@@ -28,21 +28,34 @@ export class ApprovalController extends BaseController {
       const data = req.body as AuthorizeSellerDto;
       const sellerService = SellerService.getInstance();
 
-      // Phase B-4 Step 3: Integrated with SellerService.approveSeller
-      if (data.action === AuthorizationAction.APPROVE) {
-        const seller = await sellerService.approveSeller(data.sellerId, req.user.id);
+      // Phase B-4 Step 3: Integrated with SellerService
+      let seller;
+      let message;
 
-        return BaseController.ok(res, {
-          message: 'Seller approved successfully',
-          seller
-        });
+      switch (data.action) {
+        case AuthorizationAction.APPROVE:
+          seller = await sellerService.approveSeller(data.sellerId, req.user.id);
+          message = 'Seller approved successfully';
+          break;
+        case AuthorizationAction.REJECT:
+          seller = await sellerService.rejectSeller(data.sellerId);
+          message = 'Seller rejected';
+          break;
+        case AuthorizationAction.SUSPEND:
+          seller = await sellerService.suspendSeller(data.sellerId);
+          message = 'Seller suspended';
+          break;
+        case AuthorizationAction.REACTIVATE:
+          seller = await sellerService.reactivateSeller(data.sellerId);
+          message = 'Seller reactivated';
+          break;
+        default:
+          return BaseController.error(res, `Unknown action: ${data.action}`, 400);
       }
 
-      // TODO: Implement REJECT, SUSPEND, REACTIVATE actions
       return BaseController.ok(res, {
-        message: `Seller ${data.action} action not yet implemented`,
-        sellerId: data.sellerId,
-        action: data.action
+        message,
+        seller
       });
     } catch (error: any) {
       logger.error('[ApprovalController.approveSeller] Error', {
@@ -62,21 +75,34 @@ export class ApprovalController extends BaseController {
       const data = req.body as AuthorizeSupplierDto;
       const supplierService = SupplierService.getInstance();
 
-      // Phase B-4 Step 3: Integrated with SupplierService.approveSupplier
-      if (data.action === AuthorizationAction.APPROVE) {
-        const supplier = await supplierService.approveSupplier(data.supplierId, req.user.id);
+      // Phase B-4 Step 3: Integrated with SupplierService
+      let supplier;
+      let message;
 
-        return BaseController.ok(res, {
-          message: 'Supplier approved successfully',
-          supplier
-        });
+      switch (data.action) {
+        case AuthorizationAction.APPROVE:
+          supplier = await supplierService.approveSupplier(data.supplierId, req.user.id);
+          message = 'Supplier approved successfully';
+          break;
+        case AuthorizationAction.REJECT:
+          supplier = await supplierService.rejectSupplier(data.supplierId);
+          message = 'Supplier rejected';
+          break;
+        case AuthorizationAction.SUSPEND:
+          supplier = await supplierService.suspendSupplier(data.supplierId);
+          message = 'Supplier suspended';
+          break;
+        case AuthorizationAction.REACTIVATE:
+          supplier = await supplierService.reactivateSupplier(data.supplierId);
+          message = 'Supplier reactivated';
+          break;
+        default:
+          return BaseController.error(res, `Unknown action: ${data.action}`, 400);
       }
 
-      // TODO: Implement REJECT, SUSPEND, REACTIVATE actions
       return BaseController.ok(res, {
-        message: `Supplier ${data.action} action not yet implemented`,
-        supplierId: data.supplierId,
-        action: data.action
+        message,
+        supplier
       });
     } catch (error: any) {
       logger.error('[ApprovalController.approveSupplier] Error', {

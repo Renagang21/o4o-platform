@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import api from '@/lib/api';
+import { authClient } from '@/lib/api';
 
 export default function CMSViewListDebug() {
   const [loading, setLoading] = useState(false);
@@ -19,8 +19,8 @@ export default function CMSViewListDebug() {
     setParsedData(null);
 
     try {
-      // Test 1: Direct fetch with api
-      const response = await api.get('/cms/views');
+      // Test 1: Direct fetch with authClient
+      const response = await authClient.api.get('/cms/views');
 
       setRawResponse(response.data);
 
@@ -52,7 +52,7 @@ export default function CMSViewListDebug() {
 
     try {
       const params = filter !== 'all' ? { status: filter } : {};
-      const response = await api.get('/cms/views', { params });
+      const response = await authClient.api.get('/cms/views', { params });
 
       setRawResponse(response.data);
 

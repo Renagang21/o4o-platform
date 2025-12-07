@@ -112,13 +112,23 @@ export class SellerController extends BaseController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
+      const status = req.query.status as any;
+      const search = req.query.search as string;
 
-      // TODO: Implement SellerService.list with pagination
-      return BaseController.okPaginated(res, [], {
+      const sellerService = SellerService.getInstance();
+
+      const result = await sellerService.listSellers({
+        status,
+        search,
         page,
-        limit,
-        total: 0,
-        totalPages: 0,
+        limit
+      });
+
+      return BaseController.okPaginated(res, result.sellers, {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
       });
     } catch (error: any) {
       logger.error('[SellerController.listSellers] Error', {

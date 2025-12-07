@@ -259,6 +259,152 @@ export class SellerService {
   }
 
   /**
+   * Reject Seller application
+   * Admin/Platform action to reject seller application
+   */
+  async rejectSeller(sellerId: string): Promise<Seller> {
+    try {
+      const seller = await this.sellerRepository.findOne({
+        where: { id: sellerId },
+      });
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
+      seller.reject();
+      const rejected = await this.sellerRepository.save(seller);
+
+      logger.info(`[SellerService] Seller rejected`, {
+        sellerId,
+        status: rejected.status
+      });
+
+      return rejected;
+    } catch (error: any) {
+      logger.error('[SellerService.rejectSeller] Error', {
+        error: error.message,
+        sellerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Suspend Seller
+   * Admin/Platform action to suspend seller account
+   */
+  async suspendSeller(sellerId: string): Promise<Seller> {
+    try {
+      const seller = await this.sellerRepository.findOne({
+        where: { id: sellerId },
+      });
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
+      seller.suspend();
+      const suspended = await this.sellerRepository.save(seller);
+
+      logger.info(`[SellerService] Seller suspended`, {
+        sellerId,
+        status: suspended.status
+      });
+
+      return suspended;
+    } catch (error: any) {
+      logger.error('[SellerService.suspendSeller] Error', {
+        error: error.message,
+        sellerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Reactivate Seller
+   * Admin/Platform action to reactivate suspended seller
+   */
+  async reactivateSeller(sellerId: string): Promise<Seller> {
+    try {
+      const seller = await this.sellerRepository.findOne({
+        where: { id: sellerId },
+      });
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
+      seller.reactivate();
+      const reactivated = await this.sellerRepository.save(seller);
+
+      logger.info(`[SellerService] Seller reactivated`, {
+        sellerId,
+        status: reactivated.status,
+        isActive: reactivated.isActive
+      });
+
+      return reactivated;
+    } catch (error: any) {
+      logger.error('[SellerService.reactivateSeller] Error', {
+        error: error.message,
+        sellerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * List sellers with pagination
+   * Admin/Platform action to list all sellers
+   */
+  async listSellers(filters: {
+    status?: SellerStatus;
+    page?: number;
+    limit?: number;
+    search?: string;
+  } = {}): Promise<{ sellers: Seller[]; total: number; page: number; limit: number; totalPages: number }> {
+    try {
+      const { status, page = 1, limit = 20, search } = filters;
+      const query = this.sellerRepository.createQueryBuilder('seller')
+        .leftJoinAndSelect('seller.user', 'user')
+        .leftJoinAndSelect('seller.businessInfo', 'businessInfo');
+
+      if (status) {
+        query.andWhere('seller.status = :status', { status });
+      }
+
+      if (search) {
+        query.andWhere(
+          '(user.name ILIKE :search OR user.email ILIKE :search OR seller.storeSlug ILIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+
+      query.orderBy('seller.createdAt', 'DESC');
+
+      const offset = (page - 1) * limit;
+      query.skip(offset).take(limit);
+
+      const [sellers, total] = await query.getManyAndCount();
+
+      return {
+        sellers,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error: any) {
+      logger.error('[SellerService.listSellers] Error', {
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Get supplier product catalog for sellers
    * Returns products that can be imported
    */

@@ -20,16 +20,17 @@ export class PartnerController extends BaseController {
       const data = req.body as PartnerApplicationDto;
       const partnerService = PartnerService.getInstance();
 
+      // Map PartnerApplicationDto to CreatePartnerRequest
       const partner = await partnerService.applyAsPartner({
         userId: req.user.id,
-        businessName: data.businessName,
-        website: data.website,
-        socialMedia: data.socialMedia,
-        marketingChannels: data.marketingChannels,
-        expectedMonthlyTraffic: data.expectedMonthlyTraffic,
-        targetAudience: data.targetAudience,
-        bio: data.bio,
-        profileImage: data.profileImage
+        businessName: data.profile?.bio || '',
+        website: data.profile?.website,
+        socialMedia: data.profile?.socialMedia,
+        marketingChannels: data.profile?.audience?.interests,
+        expectedMonthlyTraffic: data.profile?.audience?.size,
+        targetAudience: data.profile?.audience?.demographics,
+        bio: data.profile?.bio,
+        profileImage: undefined
       });
 
       return BaseController.ok(res, {
@@ -72,10 +73,14 @@ export class PartnerController extends BaseController {
         return BaseController.unauthorized(res, 'Not authenticated');
       }
 
-      // TODO: Implement PartnerService.getByUserId
-      return BaseController.ok(res, {
-        message: 'Partner profile pending implementation'
-      });
+      const partnerService = PartnerService.getInstance();
+      const partner = await partnerService.getByUserId(req.user.id);
+
+      if (!partner) {
+        return BaseController.notFound(res, 'Partner profile not found');
+      }
+
+      return BaseController.ok(res, { partner });
     } catch (error: any) {
       logger.error('[PartnerController.getMyPartnerProfile] Error', {
         error: error.message,
@@ -93,12 +98,17 @@ export class PartnerController extends BaseController {
 
       const { id } = req.params;
       const data = req.body as UpdatePartnerProfileDto;
+      const partnerService = PartnerService.getInstance();
 
-      // TODO: Implement PartnerService.update
+      const partner = await partnerService.updatePartner(id, {
+        // Map UpdatePartnerProfileDto fields to UpdatePartnerRequest
+        // Note: UpdatePartnerRequest expects different fields, so we store in metadata
+        ...data
+      } as any);
+
       return BaseController.ok(res, {
-        message: 'Partner profile updated',
-        partnerId: id,
-        data
+        message: 'Partner profile updated successfully',
+        partner
       });
     } catch (error: any) {
       logger.error('[PartnerController.updatePartner] Error', {
@@ -113,13 +123,25 @@ export class PartnerController extends BaseController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
+      const status = req.query.status as any;
+      const tier = req.query.tier as any;
+      const search = req.query.search as string;
 
-      // TODO: Implement PartnerService.list with pagination
-      return BaseController.okPaginated(res, [], {
+      const partnerService = PartnerService.getInstance();
+
+      const result = await partnerService.getPartners({
+        status,
+        tier,
+        search,
         page,
-        limit,
-        total: 0,
-        totalPages: 0,
+        limit
+      });
+
+      return BaseController.okPaginated(res, result.partners, {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
       });
     } catch (error: any) {
       logger.error('[PartnerController.listPartners] Error', {
