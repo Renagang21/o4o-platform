@@ -17,3 +17,6 @@ export { CosmeticsSignagePlaylist } from './signage-playlist.entity.js';
 
 // Seller Workflow Entities
 export { CosmeticsSellerWorkflowSession } from './seller-workflow-session.entity.js';
+
+// Campaign Entities
+export { CosmeticsCampaign } from './campaign.entity.js';
