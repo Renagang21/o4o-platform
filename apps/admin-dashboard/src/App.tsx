@@ -73,6 +73,7 @@ const Categories = lazy(() => import('@/pages/posts/Categories'));
 const CategoryEdit = lazy(() => import('@/pages/posts/CategoryEdit'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
+const ViewPreview = lazy(() => import('@/pages/preview/ViewPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const NavigationMenus = lazy(() => import('@/pages/menus/Menus'));
 // const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
@@ -352,6 +353,11 @@ function App() {
             <Route path="/preview/pages/:id" element={
               <Suspense fallback={<PageLoader />}>
                 <PostPreview />
+              </Suspense>
+            } />
+            <Route path="/preview/:slug" element={
+              <Suspense fallback={<PageLoader />}>
+                <ViewPreview />
               </Suspense>
             } />
             

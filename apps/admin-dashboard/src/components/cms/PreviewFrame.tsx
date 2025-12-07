@@ -12,18 +12,20 @@ interface PreviewFrameProps {
   slug: string;
   /** Callback when preview is closed */
   onClose: () => void;
-  /** Base URL for the main site (default: https://neture.co.kr) */
+  /** Base URL for preview (default: current origin for same-domain preview) */
   baseUrl?: string;
 }
 
 type ViewportMode = 'desktop' | 'mobile';
 
-export default function PreviewFrame({ slug, onClose, baseUrl = 'https://neture.co.kr' }: PreviewFrameProps) {
+export default function PreviewFrame({ slug, onClose, baseUrl }: PreviewFrameProps) {
   const [loading, setLoading] = useState(true);
   const [viewport, setViewport] = useState<ViewportMode>('desktop');
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const previewUrl = `${baseUrl}/${slug}?preview=1`;
+  // Use same origin to avoid cross-origin issues
+  const effectiveBaseUrl = baseUrl || window.location.origin;
+  const previewUrl = `${effectiveBaseUrl}/preview/${slug}?preview=1`;
 
   useEffect(() => {
     setLoading(true);
