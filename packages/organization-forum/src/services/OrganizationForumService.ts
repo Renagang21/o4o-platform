@@ -1,5 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
-import { ForumCategory } from '@o4o-apps/forum';
+import { ForumCategory } from '@o4o/forum-app';
 
 /**
  * Organization-Forum Service

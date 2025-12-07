@@ -12,6 +12,11 @@ export const forumManifest = {
   version: '1.0.0',
   description: '커뮤니티 포럼 코어 엔진 (게시글/댓글/카테고리/태그)',
 
+  // Dependencies
+  dependencies: {
+    core: ['organization-core'], // Required for organization-scoped permissions
+  },
+
   // Uninstall policy
   uninstallPolicy: {
     defaultMode: 'keep-data' as const,

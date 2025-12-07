@@ -1,6 +1,6 @@
 {
   "name": "@o4o-apps/forum-yaksa",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Forum Extension for Yaksa Organization - Drug database, case studies, and pharmacy management",
   "main": "dist/index.js",

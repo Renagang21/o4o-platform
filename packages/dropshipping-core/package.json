@@ -1,11 +1,15 @@
 {
-  "name": "@o4o-apps/forum",
+  "name": "@o4o/dropshipping-core",
   "version": "1.0.0",
   "private": true,
-  "description": "Forum app for O4O Platform - Community forum with posts, comments, categories, and tags",
-  "main": "dist/packages/forum-app/src/index.js",
-  "types": "dist/packages/forum-app/src/index.d.ts",
+  "description": "Dropshipping Core Engine for O4O Platform - Industry-neutral extensible dropshipping system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist", "src"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
@@ -19,13 +23,12 @@
     "typeorm": "^0.3.0",
     "class-validator": "^0.14.0",
     "class-transformer": "^0.5.0",
-    "react": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "@tanstack/react-query": "^5.0.0"
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/event-emitter": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/react": "^18.0.0",
     "typescript": "^5.3.0",
     "rimraf": "^5.0.0"
   }

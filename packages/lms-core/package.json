@@ -1,6 +1,6 @@
 {
   "name": "@o4o/lms-core",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "LMS (Learning Management System) Core for O4O Platform",
   "main": "dist/index.js",

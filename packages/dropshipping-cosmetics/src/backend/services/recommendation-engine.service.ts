@@ -6,7 +6,7 @@
  */
 
 import { DataSource, Repository } from 'typeorm';
-import type { Product } from '../../../../../apps/api-server/src/entities/Product.js';
+import type { Product } from '../types/product.types.js';
 import { calculateProductScore } from '../utils/recommendation-utils.js';
 
 export interface RecommendationInput {

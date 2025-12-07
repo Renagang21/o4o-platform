@@ -1,9 +1,35 @@
 import { DataSource } from 'typeorm';
-import {
-  canManageResource,
-  isSuperAdmin,
-  isOrganizationAdmin,
-} from '@o4o/organization-core';
+// TODO: Re-enable when organization-core exports these functions
+// import {
+//   canManageResource,
+//   isSuperAdmin,
+//   isOrganizationAdmin,
+// } from '@o4o/organization-core';
+
+// Temporary stub implementations until organization-core integration is complete
+async function canManageResource(
+  dataSource: DataSource,
+  userId: string,
+  permission: string,
+  resourceId: string
+): Promise<boolean> {
+  // TODO: Implement actual permission check via organization-core
+  return false;
+}
+
+async function isSuperAdmin(dataSource: DataSource, userId: string): Promise<boolean> {
+  // TODO: Implement actual admin check via organization-core
+  return false;
+}
+
+async function isOrganizationAdmin(
+  dataSource: DataSource,
+  userId: string,
+  organizationId: string
+): Promise<boolean> {
+  // TODO: Implement actual organization admin check via organization-core
+  return false;
+}
 
 /**
  * LMS Permission Helper

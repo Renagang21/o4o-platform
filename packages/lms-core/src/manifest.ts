@@ -1,12 +1,20 @@
 export const manifest = {
   id: 'lms-core',
   name: 'LMS Core',
-  version: '0.1.0',
+  version: '1.0.0',
   type: 'core',
   description: 'Learning Management System core functionality for O4O Platform',
 
   author: 'O4O Platform',
   license: 'MIT',
+
+  /**
+   * Dependencies
+   * LMS-Core requires organization-core for organization-scoped courses and permissions
+   */
+  dependencies: {
+    core: ['organization-core'],
+  },
 
   /**
    * Database Tables
@@ -37,6 +45,8 @@ export const manifest = {
    */
   lifecycle: {
     onInstall: './lifecycle/install.js',
+    onActivate: './lifecycle/activate.js',
+    onDeactivate: './lifecycle/deactivate.js',
     onUninstall: './lifecycle/uninstall.js',
   },
 

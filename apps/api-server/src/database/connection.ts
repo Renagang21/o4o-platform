@@ -146,6 +146,17 @@ import {
 import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';
 import { CosmeticsRoutine } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-routine.entity.js';
 
+// ✅ NEW: LMS-Core entities
+import {
+  Course,
+  Lesson,
+  Enrollment,
+  Progress,
+  Certificate,
+  LMSEvent,
+  Attendance,
+} from '@o4o/lms-core';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -322,6 +333,14 @@ export const AppDataSource = new DataSource({
     // ✅ NEW: Dropshipping-Cosmetics entities
     CosmeticsFilter,
     CosmeticsRoutine,
+    // ✅ NEW: LMS-Core entities
+    Course,
+    Lesson,
+    Enrollment,
+    Progress,
+    Certificate,
+    LMSEvent,
+    Attendance,
   ],
   
   // 마이그레이션 설정
