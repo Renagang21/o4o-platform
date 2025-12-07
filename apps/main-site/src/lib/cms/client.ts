@@ -95,29 +95,37 @@ export interface CMSCustomPostType {
  * Fetch a published page by slug (public endpoint, no auth required)
  */
 export async function fetchPageBySlug(slug: string): Promise<CMSPage | null> {
+  const url = `${API_BASE_URL}/api/v1/cms/public/page/${slug}`;
+  console.log(`[fetchPageBySlug] Fetching: ${url}`);
+
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/cms/public/page/${slug}`, {
+    const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
       },
     });
 
+    console.log(`[fetchPageBySlug] Response status: ${response.status}`);
+
     if (!response.ok) {
       if (response.status === 404) {
+        console.log(`[fetchPageBySlug] Page not found (404): ${slug}`);
         return null;
       }
       throw new Error(`Failed to fetch page: ${response.statusText}`);
     }
 
     const result = await response.json();
+    console.log(`[fetchPageBySlug] Response data:`, result);
 
     if (!result.success) {
+      console.log(`[fetchPageBySlug] Response not successful for ${slug}`);
       return null;
     }
 
     return result.data.page;
   } catch (error) {
-    console.error('Error fetching page:', error);
+    console.error('[fetchPageBySlug] Error fetching page:', error);
     return null;
   }
 }
@@ -126,29 +134,37 @@ export async function fetchPageBySlug(slug: string): Promise<CMSPage | null> {
  * Fetch view by slug (public endpoint for view preview)
  */
 export async function fetchViewBySlug(slug: string): Promise<{ view: CMSView; renderData?: any } | null> {
+  const url = `${API_BASE_URL}/api/v1/cms/public/view/${slug}`;
+  console.log(`[fetchViewBySlug] Fetching: ${url}`);
+
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/cms/public/view/${slug}`, {
+    const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
       },
     });
 
+    console.log(`[fetchViewBySlug] Response status: ${response.status}`);
+
     if (!response.ok) {
       if (response.status === 404) {
+        console.log(`[fetchViewBySlug] View not found (404): ${slug}`);
         return null;
       }
       throw new Error(`Failed to fetch view: ${response.statusText}`);
     }
 
     const result = await response.json();
+    console.log(`[fetchViewBySlug] Response data:`, result);
 
     if (!result.success) {
+      console.log(`[fetchViewBySlug] Response not successful for ${slug}`);
       return null;
     }
 
     return result.data;
   } catch (error) {
-    console.error('Error fetching view:', error);
+    console.error('[fetchViewBySlug] Error fetching view:', error);
     return null;
   }
 }
