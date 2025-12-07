@@ -959,6 +959,15 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
+                    {/* 설치된 앱 */}
+                    <Route path="/admin/appstore/installed" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AppStorePage defaultTab="installed" />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* Site Builder (Step 24) */}
                     <Route path="/admin/site-builder" element={
                       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>

@@ -7,6 +7,10 @@ import { adminAppsApi, AppRegistryEntry, AppCatalogItem } from '@/api/admin-apps
 
 type Tab = 'market' | 'installed';
 
+interface AppStorePageProps {
+  defaultTab?: Tab;
+}
+
 /**
  * App Store Page
  *
@@ -15,8 +19,8 @@ type Tab = 'market' | 'installed';
  * - Install/uninstall apps
  * - Activate/deactivate installed apps
  */
-const AppStorePage: FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('market');
+const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
+  const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
   const [marketApps, setMarketApps] = useState<AppCatalogItem[]>([]);
   const [installedApps, setInstalledApps] = useState<AppRegistryEntry[]>([]);
   const [loading, setLoading] = useState(true);
