@@ -43,6 +43,9 @@ import { WebSocketSessionSync } from './websocket/sessionSync.js';
 import { setupRoutes } from './config/routes.config.js';
 import { setupSwagger } from './config/swagger-enhanced.js';
 
+// Module Loader (Phase 5 — AppStore + Module Loader)
+import { moduleLoader } from './modules/module-loader.js';
+
 const app: Application = express();
 
 // IMPORTANT: Set trust proxy for nginx reverse proxy
@@ -296,7 +299,8 @@ app.use(httpMetrics.middleware());
 // ============================================================================
 // ROUTES SETUP
 // ============================================================================
-setupRoutes(app);
+// NOTE: Routes are now dynamically registered after module loading in startServer()
+// setupRoutes(app); // Commented out - replaced by dynamic module route registration
 
 // ============================================================================
 // SWAGGER DOCUMENTATION
@@ -358,6 +362,56 @@ const startServer = async () => {
     logger.info('✅ Dynamic Passport strategies initialized');
   } catch (passportError) {
     logger.error('Failed to initialize Passport strategies:', passportError);
+  }
+
+  // ============================================================================
+  // MODULE LOADER — Load and Activate Apps (Phase 5)
+  // ============================================================================
+  logger.info('📦 Loading app modules...');
+  try {
+    // 1. Scan workspace and load all app manifests
+    await moduleLoader.loadAll();
+    const loadedModules = Array.from(moduleLoader.getRegistry().keys());
+    logger.info(`✅ Loaded ${loadedModules.length} app modules: ${loadedModules.join(', ')}`);
+
+    // 2. Activate all modules (with dependency resolution)
+    let activatedCount = 0;
+    for (const moduleId of loadedModules) {
+      try {
+        await moduleLoader.activateModule(moduleId);
+        activatedCount++;
+      } catch (activationError) {
+        logger.error(`Failed to activate module ${moduleId}:`, activationError);
+      }
+    }
+    logger.info(`✅ Activated ${activatedCount}/${loadedModules.length} modules`);
+
+    // 3. Register dynamic routes from activated modules
+    const routesRegistered: string[] = [];
+    for (const moduleId of loadedModules) {
+      const router = moduleLoader.getModuleRouter(moduleId);
+      if (router) {
+        const basePath = `/api/v1/${moduleId}`;
+        app.use(basePath, router);
+        routesRegistered.push(`${basePath} → ${moduleId}`);
+      }
+    }
+    logger.info(`✅ Registered ${routesRegistered.length} dynamic routes:`);
+    routesRegistered.forEach(route => logger.info(`   - ${route}`));
+
+    // 4. Apply core routes (non-module routes)
+    setupRoutes(app);
+    logger.info('✅ Core routes registered');
+
+    // 5. Get all entities from modules (for future TypeORM integration)
+    const moduleEntities = moduleLoader.getAllEntities();
+    if (moduleEntities.length > 0) {
+      logger.info(`📊 Collected ${moduleEntities.length} entities from modules`);
+    }
+
+  } catch (moduleLoaderError) {
+    logger.error('Module Loader initialization failed:', moduleLoaderError);
+    // Continue server startup even if module loading fails
   }
 
   // Initialize Redis for session sync (if enabled)
