@@ -8,6 +8,8 @@ export { AffiliationService } from './AffiliationService.js';
 export { VerificationService } from './VerificationService.js';
 export { MembershipYearService } from './MembershipYearService.js';
 export { StatsService } from './StatsService.js';
+export { ExportService } from './ExportService.js';
+export { NotificationService } from './NotificationService.js';
 
 export type {
   CreateMemberDto,

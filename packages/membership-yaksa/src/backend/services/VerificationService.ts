@@ -1,6 +1,7 @@
 import { DataSource, Repository, In } from 'typeorm';
 import { Verification } from '../entities/Verification.js';
 import { Member } from '../entities/Member.js';
+import { NotificationService } from './NotificationService.js';
 
 export interface CreateVerificationDto {
   memberId: string;
@@ -24,10 +25,12 @@ export interface UpdateVerificationDto {
 export class VerificationService {
   private verificationRepo: Repository<Verification>;
   private memberRepo: Repository<Member>;
+  private notificationService: NotificationService;
 
   constructor(private dataSource: DataSource) {
     this.verificationRepo = dataSource.getRepository(Verification);
     this.memberRepo = dataSource.getRepository(Member);
+    this.notificationService = new NotificationService(dataSource);
   }
 
   async create(dto: CreateVerificationDto): Promise<Verification> {
@@ -82,6 +85,22 @@ export class VerificationService {
       { isVerified: true }
     );
 
+    // 알림 전송
+    try {
+      await this.notificationService.sendVerificationApproved(
+        verification.memberId,
+        {
+          verificationId: id,
+          verifierId,
+          notes,
+          approvedAt: saved.verifiedAt,
+        }
+      );
+    } catch (error) {
+      console.error('Failed to send verification approved notification:', error);
+      // 알림 실패는 무시하고 계속 진행
+    }
+
     return saved;
   }
 
@@ -92,7 +111,25 @@ export class VerificationService {
     }
 
     verification.reject(verifierId, reason);
-    return await this.verificationRepo.save(verification);
+    const saved = await this.verificationRepo.save(verification);
+
+    // 알림 전송
+    try {
+      await this.notificationService.sendVerificationRejected(
+        verification.memberId,
+        reason,
+        {
+          verificationId: id,
+          verifierId,
+          rejectedAt: new Date(),
+        }
+      );
+    } catch (error) {
+      console.error('Failed to send verification rejected notification:', error);
+      // 알림 실패는 무시하고 계속 진행
+    }
+
+    return saved;
   }
 
   async delete(id: string): Promise<void> {
