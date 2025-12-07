@@ -16,7 +16,7 @@ export class ViewController extends BaseController {
 
       const view = await service.createView(data);
 
-      return BaseController.created(res, { view });
+      return BaseController.created(res, view);
     } catch (error: any) {
       logger.error('[ViewController.createView] Error', { error: error.message });
 
@@ -45,7 +45,7 @@ export class ViewController extends BaseController {
         return BaseController.notFound(res, 'View not found');
       }
 
-      return BaseController.ok(res, { view });
+      return BaseController.ok(res, view);
     } catch (error: any) {
       logger.error('[ViewController.getView] Error', { error: error.message });
       return BaseController.error(res, error);
@@ -63,7 +63,7 @@ export class ViewController extends BaseController {
         return BaseController.notFound(res, 'View not found');
       }
 
-      return BaseController.ok(res, { view });
+      return BaseController.ok(res, view);
     } catch (error: any) {
       logger.error('[ViewController.getViewBySlug] Error', { error: error.message });
       return BaseController.error(res, error);
@@ -97,7 +97,7 @@ export class ViewController extends BaseController {
 
       const view = await service.updateView(id, data);
 
-      return BaseController.ok(res, { view });
+      return BaseController.ok(res, view);
     } catch (error: any) {
       logger.error('[ViewController.updateView] Error', { error: error.message });
 
@@ -145,7 +145,7 @@ export class ViewController extends BaseController {
 
       const view = await service.activateView(id);
 
-      return BaseController.ok(res, { view });
+      return BaseController.ok(res, view);
     } catch (error: any) {
       logger.error('[ViewController.activateView] Error', { error: error.message });
       return BaseController.error(res, error);
@@ -159,7 +159,7 @@ export class ViewController extends BaseController {
 
       const view = await service.archiveView(id);
 
-      return BaseController.ok(res, { view });
+      return BaseController.ok(res, view);
     } catch (error: any) {
       logger.error('[ViewController.archiveView] Error', { error: error.message });
       return BaseController.error(res, error);
@@ -178,7 +178,7 @@ export class ViewController extends BaseController {
       const service = ViewService.getInstance();
       const clonedView = await service.cloneView(id, slug, name);
 
-      return BaseController.created(res, { view: clonedView });
+      return BaseController.created(res, clonedView);
     } catch (error: any) {
       logger.error('[ViewController.cloneView] Error', { error: error.message });
 
@@ -203,7 +203,7 @@ export class ViewController extends BaseController {
 
       const components = await service.getComponentsInView(id);
 
-      return BaseController.ok(res, { components, total: components.length });
+      return BaseController.ok(res, components);
     } catch (error: any) {
       logger.error('[ViewController.getComponentsInView] Error', { error: error.message });
       return BaseController.error(res, error);
@@ -217,7 +217,7 @@ export class ViewController extends BaseController {
 
       const views = await service.getViewsForCPT(postTypeSlug);
 
-      return BaseController.ok(res, { views, total: views.length });
+      return BaseController.ok(res, views);
     } catch (error: any) {
       logger.error('[ViewController.getViewsForCPT] Error', { error: error.message });
       return BaseController.error(res, error);
