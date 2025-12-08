@@ -9,6 +9,7 @@ import { cosmeticsExtensionManifest } from '@o4o/dropshipping-cosmetics';
 import { selleropsManifest } from './sellerops.manifest.js';
 import { supplieropsManifest } from './supplierops.manifest.js';
 import { partneropsManifest } from './partnerops.manifest.js';
+import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
 
 /**
  * App Manifest Registry
@@ -28,6 +29,7 @@ const manifestRegistry: Record<string, AppManifest> = {
   // Organization
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
+  'membership-yaksa': membershipYaksaManifest as any,
   // Dropshipping
   'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,

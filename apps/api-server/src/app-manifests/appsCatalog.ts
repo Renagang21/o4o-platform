@@ -169,6 +169,17 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
+  {
+    appId: 'membership-yaksa',
+    name: 'Membership Extension – Yaksa Organization',
+    version: '1.0.0',
+    description: '약사회 회원 관리 시스템 - 회원정보, 자격검증, 소속관리, 연회비',
+    category: 'organization',
+    tags: ['회원', 'membership', 'yaksa', 'verification', 'license'],
+    type: 'extension',
+    dependencies: { 'organization-core': '>=1.0.0' },
+    author: 'O4O Platform',
+  },
 ];
 
 /**

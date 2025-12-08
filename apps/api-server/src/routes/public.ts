@@ -217,10 +217,10 @@ router.get('/templates/homepage', async (req, res) => {
 
     const templateRepository = AppDataSource.getRepository(Template);
     const homepageTemplate = await templateRepository.findOne({
-      where: { 
+      where: {
         type: 'page',
         name: 'homepage',
-        active: true
+        status: 'published'
       }
     });
 
@@ -340,9 +340,9 @@ router.get('/templates/:type', async (req, res) => {
     const templateRepository = AppDataSource.getRepository(Template);
     
     const template = await templateRepository.findOne({
-      where: { 
+      where: {
         type: type as 'page' | 'post' | 'product' | 'archive' | 'single',
-        active: true,
+        status: 'published',
         featured: true
       }
     });
