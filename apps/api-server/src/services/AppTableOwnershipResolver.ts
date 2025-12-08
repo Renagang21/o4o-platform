@@ -126,8 +126,9 @@ export class AppTableOwnershipResolver {
         });
       }
 
-      // Table must exist in database
-      if (!dbTables.includes(tableName)) {
+      // Table must exist in database (for extension apps only)
+      // Core apps can declare tables they will create during install
+      if (type === 'extension' && !dbTables.includes(tableName)) {
         violations.push({
           type: 'table',
           resourceName: tableName,
