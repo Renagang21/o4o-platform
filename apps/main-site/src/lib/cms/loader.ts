@@ -173,6 +173,12 @@ import {
   getCategories,
   getTags,
   type CMSPost,
+  // Forum API
+  getForumStats,
+  getForumCategories,
+  getForumPosts,
+  getForumPost,
+  getForumComments,
 } from './client';
 
 /**
@@ -281,6 +287,22 @@ export async function fetchCMSDataForBlock(
     case 'SearchBar':
       // SearchBar doesn't need data fetching
       return null;
+
+    // Forum Blocks
+    case 'ForumHome':
+      return fetchForumHomeData(resolvedProps, context);
+
+    case 'ForumPostList':
+      return fetchForumPostListData(resolvedProps, context);
+
+    case 'ForumPostDetail':
+      return fetchForumPostDetailData(resolvedProps, context);
+
+    case 'ForumCommentSection':
+      return fetchForumCommentSectionData(resolvedProps, context);
+
+    case 'ForumCategoryList':
+      return fetchForumCategoryListData(resolvedProps, context);
 
     default:
       return null;
@@ -456,5 +478,158 @@ async function fetchPaginationData(props: any, context: CMSContext) {
     totalPages,
     hasNext: currentPage < totalPages,
     hasPrev: currentPage > 1,
+  };
+}
+
+// ==================== Forum Block Data Loaders ====================
+
+/**
+ * Fetch data for ForumHome block
+ */
+async function fetchForumHomeData(props: any, _context: CMSContext) {
+  const {
+    showStats = true,
+    showCategories = true,
+    showPinnedPosts = true,
+    showRecentPosts = true,
+    recentPostsLimit = 10,
+  } = props;
+
+  const [stats, categories, pinnedPosts, recentPosts] = await Promise.all([
+    showStats ? getForumStats() : Promise.resolve(null),
+    showCategories ? getForumCategories() : Promise.resolve([]),
+    showPinnedPosts
+      ? getForumPosts({ isPinned: true, limit: 5 })
+      : Promise.resolve({ posts: [], total: 0, hasMore: false }),
+    showRecentPosts
+      ? getForumPosts({ sortBy: 'newest', limit: recentPostsLimit })
+      : Promise.resolve({ posts: [], total: 0, hasMore: false }),
+  ]);
+
+  return {
+    stats,
+    categories,
+    pinnedPosts: pinnedPosts.posts,
+    recentPosts: recentPosts.posts,
+  };
+}
+
+/**
+ * Fetch data for ForumPostList block
+ */
+async function fetchForumPostListData(props: any, context: CMSContext) {
+  const {
+    categoryId,
+    categorySlug,
+    sortBy = 'newest',
+    postsPerPage = 10,
+    showPinnedFirst = true,
+  } = props;
+
+  let pinnedPosts: any[] = [];
+
+  // Fetch pinned posts separately if needed
+  if (showPinnedFirst && context.page === 1) {
+    const pinned = await getForumPosts({
+      categoryId,
+      categorySlug,
+      isPinned: true,
+      limit: 5,
+    });
+    pinnedPosts = pinned.posts;
+  }
+
+  // Fetch regular posts
+  const result = await getForumPosts({
+    categoryId,
+    categorySlug,
+    sortBy,
+    limit: postsPerPage,
+    page: context.page || 1,
+  });
+
+  return {
+    posts: result.posts,
+    pinnedPosts,
+    pagination: {
+      currentPage: context.page || 1,
+      totalPosts: result.total,
+      hasMore: result.hasMore,
+    },
+  };
+}
+
+/**
+ * Fetch data for ForumPostDetail block
+ */
+async function fetchForumPostDetailData(props: any, context: CMSContext) {
+  const { postId, showRelatedPosts = true, relatedPostsLimit = 5 } = props;
+
+  // Use postId from props or currentSlug from context
+  const id = postId || context.currentSlug;
+
+  if (!id) {
+    return { post: null, relatedPosts: [] };
+  }
+
+  const post = await getForumPost(id);
+
+  if (!post) {
+    return { post: null, relatedPosts: [] };
+  }
+
+  // Fetch related posts from same category
+  let relatedPosts: any[] = [];
+  if (showRelatedPosts && post.categoryId) {
+    const related = await getForumPosts({
+      categoryId: post.categoryId,
+      sortBy: 'popular',
+      limit: relatedPostsLimit + 1, // +1 to filter out current post
+    });
+    relatedPosts = related.posts
+      .filter((p) => p.id !== post.id)
+      .slice(0, relatedPostsLimit);
+  }
+
+  return {
+    post,
+    relatedPosts,
+  };
+}
+
+/**
+ * Fetch data for ForumCommentSection block
+ */
+async function fetchForumCommentSectionData(props: any, context: CMSContext) {
+  const { postId, sortBy = 'newest', commentsPerPage = 20 } = props;
+
+  // Use postId from props or currentSlug from context
+  const id = postId || context.currentSlug;
+
+  if (!id) {
+    return { comments: [], totalCount: 0, hasMore: false };
+  }
+
+  const result = await getForumComments(id, {
+    sortBy,
+    limit: commentsPerPage,
+    page: context.page || 1,
+  });
+
+  return {
+    comments: result.comments,
+    totalCount: result.total,
+    hasMore: result.hasMore,
+  };
+}
+
+/**
+ * Fetch data for ForumCategoryList block
+ */
+async function fetchForumCategoryListData(_props: any, _context: CMSContext) {
+  const categories = await getForumCategories();
+
+  return {
+    categories,
   };
 }

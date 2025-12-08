@@ -63,6 +63,14 @@ import {
   SearchBarBlock,
 } from './cms';
 
+import {
+  ForumHomeBlock,
+  ForumPostListBlock,
+  ForumPostDetailBlock,
+  ForumCommentSectionBlock,
+  ForumCategoryListBlock,
+} from './forum';
+
 // Placeholder for unimplemented blocks
 const PlaceholderBlock = ({ node, children }: BlockRendererProps) => {
   return (
@@ -127,6 +135,13 @@ export const BlockRegistry: Record<string, BlockRenderer> = {
   Breadcrumb: BreadcrumbBlock,
   Pagination: PaginationBlock,
   SearchBar: SearchBarBlock,
+
+  // Forum Blocks (5)
+  ForumHome: ForumHomeBlock,
+  ForumPostList: ForumPostListBlock,
+  ForumPostDetail: ForumPostDetailBlock,
+  ForumCommentSection: ForumCommentSectionBlock,
+  ForumCategoryList: ForumCategoryListBlock,
 };
 
 export const getBlockRenderer = (type: string): BlockRenderer => {

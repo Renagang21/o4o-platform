@@ -62,6 +62,14 @@ import {
   ModalSchema,
 } from '../blocks/additional';
 
+import {
+  ForumHomeSchema,
+  ForumPostListSchema,
+  ForumPostDetailSchema,
+  ForumCommentSectionSchema,
+  ForumCategoryListSchema,
+} from '../blocks/forum';
+
 export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   // New Basic Blocks
   TextSchema,
@@ -98,6 +106,13 @@ export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   BreadcrumbSchema,
   PaginationSchema,
   SearchBarSchema,
+
+  // Forum Blocks (5 total)
+  ForumHomeSchema,
+  ForumPostListSchema,
+  ForumPostDetailSchema,
+  ForumCommentSectionSchema,
+  ForumCategoryListSchema,
 
   // New Additional Blocks (12 total)
   // Basic/Utility (5)

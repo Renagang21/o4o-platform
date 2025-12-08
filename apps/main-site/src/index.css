@@ -2,6 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =============================================
+   CMS Theme Tokens - Forum Module
+   =============================================
+   These CSS variables can be overridden by CMS Theme System
+   via ViewSchema.styles.variables
+*/
+@layer base {
+  :root {
+    /* Forum - Primary Colors */
+    --forum-primary: #3b82f6;
+    --forum-primary-hover: #2563eb;
+    --forum-primary-light: #eff6ff;
+
+    /* Forum - Accent Colors */
+    --forum-accent: #10b981;
+    --forum-accent-hover: #059669;
+    --forum-warning: #f59e0b;
+    --forum-danger: #ef4444;
+
+    /* Forum - Text Colors */
+    --forum-text-primary: #111827;
+    --forum-text-secondary: #6b7280;
+    --forum-text-muted: #9ca3af;
+    --forum-text-link: var(--forum-primary);
+    --forum-text-link-hover: var(--forum-primary-hover);
+
+    /* Forum - Background Colors */
+    --forum-bg-primary: #ffffff;
+    --forum-bg-secondary: #f9fafb;
+    --forum-bg-tertiary: #f3f4f6;
+    --forum-bg-highlight: var(--forum-primary-light);
+
+    /* Forum - Border Colors */
+    --forum-border-light: #e5e7eb;
+    --forum-border-medium: #d1d5db;
+    --forum-border-dark: #9ca3af;
+
+    /* Forum - Badge Colors */
+    --forum-badge-pinned-bg: #fef2f2;
+    --forum-badge-pinned-text: #991b1b;
+    --forum-badge-locked-bg: #f3f4f6;
+    --forum-badge-locked-text: #374151;
+    --forum-badge-new-bg: #dcfce7;
+    --forum-badge-new-text: #166534;
+
+    /* Forum - Stats Colors */
+    --forum-stat-posts-bg: #dbeafe;
+    --forum-stat-posts-text: #1e40af;
+    --forum-stat-comments-bg: #dcfce7;
+    --forum-stat-comments-text: #166534;
+    --forum-stat-users-bg: #fef3c7;
+    --forum-stat-users-text: #b45309;
+
+    /* Forum - Interaction Colors */
+    --forum-like-active: #ef4444;
+    --forum-like-inactive: #9ca3af;
+    --forum-bookmark-active: #eab308;
+    --forum-bookmark-inactive: #9ca3af;
+
+    /* Forum - Shadow */
+    --forum-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --forum-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --forum-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    /* Forum - Border Radius */
+    --forum-radius-sm: 0.25rem;
+    --forum-radius-md: 0.5rem;
+    --forum-radius-lg: 0.75rem;
+    --forum-radius-full: 9999px;
+
+    /* Forum - Spacing */
+    --forum-spacing-xs: 0.25rem;
+    --forum-spacing-sm: 0.5rem;
+    --forum-spacing-md: 1rem;
+    --forum-spacing-lg: 1.5rem;
+    --forum-spacing-xl: 2rem;
+  }
+
+  /* Dark mode support - can be enabled via CMS theme */
+  .dark-theme {
+    --forum-primary: #60a5fa;
+    --forum-primary-hover: #93c5fd;
+    --forum-primary-light: #1e3a5f;
+
+    --forum-text-primary: #f9fafb;
+    --forum-text-secondary: #d1d5db;
+    --forum-text-muted: #9ca3af;
+
+    --forum-bg-primary: #111827;
+    --forum-bg-secondary: #1f2937;
+    --forum-bg-tertiary: #374151;
+
+    --forum-border-light: #374151;
+    --forum-border-medium: #4b5563;
+    --forum-border-dark: #6b7280;
+
+    --forum-badge-pinned-bg: #7f1d1d;
+    --forum-badge-pinned-text: #fecaca;
+    --forum-badge-locked-bg: #374151;
+    --forum-badge-locked-text: #d1d5db;
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

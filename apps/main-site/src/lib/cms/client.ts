@@ -514,3 +514,287 @@ export async function searchPosts(query: string, options: Partial<GetPostsOption
     return [];
   }
 }
+
+// ==================== Forum API Client ====================
+
+export interface ForumStats {
+  totalPosts: number;
+  totalComments: number;
+  totalCategories: number;
+  activeUsers?: number;
+  postsToday?: number;
+}
+
+export interface ForumCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  postCount: number;
+  icon?: string;
+  color?: string;
+  order: number;
+  parentId?: string;
+  children?: ForumCategory[];
+}
+
+export interface ForumAuthor {
+  id: string;
+  name: string;
+  avatar?: string;
+  bio?: string;
+  postCount?: number;
+}
+
+export interface ForumPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: any[];
+  excerpt?: string;
+  authorId: string;
+  author?: ForumAuthor;
+  categoryId: string;
+  categoryName?: string;
+  isPinned: boolean;
+  isLocked: boolean;
+  viewCount: number;
+  commentCount: number;
+  likeCount: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+  createdAt: string;
+  publishedAt?: string;
+  updatedAt: string;
+  tags?: string[];
+}
+
+export interface ForumComment {
+  id: string;
+  content: any[];
+  authorId: string;
+  authorName?: string;
+  authorAvatar?: string;
+  postId: string;
+  parentId?: string;
+  createdAt: string;
+  updatedAt: string;
+  likeCount: number;
+  isLiked?: boolean;
+  isDeleted?: boolean;
+  replies?: ForumComment[];
+}
+
+export interface GetForumPostsOptions {
+  categoryId?: string;
+  categorySlug?: string;
+  authorId?: string;
+  tag?: string;
+  search?: string;
+  sortBy?: 'newest' | 'oldest' | 'popular' | 'commented';
+  isPinned?: boolean;
+  limit?: number;
+  page?: number;
+}
+
+/**
+ * Fetch forum statistics
+ */
+export async function getForumStats(): Promise<ForumStats> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/stats`, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new CMSClientError(`Failed to fetch forum stats: ${response.statusText}`, response.status);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return { totalPosts: 0, totalComments: 0, totalCategories: 0 };
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching forum stats:', error);
+    return { totalPosts: 0, totalComments: 0, totalCategories: 0 };
+  }
+}
+
+/**
+ * Fetch forum categories
+ */
+export async function getForumCategories(): Promise<ForumCategory[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories`, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new CMSClientError(`Failed to fetch forum categories: ${response.statusText}`, response.status);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return [];
+    }
+
+    return result.data.categories || result.data || [];
+  } catch (error) {
+    console.error('Error fetching forum categories:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch a single forum category by ID or slug
+ */
+export async function getForumCategory(idOrSlug: string): Promise<ForumCategory | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories/${idOrSlug}`, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new CMSClientError(`Failed to fetch forum category: ${response.statusText}`, response.status);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return null;
+    }
+
+    return result.data.category || result.data;
+  } catch (error) {
+    console.error('Error fetching forum category:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch forum posts with filtering
+ */
+export async function getForumPosts(options: GetForumPostsOptions = {}): Promise<{ posts: ForumPost[]; total: number; hasMore: boolean }> {
+  const {
+    categoryId,
+    categorySlug,
+    authorId,
+    tag,
+    search,
+    sortBy = 'newest',
+    isPinned,
+    limit = 10,
+    page = 1,
+  } = options;
+
+  try {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      page: String(page),
+      sortBy,
+    });
+
+    if (categoryId) params.append('categoryId', categoryId);
+    if (categorySlug) params.append('categorySlug', categorySlug);
+    if (authorId) params.append('authorId', authorId);
+    if (tag) params.append('tag', tag);
+    if (search) params.append('search', search);
+    if (isPinned !== undefined) params.append('isPinned', String(isPinned));
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${params}`, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new CMSClientError(`Failed to fetch forum posts: ${response.statusText}`, response.status);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return { posts: [], total: 0, hasMore: false };
+    }
+
+    return {
+      posts: result.data.posts || result.data || [],
+      total: result.data.total || 0,
+      hasMore: result.data.hasMore ?? false,
+    };
+  } catch (error) {
+    console.error('Error fetching forum posts:', error);
+    return { posts: [], total: 0, hasMore: false };
+  }
+}
+
+/**
+ * Fetch a single forum post by ID or slug
+ */
+export async function getForumPost(idOrSlug: string): Promise<ForumPost | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${idOrSlug}`, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new CMSClientError(`Failed to fetch forum post: ${response.statusText}`, response.status);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return null;
+    }
+
+    return result.data.post || result.data;
+  } catch (error) {
+    console.error('Error fetching forum post:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch comments for a forum post
+ */
+export async function getForumComments(
+  postId: string,
+  options: { sortBy?: 'newest' | 'oldest' | 'popular'; limit?: number; page?: number } = {}
+): Promise<{ comments: ForumComment[]; total: number; hasMore: boolean }> {
+  const { sortBy = 'newest', limit = 20, page = 1 } = options;
+
+  try {
+    const params = new URLSearchParams({
+      sortBy,
+      limit: String(limit),
+      page: String(page),
+    });
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/comments?${params}`, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new CMSClientError(`Failed to fetch comments: ${response.statusText}`, response.status);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return { comments: [], total: 0, hasMore: false };
+    }
+
+    return {
+      comments: result.data.comments || result.data || [],
+      total: result.data.total || 0,
+      hasMore: result.data.hasMore ?? false,
+    };
+  } catch (error) {
+    console.error('Error fetching forum comments:', error);
+    return { comments: [], total: 0, hasMore: false };
+  }
+}

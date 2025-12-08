@@ -17,6 +17,7 @@ interface CMSBlockWrapperProps {
 }
 
 const CMS_BLOCK_TYPES = [
+  // CMS Blocks
   'CPTList',
   'CPTItem',
   'CategoryList',
@@ -26,6 +27,12 @@ const CMS_BLOCK_TYPES = [
   'Breadcrumb',
   'Pagination',
   'SearchBar',
+  // Forum Blocks
+  'ForumHome',
+  'ForumPostList',
+  'ForumPostDetail',
+  'ForumCommentSection',
+  'ForumCategoryList',
 ];
 
 /**
