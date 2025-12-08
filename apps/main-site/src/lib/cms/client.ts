@@ -1020,3 +1020,300 @@ export async function getForumComments(
     return { comments: [], total: 0, hasMore: false };
   }
 }
+
+// ==========================================
+// Cosmetics Analytics & Engagement API
+// ==========================================
+
+export interface CosmeticsTrendingPost extends CosmeticsForumPost {
+  trendingScore: number;
+  viewsLast24h: number;
+  growthRate: number;
+}
+
+export interface CosmeticsPopularPost extends CosmeticsForumPost {
+  popularityScore: number;
+  totalEngagement: number;
+}
+
+export interface CosmeticsPersonalizedPost extends CosmeticsForumPost {
+  relevanceScore: number;
+  matchReason: 'skinType' | 'concerns' | 'brand' | 'history' | 'popular';
+}
+
+export interface UserPreferences {
+  skinType?: string;
+  concerns?: string[];
+  preferredBrands?: string[];
+  viewedPosts?: string[];
+}
+
+/**
+ * Get trending cosmetics forum posts
+ * Returns posts with high engagement growth in recent time period
+ */
+export async function getCosmeticsTrendingPosts(
+  options: { limit?: number; period?: '24h' | '7d' | '30d' } = {}
+): Promise<CosmeticsTrendingPost[]> {
+  const { limit = 10, period = '24h' } = options;
+
+  try {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      period,
+    });
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/cosmetics/forum/posts/trending?${params}`,
+      { headers: { Accept: 'application/json' } }
+    );
+
+    if (!response.ok) {
+      // Fallback: Get posts sorted by view count as trending proxy
+      const fallback = await getCosmeticsForumPosts({ sortBy: 'popular', limit });
+      return fallback.posts.map((post) => ({
+        ...post,
+        trendingScore: post.viewCount * 0.1,
+        viewsLast24h: Math.floor(post.viewCount * 0.1),
+        growthRate: 0,
+      }));
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return [];
+    }
+
+    return result.data || [];
+  } catch (error) {
+    console.error('Error fetching trending posts:', error);
+    // Fallback to popular posts
+    try {
+      const fallback = await getCosmeticsForumPosts({ sortBy: 'popular', limit });
+      return fallback.posts.map((post) => ({
+        ...post,
+        trendingScore: post.viewCount * 0.1,
+        viewsLast24h: Math.floor(post.viewCount * 0.1),
+        growthRate: 0,
+      }));
+    } catch {
+      return [];
+    }
+  }
+}
+
+/**
+ * Get popular cosmetics forum posts
+ * Returns posts with highest overall engagement
+ */
+export async function getCosmeticsPopularPosts(
+  options: { limit?: number; categorySlug?: string } = {}
+): Promise<CosmeticsPopularPost[]> {
+  const { limit = 10, categorySlug } = options;
+
+  try {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (categorySlug) params.set('categorySlug', categorySlug);
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/cosmetics/forum/posts/popular?${params}`,
+      { headers: { Accept: 'application/json' } }
+    );
+
+    if (!response.ok) {
+      // Fallback: Calculate popularity from existing data
+      const fallback = await getCosmeticsForumPosts({
+        categorySlug,
+        sortBy: 'popular',
+        limit,
+      });
+      return fallback.posts.map((post) => ({
+        ...post,
+        popularityScore: post.viewCount + post.likeCount * 5 + post.commentCount * 3,
+        totalEngagement: post.viewCount + post.likeCount + post.commentCount,
+      }));
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return [];
+    }
+
+    return result.data || [];
+  } catch (error) {
+    console.error('Error fetching popular posts:', error);
+    // Fallback
+    try {
+      const fallback = await getCosmeticsForumPosts({
+        categorySlug,
+        sortBy: 'popular',
+        limit,
+      });
+      return fallback.posts.map((post) => ({
+        ...post,
+        popularityScore: post.viewCount + post.likeCount * 5 + post.commentCount * 3,
+        totalEngagement: post.viewCount + post.likeCount + post.commentCount,
+      }));
+    } catch {
+      return [];
+    }
+  }
+}
+
+/**
+ * Get personalized cosmetics forum posts
+ * Returns posts based on user preferences and behavior
+ */
+export async function getCosmeticsPersonalizedPosts(
+  preferences: UserPreferences,
+  options: { limit?: number } = {}
+): Promise<CosmeticsPersonalizedPost[]> {
+  const { limit = 10 } = options;
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/cosmetics/forum/posts/personalized`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ preferences, limit }),
+      }
+    );
+
+    if (!response.ok) {
+      // Fallback: Filter by user preferences client-side
+      return await getPersonalizedFallback(preferences, limit);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return await getPersonalizedFallback(preferences, limit);
+    }
+
+    return result.data || [];
+  } catch (error) {
+    console.error('Error fetching personalized posts:', error);
+    return await getPersonalizedFallback(preferences, limit);
+  }
+}
+
+/**
+ * Fallback personalization using client-side filtering
+ */
+async function getPersonalizedFallback(
+  preferences: UserPreferences,
+  limit: number
+): Promise<CosmeticsPersonalizedPost[]> {
+  try {
+    const posts = await getCosmeticsForumPosts({
+      skinType: preferences.skinType,
+      concerns: preferences.concerns,
+      sortBy: 'popular',
+      limit: limit * 2, // Get more to filter
+    });
+
+    // Score posts based on matching criteria
+    const scored = posts.posts.map((post) => {
+      const cosmetics = post.cosmeticsMetadata || {};
+      let score = 0;
+      let reason: CosmeticsPersonalizedPost['matchReason'] = 'popular';
+
+      // Skin type match
+      if (preferences.skinType && cosmetics.skinType === preferences.skinType) {
+        score += 30;
+        reason = 'skinType';
+      }
+
+      // Concerns match
+      if (preferences.concerns && cosmetics.concerns) {
+        const matches = preferences.concerns.filter((c) =>
+          cosmetics.concerns?.includes(c)
+        ).length;
+        if (matches > 0) {
+          score += matches * 20;
+          if (score < 30) reason = 'concerns';
+        }
+      }
+
+      // Brand preference match
+      if (preferences.preferredBrands && cosmetics.brand) {
+        if (preferences.preferredBrands.includes(cosmetics.brand)) {
+          score += 15;
+          if (score < 30) reason = 'brand';
+        }
+      }
+
+      // Base popularity score
+      score += Math.min(post.viewCount / 100, 10);
+
+      return {
+        ...post,
+        relevanceScore: score,
+        matchReason: reason,
+      };
+    });
+
+    // Sort by relevance and return top N
+    return scored
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Get forum analytics summary for a category or overall
+ */
+export interface ForumAnalyticsSummary {
+  totalPosts: number;
+  totalViews: number;
+  totalComments: number;
+  totalLikes: number;
+  activeUsers: number;
+  topSkinTypes: { skinType: string; count: number }[];
+  topConcerns: { concern: string; count: number }[];
+  topBrands: { brand: string; count: number }[];
+  growthRate: {
+    posts: number;
+    views: number;
+    engagement: number;
+  };
+}
+
+export async function getCosmeticsAnalyticsSummary(
+  options: { categorySlug?: string; period?: '7d' | '30d' | '90d' } = {}
+): Promise<ForumAnalyticsSummary | null> {
+  const { categorySlug, period = '30d' } = options;
+
+  try {
+    const params = new URLSearchParams({ period });
+    if (categorySlug) params.set('categorySlug', categorySlug);
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/cosmetics/forum/analytics/summary?${params}`,
+      { headers: { Accept: 'application/json' } }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return null;
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching analytics summary:', error);
+    return null;
+  }
+}

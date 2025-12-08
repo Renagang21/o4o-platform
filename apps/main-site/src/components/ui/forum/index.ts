@@ -23,5 +23,10 @@ export {
 } from './CosmeticsRecommendedPosts';
 export { CosmeticsSEO, CosmeticsBreadcrumb } from './CosmeticsSEO';
 
+// Cosmetics Analytics & Engagement Widgets
+export { CosmeticsTrendingPosts } from './CosmeticsTrendingPosts';
+export { CosmeticsPopularPosts } from './CosmeticsPopularPosts';
+export { CosmeticsPersonalizedFeed } from './CosmeticsPersonalizedFeed';
+
 // Utils
 export * from './utils';
