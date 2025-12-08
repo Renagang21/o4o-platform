@@ -63,7 +63,7 @@ export class CosmeticsForumService {
     // Filter by skin type
     if (filter.skinType) {
       queryBuilder.andWhere(
-        "post.metadata->'cosmetics'->>'skinType' = :skinType",
+        "post.metadata->'extensions'->'neture'->>'skinType' = :skinType",
         { skinType: filter.skinType }
       );
     }
@@ -72,7 +72,7 @@ export class CosmeticsForumService {
     if (filter.concerns && filter.concerns.length > 0) {
       filter.concerns.forEach((concern, index) => {
         queryBuilder.andWhere(
-          `post.metadata->'cosmetics'->'concerns' ? :concern${index}`,
+          `post.metadata->'extensions'->'neture'->'concerns' ? :concern${index}`,
           { [`concern${index}`]: concern }
         );
       });
@@ -81,7 +81,7 @@ export class CosmeticsForumService {
     // Filter by product ID (array contains)
     if (filter.productId) {
       queryBuilder.andWhere(
-        "post.metadata->'cosmetics'->'productIds' ? :productId",
+        "post.metadata->'extensions'->'neture'->'productIds' ? :productId",
         { productId: filter.productId }
       );
     }
@@ -124,13 +124,15 @@ export class CosmeticsForumService {
       status: 'publish' as any,
       slug,
       metadata: {
-        cosmetics: data.cosmeticsMeta || {},
+        extensions: {
+          neture: data.cosmeticsMeta || {},
+        },
       },
       publishedAt: new Date() as any,
-    });
+    } as any);
 
     const savedPost = await this.forumPostRepository.save(post);
-    return savedPost;
+    return savedPost as ForumPost;
   }
 
   /**
@@ -147,7 +149,7 @@ export class CosmeticsForumService {
       .createQueryBuilder('post')
       .where("post.status = :status", { status: 'publish' })
       .andWhere(
-        "post.metadata->'cosmetics'->'productIds' ? :productId",
+        "post.metadata->'extensions'->'neture'->'productIds' ? :productId",
         { productId }
       )
       .orderBy('post.createdAt', 'DESC')
@@ -155,7 +157,7 @@ export class CosmeticsForumService {
       .take(limit)
       .getMany();
 
-    return posts;
+    return posts as ForumPost[];
   }
 
   /**
@@ -178,16 +180,20 @@ export class CosmeticsForumService {
     if (data.tags) post.tags = data.tags;
 
     if (data.cosmeticsMeta) {
+      const currentMeta = post.metadata as any || {};
       post.metadata = {
-        ...post.metadata,
-        cosmetics: {
-          ...(post.metadata as any)?.cosmetics,
-          ...data.cosmeticsMeta,
+        ...currentMeta,
+        extensions: {
+          ...(currentMeta?.extensions || {}),
+          neture: {
+            ...(currentMeta?.extensions?.neture || {}),
+            ...data.cosmeticsMeta,
+          },
         },
-      };
+      } as any;
     }
 
-    return await this.forumPostRepository.save(post);
+    return await this.forumPostRepository.save(post) as ForumPost;
   }
 
   /**
