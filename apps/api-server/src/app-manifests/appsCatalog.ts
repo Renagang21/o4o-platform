@@ -95,6 +95,14 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'integration',
     author: 'O4O Platform',
   },
+  {
+    appId: 'sellerops',
+    name: 'SellerOps',
+    version: '1.0.0',
+    description: '범용 판매자 운영 앱 - 공급자 승인, 리스팅 관리, 주문 추적, 정산 대시보드',
+    category: 'commerce',
+    author: 'O4O Platform',
+  },
 ];
 
 /**

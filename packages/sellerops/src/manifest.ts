@@ -16,8 +16,13 @@ export const manifest = {
   license: 'MIT',
 
   /**
-   * Dependencies
+   * Dependencies (Module Loader format)
    * SellerOps requires dropshipping-core as its foundation
+   */
+  dependsOn: ['dropshipping-core'],
+
+  /**
+   * Dependencies (detailed format for documentation)
    */
   dependencies: {
     core: ['dropshipping-core'],
