@@ -146,6 +146,12 @@ import {
 import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';
 import { CosmeticsRoutine } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-routine.entity.js';
 
+// ✅ NEW: Organization-Core entities
+import {
+  Organization,
+  OrganizationMember,
+} from '@o4o/organization-core';
+
 // ✅ NEW: LMS-Core entities
 import {
   Course,
@@ -333,6 +339,9 @@ export const AppDataSource = new DataSource({
     // ✅ NEW: Dropshipping-Cosmetics entities
     CosmeticsFilter,
     CosmeticsRoutine,
+    // ✅ NEW: Organization-Core entities
+    Organization,
+    OrganizationMember,
     // ✅ NEW: LMS-Core entities
     Course,
     Lesson,
