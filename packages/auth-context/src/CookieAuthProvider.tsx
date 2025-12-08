@@ -11,6 +11,7 @@ interface CookieAuthContextType {
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  clearError: () => void;
   isAuthenticated: boolean;
   hasRole: (role: string | string[]) => boolean;
   hasPermission: (permission: string) => boolean;
@@ -213,6 +214,11 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
     return user.permissions?.includes(permission) || false;
   }, [user]);
 
+  // Clear error message
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   const value: CookieAuthContextType = {
     user,
     loading,
@@ -222,6 +228,7 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
     logout,
     logoutAll,
     checkAuth,
+    clearError,
     isAuthenticated: !!user,
     hasRole,
     hasPermission,
