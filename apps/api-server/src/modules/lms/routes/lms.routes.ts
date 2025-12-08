@@ -3,6 +3,9 @@ import { CourseController } from '../controllers/CourseController.js';
 import { LessonController } from '../controllers/LessonController.js';
 import { EnrollmentController } from '../controllers/EnrollmentController.js';
 import { ProgressController } from '../controllers/ProgressController.js';
+import { CertificateController } from '../controllers/CertificateController.js';
+import { EventController } from '../controllers/EventController.js';
+import { AttendanceController } from '../controllers/AttendanceController.js';
 import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
@@ -112,15 +115,84 @@ router.post('/progress/:id/complete', requireAuth, asyncHandler(ProgressControll
 router.post('/progress/:id/submit-quiz', requireAuth, asyncHandler(ProgressController.submitQuiz));
 
 // ========================================
-// CERTIFICATE ROUTES (TODO)
+// CERTIFICATE ROUTES
 // ========================================
 
-// ========================================
-// EVENTS ROUTES (TODO)
-// ========================================
+// POST /api/v1/lms/certificates/issue - Issue Certificate
+router.post('/certificates/issue', requireAuth, asyncHandler(CertificateController.issueCertificate));
+
+// GET /api/v1/lms/certificates - List Certificates
+router.get('/certificates', requireAuth, asyncHandler(CertificateController.listCertificates));
+
+// GET /api/v1/lms/certificates/me - Get My Certificates
+router.get('/certificates/me', requireAuth, asyncHandler(CertificateController.getMyCertificates));
+
+// GET /api/v1/lms/certificates/verify/:verificationCode - Verify Certificate (Public)
+router.get('/certificates/verify/:verificationCode', asyncHandler(CertificateController.verifyCertificate));
+
+// GET /api/v1/lms/certificates/number/:certificateNumber - Get Certificate by Number
+router.get('/certificates/number/:certificateNumber', requireAuth, asyncHandler(CertificateController.getCertificateByNumber));
+
+// GET /api/v1/lms/certificates/:id - Get Certificate by ID
+router.get('/certificates/:id', requireAuth, asyncHandler(CertificateController.getCertificate));
+
+// PATCH /api/v1/lms/certificates/:id - Update Certificate
+router.patch('/certificates/:id', requireAuth, asyncHandler(CertificateController.updateCertificate));
+
+// POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
+router.post('/certificates/:id/revoke', requireAuth, asyncHandler(CertificateController.revokeCertificate));
+
+// POST /api/v1/lms/certificates/:id/renew - Renew Certificate
+router.post('/certificates/:id/renew', requireAuth, asyncHandler(CertificateController.renewCertificate));
 
 // ========================================
-// ATTENDANCE ROUTES (TODO)
+// EVENTS ROUTES
 // ========================================
+
+// POST /api/v1/lms/events - Create Event
+router.post('/events', requireAuth, asyncHandler(EventController.createEvent));
+
+// GET /api/v1/lms/events - List Events
+router.get('/events', requireAuth, asyncHandler(EventController.listEvents));
+
+// GET /api/v1/lms/events/:id - Get Event by ID
+router.get('/events/:id', requireAuth, asyncHandler(EventController.getEvent));
+
+// PATCH /api/v1/lms/events/:id - Update Event
+router.patch('/events/:id', requireAuth, asyncHandler(EventController.updateEvent));
+
+// DELETE /api/v1/lms/events/:id - Delete Event
+router.delete('/events/:id', requireAuth, asyncHandler(EventController.deleteEvent));
+
+// POST /api/v1/lms/events/:id/start - Start Event
+router.post('/events/:id/start', requireAuth, asyncHandler(EventController.startEvent));
+
+// POST /api/v1/lms/events/:id/complete - Complete Event
+router.post('/events/:id/complete', requireAuth, asyncHandler(EventController.completeEvent));
+
+// POST /api/v1/lms/events/:id/cancel - Cancel Event
+router.post('/events/:id/cancel', requireAuth, asyncHandler(EventController.cancelEvent));
+
+// ========================================
+// ATTENDANCE ROUTES
+// ========================================
+
+// POST /api/v1/lms/attendance/checkin - Check In
+router.post('/attendance/checkin', requireAuth, asyncHandler(AttendanceController.checkIn));
+
+// POST /api/v1/lms/events/:eventId/attendance - Mark Attendance (Manual)
+router.post('/events/:eventId/attendance', requireAuth, asyncHandler(AttendanceController.markAttendance));
+
+// GET /api/v1/lms/attendance - List Attendance
+router.get('/attendance', requireAuth, asyncHandler(AttendanceController.listAttendance));
+
+// GET /api/v1/lms/events/:eventId/attendance - List Attendance by Event
+router.get('/events/:eventId/attendance', requireAuth, asyncHandler(AttendanceController.listAttendanceByEvent));
+
+// GET /api/v1/lms/attendance/:id - Get Attendance by ID
+router.get('/attendance/:id', requireAuth, asyncHandler(AttendanceController.getAttendance));
+
+// PATCH /api/v1/lms/attendance/:id - Update Attendance
+router.patch('/attendance/:id', requireAuth, asyncHandler(AttendanceController.updateAttendance));
 
 export default router;
