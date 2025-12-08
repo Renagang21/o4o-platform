@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import logger from '../utils/logger.js';
 
 /**
  * Migration: Template Status Enum
@@ -15,7 +16,7 @@ export class TemplateStatusEnum1860000000000 implements MigrationInterface {
     // Check if templates table exists
     const tableExists = await queryRunner.hasTable('templates');
     if (!tableExists) {
-      console.log('templates table does not exist, skipping migration');
+      logger.info('[Migration] templates table does not exist, skipping migration');
       return;
     }
 
@@ -24,10 +25,10 @@ export class TemplateStatusEnum1860000000000 implements MigrationInterface {
     const activeColumn = table?.columns.find((col) => col.name === 'active');
 
     if (!activeColumn) {
-      console.log('active column does not exist, checking for status column');
+      logger.info('[Migration] active column does not exist, checking for status column');
       const statusColumn = table?.columns.find((col) => col.name === 'status');
       if (statusColumn) {
-        console.log('status column already exists, skipping migration');
+        logger.info('[Migration] status column already exists, skipping migration');
         return;
       }
     }
@@ -65,7 +66,7 @@ export class TemplateStatusEnum1860000000000 implements MigrationInterface {
       `);
     }
 
-    console.log('Migration completed: Template status enum applied');
+    logger.info('[Migration] Template status enum migration completed successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
