@@ -90,21 +90,30 @@ router.get('/:appId', async (req: Request, res: Response, next: NextFunction) =>
  *
  * Body: { appId: string }
  */
-router.post('/install', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { appId } = req.body;
+router.post('/install', async (req: Request, res: Response) => {
+  const { appId } = req.body;
 
-    if (!appId) {
-      return res.status(400).json({ error: 'appId is required' });
-    }
+  if (!appId) {
+    return res.status(400).json({
+      ok: false,
+      error: 'MISSING_APP_ID',
+      message: 'appId is required',
+    });
+  }
+
+  try {
+    console.log(`[Install] Starting install for app: ${appId}`);
 
     await appManager.install(appId);
 
-    res.json({
+    console.log(`[Install] Completed successfully for app: ${appId}`);
+    return res.json({
       ok: true,
       message: `App ${appId} installed successfully`,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error(`[Install] Failed for app ${appId}:`, error);
+
     // Handle ownership validation errors
     if (error instanceof OwnershipValidationError) {
       return res.status(400).json({
@@ -115,7 +124,22 @@ router.post('/install', async (req: Request, res: Response, next: NextFunction) 
       });
     }
 
-    next(error);
+    // Handle dependency errors
+    if (error instanceof DependencyError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'DEPENDENCY_ERROR',
+        message: error.message,
+        dependents: error.dependents,
+      });
+    }
+
+    // Handle all other errors - always return JSON, never pass to next()
+    return res.status(500).json({
+      ok: false,
+      error: 'INSTALL_FAILED',
+      message: error.message || 'Unknown error occurred during installation',
+    });
   }
 });
 

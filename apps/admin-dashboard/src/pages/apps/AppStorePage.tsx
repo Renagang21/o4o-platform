@@ -1,8 +1,9 @@
 import { FC, useState, useEffect } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/use-toast';
 import { adminAppsApi, AppRegistryEntry, AppCatalogItem } from '@/api/admin-apps';
 
 type Tab = 'market' | 'installed';
@@ -25,6 +26,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   const [installedApps, setInstalledApps] = useState<AppRegistryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Fetch data on mount
   useEffect(() => {
@@ -42,7 +44,11 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       setInstalledApps(installed);
     } catch (error) {
       console.error('Failed to load apps:', error);
-      alert('앱 목록을 불러오는데 실패했습니다.');
+      toast({
+        title: '로드 실패',
+        description: '앱 목록을 불러오는데 실패했습니다.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -53,21 +59,37 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     try {
       await adminAppsApi.installApp(appId);
       await loadData();
-      alert(`${appId} 앱이 설치되었습니다.`);
+      toast({
+        title: '설치 완료',
+        description: `${appId} 앱이 설치되었습니다.`,
+      });
     } catch (error: any) {
       console.error('Failed to install app:', error);
 
+      // Extract error details from response
+      const errorCode = error.response?.data?.error;
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+
       // Handle ownership validation errors
-      if (error.response?.data?.error === 'OWNERSHIP_VIOLATION') {
+      if (errorCode === 'OWNERSHIP_VIOLATION') {
         const violations = error.response.data.violations || [];
-        alert(
-          `${appId} 앱을 설치할 수 없습니다.\n\n` +
-          `소유권 충돌:\n` +
-          `${violations.map((v: any) => `  • ${v.reason}`).join('\n')}\n\n` +
-          `앱 manifest를 확인해주세요.`
-        );
+        toast({
+          title: '소유권 충돌',
+          description: `${appId} 설치 실패: ${violations.map((v: any) => v.reason).join(', ')}`,
+          variant: 'destructive',
+        });
+      } else if (errorCode === 'DEPENDENCY_ERROR') {
+        toast({
+          title: '의존성 오류',
+          description: errorMessage,
+          variant: 'destructive',
+        });
       } else {
-        alert('앱 설치에 실패했습니다.');
+        toast({
+          title: '설치 실패',
+          description: `${appId}: ${errorMessage}`,
+          variant: 'destructive',
+        });
       }
     } finally {
       setActionLoading(null);
@@ -79,10 +101,18 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     try {
       await adminAppsApi.activateApp(appId);
       await loadData();
-      alert(`${appId} 앱이 활성화되었습니다.`);
-    } catch (error) {
+      toast({
+        title: '활성화 완료',
+        description: `${appId} 앱이 활성화되었습니다.`,
+      });
+    } catch (error: any) {
       console.error('Failed to activate app:', error);
-      alert('앱 활성화에 실패했습니다.');
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+      toast({
+        title: '활성화 실패',
+        description: `${appId}: ${errorMessage}`,
+        variant: 'destructive',
+      });
     } finally {
       setActionLoading(null);
     }
@@ -93,10 +123,18 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     try {
       await adminAppsApi.deactivateApp(appId);
       await loadData();
-      alert(`${appId} 앱이 비활성화되었습니다.`);
-    } catch (error) {
+      toast({
+        title: '비활성화 완료',
+        description: `${appId} 앱이 비활성화되었습니다.`,
+      });
+    } catch (error: any) {
       console.error('Failed to deactivate app:', error);
-      alert('앱 비활성화에 실패했습니다.');
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+      toast({
+        title: '비활성화 실패',
+        description: `${appId}: ${errorMessage}`,
+        variant: 'destructive',
+      });
     } finally {
       setActionLoading(null);
     }
@@ -140,24 +178,32 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     try {
       await adminAppsApi.uninstallApp(appId, purge);
       await loadData();
-      const successMessage = purge
-        ? `${appId} 앱과 데이터가 완전히 삭제되었습니다.`
-        : `${appId} 앱이 삭제되었습니다. (데이터는 유지됨)`;
-      alert(successMessage);
+      toast({
+        title: '삭제 완료',
+        description: purge
+          ? `${appId} 앱과 데이터가 완전히 삭제되었습니다.`
+          : `${appId} 앱이 삭제되었습니다. (데이터는 유지됨)`,
+      });
     } catch (error: any) {
       console.error('Failed to uninstall app:', error);
 
+      const errorCode = error.response?.data?.error;
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+
       // Handle dependency errors
-      if (error.response?.data?.error === 'DEPENDENTS_EXIST') {
+      if (errorCode === 'DEPENDENTS_EXIST') {
         const dependents = error.response.data.dependents || [];
-        alert(
-          `${appId} 앱을 삭제할 수 없습니다.\n\n` +
-          `다음 앱들이 이 앱에 의존하고 있습니다:\n` +
-          `${dependents.map((d: string) => `  • ${d}`).join('\n')}\n\n` +
-          `의존 앱들을 먼저 삭제해주세요.`
-        );
+        toast({
+          title: '의존성 오류',
+          description: `${appId}에 의존하는 앱: ${dependents.join(', ')}. 먼저 삭제하세요.`,
+          variant: 'destructive',
+        });
       } else {
-        alert('앱 삭제에 실패했습니다.');
+        toast({
+          title: '삭제 실패',
+          description: `${appId}: ${errorMessage}`,
+          variant: 'destructive',
+        });
       }
     } finally {
       setActionLoading(null);
@@ -169,10 +215,18 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     try {
       await adminAppsApi.updateApp(appId);
       await loadData();
-      alert(`${appId} 앱이 업데이트되었습니다.`);
-    } catch (error) {
+      toast({
+        title: '업데이트 완료',
+        description: `${appId} 앱이 업데이트되었습니다.`,
+      });
+    } catch (error: any) {
       console.error('Failed to update app:', error);
-      alert('앱 업데이트에 실패했습니다.');
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+      toast({
+        title: '업데이트 실패',
+        description: `${appId}: ${errorMessage}`,
+        variant: 'destructive',
+      });
     } finally {
       setActionLoading(null);
     }
@@ -272,8 +326,17 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                         disabled={actionLoading === app.appId}
                         className="w-full"
                       >
-                        <Download className="w-4 h-4 mr-2" />
-                        {actionLoading === app.appId ? '설치 중...' : '설치'}
+                        {actionLoading === app.appId ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            설치 중...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4 mr-2" />
+                            설치
+                          </>
+                        )}
                       </Button>
                     )}
                   </div>
@@ -370,8 +433,17 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                         variant="default"
                         className="w-full bg-orange-500 hover:bg-orange-600"
                       >
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        {actionLoading === app.appId ? '업데이트 중...' : '업데이트'}
+                        {actionLoading === app.appId ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            업데이트 중...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            업데이트
+                          </>
+                        )}
                       </Button>
                     )}
                     <div className="flex space-x-2">

@@ -13,8 +13,31 @@ import { registry as cptRegistry } from '@o4o/cpt-registry';
 import type { AppManifest, InstallContext, ActivateContext, DeactivateContext, UninstallContext } from '@o4o/types';
 import logger from '../utils/logger.js';
 import { pathToFileURL } from 'url';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+
+// Get current directory for path resolution
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+/**
+ * Package mapping: appId -> package folder name
+ * Used to resolve lifecycle hook paths
+ */
+const PACKAGE_MAP: Record<string, string> = {
+  'forum': 'forum-app',
+  'forum-core': 'forum-app',
+  'forum-cosmetics': 'forum-cosmetics',
+  'forum-yaksa': 'forum-yaksa',
+  'lms-core': 'lms-core',
+  'organization-core': 'organization-core',
+  'organization-forum': 'organization-forum',
+  'dropshipping': 'dropshipping-core',
+  'dropshipping-core': 'dropshipping-core',
+  'dropshipping-cosmetics': 'dropshipping-cosmetics',
+  'sellerops': 'sellerops',
+  'supplierops': 'supplierops',
+};
 
 /**
  * AppManager Service
@@ -510,6 +533,29 @@ export class AppManager {
   }
 
   /**
+   * Get the package root path for an app
+   * Resolves appId to the actual package folder path in the workspace
+   *
+   * @param appId - App identifier
+   * @returns Absolute path to the package's dist folder
+   * @private
+   */
+  private getPackageRoot(appId: string): string {
+    const packageFolder = PACKAGE_MAP[appId];
+    if (!packageFolder) {
+      throw new Error(`Package not mapped for appId: ${appId}. Add it to PACKAGE_MAP.`);
+    }
+
+    // Path from api-server/src/services -> packages/{folder}/dist/packages/{folder}/src
+    // In production: apps/api-server -> packages/{folder}
+    const packagesRoot = resolve(__dirname, '../../../../packages');
+    const packagePath = join(packagesRoot, packageFolder, 'dist', 'packages', packageFolder, 'src');
+
+    logger.info(`[AppManager] Resolved package root for ${appId}: ${packagePath}`);
+    return packagePath;
+  }
+
+  /**
    * Run a lifecycle hook from an app's manifest
    *
    * @param appId - App identifier
@@ -526,18 +572,25 @@ export class AppManager {
     hookType: 'install' | 'activate' | 'deactivate' | 'uninstall',
     options?: Record<string, any>
   ): Promise<void> {
+    logger.info(`[Install] Starting ${hookType} hook for app: ${appId}`);
+
     try {
+      // Get package root path
+      const pkgRoot = this.getPackageRoot(appId);
+
       // Resolve hook module path
-      // Hook path is relative to the app package (e.g., './lifecycle/install.js')
-      // For now, we'll import from the published @o4o-apps/{app-name} package
-      const packageName = this.getAppPackageName(appId);
-      const hookModule = hookPath.replace(/^\.\//, '').replace(/\.js$/, '.js');
-      const modulePath = `${packageName}/${hookModule}`;
+      // hookPath is like './lifecycle/install.js' -> 'lifecycle/install.js'
+      const hookModule = hookPath.replace(/^\.\//, '').replace(/\.ts$/, '.js');
+      const hookFullPath = join(pkgRoot, hookModule);
 
-      logger.info(`[AppManager] Loading lifecycle hook: ${modulePath}`);
+      // Convert to file:// URL for dynamic import
+      const moduleUrl = pathToFileURL(hookFullPath).href;
 
-      // Dynamic import
-      const module = await import(modulePath);
+      logger.info(`[Install] Loading lifecycle hook: ${hookModule}`);
+      logger.info(`[Install] Hook path resolved: ${moduleUrl}`);
+
+      // Dynamic import using file:// URL
+      const module = await import(moduleUrl);
 
       // Determine hook function name based on type
       const hookFunctionName = hookType; // e.g., 'install', 'activate', etc.
@@ -545,9 +598,11 @@ export class AppManager {
 
       if (typeof hookFunction !== 'function') {
         throw new Error(
-          `Lifecycle hook "${hookFunctionName}" not found or not a function in module: ${modulePath}`
+          `Lifecycle hook "${hookFunctionName}" not found or not a function in module: ${hookFullPath}`
         );
       }
+
+      logger.info(`[Install] Running lifecycle hook: ${hookModule}`);
 
       // Prepare context based on hook type
       const baseContext = {
@@ -561,28 +616,11 @@ export class AppManager {
       // Call the hook function
       await hookFunction(baseContext);
 
+      logger.info(`[Install] Hook completed successfully: ${hookModule}`);
+
     } catch (error) {
-      logger.error(`[AppManager] Failed to run ${hookType} hook for ${appId}:`, error);
+      logger.error(`[Install] Hook failed for ${appId}:`, error);
       throw error;
     }
-  }
-
-  /**
-   * Get the npm package name for an app
-   * Maps appId to package name (e.g., 'forum-core' -> '@o4o-apps/forum')
-   *
-   * @param appId - App identifier
-   * @returns Package name
-   * @private
-   */
-  private getAppPackageName(appId: string): string {
-    // Map common app IDs to package names
-    const packageMap: Record<string, string> = {
-      'forum-core': '@o4o-apps/forum',
-      'forum-cosmetics': '@o4o-apps/forum-cosmetics',
-      // Add more mappings as needed
-    };
-
-    return packageMap[appId] || `@o4o-apps/${appId}`;
   }
 }
