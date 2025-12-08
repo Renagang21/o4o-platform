@@ -1789,6 +1789,25 @@ importers:
         specifier: ^5.3.0
         version: 5.9.2
 
+  packages/partnerops:
+    dependencies:
+      '@o4o/dropshipping-core':
+        specifier: workspace:*
+        version: link:../dropshipping-core
+    devDependencies:
+      express:
+        specifier: ^4.18.0
+        version: 4.21.2
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typeorm:
+        specifier: ^0.3.0
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.9.2))
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.2
+
   packages/sellerops:
     dependencies:
       '@nestjs/common':
