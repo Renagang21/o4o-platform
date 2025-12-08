@@ -1,15 +1,28 @@
 import { DataSource } from 'typeorm';
 import { MemberCategory } from '../backend/entities/MemberCategory.js';
+import * as Entities from '../backend/entities/index.js';
 
 /**
  * Membership-Yaksa Install Hook
  *
  * 앱 설치 시 실행되는 초기화 작업
+ * - 테이블 생성 (synchronize)
  * - 기본 회원 분류 생성
  */
 export async function install(dataSource: DataSource): Promise<void> {
   console.log('[Membership-Yaksa] Installing...');
 
+  // Step 1: Create tables using synchronize
+  // Note: This is a temporary solution. Proper migrations should be created.
+  // See: docs/reference/guidelines/SCHEMA_DRIFT_PREVENTION_GUIDE.md
+  console.log('[Membership-Yaksa] Creating tables...');
+
+  const entities = Object.values(Entities);
+  await dataSource.synchronize(false); // false = don't drop existing tables
+
+  console.log('[Membership-Yaksa] Tables created successfully');
+
+  // Step 2: Create default categories
   const categoryRepo = dataSource.getRepository(MemberCategory);
 
   // 기본 회원 분류 생성
