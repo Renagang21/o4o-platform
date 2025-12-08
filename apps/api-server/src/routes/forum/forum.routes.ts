@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ForumController } from '../../controllers/forum/ForumController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
+import notificationRoutes from './forum.notifications.routes.js';
 
 const router: Router = Router();
 const controller = new ForumController();
@@ -85,5 +86,10 @@ router.get('/moderation', authenticate, controller.getModerationQueue.bind(contr
 
 // Moderate content (approve/reject)
 router.post('/moderation/:type/:id', authenticate, controller.moderateContent.bind(controller));
+
+// ============================================================================
+// Notifications (Phase 13)
+// ============================================================================
+router.use('/notifications', notificationRoutes);
 
 export default router;

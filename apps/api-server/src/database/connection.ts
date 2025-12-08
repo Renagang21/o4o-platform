@@ -113,6 +113,8 @@ import { SellerProfile } from '../entities/SellerProfile.js';
 import { PartnerProfile } from '../entities/PartnerProfile.js';
 // Forum App entities (from @o4o-apps/forum package)
 import { ForumPost, ForumCategory, ForumComment } from '@o4o-apps/forum';
+// Forum Notification entity (Phase 13)
+import { ForumNotification } from '../entities/ForumNotification.js';
 // Dropshipping Core entities (from @o4o/dropshipping-core package)
 // import { dropshippingEntities } from '@o4o/dropshipping-core';
 // Digital Signage entities
@@ -313,6 +315,8 @@ export const AppDataSource = new DataSource({
     ForumPost,
     ForumCategory,
     ForumComment,
+    // Forum Notification entity (Phase 13)
+    ForumNotification,
     // Digital Signage entities
     SignageDevice,
     SignageSlide,
