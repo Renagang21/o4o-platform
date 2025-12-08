@@ -108,31 +108,235 @@ export interface UpdateForumPostDto {
   metadata?: ForumPostMetadata;
 }
 
+// =============================================================================
+// Extension Metadata Types (for forum-neture, forum-yaksa)
+// =============================================================================
+
 /**
- * Forum Post Metadata Interface
- * Structured metadata for forum posts
+ * Neture Forum Extension Metadata
+ * Used for cosmetics-related forum features
  */
-export interface ForumPostMetadata {
-  // SEO
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string[];
+export interface NetureForumMeta {
+  skinType?: 'dry' | 'oily' | 'combination' | 'sensitive' | 'normal';
+  concerns?: string[];
+  routine?: string[];
+  productIds?: string[];
+  ingredientPreferences?: string[];
+  ageGroup?: string;
+}
 
-  // Display
-  featuredImage?: string;
-  thumbnailUrl?: string;
+/**
+ * Yaksa Forum Extension Metadata
+ * Used for pharmacist community features
+ */
+export interface YaksaForumMeta {
+  communityId?: string;
+  isAnnouncement?: boolean;
+  pinned?: boolean;
+  pharmacistVerified?: boolean;
+  drugInteractionWarning?: boolean;
+  professionalOnly?: boolean;
+}
 
-  // Moderation
+// =============================================================================
+// Forum Post Metadata Interface (Core)
+// =============================================================================
+
+/**
+ * SEO Metadata Section
+ */
+export interface ForumPostSeoMeta {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  canonicalUrl?: string;
+  ogImage?: string;
+  noIndex?: boolean;
+}
+
+/**
+ * Moderation Metadata Section
+ */
+export interface ForumPostModerationMeta {
+  flaggedReason?: string;
+  flaggedAt?: string;
+  flaggedBy?: string;
   moderationNote?: string;
   moderatedAt?: string;
   moderatedBy?: string;
+  approvedAt?: string;
+  approvedBy?: string;
+  rejectedReason?: string;
+}
 
-  // Analytics
+/**
+ * Analytics Metadata Section
+ */
+export interface ForumPostAnalyticsMeta {
   lastViewedAt?: string;
   peakViewCount?: number;
+  uniqueViewers?: number;
+  averageReadTime?: number;
+  shareCount?: number;
+  bookmarkCount?: number;
+}
+
+/**
+ * Display Metadata Section
+ */
+export interface ForumPostDisplayMeta {
+  featuredImage?: string;
+  thumbnailUrl?: string;
+  backgroundColor?: string;
+  customCss?: string;
+  template?: string;
+}
+
+/**
+ * Extensions Metadata Section
+ * Contains app-specific metadata (Neture, Yaksa, etc.)
+ */
+export interface ForumPostExtensionsMeta {
+  neture?: NetureForumMeta;
+  yaksa?: YaksaForumMeta;
+  // Additional custom extensions can be added here
+}
+
+/**
+ * Forum Post Metadata Interface
+ * Structured metadata for forum posts with typed sections
+ */
+export interface ForumPostMetadata {
+  // Structured sections
+  seo?: ForumPostSeoMeta;
+  moderation?: ForumPostModerationMeta;
+  analytics?: ForumPostAnalyticsMeta;
+  display?: ForumPostDisplayMeta;
+  extensions?: ForumPostExtensionsMeta;
+
+  // Legacy flat fields (for backward compatibility)
+  /** @deprecated Use seo.title instead */
+  seoTitle?: string;
+  /** @deprecated Use seo.description instead */
+  seoDescription?: string;
+  /** @deprecated Use seo.keywords instead */
+  seoKeywords?: string[];
+  /** @deprecated Use display.featuredImage instead */
+  featuredImage?: string;
+  /** @deprecated Use display.thumbnailUrl instead */
+  thumbnailUrl?: string;
+  /** @deprecated Use moderation.moderationNote instead */
+  moderationNote?: string;
+  /** @deprecated Use moderation.moderatedAt instead */
+  moderatedAt?: string;
+  /** @deprecated Use moderation.moderatedBy instead */
+  moderatedBy?: string;
+  /** @deprecated Use analytics.lastViewedAt instead */
+  lastViewedAt?: string;
+  /** @deprecated Use analytics.peakViewCount instead */
+  peakViewCount?: number;
+
+  // Legacy extension fields (direct access - kept for backward compatibility)
+  /** @deprecated Use extensions.neture instead */
+  neture?: NetureForumMeta;
+  /** @deprecated Use extensions.yaksa instead */
+  yaksa?: YaksaForumMeta;
 
   // Custom fields (extensible)
   custom?: Record<string, unknown>;
+}
+
+/**
+ * Normalize metadata to ensure consistent structure
+ * Handles legacy flat structure and converts to new nested structure
+ */
+export function normalizeMetadata(input: Record<string, unknown> | ForumPostMetadata | null | undefined): ForumPostMetadata {
+  if (!input) {
+    return {};
+  }
+
+  const metadata = input as ForumPostMetadata;
+  const result: ForumPostMetadata = {};
+
+  // Normalize SEO section
+  result.seo = {
+    ...(metadata.seo || {}),
+    title: metadata.seo?.title || metadata.seoTitle,
+    description: metadata.seo?.description || metadata.seoDescription,
+    keywords: metadata.seo?.keywords || metadata.seoKeywords,
+  };
+
+  // Normalize moderation section
+  result.moderation = {
+    ...(metadata.moderation || {}),
+    moderationNote: metadata.moderation?.moderationNote || metadata.moderationNote,
+    moderatedAt: metadata.moderation?.moderatedAt || metadata.moderatedAt,
+    moderatedBy: metadata.moderation?.moderatedBy || metadata.moderatedBy,
+  };
+
+  // Normalize analytics section
+  result.analytics = {
+    ...(metadata.analytics || {}),
+    lastViewedAt: metadata.analytics?.lastViewedAt || metadata.lastViewedAt,
+    peakViewCount: metadata.analytics?.peakViewCount || metadata.peakViewCount,
+  };
+
+  // Normalize display section
+  result.display = {
+    ...(metadata.display || {}),
+    featuredImage: metadata.display?.featuredImage || metadata.featuredImage,
+    thumbnailUrl: metadata.display?.thumbnailUrl || metadata.thumbnailUrl,
+  };
+
+  // Normalize extensions section
+  result.extensions = {
+    ...(metadata.extensions || {}),
+    neture: metadata.extensions?.neture || metadata.neture,
+    yaksa: metadata.extensions?.yaksa || metadata.yaksa,
+  };
+
+  // Preserve custom fields
+  if (metadata.custom) {
+    result.custom = metadata.custom;
+  }
+
+  // Clean up empty sections
+  if (Object.values(result.seo || {}).every(v => v === undefined)) {
+    delete result.seo;
+  }
+  if (Object.values(result.moderation || {}).every(v => v === undefined)) {
+    delete result.moderation;
+  }
+  if (Object.values(result.analytics || {}).every(v => v === undefined)) {
+    delete result.analytics;
+  }
+  if (Object.values(result.display || {}).every(v => v === undefined)) {
+    delete result.display;
+  }
+  if (!result.extensions?.neture && !result.extensions?.yaksa) {
+    delete result.extensions;
+  }
+
+  return result;
+}
+
+/**
+ * Check if metadata has any extension data
+ */
+export function hasExtensionMeta(metadata: ForumPostMetadata | null | undefined): boolean {
+  if (!metadata) return false;
+  return !!(metadata.extensions?.neture || metadata.extensions?.yaksa || metadata.neture || metadata.yaksa);
+}
+
+/**
+ * Get extension metadata safely
+ */
+export function getExtensionMeta<T extends keyof ForumPostExtensionsMeta>(
+  metadata: ForumPostMetadata | null | undefined,
+  extension: T
+): ForumPostExtensionsMeta[T] | undefined {
+  if (!metadata) return undefined;
+  return metadata.extensions?.[extension] || (metadata as any)[extension];
 }
 
 /**

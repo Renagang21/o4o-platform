@@ -3,7 +3,8 @@ import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, PostStatus } from '@o4o-apps/forum';
 import { ForumCategory } from '@o4o-apps/forum';
 import { ForumComment, CommentStatus } from '@o4o-apps/forum';
-import { normalizeContent, blocksToText } from '@o4o-apps/forum';
+import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o-apps/forum';
+import type { ForumPostMetadata } from '@o4o-apps/forum';
 import { User } from '../../modules/auth/entities/User.js';
 import { MoreThanOrEqual } from 'typeorm';
 import logger from '../../utils/logger.js';
@@ -202,6 +203,9 @@ export class ForumController {
       // Auto-generate excerpt from content if not provided
       const postExcerpt = excerpt || blocksToText(normalizedContent).substring(0, 200);
 
+      // Normalize metadata to structured format
+      const normalizedMeta = metadata ? normalizeMetadata(metadata) : undefined;
+
       const post = this.postRepository.create({
         title,
         content: normalizedContent,
@@ -211,7 +215,7 @@ export class ForumController {
         tags,
         isPinned,
         allowComments: allowComments !== false,
-        metadata,
+        metadata: normalizedMeta,
         authorId: userId,
         slug,
         status: category.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
@@ -294,7 +298,14 @@ export class ForumController {
       if (isPinned !== undefined) post.isPinned = isPinned;
       if (isLocked !== undefined) post.isLocked = isLocked;
       if (allowComments !== undefined) post.allowComments = allowComments;
-      if (metadata !== undefined) post.metadata = metadata;
+      if (metadata !== undefined) {
+        // Merge existing metadata with new metadata and normalize
+        const mergedMetadata = {
+          ...(post.metadata || {}),
+          ...metadata,
+        };
+        post.metadata = normalizeMetadata(mergedMetadata);
+      }
 
       const updatedPost = await this.postRepository.save(post);
 
