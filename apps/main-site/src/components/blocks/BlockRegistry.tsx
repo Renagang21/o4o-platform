@@ -69,6 +69,7 @@ import {
   ForumPostDetailBlock,
   ForumCommentSectionBlock,
   ForumCategoryListBlock,
+  CosmeticsPostListBlock,
 } from './forum';
 
 // Placeholder for unimplemented blocks
@@ -142,6 +143,9 @@ export const BlockRegistry: Record<string, BlockRenderer> = {
   ForumPostDetail: ForumPostDetailBlock,
   ForumCommentSection: ForumCommentSectionBlock,
   ForumCategoryList: ForumCategoryListBlock,
+
+  // Cosmetics Forum Blocks (1)
+  CosmeticsPostList: CosmeticsPostListBlock,
 };
 
 export const getBlockRenderer = (type: string): BlockRenderer => {
