@@ -83,7 +83,7 @@ const MemberManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await authClient.api.get('/api/membership/categories');
+      const response = await authClient.api.get('/membership/categories');
       if (response.data.success) {
         setCategories(response.data.data || []);
       }
@@ -108,7 +108,7 @@ const MemberManagement = () => {
       if (filterCategory !== 'all') params.categoryId = filterCategory;
       if (debouncedSearchQuery) params.search = debouncedSearchQuery;
 
-      const response = await authClient.api.get('/api/membership/members', { params });
+      const response = await authClient.api.get('/membership/members', { params });
 
       if (response.data.success) {
         setMembers(response.data.data || []);

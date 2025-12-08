@@ -45,7 +45,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
 
     try {
       setLoading(true);
-      await authClient.api.post('/api/membership/members/bulk-update', {
+      await authClient.api.post('/membership/members/bulk-update', {
         memberIds: selectedIds,
         categoryId,
       });
@@ -67,7 +67,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
 
     try {
       setLoading(true);
-      await authClient.api.post('/api/membership/members/bulk-update', {
+      await authClient.api.post('/membership/members/bulk-update', {
         memberIds: selectedIds,
         isVerified: true,
       });
@@ -90,7 +90,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
 
     try {
       setLoading(true);
-      await authClient.api.post('/api/membership/members/bulk-update', {
+      await authClient.api.post('/membership/members/bulk-update', {
         memberIds: selectedIds,
         isActive,
       });

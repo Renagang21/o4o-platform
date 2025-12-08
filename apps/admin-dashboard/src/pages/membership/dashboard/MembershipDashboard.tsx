@@ -51,7 +51,7 @@ const MembershipDashboard = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await authClient.api.get('/api/membership/stats');
+      const response = await authClient.api.get('/membership/stats');
 
       if (response.data.success) {
         setStats(response.data.data);

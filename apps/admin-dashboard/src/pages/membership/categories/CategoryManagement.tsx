@@ -64,7 +64,7 @@ const CategoryManagement = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await authClient.api.get('/api/membership/categories');
+      const response = await authClient.api.get('/membership/categories');
 
       if (response.data.success) {
         setCategories(response.data.data || []);
@@ -138,7 +138,7 @@ const CategoryManagement = () => {
       };
 
       if (isCreating) {
-        await authClient.api.post('/api/membership/categories', payload);
+        await authClient.api.post('/membership/categories', payload);
         toast.success('카테고리가 생성되었습니다.');
       } else if (editingId) {
         await authClient.api.put(`/api/membership/categories/${editingId}`, payload);

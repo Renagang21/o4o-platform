@@ -35,7 +35,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       });
 
       const queryString = params.toString();
-      const url = `/api/membership/export/${type}.xlsx${queryString ? `?${queryString}` : ''}`;
+      const url = `/membership/export/${type}.xlsx${queryString ? `?${queryString}` : ''}`;
 
       // Fetch Excel file as blob
       const response = await authClient.api.get(url, {

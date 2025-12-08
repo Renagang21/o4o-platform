@@ -88,7 +88,7 @@ const VerificationManagement = () => {
       if (filterMethod !== 'all') params.method = filterMethod;
       if (debouncedSearchQuery) params.search = debouncedSearchQuery;
 
-      const response = await authClient.api.get('/api/membership/verifications', { params });
+      const response = await authClient.api.get('/membership/verifications', { params });
 
       if (response.data.success) {
         setVerifications(response.data.data || []);
