@@ -28,16 +28,17 @@ export class AppRegistry {
   @Column({ type: 'varchar', length: 50 })
   version!: string; // semver format
 
-  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
-  @Column({ type: 'varchar', length: 50, nullable: true, select: false })
+  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
+  @Column({ type: 'varchar', length: 50, nullable: true, select: false, insert: false })
   previousVersion?: string; // for rollback support
 
-  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
+  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
   @Column({
     type: 'enum',
     enum: ['core', 'extension', 'standalone'],
     default: 'standalone',
-    select: false
+    select: false,
+    insert: false
   })
   // @Index() // TEMPORARY: Disabled until type column is added to DB
   type!: 'core' | 'extension' | 'standalone';
@@ -50,12 +51,12 @@ export class AppRegistry {
   @Index()
   status!: 'installed' | 'active' | 'inactive';
 
-  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
-  @Column({ type: 'jsonb', nullable: true, select: false })
+  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
+  @Column({ type: 'jsonb', nullable: true, select: false, insert: false })
   dependencies?: Record<string, string>; // { "app-id": "version-range" }
 
-  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
-  @Column({ type: 'varchar', length: 50, default: 'local', select: false })
+  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
+  @Column({ type: 'varchar', length: 50, default: 'local', select: false, insert: false })
   source?: string; // 'local' for now, can be 'remote' later
 
   @CreateDateColumn()
