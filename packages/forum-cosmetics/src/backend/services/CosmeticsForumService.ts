@@ -132,7 +132,7 @@ export class CosmeticsForumService {
     } as any);
 
     const savedPost = await this.forumPostRepository.save(post);
-    return savedPost as ForumPost;
+    return savedPost as unknown as ForumPost;
   }
 
   /**
@@ -193,7 +193,7 @@ export class CosmeticsForumService {
       } as any;
     }
 
-    return await this.forumPostRepository.save(post) as ForumPost;
+    return await this.forumPostRepository.save(post) as unknown as ForumPost;
   }
 
   /**
