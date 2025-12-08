@@ -1,0 +1,21 @@
+{
+  "viewId": "forum-category-detail",
+  "meta": {
+    "title": "카테고리",
+    "description": "포럼 카테고리별 게시글",
+    "route": "/forum/category/:slug"
+  },
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": [
+    {
+      "type": "ForumCategoryView",
+      "props": {
+        "postsPerPage": 20,
+        "viewMode": "list",
+        "showSidebar": true
+      }
+    }
+  ]
+}

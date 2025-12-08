@@ -1,0 +1,22 @@
+{
+  "viewId": "forum-post-detail",
+  "meta": {
+    "title": "게시글",
+    "description": "포럼 게시글 상세",
+    "route": "/forum/post/:id"
+  },
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": [
+    {
+      "type": "ForumDetailView",
+      "props": {
+        "showRelatedPosts": true,
+        "relatedPostsLimit": 5,
+        "showComments": true,
+        "commentsPerPage": 20
+      }
+    }
+  ]
+}
