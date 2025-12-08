@@ -108,6 +108,7 @@ export class AppManager {
     }
 
     const manifest = loadLocalManifest(appId);
+    const actualAppId = manifest.appId || appId;
 
     // Validate ownership claims before installation
     logger.info(`[AppManager] Validating ownership for ${appId}...`);
@@ -122,7 +123,17 @@ export class AppManager {
       throw error;
     }
 
-    let entry = await this.repo.findOne({ where: { appId } });
+    // Check if already installed using actual appId from manifest
+    let entry = await this.repo.findOne({ where: { appId: actualAppId } });
+    if (entry) {
+      logger.info(`[AppManager] App ${actualAppId} already installed (status: ${entry.status})`);
+      return; // Already installed, skip
+    }
+
+    // Also check with the alias appId if different
+    if (appId !== actualAppId) {
+      entry = await this.repo.findOne({ where: { appId } });
+    }
 
     // Get dependencies in correct format
     const manifestDeps = manifest.dependencies || {};
