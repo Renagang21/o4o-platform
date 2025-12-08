@@ -144,6 +144,38 @@ pnpm start:dev
 - ❌ 패키지 설치 시간 소요
 - ✅ **권장**: develop 브랜치 푸시 → 웹 테스트
 
+### 8. Schema Policy Compliance (⚠️ 필수)
+
+**모든 엔티티/DB 관련 변경은 아래 문서를 반드시 준수해야 함:**
+- **`docs/reference/guidelines/SCHEMA_DRIFT_PREVENTION_GUIDE.md`**
+
+**CLAUDE(Code Agents)는 다음 원칙을 자동 적용해야 함:**
+
+1. **엔티티 필드 추가 → 반드시 migration 먼저 생성할 것**
+   - Migration 없이 엔티티 변경 금지
+   - Migration-First Rule 준수
+
+2. **DB에 없는 필드는 `select: false`가 기본값**
+   ```typescript
+   @Column({ select: false, nullable: true })
+   previousVersion?: string;
+   ```
+
+3. **AppStore install/update 전에 schema conflict 검증 필요**
+   - SchemaValidator 통과 필수
+   - 500 에러 사전 차단
+
+4. **Remote manifest 설치 시 manifest/schema 검증 의무화**
+   - Remote App의 DB 변경 금지
+   - CPT/ACF 확장만 허용
+
+5. **Schema drift 위험이 있는 PR/코드 제안 금지**
+   - Migration 누락 코드 거부
+   - AppStore-safe 설계 원칙
+
+**참고:** Schema Drift는 500 에러, 앱 설치 실패, 업데이트 실패의 주요 원인입니다.
+위 규칙을 준수하지 않으면 프로덕션 장애가 발생할 수 있습니다.
+
 ---
 
 # 인프라 구조
