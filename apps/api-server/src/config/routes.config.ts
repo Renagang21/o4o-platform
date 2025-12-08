@@ -173,6 +173,9 @@ import forumRoutes from '../routes/forum/forum.routes.js';
 // ✅ NEW: CMS Module V2 Routes (Phase C-2)
 import { cmsRoutes } from '../modules/cms/index.js';
 
+// ✅ NEW: LMS Module Routes
+import { lmsRoutes } from '../modules/lms/index.js';
+
 // Digital Signage Routes
 import signageRoutes from '../routes/signage.routes.js';
 
@@ -488,6 +491,11 @@ export function setupRoutes(app: Application): void {
   // Provides: CustomPostType, CustomField, View, Page endpoints
   // See: src/modules/cms/routes/cms.routes.ts
   app.use('/api/v1/cms', standardLimiter, cmsRoutes);
+
+  // ✅ NEW: LMS Module Routes
+  // Provides: Course, Lesson, Enrollment, Progress, Certificate, Events, Attendance endpoints
+  // See: src/modules/lms/routes/lms.routes.ts
+  app.use('/api/v1/lms', standardLimiter, lmsRoutes);
 
   // ✅ NEW: Membership-Yaksa Routes
   // Provides: Member, MemberCategory, Affiliation, Verification endpoints
