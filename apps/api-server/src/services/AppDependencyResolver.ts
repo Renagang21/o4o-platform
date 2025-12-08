@@ -3,6 +3,7 @@ import { AppDataSource } from '../database/connection.js';
 import { AppRegistry } from '../entities/AppRegistry.js';
 import { loadLocalManifest, hasManifest } from '../app-manifests/index.js';
 import * as semver from 'semver';
+import logger from '../utils/logger.js';
 
 /**
  * Dependency Graph Structure
@@ -10,6 +11,16 @@ import * as semver from 'semver';
  */
 interface DependencyGraph {
   [appId: string]: string[]; // appId -> [dependency appIds]
+}
+
+/**
+ * Dependency Validation Result
+ */
+export interface DependencyValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  installOrder: string[];
 }
 
 /**
@@ -255,24 +266,51 @@ export class AppDependencyResolver {
   }
 
   /**
-   * Topological sort using Kahn's algorithm
+   * Topological sort using Kahn's algorithm (improved)
    * Returns apps in dependency order (dependencies first)
+   *
+   * Improvements:
+   * - Handles orphan nodes (nodes not in any dependency chain)
+   * - Better logging for debugging
+   * - Handles undefined graph entries
    *
    * @param graph - Dependency graph
    * @returns Array of appIds in installation order
    */
   private topologicalSort(graph: DependencyGraph): string[] {
+    logger.info(`[DependencyResolver] Starting topological sort for ${Object.keys(graph).length} apps`);
+
+    // Collect all nodes (including those only appearing as dependencies)
+    const allNodes = new Set<string>();
+
+    // Add all nodes from graph keys
+    for (const node of Object.keys(graph)) {
+      allNodes.add(node);
+      // Also add dependencies as nodes (orphan node prevention)
+      for (const dep of graph[node] || []) {
+        allNodes.add(dep);
+      }
+    }
+
+    // Ensure all nodes exist in graph (orphan node handling)
+    for (const node of allNodes) {
+      if (!graph[node]) {
+        graph[node] = [];
+      }
+    }
+
     // Calculate in-degree for each node
     const inDegree = new Map<string, number>();
-    const nodes = Object.keys(graph);
+    const nodes = Array.from(allNodes);
 
-    // Initialize in-degrees
+    // Initialize in-degrees to 0
     for (const node of nodes) {
-      if (!inDegree.has(node)) {
-        inDegree.set(node, 0);
-      }
+      inDegree.set(node, 0);
+    }
 
-      for (const dep of graph[node]) {
+    // Calculate actual in-degrees
+    for (const node of nodes) {
+      for (const dep of graph[node] || []) {
         inDegree.set(dep, (inDegree.get(dep) || 0) + 1);
       }
     }
@@ -285,6 +323,8 @@ export class AppDependencyResolver {
       }
     }
 
+    logger.info(`[DependencyResolver] Starting with ${queue.length} root nodes: ${queue.join(', ')}`);
+
     const result: string[] = [];
 
     while (queue.length > 0) {
@@ -294,7 +334,7 @@ export class AppDependencyResolver {
       // Reduce in-degree for dependent nodes
       const deps = graph[node] || [];
       for (const dep of deps) {
-        const newDegree = inDegree.get(dep)! - 1;
+        const newDegree = (inDegree.get(dep) || 0) - 1;
         inDegree.set(dep, newDegree);
 
         if (newDegree === 0) {
@@ -303,8 +343,19 @@ export class AppDependencyResolver {
       }
     }
 
+    // Check for orphan nodes (not processed)
+    const orphans = nodes.filter(n => !result.includes(n));
+    if (orphans.length > 0) {
+      logger.warn(`[DependencyResolver] Found orphan nodes (adding to end): ${orphans.join(', ')}`);
+      result.push(...orphans);
+    }
+
     // Reverse to get installation order (dependencies first)
-    return result.reverse();
+    const installOrder = result.reverse();
+
+    logger.info(`[DependencyResolver] ✓ Install order: ${installOrder.join(' → ')}`);
+
+    return installOrder;
   }
 
   /**
@@ -320,5 +371,102 @@ export class AppDependencyResolver {
 
     // Reverse for uninstall order (dependents first, then dependencies)
     return installOrder.reverse();
+  }
+
+  /**
+   * Validate all dependencies for an app before installation
+   * Checks for missing manifests, invalid dependencies, cyclic dependencies
+   *
+   * @param appId - App to validate
+   * @returns Validation result with errors, warnings, and install order
+   */
+  async validateDependencies(appId: string): Promise<DependencyValidationResult> {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    logger.info(`[DependencyResolver] Validating dependencies for ${appId}`);
+
+    // Check if manifest exists
+    if (!hasManifest(appId)) {
+      return {
+        valid: false,
+        errors: [`No manifest found for app: ${appId}`],
+        warnings: [],
+        installOrder: [],
+      };
+    }
+
+    try {
+      // Collect dependencies
+      const dependencies = await this.collectDependencies(appId, new Set());
+
+      // Check each dependency has a manifest
+      for (const depId of dependencies) {
+        if (!hasManifest(depId)) {
+          errors.push(`Missing manifest for dependency: ${depId}`);
+        }
+      }
+
+      // Build dependency graph
+      const graph = await this.buildDependencyGraph(Array.from(dependencies));
+
+      // Check for cycles
+      const cycle = this.detectCycle(graph);
+      if (cycle.length > 0) {
+        errors.push(`Cyclic dependency detected: ${cycle.join(' → ')}`);
+      }
+
+      // Check version compatibility for installed apps
+      for (const depId of dependencies) {
+        const manifest = loadLocalManifest(depId);
+        const deps = this.extractDependencies(manifest.dependencies || {});
+
+        for (const [reqAppId, versionRange] of Object.entries(deps)) {
+          const installedApp = await this.repo.findOne({ where: { appId: reqAppId } });
+
+          if (installedApp) {
+            if (!semver.satisfies(installedApp.version, versionRange)) {
+              warnings.push(
+                `${depId} requires ${reqAppId}@${versionRange}, but ${installedApp.version} is installed`
+              );
+            }
+          }
+        }
+      }
+
+      // Get install order
+      const installOrder = errors.length === 0
+        ? this.topologicalSort(graph)
+        : [];
+
+      return {
+        valid: errors.length === 0,
+        errors,
+        warnings,
+        installOrder,
+      };
+    } catch (error) {
+      return {
+        valid: false,
+        errors: [error instanceof Error ? error.message : String(error)],
+        warnings,
+        installOrder: [],
+      };
+    }
+  }
+
+  /**
+   * Helper to extract dependencies from manifest dependencies field
+   */
+  private extractDependencies(manifestDeps: unknown): Record<string, string> {
+    if (!manifestDeps || typeof manifestDeps !== 'object' || Array.isArray(manifestDeps)) {
+      return {};
+    }
+
+    if ('apps' in manifestDeps || 'services' in manifestDeps) {
+      return {};
+    }
+
+    return manifestDeps as Record<string, string>;
   }
 }

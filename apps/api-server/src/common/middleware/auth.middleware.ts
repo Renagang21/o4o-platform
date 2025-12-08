@@ -313,6 +313,198 @@ export const optionalAuth = async (
 };
 
 /**
+ * Require Permission Middleware
+ *
+ * Requires the user to have a specific permission.
+ * Checks user's roles against the SSOT permission mapping.
+ *
+ * @param permission - Permission key (e.g., 'cms.templates.edit')
+ *
+ * @example
+ * ```typescript
+ * router.put('/templates/:id', requirePermission('cms.templates.edit'), TemplateController.update);
+ * ```
+ */
+export const requirePermission = (permission: string) => {
+  return async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> => {
+    // First ensure user is authenticated
+    if (!req.user) {
+      return requireAuth(req, res, next);
+    }
+
+    const user = req.user as User;
+
+    try {
+      // Check direct permissions on user
+      if (user.permissions?.includes(permission)) {
+        return next();
+      }
+
+      // Check if user has permission through their role
+      // Import dynamically to avoid circular dependencies
+      const { roleHasPermission, ADMIN_ROLES } = await import('@o4o/types');
+
+      // Admin roles have all permissions
+      if (ADMIN_ROLES.includes(user.role as any)) {
+        return next();
+      }
+
+      // Check legacy role
+      if (roleHasPermission(user.role, permission)) {
+        return next();
+      }
+
+      // Check RoleAssignment-based roles
+      const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
+      const assignments = await assignmentRepo.find({
+        where: {
+          userId: user.id,
+          isActive: true,
+        },
+      });
+
+      for (const assignment of assignments) {
+        if (assignment.isValidNow() && roleHasPermission(assignment.role, permission)) {
+          return next();
+        }
+      }
+
+      // No permission found
+      logger.warn('[requirePermission] Permission denied', {
+        userId: user.id,
+        email: user.email,
+        permission,
+        path: req.path,
+        method: req.method,
+      });
+
+      return res.status(403).json({
+        success: false,
+        error: `Permission denied: ${permission}`,
+        code: 'PERMISSION_DENIED',
+        details: {
+          requiredPermission: permission,
+        },
+      });
+    } catch (error) {
+      logger.error('[requirePermission] Error checking permission', {
+        error: error instanceof Error ? error.message : String(error),
+        userId: user.id,
+        permission,
+      });
+
+      return res.status(500).json({
+        success: false,
+        error: 'Error verifying permission',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  };
+};
+
+/**
+ * Require Any Permission Middleware
+ *
+ * Requires the user to have at least one of the specified permissions.
+ *
+ * @param permissions - Array of permission keys
+ *
+ * @example
+ * ```typescript
+ * router.get('/reports', requireAnyPermission(['analytics.view', 'reports.view']), ReportController.list);
+ * ```
+ */
+export const requireAnyPermission = (permissions: string[]) => {
+  return async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> => {
+    if (!req.user) {
+      return requireAuth(req, res, next);
+    }
+
+    const user = req.user as User;
+
+    try {
+      const { roleHasPermission, ADMIN_ROLES } = await import('@o4o/types');
+
+      // Admin roles have all permissions
+      if (ADMIN_ROLES.includes(user.role as any)) {
+        return next();
+      }
+
+      // Check direct permissions
+      for (const permission of permissions) {
+        if (user.permissions?.includes(permission)) {
+          return next();
+        }
+      }
+
+      // Check role-based permissions
+      for (const permission of permissions) {
+        if (roleHasPermission(user.role, permission)) {
+          return next();
+        }
+      }
+
+      // Check RoleAssignment-based roles
+      const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
+      const assignments = await assignmentRepo.find({
+        where: {
+          userId: user.id,
+          isActive: true,
+        },
+      });
+
+      for (const assignment of assignments) {
+        if (assignment.isValidNow()) {
+          for (const permission of permissions) {
+            if (roleHasPermission(assignment.role, permission)) {
+              return next();
+            }
+          }
+        }
+      }
+
+      // No permission found
+      logger.warn('[requireAnyPermission] Permission denied', {
+        userId: user.id,
+        email: user.email,
+        permissions,
+        path: req.path,
+        method: req.method,
+      });
+
+      return res.status(403).json({
+        success: false,
+        error: 'Permission denied',
+        code: 'PERMISSION_DENIED',
+        details: {
+          requiredPermissions: permissions,
+        },
+      });
+    } catch (error) {
+      logger.error('[requireAnyPermission] Error checking permissions', {
+        error: error instanceof Error ? error.message : String(error),
+        userId: user.id,
+        permissions,
+      });
+
+      return res.status(500).json({
+        success: false,
+        error: 'Error verifying permissions',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  };
+};
+
+/**
  * Backwards compatibility aliases
  */
 export const authenticate = requireAuth;

@@ -1,10 +1,96 @@
 // API related types
+
+/**
+ * General API Error Codes (SSOT)
+ */
+export const API_ERROR_CODES = {
+  // Generic errors
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+
+  // Resource errors (404)
+  NOT_FOUND: 'NOT_FOUND',
+  RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
+  USER_NOT_FOUND: 'USER_NOT_FOUND',
+
+  // Validation errors (400)
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  INVALID_REQUEST: 'INVALID_REQUEST',
+  MISSING_REQUIRED_FIELD: 'MISSING_REQUIRED_FIELD',
+  INVALID_FORMAT: 'INVALID_FORMAT',
+
+  // Conflict errors (409)
+  ALREADY_EXISTS: 'ALREADY_EXISTS',
+  DUPLICATE_ENTRY: 'DUPLICATE_ENTRY',
+
+  // Rate limiting (429)
+  RATE_LIMITED: 'RATE_LIMITED',
+
+  // Database errors
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  QUERY_FAILED: 'QUERY_FAILED',
+
+  // File/Upload errors
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
+  UPLOAD_FAILED: 'UPLOAD_FAILED',
+
+  // External service errors
+  EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  EMAIL_SEND_FAILED: 'EMAIL_SEND_FAILED',
+} as const;
+
+export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
+
+/**
+ * HTTP Status Codes (for reference)
+ */
+export const HTTP_STATUS_CODES = {
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  SERVICE_UNAVAILABLE: 503,
+} as const;
+
+export type HttpStatusCode = (typeof HTTP_STATUS_CODES)[keyof typeof HTTP_STATUS_CODES];
+
+/**
+ * Standard API Success Response
+ */
 export interface ApiResponse<T = unknown> {
+  success: true;
   data: T;
-  success: boolean;
   message?: string;
 }
 
+/**
+ * Standard API Error Response
+ */
+export interface ApiErrorResponse {
+  success: false;
+  error: string;        // Human-readable message
+  code?: string;        // Machine-readable error code (ApiErrorCode or AuthErrorCode)
+  details?: unknown;    // Additional error details (validation errors, etc.)
+}
+
+/**
+ * Union type for any API response
+ */
+export type ApiResult<T = unknown> = ApiResponse<T> | ApiErrorResponse;
+
+/**
+ * Legacy ApiError interface (deprecated, use ApiErrorResponse)
+ * @deprecated Use ApiErrorResponse instead
+ */
 export interface ApiError {
   code: string;
   message: string;
@@ -19,13 +105,22 @@ export interface PaginationParams {
   order?: 'asc' | 'desc';
 }
 
-export interface PaginatedApiResponse<T> extends ApiResponse<T[]> {
+/**
+ * Paginated API Response
+ */
+export interface PaginatedApiResponse<T> {
+  success: true;
+  data: T[];
   pagination: {
-    currentPage: number;
-    pageSize: number;
-    totalItems: number;
+    page: number;        // Renamed for consistency
+    limit: number;       // Renamed for consistency
+    total: number;       // Total items
     totalPages: number;
   };
+  // Legacy aliases for backward compatibility
+  currentPage?: number;
+  pageSize?: number;
+  totalItems?: number;
 }
 
 // API request types

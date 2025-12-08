@@ -395,6 +395,16 @@ export class ContentApi {
     return response.data
   }
 
+  static async publishTemplate(id: string): Promise<ApiResponse<Template>> {
+    const response = await unifiedApi.raw.post(`/admin/templates/${id}/publish`)
+    return response.data
+  }
+
+  static async unpublishTemplate(id: string): Promise<ApiResponse<Template>> {
+    const response = await unifiedApi.raw.post(`/admin/templates/${id}/unpublish`)
+    return response.data
+  }
+
   // Menus
   static async getMenus(): Promise<ApiResponse<Menu[]>> {
     const response = await unifiedApi.raw.get('/admin/menus')

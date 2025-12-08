@@ -196,12 +196,21 @@ export class AuthController extends BaseController {
   /**
    * POST /api/v1/auth/refresh
    * Refresh access token
+   *
+   * Response format (unified):
+   * - Success: { success: true, data: { accessToken, refreshToken, expiresIn } }
+   * - Error: { success: false, error: "ERROR_CODE", code: "ERROR_CODE" }
    */
   static async refresh(req: Request, res: Response): Promise<any> {
     const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
 
     if (!refreshToken) {
-      return BaseController.unauthorized(res, 'Refresh token not provided');
+      authenticationService.clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        error: 'Refresh token not provided',
+        code: 'NO_REFRESH_TOKEN',
+      });
     }
 
     try {
@@ -209,7 +218,11 @@ export class AuthController extends BaseController {
 
       if (!tokens) {
         authenticationService.clearAuthCookies(res);
-        return BaseController.unauthorized(res, 'Invalid refresh token');
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid or expired refresh token',
+          code: 'INVALID_REFRESH_TOKEN',
+        });
       }
 
       authenticationService.setAuthCookies(res, tokens);
@@ -218,6 +231,7 @@ export class AuthController extends BaseController {
         message: 'Token refreshed successfully',
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
+        expiresIn: tokens.expiresIn || 900, // Default 15 minutes
       });
     } catch (error: any) {
       logger.error('[AuthController.refresh] Token refresh error', {
@@ -225,7 +239,14 @@ export class AuthController extends BaseController {
       });
 
       authenticationService.clearAuthCookies(res);
-      return BaseController.unauthorized(res, 'Invalid or expired refresh token');
+
+      // Return specific error code for FE handling
+      const errorCode = error.code || 'TOKEN_EXPIRED';
+      return res.status(401).json({
+        success: false,
+        error: error.message || 'Invalid or expired refresh token',
+        code: errorCode,
+      });
     }
   }
 

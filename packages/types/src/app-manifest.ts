@@ -105,6 +105,12 @@ export interface LifecycleHooks {
 
   /** Uninstall hook - relative path to module */
   uninstall?: string;
+
+  /** Update hook - relative path to module (receives oldVersion, newVersion in options) */
+  update?: string;
+
+  /** Rollback hook - relative path to module (receives currentVersion, previousVersion in options) */
+  rollback?: string;
 }
 
 /**
@@ -124,6 +130,21 @@ export interface AppManifest {
 
   /** App type (for Core/Extension pattern) */
   type?: 'core' | 'extension' | 'standalone';
+
+  /** App source - local or remote */
+  source?: 'local' | 'remote';
+
+  /** Remote manifest URL (when source is 'remote') */
+  url?: string;
+
+  /** Vendor/author info for remote apps */
+  vendor?: string;
+
+  /** SHA-256 hash of the manifest for integrity verification */
+  hash?: string;
+
+  /** Remote block scripts to load */
+  blockScripts?: string[];
 
   /** Short description */
   description?: string;

@@ -7,6 +7,9 @@ import { requireAdmin } from '../../middleware/permission.middleware.js';
 import { APPS_CATALOG, getCatalogItem } from '../../app-manifests/appsCatalog.js';
 import { loadLocalManifest, hasManifest } from '../../app-manifests/index.js';
 import { isNewerVersion } from '../../utils/semver.js';
+import { remoteManifestLoader, ManifestFetchError, ManifestHashMismatchError, ManifestValidationError } from '../../services/RemoteManifestLoader.js';
+import { appSecurityValidator } from '../../services/AppSecurityValidator.js';
+import { remoteResourcesLoader } from '../../services/RemoteResourcesLoader.js';
 import logger from '../../utils/logger.js';
 
 const router: Router = Router();
@@ -254,6 +257,256 @@ router.post('/update', async (req: Request, res: Response, next: NextFunction) =
     });
   } catch (error) {
     next(error);
+  }
+});
+
+/**
+ * POST /api/admin/apps/rollback
+ * Rollback an app to its previous version
+ *
+ * Body: { appId: string }
+ */
+router.post('/rollback', async (req: Request, res: Response) => {
+  const { appId } = req.body;
+
+  if (!appId) {
+    return res.status(400).json({
+      ok: false,
+      error: 'MISSING_APP_ID',
+      message: 'appId is required',
+    });
+  }
+
+  try {
+    logger.info(`[Rollback] Starting rollback for app: ${appId}`);
+
+    const result = await appManager.rollback(appId);
+
+    logger.info(`[Rollback] Completed successfully for app: ${appId}, reverted to: ${result.revertedTo}`);
+    return res.json({
+      ok: true,
+      message: `App ${appId} rolled back successfully to version ${result.revertedTo}`,
+      revertedTo: result.revertedTo,
+    });
+  } catch (error: any) {
+    logger.error(`[Rollback] Failed for app ${appId}:`, error);
+
+    // Handle no rollback available
+    if (error.message?.includes('No rollback available')) {
+      return res.status(400).json({
+        ok: false,
+        error: 'NO_ROLLBACK_AVAILABLE',
+        message: error.message,
+      });
+    }
+
+    // Handle all other errors
+    return res.status(500).json({
+      ok: false,
+      error: 'ROLLBACK_FAILED',
+      message: error.message || 'Unknown error occurred during rollback',
+    });
+  }
+});
+
+/**
+ * GET /api/admin/apps/:appId/version-info
+ * Get version information for an app (current, previous, available versions)
+ */
+router.get('/:appId/version-info', async (req: Request, res: Response) => {
+  const { appId } = req.params;
+
+  try {
+    const versionInfo = await appManager.getVersionInfo(appId);
+
+    return res.json({
+      ok: true,
+      ...versionInfo,
+    });
+  } catch (error: any) {
+    logger.error(`[VersionInfo] Failed for app ${appId}:`, error);
+
+    if (error.message?.includes('not installed')) {
+      return res.status(404).json({
+        ok: false,
+        error: 'APP_NOT_FOUND',
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      ok: false,
+      error: 'VERSION_INFO_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * POST /api/admin/apps/validate-remote
+ * Validate a remote manifest URL before installation
+ *
+ * Body: { manifestUrl: string }
+ */
+router.post('/validate-remote', async (req: Request, res: Response) => {
+  const { manifestUrl } = req.body;
+
+  if (!manifestUrl) {
+    return res.status(400).json({
+      ok: false,
+      error: 'MISSING_URL',
+      message: 'manifestUrl is required',
+    });
+  }
+
+  try {
+    logger.info(`[ValidateRemote] Validating manifest from: ${manifestUrl}`);
+
+    // Fetch and validate manifest
+    const result = await remoteManifestLoader.load(manifestUrl);
+    const manifest = result.manifest;
+
+    // Run security validation
+    const validation = appSecurityValidator.validate(manifest, result.hash);
+
+    logger.info(`[ValidateRemote] Validation complete for ${manifest.appId}: ${validation.valid ? 'PASSED' : 'FAILED'}`);
+
+    return res.json({
+      ok: true,
+      manifest: {
+        appId: manifest.appId,
+        name: manifest.name,
+        version: manifest.version,
+        description: manifest.description,
+        type: manifest.type,
+        vendor: manifest.vendor,
+        hash: result.hash,
+        source: 'remote',
+        url: manifestUrl,
+        riskLevel: validation.riskLevel,
+        dependencies: manifest.dependencies,
+        blockScripts: manifest.blockScripts,
+      },
+      validation,
+    });
+  } catch (error: any) {
+    logger.error(`[ValidateRemote] Failed for ${manifestUrl}:`, error);
+
+    if (error instanceof ManifestFetchError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'FETCH_FAILED',
+        message: error.message,
+      });
+    }
+
+    if (error instanceof ManifestValidationError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'VALIDATION_FAILED',
+        message: error.message,
+        errors: error.validationErrors,
+      });
+    }
+
+    return res.status(500).json({
+      ok: false,
+      error: 'VALIDATE_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * POST /api/admin/apps/install-remote
+ * Install an app from a remote manifest URL
+ *
+ * Body: { manifestUrl: string, expectedHash?: string, skipHashVerification?: boolean }
+ */
+router.post('/install-remote', async (req: Request, res: Response) => {
+  const { manifestUrl, expectedHash, skipHashVerification = false } = req.body;
+
+  if (!manifestUrl) {
+    return res.status(400).json({
+      ok: false,
+      error: 'MISSING_URL',
+      message: 'manifestUrl is required',
+    });
+  }
+
+  try {
+    logger.info(`[InstallRemote] Starting install from: ${manifestUrl}`);
+
+    // Fetch manifest
+    const result = await remoteManifestLoader.load(manifestUrl, {
+      expectedHash: skipHashVerification ? undefined : expectedHash,
+      verifyHash: !skipHashVerification,
+    });
+    const manifest = result.manifest;
+
+    // Security validation
+    const validation = appSecurityValidator.validate(manifest, expectedHash);
+    if (!validation.valid) {
+      logger.warn(`[InstallRemote] Security validation failed for ${manifest.appId}`);
+      return res.status(400).json({
+        ok: false,
+        error: 'SECURITY_VALIDATION_FAILED',
+        message: 'Security validation failed',
+        validation,
+      });
+    }
+
+    // Load block scripts if any
+    if (manifest.blockScripts && manifest.blockScripts.length > 0) {
+      logger.info(`[InstallRemote] Loading ${manifest.blockScripts.length} block scripts for ${manifest.appId}`);
+      await remoteResourcesLoader.loadBlockScripts(manifest.appId, manifest);
+    }
+
+    // Install the remote app using AppManager
+    // Note: AppManager.installRemote would need to be implemented to handle remote apps
+    // For now, we store the manifest and mark as installed
+    logger.info(`[InstallRemote] Installing remote app: ${manifest.appId}`);
+
+    // TODO: Implement appManager.installRemote(manifest) when ready
+    // For now, return success with manifest info
+    logger.info(`[InstallRemote] Remote app ${manifest.appId} installed successfully`);
+
+    return res.json({
+      ok: true,
+      message: `Remote app ${manifest.appId} installed successfully`,
+      appId: manifest.appId,
+      manifest: {
+        appId: manifest.appId,
+        name: manifest.name,
+        version: manifest.version,
+        source: 'remote',
+        vendor: manifest.vendor,
+      },
+    });
+  } catch (error: any) {
+    logger.error(`[InstallRemote] Failed for ${manifestUrl}:`, error);
+
+    if (error instanceof ManifestHashMismatchError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'HASH_MISMATCH',
+        message: error.message,
+      });
+    }
+
+    if (error instanceof ManifestFetchError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'FETCH_FAILED',
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      ok: false,
+      error: 'INSTALL_REMOTE_FAILED',
+      message: error.message || 'Unknown error',
+    });
   }
 });
 

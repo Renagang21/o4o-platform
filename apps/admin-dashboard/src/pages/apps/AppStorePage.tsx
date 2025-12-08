@@ -1,12 +1,16 @@
-import { FC, useState, useEffect } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2 } from 'lucide-react';
+import { FC, useState, useEffect, useMemo } from 'react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { adminAppsApi, AppRegistryEntry, AppCatalogItem } from '@/api/admin-apps';
+import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult } from '@/api/admin-apps';
 
 type Tab = 'market' | 'installed';
+
+// Lifecycle action status for UI feedback
+type LifecycleStatus = 'idle' | 'installing' | 'activating' | 'deactivating' | 'uninstalling' | 'updating' | 'rolling_back';
 
 interface AppStorePageProps {
   defaultTab?: Tab;
@@ -26,7 +30,72 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   const [installedApps, setInstalledApps] = useState<AppRegistryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [lifecycleStatus, setLifecycleStatus] = useState<Record<string, LifecycleStatus>>({});
   const { toast } = useToast();
+
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showDependencies, setShowDependencies] = useState<string | null>(null);
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'local' | 'remote'>('all');
+
+  // Remote app install state
+  const [showRemoteInstall, setShowRemoteInstall] = useState(false);
+  const [remoteUrl, setRemoteUrl] = useState('');
+  const [remoteValidating, setRemoteValidating] = useState(false);
+  const [remoteValidation, setRemoteValidation] = useState<{
+    manifest: AppCatalogItem;
+    validation: SecurityValidationResult;
+  } | null>(null);
+
+  // Extract unique categories from apps
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    marketApps.forEach(app => {
+      if (app.category) cats.add(app.category);
+    });
+    return ['all', ...Array.from(cats).sort()];
+  }, [marketApps]);
+
+  // Filter market apps by search, category, and source
+  const filteredMarketApps = useMemo(() => {
+    let filtered = marketApps;
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(app => app.category === selectedCategory);
+    }
+
+    // Filter by source
+    if (sourceFilter !== 'all') {
+      filtered = filtered.filter(app => (app.source || 'local') === sourceFilter);
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(app =>
+        app.name.toLowerCase().includes(query) ||
+        app.description?.toLowerCase().includes(query) ||
+        app.appId.toLowerCase().includes(query) ||
+        app.vendor?.toLowerCase().includes(query) ||
+        app.tags?.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+
+    return filtered;
+  }, [marketApps, selectedCategory, sourceFilter, searchQuery]);
+
+  // Filter installed apps by search
+  const filteredInstalledApps = useMemo(() => {
+    if (!searchQuery.trim()) return installedApps;
+
+    const query = searchQuery.toLowerCase().trim();
+    return installedApps.filter(app =>
+      app.name.toLowerCase().includes(query) ||
+      app.appId.toLowerCase().includes(query)
+    );
+  }, [installedApps, searchQuery]);
 
   // Fetch data on mount
   useEffect(() => {
@@ -56,6 +125,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
 
   const handleInstall = async (appId: string) => {
     setActionLoading(appId);
+    setLifecycleStatus(prev => ({ ...prev, [appId]: 'installing' }));
     try {
       await adminAppsApi.installApp(appId);
       await loadData();
@@ -93,11 +163,13 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       }
     } finally {
       setActionLoading(null);
+      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
     }
   };
 
   const handleActivate = async (appId: string) => {
     setActionLoading(appId);
+    setLifecycleStatus(prev => ({ ...prev, [appId]: 'activating' }));
     try {
       await adminAppsApi.activateApp(appId);
       await loadData();
@@ -115,11 +187,13 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       });
     } finally {
       setActionLoading(null);
+      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
     }
   };
 
   const handleDeactivate = async (appId: string) => {
     setActionLoading(appId);
+    setLifecycleStatus(prev => ({ ...prev, [appId]: 'deactivating' }));
     try {
       await adminAppsApi.deactivateApp(appId);
       await loadData();
@@ -137,6 +211,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       });
     } finally {
       setActionLoading(null);
+      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
     }
   };
 
@@ -175,6 +250,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     }
 
     setActionLoading(appId);
+    setLifecycleStatus(prev => ({ ...prev, [appId]: 'uninstalling' }));
     try {
       await adminAppsApi.uninstallApp(appId, purge);
       await loadData();
@@ -207,11 +283,13 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       }
     } finally {
       setActionLoading(null);
+      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
     }
   };
 
   const handleUpdate = async (appId: string) => {
     setActionLoading(appId);
+    setLifecycleStatus(prev => ({ ...prev, [appId]: 'updating' }));
     try {
       await adminAppsApi.updateApp(appId);
       await loadData();
@@ -229,6 +307,115 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       });
     } finally {
       setActionLoading(null);
+      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
+    }
+  };
+
+  const handleRollback = async (appId: string, previousVersion: string) => {
+    if (!confirm(`${appId} 앱을 이전 버전(${previousVersion})으로 롤백하시겠습니까?`)) {
+      return;
+    }
+
+    setActionLoading(appId);
+    setLifecycleStatus(prev => ({ ...prev, [appId]: 'rolling_back' }));
+    try {
+      const result = await adminAppsApi.rollbackApp(appId);
+      await loadData();
+      toast({
+        title: '롤백 완료',
+        description: `${appId} 앱이 버전 ${result.revertedTo}로 롤백되었습니다.`,
+      });
+    } catch (error: any) {
+      console.error('Failed to rollback app:', error);
+      const errorCode = error.response?.data?.error;
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+
+      if (errorCode === 'NO_ROLLBACK_AVAILABLE') {
+        toast({
+          title: '롤백 불가',
+          description: '이전 버전 정보가 없습니다.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: '롤백 실패',
+          description: `${appId}: ${errorMessage}`,
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      setActionLoading(null);
+      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
+    }
+  };
+
+  // Validate remote manifest
+  const handleValidateRemote = async () => {
+    if (!remoteUrl.trim()) return;
+
+    setRemoteValidating(true);
+    setRemoteValidation(null);
+
+    try {
+      const result = await adminAppsApi.validateRemoteManifest(remoteUrl.trim());
+      setRemoteValidation(result);
+    } catch (error: any) {
+      console.error('Failed to validate remote manifest:', error);
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+      toast({
+        title: '검증 실패',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setRemoteValidating(false);
+    }
+  };
+
+  // Install remote app
+  const handleInstallRemote = async () => {
+    if (!remoteValidation) return;
+
+    setActionLoading('remote');
+    try {
+      await adminAppsApi.installRemoteApp({
+        manifestUrl: remoteUrl.trim(),
+        expectedHash: remoteValidation.manifest.hash,
+      });
+      await loadData();
+      setShowRemoteInstall(false);
+      setRemoteUrl('');
+      setRemoteValidation(null);
+      toast({
+        title: '설치 완료',
+        description: `${remoteValidation.manifest.name} 앱이 설치되었습니다.`,
+      });
+    } catch (error: any) {
+      console.error('Failed to install remote app:', error);
+      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
+      toast({
+        title: '설치 실패',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Get risk level badge
+  const getRiskBadge = (riskLevel?: 'low' | 'medium' | 'high' | 'critical') => {
+    switch (riskLevel) {
+      case 'low':
+        return <Badge className="bg-green-500"><ShieldCheck className="w-3 h-3 mr-1" />안전</Badge>;
+      case 'medium':
+        return <Badge className="bg-yellow-500"><Shield className="w-3 h-3 mr-1" />주의</Badge>;
+      case 'high':
+        return <Badge className="bg-orange-500"><ShieldAlert className="w-3 h-3 mr-1" />경고</Badge>;
+      case 'critical':
+        return <Badge className="bg-red-500"><ShieldX className="w-3 h-3 mr-1" />위험</Badge>;
+      default:
+        return null;
     }
   };
 
@@ -284,19 +471,227 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         </button>
       </div>
 
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Search Input */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="앱 검색 (이름, 설명, 태그, 벤더)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Category Filter (only show in market tab) */}
+        {activeTab === 'market' && (
+          <>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="pl-10 pr-8 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer min-w-[150px]"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === 'all' ? '모든 카테고리' : cat}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+            </div>
+
+            {/* Source Filter */}
+            <div className="relative">
+              <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value as 'all' | 'local' | 'remote')}
+                className="pl-10 pr-8 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer min-w-[120px]"
+              >
+                <option value="all">모든 소스</option>
+                <option value="local">로컬</option>
+                <option value="remote">원격</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+            </div>
+
+            {/* Remote Install Button */}
+            <Button
+              variant="outline"
+              onClick={() => setShowRemoteInstall(true)}
+              className="whitespace-nowrap"
+            >
+              <Link className="w-4 h-4 mr-2" />
+              URL로 설치
+            </Button>
+          </>
+        )}
+      </div>
+
+      {/* Remote Install Modal */}
+      {showRemoteInstall && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-4 space-y-4">
+            <h3 className="text-lg font-bold">원격 앱 설치</h3>
+            <p className="text-sm text-gray-600">
+              앱 매니페스트 URL을 입력하여 원격 앱을 설치합니다.
+            </p>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">매니페스트 URL</label>
+              <div className="flex gap-2">
+                <Input
+                  type="url"
+                  placeholder="https://example.com/app/manifest.json"
+                  value={remoteUrl}
+                  onChange={(e) => setRemoteUrl(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleValidateRemote}
+                  disabled={remoteValidating || !remoteUrl.trim()}
+                >
+                  {remoteValidating ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    '검증'
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Validation Result */}
+            {remoteValidation && (
+              <div className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{remoteValidation.manifest.name}</span>
+                  {getRiskBadge(remoteValidation.validation.riskLevel)}
+                </div>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <div>버전: {remoteValidation.manifest.version}</div>
+                  {remoteValidation.manifest.vendor && (
+                    <div>벤더: {remoteValidation.manifest.vendor}</div>
+                  )}
+                  {remoteValidation.manifest.description && (
+                    <div>{remoteValidation.manifest.description}</div>
+                  )}
+                </div>
+
+                {/* Warnings */}
+                {remoteValidation.validation.warnings.length > 0 && (
+                  <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
+                    <div className="font-medium mb-1">경고:</div>
+                    {remoteValidation.validation.warnings.map((w, i) => (
+                      <div key={i}>• {w.message}</div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Errors */}
+                {remoteValidation.validation.errors.length > 0 && (
+                  <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                    <div className="font-medium mb-1">오류:</div>
+                    {remoteValidation.validation.errors.map((e, i) => (
+                      <div key={i}>• {e.message}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowRemoteInstall(false);
+                  setRemoteUrl('');
+                  setRemoteValidation(null);
+                }}
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleInstallRemote}
+                disabled={
+                  !remoteValidation ||
+                  !remoteValidation.validation.valid ||
+                  actionLoading === 'remote'
+                }
+              >
+                {actionLoading === 'remote' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    설치 중...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    설치
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filter Results Info */}
+      {(searchQuery || selectedCategory !== 'all') && (
+        <div className="text-sm text-gray-500">
+          {activeTab === 'market' ? (
+            <>
+              {filteredMarketApps.length}개 앱 표시 중
+              {searchQuery && <span> (검색: "{searchQuery}")</span>}
+              {selectedCategory !== 'all' && <span> (카테고리: {selectedCategory})</span>}
+            </>
+          ) : (
+            <>
+              {filteredInstalledApps.length}개 앱 표시 중
+              {searchQuery && <span> (검색: "{searchQuery}")</span>}
+            </>
+          )}
+        </div>
+      )}
+
       {/* Market Tab */}
       {activeTab === 'market' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {marketApps.map((app) => {
+          {filteredMarketApps.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              {searchQuery || selectedCategory !== 'all' ? '검색 결과가 없습니다.' : '사용 가능한 앱이 없습니다.'}
+            </div>
+          ) : filteredMarketApps.map((app) => {
             const installed = getInstallStatus(app.appId);
+            const status = lifecycleStatus[app.appId] || 'idle';
+            const typeBadgeColor = app.type === 'core' ? 'bg-blue-500' : app.type === 'extension' ? 'bg-purple-500' : 'bg-gray-500';
             return (
-              <Card key={app.appId}>
+              <Card key={app.appId} className={status !== 'idle' ? 'ring-2 ring-blue-300' : ''}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>{app.name}</span>
-                    {app.category && (
-                      <Badge variant="outline">{app.category}</Badge>
-                    )}
+                    <span className="flex items-center gap-2">
+                      {app.name}
+                      {app.type && (
+                        <Badge variant="default" className={`text-xs ${typeBadgeColor}`}>
+                          {app.type === 'core' ? '코어' : app.type === 'extension' ? '확장' : '독립'}
+                        </Badge>
+                      )}
+                      {app.source === 'remote' && (
+                        <Badge variant="outline" className="text-xs border-cyan-300 text-cyan-600">
+                          <Globe className="w-3 h-3 mr-1" />
+                          원격
+                        </Badge>
+                      )}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {app.riskLevel && getRiskBadge(app.riskLevel)}
+                      {app.category && (
+                        <Badge variant="outline">{app.category}</Badge>
+                      )}
+                    </div>
                   </CardTitle>
                   <CardDescription>{app.description}</CardDescription>
                 </CardHeader>
@@ -305,6 +700,40 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                     <div className="text-sm text-gray-600">
                       <div>버전: {app.version}</div>
                       {app.author && <div>개발자: {app.author}</div>}
+                      {app.vendor && <div>벤더: {app.vendor}</div>}
+                      {/* Dependencies info */}
+                      {app.dependencies && Object.keys(app.dependencies).length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-gray-100">
+                          <button
+                            onClick={() => setShowDependencies(showDependencies === app.appId ? null : app.appId)}
+                            className="flex items-center text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            <Info className="w-3 h-3 mr-1" />
+                            의존성 ({Object.keys(app.dependencies).length})
+                            <ChevronDown className={`w-3 h-3 ml-1 transition-transform ${showDependencies === app.appId ? 'rotate-180' : ''}`} />
+                          </button>
+                          {showDependencies === app.appId && (
+                            <div className="mt-1 text-xs text-gray-500 pl-4">
+                              {Object.entries(app.dependencies).map(([dep, ver]) => (
+                                <div key={dep}>{dep}: {ver}</div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {/* Tags */}
+                      {app.tags && app.tags.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {app.tags.slice(0, 3).map((tag) => (
+                            <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                              {tag}
+                            </span>
+                          ))}
+                          {app.tags.length > 3 && (
+                            <span className="text-xs text-gray-400">+{app.tags.length - 3}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {installed ? (
                       <div className="space-y-2">
@@ -350,37 +779,62 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       {/* Installed Tab */}
       {activeTab === 'installed' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {installedApps.length === 0 ? (
+          {filteredInstalledApps.length === 0 ? (
             <div className="col-span-full text-center py-12 text-gray-500">
-              설치된 앱이 없습니다.
+              {searchQuery ? '검색 결과가 없습니다.' : '설치된 앱이 없습니다.'}
             </div>
           ) : (
-            installedApps.map((app) => (
-              <Card key={app.id}>
+            filteredInstalledApps.map((app) => {
+              const status = lifecycleStatus[app.appId] || 'idle';
+              const statusLabel: Record<LifecycleStatus, string> = {
+                idle: '',
+                installing: '설치 중...',
+                activating: '활성화 중...',
+                deactivating: '비활성화 중...',
+                uninstalling: '삭제 중...',
+                updating: '업데이트 중...',
+                rolling_back: '롤백 중...',
+              };
+              const canRollback = !!app.previousVersion;
+              return (
+              <Card key={app.id} className={status !== 'idle' ? 'ring-2 ring-blue-300' : ''}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{app.name}</span>
                     <div className="flex items-center space-x-2">
-                      {app.hasUpdate && (
+                      {status !== 'idle' && (
+                        <Badge variant="default" className="bg-blue-500 animate-pulse">
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          {statusLabel[status]}
+                        </Badge>
+                      )}
+                      {app.hasUpdate && status === 'idle' && (
                         <Badge variant="default" className="bg-orange-500">
                           업데이트 가능
                         </Badge>
                       )}
-                      <Badge
-                        variant={
-                          app.status === 'active'
-                            ? 'default'
+                      {canRollback && status === 'idle' && (
+                        <Badge variant="outline" className="text-purple-600 border-purple-300">
+                          롤백 가능
+                        </Badge>
+                      )}
+                      {status === 'idle' && (
+                        <Badge
+                          variant={
+                            app.status === 'active'
+                              ? 'default'
+                              : app.status === 'inactive'
+                              ? 'secondary'
+                              : 'outline'
+                          }
+                        >
+                          {app.status === 'active'
+                            ? '활성'
                             : app.status === 'inactive'
-                            ? 'secondary'
-                            : 'outline'
-                        }
-                      >
-                        {app.status === 'active'
-                          ? '활성'
-                          : app.status === 'inactive'
-                          ? '비활성'
-                          : '설치됨'}
-                      </Badge>
+                            ? '비활성'
+                            : '설치됨'}
+                        </Badge>
+                      )}
                     </div>
                   </CardTitle>
                   <CardDescription>App ID: {app.appId}</CardDescription>
@@ -389,6 +843,11 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                   <div className="space-y-3">
                     <div className="text-sm text-gray-600">
                       <div>현재 버전: {app.version}</div>
+                      {app.previousVersion && (
+                        <div className="text-purple-600 text-xs">
+                          이전 버전: {app.previousVersion}
+                        </div>
+                      )}
                       {app.hasUpdate && app.availableVersion && (
                         <div className="text-orange-600 font-medium">
                           최신 버전: {app.availableVersion}
@@ -426,26 +885,49 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                         </div>
                       ) : null}
                     </div>
-                    {app.hasUpdate && (
-                      <Button
-                        onClick={() => handleUpdate(app.appId)}
-                        disabled={actionLoading === app.appId}
-                        variant="default"
-                        className="w-full bg-orange-500 hover:bg-orange-600"
-                      >
-                        {actionLoading === app.appId ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            업데이트 중...
-                          </>
-                        ) : (
-                          <>
-                            <RefreshCw className="w-4 h-4 mr-2" />
-                            업데이트
-                          </>
-                        )}
-                      </Button>
-                    )}
+                    {/* Update and Rollback buttons */}
+                    <div className="flex space-x-2">
+                      {app.hasUpdate && (
+                        <Button
+                          onClick={() => handleUpdate(app.appId)}
+                          disabled={actionLoading === app.appId}
+                          variant="default"
+                          className="flex-1 bg-orange-500 hover:bg-orange-600"
+                        >
+                          {status === 'updating' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              업데이트 중...
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className="w-4 h-4 mr-2" />
+                              업데이트
+                            </>
+                          )}
+                        </Button>
+                      )}
+                      {canRollback && (
+                        <Button
+                          onClick={() => handleRollback(app.appId, app.previousVersion!)}
+                          disabled={actionLoading === app.appId}
+                          variant="outline"
+                          className="flex-1 border-purple-300 text-purple-600 hover:bg-purple-50"
+                        >
+                          {status === 'rolling_back' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              롤백 중...
+                            </>
+                          ) : (
+                            <>
+                              <RotateCcw className="w-4 h-4 mr-2" />
+                              롤백 ({app.previousVersion})
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
                     <div className="flex space-x-2">
                       {app.status === 'active' ? (
                         <Button
@@ -499,7 +981,8 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                   </div>
                 </CardContent>
               </Card>
-            ))
+              );
+            })
           )}
         </div>
       )}

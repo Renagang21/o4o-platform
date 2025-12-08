@@ -62,8 +62,12 @@ export class Template {
   @JoinColumn({ name: 'author_id' })
   author!: User
 
-  @Column({ type: 'boolean', default: true })
-  active!: boolean
+  @Column({
+    type: 'enum',
+    enum: ['draft', 'published'],
+    default: 'draft'
+  })
+  status!: 'draft' | 'published'
 
   @Column({ type: 'boolean', default: false })
   featured!: boolean

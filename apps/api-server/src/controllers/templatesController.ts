@@ -18,8 +18,13 @@ export class TemplatesController {
 
       const queryBuilder = this.templateRepository
         .createQueryBuilder('template')
-        .leftJoinAndSelect('template.author', 'author')
-        .where('template.active = :active', { active: true });
+        .leftJoinAndSelect('template.author', 'author');
+
+      // Filter by status if provided, otherwise show all
+      const { status } = req.query;
+      if (status === 'published' || status === 'draft') {
+        queryBuilder.where('template.status = :status', { status });
+      }
 
       // Apply filters
       if (type) {
@@ -200,7 +205,7 @@ export class TemplatesController {
         customFields,
         preview,
         authorId: userId,
-        active: true,
+        status: 'draft',
         featured,
         usageCount: 0,
         tags: Array.isArray(tags) ? tags : [],
@@ -263,7 +268,7 @@ export class TemplatesController {
         settings,
         customFields,
         preview,
-        active,
+        status,
         featured,
         tags,
         version,
@@ -278,7 +283,7 @@ export class TemplatesController {
         settings,
         customFields,
         preview,
-        active,
+        status,
         featured,
         tags: Array.isArray(tags) ? tags : template.tags,
         version,
@@ -330,8 +335,8 @@ export class TemplatesController {
         }
       }
 
-      // Don't actually delete, just mark as inactive
-      await this.templateRepository.update(id, { active: false });
+      // Hard delete the template
+      await this.templateRepository.delete(id);
 
       res.json({
         success: true,
@@ -342,6 +347,98 @@ export class TemplatesController {
       res.status(500).json({
         success: false,
         message: 'Failed to delete template',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // POST /api/admin/templates/:id/publish
+  async publishTemplate(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      const template = await this.templateRepository.findOne({ where: { id } });
+      if (!template) {
+        return res.status(404).json({
+          success: false,
+          message: 'Template not found'
+        });
+      }
+
+      // Check if user owns the template or is admin
+      if (template.authorId !== userId) {
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+        if (!user || user.role !== 'admin') {
+          return res.status(403).json({
+            success: false,
+            message: 'Not authorized to publish this template'
+          });
+        }
+      }
+
+      await this.templateRepository.update(id, { status: 'published' });
+
+      const updatedTemplate = await this.templateRepository.findOne({
+        where: { id },
+        relations: ['author']
+      });
+
+      res.json({
+        success: true,
+        data: updatedTemplate,
+        message: 'Template published successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to publish template',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // POST /api/admin/templates/:id/unpublish
+  async unpublishTemplate(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      const template = await this.templateRepository.findOne({ where: { id } });
+      if (!template) {
+        return res.status(404).json({
+          success: false,
+          message: 'Template not found'
+        });
+      }
+
+      // Check if user owns the template or is admin
+      if (template.authorId !== userId) {
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+        if (!user || user.role !== 'admin') {
+          return res.status(403).json({
+            success: false,
+            message: 'Not authorized to unpublish this template'
+          });
+        }
+      }
+
+      await this.templateRepository.update(id, { status: 'draft' });
+
+      const updatedTemplate = await this.templateRepository.findOne({
+        where: { id },
+        relations: ['author']
+      });
+
+      res.json({
+        success: true,
+        data: updatedTemplate,
+        message: 'Template unpublished successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to unpublish template',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
@@ -403,7 +500,7 @@ export class TemplatesController {
         customFields: parsedTemplate.customFields,
         preview: parsedTemplate.preview,
         authorId: userId,
-        active: true,
+        status: 'draft',
         featured: false,
         usageCount: 0,
         tags: parsedTemplate.tags || [],
@@ -515,7 +612,7 @@ export class TemplatesController {
             return {
               id: path.basename(file, '.json'),
               source: 'system',
-              active: true,
+              status: 'published',
               usageCount: 0,
               ...template
             };

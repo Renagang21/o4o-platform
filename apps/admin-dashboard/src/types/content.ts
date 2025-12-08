@@ -174,9 +174,8 @@ export interface Template {
   customFields?: string[] | Record<string, unknown> // Field group IDs or actual fields
   settings?: Record<string, unknown>
   isDefault?: boolean
-  active?: boolean
   featured?: boolean
-  status?: 'active' | 'inactive' | 'draft'
+  status: 'draft' | 'published'
   category?: string
   tags?: string[]
   version?: string

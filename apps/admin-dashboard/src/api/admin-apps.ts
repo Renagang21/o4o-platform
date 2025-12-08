@@ -14,15 +14,29 @@ export interface AppRegistryEntry {
   appId: string;
   name: string;
   version: string;
+  previousVersion?: string;  // Previous version for rollback
   status: 'installed' | 'active' | 'inactive';
   source: string;
   installedAt: string;
   updatedAt: string;
   availableVersion?: string; // Latest version from catalog
   hasUpdate?: boolean;       // Whether an update is available
+  canRollback?: boolean;     // Whether rollback is available
   ownsTables?: string[];     // Tables owned by this app
   ownsCPT?: string[];        // CPTs owned by this app
   ownsACF?: string[];        // ACF groups owned by this app
+}
+
+/**
+ * Version Info Response
+ */
+export interface VersionInfo {
+  appId: string;
+  currentVersion: string;
+  previousVersion: string | null;
+  availableVersion: string | null;
+  hasUpdate: boolean;
+  canRollback: boolean;
 }
 
 /**
@@ -37,6 +51,33 @@ export interface AppCatalogItem {
   icon?: string;
   homepage?: string;
   author?: string;
+  type?: 'core' | 'extension' | 'standalone';  // App type for Core/Extension pattern
+  tags?: string[];                              // Searchable tags
+  dependencies?: Record<string, string>;        // Dependencies: { appId: versionRange }
+  source?: 'local' | 'remote';                  // App source
+  vendor?: string;                              // Vendor for remote apps
+  url?: string;                                 // Remote manifest URL
+  hash?: string;                                // SHA-256 hash for integrity
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';  // Security risk level
+}
+
+/**
+ * Remote App Install Options
+ */
+export interface RemoteInstallOptions {
+  manifestUrl: string;
+  expectedHash?: string;
+  skipHashVerification?: boolean;
+}
+
+/**
+ * Security Validation Result
+ */
+export interface SecurityValidationResult {
+  valid: boolean;
+  errors: Array<{ code: string; message: string; field?: string }>;
+  warnings: Array<{ code: string; message: string; field?: string }>;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
 /**
@@ -100,5 +141,40 @@ export const adminAppsApi = {
    */
   updateApp: async (appId: string): Promise<void> => {
     await api.post('/admin/apps/update', { appId });
+  },
+
+  /**
+   * Rollback an app to its previous version
+   */
+  rollbackApp: async (appId: string): Promise<{ revertedTo: string }> => {
+    const response = await api.post('/admin/apps/rollback', { appId });
+    return response.data;
+  },
+
+  /**
+   * Get version info for an app
+   */
+  getVersionInfo: async (appId: string): Promise<VersionInfo> => {
+    const response = await api.get(`/admin/apps/${appId}/version-info`);
+    return response.data;
+  },
+
+  /**
+   * Install a remote app from URL
+   */
+  installRemoteApp: async (options: RemoteInstallOptions): Promise<{ appId: string; manifest: AppCatalogItem }> => {
+    const response = await api.post('/admin/apps/install-remote', options);
+    return response.data;
+  },
+
+  /**
+   * Validate a remote manifest URL (preview before install)
+   */
+  validateRemoteManifest: async (manifestUrl: string): Promise<{
+    manifest: AppCatalogItem;
+    validation: SecurityValidationResult;
+  }> => {
+    const response = await api.post('/admin/apps/validate-remote', { manifestUrl });
+    return response.data;
   },
 };

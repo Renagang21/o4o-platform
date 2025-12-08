@@ -12,10 +12,29 @@ export interface AppCatalogItem {
   version: string;
   description?: string;
   category?: string; // 'commerce', 'content', 'community', 'display', etc.
+  tags?: string[]; // searchable tags
   icon?: string;
   homepage?: string;
   author?: string;
+  type?: 'core' | 'extension' | 'standalone';
+  dependencies?: Record<string, string>; // { appId: versionRange }
 }
+
+/**
+ * Extended catalog item with manifest data (cached)
+ */
+export interface ExtendedCatalogItem extends AppCatalogItem {
+  permissions?: string[];
+  cpt?: string[];
+  acf?: string[];
+  routes?: string[];
+  hasLifecycle?: boolean;
+}
+
+// Manifest cache
+let manifestCache: Map<string, ExtendedCatalogItem> | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
  * Available Apps Catalog
@@ -29,6 +48,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '커뮤니티 게시판 기능 - 게시글, 댓글, 카테고리, 태그 지원',
     category: 'community',
+    tags: ['게시판', 'community', 'board', 'post', 'comment'],
+    type: 'core',
     author: 'O4O Platform',
   },
   {
@@ -37,6 +58,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.1.0',
     description: '매장용 디지털 사이니지 콘텐츠 관리 및 스케줄링',
     category: 'display',
+    tags: ['signage', '디지털사이니지', 'display', 'schedule'],
+    type: 'standalone',
     author: 'O4O Platform',
   },
   {
@@ -45,6 +68,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '화장품 매장 특화 포럼 (피부타입, 루틴, 제품 연동)',
     category: 'community',
+    tags: ['화장품', 'cosmetics', 'forum', 'skincare'],
+    type: 'extension',
+    dependencies: { 'forum': '>=1.0.0' },
     author: 'O4O Platform',
   },
   {
@@ -53,6 +79,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '멀티벤더 드랍쉬핑 마켓플레이스 코어 엔진',
     category: 'commerce',
+    tags: ['드랍쉬핑', 'dropshipping', 'marketplace', 'ecommerce', 'vendor'],
+    type: 'core',
     author: 'O4O Platform',
   },
   {
@@ -61,6 +89,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '화장품 특화 드랍쉬핑 기능 - 피부타입, 성분, 루틴 추천',
     category: 'commerce',
+    tags: ['화장품', 'cosmetics', 'dropshipping', 'skincare'],
+    type: 'extension',
+    dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
   {
@@ -69,6 +100,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '0.1.0',
     description: '학습 관리 시스템 - 강좌, 수강, 진도, 수료증 관리',
     category: 'education',
+    tags: ['LMS', '학습', 'education', 'course', 'learning'],
+    type: 'core',
     author: 'O4O Platform',
   },
   {
@@ -77,6 +110,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '전사 조직 관리 시스템 - 계층 구조, 멤버 관리, 조직 스코프 권한',
     category: 'organization',
+    tags: ['조직', 'organization', 'team', 'hierarchy', 'member'],
+    type: 'core',
     author: 'O4O Platform',
   },
   {
@@ -85,6 +120,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '0.1.0',
     description: '조직 단위 드랍쉬핑 통합 - 조직별 공동구매, 조직 가격 정책',
     category: 'integration',
+    tags: ['조직', 'organization', 'dropshipping', 'group-buy'],
+    type: 'extension',
+    dependencies: { 'organization-core': '>=1.0.0', 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
   {
@@ -93,6 +131,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '0.1.0',
     description: '조직 단위 포럼 통합 - 조직별 게시판, 계층 권한 관리',
     category: 'integration',
+    tags: ['조직', 'organization', 'forum', 'board'],
+    type: 'extension',
+    dependencies: { 'organization-core': '>=1.0.0', 'forum': '>=1.0.0' },
     author: 'O4O Platform',
   },
   {
@@ -101,6 +142,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '범용 판매자 운영 앱 - 공급자 승인, 리스팅 관리, 주문 추적, 정산 대시보드',
     category: 'commerce',
+    tags: ['판매자', 'seller', 'vendor', 'listing', 'settlement'],
+    type: 'extension',
+    dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
   {
@@ -109,6 +153,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '범용 공급자 운영 앱 - 상품 등록, Offer 관리, 주문 Relay, 정산 관리',
     category: 'commerce',
+    tags: ['공급자', 'supplier', 'product', 'offer', 'settlement'],
+    type: 'extension',
+    dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
   {
@@ -117,6 +164,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '파트너/어필리에이트 운영 앱 - 링크 추적, 전환 분석, 커미션 정산',
     category: 'commerce',
+    tags: ['파트너', 'partner', 'affiliate', 'commission', 'referral'],
+    type: 'extension',
+    dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
 ];
@@ -139,4 +189,96 @@ export function getCatalogItem(appId: string): AppCatalogItem | undefined {
  */
 export function isInCatalog(appId: string): boolean {
   return APPS_CATALOG.some((app) => app.appId === appId);
+}
+
+/**
+ * Search apps by query string
+ * Searches in name, description, and tags
+ *
+ * @param query - Search query
+ * @returns Array of matching catalog items
+ */
+export function searchCatalog(query: string): AppCatalogItem[] {
+  if (!query || query.trim() === '') {
+    return APPS_CATALOG;
+  }
+
+  const normalizedQuery = query.toLowerCase().trim();
+
+  return APPS_CATALOG.filter((app) => {
+    // Search in name
+    if (app.name.toLowerCase().includes(normalizedQuery)) return true;
+
+    // Search in description
+    if (app.description?.toLowerCase().includes(normalizedQuery)) return true;
+
+    // Search in appId
+    if (app.appId.toLowerCase().includes(normalizedQuery)) return true;
+
+    // Search in tags
+    if (app.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))) return true;
+
+    return false;
+  });
+}
+
+/**
+ * Filter apps by category
+ *
+ * @param category - Category to filter by
+ * @returns Array of matching catalog items
+ */
+export function filterByCategory(category: string): AppCatalogItem[] {
+  if (!category || category === 'all') {
+    return APPS_CATALOG;
+  }
+
+  return APPS_CATALOG.filter((app) => app.category === category);
+}
+
+/**
+ * Get all unique categories in catalog
+ *
+ * @returns Array of category names
+ */
+export function getCategories(): string[] {
+  const categories = new Set<string>();
+
+  for (const app of APPS_CATALOG) {
+    if (app.category) {
+      categories.add(app.category);
+    }
+  }
+
+  return Array.from(categories).sort();
+}
+
+/**
+ * Get apps that depend on a specific app
+ *
+ * @param appId - App identifier
+ * @returns Array of apps that depend on this app
+ */
+export function getDependentApps(appId: string): AppCatalogItem[] {
+  return APPS_CATALOG.filter((app) => {
+    if (!app.dependencies) return false;
+    return Object.keys(app.dependencies).includes(appId);
+  });
+}
+
+/**
+ * Invalidate manifest cache
+ * Call this after install/uninstall/update operations
+ */
+export function invalidateManifestCache(): void {
+  manifestCache = null;
+  cacheTimestamp = 0;
+}
+
+/**
+ * Check if cache is valid
+ */
+export function isCacheValid(): boolean {
+  if (!manifestCache) return false;
+  return Date.now() - cacheTimestamp < CACHE_TTL;
 }

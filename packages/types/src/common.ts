@@ -53,7 +53,11 @@ export interface PermissionObject {
   action: string;
 }
 
-export interface Role {
+/**
+ * Role entity interface (database entity)
+ * Note: For role string type, use `Role` from auth/roles.ts
+ */
+export interface RoleEntity {
   id: string;
   name: string;
   description?: string;
@@ -62,3 +66,6 @@ export interface Role {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Note: The `Role` type export has been moved to auth/roles.ts
+// This RoleEntity is for database entity, not the role string type

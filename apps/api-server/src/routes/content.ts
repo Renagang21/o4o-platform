@@ -71,6 +71,10 @@ router.delete('/admin/templates/:id', templatesController.deleteTemplate.bind(te
 // System templates
 router.get('/admin/templates/system/:name', templatesController.getSystemTemplate.bind(templatesController));
 
+// Publish/Unpublish
+router.post('/admin/templates/:id/publish', templatesController.publishTemplate.bind(templatesController));
+router.post('/admin/templates/:id/unpublish', templatesController.unpublishTemplate.bind(templatesController));
+
 // Import/Export
 router.post('/admin/templates/import', templatesController.importTemplate.bind(templatesController));
 router.get('/admin/templates/:id/export', templatesController.exportTemplate.bind(templatesController));

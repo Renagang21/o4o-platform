@@ -2,7 +2,14 @@
 // Export all type definitions here
 
 export * from './api.js';
-export * from './auth.js';
+
+// Legacy auth exports (selectively, for backward compatibility)
+// Note: User, Permission are now in auth/index.ts (SSOT)
+export type { UserRole, AuthToken, SessionStatus } from './auth.js';
+export { COMMON_PERMISSIONS } from './auth.js';
+
+// New SSOT Auth module (P0 RBAC) - Primary source for auth types
+export * from './auth/index.js';
 export * from './common.js';
 export * from './database.js';
 export * from './performance.js';

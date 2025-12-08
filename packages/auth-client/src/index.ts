@@ -3,3 +3,9 @@ export * from './types.js';
 export * from './client.js';
 export * from './cookie-client.js';
 export * from './sso-client.js';
+
+// RBAC utilities
+export * from './rbac.js';
+
+// React hooks
+export * from './hooks.js';
