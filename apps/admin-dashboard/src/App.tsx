@@ -123,6 +123,9 @@ const GroupbuyCampaignDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyC
 const GroupbuyParticipantsPage = lazy(() => import('@/pages/groupbuy/GroupbuyParticipantsPage'));
 const GroupbuySettlementPage = lazy(() => import('@/pages/groupbuy/GroupbuySettlementPage'));
 
+// SellerOps Pages
+const SellerOpsRouter = lazy(() => import('@/pages/sellerops/SellerOpsRouter'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1094,6 +1097,17 @@ function App() {
                         <AppRouteGuard appId="forum-neture">
                           <Suspense fallback={<PageLoader />}>
                             <NetureForumPostForm />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* SellerOps - Seller Operations App */}
+                    <Route path="/sellerops/*" element={
+                      <AdminProtectedRoute requiredRoles={['seller', 'admin']}>
+                        <AppRouteGuard appId="sellerops">
+                          <Suspense fallback={<PageLoader />}>
+                            <SellerOpsRouter />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>
