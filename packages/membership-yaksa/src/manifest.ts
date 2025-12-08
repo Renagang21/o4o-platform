@@ -9,6 +9,7 @@
  */
 
 export const membershipYaksaManifest = {
+  id: 'membership-yaksa',
   appId: 'membership-yaksa',
   name: 'Membership Extension – Yaksa Organization',
   type: 'extension' as const,
