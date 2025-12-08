@@ -134,7 +134,10 @@ export class StartupService {
       logger.info('✅ App System initialized (Google AI ready)');
     } catch (appError) {
       logger.error('Failed to initialize App System:', appError);
-      throw appError; // Critical error - App System is core functionality
+      // Temporarily non-critical during clean DB reset + app installation
+      // Will be re-enabled after core apps are installed
+      logger.warn('⚠️  Continuing without App System (clean DB mode)');
+      // throw appError; // Critical error - App System is core functionality
     }
   }
 
