@@ -1,6 +1,6 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
-import { forumNetureManifest } from '@o4o-apps/forum-neture';
+import { forumCosmeticsManifest } from '@o4o-apps/forum-cosmetics';
 import { manifest as lmsCoreManifest } from '@o4o/lms-core';
 import { manifest as organizationCoreManifest } from '@o4o/organization-core';
 import { manifest as organizationForumManifest } from '@o4o-extensions/organization-forum';
@@ -18,8 +18,8 @@ import { supplieropsManifest } from './supplierops.manifest.js';
  * Type assertions are used here to accommodate the extended manifest schema.
  */
 const manifestRegistry: Record<string, AppManifest> = {
-  forum: forumManifest as any,
-  'forum-neture': forumNetureManifest as any,
+  'forum-core': forumManifest as any,
+  'forum-cosmetics': forumCosmeticsManifest as any,
   'lms-core': lmsCoreManifest as any,
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
