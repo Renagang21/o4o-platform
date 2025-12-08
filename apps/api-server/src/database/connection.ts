@@ -112,7 +112,7 @@ import { SupplierProfile } from '../entities/SupplierProfile.js';
 import { SellerProfile } from '../entities/SellerProfile.js';
 import { PartnerProfile } from '../entities/PartnerProfile.js';
 // Forum App entities (from @o4o-apps/forum package)
-// import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum';
+import { ForumPost, ForumCategory, ForumComment } from '@o4o-apps/forum';
 // Dropshipping Core entities (from @o4o/dropshipping-core package)
 // import { dropshippingEntities } from '@o4o/dropshipping-core';
 // Digital Signage entities
@@ -310,10 +310,9 @@ export const AppDataSource = new DataSource({
     SellerProfile,
     PartnerProfile,
     // Forum App entities (from @o4o-apps/forum package)
-    //     ForumPost,
-    //     ForumCategory,
-    //     ForumComment,
-    //     ForumTag,
+    ForumPost,
+    ForumCategory,
+    ForumComment,
     // Digital Signage entities
     SignageDevice,
     SignageSlide,
