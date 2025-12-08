@@ -292,7 +292,8 @@ export class AppDependencyResolver {
       result.push(node);
 
       // Reduce in-degree for dependent nodes
-      for (const dep of graph[node]) {
+      const deps = graph[node] || [];
+      for (const dep of deps) {
         const newDegree = inDegree.get(dep)! - 1;
         inDegree.set(dep, newDegree);
 
