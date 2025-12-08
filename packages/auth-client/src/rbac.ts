@@ -44,7 +44,7 @@ export function getActiveRoles(user: MeResponse | null): string[] {
   const now = new Date();
 
   return user.assignments
-    .filter((assignment) => {
+    .filter((assignment: RoleAssignment) => {
       if (!assignment.isActive) return false;
 
       // Check validFrom
@@ -59,7 +59,7 @@ export function getActiveRoles(user: MeResponse | null): string[] {
 
       return true;
     })
-    .map((assignment) => assignment.role);
+    .map((assignment: RoleAssignment) => assignment.role);
 }
 
 /**
