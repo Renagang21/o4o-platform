@@ -1,4 +1,4 @@
-import { AppManifest } from './types/context';
+import { AppManifest } from './types/context.js';
 
 /**
  * Organization-Core App Manifest
