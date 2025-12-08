@@ -31,8 +31,9 @@ export class Permission {
   category!: string;
 
   // App that owns this permission (nullable for system permissions)
-  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
-  @Column({ type: 'varchar', length: 100, nullable: true, select: false })
+  // TEMPORARY FIX: insert: false, select: false to avoid using non-existent column in DB
+  // TODO: Run migration to add appId column, then remove insert: false
+  @Column({ type: 'varchar', length: 100, nullable: true, insert: false, select: false })
   appId?: string;
 
   // Active status
