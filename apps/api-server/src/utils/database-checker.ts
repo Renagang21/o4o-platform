@@ -10,8 +10,10 @@ import logger from './logger.js';
 export class DatabaseChecker {
   private dataSource: DataSource;
   private requiredTables = [
-    'users',
-    'settings',
+    // Temporarily disabled during clean DB reset + app installation
+    // Will be re-enabled after core apps are installed
+    // 'users',
+    // 'settings',
   ];
   
   private optionalTables = [
