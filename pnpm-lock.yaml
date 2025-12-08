@@ -531,7 +531,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../../packages/types
-        version: link:../../packages/types
+        version: file:packages/types(react@19.1.1)
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: file:packages/utils
@@ -589,7 +589,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@types/compression':
         specifier: ^1.7.5
         version: 1.8.1
@@ -881,7 +881,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@types/bcryptjs':
         specifier: 2.4.6
         version: 2.4.6
@@ -1279,7 +1279,7 @@ importers:
         version: 19.1.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1455,7 +1455,7 @@ importers:
         version: 19.1.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1492,7 +1492,7 @@ importers:
         version: 19.1.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1576,7 +1576,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0
-        version: 6.30.1(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 6.30.1(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.4.5))
@@ -1604,7 +1604,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1629,7 +1629,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1693,7 +1693,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
@@ -1782,6 +1782,52 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.2.5
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
+
+  packages/sellerops:
+    dependencies:
+      '@nestjs/common':
+        specifier: ^10.0.0
+        version: 10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2)
+      '@nestjs/event-emitter':
+        specifier: ^2.0.0
+        version: 2.1.1(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@10.4.20(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.2))
+      '@nestjs/typeorm':
+        specifier: ^10.0.0
+        version: 10.0.2(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@10.4.20(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.2))(reflect-metadata@0.1.14)(rxjs@7.8.2)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2)))
+      '@o4o/dropshipping-core':
+        specifier: workspace:*
+        version: link:../dropshipping-core
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.87.1(react@19.1.1)
+      class-transformer:
+        specifier: ^0.5.0
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.0
+        version: 0.14.2
+      react:
+        specifier: ^19.0.0
+        version: 19.1.1
+      typeorm:
+        specifier: ^0.3.0
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.2
       rimraf:
         specifier: ^5.0.0
         version: 5.0.10
@@ -3619,6 +3665,12 @@ packages:
     peerDependencies:
       react: 18.2.0
       react-dom: 18.2.0
+
+  '@o4o/types@file:packages/types':
+    resolution: {directory: packages/types, type: directory}
+    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
+    peerDependencies:
+      react: 18.2.0
 
   '@o4o/utils@file:packages/utils':
     resolution: {directory: packages/utils, type: directory}
@@ -12287,7 +12339,7 @@ snapshots:
       '@babel/types': 7.28.4
       '@jridgewell/remapping': 2.3.5
       convert-source-map: 2.0.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -12460,7 +12512,7 @@ snapshots:
       '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/types': 7.28.4
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -12491,7 +12543,7 @@ snapshots:
       '@ionic/utils-subprocess': 3.0.1
       '@ionic/utils-terminal': 2.3.5
       commander: 12.1.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       env-paths: 2.2.1
       fs-extra: 11.3.2
       kleur: 4.1.5
@@ -12951,7 +13003,7 @@ snapshots:
   '@eslint/config-array@0.21.0':
     dependencies:
       '@eslint/object-schema': 2.1.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -12965,7 +13017,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -12979,7 +13031,7 @@ snapshots:
   '@eslint/eslintrc@3.3.1':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       espree: 10.4.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -13112,7 +13164,7 @@ snapshots:
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -13267,14 +13319,14 @@ snapshots:
   '@ionic/cli-framework-output@2.2.8':
     dependencies:
       '@ionic/utils-terminal': 2.3.5
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
   '@ionic/utils-array@2.1.6':
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -13282,7 +13334,7 @@ snapshots:
   '@ionic/utils-fs@3.1.7':
     dependencies:
       '@types/fs-extra': 8.1.5
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fs-extra: 9.1.0
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -13290,7 +13342,7 @@ snapshots:
 
   '@ionic/utils-object@2.1.6':
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -13299,7 +13351,7 @@ snapshots:
     dependencies:
       '@ionic/utils-object': 2.1.6
       '@ionic/utils-terminal': 2.3.5
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       signal-exit: 3.0.7
       tree-kill: 1.2.2
       tslib: 2.8.1
@@ -13308,7 +13360,7 @@ snapshots:
 
   '@ionic/utils-stream@3.1.7':
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -13321,7 +13373,7 @@ snapshots:
       '@ionic/utils-stream': 3.1.7
       '@ionic/utils-terminal': 2.3.5
       cross-spawn: 7.0.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -13329,7 +13381,7 @@ snapshots:
   '@ionic/utils-terminal@2.3.5':
     dependencies:
       '@types/slice-ansi': 4.0.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       signal-exit: 3.0.7
       slice-ansi: 4.0.0
       string-width: 4.2.3
@@ -13918,6 +13970,10 @@ snapshots:
       '@o4o/utils': link:packages/utils
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@o4o/types@file:packages/types(react@19.1.1)':
+    dependencies:
+      react: 19.1.1
 
   '@o4o/utils@file:packages/utils':
     dependencies:
@@ -15825,12 +15881,12 @@ snapshots:
       '@types/react': 18.2.79
       '@types/react-dom': 18.2.25
 
-  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@testing-library/dom': 10.4.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
     optionalDependencies:
       '@types/react': 19.2.2
       '@types/react-dom': 19.2.2(@types/react@19.2.2)
@@ -15841,7 +15897,7 @@ snapshots:
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fflate: 0.8.2
       token-types: 6.1.1
     transitivePeerDependencies:
@@ -16337,7 +16393,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.1)(typescript@5.9.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.2)
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 8.57.1
       graphemer: 1.4.0
       ignore: 5.3.2
@@ -16405,7 +16461,7 @@ snapshots:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.2)
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 8.57.1
     optionalDependencies:
       typescript: 5.9.2
@@ -16418,7 +16474,7 @@ snapshots:
       '@typescript-eslint/types': 8.39.0
       '@typescript-eslint/typescript-estree': 8.39.0(typescript@5.4.5)
       '@typescript-eslint/visitor-keys': 8.39.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.33.0(jiti@1.21.7)
       typescript: 5.4.5
     transitivePeerDependencies:
@@ -16430,7 +16486,7 @@ snapshots:
       '@typescript-eslint/types': 8.42.0
       '@typescript-eslint/typescript-estree': 8.42.0(typescript@5.4.5)
       '@typescript-eslint/visitor-keys': 8.42.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.33.0(jiti@1.21.7)
       typescript: 5.4.5
     transitivePeerDependencies:
@@ -16442,7 +16498,7 @@ snapshots:
       '@typescript-eslint/types': 8.43.0
       '@typescript-eslint/typescript-estree': 8.43.0(typescript@5.4.5)
       '@typescript-eslint/visitor-keys': 8.43.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.33.0(jiti@1.21.7)
       typescript: 5.4.5
     transitivePeerDependencies:
@@ -16452,7 +16508,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.42.0(typescript@5.4.5)
       '@typescript-eslint/types': 8.43.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       typescript: 5.4.5
     transitivePeerDependencies:
       - supports-color
@@ -16461,7 +16517,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.42.0(typescript@5.4.5)
       '@typescript-eslint/types': 8.43.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       typescript: 5.4.5
     transitivePeerDependencies:
       - supports-color
@@ -16470,7 +16526,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.43.0(typescript@5.4.5)
       '@typescript-eslint/types': 8.43.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       typescript: 5.4.5
     transitivePeerDependencies:
       - supports-color
@@ -16511,7 +16567,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.2)
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 8.57.1
       tsutils: 3.21.0(typescript@5.9.2)
     optionalDependencies:
@@ -16524,7 +16580,7 @@ snapshots:
       '@typescript-eslint/types': 8.39.0
       '@typescript-eslint/typescript-estree': 8.39.0(typescript@5.4.5)
       '@typescript-eslint/utils': 8.39.0(eslint@9.33.0(jiti@1.21.7))(typescript@5.4.5)
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.33.0(jiti@1.21.7)
       ts-api-utils: 2.1.0(typescript@5.4.5)
       typescript: 5.4.5
@@ -16536,7 +16592,7 @@ snapshots:
       '@typescript-eslint/types': 8.42.0
       '@typescript-eslint/typescript-estree': 8.42.0(typescript@5.4.5)
       '@typescript-eslint/utils': 8.42.0(eslint@9.33.0(jiti@1.21.7))(typescript@5.4.5)
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.33.0(jiti@1.21.7)
       ts-api-utils: 2.1.0(typescript@5.4.5)
       typescript: 5.4.5
@@ -16555,7 +16611,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.7.2
@@ -16571,7 +16627,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.39.0(typescript@5.4.5)
       '@typescript-eslint/types': 8.39.0
       '@typescript-eslint/visitor-keys': 8.39.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -16587,7 +16643,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.42.0(typescript@5.4.5)
       '@typescript-eslint/types': 8.42.0
       '@typescript-eslint/visitor-keys': 8.42.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -16603,7 +16659,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.43.0(typescript@5.4.5)
       '@typescript-eslint/types': 8.43.0
       '@typescript-eslint/visitor-keys': 8.43.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -16815,7 +16871,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.2.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.2(@types/node@24.2.1)(typescript@5.4.5))(terser@5.44.0)
+      vitest: 3.2.4(@types/node@24.2.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.1(@types/node@24.2.1)(typescript@5.4.5))(terser@5.43.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -17550,7 +17606,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -19177,7 +19233,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -19225,7 +19281,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       escape-string-regexp: 4.0.0
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
@@ -19538,7 +19594,7 @@ snapshots:
 
   follow-redirects@1.15.11(debug@4.4.3):
     optionalDependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
 
   fontkit@2.0.4:
     dependencies:
@@ -19905,7 +19961,7 @@ snapshots:
     dependencies:
       '@tootallnate/once': 1.1.2
       agent-base: 6.0.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -19913,14 +19969,14 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
   http-proxy-middleware@3.0.5:
     dependencies:
       '@types/http-proxy': 1.17.16
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       http-proxy: 1.18.1(debug@4.4.3)
       is-glob: 4.0.3
       is-plain-object: 5.0.0
@@ -19939,7 +19995,7 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -19947,7 +20003,7 @@ snapshots:
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -20029,7 +20085,7 @@ snapshots:
     dependencies:
       '@ioredis/commands': 1.4.0
       cluster-key-slot: 1.1.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       denque: 2.1.0
       lodash.defaults: 4.2.0
       lodash.isarguments: 3.1.0
@@ -20236,7 +20292,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -21436,7 +21492,7 @@ snapshots:
       '@ionic/utils-fs': 3.1.7
       '@ionic/utils-terminal': 2.3.5
       bplist-parser: 0.3.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       elementtree: 0.1.7
       ini: 4.1.3
       plist: 3.1.0
@@ -22185,23 +22241,16 @@ snapshots:
       react: 18.2.0
       scheduler: 0.23.2
 
-  react-dom@18.2.0(react@18.3.1):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 18.3.1
-      scheduler: 0.23.2
-
-  react-dom@18.2.0(react@19.1.1):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 19.1.1
-      scheduler: 0.23.2
-
   react-dom@18.3.1(react@18.3.1):
     dependencies:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-dom@19.1.1(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      scheduler: 0.26.0
 
   react-dom@19.1.1(react@19.1.1):
     dependencies:
@@ -22286,11 +22335,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.2.79
 
-  react-router-dom@6.30.1(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  react-router-dom@6.30.1(react-dom@19.1.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@remix-run/router': 1.23.0
       react: 18.3.1
-      react-dom: 18.2.0(react@18.3.1)
+      react-dom: 19.1.1(react@18.3.1)
       react-router: 6.30.1(react@18.3.1)
 
   react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
@@ -22299,17 +22348,11 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
       react-router: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
 
-  react-router-dom@7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  react-router-dom@7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
-      react-dom: 18.2.0(react@18.3.1)
-      react-router: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
-
-  react-router-dom@7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1):
-    dependencies:
-      react: 19.1.1
-      react-dom: 18.2.0(react@19.1.1)
-      react-router: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+      react-dom: 19.1.1(react@18.3.1)
+      react-router: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
 
   react-router-dom@7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
@@ -22330,21 +22373,13 @@ snapshots:
     optionalDependencies:
       react-dom: 18.2.0(react@18.2.0)
 
-  react-router@7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  react-router@7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1):
     dependencies:
       cookie: 1.0.2
       react: 18.3.1
       set-cookie-parser: 2.7.1
     optionalDependencies:
-      react-dom: 18.2.0(react@18.3.1)
-
-  react-router@7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1):
-    dependencies:
-      cookie: 1.0.2
-      react: 19.1.1
-      set-cookie-parser: 2.7.1
-    optionalDependencies:
-      react-dom: 18.2.0(react@19.1.1)
+      react-dom: 19.1.1(react@18.3.1)
 
   react-router@7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
@@ -22514,7 +22549,7 @@ snapshots:
 
   require-in-the-middle@8.0.0:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -22962,7 +22997,7 @@ snapshots:
   socks-proxy-agent@6.2.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color
@@ -23194,7 +23229,7 @@ snapshots:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fast-safe-stringify: 2.1.1
       form-data: 4.0.4
       formidable: 3.5.4
@@ -23718,7 +23753,7 @@ snapshots:
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.4.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       esbuild: 0.25.10
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
@@ -23818,7 +23853,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.18
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       dedent: 1.7.0(babel-plugin-macros@3.1.0)
       dotenv: 16.6.1
       glob: 10.4.5
@@ -23846,7 +23881,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.18
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       dedent: 1.7.0(babel-plugin-macros@3.1.0)
       dotenv: 16.6.1
       glob: 10.4.5
@@ -23874,7 +23909,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.18
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       dedent: 1.7.0(babel-plugin-macros@3.1.0)
       dotenv: 16.6.1
       glob: 10.4.5
@@ -23902,7 +23937,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.18
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       dedent: 1.7.0(babel-plugin-macros@3.1.0)
       dotenv: 16.6.1
       glob: 10.4.5
@@ -23930,7 +23965,7 @@ snapshots:
       app-root-path: 3.1.0
       buffer: 6.0.3
       dayjs: 1.11.18
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       dedent: 1.7.0(babel-plugin-macros@3.1.0)
       dotenv: 16.6.1
       glob: 10.4.5
@@ -24138,7 +24173,7 @@ snapshots:
   vite-node@3.2.4(@types/node@22.17.2)(lightningcss@1.30.1)(terser@5.44.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 5.4.19(@types/node@22.17.2)(lightningcss@1.30.1)(terser@5.44.0)
@@ -24156,7 +24191,7 @@ snapshots:
   vite-node@3.2.4(@types/node@24.2.1)(lightningcss@1.30.1)(terser@5.43.1):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 5.4.19(@types/node@24.2.1)(lightningcss@1.30.1)(terser@5.43.1)
@@ -24174,7 +24209,7 @@ snapshots:
   vite-node@3.2.4(@types/node@24.2.1)(lightningcss@1.30.1)(terser@5.44.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 5.4.19(@types/node@24.2.1)(lightningcss@1.30.1)(terser@5.44.0)
@@ -24261,7 +24296,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.19
       pathe: 2.0.3
@@ -24301,7 +24336,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.19
       pathe: 2.0.3
@@ -24341,7 +24376,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.19
       pathe: 2.0.3
