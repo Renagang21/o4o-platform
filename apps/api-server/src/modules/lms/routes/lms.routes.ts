@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { CourseController } from '../controllers/CourseController.js';
 import { LessonController } from '../controllers/LessonController.js';
+import { EnrollmentController } from '../controllers/EnrollmentController.js';
+import { ProgressController } from '../controllers/ProgressController.js';
 import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
@@ -57,12 +59,57 @@ router.delete('/lessons/:id', requireAuth, asyncHandler(LessonController.deleteL
 router.post('/courses/:courseId/lessons/reorder', requireAuth, asyncHandler(LessonController.reorderLessons));
 
 // ========================================
-// ENROLLMENT ROUTES (TODO)
+// ENROLLMENT ROUTES
 // ========================================
 
+// POST /api/v1/lms/courses/:courseId/enroll - Enroll in Course
+router.post('/courses/:courseId/enroll', requireAuth, asyncHandler(EnrollmentController.enrollCourse));
+
+// GET /api/v1/lms/enrollments - List Enrollments
+router.get('/enrollments', requireAuth, asyncHandler(EnrollmentController.listEnrollments));
+
+// GET /api/v1/lms/enrollments/me - Get My Enrollments
+router.get('/enrollments/me', requireAuth, asyncHandler(EnrollmentController.getMyEnrollments));
+
+// GET /api/v1/lms/enrollments/:id - Get Enrollment by ID
+router.get('/enrollments/:id', requireAuth, asyncHandler(EnrollmentController.getEnrollment));
+
+// PATCH /api/v1/lms/enrollments/:id - Update Enrollment
+router.patch('/enrollments/:id', requireAuth, asyncHandler(EnrollmentController.updateEnrollment));
+
+// POST /api/v1/lms/enrollments/:id/start - Start Enrollment
+router.post('/enrollments/:id/start', requireAuth, asyncHandler(EnrollmentController.startEnrollment));
+
+// POST /api/v1/lms/enrollments/:id/complete - Complete Enrollment
+router.post('/enrollments/:id/complete', requireAuth, asyncHandler(EnrollmentController.completeEnrollment));
+
+// POST /api/v1/lms/enrollments/:id/cancel - Cancel Enrollment
+router.post('/enrollments/:id/cancel', requireAuth, asyncHandler(EnrollmentController.cancelEnrollment));
+
 // ========================================
-// PROGRESS ROUTES (TODO)
+// PROGRESS ROUTES
 // ========================================
+
+// POST /api/v1/lms/progress - Record Progress
+router.post('/progress', requireAuth, asyncHandler(ProgressController.recordProgress));
+
+// GET /api/v1/lms/progress - List Progress
+router.get('/progress', requireAuth, asyncHandler(ProgressController.listProgress));
+
+// GET /api/v1/lms/enrollments/:enrollmentId/progress - Get Progress by Enrollment
+router.get('/enrollments/:enrollmentId/progress', requireAuth, asyncHandler(ProgressController.getProgressByEnrollment));
+
+// GET /api/v1/lms/progress/:id - Get Progress by ID
+router.get('/progress/:id', requireAuth, asyncHandler(ProgressController.getProgress));
+
+// PATCH /api/v1/lms/progress/:id - Update Progress
+router.patch('/progress/:id', requireAuth, asyncHandler(ProgressController.updateProgress));
+
+// POST /api/v1/lms/progress/:id/complete - Complete Progress
+router.post('/progress/:id/complete', requireAuth, asyncHandler(ProgressController.completeProgress));
+
+// POST /api/v1/lms/progress/:id/submit-quiz - Submit Quiz
+router.post('/progress/:id/submit-quiz', requireAuth, asyncHandler(ProgressController.submitQuiz));
 
 // ========================================
 // CERTIFICATE ROUTES (TODO)
