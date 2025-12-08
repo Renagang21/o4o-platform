@@ -13,9 +13,9 @@ export const forumManifest = {
   description: '커뮤니티 포럼 코어 엔진 (게시글/댓글/카테고리/태그)',
 
   // Dependencies - format: { "app-id": "version-range" }
-  dependencies: {
-    'organization-core': '*', // Required for organization-scoped permissions
-  },
+  // Note: organization-core dependency removed for initial setup
+  // Can be added back when organization tables exist
+  dependencies: {},
 
   // Uninstall policy
   uninstallPolicy: {
