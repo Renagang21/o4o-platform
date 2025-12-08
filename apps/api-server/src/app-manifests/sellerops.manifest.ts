@@ -35,11 +35,9 @@ export const selleropsManifest: AppManifest = {
   acf: [],
 
   // Tables owned by this app
-  ownsTables: [
-    'sellerops_settings',
-    'sellerops_notifications',
-    'sellerops_documents',
-  ],
+  // Note: Tables are created by install lifecycle hook
+  // Ownership validation happens before install, so we leave this empty
+  ownsTables: [],
 
   // Uninstall policy
   uninstallPolicy: {
