@@ -8,6 +8,7 @@ import { dropshippingCoreManifest } from './dropshipping-core.manifest.js';
 import { cosmeticsExtensionManifest } from '@o4o/dropshipping-cosmetics';
 import { selleropsManifest } from './sellerops.manifest.js';
 import { supplieropsManifest } from './supplierops.manifest.js';
+import { partneropsManifest } from './partnerops.manifest.js';
 
 /**
  * App Manifest Registry
@@ -34,6 +35,7 @@ const manifestRegistry: Record<string, AppManifest> = {
   // Operations
   sellerops: selleropsManifest as any,
   supplierops: supplieropsManifest as any,
+  partnerops: partneropsManifest as any,
 };
 
 /**

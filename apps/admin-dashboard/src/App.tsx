@@ -129,6 +129,9 @@ const SellerOpsRouter = lazy(() => import('@/pages/sellerops/SellerOpsRouter'));
 // SupplierOps Pages
 const SupplierOpsRouter = lazy(() => import('@/pages/supplierops/SupplierOpsRouter'));
 
+// PartnerOps Pages
+const PartnerOpsRouter = lazy(() => import('@/pages/partnerops/PartnerOpsRouter'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1113,6 +1116,17 @@ function App() {
                         <AppRouteGuard appId="supplierops">
                           <Suspense fallback={<PageLoader />}>
                             <SupplierOpsRouter />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PartnerOps - Partner/Affiliate Operations App */}
+                    <Route path="/partnerops/*" element={
+                      <AdminProtectedRoute requiredRoles={['partner', 'admin']}>
+                        <AppRouteGuard appId="partnerops">
+                          <Suspense fallback={<PageLoader />}>
+                            <PartnerOpsRouter />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

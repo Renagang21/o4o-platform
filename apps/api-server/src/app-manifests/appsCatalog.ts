@@ -111,6 +111,14 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     author: 'O4O Platform',
   },
+  {
+    appId: 'partnerops',
+    name: 'PartnerOps',
+    version: '1.0.0',
+    description: '파트너/어필리에이트 운영 앱 - 링크 추적, 전환 분석, 커미션 정산',
+    category: 'commerce',
+    author: 'O4O Platform',
+  },
 ];
 
 /**
