@@ -18,13 +18,20 @@ import { supplieropsManifest } from './supplierops.manifest.js';
  * Type assertions are used here to accommodate the extended manifest schema.
  */
 const manifestRegistry: Record<string, AppManifest> = {
+  // Forum apps
+  'forum': forumManifest as any, // Alias for backward compatibility
   'forum-core': forumManifest as any,
   'forum-cosmetics': forumCosmeticsManifest as any,
+  // LMS
   'lms-core': lmsCoreManifest as any,
+  // Organization
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
+  // Dropshipping
+  'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,
   'dropshipping-cosmetics': cosmeticsExtensionManifest as any,
+  // Operations
   sellerops: selleropsManifest as any,
   supplierops: supplieropsManifest as any,
 };
