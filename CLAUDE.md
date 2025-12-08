@@ -17,16 +17,15 @@ git pull origin develop
 git add .
 git commit -m "feat: 새 기능"
 
-# 3. develop 푸시 → 자동 배포
+# 3. develop 푸시 → 개발 환경 자동 배포
 git push origin develop
-# → 1-2분 후 https://admin.neture.co.kr 자동 업데이트
-# → 화면 상단에 "⚠️ 테스트 버전" 배지 표시
+# → 1-2분 후 https://dev-admin.neture.co.kr 자동 업데이트
 
-# 4. 충분히 테스트 후 main 머지
+# 4. 충분히 테스트 후 main 머지 → 프로덕션 배포
 git checkout main
 git merge develop
 git push origin main
-# → 프로덕션 배포 완료
+# → https://admin.neture.co.kr 프로덕션 배포 완료
 ```
 
 ### 작업 환경 이동 시
@@ -36,10 +35,10 @@ git checkout develop
 git pull origin develop  # ← 최신 코드 동기화
 
 # 코드 수정 후
-git push origin develop  # ← 자동 배포
+git push origin develop  # ← 개발 환경 자동 배포
 
 # 테스트
-https://admin.neture.co.kr  # ← 1-2분 후 업데이트됨
+https://dev-admin.neture.co.kr  # ← 1-2분 후 업데이트됨
 ```
 
 ---
@@ -67,7 +66,8 @@ https://admin.neture.co.kr  # ← 1-2분 후 업데이트됨
   - Main Site: `./scripts/deploy-main-site-manual.sh`
 
 - 배포 확인:
-  - Admin: `curl -s https://admin.neture.co.kr/version.json`
+  - Admin (개발): `curl -s https://dev-admin.neture.co.kr/version.json`
+  - Admin (프로덕션): `curl -s https://admin.neture.co.kr/version.json`
   - Main Site: `curl -s https://neture.co.kr/version.json`
 
 - 로컬 빌드만으로는 사용자 테스트 불가능
@@ -161,7 +161,8 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 
 ## 배포 경로
 - API: `/home/ubuntu/o4o-platform` (on o4o-api)
-- Admin: `/var/www/admin.neture.co.kr` (on o4o-web)
+- Admin (개발): `/var/www/dev-admin.neture.co.kr` (on o4o-web)
+- Admin (프로덕션): `/var/www/admin.neture.co.kr` (on o4o-web)
 - Main Site: `/var/www/neture.co.kr` (on o4o-web)
 
 ## 자동 배포
@@ -170,10 +171,9 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 - **Workflow**: `.github/workflows/deploy-admin.yml`
 - **Trigger**: `develop` 또는 `main` 브랜치 푸시
 - **시간**: 1-2분
-- **URL**: https://admin.neture.co.kr
 - **환경 구분**:
-  - `develop` 푸시: 화면 상단에 "⚠️ 테스트 버전" 배지 표시
-  - `main` 푸시: 배지 없음 (프로덕션)
+  - `develop` 푸시 → https://dev-admin.neture.co.kr (개발 환경)
+  - `main` 푸시 → https://admin.neture.co.kr (프로덕션 환경)
 
 ### API 서버 배포
 - **Workflow**: `.github/workflows/deploy-api.yml`
@@ -193,7 +193,8 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 - Admin 수동 배포: `./scripts/deploy-admin-manual.sh`
 - Main Site 수동 배포: `./scripts/deploy-main-site-manual.sh`
 - 배포 확인:
-  - Admin: `curl -s https://admin.neture.co.kr/version.json`
+  - Admin (개발): `curl -s https://dev-admin.neture.co.kr/version.json`
+  - Admin (프로덕션): `curl -s https://admin.neture.co.kr/version.json`
   - Main Site: `curl -s https://neture.co.kr/version.json`
 
 ### 주요 문서
