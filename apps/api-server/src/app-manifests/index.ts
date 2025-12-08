@@ -7,6 +7,7 @@ import { manifest as organizationForumManifest } from '@o4o-extensions/organizat
 import { dropshippingCoreManifest } from './dropshipping-core.manifest.js';
 import { cosmeticsExtensionManifest } from '@o4o/dropshipping-cosmetics';
 import { selleropsManifest } from './sellerops.manifest.js';
+import { supplieropsManifest } from './supplierops.manifest.js';
 
 /**
  * App Manifest Registry
@@ -25,6 +26,7 @@ const manifestRegistry: Record<string, AppManifest> = {
   'dropshipping-core': dropshippingCoreManifest as any,
   'dropshipping-cosmetics': cosmeticsExtensionManifest as any,
   sellerops: selleropsManifest as any,
+  supplierops: supplieropsManifest as any,
 };
 
 /**

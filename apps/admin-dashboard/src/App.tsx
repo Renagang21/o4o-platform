@@ -126,6 +126,9 @@ const GroupbuySettlementPage = lazy(() => import('@/pages/groupbuy/GroupbuySettl
 // SellerOps Pages
 const SellerOpsRouter = lazy(() => import('@/pages/sellerops/SellerOpsRouter'));
 
+// SupplierOps Pages
+const SupplierOpsRouter = lazy(() => import('@/pages/supplierops/SupplierOpsRouter'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1108,6 +1111,17 @@ function App() {
                         <AppRouteGuard appId="sellerops">
                           <Suspense fallback={<PageLoader />}>
                             <SellerOpsRouter />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* SupplierOps - Supplier Operations App */}
+                    <Route path="/supplierops/*" element={
+                      <AdminProtectedRoute requiredRoles={['supplier', 'admin']}>
+                        <AppRouteGuard appId="supplierops">
+                          <Suspense fallback={<PageLoader />}>
+                            <SupplierOpsRouter />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>
