@@ -124,8 +124,13 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
       setLoading(true);
       const response = await cookieAuthClient.loginWithSync(credentials);
       if (response.success && response.user) {
-        setUser(response.user);
-        onAuthChange?.(response.user);
+        const userWithDates = {
+          ...response.user,
+          createdAt: (response.user as any).createdAt || new Date().toISOString(),
+          updatedAt: (response.user as any).updatedAt || new Date().toISOString()
+        };
+        setUser(userWithDates as any);
+        onAuthChange?.(userWithDates as any);
         
         // Initialize WebSocket session sync with new token
         if (response.token) {

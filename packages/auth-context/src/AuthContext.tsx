@@ -1,17 +1,47 @@
 import { createContext, useContext } from 'react';
 
 // Type definitions (to avoid circular dependency)
+export type UserStatus = 'pending' | 'active' | 'approved' | 'rejected' | 'suspended' | 'inactive' | string;
+
+export interface RoleAssignment {
+  id: string;
+  userId?: string;  // Optional to match auth-client response
+  role: string;
+  isActive: boolean;
+  validFrom: string | Date | null;
+  validUntil: string | Date | null;
+  assignedAt?: string | Date;
+  assignedBy?: string | null;
+}
+
+// Compatible with @o4o/types User interface but with more flexible field requirements
 export interface User {
   id: string | number;  // Support both string and number IDs
   email: string;
-  name?: string;
-  role?: string;  // Legacy single role (optional to match auth-client User type)
-  roles?: string[];  // Multiple roles support (from User entity)
+  name?: string | null;  // Optional for backward compatibility
+  firstName?: string | null;
+  lastName?: string | null;
+  avatar?: string | null;
+  status: UserStatus | string;  // Allow string for flexibility
+  isEmailVerified?: boolean;
+  lastLoginAt?: string | Date | null;
+  createdAt?: string | Date;  // Optional since login responses may not include it
+  updatedAt?: string | Date;  // Optional since login responses may not include it
+
+  // Legacy role field (deprecated, use assignments)
+  role?: string;
+  roles?: string[];  // Multiple roles support
   currentRole?: string;  // Active role for role switching
   isApproved?: boolean;
+
+  // P0 RBAC: Role assignments
+  assignments?: RoleAssignment[];
+
+  // Direct permissions (not from roles)
   permissions?: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
+
+  // Metadata
+  metadata?: Record<string, unknown>;
 }
 
 export interface SessionStatus {

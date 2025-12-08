@@ -96,7 +96,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       setIsLoading(true);
       setError(null);
       const response = await authClient.login(credentials);
-      setUser(response.user);
+      const userWithDates = {
+        ...response.user,
+        createdAt: (response.user as any).createdAt || new Date().toISOString(),
+        updatedAt: (response.user as any).updatedAt || new Date().toISOString()
+      };
+      setUser(userWithDates as any);
       
       // 토큰을 localStorage에 저장
       if (response.token) {
