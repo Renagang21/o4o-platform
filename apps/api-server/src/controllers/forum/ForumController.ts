@@ -3,7 +3,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, PostStatus } from '@o4o-apps/forum';
 import { ForumCategory } from '@o4o-apps/forum';
 import { ForumComment, CommentStatus } from '@o4o-apps/forum';
-import { User } from '../../entities/User.js';
+import { User } from '../../modules/auth/entities/User.js';
 import { MoreThanOrEqual } from 'typeorm';
 import logger from '../../utils/logger.js';
 
