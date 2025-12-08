@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { NetureForumService } from '@o4o-apps/forum-neture';
+import { CosmeticsForumService } from '@o4o-apps/forum-cosmetics';
 import { ForumPost } from '@o4o-apps/forum';
 
 export class NetureForumController {
-  private forumService: NetureForumService;
+  private forumService: CosmeticsForumService;
 
   constructor() {
     const forumPostRepository = AppDataSource.getRepository(ForumPost);
-    this.forumService = new NetureForumService(forumPostRepository);
+    this.forumService = new CosmeticsForumService(forumPostRepository);
   }
 
   /**

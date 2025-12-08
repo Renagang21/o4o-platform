@@ -579,7 +579,7 @@ export class AppManager {
     // Map common app IDs to package names
     const packageMap: Record<string, string> = {
       'forum-core': '@o4o-apps/forum',
-      'forum-neture': '@o4o-apps/forum-neture',
+      'forum-cosmetics': '@o4o-apps/forum-cosmetics',
       // Add more mappings as needed
     };
 
