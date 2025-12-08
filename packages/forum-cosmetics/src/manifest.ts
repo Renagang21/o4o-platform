@@ -1,16 +1,16 @@
 /**
- * Forum Neture Extension App Manifest
+ * Forum Cosmetics Extension App Manifest
  *
- * Extends forum-core with Neture cosmetics-specific features:
+ * Extends forum-core with cosmetics-specific features:
  * - Skin type filtering
  * - Routine builder
  * - Product integration
  * - Beauty-focused categories
  */
 
-export const forumNetureManifest = {
-  appId: 'forum-neture',
-  name: 'Forum Extension – Neture Cosmetics',
+export const forumCosmeticsManifest = {
+  appId: 'forum-cosmetics',
+  name: 'Forum Extension – Cosmetics',
   type: 'extension' as const,
   version: '1.0.0',
   description: '화장품 매장 특화 포럼 (피부타입, 루틴, 제품 연동)',
@@ -72,11 +72,19 @@ export const forumNetureManifest = {
     },
   ],
 
-  // Admin UI routes (override core UI)
+  // Admin UI routes
   adminRoutes: [
     {
-      path: '/admin/forum',
-      component: './admin-ui/pages/ForumNetureApp.js',
+      path: '/admin/cosmetics/forum',
+      component: './admin-ui/pages/CosmeticsForumDashboard',
+    },
+    {
+      path: '/admin/cosmetics/forum/posts',
+      component: './admin-ui/pages/CosmeticsForumPostList',
+    },
+    {
+      path: '/admin/cosmetics/forum/stats',
+      component: './admin-ui/pages/CosmeticsForumStats',
     },
   ],
 
@@ -88,7 +96,7 @@ export const forumNetureManifest = {
       { name: '질문답변', slug: 'qna', color: '#95E1D3' },
       { name: '이벤트', slug: 'events', color: '#FFD93D' },
     ],
-    skin: 'neture',
+    skin: 'cosmetics',
     brandColor: '#8B7355',
     accentColor: '#E8B4B8',
   },
@@ -96,8 +104,8 @@ export const forumNetureManifest = {
   // Permissions (inherits from forum-core)
   permissions: [],
 
-  // Menu (uses core menu with neture theme)
+  // Menu (uses core menu with cosmetics theme)
   menu: null,
 };
 
-export default forumNetureManifest;
+export default forumCosmeticsManifest;

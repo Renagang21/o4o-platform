@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@o4o-apps/forum": "workspace:*",
-    "@o4o-apps/forum-neture": "workspace:*",
+    "@o4o-apps/forum-cosmetics": "workspace:*",
     "@o4o-apps/forum-yaksa": "workspace:*",
     "@o4o-extensions/organization-forum": "workspace:*",
     "@o4o/auth-client": "workspace:*",

@@ -3,15 +3,15 @@ import type { ForumPost } from '@o4o-apps/forum';
 import { normalizeContent } from '@o4o-apps/forum';
 
 /**
- * Neture Forum Service
+ * Cosmetics Forum Service
  *
- * Handles Neture cosmetics forum operations including:
+ * Handles cosmetics forum operations including:
  * - Skin type filtering
  * - Concern-based filtering
  * - Product-related posts
  */
 
-export interface NetureMetadata {
+export interface CosmeticsMetadata {
   skinType?: 'dry' | 'oily' | 'combination' | 'sensitive';
   concerns?: string[];
   routine?: string[];
@@ -32,12 +32,12 @@ export interface CreatePostData {
   content: string;
   categoryId: string;
   authorId: string;
-  netureMeta?: NetureMetadata;
+  cosmeticsMeta?: CosmeticsMetadata;
   type?: string;
   tags?: string[];
 }
 
-export class NetureForumService {
+export class CosmeticsForumService {
   private forumPostRepository: Repository<ForumPost>;
 
   constructor(forumPostRepository: Repository<ForumPost>) {
@@ -45,7 +45,7 @@ export class NetureForumService {
   }
 
   /**
-   * List posts with Neture-specific filtering
+   * List posts with Cosmetics-specific filtering
    */
   async listPosts(filter: PostFilter): Promise<ForumPost[]> {
     const limit = filter.limit || 20;
@@ -63,7 +63,7 @@ export class NetureForumService {
     // Filter by skin type
     if (filter.skinType) {
       queryBuilder.andWhere(
-        "post.metadata->'neture'->>'skinType' = :skinType",
+        "post.metadata->'cosmetics'->>'skinType' = :skinType",
         { skinType: filter.skinType }
       );
     }
@@ -72,7 +72,7 @@ export class NetureForumService {
     if (filter.concerns && filter.concerns.length > 0) {
       filter.concerns.forEach((concern, index) => {
         queryBuilder.andWhere(
-          `post.metadata->'neture'->'concerns' ? :concern${index}`,
+          `post.metadata->'cosmetics'->'concerns' ? :concern${index}`,
           { [`concern${index}`]: concern }
         );
       });
@@ -81,7 +81,7 @@ export class NetureForumService {
     // Filter by product ID (array contains)
     if (filter.productId) {
       queryBuilder.andWhere(
-        "post.metadata->'neture'->'productIds' ? :productId",
+        "post.metadata->'cosmetics'->'productIds' ? :productId",
         { productId: filter.productId }
       );
     }
@@ -105,7 +105,7 @@ export class NetureForumService {
   }
 
   /**
-   * Create a new post with Neture metadata
+   * Create a new post with Cosmetics metadata
    */
   async createPost(data: CreatePostData): Promise<ForumPost> {
     // Generate slug from title
@@ -124,7 +124,7 @@ export class NetureForumService {
       status: 'publish' as any,
       slug,
       metadata: {
-        neture: data.netureMeta || {},
+        cosmetics: data.cosmeticsMeta || {},
       },
       publishedAt: new Date() as any,
     });
@@ -147,7 +147,7 @@ export class NetureForumService {
       .createQueryBuilder('post')
       .where("post.status = :status", { status: 'publish' })
       .andWhere(
-        "post.metadata->'neture'->'productIds' ? :productId",
+        "post.metadata->'cosmetics'->'productIds' ? :productId",
         { productId }
       )
       .orderBy('post.createdAt', 'DESC')
@@ -177,12 +177,12 @@ export class NetureForumService {
     if (data.type) post.type = data.type as any;
     if (data.tags) post.tags = data.tags;
 
-    if (data.netureMeta) {
+    if (data.cosmeticsMeta) {
       post.metadata = {
         ...post.metadata,
-        neture: {
-          ...(post.metadata as any)?.neture,
-          ...data.netureMeta,
+        cosmetics: {
+          ...(post.metadata as any)?.cosmetics,
+          ...data.cosmeticsMeta,
         },
       };
     }

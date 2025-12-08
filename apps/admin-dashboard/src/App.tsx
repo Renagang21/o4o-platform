@@ -112,10 +112,10 @@ const YaksaCommunityList = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui
 const YaksaCommunityDetail = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
 const YaksaCommunityFeed = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
 
-// Neture Forum Pages (from @o4o-apps/forum-neture package - source imports)
-const NetureForumDashboard = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumDashboard'));
-const NetureForumPostDetail = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumPostDetail'));
-const NetureForumPostForm = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumPostForm'));
+// Cosmetics Forum Pages (from @o4o-apps/forum-cosmetics package - source imports)
+const CosmeticsForumDashboard = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumDashboard'));
+const CosmeticsForumPostList = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumPostList'));
+const CosmeticsForumStats = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumStats'));
 
 // Groupbuy Pages
 const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
@@ -1067,39 +1067,30 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
-                    {/* Neture Forum - App-based routes with AppRouteGuard */}
-                    <Route path="/neture/forum" element={
+                    {/* Cosmetics Forum - App-based routes with AppRouteGuard */}
+                    <Route path="/cosmetics/forum" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-neture">
+                        <AppRouteGuard appId="forum-cosmetics">
                           <Suspense fallback={<PageLoader />}>
-                            <NetureForumDashboard />
+                            <CosmeticsForumDashboard />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>
                     } />
-                    <Route path="/neture/forum/new" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:write']}>
-                        <AppRouteGuard appId="forum-neture">
-                          <Suspense fallback={<PageLoader />}>
-                            <NetureForumPostForm />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/neture/forum/posts/:id" element={
+                    <Route path="/cosmetics/forum/posts" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-neture">
+                        <AppRouteGuard appId="forum-cosmetics">
                           <Suspense fallback={<PageLoader />}>
-                            <NetureForumPostDetail />
+                            <CosmeticsForumPostList />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>
                     } />
-                    <Route path="/neture/forum/posts/:id/edit" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:write']}>
-                        <AppRouteGuard appId="forum-neture">
+                    <Route path="/cosmetics/forum/stats" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum-cosmetics">
                           <Suspense fallback={<PageLoader />}>
-                            <NetureForumPostForm />
+                            <CosmeticsForumStats />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

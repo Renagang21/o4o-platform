@@ -41,7 +41,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       // Forum app packages - map to source directories for lazy loading
       '@o4o-apps/forum': path.resolve(__dirname, '../../packages/forum-app'),
       '@o4o-apps/forum-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
-      '@o4o-apps/forum-neture': path.resolve(__dirname, '../../packages/forum-neture'),
+      '@o4o-apps/forum-cosmetics': path.resolve(__dirname, '../../packages/forum-cosmetics'),
       // Dropshipping core - map to source for subpath imports
       '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
       // Force React to use single version
@@ -99,7 +99,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/dropshipping-core', // Dropshipping core - source imports
       '@o4o-apps/forum', // Forum app packages - source imports
       '@o4o-apps/forum-yaksa',
-      '@o4o-apps/forum-neture'
+      '@o4o-apps/forum-cosmetics'
     ],
     esbuildOptions: {
       define: {

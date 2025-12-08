@@ -1,7 +1,7 @@
 /**
- * Forum Neture Extension App
+ * Forum Cosmetics Extension App
  *
- * Entry point for the Neture cosmetics forum extension.
+ * Entry point for the cosmetics forum extension.
  * This app extends forum-core with beauty-specific features.
  */
 
@@ -12,4 +12,4 @@ export * from './manifest.js';
 export * from './backend/services/index.js';
 
 // Note: Admin UI components will be imported directly by admin-dashboard via:
-// import('@o4o-apps/forum-neture/src/admin-ui/pages/ForumNetureApp')
+// import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumDashboard')

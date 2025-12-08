@@ -1,22 +1,22 @@
 /**
- * Neture Forum Dashboard Page
- * Neture 화장품 포럼 대시보드
+ * Cosmetics Forum Dashboard Page
+ * 화장품 포럼 대시보드
  */
 
 import React from 'react';
 
-export const NetureForumDashboard: React.FC = () => {
+export const CosmeticsForumDashboard: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Neture 화장품 포럼</h1>
+        <h1 className="text-2xl font-bold text-gray-900">화장품 포럼</h1>
         <p className="text-gray-600">화장품 관련 토론 및 정보 공유</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-2">총 게시글</h3>
-          <p className="text-3xl font-bold text-blue-600">0</p>
+          <p className="text-3xl font-bold text-pink-600">0</p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-2">활성 사용자</h3>
@@ -39,4 +39,4 @@ export const NetureForumDashboard: React.FC = () => {
   );
 };
 
-export default NetureForumDashboard;
+export default CosmeticsForumDashboard;

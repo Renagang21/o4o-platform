@@ -1,8 +1,8 @@
 {
-  "name": "@o4o-apps/forum-neture",
+  "name": "@o4o-apps/forum-cosmetics",
   "version": "0.1.0",
   "private": true,
-  "description": "Forum Extension for Neture Cosmetics - Skin type, routine, and product integration",
+  "description": "Forum Extension for Cosmetics - Skin type, routine, and product integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
