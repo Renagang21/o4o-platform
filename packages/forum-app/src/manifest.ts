@@ -69,6 +69,7 @@ export const forumManifest = {
   // ACF groups (core provides metadata field for extensions)
   acf: [],
 
+  // Admin routes (dashboard management)
   routes: [
     '/admin/forum',
     '/admin/forum/posts',
@@ -77,6 +78,70 @@ export const forumManifest = {
     '/admin/forum/posts/new',
     '/admin/forum/categories',
     '/admin/forum/reports',
+  ],
+
+  // Public routes (user-facing pages)
+  publicRoutes: [
+    {
+      path: '/forum',
+      template: 'forum-home',
+      label: '포럼 홈',
+    },
+    {
+      path: '/forum/category/:slug',
+      template: 'category-archive',
+      label: '카테고리 아카이브',
+    },
+    {
+      path: '/forum/post/:slug',
+      template: 'post-single',
+      label: '게시글 상세',
+    },
+    {
+      path: '/forum/tag/:tag',
+      template: 'post-list',
+      label: '태그 아카이브',
+    },
+    {
+      path: '/forum/search',
+      template: 'post-list',
+      label: '검색 결과',
+    },
+  ],
+
+  // View Templates for public rendering
+  viewTemplates: [
+    {
+      id: 'forum-home',
+      name: '포럼 홈',
+      description: '카테고리, 공지사항, 최근 게시글을 표시하는 포럼 메인 페이지',
+      component: './templates/ForumHome.js',
+      dataLoader: 'forumHomeLoader',
+    },
+    {
+      id: 'post-list',
+      name: '게시글 목록',
+      description: '게시글 목록을 표시하는 템플릿 (검색, 태그, 일반 목록)',
+      component: './templates/PostList.js',
+      dataLoader: 'postListLoader',
+      supports: ['pagination', 'filtering', 'sorting'],
+    },
+    {
+      id: 'post-single',
+      name: '게시글 상세',
+      description: '단일 게시글 내용, 댓글, 관련 게시글을 표시',
+      component: './templates/PostSingle.js',
+      dataLoader: 'postSingleLoader',
+      supports: ['comments', 'likes', 'bookmarks', 'shares'],
+    },
+    {
+      id: 'category-archive',
+      name: '카테고리 아카이브',
+      description: '특정 카테고리의 게시글 목록과 하위 카테고리를 표시',
+      component: './templates/CategoryArchive.js',
+      dataLoader: 'categoryArchiveLoader',
+      supports: ['pagination', 'subcategories'],
+    },
   ],
 
   permissions: [
