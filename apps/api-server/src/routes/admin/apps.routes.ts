@@ -7,6 +7,7 @@ import { requireAdmin } from '../../middleware/permission.middleware.js';
 import { APPS_CATALOG, getCatalogItem } from '../../app-manifests/appsCatalog.js';
 import { loadLocalManifest, hasManifest } from '../../app-manifests/index.js';
 import { isNewerVersion } from '../../utils/semver.js';
+import logger from '../../utils/logger.js';
 
 const router: Router = Router();
 
@@ -102,17 +103,17 @@ router.post('/install', async (req: Request, res: Response) => {
   }
 
   try {
-    console.log(`[Install] Starting install for app: ${appId}`);
+    logger.info(`[Install] Starting install for app: ${appId}`);
 
     await appManager.install(appId);
 
-    console.log(`[Install] Completed successfully for app: ${appId}`);
+    logger.info(`[Install] Completed successfully for app: ${appId}`);
     return res.json({
       ok: true,
       message: `App ${appId} installed successfully`,
     });
   } catch (error: any) {
-    console.error(`[Install] Failed for app ${appId}:`, error);
+    logger.error(`[Install] Failed for app ${appId}:`, error);
 
     // Handle ownership validation errors
     if (error instanceof OwnershipValidationError) {
