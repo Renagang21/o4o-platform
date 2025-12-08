@@ -1,0 +1,25 @@
+{
+  "name": "@o4o/supplierops",
+  "version": "1.0.0",
+  "description": "Universal Supplier Operations App for O4O Platform",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@o4o/dropshipping-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0",
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "author": "O4O Platform",
+  "license": "MIT"
+}

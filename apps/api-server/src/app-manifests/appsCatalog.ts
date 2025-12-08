@@ -103,6 +103,14 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     author: 'O4O Platform',
   },
+  {
+    appId: 'supplierops',
+    name: 'SupplierOps',
+    version: '1.0.0',
+    description: '범용 공급자 운영 앱 - 상품 등록, Offer 관리, 주문 Relay, 정산 관리',
+    category: 'commerce',
+    author: 'O4O Platform',
+  },
 ];
 
 /**
