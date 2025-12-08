@@ -78,10 +78,10 @@ export const forumYaksaManifest = {
     },
   ],
 
-  // Admin UI routes (override core UI)
+  // Admin UI routes
   adminRoutes: [
     {
-      path: '/admin/forum',
+      path: '/admin/forum/yaksa',
       component: './admin-ui/pages/ForumYaksaApp.js',
     },
   ],
