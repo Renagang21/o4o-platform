@@ -3,6 +3,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, PostStatus } from '@o4o-apps/forum';
 import { ForumCategory } from '@o4o-apps/forum';
 import { ForumComment, CommentStatus } from '@o4o-apps/forum';
+import { normalizeContent, blocksToText } from '@o4o-apps/forum';
 import { User } from '../../modules/auth/entities/User.js';
 import { MoreThanOrEqual } from 'typeorm';
 import logger from '../../utils/logger.js';
@@ -82,10 +83,10 @@ export class ForumController {
         queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
       }
 
-      // Search filter
+      // Search filter (search in title and excerpt, since content is JSONB)
       if (query) {
         queryBuilder.andWhere(
-          '(post.title ILIKE :query OR post.content ILIKE :query)',
+          '(post.title ILIKE :query OR post.excerpt ILIKE :query)',
           { query: `%${query}%` }
         );
       }
@@ -195,10 +196,16 @@ export class ForumController {
         return;
       }
 
+      // Normalize content to Block[] format
+      const normalizedContent = normalizeContent(content);
+
+      // Auto-generate excerpt from content if not provided
+      const postExcerpt = excerpt || blocksToText(normalizedContent).substring(0, 200);
+
       const post = this.postRepository.create({
         title,
-        content,
-        excerpt,
+        content: normalizedContent,
+        excerpt: postExcerpt,
         categoryId,
         type,
         tags,
@@ -271,7 +278,14 @@ export class ForumController {
 
       // Update fields
       if (title !== undefined) post.title = title;
-      if (content !== undefined) post.content = content;
+      if (content !== undefined) {
+        // Normalize content to Block[] format
+        post.content = normalizeContent(content);
+        // Auto-generate excerpt if not provided
+        if (excerpt === undefined) {
+          post.excerpt = blocksToText(post.content).substring(0, 200);
+        }
+      }
       if (excerpt !== undefined) post.excerpt = excerpt;
       if (categoryId !== undefined) post.categoryId = categoryId;
       if (type !== undefined) post.type = type;

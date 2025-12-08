@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
 import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+import type { Block } from '@o4o/types';
 
 export enum PostStatus {
   DRAFT = 'draft',
@@ -40,8 +41,8 @@ export class ForumPost {
   @Column({ type: 'varchar', length: 250, unique: true })
   slug!: string;
 
-  @Column({ type: 'text' })
-  content!: string;
+  @Column({ type: 'jsonb', default: [] })
+  content!: Block[];
 
   @Column({ type: 'text', nullable: true })
   excerpt?: string;

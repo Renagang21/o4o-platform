@@ -1,6 +1,9 @@
 // Backend exports (compiled)
 export * from './backend/entities/index.js';
 
+// Backend types and DTOs
+export * from './backend/types/index.js';
+
 // Manifest export
 export { forumManifest } from './manifest.js';
 export { default } from './manifest.js';

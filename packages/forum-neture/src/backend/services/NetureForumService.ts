@@ -1,5 +1,6 @@
 import { Repository } from 'typeorm';
 import type { ForumPost } from '@o4o-apps/forum';
+import { normalizeContent } from '@o4o-apps/forum';
 
 /**
  * Neture Forum Service
@@ -110,9 +111,12 @@ export class NetureForumService {
     // Generate slug from title
     const slug = this.generateSlug(data.title);
 
+    // Normalize content to Block[] format
+    const normalizedContent = normalizeContent(data.content);
+
     const post = this.forumPostRepository.create({
       title: data.title,
-      content: data.content,
+      content: normalizedContent,
       authorId: data.authorId,
       categoryId: data.categoryId,
       type: data.type as any || 'discussion',
@@ -125,7 +129,8 @@ export class NetureForumService {
       publishedAt: new Date() as any,
     });
 
-    return await this.forumPostRepository.save(post);
+    const savedPost = await this.forumPostRepository.save(post);
+    return savedPost;
   }
 
   /**
@@ -164,7 +169,10 @@ export class NetureForumService {
     }
 
     if (data.title) post.title = data.title;
-    if (data.content) post.content = data.content;
+    if (data.content) {
+      // Normalize content to Block[] format
+      post.content = normalizeContent(data.content);
+    }
     if (data.categoryId) post.categoryId = data.categoryId;
     if (data.type) post.type = data.type as any;
     if (data.tags) post.tags = data.tags;

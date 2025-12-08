@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { YaksaCommunity, CommunityType } from '../entities/YaksaCommunity.js';
 import { YaksaCommunityMember, CommunityMemberRole } from '../entities/YaksaCommunityMember.js';
 import type { ForumPost } from '@o4o-apps/forum';
+import { normalizeContent } from '@o4o-apps/forum';
 
 /**
  * YaksaCommunityService
@@ -364,9 +365,12 @@ export class YaksaCommunityService {
     const publishedAt = community.requireApproval ? null : new Date();
 
     // Create the forum post with Yaksa metadata
+    // Normalize content to Block[] format
+    const normalizedContent = normalizeContent(data.content);
+
     const post = this.forumPostRepository.create({
       title: data.title,
-      content: data.content,
+      content: normalizedContent,
       authorId: data.userId,
       categoryId: data.categoryId,
       type: data.type as any || 'discussion',
@@ -382,7 +386,8 @@ export class YaksaCommunityService {
       publishedAt: publishedAt as any,
     });
 
-    return await this.forumPostRepository.save(post);
+    const savedPost = await this.forumPostRepository.save(post);
+    return savedPost;
   }
 
   /**

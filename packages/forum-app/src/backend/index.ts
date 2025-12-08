@@ -10,6 +10,9 @@ export * from './entities/index.js';
 // Export services
 export * from './services/index.js';
 
+// Export types and DTOs
+export * from './types/index.js';
+
 /**
  * Entity list for TypeORM
  */
