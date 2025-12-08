@@ -28,7 +28,8 @@ export class AppRegistry {
   @Column({ type: 'varchar', length: 50 })
   version!: string; // semver format
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
+  @Column({ type: 'varchar', length: 50, nullable: true, select: false })
   previousVersion?: string; // for rollback support
 
   // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
