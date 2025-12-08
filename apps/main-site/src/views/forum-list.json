@@ -1,0 +1,22 @@
+{
+  "viewId": "forum-list",
+  "meta": {
+    "title": "게시글 목록",
+    "description": "포럼 게시글 목록",
+    "route": "/forum/list"
+  },
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": [
+    {
+      "type": "ForumListView",
+      "props": {
+        "postsPerPage": 20,
+        "viewMode": "list",
+        "showFilter": true,
+        "showSidebar": true
+      }
+    }
+  ]
+}

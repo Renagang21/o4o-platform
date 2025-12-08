@@ -1,0 +1,21 @@
+{
+  "viewId": "forum-tag-detail",
+  "meta": {
+    "title": "태그",
+    "description": "포럼 태그별 게시글",
+    "route": "/forum/tag/:slug"
+  },
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": [
+    {
+      "type": "ForumTagView",
+      "props": {
+        "postsPerPage": 20,
+        "viewMode": "list",
+        "showSidebar": true
+      }
+    }
+  ]
+}

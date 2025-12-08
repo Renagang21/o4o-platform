@@ -11,5 +11,15 @@ export { ForumPostDetailBlock } from './ForumPostDetail';
 export { ForumCommentSectionBlock } from './ForumCommentSection';
 export { ForumCategoryListBlock } from './ForumCategoryList';
 
+// Cosmetics-specific blocks
+export { CosmeticsPostListBlock } from './CosmeticsPostList';
+
+// Cosmetics Analytics Widgets
+export {
+  CosmeticsTrendingBlock,
+  CosmeticsPopularBlock,
+  CosmeticsPersonalizedBlock,
+} from './CosmeticsAnalyticsWidgets';
+
 // Theme utilities
 export { forumStyles, getPrimaryColor, getPrimaryBg, mergeStyles } from './theme';

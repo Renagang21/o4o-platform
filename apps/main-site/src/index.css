@@ -80,6 +80,36 @@
     --forum-spacing-xl: 2rem;
   }
 
+  /* Cosmetics Forum Theme - Pink/Rose color palette */
+  .cosmetics-theme {
+    --forum-primary: #ec4899;
+    --forum-primary-hover: #db2777;
+    --forum-primary-light: #fdf2f8;
+
+    --forum-accent: #f97316;
+    --forum-accent-hover: #ea580c;
+
+    --forum-text-link: var(--forum-primary);
+    --forum-text-link-hover: var(--forum-primary-hover);
+
+    --forum-bg-highlight: var(--forum-primary-light);
+
+    --forum-badge-pinned-bg: #fdf2f8;
+    --forum-badge-pinned-text: #9d174d;
+    --forum-badge-new-bg: #fce7f3;
+    --forum-badge-new-text: #be185d;
+
+    --forum-stat-posts-bg: #fce7f3;
+    --forum-stat-posts-text: #9d174d;
+    --forum-stat-comments-bg: #fef3c7;
+    --forum-stat-comments-text: #b45309;
+    --forum-stat-users-bg: #dbeafe;
+    --forum-stat-users-text: #1e40af;
+
+    --forum-like-active: #ec4899;
+    --forum-bookmark-active: #f97316;
+  }
+
   /* Dark mode support - can be enabled via CMS theme */
   .dark-theme {
     --forum-primary: #60a5fa;
@@ -102,6 +132,53 @@
     --forum-badge-pinned-text: #fecaca;
     --forum-badge-locked-bg: #374151;
     --forum-badge-locked-text: #d1d5db;
+  }
+
+  /* Yaksa Forum Theme - Navy/Professional color palette */
+  .yaksa-theme,
+  :root {
+    /* Yaksa - Primary Colors */
+    --yaksa-primary: #1e3a5f;
+    --yaksa-primary-light: #2d4a6f;
+    --yaksa-primary-dark: #0f2a4f;
+
+    /* Yaksa - Accent Colors */
+    --yaksa-accent: #0891b2;
+    --yaksa-accent-light: #22d3ee;
+    --yaksa-accent-dark: #0e7490;
+
+    /* Yaksa - Surface Colors */
+    --yaksa-surface: #ffffff;
+    --yaksa-surface-secondary: #f8fafc;
+    --yaksa-surface-tertiary: #f1f5f9;
+
+    /* Yaksa - Text Colors */
+    --yaksa-text-primary: #1e293b;
+    --yaksa-text-secondary: #475569;
+    --yaksa-text-muted: #94a3b8;
+    --yaksa-text-inverse: #ffffff;
+
+    /* Yaksa - Border Colors */
+    --yaksa-border: #e2e8f0;
+    --yaksa-border-light: #f1f5f9;
+    --yaksa-border-dark: #cbd5e1;
+
+    /* Yaksa - Status Colors */
+    --yaksa-info: #0ea5e9;
+    --yaksa-warning: #f59e0b;
+    --yaksa-critical: #ef4444;
+    --yaksa-success: #22c55e;
+
+    /* Yaksa - Role Badge Colors */
+    --yaksa-role-admin: #7c3aed;
+    --yaksa-role-operator: #0891b2;
+    --yaksa-role-member: #22c55e;
+    --yaksa-role-guest: #94a3b8;
+
+    /* Yaksa - Organization Colors */
+    --yaksa-org-national: #1e3a5f;
+    --yaksa-org-regional: #2563eb;
+    --yaksa-org-local: #0891b2;
   }
 }
 

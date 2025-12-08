@@ -51,6 +51,26 @@ import { ViewEditor } from '@/components/ui/cms/ViewEditor';
 // CMS Block Components
 import { TextBlock } from '@/components/ui/cms/blocks/Text';
 
+// Forum UI Components
+import { ForumHomeView } from '@/components/ui/forum/ForumHomeView';
+import { ForumListView } from '@/components/ui/forum/ForumListView';
+import { ForumDetailView } from '@/components/ui/forum/ForumDetailView';
+import { ForumCategoryView } from '@/components/ui/forum/ForumCategoryView';
+import { ForumTagView } from '@/components/ui/forum/ForumTagView';
+
+// Cosmetics Forum UI Components
+import { CosmeticsFilterBar } from '@/components/ui/forum/CosmeticsFilterBar';
+import { CosmeticsForumListView } from '@/components/ui/forum/CosmeticsForumListView';
+import { CosmeticsReviewCard } from '@/components/ui/forum/CosmeticsReviewCard';
+import {
+  CosmeticsRecommendedPosts,
+  CosmeticsRelatedProducts,
+} from '@/components/ui/forum/CosmeticsRecommendedPosts';
+import {
+  CosmeticsSEO,
+  CosmeticsBreadcrumb,
+} from '@/components/ui/forum/CosmeticsSEO';
+
 // Digital Signage UI Components
 import { SignageGrid } from '@o4o-apps/signage/ui/SignageGrid';
 import { SignagePlayer } from '@o4o-apps/signage/ui/SignagePlayer';
@@ -137,6 +157,20 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   ViewEditor,
   // CMS Blocks
   Text: TextBlock,
+  // Forum
+  ForumHomeView,
+  ForumListView,
+  ForumDetailView,
+  ForumCategoryView,
+  ForumTagView,
+  // Cosmetics Forum
+  CosmeticsFilterBar,
+  CosmeticsForumListView,
+  CosmeticsReviewCard,
+  CosmeticsRecommendedPosts,
+  CosmeticsRelatedProducts,
+  CosmeticsSEO,
+  CosmeticsBreadcrumb,
   // Digital Signage
   SignageGrid,
   SignagePlayer,

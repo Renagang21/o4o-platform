@@ -1,0 +1,24 @@
+{
+  "viewId": "forum-home",
+  "meta": {
+    "title": "포럼",
+    "description": "커뮤니티 포럼 - 화장품 정보 공유",
+    "route": "/forum"
+  },
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": [
+    {
+      "type": "ForumHomeView",
+      "props": {
+        "showStats": true,
+        "showCategories": true,
+        "showPinnedPosts": true,
+        "showRecentPosts": true,
+        "recentPostsLimit": 10,
+        "categoryColumns": 3
+      }
+    }
+  ]
+}
