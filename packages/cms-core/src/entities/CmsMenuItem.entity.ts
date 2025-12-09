@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { CmsMenu } from './CmsMenu.entity.js';
+import type { CmsMenu } from './CmsMenu.entity.js';
 
 @Entity('cms_menu_items')
 export class CmsMenuItem {
@@ -68,7 +68,7 @@ export class CmsMenuItem {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => CmsMenu, (menu) => menu.items, { onDelete: 'CASCADE' })
+  @ManyToOne('CmsMenu', 'items', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menuId' })
   menu!: CmsMenu;
 }

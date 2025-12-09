@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { CmsAcfFieldGroup } from './CmsAcfFieldGroup.entity.js';
+import type { CmsAcfFieldGroup } from './CmsAcfFieldGroup.entity.js';
 
 @Entity('cms_acf_fields')
 @Index(['fieldGroupId', 'key'], { unique: true })
@@ -92,7 +92,7 @@ export class CmsAcfField {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => CmsAcfFieldGroup, (group) => group.fields, { onDelete: 'CASCADE' })
+  @ManyToOne('CmsAcfFieldGroup', 'fields', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'fieldGroupId' })
   fieldGroup!: CmsAcfFieldGroup;
 }

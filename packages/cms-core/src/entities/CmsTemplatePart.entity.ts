@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { CmsTemplate } from './CmsTemplate.entity.js';
+import type { CmsTemplate } from './CmsTemplate.entity.js';
 
 @Entity('cms_template_parts')
 @Index(['organizationId', 'slug'], { unique: true })
@@ -57,7 +57,7 @@ export class CmsTemplatePart {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => CmsTemplate, (template) => template.parts, { onDelete: 'SET NULL' })
+  @ManyToOne('CmsTemplate', 'parts', { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'templateId' })
   template!: CmsTemplate | null;
 }

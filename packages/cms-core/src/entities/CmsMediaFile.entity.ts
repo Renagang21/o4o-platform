@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { CmsMedia } from './CmsMedia.entity.js';
+import type { CmsMedia } from './CmsMedia.entity.js';
 
 @Entity('cms_media_files')
 export class CmsMediaFile {
@@ -58,7 +58,7 @@ export class CmsMediaFile {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => CmsMedia, (media) => media.files, { onDelete: 'CASCADE' })
+  @ManyToOne('CmsMedia', 'files', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'mediaId' })
   media!: CmsMedia;
 }

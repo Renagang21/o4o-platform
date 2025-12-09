@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { CmsCptType } from './CmsCptType.entity.js';
+import type { CmsCptType } from './CmsCptType.entity.js';
 
 @Entity('cms_cpt_fields')
 @Index(['cptTypeId', 'key'], { unique: true })
@@ -71,7 +71,7 @@ export class CmsCptField {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => CmsCptType, (cptType) => cptType.fields, { onDelete: 'CASCADE' })
+  @ManyToOne('CmsCptType', 'fields', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cptTypeId' })
   cptType!: CmsCptType;
 }
