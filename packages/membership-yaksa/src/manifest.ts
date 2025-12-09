@@ -12,7 +12,7 @@ export const membershipYaksaManifest = {
   id: 'membership-yaksa',
   appId: 'membership-yaksa',
   name: 'Membership Extension – Yaksa Organization',
-  type: 'extension' as const,
+  type: 'core' as const,  // Core type because it creates its own tables
   version: '1.0.0',
   description: '약사회 회원 관리 시스템 (회원정보, 자격검증, 소속관리, 연회비)',
 

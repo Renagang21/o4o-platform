@@ -10,7 +10,7 @@
 export const forumYaksaManifest = {
     appId: 'forum-yaksa',
     name: 'Forum Extension – Yaksa Organization',
-    type: 'extension',
+    type: 'core',  // Core type because it creates its own tables
     version: '1.0.0',
     description: '약사 조직 특화 포럼 (복약지도, 케이스 스터디, 약물 정보)',
     // Core dependency
