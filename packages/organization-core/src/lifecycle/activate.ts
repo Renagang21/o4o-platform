@@ -58,11 +58,12 @@ async function updateAppStatus(
     return;
   }
 
+  // Note: TypeORM uses quoted camelCase column names ("appId", "updatedAt")
   await dataSource.query(
     `
     UPDATE app_registry
-    SET status = $1, activated_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-    WHERE app_id = $2
+    SET status = $1, "updatedAt" = CURRENT_TIMESTAMP
+    WHERE "appId" = $2
   `,
     [status, appId]
   );
