@@ -1,0 +1,2095 @@
+[
+  {
+    "path": "docs/README.md",
+    "filename": "README.md",
+    "current_directory": "docs",
+    "suggested_category": "reference",
+    "classification_reason": "Default categorization based on content"
+  },
+  {
+    "path": "docs/_standards/DOCUMENT_ORGANIZATION_STANDARD_v1.0.md",
+    "filename": "DOCUMENT_ORGANIZATION_STANDARD_v1.0.md",
+    "current_directory": "docs/_standards",
+    "suggested_category": "reference",
+    "classification_reason": "Standards doc - mapped to reference"
+  },
+  {
+    "path": "docs/admin/appearance/APPEARANCE_CLEANUP_PLAN.md",
+    "filename": "APPEARANCE_CLEANUP_PLAN.md",
+    "current_directory": "docs/admin/appearance",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/admin/appearance/APPEARANCE_COMPONENT_MAP.md",
+    "filename": "APPEARANCE_COMPONENT_MAP.md",
+    "current_directory": "docs/admin/appearance",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/admin/appearance/APPEARANCE_GENERATORS_MAP.md",
+    "filename": "APPEARANCE_GENERATORS_MAP.md",
+    "current_directory": "docs/admin/appearance",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/admin/appearance/APPEARANCE_MIGRATION_GUIDE.md",
+    "filename": "APPEARANCE_MIGRATION_GUIDE.md",
+    "current_directory": "docs/admin/appearance",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/admin/appearance/APPEARANCE_TOKENS.md",
+    "filename": "APPEARANCE_TOKENS.md",
+    "current_directory": "docs/admin/appearance",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/inventory/controller_inventory.md",
+    "filename": "controller_inventory.md",
+    "current_directory": "docs/api-server/inventory",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/inventory/dependency_graph.md",
+    "filename": "dependency_graph.md",
+    "current_directory": "docs/api-server/inventory",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/inventory/dto_inventory.md",
+    "filename": "dto_inventory.md",
+    "current_directory": "docs/api-server/inventory",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/inventory/entity_inventory.md",
+    "filename": "entity_inventory.md",
+    "current_directory": "docs/api-server/inventory",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/inventory/route_inventory.md",
+    "filename": "route_inventory.md",
+    "current_directory": "docs/api-server/inventory",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/inventory/service_inventory.md",
+    "filename": "service_inventory.md",
+    "current_directory": "docs/api-server/inventory",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/specs/phase_b_module_structure_draft.md",
+    "filename": "phase_b_module_structure_draft.md",
+    "current_directory": "docs/api-server/specs",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/api-server/tests/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/api-server/tests",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/api-server/tests/cms_v2_test_matrix.md",
+    "filename": "cms_v2_test_matrix.md",
+    "current_directory": "docs/api-server/tests",
+    "suggested_category": "dev",
+    "classification_reason": "API server doc - mapped to dev"
+  },
+  {
+    "path": "docs/app-guidelines/app-dependency-handling.md",
+    "filename": "app-dependency-handling.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/appstore-build.md",
+    "filename": "appstore-build.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/core-app-development.md",
+    "filename": "core-app-development.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/cpt-acf-development.md",
+    "filename": "cpt-acf-development.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/cpt-registry.md",
+    "filename": "cpt-registry.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/extension-app-guideline.md",
+    "filename": "extension-app-guideline.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/extension-app-pattern.md",
+    "filename": "extension-app-pattern.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/manifest-specification.md",
+    "filename": "manifest-specification.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/refactoring-audit-guideline.md",
+    "filename": "refactoring-audit-guideline.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/registry-architecture.md",
+    "filename": "registry-architecture.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/schema-drift-prevention.md",
+    "filename": "schema-drift-prevention.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/app-guidelines/service-app-guideline.md",
+    "filename": "service-app-guideline.md",
+    "current_directory": "docs/app-guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "App guidelines - mapped to reference"
+  },
+  {
+    "path": "docs/apps/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/apps",
+    "suggested_category": "reference",
+    "classification_reason": "Default categorization based on content"
+  },
+  {
+    "path": "docs/archive/kakao-oauth-setup.md",
+    "filename": "kakao-oauth-setup.md",
+    "current_directory": "docs/archive",
+    "suggested_category": "archive",
+    "classification_reason": "Located in archive folder"
+  },
+  {
+    "path": "docs/archive/vscode-extension.md",
+    "filename": "vscode-extension.md",
+    "current_directory": "docs/archive",
+    "suggested_category": "archive",
+    "classification_reason": "Located in archive folder"
+  },
+  {
+    "path": "docs/design/admin/header-builder-specs.md",
+    "filename": "header-builder-specs.md",
+    "current_directory": "docs/design/admin",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/appstore/manifest-schema-v1.md",
+    "filename": "manifest-schema-v1.md",
+    "current_directory": "docs/design/appstore",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/appstore/registry-schema.md",
+    "filename": "registry-schema.md",
+    "current_directory": "docs/design/appstore",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/architecture/api-server-requirements.md",
+    "filename": "api-server-requirements.md",
+    "current_directory": "docs/design/architecture",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/architecture/editor-data-storage.md",
+    "filename": "editor-data-storage.md",
+    "current_directory": "docs/design/architecture",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/architecture/page-management.md",
+    "filename": "page-management.md",
+    "current_directory": "docs/design/architecture",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/auth/schema-design.md",
+    "filename": "schema-design.md",
+    "current_directory": "docs/design/auth",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/blocks/architecture.md",
+    "filename": "architecture.md",
+    "current_directory": "docs/design/blocks",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/blocks/dynamic-blocks.md",
+    "filename": "dynamic-blocks.md",
+    "current_directory": "docs/design/blocks",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/frontend/component-registry.md",
+    "filename": "component-registry.md",
+    "current_directory": "docs/design/frontend",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/frontend/layout-system.md",
+    "filename": "layout-system.md",
+    "current_directory": "docs/design/frontend",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/frontend/routing-view-architecture.md",
+    "filename": "routing-view-architecture.md",
+    "current_directory": "docs/design/frontend",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/frontend/shortcode-function-component.md",
+    "filename": "shortcode-function-component.md",
+    "current_directory": "docs/design/frontend",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/frontend/view-generator.md",
+    "filename": "view-generator.md",
+    "current_directory": "docs/design/frontend",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/frontend/view-schema.md",
+    "filename": "view-schema.md",
+    "current_directory": "docs/design/frontend",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/platform/antigravity-integration.md",
+    "filename": "antigravity-integration.md",
+    "current_directory": "docs/design/platform",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/platform/monitoring-logging.md",
+    "filename": "monitoring-logging.md",
+    "current_directory": "docs/design/platform",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/platform/payment-gateway.md",
+    "filename": "payment-gateway.md",
+    "current_directory": "docs/design/platform",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/platform/settlement-engine.md",
+    "filename": "settlement-engine.md",
+    "current_directory": "docs/design/platform",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/design/platform/shadow-mode.md",
+    "filename": "shadow-mode.md",
+    "current_directory": "docs/design/platform",
+    "suggested_category": "design",
+    "classification_reason": "Located in design folder"
+  },
+  {
+    "path": "docs/dev/AM1-AppMarket-Execution-Request.md",
+    "filename": "AM1-AppMarket-Execution-Request.md",
+    "current_directory": "docs/dev",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/AM1-AppMarket-Investigation-Request.md",
+    "filename": "AM1-AppMarket-Investigation-Request.md",
+    "current_directory": "docs/dev",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/AM2-AppMarket-Design-Request.md",
+    "filename": "AM2-AppMarket-Design-Request.md",
+    "current_directory": "docs/dev",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/decisions/2025-10-21-architecture-decisions.md",
+    "filename": "2025-10-21-architecture-decisions.md",
+    "current_directory": "docs/dev/decisions",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/mobile/mobile_app_appstore_preparation.md",
+    "filename": "mobile_app_appstore_preparation.md",
+    "current_directory": "docs/dev/mobile",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/mobile/mobile_app_investigation_report.md",
+    "filename": "mobile_app_investigation_report.md",
+    "current_directory": "docs/dev/mobile",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/planning/p1_kickoff_task_order.md",
+    "filename": "p1_kickoff_task_order.md",
+    "current_directory": "docs/dev/planning",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/planning/p2_kickoff_draft.md",
+    "filename": "p2_kickoff_draft.md",
+    "current_directory": "docs/dev/planning",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/shortcodes/SCAN_REPORT.md",
+    "filename": "SCAN_REPORT.md",
+    "current_directory": "docs/dev/shortcodes",
+    "suggested_category": "dev",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/spec/p1_rbac_enhancement.md",
+    "filename": "p1_rbac_enhancement.md",
+    "current_directory": "docs/dev/spec",
+    "suggested_category": "design",
+    "classification_reason": "Located in dev folder"
+  },
+  {
+    "path": "docs/dev/tasks/appearance-cleanup-final-report.md",
+    "filename": "appearance-cleanup-final-report.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/appearance-contamination-report.md",
+    "filename": "appearance-contamination-report.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/code_prune_inventory.md",
+    "filename": "code_prune_inventory.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/code_prune_pr_checklist.md",
+    "filename": "code_prune_pr_checklist.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/control_based_schema_spec.md",
+    "filename": "control_based_schema_spec.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/cross_origin_inventory.md",
+    "filename": "cross_origin_inventory.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/customizer_bug_kill_list.md",
+    "filename": "customizer_bug_kill_list.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/customizer_phase1_cleanup_and_preview_build.md",
+    "filename": "customizer_phase1_cleanup_and_preview_build.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/customizer_preview_off_hotfix.md",
+    "filename": "customizer_preview_off_hotfix.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/customizer_refactor_reset.md",
+    "filename": "customizer_refactor_reset.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/customizer_schema_spec.md",
+    "filename": "customizer_schema_spec.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/customizer_smoke_tests.md",
+    "filename": "customizer_smoke_tests.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/dropshipping/DROPSHIPPING_CORE_TASK_ORDER_v1.md",
+    "filename": "DROPSHIPPING_CORE_TASK_ORDER_v1.md",
+    "current_directory": "docs/dev/tasks/dropshipping",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/dropshipping/DROPSHIPPING_P2_REMAINING_TASK_ORDER.md",
+    "filename": "DROPSHIPPING_P2_REMAINING_TASK_ORDER.md",
+    "current_directory": "docs/dev/tasks/dropshipping",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/p1_phase_a_work_order.md",
+    "filename": "p1_phase_a_work_order.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/p1_phase_b_email_service_reference.md",
+    "filename": "p1_phase_b_email_service_reference.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/p1_phase_b_work_order.md",
+    "filename": "p1_phase_b_work_order.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/p1_phase_c_work_order.md",
+    "filename": "p1_phase_c_work_order.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/p1_phase_d_work_order.md",
+    "filename": "p1_phase_d_work_order.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/phase0_rollback_point.md",
+    "filename": "phase0_rollback_point.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/phase1_inventory_report.md",
+    "filename": "phase1_inventory_report.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/phase2_adapter_bypass_inventory.md",
+    "filename": "phase2_adapter_bypass_inventory.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/phase3_authcontext_report.md",
+    "filename": "phase3_authcontext_report.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/phase4_pipeline_cleanup.md",
+    "filename": "phase4_pipeline_cleanup.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/dev/tasks/type_hardening_checklist.md",
+    "filename": "type_hardening_checklist.md",
+    "current_directory": "docs/dev/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/frontend/FRONTEND_VIEW_ARCHITECTURE_WORKORDER.md",
+    "filename": "FRONTEND_VIEW_ARCHITECTURE_WORKORDER.md",
+    "current_directory": "docs/frontend",
+    "suggested_category": "plan",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/guides/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/ROUTING_QUICK_REFERENCE.md",
+    "filename": "ROUTING_QUICK_REFERENCE.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/ROUTING_SYSTEM.md",
+    "filename": "ROUTING_SYSTEM.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/cpt-preset-api-reference.md",
+    "filename": "cpt-preset-api-reference.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/cpt-preset-form-guide.md",
+    "filename": "cpt-preset-form-guide.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/cpt-preset-system.md",
+    "filename": "cpt-preset-system.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/cpt-preset-template-guide.md",
+    "filename": "cpt-preset-template-guide.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/cpt-preset-view-guide.md",
+    "filename": "cpt-preset-view-guide.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/ai-page-generation.md",
+    "filename": "ai-page-generation.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/appearance-customize.md",
+    "filename": "appearance-customize.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/appearance-menus.md",
+    "filename": "appearance-menus.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/appearance-template-parts.md",
+    "filename": "appearance-template-parts.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/blocks-reference.md",
+    "filename": "blocks-reference.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/platform-features.md",
+    "filename": "platform-features.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/features/shortcodes-reference.md",
+    "filename": "shortcodes-reference.md",
+    "current_directory": "docs/guides/features",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/getting-started/environment-setup.md",
+    "filename": "environment-setup.md",
+    "current_directory": "docs/guides/getting-started",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/getting-started/local-setup.md",
+    "filename": "local-setup.md",
+    "current_directory": "docs/guides/getting-started",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/getting-started/quick-start.md",
+    "filename": "quick-start.md",
+    "current_directory": "docs/guides/getting-started",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/roles/menu-role-application.md",
+    "filename": "menu-role-application.md",
+    "current_directory": "docs/guides/roles",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/roles/role-personalization.md",
+    "filename": "role-personalization.md",
+    "current_directory": "docs/guides/roles",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/shortcode-list-table.md",
+    "filename": "shortcode-list-table.md",
+    "current_directory": "docs/guides",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/admin-manual.md",
+    "filename": "admin-manual.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/admin-menu-guide.md",
+    "filename": "admin-menu-guide.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/dropshipping-manual.md",
+    "filename": "dropshipping-manual.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/editor-manual.md",
+    "filename": "editor-manual.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/screen-options-guide.md",
+    "filename": "screen-options-guide.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/seller-manual.md",
+    "filename": "seller-manual.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/supplier-manual.md",
+    "filename": "supplier-manual.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/guides/user-manuals/user-manual-ko.md",
+    "filename": "user-manual-ko.md",
+    "current_directory": "docs/guides/user-manuals",
+    "suggested_category": "guides",
+    "classification_reason": "Located in guides folder"
+  },
+  {
+    "path": "docs/marketing/intro-overview.md",
+    "filename": "intro-overview.md",
+    "current_directory": "docs/marketing",
+    "suggested_category": "guides",
+    "classification_reason": "Marketing doc - mapped to guides"
+  },
+  {
+    "path": "docs/marketing/partner-overview.md",
+    "filename": "partner-overview.md",
+    "current_directory": "docs/marketing",
+    "suggested_category": "guides",
+    "classification_reason": "Marketing doc - mapped to guides"
+  },
+  {
+    "path": "docs/nextgen-frontend/PHASE_D3_E2E_TEST_CHECKLIST.md",
+    "filename": "PHASE_D3_E2E_TEST_CHECKLIST.md",
+    "current_directory": "docs/nextgen-frontend",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/nextgen-frontend/implementation/view-renderer-plan.md",
+    "filename": "view-renderer-plan.md",
+    "current_directory": "docs/nextgen-frontend/implementation",
+    "suggested_category": "dev",
+    "classification_reason": "Frontend/admin code - mapped to dev"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/priority1-kickoff-message.md",
+    "filename": "priority1-kickoff-message.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step10_viewgenerator_implementation_workorder.md",
+    "filename": "step10_viewgenerator_implementation_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step10_viewgenerator_workorder.md",
+    "filename": "step10_viewgenerator_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step11_ai_generator_integration_workorder.md",
+    "filename": "step11_ai_generator_integration_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step13_legacy_main_site_cleanup_workorder.md",
+    "filename": "step13_legacy_main_site_cleanup_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step14_dropshipping_core_cleanup_workorder.md",
+    "filename": "step14_dropshipping_core_cleanup_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step16_nextgen_appstore_integration_workorder.md",
+    "filename": "step16_nextgen_appstore_integration_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step17b_app_manifest_generation_workorder.md",
+    "filename": "step17b_app_manifest_generation_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step18_design_system_workorder.md",
+    "filename": "step18_design_system_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step19_nextgen_cms_builder_workorder.md",
+    "filename": "step19_nextgen_cms_builder_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step21_phase_h_finalization_workorder.md",
+    "filename": "step21_phase_h_finalization_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step22_ts_vite_workspace_fix_workorder.md",
+    "filename": "step22_ts_vite_workspace_fix_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step23_multi_instance_deployment_manager_workorder.md",
+    "filename": "step23_multi_instance_deployment_manager_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step2_function_component_extraction.md",
+    "filename": "step2_function_component_extraction.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step3_priority1_dropshipping_conversion.md",
+    "filename": "step3_priority1_dropshipping_conversion.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step4_priority1_conversion_workorder.md",
+    "filename": "step4_priority1_conversion_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step5_priority2_commerce_conversion_workorder.md",
+    "filename": "step5_priority2_commerce_conversion_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step6_priority3_customer_auth_workorder.md",
+    "filename": "step6_priority3_customer_auth_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step7_priority4_admin_conversion_workorder.md",
+    "filename": "step7_priority4_admin_conversion_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step8_routing_automation_workorder.md",
+    "filename": "step8_routing_automation_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/nextgen-frontend/tasks/step9_performance_optimization_workorder.md",
+    "filename": "step9_performance_optimization_workorder.md",
+    "current_directory": "docs/nextgen-frontend/tasks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in tasks/planning folder"
+  },
+  {
+    "path": "docs/ops/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/ops",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/access/server-access.md",
+    "filename": "server-access.md",
+    "current_directory": "docs/ops/access",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/ci-cd/github-actions.md",
+    "filename": "github-actions.md",
+    "current_directory": "docs/ops/ci-cd",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/ci-cd/github-secrets.md",
+    "filename": "github-secrets.md",
+    "current_directory": "docs/ops/ci-cd",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/database/db-index-execution.md",
+    "filename": "db-index-execution.md",
+    "current_directory": "docs/ops/database",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/deployment-plan.md",
+    "filename": "deployment-plan.md",
+    "current_directory": "docs/ops",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/environments/api-server-setup.md",
+    "filename": "api-server-setup.md",
+    "current_directory": "docs/ops/environments",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/environments/api-server.md",
+    "filename": "api-server.md",
+    "current_directory": "docs/ops/environments",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/environments/env-variables-design.md",
+    "filename": "env-variables-design.md",
+    "current_directory": "docs/ops/environments",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/environments/header-setup.md",
+    "filename": "header-setup.md",
+    "current_directory": "docs/ops/environments",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/environments/webserver.md",
+    "filename": "webserver.md",
+    "current_directory": "docs/ops/environments",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/monitoring/metrics-duplication-prevention.md",
+    "filename": "metrics-duplication-prevention.md",
+    "current_directory": "docs/ops/monitoring",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/operations/claude-webserver.md",
+    "filename": "claude-webserver.md",
+    "current_directory": "docs/ops/operations",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/operations/product-import.md",
+    "filename": "product-import.md",
+    "current_directory": "docs/ops/operations",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/operations/webserver-no-build.md",
+    "filename": "webserver-no-build.md",
+    "current_directory": "docs/ops/operations",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/setup/aws-ses.md",
+    "filename": "aws-ses.md",
+    "current_directory": "docs/ops/setup",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/setup/database.md",
+    "filename": "database.md",
+    "current_directory": "docs/ops/setup",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/setup/dns-configuration.md",
+    "filename": "dns-configuration.md",
+    "current_directory": "docs/ops/setup",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/setup/nginx.md",
+    "filename": "nginx.md",
+    "current_directory": "docs/ops/setup",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/setup/pm2-autostart.md",
+    "filename": "pm2-autostart.md",
+    "current_directory": "docs/ops/setup",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/ops/setup/server-setup.md",
+    "filename": "server-setup.md",
+    "current_directory": "docs/ops/setup",
+    "suggested_category": "ops",
+    "classification_reason": "Located in ops folder"
+  },
+  {
+    "path": "docs/page-generator/test-report.md",
+    "filename": "test-report.md",
+    "current_directory": "docs/page-generator",
+    "suggested_category": "dev",
+    "classification_reason": "Page generator - mapped to dev"
+  },
+  {
+    "path": "docs/plan/active/api-server/step25-phase-b-implementation.md",
+    "filename": "step25-phase-b-implementation.md",
+    "current_directory": "docs/plan/active/api-server",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/api-server/step25-phase-b2-auth-module.md",
+    "filename": "step25-phase-b2-auth-module.md",
+    "current_directory": "docs/plan/active/api-server",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/api-server/step25-pre-phase-b-investigation.md",
+    "filename": "step25-pre-phase-b-investigation.md",
+    "current_directory": "docs/plan/active/api-server",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/apps/cosmetics-development.md",
+    "filename": "cosmetics-development.md",
+    "current_directory": "docs/plan/active/apps",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/apps/cosmetics-mvp.md",
+    "filename": "cosmetics-mvp.md",
+    "current_directory": "docs/plan/active/apps",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/apps/dropshipping-cleanup.md",
+    "filename": "dropshipping-cleanup.md",
+    "current_directory": "docs/plan/active/apps",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/apps/dropshipping-sprint1-tasks.md",
+    "filename": "dropshipping-sprint1-tasks.md",
+    "current_directory": "docs/plan/active/apps",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/apps/dropshipping-sprint1.md",
+    "filename": "dropshipping-sprint1.md",
+    "current_directory": "docs/plan/active/apps",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/phase-c2-deployment-blocked.md",
+    "filename": "phase-c2-deployment-blocked.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/phase-c2-deployment-steps.md",
+    "filename": "phase-c2-deployment-steps.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-api-server-v2.md",
+    "filename": "step25-api-server-v2.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-b2-step3-auth.md",
+    "filename": "step25-phase-b2-step3-auth.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-b2-step4-profile.md",
+    "filename": "step25-phase-b2-step4-profile.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-b3-commerce.md",
+    "filename": "step25-phase-b3-commerce.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-b4-integration-tests.md",
+    "filename": "step25-phase-b4-integration-tests.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-b4-stabilization.md",
+    "filename": "step25-phase-b4-stabilization.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-c1-cms-migration.md",
+    "filename": "step25-phase-c1-cms-migration.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-c2-cms-integration.md",
+    "filename": "step25-phase-c2-cms-integration.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-c31-designer.md",
+    "filename": "step25-phase-c31-designer.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/backend/step25-phase-c32-block-library.md",
+    "filename": "step25-phase-c32-block-library.md",
+    "current_directory": "docs/plan/active/backend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/frontend/phase-d2-cms-dynamic-data.md",
+    "filename": "phase-d2-cms-dynamic-data.md",
+    "current_directory": "docs/plan/active/frontend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/frontend/step24-multisite-builder.md",
+    "filename": "step24-multisite-builder.md",
+    "current_directory": "docs/plan/active/frontend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/plan/active/frontend/step24-phase-h-e2e-test.md",
+    "filename": "step24-phase-h-e2e-test.md",
+    "current_directory": "docs/plan/active/frontend",
+    "suggested_category": "plan",
+    "classification_reason": "Located in plan folder"
+  },
+  {
+    "path": "docs/reference/API_CONTRACT_UPDATE.md",
+    "filename": "API_CONTRACT_UPDATE.md",
+    "current_directory": "docs/reference",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/NAVIGATION_AND_URL_STRUCTURE.md",
+    "filename": "NAVIGATION_AND_URL_STRUCTURE.md",
+    "current_directory": "docs/reference",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/reference",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/ROLE_BASED_LANDING_PAGES.md",
+    "filename": "ROLE_BASED_LANDING_PAGES.md",
+    "current_directory": "docs/reference",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/ai/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/reference/ai",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/ai/block-reference-system.md",
+    "filename": "block-reference-system.md",
+    "current_directory": "docs/reference/ai",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/ai/dynamic-reference-summary.md",
+    "filename": "dynamic-reference-summary.md",
+    "current_directory": "docs/reference/ai",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/analytics/ANALYTICS_API_SPEC.md",
+    "filename": "ANALYTICS_API_SPEC.md",
+    "current_directory": "docs/reference/analytics",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/analytics/ANALYTICS_DEPLOYMENT.md",
+    "filename": "ANALYTICS_DEPLOYMENT.md",
+    "current_directory": "docs/reference/analytics",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/analytics/ANALYTICS_KPIs.md",
+    "filename": "ANALYTICS_KPIs.md",
+    "current_directory": "docs/reference/analytics",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/analytics/ANALYTICS_VALIDATION.md",
+    "filename": "ANALYTICS_VALIDATION.md",
+    "current_directory": "docs/reference/analytics",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/api/api-documentation.md",
+    "filename": "api-documentation.md",
+    "current_directory": "docs/reference/api",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/api/api-error-analysis.md",
+    "filename": "api-error-analysis.md",
+    "current_directory": "docs/reference/api",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/api/api-safety-guide.md",
+    "filename": "api-safety-guide.md",
+    "current_directory": "docs/reference/api",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/api/api-server-fix.md",
+    "filename": "api-server-fix.md",
+    "current_directory": "docs/reference/api",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/api-spec.md",
+    "filename": "api-spec.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/authentication-integration.md",
+    "filename": "authentication-integration.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/authorization-rules.md",
+    "filename": "authorization-rules.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/cross-app-session-sync.md",
+    "filename": "cross-app-session-sync.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/deployment-plan.md",
+    "filename": "deployment-plan.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/login-security.md",
+    "filename": "login-security.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/migration-guide.md",
+    "filename": "migration-guide.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/migration-quick-start.md",
+    "filename": "migration-quick-start.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/oauth-integration.md",
+    "filename": "oauth-integration.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/oauth-setup.md",
+    "filename": "oauth-setup.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/password-reset.md",
+    "filename": "password-reset.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/policy-rules.md",
+    "filename": "policy-rules.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/refresh-token.md",
+    "filename": "refresh-token.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/schema-policy-integration.md",
+    "filename": "schema-policy-integration.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/session-management.md",
+    "filename": "session-management.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/test-matrix.md",
+    "filename": "test-matrix.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/auth/ui-flow.md",
+    "filename": "ui-flow.md",
+    "current_directory": "docs/reference/auth",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/BLOCK_TOOLBAR_STANDARDIZATION.md",
+    "filename": "BLOCK_TOOLBAR_STANDARDIZATION.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/block-audit-report.md",
+    "filename": "block-audit-report.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/block-implementation-status.md",
+    "filename": "block-implementation-status.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/block-migration-roadmap.md",
+    "filename": "block-migration-roadmap.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "plan",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/block-optimization.md",
+    "filename": "block-optimization.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/blocks-development.md",
+    "filename": "blocks-development.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/form-solution-analysis.md",
+    "filename": "form-solution-analysis.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/gallery-block-api.md",
+    "filename": "gallery-block-api.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/blocks/template-editor-verification.md",
+    "filename": "template-editor-verification.md",
+    "current_directory": "docs/reference/blocks",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/database/idempotency-constraint.md",
+    "filename": "idempotency-constraint.md",
+    "current_directory": "docs/reference/database",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/database/jsonb-optimization.md",
+    "filename": "jsonb-optimization.md",
+    "current_directory": "docs/reference/database",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/getting-started/development-commands.md",
+    "filename": "development-commands.md",
+    "current_directory": "docs/reference/getting-started",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/getting-started/npm-scripts.md",
+    "filename": "npm-scripts.md",
+    "current_directory": "docs/reference/getting-started",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/guidelines/architecture-decisions.md",
+    "filename": "architecture-decisions.md",
+    "current_directory": "docs/reference/guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/guidelines/development-guidelines.md",
+    "filename": "development-guidelines.md",
+    "current_directory": "docs/reference/guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/guidelines/development-process.md",
+    "filename": "development-process.md",
+    "current_directory": "docs/reference/guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/guidelines/implementation-challenges.md",
+    "filename": "implementation-challenges.md",
+    "current_directory": "docs/reference/guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/guidelines/routing-guide.md",
+    "filename": "routing-guide.md",
+    "current_directory": "docs/reference/guidelines",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/payment/payment-setup.md",
+    "filename": "payment-setup.md",
+    "current_directory": "docs/reference/payment",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/specialized/conversational-editor.md",
+    "filename": "conversational-editor.md",
+    "current_directory": "docs/reference/specialized",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/specialized/role-based-navigation.md",
+    "filename": "role-based-navigation.md",
+    "current_directory": "docs/reference/specialized",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reference/specialized/role-personalization.md",
+    "filename": "role-personalization.md",
+    "current_directory": "docs/reference/specialized",
+    "suggested_category": "reference",
+    "classification_reason": "Located in reference folder"
+  },
+  {
+    "path": "docs/reports/phase-completions/api-server-phase-a.md",
+    "filename": "api-server-phase-a.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/api-server-phase-b-step10.md",
+    "filename": "api-server-phase-b-step10.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/api-server-phase-bc.md",
+    "filename": "api-server-phase-bc.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/api-server-phase-c23.md",
+    "filename": "api-server-phase-c23.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/backend-phase-c2.md",
+    "filename": "backend-phase-c2.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/backend-phase-c24.md",
+    "filename": "backend-phase-c24.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/backend-phase-c25.md",
+    "filename": "backend-phase-c25.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/backend-phase-c31-part3.md",
+    "filename": "backend-phase-c31-part3.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/backend-step25-phase-b3.md",
+    "filename": "backend-step25-phase-b3.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/dev-p1-phase-c.md",
+    "filename": "dev-p1-phase-c.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/dev-p1-phase-d234.md",
+    "filename": "dev-p1-phase-d234.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/dev-phase-p0-a.md",
+    "filename": "dev-phase-p0-a.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/frontend-phase-h.md",
+    "filename": "frontend-phase-h.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/frontend-step21-signage.md",
+    "filename": "frontend-step21-signage.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/frontend-step23-deployment.md",
+    "filename": "frontend-step23-deployment.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/frontend-step24-multisite.md",
+    "filename": "frontend-step24-multisite.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/frontend-step24-phase-defg.md",
+    "filename": "frontend-step24-phase-defg.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/phase-completions/impl-step24-multisite.md",
+    "filename": "impl-step24-multisite.md",
+    "current_directory": "docs/reports/phase-completions",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/reports/releases/v2.0.0-p0.md",
+    "filename": "v2.0.0-p0.md",
+    "current_directory": "docs/reports/releases",
+    "suggested_category": "plan",
+    "classification_reason": "Completion report - mapped to plan"
+  },
+  {
+    "path": "docs/specs/cms/engine-spec.md",
+    "filename": "engine-spec.md",
+    "current_directory": "docs/specs/cms",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cosmetics/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/specs/cosmetics",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cosmetics/api-spec.md",
+    "filename": "api-spec.md",
+    "current_directory": "docs/specs/cosmetics",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cosmetics/extension-manifest.md",
+    "filename": "extension-manifest.md",
+    "current_directory": "docs/specs/cosmetics",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cosmetics/service-blueprint.md",
+    "filename": "service-blueprint.md",
+    "current_directory": "docs/specs/cosmetics",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cosmetics/ui-wireframes.md",
+    "filename": "ui-wireframes.md",
+    "current_directory": "docs/specs/cosmetics",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cpt-acf/cleanup-plan.md",
+    "filename": "cleanup-plan.md",
+    "current_directory": "docs/specs/cpt-acf",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cpt-acf/investigation.md",
+    "filename": "investigation.md",
+    "current_directory": "docs/specs/cpt-acf",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cpt-acf/presets-spec.md",
+    "filename": "presets-spec.md",
+    "current_directory": "docs/specs/cpt-acf",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/cpt-acf/route-matrix.md",
+    "filename": "route-matrix.md",
+    "current_directory": "docs/specs/cpt-acf",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/dropshipping/api-contract.md",
+    "filename": "api-contract.md",
+    "current_directory": "docs/specs/dropshipping",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/dropshipping/db-inventory.md",
+    "filename": "db-inventory.md",
+    "current_directory": "docs/specs/dropshipping",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/dropshipping/investigation.md",
+    "filename": "investigation.md",
+    "current_directory": "docs/specs/dropshipping",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/forum/app-structure.md",
+    "filename": "app-structure.md",
+    "current_directory": "docs/specs/forum",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/forum/cms-compatibility-audit.md",
+    "filename": "cms-compatibility-audit.md",
+    "current_directory": "docs/specs/forum",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/forum/cms-compatibility-result.md",
+    "filename": "cms-compatibility-result.md",
+    "current_directory": "docs/specs/forum",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/forum/phase1-investigation.md",
+    "filename": "phase1-investigation.md",
+    "current_directory": "docs/specs/forum",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/api-design.md",
+    "filename": "api-design.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/app-manifest.md",
+    "filename": "app-manifest.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/core-overview.md",
+    "filename": "core-overview.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/entities.md",
+    "filename": "entities.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/extension-rules.md",
+    "filename": "extension-rules.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/integration-map.md",
+    "filename": "integration-map.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/lifecycle-hooks.md",
+    "filename": "lifecycle-hooks.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/specs/organization/rbac-scope.md",
+    "filename": "rbac-scope.md",
+    "current_directory": "docs/specs/organization",
+    "suggested_category": "design",
+    "classification_reason": "Located in specs folder - mapped to design"
+  },
+  {
+    "path": "docs/templates/PR_BODY.md",
+    "filename": "PR_BODY.md",
+    "current_directory": "docs/templates",
+    "suggested_category": "reference",
+    "classification_reason": "Template - mapped to reference"
+  },
+  {
+    "path": "docs/templates/PR_CHECKLIST.md",
+    "filename": "PR_CHECKLIST.md",
+    "current_directory": "docs/templates",
+    "suggested_category": "reference",
+    "classification_reason": "Template - mapped to reference"
+  },
+  {
+    "path": "docs/templates/TEMPLATE_PRESET_SAMPLE.md",
+    "filename": "TEMPLATE_PRESET_SAMPLE.md",
+    "current_directory": "docs/templates",
+    "suggested_category": "reference",
+    "classification_reason": "Template - mapped to reference"
+  },
+  {
+    "path": "docs/testing/JEST_ESM_FIX_GUIDE.md",
+    "filename": "JEST_ESM_FIX_GUIDE.md",
+    "current_directory": "docs/testing",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/testing/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/testing",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/testing/TEST_MATRIX.md",
+    "filename": "TEST_MATRIX.md",
+    "current_directory": "docs/testing",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/testing/dropshipping-test-checklist.md",
+    "filename": "dropshipping-test-checklist.md",
+    "current_directory": "docs/testing",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/testing/m5-slideapp-qa-checklist.md",
+    "filename": "m5-slideapp-qa-checklist.md",
+    "current_directory": "docs/testing",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/testing/test-guide.md",
+    "filename": "test-guide.md",
+    "current_directory": "docs/testing",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/troubleshooting/README.md",
+    "filename": "README.md",
+    "current_directory": "docs/troubleshooting",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/troubleshooting/common-issues/502-bad-gateway.md",
+    "filename": "502-bad-gateway.md",
+    "current_directory": "docs/troubleshooting/common-issues",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/troubleshooting/common-issues/api-cors-fix.md",
+    "filename": "api-cors-fix.md",
+    "current_directory": "docs/troubleshooting/common-issues",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/troubleshooting/recovery/api-server-recovery.md",
+    "filename": "api-server-recovery.md",
+    "current_directory": "docs/troubleshooting/recovery",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  },
+  {
+    "path": "docs/troubleshooting/recovery/disaster-recovery-runbook.md",
+    "filename": "disaster-recovery-runbook.md",
+    "current_directory": "docs/troubleshooting/recovery",
+    "suggested_category": "dev",
+    "classification_reason": "Testing/troubleshooting - mapped to dev"
+  }
+]
