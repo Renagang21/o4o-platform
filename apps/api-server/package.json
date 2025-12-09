@@ -85,6 +85,7 @@
     "validate:env": "node scripts/pm2-env-validator.sh ecosystem.config.apiserver.cjs"
   },
   "dependencies": {
+    "@o4o-apps/cms-core": "workspace:*",
     "@o4o-apps/forum": "workspace:*",
     "@o4o-apps/forum-cosmetics": "workspace:*",
     "@o4o-apps/forum-yaksa": "workspace:*",

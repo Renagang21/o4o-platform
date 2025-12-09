@@ -20,6 +20,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./",
@@ -30,7 +32,8 @@
         "./src/*"
       ],
       "@o4o-apps/*": [
-        "./packages/@o4o-apps/*"
+        "./packages/@o4o-apps/*",
+        "./packages/*"
       ],
       "@o4o/*": [
         "./packages/*/dist",
@@ -96,6 +99,9 @@
     },
     {
       "path": "./packages/organization-core"
+    },
+    {
+      "path": "./packages/cms-core"
     }
   ]
 }
