@@ -629,6 +629,9 @@ importers:
 
   apps/api-server:
     dependencies:
+      '@o4o-apps/cms-core':
+        specifier: workspace:*
+        version: link:../../packages/cms-core
       '@o4o-apps/forum':
         specifier: workspace:*
         version: link:../../packages/forum-app
