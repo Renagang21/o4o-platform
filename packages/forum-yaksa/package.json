@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "description": "Forum Extension for Yaksa Organization - Drug database, case studies, and pharmacy management",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
+    ".": "./dist/index.js",
     "./src/*": "./src/*"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "rimraf dist && mkdir -p dist/backend/entities dist/backend/services && cp src/*.js src/*.d.ts src/*.js.map src/*.d.ts.map dist/ 2>/dev/null || true && cd src/backend/entities && cp *.js *.d.ts *.js.map *.d.ts.map ../../../dist/backend/entities/ 2>/dev/null || true && cd ../services && cp *.js *.d.ts *.js.map *.d.ts.map ../../../dist/backend/services/ 2>/dev/null || true",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
