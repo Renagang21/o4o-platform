@@ -1,10 +1,16 @@
 import axios from 'axios';
+// Import AUTH_ERROR_CODES from types (SSOT from @o4o/types)
+import { AUTH_ERROR_CODES } from './types.js';
 export class CookieAuthClient {
     baseURL;
     api;
     refreshPromise = null;
     currentToken = null;
     hasHandledSessionExpiry = false;
+    tokenExpiresAt = null;
+    refreshTimer = null;
+    refreshRetryCount = 0;
+    MAX_REFRESH_RETRIES = 3;
     constructor(baseURL) {
         this.baseURL = baseURL;
         this.api = axios.create({
@@ -74,22 +80,86 @@ export class CookieAuthClient {
         this.currentToken = null;
     }
     async refreshToken() {
+        // Prevent infinite refresh loops
+        if (this.refreshRetryCount >= this.MAX_REFRESH_RETRIES) {
+            this.handleSessionExpiry();
+            this.refreshRetryCount = 0;
+            return false;
+        }
+        this.refreshRetryCount++;
         try {
             const config = {
                 validateStatus: (status) => status === 200 || status === 401
             };
             const response = await this.api.post('/auth/cookie/refresh', {}, config);
             if (response.status === 401) {
+                const errorCode = response.data?.code;
+                // Handle specific error codes
+                if (errorCode === AUTH_ERROR_CODES.NO_REFRESH_TOKEN ||
+                    errorCode === AUTH_ERROR_CODES.INVALID_REFRESH_TOKEN ||
+                    errorCode === AUTH_ERROR_CODES.TOKEN_EXPIRED) {
+                    this.handleSessionExpiry();
+                    this.refreshRetryCount = 0;
+                    return false;
+                }
                 // Session expired - broadcast event once
                 this.handleSessionExpiry();
+                this.refreshRetryCount = 0;
                 return false;
             }
-            return response.data.success;
-        }
-        catch (error) {
-            // Network or other errors
+            if (response.data.success) {
+                // Reset retry count on success
+                this.refreshRetryCount = 0;
+                // Schedule next refresh if expiresIn is provided
+                const expiresIn = response.data.data?.expiresIn;
+                if (expiresIn) {
+                    this.scheduleTokenRefresh(expiresIn);
+                }
+                return true;
+            }
             return false;
         }
+        catch (error) {
+            // Network or other errors - don't count as session expiry
+            // The interceptor will retry
+            return false;
+        }
+    }
+    /**
+     * Schedule proactive token refresh before expiry
+     * Refreshes at 80% of token lifetime to avoid edge cases
+     */
+    scheduleTokenRefresh(expiresIn) {
+        // Clear any existing timer
+        if (this.refreshTimer) {
+            clearTimeout(this.refreshTimer);
+        }
+        // Calculate refresh time (80% of expiry time)
+        const refreshInMs = expiresIn * 1000 * 0.8;
+        // Set expiry timestamp
+        this.tokenExpiresAt = Date.now() + expiresIn * 1000;
+        // Schedule refresh
+        this.refreshTimer = setTimeout(() => {
+            this.refreshToken();
+        }, refreshInMs);
+    }
+    /**
+     * Check if token is about to expire (within 2 minutes)
+     */
+    isTokenExpiringSoon() {
+        if (!this.tokenExpiresAt)
+            return false;
+        return this.tokenExpiresAt - Date.now() < 2 * 60 * 1000;
+    }
+    /**
+     * Stop scheduled token refresh
+     */
+    stopTokenRefresh() {
+        if (this.refreshTimer) {
+            clearTimeout(this.refreshTimer);
+            this.refreshTimer = null;
+        }
+        this.tokenExpiresAt = null;
     }
     /**
      * Handle session expiry by broadcasting event

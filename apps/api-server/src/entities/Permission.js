@@ -82,3 +82,4 @@ Permission = Permission_1 = __decorate([
     // @Index(['appId']) // TEMPORARY: Disabled until appId column is added to DB
 ], Permission);
 export { Permission };
+//# sourceMappingURL=Permission.js.map

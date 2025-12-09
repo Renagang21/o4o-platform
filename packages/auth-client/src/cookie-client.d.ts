@@ -6,12 +6,29 @@ export declare class CookieAuthClient {
     private refreshPromise;
     private currentToken;
     private hasHandledSessionExpiry;
+    private tokenExpiresAt;
+    private refreshTimer;
+    private refreshRetryCount;
+    private readonly MAX_REFRESH_RETRIES;
     constructor(baseURL: string);
     login(credentials: LoginCredentials): Promise<AuthResponse>;
     register(data: RegisterData): Promise<AuthResponse>;
     logout(): Promise<void>;
     logoutAll(): Promise<void>;
     refreshToken(): Promise<boolean>;
+    /**
+     * Schedule proactive token refresh before expiry
+     * Refreshes at 80% of token lifetime to avoid edge cases
+     */
+    private scheduleTokenRefresh;
+    /**
+     * Check if token is about to expire (within 2 minutes)
+     */
+    isTokenExpiringSoon(): boolean;
+    /**
+     * Stop scheduled token refresh
+     */
+    stopTokenRefresh(): void;
     /**
      * Handle session expiry by broadcasting event
      * Only happens once per session to avoid spam

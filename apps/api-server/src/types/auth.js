@@ -23,3 +23,4 @@ export var UserStatus;
     UserStatus["SUSPENDED"] = "suspended";
     UserStatus["REJECTED"] = "rejected";
 })(UserStatus || (UserStatus = {}));
+//# sourceMappingURL=auth.js.map

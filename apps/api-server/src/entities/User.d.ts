@@ -102,17 +102,17 @@ export declare class User {
     toPublicData(): {
         id: string;
         email: string;
-        firstName: string | undefined;
-        lastName: string | undefined;
+        firstName: string;
+        lastName: string;
         fullName: string;
-        phone: string | undefined;
+        phone: string;
         role: UserRole;
         roles: string[];
         activeRole: {
             id: string;
             name: string;
             displayName: string;
-        } | null;
+        };
         dbRoles: {
             id: string;
             name: string;
@@ -123,7 +123,7 @@ export declare class User {
         permissions: string[];
         isActive: boolean;
         isEmailVerified: boolean;
-        lastLoginAt: Date | undefined;
+        lastLoginAt: Date;
         createdAt: Date;
         updatedAt: Date;
     };

@@ -359,7 +359,7 @@ __decorate([
 __decorate([
     ManyToOne('Role', { nullable: true, eager: true }),
     JoinColumn({ name: 'active_role_id' }),
-    __metadata("design:type", Object)
+    __metadata("design:type", Function)
 ], User.prototype, "activeRole", void 0);
 __decorate([
     Column({ type: 'json', default: () => "'[]'" })
@@ -441,11 +441,11 @@ __decorate([
 ], User.prototype, "provider_id", void 0);
 __decorate([
     Column({ type: 'varchar', length: 255, nullable: true, name: 'reset_password_token' }),
-    __metadata("design:type", Object)
+    __metadata("design:type", String)
 ], User.prototype, "resetPasswordToken", void 0);
 __decorate([
     Column({ type: 'timestamp', nullable: true, name: 'reset_password_expires' }),
-    __metadata("design:type", Object)
+    __metadata("design:type", Date)
 ], User.prototype, "resetPasswordExpires", void 0);
 __decorate([
     Column({ type: 'boolean', default: false, name: 'onboarding_completed' }),
@@ -485,3 +485,4 @@ User = __decorate([
     Index(['isActive'])
 ], User);
 export { User };
+//# sourceMappingURL=User.js.map

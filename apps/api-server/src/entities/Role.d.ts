@@ -19,7 +19,7 @@ export declare class Role {
         id: string;
         name: string;
         displayName: string;
-        description: string | undefined;
+        description: string;
         isActive: boolean;
         isSystem: boolean;
         permissions: string[];
