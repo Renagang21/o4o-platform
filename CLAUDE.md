@@ -147,7 +147,7 @@ pnpm start:dev
 ### 8. Schema Policy Compliance (⚠️ 필수)
 
 **모든 엔티티/DB 관련 변경은 아래 문서를 반드시 준수해야 함:**
-- **`docs/reference/guidelines/SCHEMA_DRIFT_PREVENTION_GUIDE.md`**
+- **`docs/app-guidelines/schema-drift-prevention.md`**
 
 **CLAUDE(Code Agents)는 다음 원칙을 자동 적용해야 함:**
 
@@ -232,7 +232,46 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 ### 주요 문서
 - 블록 개발 가이드: `BLOCKS_DEVELOPMENT.md`
 - 배포 가이드: `DEPLOYMENT.md`
+- **문서 정리 기준**: `docs/_standards/DOCUMENT_ORGANIZATION_STANDARD_v1.0.md`
+
+### App 개발 가이드라인 (docs/app-guidelines/)
+| 문서 | 설명 |
+|------|------|
+| `schema-drift-prevention.md` | Schema 드리프트 방지 규칙 |
+| `registry-architecture.md` | Registry 아키텍처 |
+| `cpt-acf-development.md` | CPT/ACF 개발 가이드 |
+| `extension-app-pattern.md` | Extension App 패턴 |
+| `appstore-build.md` | AppStore 빌드 가이드 |
+
+### 문서 구조
+
+```
+docs/
+├── _standards/      # 문서 정리 기준
+├── app-guidelines/  # 핵심 개발 가이드라인
+├── specs/           # 앱별 스펙 문서
+│   ├── dropshipping/
+│   ├── forum/
+│   ├── cosmetics/
+│   ├── cms/
+│   ├── cpt-acf/
+│   └── organization/
+├── design/          # 아키텍처/설계 문서
+├── plan/            # 작업 계획/워크오더
+│   └── active/      # 진행 중인 작업
+├── ops/             # 운영/배포 (구 deployment)
+├── guides/          # 사용자 매뉴얼
+├── reference/       # 기술 참고
+├── reports/         # 완료 보고서
+└── archive/         # 구버전/아카이브
+```
+
+**문서 작업 시 규칙:**
+- 새 문서 생성 전 `docs/_standards/DOCUMENT_ORGANIZATION_STANDARD_v1.0.md` 확인
+- App 관련 스펙은 `docs/specs/{app-id}/`에 배치
+- 작업 계획은 `docs/plan/active/`에 배치
+- 완료된 작업은 `docs/reports/`로 이동
 
 ---
 
-*최종 업데이트: 2025-12-08*
+*최종 업데이트: 2025-12-09*
