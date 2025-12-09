@@ -10,7 +10,7 @@
  * - CMS settings management
  */
 
-export const cmsCoreManifest = {
+export const manifest = {
   appId: 'cms-core',
   name: 'CMS Core Engine',
   type: 'core' as const,
@@ -213,4 +213,4 @@ export const cmsCoreManifest = {
   },
 };
 
-export default cmsCoreManifest;
+export default manifest;
