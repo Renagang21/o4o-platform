@@ -12,6 +12,7 @@ import { selleropsManifest } from './sellerops.manifest.js';
 import { supplieropsManifest } from './supplierops.manifest.js';
 import { partneropsManifest } from './partnerops.manifest.js';
 import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
+import { manifest as cmsCoreManifest } from '@o4o-apps/cms-core';
 
 /**
  * App Manifest Registry
@@ -44,6 +45,8 @@ const manifestRegistry: Record<string, AppManifest> = {
   sellerops: selleropsManifest as any,
   supplierops: supplieropsManifest as any,
   partnerops: partneropsManifest as any,
+  // CMS
+  'cms-core': cmsCoreManifest as any,
 };
 
 /**
