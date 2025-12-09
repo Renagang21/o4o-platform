@@ -180,6 +180,16 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     dependencies: { 'forum-core': '>=1.0.0' },
     author: 'O4O Platform',
   },
+  {
+    appId: 'cms-core',
+    name: 'CMS Core Engine',
+    version: '1.0.0',
+    description: 'CMS 핵심 엔진 - 템플릿, CPT, ACF, 뷰, 메뉴, 미디어',
+    category: 'content',
+    tags: ['CMS', '템플릿', 'template', 'CPT', 'ACF', 'menu', 'media'],
+    type: 'core',
+    author: 'O4O Platform',
+  },
 ];
 
 /**

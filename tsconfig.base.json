@@ -96,6 +96,9 @@
     },
     {
       "path": "./packages/organization-core"
+    },
+    {
+      "path": "./packages/cms-core"
     }
   ]
 }

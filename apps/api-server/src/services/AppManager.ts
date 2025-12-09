@@ -39,6 +39,7 @@ const PACKAGE_MAP: Record<string, string> = {
   'membership-yaksa': 'membership-yaksa',
   'sellerops': 'sellerops',
   'supplierops': 'supplierops',
+  'cms-core': 'cms-core',
 };
 
 /**
