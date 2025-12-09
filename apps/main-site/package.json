@@ -14,11 +14,12 @@
     "delete:view": "tsx src/generator/cli.ts delete"
   },
   "dependencies": {
+    "@o4o/auth-client": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.6.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.0.0",
-    "@tanstack/react-query": "^5.0.0",
-    "axios": "^1.6.0"
+    "react-router-dom": "^7.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.1",

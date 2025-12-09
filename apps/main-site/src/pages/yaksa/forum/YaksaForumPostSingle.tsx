@@ -282,13 +282,27 @@ export function YaksaForumPostSingle({ postSlug }: YaksaForumPostSingleProps) {
             <YaksaModerationPanel
               post={post}
               userRole={user!.role}
-              onApprove={() => console.log('Approve')}
-              onReject={(reason) => console.log('Reject:', reason)}
-              onPin={() => console.log('Pin')}
-              onUnpin={() => console.log('Unpin')}
-              onLock={() => console.log('Lock')}
-              onUnlock={() => console.log('Unlock')}
-              onDelete={() => console.log('Delete')}
+              onApprove={() => {
+                // TODO: Implement approve action via API
+              }}
+              onReject={() => {
+                // TODO: Implement reject action via API
+              }}
+              onPin={() => {
+                // TODO: Implement pin action via API
+              }}
+              onUnpin={() => {
+                // TODO: Implement unpin action via API
+              }}
+              onLock={() => {
+                // TODO: Implement lock action via API
+              }}
+              onUnlock={() => {
+                // TODO: Implement unlock action via API
+              }}
+              onDelete={() => {
+                // TODO: Implement delete action via API
+              }}
             />
           </div>
         )}

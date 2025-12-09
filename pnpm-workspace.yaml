@@ -1,6 +1,7 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+  - 'packages/@o4o-apps/*'
   - 'services/*'
   - '!apps/*.backup'
   - '!packages/*.backup'

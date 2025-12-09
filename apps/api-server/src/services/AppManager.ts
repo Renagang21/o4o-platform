@@ -36,6 +36,7 @@ const PACKAGE_MAP: Record<string, string> = {
   'dropshipping': 'dropshipping-core',
   'dropshipping-core': 'dropshipping-core',
   'dropshipping-cosmetics': 'dropshipping-cosmetics',
+  'membership-yaksa': 'membership-yaksa',
   'sellerops': 'sellerops',
   'supplierops': 'supplierops',
 };
@@ -671,10 +672,10 @@ export class AppManager {
       throw new Error(`Package not mapped for appId: ${appId}. Add it to PACKAGE_MAP.`);
     }
 
-    // Path from api-server/src/services -> packages/{folder}/dist/packages/{folder}/src
+    // Path from api-server/src/services -> packages/{folder}/dist
     // In production: apps/api-server -> packages/{folder}
     const packagesRoot = resolve(__dirname, '../../../../packages');
-    const packagePath = join(packagesRoot, packageFolder, 'dist', 'packages', packageFolder, 'src');
+    const packagePath = join(packagesRoot, packageFolder, 'dist');
 
     logger.info(`[AppManager] Resolved package root for ${appId}: ${packagePath}`);
     return packagePath;

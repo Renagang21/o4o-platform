@@ -107,3 +107,4 @@ Role = __decorate([
     Index(['isActive'])
 ], Role);
 export { Role };
+//# sourceMappingURL=Role.js.map

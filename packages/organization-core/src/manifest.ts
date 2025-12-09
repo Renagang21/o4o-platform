@@ -21,11 +21,22 @@ export const manifest: AppManifest = {
     url: 'https://o4o-platform.com',
   },
 
-  // 의존성 (Core App이므로 의존성 없음)
-  dependencies: [],
+  // 의존성
+  dependencies: [
+    {
+      appId: 'auth-core',
+      version: '>=1.0.0',
+      required: true,
+    },
+  ],
 
   // 소유 테이블
-  ownsTables: ['organizations', 'organization_members'],
+  ownsTables: [
+    'organizations',
+    'organization_members',
+    'organization_units',
+    'organization_roles',
+  ],
 
   // 권한 정의
   permissions: [
@@ -57,10 +68,10 @@ export const manifest: AppManifest = {
 
   // 라이프사이클 훅
   lifecycle: {
-    install: './lifecycle/install',
-    activate: './lifecycle/activate',
-    deactivate: './lifecycle/deactivate',
-    uninstall: './lifecycle/uninstall',
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
   },
 
   // API 라우트

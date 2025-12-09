@@ -1,0 +1,226 @@
+{
+  "plan_version": "3.0",
+  "created_date": "2025-12-09",
+  "based_on": "DOCUMENT_ORGANIZATION_STANDARD_v1.0",
+  "summary": {
+    "total_documents": 241,
+    "new_structure_directories": 10,
+    "estimated_moves": 200,
+    "files_to_archive": 37
+  },
+  "new_directory_structure": {
+    "docs/app-guidelines/": "Core/Extension/Service/Refactoring/Manifest 기준 문서",
+    "docs/specs/": "각 앱 스펙·도메인 사양",
+    "docs/design/": "아키텍처·플랫폼 구조 설계",
+    "docs/plan/": "Task, Work Order, Phase 문서",
+    "docs/dev/": "개발 조사, 분석, 코드 레퍼런스",
+    "docs/ops/": "배포, 운영, CI/CD, 인프라",
+    "docs/guides/": "사용자/관리자 매뉴얼 (기존 유지)",
+    "docs/reference/": "기술 참고 (기존 유지, 하위 구조 정리)",
+    "docs/reports/": "완료 보고서, 릴리즈 노트",
+    "docs/archive/": "구버전/과거 자료"
+  },
+  "migration_plan": {
+    "phase_1_create_directories": {
+      "description": "새 디렉토리 구조 생성",
+      "directories": [
+        "docs/app-guidelines",
+        "docs/specs",
+        "docs/specs/dropshipping",
+        "docs/specs/forum",
+        "docs/specs/cosmetics",
+        "docs/specs/cms",
+        "docs/specs/cpt-acf",
+        "docs/design",
+        "docs/design/architecture",
+        "docs/design/platform",
+        "docs/plan",
+        "docs/plan/active",
+        "docs/plan/completed",
+        "docs/reports",
+        "docs/reports/phase-completions",
+        "docs/reports/releases",
+        "docs/archive",
+        "docs/archive/legacy",
+        "docs/archive/completed-tasks"
+      ]
+    },
+    "phase_2_move_app_guidelines": {
+      "description": "플랫폼 핵심 가이드라인 이동",
+      "moves": [
+        {"from": "docs/reference/guidelines/SCHEMA_DRIFT_PREVENTION_GUIDE.md", "to": "docs/app-guidelines/schema-drift-prevention.md"},
+        {"from": "docs/dev/REGISTRY_ARCHITECTURE.md", "to": "docs/app-guidelines/registry-architecture.md"},
+        {"from": "docs/dev/CPT_ACF_GUIDE.md", "to": "docs/app-guidelines/cpt-acf-development.md"},
+        {"from": "docs/cpt-acf/CPT_REGISTRY_GUIDE.md", "to": "docs/app-guidelines/cpt-registry.md"},
+        {"from": "docs/dev/appstore/BUILD_GUIDE.md", "to": "docs/app-guidelines/appstore-build.md"},
+        {"from": "docs/dev/spec/extension_app_pattern.md", "to": "docs/app-guidelines/extension-app-pattern.md"},
+        {"from": "docs/dev/spec/app_manager_dependency_handling.md", "to": "docs/app-guidelines/app-dependency-handling.md"}
+      ]
+    },
+    "phase_3_move_specs": {
+      "description": "앱별 스펙 문서 이동",
+      "moves": [
+        {"from": "docs/apps/dropshipping/DS_API_CONTRACT_MATRIX.md", "to": "docs/specs/dropshipping/api-contract.md"},
+        {"from": "docs/apps/dropshipping/DROPSHIPPING_DB_INVENTORY_REPORT.md", "to": "docs/specs/dropshipping/db-inventory.md"},
+        {"from": "docs/apps/dropshipping/DS_INVESTIGATION.md", "to": "docs/specs/dropshipping/investigation.md"},
+        {"from": "docs/apps/cosmetics/cosmetics_api_spec.md", "to": "docs/specs/cosmetics/api-spec.md"},
+        {"from": "docs/apps/cosmetics/cosmetics_service_blueprint.md", "to": "docs/specs/cosmetics/service-blueprint.md"},
+        {"from": "docs/apps/cosmetics/cosmetics_extension_manifest.md", "to": "docs/specs/cosmetics/extension-manifest.md"},
+        {"from": "docs/apps/cosmetics/cosmetics_ui_wireframes.md", "to": "docs/specs/cosmetics/ui-wireframes.md"},
+        {"from": "docs/apps/forum-core/investigation/forum_core_phase1_investigation_report.md", "to": "docs/specs/forum/phase1-investigation.md"},
+        {"from": "docs/dev/spec/forum_app_structure.md", "to": "docs/specs/forum/app-structure.md"},
+        {"from": "docs/cms/CMS_ENGINE_SPEC.md", "to": "docs/specs/cms/engine-spec.md"},
+        {"from": "docs/cpt-acf/03-presets-spec.md", "to": "docs/specs/cpt-acf/presets-spec.md"},
+        {"from": "docs/cpt-acf/CPT_ACF_ROUTE_MATRIX.md", "to": "docs/specs/cpt-acf/route-matrix.md"},
+        {"from": "docs/cpt-acf/CPT_ACF_INVESTIGATION.md", "to": "docs/specs/cpt-acf/investigation.md"}
+      ]
+    },
+    "phase_4_move_design": {
+      "description": "아키텍처/설계 문서 이동",
+      "moves": [
+        {"from": "docs/admin/HEADER_BUILDER_MODULE_SPECS.md", "to": "docs/design/admin/header-builder-specs.md"},
+        {"from": "docs/reference/architecture/api-server-requirements.md", "to": "docs/design/architecture/api-server-requirements.md"},
+        {"from": "docs/reference/architecture/editor-data-storage.md", "to": "docs/design/architecture/editor-data-storage.md"},
+        {"from": "docs/reference/architecture/page-management.md", "to": "docs/design/architecture/page-management.md"},
+        {"from": "docs/reference/MONITORING_LOGGING_DESIGN.md", "to": "docs/design/platform/monitoring-logging.md"},
+        {"from": "docs/reference/SETTLEMENT_ENGINE_DESIGN.md", "to": "docs/design/platform/settlement-engine.md"},
+        {"from": "docs/reference/SHADOW_MODE_IMPLEMENTATION.md", "to": "docs/design/platform/shadow-mode.md"},
+        {"from": "docs/reference/blocks/block-architecture.md", "to": "docs/design/blocks/architecture.md"},
+        {"from": "docs/reference/blocks/dynamic-blocks-architecture.md", "to": "docs/design/blocks/dynamic-blocks.md"},
+        {"from": "docs/reference/payment/payment-gateway-design.md", "to": "docs/design/platform/payment-gateway.md"},
+        {"from": "docs/reference/authentication/AUTH_SCHEMA_DESIGN.md", "to": "docs/design/auth/schema-design.md"},
+        {"from": "docs/dev/design/organization-core/organization_core_overview.md", "to": "docs/design/organization/core-overview.md"},
+        {"from": "docs/dev/design/organization-core/organization_api_design.md", "to": "docs/design/organization/api-design.md"},
+        {"from": "docs/dev/design/organization-core/organization_entities.md", "to": "docs/design/organization/entities.md"},
+        {"from": "docs/dev/design/app-manifest-schema-v1.md", "to": "docs/design/appstore/manifest-schema-v1.md"},
+        {"from": "docs/dev/design/app-registry-schema.md", "to": "docs/design/appstore/registry-schema.md"},
+        {"from": "docs/nextgen-frontend/specs/view-schema.md", "to": "docs/design/frontend/view-schema.md"},
+        {"from": "docs/nextgen-frontend/specs/layout-system-spec.md", "to": "docs/design/frontend/layout-system.md"},
+        {"from": "docs/nextgen-frontend/specs/component-registry-spec.md", "to": "docs/design/frontend/component-registry.md"}
+      ]
+    },
+    "phase_5_move_plan": {
+      "description": "진행 중인 작업 문서 이동",
+      "moves": [
+        {"from": "docs/api-server/tasks/step25_phase_b2_auth_module_workorder.md", "to": "docs/plan/active/api-server/step25-phase-b2-auth-module.md"},
+        {"from": "docs/api-server/tasks/step25_phase_b_implementation_workorder.md", "to": "docs/plan/active/api-server/step25-phase-b-implementation.md"},
+        {"from": "docs/nextgen-backend/tasks/step25_api_server_v2_workorder.md", "to": "docs/plan/active/backend/step25-api-server-v2.md"},
+        {"from": "docs/nextgen-backend/tasks/step25_phase_c32_block_library_expansion_workorder.md", "to": "docs/plan/active/backend/step25-phase-c32-block-library.md"},
+        {"from": "docs/nextgen-frontend/tasks/step24_multisite_builder_workorder.md", "to": "docs/plan/active/frontend/step24-multisite-builder.md"},
+        {"from": "docs/apps/cosmetics/TASK-01-COSMETICS-MVP.md", "to": "docs/plan/active/apps/cosmetics-mvp.md"},
+        {"from": "docs/apps/cosmetics/cosmetics_development_plan.md", "to": "docs/plan/active/apps/cosmetics-development.md"},
+        {"from": "docs/apps/dropshipping/sprint1_checklist.md", "to": "docs/plan/active/apps/dropshipping-sprint1.md"}
+      ],
+      "note": "완료된 workorder는 reports/로 이동"
+    },
+    "phase_6_move_ops": {
+      "description": "운영/배포 문서 이동 (deployment -> ops)",
+      "moves": [
+        {"from": "docs/deployment/README.md", "to": "docs/ops/README.md"},
+        {"from": "docs/deployment/DEPLOYMENT_PLAN.md", "to": "docs/ops/deployment-plan.md"},
+        {"from": "docs/deployment/DB_INDEX_EXECUTION_GUIDE.md", "to": "docs/ops/database/db-index-execution.md"},
+        {"from": "docs/deployment/environments/api-server-env.md", "to": "docs/ops/environments/api-server.md"},
+        {"from": "docs/deployment/environments/api-server-setup.md", "to": "docs/ops/environments/api-server-setup.md"},
+        {"from": "docs/deployment/environments/webserver-env.md", "to": "docs/ops/environments/webserver.md"},
+        {"from": "docs/deployment/operations/server-access.md", "to": "docs/ops/access/server-access.md"},
+        {"from": "docs/deployment/operations/claude-webserver.md", "to": "docs/ops/operations/claude-webserver.md"},
+        {"from": "docs/deployment/setup/database-setup.md", "to": "docs/ops/setup/database.md"},
+        {"from": "docs/deployment/setup/nginx-setup.md", "to": "docs/ops/setup/nginx.md"},
+        {"from": "docs/deployment/setup/pm2-autostart.md", "to": "docs/ops/setup/pm2-autostart.md"},
+        {"from": "docs/deployment/setup/github-actions-setup.md", "to": "docs/ops/ci-cd/github-actions.md"},
+        {"from": "docs/deployment/setup/github-secrets.md", "to": "docs/ops/ci-cd/github-secrets.md"},
+        {"from": "docs/dev/setup/aws-ses-setup-guide.md", "to": "docs/ops/setup/aws-ses.md"},
+        {"from": "docs/operations/METRICS-DUPLICATION-PREVENTION.md", "to": "docs/ops/monitoring/metrics-duplication-prevention.md"}
+      ]
+    },
+    "phase_7_consolidate_reference": {
+      "description": "reference 폴더 정리 (하위 구조 단순화)",
+      "moves": [
+        {"from": "docs/reference/api/api-documentation.md", "to": "docs/reference/api/documentation.md"},
+        {"from": "docs/reference/authentication/AUTH_API_SPEC.md", "to": "docs/reference/auth/api-spec.md"},
+        {"from": "docs/reference/authentication/AUTH_MIGRATION_GUIDE.md", "to": "docs/reference/auth/migration-guide.md"},
+        {"from": "docs/reference/authentication/oauth-integration.md", "to": "docs/reference/auth/oauth-integration.md"},
+        {"from": "docs/reference/authentication/session-management.md", "to": "docs/reference/auth/session-management.md"},
+        {"from": "docs/reference/blocks/blocks-development.md", "to": "docs/reference/blocks/development.md"},
+        {"from": "docs/reference/blocks/gallery-block-api.md", "to": "docs/reference/blocks/gallery-api.md"},
+        {"from": "docs/reference/database/jsonb-optimization.md", "to": "docs/reference/database/jsonb-optimization.md"},
+        {"from": "docs/dev/ai/AI_BLOCK_REFERENCE_SYSTEM.md", "to": "docs/reference/ai/block-reference-system.md"},
+        {"from": "docs/dev/ai/AI_DYNAMIC_REFERENCE_SUMMARY.md", "to": "docs/reference/ai/dynamic-reference-summary.md"}
+      ]
+    },
+    "phase_8_move_reports": {
+      "description": "완료 보고서 이동",
+      "moves": [
+        {"from": "docs/api-server/reports/phase_a_completion_summary.md", "to": "docs/reports/phase-completions/api-server-phase-a.md"},
+        {"from": "docs/api-server/reports/phase_bc_completion_summary.md", "to": "docs/reports/phase-completions/api-server-phase-bc.md"},
+        {"from": "docs/api-server/reports/phase_c23_completion_summary.md", "to": "docs/reports/phase-completions/api-server-phase-c23.md"},
+        {"from": "docs/nextgen-backend/reports/phase_c2_completion_summary.md", "to": "docs/reports/phase-completions/backend-phase-c2.md"},
+        {"from": "docs/nextgen-backend/reports/phase_c24_completion_summary.md", "to": "docs/reports/phase-completions/backend-phase-c24.md"},
+        {"from": "docs/nextgen-backend/reports/phase_c25_completion_summary.md", "to": "docs/reports/phase-completions/backend-phase-c25.md"},
+        {"from": "docs/nextgen-backend/reports/step25_phase_b3_completion_report.md", "to": "docs/reports/phase-completions/backend-step25-phase-b3.md"},
+        {"from": "docs/nextgen-frontend/reports/phase_h_completion_summary.md", "to": "docs/reports/phase-completions/frontend-phase-h.md"},
+        {"from": "docs/nextgen-frontend/reports/step21_digital_signage_completion_report.md", "to": "docs/reports/phase-completions/frontend-step21-signage.md"},
+        {"from": "docs/nextgen-frontend/reports/step23_deployment_manager_completion_report.md", "to": "docs/reports/phase-completions/frontend-step23-deployment.md"},
+        {"from": "docs/nextgen-frontend/reports/step24_multisite_builder_completion_report.md", "to": "docs/reports/phase-completions/frontend-step24-multisite.md"},
+        {"from": "docs/dev/tasks/p1_phase_c_completion_report.md", "to": "docs/reports/phase-completions/dev-p1-phase-c.md"},
+        {"from": "docs/dev/tasks/p1_phase_d2_d3_d4_completion_report.md", "to": "docs/reports/phase-completions/dev-p1-phase-d234.md"},
+        {"from": "docs/releases/v2.0.0-p0_release_notes.md", "to": "docs/reports/releases/v2.0.0-p0.md"}
+      ]
+    },
+    "phase_9_move_archive": {
+      "description": "아카이브 대상 이동",
+      "moves": [
+        {"from": "docs/dev/VSCODE_EXTENSION_ARCHIVE.md", "to": "docs/archive/legacy/vscode-extension.md"},
+        {"from": "docs/reports/LEGACY_CLEANUP_REPORT.md", "to": "docs/archive/legacy/cleanup-report.md"},
+        {"from": "docs/reports/META_USAGE_REPORT.md", "to": "docs/archive/legacy/meta-usage-report.md"},
+        {"from": "docs/api-server/reports/legacy_cleanup_report.md", "to": "docs/archive/legacy/api-server-cleanup.md"},
+        {"from": "docs/reference/architecture/wordpress-theme-analysis.md", "to": "docs/archive/legacy/wordpress-theme-analysis.md"},
+        {"from": "docs/reference/authentication/KAKAO_OAUTH_CHECKLIST.md", "to": "docs/archive/completed-tasks/kakao-oauth-checklist.md"},
+        {"from": "docs/reference/authentication/KAKAO_OAUTH_SETUP_REQUEST.md", "to": "docs/archive/completed-tasks/kakao-oauth-setup.md"},
+        {"from": "docs/troubleshooting/fixes/dependency-fix-summary.md", "to": "docs/archive/completed-tasks/dependency-fix.md"}
+      ],
+      "note": "120일+ 미수정 + legacy 키워드 포함 문서"
+    },
+    "phase_10_cleanup_empty_dirs": {
+      "description": "빈 디렉토리 정리",
+      "directories_to_remove_if_empty": [
+        "docs/api-server/reports",
+        "docs/api-server/tasks",
+        "docs/nextgen-backend/reports",
+        "docs/nextgen-backend/tasks",
+        "docs/nextgen-frontend/reports",
+        "docs/nextgen-frontend/tasks",
+        "docs/apps/dropshipping",
+        "docs/apps/cosmetics",
+        "docs/apps/forum-core",
+        "docs/deployment"
+      ]
+    }
+  },
+  "guides_consolidation": {
+    "description": "guides/ 폴더는 기존 구조 유지 (이미 잘 정리됨)",
+    "keep_as_is": [
+      "docs/guides/README.md",
+      "docs/guides/features/*",
+      "docs/guides/getting-started/*",
+      "docs/guides/user-manuals/*",
+      "docs/guides/roles/*",
+      "docs/guides/cpt-preset-*.md"
+    ]
+  },
+  "files_requiring_manual_review": [
+    "docs/README.md - 루트 README 업데이트 필요",
+    "docs/cms-compatibility-audit-forum-core.md - 위치 결정 필요",
+    "docs/cms-compatibility-audit-forum-core-RESULT.md - 위치 결정 필요",
+    "docs/frontend/FRONTEND_VIEW_ARCHITECTURE_WORKORDER.md - plan or design",
+    "docs/implementation-reports/* - reports로 이동 여부",
+    "docs/testing/* - dev or reference",
+    "docs/troubleshooting/* - ops or reference"
+  ],
+  "execution_notes": {
+    "order": "phase_1 부터 phase_10 순서대로 실행",
+    "backup": "이동 전 git commit 권장",
+    "validation": "이동 후 broken links 체크 필요",
+    "claude_md_update": "이동 완료 후 CLAUDE.md 참조 경로 업데이트"
+  }
+}
