@@ -32,7 +32,8 @@
         "./src/*"
       ],
       "@o4o-apps/*": [
-        "./packages/@o4o-apps/*"
+        "./packages/@o4o-apps/*",
+        "./packages/*"
       ],
       "@o4o/*": [
         "./packages/*/dist",
