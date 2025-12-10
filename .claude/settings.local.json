@@ -111,7 +111,8 @@
       "Bash(for pkg in cms-core organization-core forum-app dropshipping-core forum-yaksa membership-yaksa dropshipping-cosmetics forum-cosmetics organization-forum sellerops supplierops partnerops)",
       "Bash(do if [ -d \"C:/Users/home/coding/o4o-platform/packages/$pkg/dist/lifecycle\" ])",
       "Bash(then echo \"$pkg: OK\")",
-      "Bash(else echo \"$pkg: MISSING\")"
+      "Bash(else echo \"$pkg: MISSING\")",
+      "Bash(scp:*)"
     ],
     "deny": []
   }

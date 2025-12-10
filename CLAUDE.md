@@ -154,4 +154,61 @@ docs/
 
 ---
 
-*최종 업데이트: 2025-12-09*
+## 7. App Development Minimal Standards (for Claude)
+
+앱 개발 시 Claude Code가 반드시 따라야 하는 최소 규칙:
+
+### 7.1 TODO 기반 개발
+
+- 앱 개발은 항상 `/packages/<app>/TODO.md`를 최우선 기준으로 진행
+- TODO 템플릿: `docs/templates/APP_TODO_TEMPLATE.md`
+- 완료된 항목은 문서에 반영 후 TODO에서 제거
+
+### 7.2 Manifest 필수 구조
+
+`manifest.ts`는 앱 개발의 출발점이며, 다음을 선언해야 한다:
+
+| 항목 | 설명 |
+|------|------|
+| meta | appId, name, version, type, description |
+| dependencies | core[], extension[] |
+| cms | cpt[], acf[], viewTemplates[] |
+| backend | entities[], services[], routes[] |
+| navigation | menus[], adminRoutes[] |
+
+### 7.3 Backend 필수 Export
+
+`backend/index.ts`는 다음을 반드시 export:
+
+```typescript
+export { createRoutes } from './routes';
+export * from './entities';
+export * from './services';
+```
+
+### 7.4 View 구조 규칙
+
+- Next.js page 기반 금지
+- View Component 기반으로만 구성 (ListView, DetailView, FormView)
+- manifest.viewTemplates에 등록
+
+### 7.5 아키텍처 준수
+
+모든 구조 변경은 다음 기준 준수:
+- **CMS 2.0**: CPT/ACF 기반 데이터 구조
+- **AppStore**: manifest 기반 앱 등록
+- **ModuleLoader**: 자동 백엔드 로딩
+- **ViewSystem**: 컴포넌트 기반 렌더링
+
+### 7.6 문서 참조 순서
+
+앱 개발 시 참조 순서:
+
+1. `docs/specs/{app-id}/` - 앱 스펙
+2. `docs/app-guidelines/` - 개발 가이드라인
+3. `docs/design/architecture/` - 아키텍처 문서
+4. `docs/reference/glossary.md` - 용어집
+
+---
+
+*최종 업데이트: 2025-12-10*

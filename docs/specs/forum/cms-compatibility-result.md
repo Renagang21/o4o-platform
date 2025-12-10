@@ -1,6 +1,18 @@
-# [CMS 호환성 조사 결과 — forum-core]
+# [ARCHIVED] CMS 호환성 조사 결과 — forum-core
 
-**조사 완료일**: 2025-12-07
+> **⚠️ ARCHIVED (2025-12-10)**
+>
+> 이 문서는 forum-core의 CMS 1.x 호환성 감사 결과입니다.
+> 결과가 **forum-overview.md**에 반영되었으며, 이 문서는 참조용으로 보관됩니다.
+>
+> 아카이브 사본: `docs/archive/forum/cms-compatibility-result.md`
+>
+> 최신 forum 문서:
+> - [forum-overview.md](./forum-overview.md)
+
+---
+
+**조사 완료일**: 2025-12-07 (ARCHIVED)
 **조사자**: Claude (AI Agent)
 **대상 패키지**: `packages/forum-app` (forum-core)
 
