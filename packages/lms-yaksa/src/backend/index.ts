@@ -21,6 +21,10 @@ export * from './controllers/index.js';
 // Export routes
 export * from './routes/index.js';
 
+// Export hooks
+export * from './hooks/index.js';
+export { createHooks, createHooksWithServices, LmsCoreEventHandlers } from './hooks/index.js';
+
 // Import services for routes
 import { LicenseProfileService } from './services/LicenseProfileService.js';
 import { RequiredCoursePolicyService } from './services/RequiredCoursePolicyService.js';

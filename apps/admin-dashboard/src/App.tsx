@@ -131,6 +131,9 @@ const SupplierOpsRouter = lazy(() => import('@/pages/supplierops/SupplierOpsRout
 // PartnerOps Pages
 const PartnerOpsRouter = lazy(() => import('@/pages/partnerops/PartnerOpsRouter'));
 
+// LMS-Yaksa Pages
+const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1127,6 +1130,17 @@ function App() {
                         <AppRouteGuard appId="partnerops">
                           <Suspense fallback={<PageLoader />}>
                             <PartnerOpsRouter />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* LMS-Yaksa - Pharmacist LMS Extension */}
+                    <Route path="/admin/lms-yaksa/*" element={
+                      <AdminProtectedRoute requiredPermissions={['lms-yaksa.license.read']}>
+                        <AppRouteGuard appId="lms-yaksa">
+                          <Suspense fallback={<PageLoader />}>
+                            <LmsYaksaRouter />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

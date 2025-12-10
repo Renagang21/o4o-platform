@@ -107,6 +107,15 @@ export const lmsYaksaManifest = {
     ],
     routesExport: 'createRoutes',
     routePrefix: '/lms/yaksa',
+    hooks: {
+      events: [
+        'lms-core.course.completed',
+        'lms-core.certificate.issued',
+        'lms-core.enrollment.created',
+        'lms-core.enrollment.progress',
+      ],
+      handlerExport: 'createHooks',
+    },
   },
 
   // ===== 프론트엔드 =====
@@ -272,6 +281,15 @@ export const lmsYaksaManifest = {
       'lms-yaksa.credit.earned',
       'lms-yaksa.assignment.completed',
       'lms-yaksa.license.verified',
+      'lms-yaksa.assignment.auto-completed',
+      'lms-yaksa.credit.auto-recorded',
+    ],
+    hooks: [
+      'LmsCoreEventHandlers',
+      'CourseCompletionHandler',
+      'CertificateIssuedHandler',
+      'EnrollmentHandler',
+      'ProgressSyncHandler',
     ],
   },
 
