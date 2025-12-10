@@ -1,3 +1,15 @@
+/**
+ * Forum-Core
+ *
+ * 커뮤니티 포럼 코어 엔진 (Core Domain)
+ *
+ * @package @o4o/forum-app
+ * @version 1.0.0
+ */
+
+import { Router } from 'express';
+import type { DataSource } from 'typeorm';
+
 // Backend exports (compiled)
 export * from './backend/entities/index.js';
 
@@ -5,8 +17,32 @@ export * from './backend/entities/index.js';
 export * from './backend/types/index.js';
 
 // Manifest export
-export { forumManifest } from './manifest.js';
-export { default } from './manifest.js';
+export { forumManifest, manifest, default as manifestDefault } from './manifest.js';
+
+// Entity list for TypeORM
+import * as Entities from './backend/entities/index.js';
+export const entities = Object.values(Entities).filter(
+  (item) => typeof item === 'function' && item.prototype
+);
+
+/**
+ * Routes factory compatible with Module Loader
+ *
+ * @param dataSource - TypeORM DataSource from API server
+ */
+export function routes(dataSource?: DataSource | any): Router {
+  const router = Router();
+
+  // TODO: Implement actual routes using controllers
+  router.get('/health', (req, res) => {
+    res.json({ status: 'ok', app: 'forum-core' });
+  });
+
+  return router;
+}
+
+// Alias for manifest compatibility
+export const createRoutes = routes;
 
 // Public UI exports (templates and components for public-facing pages)
 // Note: Re-export specific items to avoid naming conflicts with entities
