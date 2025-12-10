@@ -18,13 +18,11 @@ export class RoutinesController {
         return;
       }
 
-      const result = await this.routineService.list(tenantId, partnerId, {
-        page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 20,
-        isActive: req.query.isActive ? req.query.isActive === 'true' : undefined,
+      const routines = await this.routineService.list(tenantId, partnerId, {
+        status: req.query.status as string | undefined,
       });
 
-      res.json({ success: true, ...result });
+      res.json({ success: true, data: routines });
     } catch (error: any) {
       console.error('List routines error:', error);
       res.status(500).json({ success: false, message: error.message });

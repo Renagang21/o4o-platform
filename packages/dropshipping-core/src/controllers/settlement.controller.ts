@@ -6,7 +6,7 @@
 
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { SettlementService } from '../services/SettlementService.js';
-import { SettlementBatch, SettlementStatus } from '../entities/SettlementBatch.entity.js';
+import { SettlementBatch, SettlementBatchStatus } from '../entities/SettlementBatch.entity.js';
 
 @Controller('api/v1/dropshipping/core/settlement')
 export class SettlementController {
@@ -14,9 +14,10 @@ export class SettlementController {
 
   @Get('batches')
   async findAllBatches(
-    @Query('status') status?: SettlementStatus
+    @Query('status') status?: SettlementBatchStatus,
+    @Query('sellerId') sellerId?: string
   ): Promise<SettlementBatch[]> {
-    return await this.settlementService.findAll({ status });
+    return await this.settlementService.findAll({ status, sellerId });
   }
 
   @Get('batches/:id')
@@ -30,17 +31,24 @@ export class SettlementController {
 
   @Post('batches')
   async createBatch(
+    @Body('sellerId') sellerId: string,
     @Body('periodStart') periodStart: string,
     @Body('periodEnd') periodEnd: string
   ): Promise<SettlementBatch> {
     return await this.settlementService.createSettlementBatch(
+      sellerId,
       new Date(periodStart),
       new Date(periodEnd)
     );
   }
 
-  @Post('batches/:id/process')
-  async processBatch(@Param('id') id: string): Promise<SettlementBatch> {
-    return await this.settlementService.processSettlement(id);
+  @Post('batches/:id/close')
+  async closeBatch(@Param('id') id: string): Promise<SettlementBatch> {
+    return await this.settlementService.closeSettlement(id);
+  }
+
+  @Post('batches/:id/pay')
+  async payBatch(@Param('id') id: string): Promise<SettlementBatch> {
+    return await this.settlementService.paySettlement(id);
   }
 }

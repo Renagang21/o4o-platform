@@ -244,6 +244,111 @@ export const cmsCoreManifest = {
     events: ['template.updated', 'cpt.created', 'acf.updated', 'menu.updated', 'media.uploaded'],
   },
 
+  // ===== 뷰 템플릿 =====
+  viewTemplates: [
+    {
+      viewId: 'templates-list',
+      route: '/admin/cms/templates',
+      title: '템플릿 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
+    },
+    {
+      viewId: 'templates-detail',
+      route: '/admin/cms/templates/:id',
+      title: '템플릿 상세',
+      type: 'detail' as const,
+      layout: 'admin',
+      auth: true,
+    },
+    {
+      viewId: 'cpt-list',
+      route: '/admin/cms/cpt',
+      title: 'CPT 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
+    },
+    {
+      viewId: 'acf-list',
+      route: '/admin/cms/acf',
+      title: 'ACF 필드 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
+    },
+    {
+      viewId: 'menus-list',
+      route: '/admin/cms/menus',
+      title: '메뉴 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
+    },
+    {
+      viewId: 'media-list',
+      route: '/admin/cms/media',
+      title: '미디어 라이브러리',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
+    },
+  ],
+
+  // ===== Navigation 정의 =====
+  navigation: {
+    admin: [
+      {
+        id: 'cms-core.cms',
+        label: 'CMS',
+        path: '/admin/cms',
+        icon: 'layout',
+        order: 5,
+      },
+      {
+        id: 'cms-core.templates',
+        label: '템플릿',
+        path: '/admin/cms/templates',
+        icon: 'document',
+        parentId: 'cms-core.cms',
+        order: 1,
+      },
+      {
+        id: 'cms-core.cpt',
+        label: 'Custom Post Types',
+        path: '/admin/cms/cpt',
+        icon: 'collection',
+        parentId: 'cms-core.cms',
+        order: 2,
+      },
+      {
+        id: 'cms-core.acf',
+        label: 'ACF 필드',
+        path: '/admin/cms/acf',
+        icon: 'adjustments',
+        parentId: 'cms-core.cms',
+        order: 3,
+      },
+      {
+        id: 'cms-core.menus',
+        label: '메뉴 관리',
+        path: '/admin/cms/menus',
+        icon: 'menu',
+        parentId: 'cms-core.cms',
+        order: 4,
+      },
+      {
+        id: 'cms-core.media',
+        label: '미디어 라이브러리',
+        path: '/admin/cms/media',
+        icon: 'photograph',
+        parentId: 'cms-core.cms',
+        order: 5,
+      },
+    ],
+  },
+
   // ===== 기본 설정 =====
   defaultConfig: {
     defaultTemplateEngine: 'handlebars',

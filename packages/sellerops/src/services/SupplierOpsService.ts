@@ -7,7 +7,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Supplier, SupplierProductOffer } from '@o4o/dropshipping-core';
+import {
+  Supplier,
+  SupplierProductOffer,
+  SupplierStatus,
+  OfferStatus,
+} from '@o4o/dropshipping-core';
 import type { SupplierListItemDto, SupplierApprovalRequestDto } from '../dto/index.js';
 
 @Injectable()
@@ -25,7 +30,7 @@ export class SupplierOpsService {
    */
   async getSupplierList(sellerId: string): Promise<SupplierListItemDto[]> {
     const suppliers = await this.supplierRepository.find({
-      where: { status: 'active' },
+      where: { status: SupplierStatus.ACTIVE },
     });
 
     const result: SupplierListItemDto[] = [];
@@ -33,7 +38,7 @@ export class SupplierOpsService {
     for (const supplier of suppliers) {
       // 해당 공급자의 상품 수 조회
       const productCount = await this.offerRepository.count({
-        where: { supplierId: supplier.id, isActive: true },
+        where: { supplierId: supplier.id, status: OfferStatus.ACTIVE },
       });
 
       // 승인 상태 조회 (SellerOps 전용 테이블에서)
@@ -45,11 +50,19 @@ export class SupplierOpsService {
 
       const approvalStatus = approvalResult[0]?.status || 'none';
 
+      // SupplierStatus enum을 DTO의 문자열 타입으로 변환
+      const statusMap: Record<string, 'pending' | 'active' | 'suspended'> = {
+        [SupplierStatus.PENDING]: 'pending',
+        [SupplierStatus.ACTIVE]: 'active',
+        [SupplierStatus.SUSPENDED]: 'suspended',
+        [SupplierStatus.INACTIVE]: 'suspended', // INACTIVE를 suspended로 매핑
+      };
+
       result.push({
         id: supplier.id,
         name: supplier.name,
-        contactEmail: supplier.contactEmail,
-        status: supplier.status,
+        contactEmail: supplier.contactEmail || '',
+        status: statusMap[supplier.status] || 'pending',
         approvalStatus,
         productCount,
       });
@@ -132,7 +145,7 @@ export class SupplierOpsService {
     }
 
     return await this.offerRepository.find({
-      where: { supplierId, isActive: true },
+      where: { supplierId, status: OfferStatus.ACTIVE },
       relations: ['productMaster'],
     });
   }

@@ -57,16 +57,15 @@ export async function handleOrderCreated(
       `SELECT default_commission_rate FROM partnerops_settings WHERE tenant_id = $1`,
       [tenantId]
     );
-    const commissionRate = parseFloat(settings[0]?.default_commission_rate || '5.00');
+    const commissionRate = parseFloat(settings[0]?.default_commission_rate || '0.05'); // 5%
 
-    // Record conversion
+    // Record conversion using createFromOrder helper
     const conversionService = new ConversionService(dataSource);
-    await conversionService.recordConversion(tenantId, {
+    await conversionService.createFromOrder(tenantId, {
+      id: data.orderId,
       partnerId,
       linkId: data.linkId,
-      clickId: data.clickId,
-      orderId: data.orderId,
-      orderAmount: data.orderAmount,
+      amount: data.orderAmount,
       commissionRate,
     });
 

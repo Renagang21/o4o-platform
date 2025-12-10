@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import {
   SettlementBatch,
   CommissionTransaction,
+  SettlementBatchStatus,
 } from '@o4o/dropshipping-core';
 import type {
   SettlementSummaryDto,
@@ -52,7 +53,7 @@ export class SettlementOpsService {
 
     // 현재 기간 판매액
     const currentPeriod = await this.settlementRepository.findOne({
-      where: { sellerId, status: 'open' },
+      where: { sellerId, status: SettlementBatchStatus.OPEN },
     });
 
     const currentPeriodSales = currentPeriod?.totalAmount || 0;
@@ -162,6 +163,10 @@ export class SettlementOpsService {
     const query = this.commissionRepository
       .createQueryBuilder('commission')
       .innerJoin('commission.settlementBatch', 'batch')
+      .leftJoinAndSelect('commission.orderRelay', 'orderRelay')
+      .leftJoinAndSelect('orderRelay.listing', 'listing')
+      .leftJoinAndSelect('listing.offer', 'offer')
+      .leftJoinAndSelect('offer.productMaster', 'productMaster')
       .where('batch.sellerId = :sellerId', { sellerId });
 
     if (batchId) {
@@ -172,15 +177,22 @@ export class SettlementOpsService {
 
     const commissions = await query.getMany();
 
-    return commissions.map((c) => ({
-      id: c.id,
-      orderId: c.orderId,
-      productName: c.productName || 'Unknown',
-      saleAmount: c.saleAmount,
-      commissionRate: c.commissionRate,
-      commissionAmount: c.commissionAmount,
-      netAmount: c.saleAmount - c.commissionAmount,
-      createdAt: c.createdAt,
-    }));
+    return commissions.map((c) => {
+      const orderAmount = Number(c.orderAmount) || 0;
+      const commissionAmount = Number(c.commissionAmount) || 0;
+      const productName =
+        c.orderRelay?.listing?.offer?.productMaster?.name || 'Unknown';
+
+      return {
+        id: c.id,
+        orderId: c.orderRelayId,
+        productName,
+        saleAmount: orderAmount,
+        commissionRate: c.appliedRate || 0,
+        commissionAmount,
+        netAmount: orderAmount - commissionAmount,
+        createdAt: c.createdAt,
+      };
+    });
   }
 }

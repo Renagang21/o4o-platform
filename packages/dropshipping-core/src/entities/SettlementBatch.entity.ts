@@ -4,6 +4,7 @@
  * 정산 배치 관리
  *
  * 특정 기간 동안의 주문/수수료를 묶어서 정산하는 단위입니다.
+ * 판매자(Seller)별로 정산 배치가 생성됩니다.
  */
 
 import {
@@ -13,20 +14,25 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { CommissionTransaction } from './CommissionTransaction.entity.js';
+import { Seller } from './Seller.entity.js';
 
-export enum SettlementStatus {
-  PENDING = 'pending',       // 정산 대기
-  PROCESSING = 'processing', // 처리 중
-  COMPLETED = 'completed',   // 정산 완료
-  FAILED = 'failed',         // 정산 실패
+export enum SettlementBatchStatus {
+  OPEN = 'open',           // 진행중 (거래 추가 가능)
+  CLOSED = 'closed',       // 마감 (정산 대기)
+  PAID = 'paid',           // 지급 완료
 }
 
 @Entity('dropshipping_settlement_batches')
 export class SettlementBatch {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+
+  @Column({ type: 'uuid' })
+  sellerId!: string; // 판매자 ID
 
   @Column({ type: 'varchar', length: 255 })
   batchNumber!: string; // 정산 배치 번호
@@ -38,23 +44,26 @@ export class SettlementBatch {
   periodEnd!: Date; // 정산 기간 종료
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  totalOrderAmount!: number; // 총 주문 금액
+  totalAmount!: number; // 총 주문 금액
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  totalCommissionAmount!: number; // 총 수수료
+  commissionAmount!: number; // 총 수수료
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  totalSettlementAmount!: number; // 총 정산 금액
+  netAmount!: number; // 정산 금액 (총 주문 금액 - 수수료)
 
   @Column({
     type: 'enum',
-    enum: SettlementStatus,
-    default: SettlementStatus.PENDING,
+    enum: SettlementBatchStatus,
+    default: SettlementBatchStatus.OPEN,
   })
-  status!: SettlementStatus;
+  status!: SettlementBatchStatus;
 
   @Column({ type: 'timestamp', nullable: true })
-  processedAt?: Date;
+  closedAt?: Date; // 마감 시점
+
+  @Column({ type: 'timestamp', nullable: true })
+  paidAt?: Date; // 지급 시점
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
@@ -66,6 +75,10 @@ export class SettlementBatch {
   updatedAt!: Date;
 
   // Relations
+  @ManyToOne(() => Seller)
+  @JoinColumn({ name: 'sellerId' })
+  seller?: Seller;
+
   @OneToMany(() => CommissionTransaction, (transaction) => transaction.settlementBatch)
   commissionTransactions?: CommissionTransaction[];
 }

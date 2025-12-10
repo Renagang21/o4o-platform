@@ -19,7 +19,7 @@ export {
 export { OrderRelay, OrderRelayStatus } from './OrderRelay.entity.js';
 export {
   SettlementBatch,
-  SettlementStatus,
+  SettlementBatchStatus,
 } from './SettlementBatch.entity.js';
 export {
   CommissionRule,

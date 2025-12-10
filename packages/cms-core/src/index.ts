@@ -41,3 +41,6 @@ export function routes(dataSource?: DataSource | any): Router {
 
 // Alias for manifest compatibility
 export const createRoutes = routes;
+
+// View System
+export * from './view-system/index.js';

@@ -1,123 +1,95 @@
-# CMS-Core – Development TODO
+# CMS-Core – Development TODO (Phase 18 Reset)
 
 > 최종 업데이트: 2025-12-10
 > 담당: Claude Code Agent
+> Phase 17 완료 후 개발 시작점 재정의
 
 ---
 
-## Current Phase: CLAUDE.md Compliance
+## 1. 완성된 기반 (Resolved Issues - Phase 16 & 17)
 
-### Pending
+### View System Implementation (HP-001 해결됨)
+- [x] ViewRegistry 완성 (registerView, getView, listViews, getViewsByCPT)
+- [x] NavigationRegistry 완성 (registerNav, getNavTree, 권한 기반 필터링)
+- [x] DynamicRouter 완성 (registerFromManifest, matchRoute, resolveView)
+- [x] Manifest ↔ ViewSystem 연결 완료
+- [x] activate 시 ViewSystem 자동 초기화
+- [x] deactivate 시 ViewSystem 정리
 
-- [ ] Implement createRoutes with actual controller bindings
-- [ ] Add migration files for entities
-- [ ] Add unit tests for services
-- [ ] Implement TemplateService
-- [ ] Implement CptService
-- [ ] Implement AcfService
-- [ ] Implement MenuService
-- [ ] Implement MediaService
-
-### In Progress
-
-- [ ] CLAUDE.md compliance refactoring
-
-### Completed (이번 Phase)
-
-- [x] Manifest 표준화 (appId, displayName, appType, dependencies.core)
+### Manifest & Lifecycle
+- [x] Manifest 표준화 (appId, displayName, appType)
+- [x] viewTemplates 섹션 추가
+- [x] navigation 섹션 추가
 - [x] Backend 섹션 추가
-- [x] Menus 섹션 추가
-- [x] Exposes 섹션 추가
 - [x] createRoutes 함수 추가
-- [x] TODO.md 생성
-
----
-
-## Existing Implementation
 
 ### Entities
-
-- [x] Template
-- [x] TemplatePart
-- [x] View
-- [x] CptType
-- [x] CptField
-- [x] AcfFieldGroup
-- [x] AcfField
-- [x] AcfValue
+- [x] Template, TemplatePart, View
+- [x] CptType, CptField
+- [x] AcfFieldGroup, AcfField, AcfValue
 - [x] CmsSetting
-- [x] Menu
-- [x] MenuItem
-- [x] MenuLocation
-- [x] Media
-- [x] MediaFile
-- [x] MediaFolder
-- [x] MediaTag
-
-### Services
-
-- [ ] TemplateService (정의만, 구현 필요)
-- [ ] CptService (정의만, 구현 필요)
-- [ ] AcfService (정의만, 구현 필요)
-- [ ] MenuService (정의만, 구현 필요)
-- [ ] MediaService (정의만, 구현 필요)
-- [ ] SettingsService (정의만, 구현 필요)
-
-### Controllers
-
-- [ ] TemplateController (정의만, 구현 필요)
-- [ ] CptController (정의만, 구현 필요)
-- [ ] AcfController (정의만, 구현 필요)
-- [ ] MenuController (정의만, 구현 필요)
-- [ ] MediaController (정의만, 구현 필요)
-
-### Lifecycle
-
-- [x] install
-- [x] activate
-- [x] deactivate
-- [x] uninstall
+- [x] Menu, MenuItem, MenuLocation
+- [x] Media, MediaFile, MediaFolder, MediaTag
 
 ---
 
-## Future Phases
+## 2. 착수할 개발 항목 (Next Actions)
 
-### Phase 2: Services Implementation
-
+### Phase 18-A: Service 구현
 - [ ] TemplateService 완전 구현
 - [ ] CptService 완전 구현
 - [ ] AcfService 완전 구현
 - [ ] MenuService 완전 구현
 - [ ] MediaService 완전 구현
+- [ ] SettingsService 완전 구현
 
-### Phase 3: Controllers & Routes
+### Phase 18-B: Controller & API
+- [ ] TemplateController 구현
+- [ ] CptController 구현
+- [ ] AcfController 구현
+- [ ] MenuController 구현
+- [ ] MediaController 구현
+- [ ] createRoutes 실제 라우트 바인딩
 
-- [ ] Controller 메서드 구현
-- [ ] Express Router 기반 실제 라우트 구현
-- [ ] 권한 미들웨어 적용
-
-### Phase 4: Testing
-
-- [ ] Unit tests for services
-- [ ] Integration tests for API endpoints
+### Phase 18-C: View 연동
+- [ ] View 컴포넌트 등록 예제
+- [ ] Dynamic Router 통합 테스트
+- [ ] Navigation Tree 렌더링 검증
 
 ---
 
-## Reference Documents
+## 3. 테스트
+
+### 단위 테스트
+- [ ] ViewRegistry 테스트
+- [ ] NavigationRegistry 테스트
+- [ ] DynamicRouter 테스트
+- [ ] Service 단위 테스트
+
+### 통합 테스트
+- [ ] lifecycle.activate 테스트
+- [ ] manifest.ts 기반 로딩 테스트
+- [ ] View-Route 매핑 E2E 테스트
+
+---
+
+## 4. Reference Documents
 
 | Document | Path |
 |----------|------|
+| CMS Overview | `docs/specs/cms/cms-cpt-overview.md` |
+| View System Design | `docs/design/architecture/view-system.md` |
 | Manifest Guide | `docs/app-guidelines/manifest-specification.md` |
 | Core App Guide | `docs/app-guidelines/core-app-development.md` |
-| Backend Guide | `docs/app-guidelines/backend-structure.md` |
 
 ---
 
-## Notes
+## 5. Notes
 
-- CMS의 핵심 기능 제공 (템플릿, CPT, ACF, 메뉴, 미디어)
-- 다른 앱에서 템플릿 및 콘텐츠 관리에 활용
+- CMS 핵심 엔진 (템플릿, CPT, ACF, 메뉴, 미디어)
+- View System은 Phase 17에서 완성됨
+- 다른 앱에서 `registerAppToViewSystem()` 헬퍼 사용 가능
 
 ---
 
-*이 파일은 `docs/templates/APP_TODO_TEMPLATE.md`에서 복사하여 사용*
+*Phase 18 개발 시작점으로 Reset됨 (2025-12-10)*
