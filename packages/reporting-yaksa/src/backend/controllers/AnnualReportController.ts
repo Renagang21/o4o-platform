@@ -1,413 +1,401 @@
-import { DataSource } from 'typeorm';
+import type { Request, Response } from 'express';
+import type { DataSource } from 'typeorm';
 import {
   AnnualReportService,
-  CreateReportDto,
-  UpdateReportDto,
-  ReportFilterDto,
-  ActorInfo,
+  type ReportFilterDto,
+  type ActorInfo,
 } from '../services/AnnualReportService.js';
 import { MembershipSyncService } from '../services/MembershipSyncService.js';
-import { ReportStatus } from '../entities/AnnualReport.js';
+import type { ReportStatus } from '../entities/AnnualReport.js';
 
 /**
  * AnnualReportController
  *
- * 신상신고서 관리 API 컨트롤러
+ * 신상신고서 관리 API 컨트롤러 (Express Request/Response 스타일)
  */
 export class AnnualReportController {
   private reportService: AnnualReportService;
   private syncService: MembershipSyncService;
 
-  constructor(private dataSource: DataSource) {
-    this.reportService = new AnnualReportService(dataSource);
-    this.syncService = new MembershipSyncService(dataSource);
+  constructor(reportService: AnnualReportService, syncService: MembershipSyncService) {
+    this.reportService = reportService;
+    this.syncService = syncService;
+  }
+
+  /**
+   * Extract actor info from request
+   */
+  private getActor(req: Request): ActorInfo {
+    const user = (req as any).user || {};
+    return {
+      id: user.id || 'unknown',
+      name: user.name || user.username || 'Unknown User',
+      role: user.role,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    };
+  }
+
+  /**
+   * Extract member ID from request
+   */
+  private getMemberId(req: Request): string {
+    const user = (req as any).user || {};
+    return user.memberId || user.id || '';
+  }
+
+  /**
+   * Extract organization ID from request
+   */
+  private getOrganizationId(req: Request): string {
+    const user = (req as any).user || {};
+    return user.organizationId || '';
   }
 
   // ===== 회원용 API =====
 
   /**
    * GET /api/reporting/my-report
-   * 내 신상신고서 조회 (현재 연도 또는 특정 연도)
    */
-  async getMyReport(memberId: string, query: { year?: string }): Promise<{
-    success: boolean;
-    data: any | null;
-  }> {
-    const year = query.year ? parseInt(query.year, 10) : new Date().getFullYear();
-    const report = await this.reportService.findByMemberAndYear(memberId, year);
+  async getMyReport(req: Request, res: Response): Promise<void> {
+    try {
+      const memberId = this.getMemberId(req);
+      const year = req.query.year
+        ? parseInt(req.query.year as string, 10)
+        : new Date().getFullYear();
 
-    return {
-      success: true,
-      data: report,
-    };
+      const report = await this.reportService.findByMemberAndYear(memberId, year);
+
+      res.json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * GET /api/reporting/my-reports
-   * 내 모든 신상신고서 목록
    */
-  async getMyReports(memberId: string): Promise<{
-    success: boolean;
-    data: any[];
-  }> {
-    const reports = await this.reportService.findByMember(memberId);
+  async getMyReports(req: Request, res: Response): Promise<void> {
+    try {
+      const memberId = this.getMemberId(req);
+      const reports = await this.reportService.findByMember(memberId);
 
-    return {
-      success: true,
-      data: reports,
-    };
+      res.json({ success: true, data: reports });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * POST /api/reporting/my-report
-   * 내 신상신고서 생성 (초안)
    */
-  async createMyReport(
-    memberId: string,
-    organizationId: string,
-    body: { year?: number; fields?: Record<string, any> },
-    actor?: ActorInfo
-  ): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const year = body.year || new Date().getFullYear();
+  async createMyReport(req: Request, res: Response): Promise<void> {
+    try {
+      const memberId = this.getMemberId(req);
+      const organizationId = this.getOrganizationId(req);
+      const actor = this.getActor(req);
+      const { year, fields } = req.body;
 
-    const report = await this.reportService.create(
-      {
-        memberId,
-        organizationId,
-        year,
-        fields: body.fields,
-      },
-      actor
-    );
+      const report = await this.reportService.create(
+        {
+          memberId,
+          organizationId,
+          year: year || new Date().getFullYear(),
+          fields,
+        },
+        actor
+      );
 
-    return {
-      success: true,
-      data: report,
-    };
+      res.status(201).json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * PUT /api/reporting/my-report
-   * 내 신상신고서 수정
    */
-  async updateMyReport(
-    memberId: string,
-    body: { year?: number; fields: Record<string, any> },
-    actor?: ActorInfo
-  ): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const year = body.year || new Date().getFullYear();
-    const existing = await this.reportService.findByMemberAndYear(memberId, year);
+  async updateMyReport(req: Request, res: Response): Promise<void> {
+    try {
+      const memberId = this.getMemberId(req);
+      const actor = this.getActor(req);
+      const { year, fields } = req.body;
 
-    if (!existing) {
-      throw new Error(`Report for year ${year} not found`);
+      const targetYear = year || new Date().getFullYear();
+      const existing = await this.reportService.findByMemberAndYear(memberId, targetYear);
+
+      if (!existing) {
+        res.status(404).json({ success: false, error: `Report for year ${targetYear} not found` });
+        return;
+      }
+
+      const report = await this.reportService.update(existing.id, { fields }, actor);
+
+      res.json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-
-    const report = await this.reportService.update(
-      existing.id,
-      { fields: body.fields },
-      actor
-    );
-
-    return {
-      success: true,
-      data: report,
-    };
   }
 
   /**
    * POST /api/reporting/my-report/submit
-   * 내 신상신고서 제출
    */
-  async submitMyReport(
-    memberId: string,
-    body: { year?: number },
-    actor?: ActorInfo
-  ): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const year = body.year || new Date().getFullYear();
-    const existing = await this.reportService.findByMemberAndYear(memberId, year);
+  async submitMyReport(req: Request, res: Response): Promise<void> {
+    try {
+      const memberId = this.getMemberId(req);
+      const actor = this.getActor(req);
+      const { year } = req.body;
 
-    if (!existing) {
-      throw new Error(`Report for year ${year} not found`);
+      const targetYear = year || new Date().getFullYear();
+      const existing = await this.reportService.findByMemberAndYear(memberId, targetYear);
+
+      if (!existing) {
+        res.status(404).json({ success: false, error: `Report for year ${targetYear} not found` });
+        return;
+      }
+
+      const report = await this.reportService.submit(existing.id, actor);
+
+      res.json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-
-    const report = await this.reportService.submit(existing.id, actor);
-
-    return {
-      success: true,
-      data: report,
-    };
   }
 
   /**
    * GET /api/reporting/my-report/:id/logs
-   * 내 신상신고서 로그 조회
    */
-  async getMyReportLogs(reportId: string, memberId: string): Promise<{
-    success: boolean;
-    data: any[];
-  }> {
-    const report = await this.reportService.findById(reportId);
+  async getMyReportLogs(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const memberId = this.getMemberId(req);
 
-    if (!report) {
-      throw new Error(`Report "${reportId}" not found`);
+      const report = await this.reportService.findById(id);
+
+      if (!report) {
+        res.status(404).json({ success: false, error: `Report "${id}" not found` });
+        return;
+      }
+
+      if (report.memberId !== memberId) {
+        res.status(403).json({ success: false, error: 'Access denied' });
+        return;
+      }
+
+      const logs = await this.reportService.getLogs(id);
+
+      res.json({ success: true, data: logs });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-
-    if (report.memberId !== memberId) {
-      throw new Error('Access denied');
-    }
-
-    const logs = await this.reportService.getLogs(reportId);
-
-    return {
-      success: true,
-      data: logs,
-    };
   }
 
   // ===== 관리자용 API =====
 
   /**
    * GET /api/reporting/reports
-   * 신상신고서 목록 조회 (관리자)
    */
-  async list(query: {
-    organizationId?: string;
-    year?: string;
-    status?: string;
-    page?: string;
-    limit?: string;
-  }): Promise<{
-    success: boolean;
-    data: any[];
-    total: number;
-    page: number;
-    limit: number;
-  }> {
-    const filter: ReportFilterDto = {};
+  async list(req: Request, res: Response): Promise<void> {
+    try {
+      const filter: ReportFilterDto = {};
 
-    if (query.organizationId) {
-      filter.organizationId = query.organizationId;
-    }
-    if (query.year) {
-      filter.year = parseInt(query.year, 10);
-    }
-    if (query.status) {
-      filter.status = query.status as ReportStatus;
-    }
-    if (query.page) {
-      filter.page = parseInt(query.page, 10);
-    }
-    if (query.limit) {
-      filter.limit = parseInt(query.limit, 10);
-    }
-
-    const { data, total } = await this.reportService.list(filter);
-
-    return {
-      success: true,
-      data,
-      total,
-      page: filter.page || 1,
-      limit: filter.limit || 20,
-    };
-  }
-
-  /**
-   * GET /api/reporting/reports/:id
-   * 신상신고서 상세 조회 (관리자)
-   */
-  async get(id: string): Promise<{
-    success: boolean;
-    data: any | null;
-  }> {
-    const report = await this.reportService.findById(id);
-
-    if (!report) {
-      throw new Error(`Report "${id}" not found`);
-    }
-
-    return {
-      success: true,
-      data: report,
-    };
-  }
-
-  /**
-   * GET /api/reporting/reports/:id/logs
-   * 신상신고서 로그 조회 (관리자)
-   */
-  async getLogs(id: string): Promise<{
-    success: boolean;
-    data: any[];
-  }> {
-    const logs = await this.reportService.getLogs(id);
-
-    return {
-      success: true,
-      data: logs,
-    };
-  }
-
-  /**
-   * PATCH /api/reporting/reports/:id/approve
-   * 신상신고서 승인
-   */
-  async approve(
-    id: string,
-    body: { comment?: string; autoSync?: boolean },
-    actor: ActorInfo
-  ): Promise<{
-    success: boolean;
-    data: any;
-    syncResult?: any;
-  }> {
-    const report = await this.reportService.approve(id, actor, body.comment);
-
-    let syncResult;
-    // 자동 동기화가 활성화된 경우
-    if (body.autoSync !== false) {
-      try {
-        syncResult = await this.syncService.syncApprovedReport(id, actor);
-      } catch (error: any) {
-        // 동기화 실패해도 승인은 성공
-        syncResult = { success: false, error: error.message };
+      if (req.query.organizationId) {
+        filter.organizationId = req.query.organizationId as string;
       }
+      if (req.query.year) {
+        filter.year = parseInt(req.query.year as string, 10);
+      }
+      if (req.query.status) {
+        filter.status = req.query.status as ReportStatus;
+      }
+      if (req.query.page) {
+        filter.page = parseInt(req.query.page as string, 10);
+      }
+      if (req.query.limit) {
+        filter.limit = parseInt(req.query.limit as string, 10);
+      }
+
+      const { data, total } = await this.reportService.list(filter);
+
+      res.json({
+        success: true,
+        data,
+        total,
+        page: filter.page || 1,
+        limit: filter.limit || 20,
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-
-    return {
-      success: true,
-      data: report,
-      syncResult,
-    };
-  }
-
-  /**
-   * PATCH /api/reporting/reports/:id/reject
-   * 신상신고서 반려
-   */
-  async reject(
-    id: string,
-    body: { reason: string },
-    actor: ActorInfo
-  ): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    if (!body.reason) {
-      throw new Error('Rejection reason is required');
-    }
-
-    const report = await this.reportService.reject(id, actor, body.reason);
-
-    return {
-      success: true,
-      data: report,
-    };
-  }
-
-  /**
-   * PATCH /api/reporting/reports/:id/request-revision
-   * 수정 요청
-   */
-  async requestRevision(
-    id: string,
-    body: { reason: string },
-    actor: ActorInfo
-  ): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    if (!body.reason) {
-      throw new Error('Revision reason is required');
-    }
-
-    const report = await this.reportService.requestRevision(id, actor, body.reason);
-
-    return {
-      success: true,
-      data: report,
-    };
   }
 
   /**
    * GET /api/reporting/reports/stats
-   * 신고서 통계
    */
-  async getStats(query: { organizationId?: string; year?: string }): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const filter: { organizationId?: string; year?: number } = {};
+  async getStats(req: Request, res: Response): Promise<void> {
+    try {
+      const filter: { organizationId?: string; year?: number } = {};
 
-    if (query.organizationId) {
-      filter.organizationId = query.organizationId;
+      if (req.query.organizationId) {
+        filter.organizationId = req.query.organizationId as string;
+      }
+      if (req.query.year) {
+        filter.year = parseInt(req.query.year as string, 10);
+      }
+
+      const stats = await this.reportService.getStatsByStatus(filter);
+
+      res.json({ success: true, data: stats });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-    if (query.year) {
-      filter.year = parseInt(query.year, 10);
+  }
+
+  /**
+   * GET /api/reporting/reports/:id
+   */
+  async get(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const report = await this.reportService.findById(id);
+
+      if (!report) {
+        res.status(404).json({ success: false, error: `Report "${id}" not found` });
+        return;
+      }
+
+      res.json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
+  }
 
-    const stats = await this.reportService.getStatsByStatus(filter);
+  /**
+   * GET /api/reporting/reports/:id/logs
+   */
+  async getLogs(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const logs = await this.reportService.getLogs(id);
 
-    return {
-      success: true,
-      data: stats,
-    };
+      res.json({ success: true, data: logs });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * GET /api/reporting/reports/:id/sync-preview
-   * 동기화 미리보기
    */
-  async getSyncPreview(id: string): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const preview = await this.syncService.previewSync(id);
+  async getSyncPreview(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const preview = await this.syncService.previewSync(id);
 
-    return {
-      success: true,
-      data: preview,
-    };
+      res.json({ success: true, data: preview });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/reporting/reports/:id/approve
+   */
+  async approve(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const actor = this.getActor(req);
+      const { comment, autoSync } = req.body;
+
+      const report = await this.reportService.approve(id, actor, comment);
+
+      let syncResult;
+      if (autoSync !== false) {
+        try {
+          syncResult = await this.syncService.syncApprovedReport(id, actor);
+        } catch (syncError: any) {
+          syncResult = { success: false, error: syncError.message };
+        }
+      }
+
+      res.json({ success: true, data: report, syncResult });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/reporting/reports/:id/reject
+   */
+  async reject(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const actor = this.getActor(req);
+      const { reason } = req.body;
+
+      if (!reason) {
+        res.status(400).json({ success: false, error: 'Rejection reason is required' });
+        return;
+      }
+
+      const report = await this.reportService.reject(id, actor, reason);
+
+      res.json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/reporting/reports/:id/request-revision
+   */
+  async requestRevision(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const actor = this.getActor(req);
+      const { reason } = req.body;
+
+      if (!reason) {
+        res.status(400).json({ success: false, error: 'Revision reason is required' });
+        return;
+      }
+
+      const report = await this.reportService.requestRevision(id, actor, reason);
+
+      res.json({ success: true, data: report });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * POST /api/reporting/reports/:id/sync
-   * 수동 동기화
    */
-  async manualSync(id: string, actor: ActorInfo): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const result = await this.syncService.syncApprovedReport(id, actor);
+  async manualSync(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const actor = this.getActor(req);
 
-    return {
-      success: true,
-      data: result,
-    };
+      const result = await this.syncService.syncApprovedReport(id, actor);
+
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * POST /api/reporting/sync-all
-   * 미동기화 신고서 일괄 동기화
    */
-  async syncAll(actor: ActorInfo): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const result = await this.syncService.syncAllPending(actor);
+  async syncAll(req: Request, res: Response): Promise<void> {
+    try {
+      const actor = this.getActor(req);
 
-    return {
-      success: true,
-      data: result,
-    };
+      const result = await this.syncService.syncAllPending(actor);
+
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 }

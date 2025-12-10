@@ -1,37 +1,28 @@
 /**
  * Reporting-Yaksa Extension App Manifest
  *
- * 약사회 신상신고 앱
- *
- * - 연간 신상신고서 제출/관리
- * - 관리자 승인/반려 워크플로우
- * - Membership-Yaksa 자동 연동
- * - 감사 로그 보존
+ * Extends organization-core/membership-yaksa with annual reporting features:
+ * - Annual status report submission/management
+ * - Admin approval/rejection workflow
+ * - Membership-Yaksa auto-sync
+ * - Audit log preservation
  */
 
 export const reportingYaksaManifest = {
-  // 기본 정보
-  id: 'reporting-yaksa',
+  // ===== 필수 기본 정보 =====
   appId: 'reporting-yaksa',
-  name: 'Annual Reporting – Yaksa Organization',
+  displayName: '신상신고 시스템',
   version: '1.0.0',
-  type: 'extension' as const,
+  appType: 'extension' as const,
   description: '약사회 신상신고 시스템 (연간 신고서, 승인 워크플로우, 자동 동기화)',
 
-  // 작성자 정보
-  author: {
-    name: 'O4O Platform',
-    email: 'dev@o4o-platform.com',
-    url: 'https://o4o-platform.com',
-  },
-
-  // 의존성
+  // ===== 의존성 =====
   dependencies: {
-    'organization-core': '>=1.0.0',
-    'membership-yaksa': '>=1.0.0',
+    core: ['organization-core', 'membership-yaksa'],
+    optional: [],
   },
 
-  // 소유 테이블
+  // ===== 소유 테이블 =====
   ownsTables: [
     'yaksa_annual_reports',
     'yaksa_report_field_templates',
@@ -39,14 +30,61 @@ export const reportingYaksaManifest = {
     'yaksa_report_assignments',
   ],
 
-  // 삭제 정책
+  // ===== 삭제 정책 =====
   uninstallPolicy: {
     defaultMode: 'keep-data' as const,
     allowPurge: true,
     autoBackup: true, // 신고서 데이터는 중요
   },
 
-  // 권한 정의
+  // ===== 백엔드 =====
+  backend: {
+    entities: [
+      'AnnualReport',
+      'ReportFieldTemplate',
+      'ReportLog',
+      'ReportAssignment',
+    ],
+    services: [
+      'AnnualReportService',
+      'ReportTemplateService',
+      'MembershipSyncService',
+    ],
+    controllers: [
+      'AnnualReportController',
+      'ReportTemplateController',
+    ],
+    routesExport: 'createRoutes',
+  },
+
+  // ===== 프론트엔드 =====
+  frontend: {
+    admin: {
+      pages: [
+        { path: '/admin/reporting', component: 'ReportingDashboard' },
+        { path: '/admin/reporting/reports', component: 'ReportList' },
+        { path: '/admin/reporting/reports/:id', component: 'ReportDetail' },
+        { path: '/admin/reporting/templates', component: 'TemplateList' },
+        { path: '/admin/reporting/templates/:id', component: 'TemplateEditor' },
+      ],
+    },
+    member: {
+      pages: [
+        { path: '/member/reporting', component: 'MyReportPage' },
+        { path: '/member/reporting/new', component: 'ReportForm' },
+      ],
+    },
+  },
+
+  // ===== 라이프사이클 =====
+  lifecycle: {
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
+  },
+
+  // ===== 권한 정의 =====
   permissions: [
     // 회원용 권한
     {
@@ -97,40 +135,8 @@ export const reportingYaksaManifest = {
     },
   ],
 
-  // 라이프사이클 훅
-  lifecycle: {
-    install: './lifecycle/install.js',
-    activate: './lifecycle/activate.js',
-    deactivate: './lifecycle/deactivate.js',
-    uninstall: './lifecycle/uninstall.js',
-  },
-
-  // Admin UI 라우트
-  adminRoutes: [
-    {
-      path: '/admin/reporting',
-      component: './admin-ui/pages/ReportingDashboard.js',
-    },
-    {
-      path: '/admin/reporting/reports',
-      component: './admin-ui/pages/ReportList.js',
-    },
-    {
-      path: '/admin/reporting/reports/:id',
-      component: './admin-ui/pages/ReportDetail.js',
-    },
-    {
-      path: '/admin/reporting/templates',
-      component: './admin-ui/pages/TemplateList.js',
-    },
-    {
-      path: '/admin/reporting/templates/:id',
-      component: './admin-ui/pages/TemplateEditor.js',
-    },
-  ],
-
-  // 메뉴 정의
-  menu: {
+  // ===== 메뉴 정의 =====
+  menus: {
     admin: [
       {
         id: 'reporting',
@@ -166,11 +172,19 @@ export const reportingYaksaManifest = {
         label: '신상신고',
         icon: 'clipboard-document',
         path: '/member/reporting',
+        order: 20,
       },
     ],
   },
 
-  // 기본 설정
+  // ===== 외부 노출 (다른 앱에서 사용 가능) =====
+  exposes: {
+    services: ['AnnualReportService', 'MembershipSyncService'],
+    types: ['AnnualReport', 'ReportFieldTemplate', 'ReportStatus'],
+    events: ['report.submitted', 'report.approved', 'report.rejected', 'report.synced'],
+  },
+
+  // ===== 기본 설정 =====
   defaultConfig: {
     // 자동 동기화 활성화
     autoSyncOnApprove: true,
@@ -190,21 +204,6 @@ export const reportingYaksaManifest = {
 
     // 승인 체계: single | branch_district | branch_district_national
     approvalWorkflow: 'single',
-  },
-
-  // 이벤트 훅 (다른 앱과 연동)
-  hooks: {
-    // 승인 후 Membership-Yaksa 업데이트
-    onReportApproved: {
-      handler: './hooks/onReportApproved.js',
-      async: true,
-    },
-
-    // 신고서 제출 시 알림
-    onReportSubmitted: {
-      handler: './hooks/onReportSubmitted.js',
-      async: true,
-    },
   },
 };
 

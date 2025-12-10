@@ -1,187 +1,176 @@
-import { DataSource } from 'typeorm';
+import type { Request, Response } from 'express';
+import type { DataSource } from 'typeorm';
 import {
   ReportTemplateService,
-  CreateTemplateDto,
-  UpdateTemplateDto,
+  type CreateTemplateDto,
+  type UpdateTemplateDto,
 } from '../services/ReportTemplateService.js';
 
 /**
  * ReportTemplateController
  *
- * 신상신고 템플릿 관리 API 컨트롤러
+ * 신상신고 템플릿 관리 API 컨트롤러 (Express Request/Response 스타일)
  */
 export class ReportTemplateController {
   private templateService: ReportTemplateService;
 
-  constructor(private dataSource: DataSource) {
-    this.templateService = new ReportTemplateService(dataSource);
+  constructor(templateService: ReportTemplateService) {
+    this.templateService = templateService;
   }
 
   /**
    * GET /api/reporting/templates
-   * 모든 템플릿 목록 조회
    */
-  async list(query: { active?: string }): Promise<{
-    success: boolean;
-    data: any[];
-  }> {
-    const filter = query.active !== undefined
-      ? { active: query.active === 'true' }
-      : undefined;
+  async list(req: Request, res: Response): Promise<void> {
+    try {
+      const filter =
+        req.query.active !== undefined
+          ? { active: req.query.active === 'true' }
+          : undefined;
 
-    const templates = await this.templateService.list(filter);
+      const templates = await this.templateService.list(filter);
 
-    return {
-      success: true,
-      data: templates,
-    };
+      res.json({ success: true, data: templates });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * GET /api/reporting/templates/current
-   * 현재 연도 활성 템플릿 조회
    */
-  async getCurrent(): Promise<{
-    success: boolean;
-    data: any | null;
-  }> {
-    const template = await this.templateService.findCurrentActive();
+  async getCurrent(req: Request, res: Response): Promise<void> {
+    try {
+      const template = await this.templateService.findCurrentActive();
 
-    return {
-      success: true,
-      data: template,
-    };
+      res.json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * GET /api/reporting/templates/:id
-   * 템플릿 상세 조회
    */
-  async get(id: string): Promise<{
-    success: boolean;
-    data: any | null;
-  }> {
-    const template = await this.templateService.findById(id);
+  async get(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const template = await this.templateService.findById(id);
 
-    if (!template) {
-      throw new Error(`Template "${id}" not found`);
+      if (!template) {
+        res.status(404).json({ success: false, error: `Template "${id}" not found` });
+        return;
+      }
+
+      res.json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-
-    return {
-      success: true,
-      data: template,
-    };
   }
 
   /**
    * GET /api/reporting/templates/year/:year
-   * 특정 연도 템플릿 조회
    */
-  async getByYear(year: number): Promise<{
-    success: boolean;
-    data: any | null;
-  }> {
-    const template = await this.templateService.findByYear(year);
+  async getByYear(req: Request, res: Response): Promise<void> {
+    try {
+      const year = parseInt(req.params.year, 10);
+      const template = await this.templateService.findByYear(year);
 
-    return {
-      success: true,
-      data: template,
-    };
+      res.json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * POST /api/reporting/templates
-   * 템플릿 생성
    */
-  async create(dto: CreateTemplateDto): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const template = await this.templateService.create(dto);
+  async create(req: Request, res: Response): Promise<void> {
+    try {
+      const dto: CreateTemplateDto = req.body;
+      const template = await this.templateService.create(dto);
 
-    return {
-      success: true,
-      data: template,
-    };
+      res.status(201).json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * PUT /api/reporting/templates/:id
-   * 템플릿 수정
    */
-  async update(id: string, dto: UpdateTemplateDto): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const template = await this.templateService.update(id, dto);
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const dto: UpdateTemplateDto = req.body;
+      const template = await this.templateService.update(id, dto);
 
-    return {
-      success: true,
-      data: template,
-    };
+      res.json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * DELETE /api/reporting/templates/:id
-   * 템플릿 삭제
    */
-  async delete(id: string): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    await this.templateService.delete(id);
+  async delete(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      await this.templateService.delete(id);
 
-    return {
-      success: true,
-      message: 'Template deleted successfully',
-    };
+      res.json({ success: true, message: 'Template deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * PATCH /api/reporting/templates/:id/activate
-   * 템플릿 활성화
    */
-  async activate(id: string): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const template = await this.templateService.setActive(id, true);
+  async activate(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const template = await this.templateService.setActive(id, true);
 
-    return {
-      success: true,
-      data: template,
-    };
+      res.json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * PATCH /api/reporting/templates/:id/deactivate
-   * 템플릿 비활성화
    */
-  async deactivate(id: string): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const template = await this.templateService.setActive(id, false);
+  async deactivate(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const template = await this.templateService.setActive(id, false);
 
-    return {
-      success: true,
-      data: template,
-    };
+      res.json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   /**
    * POST /api/reporting/templates/:id/duplicate
-   * 템플릿 복제 (새 연도용)
    */
-  async duplicate(id: string, body: { targetYear: number }): Promise<{
-    success: boolean;
-    data: any;
-  }> {
-    const template = await this.templateService.duplicateForYear(id, body.targetYear);
+  async duplicate(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { targetYear } = req.body;
 
-    return {
-      success: true,
-      data: template,
-    };
+      if (!targetYear) {
+        res.status(400).json({ success: false, error: 'Target year is required' });
+        return;
+      }
+
+      const template = await this.templateService.duplicateForYear(id, targetYear);
+
+      res.status(201).json({ success: true, data: template });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 }
