@@ -1,6 +1,5 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
-import { forumCosmeticsManifest } from '@o4o-apps/forum-cosmetics';
 import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
 import { signageManifest } from '@o4o-apps/signage';
 import { manifest as lmsCoreManifest } from '@o4o/lms-core';
@@ -26,7 +25,6 @@ const manifestRegistry: Record<string, AppManifest> = {
   // Forum apps
   'forum': forumManifest as any, // Alias for backward compatibility
   'forum-core': forumManifest as any,
-  'forum-cosmetics': forumCosmeticsManifest as any,
   'forum-yaksa': forumYaksaManifest as any,
   // Display apps
   'signage': signageManifest as any,

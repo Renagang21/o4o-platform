@@ -159,17 +159,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
   },
   {
-    appId: 'forum-cosmetics',
-    name: 'Forum Extension – Cosmetics',
-    version: '1.0.0',
-    description: '화장품 매장 특화 포럼 (피부타입, 루틴, 제품 연동)',
-    category: 'community',
-    tags: ['화장품', 'cosmetics', 'forum', 'skincare', 'routine'],
-    type: 'extension',
-    dependencies: { 'forum-core': '>=1.0.0' },
-    author: 'O4O Platform',
-  },
-  {
     appId: 'forum-yaksa',
     name: 'Forum Extension – Yaksa Organization',
     version: '1.0.0',
