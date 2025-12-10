@@ -123,7 +123,7 @@ export class ModuleLoader {
         };
         logger.debug(`[ModuleLoader] Loaded lifecycle hooks for ${manifest.id}`);
       } catch (lifecycleError) {
-        logger.debug(`[ModuleLoader] No lifecycle hooks for ${manifest.id}`);
+        logger.warn(`[ModuleLoader] Failed to load lifecycle hooks for ${manifest.id}:`, lifecycleError);
       }
 
       // Register in registry
