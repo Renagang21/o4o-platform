@@ -9,21 +9,18 @@
  * - Product certifications
  */
 
-import type { AppManifest } from '@o4o/types';
-
-export const cosmeticsExtensionManifest: AppManifest = {
+export const cosmeticsExtensionManifest = {
+  // ===== 필수 기본 정보 =====
   appId: 'dropshipping-cosmetics',
-  name: 'Dropshipping Cosmetics Extension',
+  displayName: '화장품 Dropshipping',
   version: '1.0.0',
-  type: 'extension',
+  appType: 'extension' as const,
   description: 'Cosmetics-specific features for dropshipping platform',
 
-  // Extension configuration
-  extendsApp: 'dropshipping-core',
-
-  // Dependencies
+  // ===== 의존성 =====
   dependencies: {
-    'dropshipping-core': '^1.0.0',
+    core: ['dropshipping-core'],
+    optional: [],
   },
 
   // Extend existing CPTs with cosmetics metadata
@@ -435,34 +432,80 @@ export const cosmeticsExtensionManifest: AppManifest = {
     },
   ],
 
-  // Admin menu extension (adds submenu under Dropshipping)
-  menu: {
-    parent: 'dropshipping',
-    items: [
-      {
-        id: 'cosmetics-filters',
-        label: 'Cosmetics Filters',
-        path: '/admin/cosmetics/filters',
-        permission: 'cosmetics:manage_filters',
-        icon: 'Filter',
-      },
-      {
-        id: 'cosmetics-routines',
-        label: 'Routine Templates',
-        path: '/admin/cosmetics/routines',
-        permission: 'cosmetics:recommend_routine',
-        icon: 'Layers',
-      },
-    ],
+  // ===== 소유 테이블 =====
+  ownsTables: [],
+
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: false,
   },
 
-  // Lifecycle hooks
+  // ===== 백엔드 =====
+  backend: {
+    entities: [],
+    services: [
+      'CosmeticsMetadataService',
+      'RoutineService',
+    ],
+    controllers: [],
+    routesExport: 'createRoutes',
+  },
+
+  // ===== 프론트엔드 =====
+  frontend: {
+    admin: {
+      pages: [
+        { path: '/admin/cosmetics/filters', component: 'CosmeticsFilters' },
+        { path: '/admin/cosmetics/routines', component: 'RoutineTemplates' },
+      ],
+    },
+  },
+
+  // ===== 라이프사이클 =====
   lifecycle: {
     install: './lifecycle/install.js',
     activate: './lifecycle/activate.js',
     deactivate: './lifecycle/deactivate.js',
     uninstall: './lifecycle/uninstall.js',
   },
+
+  // ===== 메뉴 정의 =====
+  menus: {
+    admin: [
+      {
+        id: 'cosmetics',
+        label: '화장품',
+        icon: 'sparkles',
+        order: 35,
+        parent: 'dropshipping',
+        children: [
+          {
+            id: 'cosmetics-filters',
+            label: '필터 관리',
+            path: '/admin/cosmetics/filters',
+            icon: 'filter',
+          },
+          {
+            id: 'cosmetics-routines',
+            label: '루틴 템플릿',
+            path: '/admin/cosmetics/routines',
+            icon: 'layers',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ===== 외부 노출 =====
+  exposes: {
+    services: ['CosmeticsMetadataService', 'RoutineService'],
+    types: ['CosmeticsMetadata', 'InfluencerRoutine'],
+    events: ['cosmetics.filter.applied', 'routine.created'],
+  },
 };
 
+// Legacy export for backward compatibility
+export const manifest = cosmeticsExtensionManifest;
 export default cosmeticsExtensionManifest;

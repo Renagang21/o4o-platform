@@ -1,20 +1,20 @@
 /**
- * Organization-Forum Integration Extension Manifest
+ * Organization-LMS Integration Extension Manifest
  *
- * Integrates organization-core with forum-app for organization-scoped forums
+ * Integrates organization-core with lms-core for organization-scoped training
  */
 
-export const organizationForumManifest = {
+export const organizationLmsManifest = {
   // ===== 필수 기본 정보 =====
-  appId: 'organization-forum',
-  displayName: '조직-포럼 연동',
+  appId: 'organization-lms',
+  displayName: '조직-LMS 연동',
   version: '1.0.0',
   appType: 'extension' as const,
-  description: '조직별 포럼 연동 (조직 생성 시 카테고리 자동 생성, 조직 스코프 권한)',
+  description: '조직별 LMS 연동 (조직 스코프 교육, 수료증 관리)',
 
   // ===== 의존성 =====
   dependencies: {
-    core: ['organization-core', 'forum-core'],
+    core: ['organization-core', 'lms-core'],
     optional: [],
   },
 
@@ -31,7 +31,7 @@ export const organizationForumManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [],
-    services: ['OrganizationForumService'],
+    services: ['OrganizationLmsService'],
     controllers: [],
     routesExport: 'createRoutes',
   },
@@ -52,18 +52,18 @@ export const organizationForumManifest = {
 
   // ===== 외부 노출 =====
   exposes: {
-    services: ['OrganizationForumService'],
+    services: ['OrganizationLmsService'],
     types: [],
-    events: ['organization.forum.categories.created'],
+    events: ['organization.lms.course.assigned'],
   },
 
   // ===== 기본 설정 =====
   defaultConfig: {
-    autoCreateDefaultCategories: true,
-    defaultCategories: ['공지사항', '자유게시판', '질문/답변', '자료실'],
+    autoAssignCourses: false,
+    requireOrganizationApproval: true,
   },
 };
 
 // Legacy export for backward compatibility
-export const manifest = organizationForumManifest;
-export default organizationForumManifest;
+export const manifest = organizationLmsManifest;
+export default organizationLmsManifest;
