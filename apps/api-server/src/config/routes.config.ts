@@ -185,6 +185,9 @@ import sitesRoutes from '../modules/sites/sites.routes.js';
 // ✅ NEW: Membership-Yaksa Routes
 import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
 
+// ✅ NEW: Reporting-Yaksa Routes
+import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
+
 // ✅ NEW: Dropshipping-Cosmetics Routes
 import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-filter.routes.js';
 import { createInfluencerRoutineRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/influencer-routine.routes.js';
@@ -495,6 +498,11 @@ export function setupRoutes(app: Application): void {
   // Provides: Member, MemberCategory, Affiliation, Verification endpoints
   // See: packages/membership-yaksa/src/backend/routes/index.ts
   app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
+
+  // ✅ NEW: Reporting-Yaksa Routes
+  // Provides: Annual Report submission, approval workflow, membership sync endpoints
+  // See: packages/reporting-yaksa/src/backend/routes/index.ts
+  app.use('/api/reporting', standardLimiter, createReportingRoutes(AppDataSource) as any);
 
   // ✅ NEW: Dropshipping-Cosmetics Routes
   // Provides: Cosmetics Filter, Influencer Routine, Signage, Product Detail, Product List, Brand Management, Recommendations endpoints

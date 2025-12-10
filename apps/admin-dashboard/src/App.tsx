@@ -57,6 +57,10 @@ const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/Memb
 const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
 const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
+// Reporting-Yaksa: Annual Report Management
+const ReportingDashboard = lazy(() => import('@/pages/reporting/dashboard/ReportingDashboard'));
+const ReportList = lazy(() => import('@/pages/reporting/reports/ReportList'));
+const TemplateList = lazy(() => import('@/pages/reporting/templates/TemplateList'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
@@ -573,6 +577,36 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['membership:manage']}>
                         <Suspense fallback={<PageLoader />}>
                           <CategoryManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Reporting-Yaksa: 신상신고 관리 */}
+                    <Route path="/admin/reporting" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportingDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/reporting/dashboard" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportingDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/reporting/reports" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:view', 'reporting:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/reporting/templates" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplateList />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

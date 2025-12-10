@@ -165,6 +165,14 @@ import {
   Attendance,
 } from '@o4o/lms-core';
 
+// ✅ NEW: Reporting-Yaksa entities
+import {
+  AnnualReport,
+  ReportFieldTemplate,
+  ReportLog,
+  ReportAssignment,
+} from '@o4o/reporting-yaksa/backend/entities/index.js';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -353,6 +361,11 @@ export const AppDataSource = new DataSource({
     Certificate,
     LMSEvent,
     Attendance,
+    // ✅ NEW: Reporting-Yaksa entities
+    AnnualReport,
+    ReportFieldTemplate,
+    ReportLog,
+    ReportAssignment,
   ],
   
   // 마이그레이션 설정
