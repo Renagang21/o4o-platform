@@ -92,8 +92,11 @@ export class ModuleLoader {
         return null;
       }
 
-      // Store package path
-      const packagePath = path.dirname(manifestPath);
+      // Store package path (manifest is in src/, so go up one level to get package root)
+      const manifestDir = path.dirname(manifestPath);
+      const packagePath = manifestDir.endsWith('/src') || manifestDir.endsWith('\\src')
+        ? path.dirname(manifestDir)
+        : manifestDir;
       manifest.packagePath = packagePath;
 
       // Try to load backend exports
