@@ -179,6 +179,17 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'core',
     author: 'O4O Platform',
   },
+  {
+    appId: 'reporting-yaksa',
+    name: 'Annual Reporting Extension – Yaksa Organization',
+    version: '1.0.0',
+    description: '약사회 신상신고 시스템 - 연간 신고서, 승인 워크플로우, 자동 동기화',
+    category: 'organization',
+    tags: ['신상신고', 'reporting', 'yaksa', 'annual', 'membership'],
+    type: 'extension',
+    dependencies: { 'organization-core': '>=1.0.0', 'membership-yaksa': '>=1.0.0' },
+    author: 'O4O Platform',
+  },
 ];
 
 /**

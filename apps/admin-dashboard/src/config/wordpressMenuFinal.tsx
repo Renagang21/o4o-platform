@@ -11,6 +11,7 @@ import {
   FileText,
   UserCheck,
   BarChart2,
+  ClipboardList,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -167,6 +168,34 @@ export const wordpressMenuItems: MenuItem[] = [
         label: 'Categories',
         icon: <FileText className="w-4 h-4" />,
         path: '/admin/membership/categories',
+      },
+    ],
+  },
+
+  // Reporting (신상신고)
+  {
+    id: 'reporting',
+    label: '신상신고',
+    icon: <ClipboardList className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'reporting-dashboard',
+        label: 'Dashboard',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/admin/reporting/dashboard',
+      },
+      {
+        id: 'reporting-reports',
+        label: '신고서 목록',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/admin/reporting/reports',
+      },
+      {
+        id: 'reporting-templates',
+        label: '템플릿 관리',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/reporting/templates',
       },
     ],
   },
