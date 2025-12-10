@@ -116,8 +116,10 @@ export class ModuleLoader {
 
       // Try to load lifecycle hooks
       const lifecyclePath = path.join(packagePath, 'dist', 'lifecycle');
+      logger.info(`[ModuleLoader] Attempting to load lifecycle from: ${lifecyclePath}/index.js`);
       try {
         const lifecycleModule = await import(`file://${lifecyclePath}/index.js`);
+        logger.info(`[ModuleLoader] Lifecycle module keys: ${Object.keys(lifecycleModule).join(', ')}`);
         manifest.lifecycle = {
           install: lifecycleModule.install,
           activate: lifecycleModule.activate,
