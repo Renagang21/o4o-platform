@@ -1,7 +1,7 @@
 {
-  "name": "@o4o/lms-yaksa",
+  "name": "@o4o/cosmetics-store",
   "version": "1.0.0",
-  "description": "LMS Extension for Yaksa Organization - 약사회 교육/연수 시스템",
+  "description": "Cosmetics E-commerce Store Service App - 화장품 쇼핑몰",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,9 +21,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/lms-core": "workspace:*",
+    "@o4o/dropshipping-cosmetics": "workspace:*",
     "@o4o/organization-core": "workspace:*",
-    "@o4o/membership-yaksa": "workspace:*",
     "@o4o/types": "workspace:*"
   },
   "devDependencies": {
