@@ -11,8 +11,15 @@ import type { DataSource } from 'typeorm';
 export * from './entities/index.js';
 export { lmsYaksaEntities } from './entities/index.js';
 
-// Export services (placeholder for Phase 2)
-// export * from './services/index.js';
+// Export services
+export * from './services/index.js';
+export { lmsYaksaServices } from './services/index.js';
+
+// Import services for routes
+import { LicenseProfileService } from './services/LicenseProfileService.js';
+import { RequiredCoursePolicyService } from './services/RequiredCoursePolicyService.js';
+import { CreditRecordService } from './services/CreditRecordService.js';
+import { CourseAssignmentService } from './services/CourseAssignmentService.js';
 
 /**
  * Routes factory compatible with Module Loader
@@ -57,11 +64,25 @@ export const entities = [
 ];
 
 /**
- * Services registry (placeholder for Phase 2)
+ * Services registry
+ * Returns initialized service instances with DataSource
  */
 export const services = {
-  // LicenseProfileService: null,
-  // RequiredCoursePolicyService: null,
-  // CreditRecordService: null,
-  // CourseAssignmentService: null,
+  LicenseProfileService,
+  RequiredCoursePolicyService,
+  CreditRecordService,
+  CourseAssignmentService,
 };
+
+/**
+ * Create service instances factory
+ * @param dataSource - TypeORM DataSource from API server
+ */
+export function createServices(dataSource: DataSource) {
+  return {
+    licenseProfileService: new LicenseProfileService(dataSource),
+    requiredCoursePolicyService: new RequiredCoursePolicyService(dataSource),
+    creditRecordService: new CreditRecordService(dataSource),
+    courseAssignmentService: new CourseAssignmentService(dataSource),
+  };
+}

@@ -249,7 +249,9 @@ export const lmsYaksaManifest = {
     ],
     services: [
       'LicenseProfileService',
+      'RequiredCoursePolicyService',
       'CreditRecordService',
+      'CourseAssignmentService',
     ],
     types: [
       'YaksaLicenseProfile',

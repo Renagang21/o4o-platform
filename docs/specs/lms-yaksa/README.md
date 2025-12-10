@@ -145,7 +145,7 @@ PUT    /api/lms-yaksa/course-assignments/:id/complete
 | Phase | 내용 | 상태 |
 |-------|------|------|
 | Phase 1 | Entity Design | ✅ Complete |
-| Phase 2 | Services Implementation | Pending |
+| Phase 2 | Services Implementation | ✅ Complete |
 | Phase 3 | API Routes | Pending |
 | Phase 4 | Admin UI | Pending |
 | Phase 5 | Member UI | Pending |

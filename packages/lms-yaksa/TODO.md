@@ -5,7 +5,64 @@
 
 ---
 
-## Current Phase: Phase 1 - Entity Design (Completed)
+## Current Phase: Phase 2 - Services Implementation (Completed)
+
+### Phase 2 완료 항목
+
+- [x] LicenseProfileService 구현
+- [x] RequiredCoursePolicyService 구현
+- [x] CreditRecordService 구현
+- [x] CourseAssignmentService 구현
+- [x] services/index.ts export 구성
+- [x] backend/index.ts services export 추가
+- [x] manifest.ts exposes.services 업데이트
+
+### Phase 2 결과물
+
+```
+packages/lms-yaksa/src/backend/services/
+├── LicenseProfileService.ts
+├── RequiredCoursePolicyService.ts
+├── CreditRecordService.ts
+├── CourseAssignmentService.ts
+└── index.ts
+```
+
+### Service 구현 내역
+
+1. **LicenseProfileService**
+   - 면허 정보 CRUD (getProfile, createProfile, updateProfile, deleteProfile)
+   - 연간 평점 집계 (recalculateCredits, calculateYearCredits)
+   - 갱신 필요 여부 판단 (checkRenewalRequired)
+   - 면허 검증 (verifyLicense)
+   - 연간 초기화 (resetYearlyCreditsForAll)
+
+2. **RequiredCoursePolicyService**
+   - 정책 CRUD (getPolicy, createPolicy, updatePolicy, deletePolicy)
+   - 정책 적용 대상 조회 (getPoliciesForMemberType)
+   - 필수 강좌 목록 관리 (addRequiredCourse, removeRequiredCourse)
+   - 정책 검증 (validatePolicy)
+   - 활성화/비활성화 (setActive)
+
+3. **CreditRecordService**
+   - 평점 기록 CRUD (getCredits, addCreditRecord, updateCreditRecord, deleteCreditRecord)
+   - 연간 평점 집계 (calculateTotalCredits, aggregateCreditsByYear, aggregateCreditsByType)
+   - 외부 평점 등록 (addExternalCredit)
+   - 수동 조정 (addManualAdjustment)
+   - 평점 요약 (getCreditSummary)
+   - 검증 관리 (verifyCredit, rejectCredit, getUnverifiedCredits)
+
+4. **CourseAssignmentService**
+   - 강좌 배정 CRUD (assignCourse, updateAssignment, deleteAssignment)
+   - 완료 처리 (markCompleted, updateProgress)
+   - 만료 처리 (expireOverdueAssignments, getOverdueAssignments)
+   - 정책 기반 자동 배정 (assignByPolicy)
+   - 대량 배정 (bulkAssignCourse)
+   - 통계 조회 (getUserStatistics, getOrganizationStatistics)
+
+---
+
+## Previous Phase: Phase 1 - Entity Design (Completed)
 
 ### Phase 1 완료 항목
 
@@ -27,42 +84,6 @@ packages/lms-yaksa/src/backend/entities/
 ├── YaksaCourseAssignment.entity.ts
 └── index.ts
 ```
-
----
-
-## Next Phase: Phase 2 - Services Implementation
-
-### Pending
-
-- [ ] LicenseProfileService 구현
-- [ ] RequiredCoursePolicyService 구현
-- [ ] CreditRecordService 구현
-- [ ] CourseAssignmentService 구현
-- [ ] services/index.ts export 구성
-- [ ] backend/index.ts services export 추가
-
-### Service 요구사항
-
-1. **LicenseProfileService**
-   - 면허 정보 CRUD
-   - 연간 평점 집계
-   - 갱신 필요 여부 판단
-
-2. **RequiredCoursePolicyService**
-   - 정책 CRUD
-   - 정책 적용 대상 조회
-   - 필수 강좌 목록 관리
-
-3. **CreditRecordService**
-   - 평점 기록 CRUD
-   - 연간 평점 집계
-   - 코스 완료 시 자동 기록
-
-4. **CourseAssignmentService**
-   - 강좌 배정 CRUD
-   - 완료 처리
-   - 만료 처리
-   - 정책 기반 자동 배정
 
 ---
 
