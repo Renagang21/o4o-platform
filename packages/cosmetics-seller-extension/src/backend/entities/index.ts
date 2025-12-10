@@ -29,3 +29,18 @@ export const CosmeticsSellerEntities = [
   'SellerConsultationLog',
   'SellerKPI',
 ];
+
+// ModuleLoader compatibility - export actual entity classes as 'entities' array
+import { SellerDisplay } from './seller-display.entity';
+import { SellerSample } from './seller-sample.entity';
+import { SellerInventory } from './seller-inventory.entity';
+import { SellerConsultationLog } from './seller-consultation-log.entity';
+import { SellerKPI } from './seller-kpi.entity';
+
+export const entities = [
+  SellerDisplay,
+  SellerSample,
+  SellerInventory,
+  SellerConsultationLog,
+  SellerKPI,
+];

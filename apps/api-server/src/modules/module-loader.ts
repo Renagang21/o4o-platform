@@ -8,7 +8,7 @@
 import { Router } from 'express';
 import { glob } from 'glob';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import logger from '../utils/logger.js';
 import type {
   AppModule,
@@ -19,6 +19,14 @@ import type {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/**
+ * Convert a file path to a proper file:// URL
+ * Handles Windows paths correctly (C:\path -> file:///C:/path)
+ */
+function toFileUrl(filePath: string): string {
+  return pathToFileURL(filePath).href;
+}
 
 /**
  * Module Loader Class
@@ -82,8 +90,9 @@ export class ModuleLoader {
    */
   async loadModule(manifestPath: string): Promise<AppModule | null> {
     try {
-      // Import the manifest
-      const manifestUrl = `file://${manifestPath}`;
+      // Import the manifest (use pathToFileURL for cross-platform compatibility)
+      const manifestUrl = toFileUrl(manifestPath);
+      logger.debug(`[ModuleLoader] Loading manifest from: ${manifestUrl}`);
       const manifestModule = await import(manifestUrl);
       const manifest: AppModule = manifestModule.default || manifestModule.manifest;
 
@@ -92,14 +101,17 @@ export class ModuleLoader {
         return null;
       }
 
-      // Store package path
-      const packagePath = path.dirname(manifestPath);
+      // Store package path (manifest is in src/, so go up one level to get package root)
+      const manifestDir = path.dirname(manifestPath);
+      const packagePath = manifestDir.endsWith('/src') || manifestDir.endsWith('\\src')
+        ? path.dirname(manifestDir)
+        : manifestDir;
       manifest.packagePath = packagePath;
 
       // Try to load backend exports
       const backendIndexPath = path.join(packagePath, 'dist', 'backend', 'index.js');
       try {
-        const backendModule = await import(`file://${backendIndexPath}`);
+        const backendModule = await import(toFileUrl(backendIndexPath));
         manifest.backend = {
           routes: backendModule.routes,
           services: backendModule.services,
@@ -112,9 +124,12 @@ export class ModuleLoader {
       }
 
       // Try to load lifecycle hooks
-      const lifecyclePath = path.join(packagePath, 'dist', 'lifecycle');
+      const lifecyclePath = path.join(packagePath, 'dist', 'lifecycle', 'index.js');
+      const lifecycleUrl = toFileUrl(lifecyclePath);
+      logger.info(`[ModuleLoader] Attempting to load lifecycle from: ${lifecycleUrl}`);
       try {
-        const lifecycleModule = await import(`file://${lifecyclePath}/index.js`);
+        const lifecycleModule = await import(lifecycleUrl);
+        logger.info(`[ModuleLoader] Lifecycle module keys: ${Object.keys(lifecycleModule).join(', ')}`);
         manifest.lifecycle = {
           install: lifecycleModule.install,
           activate: lifecycleModule.activate,
@@ -123,7 +138,7 @@ export class ModuleLoader {
         };
         logger.debug(`[ModuleLoader] Loaded lifecycle hooks for ${manifest.id}`);
       } catch (lifecycleError) {
-        logger.debug(`[ModuleLoader] No lifecycle hooks for ${manifest.id}`);
+        logger.warn(`[ModuleLoader] Failed to load lifecycle hooks for ${manifest.id}:`, lifecycleError);
       }
 
       // Register in registry
