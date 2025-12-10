@@ -37,6 +37,53 @@ export const lmsYaksaManifest = {
     autoBackup: true,
   },
 
+  // ===== CMS (CPT/ACF/ViewTemplates) =====
+  cms: {
+    // lms-yaksa는 독자 CPT 없이 lms-core의 Course를 확장 사용
+    cpt: [],
+    // ACF 필드 그룹 (향후 확장 시 추가)
+    acf: [],
+    // View Templates
+    viewTemplates: [
+      {
+        id: 'lms-yaksa-dashboard',
+        name: '약사 LMS 대시보드',
+        component: 'LmsYaksaDashboard',
+        type: 'admin',
+      },
+      {
+        id: 'lms-yaksa-license-list',
+        name: '면허 목록',
+        component: 'LicenseProfileList',
+        type: 'admin',
+      },
+      {
+        id: 'lms-yaksa-policy-list',
+        name: '필수 교육 정책 목록',
+        component: 'RequiredCoursePolicyList',
+        type: 'admin',
+      },
+      {
+        id: 'lms-yaksa-credit-list',
+        name: '평점 기록 목록',
+        component: 'CreditRecordList',
+        type: 'admin',
+      },
+      {
+        id: 'lms-yaksa-assignment-list',
+        name: '강좌 배정 목록',
+        component: 'CourseAssignmentList',
+        type: 'admin',
+      },
+      {
+        id: 'lms-yaksa-my-education',
+        name: '내 교육 현황',
+        component: 'MyEducationPage',
+        type: 'member',
+      },
+    ],
+  },
+
   // ===== 백엔드 =====
   backend: {
     entities: [
