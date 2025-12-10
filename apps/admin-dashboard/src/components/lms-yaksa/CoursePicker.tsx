@@ -4,20 +4,7 @@
  * Searchable dropdown for selecting courses from LMS
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, ChevronsUpDown, X, BookOpen } from 'lucide-react';
@@ -55,6 +42,7 @@ export function CoursePicker({
 }: CoursePickerProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedCourses = courses.filter((c) => selectedIds.includes(c.id));
 
@@ -86,72 +74,92 @@ export function CoursePicker({
     [onDeselect]
   );
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className={cn('flex flex-col gap-2', className)}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            disabled={disabled || isLoading}
-            className="w-full justify-between"
-          >
-            <span className="truncate">
-              {selectedCourses.length === 0
-                ? placeholder
-                : multiple
-                ? `${selectedCourses.length}개 강좌 선택됨`
-                : selectedCourses[0]?.title}
-            </span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0" align="start">
-          <Command>
-            <CommandInput
+    <div ref={containerRef} className={cn('flex flex-col gap-2 relative', className)}>
+      <Button
+        type="button"
+        variant="outline"
+        role="combobox"
+        aria-expanded={open}
+        disabled={disabled || isLoading}
+        className="w-full justify-between"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="truncate">
+          {selectedCourses.length === 0
+            ? placeholder
+            : multiple
+            ? `${selectedCourses.length}개 강좌 선택됨`
+            : selectedCourses[0]?.title}
+        </span>
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+
+      {open && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+          <div className="p-2 border-b border-gray-100">
+            <input
+              type="text"
               placeholder="강좌 검색..."
               value={searchQuery}
-              onValueChange={setSearchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoFocus
             />
-            <CommandList>
-              <CommandEmpty>
-                {isLoading ? '로딩 중...' : '검색 결과가 없습니다.'}
-              </CommandEmpty>
-              <CommandGroup>
-                {filteredCourses.map((course) => (
-                  <CommandItem
-                    key={course.id}
-                    value={course.id}
-                    onSelect={() => handleSelect(course.id)}
-                    className="cursor-pointer"
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        selectedIds.includes(course.id)
-                          ? 'opacity-100'
-                          : 'opacity-0'
+          </div>
+          <div className="max-h-60 overflow-y-auto">
+            {isLoading ? (
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                로딩 중...
+              </div>
+            ) : filteredCourses.length === 0 ? (
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                검색 결과가 없습니다.
+              </div>
+            ) : (
+              filteredCourses.map((course) => (
+                <button
+                  key={course.id}
+                  type="button"
+                  onClick={() => handleSelect(course.id)}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      'h-4 w-4 flex-shrink-0',
+                      selectedIds.includes(course.id)
+                        ? 'opacity-100 text-blue-600'
+                        : 'opacity-0'
+                    )}
+                  />
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="font-medium text-sm truncate">{course.title}</span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      {course.category && <span>{course.category}</span>}
+                      {course.credits && (
+                        <span className="text-green-600">
+                          {course.credits} 평점
+                        </span>
                       )}
-                    />
-                    <div className="flex flex-col flex-1">
-                      <span className="font-medium">{course.title}</span>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {course.category && <span>{course.category}</span>}
-                        {course.credits && (
-                          <span className="text-green-600">
-                            {course.credits} 평점
-                          </span>
-                        )}
-                      </div>
                     </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Selected courses display (for multiple selection) */}
       {multiple && selectedCourses.length > 0 && (
