@@ -11,8 +11,12 @@
  * - KPI Tracking (성과 지표)
  */
 
+import { Router } from 'express';
+import type { DataSource } from 'typeorm';
+
 // Manifest
-export { manifest } from './manifest';
+export { cosmeticsSellerExtensionManifest, cosmeticsSellerExtensionManifest as manifest } from './manifest';
+export { cosmeticsSellerExtensionManifest as default } from './manifest';
 
 // Backend
 export * from './backend';
@@ -25,3 +29,17 @@ export { shortcodes } from './shortcodes';
 
 // Lifecycle
 export * from './lifecycle';
+
+/**
+ * Create Express routes for Cosmetics Seller Extension
+ */
+export function createRoutes(dataSource: DataSource): Router {
+  const router = Router();
+
+  // TODO: Implement actual routes
+  router.get('/health', (_req, res) => {
+    res.json({ status: 'ok', app: 'cosmetics-seller-extension' });
+  });
+
+  return router;
+}

@@ -82,22 +82,6 @@ export const partneropsManifest = {
     { method: 'GET', path: '/partnerops/settlement/transactions', handler: 'SettlementController.getTransactions' },
   ],
 
-  // Admin Menu Configuration
-  menu: {
-    label: '파트너 관리',
-    icon: 'Users',
-    path: '/partnerops',
-    requiredPermission: 'partnerops.read',
-    children: [
-      { label: '대시보드', path: '/partnerops/dashboard', icon: 'LayoutDashboard' },
-      { label: '내 프로필', path: '/partnerops/profile', icon: 'User' },
-      { label: '콘텐츠 관리', path: '/partnerops/routines', icon: 'FileText' },
-      { label: '링크 관리', path: '/partnerops/links', icon: 'Link' },
-      { label: '전환 분석', path: '/partnerops/conversions', icon: 'TrendingUp' },
-      { label: '정산 내역', path: '/partnerops/settlement', icon: 'DollarSign' },
-    ],
-  },
-
   // Lifecycle Hooks
   lifecycle: {
     install: './lifecycle/install',
