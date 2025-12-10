@@ -56,16 +56,18 @@ export interface SupplierApprovalRequestDto {
 }
 
 // Listing
+import type { ListingStatus } from '@o4o/dropshipping-core';
+
 export interface CreateListingDto {
   offerId: string;
   sellingPrice: number;
   channel: string;
-  isActive?: boolean;
+  status?: ListingStatus;
 }
 
 export interface UpdateListingDto {
   sellingPrice?: number;
-  isActive?: boolean;
+  status?: ListingStatus;
 }
 
 export interface ListingDetailDto {
@@ -77,14 +79,14 @@ export interface ListingDetailDto {
       name: string;
       sku: string;
     };
-    supplyPrice: number;
-    stock: number;
+    supplierPrice: number;
+    stockQuantity: number;
   };
   sellingPrice: number;
   margin: number;
   marginRate: number;
   channel: string;
-  isActive: boolean;
+  status: ListingStatus;
   createdAt: Date;
 }
 

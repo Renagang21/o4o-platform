@@ -161,9 +161,6 @@ import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 // Phase PD-9 - Multichannel RPA Routes
 import channelsRoutes from '../routes/v1/channels.routes.js';
 
-// Neture Forum Routes
-import netureForumRoutes from '../routes/neture/forum.routes.js';
-
 // Generic Forum Routes (forum-core)
 import forumRoutes from '../routes/forum/forum.routes.js';
 
@@ -187,6 +184,9 @@ import sitesRoutes from '../modules/sites/sites.routes.js';
 
 // ✅ NEW: Membership-Yaksa Routes
 import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
+
+// ✅ NEW: Reporting-Yaksa Routes
+import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
 
 // ✅ NEW: Dropshipping-Cosmetics Routes
 import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-filter.routes.js';
@@ -476,9 +476,6 @@ export function setupRoutes(app: Application): void {
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);
 
-  // Neture Forum Routes
-  app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
-
   // ✅ NEW: Generic Forum Routes (forum-core)
   // Provides: Posts CRUD, Categories CRUD, Comments, Stats, Moderation
   // Used by admin-dashboard for forum management
@@ -501,6 +498,11 @@ export function setupRoutes(app: Application): void {
   // Provides: Member, MemberCategory, Affiliation, Verification endpoints
   // See: packages/membership-yaksa/src/backend/routes/index.ts
   app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
+
+  // ✅ NEW: Reporting-Yaksa Routes
+  // Provides: Annual Report submission, approval workflow, membership sync endpoints
+  // See: packages/reporting-yaksa/src/backend/routes/index.ts
+  app.use('/api/reporting', standardLimiter, createReportingRoutes(AppDataSource) as any);
 
   // ✅ NEW: Dropshipping-Cosmetics Routes
   // Provides: Cosmetics Filter, Influencer Routine, Signage, Product Detail, Product List, Brand Management, Recommendations endpoints

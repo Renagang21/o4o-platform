@@ -16,7 +16,6 @@ const CORE_APPS_INSTALL_ORDER = [
   'dropshipping-cosmetics',
   'organization-forum',
   'membership-yaksa',
-  'forum-cosmetics',
   'forum-yaksa',
   'sellerops',
   'supplierops',

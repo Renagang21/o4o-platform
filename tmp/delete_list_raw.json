@@ -1,0 +1,77 @@
+{
+  "generated": "2025-12-09",
+  "description": "Phase 4 삭제 후보 목록 - 검토 필요",
+  "categories": {
+    "1_analysis_temp": {
+      "description": "임시 분석 파일 - 문서 재구성 후 불필요",
+      "safe_to_delete": true,
+      "files": [
+        "docs/_analysis/docs_app_related.txt",
+        "docs/_analysis/docs_apps_mapping.json",
+        "docs/_analysis/docs_archive_candidates.txt",
+        "docs/_analysis/docs_category_auto.json",
+        "docs/_analysis/docs_classification_raw.json",
+        "docs/_analysis/docs_full_list.txt",
+        "docs/_analysis/docs_metadata.json",
+        "docs/_analysis/docs_move_plan_draft.json",
+        "docs/_analysis/docs_move_plan_final.json",
+        "docs/_analysis/docs_reorganization_plan.json",
+        "docs/_analysis/app_document_distribution_plan.md",
+        "docs/_analysis/claude_md_update_plan.md"
+      ]
+    },
+    "2_completed_phase_docs": {
+      "description": "완료된 Phase 문서 - archive 이동 또는 삭제 후보",
+      "safe_to_delete": false,
+      "review_reason": "일부 문서는 참고 가치가 있을 수 있음",
+      "files": [
+        "docs/plan/completed/appearance-cleanup-final-report.md",
+        "docs/plan/completed/appearance-contamination-report.md",
+        "docs/plan/completed/code_prune_inventory.md",
+        "docs/plan/completed/code_prune_pr_checklist.md",
+        "docs/plan/completed/control_based_schema_spec.md",
+        "docs/plan/completed/cross_origin_inventory.md",
+        "docs/plan/completed/customizer_bug_kill_list.md",
+        "docs/plan/completed/customizer_phase1_cleanup_and_preview_build.md",
+        "docs/plan/completed/customizer_preview_off_hotfix.md",
+        "docs/plan/completed/customizer_refactor_reset.md",
+        "docs/plan/completed/customizer_schema_spec.md",
+        "docs/plan/completed/customizer_smoke_tests.md",
+        "docs/plan/completed/p1_phase_a_work_order.md",
+        "docs/plan/completed/p1_phase_b_email_service_reference.md",
+        "docs/plan/completed/p1_phase_b_work_order.md",
+        "docs/plan/completed/p1_phase_c_work_order.md",
+        "docs/plan/completed/p1_phase_d_work_order.md",
+        "docs/plan/completed/phase0_rollback_point.md",
+        "docs/plan/completed/phase1_inventory_report.md",
+        "docs/plan/completed/phase2_adapter_bypass_inventory.md",
+        "docs/plan/completed/phase3_authcontext_report.md",
+        "docs/plan/completed/phase4_pipeline_cleanup.md",
+        "docs/plan/completed/type_hardening_checklist.md"
+      ]
+    },
+    "3_orphan_directories": {
+      "description": "비어있거나 단일 파일만 있는 고아 디렉토리",
+      "safe_to_delete": true,
+      "files": [
+        "docs/nextgen-frontend/PHASE_D3_E2E_TEST_CHECKLIST.md"
+      ],
+      "note": "nextgen-frontend 디렉토리 전체 삭제 후보 - 단일 파일만 있음"
+    },
+    "4_duplicate_or_obsolete": {
+      "description": "중복/구버전 문서 - 검토 필요",
+      "safe_to_delete": false,
+      "files": [
+        "docs/archive/kakao-oauth-setup.md",
+        "docs/archive/vscode-extension.md"
+      ],
+      "note": "이미 archive에 있으므로 유지해도 무방"
+    }
+  },
+  "summary": {
+    "total_candidates": 38,
+    "safe_to_delete": 13,
+    "require_review": 25
+  },
+  "recommendation": "1_analysis_temp과 3_orphan_directories는 즉시 삭제 가능. 2_completed_phase_docs는 폴더 전체 유지 권장 (히스토리 참고용)"
+}

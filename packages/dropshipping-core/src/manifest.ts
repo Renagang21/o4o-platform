@@ -1,32 +1,28 @@
 /**
  * Dropshipping-Core Manifest
  *
- * AppStore 표준 manifest - 산업 중립적·확장형·범용 Dropshipping 엔진
+ * Industry-neutral extensible dropshipping engine:
+ * - Supplier/Seller management
+ * - Product catalog (Master, Offers, Listings)
+ * - Order relay workflow
+ * - Settlement and commission
  */
 
-export const manifest = {
-  id: 'dropshipping-core',
-  name: 'Dropshipping Core',
+export const dropshippingCoreManifest = {
+  // ===== 필수 기본 정보 =====
+  appId: 'dropshipping-core',
+  displayName: 'Dropshipping 엔진',
   version: '1.0.0',
-  type: 'core',
-  description:
-    'Industry-neutral extensible dropshipping engine for O4O Platform - Supplier/Seller/Product/Order/Settlement/Commission management',
+  appType: 'core' as const,
+  description: '산업 중립적 확장형 Dropshipping 엔진 - Supplier/Seller/Product/Order/Settlement/Commission',
 
-  author: 'O4O Platform',
-  license: 'MIT',
-
-  /**
-   * Dependencies
-   * Dropshipping-Core requires organization-core for organization-scoped features
-   */
+  // ===== 의존성 =====
   dependencies: {
     core: ['organization-core'],
+    optional: [],
   },
 
-  /**
-   * Database Tables
-   * Core가 소유하는 테이블 목록
-   */
+  // ===== 소유 테이블 =====
   ownsTables: [
     'dropshipping_suppliers',
     'dropshipping_sellers',
@@ -39,104 +35,183 @@ export const manifest = {
     'dropshipping_commission_transactions',
   ],
 
-  /**
-   * Permissions
-   */
-  permissions: [
-    'dropshipping.read',
-    'dropshipping.write',
-    'dropshipping.manage',
-    'dropshipping.supplier',
-    'dropshipping.seller',
-    'dropshipping.admin',
-  ],
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true,
+  },
 
-  /**
-   * Lifecycle Hooks
-   */
+  // ===== 백엔드 =====
+  backend: {
+    entities: [
+      'Supplier',
+      'Seller',
+      'ProductMaster',
+      'SupplierProductOffer',
+      'SellerListing',
+      'OrderRelay',
+      'SettlementBatch',
+      'CommissionRule',
+      'CommissionTransaction',
+    ],
+    services: [
+      'SupplierService',
+      'SellerService',
+      'ProductService',
+      'OrderRelayService',
+      'SettlementService',
+      'CommissionService',
+    ],
+    controllers: [
+      'SupplierController',
+      'SellerController',
+      'ProductController',
+      'OrderController',
+      'SettlementController',
+    ],
+    routesExport: 'createRoutes',
+  },
+
+  // ===== 프론트엔드 =====
+  frontend: {
+    admin: {
+      pages: [
+        { path: '/admin/dropshipping', component: 'DropshippingDashboard' },
+        { path: '/admin/dropshipping/suppliers', component: 'SupplierList' },
+        { path: '/admin/dropshipping/sellers', component: 'SellerList' },
+        { path: '/admin/dropshipping/products', component: 'ProductList' },
+        { path: '/admin/dropshipping/orders', component: 'OrderList' },
+        { path: '/admin/dropshipping/settlement', component: 'SettlementList' },
+        { path: '/admin/dropshipping/commission', component: 'CommissionSettings' },
+      ],
+    },
+  },
+
+  // ===== 라이프사이클 =====
   lifecycle: {
-    onInstall: './lifecycle/install.js',
-    onActivate: './lifecycle/activate.js',
-    onDeactivate: './lifecycle/deactivate.js',
-    onUninstall: './lifecycle/uninstall.js',
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
   },
 
-  /**
-   * Features
-   */
-  features: [
-    'supplier-management',
-    'seller-management',
-    'product-master-catalog',
-    'supplier-offer-system',
-    'seller-listing-management',
-    'order-relay-workflow',
-    'settlement-batch-processing',
-    'commission-calculation-engine',
-    'multi-channel-support',
-    'industry-neutral-architecture',
+  // ===== 권한 정의 =====
+  permissions: [
+    {
+      id: 'dropshipping.read',
+      name: 'Dropshipping 읽기',
+      description: 'Dropshipping 데이터 조회 권한',
+      category: 'dropshipping',
+    },
+    {
+      id: 'dropshipping.write',
+      name: 'Dropshipping 쓰기',
+      description: 'Dropshipping 데이터 생성/수정 권한',
+      category: 'dropshipping',
+    },
+    {
+      id: 'dropshipping.manage',
+      name: 'Dropshipping 관리',
+      description: 'Dropshipping 전체 관리 권한',
+      category: 'dropshipping',
+    },
+    {
+      id: 'dropshipping.supplier',
+      name: '공급사 역할',
+      description: '공급사로서의 권한',
+      category: 'dropshipping',
+    },
+    {
+      id: 'dropshipping.seller',
+      name: '판매자 역할',
+      description: '판매자로서의 권한',
+      category: 'dropshipping',
+    },
+    {
+      id: 'dropshipping.admin',
+      name: 'Dropshipping 관리자',
+      description: '정산/수수료 설정 등 관리자 권한',
+      category: 'dropshipping',
+    },
   ],
 
-  /**
-   * Configuration
-   */
-  config: {
-    enableAutoRelayToSupplier: {
-      type: 'boolean',
-      default: true,
-      description: 'Automatically relay orders to suppliers when created',
-    },
-    defaultCommissionRate: {
-      type: 'number',
-      default: 10,
-      description: 'Default commission rate percentage',
-    },
-    settlementCycle: {
-      type: 'string',
-      default: 'monthly',
-      description: 'Settlement cycle: daily, weekly, monthly',
-    },
-    requireSellerApproval: {
-      type: 'boolean',
-      default: true,
-      description: 'Require admin approval for new sellers',
-    },
-    requireSupplierApproval: {
-      type: 'boolean',
-      default: true,
-      description: 'Require admin approval for new suppliers',
-    },
+  // ===== 메뉴 정의 =====
+  menus: {
+    admin: [
+      {
+        id: 'dropshipping',
+        label: 'Dropshipping',
+        icon: 'truck',
+        order: 30,
+        children: [
+          {
+            id: 'dropshipping-dashboard',
+            label: '대시보드',
+            path: '/admin/dropshipping',
+            icon: 'layout-dashboard',
+          },
+          {
+            id: 'dropshipping-suppliers',
+            label: '공급사 관리',
+            path: '/admin/dropshipping/suppliers',
+            icon: 'building',
+          },
+          {
+            id: 'dropshipping-sellers',
+            label: '판매자 관리',
+            path: '/admin/dropshipping/sellers',
+            icon: 'store',
+          },
+          {
+            id: 'dropshipping-products',
+            label: '상품 관리',
+            path: '/admin/dropshipping/products',
+            icon: 'package',
+          },
+          {
+            id: 'dropshipping-orders',
+            label: '주문 관리',
+            path: '/admin/dropshipping/orders',
+            icon: 'shopping-cart',
+          },
+          {
+            id: 'dropshipping-settlement',
+            label: '정산',
+            path: '/admin/dropshipping/settlement',
+            icon: 'calculator',
+          },
+        ],
+      },
+    ],
   },
 
-  /**
-   * Events
-   * Core에서 발행하는 이벤트 목록
-   */
-  events: [
-    'product.master.updated',
-    'product.offer.updated',
-    'listing.created',
-    'order.created',
-    'order.relay.dispatched',
-    'order.relay.fulfilled',
-    'settlement.closed',
-    'commission.applied',
-  ],
+  // ===== 외부 노출 =====
+  exposes: {
+    services: ['SupplierService', 'SellerService', 'ProductService', 'OrderRelayService', 'SettlementService', 'CommissionService'],
+    types: ['Supplier', 'Seller', 'ProductMaster', 'SupplierProductOffer', 'SellerListing', 'OrderRelay'],
+    events: [
+      'product.master.updated',
+      'product.offer.updated',
+      'listing.created',
+      'order.created',
+      'order.relay.dispatched',
+      'order.relay.fulfilled',
+      'settlement.closed',
+      'commission.applied',
+    ],
+  },
 
-  /**
-   * API Routes
-   */
-  apiRoutes: [
-    '/api/v1/dropshipping/core/supplier',
-    '/api/v1/dropshipping/core/seller',
-    '/api/v1/dropshipping/core/products',
-    '/api/v1/dropshipping/core/offers',
-    '/api/v1/dropshipping/core/listings',
-    '/api/v1/dropshipping/core/orders',
-    '/api/v1/dropshipping/core/orders/relay',
-    '/api/v1/dropshipping/core/settlement',
-    '/api/v1/dropshipping/core/commission',
-  ],
+  // ===== 기본 설정 =====
+  defaultConfig: {
+    enableAutoRelayToSupplier: true,
+    defaultCommissionRate: 10,
+    settlementCycle: 'monthly',
+    requireSellerApproval: true,
+    requireSupplierApproval: true,
+  },
 };
 
-export default manifest;
+// Legacy export for backward compatibility
+export const manifest = dropshippingCoreManifest;
+export default dropshippingCoreManifest;

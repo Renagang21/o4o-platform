@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import type { ListingDetailDto } from '../../dto/index.js';
 
+type ListingStatusFilter = 'all' | 'active' | 'draft' | 'paused' | 'sold_out' | 'delisted';
+
 interface ListingsListProps {
   sellerId: string;
   apiBaseUrl?: string;
@@ -32,18 +34,18 @@ export const ListingsList: React.FC<ListingsListProps> = ({
   const [listings, setListings] = useState<ListingDetailDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
+  const [statusFilter, setStatusFilter] = useState<ListingStatusFilter>('all');
 
   useEffect(() => {
     fetchListings();
-  }, [sellerId, filterActive]);
+  }, [sellerId, statusFilter]);
 
   const fetchListings = async () => {
     setLoading(true);
     try {
       let url = `${apiBaseUrl}/listings?sellerId=${sellerId}`;
-      if (filterActive !== 'all') {
-        url += `&isActive=${filterActive === 'active'}`;
+      if (statusFilter !== 'all') {
+        url += `&status=${statusFilter}`;
       }
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch listings');
@@ -56,10 +58,13 @@ export const ListingsList: React.FC<ListingsListProps> = ({
     }
   };
 
+  const isActiveStatus = (status: string) => status === 'active';
+
   const handleToggleActive = async (listing: ListingDetailDto) => {
     try {
+      const action = isActiveStatus(listing.status) ? 'deactivate' : 'activate';
       const response = await fetch(
-        `${apiBaseUrl}/listings/${listing.id}/${listing.isActive ? 'deactivate' : 'activate'}?sellerId=${sellerId}`,
+        `${apiBaseUrl}/listings/${listing.id}/${action}?sellerId=${sellerId}`,
         { method: 'POST' }
       );
       if (response.ok) {
@@ -84,6 +89,22 @@ export const ListingsList: React.FC<ListingsListProps> = ({
     } catch (err) {
       alert('삭제에 실패했습니다.');
     }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+      active: { bg: 'bg-green-100', text: 'text-green-800', label: '판매중' },
+      draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: '작성중' },
+      paused: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: '일시중지' },
+      sold_out: { bg: 'bg-red-100', text: 'text-red-800', label: '품절' },
+      delisted: { bg: 'bg-gray-100', text: 'text-gray-600', label: '판매종료' },
+    };
+    const config = statusConfig[status] || statusConfig.draft;
+    return (
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.bg} ${config.text}`}>
+        {config.label}
+      </span>
+    );
   };
 
   const filteredListings = listings.filter((l) =>
@@ -127,12 +148,15 @@ export const ListingsList: React.FC<ListingsListProps> = ({
             <Filter className="w-4 h-4 text-gray-500" />
             <select
               className="px-4 py-2 border rounded-lg"
-              value={filterActive}
-              onChange={(e) => setFilterActive(e.target.value as any)}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as ListingStatusFilter)}
             >
               <option value="all">전체</option>
               <option value="active">판매중</option>
-              <option value="inactive">판매중지</option>
+              <option value="draft">작성중</option>
+              <option value="paused">일시중지</option>
+              <option value="sold_out">품절</option>
+              <option value="delisted">판매종료</option>
             </select>
           </div>
         </div>
@@ -195,7 +219,7 @@ export const ListingsList: React.FC<ListingsListProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {listing.offer.supplyPrice.toLocaleString()}원
+                    {listing.offer.supplierPrice.toLocaleString()}원
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                     {listing.sellingPrice.toLocaleString()}원
@@ -215,37 +239,29 @@ export const ListingsList: React.FC<ListingsListProps> = ({
                   <td className="px-6 py-4 text-sm">
                     <span
                       className={
-                        listing.offer.stock < 10
+                        listing.offer.stockQuantity < 10
                           ? 'text-red-600 font-medium'
                           : 'text-gray-900'
                       }
                     >
-                      {listing.offer.stock}
+                      {listing.offer.stockQuantity}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        listing.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {listing.isActive ? '판매중' : '판매중지'}
-                    </span>
+                    {getStatusBadge(listing.status)}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleToggleActive(listing)}
                         className={`p-1 rounded ${
-                          listing.isActive
+                          isActiveStatus(listing.status)
                             ? 'text-gray-600 hover:text-gray-900'
                             : 'text-green-600 hover:text-green-900'
                         }`}
-                        title={listing.isActive ? '판매 중지' : '판매 시작'}
+                        title={isActiveStatus(listing.status) ? '판매 중지' : '판매 시작'}
                       >
-                        {listing.isActive ? (
+                        {isActiveStatus(listing.status) ? (
                           <PowerOff className="w-4 h-4" />
                         ) : (
                           <Power className="w-4 h-4" />

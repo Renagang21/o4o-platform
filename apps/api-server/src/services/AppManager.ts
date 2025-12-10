@@ -28,7 +28,6 @@ const __dirname = dirname(__filename);
 const PACKAGE_MAP: Record<string, string> = {
   'forum': 'forum-app',
   'forum-core': 'forum-app',
-  'forum-cosmetics': 'forum-cosmetics',
   'forum-yaksa': 'forum-yaksa',
   'lms-core': 'lms-core',
   'organization-core': 'organization-core',

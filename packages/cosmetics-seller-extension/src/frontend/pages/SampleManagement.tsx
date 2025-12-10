@@ -1,0 +1,167 @@
+/**
+ * SampleManagement Page
+ *
+ * 샘플 관리 페이지 - 매장 샘플 재고 및 사용 현황 관리
+ */
+
+import React, { useState, useEffect } from 'react';
+
+interface SampleItem {
+  id: string;
+  productId: string;
+  productName?: string;
+  sampleCount: number;
+  minStockLevel: number;
+  lastRefilledAt?: string;
+  lastRefillQuantity?: number;
+}
+
+interface SampleStats {
+  totalSamples: number;
+  totalProducts: number;
+  lowStockCount: number;
+  recentUsage: number;
+}
+
+interface SampleManagementProps {
+  sellerId: string;
+  apiBaseUrl?: string;
+}
+
+export const SampleManagement: React.FC<SampleManagementProps> = ({
+  sellerId,
+  apiBaseUrl = '/api/v1/cosmetics-seller',
+}) => {
+  const [samples, setSamples] = useState<SampleItem[]>([]);
+  const [stats, setStats] = useState<SampleStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, [sellerId]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [samplesRes, statsRes] = await Promise.all([
+        fetch(`${apiBaseUrl}/sample/seller/${sellerId}`),
+        fetch(`${apiBaseUrl}/sample/seller/${sellerId}/stats`),
+      ]);
+
+      const samplesData = await samplesRes.json();
+      const statsData = await statsRes.json();
+
+      if (samplesData.success) {
+        setSamples(samplesData.data);
+      }
+      if (statsData.success) {
+        setStats(statsData.data);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefill = async (sampleId: string, quantity: number) => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/sample/${sampleId}/refill`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        fetchData();
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">샘플 정보 로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className="error">오류: {error}</div>;
+  }
+
+  return (
+    <div className="sample-management">
+      <h2>샘플 관리</h2>
+
+      {stats && (
+        <div className="stats-summary">
+          <div className="stat-card">
+            <span className="stat-value">{stats.totalSamples}</span>
+            <span className="stat-label">총 샘플 수</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-value">{stats.lowStockCount}</span>
+            <span className="stat-label">부족 품목</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-value">{stats.recentUsage}</span>
+            <span className="stat-label">최근 사용량</span>
+          </div>
+        </div>
+      )}
+
+      <div className="sample-list">
+        {samples.length === 0 ? (
+          <p>등록된 샘플 정보가 없습니다.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>상품</th>
+                <th>현재 수량</th>
+                <th>최소 수량</th>
+                <th>상태</th>
+                <th>최근 보충</th>
+                <th>액션</th>
+              </tr>
+            </thead>
+            <tbody>
+              {samples.map((sample) => (
+                <tr
+                  key={sample.id}
+                  className={sample.sampleCount <= sample.minStockLevel ? 'low-stock' : ''}
+                >
+                  <td>{sample.productName || sample.productId}</td>
+                  <td>{sample.sampleCount}</td>
+                  <td>{sample.minStockLevel}</td>
+                  <td>
+                    {sample.sampleCount <= sample.minStockLevel ? (
+                      <span className="status-warning">부족</span>
+                    ) : (
+                      <span className="status-ok">정상</span>
+                    )}
+                  </td>
+                  <td>
+                    {sample.lastRefilledAt
+                      ? `${new Date(sample.lastRefilledAt).toLocaleDateString()} (+${sample.lastRefillQuantity})`
+                      : '-'}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleRefill(sample.id, 10)}
+                      className="btn-refill"
+                    >
+                      보충
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SampleManagement;

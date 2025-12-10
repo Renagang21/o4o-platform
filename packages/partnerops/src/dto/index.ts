@@ -1,8 +1,11 @@
 /**
  * PartnerOps DTOs
+ *
+ * Note: Service-specific DTOs (CreateProfileDto, UpdateProfileDto, CreateRoutineDto,
+ * UpdateRoutineDto, CreateLinkDto) are defined in their respective services.
  */
 
-// Partner Profile DTOs
+// Partner Profile DTOs (legacy, prefer service DTOs)
 export interface CreatePartnerDto {
   name: string;
   description?: string;
@@ -13,29 +16,6 @@ export interface UpdatePartnerDto {
   name?: string;
   description?: string;
   snsAccounts?: Record<string, string>;
-}
-
-// Routine DTOs
-export interface CreateRoutineDto {
-  title: string;
-  description?: string;
-  content?: Record<string, any>;
-  products?: string[];
-}
-
-export interface UpdateRoutineDto {
-  title?: string;
-  description?: string;
-  content?: Record<string, any>;
-  products?: string[];
-  isActive?: boolean;
-}
-
-// Link DTOs
-export interface CreateLinkDto {
-  targetUrl: string;
-  targetType?: 'listing' | 'routine' | 'custom';
-  targetId?: string;
 }
 
 // Click DTOs

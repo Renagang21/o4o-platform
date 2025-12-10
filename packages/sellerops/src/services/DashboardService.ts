@@ -12,6 +12,7 @@ import {
   SellerListing,
   OrderRelay,
   SettlementBatch,
+  ListingStatus,
 } from '@o4o/dropshipping-core';
 import type { DashboardSummaryDto, AlertDto } from '../dto/index.js';
 
@@ -58,7 +59,7 @@ export class DashboardService {
 
     // 활성 리스팅 수
     const activeListings = await this.listingRepository.count({
-      where: { sellerId, isActive: true },
+      where: { sellerId, status: ListingStatus.ACTIVE },
     });
 
     // 대기 중인 주문 수

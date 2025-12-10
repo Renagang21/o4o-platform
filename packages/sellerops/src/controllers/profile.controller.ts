@@ -7,7 +7,7 @@
 import { Controller, Get, Put, Body, Req } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Seller } from '@o4o/dropshipping-core';
+import { Seller, SellerStatus } from '@o4o/dropshipping-core';
 import type { SellerProfileDto, UpdateProfileDto } from '../dto/index.js';
 
 @Controller('api/v1/sellerops/profile')
@@ -32,17 +32,7 @@ export class ProfileController {
       throw new Error('Seller not found');
     }
 
-    return {
-      id: seller.id,
-      name: seller.name,
-      contactEmail: seller.contactEmail,
-      contactPhone: seller.contactPhone,
-      status: seller.status,
-      channelConfigs: seller.channelConfigs || {},
-      organizationId: seller.organizationId,
-      createdAt: seller.createdAt,
-      updatedAt: seller.updatedAt,
-    };
+    return this.toSellerProfileDto(seller);
   }
 
   @Put()
@@ -70,12 +60,24 @@ export class ProfileController {
 
     await this.sellerRepository.save(seller);
 
+    return this.toSellerProfileDto(seller);
+  }
+
+  private toSellerProfileDto(seller: Seller): SellerProfileDto {
+    // SellerStatus enum을 DTO의 문자열 타입으로 변환
+    const statusMap: Record<string, 'pending' | 'active' | 'suspended' | 'banned'> = {
+      [SellerStatus.PENDING]: 'pending',
+      [SellerStatus.ACTIVE]: 'active',
+      [SellerStatus.SUSPENDED]: 'suspended',
+      [SellerStatus.INACTIVE]: 'banned', // INACTIVE를 banned로 매핑
+    };
+
     return {
       id: seller.id,
       name: seller.name,
-      contactEmail: seller.contactEmail,
+      contactEmail: seller.contactEmail || '',
       contactPhone: seller.contactPhone,
-      status: seller.status,
+      status: statusMap[seller.status] || 'pending',
       channelConfigs: seller.channelConfigs || {},
       organizationId: seller.organizationId,
       createdAt: seller.createdAt,

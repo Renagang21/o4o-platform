@@ -18,12 +18,11 @@ export class LinksController {
         return;
       }
 
-      const result = await this.linkService.list(tenantId, partnerId, {
-        page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 20,
+      const links = await this.linkService.list(tenantId, partnerId, {
+        productId: req.query.productId as string | undefined,
       });
 
-      res.json({ success: true, ...result });
+      res.json({ success: true, data: links });
     } catch (error: any) {
       console.error('List links error:', error);
       res.status(500).json({ success: false, message: error.message });

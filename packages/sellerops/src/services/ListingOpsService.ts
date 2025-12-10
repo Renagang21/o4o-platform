@@ -12,6 +12,8 @@ import {
   SellerListing,
   SupplierProductOffer,
   ListingService,
+  ListingStatus,
+  ListingChannel,
 } from '@o4o/dropshipping-core';
 import type {
   CreateListingDto,
@@ -35,7 +37,7 @@ export class ListingOpsService {
    */
   async getListings(
     sellerId: string,
-    filters?: { isActive?: boolean; channel?: string }
+    filters?: { status?: ListingStatus; channel?: string }
   ): Promise<ListingDetailDto[]> {
     const query = this.listingRepository
       .createQueryBuilder('listing')
@@ -43,9 +45,9 @@ export class ListingOpsService {
       .leftJoinAndSelect('offer.productMaster', 'product')
       .where('listing.sellerId = :sellerId', { sellerId });
 
-    if (filters?.isActive !== undefined) {
-      query.andWhere('listing.isActive = :isActive', {
-        isActive: filters.isActive,
+    if (filters?.status !== undefined) {
+      query.andWhere('listing.status = :status', {
+        status: filters.status,
       });
     }
 
@@ -92,13 +94,22 @@ export class ListingOpsService {
       throw new Error('Offer not found');
     }
 
+    // channel 문자열을 ListingChannel enum으로 변환
+    const channelMap: Record<string, ListingChannel> = {
+      smartstore: ListingChannel.SMARTSTORE,
+      coupang: ListingChannel.COUPANG,
+      custom: ListingChannel.CUSTOM,
+    };
+    const channel = channelMap[dto.channel] || ListingChannel.CUSTOM;
+
     // Core의 ListingService를 통해 생성
     const listing = await this.listingService.createListing({
       sellerId,
       offerId: dto.offerId,
       sellingPrice: dto.sellingPrice,
-      channel: dto.channel,
-      isActive: dto.isActive ?? false,
+      channel,
+      title: offer.productMaster?.name || 'Untitled',
+      status: dto.status ?? ListingStatus.DRAFT,
     });
 
     // SellerOps 이벤트 발행
@@ -137,10 +148,10 @@ export class ListingOpsService {
       listing.sellingPrice = dto.sellingPrice;
     }
 
-    if (dto.isActive !== undefined) {
-      listing.isActive = dto.isActive;
+    if (dto.status !== undefined) {
+      listing.status = dto.status;
 
-      if (dto.isActive) {
+      if (dto.status === ListingStatus.ACTIVE) {
         this.eventEmitter.emit('sellerops.listing.activated', {
           listingId: listing.id,
           sellerId,
@@ -173,10 +184,10 @@ export class ListingOpsService {
    */
   private toListingDetailDto(listing: SellerListing): ListingDetailDto {
     const offer = listing.offer;
-    const supplyPrice = offer?.supplyPrice || 0;
+    const supplierPrice = offer?.supplierPrice || 0;
     const sellingPrice = listing.sellingPrice;
-    const margin = sellingPrice - supplyPrice;
-    const marginRate = supplyPrice > 0 ? (margin / supplyPrice) * 100 : 0;
+    const margin = sellingPrice - supplierPrice;
+    const marginRate = supplierPrice > 0 ? (margin / supplierPrice) * 100 : 0;
 
     return {
       id: listing.id,
@@ -187,14 +198,14 @@ export class ListingOpsService {
           name: offer?.productMaster?.name || '',
           sku: offer?.productMaster?.sku || '',
         },
-        supplyPrice,
-        stock: offer?.stock || 0,
+        supplierPrice,
+        stockQuantity: offer?.stockQuantity || 0,
       },
       sellingPrice,
       margin,
       marginRate: Math.round(marginRate * 100) / 100,
       channel: listing.channel,
-      isActive: listing.isActive,
+      status: listing.status,
       createdAt: listing.createdAt,
     };
   }

@@ -7,9 +7,11 @@
  * @version 1.0.0
  */
 
+import { Router } from 'express';
+import type { DataSource } from 'typeorm';
+
 // Manifest
-export { manifest } from './manifest.js';
-export { manifest as default } from './manifest.js';
+export { organizationCoreManifest, manifest, default as manifestDefault } from './manifest.js';
 
 // Types (needed by manifest)
 export * from './types/index.js';
@@ -31,3 +33,23 @@ export const entities = Object.values(Entities).filter(
 // Service registry
 import * as Services from './services/index.js';
 export const services = Services;
+
+/**
+ * Routes factory compatible with Module Loader
+ *
+ * @param dataSource - TypeORM DataSource from API server
+ */
+export function routes(dataSource?: DataSource | any): Router {
+  const router = Router();
+
+  // TODO: Implement actual routes using controllers
+  // For now, return a placeholder router
+  router.get('/health', (req, res) => {
+    res.json({ status: 'ok', app: 'organization-core' });
+  });
+
+  return router;
+}
+
+// Alias for manifest compatibility
+export const createRoutes = routes;

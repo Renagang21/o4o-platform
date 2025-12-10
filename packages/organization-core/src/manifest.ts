@@ -1,36 +1,27 @@
-import { AppManifest } from './types/context.js';
-
 /**
  * Organization-Core App Manifest
  *
- * App Store에 등록되는 organization-core 앱의 메타데이터
+ * 전사 조직 관리 시스템 (Core Domain)
+ * - 계층 구조 조직 관리
+ * - 멤버 관리
+ * - 조직 스코프 권한
  */
-export const manifest: AppManifest = {
-  // 기본 정보
-  appId: 'organization-core',
-  name: 'Organization Core',
-  version: '1.0.0',
-  type: 'core',
-  description:
-    '전사 조직 관리 시스템 (Core Domain) - 계층 구조, 멤버 관리, 조직 스코프 권한',
 
-  // 작성자 정보
-  author: {
-    name: 'O4O Platform',
-    email: 'dev@o4o-platform.com',
-    url: 'https://o4o-platform.com',
+export const organizationCoreManifest = {
+  // ===== 필수 기본 정보 =====
+  appId: 'organization-core',
+  displayName: '조직 관리',
+  version: '1.0.0',
+  appType: 'core' as const,
+  description: '전사 조직 관리 시스템 (Core Domain) - 계층 구조, 멤버 관리, 조직 스코프 권한',
+
+  // ===== 의존성 =====
+  dependencies: {
+    core: [],
+    optional: [],
   },
 
-  // 의존성
-  dependencies: [
-    {
-      appId: 'auth-core',
-      version: '>=1.0.0',
-      required: true,
-    },
-  ],
-
-  // 소유 테이블
+  // ===== 소유 테이블 =====
   ownsTables: [
     'organizations',
     'organization_members',
@@ -38,7 +29,51 @@ export const manifest: AppManifest = {
     'organization_roles',
   ],
 
-  // 권한 정의
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true,
+  },
+
+  // ===== 백엔드 =====
+  backend: {
+    entities: [
+      'Organization',
+      'OrganizationMember',
+      'OrganizationUnit',
+      'OrganizationRole',
+    ],
+    services: [
+      'OrganizationService',
+      'OrganizationMemberService',
+    ],
+    controllers: [
+      'OrganizationController',
+    ],
+    routesExport: 'createRoutes',
+  },
+
+  // ===== 프론트엔드 =====
+  frontend: {
+    admin: {
+      pages: [
+        { path: '/admin/organizations', component: 'OrganizationList' },
+        { path: '/admin/organizations/:id', component: 'OrganizationDetail' },
+        { path: '/admin/organizations/:id/members', component: 'OrganizationMembers' },
+      ],
+    },
+  },
+
+  // ===== 라이프사이클 =====
+  lifecycle: {
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
+  },
+
+  // ===== 권한 정의 =====
   permissions: [
     {
       id: 'organization.read',
@@ -66,97 +101,41 @@ export const manifest: AppManifest = {
     },
   ],
 
-  // 라이프사이클 훅
-  lifecycle: {
-    install: './lifecycle/install.js',
-    activate: './lifecycle/activate.js',
-    deactivate: './lifecycle/deactivate.js',
-    uninstall: './lifecycle/uninstall.js',
+  // ===== 메뉴 정의 =====
+  menus: {
+    admin: [
+      {
+        id: 'organizations',
+        label: '조직 관리',
+        icon: 'building-office',
+        order: 10,
+        children: [
+          {
+            id: 'organization-list',
+            label: '조직 목록',
+            path: '/admin/organizations',
+            icon: 'list-bullet',
+          },
+        ],
+      },
+    ],
   },
 
-  // API 라우트
-  routes: [
-    {
-      path: '/api/organization',
-      method: 'GET',
-      handler: './controllers/OrganizationController.list',
-      permission: 'organization.read',
-    },
-    {
-      path: '/api/organization/:id',
-      method: 'GET',
-      handler: './controllers/OrganizationController.get',
-      permission: 'organization.read',
-    },
-    {
-      path: '/api/organization',
-      method: 'POST',
-      handler: './controllers/OrganizationController.create',
-      permission: 'organization.manage',
-    },
-    {
-      path: '/api/organization/:id',
-      method: 'PUT',
-      handler: './controllers/OrganizationController.update',
-      permission: 'organization.manage',
-    },
-    {
-      path: '/api/organization/:id',
-      method: 'DELETE',
-      handler: './controllers/OrganizationController.delete',
-      permission: 'organization.manage',
-    },
-    {
-      path: '/api/organization/:id/descendants',
-      method: 'GET',
-      handler: './controllers/OrganizationController.getDescendants',
-      permission: 'organization.read',
-    },
-    {
-      path: '/api/organization/:id/members',
-      method: 'GET',
-      handler: './controllers/OrganizationController.getMembers',
-      permission: 'organization.member.read',
-    },
-    {
-      path: '/api/organization/:id/members',
-      method: 'POST',
-      handler: './controllers/OrganizationController.addMember',
-      permission: 'organization.member.manage',
-    },
-    {
-      path: '/api/organization/:id/members/:userId',
-      method: 'PUT',
-      handler: './controllers/OrganizationController.updateMember',
-      permission: 'organization.member.manage',
-    },
-    {
-      path: '/api/organization/:id/members/:userId',
-      method: 'DELETE',
-      handler: './controllers/OrganizationController.removeMember',
-      permission: 'organization.member.manage',
-    },
-    {
-      path: '/api/organization/my',
-      method: 'GET',
-      handler: './controllers/OrganizationController.getMyOrganizations',
-      permission: 'organization.read',
-    },
-  ],
+  // ===== 외부 노출 (다른 앱에서 사용 가능) =====
+  exposes: {
+    services: ['OrganizationService', 'OrganizationMemberService'],
+    types: ['Organization', 'OrganizationMember', 'OrganizationUnit', 'OrganizationRole'],
+    events: ['organization.created', 'organization.updated', 'organization.deleted', 'member.added', 'member.removed'],
+  },
 
-  // CPT 정의 (선택적 - organization은 엔티티 중심이므로 CPT 불필요)
-  customPostTypes: [],
-
-  // ACF 정의 (선택적)
-  advancedCustomFields: [],
-
-  // 블록 정의 (선택적)
-  blocks: [],
-
-  // 설정
-  settings: {
-    enableHierarchy: true, // 계층 구조 활성화
-    maxDepth: 5, // 최대 계층 깊이
-    defaultOrganizationType: 'branch', // 기본 조직 유형
+  // ===== 기본 설정 =====
+  defaultConfig: {
+    enableHierarchy: true,
+    maxDepth: 5,
+    defaultOrganizationType: 'branch',
   },
 };
+
+// Legacy export for backward compatibility
+export const manifest = organizationCoreManifest;
+export default organizationCoreManifest;

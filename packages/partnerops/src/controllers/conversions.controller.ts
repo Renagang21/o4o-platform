@@ -18,15 +18,13 @@ export class ConversionsController {
         return;
       }
 
-      const result = await this.conversionService.list(tenantId, partnerId, {
-        page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 20,
-        status: req.query.status as string,
+      const conversions = await this.conversionService.list(tenantId, partnerId, {
+        status: req.query.status as string | undefined,
         startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
         endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
       });
 
-      res.json({ success: true, ...result });
+      res.json({ success: true, data: conversions });
     } catch (error: any) {
       console.error('List conversions error:', error);
       res.status(500).json({ success: false, message: error.message });
@@ -61,8 +59,9 @@ export class ConversionsController {
         return;
       }
 
-      const days = parseInt(req.query.days as string) || 30;
-      const funnel = await this.conversionService.getFunnel(tenantId, partnerId, days);
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const funnel = await this.conversionService.getFunnel(tenantId, partnerId, startDate, endDate);
       res.json({ success: true, data: funnel });
     } catch (error: any) {
       console.error('Get conversion funnel error:', error);

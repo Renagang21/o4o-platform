@@ -15,6 +15,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import { ListingStatus } from '@o4o/dropshipping-core';
 import { ListingOpsService } from '../services/ListingOpsService.js';
 import type {
   CreateListingDto,
@@ -29,7 +30,7 @@ export class ListingsController {
   @Get()
   async getListings(
     @Req() req: any,
-    @Query('isActive') isActive?: string,
+    @Query('status') status?: ListingStatus,
     @Query('channel') channel?: string
   ): Promise<ListingDetailDto[]> {
     const sellerId = req.user?.sellerId || req.query.sellerId;
@@ -37,9 +38,9 @@ export class ListingsController {
       throw new Error('Seller ID is required');
     }
 
-    const filters: any = {};
-    if (isActive !== undefined) {
-      filters.isActive = isActive === 'true';
+    const filters: { status?: ListingStatus; channel?: string } = {};
+    if (status !== undefined) {
+      filters.status = status;
     }
     if (channel) {
       filters.channel = channel;
@@ -109,7 +110,7 @@ export class ListingsController {
       throw new Error('Seller ID is required');
     }
     return await this.listingOpsService.updateListing(id, sellerId, {
-      isActive: true,
+      status: ListingStatus.ACTIVE,
     });
   }
 
@@ -123,7 +124,7 @@ export class ListingsController {
       throw new Error('Seller ID is required');
     }
     return await this.listingOpsService.updateListing(id, sellerId, {
-      isActive: false,
+      status: ListingStatus.PAUSED,
     });
   }
 }

@@ -36,12 +36,11 @@ export class SettlementController {
         return;
       }
 
-      const result = await this.settlementService.getBatches(tenantId, partnerId, {
-        page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 12,
+      const batches = await this.settlementService.getBatches(tenantId, partnerId, {
+        status: req.query.status as string | undefined,
       });
 
-      res.json({ success: true, ...result });
+      res.json({ success: true, data: batches });
     } catch (error: any) {
       console.error('Get settlement batches error:', error);
       res.status(500).json({ success: false, message: error.message });
@@ -58,13 +57,10 @@ export class SettlementController {
         return;
       }
 
-      const result = await this.settlementService.getTransactions(tenantId, partnerId, {
-        page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 20,
-        status: req.query.status as string,
-      });
+      const batchId = req.query.batchId as string | undefined;
+      const transactions = await this.settlementService.getTransactions(tenantId, partnerId, batchId);
 
-      res.json({ success: true, ...result });
+      res.json({ success: true, data: transactions });
     } catch (error: any) {
       console.error('Get settlement transactions error:', error);
       res.status(500).json({ success: false, message: error.message });

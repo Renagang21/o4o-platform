@@ -6,7 +6,8 @@
  */
 
 // Manifest
-export { manifest } from './manifest';
+export { partneropsManifest, partneropsManifest as manifest } from './manifest';
+export { partneropsManifest as default } from './manifest';
 
 // Lifecycle hooks
 export * from './lifecycle';

@@ -57,6 +57,10 @@ const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/Memb
 const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
 const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
+// Reporting-Yaksa: Annual Report Management
+const ReportingDashboard = lazy(() => import('@/pages/reporting/dashboard/ReportingDashboard'));
+const ReportList = lazy(() => import('@/pages/reporting/reports/ReportList'));
+const TemplateList = lazy(() => import('@/pages/reporting/templates/TemplateList'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
@@ -111,11 +115,6 @@ const ForumPostForm = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/Foru
 const YaksaCommunityList = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityList'));
 const YaksaCommunityDetail = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
 const YaksaCommunityFeed = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
-
-// Cosmetics Forum Pages (from @o4o-apps/forum-cosmetics package - source imports)
-const CosmeticsForumDashboard = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumDashboard'));
-const CosmeticsForumPostList = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumPostList'));
-const CosmeticsForumStats = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumStats'));
 
 // Groupbuy Pages
 const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
@@ -578,6 +577,36 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['membership:manage']}>
                         <Suspense fallback={<PageLoader />}>
                           <CategoryManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Reporting-Yaksa: 신상신고 관리 */}
+                    <Route path="/admin/reporting" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportingDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/reporting/dashboard" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportingDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/reporting/reports" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:view', 'reporting:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/reporting/templates" element={
+                      <AdminProtectedRoute requiredPermissions={['reporting:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplateList />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -1065,35 +1094,6 @@ function App() {
                         <AppRouteGuard appId="forum-yaksa">
                           <Suspense fallback={<PageLoader />}>
                             <YaksaCommunityFeed />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-
-                    {/* Cosmetics Forum - App-based routes with AppRouteGuard */}
-                    <Route path="/cosmetics/forum" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-cosmetics">
-                          <Suspense fallback={<PageLoader />}>
-                            <CosmeticsForumDashboard />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/cosmetics/forum/posts" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-cosmetics">
-                          <Suspense fallback={<PageLoader />}>
-                            <CosmeticsForumPostList />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/cosmetics/forum/stats" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-cosmetics">
-                          <Suspense fallback={<PageLoader />}>
-                            <CosmeticsForumStats />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

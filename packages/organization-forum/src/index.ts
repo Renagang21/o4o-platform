@@ -3,19 +3,27 @@
  *
  * Provides seamless integration between organization-core and forum-app.
  *
- * Features:
- * - Auto-create forum categories on organization creation
- * - Organization-scoped forum permissions
- * - Hierarchical forum access control
- *
  * @package @o4o-extensions/organization-forum
- * @version 0.1.0
+ * @version 1.0.0
  */
 
-// Manifest
-export { manifest } from './manifest.js';
-export { manifest as default } from './manifest.js';
+import { Router } from 'express';
+import type { DataSource } from 'typeorm';
 
-// Backend code (imported directly by API server from src/)
-// export { OrganizationForumService } from './services/OrganizationForumService.js';
-// export { onInstall, onUninstall } from './lifecycle/install.js';
+// Manifest
+export { organizationForumManifest, manifest, default as manifestDefault } from './manifest.js';
+
+/**
+ * Routes factory compatible with Module Loader
+ */
+export function routes(dataSource?: DataSource | any): Router {
+  const router = Router();
+
+  router.get('/health', (req, res) => {
+    res.json({ status: 'ok', app: 'organization-forum' });
+  });
+
+  return router;
+}
+
+export const createRoutes = routes;

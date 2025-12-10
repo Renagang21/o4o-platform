@@ -10,47 +10,39 @@
  * - CMS settings management
  */
 
-export const manifest = {
+export const cmsCoreManifest = {
+  // ===== 필수 기본 정보 =====
   appId: 'cms-core',
-  name: 'CMS Core Engine',
-  type: 'core' as const,
+  displayName: 'CMS 엔진',
   version: '1.0.0',
+  appType: 'core' as const,
   description: 'CMS 핵심 엔진 - 템플릿, CPT, ACF, 뷰, 메뉴, 미디어',
 
-  // No dependencies - this is a foundational package
-  dependencies: {},
-
-  // Uninstall policy
-  uninstallPolicy: {
-    defaultMode: 'keep-data' as const,
-    allowPurge: true,
-    autoBackup: true, // CMS data is critical
+  // ===== 의존성 =====
+  dependencies: {
+    core: [],
+    optional: [],
   },
 
-  // All owned tables (16 tables)
+  // ===== 소유 테이블 =====
   ownsTables: [
     // Template system
     'cms_templates',
     'cms_template_parts',
     'cms_views',
-
     // Custom Post Types
     'cms_cpt_types',
     'cms_cpt_fields',
-
     // Advanced Custom Fields
     'cms_acf_field_groups',
     'cms_acf_fields',
     'cms_acf_values',
-
     // Settings
     'cms_settings',
-
     // Menu system
     'cms_menus',
     'cms_menu_items',
     'cms_menu_locations',
-
     // Media library
     'cms_media',
     'cms_media_files',
@@ -58,7 +50,74 @@ export const manifest = {
     'cms_media_tags',
   ],
 
-  // Permissions
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true,
+  },
+
+  // ===== 백엔드 =====
+  backend: {
+    entities: [
+      'Template',
+      'TemplatePart',
+      'View',
+      'CptType',
+      'CptField',
+      'AcfFieldGroup',
+      'AcfField',
+      'AcfValue',
+      'CmsSetting',
+      'Menu',
+      'MenuItem',
+      'MenuLocation',
+      'Media',
+      'MediaFile',
+      'MediaFolder',
+      'MediaTag',
+    ],
+    services: [
+      'TemplateService',
+      'CptService',
+      'AcfService',
+      'MenuService',
+      'MediaService',
+      'SettingsService',
+    ],
+    controllers: [
+      'TemplateController',
+      'CptController',
+      'AcfController',
+      'MenuController',
+      'MediaController',
+    ],
+    routesExport: 'createRoutes',
+  },
+
+  // ===== 프론트엔드 =====
+  frontend: {
+    admin: {
+      pages: [
+        { path: '/admin/cms', component: 'CmsApp' },
+        { path: '/admin/cms/templates', component: 'TemplatesPage' },
+        { path: '/admin/cms/cpt', component: 'CptPage' },
+        { path: '/admin/cms/acf', component: 'AcfPage' },
+        { path: '/admin/cms/menus', component: 'MenusPage' },
+        { path: '/admin/cms/media', component: 'MediaPage' },
+      ],
+    },
+  },
+
+  // ===== 라이프사이클 =====
+  lifecycle: {
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
+  },
+
+  // ===== 권한 정의 =====
   permissions: [
     {
       id: 'cms.templates.view',
@@ -134,38 +193,166 @@ export const manifest = {
     },
   ],
 
-  // Admin UI routes
-  adminRoutes: [
+  // ===== 메뉴 정의 =====
+  menus: {
+    admin: [
+      {
+        id: 'cms',
+        label: 'CMS',
+        icon: 'layout',
+        order: 5,
+        children: [
+          {
+            id: 'templates',
+            label: '템플릿',
+            path: '/admin/cms/templates',
+            icon: 'document',
+          },
+          {
+            id: 'cpt',
+            label: 'Custom Post Types',
+            path: '/admin/cms/cpt',
+            icon: 'collection',
+          },
+          {
+            id: 'acf',
+            label: 'ACF 필드',
+            path: '/admin/cms/acf',
+            icon: 'adjustments',
+          },
+          {
+            id: 'menus',
+            label: '메뉴 관리',
+            path: '/admin/cms/menus',
+            icon: 'menu',
+          },
+          {
+            id: 'media',
+            label: '미디어 라이브러리',
+            path: '/admin/cms/media',
+            icon: 'photograph',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ===== 외부 노출 =====
+  exposes: {
+    services: ['TemplateService', 'CptService', 'AcfService', 'MenuService', 'MediaService'],
+    types: ['Template', 'CptType', 'AcfFieldGroup', 'Menu', 'Media'],
+    events: ['template.updated', 'cpt.created', 'acf.updated', 'menu.updated', 'media.uploaded'],
+  },
+
+  // ===== 뷰 템플릿 =====
+  viewTemplates: [
     {
-      path: '/admin/cms',
-      component: './admin-ui/pages/CmsApp.js',
+      viewId: 'templates-list',
+      route: '/admin/cms/templates',
+      title: '템플릿 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
     },
     {
-      path: '/admin/cms/templates',
-      component: './admin-ui/pages/TemplatesPage.js',
+      viewId: 'templates-detail',
+      route: '/admin/cms/templates/:id',
+      title: '템플릿 상세',
+      type: 'detail' as const,
+      layout: 'admin',
+      auth: true,
     },
     {
-      path: '/admin/cms/cpt',
-      component: './admin-ui/pages/CptPage.js',
+      viewId: 'cpt-list',
+      route: '/admin/cms/cpt',
+      title: 'CPT 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
     },
     {
-      path: '/admin/cms/acf',
-      component: './admin-ui/pages/AcfPage.js',
+      viewId: 'acf-list',
+      route: '/admin/cms/acf',
+      title: 'ACF 필드 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
     },
     {
-      path: '/admin/cms/menus',
-      component: './admin-ui/pages/MenusPage.js',
+      viewId: 'menus-list',
+      route: '/admin/cms/menus',
+      title: '메뉴 목록',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
     },
     {
-      path: '/admin/cms/media',
-      component: './admin-ui/pages/MediaPage.js',
+      viewId: 'media-list',
+      route: '/admin/cms/media',
+      title: '미디어 라이브러리',
+      type: 'list' as const,
+      layout: 'admin',
+      auth: true,
     },
   ],
 
-  // Default configuration
+  // ===== Navigation 정의 =====
+  navigation: {
+    admin: [
+      {
+        id: 'cms-core.cms',
+        label: 'CMS',
+        path: '/admin/cms',
+        icon: 'layout',
+        order: 5,
+      },
+      {
+        id: 'cms-core.templates',
+        label: '템플릿',
+        path: '/admin/cms/templates',
+        icon: 'document',
+        parentId: 'cms-core.cms',
+        order: 1,
+      },
+      {
+        id: 'cms-core.cpt',
+        label: 'Custom Post Types',
+        path: '/admin/cms/cpt',
+        icon: 'collection',
+        parentId: 'cms-core.cms',
+        order: 2,
+      },
+      {
+        id: 'cms-core.acf',
+        label: 'ACF 필드',
+        path: '/admin/cms/acf',
+        icon: 'adjustments',
+        parentId: 'cms-core.cms',
+        order: 3,
+      },
+      {
+        id: 'cms-core.menus',
+        label: '메뉴 관리',
+        path: '/admin/cms/menus',
+        icon: 'menu',
+        parentId: 'cms-core.cms',
+        order: 4,
+      },
+      {
+        id: 'cms-core.media',
+        label: '미디어 라이브러리',
+        path: '/admin/cms/media',
+        icon: 'photograph',
+        parentId: 'cms-core.cms',
+        order: 5,
+      },
+    ],
+  },
+
+  // ===== 기본 설정 =====
   defaultConfig: {
     defaultTemplateEngine: 'handlebars',
-    mediaUploadMaxSize: 10485760, // 10MB
+    mediaUploadMaxSize: 10485760,
     allowedMediaTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'],
     thumbnailSizes: [
       { name: 'small', width: 150, height: 150 },
@@ -173,44 +360,8 @@ export const manifest = {
       { name: 'large', width: 1024, height: 1024 },
     ],
   },
-
-  // Menu structure for admin
-  menu: {
-    admin: [
-      {
-        id: 'cms',
-        label: 'CMS',
-        icon: 'layout',
-        children: [
-          {
-            id: 'templates',
-            label: '템플릿',
-            path: '/admin/cms/templates',
-          },
-          {
-            id: 'cpt',
-            label: 'Custom Post Types',
-            path: '/admin/cms/cpt',
-          },
-          {
-            id: 'acf',
-            label: 'ACF 필드',
-            path: '/admin/cms/acf',
-          },
-          {
-            id: 'menus',
-            label: '메뉴 관리',
-            path: '/admin/cms/menus',
-          },
-          {
-            id: 'media',
-            label: '미디어 라이브러리',
-            path: '/admin/cms/media',
-          },
-        ],
-      },
-    ],
-  },
 };
 
-export default manifest;
+// Legacy export for backward compatibility
+export const manifest = cmsCoreManifest;
+export default cmsCoreManifest;

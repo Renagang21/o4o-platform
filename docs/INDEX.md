@@ -1,7 +1,7 @@
 # O4O Platform Documentation Index
 
-> Auto-generated: 2025-12-09
-> Total Documents: 123
+> 최종 업데이트: 2025-12-10 (Phase 11-B)
+> 총 문서: 약 140개
 
 ---
 
@@ -9,12 +9,14 @@
 
 | Category | Docs | Description |
 |----------|------|-------------|
-| [app-guidelines](./app-guidelines/INDEX.md) | 12 | App development rules |
-| [specs](./specs/INDEX.md) | 30 | App specifications |
+| [app-guidelines](./app-guidelines/INDEX.md) | 16 | App development rules |
+| [specs](./specs/INDEX.md) | 26 | App specifications |
 | [reference](./reference/INDEX.md) | 52 | Technical reference |
-| [design](./design/INDEX.md) | 22 | Architecture & design |
+| [design](./design/INDEX.md) | 27 | Architecture & design |
 | [plan](./plan/) | 5 | Active plans |
 | [_standards](./_standards/) | 1 | Documentation standards |
+| [_analysis](./_analysis/) | 5 | Audit & analysis reports |
+| [archive](./archive/) | 3 | Archived documents |
 
 ---
 
@@ -22,8 +24,10 @@
 
 ```
 docs/
+├── _analysis/            # Audit & analysis reports (NEW)
 ├── _standards/           # Documentation standards
 ├── app-guidelines/       # Core/Extension/Service app rules
+├── archive/              # Archived documents (NEW)
 ├── design/               # Architecture & system design
 ├── plan/active/apps/     # Current app development plans
 ├── reference/            # Technical reference docs
@@ -33,15 +37,30 @@ docs/
 
 ---
 
+## Core Architecture (Quick Start)
+
+새 개발자가 읽어야 할 핵심 문서:
+
+| Document | Description |
+|----------|-------------|
+| [cms-overview.md](./design/architecture/cms-overview.md) | CMS 2.0 구조 |
+| [appstore-overview.md](./design/architecture/appstore-overview.md) | AppStore 시스템 |
+| [module-loader-spec.md](./design/architecture/module-loader-spec.md) | Module Loader |
+| [view-system.md](./design/architecture/view-system.md) | View System |
+| [extension-lifecycle.md](./design/architecture/extension-lifecycle.md) | Lifecycle 훅 |
+
+---
+
 ## By Category
 
 ### App Development (app-guidelines/)
 Essential guides for developing apps on O4O Platform.
+- [App Overview](./app-guidelines/app-overview.md) - 앱 개발 전체 흐름
 - [Core App Development](./app-guidelines/core-app-development.md)
 - [Extension App Guideline](./app-guidelines/extension-app-guideline.md)
 - [Service App Guideline](./app-guidelines/service-app-guideline.md)
-- [Manifest Specification](./app-guidelines/manifest-specification.md)
-- [Schema Drift Prevention](./app-guidelines/schema-drift-prevention.md)
+- [Manifest Guideline](./app-guidelines/manifest-guideline.md)
+- [View Guideline](./app-guidelines/view-guideline.md)
 
 ### App Specifications (specs/)
 Detailed specifications for each app domain.
@@ -62,8 +81,8 @@ API, authentication, blocks, and other technical docs.
 
 ### Architecture Design (design/)
 System architecture and design documents.
+- [Architecture](./design/architecture/) - Core architecture **(+5 NEW)**
 - [AppStore](./design/appstore/) - App registry & manifest
-- [Architecture](./design/architecture/) - Core architecture
 - [Frontend](./design/frontend/) - Frontend architecture
 - [Platform](./design/platform/) - Platform features
 
@@ -89,4 +108,4 @@ docs/design/{domain}/
 
 ---
 
-*Last Updated: 2025-12-09*
+*최종 업데이트: 2025-12-10*

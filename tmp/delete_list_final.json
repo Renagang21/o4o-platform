@@ -1,0 +1,33 @@
+{
+  "generated": "2025-12-09",
+  "description": "Phase 4 최종 삭제 리스트 - 검토 완료",
+  "delete_files": [
+    "docs/_analysis/docs_app_related.txt",
+    "docs/_analysis/docs_apps_mapping.json",
+    "docs/_analysis/docs_archive_candidates.txt",
+    "docs/_analysis/docs_category_auto.json",
+    "docs/_analysis/docs_classification_raw.json",
+    "docs/_analysis/docs_full_list.txt",
+    "docs/_analysis/docs_metadata.json",
+    "docs/_analysis/docs_move_plan_draft.json",
+    "docs/_analysis/docs_move_plan_final.json",
+    "docs/_analysis/docs_reorganization_plan.json",
+    "docs/_analysis/app_document_distribution_plan.md",
+    "docs/_analysis/claude_md_update_plan.md"
+  ],
+  "delete_directories": [
+    "docs/_analysis",
+    "docs/nextgen-frontend"
+  ],
+  "keep": [
+    "docs/plan/completed/*",
+    "docs/archive/*",
+    "docs/specs/*",
+    "docs/reference/*"
+  ],
+  "summary": {
+    "files_to_delete": 12,
+    "directories_to_delete": 2,
+    "reason": "_analysis 임시 분석 파일과 nextgen-frontend 고아 디렉토리 정리"
+  }
+}

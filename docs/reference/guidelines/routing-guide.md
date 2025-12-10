@@ -1,112 +1,94 @@
 # Admin Dashboard Routing Guide
 
-## Current Routing Structure (As of 2025-09-04)
-
-### Main Routes and Their Components
-
-| Menu Path | Route | Router/Component | Actual List Component |
-|-----------|-------|------------------|----------------------|
-| Posts | `/posts/*` | `Content.tsx` | `content/PostList.tsx` (WordPress-style) |
-| Pages | `/pages/*` | `PagesRouter.tsx` | `content/PageListWordPress.tsx` |
-| Users | `/users` | `UsersPage/index.tsx` | `users/UserList.tsx` |
-| Media | `/media` | Direct | `media/MediaLibrary.tsx` |
-| Categories | `/posts/categories` | Direct | `categories/Categories.tsx` |
-| Tags | `/posts/tags` | Direct | `posts/Tags.tsx` |
-
-## Component Organization Issues
-
-### Problem Areas:
-1. **Duplicate Components**: Multiple versions of the same functionality
-   - PostList, PostListQuickEdit, PostListWordPress, PostListBulk
-   - UserList, UsersListBulk, UserListEnhanced
-   - Pages, PageList, PageListWordPress
-
-2. **Inconsistent Folder Structure**:
-   - `posts/` - Contains some post-related components
-   - `content/` - Contains most content management components
-   - `pages/` - Has its own folder despite being content
-   - `users/` - Standalone folder
-
-3. **Router Nesting Inconsistency**:
-   - Some routes use intermediate routers (Content, PagesRouter)
-   - Others connect directly to components
-   - No clear pattern for when to use which approach
-
-## Recommended Refactoring Strategy
-
-### 1. Folder Restructuring
-```
-src/pages/
-├── admin/
-│   ├── posts/
-│   │   ├── PostList.tsx (main WordPress-style)
-│   │   ├── PostForm.tsx
-│   │   └── PostRouter.tsx
-│   ├── pages/
-│   │   ├── PageList.tsx
-│   │   ├── PageForm.tsx
-│   │   └── PageRouter.tsx
-│   ├── users/
-│   │   ├── UserList.tsx
-│   │   ├── UserForm.tsx
-│   │   └── UserRouter.tsx
-│   └── media/
-│       └── MediaLibrary.tsx
-```
-
-### 2. Naming Convention
-- Use singular for routers: `PostRouter`, `PageRouter`
-- Use descriptive names: `PostList` not `Posts` or `PostsList`
-- Remove version suffixes: No more `WordPress`, `Enhanced`, `Bulk` variants
-
-### 3. Clean Up Old Files
-Files to remove after verification:
-- `*.old.tsx`, `*.old2.tsx` files
-- Unused experimental versions
-- Duplicate implementations
-
-### 4. Standardize Routing Pattern
-All major sections should follow:
-```
-/section/* → SectionRouter → SectionList (default)
-                           → SectionForm (/new, /:id/edit)
-```
-
-## Migration Checklist
-
-- [ ] Backup current working version
-- [ ] Consolidate duplicate components
-- [ ] Standardize folder structure
-- [ ] Update all imports
-- [ ] Test each route thoroughly
-- [ ] Remove old/unused files
-- [ ] Update this documentation
-
-## Component Usage Status (Current)
-
-### ✅ Active (Using WordPress-style)
-- `content/PostList.tsx`
-- `content/PageListWordPress.tsx`
-- `users/UserList.tsx`
-
-### ⚠️ Legacy (Still referenced somewhere)
-- `content/PostListQuickEdit.tsx`
-- `users/UsersListBulk.tsx`
-- `pages/Pages.tsx`
-
-### ❌ Unused (Can be removed)
-- `posts/PostsList.tsx`
-- `content/PostList.old2.tsx`
-- `content/PageList.old.tsx`
-
-## Notes for Future Development
-
-1. **Before creating a new version**: Check if one already exists
-2. **When refactoring**: Update this guide
-3. **Use consistent patterns**: Follow the established routing structure
-4. **Clean up immediately**: Don't leave .old files in the codebase
-5. **Document changes**: Update both this guide and CLAUDE.md
+> **업데이트:** 2025-12-10
+> **상태:** CMS 2.0 View System 기준으로 업데이트
 
 ---
-*Last Updated: 2025-09-04*
-*Updated by: Claude (Routing standardization)*
+
+## 1. Overview
+
+Admin Dashboard의 라우팅은 **View System** 기반으로 동작한다.
+앱이 manifest에서 View를 등록하면, Navigation Registry가 자동으로 라우트를 생성한다.
+
+## 2. Routing Architecture
+
+### View System 기반 라우팅
+
+```
+앱 manifest.viewTemplates 등록
+         ↓
+Navigation Registry 자동 구성
+         ↓
+Dynamic Router 라우트 생성
+         ↓
+View Component 렌더링
+```
+
+### 주요 라우트
+
+| 경로 | View Component | 설명 |
+|------|----------------|------|
+| `/posts/*` | PostListView, PostDetailView | 게시물 관리 |
+| `/pages/*` | PageListView, PageDetailView | 페이지 관리 |
+| `/users/*` | UserListView, UserFormView | 사용자 관리 |
+| `/media/*` | MediaLibraryView | 미디어 관리 |
+| `/forum/*` | ForumListView (앱별) | 포럼 (앱 설치 시) |
+
+## 3. View Registration
+
+manifest.ts에서 View를 등록:
+
+```typescript
+// manifest.ts
+viewTemplates: ['PostListView', 'PostDetailView', 'PostFormView'],
+
+navigation: {
+  admin: [
+    { path: '/posts', label: 'Posts', view: 'PostListView' },
+    { path: '/posts/:id', view: 'PostDetailView' }
+  ]
+}
+```
+
+## 4. Component Organization
+
+### 권장 구조
+
+```
+packages/{app-name}/
+└── src/
+    └── frontend/
+        └── views/
+            ├── PostListView.tsx
+            ├── PostDetailView.tsx
+            └── PostFormView.tsx
+```
+
+### View Types
+
+| 타입 | 용도 | 예시 |
+|------|------|------|
+| ListView | 목록 표시 | PostListView |
+| DetailView | 상세 표시 | PostDetailView |
+| FormView | 생성/수정 | PostFormView |
+| DashboardView | 대시보드 | ForumDashboard |
+
+## 5. Rules
+
+1. **View Component 기반**: 페이지 파일을 직접 생성하지 않는다.
+2. **manifest 등록 필수**: 모든 View는 manifest.viewTemplates에 등록한다.
+3. **Navigation Registry 활용**: 메뉴와 라우트는 Navigation Registry에서 자동 생성.
+4. **@o4o/ui 사용**: 공통 UI 컴포넌트는 @o4o/ui 패키지에서 가져온다.
+5. **독립적 구조**: 앱 간 View 충돌이 발생하지 않도록 독립적으로 유지.
+
+---
+
+## Related Documents
+
+- [view-system.md](../../design/architecture/view-system.md) - View System 아키텍처
+- [view-guideline.md](../../app-guidelines/view-guideline.md) - View 개발 가이드
+- [manifest-guideline.md](../../app-guidelines/manifest-guideline.md) - Manifest 작성 가이드
+
+---
+
+*최종 업데이트: 2025-12-10*

@@ -7,7 +7,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OrderRelay, SellerListing } from '@o4o/dropshipping-core';
+import {
+  OrderRelay,
+  SellerListing,
+  OrderRelayStatus,
+} from '@o4o/dropshipping-core';
 import type { OrderListItemDto, OrderDetailDto } from '../dto/index.js';
 
 @Injectable()
@@ -26,7 +30,6 @@ export class OrderOpsService {
     sellerId: string,
     filters?: {
       status?: string;
-      relayStatus?: string;
       dateFrom?: Date;
       dateTo?: Date;
     }
@@ -40,12 +43,6 @@ export class OrderOpsService {
 
     if (filters?.status) {
       query.andWhere('relay.status = :status', { status: filters.status });
-    }
-
-    if (filters?.relayStatus) {
-      query.andWhere('relay.relayStatus = :relayStatus', {
-        relayStatus: filters.relayStatus,
-      });
     }
 
     if (filters?.dateFrom) {
@@ -69,7 +66,7 @@ export class OrderOpsService {
       quantity: order.quantity,
       totalPrice: order.totalPrice,
       status: order.status,
-      relayStatus: order.relayStatus || 'pending',
+      relayStatus: order.status, // status와 동일하게 매핑
       createdAt: order.createdAt,
     }));
   }
@@ -92,6 +89,13 @@ export class OrderOpsService {
 
     const offer = order.listing?.offer;
     const productMaster = offer?.productMaster;
+    const supplierPrice = offer?.supplierPrice || 0;
+    const sellingPrice = order.listing?.sellingPrice || 0;
+    const margin = sellingPrice - supplierPrice;
+    const marginRate = supplierPrice > 0 ? (margin / supplierPrice) * 100 : 0;
+
+    // shippingInfo에서 배송 정보 추출
+    const shippingInfo = order.shippingInfo || {};
 
     return {
       id: order.id,
@@ -104,14 +108,14 @@ export class OrderOpsService {
             name: productMaster?.name || '',
             sku: productMaster?.sku || '',
           },
-          supplyPrice: offer?.supplyPrice || 0,
-          stock: offer?.stock || 0,
+          supplierPrice,
+          stockQuantity: offer?.stockQuantity || 0,
         },
-        sellingPrice: order.listing?.sellingPrice || 0,
-        margin: (order.listing?.sellingPrice || 0) - (offer?.supplyPrice || 0),
-        marginRate: 0,
-        channel: order.listing?.channel || '',
-        isActive: order.listing?.isActive || false,
+        sellingPrice,
+        margin,
+        marginRate: Math.round(marginRate * 100) / 100,
+        channel: order.listing?.channel || 'custom',
+        status: order.listing?.status || 'draft',
         createdAt: order.listing?.createdAt || new Date(),
       },
       quantity: order.quantity,
@@ -119,11 +123,11 @@ export class OrderOpsService {
       status: order.status,
       relay: {
         id: order.id,
-        status: order.relayStatus || 'pending',
-        supplierOrderId: order.supplierOrderId,
-        trackingNumber: order.trackingNumber,
-        shippingCarrier: order.shippingCarrier,
-        dispatchedAt: order.dispatchedAt,
+        status: order.status,
+        supplierOrderId: shippingInfo.supplierOrderId,
+        trackingNumber: shippingInfo.trackingNumber,
+        shippingCarrier: shippingInfo.shippingCarrier,
+        dispatchedAt: order.shippedAt,
         deliveredAt: order.deliveredAt,
       },
       createdAt: order.createdAt,
