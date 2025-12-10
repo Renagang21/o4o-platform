@@ -7,10 +7,11 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 
-// Export entities (placeholder)
-// export * from './entities/index.js';
+// Export entities
+export * from './entities/index.js';
+export { lmsYaksaEntities } from './entities/index.js';
 
-// Export services (placeholder)
+// Export services (placeholder for Phase 2)
 // export * from './services/index.js';
 
 /**
@@ -21,10 +22,16 @@ import type { DataSource } from 'typeorm';
 export function routes(dataSource?: DataSource | any): Router {
   const router = Router();
 
-  // TODO: Implement routes
+  // Health check endpoint
   router.get('/health', (req, res) => {
-    res.json({ status: 'ok', app: 'lms-yaksa' });
+    res.json({ status: 'ok', app: 'lms-yaksa', version: '1.0.0' });
   });
+
+  // TODO Phase 2: Add API routes for each entity
+  // - /license-profiles
+  // - /required-policies
+  // - /credit-records
+  // - /course-assignments
 
   return router;
 }
@@ -33,11 +40,28 @@ export function routes(dataSource?: DataSource | any): Router {
 export const createRoutes = routes;
 
 /**
- * Entity list for TypeORM (placeholder)
+ * Entity list for TypeORM registration
  */
-export const entities: any[] = [];
+import {
+  YaksaLicenseProfile,
+  RequiredCoursePolicy,
+  CreditRecord,
+  YaksaCourseAssignment,
+} from './entities/index.js';
+
+export const entities = [
+  YaksaLicenseProfile,
+  RequiredCoursePolicy,
+  CreditRecord,
+  YaksaCourseAssignment,
+];
 
 /**
- * Services registry (placeholder)
+ * Services registry (placeholder for Phase 2)
  */
-export const services = {};
+export const services = {
+  // LicenseProfileService: null,
+  // RequiredCoursePolicyService: null,
+  // CreditRecordService: null,
+  // CourseAssignmentService: null,
+};

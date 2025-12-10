@@ -5,59 +5,95 @@
 
 ---
 
-## Current Phase: Initial Setup
+## Current Phase: Phase 1 - Entity Design (Completed)
+
+### Phase 1 완료 항목
+
+- [x] YaksaLicenseProfile Entity 생성
+- [x] RequiredCoursePolicy Entity 생성
+- [x] CreditRecord Entity 생성
+- [x] YaksaCourseAssignment Entity 생성
+- [x] backend/entities/index.ts export 구성
+- [x] backend/index.ts 업데이트 (entities export)
+- [x] manifest.ts 업데이트 (Phase 1 entities 반영)
+
+### Phase 1 결과물
+
+```
+packages/lms-yaksa/src/backend/entities/
+├── YaksaLicenseProfile.entity.ts
+├── RequiredCoursePolicy.entity.ts
+├── CreditRecord.entity.ts
+├── YaksaCourseAssignment.entity.ts
+└── index.ts
+```
+
+---
+
+## Next Phase: Phase 2 - Services Implementation
 
 ### Pending
 
-- [ ] Create Entity classes (EducationCredit, TrainingProgram, EducationHistory, CertificateTemplate)
-- [ ] Add TypeORM decorators and relations
-- [ ] Create migration files
-- [ ] Implement EducationCreditService
-- [ ] Implement TrainingProgramService
-- [ ] Implement CertificateService
-- [ ] Create API routes with createRoutes factory
-- [ ] Add controllers for admin/member endpoints
+- [ ] LicenseProfileService 구현
+- [ ] RequiredCoursePolicyService 구현
+- [ ] CreditRecordService 구현
+- [ ] CourseAssignmentService 구현
+- [ ] services/index.ts export 구성
+- [ ] backend/index.ts services export 추가
 
-### In Progress
+### Service 요구사항
 
-- [ ] Basic package structure setup
+1. **LicenseProfileService**
+   - 면허 정보 CRUD
+   - 연간 평점 집계
+   - 갱신 필요 여부 판단
 
-### Completed (이번 Phase)
+2. **RequiredCoursePolicyService**
+   - 정책 CRUD
+   - 정책 적용 대상 조회
+   - 필수 강좌 목록 관리
 
-- [x] package.json 생성
-- [x] tsconfig.json 생성
-- [x] manifest.ts 표준 형식으로 생성
-- [x] Lifecycle hooks 기본 구현
-- [x] Backend export 구조 설정
-- [x] Types 정의
+3. **CreditRecordService**
+   - 평점 기록 CRUD
+   - 연간 평점 집계
+   - 코스 완료 시 자동 기록
+
+4. **CourseAssignmentService**
+   - 강좌 배정 CRUD
+   - 완료 처리
+   - 만료 처리
+   - 정책 기반 자동 배정
 
 ---
 
 ## Future Phases
 
-### Phase 2: Backend Implementation
+### Phase 3: API Routes
 
-- [ ] Entity 완전 구현
-- [ ] Service 로직 구현
-- [ ] Controller 구현
-- [ ] Routes 구현 (Express Router factory)
+- [ ] /api/lms-yaksa/license-profiles
+- [ ] /api/lms-yaksa/required-policies
+- [ ] /api/lms-yaksa/credit-records
+- [ ] /api/lms-yaksa/course-assignments
 
-### Phase 3: Admin UI
+### Phase 4: Admin UI
 
-- [ ] 대시보드 컴포넌트
-- [ ] 연수 프로그램 관리 페이지
-- [ ] 학점 관리 페이지
+- [ ] LmsYaksaDashboard 컴포넌트
+- [ ] RequiredCoursePolicyList 페이지
+- [ ] CreditRecordList 페이지
+- [ ] CourseAssignmentList 페이지
+- [ ] LicenseProfileList 페이지
 
-### Phase 4: Member UI
+### Phase 5: Member UI
 
-- [ ] 내 교육 현황 페이지
-- [ ] 교육 이력 페이지
-- [ ] 이수증 출력 기능
+- [ ] MyEducationPage
+- [ ] MyCreditHistory
+- [ ] MyAssignments
 
-### Phase 5: Integration
+### Phase 6: Integration
 
-- [ ] membership-yaksa 연동 (회원 교육 이력)
-- [ ] lms-core 연동 (코스/레슨 연결)
+- [ ] lms-core Course 완료 이벤트 연동
+- [ ] membership-yaksa 회원 정보 연동
+- [ ] organization-core 조직 정보 연동
 
 ---
 
@@ -65,18 +101,29 @@
 
 | Document | Path |
 |----------|------|
-| App Spec | `docs/specs/lms-yaksa/` (TBD) |
+| Work Order | `docs/plan/active/lms-yaksa-phase1-work-order.md` |
+| App Spec | `docs/specs/lms-yaksa/` |
 | Manifest Guide | `docs/app-guidelines/manifest-specification.md` |
-| Backend Guide | `docs/app-guidelines/backend-structure.md` |
 | Extension Guide | `docs/app-guidelines/extension-app-guideline.md` |
+
+---
+
+## Entity Summary (Phase 1)
+
+| Entity | Table | Purpose |
+|--------|-------|---------|
+| YaksaLicenseProfile | lms_yaksa_license_profiles | 약사 면허/자격 정보 |
+| RequiredCoursePolicy | lms_yaksa_required_course_policies | 필수 교육 정책 |
+| CreditRecord | lms_yaksa_credit_records | 연수 평점 기록 |
+| YaksaCourseAssignment | lms_yaksa_course_assignments | 강좌 배정 |
 
 ---
 
 ## Notes
 
-- lms-core의 코스/레슨 기능을 확장하는 Extension App
-- 약사회 보수교육 학점 관리가 핵심 기능
-- membership-yaksa와 연동하여 회원별 교육 이력 관리
+- lms-core의 Course/Enrollment 엔티티와 연동
+- organization-core의 Organization 엔티티와 연동
+- membership-yaksa와 선택적 연동 가능
 
 ---
 

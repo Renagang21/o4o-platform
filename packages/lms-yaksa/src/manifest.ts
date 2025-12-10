@@ -2,10 +2,10 @@
  * LMS-Yaksa Extension App Manifest
  *
  * Extends lms-core with Yaksa organization-specific features:
- * - 보수교육 (Continuing Education)
- * - 연수 프로그램 (Training Programs)
- * - 이수증 발급 (Certificate Issuance)
- * - 회원 교육 이력 관리
+ * - 면허/자격 정보 관리 (License Profile)
+ * - 필수 연수교육 정책 (Required Course Policy)
+ * - 연수 평점 기록 (Credit Records)
+ * - 강좌 배정 관리 (Course Assignment)
  */
 
 export const lmsYaksaManifest = {
@@ -24,10 +24,10 @@ export const lmsYaksaManifest = {
 
   // ===== 소유 테이블 =====
   ownsTables: [
-    'yaksa_education_credits',      // 보수교육 학점
-    'yaksa_training_programs',      // 연수 프로그램
-    'yaksa_education_history',      // 교육 이력
-    'yaksa_certificate_templates',  // 이수증 템플릿
+    'lms_yaksa_license_profiles',       // 면허/자격 프로필
+    'lms_yaksa_required_course_policies', // 필수 교육 정책
+    'lms_yaksa_credit_records',          // 연수 평점 기록
+    'lms_yaksa_course_assignments',      // 강좌 배정
   ],
 
   // ===== 삭제 정책 =====
@@ -40,15 +40,16 @@ export const lmsYaksaManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [
-      'EducationCredit',
-      'TrainingProgram',
-      'EducationHistory',
-      'CertificateTemplate',
+      'YaksaLicenseProfile',
+      'RequiredCoursePolicy',
+      'CreditRecord',
+      'YaksaCourseAssignment',
     ],
     services: [
-      'EducationCreditService',
-      'TrainingProgramService',
-      'CertificateService',
+      'LicenseProfileService',
+      'RequiredCoursePolicyService',
+      'CreditRecordService',
+      'CourseAssignmentService',
     ],
     controllers: [],
     routesExport: 'createRoutes',
@@ -59,14 +60,17 @@ export const lmsYaksaManifest = {
     admin: {
       pages: [
         { path: '/admin/lms-yaksa', component: 'LmsYaksaDashboard' },
-        { path: '/admin/lms-yaksa/programs', component: 'TrainingProgramList' },
-        { path: '/admin/lms-yaksa/credits', component: 'EducationCreditList' },
+        { path: '/admin/lms-yaksa/policies', component: 'RequiredCoursePolicyList' },
+        { path: '/admin/lms-yaksa/credits', component: 'CreditRecordList' },
+        { path: '/admin/lms-yaksa/assignments', component: 'CourseAssignmentList' },
+        { path: '/admin/lms-yaksa/licenses', component: 'LicenseProfileList' },
       ],
     },
     member: {
       pages: [
         { path: '/member/education', component: 'MyEducationPage' },
-        { path: '/member/education/history', component: 'EducationHistoryPage' },
+        { path: '/member/education/credits', component: 'MyCreditHistory' },
+        { path: '/member/education/assignments', component: 'MyAssignments' },
       ],
     },
   },
@@ -82,33 +86,51 @@ export const lmsYaksaManifest = {
   // ===== 권한 정의 =====
   permissions: [
     {
+      id: 'lms-yaksa.license.read',
+      name: '면허 정보 조회',
+      description: '약사 면허 정보를 조회할 수 있는 권한',
+      category: 'lms-yaksa',
+    },
+    {
+      id: 'lms-yaksa.license.manage',
+      name: '면허 정보 관리',
+      description: '약사 면허 정보를 관리할 수 있는 권한',
+      category: 'lms-yaksa',
+    },
+    {
+      id: 'lms-yaksa.policy.read',
+      name: '필수 교육 정책 조회',
+      description: '필수 교육 정책을 조회할 수 있는 권한',
+      category: 'lms-yaksa',
+    },
+    {
+      id: 'lms-yaksa.policy.manage',
+      name: '필수 교육 정책 관리',
+      description: '필수 교육 정책을 관리할 수 있는 권한',
+      category: 'lms-yaksa',
+    },
+    {
       id: 'lms-yaksa.credit.read',
-      name: '교육 학점 조회',
-      description: '보수교육 학점을 조회할 수 있는 권한',
+      name: '교육 평점 조회',
+      description: '보수교육 평점을 조회할 수 있는 권한',
       category: 'lms-yaksa',
     },
     {
       id: 'lms-yaksa.credit.manage',
-      name: '교육 학점 관리',
-      description: '보수교육 학점을 관리할 수 있는 권한',
+      name: '교육 평점 관리',
+      description: '보수교육 평점을 관리할 수 있는 권한',
       category: 'lms-yaksa',
     },
     {
-      id: 'lms-yaksa.program.read',
-      name: '연수 프로그램 조회',
-      description: '연수 프로그램을 조회할 수 있는 권한',
+      id: 'lms-yaksa.assignment.read',
+      name: '강좌 배정 조회',
+      description: '강좌 배정을 조회할 수 있는 권한',
       category: 'lms-yaksa',
     },
     {
-      id: 'lms-yaksa.program.manage',
-      name: '연수 프로그램 관리',
-      description: '연수 프로그램을 관리할 수 있는 권한',
-      category: 'lms-yaksa',
-    },
-    {
-      id: 'lms-yaksa.certificate.issue',
-      name: '이수증 발급',
-      description: '교육 이수증을 발급할 수 있는 권한',
+      id: 'lms-yaksa.assignment.manage',
+      name: '강좌 배정 관리',
+      description: '강좌 배정을 관리할 수 있는 권한',
       category: 'lms-yaksa',
     },
   ],
@@ -129,17 +151,32 @@ export const lmsYaksaManifest = {
             icon: 'chart-bar',
           },
           {
-            id: 'lms-yaksa-programs',
-            label: '연수 프로그램',
-            path: '/admin/lms-yaksa/programs',
-            icon: 'book-open',
+            id: 'lms-yaksa-policies',
+            label: '필수 교육 정책',
+            path: '/admin/lms-yaksa/policies',
+            icon: 'clipboard-list',
+            permission: 'lms-yaksa.policy.read',
           },
           {
             id: 'lms-yaksa-credits',
-            label: '학점 관리',
+            label: '평점 관리',
             path: '/admin/lms-yaksa/credits',
             icon: 'clipboard-check',
             permission: 'lms-yaksa.credit.manage',
+          },
+          {
+            id: 'lms-yaksa-assignments',
+            label: '강좌 배정',
+            path: '/admin/lms-yaksa/assignments',
+            icon: 'user-plus',
+            permission: 'lms-yaksa.assignment.read',
+          },
+          {
+            id: 'lms-yaksa-licenses',
+            label: '면허 관리',
+            path: '/admin/lms-yaksa/licenses',
+            icon: 'identification',
+            permission: 'lms-yaksa.license.manage',
           },
         ],
       },
@@ -157,14 +194,34 @@ export const lmsYaksaManifest = {
 
   // ===== 외부 노출 =====
   exposes: {
-    services: ['EducationCreditService', 'CertificateService'],
-    types: ['EducationCredit', 'TrainingProgram', 'EducationHistory'],
-    events: ['education.completed', 'certificate.issued'],
+    entities: [
+      'YaksaLicenseProfile',
+      'RequiredCoursePolicy',
+      'CreditRecord',
+      'YaksaCourseAssignment',
+    ],
+    services: [
+      'LicenseProfileService',
+      'CreditRecordService',
+    ],
+    types: [
+      'YaksaLicenseProfile',
+      'RequiredCoursePolicy',
+      'CreditRecord',
+      'YaksaCourseAssignment',
+      'CreditType',
+      'AssignmentStatus',
+    ],
+    events: [
+      'lms-yaksa.credit.earned',
+      'lms-yaksa.assignment.completed',
+      'lms-yaksa.license.verified',
+    ],
   },
 
   // ===== 기본 설정 =====
   defaultConfig: {
-    // 연간 필수 이수 학점
+    // 연간 필수 이수 평점
     requiredAnnualCredits: 8,
 
     // 이수증 자동 발급
@@ -172,6 +229,9 @@ export const lmsYaksaManifest = {
 
     // 교육 이력 보존 기간 (년)
     historyRetentionYears: 10,
+
+    // 과제 기본 만료 기간 (일)
+    defaultAssignmentDueDays: 90,
   },
 };
 
