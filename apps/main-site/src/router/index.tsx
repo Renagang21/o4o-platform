@@ -27,6 +27,27 @@ const MyCoursesPage = lazy(() => import('@/pages/lms/MyCoursesPage'));
 const CourseDetailPage = lazy(() => import('@/pages/lms/CourseDetailPage'));
 const LessonPage = lazy(() => import('@/pages/lms/LessonPage'));
 
+// LMS Member (Yaksa) pages
+const LmsMemberDashboard = lazy(() =>
+  import('@/pages/member/lms/LmsMemberDashboard').then((m) => ({ default: m.LmsMemberDashboard }))
+);
+const LmsMemberRequiredCourses = lazy(() =>
+  import('@/pages/member/lms/LmsMemberRequiredCourses').then((m) => ({
+    default: m.LmsMemberRequiredCourses,
+  }))
+);
+const LmsMemberCredits = lazy(() =>
+  import('@/pages/member/lms/LmsMemberCredits').then((m) => ({ default: m.LmsMemberCredits }))
+);
+const LmsMemberLicense = lazy(() =>
+  import('@/pages/member/lms/LmsMemberLicense').then((m) => ({ default: m.LmsMemberLicense }))
+);
+const LmsMemberAssignments = lazy(() =>
+  import('@/pages/member/lms/LmsMemberAssignments').then((m) => ({
+    default: m.LmsMemberAssignments,
+  }))
+);
+
 // Loading fallback
 function PageFallback() {
   return <PageLoading message="페이지를 불러오는 중..." />;
@@ -86,6 +107,57 @@ export function AppRouter() {
                     element={
                       <RequireAuth>
                         <LessonPage />
+                      </RequireAuth>
+                    }
+                  />
+
+                  {/* 회원 LMS (약사 교육) */}
+                  <Route
+                    path="/member/lms/dashboard"
+                    element={
+                      <RequireAuth>
+                        <LmsMemberDashboard />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/member/lms/required-courses"
+                    element={
+                      <RequireAuth>
+                        <LmsMemberRequiredCourses />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/member/lms/credits"
+                    element={
+                      <RequireAuth>
+                        <LmsMemberCredits />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/member/lms/license"
+                    element={
+                      <RequireAuth>
+                        <LmsMemberLicense />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/member/lms/assignments"
+                    element={
+                      <RequireAuth>
+                        <LmsMemberAssignments />
+                      </RequireAuth>
+                    }
+                  />
+                  {/* /member/lms → dashboard 리다이렉트 */}
+                  <Route
+                    path="/member/lms"
+                    element={
+                      <RequireAuth>
+                        <LmsMemberDashboard />
                       </RequireAuth>
                     }
                   />

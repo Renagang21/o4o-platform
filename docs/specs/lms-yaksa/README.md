@@ -148,7 +148,7 @@ PUT    /api/lms-yaksa/course-assignments/:id/complete
 | Phase 2 | Services Implementation | ✅ Complete |
 | Phase 3 | Controllers & Routes | ✅ Complete |
 | Phase 4 | LMS Core Hooks Integration | ✅ Complete |
-| Phase 5 | Admin UI | Pending |
+| Phase 5 | Admin UI | ✅ Complete |
 | Phase 6 | Member UI | Pending |
 | Phase 7 | Integration Testing | Pending |
 
