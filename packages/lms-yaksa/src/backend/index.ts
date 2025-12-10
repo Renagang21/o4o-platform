@@ -15,14 +15,25 @@ export { lmsYaksaEntities } from './entities/index.js';
 export * from './services/index.js';
 export { lmsYaksaServices } from './services/index.js';
 
+// Export controllers
+export * from './controllers/index.js';
+
+// Export routes
+export * from './routes/index.js';
+
 // Import services for routes
 import { LicenseProfileService } from './services/LicenseProfileService.js';
 import { RequiredCoursePolicyService } from './services/RequiredCoursePolicyService.js';
 import { CreditRecordService } from './services/CreditRecordService.js';
 import { CourseAssignmentService } from './services/CourseAssignmentService.js';
 
+// Import route factory
+import { createYaksaLmsRoutes } from './routes/yaksaLms.routes.js';
+
 /**
  * Routes factory compatible with Module Loader
+ *
+ * Base path for API: /api/v1/lms/yaksa/*
  *
  * @param dataSource - TypeORM DataSource from API server
  */
@@ -34,11 +45,10 @@ export function routes(dataSource?: DataSource | any): Router {
     res.json({ status: 'ok', app: 'lms-yaksa', version: '1.0.0' });
   });
 
-  // TODO Phase 2: Add API routes for each entity
-  // - /license-profiles
-  // - /required-policies
-  // - /credit-records
-  // - /course-assignments
+  // Mount Yaksa LMS routes if dataSource is provided
+  if (dataSource) {
+    router.use('/', createYaksaLmsRoutes(dataSource));
+  }
 
   return router;
 }

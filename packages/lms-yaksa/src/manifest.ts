@@ -98,8 +98,15 @@ export const lmsYaksaManifest = {
       'CreditRecordService',
       'CourseAssignmentService',
     ],
-    controllers: [],
+    controllers: [
+      'LicenseProfileController',
+      'RequiredCoursePolicyController',
+      'CreditRecordController',
+      'CourseAssignmentController',
+      'YaksaLmsAdminController',
+    ],
     routesExport: 'createRoutes',
+    routePrefix: '/lms/yaksa',
   },
 
   // ===== 프론트엔드 =====

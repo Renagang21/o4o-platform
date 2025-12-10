@@ -5,7 +5,52 @@
 
 ---
 
-## Current Phase: Phase 2 - Services Implementation (Completed)
+## Current Phase: Phase 3 - Controllers & Routes (Completed)
+
+### Phase 3 완료 항목
+
+- [x] LicenseProfileController 구현
+- [x] RequiredCoursePolicyController 구현
+- [x] CreditRecordController 구현
+- [x] CourseAssignmentController 구현
+- [x] YaksaLmsAdminController 구현
+- [x] controllers/index.ts export 구성
+- [x] yaksaLms.routes.ts 생성
+- [x] routes/index.ts export 구성
+- [x] backend/index.ts Router 등록
+- [x] manifest.ts backend.controllers 업데이트
+
+### Phase 3 결과물
+
+```
+packages/lms-yaksa/src/backend/controllers/
+├── LicenseProfileController.ts
+├── RequiredCoursePolicyController.ts
+├── CreditRecordController.ts
+├── CourseAssignmentController.ts
+├── YaksaLmsAdminController.ts
+└── index.ts
+
+packages/lms-yaksa/src/backend/routes/
+├── yaksaLms.routes.ts
+└── index.ts
+```
+
+### API Endpoints
+
+**Base Path:** `/api/v1/lms/yaksa`
+
+| Controller | Path | Endpoints |
+|------------|------|-----------|
+| LicenseProfileController | /license-profiles | GET /:userId, POST /, PATCH /:id, POST /:id/recalculate-credits, POST /:id/check-renewal, DELETE /:id |
+| RequiredCoursePolicyController | /policies/required-courses | GET /, GET /:id, POST /, PATCH /:id, POST /:id/activate, POST /:id/deactivate, POST /:id/courses/:courseId, DELETE /:id/courses/:courseId, DELETE /:id |
+| CreditRecordController | /credits | GET /:userId, GET /:userId/summary, GET /:userId/aggregate, POST /, POST /external, POST /manual-adjustment, POST /:id/verify, POST /:id/reject, GET /admin/unverified, PATCH /:id, DELETE /:id |
+| CourseAssignmentController | /course-assignments | GET /:userId, GET /:userId/statistics, POST /, POST /bulk, POST /by-policy, POST /:id/complete, POST /:id/progress, POST /:id/link-enrollment, POST /:id/cancel, PATCH /:id, DELETE /:id |
+| YaksaLmsAdminController | /admin | GET /stats, GET /license-expiring, GET /pending-required-courses, GET /overdue-assignments, POST /expire-overdue, GET /unverified-credits, GET /dashboard |
+
+---
+
+## Previous Phase: Phase 2 - Services Implementation (Completed)
 
 ### Phase 2 완료 항목
 
@@ -88,13 +133,6 @@ packages/lms-yaksa/src/backend/entities/
 ---
 
 ## Future Phases
-
-### Phase 3: API Routes
-
-- [ ] /api/lms-yaksa/license-profiles
-- [ ] /api/lms-yaksa/required-policies
-- [ ] /api/lms-yaksa/credit-records
-- [ ] /api/lms-yaksa/course-assignments
 
 ### Phase 4: Admin UI
 
