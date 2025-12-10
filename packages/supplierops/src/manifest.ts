@@ -4,28 +4,19 @@
  * AppStore 표준 manifest - 범용 공급자 운영 앱
  */
 
-export const manifest = {
-  id: 'supplierops',
-  name: 'SupplierOps',
+export const supplieropsManifest = {
+  // ===== 필수 기본 정보 =====
+  appId: 'supplierops',
+  displayName: '공급자 운영',
   version: '1.0.0',
-  type: 'extension',
+  appType: 'extension' as const,
   description:
     'Universal Supplier Operations App - Product management, Offer creation, Order relay monitoring, Settlement dashboard',
 
-  author: 'O4O Platform',
-  license: 'MIT',
-
-  /**
-   * Dependencies (Module Loader format)
-   * SupplierOps requires dropshipping-core as its foundation
-   */
-  dependsOn: ['dropshipping-core'],
-
-  /**
-   * Dependencies (detailed format for documentation)
-   */
+  // ===== 의존성 =====
   dependencies: {
     core: ['dropshipping-core'],
+    optional: [],
   },
 
   /**
@@ -54,10 +45,10 @@ export const manifest = {
    * Lifecycle Hooks
    */
   lifecycle: {
-    onInstall: './lifecycle/install.js',
-    onActivate: './lifecycle/activate.js',
-    onDeactivate: './lifecycle/deactivate.js',
-    onUninstall: './lifecycle/uninstall.js',
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
   },
 
   /**
@@ -150,11 +141,9 @@ export const manifest = {
   /**
    * Menu Configuration
    */
-  menu: {
-    label: 'SupplierOps',
-    icon: 'Factory',
-    order: 110,
-    items: [
+  menus: {
+    admin: [],
+    member: [
       { label: '대시보드', path: '/supplierops/dashboard', icon: 'Dashboard' },
       { label: '내 정보', path: '/supplierops/profile', icon: 'Person' },
       { label: '상품 관리', path: '/supplierops/products', icon: 'Inventory' },
@@ -163,6 +152,30 @@ export const manifest = {
       { label: '정산', path: '/supplierops/settlement', icon: 'AccountBalance' },
     ],
   },
+
+  /**
+   * Backend Configuration
+   */
+  backend: {
+    entities: [],
+    services: ['SupplierOpsService'],
+    controllers: ['SupplierOpsController'],
+    routesExport: 'createRoutes',
+  },
+
+  /**
+   * Exposes
+   */
+  exposes: {
+    services: ['SupplierOpsService'],
+    types: ['SupplierOpsDashboardDto', 'SupplierOpsProfileDto'],
+    events: [
+      'supplierops.product.created',
+      'supplierops.offer.created',
+      'supplierops.offer.updated',
+      'supplierops.notification.sent',
+    ],
+  },
 };
 
-export default manifest;
+export default supplieropsManifest;
