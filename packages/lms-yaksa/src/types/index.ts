@@ -2,6 +2,9 @@
  * LMS-Yaksa Types
  */
 
+// Export event types
+export * from './events.js';
+
 /**
  * 보수교육 학점
  */

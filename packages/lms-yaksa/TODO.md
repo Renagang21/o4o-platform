@@ -5,7 +5,60 @@
 
 ---
 
-## Current Phase: Phase 3 - Controllers & Routes (Completed)
+## Current Phase: Phase 4 - LMS Core Hooks Integration (Completed)
+
+### Phase 4 완료 항목
+
+- [x] hooks 디렉토리 생성
+- [x] types/events.ts 이벤트 타입 정의
+- [x] CourseCompletionHandler 구현
+- [x] CertificateIssuedHandler 구현
+- [x] EnrollmentHandler 구현
+- [x] ProgressSyncHandler 구현
+- [x] LmsCoreEventHandlers 통합 클래스 구현
+- [x] hooks/index.ts export 구성
+- [x] backend/index.ts hooks export 추가
+- [x] manifest.ts backend.hooks 섹션 추가
+- [x] manifest.ts exposes.hooks 추가
+
+### Phase 4 결과물
+
+```
+packages/lms-yaksa/src/backend/hooks/
+├── CourseCompletionHandler.ts
+├── CertificateIssuedHandler.ts
+├── EnrollmentHandler.ts
+├── ProgressSyncHandler.ts
+├── LmsCoreEventHandlers.ts
+└── index.ts
+
+packages/lms-yaksa/src/types/
+└── events.ts
+```
+
+### Event Handlers
+
+| Handler | Trigger Event | Description |
+|---------|---------------|-------------|
+| CourseCompletionHandler | lms-core.course.completed | 강좌 완료 시 평점 자동 기록, 배정 완료 처리 |
+| CertificateIssuedHandler | lms-core.certificate.issued | 이수증 발급 시 평점 연결, 배정 완료 확인 |
+| EnrollmentHandler | lms-core.enrollment.created | 수강 등록 시 배정 상태 IN_PROGRESS로 변경 |
+| ProgressSyncHandler | lms-core.enrollment.progress | 진도 업데이트 시 배정 진행률 동기화 |
+
+### Hook Integration Flow
+
+```
+lms-core Events → LmsCoreEventHandlers → Individual Handlers → Yaksa Services
+     ↓                    ↓                      ↓                    ↓
+course.completed    registerHandlers()    CourseCompletionHandler   CreditRecordService
+certificate.issued                        CertificateIssuedHandler  CourseAssignmentService
+enrollment.created                        EnrollmentHandler         LicenseProfileService
+enrollment.progress                       ProgressSyncHandler       RequiredCoursePolicyService
+```
+
+---
+
+## Previous Phase: Phase 3 - Controllers & Routes (Completed)
 
 ### Phase 3 완료 항목
 
