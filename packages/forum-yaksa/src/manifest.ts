@@ -9,31 +9,113 @@
  */
 
 export const forumYaksaManifest = {
+  // ===== 필수 기본 정보 =====
   appId: 'forum-yaksa',
-  name: 'Forum Extension – Yaksa Organization',
-  type: 'core' as const,  // Core type because it creates its own tables
+  displayName: '약사회 포럼',
   version: '1.0.0',
+  appType: 'extension' as const,
   description: '약사 조직 특화 포럼 (복약지도, 케이스 스터디, 약물 정보)',
 
-  // Core dependency
+  // ===== 의존성 =====
   dependencies: {
-    'forum-core': '>=1.0.0',
+    core: ['forum-core'],
+    optional: ['organization-core', 'membership-yaksa'],
   },
 
-  // Uninstall policy
-  uninstallPolicy: {
-    defaultMode: 'keep-data' as const,
-    allowPurge: true,
-    autoBackup: true, // Yaksa communities are important
-  },
-
-  // Extension tables (yaksa-specific)
+  // ===== 소유 테이블 =====
   ownsTables: [
     'yaksa_forum_community',
     'yaksa_forum_community_member',
   ],
 
-  // Extend forum_post CPT with pharmacy metadata
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true,
+  },
+
+  // ===== 백엔드 =====
+  backend: {
+    entities: [
+      'YaksaForumCommunity',
+      'YaksaForumCommunityMember',
+    ],
+    services: [
+      'YaksaForumService',
+    ],
+    controllers: [],
+    routesExport: 'createRoutes',
+  },
+
+  // ===== 프론트엔드 =====
+  frontend: {
+    admin: {
+      pages: [
+        { path: '/admin/forum/yaksa', component: 'ForumYaksaApp' },
+      ],
+    },
+  },
+
+  // ===== 라이프사이클 =====
+  lifecycle: {
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
+  },
+
+  // ===== 권한 정의 =====
+  permissions: [
+    {
+      id: 'forum.yaksa.view',
+      name: '약사회 포럼 조회',
+      description: '약사회 포럼 게시글 조회 권한',
+      category: 'forum-yaksa',
+    },
+    {
+      id: 'forum.yaksa.write',
+      name: '약사회 포럼 작성',
+      description: '약사회 포럼 게시글 작성 권한',
+      category: 'forum-yaksa',
+    },
+    {
+      id: 'forum.yaksa.manage',
+      name: '약사회 포럼 관리',
+      description: '약사회 포럼 관리 권한',
+      category: 'forum-yaksa',
+    },
+  ],
+
+  // ===== 메뉴 정의 =====
+  menus: {
+    admin: [
+      {
+        id: 'forum-yaksa',
+        label: '약사회 포럼',
+        icon: 'message-square',
+        order: 25,
+        parent: 'forum',
+        children: [
+          {
+            id: 'forum-yaksa-dashboard',
+            label: '대시보드',
+            path: '/admin/forum/yaksa',
+            icon: 'layout-dashboard',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ===== 외부 노출 =====
+  exposes: {
+    services: ['YaksaForumService'],
+    types: ['YaksaForumCommunity', 'YaksaForumCommunityMember'],
+    events: ['yaksa.community.created', 'yaksa.post.created'],
+  },
+
+  // ===== CPT 확장 =====
   extendsCPT: [
     {
       name: 'forum_post',
@@ -41,52 +123,22 @@ export const forumYaksaManifest = {
     },
   ],
 
-  // ACF group for pharmacy metadata
+  // ===== ACF 정의 =====
   acf: [
     {
       groupId: 'pharmacy_meta',
       label: '약물 메타데이터',
       fields: [
-        {
-          key: 'drugName',
-          type: 'string',
-          label: '약물명',
-        },
-        {
-          key: 'drugCode',
-          type: 'string',
-          label: '약물 코드 (EDI)',
-        },
-        {
-          key: 'category',
-          type: 'select',
-          label: '카테고리',
-          options: ['복약지도', '부작용', '상호작용', '조제'],
-        },
-        {
-          key: 'severity',
-          type: 'select',
-          label: '중요도',
-          options: ['일반', '주의', '경고'],
-        },
-        {
-          key: 'caseStudy',
-          type: 'boolean',
-          label: '케이스 스터디',
-        },
+        { key: 'drugName', type: 'string', label: '약물명' },
+        { key: 'drugCode', type: 'string', label: '약물 코드 (EDI)' },
+        { key: 'category', type: 'select', label: '카테고리', options: ['복약지도', '부작용', '상호작용', '조제'] },
+        { key: 'severity', type: 'select', label: '중요도', options: ['일반', '주의', '경고'] },
+        { key: 'caseStudy', type: 'boolean', label: '케이스 스터디' },
       ],
     },
   ],
 
-  // Admin UI routes
-  adminRoutes: [
-    {
-      path: '/admin/forum/yaksa',
-      component: './admin-ui/pages/ForumYaksaApp.js',
-    },
-  ],
-
-  // Default configuration
+  // ===== 기본 설정 =====
   defaultConfig: {
     categories: [
       { name: '지부 공지', slug: 'branch-announcements', color: '#1E40AF' },
@@ -97,14 +149,10 @@ export const forumYaksaManifest = {
     skin: 'yaksa',
     brandColor: '#1E40AF',
     accentColor: '#3B82F6',
-    requireApproval: true, // Yaksa-specific: require approval for posts
+    requireApproval: true,
   },
-
-  // Permissions (inherits from forum-core)
-  permissions: [],
-
-  // Menu (uses core menu with yaksa theme)
-  menu: null,
 };
 
+// Legacy export for backward compatibility
+export const manifest = forumYaksaManifest;
 export default forumYaksaManifest;

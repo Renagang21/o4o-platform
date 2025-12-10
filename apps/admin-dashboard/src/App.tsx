@@ -112,11 +112,6 @@ const YaksaCommunityList = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui
 const YaksaCommunityDetail = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
 const YaksaCommunityFeed = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
 
-// Cosmetics Forum Pages (from @o4o-apps/forum-cosmetics package - source imports)
-const CosmeticsForumDashboard = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumDashboard'));
-const CosmeticsForumPostList = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumPostList'));
-const CosmeticsForumStats = lazy(() => import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/CosmeticsForumStats'));
-
 // Groupbuy Pages
 const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
 const GroupbuyCampaignDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignDetailPage'));
@@ -1065,35 +1060,6 @@ function App() {
                         <AppRouteGuard appId="forum-yaksa">
                           <Suspense fallback={<PageLoader />}>
                             <YaksaCommunityFeed />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-
-                    {/* Cosmetics Forum - App-based routes with AppRouteGuard */}
-                    <Route path="/cosmetics/forum" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-cosmetics">
-                          <Suspense fallback={<PageLoader />}>
-                            <CosmeticsForumDashboard />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/cosmetics/forum/posts" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-cosmetics">
-                          <Suspense fallback={<PageLoader />}>
-                            <CosmeticsForumPostList />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/cosmetics/forum/stats" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppRouteGuard appId="forum-cosmetics">
-                          <Suspense fallback={<PageLoader />}>
-                            <CosmeticsForumStats />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

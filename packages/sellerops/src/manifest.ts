@@ -1,31 +1,21 @@
 /**
  * SellerOps Manifest
  *
- * AppStore 표준 manifest - 범용 판매자 운영 앱
+ * 범용 판매자 운영 앱 - Dropshipping Core Extension
  */
 
-export const manifest = {
-  id: 'sellerops',
-  name: 'SellerOps',
+export const selleropsManifest = {
+  // ===== 필수 기본 정보 =====
+  appId: 'sellerops',
+  displayName: '판매자 운영',
   version: '1.0.0',
-  type: 'extension',
-  description:
-    'Universal Seller Operations App - Supplier approval, Offer selection, Listing management, Order tracking, Settlement dashboard',
+  appType: 'extension' as const,
+  description: '범용 판매자 운영 앱 - 공급자 승인, Offer 선택, 리스팅 관리, 주문 추적, 정산',
 
-  author: 'O4O Platform',
-  license: 'MIT',
-
-  /**
-   * Dependencies (Module Loader format)
-   * SellerOps requires dropshipping-core as its foundation
-   */
-  dependsOn: ['dropshipping-core'],
-
-  /**
-   * Dependencies (detailed format for documentation)
-   */
+  // ===== 의존성 =====
   dependencies: {
     core: ['dropshipping-core'],
+    optional: [],
   },
 
   /**
@@ -55,10 +45,10 @@ export const manifest = {
    * Lifecycle Hooks
    */
   lifecycle: {
-    onInstall: './lifecycle/install.js',
-    onActivate: './lifecycle/activate.js',
-    onDeactivate: './lifecycle/deactivate.js',
-    onUninstall: './lifecycle/uninstall.js',
+    install: './lifecycle/install.js',
+    activate: './lifecycle/activate.js',
+    deactivate: './lifecycle/deactivate.js',
+    uninstall: './lifecycle/uninstall.js',
   },
 
   /**
@@ -153,11 +143,9 @@ export const manifest = {
   /**
    * Menu Configuration
    */
-  menu: {
-    label: 'SellerOps',
-    icon: 'Store',
-    order: 100,
-    items: [
+  menus: {
+    admin: [],
+    member: [
       { label: '대시보드', path: '/sellerops/dashboard', icon: 'Dashboard' },
       { label: '내 정보', path: '/sellerops/profile', icon: 'Person' },
       { label: '공급자 관리', path: '/sellerops/suppliers', icon: 'Inventory' },
@@ -167,6 +155,30 @@ export const manifest = {
       { label: '공지사항', path: '/sellerops/notice', icon: 'Announcement' },
     ],
   },
+
+  /**
+   * Backend Configuration
+   */
+  backend: {
+    entities: [],
+    services: ['SellerOpsService'],
+    controllers: ['SellerOpsController'],
+    routesExport: 'createRoutes',
+  },
+
+  /**
+   * Exposes
+   */
+  exposes: {
+    services: ['SellerOpsService'],
+    types: ['SellerOpsDashboardDto', 'SellerOpsProfileDto'],
+    events: [
+      'sellerops.supplier.requested',
+      'sellerops.listing.created',
+      'sellerops.listing.activated',
+      'sellerops.notification.sent',
+    ],
+  },
 };
 
-export default manifest;
+export default selleropsManifest;

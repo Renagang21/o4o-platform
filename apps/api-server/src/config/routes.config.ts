@@ -161,9 +161,6 @@ import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 // Phase PD-9 - Multichannel RPA Routes
 import channelsRoutes from '../routes/v1/channels.routes.js';
 
-// Neture Forum Routes
-import netureForumRoutes from '../routes/neture/forum.routes.js';
-
 // Generic Forum Routes (forum-core)
 import forumRoutes from '../routes/forum/forum.routes.js';
 
@@ -475,9 +472,6 @@ export function setupRoutes(app: Application): void {
 
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);
-
-  // Neture Forum Routes
-  app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
 
   // ✅ NEW: Generic Forum Routes (forum-core)
   // Provides: Posts CRUD, Categories CRUD, Comments, Stats, Moderation

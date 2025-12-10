@@ -1,15 +1,17 @@
 /**
  * LMS-Core
  *
- * Learning Management System core functionality
+ * Learning Management System 핵심 엔진 (Core Domain)
  *
  * @package @o4o/lms-core
- * @version 0.1.0
+ * @version 1.0.0
  */
 
+import { Router } from 'express';
+import type { DataSource } from 'typeorm';
+
 // Manifest
-export { manifest } from './manifest.js';
-export { manifest as default } from './manifest.js';
+export { lmsCoreManifest, manifest, default as manifestDefault } from './manifest.js';
 
 // Backend entities and utils (imported directly by API server from src/)
 export * from './entities/index.js';
@@ -20,3 +22,22 @@ import * as Entities from './entities/index.js';
 export const entities = Object.values(Entities).filter(
   (item) => typeof item === 'function' && item.prototype
 );
+
+/**
+ * Routes factory compatible with Module Loader
+ *
+ * @param dataSource - TypeORM DataSource from API server
+ */
+export function routes(dataSource?: DataSource | any): Router {
+  const router = Router();
+
+  // TODO: Implement actual routes using controllers
+  router.get('/health', (req, res) => {
+    res.json({ status: 'ok', app: 'lms-core' });
+  });
+
+  return router;
+}
+
+// Alias for manifest compatibility
+export const createRoutes = routes;

@@ -5,18 +5,19 @@
  * Manages partners, affiliate links, conversions, and commissions
  */
 
-export const manifest = {
-  // Basic Info
+export const partneropsManifest = {
+  // ===== 필수 기본 정보 =====
   appId: 'partnerops',
-  name: 'PartnerOps',
+  displayName: '파트너 운영',
   version: '1.0.0',
+  appType: 'extension' as const,
   description: '파트너 운영 앱 - 파트너 관리, 링크 추적, 전환 분석, 커미션 정산',
 
-  // App Type
-  type: 'extension' as const,
-
-  // Dependencies - requires dropshipping-core
-  dependsOn: ['dropshipping-core'],
+  // ===== 의존성 =====
+  dependencies: {
+    core: ['dropshipping-core'],
+    optional: [],
+  },
 
   // Permissions
   permissions: [
@@ -81,13 +82,20 @@ export const manifest = {
     { method: 'GET', path: '/partnerops/settlement/transactions', handler: 'SettlementController.getTransactions' },
   ],
 
-  // Admin Menu Configuration
-  menu: {
-    label: '파트너 관리',
-    icon: 'Users',
-    path: '/partnerops',
-    requiredPermission: 'partnerops.read',
-    children: [
+  // Lifecycle Hooks
+  lifecycle: {
+    install: './lifecycle/install',
+    activate: './lifecycle/activate',
+    deactivate: './lifecycle/deactivate',
+    uninstall: './lifecycle/uninstall',
+  },
+
+  /**
+   * Menu Configuration (표준 형식)
+   */
+  menus: {
+    admin: [],
+    member: [
       { label: '대시보드', path: '/partnerops/dashboard', icon: 'LayoutDashboard' },
       { label: '내 프로필', path: '/partnerops/profile', icon: 'User' },
       { label: '콘텐츠 관리', path: '/partnerops/routines', icon: 'FileText' },
@@ -97,13 +105,57 @@ export const manifest = {
     ],
   },
 
-  // Lifecycle Hooks
-  lifecycle: {
-    onInstall: './lifecycle/install',
-    onActivate: './lifecycle/activate',
-    onDeactivate: './lifecycle/deactivate',
-    onUninstall: './lifecycle/uninstall',
+  /**
+   * Backend Configuration
+   */
+  backend: {
+    entities: [],
+    services: [
+      'DashboardService',
+      'ProfileService',
+      'RoutinesService',
+      'LinksService',
+      'ConversionsService',
+      'SettlementService',
+    ],
+    controllers: [
+      'DashboardController',
+      'ProfileController',
+      'RoutinesController',
+      'LinksController',
+      'ConversionsController',
+      'SettlementController',
+    ],
+    routesExport: 'createRoutes',
+  },
+
+  /**
+   * Exposes
+   */
+  exposes: {
+    services: [
+      'DashboardService',
+      'ProfileService',
+      'RoutinesService',
+      'LinksService',
+      'ConversionsService',
+      'SettlementService',
+    ],
+    types: [
+      'PartnerProfileDto',
+      'PartnerRoutineDto',
+      'PartnerLinkDto',
+      'ConversionDto',
+    ],
+    events: [
+      'partner.registered',
+      'partner.approved',
+      'partner.link.created',
+      'partner.link.clicked',
+      'partner.conversion.recorded',
+      'partner.routine.created',
+    ],
   },
 };
 
-export default manifest;
+export default partneropsManifest;

@@ -17,7 +17,6 @@ const AVAILABLE_APPS = [
   { id: 'customer', name: 'Customer Portal', description: 'Customer dashboard' },
   { id: 'admin', name: 'Admin Dashboard', description: 'Administration interface' },
   { id: 'forum-yaksa', name: 'Yaksa Forum', description: 'Community forum' },
-  { id: 'forum-cosmetics', name: 'Cosmetics Forum', description: 'Cosmetics community' },
   { id: 'signage', name: 'Digital Signage', description: 'Signage system' },
 ];
 

@@ -1,7 +1,7 @@
 # Architecture & Design Index
 
-> Auto-generated: 2025-12-09
-> Total: 22 documents
+> 최종 업데이트: 2025-12-10
+> 총 문서: 27개 (Phase 11-B 업데이트)
 
 ---
 
@@ -12,7 +12,7 @@
 | [admin](./admin/) | 1 | Admin UI design |
 | [api-server](./api-server/) | 1 | API server structure |
 | [appstore](./appstore/) | 2 | AppStore system |
-| [architecture](./architecture/) | 3 | Core architecture |
+| [architecture](./architecture/) | 8 | Core architecture **(+5 NEW)** |
 | [auth](./auth/) | 1 | Authentication design |
 | [blocks](./blocks/) | 2 | Block system |
 | [frontend](./frontend/) | 6 | Frontend architecture |
@@ -30,10 +30,19 @@
 - [manifest-schema-v1.md](./appstore/manifest-schema-v1.md) - Manifest schema v1
 - [registry-schema.md](./appstore/registry-schema.md) - Registry schema
 
-## Architecture (3 docs)
+## Architecture (8 docs)
+
+### Core Architecture (NEW)
+- [cms-overview.md](./architecture/cms-overview.md) - CMS 2.0 overview **(NEW)**
+- [appstore-overview.md](./architecture/appstore-overview.md) - AppStore overview **(NEW)**
+- [module-loader-spec.md](./architecture/module-loader-spec.md) - Module Loader spec **(NEW)**
+- [extension-lifecycle.md](./architecture/extension-lifecycle.md) - Extension lifecycle **(NEW)**
+- [view-system.md](./architecture/view-system.md) - View System **(NEW)**
+
+### Reference
 - [api-server-requirements.md](./architecture/api-server-requirements.md) - API server requirements
 - [editor-data-storage.md](./architecture/editor-data-storage.md) - Editor data storage
-- [page-management.md](./architecture/page-management.md) - Page management
+- [page-management.md](./architecture/page-management.md) - Page management **(ARCHIVED)**
 
 ## Auth (1 doc)
 - [schema-design.md](./auth/schema-design.md) - Auth schema design
@@ -62,4 +71,4 @@
 
 ---
 
-*Last Updated: 2025-12-09*
+*최종 업데이트: 2025-12-10*

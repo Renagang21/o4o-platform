@@ -1,6 +1,18 @@
-# 📄 **[CMS 호환성 조사 요청서 — forum-core 전용]**
+# [ARCHIVED] CMS 호환성 조사 요청서 — forum-core
 
-### 문서 버전: v1.0
+> **⚠️ ARCHIVED (2025-12-10)**
+>
+> 이 문서는 forum-core의 CMS 1.x 호환성 감사 요청서입니다.
+> 감사가 완료되었으며, 결과는 **forum-overview.md**에 반영되었습니다.
+>
+> 아카이브 사본: `docs/archive/forum/cms-compatibility-audit.md`
+>
+> 최신 forum 문서:
+> - [forum-overview.md](./forum-overview.md)
+
+---
+
+### 문서 버전: v1.0 (ARCHIVED)
 
 ### 요청자: Rena
 
