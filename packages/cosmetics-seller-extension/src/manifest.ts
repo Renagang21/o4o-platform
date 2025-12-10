@@ -11,6 +11,7 @@
 
 export const cosmeticsSellerExtensionManifest = {
   // ===== 필수 기본 정보 =====
+  id: 'cosmetics-seller-extension',  // ModuleLoader compatibility
   appId: 'cosmetics-seller-extension',
   displayName: '화장품 판매원 관리',
   version: '1.0.0',
