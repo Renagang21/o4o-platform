@@ -342,7 +342,7 @@ export class AuthenticationService {
       roles: [UserRole.USER],
       status: UserStatus.ACTIVE,
       isEmailVerified: profile.emailVerified || false,
-      provider: 
+      provider: provider,
       provider_id: profile.id,
       permissions: []
     });
@@ -353,7 +353,7 @@ export class AuthenticationService {
     const linkedAccount = this.linkedAccountRepository.create({
       userId: newUser.id,
       user: newUser,
-      
+      provider: provider,
       providerId: profile.id,
       email: profile.email,
       displayName: profile.displayName,
