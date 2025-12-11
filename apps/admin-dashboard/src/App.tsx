@@ -92,6 +92,9 @@ const SiteThemeSettings = lazy(() => import('@/pages/appearance/SiteThemeSetting
 const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
+
+// Service Monitoring (Phase 9 Task 3)
+const ServiceOverview = lazy(() => import('@/pages/services/ServiceOverview'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
 
 
@@ -1302,6 +1305,22 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <OperationsDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Phase 9 Task 3 - Service Monitoring Dashboard */}
+                    <Route path="/admin/services/overview" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ServiceOverview />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/services" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ServiceOverview />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
