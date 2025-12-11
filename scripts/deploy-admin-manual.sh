@@ -20,13 +20,19 @@ if [ ! -f "apps/admin-dashboard/package.json" ]; then
   exit 1
 fi
 
-# Check git status
+# Check git status (skip interactive prompt in non-interactive mode)
 if [ -n "$(git status --porcelain)" ]; then
   echo "⚠️  Warning: You have uncommitted changes"
-  read -p "Continue anyway? (y/N) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
+  if [ -t 0 ]; then
+    # Interactive mode - ask user
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 1
+    fi
+  else
+    # Non-interactive mode - continue with warning
+    echo "ℹ️  Non-interactive mode: continuing despite uncommitted changes"
   fi
 fi
 
@@ -37,8 +43,6 @@ pnpm run build:packages 2>&1 | grep -E "(✅|❌|Error|error|warning)" || true
 # Build admin dashboard
 echo "🔨 Building admin dashboard..."
 cd apps/admin-dashboard
-NODE_ENV=production \
-NODE_OPTIONS='--max-old-space-size=4096' \
 VITE_API_URL=https://api.neture.co.kr/api \
 VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
 pnpm run build:prod 2>&1 | tail -20
