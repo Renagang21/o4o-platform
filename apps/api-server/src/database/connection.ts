@@ -61,8 +61,7 @@ import { Taxonomy, Term, TermRelationship } from '../entities/Taxonomy.js';
 import { Menu } from '../entities/Menu.js';
 import { MenuItem } from '../entities/MenuItem.js';
 import { MenuLocation } from '../entities/MenuLocation.js';
-// AI Settings entity
-import { AISetting } from '../entities/AISetting.js';
+// AI Settings entity (unified - AISetting removed)
 import { AiSettings } from '../entities/AiSettings.js';
 import { AIUsageLog } from '../entities/AIUsageLog.js';
 // App System entities
@@ -277,8 +276,7 @@ export const AppDataSource = new DataSource({
     Menu,
     MenuItem,
     MenuLocation,
-    // AI Settings
-    AISetting,
+    // AI Settings (unified)
     AiSettings,
     AIUsageLog,
     // App System entities
