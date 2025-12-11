@@ -330,6 +330,7 @@ import healthRoutes from './routes/health.js';
 import forumRoutes from './routes/forum/forum.routes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import adminAppsRoutes from './routes/admin/apps.routes.js';
+import serviceMonitorRoutes from './routes/service-monitor.routes.js';
 
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
@@ -342,6 +343,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/v1/forum', forumRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/admin/apps', adminAppsRoutes);
+app.use('/api/v1/service/monitor', serviceMonitorRoutes);
 
 logger.info('✅ Core API routes registered');
 
