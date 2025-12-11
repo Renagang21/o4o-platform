@@ -14,6 +14,8 @@ import type {
   ViewEntry,
   ViewRegistrationOptions,
   ViewSystemStats,
+  ViewQueryContext,
+  ServiceGroup,
 } from './types.js';
 
 /**
@@ -107,6 +109,144 @@ export class ViewRegistry {
     return Array.from(this.views.values()).filter(
       (entry) => entry.options.type === type
     );
+  }
+
+  /**
+   * Service Group별 View 목록 조회 (Phase 6)
+   *
+   * @param serviceGroup - Service Group
+   * @returns 해당 Service Group에 속한 View 배열
+   */
+  getViewsByServiceGroup(serviceGroup: ServiceGroup): ViewEntry[] {
+    return Array.from(this.views.values()).filter((entry) => {
+      const viewServiceGroups = entry.options.serviceGroups;
+      // global이거나 serviceGroups가 없으면 모든 서비스에서 사용 가능
+      if (!viewServiceGroups || viewServiceGroups.length === 0) {
+        return true;
+      }
+      return viewServiceGroups.includes(serviceGroup) || viewServiceGroups.includes('global');
+    });
+  }
+
+  /**
+   * Tenant별 View 목록 조회 (Phase 6)
+   *
+   * @param tenantId - Tenant ID
+   * @returns 해당 Tenant에서 사용 가능한 View 배열
+   */
+  getViewsByTenant(tenantId: string): ViewEntry[] {
+    return Array.from(this.views.values()).filter((entry) => {
+      const allowedTenants = entry.options.allowedTenants;
+      // allowedTenants가 없으면 모든 테넌트에서 사용 가능
+      if (!allowedTenants || allowedTenants.length === 0) {
+        return true;
+      }
+      return allowedTenants.includes(tenantId);
+    });
+  }
+
+  /**
+   * Context 기반 View 조회 (Phase 6)
+   * ServiceGroup, Tenant, Permission을 모두 고려하여 적합한 View를 찾음
+   *
+   * @param viewId - View ID (패턴 매칭 지원: 'forum.post.*')
+   * @param context - Query Context
+   * @returns 조건에 맞는 View 또는 undefined
+   */
+  getViewByContext(viewId: string, context: ViewQueryContext): ViewEntry | undefined {
+    // 먼저 정확한 ID로 찾기
+    const exactMatch = this.views.get(viewId);
+    if (exactMatch && this.matchesContext(exactMatch, context)) {
+      return exactMatch;
+    }
+
+    // 패턴 매칭 (viewId가 'forum.post.*' 형태인 경우)
+    if (viewId.includes('*')) {
+      const pattern = new RegExp('^' + viewId.replace(/\*/g, '.*') + '$');
+      const candidates = Array.from(this.views.values())
+        .filter((entry) => pattern.test(entry.viewId) && this.matchesContext(entry, context))
+        .sort((a, b) => (b.options.priority || 0) - (a.options.priority || 0));
+      return candidates[0];
+    }
+
+    return undefined;
+  }
+
+  /**
+   * CPT와 Context 기반으로 가장 적합한 View 찾기 (Phase 6)
+   *
+   * @param cptName - CPT 이름
+   * @param type - View 타입
+   * @param context - Query Context
+   * @returns 가장 적합한 View 또는 undefined
+   */
+  resolveView(
+    cptName: string,
+    type: ViewRegistrationOptions['type'],
+    context: ViewQueryContext
+  ): ViewEntry | undefined {
+    const candidates = Array.from(this.views.values())
+      .filter((entry) =>
+        entry.options.cptName === cptName &&
+        entry.options.type === type &&
+        this.matchesContext(entry, context)
+      )
+      .sort((a, b) => (b.options.priority || 0) - (a.options.priority || 0));
+
+    return candidates[0];
+  }
+
+  /**
+   * View가 주어진 Context에 맞는지 확인 (Phase 6)
+   *
+   * @param entry - View Entry
+   * @param context - Query Context
+   * @returns 매칭 여부
+   */
+  private matchesContext(entry: ViewEntry, context: ViewQueryContext): boolean {
+    const { options } = entry;
+
+    // Service Group 체크
+    if (context.serviceGroup && options.serviceGroups && options.serviceGroups.length > 0) {
+      if (!options.serviceGroups.includes(context.serviceGroup) && !options.serviceGroups.includes('global')) {
+        return false;
+      }
+    }
+
+    // Tenant 체크
+    if (context.tenantId && options.allowedTenants && options.allowedTenants.length > 0) {
+      if (!options.allowedTenants.includes(context.tenantId)) {
+        return false;
+      }
+    }
+
+    // Permission 체크
+    if (options.permissions && options.permissions.length > 0) {
+      if (!context.permissions || !options.permissions.some(p => context.permissions!.includes(p))) {
+        return false;
+      }
+    }
+
+    // Custom condition 체크
+    if (options.condition) {
+      if (!options.condition(context)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Context에 맞는 모든 View 목록 조회 (Phase 6)
+   *
+   * @param context - Query Context
+   * @returns 조건에 맞는 모든 View 배열
+   */
+  getViewsByContext(context: ViewQueryContext): ViewEntry[] {
+    return Array.from(this.views.values())
+      .filter((entry) => this.matchesContext(entry, context))
+      .sort((a, b) => (b.options.priority || 0) - (a.options.priority || 0));
   }
 
   /**

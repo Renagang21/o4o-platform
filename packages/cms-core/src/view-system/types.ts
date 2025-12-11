@@ -2,9 +2,36 @@
  * View System Types
  *
  * View System의 핵심 타입 정의
+ * Phase 6: Multi-Tenancy & Service Group Support
  */
 
 import type { ComponentType } from 'react';
+
+/**
+ * Service Group 타입 (Phase 6)
+ */
+export type ServiceGroup =
+  | 'cosmetics'    // 화장품 서비스
+  | 'yaksa'        // 약사회 서비스
+  | 'tourist'      // 관광객 서비스
+  | 'sellerops'    // 판매자 운영
+  | 'supplierops'  // 공급자 운영
+  | 'global';      // 모든 서비스 공통
+
+/**
+ * View Query Context (Phase 6)
+ * View 조회 시 사용되는 필터링 컨텍스트
+ */
+export interface ViewQueryContext {
+  /** 현재 서비스 그룹 */
+  serviceGroup?: ServiceGroup;
+  /** 현재 테넌트 ID */
+  tenantId?: string;
+  /** 사용자 권한 */
+  permissions?: string[];
+  /** 사용자 역할 */
+  roles?: string[];
+}
 
 /**
  * View 컴포넌트 타입
@@ -39,6 +66,14 @@ export interface ViewRegistrationOptions {
   title?: string;
   /** View 설명 */
   description?: string;
+  /** Service Group 제한 (Phase 6) */
+  serviceGroups?: ServiceGroup[];
+  /** 허용된 테넌트 목록 (Phase 6) */
+  allowedTenants?: string[];
+  /** 우선순위 (높을수록 먼저 선택됨, Phase 6) */
+  priority?: number;
+  /** 조건 함수 - 동적으로 View 선택 여부 결정 (Phase 6) */
+  condition?: (context: ViewQueryContext) => boolean;
 }
 
 /**
@@ -106,4 +141,31 @@ export interface ViewSystemStats {
   viewsByType: Record<string, number>;
   totalNavItems: number;
   totalRoutes: number;
+}
+
+/**
+ * Theme Token Context for Views (Phase 6)
+ * Views can access theme tokens for styling
+ */
+export interface ViewThemeContext {
+  /** Theme identifier */
+  themeId?: string;
+  /** Color mode */
+  colorMode?: 'light' | 'dark' | 'system';
+  /** Custom token overrides */
+  tokenOverrides?: Record<string, string>;
+  /** Whether to apply token CSS variables */
+  injectTokens?: boolean;
+}
+
+/**
+ * Extended View Props with Theme Context (Phase 6)
+ */
+export interface ViewPropsWithTheme extends ViewProps {
+  /** Theme context for styling */
+  theme?: ViewThemeContext;
+  /** Service group context */
+  serviceGroup?: ServiceGroup;
+  /** Tenant context */
+  tenantId?: string;
 }

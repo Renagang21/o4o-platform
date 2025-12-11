@@ -10,6 +10,7 @@ import { glob } from 'glob';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import logger from '../utils/logger.js';
+import { requireServiceGroup, requireTenantMatch, type ServiceGroup } from '../middleware/tenant-context.middleware.js';
 import type {
   AppModule,
   ModuleLoaderConfig,
@@ -230,7 +231,12 @@ export class ModuleLoader {
     // Run activate lifecycle hook
     if (module.lifecycle?.activate) {
       try {
-        await module.lifecycle.activate();
+        // Pass context with appId to lifecycle hook
+        const activateContext = {
+          appId: moduleId,
+          manifest: module,
+        };
+        await module.lifecycle.activate(activateContext);
         logger.debug(`[ModuleLoader] Ran activate hook for ${moduleId}`);
       } catch (activateError) {
         logger.error(`[ModuleLoader] Activate hook failed for ${moduleId}:`, activateError);
@@ -265,7 +271,11 @@ export class ModuleLoader {
     // Run deactivate lifecycle hook
     if (module.lifecycle?.deactivate) {
       try {
-        await module.lifecycle.deactivate();
+        // Pass context with appId to lifecycle hook
+        const deactivateContext = {
+          appId: moduleId,
+        };
+        await module.lifecycle.deactivate(deactivateContext);
         logger.debug(`[ModuleLoader] Ran deactivate hook for ${moduleId}`);
       } catch (deactivateError) {
         logger.error(`[ModuleLoader] Deactivate hook failed for ${moduleId}:`, deactivateError);
@@ -280,13 +290,21 @@ export class ModuleLoader {
   }
 
   /**
-   * Get module router
+   * Get module router with optional service group protection
    *
    * @param moduleId - Module ID
    * @param dataSource - Optional TypeORM DataSource for route factories
+   * @param options - Additional options for route wrapping
    * @returns Express Router or null
    */
-  getModuleRouter(moduleId: string, dataSource?: any): Router | null {
+  getModuleRouter(
+    moduleId: string,
+    dataSource?: any,
+    options?: {
+      applyServiceGroupProtection?: boolean;
+      applyTenantProtection?: boolean;
+    }
+  ): Router | null {
     const entry = this.registry.get(moduleId);
 
     if (!entry || entry.status !== 'active') {
@@ -300,13 +318,78 @@ export class ModuleLoader {
         // Support both patterns:
         // 1. routes() => Router (simple function)
         // 2. routes(dataSource) => Router (factory pattern)
+        let router: Router;
         if (dataSource) {
-          return module.backend.routes(dataSource);
+          router = module.backend.routes(dataSource);
         } else {
-          return module.backend.routes();
+          router = module.backend.routes();
         }
+
+        // Apply service group protection if configured (Phase 6)
+        if (options?.applyServiceGroupProtection && module.serviceGroup) {
+          const wrapperRouter = Router();
+          wrapperRouter.use(requireServiceGroup(module.serviceGroup, 'global'));
+          wrapperRouter.use(router);
+          logger.debug(`[ModuleLoader] Applied service group protection (${module.serviceGroup}) to ${moduleId}`);
+          return wrapperRouter;
+        }
+
+        // Apply tenant protection if configured (Phase 6)
+        if (options?.applyTenantProtection && module.allowedTenants && module.allowedTenants.length > 0) {
+          const wrapperRouter = Router();
+          wrapperRouter.use(requireTenantMatch(...module.allowedTenants));
+          wrapperRouter.use(router);
+          logger.debug(`[ModuleLoader] Applied tenant protection to ${moduleId}`);
+          return wrapperRouter;
+        }
+
+        return router;
       } catch (error) {
         logger.error(`[ModuleLoader] Failed to get router for ${moduleId}:`, error);
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get module router with service group protection
+   * Convenience method for applying service group-based route protection
+   *
+   * @param moduleId - Module ID
+   * @param serviceGroup - Service group to restrict to
+   * @param dataSource - Optional TypeORM DataSource for route factories
+   * @returns Express Router with protection middleware or null
+   */
+  getProtectedModuleRouter(
+    moduleId: string,
+    serviceGroup: ServiceGroup,
+    dataSource?: any
+  ): Router | null {
+    const entry = this.registry.get(moduleId);
+
+    if (!entry || entry.status !== 'active') {
+      return null;
+    }
+
+    const { module } = entry;
+
+    if (module.backend?.routes) {
+      try {
+        const baseRouter = dataSource
+          ? module.backend.routes(dataSource)
+          : module.backend.routes();
+
+        // Wrap with service group protection
+        const protectedRouter = Router();
+        protectedRouter.use(requireServiceGroup(serviceGroup, 'global'));
+        protectedRouter.use(baseRouter);
+
+        logger.debug(`[ModuleLoader] Created protected router for ${moduleId} (service: ${serviceGroup})`);
+        return protectedRouter;
+      } catch (error) {
+        logger.error(`[ModuleLoader] Failed to create protected router for ${moduleId}:`, error);
         return null;
       }
     }

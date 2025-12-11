@@ -1,9 +1,23 @@
 /**
  * Module Loader Type Definitions
  * Phase 5 — AppStore + Module Loader
+ * Phase 6 — Multi-Tenancy & Service Group Support
  */
 
 import { Router } from 'express';
+import type { ServiceGroup } from '../middleware/tenant-context.middleware.js';
+
+/**
+ * Lifecycle Context passed to lifecycle hooks
+ */
+export interface LifecycleContext {
+  /** App identifier */
+  appId: string;
+  /** Full manifest (optional) */
+  manifest?: AppModule;
+  /** Additional context data */
+  [key: string]: any;
+}
 
 /**
  * App Module Interface
@@ -47,16 +61,16 @@ export interface AppModule {
   /** Lifecycle hooks */
   lifecycle?: {
     /** Called when app is first installed */
-    install?: () => Promise<void>;
+    install?: (context?: LifecycleContext) => Promise<void>;
 
     /** Called when app is activated */
-    activate?: () => Promise<void>;
+    activate?: (context?: LifecycleContext) => Promise<void>;
 
     /** Called when app is deactivated */
-    deactivate?: () => Promise<void>;
+    deactivate?: (context?: LifecycleContext) => Promise<void>;
 
     /** Called when app is uninstalled */
-    uninstall?: () => Promise<void>;
+    uninstall?: (context?: LifecycleContext) => Promise<void>;
   };
 
   /** Absolute path to package directory */
@@ -64,6 +78,12 @@ export interface AppModule {
 
   /** Whether the module is currently active */
   isActive?: boolean;
+
+  /** Service group this module belongs to (Phase 6) */
+  serviceGroup?: ServiceGroup;
+
+  /** Allowed tenants for this module (Phase 6) */
+  allowedTenants?: string[];
 }
 
 /**

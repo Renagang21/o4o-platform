@@ -33,6 +33,7 @@ import logger from './utils/logger.js';
 // Middleware
 import { performanceMonitor } from './middleware/performanceMonitor.js';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware.js';
+import { tenantContextEnhanced } from './middleware/tenant-context.middleware.js';
 
 // Services
 import { startupService } from './services/startup.service.js';
@@ -46,6 +47,9 @@ import { setupSwagger } from './config/swagger-enhanced.js';
 // Module Loader (Phase 5 — AppStore + Module Loader)
 import { moduleLoader } from './modules/module-loader.js';
 import { AppDataSource } from './database/connection.js';
+
+// AppStore Routes
+import appstoreRoutes from './routes/appstore.routes.js';
 
 const app: Application = express();
 
@@ -236,6 +240,10 @@ app.use(performanceMonitor as any);
 app.use(securityMiddleware as any);
 app.use(sqlInjectionDetection as any);
 
+// Tenant context middleware (Phase 6 - Multi-Tenancy)
+// Extracts tenant ID from headers/subdomain and service group
+app.use(tenantContextEnhanced);
+
 // Body parsing
 app.use(cookieParser() as any);
 app.use(express.json({ limit: '50mb' }));
@@ -392,11 +400,15 @@ const startServer = async () => {
     logger.info(`✅ Registered ${routesRegistered.length} dynamic routes:`);
     routesRegistered.forEach(route => logger.info(`   - ${route}`));
 
-    // 4. Core routes now registered via dynamic module loader
+    // 4. Register AppStore routes for app lifecycle management
+    app.use('/api/v1/appstore', appstoreRoutes);
+    logger.info('✅ AppStore routes registered at /api/v1/appstore');
+
+    // 5. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
     logger.info('✅ Routes registered via module loader');
 
-    // 5. Get all entities from modules (for future TypeORM integration)
+    // 6. Get all entities from modules (for future TypeORM integration)
     const moduleEntities = moduleLoader.getAllEntities();
     if (moduleEntities.length > 0) {
       logger.info(`📊 Collected ${moduleEntities.length} entities from modules`);

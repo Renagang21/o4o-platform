@@ -7,9 +7,33 @@
  * - Navigation 아이템 등록
  * - 계층적 메뉴 트리 구성
  * - 권한 기반 필터링
+ * - Phase 6: ServiceGroup/Tenant/Role 기반 필터링 및 캐싱
  */
 
-import type { NavigationItem } from './types.js';
+import type { NavigationItem, ServiceGroup, ViewQueryContext } from './types.js';
+
+/**
+ * Extended Navigation Item with Phase 6 fields
+ */
+export interface NavigationItemExtended extends NavigationItem {
+  /** Service Group 제한 (Phase 6) */
+  serviceGroups?: ServiceGroup[];
+  /** 허용된 테넌트 목록 (Phase 6) */
+  allowedTenants?: string[];
+  /** 필요한 역할 (Phase 6) */
+  roles?: string[];
+  /** 필요한 권한 (capabilities) */
+  capabilities?: string[];
+}
+
+/**
+ * Navigation Cache Entry
+ */
+interface NavigationCacheEntry {
+  tree: NavigationItemExtended[];
+  cachedAt: number;
+  cacheKey: string;
+}
 
 /**
  * Navigation Registry 클래스
@@ -17,20 +41,42 @@ import type { NavigationItem } from './types.js';
  * 모든 앱의 Navigation 정보를 중앙에서 관리
  */
 export class NavigationRegistry {
-  private items = new Map<string, NavigationItem>();
+  private items = new Map<string, NavigationItemExtended>();
+  private cache = new Map<string, NavigationCacheEntry>();
+  private cacheMaxAge = 5 * 60 * 1000; // 5분 캐시
 
   /**
    * Navigation 아이템 등록
    *
    * @param item - Navigation 아이템
    */
-  registerNav(item: NavigationItem): void {
+  registerNav(item: NavigationItem | NavigationItemExtended): void {
     if (this.items.has(item.id)) {
       console.warn(`[NavigationRegistry] Nav item "${item.id}" already registered. Replacing.`);
     }
 
-    this.items.set(item.id, item);
+    this.items.set(item.id, item as NavigationItemExtended);
+    this.invalidateCache(); // 등록 시 캐시 무효화
     console.log(`[NavigationRegistry] Registered nav: ${item.id} (app: ${item.appId})`);
+  }
+
+  /**
+   * 캐시 무효화 (Phase 6)
+   */
+  private invalidateCache(): void {
+    this.cache.clear();
+  }
+
+  /**
+   * 캐시 키 생성 (Phase 6)
+   */
+  private generateCacheKey(context: ViewQueryContext): string {
+    return JSON.stringify({
+      sg: context.serviceGroup || '',
+      t: context.tenantId || '',
+      p: (context.permissions || []).sort().join(','),
+      r: (context.roles || []).sort().join(','),
+    });
   }
 
   /**
@@ -138,6 +184,119 @@ export class NavigationRegistry {
     };
 
     return filterTree(this.getNavTree());
+  }
+
+  /**
+   * Context 기반 Navigation 필터링 (Phase 6)
+   * ServiceGroup, Tenant, Role, Permission을 모두 고려
+   *
+   * @param context - Query Context
+   * @returns 접근 가능한 Navigation 트리
+   */
+  getNavTreeByContext(context: ViewQueryContext): NavigationItemExtended[] {
+    // 캐시 확인
+    const cacheKey = this.generateCacheKey(context);
+    const cached = this.cache.get(cacheKey);
+    if (cached && Date.now() - cached.cachedAt < this.cacheMaxAge) {
+      return cached.tree;
+    }
+
+    const matchesContext = (item: NavigationItemExtended): boolean => {
+      // Service Group 체크
+      if (context.serviceGroup && item.serviceGroups && item.serviceGroups.length > 0) {
+        if (!item.serviceGroups.includes(context.serviceGroup) && !item.serviceGroups.includes('global')) {
+          return false;
+        }
+      }
+
+      // Tenant 체크
+      if (context.tenantId && item.allowedTenants && item.allowedTenants.length > 0) {
+        if (!item.allowedTenants.includes(context.tenantId)) {
+          return false;
+        }
+      }
+
+      // Role 체크
+      if (item.roles && item.roles.length > 0) {
+        if (!context.roles || !item.roles.some(r => context.roles!.includes(r))) {
+          return false;
+        }
+      }
+
+      // Permission/Capability 체크
+      if (item.permissions && item.permissions.length > 0) {
+        if (!context.permissions || !item.permissions.some(p => context.permissions!.includes(p))) {
+          return false;
+        }
+      }
+
+      if (item.capabilities && item.capabilities.length > 0) {
+        if (!context.permissions || !item.capabilities.some(c => context.permissions!.includes(c))) {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    const filterTree = (items: NavigationItemExtended[]): NavigationItemExtended[] => {
+      return items
+        .filter(matchesContext)
+        .map((item) => ({
+          ...item,
+          children: item.children ? filterTree(item.children as NavigationItemExtended[]) : undefined,
+        }))
+        .filter((item) => !item.children || item.children.length > 0 || !item.parentId);
+    };
+
+    const result = filterTree(this.getNavTree() as NavigationItemExtended[]);
+
+    // 캐시 저장
+    this.cache.set(cacheKey, {
+      tree: result,
+      cachedAt: Date.now(),
+      cacheKey,
+    });
+
+    return result;
+  }
+
+  /**
+   * Service Group별 Navigation 필터링 (Phase 6)
+   *
+   * @param serviceGroup - Service Group
+   * @returns 해당 Service Group에서 사용 가능한 Navigation 트리
+   */
+  getNavTreeByServiceGroup(serviceGroup: ServiceGroup): NavigationItemExtended[] {
+    return this.getNavTreeByContext({ serviceGroup });
+  }
+
+  /**
+   * Tenant별 Navigation 필터링 (Phase 6)
+   *
+   * @param tenantId - Tenant ID
+   * @returns 해당 Tenant에서 사용 가능한 Navigation 트리
+   */
+  getNavTreeByTenant(tenantId: string): NavigationItemExtended[] {
+    return this.getNavTreeByContext({ tenantId });
+  }
+
+  /**
+   * 캐시 통계 조회 (Phase 6)
+   */
+  getCacheStats(): { size: number; maxAge: number } {
+    return {
+      size: this.cache.size,
+      maxAge: this.cacheMaxAge,
+    };
+  }
+
+  /**
+   * 캐시 수동 무효화 (Phase 6)
+   */
+  clearCache(): void {
+    this.invalidateCache();
+    console.log('[NavigationRegistry] Cache cleared manually');
   }
 
   /**

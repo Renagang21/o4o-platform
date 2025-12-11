@@ -4,7 +4,19 @@
  * Central catalog of all available apps in the platform
  * V1: Local/hardcoded catalog
  * Future: Can be extended to remote catalog with download URLs
+ * Phase 6: ServiceGroup filtering support
  */
+
+/**
+ * Service Group 타입 (Phase 6)
+ */
+export type ServiceGroup =
+  | 'cosmetics'    // 화장품 서비스
+  | 'yaksa'        // 약사회 서비스
+  | 'tourist'      // 관광객 서비스
+  | 'sellerops'    // 판매자 운영
+  | 'supplierops'  // 공급자 운영
+  | 'global';      // 모든 서비스 공통
 
 export interface AppCatalogItem {
   appId: string;
@@ -18,6 +30,8 @@ export interface AppCatalogItem {
   author?: string;
   type?: 'core' | 'extension' | 'standalone';
   dependencies?: Record<string, string>; // { appId: versionRange }
+  /** Service Groups this app belongs to (Phase 6) */
+  serviceGroups?: ServiceGroup[];
 }
 
 /**
@@ -82,6 +96,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'extension',
     dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
+    serviceGroups: ['cosmetics'],
   },
   {
     appId: 'lms-core',
@@ -124,6 +139,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'extension',
     dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
+    serviceGroups: ['sellerops', 'cosmetics'],
   },
   {
     appId: 'supplierops',
@@ -135,6 +151,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'extension',
     dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
+    serviceGroups: ['supplierops', 'cosmetics'],
   },
   {
     appId: 'partnerops',
@@ -157,6 +174,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'extension',
     dependencies: { 'organization-core': '>=1.0.0' },
     author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
   },
   {
     appId: 'forum-yaksa',
@@ -168,6 +186,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'extension',
     dependencies: { 'forum-core': '>=1.0.0' },
     author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
   },
   {
     appId: 'cms-core',
@@ -189,6 +208,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     type: 'extension',
     dependencies: { 'organization-core': '>=1.0.0', 'membership-yaksa': '>=1.0.0' },
     author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
   },
 ];
 
@@ -285,6 +305,81 @@ export function getDependentApps(appId: string): AppCatalogItem[] {
     if (!app.dependencies) return false;
     return Object.keys(app.dependencies).includes(appId);
   });
+}
+
+/**
+ * Filter apps by service group (Phase 6)
+ * Returns apps that belong to the specified service group or have no service group restriction
+ *
+ * @param serviceGroup - Service group to filter by
+ * @returns Array of matching catalog items
+ */
+export function filterByServiceGroup(serviceGroup: ServiceGroup): AppCatalogItem[] {
+  return APPS_CATALOG.filter((app) => {
+    // Apps with no serviceGroups are available to all (global)
+    if (!app.serviceGroups || app.serviceGroups.length === 0) {
+      return true;
+    }
+    // Check if app belongs to the specified service group or is global
+    return app.serviceGroups.includes(serviceGroup) || app.serviceGroups.includes('global');
+  });
+}
+
+/**
+ * Get all apps for a specific service group with their dependencies resolved
+ * This ensures that if an app is included, all its dependencies are also included
+ *
+ * @param serviceGroup - Service group to filter by
+ * @returns Array of catalog items with resolved dependencies
+ */
+export function getAppsForServiceGroupWithDependencies(serviceGroup: ServiceGroup): AppCatalogItem[] {
+  const serviceApps = filterByServiceGroup(serviceGroup);
+  const result = new Map<string, AppCatalogItem>();
+
+  // Add all service apps
+  for (const app of serviceApps) {
+    result.set(app.appId, app);
+  }
+
+  // Resolve dependencies
+  const resolveDeps = (app: AppCatalogItem): void => {
+    if (!app.dependencies) return;
+
+    for (const depId of Object.keys(app.dependencies)) {
+      if (!result.has(depId)) {
+        const depApp = getCatalogItem(depId);
+        if (depApp) {
+          result.set(depId, depApp);
+          resolveDeps(depApp);
+        }
+      }
+    }
+  };
+
+  for (const app of serviceApps) {
+    resolveDeps(app);
+  }
+
+  return Array.from(result.values());
+}
+
+/**
+ * Get all unique service groups in catalog
+ *
+ * @returns Array of service group names
+ */
+export function getServiceGroups(): ServiceGroup[] {
+  const groups = new Set<ServiceGroup>();
+
+  for (const app of APPS_CATALOG) {
+    if (app.serviceGroups) {
+      for (const sg of app.serviceGroups) {
+        groups.add(sg);
+      }
+    }
+  }
+
+  return Array.from(groups).sort();
 }
 
 /**
