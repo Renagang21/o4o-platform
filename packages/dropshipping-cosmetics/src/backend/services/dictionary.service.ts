@@ -5,7 +5,7 @@
  * (Skin Types, Concerns, Ingredients, Categories)
  */
 
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, ObjectLiteral } from 'typeorm';
 import {
   CosmeticsSkinType,
   CosmeticsConcern,
@@ -203,7 +203,7 @@ export class DictionaryService {
     };
   }
 
-  private async createItem<T>(
+  private async createItem<T extends ObjectLiteral>(
     repository: Repository<T>,
     dto: CreateDictionaryItemDTO
   ): Promise<T> {
@@ -213,7 +213,8 @@ export class DictionaryService {
       metadata: dto.metadata || {},
     } as any);
 
-    return await repository.save(item);
+    const saved = await repository.save(item);
+    return Array.isArray(saved) ? saved[0] : saved;
   }
 
   private async updateItem<T extends { id: string; name: string; description?: string; metadata: any }>(
@@ -241,7 +242,7 @@ export class DictionaryService {
     return await repository.save(item);
   }
 
-  private async deleteItem<T>(repository: Repository<T>, id: string): Promise<boolean> {
+  private async deleteItem<T extends ObjectLiteral>(repository: Repository<T>, id: string): Promise<boolean> {
     const result = await repository.delete({ id } as any);
     return (result.affected || 0) > 0;
   }

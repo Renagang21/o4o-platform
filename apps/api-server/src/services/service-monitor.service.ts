@@ -85,6 +85,14 @@ export interface SystemSummary {
     medium: number;
     low: number;
   };
+  // Phase 9 Task 4 - Quality Score
+  qualityScore: number;
+  qualityIssues: {
+    critical: number;
+    warnings: number;
+    passed: number;
+  };
+  perTenantScore: Record<string, number>;
 }
 
 export interface ValidationResult {
@@ -304,6 +312,37 @@ export class ServiceMonitorService {
       const navigationMatchScore = this.calculateNavigationScore(warnings);
       const viewResolutionAccuracy = this.calculateViewAccuracy(warnings);
 
+      // Phase 9 Task 4 - Quality Score calculation
+      // Formula: 100 - criticalErrors * 20 - warnings * 5 - missingApps * 10 - baselineDeviation * 10
+      const criticalErrors = warningCounts.critical + warningCounts.high;
+      const warningErrors = warningCounts.medium + warningCounts.low;
+      const missingAppsCount = warnings.filter(w => w.issueType === 'MissingCoreApp' || w.issueType === 'IncorrectAppInstallation').length;
+      const baselineDeviationCount = warnings.filter(w => w.issueType === 'NavigationMismatch' || w.issueType === 'ThemePresetMismatch').length;
+
+      const qualityScore = Math.max(0, Math.min(100,
+        100 -
+        (criticalErrors * 20) -
+        (warningErrors * 5) -
+        (missingAppsCount * 10) -
+        (baselineDeviationCount * 10)
+      ));
+
+      // Per-tenant quality scores
+      const perTenantScore: Record<string, number> = {};
+      sites.forEach(site => {
+        const tenantWarnings = warnings.filter(w => w.tenantId === site.domain);
+        const criticalCount = tenantWarnings.filter(w => w.severity === 'critical' || w.severity === 'high').length;
+        const warningCount = tenantWarnings.filter(w => w.severity === 'medium' || w.severity === 'low').length;
+        perTenantScore[site.domain] = Math.max(0, 100 - (criticalCount * 20) - (warningCount * 5));
+      });
+
+      // Quality issues summary
+      const qualityIssues = {
+        critical: criticalErrors,
+        warnings: warningErrors,
+        passed: sites.length - criticalTenants - warningTenants,
+      };
+
       return {
         totalTenants: sites.length,
         healthyTenants,
@@ -319,6 +358,9 @@ export class ServiceMonitorService {
         viewResolutionAccuracy,
         lastValidationAt: this.lastValidationTime,
         warnings: warningCounts,
+        qualityScore,
+        qualityIssues,
+        perTenantScore,
       };
     } catch (error) {
       logger.error('[ServiceMonitor] Error getting system summary:', error);

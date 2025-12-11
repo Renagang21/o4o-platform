@@ -16,6 +16,7 @@ export interface RecommendationInput {
   category?: string;
   limit?: number;
   excludeProductId?: string; // Exclude current product from recommendations
+  preferences?: string[]; // User preferences for product filtering
 }
 
 export interface ScoredProduct {

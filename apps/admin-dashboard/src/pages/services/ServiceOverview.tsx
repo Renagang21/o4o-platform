@@ -26,7 +26,11 @@ import {
   FileText,
   Activity,
   Layers,
-  Eye
+  Eye,
+  Gauge,
+  TrendingUp,
+  TrendingDown,
+  Minus
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -122,6 +126,14 @@ interface SystemSummary {
     medium: number;
     low: number;
   };
+  // Phase 9 Task 4 - Quality Score
+  qualityScore: number;
+  qualityIssues: {
+    critical: number;
+    warnings: number;
+    passed: number;
+  };
+  perTenantScore: Record<string, number>;
 }
 
 interface ValidationResult {
@@ -372,6 +384,118 @@ export default function ServiceOverview() {
               <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                 <span className="text-red-500">{summary.warnings.critical} critical</span>
                 <span className="text-orange-500">{summary.warnings.high} high</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Quality Score Card - Phase 9 Task 4 */}
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Overall Quality Score</CardTitle>
+              <Gauge className="w-4 h-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 transform -rotate-90">
+                    <circle
+                      cx="48"
+                      cy="48"
+                      r="40"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="none"
+                      className="text-muted"
+                    />
+                    <circle
+                      cx="48"
+                      cy="48"
+                      r="40"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 40}`}
+                      strokeDashoffset={`${2 * Math.PI * 40 * (1 - (summary.qualityScore || 0) / 100)}`}
+                      className={
+                        (summary.qualityScore || 0) >= 80 ? 'text-green-500' :
+                        (summary.qualityScore || 0) >= 60 ? 'text-yellow-500' :
+                        'text-red-500'
+                      }
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold">{summary.qualityScore || 0}</span>
+                  </div>
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-1 text-red-500">
+                      <XCircle className="w-3 h-3" />
+                      Critical Issues
+                    </span>
+                    <span className="font-medium">{summary.qualityIssues?.critical || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-1 text-yellow-500">
+                      <AlertCircle className="w-3 h-3" />
+                      Warnings
+                    </span>
+                    <span className="font-medium">{summary.qualityIssues?.warnings || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-1 text-green-500">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Passed Checks
+                    </span>
+                    <span className="font-medium">{summary.qualityIssues?.passed || 0}</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Quality formula: 100 - (critical×20) - (warnings×5) - (missing apps×10)
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="col-span-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Per-Tenant Quality Breakdown</CardTitle>
+              <CardDescription>Quality scores by service tenant</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                {summary.perTenantScore && Object.entries(summary.perTenantScore)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([tenantId, score]) => (
+                    <div key={tenantId} className="flex items-center gap-2">
+                      <span className="text-sm w-32 truncate" title={tenantId}>{tenantId}</span>
+                      <Progress value={score} className="flex-1" />
+                      <span className={`text-sm font-medium w-12 text-right ${
+                        score >= 80 ? 'text-green-500' :
+                        score >= 60 ? 'text-yellow-500' :
+                        'text-red-500'
+                      }`}>
+                        {score}
+                      </span>
+                      {score >= 80 ? (
+                        <TrendingUp className="w-4 h-4 text-green-500" />
+                      ) : score >= 60 ? (
+                        <Minus className="w-4 h-4 text-yellow-500" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4 text-red-500" />
+                      )}
+                    </div>
+                  ))}
+                {(!summary.perTenantScore || Object.keys(summary.perTenantScore).length === 0) && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No tenant quality data available
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
