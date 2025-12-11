@@ -4,6 +4,37 @@ import { ReportFieldTemplate, ReportFieldDefinition } from '../entities/ReportFi
 import { AnnualReportService, ActorInfo } from './AnnualReportService.js';
 
 /**
+ * Phase 1: 유효한 동기화 타겟 필드 목록
+ *
+ * 이 목록은 membership-yaksa의 Member Entity 필드와 일치해야 합니다.
+ * syncTarget에 지정할 수 있는 값들입니다.
+ */
+export const VALID_SYNC_TARGETS = [
+  // 기본 필드
+  'name',
+  'phone',
+  'email',
+  'pharmacyName',
+  'pharmacyAddress',
+  // Phase 1 필드
+  'gender',
+  'licenseIssuedAt',
+  'licenseRenewalAt',
+  'pharmacistType',
+  'workplaceName',
+  'workplaceAddress',
+  'workplaceType',
+  'yaksaJoinDate',
+  'officialRole',
+  'registrationNumber',
+  'memo',
+  // metadata 하위 (커스텀 필드용)
+  'metadata.custom',
+] as const;
+
+export type SyncTarget = typeof VALID_SYNC_TARGETS[number] | `metadata.${string}`;
+
+/**
  * SyncResult
  */
 export interface SyncResult {
