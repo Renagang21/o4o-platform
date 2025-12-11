@@ -15,6 +15,7 @@ export { MemberCategory } from './MemberCategory.js';
 
 // Then load Member which depends on MemberCategory
 export { Member } from './Member.js';
+export type { PharmacistType, WorkplaceType, OfficialRole, Gender } from './Member.js';
 
 // Finally load entities that depend on Member
 export { Affiliation } from './Affiliation.js';

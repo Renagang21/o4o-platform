@@ -22,6 +22,33 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import ExportButton from '@/components/membership/ExportButton';
 import BulkActionToolbar from '@/components/membership/BulkActionToolbar';
 
+// Phase 1 Type definitions
+type PharmacistType = 'working' | 'owner' | 'hospital' | 'public' | 'industry' | 'retired' | 'other';
+type WorkplaceType = 'pharmacy' | 'hospital' | 'public' | 'company' | 'education' | 'research' | 'other';
+type OfficialRole = 'president' | 'vice_president' | 'general_manager' | 'auditor' | 'director' | 'branch_head' | 'district_head' | 'none';
+type Gender = 'male' | 'female' | 'other';
+
+const PHARMACIST_TYPE_LABELS: Record<PharmacistType, string> = {
+  working: '근무약사',
+  owner: '개설약사',
+  hospital: '병원약사',
+  public: '공직약사',
+  industry: '산업약사',
+  retired: '은퇴약사',
+  other: '기타',
+};
+
+const OFFICIAL_ROLE_LABELS: Record<OfficialRole, string> = {
+  president: '회장',
+  vice_president: '부회장',
+  general_manager: '총무',
+  auditor: '감사',
+  director: '이사',
+  branch_head: '지부장',
+  district_head: '분회장',
+  none: '일반',
+};
+
 interface Member {
   id: string;
   userId: string;
@@ -42,6 +69,13 @@ interface Member {
     id: string;
     name: string;
   };
+  // Phase 1 fields
+  gender?: Gender;
+  pharmacistType?: PharmacistType;
+  workplaceName?: string;
+  workplaceType?: WorkplaceType;
+  officialRole?: OfficialRole;
+  registrationNumber?: string;
 }
 
 interface MemberCategory {
@@ -63,6 +97,9 @@ const MemberManagement = () => {
   const [filterVerified, setFilterVerified] = useState<FilterVerified>('all');
   const [filterActive, setFilterActive] = useState<FilterActive>('active');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  // Phase 1: 신규 필터
+  const [filterPharmacistType, setFilterPharmacistType] = useState<string>('all');
+  const [filterOfficialRole, setFilterOfficialRole] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
   const [totalMembers, setTotalMembers] = useState(0);
@@ -79,7 +116,7 @@ const MemberManagement = () => {
   // Fetch members
   useEffect(() => {
     fetchMembers();
-  }, [filterVerified, filterActive, filterCategory, currentPage, debouncedSearchQuery]);
+  }, [filterVerified, filterActive, filterCategory, filterPharmacistType, filterOfficialRole, currentPage, debouncedSearchQuery]);
 
   const fetchCategories = async () => {
     try {
@@ -107,6 +144,9 @@ const MemberManagement = () => {
       if (filterActive === 'inactive') params.isActive = false;
       if (filterCategory !== 'all') params.categoryId = filterCategory;
       if (debouncedSearchQuery) params.search = debouncedSearchQuery;
+      // Phase 1: 신규 필터
+      if (filterPharmacistType !== 'all') params.pharmacistType = filterPharmacistType;
+      if (filterOfficialRole !== 'all') params.officialRole = filterOfficialRole;
 
       const response = await authClient.api.get('/membership/members', { params });
 
@@ -224,9 +264,9 @@ const MemberManagement = () => {
 
           {/* Filters */}
           <div className="p-6 border-b border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {/* Search */}
-              <div className="relative">
+              <div className="relative md:col-span-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
@@ -253,6 +293,38 @@ const MemberManagement = () => {
                 </select>
               </div>
 
+              {/* Phase 1: Pharmacist Type Filter */}
+              <div>
+                <select
+                  value={filterPharmacistType}
+                  onChange={(e) => setFilterPharmacistType(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="all">모든 약사유형</option>
+                  {Object.entries(PHARMACIST_TYPE_LABELS).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Phase 1: Official Role Filter */}
+              <div>
+                <select
+                  value={filterOfficialRole}
+                  onChange={(e) => setFilterOfficialRole(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="all">모든 직책</option>
+                  {Object.entries(OFFICIAL_ROLE_LABELS).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Verification Filter */}
               <div>
                 <select
@@ -265,7 +337,9 @@ const MemberManagement = () => {
                   <option value="unverified">미검증</option>
                 </select>
               </div>
-
+            </div>
+            {/* Second row of filters */}
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-4">
               {/* Active Filter */}
               <div>
                 <select
@@ -324,7 +398,13 @@ const MemberManagement = () => {
                       분류
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      약국명
+                      근무지
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      약사유형
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      직책
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       검증 상태
@@ -359,7 +439,19 @@ const MemberManagement = () => {
                         {member.category?.name || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {member.pharmacyName || '-'}
+                        {member.workplaceName || member.pharmacyName || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {member.pharmacistType ? PHARMACIST_TYPE_LABELS[member.pharmacistType] : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {member.officialRole && member.officialRole !== 'none'
+                          ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                              {OFFICIAL_ROLE_LABELS[member.officialRole]}
+                            </span>
+                          )
+                          : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {member.isVerified ? (

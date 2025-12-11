@@ -66,6 +66,15 @@ export class RequiredCoursePolicy {
   targetMemberTypes?: string[];
 
   /**
+   * Phase 1: Target pharmacist types this policy applies to
+   * Values from membership-yaksa: PharmacistType
+   * e.g., ['working', 'owner', 'hospital', 'public', 'industry', 'retired', 'other']
+   * If empty, applies to all pharmacist types
+   */
+  @Column({ type: 'simple-array', nullable: true })
+  targetPharmacistTypes?: string[];
+
+  /**
    * Period for which this policy is valid (e.g., year)
    */
   @Column({ type: 'varchar', length: 50, default: 'annual' })
