@@ -11,14 +11,17 @@ export const organizationCoreManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'organization-core',
   displayName: '조직 관리',
+  name: 'Organization Core',
   version: '1.0.0',
-  appType: 'core' as const,
+  type: 'core' as const,
+  appType: 'core' as const, // Legacy compatibility
+  category: 'organization' as const,
   description: '전사 조직 관리 시스템 (Core Domain) - 계층 구조, 멤버 관리, 조직 스코프 권한',
 
   // ===== 의존성 =====
   dependencies: {
     core: [],
-    optional: [],
+    apps: [],
   },
 
   // ===== 소유 테이블 =====
@@ -39,10 +42,9 @@ export const organizationCoreManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [
-      'Organization',
-      'OrganizationMember',
-      'OrganizationUnit',
-      'OrganizationRole',
+      './entities/Organization',
+      './entities/OrganizationMember',
+      './entities/RoleAssignment',
     ],
     services: [
       'OrganizationService',

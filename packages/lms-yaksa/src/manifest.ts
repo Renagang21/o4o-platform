@@ -12,14 +12,17 @@ export const lmsYaksaManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'lms-yaksa',
   displayName: '약사회 교육/연수',
+  name: 'LMS Yaksa Extension',
   version: '1.0.0',
-  appType: 'extension' as const,
+  type: 'extension' as const,
+  appType: 'extension' as const, // Legacy compatibility
+  category: 'education' as const,
   description: '약사회 보수교육 및 연수 시스템 (교육 이수, 이수증 발급, 교육 이력 관리)',
 
   // ===== 의존성 =====
   dependencies: {
     core: ['lms-core', 'organization-core'],
-    optional: ['membership-yaksa'],
+    apps: ['membership-yaksa'],
   },
 
   // ===== 소유 테이블 =====
@@ -87,10 +90,10 @@ export const lmsYaksaManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [
-      'YaksaLicenseProfile',
-      'RequiredCoursePolicy',
-      'CreditRecord',
-      'YaksaCourseAssignment',
+      './backend/entities/YaksaLicenseProfile.entity',
+      './backend/entities/RequiredCoursePolicy.entity',
+      './backend/entities/CreditRecord.entity',
+      './backend/entities/YaksaCourseAssignment.entity',
     ],
     services: [
       'LicenseProfileService',
@@ -106,7 +109,7 @@ export const lmsYaksaManifest = {
       'YaksaLmsAdminController',
     ],
     routesExport: 'createRoutes',
-    routePrefix: '/lms/yaksa',
+    routePrefix: '/api/v1/lms-yaksa',
   },
 
   // ===== 프론트엔드 =====

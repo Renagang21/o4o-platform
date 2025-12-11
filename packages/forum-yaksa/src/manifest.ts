@@ -12,14 +12,17 @@ export const forumYaksaManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'forum-yaksa',
   displayName: '약사회 포럼',
+  name: 'Forum Yaksa Extension',
   version: '1.0.0',
-  appType: 'extension' as const,
+  type: 'extension' as const,
+  appType: 'extension' as const, // Legacy compatibility
+  category: 'community' as const,
   description: '약사 조직 특화 포럼 (복약지도, 케이스 스터디, 약물 정보)',
 
   // ===== 의존성 =====
   dependencies: {
     core: ['forum-core'],
-    optional: ['organization-core', 'membership-yaksa'],
+    apps: ['organization-core', 'membership-yaksa'],
   },
 
   // ===== 소유 테이블 =====
@@ -38,8 +41,8 @@ export const forumYaksaManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [
-      'YaksaForumCommunity',
-      'YaksaForumCommunityMember',
+      './backend/entities/YaksaCommunity',
+      './backend/entities/YaksaCommunityMember',
     ],
     services: [
       'YaksaForumService',

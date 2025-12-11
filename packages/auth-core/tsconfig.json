@@ -7,19 +7,13 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "jsx": "react-jsx",
     "noEmit": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "strict": false,
-    "skipLibCheck": true,
-    "isolatedModules": false,
-    "lib": ["ES2022", "DOM"]
+    "skipLibCheck": true
   },
-  "include": [
-    "src/manifest.ts",
-    "src/lifecycle/**/*"
-  ],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

@@ -12,14 +12,17 @@ export const reportingYaksaManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'reporting-yaksa',
   displayName: '신상신고 시스템',
+  name: 'Reporting Yaksa Extension',
   version: '1.0.0',
-  appType: 'extension' as const,
+  type: 'extension' as const,
+  appType: 'extension' as const, // Legacy compatibility
+  category: 'reporting' as const,
   description: '약사회 신상신고 시스템 (연간 신고서, 승인 워크플로우, 자동 동기화)',
 
   // ===== 의존성 =====
   dependencies: {
     core: ['organization-core', 'membership-yaksa'],
-    optional: [],
+    apps: [],
   },
 
   // ===== 소유 테이블 =====
@@ -40,10 +43,10 @@ export const reportingYaksaManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [
-      'AnnualReport',
-      'ReportFieldTemplate',
-      'ReportLog',
-      'ReportAssignment',
+      './backend/entities/AnnualReport',
+      './backend/entities/ReportFieldTemplate',
+      './backend/entities/ReportLog',
+      './backend/entities/ReportAssignment',
     ],
     services: [
       'AnnualReportService',
