@@ -210,6 +210,18 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['yaksa'],
   },
+  {
+    appId: 'lms-yaksa',
+    name: 'LMS Extension – Yaksa Organization',
+    version: '1.0.0',
+    description: '약사 면허 교육 학습 관리 시스템 - 필수교육, 학점관리, 수료증, 면허갱신',
+    category: 'education',
+    tags: ['LMS', '학습', 'yaksa', 'education', 'credit', 'license', 'certification'],
+    type: 'extension',
+    dependencies: { 'lms-core': '>=0.1.0', 'organization-core': '>=1.0.0' },
+    author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
+  },
 ];
 
 /**

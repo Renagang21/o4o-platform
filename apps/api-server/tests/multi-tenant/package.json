@@ -1,0 +1,24 @@
+{
+    "name": "@o4o-platform/multi-tenant-tests",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "test:ui": "vitest --ui",
+        "test:navigation": "vitest run navigation.spec.ts",
+        "test:views": "vitest run view-system.spec.ts",
+        "test:data": "vitest run data-isolation.spec.ts",
+        "test:appstore": "vitest run appstore.spec.ts",
+        "test:coverage": "vitest run --coverage"
+    },
+    "dependencies": {
+        "typeorm": "^0.3.0"
+    },
+    "devDependencies": {
+        "vitest": "^1.0.0",
+        "@vitest/ui": "^1.0.0",
+        "@types/node": "^20.0.0"
+    }
+}
