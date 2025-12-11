@@ -70,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // 사용자 정보 로드
   const loadUser = useCallback(async (): Promise<User | null> => {
     try {
-      const response = await authClient.api.get('/users/me');
+      const response = await authClient.api.get('/auth/me');
       return response.data;
     } catch (err) {
       console.error('Failed to load user:', err);
