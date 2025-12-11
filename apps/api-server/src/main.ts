@@ -333,6 +333,7 @@ import adminAppsRoutes from './routes/admin/apps.routes.js';
 
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
 app.use('/api/v1/cms', cmsRoutes);
 app.use('/api/v1/lms', lmsRoutes);
 app.use('/api/v1/users', usersRoutes);
