@@ -1,0 +1,29 @@
+{
+  "id": "sellerops-universal",
+  "label": "SellerOps Universal Service",
+  "description": "범용 판매자 운영 서비스 - 공급자 승인, 리스팅, 주문, 정산",
+  "serviceGroup": "sellerops",
+  "coreApps": [
+    "dropshipping-core",
+    "sellerops"
+  ],
+  "extensionApps": [
+    "supplierops",
+    "partnerops"
+  ],
+  "globalCoreApps": [
+    "cms-core",
+    "organization-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableMultiVendor": true,
+    "enableSettlementDashboard": true,
+    "enableOrderTracking": true
+  },
+  "icon": "store",
+  "category": "commerce",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

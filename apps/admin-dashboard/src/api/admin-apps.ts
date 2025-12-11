@@ -2,9 +2,86 @@
  * Admin Apps API
  *
  * API client for app management (App Market V1)
+ * Phase 7: Service Templates & App Installer Automation
  */
 
 import api from './base';
+
+// =============================================================================
+// Service Template Types (Phase 7)
+// =============================================================================
+
+export type ServiceGroup = 'cosmetics' | 'yaksa' | 'tourist' | 'sellerops' | 'supplierops' | 'global';
+export type TemplateCategory = 'commerce' | 'organization' | 'community' | 'education' | 'health' | 'retail';
+
+/**
+ * Service Template
+ */
+export interface ServiceTemplate {
+  id: string;
+  label: string;
+  description: string;
+  serviceGroup: ServiceGroup;
+  coreApps: string[];
+  extensionApps?: string[];
+  globalCoreApps?: string[];
+  autoInstall: boolean;
+  defaultSettings?: Record<string, unknown>;
+  icon?: string;
+  category?: TemplateCategory;
+  version: string;
+  author?: string;
+  isActive: boolean;
+}
+
+/**
+ * Service Provisioning Request
+ */
+export interface ServiceProvisioningRequest {
+  organizationId: string;
+  tenantId: string;
+  serviceTemplateId: string;
+  settingsOverride?: Record<string, unknown>;
+  additionalExtensions?: string[];
+  skipApps?: string[];
+}
+
+/**
+ * Service Provisioning Result
+ */
+export interface ServiceProvisioningResult {
+  success: boolean;
+  organizationId: string;
+  tenantId: string;
+  serviceGroup: ServiceGroup;
+  installedApps: string[];
+  skippedApps: string[];
+  failedApps: Array<{ appId: string; error: string }>;
+  installationTimeMs: number;
+  error?: string;
+}
+
+/**
+ * Installation Preview
+ */
+export interface InstallationPreview {
+  template: ServiceTemplate | undefined;
+  appsToInstall: string[];
+  alreadyInstalled: string[];
+  willBeSkipped: string[];
+  dependencyOrder: string[];
+  issues: string[];
+}
+
+/**
+ * Template Stats
+ */
+export interface TemplateStats {
+  total: number;
+  active: number;
+  byServiceGroup: Record<string, number>;
+  byCategory: Record<string, number>;
+}
 
 /**
  * App Registry Entry (installed app)
@@ -176,5 +253,103 @@ export const adminAppsApi = {
   }> => {
     const response = await api.post('/admin/apps/validate-remote', { manifestUrl });
     return response.data;
+  },
+
+  // ===========================================================================
+  // Service Template APIs (Phase 7)
+  // ===========================================================================
+
+  /**
+   * Get all service templates
+   */
+  getTemplates: async (filters?: {
+    serviceGroup?: ServiceGroup;
+    category?: TemplateCategory;
+    activeOnly?: boolean;
+  }): Promise<ServiceTemplate[]> => {
+    const params = new URLSearchParams();
+    if (filters?.serviceGroup) params.append('serviceGroup', filters.serviceGroup);
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.activeOnly) params.append('activeOnly', 'true');
+
+    const queryString = params.toString();
+    const response = await api.get(`/v1/service/templates${queryString ? `?${queryString}` : ''}`);
+    return response.data.data;
+  },
+
+  /**
+   * Get a specific template with its apps
+   */
+  getTemplate: async (templateId: string): Promise<{
+    template: ServiceTemplate;
+    apps: { coreApps: string[]; extensionApps: string[] };
+  }> => {
+    const response = await api.get(`/v1/service/templates/${templateId}`);
+    return response.data.data;
+  },
+
+  /**
+   * Get installation preview for a template
+   */
+  getInstallationPreview: async (
+    templateId: string,
+    options?: {
+      installExtensions?: boolean;
+      skipApps?: string[];
+      additionalExtensions?: string[];
+    }
+  ): Promise<InstallationPreview> => {
+    const params = new URLSearchParams();
+    if (options?.installExtensions) params.append('installExtensions', 'true');
+    if (options?.skipApps) params.append('skipApps', options.skipApps.join(','));
+    if (options?.additionalExtensions) params.append('additionalExtensions', options.additionalExtensions.join(','));
+
+    const queryString = params.toString();
+    const response = await api.get(`/v1/service/templates/${templateId}/preview${queryString ? `?${queryString}` : ''}`);
+    return response.data.data;
+  },
+
+  /**
+   * Install a service template
+   */
+  installTemplate: async (
+    templateId: string,
+    options?: {
+      installExtensions?: boolean;
+      skipApps?: string[];
+      additionalExtensions?: string[];
+    }
+  ): Promise<{
+    success: boolean;
+    installed: string[];
+    skipped: string[];
+    failed: Array<{ appId: string; error: string }>;
+  }> => {
+    const response = await api.post(`/v1/service/templates/${templateId}/install`, options || {});
+    return response.data.data;
+  },
+
+  /**
+   * Provision a complete service
+   */
+  provisionService: async (request: ServiceProvisioningRequest): Promise<ServiceProvisioningResult> => {
+    const response = await api.post('/v1/service/create', request);
+    return response.data.data;
+  },
+
+  /**
+   * Get recommended templates for a service group
+   */
+  getRecommendedTemplates: async (serviceGroup: ServiceGroup): Promise<ServiceTemplate[]> => {
+    const response = await api.get(`/v1/service/templates/recommend/${serviceGroup}`);
+    return response.data.data;
+  },
+
+  /**
+   * Get template statistics
+   */
+  getTemplateStats: async (): Promise<TemplateStats> => {
+    const response = await api.get('/v1/service/stats');
+    return response.data.data;
   },
 };

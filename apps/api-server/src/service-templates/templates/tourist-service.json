@@ -1,0 +1,26 @@
+{
+  "id": "tourist-service",
+  "label": "Tourist Service",
+  "description": "관광객 서비스 - 여행 상품, 리테일 연동, 예약 시스템",
+  "serviceGroup": "tourist",
+  "coreApps": [
+    "dropshipping-core"
+  ],
+  "extensionApps": [
+    "signage"
+  ],
+  "globalCoreApps": [
+    "cms-core",
+    "organization-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableMultiLanguage": true,
+    "enableLocationServices": true
+  },
+  "icon": "plane",
+  "category": "retail",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

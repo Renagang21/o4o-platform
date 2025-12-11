@@ -1,0 +1,31 @@
+{
+  "id": "cosmetics-retail",
+  "label": "Cosmetics Retail Service",
+  "description": "화장품 리테일 서비스 - 드랍쉬핑, 셀러 운영, 리뷰 시스템 포함",
+  "serviceGroup": "cosmetics",
+  "coreApps": [
+    "dropshipping-core",
+    "dropshipping-cosmetics",
+    "sellerops",
+    "supplierops"
+  ],
+  "extensionApps": [
+    "partnerops",
+    "signage"
+  ],
+  "globalCoreApps": [
+    "cms-core",
+    "organization-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableInfluencerRoutines": true,
+    "enableProductRecommendations": true,
+    "enableSkinTypeFilters": true
+  },
+  "icon": "sparkles",
+  "category": "commerce",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

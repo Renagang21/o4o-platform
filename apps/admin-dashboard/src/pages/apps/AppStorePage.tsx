@@ -1,13 +1,14 @@
 import { FC, useState, useEffect, useMemo } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult } from '@/api/admin-apps';
+import ServiceTemplateSelector from '@/components/apps/ServiceTemplateSelector';
 
-type Tab = 'market' | 'installed';
+type Tab = 'market' | 'installed' | 'templates';
 
 // Lifecycle action status for UI feedback
 type LifecycleStatus = 'idle' | 'installing' | 'activating' | 'deactivating' | 'uninstalling' | 'updating' | 'rolling_back';
@@ -448,6 +449,17 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       {/* Tabs */}
       <div className="flex space-x-4 border-b">
         <button
+          onClick={() => setActiveTab('templates')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            activeTab === 'templates'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <Layers className="inline-block w-4 h-4 mr-2" />
+          서비스 템플릿
+        </button>
+        <button
           onClick={() => setActiveTab('market')}
           className={`px-4 py-2 font-medium border-b-2 transition-colors ${
             activeTab === 'market'
@@ -471,7 +483,8 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         </button>
       </div>
 
-      {/* Search and Filter Bar */}
+      {/* Search and Filter Bar - Hide on templates tab */}
+      {activeTab !== 'templates' && (
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search Input */}
         <div className="relative flex-1">
@@ -531,6 +544,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
           </>
         )}
       </div>
+      )}
 
       {/* Remote Install Modal */}
       {showRemoteInstall && (
@@ -640,7 +654,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       )}
 
       {/* Filter Results Info */}
-      {(searchQuery || selectedCategory !== 'all') && (
+      {activeTab !== 'templates' && (searchQuery || selectedCategory !== 'all') && (
         <div className="text-sm text-gray-500">
           {activeTab === 'market' ? (
             <>
@@ -655,6 +669,11 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
             </>
           )}
         </div>
+      )}
+
+      {/* Templates Tab */}
+      {activeTab === 'templates' && (
+        <ServiceTemplateSelector onInstallComplete={loadData} />
       )}
 
       {/* Market Tab */}

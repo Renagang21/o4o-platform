@@ -1,0 +1,31 @@
+{
+  "id": "yaksa-branch",
+  "label": "Yaksa Branch Service",
+  "description": "약사회 지부 서비스 - 회원관리, 신상신고, 포럼, LMS 포함",
+  "serviceGroup": "yaksa",
+  "coreApps": [
+    "membership-yaksa",
+    "reporting-yaksa",
+    "forum-core",
+    "forum-yaksa",
+    "lms-core"
+  ],
+  "extensionApps": [
+    "organization-forum"
+  ],
+  "globalCoreApps": [
+    "cms-core",
+    "organization-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableMemberVerification": true,
+    "enableAnnualReporting": true,
+    "enableLicenseValidation": true
+  },
+  "icon": "building-2",
+  "category": "organization",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

@@ -1,0 +1,28 @@
+{
+  "id": "supplierops-universal",
+  "label": "SupplierOps Universal Service",
+  "description": "범용 공급자 운영 서비스 - 상품 등록, Offer 관리, 주문 Relay, 정산",
+  "serviceGroup": "supplierops",
+  "coreApps": [
+    "dropshipping-core",
+    "supplierops"
+  ],
+  "extensionApps": [
+    "partnerops"
+  ],
+  "globalCoreApps": [
+    "cms-core",
+    "organization-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableProductCatalog": true,
+    "enableOfferManagement": true,
+    "enableSettlement": true
+  },
+  "icon": "package",
+  "category": "commerce",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

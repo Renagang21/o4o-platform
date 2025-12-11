@@ -51,6 +51,12 @@ import { AppDataSource } from './database/connection.js';
 // AppStore Routes
 import appstoreRoutes from './routes/appstore.routes.js';
 
+// Service Provisioning Routes (Phase 7)
+import serviceProvisioningRoutes from './routes/service-provisioning.routes.js';
+
+// Service Template Registry (Phase 7)
+import { templateRegistry } from './service-templates/template-registry.js';
+
 const app: Application = express();
 
 // IMPORTANT: Set trust proxy for nginx reverse proxy
@@ -404,11 +410,21 @@ const startServer = async () => {
     app.use('/api/v1/appstore', appstoreRoutes);
     logger.info('✅ AppStore routes registered at /api/v1/appstore');
 
-    // 5. Core routes now registered via dynamic module loader
+    // 5. Load Service Templates and register provisioning routes (Phase 7)
+    try {
+      await templateRegistry.loadAll();
+      app.use('/api/v1/service', serviceProvisioningRoutes);
+      logger.info(`✅ Service Templates loaded: ${templateRegistry.getStats().total} templates`);
+      logger.info('✅ Service Provisioning routes registered at /api/v1/service');
+    } catch (templateError) {
+      logger.error('Service Template loading failed:', templateError);
+    }
+
+    // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
     logger.info('✅ Routes registered via module loader');
 
-    // 6. Get all entities from modules (for future TypeORM integration)
+    // 7. Get all entities from modules (for future TypeORM integration)
     const moduleEntities = moduleLoader.getAllEntities();
     if (moduleEntities.length > 0) {
       logger.info(`📊 Collected ${moduleEntities.length} entities from modules`);
