@@ -1,6 +1,6 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
-import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
+import { forumYaksaManifest } from './forum-yaksa.manifest.js';
 import { signageManifest } from '@o4o-apps/signage';
 import { manifest as lmsCoreManifest } from '@o4o/lms-core';
 import { manifest as organizationCoreManifest } from '@o4o/organization-core';

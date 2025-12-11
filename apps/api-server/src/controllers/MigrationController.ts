@@ -68,25 +68,30 @@ export class MigrationController {
         }
       ];
 
+      // Default organization ID for legacy migration
+      const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000000';
+
       for (const cptDef of cptDefinitions) {
         let postType = await postTypeRepo.findOne({ where: { slug: cptDef.slug } });
-        
+
         if (!postType) {
           postType = postTypeRepo.create({
+            organizationId: DEFAULT_ORG_ID,
             slug: cptDef.slug,
             name: cptDef.name,
+            singularLabel: cptDef.name,
+            pluralLabel: cptDef.name + 's',
             description: cptDef.description,
             icon: cptDef.icon,
-            public: cptDef.public,
+            isPublic: cptDef.public,
             hasArchive: cptDef.hasArchive,
-            showInMenu: cptDef.showInMenu,
             supports: cptDef.supports,
-            menuPosition: cptDef.menuPosition,
-            active: true,
-            capabilityType: 'post',
-            rewrite: { slug: cptDef.slug.replace('_', '-') }
+            isActive: true,
+            rewriteRules: { slug: cptDef.slug.replace('_', '-') },
+            metadata: { menuPosition: cptDef.menuPosition },
+            capabilities: { type: 'post' }
           });
-          
+
           await postTypeRepo.save(postType);
           logger.info(`Created CPT: ${cptDef.slug}`);
         }

@@ -34,22 +34,16 @@ import { LinkedAccount } from '../entities/LinkedAccount.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
 import { UserActivityLog } from '../entities/UserActivityLog.js';
 import { Notification } from '../entities/Notification.js';
-import { Media } from '../entities/Media.js';
-import { MediaFile } from '../entities/MediaFile.js';
-import { MediaFolder } from '../entities/MediaFolder.js';
+// Media/MediaFile/MediaFolder removed - legacy CMS entities
 import { Category } from '../entities/Category.js';
 import { Settings } from '../entities/Settings.js';
 import { Theme, ThemeInstallation } from '../entities/Theme.js';
-import { Post } from '../entities/Post.js';
-import { PostMeta } from '../entities/PostMeta.js';
+// Post/PostMeta/Page/PostAutosave removed - legacy WP-like CMS entities
 import { Tag } from '../entities/Tag.js';
-import { PostAutosave } from '../entities/PostAutosave.js';
-import { Page } from '../entities/Page.js';
 import { ReusableBlock } from '../entities/ReusableBlock.js';
 import { BlockPattern } from '../entities/BlockPattern.js';
 import { TemplatePart } from '../entities/TemplatePart.js';
-import { Shipment } from '../entities/Shipment.js';
-import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory.js';
+// Shipment/ShipmentTrackingHistory removed - legacy commerce entities
 import { SmtpSettings } from '../entities/SmtpSettings.js';
 import { EmailLog } from '../entities/EmailLog.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
@@ -57,12 +51,8 @@ import { CustomPost } from '../entities/CustomPost.js';
 import { CustomPostType } from '../entities/CustomPostType.js';
 // Taxonomy System entities
 import { Taxonomy, Term, TermRelationship } from '../entities/Taxonomy.js';
-// Menu System entities
-import { Menu } from '../entities/Menu.js';
-import { MenuItem } from '../entities/MenuItem.js';
-import { MenuLocation } from '../entities/MenuLocation.js';
-// AI Settings entity
-import { AISetting } from '../entities/AISetting.js';
+// Menu System entities - removed (legacy CMS)
+// AI Settings entity (unified - AISetting removed)
 import { AiSettings } from '../entities/AiSettings.js';
 import { AIUsageLog } from '../entities/AIUsageLog.js';
 // App System entities
@@ -70,17 +60,7 @@ import { App } from '../entities/App.js';
 import { AppInstance } from '../entities/AppInstance.js';
 import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { AppRegistry } from '../entities/AppRegistry.js';
-// Cart and Order entities
-import { Cart } from '../entities/Cart.js';
-import { CartItem } from '../entities/CartItem.js';
-import { Order } from '../entities/Order.js';
-import { OrderItem } from '../entities/OrderItem.js';
-import { OrderEvent } from '../entities/OrderEvent.js';
-// // Wishlist entity (R-6-5)
-// import { Wishlist } from '../entities/Wishlist.js';
-// Settlement entities
-import { Settlement } from '../entities/Settlement.js';
-import { SettlementItem } from '../entities/SettlementItem.js';
+// Cart/Order/Settlement entities removed - legacy commerce entities
 // Dropshipping entities - Now imported from @o4o/dropshipping-core package
 // import { Product } from '../entities/Product.js';
 // import { Supplier } from '../entities/Supplier.js';
@@ -108,9 +88,7 @@ import { TemplatePreset } from '../entities/TemplatePreset.js';
 import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
-import { SupplierProfile } from '../entities/SupplierProfile.js';
-import { SellerProfile } from '../entities/SellerProfile.js';
-import { PartnerProfile } from '../entities/PartnerProfile.js';
+// SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
 // Forum App entities (from @o4o-apps/forum package)
 import { ForumPost, ForumCategory, ForumComment } from '@o4o-apps/forum';
 // Forum Notification entity (Phase 13)
@@ -127,8 +105,8 @@ import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
 // Site entities
 import { Site } from '../modules/sites/site.entity.js';
 
-// ✅ NEW: CMS Module V2 entities (Phase C-2)
-import { CustomPostType as CMSCustomPostType } from '../modules/cms/entities/CustomPostType.js';
+// ✅ CMS Module V2 entities (Phase C-2)
+// Note: CMSCustomPostType removed - now unified with CustomPostType using cms_cpt_types table
 import { CustomField as CMSCustomField } from '../modules/cms/entities/CustomField.js';
 import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
@@ -244,24 +222,18 @@ export const AppDataSource = new DataSource({
     AccountActivity,
     UserActivityLog,
     Notification,
-    Media,
-    MediaFile,
-    MediaFolder,
+    // Media/MediaFile/MediaFolder removed
     Category,
     Settings,
     Theme,
     ThemeInstallation,
     // Content entities
-    Post,
-    PostMeta,
-    PostAutosave,
+    // Post/PostMeta/Page/PostAutosave removed
     Tag,
-    Page,
     ReusableBlock,
     BlockPattern,
     TemplatePart,
-    Shipment,
-    ShipmentTrackingHistory,
+    // Shipment/ShipmentTrackingHistory removed
     SmtpSettings,
     EmailLog,
     FieldGroup,
@@ -273,12 +245,8 @@ export const AppDataSource = new DataSource({
     Taxonomy,
     Term,
     TermRelationship,
-    // Menu System entities
-    Menu,
-    MenuItem,
-    MenuLocation,
-    // AI Settings
-    AISetting,
+    // Menu System entities removed
+    // AI Settings (unified)
     AiSettings,
     AIUsageLog,
     // App System entities
@@ -286,23 +254,7 @@ export const AppDataSource = new DataSource({
     AppInstance,
     AppUsageLog,
     AppRegistry,
-    // Cart and Order entities
-    Cart,
-    CartItem,
-    Order,
-    OrderItem,
-    OrderEvent,
-    // Wishlist entity (R-6-5)
-    //     Wishlist,
-    // Settlement entities
-    Settlement,
-    SettlementItem,
-    // Dropshipping Core entities (from @o4o/dropshipping-core package)
-    //     ...dropshippingEntities,
-    //     // Additional dropshipping entities (not in core package)
-    // //     BusinessInfo,
-    // //     ConversionEvent,
-    // ReferralClick,
+    // Cart/Order/Settlement entities removed - legacy commerce
     // Form entities
     Form,
     FormSubmission,
@@ -316,9 +268,7 @@ export const AppDataSource = new DataSource({
     // P0 Zero-Data Role Management entities (RoleAssignment moved to AUTH module)
     RoleApplication,
     KycDocument,
-    SupplierProfile,
-    SellerProfile,
-    PartnerProfile,
+    // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
     // Forum App entities (from @o4o-apps/forum package)
     ForumPost,
     ForumCategory,
@@ -335,8 +285,8 @@ export const AppDataSource = new DataSource({
     DeploymentInstance,
     // Site entities
     Site,
-    // ✅ NEW: CMS Module V2 entities (Phase C-2)
-    CMSCustomPostType,
+    // ✅ CMS Module V2 entities (Phase C-2)
+    // Note: CMSCustomPostType removed - CustomPostType now uses cms_cpt_types table
     CMSCustomField,
     CMSView,
     CMSPage,

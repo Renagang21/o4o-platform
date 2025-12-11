@@ -6,25 +6,19 @@ import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
-import { MediaFile } from '../entities/MediaFile.js';
-import { MediaFolder } from '../entities/MediaFolder.js';
+// MediaFile/MediaFolder removed - legacy CMS
 import { Category } from '../entities/Category.js';
 import { Settings } from '../entities/Settings.js';
 import { Theme, ThemeInstallation } from '../entities/Theme.js';
-import { Post } from '../entities/Post.js';
-// import { PostTag } from '../entities/PostTag.js'; // Entity does not exist
-import { Page } from '../entities/Page.js';
+// Post/Page removed - legacy WP-style CMS
 import { ReusableBlock } from '../entities/ReusableBlock.js';
 import { BlockPattern } from '../entities/BlockPattern.js';
 import { TemplatePart } from '../entities/TemplatePart.js';
-import { Shipment } from '../entities/Shipment.js';
-import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory.js';
+// Shipment removed - legacy commerce
 import { SmtpSettings } from '../entities/SmtpSettings.js';
 import { EmailLog } from '../entities/EmailLog.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
-import { Menu } from '../entities/Menu.js';
-import { MenuItem } from '../entities/MenuItem.js';
-import { MenuLocation } from '../entities/MenuLocation.js';
+// Menu removed - legacy CMS
 import { CustomPostType } from '../entities/CustomPostType.js';
 
 // 환경변수 기본값 설정
@@ -43,10 +37,10 @@ const CLIDataSource = new DataSource({
   username: DB_USERNAME,
   password: DB_PASSWORD,
   database: DB_NAME,
-  
+
   synchronize: false,
   logging: NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
-  
+
   entities: [
     User,
     RefreshToken,
@@ -55,34 +49,26 @@ const CLIDataSource = new DataSource({
     ApprovalLog,
     LinkedAccount,
     AccountActivity,
-    MediaFile,
-    MediaFolder,
+    // MediaFile/MediaFolder removed
     Category,
     Settings,
     Theme,
     ThemeInstallation,
-    // Content entities
-    Post,
-    // PostTag, // Entity does not exist
-    Page,
+    // Content entities - Post/Page removed
     ReusableBlock,
     BlockPattern,
     TemplatePart,
-    Shipment,
-    ShipmentTrackingHistory,
+    // Shipment/ShipmentTrackingHistory removed
     SmtpSettings,
     EmailLog,
     FieldGroup,
     CustomField,
     CustomFieldValue,
-    // Menu System entities
-    Menu,
-    MenuItem,
-    MenuLocation,
+    // Menu System entities removed
     // CPT entity
     CustomPostType,
   ],
-  
+
   migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'typeorm_migrations'
 });

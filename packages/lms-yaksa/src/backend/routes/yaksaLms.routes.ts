@@ -25,7 +25,7 @@ interface YaksaLmsServices {
 /**
  * Create all Yaksa LMS routes
  *
- * Base path: /lms/yaksa
+ * Base path: /api/v1/lms-yaksa
  *
  * @param dataSource - TypeORM DataSource for service initialization
  * @returns Express Router with all Yaksa LMS routes

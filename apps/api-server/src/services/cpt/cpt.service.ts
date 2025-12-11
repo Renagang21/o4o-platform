@@ -43,7 +43,7 @@ export class CPTService {
       const queryBuilder = this.cptRepository.createQueryBuilder('cpt');
 
       if (active !== undefined) {
-        queryBuilder.where('cpt.active = :active', { active });
+        queryBuilder.where('cpt."isActive" = :active', { active });
       }
 
       queryBuilder.orderBy('cpt.name', 'ASC');

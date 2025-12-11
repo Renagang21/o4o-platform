@@ -1,8 +1,9 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "composite": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -16,6 +17,9 @@
     "isolatedModules": false,
     "lib": ["ES2022", "DOM"]
   },
-  "include": ["src/backend/entities/**/*", "src/manifest.ts", "src/index.ts", "src/lifecycle/**/*", "src/migrations/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/admin-ui/**/*", "src/backend/services/**/*"]
+  "include": [
+    "src/manifest.ts",
+    "src/lifecycle/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

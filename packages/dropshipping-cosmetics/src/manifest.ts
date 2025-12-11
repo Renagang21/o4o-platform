@@ -13,14 +13,17 @@ export const cosmeticsExtensionManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'dropshipping-cosmetics',
   displayName: '화장품 Dropshipping',
+  name: 'Dropshipping Cosmetics Extension',
   version: '1.0.0',
-  appType: 'extension' as const,
+  type: 'extension' as const,
+  appType: 'extension' as const, // Legacy compatibility
+  category: 'commerce' as const,
   description: 'Cosmetics-specific features for dropshipping platform',
 
   // ===== 의존성 =====
   dependencies: {
     core: ['dropshipping-core'],
-    optional: [],
+    apps: [],
   },
 
   // Extend existing CPTs with cosmetics metadata
@@ -433,7 +436,18 @@ export const cosmeticsExtensionManifest = {
   ],
 
   // ===== 소유 테이블 =====
-  ownsTables: [],
+  ownsTables: [
+    'cosmetics_filters',
+    'cosmetics_routines',
+    'cosmetics_brands',
+    'cosmetics_skin_types',
+    'cosmetics_concerns',
+    'cosmetics_ingredients',
+    'cosmetics_categories',
+    'cosmetics_signage_playlists',
+    'cosmetics_seller_workflow_sessions',
+    'cosmetics_campaigns',
+  ],
 
   // ===== 삭제 정책 =====
   uninstallPolicy: {
@@ -444,7 +458,18 @@ export const cosmeticsExtensionManifest = {
 
   // ===== 백엔드 =====
   backend: {
-    entities: [],
+    entities: [
+      './backend/entities/cosmetics-filter.entity',
+      './backend/entities/cosmetics-routine.entity',
+      './backend/entities/brand.entity',
+      './backend/entities/skin-type.entity',
+      './backend/entities/concern.entity',
+      './backend/entities/ingredient.entity',
+      './backend/entities/category.entity',
+      './backend/entities/signage-playlist.entity',
+      './backend/entities/seller-workflow-session.entity',
+      './backend/entities/campaign.entity',
+    ],
     services: [
       'CosmeticsMetadataService',
       'RoutineService',

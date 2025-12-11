@@ -12,14 +12,17 @@ export const lmsCoreManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'lms-core',
   displayName: 'LMS 엔진',
+  name: 'LMS Core',
   version: '1.0.0',
-  appType: 'core' as const,
+  type: 'core' as const,
+  appType: 'core' as const, // Legacy compatibility
+  category: 'education' as const,
   description: 'Learning Management System 핵심 엔진 - 과정/레슨/등록/진도/수료증/출석',
 
   // ===== 의존성 =====
   dependencies: {
     core: ['organization-core'],
-    optional: [],
+    apps: [],
   },
 
   // ===== 소유 테이블 =====
@@ -43,13 +46,13 @@ export const lmsCoreManifest = {
   // ===== 백엔드 =====
   backend: {
     entities: [
-      'Course',
-      'Lesson',
-      'Enrollment',
-      'Progress',
-      'Certificate',
-      'LmsEvent',
-      'Attendance',
+      './entities/Course',
+      './entities/Lesson',
+      './entities/Enrollment',
+      './entities/Progress',
+      './entities/Certificate',
+      './entities/LMSEvent',
+      './entities/Attendance',
     ],
     services: [
       'CourseService',

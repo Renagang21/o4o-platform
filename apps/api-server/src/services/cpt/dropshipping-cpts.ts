@@ -142,30 +142,40 @@ export const DROPSHIPPING_CPT_DEFINITIONS = [
   },
 ];
 
+// Default organization ID for legacy CPTs
+const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000000';
+
 export async function registerDropshippingCPTs() {
   const cptRepository = AppDataSource.getRepository(CustomPostType);
-  
+
   for (const cptDef of DROPSHIPPING_CPT_DEFINITIONS) {
     const existing = await cptRepository.findOne({ where: { slug: cptDef.name } });
-    
+
     if (!existing) {
       const cpt = cptRepository.create({
+        organizationId: DEFAULT_ORG_ID,
         slug: cptDef.name,
         name: cptDef.label,
+        singularLabel: cptDef.singular_label,
+        pluralLabel: cptDef.label + 's',
         description: cptDef.description,
-        icon: cptDef.menu_icon,
-        menuPosition: cptDef.menu_position,
-        public: cptDef.public,
+        icon: cptDef.menu_icon?.replace('dashicons-', ''),
+        isPublic: cptDef.public,
         hasArchive: cptDef.has_archive,
-        showInMenu: cptDef.show_in_menu,
         supports: cptDef.supports,
         taxonomies: (cptDef as any).taxonomies || [],
-        capabilityType: 'post',
-        rewrite: cptDef.rewrite,
-        labels: cptDef.labels,
-        active: true
+        capabilities: cptDef.capabilities || {},
+        rewriteRules: cptDef.rewrite || {},
+        metadata: {
+          menuPosition: cptDef.menu_position,
+          labels: cptDef.labels,
+          showInMenu: cptDef.show_in_menu,
+          showUi: cptDef.show_ui,
+          showInRest: cptDef.show_in_rest,
+        },
+        isActive: true
       });
-      
+
       await cptRepository.save(cpt);
       logger.info(`Registered CPT: ${cptDef.name}`);
     } else {

@@ -14,8 +14,11 @@ export const cosmeticsSellerExtensionManifest = {
   id: 'cosmetics-seller-extension',  // ModuleLoader compatibility
   appId: 'cosmetics-seller-extension',
   displayName: '화장품 판매원 관리',
+  name: 'Cosmetics Seller Extension',
   version: '1.0.0',
-  appType: 'extension' as const,
+  type: 'extension' as const,
+  appType: 'extension' as const, // Legacy compatibility
+  category: 'commerce' as const,
   description: '화장품 매장 판매원 운영 기능 - 진열, 샘플, 재고, 상담, KPI 관리',
 
   // Extension configuration
@@ -24,7 +27,23 @@ export const cosmeticsSellerExtensionManifest = {
   // ===== 의존성 =====
   dependencies: {
     core: ['dropshipping-core', 'dropshipping-cosmetics'],
-    optional: [],
+    apps: [],
+  },
+
+  // ===== 소유 테이블 =====
+  ownsTables: [
+    'cosmetics_seller_displays',
+    'cosmetics_seller_samples',
+    'cosmetics_seller_inventory',
+    'cosmetics_seller_consultation_logs',
+    'cosmetics_seller_kpi',
+  ],
+
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: false,
   },
 
   // Custom Post Types owned by this extension
@@ -254,11 +273,11 @@ export const cosmeticsSellerExtensionManifest = {
    */
   backend: {
     entities: [
-      'SellerDisplayEntity',
-      'SellerSampleEntity',
-      'SellerInventoryEntity',
-      'SellerConsultationLogEntity',
-      'SellerKpiEntity',
+      './backend/entities/seller-display.entity',
+      './backend/entities/seller-sample.entity',
+      './backend/entities/seller-inventory.entity',
+      './backend/entities/seller-consultation-log.entity',
+      './backend/entities/seller-kpi.entity',
     ],
     services: ['CosmeticsSellerService'],
     controllers: ['CosmeticsSellerController'],
