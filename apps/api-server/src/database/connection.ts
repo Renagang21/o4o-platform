@@ -127,8 +127,8 @@ import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
 // Site entities
 import { Site } from '../modules/sites/site.entity.js';
 
-// ✅ NEW: CMS Module V2 entities (Phase C-2)
-import { CustomPostType as CMSCustomPostType } from '../modules/cms/entities/CustomPostType.js';
+// ✅ CMS Module V2 entities (Phase C-2)
+// Note: CMSCustomPostType removed - now unified with CustomPostType using cms_cpt_types table
 import { CustomField as CMSCustomField } from '../modules/cms/entities/CustomField.js';
 import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
@@ -335,8 +335,8 @@ export const AppDataSource = new DataSource({
     DeploymentInstance,
     // Site entities
     Site,
-    // ✅ NEW: CMS Module V2 entities (Phase C-2)
-    CMSCustomPostType,
+    // ✅ CMS Module V2 entities (Phase C-2)
+    // Note: CMSCustomPostType removed - CustomPostType now uses cms_cpt_types table
     CMSCustomField,
     CMSView,
     CMSPage,
