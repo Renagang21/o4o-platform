@@ -110,11 +110,10 @@ export class AccountLinkingService {
       // Log activity
       await activityRepo.save(activityRepo.create({
         userId,
-        action: 'linked',
-        provider,
+        type: `linked_${provider}`,
         ipAddress: '',
         userAgent: '',
-        metadata: { providerId: providerData.providerId }
+        details: { provider, providerId: providerData.providerId }
       }));
 
       return {
@@ -195,7 +194,7 @@ export class AccountLinkingService {
         status: LinkingStatus.PENDING,
         verificationToken,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-        metadata: { email }
+        details: { email }
       });
 
       await sessionRepo.save(session);
@@ -304,11 +303,10 @@ export class AccountLinkingService {
       // Log activity
       await activityRepo.save(activityRepo.create({
         userId: session.userId,
-        action: 'linked',
-        provider: 'email',
+        type: 'linked_email',
         ipAddress: '',
         userAgent: '',
-        metadata: { email }
+        details: { provider: 'email', email }
       }));
 
       return {
@@ -407,11 +405,10 @@ export class AccountLinkingService {
       // Log activity
       await activityRepo.save(activityRepo.create({
         userId,
-        action: 'unlinked',
-        provider: request.provider,
+        type: `unlinked_${request.provider}`,
         ipAddress: '',
         userAgent: '',
-        metadata: { providerId: linkedAccount.providerId }
+        details: { provider: request.provider, providerId: linkedAccount.providerId }
       }));
 
       return {

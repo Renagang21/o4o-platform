@@ -293,7 +293,7 @@ export class AuthenticationService {
       // Auto-link if same email
       const linkResult = await AccountLinkingService.linkOAuthAccount(
         existingUserByEmail.id,
-        
+        provider,
         {
           providerId: profile.id,
           email: profile.email,
