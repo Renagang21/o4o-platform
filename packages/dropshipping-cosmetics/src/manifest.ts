@@ -11,6 +11,7 @@
 
 export const cosmeticsExtensionManifest = {
   // ===== 필수 기본 정보 =====
+  id: 'dropshipping-cosmetics', // ModuleLoader compatibility
   appId: 'dropshipping-cosmetics',
   displayName: '화장품 Dropshipping',
   name: 'Dropshipping Cosmetics Extension',

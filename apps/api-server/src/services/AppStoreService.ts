@@ -66,7 +66,8 @@ export class AppStoreService {
     // Run install lifecycle hook
     if (appModule.lifecycle?.install) {
       try {
-        await appModule.lifecycle.install();
+        const installContext = { appId };
+        await appModule.lifecycle.install(installContext);
         logger.info(`[AppStore] Ran install hook for ${appId}`);
       } catch (installError) {
         logger.error(`[AppStore] Install hook failed for ${appId}:`, installError);
@@ -103,7 +104,8 @@ export class AppStoreService {
     // Run uninstall lifecycle hook
     if (appModule.lifecycle?.uninstall) {
       try {
-        await appModule.lifecycle.uninstall();
+        const uninstallContext = { appId };
+        await appModule.lifecycle.uninstall(uninstallContext);
         logger.info(`[AppStore] Ran uninstall hook for ${appId}`);
       } catch (uninstallError) {
         logger.error(`[AppStore] Uninstall hook failed for ${appId}:`, uninstallError);
