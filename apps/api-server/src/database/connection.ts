@@ -151,6 +151,14 @@ import {
   ReportAssignment,
 } from '@o4o/reporting-yaksa/backend/entities/index.js';
 
+// ✅ NEW: LMS-Yaksa entities
+import {
+  YaksaLicenseProfile,
+  RequiredCoursePolicy,
+  CreditRecord,
+  YaksaCourseAssignment,
+} from '@o4o/lms-yaksa';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -316,6 +324,11 @@ export const AppDataSource = new DataSource({
     ReportFieldTemplate,
     ReportLog,
     ReportAssignment,
+    // ✅ NEW: LMS-Yaksa entities
+    YaksaLicenseProfile,
+    RequiredCoursePolicy,
+    CreditRecord,
+    YaksaCourseAssignment,
   ],
   
   // 마이그레이션 설정
