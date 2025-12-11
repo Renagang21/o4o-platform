@@ -1,17 +1,14 @@
 import { Repository, Like, In } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { Tag } from '../entities/Tag.js';
-import { Post } from '../entities/Post.js';
 import { CreateTagDto, UpdateTagDto, TagStatistics } from '../types/tag.types.js';
 import { generateSlug } from '../utils/slug.js';
 
 export class TagService {
   private tagRepository: Repository<Tag>;
-  private postRepository: Repository<Post>;
 
   constructor() {
     this.tagRepository = AppDataSource.getRepository(Tag);
-    this.postRepository = AppDataSource.getRepository(Post);
   }
 
   /**
@@ -38,7 +35,7 @@ export class TagService {
     }
 
     // Add sorting
-    const allowedSortFields = ['name', 'slug', 'createdAt', 'updatedAt'];
+    const allowedSortFields = ['name', 'slug', 'createdAt', 'updatedAt', 'count'];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'name';
     queryBuilder.orderBy(`tag.${sortField}`, sortOrder);
 
@@ -47,9 +44,6 @@ export class TagService {
 
     // Add pagination
     queryBuilder.skip(skip).limit(limit);
-
-    // Load post count for each tag
-    queryBuilder.loadRelationCountAndMap('tag.postCount', 'tag.posts');
 
     const tags = await queryBuilder.getMany();
 
@@ -61,8 +55,7 @@ export class TagService {
    */
   async getTagById(id: string): Promise<Tag | null> {
     return await this.tagRepository.findOne({
-      where: { id },
-      relations: ['posts']
+      where: { id }
     });
   }
 
@@ -81,27 +74,20 @@ export class TagService {
    */
   async createTag(data: CreateTagDto & { createdBy?: string }): Promise<Tag> {
     const tag = new Tag();
-    
+
     tag.name = data.name;
     tag.slug = data.slug || generateSlug(data.name);
     tag.description = data.description || '';
-    
+
     // Store meta information in meta field
-    // Support both backward compatibility fields and new meta structure
     tag.meta = {
       ...(tag.meta || {}),
-      // Backward compatibility: direct metaTitle/metaDescription fields
       ...(data.metaTitle && { metaTitle: data.metaTitle }),
       ...(data.metaDescription && { metaDescription: data.metaDescription }),
-      // New structure: meta object
       ...(data.meta || {}),
-      // Defaults if nothing provided
       ...(!data.metaTitle && !data.meta?.metaTitle && { metaTitle: data.name }),
       ...(!data.metaDescription && !data.meta?.metaDescription && { metaDescription: data.description || '' })
     };
-    
-    // Timestamps are handled automatically by TypeORM
-    // tag.createdAt and tag.updatedAt are set by @CreateDateColumn and @UpdateDateColumn
 
     return await this.tagRepository.save(tag);
   }
@@ -111,7 +97,7 @@ export class TagService {
    */
   async updateTag(id: string, data: UpdateTagDto & { updatedBy?: string }): Promise<Tag> {
     const tag = await this.getTagById(id);
-    
+
     if (!tag) {
       throw new Error('Tag not found');
     }
@@ -120,21 +106,16 @@ export class TagService {
     if (data.name !== undefined) tag.name = data.name;
     if (data.slug !== undefined) tag.slug = generateSlug(data.slug);
     if (data.description !== undefined) tag.description = data.description;
-    
+
     // Update meta information if provided
-    // Support both backward compatibility fields and new meta structure
     if (data.metaTitle !== undefined || data.metaDescription !== undefined || data.meta !== undefined) {
       tag.meta = {
         ...(tag.meta || {}),
-        // Backward compatibility: direct metaTitle/metaDescription fields
         ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle }),
         ...(data.metaDescription !== undefined && { metaDescription: data.metaDescription }),
-        // New structure: meta object
         ...(data.meta || {})
       };
     }
-
-    // Timestamp is updated automatically by @UpdateDateColumn
 
     return await this.tagRepository.save(tag);
   }
@@ -144,30 +125,28 @@ export class TagService {
    */
   async deleteTag(id: string): Promise<void> {
     const tag = await this.getTagById(id);
-    
+
     if (!tag) {
       throw new Error('Tag not found');
     }
 
-    // Check if tag has posts
-    const postCount = await this.getTagPostCount(id);
-    if (postCount > 0) {
-      throw new Error(`Cannot delete tag with ${postCount} associated posts`);
+    // Check if tag is in use
+    if (tag.count > 0) {
+      throw new Error(`Cannot delete tag with ${tag.count} usages`);
     }
 
     await this.tagRepository.remove(tag);
   }
 
   /**
-   * Get the number of posts using a tag
+   * Get the usage count of a tag
    */
   async getTagPostCount(tagId: string): Promise<number> {
     const tag = await this.tagRepository.findOne({
-      where: { id: tagId },
-      relations: ['posts']
+      where: { id: tagId }
     });
 
-    return tag?.posts?.length || 0;
+    return tag?.count || 0;
   }
 
   /**
@@ -181,33 +160,19 @@ export class TagService {
       throw new Error('One or both tags not found');
     }
 
-    // Get all posts with the source tag
-    const posts = fromTag.posts || [];
-    let postsUpdated = 0;
+    // Transfer count from source to target
+    const countMerged = fromTag.count;
+    toTag.count += countMerged;
 
-    // Update each post to use the target tag
-    for (const post of posts) {
-      // Remove old tag
-      if (post.tags) {
-        post.tags = post.tags.filter(tag => tag.id !== fromId);
-        
-        // Add new tag if not already present
-        const hasTargetTag = post.tags.some(tag => tag.id === toId);
-        if (!hasTargetTag) {
-          post.tags.push(toTag);
-          postsUpdated++;
-        }
-        
-        await this.postRepository.save(post);
-      }
-    }
+    // Save target tag
+    await this.tagRepository.save(toTag);
 
     // Delete the source tag
     await this.tagRepository.remove(fromTag);
 
     return {
       targetTag: toTag,
-      postsUpdated
+      postsUpdated: countMerged
     };
   }
 
@@ -216,73 +181,33 @@ export class TagService {
    */
   async getTagStatistics(tagId: string): Promise<TagStatistics | null> {
     const tag = await this.tagRepository.findOne({
-      where: { id: tagId },
-      relations: ['posts']
+      where: { id: tagId }
     });
 
     if (!tag) {
       return null;
     }
 
-    const posts = tag.posts || [];
-    const postCount = posts.length;
-
-    // Calculate view count (sum of all post views)
-    let totalViews = 0;
-    for (const post of posts) {
-      totalViews += 0; // viewCount not available in Post entity yet
-    }
-
-    // Get recent posts
-    const recentPosts = posts
-      .sort((a, b) => {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
-        return dateB - dateA;
-      })
-      .slice(0, 5);
-
-    // Get most viewed posts (using creation date as fallback for now)
-    const popularPosts = posts
-      .sort((a, b) => {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
-        return dateB - dateA;
-      })
-      .slice(0, 5);
-
     return {
       tagId,
       name: tag.name,
       slug: tag.slug,
-      postCount,
-      totalViews,
-      recentPosts: recentPosts.map(p => ({
-        id: p.id,
-        title: p.title,
-        slug: p.slug,
-        createdAt: p.created_at,
-        viewCount: 0 // viewCount not available yet
-      })),
-      popularPosts: popularPosts.map(p => ({
-        id: p.id,
-        title: p.title,
-        slug: p.slug,
-        viewCount: 0 // viewCount not available yet
-      })),
+      postCount: tag.count,
+      totalViews: 0,
+      recentPosts: [],
+      popularPosts: [],
       createdAt: tag.created_at,
       updatedAt: tag.updated_at
     };
   }
 
   /**
-   * Get popular tags based on post count
+   * Get popular tags based on count
    */
   async getPopularTags(limit: number = 10): Promise<any[]> {
     const tags = await this.tagRepository
       .createQueryBuilder('tag')
-      .loadRelationCountAndMap('tag.postCount', 'tag.posts')
-      .orderBy('tag.postCount', 'DESC')
+      .orderBy('tag.count', 'DESC')
       .limit(limit)
       .getMany();
 
@@ -290,7 +215,7 @@ export class TagService {
       id: tag.id,
       name: tag.name,
       slug: tag.slug,
-      postCount: (tag as any).postCount || 0
+      postCount: tag.count
     }));
   }
 
@@ -315,21 +240,21 @@ export class TagService {
    */
   async bulkCreateTags(tagNames: string[]): Promise<Tag[]> {
     const tags: Tag[] = [];
-    
+
     for (const name of tagNames) {
       const slug = generateSlug(name);
-      
+
       // Check if tag already exists
       let tag = await this.findBySlug(slug);
-      
+
       if (!tag) {
         // Create new tag
         tag = await this.createTag({ name, slug });
       }
-      
+
       tags.push(tag);
     }
-    
+
     return tags;
   }
 
@@ -340,7 +265,7 @@ export class TagService {
     if (ids.length === 0) {
       return [];
     }
-    
+
     return await this.tagRepository.find({
       where: {
         id: In(ids)

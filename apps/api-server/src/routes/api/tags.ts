@@ -185,20 +185,19 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
     
     const tag = await tagRepository.findOne({
-      where: { id },
-      relations: ['posts']
+      where: { id }
     })
 
     if (!tag) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Tag not found' } })
     }
 
-    // Check if tag is in use
-    if (tag.posts && tag.posts.length > 0) {
-      return res.status(400).json({ 
-        error: { 
-          code: 'VALIDATION_ERROR', 
-          message: 'Cannot delete tag that is in use by posts' 
+    // Check if tag is in use by count
+    if (tag.count > 0) {
+      return res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Cannot delete tag that is in use'
         }
       })
     }
@@ -226,8 +225,7 @@ router.post('/merge', authenticateToken, async (req: Request, res: Response) => 
     }
 
     const targetTag = await tagRepository.findOne({
-      where: { id: targetId },
-      relations: ['posts']
+      where: { id: targetId }
     })
 
     if (!targetTag) {
@@ -235,20 +233,11 @@ router.post('/merge', authenticateToken, async (req: Request, res: Response) => 
     }
 
     const sourceTags = await tagRepository.find({
-      where: sourceIds.map(id => ({ id })),
-      relations: ['posts']
+      where: sourceIds.map(id => ({ id }))
     })
 
-    // Merge posts from source tags to target tag
+    // Merge counts from source tags to target tag
     for (const sourceTag of sourceTags) {
-      if (sourceTag.posts) {
-        for (const post of sourceTag.posts) {
-          if (!targetTag.posts.find(p => p.id === post.id)) {
-            targetTag.posts.push(post)
-          }
-        }
-      }
-      // Update usage count
       targetTag.count += sourceTag.count
     }
 
