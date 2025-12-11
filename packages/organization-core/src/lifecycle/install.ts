@@ -82,6 +82,40 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
     );
   `);
 
+  // organization_units 테이블 (조직 단위/부서)
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS organization_units (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+      name VARCHAR(255) NOT NULL,
+      code VARCHAR(100),
+      parent_id UUID REFERENCES organization_units(id) ON DELETE RESTRICT,
+      level INTEGER NOT NULL DEFAULT 0,
+      description TEXT,
+      metadata JSONB,
+      is_active BOOLEAN NOT NULL DEFAULT true,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // organization_roles 테이블 (조직 내 역할 정의)
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS organization_roles (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+      role_name VARCHAR(255) NOT NULL,
+      display_name VARCHAR(255),
+      description TEXT,
+      permissions JSONB,
+      is_default BOOLEAN NOT NULL DEFAULT false,
+      metadata JSONB,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(organization_id, role_name)
+    );
+  `);
+
   logger.info('Tables created successfully.');
 }
 
@@ -107,6 +141,17 @@ async function createIndexes(dataSource: any, logger: any): Promise<void> {
       ON organization_members(is_primary) WHERE is_primary = true;
     CREATE INDEX IF NOT EXISTS idx_org_members_active
       ON organization_members(organization_id, left_at) WHERE left_at IS NULL;
+
+    -- organization_units indexes
+    CREATE INDEX IF NOT EXISTS idx_org_units_org_id ON organization_units(organization_id);
+    CREATE INDEX IF NOT EXISTS idx_org_units_parent_id ON organization_units(parent_id);
+    CREATE INDEX IF NOT EXISTS idx_org_units_code ON organization_units(code);
+    CREATE INDEX IF NOT EXISTS idx_org_units_active ON organization_units(is_active);
+
+    -- organization_roles indexes
+    CREATE INDEX IF NOT EXISTS idx_org_roles_org_id ON organization_roles(organization_id);
+    CREATE INDEX IF NOT EXISTS idx_org_roles_role_name ON organization_roles(role_name);
+    CREATE INDEX IF NOT EXISTS idx_org_roles_default ON organization_roles(is_default) WHERE is_default = true;
   `);
 
   logger.info('Indexes created successfully.');
