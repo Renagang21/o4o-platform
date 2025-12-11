@@ -318,10 +318,31 @@ const httpMetrics = HttpMetricsService.getInstance(prometheusMetrics.registry);
 app.use(httpMetrics.middleware());
 
 // ============================================================================
-// ROUTES SETUP
+// CORE ROUTES SETUP (Phase 8-4 - Core Routes Registration)
 // ============================================================================
-// NOTE: Routes are now dynamically registered after module loading in startServer()
-// setupRoutes(app); // Commented out - replaced by dynamic module route registration
+// Core routes are registered here, while dynamic app routes are registered via module loader
+import authRoutes from './modules/auth/routes/auth.routes.js';
+import cmsRoutes from './modules/cms/routes/cms.routes.js';
+import lmsRoutes from './modules/lms/routes/lms.routes.js';
+import usersRoutes from './routes/users.routes.js';
+import cptRoutes from './routes/cpt.ts';
+import healthRoutes from './routes/health.ts';
+import forumRoutes from './routes/forum/forum.routes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import adminAppsRoutes from './routes/admin/apps.routes.js';
+
+// Register core API routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/cms', cmsRoutes);
+app.use('/api/v1/lms', lmsRoutes);
+app.use('/api/v1/users', usersRoutes);
+app.use('/api/v1/cpt', cptRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/v1/forum', forumRoutes);
+app.use('/api/v1/settings', settingsRoutes);
+app.use('/api/v1/admin/apps', adminAppsRoutes);
+
+logger.info('✅ Core API routes registered');
 
 // ============================================================================
 // SWAGGER DOCUMENTATION
