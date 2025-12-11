@@ -13,5 +13,5 @@ export type {
   ActorInfo,
 } from './AnnualReportService.js';
 
-export { MembershipSyncService } from './MembershipSyncService.js';
-export type { SyncResult } from './MembershipSyncService.js';
+export { MembershipSyncService, VALID_SYNC_TARGETS } from './MembershipSyncService.js';
+export type { SyncResult, SyncTarget } from './MembershipSyncService.js';

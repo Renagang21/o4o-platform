@@ -229,4 +229,75 @@ export class RequiredCoursePolicyService {
              policy.targetMemberTypes.includes('all');
     });
   }
+
+  // ===== Phase 1: Pharmacist Type Integration =====
+
+  /**
+   * Phase 1: Get policies applicable to a specific pharmacist type
+   *
+   * Filters policies by pharmacistType from membership-yaksa.
+   * If targetPharmacistTypes is empty/null, the policy applies to all.
+   *
+   * @param organizationId - Organization ID
+   * @param pharmacistType - PharmacistType from membership-yaksa ('working' | 'owner' | etc)
+   */
+  async getPoliciesForPharmacistType(
+    organizationId: string,
+    pharmacistType: string
+  ): Promise<RequiredCoursePolicy[]> {
+    const policies = await this.getActivePolicies(organizationId);
+    return policies.filter(policy => {
+      if (!policy.targetPharmacistTypes || policy.targetPharmacistTypes.length === 0) {
+        return true; // Applies to all if no specific types
+      }
+      return policy.targetPharmacistTypes.includes(pharmacistType) ||
+             policy.targetPharmacistTypes.includes('all');
+    });
+  }
+
+  /**
+   * Phase 1: Get required credits for a specific pharmacist type
+   *
+   * @param organizationId - Organization ID
+   * @param pharmacistType - PharmacistType from membership-yaksa
+   */
+  async getRequiredCreditsForPharmacistType(
+    organizationId: string,
+    pharmacistType: string
+  ): Promise<number> {
+    const policies = await this.getPoliciesForPharmacistType(organizationId, pharmacistType);
+    let maxCredits = 0;
+
+    for (const policy of policies) {
+      if (policy.isCurrentlyValid()) {
+        maxCredits = Math.max(maxCredits, Number(policy.requiredCredits));
+      }
+    }
+
+    return maxCredits;
+  }
+
+  /**
+   * Phase 1: Get required course IDs for a specific pharmacist type
+   *
+   * @param organizationId - Organization ID
+   * @param pharmacistType - PharmacistType from membership-yaksa
+   */
+  async getRequiredCourseIdsForPharmacistType(
+    organizationId: string,
+    pharmacistType: string
+  ): Promise<string[]> {
+    const policies = await this.getPoliciesForPharmacistType(organizationId, pharmacistType);
+    const courseIds = new Set<string>();
+
+    for (const policy of policies) {
+      if (policy.isCurrentlyValid()) {
+        for (const courseId of policy.requiredCourseIds) {
+          courseIds.add(courseId);
+        }
+      }
+    }
+
+    return Array.from(courseIds);
+  }
 }

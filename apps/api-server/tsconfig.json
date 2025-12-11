@@ -30,6 +30,7 @@
     "baseUrl": ".",
     "paths": {
       "@o4o/membership-yaksa/*": ["../../packages/membership-yaksa/dist/*"],
+      "@o4o/reporting-yaksa/*": ["../../packages/reporting-yaksa/dist/*"],
       "@o4o/dropshipping-cosmetics/*": ["../../packages/dropshipping-cosmetics/dist/*"],
       "@o4o/*": ["../../packages/*/dist"],
       "@o4o-apps/signage": ["../../packages/@o4o-apps/signage/dist"],

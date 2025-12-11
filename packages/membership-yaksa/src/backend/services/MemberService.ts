@@ -1,5 +1,11 @@
 import { DataSource, Repository, FindOptionsWhere, Like, Between } from 'typeorm';
-import { Member } from '../entities/Member.js';
+import {
+  Member,
+  PharmacistType,
+  WorkplaceType,
+  OfficialRole,
+  Gender,
+} from '../entities/Member.js';
 import { MemberCategory } from '../entities/MemberCategory.js';
 import { MembershipYear } from '../entities/MembershipYear.js';
 import { Verification } from '../entities/Verification.js';
@@ -22,6 +28,11 @@ export interface ComputedMemberStatus {
     amount?: number;
     paidAt?: Date;
   };
+  // Phase 1: 약사 정보
+  pharmacistType?: PharmacistType;
+  workplaceType?: WorkplaceType;
+  isExecutive: boolean; // 임원 여부
+  officialRole?: OfficialRole;
 }
 
 /**
@@ -39,6 +50,18 @@ export interface CreateMemberDto {
   pharmacyName?: string;
   pharmacyAddress?: string;
   metadata?: Record<string, any>;
+  // Phase 1: 확장 필드
+  gender?: Gender;
+  licenseIssuedAt?: string;
+  licenseRenewalAt?: string;
+  pharmacistType?: PharmacistType;
+  workplaceName?: string;
+  workplaceAddress?: string;
+  workplaceType?: WorkplaceType;
+  yaksaJoinDate?: string;
+  officialRole?: OfficialRole;
+  registrationNumber?: string;
+  memo?: string;
 }
 
 /**
@@ -56,6 +79,18 @@ export interface UpdateMemberDto {
   isVerified?: boolean;
   isActive?: boolean;
   metadata?: Record<string, any>;
+  // Phase 1: 확장 필드
+  gender?: Gender;
+  licenseIssuedAt?: string;
+  licenseRenewalAt?: string;
+  pharmacistType?: PharmacistType;
+  workplaceName?: string;
+  workplaceAddress?: string;
+  workplaceType?: WorkplaceType;
+  yaksaJoinDate?: string;
+  officialRole?: OfficialRole;
+  registrationNumber?: string;
+  memo?: string;
 }
 
 /**
@@ -76,6 +111,13 @@ export interface MemberFilterDto {
   createdTo?: Date; // 가입일 종료
   page?: number; // 페이지 번호
   limit?: number; // 페이지당 항목 수
+  // Phase 1: 확장 필터
+  pharmacistType?: PharmacistType;
+  workplaceType?: WorkplaceType;
+  officialRole?: OfficialRole;
+  gender?: Gender;
+  isExecutive?: boolean; // 임원 여부
+  registrationNumber?: string;
 }
 
 /**
@@ -272,6 +314,51 @@ export class MemberService {
       });
     }
 
+    // Phase 1: 약사 유형 필터
+    if (filter?.pharmacistType) {
+      queryBuilder.andWhere('member.pharmacistType = :pharmacistType', {
+        pharmacistType: filter.pharmacistType,
+      });
+    }
+
+    // Phase 1: 근무지 유형 필터
+    if (filter?.workplaceType) {
+      queryBuilder.andWhere('member.workplaceType = :workplaceType', {
+        workplaceType: filter.workplaceType,
+      });
+    }
+
+    // Phase 1: 직책 필터
+    if (filter?.officialRole) {
+      queryBuilder.andWhere('member.officialRole = :officialRole', {
+        officialRole: filter.officialRole,
+      });
+    }
+
+    // Phase 1: 성별 필터
+    if (filter?.gender) {
+      queryBuilder.andWhere('member.gender = :gender', {
+        gender: filter.gender,
+      });
+    }
+
+    // Phase 1: 임원 여부 필터
+    if (filter?.isExecutive !== undefined) {
+      const executiveRoles = ['president', 'vice_president', 'general_manager', 'auditor', 'director', 'branch_head', 'district_head'];
+      if (filter.isExecutive) {
+        queryBuilder.andWhere('member.officialRole IN (:...executiveRoles)', { executiveRoles });
+      } else {
+        queryBuilder.andWhere('(member.officialRole IS NULL OR member.officialRole = :noneRole)', { noneRole: 'none' });
+      }
+    }
+
+    // Phase 1: 회원등록번호 필터
+    if (filter?.registrationNumber) {
+      queryBuilder.andWhere('member.registrationNumber LIKE :registrationNumber', {
+        registrationNumber: `%${filter.registrationNumber}%`,
+      });
+    }
+
     // 전체 카운트 (페이지네이션 전)
     const total = await queryBuilder.getCount();
 
@@ -402,6 +489,9 @@ export class MemberService {
     // 4. 검증 여부 (member.isVerified 또는 최신 verification이 approved인 경우)
     const isVerified = member.isVerified || verificationStatus === 'approved';
 
+    // 5. Phase 1: 임원 여부 계산
+    const isExecutive = member.isExecutive ? member.isExecutive() : false;
+
     return {
       isVerified,
       isActive: member.isActive,
@@ -410,6 +500,11 @@ export class MemberService {
       verificationStatus,
       lastVerificationDate,
       currentYearFee,
+      // Phase 1: 약사 정보
+      pharmacistType: member.pharmacistType,
+      workplaceType: member.workplaceType,
+      isExecutive,
+      officialRole: member.officialRole,
     };
   }
 
@@ -527,5 +622,203 @@ export class MemberService {
     }
 
     return { success, failed, errors };
+  }
+
+  // ===== Phase 1: 신규 Bulk 메서드 =====
+
+  /**
+   * 일괄 약사 유형 변경
+   */
+  async bulkSetPharmacistType(
+    memberIds: string[],
+    pharmacistType: PharmacistType
+  ): Promise<{ success: number; failed: number; errors: string[] }> {
+    let success = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const memberId of memberIds) {
+      try {
+        await this.update(memberId, { pharmacistType });
+        success++;
+      } catch (error: any) {
+        failed++;
+        errors.push(`Member ${memberId}: ${error.message}`);
+      }
+    }
+
+    return { success, failed, errors };
+  }
+
+  /**
+   * 일괄 직책 변경
+   */
+  async bulkSetOfficialRole(
+    memberIds: string[],
+    officialRole: OfficialRole
+  ): Promise<{ success: number; failed: number; errors: string[] }> {
+    let success = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const memberId of memberIds) {
+      try {
+        await this.update(memberId, { officialRole });
+        success++;
+      } catch (error: any) {
+        failed++;
+        errors.push(`Member ${memberId}: ${error.message}`);
+      }
+    }
+
+    return { success, failed, errors };
+  }
+
+  /**
+   * 일괄 근무지 유형 변경
+   */
+  async bulkSetWorkplaceType(
+    memberIds: string[],
+    workplaceType: WorkplaceType
+  ): Promise<{ success: number; failed: number; errors: string[] }> {
+    let success = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const memberId of memberIds) {
+      try {
+        await this.update(memberId, { workplaceType });
+        success++;
+      } catch (error: any) {
+        failed++;
+        errors.push(`Member ${memberId}: ${error.message}`);
+      }
+    }
+
+    return { success, failed, errors };
+  }
+
+  // ===== Phase 1: 통계 메서드 =====
+
+  /**
+   * 약사 유형별 통계
+   */
+  async getStatsByPharmacistType(organizationId?: string): Promise<Record<string, number>> {
+    const queryBuilder = this.memberRepo
+      .createQueryBuilder('member')
+      .select('member.pharmacistType', 'pharmacistType')
+      .addSelect('COUNT(*)', 'count')
+      .where('member.isActive = :isActive', { isActive: true })
+      .groupBy('member.pharmacistType');
+
+    if (organizationId) {
+      queryBuilder.andWhere('member.organizationId = :organizationId', { organizationId });
+    }
+
+    const results = await queryBuilder.getRawMany();
+    const stats: Record<string, number> = {};
+
+    for (const row of results) {
+      const key = row.pharmacistType || 'unset';
+      stats[key] = parseInt(row.count, 10);
+    }
+
+    return stats;
+  }
+
+  /**
+   * 직책별 통계
+   */
+  async getStatsByOfficialRole(organizationId?: string): Promise<Record<string, number>> {
+    const queryBuilder = this.memberRepo
+      .createQueryBuilder('member')
+      .select('member.officialRole', 'officialRole')
+      .addSelect('COUNT(*)', 'count')
+      .where('member.isActive = :isActive', { isActive: true })
+      .groupBy('member.officialRole');
+
+    if (organizationId) {
+      queryBuilder.andWhere('member.organizationId = :organizationId', { organizationId });
+    }
+
+    const results = await queryBuilder.getRawMany();
+    const stats: Record<string, number> = {};
+
+    for (const row of results) {
+      const key = row.officialRole || 'none';
+      stats[key] = parseInt(row.count, 10);
+    }
+
+    return stats;
+  }
+
+  /**
+   * 근무지 유형별 통계
+   */
+  async getStatsByWorkplaceType(organizationId?: string): Promise<Record<string, number>> {
+    const queryBuilder = this.memberRepo
+      .createQueryBuilder('member')
+      .select('member.workplaceType', 'workplaceType')
+      .addSelect('COUNT(*)', 'count')
+      .where('member.isActive = :isActive', { isActive: true })
+      .groupBy('member.workplaceType');
+
+    if (organizationId) {
+      queryBuilder.andWhere('member.organizationId = :organizationId', { organizationId });
+    }
+
+    const results = await queryBuilder.getRawMany();
+    const stats: Record<string, number> = {};
+
+    for (const row of results) {
+      const key = row.workplaceType || 'unset';
+      stats[key] = parseInt(row.count, 10);
+    }
+
+    return stats;
+  }
+
+  /**
+   * 성별 통계
+   */
+  async getStatsByGender(organizationId?: string): Promise<Record<string, number>> {
+    const queryBuilder = this.memberRepo
+      .createQueryBuilder('member')
+      .select('member.gender', 'gender')
+      .addSelect('COUNT(*)', 'count')
+      .where('member.isActive = :isActive', { isActive: true })
+      .groupBy('member.gender');
+
+    if (organizationId) {
+      queryBuilder.andWhere('member.organizationId = :organizationId', { organizationId });
+    }
+
+    const results = await queryBuilder.getRawMany();
+    const stats: Record<string, number> = {};
+
+    for (const row of results) {
+      const key = row.gender || 'unset';
+      stats[key] = parseInt(row.count, 10);
+    }
+
+    return stats;
+  }
+
+  /**
+   * 임원 수 조회
+   */
+  async countExecutives(organizationId?: string): Promise<number> {
+    const executiveRoles = ['president', 'vice_president', 'general_manager', 'auditor', 'director', 'branch_head', 'district_head'];
+
+    const queryBuilder = this.memberRepo
+      .createQueryBuilder('member')
+      .where('member.isActive = :isActive', { isActive: true })
+      .andWhere('member.officialRole IN (:...executiveRoles)', { executiveRoles });
+
+    if (organizationId) {
+      queryBuilder.andWhere('member.organizationId = :organizationId', { organizationId });
+    }
+
+    return await queryBuilder.getCount();
   }
 }

@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { AnnualReport } from './AnnualReport.js';
+import type { AnnualReport } from './AnnualReport.js';
 
 /**
  * 담당자 역할 타입
@@ -57,8 +57,9 @@ export class ReportAssignment {
 
   /**
    * 신고서 관계
+   * Using string reference to avoid circular dependency
    */
-  @ManyToOne(() => AnnualReport, (report) => report.assignments, { onDelete: 'CASCADE' })
+  @ManyToOne('AnnualReport', 'assignments', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'reportId' })
   report!: AnnualReport;
 
