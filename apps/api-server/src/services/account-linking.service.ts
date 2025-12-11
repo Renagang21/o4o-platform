@@ -194,7 +194,7 @@ export class AccountLinkingService {
         status: LinkingStatus.PENDING,
         verificationToken,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-        details: { email }
+        metadata: { email }
       });
 
       await sessionRepo.save(session);
