@@ -10,6 +10,7 @@
 
 export const lmsYaksaManifest = {
   // ===== 필수 기본 정보 =====
+  id: 'lms-yaksa', // ModuleLoader compatibility
   appId: 'lms-yaksa',
   displayName: '약사회 교육/연수',
   name: 'LMS Yaksa Extension',

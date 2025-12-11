@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinColumn, Tree, TreeParent, TreeChildren } from 'typeorm';
-import type { Post } from './Post.js';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Tree, TreeParent, TreeChildren } from 'typeorm';
 
 @Entity('categories')
 @Tree('nested-set')
@@ -41,10 +40,6 @@ export class Category {
 
   @Column({ type: 'integer', default: 0 })
   count!: number;
-
-  // Relations
-  @ManyToMany('Post', 'categories')
-  posts!: Post[];
 
   @CreateDateColumn({ name: 'createdAt' })
   created_at!: Date;
