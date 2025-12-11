@@ -275,8 +275,6 @@ function registerTestNavigationItems(navRegistry: NavigationRegistry): void {
         roles: ['admin'],
         serviceGroups: ['global'],
     });
-
-    console.log(`[TestSetup] Registered ${navRegistry.count()} test navigation items`);
 }
 
 /**
@@ -398,8 +396,6 @@ function registerTestViews(vRegistry: ViewRegistry): void {
         cptName: 'product',
         priority: 10,
     }, 'cms-core');
-
-    console.log(`[TestSetup] Registered ${vRegistry.count()} test views`);
 }
 
 /**
@@ -409,9 +405,6 @@ function registerTestViews(vRegistry: ViewRegistry): void {
 export async function setupMultiTenantTests(
     dataSource: DataSource
 ): Promise<MultiTenantTestContext> {
-    console.log('\n📋 Setting up Multi-Tenant Test Environment');
-    console.log('='.repeat(60));
-
     // Create tenant factory
     const factory = new TenantFactory(dataSource);
 
@@ -442,23 +435,6 @@ export async function setupMultiTenantTests(
         viewRegistry,
     };
 
-    // Log summary
-    const stats = factory.getStatistics();
-    console.log('\n📊 Test Environment Summary:');
-    console.log(`   Total tenants: ${stats.total}`);
-    console.log(`   Service groups: ${stats.serviceGroups}`);
-    console.log('');
-    console.log('   Distribution:');
-    for (const [group, count] of Object.entries(stats.byServiceGroup)) {
-        console.log(`   - ${group}: ${count} tenants`);
-    }
-    console.log('');
-    console.log(`   Navigation items: ${navigationRegistry.count()}`);
-    console.log(`   Views registered: ${viewRegistry.count()}`);
-    console.log('');
-    console.log('='.repeat(60));
-    console.log('✅ Multi-Tenant Test Environment Ready\n');
-
     return context;
 }
 
@@ -469,17 +445,11 @@ export async function setupMultiTenantTests(
 export async function teardownMultiTenantTests(
     context: MultiTenantTestContext
 ): Promise<void> {
-    console.log('\n🧹 Tearing down Multi-Tenant Test Environment');
-    console.log('='.repeat(60));
-
     await context.factory.cleanup();
 
     // Clear test data from registries
     context.navigationRegistry.clear();
     context.viewRegistry.clear();
-
-    console.log('='.repeat(60));
-    console.log('✅ Teardown Complete\n');
 }
 
 /**

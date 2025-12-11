@@ -460,9 +460,6 @@ describe('Multi-Tenant AppStore Filtering', () => {
             for (const sg of serviceGroups) {
                 expect(counts[sg]).toBeGreaterThan(0);
             }
-
-            // Log for debugging
-            console.log('Catalog counts by service group:', counts);
         });
     });
 });

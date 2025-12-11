@@ -60,8 +60,6 @@ export class TenantFactory {
         // Store in test registry
         this.createdTenants.push(tenant);
 
-        console.log(`✅ Created tenant: ${tenant.name} (${tenant.serviceGroup})`);
-
         return tenant;
     }
 
@@ -70,15 +68,9 @@ export class TenantFactory {
      * Returns array of all created tenants
      */
     async generateSimulation(): Promise<SimulatedTenant[]> {
-        console.log('🚀 Starting Multi-Tenant Simulation Generation');
-        console.log(`📊 Target: ${SERVICE_GROUPS.length} service groups`);
-        console.log('');
-
         const tenants: SimulatedTenant[] = [];
 
         for (const group of SERVICE_GROUPS) {
-            console.log(`\n📦 Creating ${group.serviceGroup} tenants (${group.tenantCount}x)...`);
-
             for (let i = 1; i <= group.tenantCount; i++) {
                 const tenant = await this.createTenant({
                     name: `${group.serviceGroup}-tenant-${i}`,
@@ -96,10 +88,6 @@ export class TenantFactory {
                 tenants.push(tenant);
             }
         }
-
-        console.log('\n✅ Multi-Tenant Simulation Complete');
-        console.log(`   Total tenants created: ${tenants.length}`);
-        console.log('');
 
         return tenants;
     }
@@ -122,13 +110,9 @@ export class TenantFactory {
      * Clean up all created tenants (for teardown)
      */
     async cleanup(): Promise<void> {
-        console.log(`🧹 Cleaning up ${this.createdTenants.length} test tenants...`);
-
         // TODO: Implement actual cleanup logic
         // Would delete tenants from database, clean associated data, etc.
-
         this.createdTenants = [];
-        console.log('✅ Cleanup complete');
     }
 
     /**
