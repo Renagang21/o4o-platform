@@ -48,7 +48,7 @@ export * from './ThemeService.js';
 export { userService } from '../modules/auth/services/user.service.js';
 export * from './account-linking.service.js';
 export * from './email.service.js';
-export * from './imageProcessingService.js';
+// imageProcessingService removed - legacy CMS (Phase 8-3)
 // export * from './inventoryService.js';
 export * from './passwordResetService.js';
 // export * from './pricingService.js';

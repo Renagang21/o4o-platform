@@ -40,7 +40,7 @@ import { SessionSyncService } from './services/sessionSyncService.js';
 import { WebSocketSessionSync } from './websocket/sessionSync.js';
 
 // Configuration
-import { setupRoutes } from './config/routes.config.js';
+// setupRoutes removed - legacy routes.config.js deleted
 import { setupSwagger } from './config/swagger-enhanced.js';
 
 // Module Loader (Phase 5 — AppStore + Module Loader)
@@ -347,15 +347,7 @@ const startServer = async () => {
     }
   }
 
-  // Initialize Channel Connectors (Phase PD-9)
-  try {
-    const { initializeChannelConnectors } = await import('./channels/index.js');
-    initializeChannelConnectors();
-    logger.info('✅ Channel connectors initialized');
-  } catch (channelError) {
-    logger.error('Channel connectors initialization failed:', channelError);
-    // Continue server startup even if channel init fails
-  }
+  // Channel Connectors removed - legacy commerce system (Phase 8-3)
 
   // Initialize dynamic Passport strategies (AFTER database is initialized)
   try {
@@ -400,9 +392,9 @@ const startServer = async () => {
     logger.info(`✅ Registered ${routesRegistered.length} dynamic routes:`);
     routesRegistered.forEach(route => logger.info(`   - ${route}`));
 
-    // 4. Apply core routes (non-module routes)
-    setupRoutes(app);
-    logger.info('✅ Core routes registered');
+    // 4. Core routes now registered via dynamic module loader
+    // setupRoutes removed - legacy routes.config.js deleted
+    logger.info('✅ Routes registered via module loader');
 
     // 5. Get all entities from modules (for future TypeORM integration)
     const moduleEntities = moduleLoader.getAllEntities();

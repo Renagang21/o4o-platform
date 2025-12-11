@@ -1,7 +1,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { DatabaseChecker } from '../utils/database-checker.js';
 import { MaterializedViewScheduler } from './MaterializedViewScheduler.js';
-import settlementScheduler from './SettlementScheduler.js';
+// settlementScheduler removed (Phase 8-3 - legacy commerce)
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { env } from '../utils/env-validator.js';
@@ -174,9 +174,8 @@ export class StartupService {
       MaterializedViewScheduler.start(refreshInterval);
       logger.info('✅ Materialized View Scheduler started');
 
-      // Settlement Scheduler (daily at midnight)
-      settlementScheduler.start('0 0 * * *');
-      logger.info('✅ Settlement Scheduler started');
+      // Settlement Scheduler removed (Phase 8-3 - legacy commerce)
+      logger.info('✅ Settlement Scheduler skipped (legacy commerce removed)');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
     }
@@ -191,23 +190,8 @@ export class StartupService {
       return;
     }
 
-    try {
-      // Initialize webhook subscribers
-      const { OperationsService } = await import('./OperationsService.js');
-      const { initializeWebhookSubscribers } = await import('../init/webhook-subscribers.js');
-
-      const operationsService = new OperationsService();
-      initializeWebhookSubscribers(operationsService);
-      logger.info('✅ Webhook subscribers initialized (5 events)');
-
-      // Initialize commission batch job
-      const { initializeCommissionBatchJob } = await import('../jobs/commission-batch.job.js');
-      const schedule = env.getString('COMMISSION_BATCH_SCHEDULE', '0 2 * * *');
-      initializeCommissionBatchJob(schedule);
-      logger.info(`✅ Commission batch job initialized (schedule: ${schedule})`);
-    } catch (webhookError) {
-      logger.warn('Webhook/batch job initialization failed (non-critical):', webhookError);
-    }
+    // Webhook subscribers and commission batch job removed (Phase 8-3 - legacy commerce)
+    logger.info('✅ Webhook/batch jobs skipped (legacy commerce removed)');
   }
 
   /**
@@ -261,15 +245,11 @@ export class StartupService {
 
   /**
    * Initialize image processing folders
+   * NOTE: Legacy image processing removed in Phase 8-3
    */
   private async initializeImageProcessing(): Promise<void> {
-    try {
-      const { imageProcessingService } = await import('./image-processing.service.js');
-      await imageProcessingService.initializeFolders();
-      logger.info('✅ Image processing folders initialized');
-    } catch (folderError) {
-      logger.warn('Failed to initialize image processing folders:', folderError);
-    }
+    // Image processing service removed (Phase 8-3 - legacy CMS)
+    logger.info('✅ Image processing skipped (legacy CMS removed)');
   }
 
   /**
@@ -280,7 +260,7 @@ export class StartupService {
 
     try {
       MaterializedViewScheduler.stop();
-      settlementScheduler.stop();
+      // settlementScheduler removed (Phase 8-3 - legacy commerce)
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);

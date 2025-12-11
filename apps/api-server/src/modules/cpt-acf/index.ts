@@ -20,10 +20,7 @@ export { cptService } from './services/cpt.service.js';
  */
 export { acfService } from './services/acf.service.js';
 
-export { blockDataService } from './services/block-data.service.js';
-
-// Routes
-export { default as blockApiRoutes } from './routes/block-api.routes.js';
+// blockDataService removed - legacy CMS service (Phase 8-3)
 
 // Module info
 export const MODULE_INFO = {
