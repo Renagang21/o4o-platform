@@ -5,7 +5,7 @@
  * Enhanced middleware for enforcing tenant isolation at the route level.
  */
 
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import logger from '../utils/logger.js';
 import type { ServiceGroup } from './tenant-context.middleware.js';
 
@@ -232,12 +232,12 @@ export function validateBodyTenant(tenantIdField: string = 'tenantId') {
 /**
  * Service group route guard factory
  */
-export function serviceGroupGuard(...allowedGroups: ServiceGroup[]) {
+export function serviceGroupGuard(...allowedGroups: ServiceGroup[]): RequestHandler {
   return tenantIsolation({
     requireTenant: false,
     allowedServiceGroups: allowedGroups,
     logAccess: true,
-  });
+  }) as RequestHandler;
 }
 
 /**

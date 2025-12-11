@@ -46,7 +46,7 @@ function getInstalledAppsInfo() {
   }>;
 }
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/v1/service-admin/summary

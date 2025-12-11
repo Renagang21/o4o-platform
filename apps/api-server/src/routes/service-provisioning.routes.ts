@@ -15,7 +15,7 @@ import type {
 } from '../service-templates/template-schema.js';
 import type { ServiceGroup } from '../middleware/tenant-context.middleware.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/v1/service/templates
