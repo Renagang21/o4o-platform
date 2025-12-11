@@ -103,17 +103,6 @@ export class CustomPostType {
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
-  /**
-   * Alias for backward compatibility
-   * Maps to isActive column
-   */
-  get active(): boolean {
-    return this.isActive;
-  }
-  set active(value: boolean) {
-    this.isActive = value;
-  }
-
   @Column({ type: 'int', default: 0 })
   sortOrder!: number;
 
@@ -126,4 +115,88 @@ export class CustomPostType {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  // ============================================================================
+  // Backward Compatibility Aliases
+  // These getters/setters maintain compatibility with legacy code
+  // ============================================================================
+
+  /**
+   * Alias for isActive (backward compatibility)
+   */
+  get active(): boolean {
+    return this.isActive;
+  }
+  set active(value: boolean) {
+    this.isActive = value;
+  }
+
+  /**
+   * Alias for isPublic (backward compatibility)
+   * Legacy field name was 'public'
+   */
+  get public(): boolean {
+    return this.isPublic;
+  }
+  set public(value: boolean) {
+    this.isPublic = value;
+  }
+
+  /**
+   * Alias for hierarchical (backward compatibility)
+   * Legacy field name was 'showInMenu'
+   */
+  get showInMenu(): boolean {
+    return true; // Always show in menu by default
+  }
+  set showInMenu(_value: boolean) {
+    // Stored in metadata if needed
+  }
+
+  /**
+   * Menu position (backward compatibility)
+   * Stored in metadata
+   */
+  get menuPosition(): number | undefined {
+    return this.metadata?.menuPosition;
+  }
+  set menuPosition(value: number | undefined) {
+    if (!this.metadata) this.metadata = {};
+    this.metadata.menuPosition = value;
+  }
+
+  /**
+   * Capability type (backward compatibility)
+   * Stored in capabilities
+   */
+  get capabilityType(): string {
+    return this.capabilities?.type || 'post';
+  }
+  set capabilityType(value: string) {
+    if (!this.capabilities) this.capabilities = {};
+    this.capabilities.type = value;
+  }
+
+  /**
+   * Rewrite rules (backward compatibility)
+   * Maps to rewriteRules
+   */
+  get rewrite(): Record<string, any> | undefined {
+    return this.rewriteRules;
+  }
+  set rewrite(value: Record<string, any> | undefined) {
+    this.rewriteRules = value || {};
+  }
+
+  /**
+   * Labels (backward compatibility)
+   * Stored in metadata
+   */
+  get labels(): any {
+    return this.metadata?.labels;
+  }
+  set labels(value: any) {
+    if (!this.metadata) this.metadata = {};
+    this.metadata.labels = value;
+  }
 }
