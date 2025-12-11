@@ -54,8 +54,14 @@ import appstoreRoutes from './routes/appstore.routes.js';
 // Service Provisioning Routes (Phase 7)
 import serviceProvisioningRoutes from './routes/service-provisioning.routes.js';
 
+// Service Admin Routes (Phase 8)
+import serviceAdminRoutes from './routes/service-admin.routes.js';
+
 // Service Template Registry (Phase 7)
 import { templateRegistry } from './service-templates/template-registry.js';
+
+// Init Pack Registry (Phase 8)
+import { initPackRegistry } from './service-templates/init-pack-registry.js';
 
 const app: Application = express();
 
@@ -419,6 +425,18 @@ const startServer = async () => {
     } catch (templateError) {
       logger.error('Service Template loading failed:', templateError);
     }
+
+    // 6. Load Init Packs (Phase 8 - Service Environment Initialization)
+    try {
+      await initPackRegistry.loadAll();
+      logger.info(`✅ Init Packs loaded: ${initPackRegistry.getStats().total} packs`);
+    } catch (initPackError) {
+      logger.error('Init Pack loading failed:', initPackError);
+    }
+
+    // 7. Register Service Admin routes (Phase 8)
+    app.use('/api/v1/service-admin', serviceAdminRoutes);
+    logger.info('✅ Service Admin routes registered at /api/v1/service-admin');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted

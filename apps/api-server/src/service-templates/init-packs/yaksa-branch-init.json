@@ -1,0 +1,341 @@
+{
+  "id": "yaksa-branch-init",
+  "name": "약사회 지부 서비스 초기화",
+  "description": "약사회 지부를 위한 기본 메뉴, 카테고리, 테마 설정",
+  "serviceGroup": "yaksa",
+  "version": "1.0.0",
+  "defaultMenus": [
+    {
+      "id": "main-nav",
+      "label": "메인 네비게이션",
+      "location": "header",
+      "isActive": true,
+      "items": [
+        {
+          "id": "home",
+          "label": "홈",
+          "path": "/",
+          "icon": "Home",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "about",
+          "label": "지부소개",
+          "path": "/about",
+          "icon": "Building",
+          "order": 2,
+          "visible": true,
+          "children": [
+            {
+              "id": "greeting",
+              "label": "인사말",
+              "path": "/about/greeting",
+              "order": 1
+            },
+            {
+              "id": "organization",
+              "label": "조직도",
+              "path": "/about/organization",
+              "order": 2
+            },
+            {
+              "id": "history",
+              "label": "연혁",
+              "path": "/about/history",
+              "order": 3
+            },
+            {
+              "id": "location",
+              "label": "오시는 길",
+              "path": "/about/location",
+              "order": 4
+            }
+          ]
+        },
+        {
+          "id": "notice",
+          "label": "공지사항",
+          "path": "/notice",
+          "icon": "Bell",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "community",
+          "label": "커뮤니티",
+          "path": "/community",
+          "icon": "Users",
+          "order": 4,
+          "visible": true,
+          "children": [
+            {
+              "id": "forum",
+              "label": "자유게시판",
+              "path": "/community/forum",
+              "order": 1
+            },
+            {
+              "id": "qna",
+              "label": "질의응답",
+              "path": "/community/qna",
+              "order": 2
+            },
+            {
+              "id": "gallery",
+              "label": "포토갤러리",
+              "path": "/community/gallery",
+              "order": 3
+            }
+          ]
+        },
+        {
+          "id": "member",
+          "label": "회원",
+          "path": "/member",
+          "icon": "UserCheck",
+          "order": 5,
+          "visible": true,
+          "permission": "member_area",
+          "children": [
+            {
+              "id": "shinsang",
+              "label": "신상신고",
+              "path": "/member/shinsang",
+              "order": 1
+            },
+            {
+              "id": "directory",
+              "label": "회원명부",
+              "path": "/member/directory",
+              "order": 2
+            },
+            {
+              "id": "benefits",
+              "label": "회원혜택",
+              "path": "/member/benefits",
+              "order": 3
+            }
+          ]
+        },
+        {
+          "id": "education",
+          "label": "교육/연수",
+          "path": "/education",
+          "icon": "GraduationCap",
+          "order": 6,
+          "visible": true,
+          "children": [
+            {
+              "id": "lms",
+              "label": "온라인 교육",
+              "path": "/education/lms",
+              "order": 1
+            },
+            {
+              "id": "schedule",
+              "label": "교육일정",
+              "path": "/education/schedule",
+              "order": 2
+            },
+            {
+              "id": "materials",
+              "label": "교육자료",
+              "path": "/education/materials",
+              "order": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-nav",
+      "label": "푸터 네비게이션",
+      "location": "footer",
+      "isActive": true,
+      "items": [
+        {
+          "id": "privacy",
+          "label": "개인정보처리방침",
+          "path": "/privacy",
+          "order": 1
+        },
+        {
+          "id": "terms",
+          "label": "이용약관",
+          "path": "/terms",
+          "order": 2
+        },
+        {
+          "id": "sitemap",
+          "label": "사이트맵",
+          "path": "/sitemap",
+          "order": 3
+        },
+        {
+          "id": "contact",
+          "label": "문의하기",
+          "path": "/contact",
+          "order": 4
+        }
+      ]
+    }
+  ],
+  "defaultCategories": [
+    {
+      "slug": "notice",
+      "name": "공지사항",
+      "description": "지부 공지사항",
+      "icon": "Bell",
+      "order": 1,
+      "cptSlug": "post"
+    },
+    {
+      "slug": "news",
+      "name": "뉴스",
+      "description": "약계 소식",
+      "icon": "Newspaper",
+      "order": 2,
+      "cptSlug": "post"
+    },
+    {
+      "slug": "education",
+      "name": "교육",
+      "description": "교육 관련 게시물",
+      "icon": "GraduationCap",
+      "order": 3,
+      "cptSlug": "post"
+    },
+    {
+      "slug": "committee",
+      "name": "위원회",
+      "description": "위원회 활동",
+      "icon": "Users",
+      "order": 4,
+      "cptSlug": "organization"
+    },
+    {
+      "slug": "member",
+      "name": "회원",
+      "description": "회원 관련",
+      "icon": "UserCheck",
+      "order": 5,
+      "cptSlug": "member"
+    }
+  ],
+  "defaultSettings": {
+    "general": {
+      "siteName": "대한약사회 지부",
+      "tagline": "회원과 함께하는 약사회",
+      "timezone": "Asia/Seoul",
+      "dateFormat": "YYYY년 MM월 DD일",
+      "language": "ko"
+    },
+    "seo": {
+      "metaTitle": "대한약사회 지부",
+      "metaDescription": "대한약사회 지부 공식 홈페이지입니다. 공지사항, 교육정보, 회원서비스를 제공합니다."
+    },
+    "features": {
+      "forum": true,
+      "shinsang": true,
+      "lms": true,
+      "memberDirectory": true,
+      "committee": true
+    }
+  },
+  "defaultTheme": "yaksa-default",
+  "themePreset": {
+    "id": "yaksa-default",
+    "name": "약사회 기본 테마",
+    "description": "약사회 서비스를 위한 블루/화이트 테마",
+    "colors": {
+      "primary": "#1565C0",
+      "primaryLight": "#42A5F5",
+      "primaryDark": "#0D47A1",
+      "secondary": "#00897B",
+      "secondaryLight": "#4DB6AC",
+      "secondaryDark": "#00695C",
+      "accent": "#FF5722",
+      "background": "#F5F7FA",
+      "surface": "#FFFFFF",
+      "text": "#212121",
+      "textSecondary": "#757575",
+      "error": "#D32F2F",
+      "warning": "#F57C00",
+      "success": "#388E3C",
+      "info": "#1976D2"
+    },
+    "typography": {
+      "fontFamily": "'Noto Sans KR', sans-serif",
+      "fontFamilyHeading": "'Noto Sans KR', sans-serif",
+      "fontSize": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem"
+      },
+      "fontWeight": {
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      },
+      "lineHeight": {
+        "tight": 1.25,
+        "normal": 1.5,
+        "relaxed": 1.75
+      }
+    },
+    "borderRadius": {
+      "none": "0",
+      "sm": "0.125rem",
+      "md": "0.25rem",
+      "lg": "0.5rem",
+      "full": "9999px"
+    }
+  },
+  "defaultPages": [
+    {
+      "slug": "home",
+      "title": "홈",
+      "template": "homepage",
+      "isHomepage": true
+    },
+    {
+      "slug": "about/greeting",
+      "title": "인사말",
+      "template": "page"
+    },
+    {
+      "slug": "about/organization",
+      "title": "조직도",
+      "template": "organization"
+    },
+    {
+      "slug": "contact",
+      "title": "문의하기",
+      "template": "contact"
+    }
+  ],
+  "defaultRoles": [
+    {
+      "name": "일반회원",
+      "slug": "member",
+      "permissions": ["view_posts", "view_notice", "view_education"],
+      "isDefault": true
+    },
+    {
+      "name": "정회원",
+      "slug": "active_member",
+      "permissions": ["view_posts", "view_notice", "view_education", "member_area", "shinsang", "view_directory"]
+    },
+    {
+      "name": "임원",
+      "slug": "executive",
+      "permissions": ["view_posts", "view_notice", "view_education", "member_area", "shinsang", "view_directory", "manage_posts", "manage_notice"]
+    }
+  ]
+}

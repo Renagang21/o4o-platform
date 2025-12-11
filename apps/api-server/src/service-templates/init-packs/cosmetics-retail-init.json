@@ -1,0 +1,256 @@
+{
+  "id": "cosmetics-retail-init",
+  "name": "화장품 판매 서비스 초기화",
+  "description": "화장품 리테일 서비스를 위한 기본 메뉴, 카테고리, 테마 설정",
+  "serviceGroup": "cosmetics",
+  "version": "1.0.0",
+  "defaultMenus": [
+    {
+      "id": "main-nav",
+      "label": "메인 네비게이션",
+      "location": "header",
+      "isActive": true,
+      "items": [
+        {
+          "id": "home",
+          "label": "홈",
+          "path": "/",
+          "icon": "Home",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "products",
+          "label": "제품",
+          "path": "/products",
+          "icon": "Package",
+          "order": 2,
+          "visible": true,
+          "children": [
+            {
+              "id": "skincare",
+              "label": "스킨케어",
+              "path": "/products/skincare",
+              "order": 1
+            },
+            {
+              "id": "makeup",
+              "label": "메이크업",
+              "path": "/products/makeup",
+              "order": 2
+            },
+            {
+              "id": "bodycare",
+              "label": "바디케어",
+              "path": "/products/bodycare",
+              "order": 3
+            }
+          ]
+        },
+        {
+          "id": "brands",
+          "label": "브랜드",
+          "path": "/brands",
+          "icon": "Tag",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "reviews",
+          "label": "리뷰",
+          "path": "/reviews",
+          "icon": "Star",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "events",
+          "label": "이벤트",
+          "path": "/events",
+          "icon": "Gift",
+          "order": 5,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": "footer-nav",
+      "label": "푸터 네비게이션",
+      "location": "footer",
+      "isActive": true,
+      "items": [
+        {
+          "id": "about",
+          "label": "회사소개",
+          "path": "/about",
+          "order": 1
+        },
+        {
+          "id": "terms",
+          "label": "이용약관",
+          "path": "/terms",
+          "order": 2
+        },
+        {
+          "id": "privacy",
+          "label": "개인정보처리방침",
+          "path": "/privacy",
+          "order": 3
+        },
+        {
+          "id": "contact",
+          "label": "고객센터",
+          "path": "/contact",
+          "order": 4
+        }
+      ]
+    }
+  ],
+  "defaultCategories": [
+    {
+      "slug": "skincare",
+      "name": "스킨케어",
+      "description": "피부 관리 제품",
+      "icon": "Droplet",
+      "order": 1,
+      "cptSlug": "product"
+    },
+    {
+      "slug": "makeup",
+      "name": "메이크업",
+      "description": "색조 화장품",
+      "icon": "Palette",
+      "order": 2,
+      "cptSlug": "product"
+    },
+    {
+      "slug": "bodycare",
+      "name": "바디케어",
+      "description": "바디 관리 제품",
+      "icon": "Heart",
+      "order": 3,
+      "cptSlug": "product"
+    },
+    {
+      "slug": "haircare",
+      "name": "헤어케어",
+      "description": "모발 관리 제품",
+      "icon": "Scissors",
+      "order": 4,
+      "cptSlug": "product"
+    },
+    {
+      "slug": "fragrance",
+      "name": "향수",
+      "description": "향수 및 방향제",
+      "icon": "Flower",
+      "order": 5,
+      "cptSlug": "product"
+    }
+  ],
+  "defaultSettings": {
+    "general": {
+      "siteName": "뷰티 스토어",
+      "tagline": "아름다움을 위한 선택",
+      "timezone": "Asia/Seoul",
+      "dateFormat": "YYYY-MM-DD",
+      "language": "ko"
+    },
+    "seo": {
+      "metaTitle": "뷰티 스토어 - 화장품 온라인 쇼핑몰",
+      "metaDescription": "최신 화장품과 뷰티 제품을 만나보세요. 스킨케어, 메이크업, 바디케어 등 다양한 제품을 제공합니다."
+    },
+    "features": {
+      "reviews": true,
+      "wishlist": true,
+      "compare": true,
+      "quickView": true,
+      "recentlyViewed": true
+    }
+  },
+  "defaultTheme": "cosmetics-default",
+  "themePreset": {
+    "id": "cosmetics-default",
+    "name": "코스메틱 기본 테마",
+    "description": "화장품 서비스를 위한 파스텔 핑크 테마",
+    "colors": {
+      "primary": "#FF6B9D",
+      "primaryLight": "#FFB3CC",
+      "primaryDark": "#E91E63",
+      "secondary": "#9C27B0",
+      "secondaryLight": "#CE93D8",
+      "secondaryDark": "#7B1FA2",
+      "accent": "#FF4081",
+      "background": "#FFF5F8",
+      "surface": "#FFFFFF",
+      "text": "#333333",
+      "textSecondary": "#666666",
+      "error": "#F44336",
+      "warning": "#FF9800",
+      "success": "#4CAF50",
+      "info": "#2196F3"
+    },
+    "typography": {
+      "fontFamily": "'Noto Sans KR', sans-serif",
+      "fontFamilyHeading": "'Noto Sans KR', sans-serif",
+      "fontSize": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem"
+      },
+      "fontWeight": {
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      },
+      "lineHeight": {
+        "tight": 1.25,
+        "normal": 1.5,
+        "relaxed": 1.75
+      }
+    },
+    "borderRadius": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "1rem",
+      "full": "9999px"
+    }
+  },
+  "defaultPages": [
+    {
+      "slug": "home",
+      "title": "홈",
+      "template": "homepage",
+      "isHomepage": true
+    },
+    {
+      "slug": "about",
+      "title": "회사소개",
+      "template": "page"
+    },
+    {
+      "slug": "contact",
+      "title": "고객센터",
+      "template": "contact"
+    }
+  ],
+  "defaultRoles": [
+    {
+      "name": "고객",
+      "slug": "customer",
+      "permissions": ["view_products", "create_reviews", "manage_wishlist", "place_orders"],
+      "isDefault": true
+    },
+    {
+      "name": "셀러",
+      "slug": "seller",
+      "permissions": ["view_products", "manage_products", "view_orders", "manage_inventory"]
+    }
+  ]
+}

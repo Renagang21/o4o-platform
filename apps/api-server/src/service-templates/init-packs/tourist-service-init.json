@@ -1,0 +1,270 @@
+{
+  "id": "tourist-service-init",
+  "name": "관광 서비스 초기화",
+  "description": "관광객 서비스를 위한 기본 메뉴, 카테고리, 테마 설정",
+  "serviceGroup": "tourist",
+  "version": "1.0.0",
+  "defaultMenus": [
+    {
+      "id": "main-nav",
+      "label": "메인 네비게이션",
+      "location": "header",
+      "isActive": true,
+      "items": [
+        {
+          "id": "home",
+          "label": "홈",
+          "path": "/",
+          "icon": "Home",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "destinations",
+          "label": "여행지",
+          "path": "/destinations",
+          "icon": "MapPin",
+          "order": 2,
+          "visible": true,
+          "children": [
+            {
+              "id": "popular",
+              "label": "인기 여행지",
+              "path": "/destinations/popular",
+              "order": 1
+            },
+            {
+              "id": "nature",
+              "label": "자연/힐링",
+              "path": "/destinations/nature",
+              "order": 2
+            },
+            {
+              "id": "culture",
+              "label": "문화/역사",
+              "path": "/destinations/culture",
+              "order": 3
+            },
+            {
+              "id": "food",
+              "label": "맛집/음식",
+              "path": "/destinations/food",
+              "order": 4
+            }
+          ]
+        },
+        {
+          "id": "tours",
+          "label": "투어/체험",
+          "path": "/tours",
+          "icon": "Compass",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "accommodations",
+          "label": "숙소",
+          "path": "/accommodations",
+          "icon": "Bed",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "transportation",
+          "label": "교통",
+          "path": "/transportation",
+          "icon": "Bus",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "community",
+          "label": "여행후기",
+          "path": "/reviews",
+          "icon": "MessageCircle",
+          "order": 6,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": "footer-nav",
+      "label": "푸터 네비게이션",
+      "location": "footer",
+      "isActive": true,
+      "items": [
+        {
+          "id": "about",
+          "label": "소개",
+          "path": "/about",
+          "order": 1
+        },
+        {
+          "id": "terms",
+          "label": "이용약관",
+          "path": "/terms",
+          "order": 2
+        },
+        {
+          "id": "privacy",
+          "label": "개인정보처리방침",
+          "path": "/privacy",
+          "order": 3
+        },
+        {
+          "id": "contact",
+          "label": "문의",
+          "path": "/contact",
+          "order": 4
+        }
+      ]
+    }
+  ],
+  "defaultCategories": [
+    {
+      "slug": "nature",
+      "name": "자연/힐링",
+      "description": "자연 속 힐링 여행지",
+      "icon": "TreePine",
+      "order": 1,
+      "cptSlug": "destination"
+    },
+    {
+      "slug": "culture",
+      "name": "문화/역사",
+      "description": "문화와 역사 탐방",
+      "icon": "Landmark",
+      "order": 2,
+      "cptSlug": "destination"
+    },
+    {
+      "slug": "food",
+      "name": "맛집/음식",
+      "description": "맛있는 음식 여행",
+      "icon": "UtensilsCrossed",
+      "order": 3,
+      "cptSlug": "destination"
+    },
+    {
+      "slug": "activity",
+      "name": "액티비티",
+      "description": "체험과 액티비티",
+      "icon": "Activity",
+      "order": 4,
+      "cptSlug": "tour"
+    },
+    {
+      "slug": "shopping",
+      "name": "쇼핑",
+      "description": "쇼핑 명소",
+      "icon": "ShoppingBag",
+      "order": 5,
+      "cptSlug": "destination"
+    }
+  ],
+  "defaultSettings": {
+    "general": {
+      "siteName": "여행 가이드",
+      "tagline": "특별한 여행을 위한 가이드",
+      "timezone": "Asia/Seoul",
+      "dateFormat": "YYYY-MM-DD",
+      "language": "ko"
+    },
+    "seo": {
+      "metaTitle": "여행 가이드 - 국내 여행 정보",
+      "metaDescription": "국내 여행지, 맛집, 숙소, 교통 정보를 한눈에. 나만의 특별한 여행을 계획해보세요."
+    },
+    "features": {
+      "reviews": true,
+      "bookmarks": true,
+      "maps": true,
+      "itinerary": true,
+      "weather": true
+    }
+  },
+  "defaultTheme": "tourist-default",
+  "themePreset": {
+    "id": "tourist-default",
+    "name": "관광 기본 테마",
+    "description": "관광 서비스를 위한 옐로우/네이비 테마",
+    "colors": {
+      "primary": "#FFC107",
+      "primaryLight": "#FFE082",
+      "primaryDark": "#FFA000",
+      "secondary": "#1A237E",
+      "secondaryLight": "#534BAE",
+      "secondaryDark": "#000051",
+      "accent": "#FF5722",
+      "background": "#FFFDE7",
+      "surface": "#FFFFFF",
+      "text": "#212121",
+      "textSecondary": "#616161",
+      "error": "#D32F2F",
+      "warning": "#F57C00",
+      "success": "#388E3C",
+      "info": "#0288D1"
+    },
+    "typography": {
+      "fontFamily": "'Noto Sans KR', sans-serif",
+      "fontFamilyHeading": "'Noto Sans KR', sans-serif",
+      "fontSize": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem"
+      },
+      "fontWeight": {
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      },
+      "lineHeight": {
+        "tight": 1.25,
+        "normal": 1.5,
+        "relaxed": 1.75
+      }
+    },
+    "borderRadius": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "1rem",
+      "full": "9999px"
+    }
+  },
+  "defaultPages": [
+    {
+      "slug": "home",
+      "title": "홈",
+      "template": "homepage",
+      "isHomepage": true
+    },
+    {
+      "slug": "about",
+      "title": "소개",
+      "template": "page"
+    },
+    {
+      "slug": "contact",
+      "title": "문의",
+      "template": "contact"
+    }
+  ],
+  "defaultRoles": [
+    {
+      "name": "방문자",
+      "slug": "visitor",
+      "permissions": ["view_destinations", "view_tours", "view_reviews"],
+      "isDefault": true
+    },
+    {
+      "name": "회원",
+      "slug": "member",
+      "permissions": ["view_destinations", "view_tours", "view_reviews", "create_reviews", "manage_bookmarks", "create_itinerary"]
+    }
+  ]
+}

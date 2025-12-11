@@ -1,9 +1,10 @@
 /**
  * Service Installer
  * Phase 7 — Service Templates & App Installer Automation
+ * Phase 8 — Extended with Service Initialization
  *
  * Handles automated app installation based on service templates.
- * Includes dependency resolution and installation ordering.
+ * Includes dependency resolution, installation ordering, and environment initialization.
  */
 
 import logger from '../utils/logger.js';
@@ -11,6 +12,8 @@ import { appStoreService } from '../services/AppStoreService.js';
 import { moduleLoader } from '../modules/module-loader.js';
 import { getCatalogItem, isInCatalog, type AppCatalogItem } from '../app-manifests/appsCatalog.js';
 import { templateRegistry } from './template-registry.js';
+import { serviceInitializer } from './service-initializer.js';
+import { initPackRegistry } from './init-pack-registry.js';
 import type {
   ServiceTemplate,
   ServiceProvisioningRequest,
@@ -19,7 +22,16 @@ import type {
   AppInstallationOrder,
   GLOBAL_CORE_APPS,
 } from './template-schema.js';
+import type { ServiceInitResult } from './init-schema.js';
 import type { ServiceGroup } from '../middleware/tenant-context.middleware.js';
+
+/**
+ * Extended Service Provisioning Result (Phase 8)
+ */
+export interface ExtendedServiceProvisioningResult extends ServiceProvisioningResult {
+  /** Initialization result (Phase 8) */
+  initResult?: ServiceInitResult;
+}
 
 /**
  * Service Installer Class
@@ -220,7 +232,7 @@ export class ServiceInstaller {
    *
    * @param request - Provisioning request
    */
-  async provisionService(request: ServiceProvisioningRequest): Promise<ServiceProvisioningResult> {
+  async provisionService(request: ServiceProvisioningRequest): Promise<ExtendedServiceProvisioningResult> {
     const startTime = Date.now();
 
     const template = templateRegistry.getTemplate(request.serviceTemplateId);
@@ -242,12 +254,52 @@ export class ServiceInstaller {
     logger.info(`[ServiceInstaller] Provisioning service: ${template.label}`);
     logger.info(`[ServiceInstaller] Organization: ${request.organizationId}, Tenant: ${request.tenantId}`);
 
-    // Install template
+    // Step 1: Install apps from template
     const installResult = await this.installServiceTemplate(request.serviceTemplateId, {
       skipApps: request.skipApps,
       additionalExtensions: request.additionalExtensions,
       installExtensions: true,
     });
+
+    // Step 2: Initialize service environment (Phase 8)
+    let initResult: ServiceInitResult | undefined;
+
+    if (installResult.success || installResult.installed.length > 0) {
+      try {
+        logger.info(`[ServiceInstaller] Initializing service environment for tenant: ${request.tenantId}`);
+
+        initResult = await serviceInitializer.initializeService(
+          request.tenantId,
+          request.organizationId,
+          request.serviceTemplateId,
+          {
+            settingsOverride: request.settingsOverride as any,
+          }
+        );
+
+        if (initResult.errors.length > 0) {
+          logger.warn(`[ServiceInstaller] Service initialization completed with ${initResult.errors.length} errors`);
+        } else {
+          logger.info(`[ServiceInstaller] Service initialization completed successfully`);
+        }
+      } catch (initError) {
+        logger.error(`[ServiceInstaller] Service initialization failed:`, initError);
+        initResult = {
+          success: false,
+          tenantId: request.tenantId,
+          organizationId: request.organizationId,
+          initPackId: '',
+          menusCreated: 0,
+          categoriesCreated: 0,
+          pagesCreated: 0,
+          seedDataCreated: 0,
+          settingsApplied: false,
+          errors: [{ step: 'initialization', error: initError instanceof Error ? initError.message : String(initError) }],
+          warnings: [],
+          initializationTimeMs: 0,
+        };
+      }
+    }
 
     return {
       success: installResult.success,
@@ -259,6 +311,54 @@ export class ServiceInstaller {
       failedApps: installResult.failed,
       installationTimeMs: Date.now() - startTime,
       error: installResult.success ? undefined : 'Some apps failed to install',
+      initResult,
+    };
+  }
+
+  /**
+   * Get full provisioning preview including init pack
+   */
+  getFullProvisioningPreview(
+    templateId: string,
+    options?: {
+      skipApps?: string[];
+      additionalExtensions?: string[];
+      installExtensions?: boolean;
+    }
+  ): {
+    template: ServiceTemplate | undefined;
+    appsToInstall: string[];
+    alreadyInstalled: string[];
+    willBeSkipped: string[];
+    dependencyOrder: string[];
+    issues: string[];
+    initPreview: {
+      menusCount: number;
+      categoriesCount: number;
+      pagesCount: number;
+      seedDataCount: number;
+      hasTheme: boolean;
+      hasSettings: boolean;
+      rolesCount: number;
+    };
+  } {
+    // Get app installation preview
+    const appPreview = this.getInstallationPreview(templateId, options);
+
+    // Get init pack preview
+    const initPreview = serviceInitializer.getInitializationPreview(templateId);
+
+    return {
+      ...appPreview,
+      initPreview: {
+        menusCount: initPreview.menusCount,
+        categoriesCount: initPreview.categoriesCount,
+        pagesCount: initPreview.pagesCount,
+        seedDataCount: initPreview.seedDataCount,
+        hasTheme: initPreview.hasTheme,
+        hasSettings: initPreview.hasSettings,
+        rolesCount: initPreview.rolesCount,
+      },
     };
   }
 
