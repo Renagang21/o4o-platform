@@ -131,16 +131,23 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
     const userActiveRole = (user as any).activeRole?.name;
     const userRoles = (user as any).roles || []; // roles array from User entity
 
+    // Role hierarchy: super_admin > admin > other roles
+    // super_admin has all admin privileges
+    const expandedRequiredRoles = [...requiredRoles];
+    if (requiredRoles.includes('admin') && !requiredRoles.includes('super_admin')) {
+      expandedRequiredRoles.push('super_admin');
+    }
+
     const hasRequiredRole =
       // Check user.role (string)
-      (userRole && requiredRoles.includes(userRole)) ||
+      (userRole && expandedRequiredRoles.includes(userRole)) ||
       // Check user.activeRole.name (object)
-      (userActiveRole && requiredRoles.includes(userActiveRole)) ||
+      (userActiveRole && expandedRequiredRoles.includes(userActiveRole)) ||
       // Check user.roles array (can be strings or objects)
       (Array.isArray(userRoles) && userRoles.some((r: any) =>
         typeof r === 'string'
-          ? requiredRoles.includes(r)
-          : r?.name && requiredRoles.includes(r.name)
+          ? expandedRequiredRoles.includes(r)
+          : r?.name && expandedRequiredRoles.includes(r.name)
       ));
 
     if (!hasRequiredRole) {
