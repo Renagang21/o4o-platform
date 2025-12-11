@@ -1,47 +1,38 @@
-import { 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Column, 
-  ManyToOne, 
-  CreateDateColumn, 
-  Index 
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  Index
 } from 'typeorm';
 import type { User } from './User.js';
-import { AuthProvider } from '../types/account-linking.js';
 
 @Entity('account_activities')
 @Index(['userId', 'createdAt'])
-@Index(['action', 'provider'])
 export class AccountActivity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   userId!: string;
 
   @ManyToOne('User', { onDelete: 'CASCADE', lazy: true })
   user!: Promise<User>;
 
-  @Column({
-    type: 'enum',
-    enum: ['linked', 'unlinked', 'merged', 'login', 'failed_link']
-  })
-  action!: 'linked' | 'unlinked' | 'merged' | 'login' | 'failed_link';
+  // DB column is 'type', not 'action'
+  @Column({ type: 'varchar', length: 50 })
+  type!: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['email', 'google', 'kakao', 'naver']
-  })
-  provider!: AuthProvider;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  ipAddress?: string;
 
-  @Column({ type: 'varchar' })
-  ipAddress!: string;
+  @Column({ type: 'text', nullable: true })
+  userAgent?: string;
 
-  @Column({ type: 'varchar' })
-  userAgent!: string;
-
+  // DB column is 'details', not 'metadata'
   @Column({ type: 'json', nullable: true })
-  metadata?: Record<string, any>;
+  details?: Record<string, any>;
 
   @CreateDateColumn()
   createdAt!: Date;

@@ -236,7 +236,7 @@ export class AuthenticationService {
     // Find existing linked account
     const existingLinkedAccount = await this.linkedAccountRepository.findOne({
       where: {
-        provider,
+        
         providerId: profile.id
       },
       relations: ['user', 'user.linkedAccounts']
@@ -293,7 +293,7 @@ export class AuthenticationService {
       // Auto-link if same email
       const linkResult = await AccountLinkingService.linkOAuthAccount(
         existingUserByEmail.id,
-        provider,
+        
         {
           providerId: profile.id,
           email: profile.email,
@@ -342,7 +342,7 @@ export class AuthenticationService {
       roles: [UserRole.USER],
       status: UserStatus.ACTIVE,
       isEmailVerified: profile.emailVerified || false,
-      provider: provider,
+      provider: 
       provider_id: profile.id,
       permissions: []
     });
@@ -353,7 +353,7 @@ export class AuthenticationService {
     const linkedAccount = this.linkedAccountRepository.create({
       userId: newUser.id,
       user: newUser,
-      provider,
+      
       providerId: profile.id,
       email: profile.email,
       displayName: profile.displayName,
@@ -612,11 +612,11 @@ export class AuthenticationService {
       await this.activityRepository.save(
         this.activityRepository.create({
           userId: userId || undefined,
-          action: 'login',
-          provider,
+          type: `login_${provider}`,
           ipAddress,
           userAgent,
-          metadata: {
+          details: {
+            provider,
             email,
             success,
             ...(failureReason && { reason: failureReason })
