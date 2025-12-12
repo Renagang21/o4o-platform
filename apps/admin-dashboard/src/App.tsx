@@ -55,8 +55,11 @@ const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdm
 // Membership-Yaksa: Membership Management
 const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/MembershipDashboard'));
 const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
+const MemberDetail = lazy(() => import('@/pages/membership/members/MemberDetail'));
 const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
+const AuditLogManagement = lazy(() => import('@/pages/membership/audit-logs/AuditLogManagement'));
+const AffiliationManagement = lazy(() => import('@/pages/membership/affiliations/AffiliationManagement'));
 // Reporting-Yaksa: Annual Report Management
 const ReportingDashboard = lazy(() => import('@/pages/reporting/dashboard/ReportingDashboard'));
 const ReportList = lazy(() => import('@/pages/reporting/reports/ReportList'));
@@ -133,6 +136,9 @@ const SupplierOpsRouter = lazy(() => import('@/pages/supplierops/SupplierOpsRout
 
 // PartnerOps Pages
 const PartnerOpsRouter = lazy(() => import('@/pages/partnerops/PartnerOpsRouter'));
+
+// Cosmetics Partner Extension Pages
+const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/CosmeticsPartnerRouter'));
 
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
@@ -572,6 +578,13 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
+                    <Route path="/admin/membership/members/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MemberDetail />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
                     <Route path="/admin/membership/verifications" element={
                       <AdminProtectedRoute requiredPermissions={['membership:verify']}>
                         <Suspense fallback={<PageLoader />}>
@@ -583,6 +596,20 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['membership:manage']}>
                         <Suspense fallback={<PageLoader />}>
                           <CategoryManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/membership/audit-logs" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AuditLogManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/membership/affiliations" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliationManagement />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -1133,6 +1160,17 @@ function App() {
                         <AppRouteGuard appId="partnerops">
                           <Suspense fallback={<PageLoader />}>
                             <PartnerOpsRouter />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Cosmetics Partner Extension - Partner/Influencer for Cosmetics */}
+                    <Route path="/cosmetics-partner/*" element={
+                      <AdminProtectedRoute requiredRoles={['partner', 'admin']}>
+                        <AppRouteGuard appId="cosmetics-partner-extension">
+                          <Suspense fallback={<PageLoader />}>
+                            <CosmeticsPartnerRouter />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

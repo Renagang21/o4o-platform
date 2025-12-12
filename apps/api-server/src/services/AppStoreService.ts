@@ -1,15 +1,35 @@
 /**
  * AppStore Service
  * Phase 5 — AppStore + Module Loader
+ * Phase 6 — ServiceGroup-based filtering
  *
  * High-level service for app installation and lifecycle management
  */
 
 import logger from '../utils/logger.js';
 import { moduleLoader } from '../modules/module-loader.js';
-import { getCatalogItem, isInCatalog } from '../app-manifests/appsCatalog.js';
+import {
+  getCatalogItem,
+  isInCatalog,
+  filterByServiceGroup,
+  getAppsByServiceGroup,
+  getAllServiceGroupMeta,
+  getServiceGroupMeta,
+  getCoreAppsForService,
+  checkAppCompatibility,
+  getIncompatibleApps,
+  getCompatibleApps,
+  getServiceGroupStats,
+  isAppAvailableForService,
+  getAppsForServiceGroupWithDependencies,
+} from '../app-manifests/appsCatalog.js';
 import type { AppModule, ModuleRegistryEntry } from '../modules/types.js';
-import type { AppCatalogItem } from '../app-manifests/appsCatalog.js';
+import type {
+  AppCatalogItem,
+  ServiceGroup,
+  ServiceGroupMeta,
+  CompatibilityStatus,
+} from '../app-manifests/appsCatalog.js';
 
 /**
  * AppStore Service
@@ -66,7 +86,8 @@ export class AppStoreService {
     // Run install lifecycle hook
     if (appModule.lifecycle?.install) {
       try {
-        await appModule.lifecycle.install();
+        const installContext = { appId };
+        await appModule.lifecycle.install(installContext);
         logger.info(`[AppStore] Ran install hook for ${appId}`);
       } catch (installError) {
         logger.error(`[AppStore] Install hook failed for ${appId}:`, installError);
@@ -103,7 +124,8 @@ export class AppStoreService {
     // Run uninstall lifecycle hook
     if (appModule.lifecycle?.uninstall) {
       try {
-        await appModule.lifecycle.uninstall();
+        const uninstallContext = { appId };
+        await appModule.lifecycle.uninstall(uninstallContext);
         logger.info(`[AppStore] Ran uninstall hook for ${appId}`);
       } catch (uninstallError) {
         logger.error(`[AppStore] Uninstall hook failed for ${appId}:`, uninstallError);
@@ -211,6 +233,277 @@ export class AppStoreService {
   isActive(appId: string): boolean {
     const module = moduleLoader.getModule(appId);
     return module?.status === 'active';
+  }
+
+  // ============================================
+  // ServiceGroup Filtering Engine (Phase 6)
+  // ============================================
+
+  /**
+   * Get apps by service group
+   * Returns apps that belong to the specified service group
+   *
+   * @param serviceGroup - Service group to filter by
+   * @returns Array of matching catalog items
+   */
+  getAppsByServiceGroup(serviceGroup: ServiceGroup): AppCatalogItem[] {
+    return filterByServiceGroup(serviceGroup);
+  }
+
+  /**
+   * Get all apps grouped by service group
+   * @returns Map of service group to apps
+   */
+  getAllAppsByServiceGroup(): Map<ServiceGroup, AppCatalogItem[]> {
+    return getAppsByServiceGroup();
+  }
+
+  /**
+   * Get all service group metadata for UI display
+   * @returns Array of ServiceGroupMeta sorted by priority
+   */
+  getAllServiceGroupMeta(): ServiceGroupMeta[] {
+    return getAllServiceGroupMeta();
+  }
+
+  /**
+   * Get service group metadata by ID
+   * @param serviceGroup - Service group ID
+   * @returns ServiceGroupMeta or undefined
+   */
+  getServiceGroupMeta(serviceGroup: ServiceGroup): ServiceGroupMeta | undefined {
+    return getServiceGroupMeta(serviceGroup);
+  }
+
+  /**
+   * Get apps for a service group with all dependencies resolved
+   * @param serviceGroup - Service group to filter by
+   * @returns Array of apps including dependencies
+   */
+  getAppsWithDependencies(serviceGroup: ServiceGroup): AppCatalogItem[] {
+    return getAppsForServiceGroupWithDependencies(serviceGroup);
+  }
+
+  /**
+   * Get core apps required for a service
+   * Includes platform-core apps + service-specific apps
+   *
+   * @param serviceGroup - Target service group
+   * @returns Array of required apps
+   */
+  getCoreAppsForService(serviceGroup: ServiceGroup): AppCatalogItem[] {
+    return getCoreAppsForService(serviceGroup);
+  }
+
+  /**
+   * Check if two apps are compatible
+   *
+   * @param appId1 - First app ID
+   * @param appId2 - Second app ID
+   * @returns Compatibility status
+   */
+  checkCompatibility(appId1: string, appId2: string): CompatibilityStatus {
+    return checkAppCompatibility(appId1, appId2);
+  }
+
+  /**
+   * Get all apps incompatible with a given app
+   *
+   * @param appId - App ID to check
+   * @returns Array of incompatible app IDs
+   */
+  getIncompatibleApps(appId: string): string[] {
+    return getIncompatibleApps(appId);
+  }
+
+  /**
+   * Get all apps compatible with a given app
+   *
+   * @param appId - App ID to check
+   * @returns Array of compatible apps
+   */
+  getCompatibleApps(appId: string): AppCatalogItem[] {
+    return getCompatibleApps(appId);
+  }
+
+  /**
+   * Check if an app is available for a service group
+   *
+   * @param appId - App ID
+   * @param serviceGroup - Service group to check
+   * @returns true if app is available
+   */
+  isAppAvailableForService(appId: string, serviceGroup: ServiceGroup): boolean {
+    return isAppAvailableForService(appId, serviceGroup);
+  }
+
+  /**
+   * Get service group statistics
+   * @returns Array of stats per service group
+   */
+  getServiceGroupStats(): Array<{
+    serviceGroup: ServiceGroup;
+    meta: ServiceGroupMeta;
+    coreCount: number;
+    featureCount: number;
+    extensionCount: number;
+    totalCount: number;
+  }> {
+    return getServiceGroupStats();
+  }
+
+  /**
+   * Install all core apps for a service group
+   *
+   * @param serviceGroup - Target service group
+   */
+  async installCoreAppsForService(serviceGroup: ServiceGroup): Promise<void> {
+    logger.info(`[AppStore] Installing core apps for service: ${serviceGroup}`);
+
+    const coreApps = getCoreAppsForService(serviceGroup);
+
+    // Sort by dependencies (install dependencies first)
+    const sortedApps = this.sortByDependencies(coreApps);
+
+    for (const app of sortedApps) {
+      try {
+        await this.installApp(app.appId);
+      } catch (error) {
+        logger.error(`[AppStore] Failed to install ${app.appId}:`, error);
+        throw new Error(`Failed to install core app ${app.appId} for service ${serviceGroup}`);
+      }
+    }
+
+    logger.info(`[AppStore] ✅ Core apps installed for service: ${serviceGroup}`);
+  }
+
+  /**
+   * Validate app installation against service group constraints
+   *
+   * @param appId - App to validate
+   * @param serviceGroup - Target service group
+   * @returns Validation result
+   */
+  validateInstallation(
+    appId: string,
+    serviceGroup: ServiceGroup
+  ): {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+  } {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Check if app exists
+    const app = getCatalogItem(appId);
+    if (!app) {
+      errors.push(`App ${appId} not found in catalog`);
+      return { valid: false, errors, warnings };
+    }
+
+    // Check if app is available for service group
+    if (!isAppAvailableForService(appId, serviceGroup)) {
+      errors.push(`App ${appId} is not available for service group ${serviceGroup}`);
+    }
+
+    // Check dependencies
+    if (app.dependencies) {
+      for (const depId of Object.keys(app.dependencies)) {
+        if (!this.isInstalled(depId)) {
+          errors.push(`Missing dependency: ${depId}`);
+        }
+      }
+    }
+
+    // Check incompatibilities
+    const activeApps = this.getActiveApps();
+    for (const activeAppId of activeApps) {
+      const compatibility = checkAppCompatibility(appId, activeAppId);
+      if (compatibility === 'incompatible') {
+        errors.push(`App ${appId} is incompatible with installed app ${activeAppId}`);
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+      warnings,
+    };
+  }
+
+  /**
+   * Get recommended apps for a service group based on installed apps
+   *
+   * @param serviceGroup - Target service group
+   * @returns Array of recommended apps
+   */
+  getRecommendedApps(serviceGroup: ServiceGroup): AppCatalogItem[] {
+    const serviceApps = filterByServiceGroup(serviceGroup);
+    const installedApps = this.getActiveApps();
+
+    // Filter out installed apps and find recommendations
+    return serviceApps.filter((app) => {
+      // Skip if already installed
+      if (installedApps.includes(app.appId)) return false;
+
+      // Check if all dependencies are installed
+      if (app.dependencies) {
+        for (const depId of Object.keys(app.dependencies)) {
+          if (!installedApps.includes(depId)) {
+            return false;
+          }
+        }
+      }
+
+      // Check compatibility with installed apps
+      for (const installedId of installedApps) {
+        if (checkAppCompatibility(app.appId, installedId) === 'incompatible') {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  /**
+   * Sort apps by dependencies (topological sort)
+   * Apps with no dependencies come first
+   */
+  private sortByDependencies(apps: AppCatalogItem[]): AppCatalogItem[] {
+    const appMap = new Map(apps.map((app) => [app.appId, app]));
+    const sorted: AppCatalogItem[] = [];
+    const visited = new Set<string>();
+    const visiting = new Set<string>();
+
+    const visit = (appId: string): void => {
+      if (visited.has(appId)) return;
+      if (visiting.has(appId)) {
+        throw new Error(`Circular dependency detected: ${appId}`);
+      }
+
+      const app = appMap.get(appId);
+      if (!app) return;
+
+      visiting.add(appId);
+
+      if (app.dependencies) {
+        for (const depId of Object.keys(app.dependencies)) {
+          visit(depId);
+        }
+      }
+
+      visiting.delete(appId);
+      visited.add(appId);
+      sorted.push(app);
+    };
+
+    for (const app of apps) {
+      visit(app.appId);
+    }
+
+    return sorted;
   }
 }
 

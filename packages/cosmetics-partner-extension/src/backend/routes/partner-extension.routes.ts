@@ -1,0 +1,184 @@
+/**
+ * Cosmetics Partner Extension Routes
+ *
+ * 파트너 확장 기능 API 라우트 정의
+ */
+
+import { Router } from 'express';
+import type { Repository, DataSource } from 'typeorm';
+
+// Entities
+import { PartnerProfile } from '../entities/partner-profile.entity';
+import { PartnerLink } from '../entities/partner-link.entity';
+import { PartnerRoutine } from '../entities/partner-routine.entity';
+import { PartnerEarnings } from '../entities/partner-earnings.entity';
+
+// Services
+import { PartnerProfileService } from '../services/partner-profile.service';
+import { PartnerLinkService } from '../services/partner-link.service';
+import { PartnerRoutineService } from '../services/partner-routine.service';
+import { PartnerEarningsService } from '../services/partner-earnings.service';
+import { AIRoutineService } from '../services/ai-routine.service';
+import { AIDescriptionService } from '../services/ai-description.service';
+import { PartnerStorefrontService } from '../services/partner-storefront.service';
+import { QRLandingService } from '../services/qr-landing.service';
+import { SocialShareService } from '../services/social-share.service';
+import { CampaignPublisherService } from '../services/campaign-publisher.service';
+
+// Controllers
+import { PartnerProfileController } from '../controllers/partner-profile.controller';
+import { PartnerLinkController } from '../controllers/partner-link.controller';
+import { PartnerRoutineController } from '../controllers/partner-routine.controller';
+import { PartnerEarningsController } from '../controllers/partner-earnings.controller';
+import { AIRoutineController } from '../controllers/ai-routine.controller';
+import { AIDescriptionController } from '../controllers/ai-description.controller';
+import { PartnerStorefrontController } from '../controllers/partner-storefront.controller';
+import { QRLandingController } from '../controllers/qr-landing.controller';
+import { SocialShareController } from '../controllers/social-share.controller';
+import { CampaignPublisherController } from '../controllers/campaign-publisher.controller';
+
+export interface PartnerExtensionRoutesDeps {
+  profileRepository: Repository<PartnerProfile>;
+  linkRepository: Repository<PartnerLink>;
+  routineRepository: Repository<PartnerRoutine>;
+  earningsRepository: Repository<PartnerEarnings>;
+  dataSource: DataSource;
+}
+
+export function createPartnerExtensionRoutes(deps: PartnerExtensionRoutesDeps): Router {
+  const router = Router();
+
+  // Initialize Services
+  const profileService = new PartnerProfileService(deps.profileRepository);
+  const linkService = new PartnerLinkService(deps.linkRepository);
+  const routineService = new PartnerRoutineService(deps.routineRepository);
+  const earningsService = new PartnerEarningsService(deps.earningsRepository);
+  const aiRoutineService = new AIRoutineService(deps.dataSource);
+  const aiDescriptionService = new AIDescriptionService(deps.dataSource);
+  const storefrontService = new PartnerStorefrontService(deps.dataSource);
+  const qrLandingService = new QRLandingService(deps.dataSource);
+  const socialShareService = new SocialShareService(deps.dataSource);
+  const campaignService = new CampaignPublisherService(deps.dataSource);
+
+  // Initialize Controllers
+  const profileController = new PartnerProfileController(profileService);
+  const linkController = new PartnerLinkController(linkService);
+  const routineController = new PartnerRoutineController(routineService);
+  const earningsController = new PartnerEarningsController(earningsService);
+  const aiRoutineController = new AIRoutineController(aiRoutineService);
+  const aiDescriptionController = new AIDescriptionController(aiDescriptionService);
+  const storefrontController = new PartnerStorefrontController(storefrontService);
+  const qrLandingController = new QRLandingController(qrLandingService);
+  const socialShareController = new SocialShareController(socialShareService);
+  const campaignController = new CampaignPublisherController(campaignService);
+
+  // ===================
+  // Profile Routes
+  // ===================
+  router.post('/profile', (req, res) => profileController.create(req, res));
+  router.get('/profile/:id', (req, res) => profileController.findById(req, res));
+  router.get('/profile/user/:userId', (req, res) => profileController.findByUserId(req, res));
+  router.get('/profile/code/:code', (req, res) => profileController.findByReferralCode(req, res));
+  router.put('/profile/:id', (req, res) => profileController.update(req, res));
+  router.put('/profile/:id/status', (req, res) => profileController.updateStatus(req, res));
+  router.get('/profile/top/earners', (req, res) => profileController.getTopEarners(req, res));
+  router.delete('/profile/:id', (req, res) => profileController.delete(req, res));
+
+  // ===================
+  // Link Routes
+  // ===================
+  router.post('/link', (req, res) => linkController.create(req, res));
+  router.get('/link/:id', (req, res) => linkController.findById(req, res));
+  router.get('/link/slug/:slug', (req, res) => linkController.findBySlug(req, res));
+  router.get('/link/partner/:partnerId', (req, res) => linkController.findByPartnerId(req, res));
+  router.put('/link/:id', (req, res) => linkController.update(req, res));
+  router.post('/link/:id/click', (req, res) => linkController.trackClick(req, res));
+  router.post('/link/:id/conversion', (req, res) => linkController.trackConversion(req, res));
+  router.get('/link/partner/:partnerId/stats', (req, res) => linkController.getStats(req, res));
+  router.get('/link/partner/:partnerId/top', (req, res) => linkController.getTopPerforming(req, res));
+  router.delete('/link/:id', (req, res) => linkController.delete(req, res));
+
+  // ===================
+  // Routine Routes
+  // ===================
+  router.post('/routine', (req, res) => routineController.create(req, res));
+  router.get('/routine/:id', (req, res) => routineController.findById(req, res));
+  router.get('/routine/partner/:partnerId', (req, res) => routineController.findByPartnerId(req, res));
+  router.get('/routine/public/all', (req, res) => routineController.findPublic(req, res));
+  router.put('/routine/:id', (req, res) => routineController.update(req, res));
+  router.post('/routine/:id/publish', (req, res) => routineController.publish(req, res));
+  router.post('/routine/:id/unpublish', (req, res) => routineController.unpublish(req, res));
+  router.post('/routine/:id/view', (req, res) => routineController.incrementView(req, res));
+  router.post('/routine/:id/like', (req, res) => routineController.like(req, res));
+  router.post('/routine/:id/unlike', (req, res) => routineController.unlike(req, res));
+  router.get('/routine/partner/:partnerId/stats', (req, res) => routineController.getStats(req, res));
+  router.get('/routine/trending/all', (req, res) => routineController.getTrending(req, res));
+  router.delete('/routine/:id', (req, res) => routineController.delete(req, res));
+
+  // ===================
+  // Earnings Routes
+  // ===================
+  router.post('/earnings', (req, res) => earningsController.create(req, res));
+  router.get('/earnings/:id', (req, res) => earningsController.findById(req, res));
+  router.get('/earnings/partner/:partnerId', (req, res) => earningsController.findByPartnerId(req, res));
+  router.get('/earnings/filter/all', (req, res) => earningsController.findByFilter(req, res));
+  router.put('/earnings/:id', (req, res) => earningsController.update(req, res));
+  router.post('/earnings/:id/approve', (req, res) => earningsController.approve(req, res));
+  router.post('/earnings/partner/:partnerId/withdraw', (req, res) => earningsController.requestWithdrawal(req, res));
+  router.get('/earnings/partner/:partnerId/summary', (req, res) => earningsController.getSummary(req, res));
+  router.get('/earnings/pending/all', (req, res) => earningsController.getPendingApprovals(req, res));
+  router.delete('/earnings/:id', (req, res) => earningsController.delete(req, res));
+
+  // ===================
+  // AI Routes (Phase 6-F)
+  // ===================
+  router.post('/ai/routine', (req, res) => aiRoutineController.generateRoutine(req, res));
+  router.get('/ai/routine/templates', (req, res) => aiRoutineController.getTemplates(req, res));
+  router.post('/ai/description', (req, res) => aiDescriptionController.generateDescription(req, res));
+  router.get('/ai/description/tones', (req, res) => aiDescriptionController.getTones(req, res));
+  router.get('/ai/description/platforms', (req, res) => aiDescriptionController.getPlatforms(req, res));
+
+  // ===================
+  // Storefront Routes (Phase 6-F)
+  // ===================
+  router.get('/storefront/themes', (req, res) => storefrontController.getThemes(req, res));
+  router.get('/storefront/layouts', (req, res) => storefrontController.getLayouts(req, res));
+  router.get('/storefront/:slug', (req, res) => storefrontController.getBySlug(req, res));
+  router.put('/storefront/:partnerId/config', (req, res) => storefrontController.updateConfig(req, res));
+  router.get('/storefront/:partnerId/preview', (req, res) => storefrontController.getPreview(req, res));
+
+  // ===================
+  // QR/Landing Routes (Phase 6-F)
+  // ===================
+  router.post('/qr/generate', (req, res) => qrLandingController.generateQR(req, res));
+  router.get('/qr/styles', (req, res) => qrLandingController.getStyles(req, res));
+  router.get('/qr/sizes', (req, res) => qrLandingController.getSizes(req, res));
+  router.post('/shortlink', (req, res) => qrLandingController.createShortLink(req, res));
+  router.get('/landing/:slug', (req, res) => qrLandingController.getLandingPage(req, res));
+
+  // ===================
+  // Social Share Routes (Phase 6-F)
+  // ===================
+  router.post('/social/generate', (req, res) => socialShareController.generateContent(req, res));
+  router.get('/social/platforms', (req, res) => socialShareController.getPlatforms(req, res));
+  router.get('/social/:partnerId/analytics', (req, res) => socialShareController.getAnalytics(req, res));
+
+  // ===================
+  // Campaign Routes (Phase 6-F)
+  // ===================
+  router.get('/campaign/templates', (req, res) => campaignController.getTemplates(req, res));
+  router.post('/campaign', (req, res) => campaignController.create(req, res));
+  router.post('/campaign/from-template', (req, res) => campaignController.createFromTemplate(req, res));
+  router.get('/campaign/partner/:partnerId', (req, res) => campaignController.getByPartner(req, res));
+  router.get('/campaign/:id', (req, res) => campaignController.getById(req, res));
+  router.put('/campaign/:id', (req, res) => campaignController.update(req, res));
+  router.delete('/campaign/:id', (req, res) => campaignController.delete(req, res));
+  router.post('/campaign/:id/publish', (req, res) => campaignController.publish(req, res));
+  router.post('/campaign/:id/pause', (req, res) => campaignController.pause(req, res));
+  router.post('/campaign/:id/generate-content', (req, res) => campaignController.generateContent(req, res));
+  router.get('/campaign/:id/analytics', (req, res) => campaignController.getAnalytics(req, res));
+
+  return router;
+}
+
+export default createPartnerExtensionRoutes;

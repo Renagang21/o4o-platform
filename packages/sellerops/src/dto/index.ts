@@ -55,8 +55,10 @@ export interface SupplierApprovalRequestDto {
   message?: string;
 }
 
-// Listing
+// Listing (Phase 2: productType 추가)
 import type { ListingStatus } from '@o4o/dropshipping-core';
+
+export type ProductType = 'general' | 'cosmetics' | 'food' | 'pharmaceutical' | 'tourism' | 'partner' | string;
 
 export interface CreateListingDto {
   offerId: string;
@@ -120,7 +122,9 @@ export interface OrderDetailDto {
   createdAt: Date;
 }
 
-// Settlement
+// Settlement (Phase 2: contextType 추가)
+export type SettlementContextType = 'seller' | 'supplier' | 'partner' | 'pharmacy';
+
 export interface SettlementSummaryDto {
   totalSettled: number;
   pendingSettlement: number;
@@ -136,6 +140,7 @@ export interface SettlementBatchDto {
   commissionAmount: number;
   netAmount: number;
   status: 'open' | 'closed' | 'paid';
+  contextType?: SettlementContextType;
   transactionCount: number;
   closedAt?: Date;
   paidAt?: Date;

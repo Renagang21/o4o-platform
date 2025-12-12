@@ -84,8 +84,8 @@ __decorate([
     __metadata("design:type", String)
 ], ForumPost.prototype, "slug", void 0);
 __decorate([
-    Column({ type: 'text' }),
-    __metadata("design:type", String)
+    Column({ type: 'jsonb', default: [] }),
+    __metadata("design:type", Array)
 ], ForumPost.prototype, "content", void 0);
 __decorate([
     Column({ type: 'text', nullable: true }),
@@ -107,6 +107,14 @@ __decorate([
     Column({ type: 'uuid' }),
     __metadata("design:type", String)
 ], ForumPost.prototype, "authorId", void 0);
+__decorate([
+    Column({ type: 'uuid', nullable: true }),
+    __metadata("design:type", String)
+], ForumPost.prototype, "organizationId", void 0);
+__decorate([
+    Column({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], ForumPost.prototype, "isOrganizationExclusive", void 0);
 __decorate([
     Column({ type: 'boolean', default: false }),
     __metadata("design:type", Boolean)
@@ -136,7 +144,7 @@ __decorate([
     __metadata("design:type", Array)
 ], ForumPost.prototype, "tags", void 0);
 __decorate([
-    Column({ type: 'json', nullable: true }),
+    Column({ type: 'jsonb', nullable: true }),
     __metadata("design:type", Object)
 ], ForumPost.prototype, "metadata", void 0);
 __decorate([
@@ -174,9 +182,15 @@ __decorate([
     JoinColumn({ name: 'lastCommentBy' }),
     __metadata("design:type", Function)
 ], ForumPost.prototype, "lastCommenter", void 0);
+__decorate([
+    ManyToOne('Organization', { nullable: true }),
+    JoinColumn({ name: 'organizationId' }),
+    __metadata("design:type", Object)
+], ForumPost.prototype, "organization", void 0);
 ForumPost = __decorate([
     Entity('forum_post'),
-    Index(['categoryId', 'status', 'isPinned', 'createdAt'])
+    Index(['categoryId', 'status', 'isPinned', 'createdAt']),
+    Index(['organizationId', 'status', 'createdAt'])
 ], ForumPost);
 export { ForumPost };
 //# sourceMappingURL=ForumPost.js.map

@@ -159,6 +159,25 @@ import {
   YaksaCourseAssignment,
 } from '@o4o/lms-yaksa';
 
+// ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
+// import {
+//   PartnerProfile,
+//   PartnerLink,
+//   PartnerRoutine,
+//   PartnerEarnings,
+//   CommissionPolicy,
+// } from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
+
+// ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
+import {
+  FeePolicy,
+  FeeInvoice,
+  FeePayment,
+  FeeExemption,
+  FeeSettlement,
+  FeeLog,
+} from '@o4o/annualfee-yaksa/backend/entities';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -329,6 +348,19 @@ export const AppDataSource = new DataSource({
     RequiredCoursePolicy,
     CreditRecord,
     YaksaCourseAssignment,
+    // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
+    // PartnerProfile,
+    // PartnerLink,
+    // PartnerRoutine,
+    // PartnerEarnings,
+    // CommissionPolicy,
+    // ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
+    FeePolicy,
+    FeeInvoice,
+    FeePayment,
+    FeeExemption,
+    FeeSettlement,
+    FeeLog,
   ],
   
   // 마이그레이션 설정

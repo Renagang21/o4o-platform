@@ -1,14 +1,28 @@
 import { FC, useState, useEffect, useMemo } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers } from 'lucide-react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers, Grid3X3, Settings, Sparkles, Building, Heart, Truck, Users, ShoppingBag, Tv, GlobeIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult } from '@/api/admin-apps';
+import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult, ServiceGroup, ServiceGroupMeta } from '@/api/admin-apps';
 import ServiceTemplateSelector from '@/components/apps/ServiceTemplateSelector';
 
 type Tab = 'market' | 'installed' | 'templates';
+
+// Service Group Icons mapping
+const SERVICE_GROUP_ICONS: Record<ServiceGroup, React.ComponentType<{ className?: string }>> = {
+  'platform-core': Settings,
+  'cosmetics': Sparkles,
+  'yaksa': Building,
+  'diabetes-care-pharmacy': Heart,
+  'tourist': GlobeIcon,
+  'signage': Tv,
+  'sellerops': ShoppingBag,
+  'supplierops': Truck,
+  'partnerops': Users,
+  'global': Grid3X3,
+};
 
 // Lifecycle action status for UI feedback
 type LifecycleStatus = 'idle' | 'installing' | 'activating' | 'deactivating' | 'uninstalling' | 'updating' | 'rolling_back';
@@ -37,6 +51,8 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedServiceGroup, setSelectedServiceGroup] = useState<ServiceGroup | 'all'>('all');
+  const [serviceGroupMeta, setServiceGroupMeta] = useState<ServiceGroupMeta[]>([]);
   const [showDependencies, setShowDependencies] = useState<string | null>(null);
   const [sourceFilter, setSourceFilter] = useState<'all' | 'local' | 'remote'>('all');
 
@@ -58,11 +74,23 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     return ['all', ...Array.from(cats).sort()];
   }, [marketApps]);
 
-  // Filter market apps by search, category, and source
+  // Filter market apps by search, category, service group, and source
   const filteredMarketApps = useMemo(() => {
     let filtered = marketApps;
 
-    // Filter by category
+    // Filter by service group (primary filter)
+    if (selectedServiceGroup !== 'all') {
+      filtered = filtered.filter(app => {
+        // Apps with no serviceGroups are shown in 'global'
+        if (!app.serviceGroups || app.serviceGroups.length === 0) {
+          return selectedServiceGroup === 'global';
+        }
+        // Check if app belongs to selected service group or is global
+        return app.serviceGroups.includes(selectedServiceGroup) || app.serviceGroups.includes('global');
+      });
+    }
+
+    // Filter by category (deprecated, but keep for backward compatibility)
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(app => app.category === selectedCategory);
     }
@@ -85,7 +113,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     }
 
     return filtered;
-  }, [marketApps, selectedCategory, sourceFilter, searchQuery]);
+  }, [marketApps, selectedCategory, selectedServiceGroup, sourceFilter, searchQuery]);
 
   // Filter installed apps by search
   const filteredInstalledApps = useMemo(() => {
@@ -112,6 +140,15 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       ]);
       setMarketApps(market);
       setInstalledApps(installed);
+
+      // Load service group metadata (best effort, don't fail if unavailable)
+      try {
+        const groupMeta = await adminAppsApi.getServiceGroupMeta();
+        setServiceGroupMeta(groupMeta);
+      } catch {
+        // Use default empty array if API fails
+        console.warn('Failed to load service group metadata, using defaults');
+      }
     } catch (error) {
       console.error('Failed to load apps:', error);
       toast({
@@ -483,6 +520,51 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         </button>
       </div>
 
+      {/* Service Group Tabs - Only show in market tab */}
+      {activeTab === 'market' && serviceGroupMeta.length > 0 && (
+        <div className="border rounded-lg bg-gray-50 p-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedServiceGroup('all')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                selectedServiceGroup === 'all'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              <Grid3X3 className="w-4 h-4" />
+              전체
+            </button>
+            {serviceGroupMeta.map((group) => {
+              const IconComponent = SERVICE_GROUP_ICONS[group.id] || Grid3X3;
+              const appsCount = marketApps.filter(app =>
+                app.serviceGroups?.includes(group.id) ||
+                (group.id === 'global' && (!app.serviceGroups || app.serviceGroups.length === 0))
+              ).length;
+              return (
+                <button
+                  key={group.id}
+                  onClick={() => setSelectedServiceGroup(group.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    selectedServiceGroup === group.id
+                      ? 'text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                  style={selectedServiceGroup === group.id ? { backgroundColor: group.color || '#3B82F6' } : {}}
+                  title={group.description}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{group.nameKo}</span>
+                  <Badge variant="secondary" className="ml-1 text-xs h-5 px-1.5 bg-gray-100 text-gray-600">
+                    {appsCount}
+                  </Badge>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Search and Filter Bar - Hide on templates tab */}
       {activeTab !== 'templates' && (
       <div className="flex flex-col sm:flex-row gap-4">
@@ -654,12 +736,15 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       )}
 
       {/* Filter Results Info */}
-      {activeTab !== 'templates' && (searchQuery || selectedCategory !== 'all') && (
+      {activeTab !== 'templates' && (searchQuery || selectedCategory !== 'all' || selectedServiceGroup !== 'all') && (
         <div className="text-sm text-gray-500">
           {activeTab === 'market' ? (
             <>
               {filteredMarketApps.length}개 앱 표시 중
               {searchQuery && <span> (검색: "{searchQuery}")</span>}
+              {selectedServiceGroup !== 'all' && (
+                <span> (서비스: {serviceGroupMeta.find(g => g.id === selectedServiceGroup)?.nameKo || selectedServiceGroup})</span>
+              )}
               {selectedCategory !== 'all' && <span> (카테고리: {selectedCategory})</span>}
             </>
           ) : (
@@ -686,7 +771,17 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
           ) : filteredMarketApps.map((app) => {
             const installed = getInstallStatus(app.appId);
             const status = lifecycleStatus[app.appId] || 'idle';
-            const typeBadgeColor = app.type === 'core' ? 'bg-blue-500' : app.type === 'extension' ? 'bg-purple-500' : 'bg-gray-500';
+            // Updated type badge colors to include 'feature' type
+            const typeBadgeColor =
+              app.type === 'core' ? 'bg-blue-500' :
+              app.type === 'feature' ? 'bg-green-500' :
+              app.type === 'extension' ? 'bg-purple-500' :
+              'bg-gray-500';
+            const typeLabel =
+              app.type === 'core' ? '코어' :
+              app.type === 'feature' ? '기능' :
+              app.type === 'extension' ? '확장' :
+              '독립';
             return (
               <Card key={app.appId} className={status !== 'idle' ? 'ring-2 ring-blue-300' : ''}>
                 <CardHeader>
@@ -695,7 +790,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                       {app.name}
                       {app.type && (
                         <Badge variant="default" className={`text-xs ${typeBadgeColor}`}>
-                          {app.type === 'core' ? '코어' : app.type === 'extension' ? '확장' : '독립'}
+                          {typeLabel}
                         </Badge>
                       )}
                       {app.source === 'remote' && (
@@ -707,8 +802,28 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                     </span>
                     <div className="flex items-center gap-2">
                       {app.riskLevel && getRiskBadge(app.riskLevel)}
-                      {app.category && (
-                        <Badge variant="outline">{app.category}</Badge>
+                      {/* Show service groups as badges */}
+                      {app.serviceGroups && app.serviceGroups.length > 0 && (
+                        <div className="flex gap-1">
+                          {app.serviceGroups.slice(0, 2).map(sg => {
+                            const meta = serviceGroupMeta.find(m => m.id === sg);
+                            return (
+                              <Badge
+                                key={sg}
+                                variant="outline"
+                                className="text-xs"
+                                style={{ borderColor: meta?.color || '#9CA3AF', color: meta?.color || '#6B7280' }}
+                              >
+                                {meta?.nameKo || sg}
+                              </Badge>
+                            );
+                          })}
+                          {app.serviceGroups.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{app.serviceGroups.length - 2}
+                            </Badge>
+                          )}
+                        </div>
                       )}
                     </div>
                   </CardTitle>

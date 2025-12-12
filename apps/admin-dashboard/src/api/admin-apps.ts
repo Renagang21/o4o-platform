@@ -11,8 +11,34 @@ import api from './base';
 // Service Template Types (Phase 7)
 // =============================================================================
 
-export type ServiceGroup = 'cosmetics' | 'yaksa' | 'tourist' | 'sellerops' | 'supplierops' | 'global';
+export type ServiceGroup =
+  | 'cosmetics'
+  | 'yaksa'
+  | 'tourist'
+  | 'sellerops'
+  | 'supplierops'
+  | 'partnerops'
+  | 'signage'
+  | 'diabetes-care-pharmacy'
+  | 'platform-core'
+  | 'global';
+
 export type TemplateCategory = 'commerce' | 'organization' | 'community' | 'education' | 'health' | 'retail';
+
+export type AppType = 'core' | 'feature' | 'extension' | 'standalone';
+
+/**
+ * Service Group Metadata for UI display
+ */
+export interface ServiceGroupMeta {
+  id: ServiceGroup;
+  name: string;
+  nameKo: string;
+  description: string;
+  icon?: string;
+  color?: string;
+  priority: number;
+}
 
 /**
  * Service Template
@@ -124,11 +150,12 @@ export interface AppCatalogItem {
   name: string;
   version: string;
   description?: string;
+  /** @deprecated Use serviceGroups instead */
   category?: string;
   icon?: string;
   homepage?: string;
   author?: string;
-  type?: 'core' | 'extension' | 'standalone';  // App type for Core/Extension pattern
+  type?: AppType;  // App type: core, feature, extension, standalone
   tags?: string[];                              // Searchable tags
   dependencies?: Record<string, string>;        // Dependencies: { appId: versionRange }
   source?: 'local' | 'remote';                  // App source
@@ -136,6 +163,8 @@ export interface AppCatalogItem {
   url?: string;                                 // Remote manifest URL
   hash?: string;                                // SHA-256 hash for integrity
   riskLevel?: 'low' | 'medium' | 'high' | 'critical';  // Security risk level
+  serviceGroups?: ServiceGroup[];               // Service groups this app belongs to
+  incompatibleWith?: string[];                  // Apps that are incompatible with this app
 }
 
 /**
@@ -350,6 +379,53 @@ export const adminAppsApi = {
    */
   getTemplateStats: async (): Promise<TemplateStats> => {
     const response = await api.get('/v1/service/stats');
+    return response.data.data;
+  },
+
+  // ===========================================================================
+  // ServiceGroup APIs (Phase 6)
+  // ===========================================================================
+
+  /**
+   * Get all service group metadata for UI display
+   */
+  getServiceGroupMeta: async (): Promise<ServiceGroupMeta[]> => {
+    const response = await api.get('/admin/apps/service-groups');
+    return response.data.data;
+  },
+
+  /**
+   * Get apps filtered by service group
+   */
+  getAppsByServiceGroup: async (serviceGroup: ServiceGroup): Promise<AppCatalogItem[]> => {
+    const response = await api.get(`/admin/apps/by-service/${serviceGroup}`);
+    return response.data.data;
+  },
+
+  /**
+   * Get service group statistics
+   */
+  getServiceGroupStats: async (): Promise<Array<{
+    serviceGroup: ServiceGroup;
+    meta: ServiceGroupMeta;
+    coreCount: number;
+    featureCount: number;
+    extensionCount: number;
+    totalCount: number;
+  }>> => {
+    const response = await api.get('/admin/apps/service-groups/stats');
+    return response.data.data;
+  },
+
+  /**
+   * Check if an app is compatible with currently installed apps
+   */
+  checkAppCompatibility: async (appId: string): Promise<{
+    compatible: boolean;
+    incompatibleWith: string[];
+    warnings: string[];
+  }> => {
+    const response = await api.get(`/admin/apps/${appId}/compatibility`);
     return response.data.data;
   },
 };

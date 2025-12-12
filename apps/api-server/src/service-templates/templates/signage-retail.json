@@ -1,0 +1,24 @@
+{
+  "id": "signage-retail",
+  "label": "Digital Signage Service",
+  "description": "매장 디지털 사이니지 서비스 - 콘텐츠 관리, 스케줄링, 디스플레이 관리",
+  "serviceGroup": "signage",
+  "coreApps": [
+    "signage"
+  ],
+  "extensionApps": [],
+  "globalCoreApps": [
+    "cms-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableScheduling": true,
+    "enableMultiDisplay": true,
+    "defaultTransition": "fade"
+  },
+  "icon": "tv",
+  "category": "retail",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

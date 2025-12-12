@@ -57,6 +57,18 @@ import serviceProvisioningRoutes from './routes/service-provisioning.routes.js';
 // Service Admin Routes (Phase 8)
 import serviceAdminRoutes from './routes/service-admin.routes.js';
 
+// Public Routes (no auth required)
+import publicRoutes from './routes/public.routes.js';
+
+// User Role Routes
+import userRoleRoutes from './routes/user-role.routes.js';
+
+// Auth Routes
+import authRoutes from './routes/auth.js';
+
+// Admin Apps Routes
+import adminAppsRoutes from './routes/admin/apps.routes.js';
+
 // Service Template Registry (Phase 7)
 import { templateRegistry } from './service-templates/template-registry.js';
 
@@ -461,6 +473,22 @@ const startServer = async () => {
     // 7. Register Service Admin routes (Phase 8)
     app.use('/api/v1/service-admin', serviceAdminRoutes);
     logger.info('✅ Service Admin routes registered at /api/v1/service-admin');
+
+    // 8. Register Public routes (no auth required)
+    app.use('/api/v1/public', publicRoutes);
+    logger.info('✅ Public routes registered at /api/v1/public');
+
+    // 9. Register User Role routes
+    app.use('/api/v1/userRole', userRoleRoutes);
+    logger.info('✅ User Role routes registered at /api/v1/userRole');
+
+    // 10. Register Auth routes
+    app.use('/api/auth', authRoutes);
+    logger.info('✅ Auth routes registered at /api/auth');
+
+    // 11. Register Admin Apps routes (v1 prefix for auth-client compatibility)
+    app.use('/api/v1/admin/apps', adminAppsRoutes);
+    logger.info('✅ Admin Apps routes registered at /api/v1/admin/apps');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted

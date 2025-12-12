@@ -7,10 +7,16 @@
  * - Ingredient information
  * - Routine recommendations
  * - Product certifications
+ *
+ * Phase 2 업데이트:
+ * - Core Extension Interface 구현
+ * - productType = 'cosmetics' 특화 Validation
+ * - Hook 기반 Offer/Listing/Order 검증
  */
 
 export const cosmeticsExtensionManifest = {
   // ===== 필수 기본 정보 =====
+  id: 'dropshipping-cosmetics', // ModuleLoader compatibility
   appId: 'dropshipping-cosmetics',
   displayName: '화장품 Dropshipping',
   name: 'Dropshipping Cosmetics Extension',

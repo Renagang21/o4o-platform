@@ -96,31 +96,38 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       setIsLoading(true);
       setError(null);
       const response = await authClient.login(credentials);
+
+      // API 응답 구조: { success, data: { user, accessToken, refreshToken } }
+      const loginData = (response as any).data || response;
+      const user = loginData.user;
+      const token = loginData.accessToken || loginData.token;
+      const refreshToken = loginData.refreshToken;
+
       const userWithDates = {
-        ...response.user,
-        createdAt: (response.user as any).createdAt || new Date().toISOString(),
-        updatedAt: (response.user as any).updatedAt || new Date().toISOString()
+        ...user,
+        createdAt: user?.createdAt || new Date().toISOString(),
+        updatedAt: user?.updatedAt || new Date().toISOString()
       };
       setUser(userWithDates as any);
-      
+
       // 토큰을 localStorage에 저장
-      if (response.token) {
+      if (token) {
         // 여러 키로 저장 (다양한 API 클라이언트 호환성)
-        localStorage.setItem('accessToken', response.token);
-        localStorage.setItem('authToken', response.token); // postApi 호환성
-        localStorage.setItem('token', response.token); // 하위 호환성
-        
-        if (response.refreshToken) {
-          localStorage.setItem('refreshToken', response.refreshToken);
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('authToken', token); // postApi 호환성
+        localStorage.setItem('token', token); // 하위 호환성
+
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
         }
-        
+
         // admin-auth-storage 구조도 업데이트 (apiClient 호환성을 위해)
         const authStorage = {
           state: {
-            user: response.user,
-            token: response.token,
-            accessToken: response.token,
-            refreshToken: response.refreshToken,
+            user: userWithDates,
+            token: token,
+            accessToken: token,
+            refreshToken: refreshToken,
             isAuthenticated: true
           }
         };

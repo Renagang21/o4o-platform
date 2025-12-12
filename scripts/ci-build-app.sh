@@ -32,13 +32,9 @@ fi
 echo "🔍 Verifying package.json exports before reinstall..."
 cat packages/shortcodes/package.json | grep -A 8 '"exports"'
 
-echo "🔗 Cleaning node_modules and reinstalling to pick up updated package.json..."
-rm -rf node_modules/@o4o/shortcodes
+echo "🔗 Reinstalling to pick up updated package.json..."
 pnpm install
 echo "✅ Workspace dependencies updated"
-
-echo "🔍 Verifying installed package.json exports after reinstall..."
-cat node_modules/@o4o/shortcodes/package.json | grep -A 8 '"exports"'
 echo ""
 
 # Function to build specific app

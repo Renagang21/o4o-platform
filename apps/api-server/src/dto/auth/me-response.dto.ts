@@ -108,18 +108,19 @@ export function mapUserToMeResponse(
     name?: string | null;
     status: string;
     avatar?: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
   },
   assignments: Array<{
     id: string;
     role: string;
     isActive: boolean;
-    validFrom: Date;
+    validFrom?: Date | null;
     validUntil?: Date | null;
-    assignedAt: Date;
+    assignedAt?: Date | null;
   }>
 ): MeResponseDto {
+  const now = new Date().toISOString();
   return {
     id: user.id,
     email: user.email,
@@ -134,7 +135,7 @@ export function mapUserToMeResponse(
       assignedAt: a.assignedAt?.toISOString(),
     })),
     avatar: user.avatar ?? null,
-    createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString(),
+    createdAt: user.createdAt?.toISOString() ?? now,
+    updatedAt: user.updatedAt?.toISOString() ?? now,
   };
 }

@@ -1,0 +1,22 @@
+{
+  "id": "platform-core",
+  "label": "Platform Core Service",
+  "description": "플랫폼 코어 기반 서비스 - CMS, 조직, 포럼 기본 기능",
+  "serviceGroup": "platform-core",
+  "coreApps": [
+    "cms-core",
+    "organization-core",
+    "forum-core"
+  ],
+  "extensionApps": [
+    "organization-forum"
+  ],
+  "globalCoreApps": [],
+  "autoInstall": false,
+  "defaultSettings": {},
+  "icon": "settings",
+  "category": "organization",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}

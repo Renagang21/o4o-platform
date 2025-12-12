@@ -11,9 +11,12 @@ export declare class ForumCategory {
     accessLevel: string;
     postCount: number;
     createdBy?: string;
+    organizationId?: string;
+    isOrganizationExclusive: boolean;
     createdAt: Date;
     updatedAt: Date;
     creator?: User;
+    organization?: any;
     canUserAccess(userRole: string): boolean;
     canUserPost(userRole: string): boolean;
     incrementPostCount(): void;

@@ -89,6 +89,14 @@ __decorate([
     __metadata("design:type", String)
 ], ForumCategory.prototype, "createdBy", void 0);
 __decorate([
+    Column({ type: 'uuid', nullable: true }),
+    __metadata("design:type", String)
+], ForumCategory.prototype, "organizationId", void 0);
+__decorate([
+    Column({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], ForumCategory.prototype, "isOrganizationExclusive", void 0);
+__decorate([
     CreateDateColumn(),
     __metadata("design:type", Date)
 ], ForumCategory.prototype, "createdAt", void 0);
@@ -101,9 +109,15 @@ __decorate([
     JoinColumn({ name: 'createdBy' }),
     __metadata("design:type", Function)
 ], ForumCategory.prototype, "creator", void 0);
+__decorate([
+    ManyToOne('Organization', { nullable: true }),
+    JoinColumn({ name: 'organizationId' }),
+    __metadata("design:type", Object)
+], ForumCategory.prototype, "organization", void 0);
 ForumCategory = __decorate([
     Entity('forum_category'),
-    Index(['isActive', 'sortOrder'])
+    Index(['isActive', 'sortOrder']),
+    Index(['organizationId', 'isActive'])
 ], ForumCategory);
 export { ForumCategory };
 //# sourceMappingURL=ForumCategory.js.map

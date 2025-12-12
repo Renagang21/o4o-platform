@@ -1,5 +1,7 @@
 import { ForumCategory } from './ForumCategory.js';
 import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+import type { Block } from '@o4o/types';
+import type { ForumPostMetadata } from '../types/index.js';
 export declare enum PostStatus {
     DRAFT = "draft",
     PUBLISHED = "publish",
@@ -18,12 +20,14 @@ export declare class ForumPost {
     id: string;
     title: string;
     slug: string;
-    content: string;
+    content: Block[];
     excerpt?: string;
     type: PostType;
     status: PostStatus;
     categoryId: string;
     authorId: string;
+    organizationId?: string;
+    isOrganizationExclusive: boolean;
     isPinned: boolean;
     isLocked: boolean;
     allowComments: boolean;
@@ -31,7 +35,7 @@ export declare class ForumPost {
     commentCount: number;
     likeCount: number;
     tags?: string[];
-    metadata?: Record<string, unknown>;
+    metadata?: ForumPostMetadata;
     publishedAt?: Date;
     lastCommentAt?: Date;
     lastCommentBy?: string;
@@ -40,6 +44,7 @@ export declare class ForumPost {
     category?: Promise<ForumCategory>;
     author?: User;
     lastCommenter?: User;
+    organization?: any;
     canUserView(userRole: string): boolean;
     canUserEdit(userId: string, userRole: string): boolean;
     canUserComment(userRole: string): boolean;

@@ -32,7 +32,11 @@
       "@o4o/membership-yaksa/*": ["../../packages/membership-yaksa/dist/*"],
       "@o4o/reporting-yaksa/*": ["../../packages/reporting-yaksa/dist/*"],
       "@o4o/dropshipping-cosmetics/*": ["../../packages/dropshipping-cosmetics/dist/*"],
+      "@o4o/annualfee-yaksa": ["../../packages/annualfee-yaksa/dist"],
+      "@o4o/annualfee-yaksa/*": ["../../packages/annualfee-yaksa/dist/*"],
       "@o4o/*": ["../../packages/*/dist"],
+      "@o4o-apps/forum": ["../../packages/forum-app/src/index"],
+      "@o4o-apps/forum/*": ["../../packages/forum-app/src/*"],
       "@o4o-apps/signage": ["../../packages/@o4o-apps/signage/dist"],
       "@o4o-apps/*": ["../../packages/*/dist"],
       "@o4o-extensions/*": ["../../packages/*/dist"]

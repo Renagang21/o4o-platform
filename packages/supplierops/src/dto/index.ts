@@ -1,6 +1,16 @@
 /**
  * SupplierOps DTOs
+ *
+ * Phase 2 업데이트:
+ * - productType 추가
+ * - contextType 추가
+ * - stockQuantity 통일 (stock → stockQuantity)
+ * - supplierPrice 통일 (price → supplierPrice)
  */
+
+// Phase 2: 공통 타입 정의
+export type ProductType = 'general' | 'cosmetics' | 'food' | 'pharmaceutical' | 'tourism' | 'partner' | string;
+export type SettlementContextType = 'seller' | 'supplier' | 'partner' | 'pharmacy';
 
 export interface DashboardSummaryDto {
   supplierId: string;
@@ -34,6 +44,7 @@ export interface ProductMasterDto {
   description: string;
   basePrice: number;
   category: string;
+  productType: ProductType; // Phase 2: 추가
   attributes: Record<string, any>;
   isActive: boolean;
 }
@@ -44,6 +55,7 @@ export interface CreateProductDto {
   description?: string;
   basePrice: number;
   category: string;
+  productType?: ProductType; // Phase 2: 추가 (기본값 'general')
   attributes?: Record<string, any>;
 }
 
@@ -51,8 +63,9 @@ export interface OfferDto {
   id: string;
   productId: string;
   productName: string;
-  price: number;
-  stock: number;
+  productType?: ProductType; // Phase 2: 추가
+  supplierPrice: number; // Phase 2: price → supplierPrice
+  stockQuantity: number; // Phase 2: stock → stockQuantity
   minOrderQuantity: number;
   isActive: boolean;
   activeSellers: number;
@@ -60,8 +73,8 @@ export interface OfferDto {
 
 export interface CreateOfferDto {
   productId: string;
-  price: number;
-  stock: number;
+  supplierPrice: number; // Phase 2: price → supplierPrice
+  stockQuantity: number; // Phase 2: stock → stockQuantity
   minOrderQuantity?: number;
 }
 
@@ -71,6 +84,7 @@ export interface OrderRelayDto {
   sellerId: string;
   sellerName: string;
   productName: string;
+  productType?: ProductType; // Phase 2: 추가
   quantity: number;
   totalPrice: number;
   status: string;
@@ -93,6 +107,7 @@ export interface SettlementBatchDto {
   commissionAmount: number;
   netAmount: number;
   status: string;
+  contextType?: SettlementContextType; // Phase 2: 추가
   transactionCount: number;
 }
 
