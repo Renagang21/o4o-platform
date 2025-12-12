@@ -4,7 +4,16 @@ import { DependencyError } from '../../services/AppDependencyResolver.js';
 import { OwnershipValidationError } from '../../services/AppTableOwnershipResolver.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
-import { APPS_CATALOG, getCatalogItem } from '../../app-manifests/appsCatalog.js';
+import {
+  APPS_CATALOG,
+  getCatalogItem,
+  SERVICE_GROUP_META,
+  filterByServiceGroup,
+  getServiceGroupStats,
+  checkAppCompatibility,
+  getIncompatibleApps,
+  type ServiceGroup,
+} from '../../app-manifests/appsCatalog.js';
 import { loadLocalManifest, hasManifest } from '../../app-manifests/index.js';
 import { isNewerVersion } from '../../utils/semver.js';
 import { remoteManifestLoader, ManifestFetchError, ManifestHashMismatchError, ManifestValidationError } from '../../services/RemoteManifestLoader.js';
@@ -505,6 +514,155 @@ router.post('/install-remote', async (req: Request, res: Response) => {
     return res.status(500).json({
       ok: false,
       error: 'INSTALL_REMOTE_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+// =============================================================================
+// ServiceGroup APIs (Phase 6)
+// =============================================================================
+
+/**
+ * GET /api/admin/apps/service-groups
+ * Get all service group metadata for UI display
+ */
+router.get('/service-groups', async (req: Request, res: Response) => {
+  try {
+    // Sort by priority
+    const sortedMeta = [...SERVICE_GROUP_META].sort((a, b) => a.priority - b.priority);
+    return res.json({
+      ok: true,
+      data: sortedMeta,
+    });
+  } catch (error: any) {
+    logger.error('[ServiceGroups] Failed to get service group metadata:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * GET /api/admin/apps/service-groups/stats
+ * Get statistics for all service groups
+ */
+router.get('/service-groups/stats', async (req: Request, res: Response) => {
+  try {
+    const stats = getServiceGroupStats();
+    return res.json({
+      ok: true,
+      data: stats,
+    });
+  } catch (error: any) {
+    logger.error('[ServiceGroups] Failed to get service group stats:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * GET /api/admin/apps/by-service/:serviceGroup
+ * Get apps filtered by service group
+ */
+router.get('/by-service/:serviceGroup', async (req: Request, res: Response) => {
+  try {
+    const { serviceGroup } = req.params;
+
+    // Validate service group
+    const validGroups = SERVICE_GROUP_META.map((m) => m.id);
+    if (!validGroups.includes(serviceGroup as ServiceGroup)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'INVALID_SERVICE_GROUP',
+        message: `Invalid service group: ${serviceGroup}. Valid groups: ${validGroups.join(', ')}`,
+      });
+    }
+
+    const apps = filterByServiceGroup(serviceGroup as ServiceGroup);
+    return res.json({
+      ok: true,
+      data: apps,
+      total: apps.length,
+    });
+  } catch (error: any) {
+    logger.error('[ServiceGroups] Failed to get apps by service group:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * GET /api/admin/apps/:appId/compatibility
+ * Check if an app is compatible with currently installed apps
+ */
+router.get('/:appId/compatibility', async (req: Request, res: Response) => {
+  try {
+    const { appId } = req.params;
+
+    // Check if app exists in catalog
+    const app = getCatalogItem(appId);
+    if (!app) {
+      return res.status(404).json({
+        ok: false,
+        error: 'APP_NOT_FOUND',
+        message: `App ${appId} not found in catalog`,
+      });
+    }
+
+    // Get installed apps
+    const installedApps = await appManager.listInstalled();
+    const installedAppIds = installedApps.map((a) => a.appId);
+
+    // Check compatibility with each installed app
+    const incompatibleWith: string[] = [];
+    const warnings: string[] = [];
+
+    for (const installedAppId of installedAppIds) {
+      const compatibility = checkAppCompatibility(appId, installedAppId);
+      if (compatibility === 'incompatible') {
+        incompatibleWith.push(installedAppId);
+      }
+    }
+
+    // Also check explicit incompatibleWith list
+    const explicitIncompatible = getIncompatibleApps(appId);
+    for (const incompatibleAppId of explicitIncompatible) {
+      if (installedAppIds.includes(incompatibleAppId) && !incompatibleWith.includes(incompatibleAppId)) {
+        incompatibleWith.push(incompatibleAppId);
+      }
+    }
+
+    // Check dependencies
+    if (app.dependencies) {
+      for (const depId of Object.keys(app.dependencies)) {
+        if (!installedAppIds.includes(depId)) {
+          warnings.push(`Missing dependency: ${depId}`);
+        }
+      }
+    }
+
+    return res.json({
+      ok: true,
+      data: {
+        compatible: incompatibleWith.length === 0,
+        incompatibleWith,
+        warnings,
+      },
+    });
+  } catch (error: any) {
+    logger.error('[Compatibility] Failed to check app compatibility:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'CHECK_FAILED',
       message: error.message || 'Unknown error',
     });
   }

@@ -1,0 +1,26 @@
+{
+  "id": "partnerops-service",
+  "label": "Partner Operations Service",
+  "description": "파트너/어필리에이트 운영 서비스 - 링크 추적, 전환 분석, 커미션 정산",
+  "serviceGroup": "partnerops",
+  "coreApps": [
+    "dropshipping-core",
+    "partnerops"
+  ],
+  "extensionApps": [],
+  "globalCoreApps": [
+    "cms-core",
+    "organization-core"
+  ],
+  "autoInstall": true,
+  "defaultSettings": {
+    "enableLinkTracking": true,
+    "enableCommissionManagement": true,
+    "defaultCommissionRate": 5
+  },
+  "icon": "users",
+  "category": "commerce",
+  "version": "1.0.0",
+  "author": "O4O Platform",
+  "isActive": true
+}
