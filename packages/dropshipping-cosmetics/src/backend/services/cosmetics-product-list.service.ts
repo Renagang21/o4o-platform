@@ -1,12 +1,16 @@
 /**
  * CosmeticsProductListService
  *
+ * Phase 9-C: Core v2 정렬
+ * - ProductType.COSMETICS 기반 필터링
+ * - isCosmeticsProduct 타입 가드 사용
+ *
  * Product list with filtering, sorting, and pagination
  * Integrates Dropshipping Core Product with Cosmetics metadata
  */
 
 import { DataSource, Repository } from 'typeorm';
-import type { Product } from '../types/product.types.js';
+import { type Product, isCosmeticsProduct } from '../types/product.types.js';
 
 export interface ProductListFilters {
   skinType?: string[];
@@ -106,6 +110,9 @@ export class CosmeticsProductListService {
 
   /**
    * Fetch products from database
+   *
+   * Phase 9-C: productType = COSMETICS 기반 필터링
+   * isCosmeticsProduct 타입 가드 사용 (Core v2 정렬 + legacy fallback)
    */
   private async fetchProducts(): Promise<Product[]> {
     try {
@@ -114,8 +121,10 @@ export class CosmeticsProductListService {
         relations: ['category']
       });
 
-      // Filter to only cosmetics products (those with cosmetics_metadata)
-      return products.filter(product => product.metadata?.cosmetics_metadata);
+      // Filter to only cosmetics products using Core v2 type guard
+      // Primary: productType = COSMETICS
+      // Fallback: cosmetics_metadata exists (legacy support)
+      return products.filter(product => isCosmeticsProduct(product));
     } catch (error) {
       console.error('[CosmeticsProductList] Error fetching products:', error);
       return [];
