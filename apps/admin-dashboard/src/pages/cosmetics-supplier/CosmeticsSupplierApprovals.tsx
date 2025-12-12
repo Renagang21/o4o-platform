@@ -121,14 +121,14 @@ const CosmeticsSupplierApprovals: React.FC = () => {
 
   const handleApprove = async (approval: Approval) => {
     // TODO: Call API to approve
-    console.log('Approving:', approval.id);
+    // api.post(`/api/v1/cosmetics-supplier/approvals/${approval.id}/approve`);
     fetchApprovals();
   };
 
   const handleReject = async () => {
     if (!selectedApproval || !rejectionReason) return;
     // TODO: Call API to reject
-    console.log('Rejecting:', selectedApproval.id, rejectionReason);
+    // api.post(`/api/v1/cosmetics-supplier/approvals/${selectedApproval.id}/reject`, { reason: rejectionReason });
     setShowRejectModal(false);
     setRejectionReason('');
     setSelectedApproval(null);
