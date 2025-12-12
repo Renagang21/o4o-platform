@@ -123,7 +123,8 @@ export interface OrderDetailDto {
 }
 
 // Settlement (Phase 2: contextType 추가)
-export type SettlementContextType = 'seller' | 'supplier' | 'partner' | 'pharmacy';
+import { SettlementBatchStatus } from '@o4o/dropshipping-core';
+export type SettlementContextType = 'seller' | 'supplier' | 'partner' | 'pharmacy' | 'platform-extension';
 
 export interface SettlementSummaryDto {
   totalSettled: number;
@@ -139,7 +140,7 @@ export interface SettlementBatchDto {
   totalAmount: number;
   commissionAmount: number;
   netAmount: number;
-  status: 'open' | 'closed' | 'paid';
+  status: SettlementBatchStatus;
   contextType?: SettlementContextType;
   transactionCount: number;
   closedAt?: Date;

@@ -35,8 +35,9 @@ import type {
  * // packages/dropshipping-pharmacy/src/extension.ts
  * export const pharmacyExtension: DropshippingCoreExtension = {
  *   appId: 'dropshipping-pharmacy',
+ *   supportedProductTypes: ['pharmaceutical'],
  *
- *   async validateOfferCreation(context) {
+ *   async beforeOfferCreate(context) {
  *     // 의약품은 인증된 공급자만 Offer 생성 가능
  *     if (context.productType === 'pharmaceutical') {
  *       if (!context.supplier.metadata?.pharmacyLicense) {
@@ -49,7 +50,7 @@ import type {
  *     return { valid: true, errors: [] };
  *   },
  *
- *   async validateListingCreation(context) {
+ *   async beforeListingCreate(context) {
  *     // 의약품은 Listing 금지 (B2B만 허용)
  *     if (context.productType === 'pharmaceutical') {
  *       return {
@@ -60,7 +61,7 @@ import type {
  *     return { valid: true, errors: [] };
  *   },
  *
- *   async validateOrderCreation(context) {
+ *   async beforeOrderCreate(context) {
  *     // 의약품은 약국만 구매 가능
  *     if (context.productType === 'pharmaceutical') {
  *       if (context.buyerInfo?.organizationType !== 'pharmacy') {
@@ -71,6 +72,11 @@ import type {
  *       }
  *     }
  *     return { valid: true, errors: [] };
+ *   },
+ *
+ *   async afterOrderCreate(context) {
+ *     // 주문 생성 후 약국에 알림 발송
+ *     console.log(`[Pharmacy] Order created: ${context.orderId}`);
  *   }
  * };
  * ```
@@ -97,31 +103,57 @@ export interface DropshippingCoreExtension {
    */
   supportedProductTypes?: string[];
 
-  // ===== Validation Hooks =====
+  // ===== Offer Hooks (before/after 패턴) =====
 
   /**
-   * Offer 생성 검증 Hook
+   * Offer 생성 전 검증 Hook
    * 기본: always allow
    */
-  validateOfferCreation?: (context: OfferCreationContext) => Promise<ValidationResult>;
+  beforeOfferCreate?: (context: OfferCreationContext) => Promise<ValidationResult>;
 
   /**
-   * Listing 생성 검증 Hook
-   * 기본: always allow
+   * Offer 생성 후 Hook
+   * 기본: no-op
    */
-  validateListingCreation?: (context: ListingCreationContext) => Promise<ValidationResult>;
+  afterOfferCreate?: (context: OfferCreationContext & { offerId: string }) => Promise<void>;
+
+  // ===== Listing Hooks (before/after 패턴) =====
 
   /**
-   * Order 생성 검증 Hook
+   * Listing 생성 전 검증 Hook
    * 기본: always allow
    */
-  validateOrderCreation?: (context: OrderCreationContext) => Promise<ValidationResult>;
+  beforeListingCreate?: (context: ListingCreationContext) => Promise<ValidationResult>;
+
+  /**
+   * Listing 생성 후 Hook
+   * 기본: no-op
+   */
+  afterListingCreate?: (context: ListingCreationContext & { listingId: string }) => Promise<void>;
+
+  // ===== Order Hooks (before/after 패턴) =====
+
+  /**
+   * Order 생성 전 검증 Hook
+   * 기본: always allow
+   */
+  beforeOrderCreate?: (context: OrderCreationContext) => Promise<ValidationResult>;
+
+  /**
+   * Order 생성 후 Hook
+   * 기본: no-op
+   */
+  afterOrderCreate?: (context: OrderCreationContext & { orderId: string }) => Promise<void>;
+
+  // ===== Settlement Hooks =====
 
   /**
    * Settlement 생성 전 Hook
    * 기본: always allow
    */
   beforeSettlementCreate?: (context: SettlementCreationContext) => Promise<ValidationResult>;
+
+  // ===== Commission Hooks =====
 
   /**
    * Commission 적용 전 Hook
@@ -240,30 +272,38 @@ export function registerExtension(extension: DropshippingCoreExtension): void {
   // Validation Hook Registry에도 등록
   const { validationHooks } = require('./validation-hooks.js');
 
-  if (extension.validateOfferCreation) {
+  // Offer Hooks (before/after 패턴)
+  if (extension.beforeOfferCreate || extension.afterOfferCreate) {
     validationHooks.registerOfferHook(extension.appId, {
-      validateOfferCreation: extension.validateOfferCreation,
+      beforeOfferCreate: extension.beforeOfferCreate || (async () => ({ valid: true, errors: [] })),
+      afterOfferCreate: extension.afterOfferCreate || (async () => {}),
     });
   }
 
-  if (extension.validateListingCreation) {
+  // Listing Hooks (before/after 패턴)
+  if (extension.beforeListingCreate || extension.afterListingCreate) {
     validationHooks.registerListingHook(extension.appId, {
-      validateListingCreation: extension.validateListingCreation,
+      beforeListingCreate: extension.beforeListingCreate || (async () => ({ valid: true, errors: [] })),
+      afterListingCreate: extension.afterListingCreate || (async () => {}),
     });
   }
 
-  if (extension.validateOrderCreation) {
+  // Order Hooks (before/after 패턴)
+  if (extension.beforeOrderCreate || extension.afterOrderCreate) {
     validationHooks.registerOrderHook(extension.appId, {
-      validateOrderCreation: extension.validateOrderCreation,
+      beforeOrderCreate: extension.beforeOrderCreate || (async () => ({ valid: true, errors: [] })),
+      afterOrderCreate: extension.afterOrderCreate || (async () => {}),
     });
   }
 
+  // Settlement Hooks
   if (extension.beforeSettlementCreate) {
     validationHooks.registerSettlementHook(extension.appId, {
       beforeSettlementCreate: extension.beforeSettlementCreate,
     });
   }
 
+  // Commission Hooks
   if (extension.beforeCommissionApply || extension.afterCommissionApply) {
     validationHooks.registerCommissionHook(extension.appId, {
       beforeCommissionApply: extension.beforeCommissionApply || (async () => ({ valid: true, errors: [] })),

@@ -36,7 +36,7 @@ export const supplierOpsExtension: DropshippingCoreExtension = {
   supportedProductTypes: undefined,
 
   /**
-   * Offer 생성 검증
+   * Offer 생성 전 검증 (before hook)
    *
    * SupplierOps 레벨에서의 기본 검증:
    * - Supplier 활성화 상태 확인
@@ -46,7 +46,7 @@ export const supplierOpsExtension: DropshippingCoreExtension = {
    * productType 기반 정책(예: pharmaceutical → 약국 라이센스 필요)은
    * 해당 Extension(dropshipping-pharmacy)이 담당합니다.
    */
-  async validateOfferCreation(context: OfferCreationContext): Promise<ValidationResult> {
+  async beforeOfferCreate(context: OfferCreationContext): Promise<ValidationResult> {
     const errors: Array<{ code: string; message: string; field?: string }> = [];
     const warnings: Array<{ code: string; message: string; field?: string }> = [];
 

@@ -6,7 +6,7 @@
 
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { SettlementService } from '../services/SettlementService.js';
-import { SettlementBatch, SettlementBatchStatus } from '../entities/SettlementBatch.entity.js';
+import { SettlementBatch, SettlementBatchStatus, SettlementType } from '../entities/SettlementBatch.entity.js';
 
 @Controller('api/v1/dropshipping/core/settlement')
 export class SettlementController {
@@ -15,9 +15,11 @@ export class SettlementController {
   @Get('batches')
   async findAllBatches(
     @Query('status') status?: SettlementBatchStatus,
-    @Query('sellerId') sellerId?: string
+    @Query('settlementType') settlementType?: SettlementType,
+    @Query('sellerId') sellerId?: string,
+    @Query('supplierId') supplierId?: string
   ): Promise<SettlementBatch[]> {
-    return await this.settlementService.findAll({ status, sellerId });
+    return await this.settlementService.findAll({ status, settlementType, sellerId, supplierId });
   }
 
   @Get('batches/:id')

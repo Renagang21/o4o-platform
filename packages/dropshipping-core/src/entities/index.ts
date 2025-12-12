@@ -6,7 +6,7 @@
 
 export { Supplier, SupplierStatus } from './Supplier.entity.js';
 export { Seller, SellerStatus } from './Seller.entity.js';
-export { ProductMaster, ProductStatus } from './ProductMaster.entity.js';
+export { ProductMaster, ProductStatus, ProductType } from './ProductMaster.entity.js';
 export {
   SupplierProductOffer,
   OfferStatus,
@@ -20,6 +20,7 @@ export { OrderRelay, OrderRelayStatus } from './OrderRelay.entity.js';
 export {
   SettlementBatch,
   SettlementBatchStatus,
+  SettlementType,
 } from './SettlementBatch.entity.js';
 export {
   CommissionRule,

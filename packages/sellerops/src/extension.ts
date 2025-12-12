@@ -36,7 +36,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
   supportedProductTypes: undefined,
 
   /**
-   * Listing 생성 검증
+   * Listing 생성 전 검증 (before hook)
    *
    * SellerOps 레벨에서의 기본 검증:
    * - Seller-Supplier 관계 확인
@@ -45,7 +45,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
    * productType 기반 정책(예: pharmaceutical → Listing 금지)은
    * 해당 Extension(dropshipping-pharmacy)이 담당합니다.
    */
-  async validateListingCreation(context: ListingCreationContext): Promise<ValidationResult> {
+  async beforeListingCreate(context: ListingCreationContext): Promise<ValidationResult> {
     const errors: Array<{ code: string; message: string; field?: string }> = [];
     const warnings: Array<{ code: string; message: string; field?: string }> = [];
 
@@ -92,7 +92,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
   },
 
   /**
-   * Order 생성 검증
+   * Order 생성 전 검증 (before hook)
    *
    * SellerOps 레벨에서의 기본 검증:
    * - Listing 활성화 상태 확인
@@ -101,7 +101,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
    * productType 기반 정책(예: pharmaceutical → 약국만 구매 가능)은
    * 해당 Extension(dropshipping-pharmacy)이 담당합니다.
    */
-  async validateOrderCreation(context: OrderCreationContext): Promise<ValidationResult> {
+  async beforeOrderCreate(context: OrderCreationContext): Promise<ValidationResult> {
     const errors: Array<{ code: string; message: string; field?: string }> = [];
     const warnings: Array<{ code: string; message: string; field?: string }> = [];
 

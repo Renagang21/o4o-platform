@@ -7,7 +7,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProductMaster, ProductStatus } from '../entities/ProductMaster.entity.js';
+import { ProductMaster, ProductStatus, ProductType } from '../entities/ProductMaster.entity.js';
 
 @Injectable()
 export class ProductMasterService {
@@ -51,6 +51,7 @@ export class ProductMasterService {
    */
   async findAll(filters?: {
     status?: ProductStatus;
+    productType?: ProductType;
     category?: string;
     brand?: string;
     search?: string;
@@ -59,6 +60,12 @@ export class ProductMasterService {
 
     if (filters?.status) {
       query.andWhere('product.status = :status', { status: filters.status });
+    }
+
+    if (filters?.productType) {
+      query.andWhere('product.productType = :productType', {
+        productType: filters.productType,
+      });
     }
 
     if (filters?.category) {
@@ -79,6 +86,15 @@ export class ProductMasterService {
     }
 
     return await query.getMany();
+  }
+
+  /**
+   * productType으로 상품 조회 (Extension 앱 전용)
+   */
+  async findByProductType(productType: ProductType): Promise<ProductMaster[]> {
+    return await this.productRepository.find({
+      where: { productType },
+    });
   }
 
   /**
