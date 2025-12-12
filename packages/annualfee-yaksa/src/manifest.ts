@@ -21,11 +21,15 @@ export const annualfeeYaksaManifest = {
   description: '약사회 연회비/회비 관리 시스템 - 정책, 청구, 납부, 감면, 정산 관리',
 
   // ===== 의존성 =====
+  // Note: organization-core and membership-yaksa are loaded separately
+  // They don't have manifest.ts in packages, so we don't declare them in dependsOn
   dependencies: {
     core: ['organization-core'],
     extension: ['membership-yaksa'],
   },
-  dependsOn: ['organization-core', 'membership-yaksa'],
+  // dependsOn is for module-loader runtime dependency resolution
+  // These packages don't have module loader manifests, so we skip them
+  dependsOn: [],
 
   // ===== 소유 테이블 =====
   ownsTables: [
