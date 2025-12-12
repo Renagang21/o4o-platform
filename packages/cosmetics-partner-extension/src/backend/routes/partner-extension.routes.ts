@@ -5,7 +5,7 @@
  */
 
 import { Router } from 'express';
-import type { Repository } from 'typeorm';
+import type { Repository, DataSource } from 'typeorm';
 
 // Entities
 import { PartnerProfile } from '../entities/partner-profile.entity';
@@ -18,18 +18,31 @@ import { PartnerProfileService } from '../services/partner-profile.service';
 import { PartnerLinkService } from '../services/partner-link.service';
 import { PartnerRoutineService } from '../services/partner-routine.service';
 import { PartnerEarningsService } from '../services/partner-earnings.service';
+import { AIRoutineService } from '../services/ai-routine.service';
+import { AIDescriptionService } from '../services/ai-description.service';
+import { PartnerStorefrontService } from '../services/partner-storefront.service';
+import { QRLandingService } from '../services/qr-landing.service';
+import { SocialShareService } from '../services/social-share.service';
+import { CampaignPublisherService } from '../services/campaign-publisher.service';
 
 // Controllers
 import { PartnerProfileController } from '../controllers/partner-profile.controller';
 import { PartnerLinkController } from '../controllers/partner-link.controller';
 import { PartnerRoutineController } from '../controllers/partner-routine.controller';
 import { PartnerEarningsController } from '../controllers/partner-earnings.controller';
+import { AIRoutineController } from '../controllers/ai-routine.controller';
+import { AIDescriptionController } from '../controllers/ai-description.controller';
+import { PartnerStorefrontController } from '../controllers/partner-storefront.controller';
+import { QRLandingController } from '../controllers/qr-landing.controller';
+import { SocialShareController } from '../controllers/social-share.controller';
+import { CampaignPublisherController } from '../controllers/campaign-publisher.controller';
 
 export interface PartnerExtensionRoutesDeps {
   profileRepository: Repository<PartnerProfile>;
   linkRepository: Repository<PartnerLink>;
   routineRepository: Repository<PartnerRoutine>;
   earningsRepository: Repository<PartnerEarnings>;
+  dataSource: DataSource;
 }
 
 export function createPartnerExtensionRoutes(deps: PartnerExtensionRoutesDeps): Router {
@@ -40,12 +53,24 @@ export function createPartnerExtensionRoutes(deps: PartnerExtensionRoutesDeps): 
   const linkService = new PartnerLinkService(deps.linkRepository);
   const routineService = new PartnerRoutineService(deps.routineRepository);
   const earningsService = new PartnerEarningsService(deps.earningsRepository);
+  const aiRoutineService = new AIRoutineService(deps.dataSource);
+  const aiDescriptionService = new AIDescriptionService(deps.dataSource);
+  const storefrontService = new PartnerStorefrontService(deps.dataSource);
+  const qrLandingService = new QRLandingService(deps.dataSource);
+  const socialShareService = new SocialShareService(deps.dataSource);
+  const campaignService = new CampaignPublisherService(deps.dataSource);
 
   // Initialize Controllers
   const profileController = new PartnerProfileController(profileService);
   const linkController = new PartnerLinkController(linkService);
   const routineController = new PartnerRoutineController(routineService);
   const earningsController = new PartnerEarningsController(earningsService);
+  const aiRoutineController = new AIRoutineController(aiRoutineService);
+  const aiDescriptionController = new AIDescriptionController(aiDescriptionService);
+  const storefrontController = new PartnerStorefrontController(storefrontService);
+  const qrLandingController = new QRLandingController(qrLandingService);
+  const socialShareController = new SocialShareController(socialShareService);
+  const campaignController = new CampaignPublisherController(campaignService);
 
   // ===================
   // Profile Routes
@@ -103,6 +128,55 @@ export function createPartnerExtensionRoutes(deps: PartnerExtensionRoutesDeps): 
   router.get('/earnings/partner/:partnerId/summary', (req, res) => earningsController.getSummary(req, res));
   router.get('/earnings/pending/all', (req, res) => earningsController.getPendingApprovals(req, res));
   router.delete('/earnings/:id', (req, res) => earningsController.delete(req, res));
+
+  // ===================
+  // AI Routes (Phase 6-F)
+  // ===================
+  router.post('/ai/routine', (req, res) => aiRoutineController.generateRoutine(req, res));
+  router.get('/ai/routine/templates', (req, res) => aiRoutineController.getTemplates(req, res));
+  router.post('/ai/description', (req, res) => aiDescriptionController.generateDescription(req, res));
+  router.get('/ai/description/tones', (req, res) => aiDescriptionController.getTones(req, res));
+  router.get('/ai/description/platforms', (req, res) => aiDescriptionController.getPlatforms(req, res));
+
+  // ===================
+  // Storefront Routes (Phase 6-F)
+  // ===================
+  router.get('/storefront/themes', (req, res) => storefrontController.getThemes(req, res));
+  router.get('/storefront/layouts', (req, res) => storefrontController.getLayouts(req, res));
+  router.get('/storefront/:slug', (req, res) => storefrontController.getBySlug(req, res));
+  router.put('/storefront/:partnerId/config', (req, res) => storefrontController.updateConfig(req, res));
+  router.get('/storefront/:partnerId/preview', (req, res) => storefrontController.getPreview(req, res));
+
+  // ===================
+  // QR/Landing Routes (Phase 6-F)
+  // ===================
+  router.post('/qr/generate', (req, res) => qrLandingController.generateQR(req, res));
+  router.get('/qr/styles', (req, res) => qrLandingController.getStyles(req, res));
+  router.get('/qr/sizes', (req, res) => qrLandingController.getSizes(req, res));
+  router.post('/shortlink', (req, res) => qrLandingController.createShortLink(req, res));
+  router.get('/landing/:slug', (req, res) => qrLandingController.getLandingPage(req, res));
+
+  // ===================
+  // Social Share Routes (Phase 6-F)
+  // ===================
+  router.post('/social/generate', (req, res) => socialShareController.generateContent(req, res));
+  router.get('/social/platforms', (req, res) => socialShareController.getPlatforms(req, res));
+  router.get('/social/:partnerId/analytics', (req, res) => socialShareController.getAnalytics(req, res));
+
+  // ===================
+  // Campaign Routes (Phase 6-F)
+  // ===================
+  router.get('/campaign/templates', (req, res) => campaignController.getTemplates(req, res));
+  router.post('/campaign', (req, res) => campaignController.create(req, res));
+  router.post('/campaign/from-template', (req, res) => campaignController.createFromTemplate(req, res));
+  router.get('/campaign/partner/:partnerId', (req, res) => campaignController.getByPartner(req, res));
+  router.get('/campaign/:id', (req, res) => campaignController.getById(req, res));
+  router.put('/campaign/:id', (req, res) => campaignController.update(req, res));
+  router.delete('/campaign/:id', (req, res) => campaignController.delete(req, res));
+  router.post('/campaign/:id/publish', (req, res) => campaignController.publish(req, res));
+  router.post('/campaign/:id/pause', (req, res) => campaignController.pause(req, res));
+  router.post('/campaign/:id/generate-content', (req, res) => campaignController.generateContent(req, res));
+  router.get('/campaign/:id/analytics', (req, res) => campaignController.getAnalytics(req, res));
 
   return router;
 }

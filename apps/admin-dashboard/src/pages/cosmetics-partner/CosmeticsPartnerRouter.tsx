@@ -6,6 +6,9 @@
  * - Links: 추천 링크 관리
  * - Routines: 스킨케어 루틴 관리
  * - Earnings: 수익 및 정산 관리
+ * - AI Tools: AI 루틴/설명 생성기 (Phase 6-F)
+ * - Storefront: 스토어프론트/QR/단축링크 (Phase 6-F)
+ * - Campaigns: 캠페인/소셜 콘텐츠 (Phase 6-F)
  */
 
 import React, { Suspense, lazy } from 'react';
@@ -16,6 +19,11 @@ const CosmeticsPartnerDashboard = lazy(() => import('./CosmeticsPartnerDashboard
 const CosmeticsPartnerLinks = lazy(() => import('./CosmeticsPartnerLinks'));
 const CosmeticsPartnerRoutines = lazy(() => import('./CosmeticsPartnerRoutines'));
 const CosmeticsPartnerEarnings = lazy(() => import('./CosmeticsPartnerEarnings'));
+
+// Phase 6-F: Influencer Tools
+const CosmeticsPartnerAITools = lazy(() => import('./CosmeticsPartnerAITools'));
+const CosmeticsPartnerStorefront = lazy(() => import('./CosmeticsPartnerStorefront'));
+const CosmeticsPartnerCampaigns = lazy(() => import('./CosmeticsPartnerCampaigns'));
 
 // Loading component
 const PageLoader: React.FC = () => (
@@ -35,6 +43,10 @@ const CosmeticsPartnerRouter: React.FC = () => {
         <Route path="links" element={<CosmeticsPartnerLinks />} />
         <Route path="routines" element={<CosmeticsPartnerRoutines />} />
         <Route path="earnings" element={<CosmeticsPartnerEarnings />} />
+        {/* Phase 6-F: Influencer Tools */}
+        <Route path="ai-tools" element={<CosmeticsPartnerAITools />} />
+        <Route path="storefront" element={<CosmeticsPartnerStorefront />} />
+        <Route path="campaigns" element={<CosmeticsPartnerCampaigns />} />
         <Route path="*" element={<CosmeticsPartnerDashboard />} />
       </Routes>
     </Suspense>
