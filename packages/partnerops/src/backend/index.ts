@@ -1,27 +1,43 @@
 /**
  * PartnerOps Backend Entry Point
  *
- * Provides Express routes factory for Module Loader integration
+ * Partner-Core 기반 Express routes factory for Module Loader integration
+ *
+ * @package @o4o/partnerops
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
+import {
+  Partner,
+  PartnerLink,
+  PartnerClick,
+  PartnerConversion,
+  PartnerCommission,
+  PartnerSettlementBatch,
+  PartnerService,
+} from '@o4o/partner-core';
 
 // Services
-import { DashboardService } from '../services/DashboardService';
-import { ProfileService } from '../services/ProfileService';
-import { RoutineService } from '../services/RoutineService';
-import { LinkService } from '../services/LinkService';
-import { ConversionService } from '../services/ConversionService';
-import { SettlementService } from '../services/SettlementService';
+import {
+  createDashboardService,
+  createProfileService,
+  createRoutineService,
+  createLinkService,
+  createConversionService,
+  createSettlementService,
+} from '../services/index.js';
+import type { PartnerRoutineEntity } from '../services/RoutineService.js';
 
 // Controllers
-import { DashboardController } from '../controllers/dashboard.controller';
-import { ProfileController } from '../controllers/profile.controller';
-import { RoutinesController } from '../controllers/routines.controller';
-import { LinksController } from '../controllers/links.controller';
-import { ConversionsController } from '../controllers/conversions.controller';
-import { SettlementController } from '../controllers/settlement.controller';
+import {
+  DashboardController,
+  ProfileController,
+  RoutinesController,
+  LinksController,
+  ConversionsController,
+  SettlementController,
+} from '../controllers/index.js';
 
 export interface PartnerOpsRouterOptions {
   dataSource: DataSource;
@@ -36,13 +52,46 @@ export function createRoutes(options: PartnerOpsRouterOptions): Router {
   const router = Router();
   const { dataSource } = options;
 
-  // Initialize services
-  const dashboardService = new DashboardService(dataSource);
-  const profileService = new ProfileService(dataSource);
-  const routineService = new RoutineService(dataSource);
-  const linkService = new LinkService(dataSource);
-  const conversionService = new ConversionService(dataSource);
-  const settlementService = new SettlementService(dataSource);
+  // Get Partner-Core repositories
+  const partnerRepository = dataSource.getRepository(Partner);
+  const linkRepository = dataSource.getRepository(PartnerLink);
+  const clickRepository = dataSource.getRepository(PartnerClick);
+  const conversionRepository = dataSource.getRepository(PartnerConversion);
+  const commissionRepository = dataSource.getRepository(PartnerCommission);
+  const settlementBatchRepository = dataSource.getRepository(PartnerSettlementBatch);
+
+  // PartnerOps 전용 (Routine - Partner-Core 미포함)
+  // Note: PartnerRoutine entity가 Partner-Core에 없으므로 별도 처리 필요
+  // 임시로 더미 repository 사용 (향후 실제 entity 추가 필요)
+  const routineRepository = dataSource.getRepository('PartnerRoutine') as any;
+
+  // Initialize services using factory functions
+  const dashboardService = createDashboardService(partnerRepository, {
+    link: linkRepository,
+    click: clickRepository,
+    conversion: conversionRepository,
+    commission: commissionRepository,
+    settlement: settlementBatchRepository,
+  });
+
+  const profileService = createProfileService(partnerRepository);
+
+  const routineService = createRoutineService(routineRepository, partnerRepository);
+
+  const linkService = createLinkService(linkRepository, partnerRepository);
+
+  const conversionService = createConversionService(
+    conversionRepository,
+    clickRepository,
+    linkRepository,
+    partnerRepository
+  );
+
+  const settlementService = createSettlementService(
+    settlementBatchRepository,
+    commissionRepository,
+    partnerRepository
+  );
 
   // Initialize controllers
   const dashboardController = new DashboardController(dashboardService);
@@ -52,17 +101,20 @@ export function createRoutes(options: PartnerOpsRouterOptions): Router {
   const conversionsController = new ConversionsController(conversionService);
   const settlementController = new SettlementController(settlementService);
 
+  // Partner-Core 기반 PartnerService for middleware
+  const partnerService = new PartnerService(partnerRepository);
+
   // Middleware to extract partner ID from user
-  const extractPartnerId = async (req: Request, res: Response, next: Function) => {
+  const extractPartnerId = async (req: Request, res: Response, next: NextFunction) => {
     const userId = (req as any).user?.id;
-    const tenantId = req.headers['x-tenant-id'] as string || 'default';
 
     if (userId) {
-      const result = await dataSource.query(
-        `SELECT id FROM partnerops_partners WHERE user_id = $1 AND tenant_id = $2`,
-        [userId, tenantId]
-      );
-      (req as any).partnerId = result[0]?.id;
+      try {
+        const partner = await partnerService.findByUserId(userId);
+        (req as any).partnerId = partner?.id;
+      } catch (error) {
+        console.error('Error extracting partner ID:', error);
+      }
     }
     next();
   };
@@ -72,11 +124,13 @@ export function createRoutes(options: PartnerOpsRouterOptions): Router {
 
   // Dashboard routes
   router.get('/dashboard/summary', (req, res) => dashboardController.getSummary(req, res));
+  router.get('/dashboard/stats', (req, res) => dashboardController.getStatsByPeriod(req, res));
 
   // Profile routes
   router.get('/profile', (req, res) => profileController.getProfile(req, res));
   router.put('/profile', (req, res) => profileController.updateProfile(req, res));
   router.post('/profile/apply', (req, res) => profileController.applyAsPartner(req, res));
+  router.get('/profile/level', (req, res) => profileController.getLevelInfo(req, res));
 
   // Routines routes
   router.get('/routines', (req, res) => routinesController.list(req, res));
@@ -84,9 +138,12 @@ export function createRoutes(options: PartnerOpsRouterOptions): Router {
   router.post('/routines', (req, res) => routinesController.create(req, res));
   router.put('/routines/:id', (req, res) => routinesController.update(req, res));
   router.delete('/routines/:id', (req, res) => routinesController.delete(req, res));
+  router.post('/routines/:id/publish', (req, res) => routinesController.publish(req, res));
+  router.post('/routines/:id/archive', (req, res) => routinesController.archive(req, res));
 
   // Links routes
   router.get('/links', (req, res) => linksController.list(req, res));
+  router.get('/links/summary', (req, res) => linksController.getSummary(req, res));
   router.post('/links', (req, res) => linksController.create(req, res));
   router.get('/links/:id/stats', (req, res) => linksController.getStats(req, res));
   router.delete('/links/:id', (req, res) => linksController.delete(req, res));
@@ -95,13 +152,19 @@ export function createRoutes(options: PartnerOpsRouterOptions): Router {
   router.get('/conversions', (req, res) => conversionsController.list(req, res));
   router.get('/conversions/summary', (req, res) => conversionsController.getSummary(req, res));
   router.get('/conversions/funnel', (req, res) => conversionsController.getFunnel(req, res));
+  router.get('/conversions/:id', (req, res) => conversionsController.getById(req, res));
 
   // Settlement routes
   router.get('/settlement/summary', (req, res) => settlementController.getSummary(req, res));
   router.get('/settlement/batches', (req, res) => settlementController.getBatches(req, res));
-  router.get('/settlement/transactions', (req, res) => settlementController.getTransactions(req, res));
+  router.get('/settlement/batches/:id', (req, res) => settlementController.getBatchById(req, res));
 
   return router;
 }
+
+// Re-export for module loader
+export * from '../services/index.js';
+export * from '../controllers/index.js';
+export * from '../dto/index.js';
 
 export default { createRoutes };
