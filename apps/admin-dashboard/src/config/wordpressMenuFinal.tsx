@@ -12,6 +12,10 @@ import {
   UserCheck,
   BarChart2,
   ClipboardList,
+  Heart,
+  Link2,
+  DollarSign,
+  Sparkles,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -196,6 +200,40 @@ export const wordpressMenuItems: MenuItem[] = [
         label: '템플릿 관리',
         icon: <ClipboardList className="w-4 h-4" />,
         path: '/admin/reporting/templates',
+      },
+    ],
+  },
+
+  // Cosmetics Partner (파트너/인플루언서)
+  {
+    id: 'cosmetics-partner',
+    label: 'Cosmetics Partner',
+    icon: <Heart className="w-5 h-5" />,
+    roles: ['admin', 'super_admin', 'partner'],
+    children: [
+      {
+        id: 'cosmetics-partner-dashboard',
+        label: 'Dashboard',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/cosmetics-partner/dashboard',
+      },
+      {
+        id: 'cosmetics-partner-links',
+        label: 'Links',
+        icon: <Link2 className="w-4 h-4" />,
+        path: '/cosmetics-partner/links',
+      },
+      {
+        id: 'cosmetics-partner-routines',
+        label: 'Routines',
+        icon: <Sparkles className="w-4 h-4" />,
+        path: '/cosmetics-partner/routines',
+      },
+      {
+        id: 'cosmetics-partner-earnings',
+        label: 'Earnings',
+        icon: <DollarSign className="w-4 h-4" />,
+        path: '/cosmetics-partner/earnings',
       },
     ],
   },
