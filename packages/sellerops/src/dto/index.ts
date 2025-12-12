@@ -92,7 +92,7 @@ export interface ListingDetailDto {
   createdAt: Date;
 }
 
-// Order
+// Order (Phase 4: E-commerce Core 통합 필드 추가)
 export interface OrderListItemDto {
   id: string;
   listingId: string;
@@ -102,6 +102,10 @@ export interface OrderListItemDto {
   status: string;
   relayStatus: string;
   createdAt: Date;
+  // Phase 4: E-commerce Core 통합 필드
+  ecommerceOrderId?: string;
+  orderType?: 'retail' | 'dropshipping' | 'b2b' | 'subscription';
+  paymentStatus?: string;
 }
 
 export interface OrderDetailDto {
