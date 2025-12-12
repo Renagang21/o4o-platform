@@ -1,0 +1,41 @@
+{
+  "name": "@o4o/pharmacyops",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PharmacyOps - B2B Pharmaceutical Operations App for Pharmacies",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./backend": "./dist/backend/index.js",
+    "./frontend": "./dist/frontend/index.js"
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*",
+    "@o4o/pharmaceutical-core": "workspace:*",
+    "@o4o/dropshipping-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0",
+    "class-validator": "^0.14.0",
+    "class-transformer": "^0.5.0",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/event-emitter": "^2.0.0",
+    "react": "^19.0.0",
+    "@tanstack/react-query": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  }
+}
