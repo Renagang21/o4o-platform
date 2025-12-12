@@ -14,7 +14,17 @@ import {
   ListingService,
   ListingStatus,
   ListingChannel,
+  ProductType,
+  validationHooks,
 } from '@o4o/dropshipping-core';
+
+/**
+ * SellerOps에서 차단해야 하는 productType 목록
+ * PHARMACEUTICAL 등 일반 판매 불가 상품 제외
+ */
+const BLOCKED_PRODUCT_TYPES: ProductType[] = [
+  ProductType.PHARMACEUTICAL,
+];
 import type {
   CreateListingDto,
   UpdateListingDto,
@@ -34,10 +44,12 @@ export class ListingOpsService {
 
   /**
    * 판매자의 리스팅 목록 조회
+   *
+   * PHARMACEUTICAL 등 차단된 productType은 자동 제외됩니다.
    */
   async getListings(
     sellerId: string,
-    filters?: { status?: ListingStatus; channel?: string }
+    filters?: { status?: ListingStatus; channel?: string; productType?: ProductType }
   ): Promise<ListingDetailDto[]> {
     const query = this.listingRepository
       .createQueryBuilder('listing')
@@ -55,9 +67,22 @@ export class ListingOpsService {
       query.andWhere('listing.channel = :channel', { channel: filters.channel });
     }
 
+    // productType 필터
+    if (filters?.productType) {
+      query.andWhere('product.productType = :productType', {
+        productType: filters.productType,
+      });
+    }
+
     const listings = await query.getMany();
 
-    return listings.map((listing) => this.toListingDetailDto(listing));
+    // PHARMACEUTICAL 등 차단된 productType 제외
+    const filteredListings = listings.filter(listing => {
+      const productType = listing.offer?.productMaster?.productType as ProductType;
+      return !productType || !BLOCKED_PRODUCT_TYPES.includes(productType);
+    });
+
+    return filteredListings.map((listing) => this.toListingDetailDto(listing));
   }
 
   /**
@@ -79,6 +104,9 @@ export class ListingOpsService {
 
   /**
    * 새 리스팅 생성
+   *
+   * Core Validator Hook을 통해 productType 기반 검증을 수행합니다.
+   * PHARMACEUTICAL 등 차단된 상품은 Listing 생성이 불가능합니다.
    */
   async createListing(
     sellerId: string,
@@ -94,6 +122,12 @@ export class ListingOpsService {
       throw new Error('Offer not found');
     }
 
+    // productType 기반 차단 검증
+    const productType = offer.productMaster?.productType as ProductType;
+    if (productType && BLOCKED_PRODUCT_TYPES.includes(productType)) {
+      throw new Error(`해당 상품 유형(${productType})은 일반 판매가 불가능합니다.`);
+    }
+
     // channel 문자열을 ListingChannel enum으로 변환
     const channelMap: Record<string, ListingChannel> = {
       smartstore: ListingChannel.SMARTSTORE,
@@ -101,6 +135,27 @@ export class ListingOpsService {
       custom: ListingChannel.CUSTOM,
     };
     const channel = channelMap[dto.channel] || ListingChannel.CUSTOM;
+
+    // Core Validator Hook 실행 (beforeListingCreate)
+    const validationContext = {
+      offer,
+      seller: { id: sellerId, status: 'active' } as any,
+      listingData: {
+        sellerId,
+        offerId: dto.offerId,
+        sellingPrice: dto.sellingPrice,
+        channel,
+        status: dto.status ?? ListingStatus.DRAFT,
+      },
+      productType,
+      metadata: {},
+    };
+
+    const validationResult = await validationHooks.beforeListingCreate(validationContext);
+    if (!validationResult.valid) {
+      const errorMessages = validationResult.errors.map(e => e.message).join(', ');
+      throw new Error(`Listing 생성 검증 실패: ${errorMessages}`);
+    }
 
     // Core의 ListingService를 통해 생성
     const listing = await this.listingService.createListing({
@@ -112,11 +167,18 @@ export class ListingOpsService {
       status: dto.status ?? ListingStatus.DRAFT,
     });
 
+    // Core Validator Hook 실행 (afterListingCreate)
+    await validationHooks.afterListingCreate({
+      ...validationContext,
+      listingId: listing.id,
+    });
+
     // SellerOps 이벤트 발행
     this.eventEmitter.emit('sellerops.listing.created', {
       listingId: listing.id,
       sellerId,
       offerId: dto.offerId,
+      productType,
     });
 
     const fullListing = await this.listingRepository.findOne({

@@ -4,7 +4,8 @@
  * API: /api/v1/sellerops/suppliers
  */
 
-import { Controller, Get, Post, Param, Body, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Req, Query } from '@nestjs/common';
+import { ProductType } from '@o4o/dropshipping-core';
 import { SupplierOpsService } from '../services/SupplierOpsService.js';
 import type { SupplierListItemDto, SupplierApprovalRequestDto } from '../dto/index.js';
 
@@ -52,12 +53,17 @@ export class SuppliersController {
   @Get(':id/offers')
   async getSupplierOffers(
     @Param('id') supplierId: string,
-    @Req() req: any
+    @Req() req: any,
+    @Query('productType') productType?: ProductType
   ): Promise<any[]> {
     const sellerId = req.user?.sellerId || req.query.sellerId;
     if (!sellerId) {
       throw new Error('Seller ID is required');
     }
-    return await this.supplierOpsService.getSupplierOffers(supplierId, sellerId);
+    return await this.supplierOpsService.getSupplierOffersByProductType(
+      supplierId,
+      sellerId,
+      productType
+    );
   }
 }

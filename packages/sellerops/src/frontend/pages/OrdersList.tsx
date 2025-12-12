@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import type { OrderListItemDto } from '../../dto/index.js';
 
+type ProductTypeFilter = 'all' | 'general' | 'cosmetics' | 'food' | 'health' | 'electronics';
+
 interface OrdersListProps {
   sellerId: string;
   apiBaseUrl?: string;
@@ -32,12 +34,13 @@ export const OrdersList: React.FC<OrdersListProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [productTypeFilter, setProductTypeFilter] = useState<ProductTypeFilter>('all');
   const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchOrders();
     fetchOrderCounts();
-  }, [sellerId, filterStatus]);
+  }, [sellerId, filterStatus, productTypeFilter]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -45,6 +48,9 @@ export const OrdersList: React.FC<OrdersListProps> = ({
       let url = `${apiBaseUrl}/orders?sellerId=${sellerId}`;
       if (filterStatus !== 'all') {
         url += `&status=${filterStatus}`;
+      }
+      if (productTypeFilter !== 'all') {
+        url += `&productType=${productTypeFilter}`;
       }
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch orders');
@@ -169,11 +175,23 @@ export const OrdersList: React.FC<OrdersListProps> = ({
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="all">전체</option>
+              <option value="all">전체 상태</option>
               <option value="pending">대기중</option>
               <option value="dispatched">배송중</option>
               <option value="delivered">배송완료</option>
               <option value="failed">오류</option>
+            </select>
+            <select
+              className="px-4 py-2 border rounded-lg"
+              value={productTypeFilter}
+              onChange={(e) => setProductTypeFilter(e.target.value as ProductTypeFilter)}
+            >
+              <option value="all">전체 상품유형</option>
+              <option value="general">일반</option>
+              <option value="cosmetics">화장품</option>
+              <option value="food">식품</option>
+              <option value="health">건강식품</option>
+              <option value="electronics">전자제품</option>
             </select>
           </div>
         </div>

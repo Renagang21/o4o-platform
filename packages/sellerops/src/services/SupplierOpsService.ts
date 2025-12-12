@@ -12,7 +12,16 @@ import {
   SupplierProductOffer,
   SupplierStatus,
   OfferStatus,
+  ProductType,
 } from '@o4o/dropshipping-core';
+
+/**
+ * SellerOps에서 차단해야 하는 productType 목록
+ * PHARMACEUTICAL 등 일반 판매 불가 상품 제외
+ */
+const BLOCKED_PRODUCT_TYPES: ProductType[] = [
+  ProductType.PHARMACEUTICAL,
+];
 import type { SupplierListItemDto, SupplierApprovalRequestDto } from '../dto/index.js';
 
 @Injectable()
@@ -129,6 +138,8 @@ export class SupplierOpsService {
 
   /**
    * 공급자별 Offer 목록 조회
+   *
+   * PHARMACEUTICAL 등 차단된 productType은 자동 제외됩니다.
    */
   async getSupplierOffers(
     supplierId: string,
@@ -144,9 +155,35 @@ export class SupplierOpsService {
       return []; // 승인되지 않은 공급자의 Offer는 조회 불가
     }
 
-    return await this.offerRepository.find({
+    // Offer 조회 (productType 필터링 적용)
+    const offers = await this.offerRepository.find({
       where: { supplierId, status: OfferStatus.ACTIVE },
       relations: ['productMaster'],
     });
+
+    // PHARMACEUTICAL 등 차단된 productType 제외
+    return offers.filter(offer => {
+      const productType = offer.productMaster?.productType as ProductType;
+      return !productType || !BLOCKED_PRODUCT_TYPES.includes(productType);
+    });
+  }
+
+  /**
+   * 특정 productType으로 필터링된 Offer 조회
+   */
+  async getSupplierOffersByProductType(
+    supplierId: string,
+    sellerId: string,
+    productType?: ProductType
+  ): Promise<SupplierProductOffer[]> {
+    const offers = await this.getSupplierOffers(supplierId, sellerId);
+
+    if (!productType) {
+      return offers;
+    }
+
+    return offers.filter(offer =>
+      offer.productMaster?.productType === productType
+    );
   }
 }

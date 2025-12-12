@@ -5,6 +5,7 @@
  */
 
 import { Controller, Get, Param, Query, Req } from '@nestjs/common';
+import { ProductType } from '@o4o/dropshipping-core';
 import { OrderOpsService } from '../services/OrderOpsService.js';
 import type { OrderListItemDto, OrderDetailDto } from '../dto/index.js';
 
@@ -18,7 +19,8 @@ export class OrdersController {
     @Query('status') status?: string,
     @Query('relayStatus') relayStatus?: string,
     @Query('dateFrom') dateFrom?: string,
-    @Query('dateTo') dateTo?: string
+    @Query('dateTo') dateTo?: string,
+    @Query('productType') productType?: ProductType
   ): Promise<OrderListItemDto[]> {
     const sellerId = req.user?.sellerId || req.query.sellerId;
     if (!sellerId) {
@@ -30,6 +32,7 @@ export class OrdersController {
     if (relayStatus) filters.relayStatus = relayStatus;
     if (dateFrom) filters.dateFrom = new Date(dateFrom);
     if (dateTo) filters.dateTo = new Date(dateTo);
+    if (productType) filters.productType = productType;
 
     return await this.orderOpsService.getOrders(sellerId, filters);
   }

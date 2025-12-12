@@ -15,6 +15,7 @@ import {
   SettlementBatch,
   CommissionTransaction,
   SettlementBatchStatus,
+  SettlementType,
 } from '@o4o/dropshipping-core';
 import type {
   SettlementSummaryDto,
@@ -24,9 +25,12 @@ import type {
 } from '../dto/index.js';
 
 /**
- * Settlement Context Type for Seller
+ * SellerOps는 SettlementType.SELLER만 처리합니다.
+ *
+ * 다른 정산 유형(SUPPLIER, PLATFORM_EXTENSION)은
+ * 각각 supplierops, partnerops 등에서 처리합니다.
  */
-const SELLER_CONTEXT_TYPE = 'seller';
+const SELLER_SETTLEMENT_TYPE = SettlementType.SELLER;
 
 @Injectable()
 export class SettlementOpsService {
@@ -40,36 +44,36 @@ export class SettlementOpsService {
   /**
    * 정산 요약 조회 (Seller 관점)
    *
-   * contextType = 'seller'인 정산 배치만 조회
+   * settlementType = SELLER인 정산 배치만 조회
    */
   async getSettlementSummary(sellerId: string): Promise<SettlementSummaryDto> {
-    // 총 정산 완료 금액 (seller contextType)
+    // 총 정산 완료 금액 (seller settlementType)
     const paidResult = await this.settlementRepository
       .createQueryBuilder('batch')
       .where('batch.sellerId = :sellerId', { sellerId })
-      .andWhere('batch.contextType = :contextType', { contextType: SELLER_CONTEXT_TYPE })
+      .andWhere('batch.settlementType = :settlementType', { settlementType: SELLER_SETTLEMENT_TYPE })
       .andWhere('batch.status = :status', { status: 'paid' })
       .select('SUM(batch.netAmount)', 'total')
       .getRawOne();
 
     const totalSettled = parseFloat(paidResult?.total || '0');
 
-    // 정산 대기 금액 (seller contextType)
+    // 정산 대기 금액 (seller settlementType)
     const pendingResult = await this.settlementRepository
       .createQueryBuilder('batch')
       .where('batch.sellerId = :sellerId', { sellerId })
-      .andWhere('batch.contextType = :contextType', { contextType: SELLER_CONTEXT_TYPE })
+      .andWhere('batch.settlementType = :settlementType', { settlementType: SELLER_SETTLEMENT_TYPE })
       .andWhere('batch.status = :status', { status: 'closed' })
       .select('SUM(batch.netAmount)', 'total')
       .getRawOne();
 
     const pendingSettlement = parseFloat(pendingResult?.total || '0');
 
-    // 현재 기간 판매액 (seller contextType)
+    // 현재 기간 판매액 (seller settlementType)
     const currentPeriod = await this.settlementRepository.findOne({
       where: {
         sellerId,
-        contextType: SELLER_CONTEXT_TYPE,
+        settlementType: SELLER_SETTLEMENT_TYPE,
         status: SettlementBatchStatus.OPEN,
       },
     });
@@ -88,7 +92,7 @@ export class SettlementOpsService {
   /**
    * 정산 배치 목록 조회 (Seller 관점)
    *
-   * contextType = 'seller'인 정산 배치만 조회
+   * settlementType = SELLER인 정산 배치만 조회
    */
   async getSettlementBatches(
     sellerId: string,
@@ -97,7 +101,7 @@ export class SettlementOpsService {
     const query = this.settlementRepository
       .createQueryBuilder('batch')
       .where('batch.sellerId = :sellerId', { sellerId })
-      .andWhere('batch.contextType = :contextType', { contextType: SELLER_CONTEXT_TYPE });
+      .andWhere('batch.settlementType = :settlementType', { settlementType: SELLER_SETTLEMENT_TYPE });
 
     if (filters?.status) {
       query.andWhere('batch.status = :status', { status: filters.status });
@@ -146,6 +150,8 @@ export class SettlementOpsService {
 
   /**
    * 정산 배치 상세 조회 (Seller 관점)
+   *
+   * settlementType = SELLER인 정산 배치만 조회
    */
   async getSettlementBatchById(
     batchId: string,
@@ -155,7 +161,7 @@ export class SettlementOpsService {
       where: {
         id: batchId,
         sellerId,
-        contextType: SELLER_CONTEXT_TYPE,
+        settlementType: SELLER_SETTLEMENT_TYPE,
       },
     });
 
@@ -182,6 +188,8 @@ export class SettlementOpsService {
 
   /**
    * 수수료 상세 내역 조회 (Seller 관점)
+   *
+   * settlementType = SELLER인 정산 배치만 조회
    */
   async getCommissionDetails(
     sellerId: string,
@@ -195,7 +203,7 @@ export class SettlementOpsService {
       .leftJoinAndSelect('listing.offer', 'offer')
       .leftJoinAndSelect('offer.productMaster', 'productMaster')
       .where('batch.sellerId = :sellerId', { sellerId })
-      .andWhere('batch.contextType = :contextType', { contextType: SELLER_CONTEXT_TYPE });
+      .andWhere('batch.settlementType = :settlementType', { settlementType: SELLER_SETTLEMENT_TYPE });
 
     if (batchId) {
       query.andWhere('commission.settlementBatchId = :batchId', { batchId });
