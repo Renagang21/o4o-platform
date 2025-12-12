@@ -112,13 +112,24 @@ export class MemberController {
 
   /**
    * PUT /members/:id
+   *
+   * Phase 2: officialRole 변경 시 자동 역할 동기화 결과 포함
    */
   async update(req: Request, res: Response) {
     try {
-      const member = await this.memberService.update(req.params.id, req.body);
-      res.json(member);
+      const updatedBy = (req as any).user?.id;
+      const result = await this.memberService.update(req.params.id, req.body, updatedBy);
+
+      res.json({
+        success: true,
+        data: result.member,
+        roleSyncResult: result.roleSyncResult,
+      });
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({
+        success: false,
+        error: error.message
+      });
     }
   }
 

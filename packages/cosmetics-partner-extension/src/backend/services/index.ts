@@ -19,24 +19,56 @@ export { PartnerEarningsService } from './partner-earnings.service';
 export type {
   CreatePartnerEarningsDto,
   UpdatePartnerEarningsDto,
-  RecordCommissionDto,
   EarningsFilter,
   EarningsSummary,
-  WithdrawalResult,
 } from './partner-earnings.service';
 
-// Commission System (Phase 6-D)
-export { CommissionEngineService } from './commission-engine.service';
+// Phase 6-F: Influencer Tools
+export { AIRoutineService } from './ai-routine.service';
 export type {
-  CommissionCalculationInput,
-  CommissionCalculationResult,
-  PolicyResolutionContext,
-} from './commission-engine.service';
+  GenerateRoutineDto,
+  GeneratedRoutine,
+  RoutineStep,
+} from './ai-routine.service';
 
-export { CommissionPolicyService } from './commission-policy.service';
+export { AIDescriptionService } from './ai-description.service';
 export type {
-  CreateCommissionPolicyDto,
-  UpdateCommissionPolicyDto,
-  PolicyFilter,
-  PaginatedResult,
-} from './commission-policy.service';
+  GenerateDescriptionDto,
+  GeneratedDescription,
+} from './ai-description.service';
+
+export { PartnerStorefrontService } from './partner-storefront.service';
+export type {
+  StorefrontConfig,
+  StorefrontSection,
+  StorefrontData,
+  CreateStorefrontDto,
+  UpdateStorefrontDto,
+} from './partner-storefront.service';
+
+export { QRLandingService } from './qr-landing.service';
+export type {
+  GenerateQRDto,
+  QRCodeResult,
+  LandingPageData,
+  CreateShortLinkDto,
+  ShortLinkResult,
+} from './qr-landing.service';
+
+export { SocialShareService } from './social-share.service';
+export type {
+  GenerateShareContentDto,
+  ShareContent,
+  ShareAnalytics,
+} from './social-share.service';
+
+export { CampaignPublisherService } from './campaign-publisher.service';
+export type {
+  CampaignDto,
+  Campaign,
+  CampaignSchedule,
+  CampaignContent,
+  CampaignGoals,
+  CampaignStats,
+  CampaignTemplate,
+} from './campaign-publisher.service';

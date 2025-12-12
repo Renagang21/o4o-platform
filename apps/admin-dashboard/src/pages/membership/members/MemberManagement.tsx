@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   CheckCircle,
   XCircle,
@@ -172,9 +173,10 @@ const MemberManagement = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleViewMember = (id: string) => {
-    // Navigate to member detail page (to be implemented)
-    toast.success(`회원 상세 페이지 (ID: ${id}) - 구현 예정`);
+    navigate(`/admin/membership/members/${id}`);
   };
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {

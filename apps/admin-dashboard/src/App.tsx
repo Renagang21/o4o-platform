@@ -55,6 +55,7 @@ const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdm
 // Membership-Yaksa: Membership Management
 const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/MembershipDashboard'));
 const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
+const MemberDetail = lazy(() => import('@/pages/membership/members/MemberDetail'));
 const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
 const AuditLogManagement = lazy(() => import('@/pages/membership/audit-logs/AuditLogManagement'));
@@ -571,6 +572,13 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['membership:view', 'membership:manage']}>
                         <Suspense fallback={<PageLoader />}>
                           <MemberManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/membership/members/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MemberDetail />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

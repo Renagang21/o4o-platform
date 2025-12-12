@@ -9,6 +9,7 @@ import {
 import { MemberCategory } from '../entities/MemberCategory.js';
 import { MembershipYear } from '../entities/MembershipYear.js';
 import { Verification } from '../entities/Verification.js';
+import { RoleAssignmentService, MembershipRole } from './RoleAssignmentService.js';
 
 /**
  * ComputedMemberStatus
@@ -121,17 +122,40 @@ export interface MemberFilterDto {
 }
 
 /**
+ * RoleSyncResult
+ *
+ * 역할 동기화 결과
+ */
+export interface RoleSyncResult {
+  memberId: string;
+  previousRole?: MembershipRole;
+  newRole: MembershipRole;
+  deactivated: number;
+}
+
+/**
  * MemberService
  *
  * 회원 관리 서비스
+ *
+ * Phase 2: officialRole 변경 시 자동 역할 동기화 기능 추가
  */
 export class MemberService {
   private memberRepo: Repository<Member>;
   private categoryRepo: Repository<MemberCategory>;
+  private roleAssignmentService: RoleAssignmentService;
 
   constructor(private dataSource: DataSource) {
     this.memberRepo = dataSource.getRepository(Member);
     this.categoryRepo = dataSource.getRepository(MemberCategory);
+    this.roleAssignmentService = new RoleAssignmentService(dataSource);
+  }
+
+  /**
+   * RoleAssignmentService 인스턴스 반환
+   */
+  getRoleAssignmentService(): RoleAssignmentService {
+    return this.roleAssignmentService;
   }
 
   /**
@@ -172,8 +196,19 @@ export class MemberService {
 
   /**
    * 회원 수정
+   *
+   * Phase 2: officialRole 변경 시 자동 역할 동기화
+   *
+   * @param id 회원 ID
+   * @param dto 업데이트 데이터
+   * @param updatedBy 변경자 ID (역할 동기화 기록용)
+   * @returns 업데이트된 회원 정보. roleSyncResult가 있으면 역할 동기화가 수행됨
    */
-  async update(id: string, dto: UpdateMemberDto): Promise<Member> {
+  async update(
+    id: string,
+    dto: UpdateMemberDto,
+    updatedBy?: string
+  ): Promise<{ member: Member; roleSyncResult?: RoleSyncResult }> {
     const member = await this.findById(id);
     if (!member) {
       throw new Error(`Member "${id}" not found`);
@@ -189,8 +224,35 @@ export class MemberService {
       }
     }
 
+    // Phase 2: officialRole 변경 감지
+    const oldOfficialRole = member.officialRole;
+    const newOfficialRole = dto.officialRole;
+    const officialRoleChanged =
+      newOfficialRole !== undefined && newOfficialRole !== oldOfficialRole;
+
     Object.assign(member, dto);
-    return await this.memberRepo.save(member);
+    const savedMember = await this.memberRepo.save(member);
+
+    // Phase 2: officialRole 변경 시 역할 자동 동기화
+    let roleSyncResult: RoleSyncResult | undefined;
+    if (officialRoleChanged && newOfficialRole) {
+      const syncResult = await this.roleAssignmentService.syncRoleFromOfficialRole(
+        member.id,
+        newOfficialRole,
+        member.organizationId,
+        oldOfficialRole,
+        updatedBy
+      );
+
+      roleSyncResult = {
+        memberId: member.id,
+        previousRole: syncResult.previousRole,
+        newRole: syncResult.newRole,
+        deactivated: syncResult.deactivated,
+      };
+    }
+
+    return { member: savedMember, roleSyncResult };
   }
 
   /**
