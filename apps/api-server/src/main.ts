@@ -462,9 +462,9 @@ const startServer = async () => {
     app.use('/api/auth', authRoutes);
     logger.info('✅ Auth routes registered at /api/auth');
 
-    // 11. Register Admin Apps routes
-    app.use('/api/admin/apps', adminAppsRoutes);
-    logger.info('✅ Admin Apps routes registered at /api/admin/apps');
+    // 11. Register Admin Apps routes (v1 prefix for auth-client compatibility)
+    app.use('/api/v1/admin/apps', adminAppsRoutes);
+    logger.info('✅ Admin Apps routes registered at /api/v1/admin/apps');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
