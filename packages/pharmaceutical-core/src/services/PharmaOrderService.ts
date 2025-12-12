@@ -3,6 +3,39 @@
  *
  * 의약품 B2B 주문 관리 서비스
  *
+ * ## E-commerce Core 통합 (Phase 5)
+ *
+ * 이 서비스는 E-commerce Core와 연계하여 동작합니다.
+ *
+ * ### 권장 주문 흐름 (TO-BE)
+ *
+ * ```
+ * 1. E-commerce Core에서 EcommerceOrder 생성
+ *    - orderType: 'b2b'
+ *    - EcommerceOrderService.createOrder()
+ *
+ * 2. PharmaOrder 생성 시 연결
+ *    - ecommerceOrderId: EcommerceOrder.id
+ *    - create({ ...data, ecommerceOrderId })
+ *
+ * 3. 판매 원장(E-commerce Core) + B2B 정보(여기) 조합으로 조회
+ * ```
+ *
+ * ### 주요 연계 포인트
+ *
+ * | 관심사 | 담당 모듈 |
+ * |--------|----------|
+ * | 판매 원장 (Source of Truth) | E-commerce Core |
+ * | OrderType 결정 | 이 서비스 (항상 'b2b') |
+ * | B2B 주문 상세 관리 | 이 서비스 |
+ * | 통합 통계 | EcommerceOrderQueryService |
+ *
+ * ### ecommerceOrderId 사용
+ *
+ * PharmaOrder.ecommerceOrderId를 통해 E-commerce Core의
+ * EcommerceOrder와 연결됩니다. 이 필드가 null인 경우는
+ * 레거시 주문 또는 직접 API를 통한 주문입니다.
+ *
  * @package @o4o/pharmaceutical-core
  */
 
@@ -28,6 +61,8 @@ export interface CreatePharmaOrderDto {
   };
   notes?: string;
   metadata?: Record<string, any>;
+  // Phase 5: E-commerce Core 연결
+  ecommerceOrderId?: string;
 }
 
 export interface UpdatePharmaOrderDto {
@@ -124,6 +159,8 @@ export class PharmaOrderService {
       metadata: data.metadata,
       status: PharmaOrderStatus.PENDING,
       paymentStatus: PharmaPaymentStatus.PENDING,
+      // Phase 5: E-commerce Core 연결
+      ecommerceOrderId: data.ecommerceOrderId,
     });
 
     const savedOrder = await this.orderRepository.save(order);
@@ -150,6 +187,22 @@ export class PharmaOrderService {
   async findByOrderNumber(orderNumber: string): Promise<PharmaOrder | null> {
     return this.orderRepository.findOne({
       where: { orderNumber },
+      relations: ['offer', 'offer.product'],
+    });
+  }
+
+  /**
+   * E-commerce Order ID로 조회 (Phase 5)
+   *
+   * E-commerce Core의 EcommerceOrder와 연결된 PharmaOrder를 조회합니다.
+   *
+   * @param ecommerceOrderId - E-commerce Core의 주문 ID
+   */
+  async findByEcommerceOrderId(
+    ecommerceOrderId: string
+  ): Promise<PharmaOrder | null> {
+    return this.orderRepository.findOne({
+      where: { ecommerceOrderId },
       relations: ['offer', 'offer.product'],
     });
   }

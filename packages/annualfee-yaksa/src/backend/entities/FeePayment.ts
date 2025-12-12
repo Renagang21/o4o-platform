@@ -60,6 +60,17 @@ export class FeePayment {
   invoiceId!: string;
 
   /**
+   * E-commerce Core 주문 ID (Phase 5)
+   *
+   * E-commerce Core의 EcommerceOrder와 연결됩니다.
+   * null인 경우 레거시 결제 또는 직접 API 호출 결제입니다.
+   *
+   * OrderType: 'subscription' (연회비) or 'retail' (단일 결제)
+   */
+  @Column({ type: 'uuid', nullable: true })
+  ecommerceOrderId?: string;
+
+  /**
    * 청구서 관계
    */
   @ManyToOne('FeeInvoice', (invoice: FeeInvoice) => invoice.payments, {

@@ -1,15 +1,18 @@
 /**
  * ForumNotificationService
  * Phase 13: Forum Notification System
+ * Phase 15-B: SSE Realtime Event Emission
  *
  * Service for managing forum notifications:
  * - Comment/Reply/Mention notifications
  * - Like/Bookmark notifications
  * - Moderation (approve/reject) notifications
  * - Category activity notifications
+ * - Realtime SSE event emission (Phase 15-B)
  */
 
 import { Repository, LessThan, In } from 'typeorm';
+import { notificationEventHub } from './NotificationEventHub.js';
 import { AppDataSource } from '../../database/connection.js';
 import {
   ForumNotification,
@@ -64,6 +67,7 @@ class ForumNotificationService {
 
   /**
    * Send a notification to a user
+   * Phase 15-B: Also emits SSE event for realtime delivery
    */
   async sendNotification(
     userId: string,
@@ -85,7 +89,19 @@ class ForumNotificationService {
       isRead: false,
     });
 
-    return repo.save(notification);
+    // Save to database first
+    const savedNotification = await repo.save(notification);
+
+    // Phase 15-B: Emit SSE event for realtime delivery
+    // This is non-blocking - if user is not connected, event is simply dropped
+    try {
+      notificationEventHub.emitNotification(savedNotification);
+    } catch (error) {
+      // Log but don't fail - SSE is enhancement, not critical path
+      console.error('[SSE] Failed to emit notification event:', error);
+    }
+
+    return savedNotification;
   }
 
   /**
