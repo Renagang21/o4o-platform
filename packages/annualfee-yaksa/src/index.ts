@@ -11,6 +11,13 @@
  * - 정산 관리 (FeeSettlement)
  * - 감사 로그 (FeeLog)
  * - Membership-Yaksa/LMS-Yaksa 연동
+ *
+ * Phase 2 추가 기능:
+ * - 자동 청구 생성 (InvoiceAutoGenerator)
+ * - 미납 알림 (FeeReminderService)
+ * - PDF 영수증 (ReceiptPdfGenerator)
+ * - CSV 임포트 (CsvPaymentImporter)
+ * - 정산 자동화 (SettlementAutomation)
  */
 
 // Manifest
@@ -18,3 +25,6 @@ export { manifest } from './manifest.js';
 
 // Backend
 export * from './backend/index.js';
+
+// Views (Member Portal) - import as namespace to avoid conflicts
+export * as Views from './views/index.js';

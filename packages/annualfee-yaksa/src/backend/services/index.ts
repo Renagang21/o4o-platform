@@ -13,3 +13,10 @@ export * from './FeeSettlementService.js';
 export * from './FeeLogService.js';
 export * from './FeeSyncService.js';
 export * from './MemberFeeService.js';
+
+// Phase 2: Automation Services
+export * from './InvoiceAutoGenerator.js';
+export * from './FeeReminderService.js';
+export * from './ReceiptPdfGenerator.js';
+export * from './CsvPaymentImporter.js';
+export * from './SettlementAutomation.js';
