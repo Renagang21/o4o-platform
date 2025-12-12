@@ -3,6 +3,7 @@ import { ForumController } from '../../controllers/forum/ForumController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import notificationRoutes from './forum.notifications.routes.js';
 import aiRoutes from './forum.ai.routes.js';
+import recommendationRoutes from './forum.recommendation.routes.js';
 
 const router: Router = Router();
 const controller = new ForumController();
@@ -97,5 +98,10 @@ router.use('/notifications', notificationRoutes);
 // AI Features (Phase 16)
 // ============================================================================
 router.use('/ai', aiRoutes);
+
+// ============================================================================
+// Recommendations (Phase 17)
+// ============================================================================
+router.use('/recommendations', recommendationRoutes);
 
 export default router;
