@@ -211,4 +211,103 @@ export * from './services';
 
 ---
 
-*최종 업데이트: 2025-12-10*
+## 8. Work Order 공통 규칙 (All App Development Must Comply)
+
+본 규칙은 모든 App(Core / Extension / Service)의 Work Order에 자동 적용되며,
+Work Order에서 별도 명시하지 않아도 반드시 준수해야 한다.
+
+---
+
+### 8-1. 브랜치 규칙 (필수)
+
+* 모든 기능 개발은 반드시 `feature/*` 브랜치에서 수행
+* `develop` 브랜치에서는 기능 개발 금지
+* 브랜치명 규칙:
+  * `feature/<app-id>-phase<n>`
+  * 예: `feature/sellerops-phase2`, `feature/pharmacy-core-v1`
+
+#### 브랜치 전환 전
+
+```bash
+git add .
+git commit -m "save state"
+```
+
+#### 브랜치 전환 후
+
+```bash
+git pull --rebase
+```
+
+---
+
+### 8-2. 개발 규칙 (CLAUDE.md 전체 프로세스 준수)
+
+* 새 패키지 생성 시 `pnpm install` 필수
+* `pnpm-lock.yaml` 항상 커밋
+* API 호출 시 `authClient` 사용, URL 하드코딩 금지
+* `api-server` 모듈 직접 import 금지 (AppStore Loader 사용)
+* Entity 변경 시 migration-first 원칙
+* Claude Code는 UI 변경 시 항상 브라우저 테스트 먼저 수행
+
+---
+
+### 8-3. AppStore 규칙
+
+모든 앱은 다음 필수 파일을 가져야 한다:
+
+```
+manifest.ts
+lifecycle/install.ts
+lifecycle/activate.ts
+lifecycle/deactivate.ts
+lifecycle/uninstall.ts
+```
+
+그리고 다음 조건 필요:
+
+* manifestRegistry에 등록되어야 서버가 로딩
+* appsCatalog.ts에 등록되어야 AppStore UI에 표시
+* AppStore 설치/활성화/비활성/삭제가 정상 작동해야 함
+
+---
+
+### 8-4. 앱 폴더 구조 규칙
+
+```
+packages/<app>/
+  src/
+    backend/controllers/
+    backend/services/
+    backend/dto/
+    frontend/pages/
+    frontend/components/
+    lifecycle/
+    manifest.ts
+    index.ts
+```
+
+---
+
+### 8-5. API / Entity / DTO 규칙
+
+* Controller → Service → Entity 3계층 구조 유지
+* Service는 `list/detail/create/update/delete` CRUD 메서드를 포함
+* 모든 Entity는 `index.ts`에서 export
+* 모든 DTO는 필드명·타입 정합성 유지
+* Core Hook(e.g., validateOffer, validateListing 등) 반드시 연결
+
+---
+
+### 8-6. 품질 기준 (Definition of Done)
+
+* `pnpm -F <app> build` 성공
+* AppStore 설치 & 활성화 성공
+* UI 화면 정상 렌더링 / 콘솔 에러 없음
+* develop 브랜치에 대한 PR 테스트 통과
+* 필요한 경우 Antigravity UI 테스트 수행
+* docs/plan/active 또는 docs/reports에 결과 업데이트
+
+---
+
+*최종 업데이트: 2025-12-12*
