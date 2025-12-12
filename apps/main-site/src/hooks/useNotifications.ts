@@ -1,12 +1,14 @@
 /**
  * useNotifications - Hook for forum notifications
  * Phase 13: Forum Notification System
+ * Phase 15-B: SSE Realtime Integration
  */
 
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import type { ForumNotification } from '@/components/forum/notifications';
+import { useRealtimeNotifications, type NotificationEventData } from './useRealtimeNotifications';
 
 // API functions
 const API_BASE = '/api/v1/forum/notifications';
@@ -14,6 +16,10 @@ const API_BASE = '/api/v1/forum/notifications';
 interface UseNotificationsOptions {
   pollInterval?: number; // in milliseconds, 0 to disable
   autoFetch?: boolean;
+  /** Phase 15-B: Enable SSE realtime updates (default: true) */
+  enableRealtime?: boolean;
+  /** Phase 15-B: Organization ID for yaksa multi-tenant */
+  organizationId?: string;
 }
 
 interface UseNotificationsReturn {
@@ -26,17 +32,59 @@ interface UseNotificationsReturn {
   markAsRead: (id: string) => Promise<boolean>;
   markAllAsRead: () => Promise<boolean>;
   refetch: () => Promise<void>;
+  /** Phase 15-B: SSE connection status */
+  isRealtimeConnected: boolean;
 }
 
 export function useNotifications(
   options: UseNotificationsOptions = {}
 ): UseNotificationsReturn {
-  const { pollInterval = 30000, autoFetch = true } = options;
+  const {
+    pollInterval = 30000,
+    autoFetch = true,
+    enableRealtime = true,
+    organizationId,
+  } = options;
 
   const [notifications, setNotifications] = useState<ForumNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Phase 15-B: Handle realtime notification
+  const handleRealtimeNotification = useCallback((data: NotificationEventData) => {
+    // Increment unread count immediately
+    setUnreadCount((prev) => prev + 1);
+
+    // Add to notifications list if already loaded
+    setNotifications((prev) => {
+      // Convert SSE event data to ForumNotification format
+      const newNotification: ForumNotification = {
+        id: data.id,
+        type: data.notificationType as any,
+        userId: '', // Not needed for display
+        isRead: false,
+        createdAt: data.createdAt,
+        postId: data.postId,
+        commentId: data.commentId,
+        organizationId: data.organizationId,
+        actorId: data.actorId,
+        metadata: {
+          ...data.metadata,
+          _message: data.message, // Store generated message
+        },
+      };
+      // Add to beginning of list
+      return [newNotification, ...prev];
+    });
+  }, []);
+
+  // Phase 15-B: SSE Realtime connection
+  const { isConnected: isRealtimeConnected } = useRealtimeNotifications({
+    enabled: enableRealtime,
+    organizationId,
+    onNotification: handleRealtimeNotification,
+  });
 
   // Fetch unread count
   const fetchUnreadCount = useCallback(async (): Promise<number> => {
@@ -145,6 +193,7 @@ export function useNotifications(
     markAsRead,
     markAllAsRead,
     refetch: fetchNotifications,
+    isRealtimeConnected, // Phase 15-B
   };
 }
 
