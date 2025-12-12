@@ -4,8 +4,21 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "noEmit": false
+    "declarationMap": true,
+    "noEmit": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+  "references": [
+    { "path": "../partner-core" },
+    { "path": "../types" }
+  ]
 }
