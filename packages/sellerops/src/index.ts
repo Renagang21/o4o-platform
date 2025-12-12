@@ -14,6 +14,9 @@ import type { DataSource } from 'typeorm';
 export { selleropsManifest, selleropsManifest as manifest } from './manifest.js';
 export { selleropsManifest as default } from './manifest.js';
 
+// Extension (Phase 2)
+export { sellerOpsExtension } from './extension.js';
+
 // DTOs
 export * from './dto/index.js';
 

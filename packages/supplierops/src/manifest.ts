@@ -2,6 +2,10 @@
  * SupplierOps Manifest
  *
  * AppStore 표준 manifest - 범용 공급자 운영 앱
+ *
+ * Phase 2 업데이트:
+ * - Core Extension Interface 구현
+ * - Hook 기반 Validation 지원
  */
 
 export const supplieropsManifest = {

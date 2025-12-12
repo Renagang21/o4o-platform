@@ -2,6 +2,10 @@
  * SellerOps Manifest
  *
  * 범용 판매자 운영 앱 - Dropshipping Core Extension
+ *
+ * Phase 2 업데이트:
+ * - Core Extension Interface 구현
+ * - Hook 기반 Validation 지원
  */
 
 export const selleropsManifest = {

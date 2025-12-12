@@ -2,6 +2,11 @@
  * Offers Controller
  *
  * API: /api/v1/supplierops/offers
+ *
+ * Phase 2 업데이트:
+ * - supplierPrice 통일 (price → supplierPrice)
+ * - stockQuantity 통일 (stock → stockQuantity)
+ * - productType 지원
  */
 
 import { Controller, Get, Post, Put, Req, Body, Param } from '@nestjs/common';
@@ -23,8 +28,9 @@ export class OffersController {
       id: o.id,
       productId: o.productId,
       productName: o.productName,
-      price: o.price,
-      stock: o.stock,
+      productType: o.productType,
+      supplierPrice: o.supplierPrice,
+      stockQuantity: o.stockQuantity,
       minOrderQuantity: o.minOrderQuantity,
       isActive: o.isActive,
       activeSellers: o.activeSellers,
@@ -45,8 +51,9 @@ export class OffersController {
       id: offer.id,
       productId: offer.productId,
       productName: offer.productName,
-      price: offer.price,
-      stock: offer.stock,
+      productType: offer.productType,
+      supplierPrice: offer.supplierPrice,
+      stockQuantity: offer.stockQuantity,
       minOrderQuantity: offer.minOrderQuantity,
       isActive: offer.isActive,
       activeSellers: offer.activeSellers,
@@ -63,8 +70,9 @@ export class OffersController {
       id: offer.id,
       productId: offer.productId,
       productName: offer.productName,
-      price: offer.price,
-      stock: offer.stock,
+      productType: offer.productType,
+      supplierPrice: offer.supplierPrice,
+      stockQuantity: offer.stockQuantity,
       minOrderQuantity: offer.minOrderQuantity,
       isActive: offer.isActive,
       activeSellers: offer.activeSellers,

@@ -1,15 +1,26 @@
 /**
  * SellerOps Activate Hook
  *
- * Called when the SellerOps app is activated after installation
+ * Called when the SellerOps app is activated after installation.
+ *
+ * Phase 2 업데이트:
+ * - Core Extension Registry에 SellerOps Extension 등록
+ * - Validation Hook 자동 연결
  */
 
 import { DataSource } from 'typeorm';
+import { registerExtension } from '@o4o/dropshipping-core';
+import { sellerOpsExtension } from '../extension.js';
 
 export async function onActivate(dataSource: DataSource): Promise<void> {
   console.log('[sellerops] Activating SellerOps App...');
 
-  // Register event subscriptions
+  // 1. Core Extension Registry에 등록
+  console.log('[sellerops] Registering with Dropshipping Core Extension Registry...');
+  registerExtension(sellerOpsExtension);
+  console.log('[sellerops] Extension registered successfully');
+
+  // 2. Register event subscriptions
   console.log('[sellerops] Registering event subscriptions...');
   console.log('[sellerops] - product.master.updated');
   console.log('[sellerops] - product.offer.updated');
@@ -17,7 +28,7 @@ export async function onActivate(dataSource: DataSource): Promise<void> {
   console.log('[sellerops] - order.relay.fulfilled');
   console.log('[sellerops] - settlement.closed');
 
-  // Initialize default documents/notices
+  // 3. Initialize default documents/notices
   const queryRunner = dataSource.createQueryRunner();
   await queryRunner.connect();
 
@@ -45,3 +56,5 @@ export async function onActivate(dataSource: DataSource): Promise<void> {
 
   console.log('[sellerops] SellerOps App activated successfully');
 }
+
+export default onActivate;

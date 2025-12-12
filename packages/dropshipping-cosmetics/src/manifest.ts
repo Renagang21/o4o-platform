@@ -7,6 +7,11 @@
  * - Ingredient information
  * - Routine recommendations
  * - Product certifications
+ *
+ * Phase 2 업데이트:
+ * - Core Extension Interface 구현
+ * - productType = 'cosmetics' 특화 Validation
+ * - Hook 기반 Offer/Listing/Order 검증
  */
 
 export const cosmeticsExtensionManifest = {

@@ -2,6 +2,9 @@
  * ProductMaster Service
  *
  * Manages ProductMaster CRUD operations for Supplier
+ *
+ * Phase 2 업데이트:
+ * - productType 필드 추가
  */
 
 export interface ProductMaster {
@@ -11,6 +14,7 @@ export interface ProductMaster {
   description: string;
   basePrice: number;
   category: string;
+  productType: string; // Phase 2: 추가
   attributes: Record<string, any>;
   isActive: boolean;
   createdAt: Date;
@@ -22,7 +26,7 @@ export class ProductMasterService {
    * Get all products for a supplier
    */
   async getProducts(supplierId: string): Promise<ProductMaster[]> {
-    // Demo data
+    // Demo data (Phase 2 스펙에 맞게 업데이트)
     return [
       {
         id: '1',
@@ -31,6 +35,7 @@ export class ProductMasterService {
         description: '고농축 에센스 세럼',
         basePrice: 35000,
         category: 'skincare',
+        productType: 'cosmetics',
         attributes: { volume: '30ml', skinType: 'all' },
         isActive: true,
         createdAt: new Date(),
@@ -43,6 +48,7 @@ export class ProductMasterService {
         description: '24시간 보습 크림',
         basePrice: 28000,
         category: 'skincare',
+        productType: 'cosmetics',
         attributes: { volume: '50ml', skinType: 'dry' },
         isActive: true,
         createdAt: new Date(),
@@ -55,6 +61,7 @@ export class ProductMasterService {
         description: '저자극 클렌징 폼',
         basePrice: 15000,
         category: 'cleansing',
+        productType: 'cosmetics',
         attributes: { volume: '150ml', skinType: 'sensitive' },
         isActive: true,
         createdAt: new Date(),
@@ -77,6 +84,7 @@ export class ProductMasterService {
       description: data.description || '',
       basePrice: data.basePrice || 0,
       category: data.category || '',
+      productType: data.productType || 'general',
       attributes: data.attributes || {},
       isActive: true,
       createdAt: new Date(),
@@ -98,6 +106,7 @@ export class ProductMasterService {
       description: data.description || '',
       basePrice: data.basePrice || 0,
       category: data.category || '',
+      productType: data.productType || 'general',
       attributes: data.attributes || {},
       isActive: data.isActive ?? true,
       createdAt: new Date(),

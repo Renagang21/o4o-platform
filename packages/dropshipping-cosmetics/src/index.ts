@@ -15,6 +15,9 @@ export { cosmeticsExtensionManifest, manifest, default as manifestDefault } from
 export * from './types.js';
 export * as lifecycle from './lifecycle/index.js';
 
+// Extension (Phase 2)
+export { cosmeticsExtension } from './extension.js';
+
 /**
  * Routes factory compatible with Module Loader
  */
