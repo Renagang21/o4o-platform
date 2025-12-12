@@ -159,6 +159,14 @@ import {
   YaksaCourseAssignment,
 } from '@o4o/lms-yaksa';
 
+// ✅ NEW: Cosmetics-Partner-Extension entities
+import {
+  PartnerProfile,
+  PartnerLink,
+  PartnerRoutine,
+  PartnerEarnings,
+} from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -329,6 +337,11 @@ export const AppDataSource = new DataSource({
     RequiredCoursePolicy,
     CreditRecord,
     YaksaCourseAssignment,
+    // ✅ NEW: Cosmetics-Partner-Extension entities
+    PartnerProfile,
+    PartnerLink,
+    PartnerRoutine,
+    PartnerEarnings,
   ],
   
   // 마이그레이션 설정
