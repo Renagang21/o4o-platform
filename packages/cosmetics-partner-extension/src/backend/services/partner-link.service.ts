@@ -1,201 +1,183 @@
 /**
  * PartnerLinkService
  *
- * 파트너 링크 관리 서비스
- * - 링크 생성/수정/조회
- * - 클릭/전환 추적
- * - 수익 계산
+ * 파트너 추천 링크 관리 서비스
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerLink, LinkType, LinkStatus } from '../entities/partner-link.entity';
+import { PartnerLink, LinkType } from '../entities/partner-link.entity';
 
 export interface CreatePartnerLinkDto {
   partnerId: string;
+  urlSlug: string;
   linkType: LinkType;
-  targetId?: string;
-  title?: string;
+  targetId: string;
+  commissionRate?: number;
   description?: string;
-  customCommissionRate?: number;
-  expiresAt?: Date;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UpdatePartnerLinkDto {
-  title?: string;
+  commissionRate?: number;
   description?: string;
-  customCommissionRate?: number;
-  status?: LinkStatus;
-  expiresAt?: Date;
+  isActive?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+export interface LinkFilter {
+  partnerId?: string;
+  linkType?: LinkType;
+  isActive?: boolean;
 }
 
 export class PartnerLinkService {
-  constructor(private readonly repository: Repository<PartnerLink>) {}
+  constructor(private readonly linkRepository: Repository<PartnerLink>) {}
 
-  /**
-   * 링크 생성
-   */
   async createLink(dto: CreatePartnerLinkDto): Promise<PartnerLink> {
-    const urlSlug = await this.generateUrlSlug();
+    // Check if slug is unique
+    const existing = await this.linkRepository.findOne({
+      where: { urlSlug: dto.urlSlug },
+    });
 
-    const link = this.repository.create({
+    if (existing) {
+      throw new Error('URL slug already in use');
+    }
+
+    const link = this.linkRepository.create({
       ...dto,
-      urlSlug,
-      status: 'active',
+      totalClicks: 0,
+      conversions: 0,
+      totalEarnings: 0,
+      commissionRate: dto.commissionRate ?? 10,
       isActive: true,
     });
 
-    return this.repository.save(link);
+    return this.linkRepository.save(link);
   }
 
-  /**
-   * 고유 URL Slug 생성
-   */
-  private async generateUrlSlug(): Promise<string> {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let slug: string;
-    let exists: boolean;
-
-    do {
-      slug = '';
-      for (let i = 0; i < 10; i++) {
-        slug += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      const existing = await this.repository.findOne({ where: { urlSlug: slug } });
-      exists = !!existing;
-    } while (exists);
-
-    return slug;
-  }
-
-  /**
-   * ID로 링크 조회
-   */
   async findById(id: string): Promise<PartnerLink | null> {
-    return this.repository.findOne({ where: { id } });
+    return this.linkRepository.findOne({ where: { id } });
   }
 
-  /**
-   * URL Slug로 링크 조회
-   */
   async findBySlug(urlSlug: string): Promise<PartnerLink | null> {
-    return this.repository.findOne({ where: { urlSlug } });
+    return this.linkRepository.findOne({ where: { urlSlug, isActive: true } });
   }
 
-  /**
-   * 파트너 ID로 링크 목록 조회
-   */
-  async findByPartnerId(
-    partnerId: string,
-    options?: {
-      linkType?: LinkType;
-      status?: LinkStatus;
-      page?: number;
-      limit?: number;
+  async findByPartnerId(partnerId: string): Promise<PartnerLink[]> {
+    return this.linkRepository.find({
+      where: { partnerId, isActive: true },
+      order: { totalClicks: 'DESC' },
+    });
+  }
+
+  async findByFilter(filter: LinkFilter): Promise<PartnerLink[]> {
+    const query = this.linkRepository.createQueryBuilder('link');
+
+    if (filter.partnerId) {
+      query.andWhere('link.partnerId = :partnerId', { partnerId: filter.partnerId });
     }
-  ): Promise<{ items: PartnerLink[]; total: number }> {
-    const { linkType, status, page = 1, limit = 20 } = options || {};
-
-    const queryBuilder = this.repository
-      .createQueryBuilder('link')
-      .where('link.partnerId = :partnerId', { partnerId });
-
-    if (linkType) {
-      queryBuilder.andWhere('link.linkType = :linkType', { linkType });
+    if (filter.linkType) {
+      query.andWhere('link.linkType = :linkType', { linkType: filter.linkType });
+    }
+    if (filter.isActive !== undefined) {
+      query.andWhere('link.isActive = :isActive', { isActive: filter.isActive });
     }
 
-    if (status) {
-      queryBuilder.andWhere('link.status = :status', { status });
-    }
-
-    queryBuilder.orderBy('link.createdAt', 'DESC');
-    queryBuilder.skip((page - 1) * limit);
-    queryBuilder.take(limit);
-
-    const [items, total] = await queryBuilder.getManyAndCount();
-    return { items, total };
+    return query.orderBy('link.totalClicks', 'DESC').getMany();
   }
 
-  /**
-   * 링크 업데이트
-   */
-  async updateLink(id: string, dto: UpdatePartnerLinkDto): Promise<PartnerLink | null> {
-    await this.repository.update(id, dto);
-    return this.findById(id);
-  }
-
-  /**
-   * 클릭 카운트 증가
-   */
-  async incrementClicks(
-    id: string,
-    isUnique: boolean = false
-  ): Promise<void> {
-    await this.repository.increment({ id }, 'totalClicks', 1);
-    if (isUnique) {
-      await this.repository.increment({ id }, 'uniqueClicks', 1);
-    }
-    await this.updateConversionRate(id);
-  }
-
-  /**
-   * 전환 카운트 증가
-   */
-  async incrementConversions(id: string, earnings: number): Promise<void> {
-    await this.repository.increment({ id }, 'conversions', 1);
-    await this.repository.increment({ id }, 'totalEarnings', earnings);
-    await this.updateConversionRate(id);
-  }
-
-  /**
-   * 전환율 업데이트
-   */
-  private async updateConversionRate(id: string): Promise<void> {
+  async updateLink(id: string, dto: UpdatePartnerLinkDto): Promise<PartnerLink> {
     const link = await this.findById(id);
-    if (link && link.uniqueClicks > 0) {
-      const conversionRate = (link.conversions / link.uniqueClicks) * 100;
-      await this.repository.update(id, { conversionRate });
+    if (!link) {
+      throw new Error('Partner link not found');
     }
+
+    Object.assign(link, dto);
+    return this.linkRepository.save(link);
   }
 
-  /**
-   * 링크 통계 조회
-   */
+  async incrementClicks(id: string): Promise<PartnerLink> {
+    const link = await this.findById(id);
+    if (!link) {
+      throw new Error('Partner link not found');
+    }
+
+    link.totalClicks += 1;
+    return this.linkRepository.save(link);
+  }
+
+  async incrementConversions(id: string, earnings: number): Promise<PartnerLink> {
+    const link = await this.findById(id);
+    if (!link) {
+      throw new Error('Partner link not found');
+    }
+
+    link.conversions += 1;
+    link.totalEarnings = Number(link.totalEarnings) + earnings;
+    return this.linkRepository.save(link);
+  }
+
   async getLinkStats(partnerId: string): Promise<{
     totalLinks: number;
-    activeLinks: number;
     totalClicks: number;
     totalConversions: number;
     totalEarnings: number;
-    avgConversionRate: number;
+    conversionRate: number;
+    byLinkType: Record<LinkType, { count: number; clicks: number; conversions: number }>;
   }> {
-    const result = await this.repository
-      .createQueryBuilder('link')
-      .select([
-        'COUNT(*) as totalLinks',
-        'SUM(CASE WHEN link.status = :active THEN 1 ELSE 0 END) as activeLinks',
-        'SUM(link.totalClicks) as totalClicks',
-        'SUM(link.conversions) as totalConversions',
-        'SUM(link.totalEarnings) as totalEarnings',
-        'AVG(link.conversionRate) as avgConversionRate',
-      ])
-      .where('link.partnerId = :partnerId', { partnerId })
-      .setParameter('active', 'active')
-      .getRawOne();
+    const links = await this.findByPartnerId(partnerId);
+
+    let totalClicks = 0;
+    let totalConversions = 0;
+    let totalEarnings = 0;
+
+    const byLinkType: Record<LinkType, { count: number; clicks: number; conversions: number }> = {
+      product: { count: 0, clicks: 0, conversions: 0 },
+      routine: { count: 0, clicks: 0, conversions: 0 },
+      collection: { count: 0, clicks: 0, conversions: 0 },
+      campaign: { count: 0, clicks: 0, conversions: 0 },
+    };
+
+    for (const link of links) {
+      totalClicks += link.totalClicks;
+      totalConversions += link.conversions;
+      totalEarnings += Number(link.totalEarnings);
+
+      byLinkType[link.linkType].count++;
+      byLinkType[link.linkType].clicks += link.totalClicks;
+      byLinkType[link.linkType].conversions += link.conversions;
+    }
+
+    const conversionRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0;
 
     return {
-      totalLinks: parseInt(result.totalLinks) || 0,
-      activeLinks: parseInt(result.activeLinks) || 0,
-      totalClicks: parseInt(result.totalClicks) || 0,
-      totalConversions: parseInt(result.totalConversions) || 0,
-      totalEarnings: parseFloat(result.totalEarnings) || 0,
-      avgConversionRate: parseFloat(result.avgConversionRate) || 0,
+      totalLinks: links.length,
+      totalClicks,
+      totalConversions,
+      totalEarnings,
+      conversionRate,
+      byLinkType,
     };
   }
 
-  /**
-   * 링크 삭제 (비활성화)
-   */
-  async delete(id: string): Promise<void> {
-    await this.repository.update(id, { isActive: false, status: 'inactive' });
+  async getTopPerformingLinks(partnerId: string, limit: number = 10): Promise<PartnerLink[]> {
+    return this.linkRepository.find({
+      where: { partnerId, isActive: true },
+      order: { totalEarnings: 'DESC' },
+      take: limit,
+    });
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await this.linkRepository.delete(id);
+    return (result.affected ?? 0) > 0;
+  }
+
+  async softDelete(id: string): Promise<PartnerLink | null> {
+    const link = await this.findById(id);
+    if (!link) return null;
+
+    link.isActive = false;
+    return this.linkRepository.save(link);
   }
 }

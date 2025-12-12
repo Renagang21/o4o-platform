@@ -2,170 +2,140 @@
  * PartnerProfileService
  *
  * 파트너 프로필 관리 서비스
- * - 프로필 생성/수정/조회
- * - 추천 코드 생성
- * - 파트너 승인/정지
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerProfile, PartnerStatus, PartnerType } from '../entities/partner-profile.entity';
+import { PartnerProfile, PartnerType, PartnerStatus, SocialLinks } from '../entities/partner-profile.entity';
 
 export interface CreatePartnerProfileDto {
   userId: string;
-  displayName?: string;
-  introduction?: string;
+  referralCode: string;
   partnerType: PartnerType;
-  socialLinks?: Record<string, string>;
-  profileImageUrl?: string;
+  socialLinks?: SocialLinks;
+  bio?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UpdatePartnerProfileDto {
-  displayName?: string;
-  introduction?: string;
-  socialLinks?: Record<string, string>;
-  profileImageUrl?: string;
-  defaultCommissionRate?: number;
+  partnerType?: PartnerType;
+  socialLinks?: SocialLinks;
+  bio?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export class PartnerProfileService {
-  constructor(private readonly repository: Repository<PartnerProfile>) {}
+  constructor(private readonly profileRepository: Repository<PartnerProfile>) {}
 
-  /**
-   * 파트너 프로필 생성
-   */
   async createProfile(dto: CreatePartnerProfileDto): Promise<PartnerProfile> {
-    const referralCode = await this.generateReferralCode();
-
-    const profile = this.repository.create({
-      ...dto,
-      referralCode,
-      status: 'pending',
-      isActive: true,
+    // Check if profile already exists for this user
+    const existing = await this.profileRepository.findOne({
+      where: { userId: dto.userId },
     });
 
-    return this.repository.save(profile);
+    if (existing) {
+      throw new Error('Partner profile already exists for this user');
+    }
+
+    // Check if referral code is unique
+    const existingCode = await this.profileRepository.findOne({
+      where: { referralCode: dto.referralCode },
+    });
+
+    if (existingCode) {
+      throw new Error('Referral code already in use');
+    }
+
+    const profile = this.profileRepository.create({
+      ...dto,
+      status: 'pending',
+      totalEarnings: 0,
+      availableBalance: 0,
+    });
+
+    return this.profileRepository.save(profile);
   }
 
-  /**
-   * 고유 추천 코드 생성
-   */
-  private async generateReferralCode(): Promise<string> {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code: string;
-    let exists: boolean;
-
-    do {
-      code = '';
-      for (let i = 0; i < 8; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      const existing = await this.repository.findOne({ where: { referralCode: code } });
-      exists = !!existing;
-    } while (exists);
-
-    return code;
-  }
-
-  /**
-   * 사용자 ID로 프로필 조회
-   */
-  async findByUserId(userId: string): Promise<PartnerProfile | null> {
-    return this.repository.findOne({ where: { userId } });
-  }
-
-  /**
-   * ID로 프로필 조회
-   */
   async findById(id: string): Promise<PartnerProfile | null> {
-    return this.repository.findOne({ where: { id } });
+    return this.profileRepository.findOne({ where: { id } });
   }
 
-  /**
-   * 추천 코드로 프로필 조회
-   */
+  async findByUserId(userId: string): Promise<PartnerProfile | null> {
+    return this.profileRepository.findOne({ where: { userId } });
+  }
+
   async findByReferralCode(referralCode: string): Promise<PartnerProfile | null> {
-    return this.repository.findOne({ where: { referralCode } });
+    return this.profileRepository.findOne({ where: { referralCode } });
   }
 
-  /**
-   * 프로필 업데이트
-   */
-  async updateProfile(id: string, dto: UpdatePartnerProfileDto): Promise<PartnerProfile | null> {
-    await this.repository.update(id, dto);
-    return this.findById(id);
+  async updateProfile(id: string, dto: UpdatePartnerProfileDto): Promise<PartnerProfile> {
+    const profile = await this.findById(id);
+    if (!profile) {
+      throw new Error('Partner profile not found');
+    }
+
+    Object.assign(profile, dto);
+    return this.profileRepository.save(profile);
   }
 
-  /**
-   * 파트너 상태 변경
-   */
-  async updateStatus(
-    id: string,
-    status: PartnerStatus,
-    approvedBy?: string
-  ): Promise<PartnerProfile | null> {
-    if (status === 'active' && approvedBy) {
-      await this.repository.update(id, {
-        status,
-        approvedAt: new Date(),
-        approvedBy,
-      });
-    } else {
-      await this.repository.update(id, { status });
+  async updateStatus(id: string, status: PartnerStatus): Promise<PartnerProfile> {
+    const profile = await this.findById(id);
+    if (!profile) {
+      throw new Error('Partner profile not found');
     }
-    return this.findById(id);
+
+    profile.status = status;
+    return this.profileRepository.save(profile);
   }
 
-  /**
-   * 파트너 목록 조회
-   */
-  async findAll(options?: {
-    status?: PartnerStatus;
-    partnerType?: PartnerType;
-    page?: number;
-    limit?: number;
-  }): Promise<{ items: PartnerProfile[]; total: number }> {
-    const { status, partnerType, page = 1, limit = 20 } = options || {};
-
-    const queryBuilder = this.repository.createQueryBuilder('profile');
-
-    if (status) {
-      queryBuilder.andWhere('profile.status = :status', { status });
+  async updateEarnings(id: string, amount: number): Promise<PartnerProfile> {
+    const profile = await this.findById(id);
+    if (!profile) {
+      throw new Error('Partner profile not found');
     }
 
-    if (partnerType) {
-      queryBuilder.andWhere('profile.partnerType = :partnerType', { partnerType });
-    }
-
-    queryBuilder.orderBy('profile.createdAt', 'DESC');
-    queryBuilder.skip((page - 1) * limit);
-    queryBuilder.take(limit);
-
-    const [items, total] = await queryBuilder.getManyAndCount();
-    return { items, total };
+    profile.totalEarnings = Number(profile.totalEarnings) + amount;
+    profile.availableBalance = Number(profile.availableBalance) + amount;
+    return this.profileRepository.save(profile);
   }
 
-  /**
-   * 통계 업데이트
-   */
-  async updateStats(
-    id: string,
-    stats: {
-      conversions?: number;
-      earnings?: number;
+  async deductBalance(id: string, amount: number): Promise<PartnerProfile> {
+    const profile = await this.findById(id);
+    if (!profile) {
+      throw new Error('Partner profile not found');
     }
-  ): Promise<void> {
-    if (stats.conversions !== undefined) {
-      await this.repository.increment({ id }, 'totalConversions', stats.conversions);
+
+    if (Number(profile.availableBalance) < amount) {
+      throw new Error('Insufficient balance');
     }
-    if (stats.earnings !== undefined) {
-      await this.repository.increment({ id }, 'totalEarnings', stats.earnings);
-    }
+
+    profile.availableBalance = Number(profile.availableBalance) - amount;
+    return this.profileRepository.save(profile);
   }
 
-  /**
-   * 프로필 삭제 (비활성화)
-   */
-  async delete(id: string): Promise<void> {
-    await this.repository.update(id, { isActive: false, status: 'inactive' });
+  async findByType(partnerType: PartnerType): Promise<PartnerProfile[]> {
+    return this.profileRepository.find({
+      where: { partnerType },
+      order: { totalEarnings: 'DESC' },
+    });
+  }
+
+  async findByStatus(status: PartnerStatus): Promise<PartnerProfile[]> {
+    return this.profileRepository.find({
+      where: { status },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getTopEarners(limit: number = 10): Promise<PartnerProfile[]> {
+    return this.profileRepository.find({
+      where: { status: 'active' },
+      order: { totalEarnings: 'DESC' },
+      take: limit,
+    });
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await this.profileRepository.delete(id);
+    return (result.affected ?? 0) > 0;
   }
 }

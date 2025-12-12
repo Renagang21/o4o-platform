@@ -19,13 +19,13 @@ export class PartnerProfileController {
       const { userId, displayName, introduction, partnerType, socialLinks, profileImageUrl } = req.body;
 
       if (!userId || !partnerType) {
-        res.status(400).json({ error: 'userId and partnerType are required' });
+        res.status(400).json({ success: false, message: 'userId and partnerType are required', errorCode: 'VALIDATION_ERROR' });
         return;
       }
 
       const existing = await this.service.findByUserId(userId);
       if (existing) {
-        res.status(409).json({ error: 'Partner profile already exists for this user' });
+        res.status(409).json({ success: false, message: 'Partner profile already exists for this user', errorCode: 'DUPLICATE_PROFILE' });
         return;
       }
 
@@ -38,10 +38,10 @@ export class PartnerProfileController {
         profileImageUrl,
       });
 
-      res.status(201).json(profile);
+      res.status(201).json({ success: true, data: profile });
     } catch (error) {
       console.error('[PartnerProfileController] create error:', error);
-      res.status(500).json({ error: 'Failed to create partner profile' });
+      res.status(500).json({ success: false, message: 'Failed to create partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -54,21 +54,21 @@ export class PartnerProfileController {
       const userId = (req as any).user?.id;
 
       if (!userId) {
-        res.status(401).json({ error: 'Unauthorized' });
+        res.status(401).json({ success: false, message: 'Unauthorized', errorCode: 'UNAUTHORIZED' });
         return;
       }
 
       const profile = await this.service.findByUserId(userId);
 
       if (!profile) {
-        res.status(404).json({ error: 'Partner profile not found' });
+        res.status(404).json({ success: false, message: 'Partner profile not found', errorCode: 'NOT_FOUND' });
         return;
       }
 
-      res.json(profile);
+      res.json({ success: true, data: profile });
     } catch (error) {
       console.error('[PartnerProfileController] getMyProfile error:', error);
-      res.status(500).json({ error: 'Failed to get partner profile' });
+      res.status(500).json({ success: false, message: 'Failed to get partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -82,14 +82,14 @@ export class PartnerProfileController {
       const profile = await this.service.findById(id);
 
       if (!profile) {
-        res.status(404).json({ error: 'Partner profile not found' });
+        res.status(404).json({ success: false, message: 'Partner profile not found', errorCode: 'NOT_FOUND' });
         return;
       }
 
-      res.json(profile);
+      res.json({ success: true, data: profile });
     } catch (error) {
       console.error('[PartnerProfileController] findById error:', error);
-      res.status(500).json({ error: 'Failed to get partner profile' });
+      res.status(500).json({ success: false, message: 'Failed to get partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -103,14 +103,14 @@ export class PartnerProfileController {
       const profile = await this.service.findByReferralCode(referralCode);
 
       if (!profile) {
-        res.status(404).json({ error: 'Partner profile not found' });
+        res.status(404).json({ success: false, message: 'Partner profile not found', errorCode: 'NOT_FOUND' });
         return;
       }
 
-      res.json(profile);
+      res.json({ success: true, data: profile });
     } catch (error) {
       console.error('[PartnerProfileController] findByReferralCode error:', error);
-      res.status(500).json({ error: 'Failed to get partner profile' });
+      res.status(500).json({ success: false, message: 'Failed to get partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -123,14 +123,14 @@ export class PartnerProfileController {
       const userId = (req as any).user?.id;
 
       if (!userId) {
-        res.status(401).json({ error: 'Unauthorized' });
+        res.status(401).json({ success: false, message: 'Unauthorized', errorCode: 'UNAUTHORIZED' });
         return;
       }
 
       const profile = await this.service.findByUserId(userId);
 
       if (!profile) {
-        res.status(404).json({ error: 'Partner profile not found' });
+        res.status(404).json({ success: false, message: 'Partner profile not found', errorCode: 'NOT_FOUND' });
         return;
       }
 
@@ -144,10 +144,10 @@ export class PartnerProfileController {
         defaultCommissionRate,
       });
 
-      res.json(updated);
+      res.json({ success: true, data: updated });
     } catch (error) {
       console.error('[PartnerProfileController] updateMyProfile error:', error);
-      res.status(500).json({ error: 'Failed to update partner profile' });
+      res.status(500).json({ success: false, message: 'Failed to update partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -166,10 +166,10 @@ export class PartnerProfileController {
         limit: limit ? parseInt(limit as string) : undefined,
       });
 
-      res.json(result);
+      res.json({ success: true, data: result });
     } catch (error) {
       console.error('[PartnerProfileController] findAll error:', error);
-      res.status(500).json({ error: 'Failed to get partner profiles' });
+      res.status(500).json({ success: false, message: 'Failed to get partner profiles', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -184,21 +184,21 @@ export class PartnerProfileController {
       const approvedBy = (req as any).user?.id;
 
       if (!status) {
-        res.status(400).json({ error: 'status is required' });
+        res.status(400).json({ success: false, message: 'status is required', errorCode: 'VALIDATION_ERROR' });
         return;
       }
 
       const updated = await this.service.updateStatus(id, status, approvedBy);
 
       if (!updated) {
-        res.status(404).json({ error: 'Partner profile not found' });
+        res.status(404).json({ success: false, message: 'Partner profile not found', errorCode: 'NOT_FOUND' });
         return;
       }
 
-      res.json(updated);
+      res.json({ success: true, data: updated });
     } catch (error) {
       console.error('[PartnerProfileController] updateStatus error:', error);
-      res.status(500).json({ error: 'Failed to update partner status' });
+      res.status(500).json({ success: false, message: 'Failed to update partner status', errorCode: 'INTERNAL_ERROR' });
     }
   }
 
@@ -210,10 +210,10 @@ export class PartnerProfileController {
     try {
       const { id } = req.params;
       await this.service.delete(id);
-      res.json({ success: true });
+      res.json({ success: true, message: 'Partner profile deleted' });
     } catch (error) {
       console.error('[PartnerProfileController] delete error:', error);
-      res.status(500).json({ error: 'Failed to delete partner profile' });
+      res.status(500).json({ success: false, message: 'Failed to delete partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
 }

@@ -1,248 +1,207 @@
 /**
  * PartnerRoutineService
  *
- * 파트너 루틴 관리 서비스
- * - 루틴 생성/수정/조회
- * - 조회수/좋아요/저장 추적
- * - 전환 통계
+ * 파트너 루틴 추천 관리 서비스
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerRoutine, RoutineType, RoutineVisibility, RoutineStep } from '../entities/partner-routine.entity';
+import { PartnerRoutine, RoutineType, RoutineStep } from '../entities/partner-routine.entity';
 
 export interface CreatePartnerRoutineDto {
   partnerId: string;
   title: string;
-  description?: string;
   routineType: RoutineType;
-  visibility?: RoutineVisibility;
+  description?: string;
+  steps: RoutineStep[];
   skinTypes?: string[];
   skinConcerns?: string[];
-  steps: RoutineStep[];
   thumbnailUrl?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UpdatePartnerRoutineDto {
   title?: string;
-  description?: string;
   routineType?: RoutineType;
-  visibility?: RoutineVisibility;
+  description?: string;
+  steps?: RoutineStep[];
   skinTypes?: string[];
   skinConcerns?: string[];
-  steps?: RoutineStep[];
   thumbnailUrl?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface RoutineFilter {
+  partnerId?: string;
+  routineType?: RoutineType;
   isPublished?: boolean;
-  isFeatured?: boolean;
+  skinType?: string;
+  skinConcern?: string;
 }
 
 export class PartnerRoutineService {
-  constructor(private readonly repository: Repository<PartnerRoutine>) {}
+  constructor(private readonly routineRepository: Repository<PartnerRoutine>) {}
 
-  /**
-   * 루틴 생성
-   */
   async createRoutine(dto: CreatePartnerRoutineDto): Promise<PartnerRoutine> {
-    const routine = this.repository.create({
+    const routine = this.routineRepository.create({
       ...dto,
-      visibility: dto.visibility || 'public',
+      viewCount: 0,
+      likeCount: 0,
       isPublished: false,
     });
 
-    return this.repository.save(routine);
+    return this.routineRepository.save(routine);
   }
 
-  /**
-   * ID로 루틴 조회
-   */
   async findById(id: string): Promise<PartnerRoutine | null> {
-    return this.repository.findOne({ where: { id } });
+    return this.routineRepository.findOne({ where: { id } });
   }
 
-  /**
-   * 파트너 ID로 루틴 목록 조회
-   */
-  async findByPartnerId(
-    partnerId: string,
-    options?: {
-      routineType?: RoutineType;
-      isPublished?: boolean;
-      page?: number;
-      limit?: number;
-    }
-  ): Promise<{ items: PartnerRoutine[]; total: number }> {
-    const { routineType, isPublished, page = 1, limit = 20 } = options || {};
-
-    const queryBuilder = this.repository
-      .createQueryBuilder('routine')
-      .where('routine.partnerId = :partnerId', { partnerId });
-
-    if (routineType) {
-      queryBuilder.andWhere('routine.routineType = :routineType', { routineType });
-    }
-
-    if (isPublished !== undefined) {
-      queryBuilder.andWhere('routine.isPublished = :isPublished', { isPublished });
-    }
-
-    queryBuilder.orderBy('routine.createdAt', 'DESC');
-    queryBuilder.skip((page - 1) * limit);
-    queryBuilder.take(limit);
-
-    const [items, total] = await queryBuilder.getManyAndCount();
-    return { items, total };
-  }
-
-  /**
-   * 공개 루틴 목록 조회 (피부 타입/고민 필터)
-   */
-  async findPublicRoutines(options?: {
-    skinType?: string;
-    skinConcern?: string;
-    routineType?: RoutineType;
-    page?: number;
-    limit?: number;
-  }): Promise<{ items: PartnerRoutine[]; total: number }> {
-    const { skinType, skinConcern, routineType, page = 1, limit = 20 } = options || {};
-
-    const queryBuilder = this.repository
-      .createQueryBuilder('routine')
-      .where('routine.isPublished = :isPublished', { isPublished: true })
-      .andWhere('routine.visibility = :visibility', { visibility: 'public' });
-
-    if (routineType) {
-      queryBuilder.andWhere('routine.routineType = :routineType', { routineType });
-    }
-
-    if (skinType) {
-      queryBuilder.andWhere(':skinType = ANY(routine.skinTypes)', { skinType });
-    }
-
-    if (skinConcern) {
-      queryBuilder.andWhere(':skinConcern = ANY(routine.skinConcerns)', { skinConcern });
-    }
-
-    queryBuilder.orderBy('routine.viewCount', 'DESC');
-    queryBuilder.skip((page - 1) * limit);
-    queryBuilder.take(limit);
-
-    const [items, total] = await queryBuilder.getManyAndCount();
-    return { items, total };
-  }
-
-  /**
-   * 루틴 업데이트
-   */
-  async updateRoutine(id: string, dto: UpdatePartnerRoutineDto): Promise<PartnerRoutine | null> {
-    const updatePayload: Record<string, unknown> = {};
-
-    if (dto.title !== undefined) updatePayload.title = dto.title;
-    if (dto.description !== undefined) updatePayload.description = dto.description;
-    if (dto.routineType !== undefined) updatePayload.routineType = dto.routineType;
-    if (dto.visibility !== undefined) updatePayload.visibility = dto.visibility;
-    if (dto.skinTypes !== undefined) updatePayload.skinTypes = dto.skinTypes;
-    if (dto.skinConcerns !== undefined) updatePayload.skinConcerns = dto.skinConcerns;
-    if (dto.steps !== undefined) updatePayload.steps = dto.steps;
-    if (dto.thumbnailUrl !== undefined) updatePayload.thumbnailUrl = dto.thumbnailUrl;
-    if (dto.isPublished !== undefined) {
-      updatePayload.isPublished = dto.isPublished;
-      if (dto.isPublished === true) {
-        updatePayload.publishedAt = new Date();
-      }
-    }
-    if (dto.isFeatured !== undefined) updatePayload.isFeatured = dto.isFeatured;
-
-    if (Object.keys(updatePayload).length > 0) {
-      await this.repository.update(id, updatePayload);
-    }
-    return this.findById(id);
-  }
-
-  /**
-   * 루틴 발행
-   */
-  async publishRoutine(id: string): Promise<PartnerRoutine | null> {
-    await this.repository.update(id, {
-      isPublished: true,
-      publishedAt: new Date(),
+  async findByPartnerId(partnerId: string): Promise<PartnerRoutine[]> {
+    return this.routineRepository.find({
+      where: { partnerId },
+      order: { createdAt: 'DESC' },
     });
-    return this.findById(id);
   }
 
-  /**
-   * 루틴 발행 취소
-   */
-  async unpublishRoutine(id: string): Promise<PartnerRoutine | null> {
-    await this.repository.update(id, { isPublished: false });
-    return this.findById(id);
+  async findPublicRoutines(filter?: RoutineFilter): Promise<PartnerRoutine[]> {
+    const query = this.routineRepository.createQueryBuilder('routine');
+
+    query.where('routine.isPublished = :isPublished', { isPublished: true });
+
+    if (filter?.partnerId) {
+      query.andWhere('routine.partnerId = :partnerId', { partnerId: filter.partnerId });
+    }
+    if (filter?.routineType) {
+      query.andWhere('routine.routineType = :routineType', { routineType: filter.routineType });
+    }
+    if (filter?.skinType) {
+      query.andWhere(':skinType = ANY(routine.skinTypes)', { skinType: filter.skinType });
+    }
+    if (filter?.skinConcern) {
+      query.andWhere(':skinConcern = ANY(routine.skinConcerns)', { skinConcern: filter.skinConcern });
+    }
+
+    return query.orderBy('routine.viewCount', 'DESC').getMany();
   }
 
-  /**
-   * 조회수 증가
-   */
-  async incrementViewCount(id: string): Promise<void> {
-    await this.repository.increment({ id }, 'viewCount', 1);
+  async updateRoutine(id: string, dto: UpdatePartnerRoutineDto): Promise<PartnerRoutine> {
+    const routine = await this.findById(id);
+    if (!routine) {
+      throw new Error('Partner routine not found');
+    }
+
+    Object.assign(routine, dto);
+    return this.routineRepository.save(routine);
   }
 
-  /**
-   * 좋아요 증가
-   */
-  async incrementLikeCount(id: string): Promise<void> {
-    await this.repository.increment({ id }, 'likeCount', 1);
+  async publishRoutine(id: string): Promise<PartnerRoutine> {
+    const routine = await this.findById(id);
+    if (!routine) {
+      throw new Error('Partner routine not found');
+    }
+
+    if (routine.steps.length === 0) {
+      throw new Error('Cannot publish routine without steps');
+    }
+
+    routine.isPublished = true;
+    routine.publishedAt = new Date();
+    return this.routineRepository.save(routine);
   }
 
-  /**
-   * 저장수 증가
-   */
-  async incrementSaveCount(id: string): Promise<void> {
-    await this.repository.increment({ id }, 'saveCount', 1);
+  async unpublishRoutine(id: string): Promise<PartnerRoutine> {
+    const routine = await this.findById(id);
+    if (!routine) {
+      throw new Error('Partner routine not found');
+    }
+
+    routine.isPublished = false;
+    return this.routineRepository.save(routine);
   }
 
-  /**
-   * 전환 카운트 및 수익 증가
-   */
-  async incrementConversion(id: string, earnings: number): Promise<void> {
-    await this.repository.increment({ id }, 'conversionCount', 1);
-    await this.repository.increment({ id }, 'totalEarnings', earnings);
+  async incrementViewCount(id: string): Promise<PartnerRoutine> {
+    const routine = await this.findById(id);
+    if (!routine) {
+      throw new Error('Partner routine not found');
+    }
+
+    routine.viewCount += 1;
+    return this.routineRepository.save(routine);
   }
 
-  /**
-   * 루틴 통계 조회
-   */
+  async incrementLikeCount(id: string): Promise<PartnerRoutine> {
+    const routine = await this.findById(id);
+    if (!routine) {
+      throw new Error('Partner routine not found');
+    }
+
+    routine.likeCount += 1;
+    return this.routineRepository.save(routine);
+  }
+
+  async decrementLikeCount(id: string): Promise<PartnerRoutine> {
+    const routine = await this.findById(id);
+    if (!routine) {
+      throw new Error('Partner routine not found');
+    }
+
+    if (routine.likeCount > 0) {
+      routine.likeCount -= 1;
+    }
+    return this.routineRepository.save(routine);
+  }
+
   async getRoutineStats(partnerId: string): Promise<{
     totalRoutines: number;
     publishedRoutines: number;
     totalViews: number;
     totalLikes: number;
-    totalConversions: number;
-    totalEarnings: number;
+    byRoutineType: Record<RoutineType, number>;
   }> {
-    const result = await this.repository
-      .createQueryBuilder('routine')
-      .select([
-        'COUNT(*) as totalRoutines',
-        'SUM(CASE WHEN routine.isPublished = true THEN 1 ELSE 0 END) as publishedRoutines',
-        'SUM(routine.viewCount) as totalViews',
-        'SUM(routine.likeCount) as totalLikes',
-        'SUM(routine.conversionCount) as totalConversions',
-        'SUM(routine.totalEarnings) as totalEarnings',
-      ])
-      .where('routine.partnerId = :partnerId', { partnerId })
-      .getRawOne();
+    const routines = await this.findByPartnerId(partnerId);
+
+    let publishedRoutines = 0;
+    let totalViews = 0;
+    let totalLikes = 0;
+
+    const byRoutineType: Record<RoutineType, number> = {
+      morning: 0,
+      evening: 0,
+      weekly: 0,
+      special: 0,
+    };
+
+    for (const routine of routines) {
+      if (routine.isPublished) {
+        publishedRoutines++;
+      }
+      totalViews += routine.viewCount;
+      totalLikes += routine.likeCount;
+      byRoutineType[routine.routineType]++;
+    }
 
     return {
-      totalRoutines: parseInt(result.totalRoutines) || 0,
-      publishedRoutines: parseInt(result.publishedRoutines) || 0,
-      totalViews: parseInt(result.totalViews) || 0,
-      totalLikes: parseInt(result.totalLikes) || 0,
-      totalConversions: parseInt(result.totalConversions) || 0,
-      totalEarnings: parseFloat(result.totalEarnings) || 0,
+      totalRoutines: routines.length,
+      publishedRoutines,
+      totalViews,
+      totalLikes,
+      byRoutineType,
     };
   }
 
-  /**
-   * 루틴 삭제
-   */
-  async delete(id: string): Promise<void> {
-    await this.repository.delete(id);
+  async getTrendingRoutines(limit: number = 10): Promise<PartnerRoutine[]> {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return this.routineRepository.find({
+      where: { isPublished: true },
+      order: { viewCount: 'DESC', likeCount: 'DESC' },
+      take: limit,
+    });
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await this.routineRepository.delete(id);
+    return (result.affected ?? 0) > 0;
   }
 }

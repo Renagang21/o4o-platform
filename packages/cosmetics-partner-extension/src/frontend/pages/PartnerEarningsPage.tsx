@@ -1,98 +1,71 @@
 /**
  * PartnerEarningsPage
  *
- * 파트너 수익 관리 페이지
+ * 파트너 수익 관리 및 정산 페이지
  */
 
 import React from 'react';
 
-interface PartnerEarningsPageProps {
-  partnerId?: string;
-}
-
-export const PartnerEarningsPage: React.FC<PartnerEarningsPageProps> = ({ partnerId }) => {
+export function PartnerEarningsPage() {
   return (
-    <div className="cosmetics-partner-earnings">
+    <div className="partner-earnings-page">
       <div className="page-header">
-        <h1>My Earnings</h1>
-        <button className="withdraw-btn">Request Withdrawal</button>
+        <h1>Earnings</h1>
+        <button className="btn-primary">Request Withdrawal</button>
       </div>
-
-      {/* Earnings Summary */}
       <div className="earnings-summary">
-        <div className="summary-card pending">
-          <h3>Pending</h3>
-          <p className="amount">-</p>
-          <span className="description">Processing period</span>
-        </div>
-        <div className="summary-card available">
-          <h3>Available</h3>
-          <p className="amount">-</p>
-          <span className="description">Ready to withdraw</span>
-        </div>
-        <div className="summary-card withdrawn">
-          <h3>Withdrawn</h3>
-          <p className="amount">-</p>
-          <span className="description">Total withdrawn</span>
-        </div>
-        <div className="summary-card total">
+        <div className="stat-card primary">
           <h3>Total Earnings</h3>
-          <p className="amount">-</p>
-          <span className="description">All time</span>
+          <p className="stat-value">$0.00</p>
+        </div>
+        <div className="stat-card">
+          <h3>Available Balance</h3>
+          <p className="stat-value">$0.00</p>
+        </div>
+        <div className="stat-card">
+          <h3>Pending Approval</h3>
+          <p className="stat-value">$0.00</p>
+        </div>
+        <div className="stat-card">
+          <h3>Paid Out</h3>
+          <p className="stat-value">$0.00</p>
         </div>
       </div>
-
-      {/* Monthly Chart */}
-      <div className="monthly-chart">
-        <h2>Monthly Earnings</h2>
+      <div className="earnings-chart">
+        <h2>Earnings Over Time</h2>
         <div className="chart-placeholder">
-          <p>Earnings chart will be displayed here</p>
+          <p>Chart will be displayed here</p>
         </div>
       </div>
-
-      {/* Filters */}
-      <div className="filters">
-        <select>
-          <option value="">All Types</option>
-          <option value="commission">Commission</option>
-          <option value="bonus">Bonus</option>
-          <option value="referral">Referral</option>
-          <option value="campaign">Campaign</option>
-        </select>
-        <select>
-          <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="available">Available</option>
-          <option value="withdrawn">Withdrawn</option>
-        </select>
-        <input type="date" placeholder="Start Date" />
-        <input type="date" placeholder="End Date" />
+      <div className="earnings-breakdown">
+        <h2>Earnings Breakdown</h2>
+        <div className="breakdown-grid">
+          <div className="breakdown-item">
+            <span>Commission</span>
+            <span>$0.00</span>
+          </div>
+          <div className="breakdown-item">
+            <span>Bonus</span>
+            <span>$0.00</span>
+          </div>
+          <div className="breakdown-item">
+            <span>Referral</span>
+            <span>$0.00</span>
+          </div>
+          <div className="breakdown-item">
+            <span>Campaign</span>
+            <span>$0.00</span>
+          </div>
+        </div>
       </div>
-
-      {/* Earnings History */}
       <div className="earnings-history">
-        <h2>Earnings History</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={5} className="empty">
-                No earnings history found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <h2>Transaction History</h2>
+        <div className="empty-state">
+          <p>No transactions yet</p>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default PartnerEarningsPage;

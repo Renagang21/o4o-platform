@@ -1,37 +1,19 @@
 /**
- * Cosmetics Partner Extension Activate Hook
+ * Cosmetics Partner Extension - Activate Hook
  *
- * 활성화 시 실행되는 작업
+ * 앱 활성화 시 실행되는 로직
+ * - 권한 등록
+ * - 메뉴 활성화
  */
 
-import type { DataSource } from 'typeorm';
-import type { Router } from 'express';
+export async function activate(): Promise<void> {
+  console.log('[Cosmetics Partner Extension] Activating...');
 
-export interface ActivateContext {
-  dataSource: DataSource;
-  appId: string;
-  router?: Router;
-}
+  // Register permissions
+  // Enable menus
+  // Initialize default settings
 
-export interface ActivateResult {
-  routes?: Router;
-  services?: Record<string, unknown>;
-}
-
-export async function activate(context: ActivateContext): Promise<ActivateResult> {
-  const { appId } = context;
-  console.log(`[${appId}] Activating cosmetics-partner-extension...`);
-
-  // 활성화 시 수행할 작업
-  // - Admin 메뉴 등록
-  // - API 라우트 활성화
-  // - 이벤트 리스너 등록
-
-  console.log(`[${appId}] cosmetics-partner-extension activated successfully.`);
-
-  return {
-    services: {},
-  };
+  console.log('[Cosmetics Partner Extension] Activated successfully');
 }
 
 export default activate;

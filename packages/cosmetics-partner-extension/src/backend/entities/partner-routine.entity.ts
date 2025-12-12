@@ -1,10 +1,11 @@
 /**
  * PartnerRoutine Entity
  *
- * 파트너 루틴 관리
- * - 스킨케어 루틴 구성
- * - 피부 타입/고민별 추천
- * - 제품 조합 추천
+ * 파트너 루틴 추천 관리
+ * - 루틴 제목 및 설명
+ * - 루틴 단계 (제품 목록)
+ * - 피부 타입/고민별 필터
+ * - 공개 여부
  */
 
 import {
@@ -17,23 +18,20 @@ import {
 } from 'typeorm';
 
 export type RoutineType = 'morning' | 'evening' | 'weekly' | 'special';
-export type RoutineVisibility = 'public' | 'followers' | 'private';
 
 export interface RoutineStep {
   order: number;
   productId: string;
-  productName?: string;
-  stepName: string;
-  description?: string;
-  duration?: number;
-  tips?: string;
+  description: string;
+  quantity?: string;
+  duration?: string;
 }
 
 @Entity('cosmetics_partner_routines')
 @Index(['partnerId'])
 @Index(['routineType'])
-@Index(['visibility'])
 @Index(['isPublished'])
+@Index(['createdAt'])
 export class PartnerRoutine {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -44,14 +42,14 @@ export class PartnerRoutine {
   @Column({ type: 'varchar', length: 255 })
   title!: string;
 
+  @Column({ type: 'varchar', length: 50 })
+  routineType!: RoutineType;
+
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', length: 20 })
-  routineType!: RoutineType;
-
-  @Column({ type: 'varchar', length: 20, default: 'public' })
-  visibility!: RoutineVisibility;
+  @Column({ type: 'jsonb', default: [] })
+  steps!: RoutineStep[];
 
   @Column({ type: 'simple-array', nullable: true })
   skinTypes?: string[];
@@ -59,35 +57,20 @@ export class PartnerRoutine {
   @Column({ type: 'simple-array', nullable: true })
   skinConcerns?: string[];
 
-  @Column({ type: 'jsonb', default: [] })
-  steps!: RoutineStep[];
-
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  thumbnailUrl?: string;
-
   @Column({ type: 'int', default: 0 })
   viewCount!: number;
 
   @Column({ type: 'int', default: 0 })
   likeCount!: number;
 
-  @Column({ type: 'int', default: 0 })
-  saveCount!: number;
-
-  @Column({ type: 'int', default: 0 })
-  conversionCount!: number;
-
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  totalEarnings!: number;
-
-  @Column({ type: 'boolean', default: false })
-  isPublished!: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  isFeatured!: boolean;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  thumbnailUrl?: string;
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, unknown>;
+
+  @Column({ type: 'boolean', default: false })
+  isPublished!: boolean;
 
   @CreateDateColumn()
   createdAt!: Date;

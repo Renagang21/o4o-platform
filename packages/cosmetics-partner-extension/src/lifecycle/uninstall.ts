@@ -1,31 +1,27 @@
 /**
- * Cosmetics Partner Extension Uninstall Hook
+ * Cosmetics Partner Extension - Uninstall Hook
  *
- * 제거 시 실행되는 정리 작업
+ * 앱 제거 시 실행되는 로직
+ * - 데이터 삭제 (정책에 따라)
+ * - 권한 제거
  */
 
-import type { DataSource } from 'typeorm';
+export async function uninstall(options?: { purge?: boolean }): Promise<void> {
+  console.log('[Cosmetics Partner Extension] Uninstalling...');
 
-export interface UninstallContext {
-  dataSource: DataSource;
-  appId: string;
-  keepData?: boolean;
-}
-
-export async function uninstall(context: UninstallContext): Promise<void> {
-  const { appId, keepData } = context;
-  console.log(`[${appId}] Uninstalling cosmetics-partner-extension...`);
-
-  if (!keepData) {
-    console.log(`[${appId}] Data will be preserved (keepData: true by default)`);
+  if (options?.purge) {
+    console.log('[Cosmetics Partner Extension] Purging all data...');
+    // Drop tables
+    // Remove all partner data
+  } else {
+    console.log('[Cosmetics Partner Extension] Keeping data (default mode)');
+    // Keep data, just remove app registration
   }
 
-  // 제거 시 수행할 작업
-  // - 설정 정리 (optional)
-  // - 캐시 정리 (optional)
-  // - 데이터 백업 (optional, if configured)
+  // Remove permissions
+  // Remove menus
 
-  console.log(`[${appId}] cosmetics-partner-extension uninstalled successfully.`);
+  console.log('[Cosmetics Partner Extension] Uninstalled successfully');
 }
 
 export default uninstall;

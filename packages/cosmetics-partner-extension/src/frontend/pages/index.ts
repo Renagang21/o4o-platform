@@ -1,8 +1,8 @@
 /**
- * Cosmetics Partner Extension Pages
+ * Cosmetics Partner Extension Frontend Pages
  */
 
-export * from './PartnerDashboard';
-export * from './PartnerLinksPage';
-export * from './PartnerRoutinesPage';
-export * from './PartnerEarningsPage';
+export { PartnerDashboard } from './PartnerDashboard';
+export { PartnerLinksPage } from './PartnerLinksPage';
+export { PartnerRoutinesPage } from './PartnerRoutinesPage';
+export { PartnerEarningsPage } from './PartnerEarningsPage';

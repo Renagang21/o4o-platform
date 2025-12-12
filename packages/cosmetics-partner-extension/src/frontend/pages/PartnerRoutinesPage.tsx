@@ -6,62 +6,43 @@
 
 import React from 'react';
 
-interface PartnerRoutinesPageProps {
-  partnerId?: string;
-}
-
-export const PartnerRoutinesPage: React.FC<PartnerRoutinesPageProps> = ({ partnerId }) => {
+export function PartnerRoutinesPage() {
   return (
-    <div className="cosmetics-partner-routines">
+    <div className="partner-routines-page">
       <div className="page-header">
         <h1>My Routines</h1>
-        <button className="create-btn">Create New Routine</button>
+        <button className="btn-primary">Create New Routine</button>
       </div>
-
-      {/* Routine Stats Summary */}
-      <div className="routine-stats">
-        <div className="stat-item">
-          <span className="label">Total Routines</span>
-          <span className="value">-</span>
+      <div className="routines-stats">
+        <div className="stat-card">
+          <h3>Total Routines</h3>
+          <p className="stat-value">0</p>
         </div>
-        <div className="stat-item">
-          <span className="label">Published</span>
-          <span className="value">-</span>
+        <div className="stat-card">
+          <h3>Published</h3>
+          <p className="stat-value">0</p>
         </div>
-        <div className="stat-item">
-          <span className="label">Total Views</span>
-          <span className="value">-</span>
+        <div className="stat-card">
+          <h3>Total Views</h3>
+          <p className="stat-value">0</p>
         </div>
-        <div className="stat-item">
-          <span className="label">Total Likes</span>
-          <span className="value">-</span>
+        <div className="stat-card">
+          <h3>Total Likes</h3>
+          <p className="stat-value">0</p>
         </div>
       </div>
-
-      {/* Filters */}
-      <div className="filters">
-        <select>
-          <option value="">All Types</option>
-          <option value="morning">Morning</option>
-          <option value="evening">Evening</option>
-          <option value="weekly">Weekly</option>
-          <option value="special">Special</option>
-        </select>
-        <select>
-          <option value="">All Status</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-        </select>
+      <div className="routines-tabs">
+        <button className="tab active">All Routines</button>
+        <button className="tab">Published</button>
+        <button className="tab">Drafts</button>
       </div>
-
-      {/* Routines Grid */}
-      <div className="routines-grid">
+      <div className="routines-list">
         <div className="empty-state">
-          <p>No routines found. Create your first routine!</p>
+          <p>No routines created yet. Share your skincare routine to help others!</p>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default PartnerRoutinesPage;

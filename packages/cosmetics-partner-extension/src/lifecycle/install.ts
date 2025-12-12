@@ -1,26 +1,18 @@
 /**
- * Cosmetics Partner Extension Install Hook
+ * Cosmetics Partner Extension - Install Hook
  *
- * 설치 시 실행되는 초기화 작업
+ * 앱 설치 시 실행되는 로직
+ * - 테이블 생성 (TypeORM 마이그레이션 사용)
+ * - 초기 데이터 설정
  */
 
-import type { DataSource } from 'typeorm';
+export async function install(): Promise<void> {
+  console.log('[Cosmetics Partner Extension] Installing...');
 
-export interface InstallContext {
-  dataSource: DataSource;
-  appId: string;
-}
+  // TypeORM will handle table creation via migrations
+  // This hook is for additional setup logic
 
-export async function install(context: InstallContext): Promise<void> {
-  const { appId } = context;
-  console.log(`[${appId}] Installing cosmetics-partner-extension...`);
-
-  // 기본 설정 초기화 (필요한 경우)
-  // - Partner 역할 기본 설정
-  // - 기본 커미션 설정
-  // - 초기 데이터
-
-  console.log(`[${appId}] cosmetics-partner-extension installed successfully.`);
+  console.log('[Cosmetics Partner Extension] Installed successfully');
 }
 
 export default install;

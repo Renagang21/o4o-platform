@@ -1,7 +1,10 @@
 /**
  * Cosmetics Partner Extension Shortcodes
  *
- * Re-export from frontend/shortcodes
+ * Shortcode registry for partner extension features
  */
 
-export { shortcodes, shortcodes as default } from '../frontend/shortcodes';
+import shortcodes from '../frontend/shortcodes';
+
+export { shortcodes };
+export default shortcodes;
