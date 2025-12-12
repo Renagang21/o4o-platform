@@ -109,6 +109,73 @@ export interface UpdateForumPostDto {
 }
 
 // =============================================================================
+// AI Generated Metadata Types (Phase 16)
+// =============================================================================
+
+/**
+ * AI Summary Metadata
+ * Generated summary of forum post content
+ */
+export interface ForumPostAISummary {
+  /** 1-2 line short summary */
+  shortSummary: string;
+  /** Key bullet points */
+  bulletSummary: string[];
+  /** When the summary was generated */
+  generatedAt: string;
+  /** AI model used */
+  model: string;
+}
+
+/**
+ * AI Tags Metadata
+ * Suggested tags and categories from AI analysis
+ */
+export interface ForumPostAITags {
+  /** Suggested tags from AI */
+  suggestedTags: string[];
+  /** Suggested category (optional) */
+  suggestedCategory?: string;
+  /** Confidence score (0-1) */
+  confidence: number;
+  /** Domain-specific tags (cosmetics) */
+  cosmeticsTags?: {
+    skinType?: string;
+    concerns?: string[];
+    productTypes?: string[];
+  };
+  /** Domain-specific tags (yaksa) */
+  yaksaTags?: {
+    documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
+    isOrganizational?: boolean;
+    topics?: string[];
+  };
+}
+
+/**
+ * AI Metadata Section
+ * Contains all AI-generated content for a forum post
+ */
+export interface ForumPostAIMeta {
+  /** AI-generated summary */
+  summary?: ForumPostAISummary;
+  /** AI-suggested tags */
+  tags?: ForumPostAITags;
+  /** Whether tags have been approved by user/admin */
+  tagsApproved?: boolean;
+  /** Who approved the tags */
+  tagsApprovedBy?: string;
+  /** When tags were approved */
+  tagsApprovedAt?: string;
+  /** Processing status */
+  status?: 'pending' | 'processing' | 'completed' | 'failed';
+  /** Error message if failed */
+  error?: string;
+  /** Last processing attempt */
+  lastProcessedAt?: string;
+}
+
+// =============================================================================
 // Extension Metadata Types (for forum-neture, forum-yaksa)
 // =============================================================================
 
@@ -213,6 +280,8 @@ export interface ForumPostMetadata {
   analytics?: ForumPostAnalyticsMeta;
   display?: ForumPostDisplayMeta;
   extensions?: ForumPostExtensionsMeta;
+  /** Phase 16: AI-generated content (summary, tags) */
+  ai?: ForumPostAIMeta;
 
   // Legacy flat fields (for backward compatibility)
   /** @deprecated Use seo.title instead */

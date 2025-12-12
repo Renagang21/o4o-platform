@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ForumController } from '../../controllers/forum/ForumController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import notificationRoutes from './forum.notifications.routes.js';
+import aiRoutes from './forum.ai.routes.js';
 
 const router: Router = Router();
 const controller = new ForumController();
@@ -91,5 +92,10 @@ router.post('/moderation/:type/:id', authenticate, controller.moderateContent.bi
 // Notifications (Phase 13)
 // ============================================================================
 router.use('/notifications', notificationRoutes);
+
+// ============================================================================
+// AI Features (Phase 16)
+// ============================================================================
+router.use('/ai', aiRoutes);
 
 export default router;
