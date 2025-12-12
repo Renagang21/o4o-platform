@@ -30,6 +30,7 @@ export async function onUninstall(
       await queryRunner.startTransaction();
 
       // 의존성 순서대로 삭제 (역순)
+      await queryRunner.query('DELETE FROM pharma_dispatches');
       await queryRunner.query('DELETE FROM pharma_orders');
       await queryRunner.query('DELETE FROM pharma_settlement_batches');
       await queryRunner.query('DELETE FROM pharma_offers');
