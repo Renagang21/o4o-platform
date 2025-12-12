@@ -43,6 +43,18 @@ export function createCosmeticsForumRoutes(dataSource: DataSource): Router {
   router.post('/posts/:id/feature', (req, res) => controller.featurePost(req, res));
   router.delete('/posts/:id/feature', (req, res) => controller.unfeaturePost(req, res));
 
+  // ============================================
+  // Phase 14-2: Product Integration Routes
+  // ============================================
+
+  // Product-specific forum endpoints (Ecommerce integration)
+  router.get('/product/:productId/posts', (req, res) => controller.getProductPosts(req, res));
+  router.get('/product/:productId/summary', (req, res) => controller.getProductSummary(req, res));
+  router.get('/product/:productId/rating', (req, res) => controller.getProductRating(req, res));
+
+  // Brand stats endpoint
+  router.get('/brand/:brand/stats', (req, res) => controller.getBrandStats(req, res));
+
   return router;
 }
 

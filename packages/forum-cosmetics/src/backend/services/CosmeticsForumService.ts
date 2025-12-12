@@ -101,6 +101,21 @@ export interface PaginatedResult<T> {
 }
 
 /**
+ * Product Forum Summary (Phase 14-2: Ecommerce Integration)
+ * Aggregated forum data for a specific product
+ */
+export interface ProductForumSummary {
+  productId: string;
+  avgRating: number;
+  reviewCount: number;
+  ratingDistribution: Record<number, number>;
+  topConcerns: string[];
+  topSkinTypes: string[];
+  verifiedPurchaseCount: number;
+  latestPosts: (ForumPostData & { cosmeticsMeta?: CosmeticsForumMeta })[];
+}
+
+/**
  * CosmeticsForumService
  *
  * Handles cosmetics-specific forum operations:
@@ -110,6 +125,7 @@ export interface PaginatedResult<T> {
  * - Product and brand filtering
  * - Rating-based sorting
  * - Ingredient filtering
+ * - Product integration for ecommerce (Phase 14-2)
  */
 export class CosmeticsForumService {
   private metaRepository: Repository<CosmeticsForumMeta>;
@@ -128,7 +144,6 @@ export class CosmeticsForumService {
    */
   static fromDataSource(dataSource: DataSource): CosmeticsForumService {
     const metaRepo = dataSource.getRepository(CosmeticsForumMeta);
-    // ForumPost repository will be obtained dynamically
     const forumPostRepo = dataSource.getRepository('forum_post') as Repository<ForumPostData>;
     return new CosmeticsForumService(metaRepo, forumPostRepo);
   }
@@ -193,12 +208,10 @@ export class CosmeticsForumService {
   async listPosts(options: CosmeticsForumQueryOptions = {}): Promise<PaginatedResult<ForumPostData & { cosmeticsMeta?: CosmeticsForumMeta }>> {
     const {
       skinType,
-      concerns,
       brand,
       productId,
       postType,
       minRating,
-      ingredients,
       isFeatured,
       limit = 20,
       offset = 0,
@@ -206,80 +219,52 @@ export class CosmeticsForumService {
       sortOrder = 'DESC',
     } = options;
 
-    // Build query for cosmetics_forum_meta
     const metaQueryBuilder = this.metaRepository.createQueryBuilder('meta');
 
     if (skinType) {
       metaQueryBuilder.andWhere('meta.skinType = :skinType', { skinType });
     }
-
     if (brand) {
       metaQueryBuilder.andWhere('meta.brand ILIKE :brand', { brand: `%${brand}%` });
     }
-
     if (productId) {
       metaQueryBuilder.andWhere('meta.productId = :productId', { productId });
     }
-
     if (postType) {
       metaQueryBuilder.andWhere('meta.postType = :postType', { postType });
     }
-
     if (minRating !== undefined) {
       metaQueryBuilder.andWhere('meta.rating >= :minRating', { minRating });
     }
-
     if (isFeatured !== undefined) {
       metaQueryBuilder.andWhere('meta.isFeatured = :isFeatured', { isFeatured });
     }
 
-    // Get post IDs that match the filter
     const metaResults = await metaQueryBuilder.getMany();
     const postIds = metaResults.map(m => m.postId);
 
     if (postIds.length === 0) {
-      return {
-        items: [],
-        total: 0,
-        page: Math.floor(offset / limit) + 1,
-        limit,
-        totalPages: 0,
-      };
+      return { items: [], total: 0, page: Math.floor(offset / limit) + 1, limit, totalPages: 0 };
     }
 
-    // Query forum posts
     const postQueryBuilder = this.forumPostRepository
       .createQueryBuilder('post')
       .where('post.id IN (:...postIds)', { postIds })
       .andWhere("post.status = :status", { status: 'publish' });
 
-    // Apply sorting
-    if (sortBy === 'rating') {
-      // Need to join with meta for rating sort
-      postQueryBuilder.orderBy('post.createdAt', sortOrder as 'ASC' | 'DESC');
-    } else if (sortBy === 'viewCount') {
+    if (sortBy === 'viewCount') {
       postQueryBuilder.orderBy('post.viewCount', sortOrder as 'ASC' | 'DESC');
     } else {
       postQueryBuilder.orderBy('post.createdAt', sortOrder as 'ASC' | 'DESC');
     }
 
-    // Get total count
     const total = await postQueryBuilder.getCount();
+    const posts = await postQueryBuilder.skip(offset).take(limit).getMany();
 
-    // Apply pagination
-    const posts = await postQueryBuilder
-      .skip(offset)
-      .take(limit)
-      .getMany();
-
-    // Attach cosmetics metadata to posts
-    const postsWithMeta = posts.map(post => {
-      const meta = metaResults.find(m => m.postId === post.id);
-      return {
-        ...post,
-        cosmeticsMeta: meta,
-      };
-    });
+    const postsWithMeta = posts.map(post => ({
+      ...post,
+      cosmeticsMeta: metaResults.find(m => m.postId === post.id),
+    }));
 
     return {
       items: postsWithMeta,
@@ -294,10 +279,7 @@ export class CosmeticsForumService {
    * Get posts by skin type
    */
   async getPostsBySkinType(skinType: CosmeticsSkinType, options?: { limit?: number; offset?: number }): Promise<ForumPostData[]> {
-    const result = await this.listPosts({
-      skinType,
-      ...options,
-    });
+    const result = await this.listPosts({ skinType, ...options });
     return result.items;
   }
 
@@ -305,23 +287,16 @@ export class CosmeticsForumService {
    * Get posts by concerns
    */
   async getPostsByConcerns(concerns: CosmeticsConcern[], options?: { limit?: number; offset?: number }): Promise<ForumPostData[]> {
-    const metaResults = await this.metaRepository
-      .createQueryBuilder('meta')
-      .getMany();
-
-    // Filter by concerns (in-memory filtering for array field)
+    const metaResults = await this.metaRepository.createQueryBuilder('meta').getMany();
     const matchingMeta = metaResults.filter(meta => {
       if (!meta.concerns || meta.concerns.length === 0) return false;
       return concerns.some(concern => meta.concerns?.includes(concern));
     });
 
     const postIds = matchingMeta.map(m => m.postId);
+    if (postIds.length === 0) return [];
 
-    if (postIds.length === 0) {
-      return [];
-    }
-
-    const posts = await this.forumPostRepository
+    return await this.forumPostRepository
       .createQueryBuilder('post')
       .where('post.id IN (:...postIds)', { postIds })
       .andWhere("post.status = :status", { status: 'publish' })
@@ -329,18 +304,13 @@ export class CosmeticsForumService {
       .skip(options?.offset || 0)
       .take(options?.limit || 20)
       .getMany();
-
-    return posts;
   }
 
   /**
    * Get posts by brand
    */
   async getPostsByBrand(brand: string, options?: { limit?: number; offset?: number }): Promise<ForumPostData[]> {
-    const result = await this.listPosts({
-      brand,
-      ...options,
-    });
+    const result = await this.listPosts({ brand, ...options });
     return result.items;
   }
 
@@ -359,10 +329,7 @@ export class CosmeticsForumService {
       .getMany();
 
     const postIds = metaResults.map(m => m.postId);
-
-    if (postIds.length === 0) {
-      return [];
-    }
+    if (postIds.length === 0) return [];
 
     const posts = await this.forumPostRepository
       .createQueryBuilder('post')
@@ -380,10 +347,7 @@ export class CosmeticsForumService {
    * Get featured posts
    */
   async getFeaturedPosts(limit: number = 5): Promise<(ForumPostData & { cosmeticsMeta?: CosmeticsForumMeta })[]> {
-    const result = await this.listPosts({
-      isFeatured: true,
-      limit,
-    });
+    const result = await this.listPosts({ isFeatured: true, limit });
     return result.items;
   }
 
@@ -420,27 +384,19 @@ export class CosmeticsForumService {
     let ratingCount = 0;
 
     for (const meta of allMeta) {
-      // Post type
       byPostType[meta.postType] = (byPostType[meta.postType] || 0) + 1;
-
-      // Skin type
       if (meta.skinType) {
         bySkinType[meta.skinType] = (bySkinType[meta.skinType] || 0) + 1;
       }
-
-      // Brand
       if (meta.brand) {
         brandCounts[meta.brand] = (brandCounts[meta.brand] || 0) + 1;
       }
-
-      // Rating
       if (meta.rating) {
         ratingSum += Number(meta.rating);
         ratingCount++;
       }
     }
 
-    // Sort brands by count
     const topBrands = Object.entries(brandCounts)
       .map(([brand, count]) => ({ brand, count }))
       .sort((a, b) => b.count - a.count)
@@ -470,10 +426,7 @@ export class CosmeticsForumService {
       .getMany();
 
     const postIds = metaResults.map(m => m.postId);
-
-    if (postIds.length === 0) {
-      return [];
-    }
+    if (postIds.length === 0) return [];
 
     const posts = await this.forumPostRepository
       .createQueryBuilder('post')
@@ -488,5 +441,194 @@ export class CosmeticsForumService {
       ...post,
       cosmeticsMeta: metaResults.find(m => m.postId === post.id),
     }));
+  }
+
+  // =========================================================================
+  // Product Integration Methods (Phase 14-2: Ecommerce Integration)
+  // =========================================================================
+
+  /**
+   * Get forum posts for a specific product
+   * Used by ecommerce product detail pages
+   */
+  async getPostsByProduct(
+    productId: string,
+    options?: { limit?: number; offset?: number }
+  ): Promise<PaginatedResult<ForumPostData & { cosmeticsMeta?: CosmeticsForumMeta }>> {
+    const limit = options?.limit || 10;
+    const offset = options?.offset || 0;
+
+    const metaResults = await this.metaRepository
+      .createQueryBuilder('meta')
+      .where('meta.productId = :productId', { productId })
+      .orderBy('meta.createdAt', 'DESC')
+      .getMany();
+
+    const postIds = metaResults.map(m => m.postId);
+    if (postIds.length === 0) {
+      return { items: [], total: 0, page: Math.floor(offset / limit) + 1, limit, totalPages: 0 };
+    }
+
+    const total = await this.forumPostRepository
+      .createQueryBuilder('post')
+      .where('post.id IN (:...postIds)', { postIds })
+      .andWhere("post.status = :status", { status: 'publish' })
+      .getCount();
+
+    const posts = await this.forumPostRepository
+      .createQueryBuilder('post')
+      .where('post.id IN (:...postIds)', { postIds })
+      .andWhere("post.status = :status", { status: 'publish' })
+      .orderBy('post.createdAt', 'DESC')
+      .skip(offset)
+      .take(limit)
+      .getMany();
+
+    return {
+      items: posts.map(post => ({ ...post, cosmeticsMeta: metaResults.find(m => m.postId === post.id) })),
+      total,
+      page: Math.floor(offset / limit) + 1,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  /**
+   * Get aggregated rating for a product
+   */
+  async getAggregatedRatingByProduct(productId: string): Promise<{
+    avgRating: number;
+    totalReviews: number;
+    ratingDistribution: Record<number, number>;
+    verifiedPurchaseCount: number;
+  }> {
+    const metaResults = await this.metaRepository
+      .createQueryBuilder('meta')
+      .where('meta.productId = :productId', { productId })
+      .andWhere('meta.rating IS NOT NULL')
+      .getMany();
+
+    if (metaResults.length === 0) {
+      return { avgRating: 0, totalReviews: 0, ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, verifiedPurchaseCount: 0 };
+    }
+
+    const ratings = metaResults.filter(m => m.rating !== null && m.rating !== undefined).map(m => Number(m.rating));
+    const avgRating = ratings.length > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length : 0;
+
+    const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const rating of ratings) {
+      const rounded = Math.round(rating);
+      if (rounded >= 1 && rounded <= 5) ratingDistribution[rounded]++;
+    }
+
+    return {
+      avgRating: Math.round(avgRating * 10) / 10,
+      totalReviews: metaResults.length,
+      ratingDistribution,
+      verifiedPurchaseCount: metaResults.filter(m => m.isVerifiedPurchase).length,
+    };
+  }
+
+  /**
+   * Get comprehensive forum stats for a product (for product detail page)
+   */
+  async getForumStatsForProduct(productId: string): Promise<ProductForumSummary> {
+    const metaResults = await this.metaRepository
+      .createQueryBuilder('meta')
+      .where('meta.productId = :productId', { productId })
+      .orderBy('meta.createdAt', 'DESC')
+      .getMany();
+
+    if (metaResults.length === 0) {
+      return {
+        productId, avgRating: 0, reviewCount: 0,
+        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        topConcerns: [], topSkinTypes: [], verifiedPurchaseCount: 0, latestPosts: [],
+      };
+    }
+
+    const ratingStats = await this.getAggregatedRatingByProduct(productId);
+
+    const concernCounts: Record<string, number> = {};
+    const skinTypeCounts: Record<string, number> = {};
+    for (const meta of metaResults) {
+      if (meta.concerns && Array.isArray(meta.concerns)) {
+        for (const concern of meta.concerns) concernCounts[concern] = (concernCounts[concern] || 0) + 1;
+      }
+      if (meta.skinType) skinTypeCounts[meta.skinType] = (skinTypeCounts[meta.skinType] || 0) + 1;
+    }
+
+    const topConcerns = Object.entries(concernCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c]) => c);
+    const topSkinTypes = Object.entries(skinTypeCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([s]) => s);
+
+    const postIds = metaResults.slice(0, 5).map(m => m.postId);
+    let latestPosts: (ForumPostData & { cosmeticsMeta?: CosmeticsForumMeta })[] = [];
+    if (postIds.length > 0) {
+      const posts = await this.forumPostRepository
+        .createQueryBuilder('post')
+        .where('post.id IN (:...postIds)', { postIds })
+        .andWhere("post.status = :status", { status: 'publish' })
+        .orderBy('post.createdAt', 'DESC')
+        .take(5)
+        .getMany();
+      latestPosts = posts.map(post => ({ ...post, cosmeticsMeta: metaResults.find(m => m.postId === post.id) }));
+    }
+
+    return {
+      productId,
+      avgRating: ratingStats.avgRating,
+      reviewCount: metaResults.length,
+      ratingDistribution: ratingStats.ratingDistribution,
+      topConcerns,
+      topSkinTypes,
+      verifiedPurchaseCount: ratingStats.verifiedPurchaseCount,
+      latestPosts,
+    };
+  }
+
+  /**
+   * Get brand statistics for ecommerce brand pages
+   */
+  async getProductBrandStats(brand: string): Promise<{
+    brand: string;
+    totalPosts: number;
+    avgRating: number;
+    productCount: number;
+    topProducts: { productId: string; postCount: number; avgRating: number }[];
+  }> {
+    const metaResults = await this.metaRepository
+      .createQueryBuilder('meta')
+      .where('meta.brand ILIKE :brand', { brand: `%${brand}%` })
+      .getMany();
+
+    if (metaResults.length === 0) {
+      return { brand, totalPosts: 0, avgRating: 0, productCount: 0, topProducts: [] };
+    }
+
+    const ratings = metaResults.filter(m => m.rating !== null && m.rating !== undefined).map(m => Number(m.rating));
+    const avgRating = ratings.length > 0 ? Math.round((ratings.reduce((sum, r) => sum + r, 0) / ratings.length) * 10) / 10 : 0;
+
+    const productStats: Record<string, { count: number; ratingSum: number; ratingCount: number }> = {};
+    for (const meta of metaResults) {
+      if (meta.productId) {
+        if (!productStats[meta.productId]) productStats[meta.productId] = { count: 0, ratingSum: 0, ratingCount: 0 };
+        productStats[meta.productId].count++;
+        if (meta.rating) {
+          productStats[meta.productId].ratingSum += Number(meta.rating);
+          productStats[meta.productId].ratingCount++;
+        }
+      }
+    }
+
+    const topProducts = Object.entries(productStats)
+      .map(([pid, stats]) => ({
+        productId: pid,
+        postCount: stats.count,
+        avgRating: stats.ratingCount > 0 ? Math.round((stats.ratingSum / stats.ratingCount) * 10) / 10 : 0,
+      }))
+      .sort((a, b) => b.postCount - a.postCount)
+      .slice(0, 10);
+
+    return { brand, totalPosts: metaResults.length, avgRating, productCount: Object.keys(productStats).length, topProducts };
   }
 }

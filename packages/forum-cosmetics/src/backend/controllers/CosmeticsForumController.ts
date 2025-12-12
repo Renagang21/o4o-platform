@@ -470,4 +470,114 @@ export class CosmeticsForumController {
       });
     }
   }
+
+  // ============================================
+  // Phase 14-2: Product Integration Endpoints
+  // ============================================
+
+  /**
+   * GET /api/v1/cosmetics/forum/product/:productId/posts
+   * Get forum posts for a specific product
+   */
+  async getProductPosts(req: Request, res: Response): Promise<void> {
+    try {
+      const { productId } = req.params;
+      const { page = '1', limit = '20' } = req.query;
+
+      const result = await this.service.getPostsByProduct(productId, {
+        limit: parseInt(limit as string, 10),
+        offset: (parseInt(page as string, 10) - 1) * parseInt(limit as string, 10),
+      });
+
+      res.json({
+        success: true,
+        data: result.items,
+        pagination: {
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+          totalPages: result.totalPages,
+        },
+      });
+    } catch (error) {
+      console.error('[CosmeticsForumController] Error getting product posts:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get product posts',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/cosmetics/forum/product/:productId/summary
+   * Get forum summary for a specific product (rating, reviews, etc.)
+   */
+  async getProductSummary(req: Request, res: Response): Promise<void> {
+    try {
+      const { productId } = req.params;
+
+      const summary = await this.service.getForumStatsForProduct(productId);
+
+      res.json({
+        success: true,
+        data: summary,
+      });
+    } catch (error) {
+      console.error('[CosmeticsForumController] Error getting product summary:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get product summary',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/cosmetics/forum/product/:productId/rating
+   * Get aggregated rating for a specific product
+   */
+  async getProductRating(req: Request, res: Response): Promise<void> {
+    try {
+      const { productId } = req.params;
+
+      const rating = await this.service.getAggregatedRatingByProduct(productId);
+
+      res.json({
+        success: true,
+        data: rating,
+      });
+    } catch (error) {
+      console.error('[CosmeticsForumController] Error getting product rating:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get product rating',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/cosmetics/forum/brand/:brand/stats
+   * Get forum stats for a specific brand
+   */
+  async getBrandStats(req: Request, res: Response): Promise<void> {
+    try {
+      const { brand } = req.params;
+
+      const stats = await this.service.getProductBrandStats(brand);
+
+      res.json({
+        success: true,
+        data: stats,
+      });
+    } catch (error) {
+      console.error('[CosmeticsForumController] Error getting brand stats:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get brand stats',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
 }

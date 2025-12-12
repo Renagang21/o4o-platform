@@ -26,6 +26,9 @@ export * from './backend/controllers/index.js';
 // Export lifecycle
 export * from './lifecycle/index.js';
 
+// Export frontend components (Phase 14-2)
+export * from './frontend/index.js';
+
 // Entity list for TypeORM
 import * as Entities from './backend/entities/index.js';
 export const entities = Object.values(Entities).filter(
