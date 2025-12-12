@@ -18,7 +18,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "echo 'Skipping independent build - compiled by api-server'",
+    "build": "tsc -p tsconfig.json",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
