@@ -1,7 +1,7 @@
 # App Specifications Index
 
-> 최종 업데이트: 2025-12-10 (Phase 12-4)
-> 총 문서: 40개
+> 최종 업데이트: 2025-12-13 (E-commerce Core Phase 1)
+> 총 문서: 43개
 
 ---
 
@@ -13,12 +13,13 @@
 | [cosmetics](./cosmetics/) | Extension | 4 | Cosmetics store |
 | [cpt-acf](./cpt-acf/) | Core | 5 | Custom Post Types & Fields |
 | [dropshipping](./dropshipping/) | Core | 4 | Dropshipping system |
+| [ecommerce-core](./ecommerce-core/) | Core | 3 | E-commerce engine **(NEW)** |
 | [forum](./forum/) | Core | 5 | Forum system |
 | [organization](./organization/) | Core | 8 | Organization management |
 | [partnerops](./partnerops/) | Extension | 4 | Partner operations |
 | [sellerops](./sellerops/) | Extension | 4 | Seller operations |
 | [signage](./signage/) | Standalone | 3 | Digital signage |
-| [tourist](./tourist/) | Service | 3 | Tourist app **(NEW)**
+| [tourist](./tourist/) | Service | 3 | Tourist app
 
 ---
 
@@ -47,6 +48,12 @@
 - [api-contract.md](./dropshipping/api-contract.md) - API contract
 - [db-inventory.md](./dropshipping/db-inventory.md) - Database schema
 - [investigation.md](./dropshipping/investigation.md) - Investigation summary
+
+## E-commerce Core (3 docs) **(NEW)**
+
+- [INDEX.md](./ecommerce-core/INDEX.md) - Spec index
+- [phase1-design-order-boundary.md](./ecommerce-core/phase1-design-order-boundary.md) - Phase 1 Order 책임 경계 설계
+- [responsibility-boundary.md](./ecommerce-core/responsibility-boundary.md) - 책임 경계 요약
 
 ## Forum (5 docs)
 
@@ -87,7 +94,7 @@
 - [signage-content.md](./signage/signage-content.md) - Content data model
 - [signage-playback.md](./signage/signage-playback.md) - Playback system
 
-## Tourist (3 docs) **(NEW)**
+## Tourist (3 docs)
 
 - [tourist-overview.md](./tourist/tourist-overview.md) - App overview
 - [tourist-order-flow.md](./tourist/tourist-order-flow.md) - Order and pickup flow
@@ -99,7 +106,7 @@
 
 | Status | Count | Description |
 |--------|-------|-------------|
-| ACTIVE | 36 | 현재 유효 문서 |
+| ACTIVE | 39 | 현재 유효 문서 |
 | ARCHIVED | 4 | 참고용 아카이브 |
 
 ---
@@ -111,4 +118,4 @@
 - [Document Standards](../_standards/)
 
 ---
-*최종 업데이트: 2025-12-10*
+*최종 업데이트: 2025-12-13*
