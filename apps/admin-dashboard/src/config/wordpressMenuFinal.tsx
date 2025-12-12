@@ -16,6 +16,7 @@ import {
   Link2,
   DollarSign,
   Sparkles,
+  Percent,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -234,6 +235,12 @@ export const wordpressMenuItems: MenuItem[] = [
         label: 'Earnings',
         icon: <DollarSign className="w-4 h-4" />,
         path: '/cosmetics-partner/earnings',
+      },
+      {
+        id: 'cosmetics-partner-commission-policies',
+        label: 'Commission Policies',
+        icon: <Percent className="w-4 h-4" />,
+        path: '/cosmetics-partner/commission-policies',
       },
     ],
   },

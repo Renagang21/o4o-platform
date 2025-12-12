@@ -6,3 +6,6 @@ export { PartnerProfileController } from './partner-profile.controller';
 export { PartnerLinkController } from './partner-link.controller';
 export { PartnerRoutineController } from './partner-routine.controller';
 export { PartnerEarningsController } from './partner-earnings.controller';
+
+// Commission System (Phase 6-D)
+export { CommissionPolicyController } from './commission-policy.controller';

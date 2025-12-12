@@ -6,6 +6,7 @@
  * - Links: 추천 링크 관리
  * - Routines: 스킨케어 루틴 관리
  * - Earnings: 수익 및 정산 관리
+ * - Commission Policies: 커미션 정책 관리 (Phase 6-D)
  */
 
 import React, { Suspense, lazy } from 'react';
@@ -16,6 +17,7 @@ const CosmeticsPartnerDashboard = lazy(() => import('./CosmeticsPartnerDashboard
 const CosmeticsPartnerLinks = lazy(() => import('./CosmeticsPartnerLinks'));
 const CosmeticsPartnerRoutines = lazy(() => import('./CosmeticsPartnerRoutines'));
 const CosmeticsPartnerEarnings = lazy(() => import('./CosmeticsPartnerEarnings'));
+const CosmeticsPartnerCommissionPolicies = lazy(() => import('./CosmeticsPartnerCommissionPolicies'));
 
 // Loading component
 const PageLoader: React.FC = () => (
@@ -35,6 +37,7 @@ const CosmeticsPartnerRouter: React.FC = () => {
         <Route path="links" element={<CosmeticsPartnerLinks />} />
         <Route path="routines" element={<CosmeticsPartnerRoutines />} />
         <Route path="earnings" element={<CosmeticsPartnerEarnings />} />
+        <Route path="commission-policies" element={<CosmeticsPartnerCommissionPolicies />} />
         <Route path="*" element={<CosmeticsPartnerDashboard />} />
       </Routes>
     </Suspense>

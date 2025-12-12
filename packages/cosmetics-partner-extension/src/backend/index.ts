@@ -2,6 +2,7 @@
  * Cosmetics Partner Extension Backend
  *
  * 화장품 파트너 확장 기능 백엔드 모듈
+ * - Phase 6-D: Commission Policy System 추가
  */
 
 import { Router } from 'express';
@@ -16,6 +17,7 @@ import { PartnerProfile } from './entities/partner-profile.entity';
 import { PartnerLink } from './entities/partner-link.entity';
 import { PartnerRoutine } from './entities/partner-routine.entity';
 import { PartnerEarnings } from './entities/partner-earnings.entity';
+import { CommissionPolicy } from './entities/commission-policy.entity';
 
 // Services
 export * from './services';
@@ -44,12 +46,21 @@ export function routes(dataSource?: DataSource | any): Router {
   const routineRepository = dataSource.getRepository(PartnerRoutine);
   const earningsRepository = dataSource.getRepository(PartnerEarnings);
 
+  // CommissionPolicy repository (Phase 6-D)
+  let policyRepository;
+  try {
+    policyRepository = dataSource.getRepository(CommissionPolicy);
+  } catch (error) {
+    console.warn('[cosmetics-partner-extension] CommissionPolicy entity not registered, commission features disabled');
+  }
+
   // Create routes with dependencies
   return createPartnerExtensionRoutes({
     profileRepository,
     linkRepository,
     routineRepository,
     earningsRepository,
+    policyRepository,
   });
 }
 
@@ -64,6 +75,7 @@ export const entities = [
   PartnerLink,
   PartnerRoutine,
   PartnerEarnings,
+  CommissionPolicy,
 ];
 
 /**

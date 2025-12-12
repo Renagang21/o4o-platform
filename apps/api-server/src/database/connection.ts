@@ -159,12 +159,13 @@ import {
   YaksaCourseAssignment,
 } from '@o4o/lms-yaksa';
 
-// ✅ NEW: Cosmetics-Partner-Extension entities
+// ✅ NEW: Cosmetics-Partner-Extension entities (Phase 6-D: CommissionPolicy 추가)
 import {
   PartnerProfile,
   PartnerLink,
   PartnerRoutine,
   PartnerEarnings,
+  CommissionPolicy,
 } from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
@@ -337,11 +338,12 @@ export const AppDataSource = new DataSource({
     RequiredCoursePolicy,
     CreditRecord,
     YaksaCourseAssignment,
-    // ✅ NEW: Cosmetics-Partner-Extension entities
+    // ✅ NEW: Cosmetics-Partner-Extension entities (Phase 6-D: CommissionPolicy 추가)
     PartnerProfile,
     PartnerLink,
     PartnerRoutine,
     PartnerEarnings,
+    CommissionPolicy,
   ],
   
   // 마이그레이션 설정

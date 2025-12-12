@@ -19,6 +19,24 @@ export { PartnerEarningsService } from './partner-earnings.service';
 export type {
   CreatePartnerEarningsDto,
   UpdatePartnerEarningsDto,
+  RecordCommissionDto,
   EarningsFilter,
   EarningsSummary,
+  WithdrawalResult,
 } from './partner-earnings.service';
+
+// Commission System (Phase 6-D)
+export { CommissionEngineService } from './commission-engine.service';
+export type {
+  CommissionCalculationInput,
+  CommissionCalculationResult,
+  PolicyResolutionContext,
+} from './commission-engine.service';
+
+export { CommissionPolicyService } from './commission-policy.service';
+export type {
+  CreateCommissionPolicyDto,
+  UpdateCommissionPolicyDto,
+  PolicyFilter,
+  PaginatedResult,
+} from './commission-policy.service';
