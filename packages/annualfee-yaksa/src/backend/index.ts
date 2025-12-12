@@ -13,5 +13,7 @@ export * from './services/index.js';
 // Controllers
 export * from './controllers/index.js';
 
-// Routes
-export { createRoutes } from './routes/index.js';
+// Routes - export as 'routes' for module loader compatibility
+import { createRoutes } from './routes/index.js';
+export { createRoutes };
+export const routes = createRoutes;

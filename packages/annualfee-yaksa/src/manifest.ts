@@ -1,30 +1,50 @@
 /**
- * AnnualFee-Yaksa Manifest
+ * AnnualFee-Yaksa Extension App Manifest
  *
  * 약사회 연회비 시스템 앱 매니페스트
+ *
+ * Extends membership-yaksa with annual fee management:
+ * - Fee policy management
+ * - Invoice generation and management
+ * - Payment processing
+ * - Exemption workflow
+ * - Settlement automation
  */
 
-export const manifest = {
-  meta: {
-    appId: 'annualfee-yaksa',
-    name: '약사회 연회비 시스템',
-    version: '1.0.0',
-    type: 'extension' as const,
-    description: '약사회 연회비/회비 관리 시스템 - 정책, 청구, 납부, 감면, 정산 관리',
-    author: 'O4O Platform',
-  },
+export const annualfeeYaksaManifest = {
+  // ===== 필수 기본 정보 =====
+  id: 'annualfee-yaksa',
+  appId: 'annualfee-yaksa',
+  displayName: '약사회 연회비 시스템',
+  version: '1.0.0',
+  appType: 'extension' as const,
+  description: '약사회 연회비/회비 관리 시스템 - 정책, 청구, 납부, 감면, 정산 관리',
 
+  // ===== 의존성 =====
   dependencies: {
     core: ['organization-core'],
     extension: ['membership-yaksa'],
   },
+  dependsOn: ['organization-core', 'membership-yaksa'],
 
-  cms: {
-    cpt: [],
-    acf: [],
-    viewTemplates: [],
+  // ===== 소유 테이블 =====
+  ownsTables: [
+    'yaksa_fee_policies',
+    'yaksa_fee_invoices',
+    'yaksa_fee_payments',
+    'yaksa_fee_exemptions',
+    'yaksa_fee_settlements',
+    'yaksa_fee_logs',
+  ],
+
+  // ===== 삭제 정책 =====
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true,
   },
 
+  // ===== 백엔드 =====
   backend: {
     entities: [
       'FeePolicy',
@@ -43,15 +63,18 @@ export const manifest = {
       'FeeSettlementService',
       'FeeLogService',
       'FeeSyncService',
+      'MemberFeeService',
+      // Phase 2 Automation Services
+      'InvoiceAutoGenerator',
+      'FeeReminderService',
+      'ReceiptPdfGenerator',
+      'CsvPaymentImporter',
+      'SettlementAutomation',
     ],
-    routes: [
-      {
-        path: '/api/annualfee',
-        handler: 'createRoutes',
-      },
-    ],
+    routes: 'createRoutes',
   },
 
+  // ===== 네비게이션 =====
   navigation: {
     menus: [],
     adminRoutes: [
@@ -89,6 +112,7 @@ export const manifest = {
     ],
   },
 
+  // ===== 훅 =====
   hooks: {
     // Membership-Yaksa 연동
     onMemberInfoChanged: 'FeeSyncService.onMemberInfoChanged',
@@ -97,4 +121,5 @@ export const manifest = {
   },
 };
 
-export default manifest;
+export const manifest = annualfeeYaksaManifest;
+export default annualfeeYaksaManifest;
