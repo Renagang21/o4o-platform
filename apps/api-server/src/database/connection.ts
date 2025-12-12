@@ -159,14 +159,14 @@ import {
   YaksaCourseAssignment,
 } from '@o4o/lms-yaksa';
 
-// ✅ NEW: Cosmetics-Partner-Extension entities (Phase 6-D: CommissionPolicy 추가)
-import {
-  PartnerProfile,
-  PartnerLink,
-  PartnerRoutine,
-  PartnerEarnings,
-  CommissionPolicy,
-} from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
+// ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
+// import {
+//   PartnerProfile,
+//   PartnerLink,
+//   PartnerRoutine,
+//   PartnerEarnings,
+//   CommissionPolicy,
+// } from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
 
 // ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
 import {
@@ -176,7 +176,7 @@ import {
   FeeExemption,
   FeeSettlement,
   FeeLog,
-} from '@o4o/annualfee-yaksa/backend/entities/index.js';
+} from '@o4o/annualfee-yaksa/backend/entities';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -348,12 +348,12 @@ export const AppDataSource = new DataSource({
     RequiredCoursePolicy,
     CreditRecord,
     YaksaCourseAssignment,
-    // ✅ NEW: Cosmetics-Partner-Extension entities (Phase 6-D: CommissionPolicy 추가)
-    PartnerProfile,
-    PartnerLink,
-    PartnerRoutine,
-    PartnerEarnings,
-    CommissionPolicy,
+    // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
+    // PartnerProfile,
+    // PartnerLink,
+    // PartnerRoutine,
+    // PartnerEarnings,
+    // CommissionPolicy,
     // ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
     FeePolicy,
     FeeInvoice,
