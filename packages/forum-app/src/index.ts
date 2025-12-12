@@ -16,6 +16,15 @@ export * from './backend/entities/index.js';
 // Backend types and DTOs
 export * from './backend/types/index.js';
 
+// Backend services
+export * from './backend/services/index.js';
+
+// Backend controllers
+export * from './backend/controllers/index.js';
+
+// Backend utils
+export * from './backend/utils/index.js';
+
 // Manifest export
 export { forumManifest, manifest, default as manifestDefault } from './manifest.js';
 
@@ -25,6 +34,9 @@ export const entities = Object.values(Entities).filter(
   (item) => typeof item === 'function' && item.prototype
 );
 
+// Import route factories
+import { createSearchRoutes } from './backend/routes/index.js';
+
 /**
  * Routes factory compatible with Module Loader
  *
@@ -33,10 +45,20 @@ export const entities = Object.values(Entities).filter(
 export function routes(dataSource?: DataSource | any): Router {
   const router = Router();
 
-  // TODO: Implement actual routes using controllers
+  // Health check
   router.get('/health', (req, res) => {
     res.json({ status: 'ok', app: 'forum-core' });
   });
+
+  // Mount search routes if dataSource is provided
+  if (dataSource) {
+    try {
+      const searchRoutes = createSearchRoutes(dataSource);
+      router.use('/search', searchRoutes);
+    } catch (error) {
+      console.error('[forum-app] Failed to initialize search routes:', error);
+    }
+  }
 
   return router;
 }
