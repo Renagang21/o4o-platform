@@ -243,6 +243,17 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['platform-core'],
   },
+  {
+    appId: 'ecommerce-core',
+    name: 'E-commerce Core Engine',
+    version: '1.0.0',
+    description: '판매 원장(Source of Truth) - 주문/결제/판매유형 통합 관리',
+    category: 'commerce',
+    tags: ['ecommerce', '주문', 'order', 'payment', '결제', 'sales'],
+    type: 'core',
+    author: 'O4O Platform',
+    serviceGroups: ['platform-core'],
+  },
 
   // ============================================
   // Global Feature Apps (global)

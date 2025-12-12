@@ -99,6 +99,15 @@ export class ForumPost {
   @Column({ type: 'uuid', nullable: true })
   lastCommentBy?: string;
 
+  // Phase 15-A: Full-text Search columns
+  // These are auto-populated by database trigger
+  @Column({ type: 'text', nullable: true, select: false })
+  contentText?: string;
+
+  // Note: search_vector is managed by PostgreSQL trigger, not TypeORM
+  // It's a tsvector column that cannot be directly mapped in TypeORM
+  // Use raw SQL queries for full-text search operations
+
   @CreateDateColumn()
   createdAt!: Date;
 

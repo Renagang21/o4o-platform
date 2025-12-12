@@ -57,6 +57,18 @@ export class OrderRelayService {
   }
 
   /**
+   * E-commerce Order ID로 조회
+   * - E-commerce Core의 EcommerceOrder와 연결된 OrderRelay 목록 반환
+   */
+  async findByEcommerceOrderId(ecommerceOrderId: string): Promise<OrderRelay[]> {
+    return await this.orderRepository.find({
+      where: { ecommerceOrderId },
+      relations: ['listing', 'listing.seller', 'listing.offer'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
    * 주문 목록 조회
    */
   async findAll(filters?: {
