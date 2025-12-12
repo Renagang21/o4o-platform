@@ -98,7 +98,7 @@ export interface ProductFilterDto {
 export interface OfferDto {
   id: string;
   productId: string;
-  productMasterId: string;
+  productMasterId?: string;
   productName: string;
   productType: CoreProductType;
   supplierPrice: number;
@@ -147,7 +147,7 @@ export interface OrderRelayDto {
   id: string;
   orderId: string;
   orderNumber: string;
-  listingId: string;
+  listingId?: string;
   sellerId: string;
   sellerName: string;
   productName: string;
