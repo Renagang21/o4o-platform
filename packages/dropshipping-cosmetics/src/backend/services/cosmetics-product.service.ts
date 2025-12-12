@@ -1,12 +1,16 @@
 /**
  * CosmeticsProduct Service
  *
+ * Phase 9-C: Core v2 정렬
+ * - ProductType.COSMETICS 기반 필터링
+ * - isCosmeticsProduct 타입 가드 사용
+ *
  * Handles product detail with cosmetics metadata
  * Merges Dropshipping Core Product with Cosmetics-specific data
  */
 
 import { DataSource, Repository } from 'typeorm';
-import type { Product } from '../types/product.types.js';
+import { type Product, isCosmeticsProduct } from '../types/product.types.js';
 import { CosmeticsRoutine } from '../entities/cosmetics-routine.entity.js';
 
 export interface CosmeticsProductDetail {
@@ -51,9 +55,9 @@ export class CosmeticsProductService {
         return null;
       }
 
-      // Check if this is a cosmetics product
-      if (!product.metadata?.cosmetics_metadata) {
-        console.warn(`[CosmeticsProduct] Product ${productId} has no cosmetics metadata`);
+      // Check if this is a cosmetics product using Core v2 type guard
+      if (!isCosmeticsProduct(product)) {
+        console.warn(`[CosmeticsProduct] Product ${productId} is not a cosmetics product (productType != COSMETICS)`);
         // Still return the product, but with empty metadata
       }
 

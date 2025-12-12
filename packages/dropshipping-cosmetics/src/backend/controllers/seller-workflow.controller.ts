@@ -1,7 +1,12 @@
 /**
  * Seller Workflow Controller
  *
+ * Phase 9-C: Core v2 정렬
+ * - 화장품 오프라인 매장 상담 워크플로우
+ * - SellerOps 연동 준비
+ *
  * Handles HTTP requests for seller workflow (in-store consultation)
+ * API: /api/v1/cosmetics/seller-workflow/*
  */
 
 import { Request, Response } from 'express';
@@ -10,6 +15,7 @@ import {
   StartSessionDTO,
   UpdateSessionDTO,
 } from '../services/seller-workflow.service.js';
+import type { SellerWorkflowSessionDto } from '../dto/index.js';
 
 export class SellerWorkflowController {
   constructor(private workflowService: SellerWorkflowService) {}
