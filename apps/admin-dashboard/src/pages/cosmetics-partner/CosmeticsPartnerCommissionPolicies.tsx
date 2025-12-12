@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthClient } from '@o4o/auth-context';
+import { authClient } from '@o4o/auth-client';
 
 interface CommissionPolicy {
   id: string;
@@ -43,7 +43,7 @@ interface PolicyStatistics {
 }
 
 const CosmeticsPartnerCommissionPolicies: React.FC = () => {
-  const { api } = useAuthClient();
+  const api = authClient.api;
   const [policies, setPolicies] = useState<CommissionPolicy[]>([]);
   const [statistics, setStatistics] = useState<PolicyStatistics | null>(null);
   const [loading, setLoading] = useState(true);
