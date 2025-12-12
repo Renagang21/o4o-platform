@@ -14,3 +14,11 @@ export {
   type CompletePaymentDto,
   type RefundPaymentDto,
 } from './EcommercePaymentService.js';
+
+export {
+  EcommerceOrderQueryService,
+  type DailyOrderSummary,
+  type OrderTypeStats,
+  type SellerStats,
+  type OrderQueryFilters,
+} from './EcommerceOrderQueryService.js';
