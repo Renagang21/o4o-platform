@@ -63,6 +63,12 @@ import publicRoutes from './routes/public.routes.js';
 // User Role Routes
 import userRoleRoutes from './routes/user-role.routes.js';
 
+// Auth Routes
+import authRoutes from './routes/auth.js';
+
+// Admin Apps Routes
+import adminAppsRoutes from './routes/admin/apps.routes.js';
+
 // Service Template Registry (Phase 7)
 import { templateRegistry } from './service-templates/template-registry.js';
 
@@ -451,6 +457,14 @@ const startServer = async () => {
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);
     logger.info('✅ User Role routes registered at /api/v1/userRole');
+
+    // 10. Register Auth routes
+    app.use('/api/auth', authRoutes);
+    logger.info('✅ Auth routes registered at /api/auth');
+
+    // 11. Register Admin Apps routes
+    app.use('/api/admin/apps', adminAppsRoutes);
+    logger.info('✅ Admin Apps routes registered at /api/admin/apps');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
