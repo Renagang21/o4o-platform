@@ -61,6 +61,17 @@ export class PharmaOrder {
   offerId!: string;
 
   /**
+   * E-commerce Core 주문 ID (Phase 5)
+   *
+   * E-commerce Core의 EcommerceOrder와 연결됩니다.
+   * null인 경우 레거시 주문 또는 직접 API 호출 주문입니다.
+   *
+   * OrderType: 'b2b' (의약품 B2B 거래)
+   */
+  @Column({ type: 'uuid', nullable: true })
+  ecommerceOrderId?: string;
+
+  /**
    * 약국 ID (구매자)
    */
   @Index()
