@@ -19,7 +19,7 @@ import type {
   ForumPostAIMeta,
   NetureForumMeta,
   YaksaForumMeta,
-} from '@o4o-apps/forum';
+} from '../../types/forum.types.js';
 
 // =============================================================================
 // Configuration Types
