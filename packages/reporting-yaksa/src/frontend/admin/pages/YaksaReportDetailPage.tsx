@@ -10,6 +10,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { authClient } from '@o4o/auth-client';
 
+interface SubmissionResult {
+  success: boolean;
+  submittedAt?: string;
+  externalRefId?: string;
+  errorMessage?: string;
+  outputFiles?: Array<{
+    type: 'pdf' | 'json';
+    path: string;
+    size?: number;
+  }>;
+  retryCount?: number;
+  lastRetryAt?: string;
+}
+
 interface YaksaReport {
   id: string;
   memberId: string;
@@ -26,6 +40,9 @@ interface YaksaReport {
   reviewedAt?: string;
   approvedBy?: string;
   approvedAt?: string;
+  submittedBy?: string;
+  submittedAt?: string;
+  submissionResult?: SubmissionResult;
   createdAt: string;
   updatedAt: string;
   history?: Array<{
@@ -44,6 +61,7 @@ const STATUS_LABELS: Record<string, string> = {
   REVIEWED: '검토완료',
   APPROVED: '승인',
   REJECTED: '반려',
+  SUBMITTED: '제출완료',
 };
 
 const REPORT_TYPE_LABELS: Record<string, string> = {
@@ -59,6 +77,9 @@ const ACTION_LABELS: Record<string, string> = {
   REVIEWED: '검토',
   APPROVED: '승인',
   REJECTED: '반려',
+  SUBMITTED: '제출',
+  SUBMISSION_FAILED: '제출실패',
+  SUBMISSION_RETRY_FAILED: '재시도실패',
 };
 
 interface YaksaReportDetailPageProps {
@@ -161,6 +182,46 @@ export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps):
     }
   };
 
+  const handleSubmit = async () => {
+    if (!report) return;
+    if (!confirm('이 신고서를 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.')) return;
+
+    try {
+      setSaving(true);
+      const response = await authClient.api.post(`/api/v1/yaksa/reports/${reportId}/submit`, {});
+      await fetchReport();
+      if (response.success) {
+        alert('신고서가 성공적으로 제출되었습니다.');
+      } else {
+        alert(`제출 실패: ${response.error || '알 수 없는 오류'}`);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '제출 실패');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!report) return;
+    if (!confirm('제출을 재시도하시겠습니까?')) return;
+
+    try {
+      setSaving(true);
+      const response = await authClient.api.post(`/api/v1/yaksa/reports/${reportId}/retry`, {});
+      await fetchReport();
+      if (response.success) {
+        alert('재시도가 성공했습니다.');
+      } else {
+        alert(`재시도 실패: ${response.error || '알 수 없는 오류'}`);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '재시도 실패');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return <div className="loading">로딩 중...</div>;
   }
@@ -175,6 +236,9 @@ export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps):
 
   const canEdit = report.status === 'DRAFT' || report.status === 'REVIEWED';
   const canApproveOrReject = canEdit;
+  const canSubmit = report.status === 'APPROVED';
+  const canRetry = report.status === 'APPROVED' &&
+    report.submissionResult?.success === false;
 
   return (
     <div className="yaksa-report-detail-page">
@@ -299,6 +363,80 @@ export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps):
         </div>
       )}
 
+      {/* 제출 상태 섹션 (Phase 18-C) */}
+      {(report.status === 'APPROVED' || report.status === 'SUBMITTED') && (
+        <div className="section submission-section">
+          <h2>제출 상태</h2>
+          {report.status === 'SUBMITTED' ? (
+            <div className="submission-success">
+              <span className="status-icon">✓</span>
+              <div className="status-info">
+                <p><strong>제출 완료</strong></p>
+                {report.submissionResult?.externalRefId && (
+                  <p>외부 참조 ID: {report.submissionResult.externalRefId}</p>
+                )}
+                {report.submittedAt && (
+                  <p>제출일시: {new Date(report.submittedAt).toLocaleString('ko-KR')}</p>
+                )}
+                {report.submissionResult?.outputFiles && report.submissionResult.outputFiles.length > 0 && (
+                  <div className="output-files">
+                    <p>생성된 파일:</p>
+                    <ul>
+                      {report.submissionResult.outputFiles.map((file, idx) => (
+                        <li key={idx}>
+                          {file.type.toUpperCase()}: {file.path}
+                          {file.size && ` (${(file.size / 1024).toFixed(1)} KB)`}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : report.submissionResult?.success === false ? (
+            <div className="submission-failed">
+              <span className="status-icon">✗</span>
+              <div className="status-info">
+                <p><strong>제출 실패</strong></p>
+                {report.submissionResult.errorMessage && (
+                  <p className="error-text">오류: {report.submissionResult.errorMessage}</p>
+                )}
+                {report.submissionResult.retryCount && (
+                  <p>재시도 횟수: {report.submissionResult.retryCount}</p>
+                )}
+                {report.submissionResult.lastRetryAt && (
+                  <p>마지막 시도: {new Date(report.submissionResult.lastRetryAt).toLocaleString('ko-KR')}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="submission-pending">
+              <span className="status-icon">⏳</span>
+              <div className="status-info">
+                <p><strong>제출 대기 중</strong></p>
+                <p>승인된 신고서입니다. 제출 버튼을 클릭하여 외부 시스템에 제출하세요.</p>
+              </div>
+            </div>
+          )}
+
+          {/* 제출/재시도 버튼 */}
+          {(canSubmit || canRetry) && (
+            <div className="submission-actions">
+              {canSubmit && !report.submissionResult && (
+                <button onClick={handleSubmit} disabled={saving} className="btn btn-submit">
+                  신고서 제출
+                </button>
+              )}
+              {canRetry && (
+                <button onClick={handleRetry} disabled={saving} className="btn btn-retry">
+                  재시도
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {report.history && report.history.length > 0 && (
         <div className="section">
           <h2>변경 이력</h2>
@@ -385,6 +523,7 @@ export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps):
         .badge-reviewed { background: #e3f2fd; color: #1976d2; }
         .badge-approved { background: #e8f5e9; color: #388e3c; }
         .badge-rejected { background: #ffebee; color: #c62828; }
+        .badge-submitted { background: #e1f5fe; color: #0288d1; }
         .section {
           margin-bottom: 24px;
         }
@@ -469,6 +608,76 @@ export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps):
         .history-table th {
           background: #f9f9f9;
           font-weight: 600;
+        }
+        /* Submission section styles (Phase 18-C) */
+        .submission-section {
+          background: #f8f9fa;
+          padding: 16px;
+          border-radius: 8px;
+        }
+        .submission-success,
+        .submission-failed,
+        .submission-pending {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .status-icon {
+          font-size: 24px;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+        }
+        .submission-success .status-icon {
+          background: #e8f5e9;
+          color: #388e3c;
+        }
+        .submission-failed .status-icon {
+          background: #ffebee;
+          color: #c62828;
+        }
+        .submission-pending .status-icon {
+          background: #fff3e0;
+          color: #f57c00;
+        }
+        .status-info p {
+          margin: 4px 0;
+        }
+        .error-text {
+          color: #c62828;
+        }
+        .output-files {
+          margin-top: 8px;
+        }
+        .output-files ul {
+          margin: 4px 0;
+          padding-left: 20px;
+        }
+        .output-files li {
+          font-size: 12px;
+          color: #666;
+        }
+        .submission-actions {
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid #ddd;
+        }
+        .btn-submit {
+          background: #0288d1;
+          color: white;
+        }
+        .btn-submit:hover:not(:disabled) {
+          background: #0277bd;
+        }
+        .btn-retry {
+          background: #f57c00;
+          color: white;
+        }
+        .btn-retry:hover:not(:disabled) {
+          background: #ef6c00;
         }
       `}</style>
     </div>

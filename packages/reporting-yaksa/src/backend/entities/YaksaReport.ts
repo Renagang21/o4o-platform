@@ -17,7 +17,24 @@ export type YaksaReportType = 'PROFILE_UPDATE' | 'LICENSE_CHANGE' | 'WORKPLACE_C
 /**
  * 신고서 상태
  */
-export type YaksaReportStatus = 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'REJECTED';
+export type YaksaReportStatus = 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'REJECTED' | 'SUBMITTED';
+
+/**
+ * 제출 결과
+ */
+export interface YaksaSubmissionResult {
+  success: boolean;
+  submittedAt?: Date;
+  externalRefId?: string;
+  errorMessage?: string;
+  outputFiles?: Array<{
+    type: 'pdf' | 'json';
+    path: string;
+    size?: number;
+  }>;
+  retryCount?: number;
+  lastRetryAt?: Date;
+}
 
 /**
  * YaksaReport Entity
@@ -170,6 +187,26 @@ export class YaksaReport {
   approvedAt?: Date;
 
   /**
+   * 제출자 ID
+   */
+  @Column({ type: 'uuid', nullable: true })
+  submittedBy?: string;
+
+  /**
+   * 제출일시
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  submittedAt?: Date;
+
+  /**
+   * 제출 결과 (JSON)
+   *
+   * 외부 시스템 제출 결과 정보
+   */
+  @Column({ type: 'jsonb', nullable: true })
+  submissionResult?: YaksaSubmissionResult;
+
+  /**
    * 생성일시
    */
   @CreateDateColumn()
@@ -210,5 +247,20 @@ export class YaksaReport {
    */
   canEdit(): boolean {
     return this.status === 'DRAFT' || this.status === 'REVIEWED';
+  }
+
+  /**
+   * 제출 가능 여부 확인
+   */
+  canSubmit(): boolean {
+    return this.status === 'APPROVED';
+  }
+
+  /**
+   * 재시도 가능 여부 확인
+   */
+  canRetrySubmission(): boolean {
+    return this.status === 'APPROVED' &&
+           this.submissionResult?.success === false;
   }
 }

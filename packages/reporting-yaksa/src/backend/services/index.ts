@@ -29,3 +29,18 @@ export type {
   ListReportsResult,
   Actor,
 } from './YaksaReportService.js';
+
+// 신고서 제출 서비스 (Phase 18-C)
+export {
+  initYaksaReportSubmissionService,
+  getSubmissionProvider,
+  setSubmissionProvider,
+  submitApprovedReport,
+  retrySubmission,
+  getSubmissionStatus,
+  getSubmissionStats,
+} from './YaksaReportSubmissionService.js';
+export type { SubmissionActor, SubmissionResponse } from './YaksaReportSubmissionService.js';
+
+// 제출 프로바이더
+export * from './providers/index.js';

@@ -91,5 +91,38 @@ export function createYaksaReportRoutes(): Router {
     yaksaReportController.rejectReport(req, res, next)
   );
 
+  // ============================================
+  // Submission Endpoints (Phase 18-C)
+  // ============================================
+
+  /**
+   * POST /api/v1/yaksa/reports/:id/submit
+   * 승인된 신고서 제출
+   *
+   * Body:
+   * - outputDir: string (선택, 출력 디렉토리)
+   * - generatePdf: boolean (선택, PDF 생성 여부)
+   * - generateJson: boolean (선택, JSON 생성 여부)
+   */
+  router.post('/:id/submit', (req, res, next) =>
+    yaksaReportController.submitReport(req, res, next)
+  );
+
+  /**
+   * POST /api/v1/yaksa/reports/:id/retry
+   * 실패한 제출 재시도
+   */
+  router.post('/:id/retry', (req, res, next) =>
+    yaksaReportController.retrySubmission(req, res, next)
+  );
+
+  /**
+   * GET /api/v1/yaksa/reports/:id/submission
+   * 제출 상태 조회
+   */
+  router.get('/:id/submission', (req, res, next) =>
+    yaksaReportController.getSubmissionStatus(req, res, next)
+  );
+
   return router;
 }

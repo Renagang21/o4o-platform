@@ -160,6 +160,9 @@ async function createRpaTables(dataSource: DataSource): Promise<void> {
       reviewed_at TIMESTAMP,
       approved_by UUID,
       approved_at TIMESTAMP,
+      submitted_by UUID,
+      submitted_at TIMESTAMP,
+      submission_result JSONB,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -173,7 +176,7 @@ async function createRpaTables(dataSource: DataSource): Promise<void> {
     CREATE TABLE IF NOT EXISTS yaksa_rpa_report_history (
       id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
       report_id UUID NOT NULL REFERENCES yaksa_rpa_reports(id) ON DELETE CASCADE,
-      action VARCHAR(20) NOT NULL,
+      action VARCHAR(30) NOT NULL,
       previous_status VARCHAR(20),
       new_status VARCHAR(20),
       actor_id UUID,
