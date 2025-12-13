@@ -26,6 +26,9 @@ const GroupbuyDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyDetailPag
 const MyCoursesPage = lazy(() => import('@/pages/lms/MyCoursesPage'));
 const CourseDetailPage = lazy(() => import('@/pages/lms/CourseDetailPage'));
 const LessonPage = lazy(() => import('@/pages/lms/LessonPage'));
+const BundleViewerPage = lazy(() =>
+  import('@/pages/lms/bundle/BundleViewerPage').then((m) => ({ default: m.BundleViewerPage }))
+);
 
 // Member Portal
 const MemberHome = lazy(() =>
@@ -118,6 +121,8 @@ export function AppRouter() {
                       </RequireAuth>
                     }
                   />
+                  {/* LMS ContentBundle Viewer */}
+                  <Route path="/lms/bundle/:bundleId" element={<BundleViewerPage />} />
 
                   {/* 회원 포털 (Member Portal) */}
                   <Route
