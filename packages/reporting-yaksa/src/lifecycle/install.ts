@@ -20,6 +20,7 @@ export async function install(context: InstallContext): Promise<void> {
 
   try {
     await createTables(dataSource);
+    await createRpaTables(dataSource);
     await createIndexes(dataSource);
     await seedDefaultTemplate(dataSource);
 
@@ -29,6 +30,7 @@ export async function install(context: InstallContext): Promise<void> {
     console.log('  - Report field templates');
     console.log('  - Report assignment workflow');
     console.log('  - Audit logging');
+    console.log('  - RPA-triggered reports (forum-yaksa integration)');
   } catch (error) {
     console.error('[reporting-yaksa] Installation failed:', error);
     throw error;
@@ -135,6 +137,59 @@ async function createTables(dataSource: DataSource): Promise<void> {
 }
 
 /**
+ * Create RPA-triggered report tables (forum-yaksa integration)
+ */
+async function createRpaTables(dataSource: DataSource): Promise<void> {
+  // ============================================
+  // 5. yaksa_rpa_reports table (forum-yaksa RPA 연동)
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS yaksa_rpa_reports (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      member_id UUID NOT NULL,
+      report_type VARCHAR(30) NOT NULL,
+      source_post_id UUID NOT NULL,
+      status VARCHAR(20) DEFAULT 'DRAFT',
+      payload JSONB NOT NULL,
+      confidence DECIMAL(5,4) DEFAULT 0,
+      trigger_snapshot JSONB,
+      member_snapshot JSONB,
+      operator_notes TEXT,
+      rejection_reason TEXT,
+      reviewed_by UUID,
+      reviewed_at TIMESTAMP,
+      approved_by UUID,
+      approved_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[reporting-yaksa] Created yaksa_rpa_reports table');
+
+  // ============================================
+  // 6. yaksa_rpa_report_history table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS yaksa_rpa_report_history (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      report_id UUID NOT NULL REFERENCES yaksa_rpa_reports(id) ON DELETE CASCADE,
+      action VARCHAR(20) NOT NULL,
+      previous_status VARCHAR(20),
+      new_status VARCHAR(20),
+      actor_id UUID,
+      actor_name VARCHAR(100),
+      actor_role VARCHAR(50),
+      details JSONB,
+      previous_payload JSONB,
+      new_payload JSONB,
+      ip_address VARCHAR(45),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[reporting-yaksa] Created yaksa_rpa_report_history table');
+}
+
+/**
  * Create indexes for Reporting-Yaksa tables
  */
 async function createIndexes(dataSource: DataSource): Promise<void> {
@@ -163,6 +218,18 @@ async function createIndexes(dataSource: DataSource): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_yaksa_assign_to ON yaksa_report_assignments(assigned_to);
     CREATE INDEX IF NOT EXISTS idx_yaksa_assign_status ON yaksa_report_assignments(status);
     CREATE INDEX IF NOT EXISTS idx_yaksa_assign_role ON yaksa_report_assignments(role);
+
+    -- yaksa_rpa_reports indexes
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_member ON yaksa_rpa_reports(member_id);
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_status ON yaksa_rpa_reports(status);
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_type ON yaksa_rpa_reports(report_type);
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_source ON yaksa_rpa_reports(source_post_id);
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_created ON yaksa_rpa_reports(created_at);
+
+    -- yaksa_rpa_report_history indexes
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_hist_report ON yaksa_rpa_report_history(report_id);
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_hist_actor ON yaksa_rpa_report_history(actor_id);
+    CREATE INDEX IF NOT EXISTS idx_yaksa_rpa_hist_action ON yaksa_rpa_report_history(action);
   `);
 
   console.log('[reporting-yaksa] Indexes created successfully');
