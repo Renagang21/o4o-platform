@@ -13,7 +13,7 @@
 
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
-import type { ForumPost } from '../../../../packages/forum-app/src/backend/entities/ForumPost.js';
+import { ForumPost } from '@o4o-apps/forum';
 import type { Block } from '@o4o/types';
 
 // =============================================================================
@@ -218,16 +218,16 @@ class RuleBasedProvider implements AIProvider {
 
 class ForumAIService {
   private provider: AIProvider;
-  private postRepository: Repository<any> | null = null;
+  private postRepository: Repository<ForumPost> | null = null;
 
   constructor(provider?: AIProvider) {
     // Default to rule-based provider
     this.provider = provider || new RuleBasedProvider();
   }
 
-  private getPostRepository(): Repository<any> {
+  private getPostRepository(): Repository<ForumPost> {
     if (!this.postRepository || !AppDataSource.isInitialized) {
-      this.postRepository = AppDataSource.getRepository('ForumPost');
+      this.postRepository = AppDataSource.getRepository(ForumPost);
     }
     return this.postRepository;
   }
