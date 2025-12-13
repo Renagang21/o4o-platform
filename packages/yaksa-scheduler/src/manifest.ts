@@ -22,9 +22,7 @@ export const yaksaSchedulerManifest = {
   description: 'Central scheduler infrastructure for Yaksa service automation',
 
   // ===== 의존성 =====
-  dependencies: {
-    core: ['organization-core'],
-  },
+  dependencies: {},
 
   // ===== 소유 테이블 =====
   ownsTables: [
