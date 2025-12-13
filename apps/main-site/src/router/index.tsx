@@ -27,6 +27,11 @@ const MyCoursesPage = lazy(() => import('@/pages/lms/MyCoursesPage'));
 const CourseDetailPage = lazy(() => import('@/pages/lms/CourseDetailPage'));
 const LessonPage = lazy(() => import('@/pages/lms/LessonPage'));
 
+// Member Portal
+const MemberHome = lazy(() =>
+  import('@/pages/member/MemberHome').then((m) => ({ default: m.MemberHome }))
+);
+
 // LMS Member (Yaksa) pages
 const LmsMemberDashboard = lazy(() =>
   import('@/pages/member/lms/LmsMemberDashboard').then((m) => ({ default: m.LmsMemberDashboard }))
@@ -107,6 +112,16 @@ export function AppRouter() {
                     element={
                       <RequireAuth>
                         <LessonPage />
+                      </RequireAuth>
+                    }
+                  />
+
+                  {/* 회원 포털 (Member Portal) */}
+                  <Route
+                    path="/member"
+                    element={
+                      <RequireAuth>
+                        <MemberHome />
                       </RequireAuth>
                     }
                   />
