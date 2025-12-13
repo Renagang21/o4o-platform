@@ -16,6 +16,13 @@ export type { ReportLogAction } from './ReportLog.js';
 export { ReportAssignment } from './ReportAssignment.js';
 export type { AssignmentRole, AssignmentStatus } from './ReportAssignment.js';
 
+// RPA 기반 신고서 (forum-yaksa 연동)
+export { YaksaReport } from './YaksaReport.js';
+export type { YaksaReportType, YaksaReportStatus } from './YaksaReport.js';
+
+export { YaksaReportHistory } from './YaksaReportHistory.js';
+export type { YaksaReportAction } from './YaksaReportHistory.js';
+
 /**
  * 모든 엔티티 배열 (TypeORM 등록용)
  */
