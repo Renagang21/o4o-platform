@@ -245,6 +245,7 @@ class PassportManager {
   }
 
   private static configureGoogleStrategy(config: OAuthConfig): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.use(new GoogleStrategy({
       clientID: config.clientId,
       clientSecret: config.clientSecret,
@@ -268,7 +269,7 @@ class PassportManager {
       } catch (error: any) {
         done(error as Error, undefined);
       }
-    }));
+    }) as any);
 
     this.activeStrategies.add('google');
   }
