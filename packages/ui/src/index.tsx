@@ -583,3 +583,16 @@ export const Progress = React.forwardRef<
   </div>
 ));
 Progress.displayName = 'Progress';
+
+// ===========================================================================
+// Phase 7-A: Antigravity Design System Components
+// ===========================================================================
+
+// AG Components
+export * from './ag-components';
+
+// Layout Components
+export * from './layout';
+
+// Theme Tokens
+export * from './theme';
