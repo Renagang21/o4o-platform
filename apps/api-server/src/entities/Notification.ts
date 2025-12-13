@@ -29,6 +29,14 @@ export type NotificationType =
   | 'stock.low'
   | 'role.approved'
   | 'role.application_submitted'
+  // Phase 20-B: Member notification types
+  | 'member.license_expiring'
+  | 'member.license_expired'
+  | 'member.verification_expired'
+  | 'member.fee_overdue_warning'
+  | 'member.fee_overdue'
+  | 'member.report_rejected'
+  | 'member.education_deadline'
   | 'custom';
 
 // Legacy interface for backward compatibility
