@@ -126,15 +126,10 @@ export class AppTableOwnershipResolver {
         });
       }
 
-      // Table must exist in database (for extension apps only)
-      // Core apps can declare tables they will create during install
-      if (type === 'extension' && !dbTables.includes(tableName)) {
-        violations.push({
-          type: 'table',
-          resourceName: tableName,
-          reason: `Table '${tableName}' does not exist in database`,
-        });
-      }
+      // Extension apps CAN create their own tables during install
+      // They just cannot claim ownership of CORE tables
+      // Note: Table existence check is only relevant during uninstall/purge
+      // During install, new tables will be created by the lifecycle install script
     }
 
     // 2. Validate CPT ownership
