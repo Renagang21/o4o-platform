@@ -57,21 +57,6 @@ export interface CreateMemberNotificationDto {
 }
 
 /**
- * Email data for member notifications
- */
-export interface MemberNotificationEmailData {
-  to: string;
-  memberName: string;
-  type: MemberNotificationType;
-  title: string;
-  message: string;
-  actionUrl?: string;
-  dueDate?: string;
-  amount?: number;
-  metadata?: Record<string, any>;
-}
-
-/**
  * Notification result
  */
 export interface NotificationResult {
@@ -103,15 +88,11 @@ export class NotificationService {
 
   constructor(dataSource: DataSource) {
     this.dataSource = dataSource;
-    // Clean up old dedupe entries periodically
     this.startDedupeCleanup();
   }
 
   /**
    * Send a member notification
-   *
-   * @param dto - Notification data
-   * @returns Result with success status
    */
   async send(dto: CreateMemberNotificationDto): Promise<NotificationResult> {
     const channel = dto.channel || 'both';
@@ -128,7 +109,6 @@ export class NotificationService {
           skipReason: 'Duplicate notification within window',
         };
       }
-      // Record this notification
       this.recordNotification(dto.dedupeKey);
     }
 
@@ -153,7 +133,6 @@ export class NotificationService {
       }
     }
 
-    // Log notification
     console.log('[MemberNotification]', {
       type: dto.type,
       userId: dto.userId,
@@ -178,7 +157,6 @@ export class NotificationService {
    */
   private async createInAppNotification(dto: CreateMemberNotificationDto): Promise<string | undefined> {
     try {
-      // Use raw query to insert into notifications table
       const result = await this.dataSource.query(
         `INSERT INTO notifications (id, "userId", type, title, message, metadata, channel, "isRead", "createdAt")
          VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, 'in_app', false, NOW())
@@ -204,35 +182,23 @@ export class NotificationService {
 
   /**
    * Send email notification
-   * Uses api-server's EmailService via dynamic import
    */
   private async sendEmailNotification(dto: CreateMemberNotificationDto): Promise<boolean> {
     try {
-      // Get member's email from metadata or query
       const email = dto.metadata?.email;
       if (!email) {
         console.log('[MemberNotification] No email address, skipping email');
         return false;
       }
 
-      const memberName = dto.metadata?.memberName || '회원';
-
-      // Send email via raw query to avoid circular dependencies
-      // The email will be sent by a background job or directly via EmailService
-      // For now, we'll create a notification entry that triggers email sending
-
-      // Create email content based on notification type
       const emailContent = this.generateEmailContent(dto);
 
-      // Log email intent (actual sending happens via EmailService in api-server)
       console.log('[MemberNotification] Email queued:', {
         to: email,
         subject: emailContent.subject,
         type: dto.type,
       });
 
-      // In production, this would call the email service API
-      // For Phase 20-B, we store email intent in metadata
       await this.dataSource.query(
         `INSERT INTO notifications (id, "userId", type, title, message, metadata, channel, "isRead", "createdAt")
          VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, 'email', false, NOW())
@@ -272,114 +238,31 @@ export class NotificationService {
     const templates: Record<MemberNotificationType, { subject: string; body: string }> = {
       'member.license_expiring': {
         subject: `[Neture] 면허 만료 예정 안내`,
-        body: `
-안녕하세요, ${memberName}님.
-
-회원님의 면허가 ${dto.metadata?.daysUntilExpiry || ''}일 후 만료 예정입니다.
-
-면허 갱신 절차를 진행해 주세요.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n회원님의 면허가 ${dto.metadata?.daysUntilExpiry || ''}일 후 만료 예정입니다.\n\n면허 갱신 절차를 진행해 주세요.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
       'member.license_expired': {
         subject: `[Neture] 면허 만료 알림`,
-        body: `
-안녕하세요, ${memberName}님.
-
-회원님의 면허가 만료되었습니다.
-
-자격 유지를 위해 면허 갱신을 진행해 주세요.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n회원님의 면허가 만료되었습니다.\n\n자격 유지를 위해 면허 갱신을 진행해 주세요.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
       'member.verification_expired': {
         subject: `[Neture] 자격 검증 만료 안내`,
-        body: `
-안녕하세요, ${memberName}님.
-
-회원님의 자격 검증이 만료되었습니다.
-
-재검증을 위해 회원 포털에서 자격 검증을 다시 진행해 주세요.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n회원님의 자격 검증이 만료되었습니다.\n\n재검증을 위해 회원 포털에서 자격 검증을 다시 진행해 주세요.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
       'member.fee_overdue_warning': {
         subject: `[Neture] 연회비 납부 예정 안내`,
-        body: `
-안녕하세요, ${memberName}님.
-
-${dto.metadata?.year || new Date().getFullYear()}년도 연회비 납부 기한이 ${dto.metadata?.daysUntilDue || ''}일 후입니다.
-
-금액: ${(dto.metadata?.amount || 0).toLocaleString()}원
-
-기한 내 납부 부탁드립니다.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n${dto.metadata?.year || new Date().getFullYear()}년도 연회비 납부 기한이 ${dto.metadata?.daysUntilDue || ''}일 후입니다.\n\n금액: ${(dto.metadata?.amount || 0).toLocaleString()}원\n\n기한 내 납부 부탁드립니다.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
       'member.fee_overdue': {
         subject: `[Neture] 연회비 연체 안내`,
-        body: `
-안녕하세요, ${memberName}님.
-
-${dto.metadata?.year || new Date().getFullYear()}년도 연회비가 연체되었습니다.
-
-금액: ${(dto.metadata?.amount || 0).toLocaleString()}원
-
-빠른 시일 내 납부 부탁드립니다.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n${dto.metadata?.year || new Date().getFullYear()}년도 연회비가 연체되었습니다.\n\n금액: ${(dto.metadata?.amount || 0).toLocaleString()}원\n\n빠른 시일 내 납부 부탁드립니다.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
       'member.report_rejected': {
         subject: `[Neture] 신고서 반려 안내`,
-        body: `
-안녕하세요, ${memberName}님.
-
-제출하신 신고서가 반려되었습니다.
-
-반려 사유: ${dto.metadata?.rejectReason || '담당자에게 문의해 주세요.'}
-
-수정 후 재제출해 주세요.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n제출하신 신고서가 반려되었습니다.\n\n반려 사유: ${dto.metadata?.rejectReason || '담당자에게 문의해 주세요.'}\n\n수정 후 재제출해 주세요.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
       'member.education_deadline': {
         subject: `[Neture] 필수 교육 마감 임박 안내`,
-        body: `
-안녕하세요, ${memberName}님.
-
-필수 교육 "${dto.metadata?.courseName || ''}"의 마감 기한이 ${dto.metadata?.daysUntilDeadline || ''}일 후입니다.
-
-기한 내 이수를 완료해 주세요.
-
-▶ 회원 포털 바로가기: ${portalUrl}/member
-
-감사합니다.
-Neture Platform
-        `.trim(),
+        body: `안녕하세요, ${memberName}님.\n\n필수 교육 "${dto.metadata?.courseName || ''}"의 마감 기한이 ${dto.metadata?.daysUntilDeadline || ''}일 후입니다.\n\n기한 내 이수를 완료해 주세요.\n\n▶ 회원 포털 바로가기: ${portalUrl}/member\n\n감사합니다.\nNeture Platform`,
       },
     };
 
@@ -393,9 +276,6 @@ Neture Platform
   // Convenience Methods for Specific Events
   // ============================================
 
-  /**
-   * Send license expiring notification
-   */
   async sendLicenseExpiringNotification(
     memberId: string,
     userId: string,
@@ -412,18 +292,12 @@ Neture Platform
       message: `면허가 ${daysUntilExpiry}일 후 만료 예정입니다. 갱신을 준비해 주세요.`,
       priority,
       channel: 'both',
-      metadata: {
-        ...metadata,
-        daysUntilExpiry,
-      },
+      metadata: { ...metadata, daysUntilExpiry },
       dedupeKey: `license_expiring:${memberId}:${daysUntilExpiry <= 7 ? '7' : '30'}`,
-      dedupeWindowHours: daysUntilExpiry <= 7 ? 24 : 168, // 1 day for T-7, 7 days for T-30
+      dedupeWindowHours: daysUntilExpiry <= 7 ? 24 : 168,
     });
   }
 
-  /**
-   * Send verification expired notification
-   */
   async sendVerificationExpiredNotification(
     memberId: string,
     userId: string,
@@ -439,13 +313,10 @@ Neture Platform
       channel: 'both',
       metadata,
       dedupeKey: `verification_expired:${memberId}`,
-      dedupeWindowHours: 168, // 7 days
+      dedupeWindowHours: 168,
     });
   }
 
-  /**
-   * Send fee overdue warning notification
-   */
   async sendFeeOverdueWarningNotification(
     memberId: string,
     userId: string,
@@ -462,20 +333,12 @@ Neture Platform
       message: `${year}년도 연회비(${amount.toLocaleString()}원) 납부 기한이 ${daysUntilDue}일 후입니다.`,
       priority: 'normal',
       channel: 'both',
-      metadata: {
-        ...metadata,
-        year,
-        amount,
-        daysUntilDue,
-      },
+      metadata: { ...metadata, year, amount, daysUntilDue },
       dedupeKey: `fee_warning:${memberId}:${year}`,
-      dedupeWindowHours: 168, // 7 days
+      dedupeWindowHours: 168,
     });
   }
 
-  /**
-   * Send fee overdue notification
-   */
   async sendFeeOverdueNotification(
     memberId: string,
     userId: string,
@@ -491,19 +354,12 @@ Neture Platform
       message: `${year}년도 연회비(${amount.toLocaleString()}원)가 연체되었습니다.`,
       priority: 'high',
       channel: 'both',
-      metadata: {
-        ...metadata,
-        year,
-        amount,
-      },
+      metadata: { ...metadata, year, amount },
       dedupeKey: `fee_overdue:${memberId}:${year}`,
-      dedupeWindowHours: 168, // 7 days
+      dedupeWindowHours: 168,
     });
   }
 
-  /**
-   * Send report rejected notification
-   */
   async sendReportRejectedNotification(
     memberId: string,
     userId: string,
@@ -519,19 +375,12 @@ Neture Platform
       message: `신고서가 반려되었습니다. ${rejectReason ? `사유: ${rejectReason}` : ''}`,
       priority: 'high',
       channel: 'both',
-      metadata: {
-        ...metadata,
-        reportId,
-        rejectReason,
-      },
+      metadata: { ...metadata, reportId, rejectReason },
       dedupeKey: `report_rejected:${reportId}`,
       dedupeWindowHours: 24,
     });
   }
 
-  /**
-   * Send education deadline notification
-   */
   async sendEducationDeadlineNotification(
     memberId: string,
     userId: string,
@@ -549,11 +398,7 @@ Neture Platform
       message: `"${courseName}" 교육 마감이 ${daysUntilDeadline}일 후입니다.`,
       priority,
       channel: 'both',
-      metadata: {
-        ...metadata,
-        courseName,
-        daysUntilDeadline,
-      },
+      metadata: { ...metadata, courseName, daysUntilDeadline },
       dedupeKey: `education_deadline:${memberId}:${metadata?.courseId || courseName}:${daysUntilDeadline <= 3 ? '3' : '14'}`,
       dedupeWindowHours: daysUntilDeadline <= 3 ? 24 : 168,
     });
@@ -563,34 +408,18 @@ Neture Platform
   // Legacy Methods (backward compatibility)
   // ============================================
 
-  /**
-   * @deprecated Use sendVerificationApprovedNotification instead
-   */
   async sendVerificationApproved(memberId: string, detail?: any): Promise<void> {
     console.log('[Notification] Verification approved:', { memberId, detail });
   }
 
-  /**
-   * @deprecated Use sendVerificationExpiredNotification instead
-   */
-  async sendVerificationRejected(
-    memberId: string,
-    reason: string,
-    detail?: any
-  ): Promise<void> {
+  async sendVerificationRejected(memberId: string, reason: string, detail?: any): Promise<void> {
     console.log('[Notification] Verification rejected:', { memberId, reason, detail });
   }
 
-  /**
-   * @deprecated Use sendFeeOverdueWarningNotification instead
-   */
   async sendFeeReminder(memberId: string, year: number, amount: number): Promise<void> {
     console.log('[Notification] Fee reminder:', { memberId, year, amount });
   }
 
-  /**
-   * @deprecated Use send() instead
-   */
   async sendGeneral(memberId: string, message: string, detail?: any): Promise<void> {
     console.log('[Notification] General:', { memberId, message, detail });
   }
@@ -599,9 +428,6 @@ Neture Platform
   // Deduplication Helpers
   // ============================================
 
-  /**
-   * Check if a notification is a duplicate within the window
-   */
   private isDuplicate(key: string, windowHours: number): boolean {
     const entry = this.dedupeCache.get(key);
     if (!entry) return false;
@@ -613,24 +439,14 @@ Neture Platform
     return now - entryTime < windowMs;
   }
 
-  /**
-   * Record a notification for deduplication
-   */
   private recordNotification(key: string): void {
-    this.dedupeCache.set(key, {
-      key,
-      timestamp: new Date(),
-    });
+    this.dedupeCache.set(key, { key, timestamp: new Date() });
   }
 
-  /**
-   * Start periodic cleanup of old dedupe entries
-   */
   private startDedupeCleanup(): void {
-    // Clean up every hour
     setInterval(() => {
       const now = new Date().getTime();
-      const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+      const maxAge = 7 * 24 * 60 * 60 * 1000;
 
       for (const [key, entry] of this.dedupeCache.entries()) {
         if (now - entry.timestamp.getTime() > maxAge) {
@@ -638,12 +454,5 @@ Neture Platform
         }
       }
     }, 60 * 60 * 1000);
-  }
-
-  /**
-   * Generate unique ID
-   */
-  private generateId(): string {
-    return `notif_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 }
