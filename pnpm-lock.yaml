@@ -2140,9 +2140,12 @@ importers:
 
   packages/partnerops:
     dependencies:
-      '@o4o/dropshipping-core':
+      '@o4o/partner-core':
         specifier: workspace:*
-        version: link:../dropshipping-core
+        version: link:../partner-core
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       express:
         specifier: ^4.18.0
@@ -2150,8 +2153,11 @@ importers:
       rimraf:
         specifier: ^5.0.0
         version: 5.0.10
+      tsup:
+        specifier: ^8.5.0
+        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
       typeorm:
-        specifier: ^0.3.0
+        specifier: ^0.3.20
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.9.2))
       typescript:
         specifier: ^5.0.0
@@ -17411,7 +17417,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.2.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.1(@types/node@24.2.1)(typescript@5.4.5))(terser@5.43.1)
+      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.2(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.0)
 
   '@vitest/utils@3.2.4':
     dependencies:
