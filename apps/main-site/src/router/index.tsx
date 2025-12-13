@@ -31,6 +31,9 @@ const LessonPage = lazy(() => import('@/pages/lms/LessonPage'));
 const MemberHome = lazy(() =>
   import('@/pages/member/MemberHome').then((m) => ({ default: m.MemberHome }))
 );
+const MemberNotifications = lazy(() =>
+  import('@/pages/member/MemberNotifications').then((m) => ({ default: m.MemberNotifications }))
+);
 
 // LMS Member (Yaksa) pages
 const LmsMemberDashboard = lazy(() =>
@@ -122,6 +125,14 @@ export function AppRouter() {
                     element={
                       <RequireAuth>
                         <MemberHome />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/member/notifications"
+                    element={
+                      <RequireAuth>
+                        <MemberNotifications />
                       </RequireAuth>
                     }
                   />
