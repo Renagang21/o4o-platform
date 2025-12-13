@@ -14,6 +14,7 @@ import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
 import { manifest as cmsCoreManifest } from '@o4o-apps/cms-core';
 import { manifest as lmsYaksaManifest } from '@o4o/lms-yaksa';
 import { manifest as yaksaSchedulerManifest } from '@o4o/yaksa-scheduler';
+import { manifest as lmsMarketingManifest } from '@o4o-extensions/lms-marketing';
 
 /**
  * App Manifest Registry
@@ -49,6 +50,8 @@ const manifestRegistry: Record<string, AppManifest> = {
   partnerops: partneropsManifest as any,
   // CMS
   'cms-core': cmsCoreManifest as any,
+  // Marketing
+  'lms-marketing': lmsMarketingManifest as any,
 };
 
 /**
