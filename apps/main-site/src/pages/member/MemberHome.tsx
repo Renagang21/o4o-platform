@@ -262,6 +262,12 @@ export function MemberHome() {
         </div>
       </div>
 
+      {/* Phase 20-C: Notification Summary Banner */}
+      <NotificationSummaryBanner
+        unreadCount={unreadCount}
+        notifications={notifications}
+      />
+
       {/* Alert Banner - 긴급 알림 */}
       <AlertBanner data={data} />
 
@@ -308,6 +314,53 @@ export function MemberHome() {
         {activeTab === 'reports' && <ReportsTab data={data.report} />}
         {activeTab === 'fees' && <FeesTab data={data.fee} />}
         {activeTab === 'education' && <EducationTab data={data.education} />}
+      </div>
+    </div>
+  );
+}
+
+// ===== Phase 20-C: Notification Summary Banner =====
+function NotificationSummaryBanner({
+  unreadCount,
+  notifications,
+}: {
+  unreadCount: number;
+  notifications: MemberNotification[];
+}) {
+  if (unreadCount === 0) return null;
+
+  // Get high priority notifications
+  const highPriorityCount = notifications.filter(
+    n => !n.isRead && (n.metadata?.priority === 'high' || n.metadata?.priority === 'critical')
+  ).length;
+
+  return (
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
+      <div className="max-w-4xl mx-auto px-4 py-3">
+        <Link
+          to="/member/notifications"
+          className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <div>
+              <p className="font-medium text-gray-900">
+                처리 필요 알림 {unreadCount}건
+              </p>
+              {highPriorityCount > 0 && (
+                <p className="text-sm text-red-600">
+                  긴급 {highPriorityCount}건 포함
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-blue-600">
+            <span className="text-sm font-medium">확인하기</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </Link>
       </div>
     </div>
   );
@@ -1005,6 +1058,17 @@ function transformEducationData(response: any): EducationSummary | null {
   };
 }
 
+// Phase 20-C: Deep link mapping
+const NOTIFICATION_DEEP_LINKS: Record<string, string> = {
+  'member.license_expiring': '/member/profile',
+  'member.license_expired': '/member/profile',
+  'member.verification_expired': '/member/profile',
+  'member.fee_overdue_warning': '/member/fees',
+  'member.fee_overdue': '/member/fees',
+  'member.report_rejected': '/member/reports',
+  'member.education_deadline': '/member/lms/required-courses',
+};
+
 // ===== Phase 20-B: Notification Panel =====
 function NotificationPanel({
   notifications,
@@ -1017,6 +1081,23 @@ function NotificationPanel({
   onMarkAsRead: (id: string) => void;
   onMarkAllAsRead: () => void;
 }) {
+  // Get deep link for notification
+  const getDeepLink = (notification: MemberNotification): string => {
+    let targetPath = NOTIFICATION_DEEP_LINKS[notification.type] || '/member';
+
+    // Special handling for report_rejected with reportId
+    if (notification.type === 'member.report_rejected' && notification.metadata?.reportId) {
+      targetPath = `/member/reports/${notification.metadata.reportId}`;
+    }
+
+    // Special handling for education_deadline with courseId
+    if (notification.type === 'member.education_deadline' && notification.metadata?.courseId) {
+      targetPath = `/member/lms/course/${notification.metadata.courseId}`;
+    }
+
+    return targetPath;
+  };
+
   const getNotificationIcon = (type: string): string => {
     const icons: Record<string, string> = {
       'member.license_expiring': '📜',
@@ -1093,42 +1174,48 @@ function NotificationPanel({
           ) : (
             <ul className="divide-y divide-gray-100">
               {notifications.map((notification) => (
-                <li
-                  key={notification.id}
-                  className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 ${
-                    getNotificationColor(notification.type, notification.metadata?.priority)
-                  } ${notification.isRead ? 'opacity-60' : ''}`}
-                  onClick={() => {
-                    if (!notification.isRead) {
-                      onMarkAsRead(notification.id);
-                    }
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-lg flex-shrink-0">
-                      {getNotificationIcon(notification.type)}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className={`text-sm font-medium truncate ${
-                          notification.isRead ? 'text-gray-600' : 'text-gray-900'
-                        }`}>
-                          {notification.title}
-                        </p>
-                        {!notification.isRead && (
-                          <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                <li key={notification.id}>
+                  <Link
+                    to={getDeepLink(notification)}
+                    className={`block px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 ${
+                      getNotificationColor(notification.type, notification.metadata?.priority)
+                    } ${notification.isRead ? 'opacity-60' : ''}`}
+                    onClick={() => {
+                      if (!notification.isRead) {
+                        onMarkAsRead(notification.id);
+                      }
+                      onClose();
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-lg flex-shrink-0">
+                        {getNotificationIcon(notification.type)}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className={`text-sm font-medium truncate ${
+                            notification.isRead ? 'text-gray-600' : 'text-gray-900'
+                          }`}>
+                            {notification.title}
+                          </p>
+                          {!notification.isRead && (
+                            <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                          )}
+                        </div>
+                        {notification.message && (
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                            {notification.message}
+                          </p>
                         )}
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-xs text-gray-400">
+                            {formatNotificationDate(notification.createdAt)}
+                          </p>
+                          <span className="text-xs text-blue-600">조치 →</span>
+                        </div>
                       </div>
-                      {notification.message && (
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
-                          {notification.message}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-400 mt-1">
-                        {formatNotificationDate(notification.createdAt)}
-                      </p>
                     </div>
-                  </div>
+                  </Link>
                 </li>
               ))}
             </ul>
