@@ -210,4 +210,85 @@ export const yaksaSchedulerApi = {
       };
     }
   },
+
+  /**
+   * Get admin alerts
+   */
+  async getAlerts(organizationId?: string, unreadOnly = false): Promise<ApiResponse<AdminAlertsData>> {
+    try {
+      const params: any = { limit: 10 };
+      if (organizationId) params.organizationId = organizationId;
+      if (unreadOnly) params.unreadOnly = 'true';
+
+      const response = await authClient.api.get(`${BASE_PATH}/alerts`, { params });
+      return {
+        success: true,
+        data: response.data.data || response.data,
+      };
+    } catch (error: any) {
+      console.error('Failed to fetch alerts:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || '알림을 불러올 수 없습니다.',
+        code: error.response?.data?.code,
+      };
+    }
+  },
+
+  /**
+   * Mark alert as read
+   */
+  async markAlertAsRead(alertId: string): Promise<ApiResponse<void>> {
+    try {
+      await authClient.api.post(`${BASE_PATH}/alerts/${alertId}/read`);
+      return { success: true };
+    } catch (error: any) {
+      console.error('Failed to mark alert as read:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || '알림 읽음 처리에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * Seed default jobs for organization
+   */
+  async seedJobs(organizationId: string): Promise<ApiResponse<{ created: number; skipped: number }>> {
+    try {
+      const response = await authClient.api.post(`${BASE_PATH}/seed-jobs`, { organizationId });
+      return {
+        success: true,
+        data: response.data.data || response.data,
+      };
+    } catch (error: any) {
+      console.error('Failed to seed jobs:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Job Seed에 실패했습니다.',
+      };
+    }
+  },
 };
+
+// ============================================
+// Admin Alert Types
+// ============================================
+
+export interface AdminAlert {
+  id: string;
+  type: 'job_failure' | 'retry_exhausted' | 'overdue_alert' | 'expiry_warning' | 'deadline_reminder' | 'system_health';
+  priority: 'low' | 'normal' | 'high' | 'critical';
+  title: string;
+  message: string;
+  organizationId?: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
+  read: boolean;
+  actionUrl?: string;
+}
+
+export interface AdminAlertsData {
+  alerts: AdminAlert[];
+  unreadCount: number;
+}
