@@ -76,6 +76,7 @@ export interface YaksaForumMeta {
   pharmacistVerified?: boolean;
   drugInteractionWarning?: boolean;
   professionalOnly?: boolean;
+  documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
 }
 
 // =============================================================================
