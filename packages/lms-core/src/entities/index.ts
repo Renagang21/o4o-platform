@@ -5,3 +5,5 @@ export { Progress, ProgressStatus } from './Progress.js';
 export { Certificate } from './Certificate.js';
 export { LMSEvent, LMSEventType, EventStatus } from './LMSEvent.js';
 export { Attendance, AttendanceStatus } from './Attendance.js';
+export { ContentBundle, ContentBundleType } from './ContentBundle.js';
+export type { ContentItem } from './ContentBundle.js';

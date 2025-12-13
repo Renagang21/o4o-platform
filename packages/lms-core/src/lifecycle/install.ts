@@ -26,6 +26,7 @@ export async function onInstall(dataSource: DataSource): Promise<void> {
     console.log('  - Event scheduling');
     console.log('  - Attendance tracking');
     console.log('  - Organization-scoped courses');
+    console.log('  - ContentBundle (multi-domain content structure)');
   } catch (error) {
     console.error('[lms-core] Installation failed:', error);
     throw error;
@@ -235,6 +236,27 @@ async function createTables(dataSource: DataSource): Promise<void> {
     );
   `);
   console.log('[lms-core] Created lms_attendance table');
+
+  // ============================================
+  // 8. lms_content_bundles table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_content_bundles (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      type VARCHAR(20) DEFAULT 'education',
+      metadata JSONB DEFAULT '{}',
+      content_items JSONB DEFAULT '[]',
+      is_published BOOLEAN DEFAULT false,
+      published_at TIMESTAMP,
+      organization_id UUID,
+      created_by UUID,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_content_bundles table');
 }
 
 /**
@@ -275,6 +297,11 @@ async function createIndexes(dataSource: DataSource): Promise<void> {
     -- lms_attendance indexes
     CREATE INDEX IF NOT EXISTS idx_lms_attendance_event ON lms_attendance(event_id);
     CREATE INDEX IF NOT EXISTS idx_lms_attendance_user ON lms_attendance(user_id);
+
+    -- lms_content_bundles indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_content_bundles_type_published ON lms_content_bundles(type, is_published);
+    CREATE INDEX IF NOT EXISTS idx_lms_content_bundles_organization ON lms_content_bundles(organization_id);
+    CREATE INDEX IF NOT EXISTS idx_lms_content_bundles_created_at ON lms_content_bundles(created_at);
   `);
 
   console.log('[lms-core] Indexes created successfully');

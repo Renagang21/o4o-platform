@@ -34,6 +34,7 @@ export const lmsCoreManifest = {
     'lms_certificates',
     'lms_events',
     'lms_attendance',
+    'lms_content_bundles',
   ],
 
   // ===== 삭제 정책 =====
@@ -53,6 +54,7 @@ export const lmsCoreManifest = {
       './entities/Certificate',
       './entities/LMSEvent',
       './entities/Attendance',
+      './entities/ContentBundle',
     ],
     services: [
       'CourseService',
@@ -62,11 +64,13 @@ export const lmsCoreManifest = {
       'CertificateService',
       'EventService',
       'AttendanceService',
+      'ContentBundleService',
     ],
     controllers: [
       'CourseController',
       'EnrollmentController',
       'CertificateController',
+      'ContentBundleController',
     ],
     routesExport: 'createRoutes',
   },
@@ -204,8 +208,8 @@ export const lmsCoreManifest = {
 
   // ===== 외부 노출 =====
   exposes: {
-    services: ['CourseService', 'LessonService', 'EnrollmentService', 'ProgressService', 'CertificateService'],
-    types: ['Course', 'Lesson', 'Enrollment', 'Progress', 'Certificate'],
+    services: ['CourseService', 'LessonService', 'EnrollmentService', 'ProgressService', 'CertificateService', 'ContentBundleService'],
+    types: ['Course', 'Lesson', 'Enrollment', 'Progress', 'Certificate', 'ContentBundle', 'ContentBundleType', 'ContentItem'],
     events: [
       'course.created',
       'course.updated',
@@ -214,6 +218,8 @@ export const lmsCoreManifest = {
       'certificate.issued',
       'event.scheduled',
       'attendance.recorded',
+      'contentbundle.created',
+      'contentbundle.published',
     ],
   },
 

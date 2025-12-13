@@ -5,7 +5,13 @@
  */
 
 // Entities
-export * from '../entities';
+export * from '../entities/index.js';
+
+// Services
+export * from '../services/index.js';
+
+// Controllers
+export * from '../controllers/index.js';
 
 // Utils
-export * from '../utils';
+export * from '../utils/index.js';
