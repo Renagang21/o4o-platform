@@ -410,6 +410,23 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['partnerops', 'cosmetics'],
   },
+
+  // ============================================
+  // Marketing LMS Extension (global)
+  // Product info delivery + marketing campaigns
+  // ============================================
+  {
+    appId: 'lms-marketing',
+    name: 'Marketing LMS Extension',
+    version: '0.1.0',
+    description: '마케팅 LMS 확장 - 제품 정보 전달, 마케팅 퀴즈/설문 캠페인, Engagement 수집',
+    category: 'marketing',
+    tags: ['마케팅', 'marketing', 'campaign', 'quiz', 'survey', 'engagement', 'product-info'],
+    type: 'extension',
+    dependencies: { 'lms-core': '>=0.1.0' },
+    author: 'O4O Platform',
+    serviceGroups: ['global', 'cosmetics', 'supplierops'],
+  },
 ];
 
 /**
