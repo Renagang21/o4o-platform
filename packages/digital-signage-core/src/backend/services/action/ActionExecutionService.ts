@@ -8,30 +8,48 @@ import {
   ActionExecutionResult,
 } from '../../dto/index.js';
 import { DisplaySlot } from '../../entities/DisplaySlot.entity.js';
+import { EngineManager } from '../../engine/EngineManager.js';
 
 /**
  * ActionExecutionService
  *
- * Phase 4.5: Action execution management with slot occupancy control.
+ * Phase 4.5 + 5: Action execution management with slot occupancy control
+ * and RenderingEngine integration.
  *
  * Responsibilities:
  * - Execute actions on display slots
  * - Stop/Pause/Resume actions
  * - Slot occupancy management
  * - Execution logging
+ * - RenderingEngine lifecycle management (Phase 5)
  *
  * Does NOT:
  * - Interpret business meaning
  * - Auto-trigger schedules
- * - Control actual player/renderer
  */
 export class ActionExecutionService {
   private repo: Repository<ActionExecution>;
   private slotRepo: Repository<DisplaySlot>;
+  private engineManager: EngineManager | null = null;
 
-  constructor(private dataSource: DataSource) {
+  constructor(private dataSource: DataSource, engineManager?: EngineManager) {
     this.repo = dataSource.getRepository(ActionExecution);
     this.slotRepo = dataSource.getRepository(DisplaySlot);
+    this.engineManager = engineManager || null;
+  }
+
+  /**
+   * Set the engine manager (for deferred initialization)
+   */
+  setEngineManager(engineManager: EngineManager): void {
+    this.engineManager = engineManager;
+  }
+
+  /**
+   * Get the engine manager
+   */
+  getEngineManager(): EngineManager | null {
+    return this.engineManager;
   }
 
   /**
@@ -70,7 +88,7 @@ export class ActionExecutionService {
           };
 
         case ExecuteMode.REPLACE:
-          // Stop the existing action
+          // Stop the existing action (and engine)
           await this.stopInternal(runningAction.id, dto.sourceAppId, 'Replaced by new action');
           break;
       }
@@ -94,6 +112,39 @@ export class ActionExecutionService {
     });
 
     const saved = await this.repo.save(execution);
+
+    // 4. Start RenderingEngine (Phase 5)
+    if (this.engineManager) {
+      try {
+        const started = await this.engineManager.startExecution(dto.displaySlotId, saved.id);
+        if (!started) {
+          // Engine failed to start, but execution record was created
+          // Update status to reflect the failure
+          saved.status = ActionExecutionStatus.FAILED;
+          saved.errorMessage = 'RenderingEngine failed to start';
+          await this.repo.save(saved);
+
+          return {
+            success: false,
+            executionId: saved.id,
+            status: saved.status,
+            error: 'RenderingEngine failed to start',
+          };
+        }
+      } catch (error) {
+        // Engine error, update execution status
+        saved.status = ActionExecutionStatus.FAILED;
+        saved.errorMessage = error instanceof Error ? error.message : 'Unknown engine error';
+        await this.repo.save(saved);
+
+        return {
+          success: false,
+          executionId: saved.id,
+          status: saved.status,
+          error: saved.errorMessage,
+        };
+      }
+    }
 
     return {
       success: true,
@@ -139,6 +190,16 @@ export class ActionExecutionService {
       };
     }
 
+    // Stop RenderingEngine (Phase 5)
+    if (this.engineManager && execution.displaySlotId) {
+      try {
+        await this.engineManager.stopSlot(execution.displaySlotId);
+      } catch (error) {
+        console.error('[ActionExecutionService] Engine stop error:', error);
+        // Continue with status update even if engine stop fails
+      }
+    }
+
     execution.status = ActionExecutionStatus.STOPPED;
     execution.stoppedBy = stoppedBy;
     execution.completedAt = new Date();
@@ -175,6 +236,16 @@ export class ActionExecutionService {
         success: false,
         error: `Cannot pause execution in state: ${execution.status}`,
       };
+    }
+
+    // Pause RenderingEngine (Phase 5)
+    if (this.engineManager && execution.displaySlotId) {
+      try {
+        await this.engineManager.pauseSlot(execution.displaySlotId);
+      } catch (error) {
+        console.error('[ActionExecutionService] Engine pause error:', error);
+        // Continue with status update even if engine pause fails
+      }
     }
 
     execution.status = ActionExecutionStatus.PAUSED;
@@ -226,6 +297,16 @@ export class ActionExecutionService {
       };
     }
 
+    // Resume RenderingEngine (Phase 5)
+    if (this.engineManager && execution.displaySlotId) {
+      try {
+        await this.engineManager.resumeSlot(execution.displaySlotId);
+      } catch (error) {
+        console.error('[ActionExecutionService] Engine resume error:', error);
+        // Continue with status update even if engine resume fails
+      }
+    }
+
     execution.status = ActionExecutionStatus.RUNNING;
     execution.pausedAt = null;
     if (dto.resumedBy) {
@@ -256,16 +337,20 @@ export class ActionExecutionService {
   }
 
   /**
-   * Get current slot status
+   * Get current slot status (enhanced with engine info)
    */
   async getSlotStatus(displaySlotId: string): Promise<{
     isOccupied: boolean;
     currentExecution: ActionExecution | null;
+    engineState?: string | null;
   }> {
     const execution = await this.findRunningActionOnSlot(displaySlotId);
+    const engineStatus = this.engineManager?.getSlotStatus(displaySlotId);
+
     return {
       isOccupied: execution !== null,
       currentExecution: execution,
+      engineState: engineStatus?.state || null,
     };
   }
 

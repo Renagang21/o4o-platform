@@ -21,3 +21,9 @@ export * from './lifecycle/index.js';
 
 // Types
 export * from './types/context.js';
+
+// Player (Phase 5)
+export * from './player/index.js';
+
+// Engine (Phase 5)
+export * from './engine/index.js';
