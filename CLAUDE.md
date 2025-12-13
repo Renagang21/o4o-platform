@@ -310,4 +310,57 @@ packages/<app>/
 
 ---
 
-*최종 업데이트: 2025-12-12*
+## 9. E-commerce Core 운영 규칙 (주문/결제 개발 필수)
+
+> **이 규칙은 "권장"이 아닌 "기본 전제"입니다.**
+> 주문/결제 기능이 있는 모든 서비스는 예외 없이 준수해야 합니다.
+
+### 9.1 핵심 원칙 (절대 준수)
+
+| 원칙 | 설명 |
+|------|------|
+| **주문 생성 = E-commerce Core** | 모든 주문은 `EcommerceOrderService.create()` 호출 필수 |
+| **OrderType 불변성** | OrderType은 생성 시 결정, 이후 변경 금지 |
+| **ecommerceOrderId 필수 연결** | 서비스 Entity는 반드시 ecommerceOrderId 저장 |
+
+### 9.2 주문/결제 개발 체크리스트
+
+신규 서비스에서 주문/결제 기능 개발 시:
+
+```
+☐ EcommerceOrderService.create() 호출 코드 있음
+☐ OrderType 명시적 지정 (retail, dropshipping, b2b, subscription)
+☐ ecommerceOrderId를 서비스 Entity에 저장
+☐ findByEcommerceOrderId() 조회 메서드 구현
+☐ 통계 조회 시 EcommerceOrderQueryService 사용
+```
+
+### 9.3 금지 사항
+
+| 금지 | 사유 |
+|------|------|
+| E-commerce Core 우회 주문 생성 | 판매 원장 무결성 훼손 |
+| OrderType 생성 후 변경 | 통계/분기 로직 파괴 |
+| ecommerceOrderId 없이 서비스 주문만 생성 | 통합 조회 불가 |
+| dropshipping 외 OrderType에서 Relay 사용 | 구조 오용 |
+
+### 9.4 미적용 예외
+
+E-commerce Core를 적용하지 않아도 되는 경우:
+- 주문/결제 개념이 없는 순수 컨텐츠/커뮤니티 서비스
+- 인프라/UI 전용 패키지
+
+**단, 미적용 시 반드시 문서화 필수** (`docs/guides/ecommerce-core/exemption-policy.md` 참조)
+
+### 9.5 관련 문서
+
+| 문서 | 용도 |
+|------|------|
+| `docs/guides/ecommerce-core/agent-guidelines.md` | 개발 에이전트 가이드라인 |
+| `docs/guides/ecommerce-core/new-service-order-checklist.md` | 신규 서비스 체크리스트 |
+| `docs/guides/ecommerce-core/exemption-policy.md` | 미적용 예외 규칙 |
+| `docs/specs/ecommerce-core/application-status.md` | 적용 현황 |
+
+---
+
+*최종 업데이트: 2025-12-13*
