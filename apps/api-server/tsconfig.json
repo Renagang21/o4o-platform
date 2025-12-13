@@ -35,8 +35,8 @@
       "@o4o/annualfee-yaksa": ["../../packages/annualfee-yaksa/dist"],
       "@o4o/annualfee-yaksa/*": ["../../packages/annualfee-yaksa/dist/*"],
       "@o4o/*": ["../../packages/*/dist"],
-      "@o4o-apps/forum": ["../../packages/forum-app/src/index"],
-      "@o4o-apps/forum/*": ["../../packages/forum-app/src/*"],
+      "@o4o-apps/forum": ["../../packages/forum-app/dist"],
+      "@o4o-apps/forum/*": ["../../packages/forum-app/dist/*"],
       "@o4o-apps/signage": ["../../packages/@o4o-apps/signage/dist"],
       "@o4o-apps/*": ["../../packages/*/dist"],
       "@o4o-extensions/*": ["../../packages/*/dist"]

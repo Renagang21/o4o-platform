@@ -127,14 +127,14 @@ export function useRealtimeNotifications(
 
     try {
       const url = buildUrl();
-      console.log('[SSE] Connecting to:', url);
+      // SSE connection initiated
 
       const eventSource = new EventSource(url, {
         withCredentials: true, // Include auth cookies
       });
 
       eventSource.onopen = () => {
-        console.log('[SSE] Connected');
+        // SSE connected successfully
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;
@@ -156,7 +156,7 @@ export function useRealtimeNotifications(
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           const delay = reconnectDelay * reconnectAttemptsRef.current;
-          console.log(`[SSE] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`);
+          // SSE reconnecting after delay
 
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();

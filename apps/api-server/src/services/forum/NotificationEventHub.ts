@@ -14,6 +14,7 @@
 import { EventEmitter } from 'events';
 import type { Response } from 'express';
 import type { ForumNotification } from '../../entities/ForumNotification.js';
+import logger from '../../utils/logger.js';
 
 // SSE Client connection info
 export interface SSEClient {
@@ -106,7 +107,7 @@ class NotificationEventHub extends EventEmitter {
       timestamp: new Date().toISOString(),
     });
 
-    console.log(`[SSE] Client ${clientId} subscribed for user ${userId}`);
+    logger.debug(`[SSE] Client ${clientId} subscribed for user ${userId}`);
 
     // Handle client disconnect
     res.on('close', () => {
@@ -137,7 +138,7 @@ class NotificationEventHub extends EventEmitter {
     // Remove client
     this.clients.delete(clientId);
 
-    console.log(`[SSE] Client ${clientId} unsubscribed`);
+    logger.debug(`[SSE] Client ${clientId} unsubscribed`);
   }
 
   /**
@@ -244,7 +245,7 @@ class NotificationEventHub extends EventEmitter {
 
     for (const [clientId, client] of this.clients) {
       if (client.lastHeartbeat.getTime() < staleThreshold) {
-        console.log(`[SSE] Cleaning up stale connection ${clientId}`);
+        logger.debug(`[SSE] Cleaning up stale connection ${clientId}`);
         try {
           client.res.end();
         } catch {
