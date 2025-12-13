@@ -72,6 +72,9 @@ import adminAppsRoutes from './routes/admin/apps.routes.js';
 // Forum Routes (Phase 17 - AI Recommendations)
 import forumRoutes from './routes/forum/forum.routes.js';
 
+// Linked Accounts Routes (SSO check, sessions)
+import linkedAccountsRoutes from './routes/linked-accounts.js';
+
 // Service Template Registry (Phase 7)
 import { templateRegistry } from './service-templates/template-registry.js';
 
@@ -472,6 +475,10 @@ const startServer = async () => {
     // 12. Register Forum routes (Phase 17 - AI Recommendations)
     app.use('/api/v1/forum', forumRoutes);
     logger.info('✅ Forum routes registered at /api/v1/forum');
+
+    // 13. Register Linked Accounts routes (SSO check, sessions)
+    app.use('/api/accounts', linkedAccountsRoutes);
+    logger.info('✅ Linked Accounts routes registered at /api/accounts');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
