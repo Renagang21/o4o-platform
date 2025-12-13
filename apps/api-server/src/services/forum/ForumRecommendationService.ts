@@ -11,16 +11,15 @@
  * Provides explainable recommendations with reason text.
  */
 
-import { Repository, In, MoreThan, LessThan } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
-import type { ForumPost } from '../../../../packages/forum-app/src/backend/entities/ForumPost.js';
-import { PostStatus } from '../../../../packages/forum-app/src/backend/entities/ForumPost.js';
+import { ForumPost, PostStatus } from '@o4o-apps/forum';
 import type {
   ForumPostMetadata,
   ForumPostAIMeta,
   NetureForumMeta,
   YaksaForumMeta,
-} from '../../../../packages/forum-app/src/backend/types/index.js';
+} from '@o4o-apps/forum';
 
 // =============================================================================
 // Configuration Types
@@ -183,8 +182,10 @@ export class ForumRecommendationService {
 
   private async getRepository(): Promise<Repository<ForumPost>> {
     if (!this.postRepository) {
-      const dataSource = await AppDataSource.getInstance();
-      this.postRepository = dataSource.getRepository('ForumPost') as Repository<ForumPost>;
+      if (!AppDataSource.isInitialized) {
+        await AppDataSource.initialize();
+      }
+      this.postRepository = AppDataSource.getRepository(ForumPost);
     }
     return this.postRepository;
   }

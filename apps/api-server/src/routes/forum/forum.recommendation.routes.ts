@@ -13,21 +13,23 @@
  */
 
 import { Router } from 'express';
-import { forumRecommendationController } from '../../controllers/forum/ForumRecommendationController.js';
+import { ForumRecommendationController } from '../../controllers/forum/ForumRecommendationController.js';
+import { optionalAuth, authenticate } from '../../middleware/auth.middleware.js';
 
-const router = Router();
+const router: Router = Router();
+const controller = new ForumRecommendationController();
 
 // Public endpoints (auth optional for better personalization)
-router.get('/', (req, res) => forumRecommendationController.getRecommendations(req, res));
-router.get('/trending', (req, res) => forumRecommendationController.getTrending(req, res));
-router.get('/related/:postId', (req, res) => forumRecommendationController.getRelated(req, res));
+router.get('/', optionalAuth, controller.getRecommendations.bind(controller));
+router.get('/trending', optionalAuth, controller.getTrending.bind(controller));
+router.get('/related/:postId', optionalAuth, controller.getRelated.bind(controller));
 
 // Domain-specific endpoints
-router.get('/cosmetics', (req, res) => forumRecommendationController.getCosmeticsRecommendations(req, res));
-router.get('/yaksa', (req, res) => forumRecommendationController.getYaksaRecommendations(req, res));
+router.get('/cosmetics', optionalAuth, controller.getCosmeticsRecommendations.bind(controller));
+router.get('/yaksa', optionalAuth, controller.getYaksaRecommendations.bind(controller));
 
 // Admin endpoints
-router.get('/config', (req, res) => forumRecommendationController.getConfig(req, res));
-router.put('/config', (req, res) => forumRecommendationController.updateConfig(req, res));
+router.get('/config', authenticate, controller.getConfig.bind(controller));
+router.put('/config', authenticate, controller.updateConfig.bind(controller));
 
 export default router;
