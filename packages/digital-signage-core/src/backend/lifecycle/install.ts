@@ -135,7 +135,7 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
     )
   `);
 
-  // ActionExecution table
+  // ActionExecution table (Phase 4.5 updated)
   await dataSource.query(`
     CREATE TABLE IF NOT EXISTS signage_action_execution (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -144,10 +144,16 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
       "actionType" VARCHAR(100) NOT NULL,
       "displayId" UUID,
       "displaySlotId" UUID,
+      "mediaListId" UUID,
       "scheduleId" UUID,
+      "sourceAppId" VARCHAR(100),
       status VARCHAR(100) DEFAULT 'pending',
+      "executeMode" VARCHAR(50),
+      duration INT,
       "executedAt" TIMESTAMP,
+      "pausedAt" TIMESTAMP,
       "completedAt" TIMESTAMP,
+      "stoppedBy" VARCHAR(100),
       "errorMessage" TEXT,
       metadata JSONB DEFAULT '{}',
       "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -168,6 +174,7 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_signage_action_org ON signage_action_execution("organizationId")`);
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_signage_action_display ON signage_action_execution("displayId")`);
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_signage_action_slot ON signage_action_execution("displaySlotId")`);
+  await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_signage_action_status ON signage_action_execution(status)`);
 
   logger.info('Digital Signage tables created successfully.');
 }

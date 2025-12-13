@@ -96,3 +96,61 @@ export interface ListQueryOptions {
   limit?: number;
   offset?: number;
 }
+
+// ============================================
+// Phase 4.5: Action Execution DTOs
+// ============================================
+
+/**
+ * Execute Mode
+ */
+export type ExecuteModeType = 'immediate' | 'replace' | 'reject';
+
+/**
+ * Execute Action Request DTO
+ */
+export interface ExecuteActionDto {
+  organizationId: string;
+  sourceAppId: string;
+  mediaListId: string;
+  displaySlotId: string;
+  duration?: number; // in seconds
+  executeMode?: ExecuteModeType;
+  ownerUserId?: string;
+  scheduleId?: string;
+  metadata?: Record<string, any>;
+}
+
+/**
+ * Stop Action Request DTO
+ */
+export interface StopActionDto {
+  stoppedBy: string; // appId or userId
+  reason?: string;
+}
+
+/**
+ * Pause Action Request DTO
+ */
+export interface PauseActionDto {
+  pausedBy?: string;
+  reason?: string;
+}
+
+/**
+ * Resume Action Request DTO
+ */
+export interface ResumeActionDto {
+  resumedBy?: string;
+}
+
+/**
+ * Action Execution Result
+ */
+export interface ActionExecutionResult {
+  success: boolean;
+  executionId?: string;
+  status?: string;
+  message?: string;
+  error?: string;
+}

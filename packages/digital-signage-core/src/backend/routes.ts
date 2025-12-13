@@ -15,6 +15,7 @@ import { createScheduleController } from './controllers/schedule/ScheduleControl
 
 // Action controllers
 import { createActionExecutionController } from './controllers/action/ActionExecutionController.js';
+import { createActionController } from './controllers/action/ActionController.js';
 
 /**
  * Create all Digital Signage routes
@@ -38,6 +39,9 @@ export function createRoutes(dataSource: DataSource): Router {
 
   // Action routes (read-only)
   router.use('/action-executions', createActionExecutionController(dataSource));
+
+  // Action execution API (Phase 4.5: execute/stop/pause/resume)
+  router.use('/actions', createActionController(dataSource));
 
   return router;
 }
