@@ -31,6 +31,9 @@ export const reportingYaksaManifest = {
     'yaksa_report_field_templates',
     'yaksa_report_logs',
     'yaksa_report_assignments',
+    // RPA 연동 테이블 (forum-yaksa integration)
+    'yaksa_rpa_reports',
+    'yaksa_rpa_report_history',
   ],
 
   // ===== 삭제 정책 =====
@@ -47,15 +50,22 @@ export const reportingYaksaManifest = {
       './backend/entities/ReportFieldTemplate',
       './backend/entities/ReportLog',
       './backend/entities/ReportAssignment',
+      // RPA 연동 엔티티 (forum-yaksa integration)
+      './backend/entities/YaksaReport',
+      './backend/entities/YaksaReportHistory',
     ],
     services: [
       'AnnualReportService',
       'ReportTemplateService',
       'MembershipSyncService',
+      // RPA 연동 서비스
+      'YaksaReportService',
     ],
     controllers: [
       'AnnualReportController',
       'ReportTemplateController',
+      // RPA 연동 컨트롤러
+      'YaksaReportController',
     ],
     routesExport: 'createRoutes',
   },
