@@ -34,6 +34,11 @@ export const lmsCoreManifest = {
     'lms_certificates',
     'lms_events',
     'lms_attendance',
+    'lms_quizzes',
+    'lms_quiz_attempts',
+    'lms_surveys',
+    'lms_survey_questions',
+    'lms_survey_responses',
   ],
 
   // ===== 삭제 정책 =====
@@ -53,6 +58,11 @@ export const lmsCoreManifest = {
       './entities/Certificate',
       './entities/LMSEvent',
       './entities/Attendance',
+      './entities/Quiz',
+      './entities/QuizAttempt',
+      './entities/Survey',
+      './entities/SurveyQuestion',
+      './entities/SurveyResponse',
     ],
     services: [
       'CourseService',
@@ -62,11 +72,15 @@ export const lmsCoreManifest = {
       'CertificateService',
       'EventService',
       'AttendanceService',
+      'QuizService',
+      'SurveyService',
     ],
     controllers: [
       'CourseController',
       'EnrollmentController',
       'CertificateController',
+      'QuizController',
+      'SurveyController',
     ],
     routesExport: 'createRoutes',
   },
@@ -204,8 +218,27 @@ export const lmsCoreManifest = {
 
   // ===== 외부 노출 =====
   exposes: {
-    services: ['CourseService', 'LessonService', 'EnrollmentService', 'ProgressService', 'CertificateService'],
-    types: ['Course', 'Lesson', 'Enrollment', 'Progress', 'Certificate'],
+    services: [
+      'CourseService',
+      'LessonService',
+      'EnrollmentService',
+      'ProgressService',
+      'CertificateService',
+      'QuizService',
+      'SurveyService',
+    ],
+    types: [
+      'Course',
+      'Lesson',
+      'Enrollment',
+      'Progress',
+      'Certificate',
+      'Quiz',
+      'QuizAttempt',
+      'Survey',
+      'SurveyQuestion',
+      'SurveyResponse',
+    ],
     events: [
       'course.created',
       'course.updated',
@@ -214,6 +247,12 @@ export const lmsCoreManifest = {
       'certificate.issued',
       'event.scheduled',
       'attendance.recorded',
+      'quiz.created',
+      'quiz.published',
+      'quiz.attempt.completed',
+      'survey.created',
+      'survey.published',
+      'survey.response.completed',
     ],
   },
 

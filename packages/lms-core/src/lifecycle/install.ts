@@ -26,6 +26,8 @@ export async function onInstall(dataSource: DataSource): Promise<void> {
     console.log('  - Event scheduling');
     console.log('  - Attendance tracking');
     console.log('  - Organization-scoped courses');
+    console.log('  - Quiz engine');
+    console.log('  - Survey engine');
   } catch (error) {
     console.error('[lms-core] Installation failed:', error);
     throw error;
@@ -235,6 +237,129 @@ async function createTables(dataSource: DataSource): Promise<void> {
     );
   `);
   console.log('[lms-core] Created lms_attendance table');
+
+  // ============================================
+  // 8. lms_quizzes table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_quizzes (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      questions JSONB DEFAULT '[]',
+      is_published BOOLEAN DEFAULT false,
+      published_at TIMESTAMP,
+      bundle_id UUID,
+      course_id UUID,
+      passing_score INTEGER DEFAULT 70,
+      time_limit INTEGER,
+      max_attempts INTEGER,
+      show_results_immediately BOOLEAN DEFAULT true,
+      show_correct_answers BOOLEAN DEFAULT false,
+      metadata JSONB DEFAULT '{}',
+      created_by UUID,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_quizzes table');
+
+  // ============================================
+  // 9. lms_quiz_attempts table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_quiz_attempts (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      quiz_id UUID NOT NULL,
+      user_id UUID NOT NULL,
+      answers JSONB DEFAULT '[]',
+      status VARCHAR(20) DEFAULT 'in_progress',
+      score DECIMAL(5,2),
+      earned_points INTEGER DEFAULT 0,
+      total_points INTEGER DEFAULT 0,
+      passed BOOLEAN,
+      started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      completed_at TIMESTAMP,
+      time_spent INTEGER,
+      attempt_number INTEGER DEFAULT 1,
+      metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_quiz_attempts table');
+
+  // ============================================
+  // 10. lms_surveys table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_surveys (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      status VARCHAR(20) DEFAULT 'draft',
+      is_published BOOLEAN DEFAULT false,
+      published_at TIMESTAMP,
+      bundle_id UUID,
+      start_at TIMESTAMP,
+      end_at TIMESTAMP,
+      allow_anonymous BOOLEAN DEFAULT false,
+      allow_multiple_responses BOOLEAN DEFAULT false,
+      max_responses INTEGER,
+      response_count INTEGER DEFAULT 0,
+      metadata JSONB DEFAULT '{}',
+      created_by UUID,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_surveys table');
+
+  // ============================================
+  // 11. lms_survey_questions table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_survey_questions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      survey_id UUID NOT NULL,
+      type VARCHAR(20) DEFAULT 'single',
+      question TEXT NOT NULL,
+      description TEXT,
+      options JSONB DEFAULT '[]',
+      "order" INTEGER DEFAULT 0,
+      is_required BOOLEAN DEFAULT false,
+      scale_min INTEGER,
+      scale_max INTEGER,
+      scale_min_label VARCHAR(100),
+      scale_max_label VARCHAR(100),
+      max_length INTEGER,
+      conditional_display JSONB,
+      metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_survey_questions table');
+
+  // ============================================
+  // 12. lms_survey_responses table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_survey_responses (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      survey_id UUID NOT NULL,
+      user_id UUID,
+      answers JSONB DEFAULT '[]',
+      status VARCHAR(20) DEFAULT 'in_progress',
+      completed_at TIMESTAMP,
+      time_spent INTEGER,
+      is_anonymous BOOLEAN DEFAULT false,
+      ip_address VARCHAR(45),
+      user_agent TEXT,
+      metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_survey_responses table');
 }
 
 /**
@@ -275,6 +400,28 @@ async function createIndexes(dataSource: DataSource): Promise<void> {
     -- lms_attendance indexes
     CREATE INDEX IF NOT EXISTS idx_lms_attendance_event ON lms_attendance(event_id);
     CREATE INDEX IF NOT EXISTS idx_lms_attendance_user ON lms_attendance(user_id);
+
+    -- lms_quizzes indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_quizzes_published ON lms_quizzes(is_published, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_quizzes_bundle ON lms_quizzes(bundle_id);
+    CREATE INDEX IF NOT EXISTS idx_lms_quizzes_course ON lms_quizzes(course_id);
+
+    -- lms_quiz_attempts indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_quiz_attempts_quiz_created ON lms_quiz_attempts(quiz_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_quiz_attempts_user_quiz ON lms_quiz_attempts(user_id, quiz_id);
+    CREATE INDEX IF NOT EXISTS idx_lms_quiz_attempts_status ON lms_quiz_attempts(status);
+
+    -- lms_surveys indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_surveys_status_created ON lms_surveys(status, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_surveys_bundle ON lms_surveys(bundle_id);
+
+    -- lms_survey_questions indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_survey_questions_survey_order ON lms_survey_questions(survey_id, "order");
+
+    -- lms_survey_responses indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_survey_responses_survey_created ON lms_survey_responses(survey_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_survey_responses_user_survey ON lms_survey_responses(user_id, survey_id);
+    CREATE INDEX IF NOT EXISTS idx_lms_survey_responses_status ON lms_survey_responses(status);
   `);
 
   console.log('[lms-core] Indexes created successfully');
