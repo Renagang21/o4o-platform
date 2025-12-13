@@ -121,6 +121,13 @@ class SchedulerService {
   }
 
   /**
+   * Get the entity manager (for seeding operations)
+   */
+  getEntityManager(): EntityManager | null {
+    return this.entityManager;
+  }
+
+  /**
    * Register a job handler
    */
   registerHandler(

@@ -2,6 +2,7 @@
  * Scheduler Controller
  * Phase 19-A: Central Scheduler Infrastructure
  * Phase 19-C: Integrated Admin Dashboard
+ * Phase 19-E: Job Seeding & Notifications
  *
  * Admin API endpoints for scheduler management.
  */
@@ -10,6 +11,8 @@ import type { Router, Request, Response } from 'express';
 import { schedulerService, ListJobsOptions, ListFailureQueueOptions } from '../services/SchedulerService.js';
 import { jobMonitorService } from '../services/JobMonitorService.js';
 import { integratedDashboardService } from '../services/IntegratedDashboardService.js';
+import { notificationService } from '../services/NotificationService.js';
+import { seedJobsForOrganization } from '../../lifecycle/install.js';
 import type { JobStatus, JobTargetService, JobActionType } from '../entities/ScheduledJob.js';
 import type { FailureQueueStatus } from '../entities/JobFailureQueue.js';
 
@@ -472,6 +475,131 @@ export function createSchedulerRoutes(router: Router): void {
       res.json({ success: true, data: { processed } });
     } catch (error) {
       console.error('[Scheduler] Process queue error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
+  // ============================================
+  // Job Seeding (Phase 19-E)
+  // ============================================
+
+  /**
+   * POST /yaksa-scheduler/seed-jobs
+   * Seed default jobs for an organization
+   */
+  router.post('/seed-jobs', async (req: Request, res: Response) => {
+    try {
+      const { organizationId } = req.body;
+
+      if (!organizationId) {
+        return res.status(400).json({
+          success: false,
+          error: 'organizationId is required',
+        });
+      }
+
+      // Get entity manager from scheduler service
+      const entityManager = schedulerService.getEntityManager();
+      if (!entityManager) {
+        return res.status(500).json({
+          success: false,
+          error: 'Database not initialized',
+        });
+      }
+
+      const result = await seedJobsForOrganization(entityManager, organizationId);
+
+      res.json({
+        success: true,
+        data: result,
+        message: `Created ${result.created} jobs, skipped ${result.skipped} existing jobs`,
+      });
+    } catch (error) {
+      console.error('[Scheduler] Seed jobs error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
+  // ============================================
+  // Admin Alerts (Phase 19-E)
+  // ============================================
+
+  /**
+   * GET /yaksa-scheduler/alerts
+   * Get admin alerts
+   */
+  router.get('/alerts', async (req: Request, res: Response) => {
+    try {
+      const organizationId = req.query.organizationId as string | undefined;
+      const unreadOnly = req.query.unreadOnly === 'true';
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+
+      const alerts = notificationService.getAdminAlerts(organizationId, {
+        unreadOnly,
+        limit,
+      });
+
+      const unreadCount = notificationService.getUnreadAlertCount(organizationId);
+
+      res.json({
+        success: true,
+        data: {
+          alerts,
+          unreadCount,
+        },
+      });
+    } catch (error) {
+      console.error('[Scheduler] Get alerts error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
+  /**
+   * POST /yaksa-scheduler/alerts/:id/read
+   * Mark alert as read
+   */
+  router.post('/alerts/:id/read', async (req: Request, res: Response) => {
+    try {
+      const success = notificationService.markAlertAsRead(req.params.id);
+      if (!success) {
+        return res.status(404).json({
+          success: false,
+          error: 'Alert not found',
+        });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error('[Scheduler] Mark alert read error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
+  /**
+   * POST /yaksa-scheduler/alerts/read-all
+   * Mark all alerts as read
+   */
+  router.post('/alerts/read-all', async (req: Request, res: Response) => {
+    try {
+      const organizationId = req.body.organizationId as string | undefined;
+      const count = notificationService.markAllAlertsAsRead(organizationId);
+      res.json({
+        success: true,
+        data: { markedAsRead: count },
+      });
+    } catch (error) {
+      console.error('[Scheduler] Mark all alerts read error:', error);
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
