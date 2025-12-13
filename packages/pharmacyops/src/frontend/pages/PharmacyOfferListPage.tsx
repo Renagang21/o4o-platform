@@ -13,7 +13,7 @@ import {
   StatusBadge,
   PriceDisplay,
   PriceComparisonTable,
-  type SupplierOffer,
+  type SupplierOfferDisplay,
 } from '../components/index.js';
 import type { PharmacyOfferListItemDto } from '../../dto/index.js';
 
@@ -163,12 +163,12 @@ export const PharmacyOfferListPage: React.FC = () => {
     }
   }, []);
 
-  const handleSelectOffer = (offer: SupplierOffer) => {
+  const handleSelectOffer = (offer: SupplierOfferDisplay) => {
     // Navigate to order creation with pre-selected offer
     window.location.href = `/pharmacyops/orders/create?offerId=${offer.supplierId}`;
   };
 
-  const getProductOffers = (productId: string): SupplierOffer[] => {
+  const getProductOffers = (productId: string): SupplierOfferDisplay[] => {
     return offers
       .filter((o) => o.productId === productId)
       .map((o) => ({

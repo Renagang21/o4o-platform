@@ -227,7 +227,7 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
 };
 
 // ===== Supplier Price Comparison Table =====
-export interface SupplierOffer {
+export interface SupplierOfferDisplay {
   supplierId: string;
   supplierName: string;
   supplierType: 'wholesaler' | 'manufacturer';
@@ -239,8 +239,8 @@ export interface SupplierOffer {
 }
 
 export interface PriceComparisonTableProps {
-  offers: SupplierOffer[];
-  onSelect: (offer: SupplierOffer) => void;
+  offers: SupplierOfferDisplay[];
+  onSelect: (offer: SupplierOfferDisplay) => void;
 }
 
 export const PriceComparisonTable: React.FC<PriceComparisonTableProps> = ({

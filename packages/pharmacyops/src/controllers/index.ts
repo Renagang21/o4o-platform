@@ -10,6 +10,7 @@ import { PharmacyOfferController } from './PharmacyOfferController.js';
 import { PharmacyOrderController } from './PharmacyOrderController.js';
 import { PharmacyDispatchController } from './PharmacyDispatchController.js';
 import { PharmacySettlementController } from './PharmacySettlementController.js';
+import { inventoryController } from './inventory.controller.js';
 
 // Re-export controllers
 export { PharmacyDashboardController };
@@ -18,6 +19,7 @@ export { PharmacyOfferController };
 export { PharmacyOrderController };
 export { PharmacyDispatchController };
 export { PharmacySettlementController };
+export { inventoryController };
 
 // Controller array for module registration
 export const pharmacyOpsControllers = [

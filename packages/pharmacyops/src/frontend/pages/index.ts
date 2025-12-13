@@ -10,3 +10,5 @@ export { PharmacyOfferListPage } from './PharmacyOfferListPage.js';
 export { PharmacyOrderListPage } from './PharmacyOrderListPage.js';
 export { PharmacyDispatchListPage } from './PharmacyDispatchListPage.js';
 export { PharmacySettlementListPage } from './PharmacySettlementListPage.js';
+export { AutoReorderPage } from './AutoReorderPage.js';
+export { OrderReviewPage } from './OrderReviewPage.js';
