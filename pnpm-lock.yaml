@@ -1768,6 +1768,43 @@ importers:
         specifier: ^5.3.3
         version: 5.9.2
 
+  packages/diabetes-pharmacy:
+    dependencies:
+      '@o4o/diabetes-core':
+        specifier: workspace:*
+        version: link:../diabetes-core
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      express:
+        specifier: ^4.0.0
+        version: 4.21.2
+      react:
+        specifier: ^19.0.0
+        version: 19.1.1
+      typeorm:
+        specifier: ^0.3.0
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.0
+        version: 4.17.23
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.2
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
+
   packages/dropshipping-core:
     dependencies:
       '@nestjs/common':
@@ -13201,12 +13238,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
+  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
-      '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
+      '@emotion/react': 11.14.0(@types/react@18.2.79)(react@18.2.0)
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.2.0)
       '@emotion/utils': 1.4.2
@@ -17511,7 +17548,7 @@ snapshots:
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
       '@emotion/utils': 1.4.2
       '@floating-ui/react-dom': 2.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/gradient-parser': 0.1.3
