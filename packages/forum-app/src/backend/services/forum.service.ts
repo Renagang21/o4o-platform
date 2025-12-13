@@ -1,12 +1,23 @@
-import { MoreThanOrEqual } from 'typeorm';
-import { AppDataSource } from '../../../../apps/api-server/src/database/connection.js';
+import { MoreThanOrEqual, DataSource } from 'typeorm';
 import { ForumCategory } from '../entities/ForumCategory.js';
 import { ForumPost, PostStatus, PostType } from '../entities/ForumPost.js';
 import { ForumComment, CommentStatus } from '../entities/ForumComment.js';
 import { ForumTag } from '../entities/ForumTag.js';
-import { User } from '../../../../apps/api-server/src/entities/User.js';
-import { cacheService } from '../../../../apps/api-server/src/services/CacheService.js';
 import { canCreatePost, canManagePost, canCreateCategory, canManageCategory, canCreateComment, canManageComment } from '../utils/forumPermissions.js';
+
+// DataSource and CacheService are injected at runtime from api-server
+// This avoids direct import of api-server modules
+let AppDataSource: DataSource;
+let cacheService: { get: (key: string) => Promise<any>; set: (key: string, value: any, options?: any, meta?: any) => Promise<void> };
+
+/**
+ * Initialize the forum service with required dependencies
+ * Called by api-server during module loading
+ */
+export function initForumService(dataSource: DataSource, cache: any): void {
+  AppDataSource = dataSource;
+  cacheService = cache;
+}
 
 export interface ForumSearchOptions {
   query?: string;
@@ -37,11 +48,11 @@ export interface ForumStatistics {
 }
 
 export class ForumService {
-  private categoryRepository = AppDataSource.getRepository(ForumCategory);
-  private postRepository = AppDataSource.getRepository(ForumPost);
-  private commentRepository = AppDataSource.getRepository(ForumComment);
-  private tagRepository = AppDataSource.getRepository(ForumTag);
-  private userRepository = AppDataSource.getRepository(User);
+  private get categoryRepository() { return AppDataSource.getRepository(ForumCategory); }
+  private get postRepository() { return AppDataSource.getRepository(ForumPost); }
+  private get commentRepository() { return AppDataSource.getRepository(ForumComment); }
+  private get tagRepository() { return AppDataSource.getRepository(ForumTag); }
+  // User repository is accessed via raw query since User entity is in api-server
 
   // Category Methods
   async createCategory(data: Partial<ForumCategory>, creatorId: string): Promise<ForumCategory> {
@@ -473,7 +484,7 @@ export class ForumService {
     ] = await Promise.all([
       this.postRepository.count({ where: { status: PostStatus.PUBLISHED } }),
       this.commentRepository.count({ where: { status: CommentStatus.PUBLISHED } }),
-      this.userRepository.count(),
+      AppDataSource.query('SELECT COUNT(*) as count FROM "user"').then((r: any[]) => parseInt(r[0]?.count || '0', 10)),
       this.postRepository.count({ 
         where: { 
           status: PostStatus.PUBLISHED,

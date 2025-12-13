@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+import type { User } from '@o4o/types';
 
 @Entity('forum_category')
 @Index(['isActive', 'sortOrder'])
