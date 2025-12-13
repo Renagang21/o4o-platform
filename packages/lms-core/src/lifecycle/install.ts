@@ -28,6 +28,7 @@ export async function onInstall(dataSource: DataSource): Promise<void> {
     console.log('  - Organization-scoped courses');
     console.log('  - Quiz engine');
     console.log('  - Survey engine');
+    console.log('  - Engagement logging');
   } catch (error) {
     console.error('[lms-core] Installation failed:', error);
     throw error;
@@ -360,6 +361,22 @@ async function createTables(dataSource: DataSource): Promise<void> {
     );
   `);
   console.log('[lms-core] Created lms_survey_responses table');
+
+  // ============================================
+  // 13. lms_engagement_logs table
+  // ============================================
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS lms_engagement_logs (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id UUID NOT NULL,
+      bundle_id UUID,
+      lesson_id UUID,
+      event VARCHAR(50) NOT NULL,
+      metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('[lms-core] Created lms_engagement_logs table');
 }
 
 /**
@@ -422,6 +439,12 @@ async function createIndexes(dataSource: DataSource): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_lms_survey_responses_survey_created ON lms_survey_responses(survey_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_lms_survey_responses_user_survey ON lms_survey_responses(user_id, survey_id);
     CREATE INDEX IF NOT EXISTS idx_lms_survey_responses_status ON lms_survey_responses(status);
+
+    -- lms_engagement_logs indexes
+    CREATE INDEX IF NOT EXISTS idx_lms_engagement_user_created ON lms_engagement_logs(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_engagement_bundle_created ON lms_engagement_logs(bundle_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_engagement_event_created ON lms_engagement_logs(event, created_at);
+    CREATE INDEX IF NOT EXISTS idx_lms_engagement_user_bundle_event ON lms_engagement_logs(user_id, bundle_id, event);
   `);
 
   console.log('[lms-core] Indexes created successfully');

@@ -14,3 +14,5 @@ export { SurveyResponse, ResponseStatus } from './SurveyResponse.js';
 export type { QuestionAnswer } from './SurveyResponse.js';
 export { QuizAttempt, AttemptStatus } from './QuizAttempt.js';
 export type { QuizAnswer } from './QuizAttempt.js';
+export { EngagementLog, EngagementEventType } from './EngagementLog.js';
+export type { EngagementMetadata } from './EngagementLog.js';

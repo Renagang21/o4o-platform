@@ -39,6 +39,7 @@ export const lmsCoreManifest = {
     'lms_surveys',
     'lms_survey_questions',
     'lms_survey_responses',
+    'lms_engagement_logs',
   ],
 
   // ===== 삭제 정책 =====
@@ -63,6 +64,7 @@ export const lmsCoreManifest = {
       './entities/Survey',
       './entities/SurveyQuestion',
       './entities/SurveyResponse',
+      './entities/EngagementLog',
     ],
     services: [
       'CourseService',
@@ -74,6 +76,7 @@ export const lmsCoreManifest = {
       'AttendanceService',
       'QuizService',
       'SurveyService',
+      'EngagementLoggingService',
     ],
     controllers: [
       'CourseController',
@@ -81,8 +84,10 @@ export const lmsCoreManifest = {
       'CertificateController',
       'QuizController',
       'SurveyController',
+      'EngagementLogController',
     ],
     routesExport: 'createRoutes',
+    hooksExport: 'createHooks',
   },
 
   // ===== 프론트엔드 =====
@@ -226,6 +231,7 @@ export const lmsCoreManifest = {
       'CertificateService',
       'QuizService',
       'SurveyService',
+      'EngagementLoggingService',
     ],
     types: [
       'Course',
@@ -238,6 +244,7 @@ export const lmsCoreManifest = {
       'Survey',
       'SurveyQuestion',
       'SurveyResponse',
+      'EngagementLog',
     ],
     events: [
       'course.created',
@@ -253,6 +260,13 @@ export const lmsCoreManifest = {
       'survey.created',
       'survey.published',
       'survey.response.completed',
+      'engagement.view',
+      'engagement.click',
+      'engagement.reaction',
+      'engagement.quiz-submit',
+      'engagement.survey-submit',
+      'engagement.acknowledge',
+      'engagement.complete',
     ],
   },
 
