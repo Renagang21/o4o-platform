@@ -3,12 +3,25 @@
 # Manual deployment script for Admin Dashboard
 # Use this when GitHub Actions is not working
 #
-# Usage: ./scripts/deploy-admin-manual.sh
+# Usage: ./scripts/deploy-admin-manual.sh [dev|prod]
+#   dev  - Deploy to dev-admin.neture.co.kr
+#   prod - Deploy to admin.neture.co.kr (default)
 #
 
 set -e  # Exit on error
 
-echo "🚀 Starting manual deployment of Admin Dashboard..."
+# Parse environment argument
+ENV="${1:-prod}"
+if [ "$ENV" = "dev" ]; then
+  TARGET_DIR="/var/www/dev-admin.neture.co.kr"
+  TARGET_URL="https://dev-admin.neture.co.kr"
+else
+  TARGET_DIR="/var/www/admin.neture.co.kr"
+  TARGET_URL="https://admin.neture.co.kr"
+fi
+
+echo "🚀 Starting manual deployment of Admin Dashboard to $ENV..."
+echo "   Target: $TARGET_URL"
 echo ""
 
 # Change to project root
@@ -59,12 +72,12 @@ echo ""
 
 # Copy to web server
 echo "📤 Uploading to web server..."
-ssh o4o-web "mkdir -p /tmp/admin-deploy"
-scp "$TARBALL" o4o-web:/tmp/admin-deploy/latest.tar.gz
+ssh o4o-webserver "mkdir -p /tmp/admin-deploy"
+scp "$TARBALL" o4o-webserver:/tmp/admin-deploy/latest.tar.gz
 
 # Deploy on web server
 echo "🚀 Deploying on web server..."
-ssh o4o-web << 'EOF'
+ssh o4o-webserver << EOF
   set -e
 
   echo "📋 Extracting files..."
@@ -84,17 +97,17 @@ ssh o4o-web << 'EOF'
   echo ""
 
   echo "💾 Backing up current deployment..."
-  sudo cp -r /var/www/admin.neture.co.kr "/var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+  sudo cp -r $TARGET_DIR "${TARGET_DIR}.backup.\$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
 
   echo "🗑️  Clearing current deployment..."
-  sudo rm -rf /var/www/admin.neture.co.kr/*
+  sudo rm -rf $TARGET_DIR/*
 
   echo "📦 Deploying new files..."
-  sudo cp -r extract/* /var/www/admin.neture.co.kr/
+  sudo cp -r extract/* $TARGET_DIR/
 
   echo "🔧 Setting permissions..."
-  sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
-  sudo chmod -R 755 /var/www/admin.neture.co.kr/
+  sudo chown -R www-data:www-data $TARGET_DIR/
+  sudo chmod -R 755 $TARGET_DIR/
 
   echo "🧹 Cleaning up..."
   rm -rf /tmp/admin-deploy
@@ -105,12 +118,12 @@ ssh o4o-web << 'EOF'
   echo "✅ Deployment complete!"
   echo ""
   echo "📄 Deployed version:"
-  cat /var/www/admin.neture.co.kr/version.json
+  cat $TARGET_DIR/version.json
 EOF
 
 echo ""
 echo "✅ Admin Dashboard deployed successfully!"
-echo "🌐 URL: https://admin.neture.co.kr"
+echo "🌐 URL: $TARGET_URL"
 echo ""
 
 # Clean up local tarball
