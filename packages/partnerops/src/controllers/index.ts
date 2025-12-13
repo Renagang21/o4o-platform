@@ -8,3 +8,4 @@ export { RoutinesController } from './routines.controller';
 export { LinksController } from './links.controller';
 export { ConversionsController } from './conversions.controller';
 export { SettlementController } from './settlement.controller';
+export { PharmacyActivityController } from './pharmacy-activity.controller';

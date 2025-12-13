@@ -10,6 +10,7 @@ export { RoutineService, routineService } from './RoutineService.js';
 export { LinkService, linkService } from './LinkService.js';
 export { ConversionService, conversionService } from './ConversionService.js';
 export { SettlementService, settlementService } from './SettlementService.js';
+export { PharmacyActivityService, pharmacyActivityService } from './PharmacyActivityService.js';
 
 // Re-export types
 export type { DashboardSummary } from './DashboardService.js';
@@ -18,3 +19,8 @@ export type { PartnerRoutine, CreateRoutineDto, UpdateRoutineDto } from './Routi
 export type { PartnerLink, CreateLinkDto, LinkStats } from './LinkService.js';
 export type { Conversion, ConversionSummary, ConversionFunnel } from './ConversionService.js';
 export type { SettlementBatch, SettlementTransaction, SettlementSummary } from './SettlementService.js';
+export type {
+  PharmacyActivityItem,
+  PharmacyActivityFilter,
+  PharmacyActivityStats,
+} from './PharmacyActivityService.js';

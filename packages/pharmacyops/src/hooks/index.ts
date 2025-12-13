@@ -6,6 +6,44 @@
  * @package @o4o/pharmacyops
  */
 
+// =====================================================
+// Partner-Core Event Bridge
+// =====================================================
+export {
+  pharmacyEvents,
+  emitProductViewed,
+  emitProductClicked,
+  emitOrderCreated,
+  emitOrderCompleted,
+  emitOrderCancelled,
+  onPartnerEvent,
+  onPharmacyEvent,
+  onAllPharmacyEvents,
+  isPartnerEligibleProductType,
+  isPartnerExcludedProductType,
+  PARTNER_ALLOWED_PRODUCT_TYPES,
+  PARTNER_EXCLUDED_PRODUCT_TYPES,
+} from './pharmacy-events.js';
+
+export type {
+  PharmacyEvent,
+  PharmacyEventBase,
+  ProductViewedEvent,
+  ProductClickedEvent,
+  OrderCreatedEvent,
+  OrderCompletedEvent,
+  OrderCancelledEvent,
+  PartnerEligibleEvent,
+  PartnerAllowedProductType,
+  PartnerExcludedProductType,
+  ProductType,
+  PartnerEventHandler,
+} from './pharmacy-events.js';
+
+// =====================================================
+// Pharmacy Business Logic Hooks
+// =====================================================
+
 /**
  * 약국 라이선스 검증 훅
  *

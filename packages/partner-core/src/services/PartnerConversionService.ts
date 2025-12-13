@@ -10,6 +10,7 @@ import { Repository, LessThan, MoreThan } from 'typeorm';
 import {
   PartnerConversion,
   ConversionStatus,
+  ConversionSource,
 } from '../entities/PartnerConversion.entity.js';
 import { PartnerClick } from '../entities/PartnerClick.entity.js';
 import { PartnerLink } from '../entities/PartnerLink.entity.js';
@@ -22,6 +23,8 @@ export interface CreateConversionDto {
   orderNumber?: string;
   productType?: string;
   orderAmount: number;
+  conversionSource?: ConversionSource;
+  pharmacyId?: string;
   metadata?: Record<string, any>;
 }
 
@@ -31,6 +34,8 @@ export interface ConversionFilter {
   orderId?: string;
   productType?: string;
   status?: ConversionStatus;
+  conversionSource?: ConversionSource;
+  pharmacyId?: string;
   startDate?: Date;
   endDate?: Date;
   page?: number;
@@ -81,6 +86,8 @@ export class PartnerConversionService {
       orderAmount: data.orderAmount,
       commissionAmount: 0, // 커미션은 별도로 계산됨
       status: ConversionStatus.PENDING,
+      conversionSource: data.conversionSource || ConversionSource.PARTNER,
+      pharmacyId: data.pharmacyId,
       attributionDays,
       metadata: data.metadata,
     });
@@ -208,6 +215,18 @@ export class PartnerConversionService {
 
     if (where.status) {
       qb.andWhere('conversion.status = :status', { status: where.status });
+    }
+
+    if (where.conversionSource) {
+      qb.andWhere('conversion.conversionSource = :conversionSource', {
+        conversionSource: where.conversionSource,
+      });
+    }
+
+    if (where.pharmacyId) {
+      qb.andWhere('conversion.pharmacyId = :pharmacyId', {
+        pharmacyId: where.pharmacyId,
+      });
     }
 
     if (startDate) {

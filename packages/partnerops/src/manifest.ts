@@ -80,6 +80,11 @@ export const partneropsManifest = {
     { method: 'GET', path: '/partnerops/settlement/summary', handler: 'SettlementController.getSummary' },
     { method: 'GET', path: '/partnerops/settlement/batches', handler: 'SettlementController.getBatches' },
     { method: 'GET', path: '/partnerops/settlement/transactions', handler: 'SettlementController.getTransactions' },
+
+    // Pharmacy Activity (read-only)
+    { method: 'GET', path: '/partnerops/pharmacy-activity', handler: 'PharmacyActivityController.list' },
+    { method: 'GET', path: '/partnerops/pharmacy-activity/stats', handler: 'PharmacyActivityController.getStats' },
+    { method: 'GET', path: '/partnerops/pharmacy-activity/:pharmacyId', handler: 'PharmacyActivityController.getPharmacyDetail' },
   ],
 
   // Lifecycle Hooks
@@ -101,6 +106,7 @@ export const partneropsManifest = {
       { label: '콘텐츠 관리', path: '/partnerops/routines', icon: 'FileText' },
       { label: '링크 관리', path: '/partnerops/links', icon: 'Link' },
       { label: '전환 분석', path: '/partnerops/conversions', icon: 'TrendingUp' },
+      { label: '약국 활동', path: '/partnerops/pharmacy-activity', icon: 'Activity' },
       { label: '정산 내역', path: '/partnerops/settlement', icon: 'DollarSign' },
     ],
   },
@@ -117,6 +123,7 @@ export const partneropsManifest = {
       'LinksService',
       'ConversionsService',
       'SettlementService',
+      'PharmacyActivityService',
     ],
     controllers: [
       'DashboardController',
@@ -125,6 +132,7 @@ export const partneropsManifest = {
       'LinksController',
       'ConversionsController',
       'SettlementController',
+      'PharmacyActivityController',
     ],
     routesExport: 'createRoutes',
   },
