@@ -14,11 +14,14 @@ import type { YaksaReportStatus } from './YaksaReport.js';
  * 히스토리 액션 유형
  */
 export type YaksaReportAction =
-  | 'CREATED'      // 자동 생성
-  | 'EDITED'       // 수정됨
-  | 'REVIEWED'     // 검토 완료
-  | 'APPROVED'     // 승인
-  | 'REJECTED';    // 반려
+  | 'CREATED'              // 자동 생성
+  | 'EDITED'               // 수정됨
+  | 'REVIEWED'             // 검토 완료
+  | 'APPROVED'             // 승인
+  | 'REJECTED'             // 반려
+  | 'SUBMITTED'            // 제출 완료
+  | 'SUBMISSION_FAILED'    // 제출 실패
+  | 'SUBMISSION_RETRY_FAILED'; // 제출 재시도 실패
 
 /**
  * YaksaReportHistory Entity
@@ -62,7 +65,7 @@ export class YaksaReportHistory {
    */
   @Column({
     type: 'varchar',
-    length: 20,
+    length: 30,
   })
   action!: YaksaReportAction;
 

@@ -18,7 +18,7 @@ export type { AssignmentRole, AssignmentStatus } from './ReportAssignment.js';
 
 // RPA 기반 신고서 (forum-yaksa 연동)
 export { YaksaReport } from './YaksaReport.js';
-export type { YaksaReportType, YaksaReportStatus } from './YaksaReport.js';
+export type { YaksaReportType, YaksaReportStatus, YaksaSubmissionResult } from './YaksaReport.js';
 
 export { YaksaReportHistory } from './YaksaReportHistory.js';
 export type { YaksaReportAction } from './YaksaReportHistory.js';

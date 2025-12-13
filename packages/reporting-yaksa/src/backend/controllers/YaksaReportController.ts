@@ -4,6 +4,11 @@ import {
   ListReportsOptions,
   UpdateReportInput,
 } from '../services/YaksaReportService.js';
+import {
+  submitApprovedReport,
+  retrySubmission,
+  getSubmissionStatus as getSubmissionStatusService,
+} from '../services/YaksaReportSubmissionService.js';
 import { YaksaReportStatus, YaksaReportType } from '../entities/YaksaReport.js';
 
 /**
@@ -326,6 +331,153 @@ export class YaksaReportController {
         data: stats,
       });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  // ============================================
+  // Submission Endpoints (Phase 18-C)
+  // ============================================
+
+  /**
+   * POST /api/v1/yaksa/reports/:id/submit
+   * 승인된 신고서 제출
+   */
+  async submitReport(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { outputDir, generatePdf, generateJson } = req.body;
+      const user = (req as any).user;
+
+      const actor = {
+        id: user?.id || 'system',
+        name: user?.name || user?.username || 'System',
+        role: user?.role,
+        ipAddress: req.ip,
+      };
+
+      const result = await submitApprovedReport(id, actor, {
+        outputDir,
+        generatePdf,
+        generateJson,
+      });
+
+      if (!result.success) {
+        res.status(400).json({
+          success: false,
+          error: result.error,
+          data: result,
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Report submitted successfully',
+      });
+    } catch (error: any) {
+      if (error.message?.includes('not initialized')) {
+        res.status(503).json({
+          success: false,
+          error: 'Submission service not initialized',
+        });
+        return;
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/v1/yaksa/reports/:id/retry
+   * 실패한 제출 재시도
+   */
+  async retrySubmission(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { outputDir, generatePdf, generateJson } = req.body;
+      const user = (req as any).user;
+
+      const actor = {
+        id: user?.id || 'system',
+        name: user?.name || user?.username || 'System',
+        role: user?.role,
+        ipAddress: req.ip,
+      };
+
+      const result = await retrySubmission(id, actor, {
+        outputDir,
+        generatePdf,
+        generateJson,
+      });
+
+      if (!result.success) {
+        res.status(400).json({
+          success: false,
+          error: result.error,
+          data: result,
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Submission retry successful',
+      });
+    } catch (error: any) {
+      if (error.message?.includes('not initialized')) {
+        res.status(503).json({
+          success: false,
+          error: 'Submission service not initialized',
+        });
+        return;
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/v1/yaksa/reports/:id/submission
+   * 제출 상태 조회
+   */
+  async getSubmissionStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      const status = await getSubmissionStatusService(id);
+
+      res.json({
+        success: true,
+        data: status,
+      });
+    } catch (error: any) {
+      if (error.message?.includes('not found')) {
+        res.status(404).json({
+          success: false,
+          error: error.message,
+        });
+        return;
+      }
+      if (error.message?.includes('not initialized')) {
+        res.status(503).json({
+          success: false,
+          error: 'Submission service not initialized',
+        });
+        return;
+      }
       next(error);
     }
   }
