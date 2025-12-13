@@ -79,11 +79,20 @@ export interface PharmacyProductListItemDto {
   id: string;
   name: string;
   drugCode?: string;
+  permitNumber?: string; // 품목허가번호
+  insuranceCode?: string | null; // 보험코드
   category: 'otc' | 'etc' | 'quasi_drug';
+  therapeuticCategory?: string; // 치료 카테고리
   manufacturer?: string;
+  activeIngredient?: string; // 주성분
+  dosageForm?: string; // 제형
+  unit?: string;
+  packageSize?: string; // 포장단위
   status: string;
-  availableOffers: number; // 유효한 Offer 수
-  lowestPrice?: number; // 최저가
+  activeOfferCount: number; // 유효한 Offer 수 (v2 이름 변경)
+  lowestOfferPrice?: number; // 최저가 (v2 이름 변경)
+  requiresColdChain?: boolean; // 콜드체인 필요
+  isNarcotics?: boolean; // 마약류
 }
 
 // ===== Offer DTOs =====
@@ -196,14 +205,22 @@ export interface PharmacyOrderDto {
 export interface PharmacyOrderListItemDto {
   id: string;
   orderNumber: string;
+  productId?: string;
   productName: string;
+  productDrugCode?: string;
   supplierName: string;
   quantity: number;
+  unitPrice?: number;
   totalAmount: number;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
   createdAt: Date;
+  deliveredAt?: Date;
+  cancelledAt?: Date;
   hasTracking: boolean;
+  canReorder?: boolean; // Reorder Engine 지원
+  canCancel?: boolean;
+  requiresColdChain?: boolean;
 }
 
 export interface CreatePharmacyOrderDto {
@@ -299,14 +316,22 @@ export interface PharmacyDispatchListItemDto {
   orderId: string;
   orderNumber: string;
   dispatchNumber: string;
+  productName?: string;
+  quantity?: number;
   status: DispatchStatus;
   carrierName?: string;
   trackingNumber?: string;
   temperatureControl: string;
   requiresColdChain: boolean;
   isNarcotics: boolean;
+  narcoticsVerificationRequired?: boolean;
   estimatedDeliveryAt?: Date;
   dispatchedAt?: Date;
+  deliveredAt?: Date;
+  currentLocation?: string;
+  currentTemperature?: number;
+  receiverName?: string;
+  receiverSignature?: boolean;
 }
 
 export type DispatchStatus =
@@ -357,14 +382,18 @@ export interface PharmacySettlementDto {
 
 export interface PharmacySettlementListItemDto {
   id: string;
-  batchNumber: string;
+  settlementNumber: string; // v2: batchNumber → settlementNumber
   supplierName: string;
   periodStart: Date;
   periodEnd: Date;
   orderCount: number;
-  netAmount: number;
+  totalAmount: number; // 총 금액
+  paidAmount: number; // 결제 완료 금액
+  pendingAmount: number; // 미결제 금액
   status: SettlementStatus;
-  paymentDueDate?: Date;
+  dueDate: Date; // 결제 기한
+  paidAt?: Date; // 결제 일시
+  disputeReason?: string; // 분쟁 사유
 }
 
 export interface PharmacySettlementSummaryDto {

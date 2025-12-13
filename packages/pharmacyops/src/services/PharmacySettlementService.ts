@@ -185,7 +185,7 @@ export class PharmacySettlementService {
     if (pending.length === 0) {
       return null;
     }
-    return pending[0].paymentDueDate || null;
+    return pending[0].dueDate || null;
   }
 
   /**
@@ -201,7 +201,7 @@ export class PharmacySettlementService {
 
     const pending = await this.getPendingSettlements(pharmacyId);
     return pending.filter(
-      (s) => s.paymentDueDate && s.paymentDueDate <= dueDate,
+      (s) => s.dueDate && new Date(s.dueDate) <= dueDate,
     );
   }
 
