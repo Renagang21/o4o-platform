@@ -53,10 +53,12 @@ export class ForumCategory {
   @Column({ type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
-  @CreateDateColumn()
+  // Note: created_at uses snake_case in DB (from migration 001)
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  // Note: updated_at uses snake_case in DB (from migration 001)
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Relations

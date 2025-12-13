@@ -29,7 +29,8 @@ export class ForumComment {
   @Column({ type: 'uuid' })
   postId!: string;
 
-  @Column({ type: 'uuid' })
+  // Note: author_id uses snake_case in DB (from migration 001)
+  @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
   @Column({ type: 'uuid', nullable: true })
@@ -47,10 +48,12 @@ export class ForumComment {
   @Column({ type: 'boolean', default: false })
   isEdited!: boolean;
 
-  @CreateDateColumn()
+  // Note: created_at uses snake_case in DB (from migration 001)
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  // Note: updated_at uses snake_case in DB (from migration 001)
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Relations
@@ -59,7 +62,7 @@ export class ForumComment {
   post?: Promise<ForumPost>;
 
   @ManyToOne('User')
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author?: User;
 
   @ManyToOne('ForumComment', { nullable: true, lazy: true })
