@@ -12,6 +12,8 @@ import { supplieropsManifest } from './supplierops.manifest.js';
 import { partneropsManifest } from './partnerops.manifest.js';
 import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
 import { manifest as cmsCoreManifest } from '@o4o-apps/cms-core';
+import { manifest as lmsYaksaManifest } from '@o4o/lms-yaksa';
+import { manifest as yaksaSchedulerManifest } from '@o4o/yaksa-scheduler';
 
 /**
  * App Manifest Registry
@@ -35,6 +37,8 @@ const manifestRegistry: Record<string, AppManifest> = {
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
   'membership-yaksa': membershipYaksaManifest as any,
+  'lms-yaksa': lmsYaksaManifest as any,
+  'yaksa-scheduler': yaksaSchedulerManifest as any,
   // Dropshipping
   'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,
