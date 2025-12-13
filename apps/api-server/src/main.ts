@@ -69,6 +69,9 @@ import authRoutes from './routes/auth.js';
 // Admin Apps Routes
 import adminAppsRoutes from './routes/admin/apps.routes.js';
 
+// Forum Routes (Phase 17 - AI Recommendations)
+import forumRoutes from './routes/forum/forum.routes.js';
+
 // Service Template Registry (Phase 7)
 import { templateRegistry } from './service-templates/template-registry.js';
 
@@ -465,6 +468,10 @@ const startServer = async () => {
     // 11. Register Admin Apps routes (v1 prefix for auth-client compatibility)
     app.use('/api/v1/admin/apps', adminAppsRoutes);
     logger.info('✅ Admin Apps routes registered at /api/v1/admin/apps');
+
+    // 12. Register Forum routes (Phase 17 - AI Recommendations)
+    app.use('/api/v1/forum', forumRoutes);
+    logger.info('✅ Forum routes registered at /api/v1/forum');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
