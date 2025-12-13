@@ -54,13 +54,13 @@ export class ForumPost {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.PUBLISHED })
   status!: PostStatus;
 
-  @Column({ name: 'category_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   categoryId!: string;
 
   @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
-  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   organizationId?: string;
 
   @Column({ type: 'boolean', default: false })
@@ -93,10 +93,10 @@ export class ForumPost {
   @Column({ name: 'published_at', type: 'timestamp', nullable: true })
   publishedAt?: Date;
 
-  @Column({ name: 'last_comment_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastCommentAt?: Date;
 
-  @Column({ name: 'last_comment_by', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   lastCommentBy?: string;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -107,7 +107,7 @@ export class ForumPost {
 
   // Relations
   @ManyToOne('ForumCategory', { lazy: true })
-  @JoinColumn({ name: 'category_id' })
+  @JoinColumn({ name: 'categoryId' })
   category?: Promise<ForumCategory>;
 
   @ManyToOne('User')
@@ -115,11 +115,11 @@ export class ForumPost {
   author?: User;
 
   @ManyToOne('User', { nullable: true })
-  @JoinColumn({ name: 'last_comment_by' })
+  @JoinColumn({ name: 'lastCommentBy' })
   lastCommenter?: User;
 
   @ManyToOne('Organization', { nullable: true })
-  @JoinColumn({ name: 'organization_id' })
+  @JoinColumn({ name: 'organizationId' })
   organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumComment removed to prevent circular dependency

@@ -104,7 +104,7 @@ __decorate([
     __metadata("design:type", String)
 ], ForumPost.prototype, "categoryId", void 0);
 __decorate([
-    Column({ type: 'uuid' }),
+    Column({ name: 'author_id', type: 'uuid' }),
     __metadata("design:type", String)
 ], ForumPost.prototype, "authorId", void 0);
 __decorate([
@@ -148,7 +148,7 @@ __decorate([
     __metadata("design:type", Object)
 ], ForumPost.prototype, "metadata", void 0);
 __decorate([
-    Column({ type: 'timestamp', nullable: true }),
+    Column({ name: 'published_at', type: 'timestamp', nullable: true }),
     __metadata("design:type", Date)
 ], ForumPost.prototype, "publishedAt", void 0);
 __decorate([
@@ -160,11 +160,11 @@ __decorate([
     __metadata("design:type", String)
 ], ForumPost.prototype, "lastCommentBy", void 0);
 __decorate([
-    CreateDateColumn(),
+    CreateDateColumn({ name: 'created_at' }),
     __metadata("design:type", Date)
 ], ForumPost.prototype, "createdAt", void 0);
 __decorate([
-    UpdateDateColumn(),
+    UpdateDateColumn({ name: 'updated_at' }),
     __metadata("design:type", Date)
 ], ForumPost.prototype, "updatedAt", void 0);
 __decorate([
@@ -174,7 +174,7 @@ __decorate([
 ], ForumPost.prototype, "category", void 0);
 __decorate([
     ManyToOne('User'),
-    JoinColumn({ name: 'authorId' }),
+    JoinColumn({ name: 'author_id' }),
     __metadata("design:type", Function)
 ], ForumPost.prototype, "author", void 0);
 __decorate([
