@@ -203,6 +203,8 @@ export interface YaksaForumMeta {
   pharmacistVerified?: boolean;
   drugInteractionWarning?: boolean;
   professionalOnly?: boolean;
+  /** Document type for yaksa content classification */
+  documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
 }
 
 // =============================================================================
