@@ -1,6 +1,7 @@
 /**
  * Yaksa Scheduler Job Handlers
  * Phase 19-B: Permitted State Automation
+ * Phase 20-B: Member Notification Integration
  *
  * Central export of all job handlers.
  */
@@ -8,6 +9,7 @@
 // Annualfee-Yaksa handlers
 export {
   invoiceOverdueCheckHandler,
+  invoiceDueDateWarningHandler,
   exemptionExpiryCheckHandler,
   settlementReminderHandler,
 } from './annualfee-handlers.js';
@@ -31,7 +33,7 @@ export {
 } from './reporting-handlers.js';
 
 import { schedulerService } from '../backend/services/SchedulerService.js';
-import { invoiceOverdueCheckHandler, exemptionExpiryCheckHandler, settlementReminderHandler } from './annualfee-handlers.js';
+import { invoiceOverdueCheckHandler, invoiceDueDateWarningHandler, exemptionExpiryCheckHandler, settlementReminderHandler } from './annualfee-handlers.js';
 import { verificationExpiryCheckHandler, licenseRenewalReminderHandler } from './membership-handlers.js';
 import { assignmentExpiryCheckHandler, courseDeadlineReminderHandler } from './lms-handlers.js';
 import { failedSubmissionRetryHandler, reportDeadlineReminderHandler } from './reporting-handlers.js';
@@ -42,6 +44,7 @@ import { failedSubmissionRetryHandler, reportDeadlineReminderHandler } from './r
 export function registerAllHandlers(): void {
   // Annualfee-Yaksa handlers
   schedulerService.registerHandler('annualfee-yaksa', 'invoice_overdue_check', invoiceOverdueCheckHandler);
+  schedulerService.registerHandler('annualfee-yaksa', 'invoice_due_date_warning', invoiceDueDateWarningHandler);
   schedulerService.registerHandler('annualfee-yaksa', 'exemption_expiry_check', exemptionExpiryCheckHandler);
   schedulerService.registerHandler('annualfee-yaksa', 'settlement_reminder', settlementReminderHandler);
 

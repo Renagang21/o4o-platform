@@ -2,6 +2,7 @@
  * MemberHome - Member Portal Dashboard
  *
  * Phase 20-A: 회원 포털 통합 대시보드
+ * Phase 20-B: 회원 알림 시스템 통합
  * 회원이 "여기만 보면 된다"고 느끼는 단 하나의 화면
  *
  * 4개 탭:
@@ -16,6 +17,24 @@ import { Link } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
 import { PageLoading } from '@/components/common';
+
+// Phase 20-B: Notification Types
+interface MemberNotification {
+  id: string;
+  type: string;
+  title: string;
+  message?: string;
+  isRead: boolean;
+  createdAt: string;
+  metadata?: {
+    memberId?: string;
+    priority?: 'low' | 'normal' | 'high' | 'critical';
+    daysUntilExpiry?: number;
+    year?: number;
+    amount?: number;
+    [key: string]: any;
+  };
+}
 
 // Types
 interface MemberSummary {
@@ -88,6 +107,62 @@ export function MemberHome() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Phase 20-B: Notification state
+  const [notifications, setNotifications] = useState<MemberNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Phase 20-B: Load notifications
+  const loadNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      const [notifRes, countRes] = await Promise.allSettled([
+        authClient.api.get('/api/v2/notifications?limit=10&channel=in_app'),
+        authClient.api.get('/api/v2/notifications/unread-count?channel=in_app'),
+      ]);
+
+      if (notifRes.status === 'fulfilled') {
+        // Filter member notifications
+        const allNotifs = notifRes.value.data?.data || [];
+        const memberNotifs = allNotifs.filter((n: MemberNotification) =>
+          n.type.startsWith('member.')
+        );
+        setNotifications(memberNotifs);
+      }
+
+      if (countRes.status === 'fulfilled') {
+        setUnreadCount(countRes.value.data?.data?.count || 0);
+      }
+    } catch (err) {
+      console.error('Failed to load notifications:', err);
+    }
+  }, [isAuthenticated]);
+
+  // Phase 20-B: Mark notification as read
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      await authClient.api.post(`/api/v2/notifications/${notificationId}/read`);
+      setNotifications(prev =>
+        prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
+    }
+  }, []);
+
+  // Phase 20-B: Mark all as read
+  const markAllAsRead = useCallback(async () => {
+    try {
+      await authClient.api.post('/api/v2/notifications/read-all');
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+    }
+  }, []);
+
   const loadDashboardData = useCallback(async () => {
     if (!isAuthenticated || !user) {
       setIsLoading(false);
@@ -121,7 +196,8 @@ export function MemberHome() {
 
   useEffect(() => {
     loadDashboardData();
-  }, [loadDashboardData]);
+    loadNotifications();
+  }, [loadDashboardData, loadNotifications]);
 
   if (!isAuthenticated) {
     return (
@@ -150,10 +226,39 @@ export function MemberHome() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">회원 포털</h1>
-          <p className="text-gray-600 mt-1">
-            {data.member?.name || (user as any)?.displayName || (user as any)?.name || '회원'}님, 환영합니다
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">회원 포털</h1>
+              <p className="text-gray-600 mt-1">
+                {data.member?.name || (user as any)?.displayName || (user as any)?.name || '회원'}님, 환영합니다
+              </p>
+            </div>
+            {/* Phase 20-B: Notification Bell */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="알림"
+              >
+                <span className="text-xl">🔔</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              {/* Notification Panel */}
+              {showNotifications && (
+                <NotificationPanel
+                  notifications={notifications}
+                  onClose={() => setShowNotifications(false)}
+                  onMarkAsRead={markAsRead}
+                  onMarkAllAsRead={markAllAsRead}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -898,6 +1003,153 @@ function transformEducationData(response: any): EducationSummary | null {
       return daysUntilDue > 0 && daysUntilDue <= 7;
     }).length || 0,
   };
+}
+
+// ===== Phase 20-B: Notification Panel =====
+function NotificationPanel({
+  notifications,
+  onClose,
+  onMarkAsRead,
+  onMarkAllAsRead,
+}: {
+  notifications: MemberNotification[];
+  onClose: () => void;
+  onMarkAsRead: (id: string) => void;
+  onMarkAllAsRead: () => void;
+}) {
+  const getNotificationIcon = (type: string): string => {
+    const icons: Record<string, string> = {
+      'member.license_expiring': '📜',
+      'member.license_expired': '⚠️',
+      'member.verification_expired': '🔒',
+      'member.fee_overdue_warning': '💳',
+      'member.fee_overdue': '🚨',
+      'member.report_rejected': '📋',
+      'member.education_deadline': '📚',
+    };
+    return icons[type] || '🔔';
+  };
+
+  const getNotificationColor = (type: string, priority?: string): string => {
+    if (priority === 'high' || priority === 'critical') {
+      return 'border-l-red-500 bg-red-50';
+    }
+    if (type.includes('warning') || type.includes('expiring')) {
+      return 'border-l-yellow-500 bg-yellow-50';
+    }
+    if (type.includes('expired') || type.includes('overdue') || type.includes('rejected')) {
+      return 'border-l-red-500 bg-red-50';
+    }
+    return 'border-l-blue-500 bg-blue-50';
+  };
+
+  const formatNotificationDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return '방금 전';
+    if (diffMins < 60) return `${diffMins}분 전`;
+    if (diffHours < 24) return `${diffHours}시간 전`;
+    if (diffDays < 7) return `${diffDays}일 전`;
+    return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+  };
+
+  const hasUnread = notifications.some(n => !n.isRead);
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-40"
+        onClick={onClose}
+      />
+      {/* Panel */}
+      <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-[80vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <h3 className="font-semibold text-gray-900">알림</h3>
+          {hasUnread && (
+            <button
+              type="button"
+              onClick={onMarkAllAsRead}
+              className="text-sm text-blue-600 hover:text-blue-700"
+            >
+              모두 읽음
+            </button>
+          )}
+        </div>
+
+        {/* Notification List */}
+        <div className="overflow-y-auto max-h-96">
+          {notifications.length === 0 ? (
+            <div className="px-4 py-8 text-center">
+              <span className="text-3xl block mb-2">🔔</span>
+              <p className="text-gray-500 text-sm">새로운 알림이 없습니다</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-gray-100">
+              {notifications.map((notification) => (
+                <li
+                  key={notification.id}
+                  className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 ${
+                    getNotificationColor(notification.type, notification.metadata?.priority)
+                  } ${notification.isRead ? 'opacity-60' : ''}`}
+                  onClick={() => {
+                    if (!notification.isRead) {
+                      onMarkAsRead(notification.id);
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg flex-shrink-0">
+                      {getNotificationIcon(notification.type)}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={`text-sm font-medium truncate ${
+                          notification.isRead ? 'text-gray-600' : 'text-gray-900'
+                        }`}>
+                          {notification.title}
+                        </p>
+                        {!notification.isRead && (
+                          <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                        )}
+                      </div>
+                      {notification.message && (
+                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                          {notification.message}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {formatNotificationDate(notification.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Footer */}
+        {notifications.length > 0 && (
+          <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
+            <Link
+              to="/member/notifications"
+              className="block text-center text-sm text-blue-600 hover:text-blue-700"
+              onClick={onClose}
+            >
+              모든 알림 보기
+            </Link>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }
 
 export default MemberHome;

@@ -38,6 +38,7 @@ export type JobTargetService =
 export type JobActionType =
   // Annualfee actions
   | 'invoice_overdue_check'
+  | 'invoice_due_date_warning' // Phase 20-B: D-7 warning
   | 'exemption_expiry_check'
   | 'settlement_reminder'
   // Membership actions
@@ -208,6 +209,7 @@ export class ScheduledJob {
   getActionTypeName(): string {
     const names: Record<JobActionType, string> = {
       invoice_overdue_check: '미납 청구서 체크',
+      invoice_due_date_warning: '납부기한 임박 알림', // Phase 20-B
       exemption_expiry_check: '감면 만료 체크',
       settlement_reminder: '정산 알림',
       verification_expiry_check: '면허 검증 만료 체크',
