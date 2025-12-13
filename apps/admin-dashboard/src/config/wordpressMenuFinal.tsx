@@ -17,6 +17,7 @@ import {
   DollarSign,
   Sparkles,
   Percent,
+  Activity,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -46,6 +47,15 @@ export const wordpressMenuItems: MenuItem[] = [
     label: 'Dashboard',
     icon: <LayoutDashboard className="w-5 h-5" />,
     path: '/admin',
+    roles: ['admin', 'super_admin'],
+  },
+
+  // Yaksa Admin Hub (Phase 19-D)
+  {
+    id: 'yaksa-hub',
+    label: 'Yaksa Hub',
+    icon: <Activity className="w-5 h-5" />,
+    path: '/admin/yaksa-hub',
     roles: ['admin', 'super_admin'],
   },
 

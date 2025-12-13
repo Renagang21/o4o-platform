@@ -143,6 +143,9 @@ const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/Cosm
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
+// Yaksa Admin Hub (Phase 19-D)
+const YaksaAdminHub = lazy(() => import('@/pages/yaksa/YaksaAdminHub'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1182,6 +1185,17 @@ function App() {
                         <AppRouteGuard appId="lms-yaksa">
                           <Suspense fallback={<PageLoader />}>
                             <LmsYaksaRouter />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Yaksa Admin Hub - Integrated Dashboard (Phase 19-D) */}
+                    <Route path="/admin/yaksa-hub" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-scheduler.job.read']}>
+                        <AppRouteGuard appId="yaksa-scheduler">
+                          <Suspense fallback={<PageLoader />}>
+                            <YaksaAdminHub />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>
