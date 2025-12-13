@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { ForumPost } from './ForumPost.js';
-import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+import type { User } from '@o4o/types';
 
 export enum CommentStatus {
   PUBLISHED = 'publish',

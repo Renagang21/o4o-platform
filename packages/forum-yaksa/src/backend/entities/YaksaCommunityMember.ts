@@ -9,7 +9,7 @@ import {
   Unique
 } from 'typeorm';
 import { YaksaCommunity } from './YaksaCommunity.js';
-import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+import type { User } from '@o4o/types';
 
 export enum CommunityMemberRole {
   OWNER = 'owner',

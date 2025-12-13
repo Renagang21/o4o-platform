@@ -9,8 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
-import type { User } from '../../../../../apps/api-server/src/entities/User.js';
-import type { Block } from '@o4o/types';
+import type { Block, User } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 
 export enum PostStatus {
