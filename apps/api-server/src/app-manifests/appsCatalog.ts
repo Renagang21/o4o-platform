@@ -331,6 +331,18 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['yaksa'],
   },
+  {
+    appId: 'yaksa-scheduler',
+    name: 'Yaksa Scheduler',
+    version: '0.1.0',
+    description: '약사회 서비스 자동화 스케줄러 - Job 관리, 실패 큐, 알림 시스템',
+    category: 'infrastructure',
+    tags: ['scheduler', 'automation', 'yaksa', 'cron', 'job', 'notification'],
+    type: 'extension',
+    dependencies: { 'organization-core': '>=1.0.0' },
+    author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
+  },
 
   // ============================================
   // Signage Apps (signage)
