@@ -1,7 +1,9 @@
 /**
  * Dashboard Service
  *
- * Aggregates dashboard data for Supplier
+ * Phase 9-B: Core 정렬 업데이트
+ * - OrderRelayStatus enum과 정렬
+ * - productType별 통계 지원 준비
  */
 
 import type { DashboardSummaryDto } from '../dto/index.js';
@@ -24,9 +26,11 @@ export class DashboardService {
       pendingListingRequests: 5,
       relayStats: {
         pending: 3,
-        dispatched: 8,
-        fulfilled: 45,
-        failed: 1,
+        relayed: 2,
+        confirmed: 3,
+        shipped: 8,
+        delivered: 45,
+        cancelled: 1,
       },
       monthSales: 8750000,
       pendingSettlement: 3500000,

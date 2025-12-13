@@ -15,7 +15,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import { ListingStatus } from '@o4o/dropshipping-core';
+import { ListingStatus, ProductType } from '@o4o/dropshipping-core';
 import { ListingOpsService } from '../services/ListingOpsService.js';
 import type {
   CreateListingDto,
@@ -31,19 +31,23 @@ export class ListingsController {
   async getListings(
     @Req() req: any,
     @Query('status') status?: ListingStatus,
-    @Query('channel') channel?: string
+    @Query('channel') channel?: string,
+    @Query('productType') productType?: ProductType
   ): Promise<ListingDetailDto[]> {
     const sellerId = req.user?.sellerId || req.query.sellerId;
     if (!sellerId) {
       throw new Error('Seller ID is required');
     }
 
-    const filters: { status?: ListingStatus; channel?: string } = {};
+    const filters: { status?: ListingStatus; channel?: string; productType?: ProductType } = {};
     if (status !== undefined) {
       filters.status = status;
     }
     if (channel) {
       filters.channel = channel;
+    }
+    if (productType) {
+      filters.productType = productType;
     }
 
     return await this.listingOpsService.getListings(sellerId, filters);

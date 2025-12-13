@@ -22,16 +22,29 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 
+/**
+ * Partner Profile (Partner-Core aligned)
+ * Maps to PartnerProfileDto from @o4o/partnerops
+ */
 interface PartnerProfile {
   id: string;
+  userId: string;
   name: string;
-  partnerCode: string;
-  description: string;
-  status: 'pending' | 'approved' | 'rejected' | 'suspended';
-  snsAccounts: Record<string, string>;
-  totalConversions: number;
+  profileImage?: string;
+  socialLinks?: {
+    instagram?: string;
+    youtube?: string;
+    blog?: string;
+    tiktok?: string;
+  };
+  level: 'newbie' | 'standard' | 'pro' | 'elite';
+  status: 'pending' | 'active' | 'suspended' | 'inactive';
+  commissionRate: number;
+  clickCount: number;
+  conversionCount: number;
   totalCommission: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 const Profile: React.FC = () => {
@@ -57,10 +70,10 @@ const Profile: React.FC = () => {
         setProfile(p);
         setFormData({
           name: p.name || '',
-          description: p.description || '',
-          instagram: p.snsAccounts?.instagram || '',
-          youtube: p.snsAccounts?.youtube || '',
-          blog: p.snsAccounts?.blog || '',
+          description: '',
+          instagram: p.socialLinks?.instagram || '',
+          youtube: p.socialLinks?.youtube || '',
+          blog: p.socialLinks?.blog || '',
         });
       }
     } catch (err: any) {
@@ -68,26 +81,29 @@ const Profile: React.FC = () => {
       // Demo data
       const demo: PartnerProfile = {
         id: 'demo-partner',
+        userId: user?.id || 'demo-user',
         name: user?.name || '파트너',
-        partnerCode: 'PARTNER001',
-        description: '뷰티 및 라이프스타일 인플루언서',
-        status: 'approved',
-        snsAccounts: {
+        level: 'standard',
+        status: 'active',
+        commissionRate: 5,
+        clickCount: 15420,
+        socialLinks: {
           instagram: '@beauty_partner',
           youtube: 'BeautyPartnerChannel',
           blog: 'https://blog.example.com',
         },
-        totalConversions: 342,
+        conversionCount: 342,
         totalCommission: 1542000,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
       setProfile(demo);
       setFormData({
         name: demo.name,
-        description: demo.description,
-        instagram: demo.snsAccounts.instagram || '',
-        youtube: demo.snsAccounts.youtube || '',
-        blog: demo.snsAccounts.blog || '',
+        description: '',
+        instagram: demo.socialLinks?.instagram || '',
+        youtube: demo.socialLinks?.youtube || '',
+        blog: demo.socialLinks?.blog || '',
       });
     } finally {
       setLoading(false);
@@ -103,8 +119,7 @@ const Profile: React.FC = () => {
     try {
       await authClient.api.put('/partnerops/profile', {
         name: formData.name,
-        description: formData.description,
-        snsAccounts: {
+        socialLinks: {
           instagram: formData.instagram,
           youtube: formData.youtube,
           blog: formData.blog,
@@ -125,8 +140,7 @@ const Profile: React.FC = () => {
     try {
       await authClient.api.post('/partnerops/profile/apply', {
         name: formData.name,
-        description: formData.description,
-        snsAccounts: {
+        socialLinks: {
           instagram: formData.instagram,
           youtube: formData.youtube,
           blog: formData.blog,
@@ -144,10 +158,10 @@ const Profile: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'approved':
+      case 'active':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-            <CheckCircle className="w-4 h-4" /> 승인됨
+            <CheckCircle className="w-4 h-4" /> 활성
           </span>
         );
       case 'pending':
@@ -156,15 +170,41 @@ const Profile: React.FC = () => {
             <Clock className="w-4 h-4" /> 심사중
           </span>
         );
-      case 'rejected':
+      case 'suspended':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">
-            <X className="w-4 h-4" /> 거절됨
+            <X className="w-4 h-4" /> 정지됨
+          </span>
+        );
+      case 'inactive':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+            <X className="w-4 h-4" /> 비활성
           </span>
         );
       default:
         return null;
     }
+  };
+
+  const getLevelBadge = (level: string) => {
+    const levelColors: Record<string, string> = {
+      newbie: 'bg-gray-100 text-gray-700',
+      standard: 'bg-blue-100 text-blue-700',
+      pro: 'bg-purple-100 text-purple-700',
+      elite: 'bg-yellow-100 text-yellow-700',
+    };
+    const levelNames: Record<string, string> = {
+      newbie: '뉴비',
+      standard: '스탠다드',
+      pro: '프로',
+      elite: '엘리트',
+    };
+    return (
+      <span className={`px-2 py-1 rounded-full text-sm ${levelColors[level] || 'bg-gray-100 text-gray-700'}`}>
+        {levelNames[level] || level}
+      </span>
+    );
   };
 
   if (loading) {
@@ -273,11 +313,14 @@ const Profile: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">{profile.name}</h1>
-                <p className="text-gray-600">파트너 코드: {profile.partnerCode}</p>
-                {getStatusBadge(profile.status)}
+                <div className="flex items-center gap-2 mt-1">
+                  {getLevelBadge(profile.level)}
+                  {getStatusBadge(profile.status)}
+                </div>
+                <p className="text-gray-500 text-sm mt-1">수수료율: {profile.commissionRate}%</p>
               </div>
             </div>
-            {!editing && profile.status === 'approved' && (
+            {!editing && profile.status === 'active' && (
               <button
                 onClick={() => setEditing(true)}
                 className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
@@ -360,15 +403,14 @@ const Profile: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-gray-600">소개</h3>
-                <p className="mt-1">{profile.description || '-'}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600">총 클릭</h3>
+                  <p className="mt-1 text-xl font-bold">{profile.clickCount.toLocaleString()}</p>
+                </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-600">총 전환</h3>
-                  <p className="mt-1 text-xl font-bold">{profile.totalConversions}</p>
+                  <p className="mt-1 text-xl font-bold">{profile.conversionCount}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-600">총 커미션</h3>
@@ -381,22 +423,22 @@ const Profile: React.FC = () => {
               <div>
                 <h3 className="text-sm font-medium text-gray-600 mb-2">SNS 계정</h3>
                 <div className="space-y-2">
-                  {profile.snsAccounts?.instagram && (
+                  {profile.socialLinks?.instagram && (
                     <div className="flex items-center gap-2 text-sm">
                       <Instagram className="w-4 h-4" />
-                      {profile.snsAccounts.instagram}
+                      {profile.socialLinks.instagram}
                     </div>
                   )}
-                  {profile.snsAccounts?.youtube && (
+                  {profile.socialLinks?.youtube && (
                     <div className="flex items-center gap-2 text-sm">
                       <Youtube className="w-4 h-4" />
-                      {profile.snsAccounts.youtube}
+                      {profile.socialLinks.youtube}
                     </div>
                   )}
-                  {profile.snsAccounts?.blog && (
+                  {profile.socialLinks?.blog && (
                     <div className="flex items-center gap-2 text-sm">
                       <LinkIcon className="w-4 h-4" />
-                      {profile.snsAccounts.blog}
+                      {profile.socialLinks.blog}
                     </div>
                   )}
                 </div>

@@ -6,7 +6,7 @@
 
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { ProductMasterService } from '../services/ProductMasterService.js';
-import { ProductMaster, ProductStatus } from '../entities/ProductMaster.entity.js';
+import { ProductMaster, ProductStatus, ProductType } from '../entities/ProductMaster.entity.js';
 
 @Controller('api/v1/dropshipping/core/products')
 export class ProductsController {
@@ -15,11 +15,12 @@ export class ProductsController {
   @Get()
   async findAll(
     @Query('status') status?: ProductStatus,
+    @Query('productType') productType?: ProductType,
     @Query('category') category?: string,
     @Query('brand') brand?: string,
     @Query('search') search?: string
   ): Promise<ProductMaster[]> {
-    return await this.productService.findAll({ status, category, brand, search });
+    return await this.productService.findAll({ status, productType, category, brand, search });
   }
 
   @Get(':id')

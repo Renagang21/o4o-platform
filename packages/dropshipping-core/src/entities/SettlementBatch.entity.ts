@@ -24,21 +24,38 @@ import { Seller } from './Seller.entity.js';
 export enum SettlementBatchStatus {
   OPEN = 'open',           // 진행중 (거래 추가 가능)
   CLOSED = 'closed',       // 마감 (정산 대기)
+  PROCESSING = 'processing', // 처리 중
   PAID = 'paid',           // 지급 완료
+  FAILED = 'failed',       // 실패
 }
 
 /**
- * SettlementContextType - 정산 컨텍스트 유형
+ * SettlementType - 정산 유형 (정식 Enum)
  *
- * 확장앱(Partner, Pharmacy 등)이 자체 정산 방식을 구현할 수 있도록
- * contextType을 통해 정산 유형을 구분합니다.
+ * Core에서 지원하는 기본 정산 유형.
+ * 확장앱(Partner, Pharmacy 등)은 'platform-extension'을 사용하여
+ * 자체 정산 방식을 구현합니다.
+ *
+ * - SELLER: 판매자(Seller) 정산
+ * - SUPPLIER: 공급자(Supplier) 정산
+ * - PLATFORM_EXTENSION: 플랫폼 확장앱 정산 (Partner, Pharmacy 등)
+ */
+export enum SettlementType {
+  SELLER = 'seller',
+  SUPPLIER = 'supplier',
+  PLATFORM_EXTENSION = 'platform-extension',
+}
+
+/**
+ * @deprecated Use SettlementType enum instead
  */
 export type SettlementContextType =
-  | 'seller'      // 판매자 정산 (기본)
-  | 'supplier'    // 공급자 정산
-  | 'partner'     // 파트너 정산
-  | 'pharmacy'    // 약국 정산
-  | string;       // 확장 가능
+  | 'seller'
+  | 'supplier'
+  | 'partner'
+  | 'pharmacy'
+  | 'platform-extension'
+  | string;
 
 @Entity('dropshipping_settlement_batches')
 export class SettlementBatch {
@@ -46,23 +63,41 @@ export class SettlementBatch {
   id!: string;
 
   /**
-   * 정산 컨텍스트 유형
+   * 정산 유형 (정식 Enum)
    *
-   * Core는 이 값을 단순 문자열로만 저장/조회하며, 비즈니스 로직은 처리하지 않음.
-   * 확장앱이 Settlement Hook을 통해 contextType별 정산 규칙을 적용함.
+   * Core의 정산 유형을 정의합니다.
+   * 확장앱(Partner, Pharmacy 등)은 PLATFORM_EXTENSION 사용.
+   */
+  @Index()
+  @Column({
+    type: 'enum',
+    enum: SettlementType,
+    default: SettlementType.SELLER,
+  })
+  settlementType!: SettlementType;
+
+  /**
+   * @deprecated Use settlementType instead
    */
   @Index()
   @Column({ type: 'varchar', length: 50, default: 'seller' })
   contextType!: SettlementContextType;
 
   @Column({ type: 'uuid', nullable: true })
-  sellerId?: string; // 판매자 ID (contextType === 'seller')
+  sellerId?: string; // 판매자 ID (settlementType === SELLER)
 
   @Column({ type: 'uuid', nullable: true })
-  supplierId?: string; // 공급자 ID (contextType === 'supplier')
+  supplierId?: string; // 공급자 ID (settlementType === SUPPLIER)
 
   @Column({ type: 'uuid', nullable: true })
-  partnerId?: string; // 파트너 ID (contextType === 'partner')
+  partnerId?: string; // 확장앱 ID (settlementType === PLATFORM_EXTENSION)
+
+  /**
+   * 확장앱 타입 (platform-extension인 경우)
+   * 예: 'partner', 'pharmacy', etc.
+   */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  extensionType?: string;
 
   @Column({ type: 'varchar', length: 255 })
   batchNumber!: string; // 정산 배치 번호
@@ -77,10 +112,13 @@ export class SettlementBatch {
   totalAmount!: number; // 총 주문 금액
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  commissionAmount!: number; // 총 수수료
+  commissionAmount!: number; // 총 수수료 (플랫폼 수수료)
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  netAmount!: number; // 정산 금액 (총 주문 금액 - 수수료)
+  deductionAmount!: number; // 차감 금액 (환불, 취소 등)
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  netAmount!: number; // 순 정산 금액 (totalAmount - commissionAmount - deductionAmount)
 
   @Column({
     type: 'enum',

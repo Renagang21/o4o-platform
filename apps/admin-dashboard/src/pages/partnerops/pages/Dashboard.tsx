@@ -19,21 +19,36 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+/**
+ * Dashboard Summary (Partner-Core aligned)
+ * Maps to DashboardSummaryDto from @o4o/partnerops
+ */
 interface DashboardSummary {
+  // Partner Stats
+  partnerId: string;
+  partnerLevel: 'newbie' | 'standard' | 'pro' | 'elite';
+  partnerStatus: 'pending' | 'active' | 'suspended' | 'inactive';
+
+  // Click/Conversion/Commission Stats from Partner-Core
   totalClicks: number;
   totalConversions: number;
   conversionRate: number;
-  totalCommission: number;
-  pendingCommission: number;
-  paidCommission: number;
-  activeLinks: number;
-  activeRoutines: number;
-  periodSummary: {
-    clicks: number;
-    conversions: number;
-    commission: number;
-    growth: number;
-  };
+  totalEarnings: number;
+  pendingEarnings: number;
+  settledEarnings: number;
+
+  // Period Stats (today)
+  todayClicks: number;
+  todayConversions: number;
+  todayEarnings: number;
+
+  // Recent Activity
+  recentActivity: Array<{
+    type: 'click' | 'conversion' | 'commission' | 'settlement';
+    description: string;
+    amount?: number;
+    timestamp: string;
+  }>;
 }
 
 const Dashboard: React.FC = () => {
@@ -54,20 +69,22 @@ const Dashboard: React.FC = () => {
       console.error('Failed to fetch dashboard summary:', err);
       // Show demo data when API is not available
       setSummary({
+        partnerId: 'demo-partner',
+        partnerLevel: 'standard',
+        partnerStatus: 'active',
         totalClicks: 15420,
         totalConversions: 342,
         conversionRate: 2.22,
-        totalCommission: 1542000,
-        pendingCommission: 234000,
-        paidCommission: 1308000,
-        activeLinks: 28,
-        activeRoutines: 5,
-        periodSummary: {
-          clicks: 2340,
-          conversions: 52,
-          commission: 312000,
-          growth: 12.5,
-        },
+        totalEarnings: 1542000,
+        pendingEarnings: 234000,
+        settledEarnings: 1308000,
+        todayClicks: 234,
+        todayConversions: 5,
+        todayEarnings: 31200,
+        recentActivity: [
+          { type: 'conversion', description: '주문 전환', amount: 4500, timestamp: new Date().toISOString() },
+          { type: 'click', description: '링크 클릭', timestamp: new Date().toISOString() },
+        ],
       });
     } finally {
       setLoading(false);
@@ -140,9 +157,9 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">누적 커미션</p>
+              <p className="text-sm text-gray-600">누적 수익</p>
               <p className="text-2xl font-bold text-blue-600">
-                {summary?.totalCommission.toLocaleString()}원
+                {summary?.totalEarnings.toLocaleString()}원
               </p>
             </div>
             <DollarSign className="w-8 h-8 text-blue-600 opacity-50" />
@@ -154,7 +171,7 @@ const Dashboard: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">정산 예정</p>
               <p className="text-2xl font-bold text-orange-600">
-                {summary?.pendingCommission.toLocaleString()}원
+                {summary?.pendingEarnings.toLocaleString()}원
               </p>
             </div>
             <DollarSign className="w-8 h-8 text-orange-600 opacity-50" />
@@ -164,87 +181,92 @@ const Dashboard: React.FC = () => {
 
       {/* Content Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Active Links */}
+        {/* Partner Status */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Link2 className="w-5 h-5" />
-            활성 링크
+            파트너 레벨
           </h2>
           <div className="text-center py-4">
-            <p className="text-4xl font-bold text-blue-600">
-              {summary?.activeLinks}
+            <p className="text-3xl font-bold text-blue-600 uppercase">
+              {summary?.partnerLevel || '-'}
             </p>
-            <p className="text-gray-600 mt-2">개의 추적 링크</p>
+            <p className="text-gray-600 mt-2">
+              상태: <span className={`font-medium ${
+                summary?.partnerStatus === 'active' ? 'text-green-600' :
+                summary?.partnerStatus === 'pending' ? 'text-yellow-600' :
+                'text-red-600'
+              }`}>{summary?.partnerStatus === 'active' ? '활성' :
+                   summary?.partnerStatus === 'pending' ? '심사중' :
+                   summary?.partnerStatus === 'suspended' ? '정지' : '비활성'}</span>
+            </p>
           </div>
         </div>
 
-        {/* Active Routines */}
+        {/* Today Stats */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Eye className="w-5 h-5" />
-            콘텐츠/루틴
+            오늘 성과
           </h2>
-          <div className="text-center py-4">
-            <p className="text-4xl font-bold text-purple-600">
-              {summary?.activeRoutines}
-            </p>
-            <p className="text-gray-600 mt-2">개 활성화됨</p>
-          </div>
-        </div>
-
-        {/* Period Summary */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold mb-4">이번 달 성과</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">클릭</span>
               <span className="font-medium">
-                {summary?.periodSummary.clicks.toLocaleString()}
+                {summary?.todayClicks.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">전환</span>
               <span className="font-medium">
-                {summary?.periodSummary.conversions}
+                {summary?.todayConversions}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">커미션</span>
+              <span className="text-gray-600">수익</span>
               <span className="font-medium text-blue-600">
-                {summary?.periodSummary.commission.toLocaleString()}원
-              </span>
-            </div>
-            <div className="flex justify-between pt-2 border-t">
-              <span className="text-gray-600">성장률</span>
-              <span
-                className={`font-medium ${
-                  (summary?.periodSummary.growth ?? 0) >= 0
-                    ? 'text-green-600'
-                    : 'text-red-600'
-                }`}
-              >
-                {(summary?.periodSummary.growth ?? 0) >= 0 ? '+' : ''}
-                {summary?.periodSummary.growth}%
+                {summary?.todayEarnings.toLocaleString()}원
               </span>
             </div>
           </div>
         </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="text-lg font-semibold mb-4">최근 활동</h2>
+          <div className="space-y-2 max-h-[150px] overflow-y-auto">
+            {summary?.recentActivity && summary.recentActivity.length > 0 ? (
+              summary.recentActivity.slice(0, 5).map((activity, idx) => (
+                <div key={idx} className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">{activity.description}</span>
+                  {activity.amount && (
+                    <span className="font-medium text-blue-600">
+                      +{activity.amount.toLocaleString()}원
+                    </span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm">최근 활동이 없습니다</p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Paid Commission */}
+      {/* Settlement Status */}
       <div className="bg-white rounded-lg shadow p-4">
         <h2 className="text-lg font-semibold mb-4">정산 현황</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 bg-green-50 rounded-lg">
             <p className="text-sm text-green-700">지급 완료</p>
             <p className="text-2xl font-bold text-green-600">
-              {summary?.paidCommission.toLocaleString()}원
+              {summary?.settledEarnings.toLocaleString()}원
             </p>
           </div>
           <div className="p-4 bg-orange-50 rounded-lg">
             <p className="text-sm text-orange-700">지급 예정</p>
             <p className="text-2xl font-bold text-orange-600">
-              {summary?.pendingCommission.toLocaleString()}원
+              {summary?.pendingEarnings.toLocaleString()}원
             </p>
           </div>
         </div>

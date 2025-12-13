@@ -1,21 +1,34 @@
 {
   "name": "@o4o/partnerops",
-  "version": "1.0.0",
-  "description": "Partner Operations App - Partner management, link tracking, conversions, commissions",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "version": "2.0.0",
+  "description": "Partner Operations App - Partner management, link tracking, conversions, commissions (Partner-Core based)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    }
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@o4o/dropshipping-core": "workspace:*"
+    "@o4o/partner-core": "workspace:*",
+    "@o4o/types": "workspace:*"
   },
   "devDependencies": {
-    "typeorm": "^0.3.0",
+    "typeorm": "^0.3.20",
     "express": "^4.18.0",
     "typescript": "^5.0.0",
-    "rimraf": "^5.0.0"
+    "rimraf": "^5.0.0",
+    "tsup": "^8.5.0"
   },
   "peerDependencies": {
     "typeorm": "^0.3.0",

@@ -21,16 +21,23 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 
+/**
+ * Partner Routine (Partner-Core aligned)
+ * Maps to PartnerRoutineDto from @o4o/partnerops
+ */
 interface Routine {
   id: string;
+  partnerId: string;
   title: string;
-  description: string;
-  isActive: boolean;
-  products: string[];
-  views: number;
-  clicks: number;
-  conversions: number;
+  description?: string;
+  productIds: string[];       // Changed from products
+  productType?: string;
+  status: 'draft' | 'published' | 'archived';  // Changed from isActive
+  viewCount: number;          // Changed from views
+  clickCount: number;         // Changed from clicks
+  conversionCount: number;    // Changed from conversions
   createdAt: string;
+  updatedAt: string;
 }
 
 const Routines: React.FC = () => {
@@ -43,7 +50,7 @@ const Routines: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    products: '',
+    productIds: '',
   });
 
   const fetchRoutines = async () => {
@@ -59,36 +66,42 @@ const Routines: React.FC = () => {
       setRoutines([
         {
           id: '1',
+          partnerId: 'demo-partner',
           title: '겨울철 보습 루틴',
           description: '건조한 겨울철을 위한 보습 스킨케어 루틴입니다.',
-          isActive: true,
-          products: ['product-1', 'product-2', 'product-3'],
-          views: 1234,
-          clicks: 234,
-          conversions: 12,
+          status: 'published',
+          productIds: ['product-1', 'product-2', 'product-3'],
+          viewCount: 1234,
+          clickCount: 234,
+          conversionCount: 12,
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
         {
           id: '2',
+          partnerId: 'demo-partner',
           title: '민감 피부 진정 루틴',
           description: '민감한 피부를 위한 진정 케어 루틴입니다.',
-          isActive: true,
-          products: ['product-4', 'product-5'],
-          views: 892,
-          clicks: 156,
-          conversions: 8,
+          status: 'published',
+          productIds: ['product-4', 'product-5'],
+          viewCount: 892,
+          clickCount: 156,
+          conversionCount: 8,
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
         {
           id: '3',
+          partnerId: 'demo-partner',
           title: '여드름 관리 루틴',
           description: '트러블 피부를 위한 관리 루틴입니다.',
-          isActive: false,
-          products: ['product-6'],
-          views: 456,
-          clicks: 78,
-          conversions: 3,
+          status: 'draft',
+          productIds: ['product-6'],
+          viewCount: 456,
+          clickCount: 78,
+          conversionCount: 3,
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       ]);
     } finally {
@@ -106,8 +119,8 @@ const Routines: React.FC = () => {
       if (routine) {
         setFormData({
           title: routine.title,
-          description: routine.description,
-          products: routine.products.join(', '),
+          description: routine.description || '',
+          productIds: routine.productIds.join(', '),
         });
         setEditingId(id);
         setShowForm(true);
@@ -115,7 +128,7 @@ const Routines: React.FC = () => {
     } else if (id === 'new' || window.location.pathname.includes('/new')) {
       setShowForm(true);
       setEditingId(null);
-      setFormData({ title: '', description: '', products: '' });
+      setFormData({ title: '', description: '', productIds: '' });
     }
   }, [id, routines]);
 
@@ -124,7 +137,7 @@ const Routines: React.FC = () => {
       const data = {
         title: formData.title,
         description: formData.description,
-        products: formData.products.split(',').map((p) => p.trim()).filter(Boolean),
+        productIds: formData.productIds.split(',').map((p) => p.trim()).filter(Boolean),
       };
 
       if (editingId) {
@@ -135,7 +148,7 @@ const Routines: React.FC = () => {
 
       setShowForm(false);
       setEditingId(null);
-      setFormData({ title: '', description: '', products: '' });
+      setFormData({ title: '', description: '', productIds: '' });
       fetchRoutines();
       navigate('/partnerops/routines');
     } catch (err) {
@@ -156,10 +169,11 @@ const Routines: React.FC = () => {
     }
   };
 
-  const toggleActive = async (routine: Routine) => {
+  const toggleStatus = async (routine: Routine) => {
     try {
+      const newStatus = routine.status === 'published' ? 'draft' : 'published';
       await authClient.api.put(`/partnerops/routines/${routine.id}`, {
-        isActive: !routine.isActive,
+        status: newStatus,
       });
       fetchRoutines();
     } catch (err) {
@@ -186,7 +200,7 @@ const Routines: React.FC = () => {
           onClick={() => {
             setShowForm(true);
             setEditingId(null);
-            setFormData({ title: '', description: '', products: '' });
+            setFormData({ title: '', description: '', productIds: '' });
           }}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
@@ -230,8 +244,8 @@ const Routines: React.FC = () => {
                 <label className="block text-sm font-medium mb-1">상품 ID (쉼표로 구분)</label>
                 <input
                   type="text"
-                  value={formData.products}
-                  onChange={(e) => setFormData({ ...formData, products: e.target.value })}
+                  value={formData.productIds}
+                  onChange={(e) => setFormData({ ...formData, productIds: e.target.value })}
                   className="w-full border rounded-lg px-3 py-2"
                   placeholder="product-1, product-2, product-3"
                 />
@@ -273,45 +287,49 @@ const Routines: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-lg font-semibold">{routine.title}</h3>
-                    {routine.isActive ? (
+                    {routine.status === 'published' ? (
                       <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
-                        활성
+                        게시됨
+                      </span>
+                    ) : routine.status === 'draft' ? (
+                      <span className="px-2 py-0.5 bg-yellow-100 text-yellow-600 rounded text-xs">
+                        초안
                       </span>
                     ) : (
                       <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                        비활성
+                        보관됨
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 text-sm mb-3">{routine.description}</p>
+                  <p className="text-gray-600 text-sm mb-3">{routine.description || '-'}</p>
 
                   <div className="flex gap-4 text-sm">
                     <div className="flex items-center gap-1 text-gray-600">
                       <Package className="w-4 h-4" />
-                      {routine.products.length}개 상품
+                      {routine.productIds.length}개 상품
                     </div>
                     <div className="flex items-center gap-1 text-gray-600">
                       <Eye className="w-4 h-4" />
-                      {routine.views.toLocaleString()} 조회
+                      {routine.viewCount.toLocaleString()} 조회
                     </div>
                     <div className="flex items-center gap-1 text-gray-600">
                       <LinkIcon className="w-4 h-4" />
-                      {routine.clicks.toLocaleString()} 클릭
+                      {routine.clickCount.toLocaleString()} 클릭
                     </div>
                     <div className="flex items-center gap-1 text-blue-600">
                       <TrendingUp className="w-4 h-4" />
-                      {routine.conversions} 전환
+                      {routine.conversionCount} 전환
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => toggleActive(routine)}
+                    onClick={() => toggleStatus(routine)}
                     className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-                    title={routine.isActive ? '비활성화' : '활성화'}
+                    title={routine.status === 'published' ? '비게시' : '게시'}
                   >
-                    {routine.isActive ? (
+                    {routine.status === 'published' ? (
                       <EyeOff className="w-4 h-4" />
                     ) : (
                       <Eye className="w-4 h-4" />
@@ -321,8 +339,8 @@ const Routines: React.FC = () => {
                     onClick={() => {
                       setFormData({
                         title: routine.title,
-                        description: routine.description,
-                        products: routine.products.join(', '),
+                        description: routine.description || '',
+                        productIds: routine.productIds.join(', '),
                       });
                       setEditingId(routine.id);
                       setShowForm(true);

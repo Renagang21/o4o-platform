@@ -10,6 +10,7 @@ import { Repository, Between, IsNull } from 'typeorm';
 import {
   SettlementBatch,
   SettlementBatchStatus,
+  SettlementType,
 } from '../entities/SettlementBatch.entity.js';
 import { CommissionTransaction } from '../entities/CommissionTransaction.entity.js';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -96,7 +97,9 @@ export class SettlementService {
    */
   async findAll(filters?: {
     status?: SettlementBatchStatus;
+    settlementType?: SettlementType;
     sellerId?: string;
+    supplierId?: string;
   }): Promise<SettlementBatch[]> {
     const query = this.settlementRepository.createQueryBuilder('batch');
 
@@ -104,8 +107,18 @@ export class SettlementService {
       query.andWhere('batch.status = :status', { status: filters.status });
     }
 
+    if (filters?.settlementType) {
+      query.andWhere('batch.settlementType = :settlementType', {
+        settlementType: filters.settlementType,
+      });
+    }
+
     if (filters?.sellerId) {
       query.andWhere('batch.sellerId = :sellerId', { sellerId: filters.sellerId });
+    }
+
+    if (filters?.supplierId) {
+      query.andWhere('batch.supplierId = :supplierId', { supplierId: filters.supplierId });
     }
 
     return await query.orderBy('batch.createdAt', 'DESC').getMany();

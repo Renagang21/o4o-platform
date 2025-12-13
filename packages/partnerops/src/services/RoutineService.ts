@@ -2,234 +2,240 @@
  * Routine Service
  *
  * 파트너 루틴(콘텐츠) 관리 서비스
+ *
+ * Note: Routine은 PartnerOps 전용 기능으로, Partner-Core에 포함되지 않음.
+ * 향후 Partner-Core에 PartnerRoutine 엔티티/서비스 추가 시 위임 방식으로 전환.
+ *
+ * @package @o4o/partnerops
  */
 
-import type { DataSource } from 'typeorm';
+import type { Repository } from 'typeorm';
+import { Partner, executeValidatePartnerVisibility } from '@o4o/partner-core';
+import type { PartnerRoutineDto, CreateRoutineDto, UpdateRoutineDto } from '../dto/index.js';
 
-export interface PartnerRoutine {
+// PartnerOps 전용 Routine Entity (Partner-Core 미포함)
+export interface PartnerRoutineEntity {
   id: string;
   partnerId: string;
   title: string;
   description?: string;
-  content: string;
-  products: string[]; // 연결된 상품 ID 목록
+  productIds: string[];
+  productType?: string;
   status: 'draft' | 'published' | 'archived';
   viewCount: number;
   clickCount: number;
+  conversionCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CreateRoutineDto {
-  title: string;
-  description?: string;
-  content: string;
-  products?: string[];
-}
-
-export interface UpdateRoutineDto {
-  title?: string;
-  description?: string;
-  content?: string;
-  products?: string[];
-  status?: 'draft' | 'published' | 'archived';
-}
-
 export class RoutineService {
-  constructor(private readonly dataSource?: DataSource) {}
+  constructor(
+    private readonly routineRepository: Repository<PartnerRoutineEntity>,
+    private readonly partnerRepository: Repository<Partner>
+  ) {}
 
   /**
    * 루틴 목록 조회
    */
-  async list(tenantId: string, partnerId: string, filters?: { status?: string }): Promise<PartnerRoutine[]> {
-    if (!this.dataSource) {
-      return [];
+  async list(
+    partnerId: string,
+    filters?: { status?: string; productType?: string }
+  ): Promise<PartnerRoutineDto[]> {
+    const whereClause: any = { partnerId };
+
+    if (filters?.status) {
+      whereClause.status = filters.status;
+    }
+    if (filters?.productType) {
+      whereClause.productType = filters.productType;
     }
 
-    try {
-      let query = `
-        SELECT id, partner_id as "partnerId", title, description, content,
-               products, status, view_count as "viewCount", click_count as "clickCount",
-               created_at as "createdAt", updated_at as "updatedAt"
-        FROM partnerops_routines
-        WHERE partner_id = $1 AND tenant_id = $2
-      `;
-      const params: any[] = [partnerId, tenantId];
+    const routines = await this.routineRepository.find({
+      where: whereClause,
+      order: { createdAt: 'DESC' },
+    });
 
-      if (filters?.status) {
-        query += ` AND status = $3`;
-        params.push(filters.status);
+    // pharmaceutical 필터링
+    const filteredRoutines: PartnerRoutineDto[] = [];
+    for (const routine of routines) {
+      const visibility = await executeValidatePartnerVisibility({
+        partnerId,
+        productType: routine.productType,
+      });
+
+      if (visibility.visible) {
+        filteredRoutines.push(this.toRoutineDto(routine));
       }
-
-      query += ` ORDER BY created_at DESC`;
-
-      const result = await this.dataSource.query(query, params);
-      return result.map((r: any) => ({
-        ...r,
-        products: r.products || [],
-      }));
-    } catch (error) {
-      console.error('RoutineService list error:', error);
-      return [];
     }
+
+    return filteredRoutines;
   }
 
   /**
    * 루틴 상세 조회
    */
-  async detail(tenantId: string, id: string): Promise<PartnerRoutine | null> {
-    if (!this.dataSource) {
-      return null;
-    }
+  async getById(partnerId: string, id: string): Promise<PartnerRoutineDto | null> {
+    const routine = await this.routineRepository.findOne({
+      where: { id, partnerId },
+    });
 
-    try {
-      const result = await this.dataSource.query(
-        `SELECT id, partner_id as "partnerId", title, description, content,
-                products, status, view_count as "viewCount", click_count as "clickCount",
-                created_at as "createdAt", updated_at as "updatedAt"
-         FROM partnerops_routines
-         WHERE id = $1 AND tenant_id = $2`,
-        [id, tenantId]
-      );
-      if (!result[0]) return null;
-      return {
-        ...result[0],
-        products: result[0].products || [],
-      };
-    } catch (error) {
-      console.error('RoutineService detail error:', error);
-      return null;
-    }
-  }
+    if (!routine) return null;
 
-  /**
-   * 루틴 상세 조회 (별칭)
-   */
-  async getById(tenantId: string, id: string): Promise<PartnerRoutine | null> {
-    return this.detail(tenantId, id);
+    // pharmaceutical 필터링
+    const visibility = await executeValidatePartnerVisibility({
+      partnerId,
+      productType: routine.productType,
+    });
+
+    if (!visibility.visible) return null;
+
+    return this.toRoutineDto(routine);
   }
 
   /**
    * 루틴 생성
    */
-  async create(tenantId: string, partnerId: string, dto: CreateRoutineDto): Promise<PartnerRoutine> {
-    if (!this.dataSource) {
-      return this.createEmptyRoutine(partnerId, dto);
+  async create(partnerId: string, dto: CreateRoutineDto): Promise<PartnerRoutineDto> {
+    // pharmaceutical 제품 체크
+    const visibility = await executeValidatePartnerVisibility({
+      partnerId,
+      productType: dto.productType,
+    });
+
+    if (!visibility.visible) {
+      throw new Error(visibility.reason || 'Product type not allowed for routines');
     }
 
-    try {
-      const result = await this.dataSource.query(
-        `INSERT INTO partnerops_routines
-         (tenant_id, partner_id, title, description, content, products, status,
-          view_count, click_count, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, 'draft', 0, 0, NOW(), NOW())
-         RETURNING id, partner_id as "partnerId", title, description, content,
-                   products, status, view_count as "viewCount", click_count as "clickCount",
-                   created_at as "createdAt", updated_at as "updatedAt"`,
-        [tenantId, partnerId, dto.title, dto.description || null, dto.content, JSON.stringify(dto.products || [])]
-      );
-      return {
-        ...result[0],
-        products: result[0].products || [],
-      };
-    } catch (error) {
-      console.error('RoutineService create error:', error);
-      return this.createEmptyRoutine(partnerId, dto);
-    }
+    const routine = this.routineRepository.create({
+      partnerId,
+      title: dto.title,
+      description: dto.description,
+      productIds: dto.productIds,
+      productType: dto.productType,
+      status: 'draft',
+      viewCount: 0,
+      clickCount: 0,
+      conversionCount: 0,
+    });
+
+    const saved = await this.routineRepository.save(routine);
+    return this.toRoutineDto(saved);
   }
 
   /**
    * 루틴 수정
    */
-  async update(tenantId: string, id: string, dto: UpdateRoutineDto): Promise<PartnerRoutine> {
-    if (!this.dataSource) {
-      throw new Error('DataSource not available');
-    }
+  async update(
+    partnerId: string,
+    id: string,
+    dto: UpdateRoutineDto
+  ): Promise<PartnerRoutineDto | null> {
+    const routine = await this.routineRepository.findOne({
+      where: { id, partnerId },
+    });
 
-    try {
-      const updates: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
+    if (!routine) return null;
 
-      if (dto.title !== undefined) {
-        updates.push(`title = $${paramIndex++}`);
-        values.push(dto.title);
-      }
-      if (dto.description !== undefined) {
-        updates.push(`description = $${paramIndex++}`);
-        values.push(dto.description);
-      }
-      if (dto.content !== undefined) {
-        updates.push(`content = $${paramIndex++}`);
-        values.push(dto.content);
-      }
-      if (dto.products !== undefined) {
-        updates.push(`products = $${paramIndex++}`);
-        values.push(JSON.stringify(dto.products));
-      }
-      if (dto.status !== undefined) {
-        updates.push(`status = $${paramIndex++}`);
-        values.push(dto.status);
-      }
+    if (dto.title !== undefined) routine.title = dto.title;
+    if (dto.description !== undefined) routine.description = dto.description;
+    if (dto.productIds !== undefined) routine.productIds = dto.productIds;
+    if (dto.status !== undefined) routine.status = dto.status;
 
-      updates.push(`updated_at = NOW()`);
-      values.push(id, tenantId);
-
-      const result = await this.dataSource.query(
-        `UPDATE partnerops_routines
-         SET ${updates.join(', ')}
-         WHERE id = $${paramIndex++} AND tenant_id = $${paramIndex}
-         RETURNING id, partner_id as "partnerId", title, description, content,
-                   products, status, view_count as "viewCount", click_count as "clickCount",
-                   created_at as "createdAt", updated_at as "updatedAt"`,
-        values
-      );
-      return {
-        ...result[0],
-        products: result[0].products || [],
-      };
-    } catch (error) {
-      console.error('RoutineService update error:', error);
-      throw error;
-    }
+    const saved = await this.routineRepository.save(routine);
+    return this.toRoutineDto(saved);
   }
 
   /**
    * 루틴 삭제
    */
-  async delete(tenantId: string, id: string): Promise<boolean> {
-    if (!this.dataSource) {
-      return false;
-    }
+  async delete(partnerId: string, id: string): Promise<boolean> {
+    const routine = await this.routineRepository.findOne({
+      where: { id, partnerId },
+    });
 
-    try {
-      await this.dataSource.query(
-        `DELETE FROM partnerops_routines WHERE id = $1 AND tenant_id = $2`,
-        [id, tenantId]
-      );
-      return true;
-    } catch (error) {
-      console.error('RoutineService delete error:', error);
-      return false;
-    }
+    if (!routine) return false;
+
+    await this.routineRepository.remove(routine);
+    return true;
   }
 
-  private createEmptyRoutine(partnerId: string, dto: CreateRoutineDto): PartnerRoutine {
+  /**
+   * 루틴 발행
+   */
+  async publish(partnerId: string, id: string): Promise<PartnerRoutineDto | null> {
+    return this.update(partnerId, id, { status: 'published' });
+  }
+
+  /**
+   * 루틴 아카이브
+   */
+  async archive(partnerId: string, id: string): Promise<PartnerRoutineDto | null> {
+    return this.update(partnerId, id, { status: 'archived' });
+  }
+
+  /**
+   * 조회수 증가
+   */
+  async incrementViewCount(id: string): Promise<void> {
+    await this.routineRepository.increment({ id }, 'viewCount', 1);
+  }
+
+  /**
+   * 클릭수 증가
+   */
+  async incrementClickCount(id: string): Promise<void> {
+    await this.routineRepository.increment({ id }, 'clickCount', 1);
+  }
+
+  /**
+   * 파트너별 루틴 통계
+   */
+  async getStatsByPartnerId(partnerId: string): Promise<{
+    totalRoutines: number;
+    publishedRoutines: number;
+    draftRoutines: number;
+    totalViews: number;
+    totalClicks: number;
+  }> {
+    const routines = await this.routineRepository.find({
+      where: { partnerId },
+    });
+
     return {
-      id: '',
-      partnerId,
-      title: dto.title,
-      description: dto.description,
-      content: dto.content,
-      products: dto.products || [],
-      status: 'draft',
-      viewCount: 0,
-      clickCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      totalRoutines: routines.length,
+      publishedRoutines: routines.filter((r) => r.status === 'published').length,
+      draftRoutines: routines.filter((r) => r.status === 'draft').length,
+      totalViews: routines.reduce((sum, r) => sum + r.viewCount, 0),
+      totalClicks: routines.reduce((sum, r) => sum + r.clickCount, 0),
+    };
+  }
+
+  /**
+   * RoutineEntity → DTO 변환
+   */
+  private toRoutineDto(routine: PartnerRoutineEntity): PartnerRoutineDto {
+    return {
+      id: routine.id,
+      partnerId: routine.partnerId,
+      title: routine.title,
+      description: routine.description,
+      productIds: routine.productIds,
+      productType: routine.productType,
+      status: routine.status,
+      viewCount: routine.viewCount,
+      clickCount: routine.clickCount,
+      conversionCount: routine.conversionCount,
+      createdAt: routine.createdAt,
+      updatedAt: routine.updatedAt,
     };
   }
 }
 
-export const routineService = new RoutineService();
-export default routineService;
+// Factory function
+export function createRoutineService(
+  routineRepository: Repository<PartnerRoutineEntity>,
+  partnerRepository: Repository<Partner>
+): RoutineService {
+  return new RoutineService(routineRepository, partnerRepository);
+}

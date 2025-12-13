@@ -19,24 +19,39 @@ import {
   CreditCard,
 } from 'lucide-react';
 
+/**
+ * Settlement Batch Item (Partner-Core aligned)
+ * Maps to SettlementBatchItemDto from @o4o/partnerops
+ */
 interface SettlementBatch {
   id: string;
   batchNumber: string;
-  amount: number;
-  status: 'pending' | 'approved' | 'paid';
-  conversionsCount: number;
   periodStart: string;
   periodEnd: string;
+  conversionCount: number;
+  totalCommissionAmount: number;
+  deductionAmount: number;
+  netAmount: number;
+  status: 'open' | 'closed' | 'processing' | 'paid' | 'failed';  // Partner-Core statuses
+  paymentDueDate?: string;
   paidAt?: string;
   createdAt: string;
 }
 
+/**
+ * Settlement Summary (Partner-Core aligned)
+ * Maps to SettlementSummaryDto from @o4o/partnerops
+ */
 interface SettlementSummary {
-  totalPaid: number;
-  pendingAmount: number;
-  nextSettlementDate: string;
-  lastSettlementAmount: number;
-  lastSettlementDate: string;
+  totalEarnings: number;
+  settledEarnings: number;
+  pendingEarnings: number;
+  processingAmount: number;
+  lastPaymentDate?: string;
+  nextPaymentDate?: string;
+  totalBatches: number;
+  openBatches: number;
+  paidBatches: number;
 }
 
 const Settlement: React.FC = () => {
@@ -65,52 +80,65 @@ const Settlement: React.FC = () => {
         {
           id: '1',
           batchNumber: 'SET-2024-001',
-          amount: 234000,
-          status: 'paid',
-          conversionsCount: 45,
           periodStart: '2024-01-01',
           periodEnd: '2024-01-31',
+          conversionCount: 45,
+          totalCommissionAmount: 250000,
+          deductionAmount: 16000,
+          netAmount: 234000,
+          status: 'paid',
           paidAt: '2024-02-15',
           createdAt: '2024-02-01',
         },
         {
           id: '2',
           batchNumber: 'SET-2024-002',
-          amount: 312000,
-          status: 'paid',
-          conversionsCount: 52,
           periodStart: '2024-02-01',
           periodEnd: '2024-02-29',
+          conversionCount: 52,
+          totalCommissionAmount: 330000,
+          deductionAmount: 18000,
+          netAmount: 312000,
+          status: 'paid',
           paidAt: '2024-03-15',
           createdAt: '2024-03-01',
         },
         {
           id: '3',
           batchNumber: 'SET-2024-003',
-          amount: 278000,
-          status: 'approved',
-          conversionsCount: 48,
           periodStart: '2024-03-01',
           periodEnd: '2024-03-31',
+          conversionCount: 48,
+          totalCommissionAmount: 295000,
+          deductionAmount: 17000,
+          netAmount: 278000,
+          status: 'processing',
+          paymentDueDate: '2024-04-15',
           createdAt: '2024-04-01',
         },
         {
           id: '4',
           batchNumber: 'SET-2024-004',
-          amount: 156000,
-          status: 'pending',
-          conversionsCount: 23,
           periodStart: '2024-04-01',
           periodEnd: '2024-04-30',
+          conversionCount: 23,
+          totalCommissionAmount: 170000,
+          deductionAmount: 14000,
+          netAmount: 156000,
+          status: 'open',
           createdAt: '2024-05-01',
         },
       ]);
       setSummary({
-        totalPaid: 1308000,
-        pendingAmount: 434000,
-        nextSettlementDate: '2024-05-15',
-        lastSettlementAmount: 312000,
-        lastSettlementDate: '2024-03-15',
+        totalEarnings: 1742000,
+        settledEarnings: 546000,
+        pendingEarnings: 434000,
+        processingAmount: 278000,
+        lastPaymentDate: '2024-03-15',
+        nextPaymentDate: '2024-05-15',
+        totalBatches: 4,
+        openBatches: 1,
+        paidBatches: 2,
       });
     } finally {
       setLoading(false);
@@ -129,16 +157,28 @@ const Settlement: React.FC = () => {
             <CheckCircle className="w-3 h-3" /> 지급완료
           </span>
         );
-      case 'approved':
+      case 'processing':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-            <CheckCircle className="w-3 h-3" /> 승인됨
+            <Clock className="w-3 h-3" /> 처리중
           </span>
         );
-      case 'pending':
+      case 'closed':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs">
+            <CheckCircle className="w-3 h-3" /> 마감됨
+          </span>
+        );
+      case 'open':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs">
-            <Clock className="w-3 h-3" /> 정산대기
+            <Clock className="w-3 h-3" /> 진행중
+          </span>
+        );
+      case 'failed':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs">
+            <Clock className="w-3 h-3" /> 실패
           </span>
         );
       default:
@@ -173,7 +213,7 @@ const Settlement: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">총 지급액</p>
               <p className="text-xl font-bold text-green-600">
-                {summary?.totalPaid.toLocaleString()}원
+                {summary?.settledEarnings.toLocaleString()}원
               </p>
             </div>
           </div>
@@ -187,7 +227,7 @@ const Settlement: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">정산 예정</p>
               <p className="text-xl font-bold text-orange-600">
-                {summary?.pendingAmount.toLocaleString()}원
+                {summary?.pendingEarnings.toLocaleString()}원
               </p>
             </div>
           </div>
@@ -201,8 +241,8 @@ const Settlement: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">다음 정산일</p>
               <p className="text-xl font-bold">
-                {summary?.nextSettlementDate
-                  ? new Date(summary.nextSettlementDate).toLocaleDateString()
+                {summary?.nextPaymentDate
+                  ? new Date(summary.nextPaymentDate).toLocaleDateString()
                   : '-'}
               </p>
             </div>
@@ -215,13 +255,13 @@ const Settlement: React.FC = () => {
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">마지막 정산</p>
+              <p className="text-sm text-gray-600">처리중</p>
               <p className="text-xl font-bold">
-                {summary?.lastSettlementAmount.toLocaleString()}원
+                {summary?.processingAmount.toLocaleString()}원
               </p>
               <p className="text-xs text-gray-500">
-                {summary?.lastSettlementDate
-                  ? new Date(summary.lastSettlementDate).toLocaleDateString()
+                {summary?.lastPaymentDate
+                  ? `최근 지급: ${new Date(summary.lastPaymentDate).toLocaleDateString()}`
                   : ''}
               </p>
             </div>
@@ -262,9 +302,9 @@ const Settlement: React.FC = () => {
                     {new Date(batch.periodStart).toLocaleDateString()} ~{' '}
                     {new Date(batch.periodEnd).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 text-center">{batch.conversionsCount}</td>
+                  <td className="px-4 py-3 text-center">{batch.conversionCount}</td>
                   <td className="px-4 py-3 text-right font-medium">
-                    {batch.amount.toLocaleString()}원
+                    {batch.netAmount.toLocaleString()}원
                   </td>
                   <td className="px-4 py-3 text-center">{getStatusBadge(batch.status)}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">

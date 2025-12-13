@@ -11,13 +11,23 @@
  * @package @o4o/sellerops
  */
 
-import type {
-  DropshippingCoreExtension,
-  ListingCreationContext,
-  OrderCreationContext,
-  SettlementCreationContext,
-  ValidationResult,
+import {
+  ProductType,
+  type DropshippingCoreExtension,
+  type ListingCreationContext,
+  type OrderCreationContext,
+  type SettlementCreationContext,
+  type ValidationResult,
 } from '@o4o/dropshipping-core';
+
+/**
+ * SellerOps에서 차단해야 하는 productType 목록
+ *
+ * PHARMACEUTICAL: 의약품은 Listing/Order 절대 금지
+ */
+const BLOCKED_PRODUCT_TYPES: ProductType[] = [
+  ProductType.PHARMACEUTICAL,
+];
 
 /**
  * SellerOps Extension Implementation
@@ -36,20 +46,29 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
   supportedProductTypes: undefined,
 
   /**
-   * Listing 생성 검증
+   * Listing 생성 전 검증 (before hook)
    *
    * SellerOps 레벨에서의 기본 검증:
-   * - Seller-Supplier 관계 확인
-   * - Offer 상태 확인
-   *
-   * productType 기반 정책(예: pharmaceutical → Listing 금지)은
-   * 해당 Extension(dropshipping-pharmacy)이 담당합니다.
+   * 1. productType 기반 차단 (PHARMACEUTICAL 등)
+   * 2. Seller-Supplier 관계 확인
+   * 3. Offer 상태 확인
    */
-  async validateListingCreation(context: ListingCreationContext): Promise<ValidationResult> {
+  async beforeListingCreate(context: ListingCreationContext): Promise<ValidationResult> {
     const errors: Array<{ code: string; message: string; field?: string }> = [];
     const warnings: Array<{ code: string; message: string; field?: string }> = [];
 
-    // 1. Offer 상태 확인
+    // 1. productType 기반 차단 검증 (PHARMACEUTICAL 등)
+    const productType = context.productType as ProductType;
+    if (productType && BLOCKED_PRODUCT_TYPES.includes(productType)) {
+      errors.push({
+        code: 'PRODUCT_TYPE_BLOCKED',
+        message: `해당 상품 유형(${productType})은 일반 판매가 불가능합니다.`,
+        field: 'productType',
+      });
+      return { valid: false, errors };
+    }
+
+    // 2. Offer 상태 확인
     if (!context.offer) {
       errors.push({
         code: 'OFFER_NOT_FOUND',
@@ -59,7 +78,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
       return { valid: false, errors, warnings };
     }
 
-    // 2. Offer 활성화 상태 확인
+    // 3. Offer 활성화 상태 확인
     if (context.offer.status !== 'active') {
       errors.push({
         code: 'OFFER_NOT_ACTIVE',
@@ -68,7 +87,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
       });
     }
 
-    // 3. 재고 확인
+    // 4. 재고 확인
     if (context.offer.stockQuantity <= 0) {
       warnings.push({
         code: 'LOW_STOCK',
@@ -76,7 +95,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
       });
     }
 
-    // 4. Seller 활성화 상태 확인
+    // 5. Seller 활성화 상태 확인
     if (context.seller && context.seller.status !== 'active') {
       errors.push({
         code: 'SELLER_NOT_ACTIVE',
@@ -92,20 +111,29 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
   },
 
   /**
-   * Order 생성 검증
+   * Order 생성 전 검증 (before hook)
    *
    * SellerOps 레벨에서의 기본 검증:
-   * - Listing 활성화 상태 확인
-   * - 주문 수량 확인
-   *
-   * productType 기반 정책(예: pharmaceutical → 약국만 구매 가능)은
-   * 해당 Extension(dropshipping-pharmacy)이 담당합니다.
+   * 1. productType 기반 차단 (PHARMACEUTICAL 등)
+   * 2. Listing 활성화 상태 확인
+   * 3. 주문 수량 확인
    */
-  async validateOrderCreation(context: OrderCreationContext): Promise<ValidationResult> {
+  async beforeOrderCreate(context: OrderCreationContext): Promise<ValidationResult> {
     const errors: Array<{ code: string; message: string; field?: string }> = [];
     const warnings: Array<{ code: string; message: string; field?: string }> = [];
 
-    // 1. Listing 확인
+    // 1. productType 기반 차단 검증 (PHARMACEUTICAL 등)
+    const productType = context.productType as ProductType;
+    if (productType && BLOCKED_PRODUCT_TYPES.includes(productType)) {
+      errors.push({
+        code: 'PRODUCT_TYPE_BLOCKED',
+        message: `해당 상품 유형(${productType})은 일반 판매 채널에서 주문할 수 없습니다.`,
+        field: 'productType',
+      });
+      return { valid: false, errors };
+    }
+
+    // 2. Listing 확인
     if (!context.listing) {
       errors.push({
         code: 'LISTING_NOT_FOUND',
@@ -115,7 +143,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
       return { valid: false, errors, warnings };
     }
 
-    // 2. Listing 상태 확인
+    // 3. Listing 상태 확인
     if (context.listing.status !== 'active') {
       errors.push({
         code: 'LISTING_NOT_ACTIVE',
@@ -124,7 +152,7 @@ export const sellerOpsExtension: DropshippingCoreExtension = {
       });
     }
 
-    // 3. 주문 수량 확인
+    // 4. 주문 수량 확인
     const quantity = context.orderData?.quantity || 1;
     const availableStock = context.listing.offer?.stockQuantity || 0;
 

@@ -3,6 +3,12 @@
  *
  * 범용 공급자 운영 앱 (Universal Supplier Operations App)
  *
+ * Phase 9-B: Core 정렬 완료
+ * - ProductType, OfferStatus, OrderRelayStatus, SettlementType enum 사용
+ * - productType 기반 필터링 전 계층 지원
+ * - PHARMACEUTICAL 제품 타입 차단
+ * - before/after hooks 전체 구현
+ *
  * @package @o4o/supplierops
  * @version 1.0.0
  */

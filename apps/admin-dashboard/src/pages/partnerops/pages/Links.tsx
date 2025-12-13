@@ -20,15 +20,22 @@ import {
   Check,
 } from 'lucide-react';
 
+/**
+ * Tracking Link (Partner-Core aligned)
+ * Maps to PartnerLinkStatsDto from @o4o/partnerops
+ */
 interface TrackingLink {
-  id: string;
-  shortCode: string;
-  targetUrl: string;
-  targetType: 'listing' | 'routine' | 'custom';
-  targetId?: string;
-  clicks: number;
+  id: string;            // linkId
+  shortUrl: string;      // Changed from shortCode
+  originalUrl: string;   // Changed from targetUrl
+  targetType: 'product' | 'routine' | 'category' | 'custom';  // Partner-Core types
+  targetId: string;
+  productType?: string;
+  totalClicks: number;   // Changed from clicks
+  uniqueClicks: number;
   conversions: number;
   conversionRate: number;
+  totalCommission: number;
   createdAt: string;
 }
 
@@ -38,8 +45,8 @@ const Links: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    targetUrl: '',
-    targetType: 'custom' as 'listing' | 'routine' | 'custom',
+    originalUrl: '',
+    targetType: 'custom' as 'product' | 'routine' | 'category' | 'custom',
     targetId: '',
   });
 
@@ -56,34 +63,41 @@ const Links: React.FC = () => {
       setLinks([
         {
           id: '1',
-          shortCode: 'abc123',
-          targetUrl: 'https://example.com/products/skincare-set',
-          targetType: 'listing',
+          shortUrl: 'https://link.neture.co.kr/abc123',
+          originalUrl: 'https://neture.co.kr/products/skincare-set',
+          targetType: 'product',
           targetId: 'product-1',
-          clicks: 1234,
+          totalClicks: 1234,
+          uniqueClicks: 980,
           conversions: 45,
           conversionRate: 3.65,
+          totalCommission: 225000,
           createdAt: new Date().toISOString(),
         },
         {
           id: '2',
-          shortCode: 'xyz789',
-          targetUrl: 'https://example.com/routines/winter-care',
+          shortUrl: 'https://link.neture.co.kr/xyz789',
+          originalUrl: 'https://neture.co.kr/routines/winter-care',
           targetType: 'routine',
           targetId: 'routine-1',
-          clicks: 567,
+          totalClicks: 567,
+          uniqueClicks: 450,
           conversions: 23,
           conversionRate: 4.06,
+          totalCommission: 115000,
           createdAt: new Date().toISOString(),
         },
         {
           id: '3',
-          shortCode: 'promo01',
-          targetUrl: 'https://example.com/sale',
+          shortUrl: 'https://link.neture.co.kr/promo01',
+          originalUrl: 'https://neture.co.kr/sale',
           targetType: 'custom',
-          clicks: 2340,
+          targetId: '',
+          totalClicks: 2340,
+          uniqueClicks: 1890,
           conversions: 67,
           conversionRate: 2.86,
+          totalCommission: 335000,
           createdAt: new Date().toISOString(),
         },
       ]);
@@ -100,7 +114,7 @@ const Links: React.FC = () => {
     try {
       await authClient.api.post('/partnerops/links', formData);
       setShowForm(false);
-      setFormData({ targetUrl: '', targetType: 'custom', targetId: '' });
+      setFormData({ originalUrl: '', targetType: 'custom', targetId: '' });
       fetchLinks();
     } catch (err) {
       console.error('Failed to create link:', err);
@@ -121,15 +135,20 @@ const Links: React.FC = () => {
   };
 
   const copyLink = (link: TrackingLink) => {
-    const fullUrl = `https://link.neture.co.kr/${link.shortCode}`;
-    navigator.clipboard.writeText(fullUrl);
+    navigator.clipboard.writeText(link.shortUrl);
     setCopiedId(link.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // Extract short code from shortUrl for display
+  const getShortCode = (shortUrl: string) => {
+    const parts = shortUrl.split('/');
+    return parts[parts.length - 1];
+  };
+
   const getTargetTypeBadge = (type: string) => {
     switch (type) {
-      case 'listing':
+      case 'product':
         return (
           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
             상품
@@ -139,6 +158,12 @@ const Links: React.FC = () => {
         return (
           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs">
             루틴
+          </span>
+        );
+      case 'category':
+        return (
+          <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
+            카테고리
           </span>
         );
       default:
@@ -195,7 +220,7 @@ const Links: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">총 클릭</p>
               <p className="text-xl font-bold">
-                {links.reduce((acc, l) => acc + l.clicks, 0).toLocaleString()}
+                {links.reduce((acc, l) => acc + l.totalClicks, 0).toLocaleString()}
               </p>
             </div>
           </div>
@@ -229,14 +254,15 @@ const Links: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      targetType: e.target.value as 'listing' | 'routine' | 'custom',
+                      targetType: e.target.value as 'product' | 'routine' | 'category' | 'custom',
                     })
                   }
                   className="w-full border rounded-lg px-3 py-2"
                 >
                   <option value="custom">커스텀 URL</option>
-                  <option value="listing">상품</option>
+                  <option value="product">상품</option>
                   <option value="routine">루틴</option>
+                  <option value="category">카테고리</option>
                 </select>
               </div>
 
@@ -244,10 +270,10 @@ const Links: React.FC = () => {
                 <label className="block text-sm font-medium mb-1">대상 URL</label>
                 <input
                   type="text"
-                  value={formData.targetUrl}
-                  onChange={(e) => setFormData({ ...formData, targetUrl: e.target.value })}
+                  value={formData.originalUrl}
+                  onChange={(e) => setFormData({ ...formData, originalUrl: e.target.value })}
                   className="w-full border rounded-lg px-3 py-2"
-                  placeholder="https://example.com/product"
+                  placeholder="https://neture.co.kr/product/..."
                 />
               </div>
 
@@ -275,7 +301,7 @@ const Links: React.FC = () => {
               <button
                 onClick={() => {
                   setShowForm(false);
-                  setFormData({ targetUrl: '', targetType: 'custom', targetId: '' });
+                  setFormData({ originalUrl: '', targetType: 'custom', targetId: '' });
                 }}
                 className="flex-1 py-2 border rounded-lg hover:bg-gray-50"
               >
@@ -311,15 +337,15 @@ const Links: React.FC = () => {
                 <tr key={link.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div>
-                      <p className="font-medium text-blue-600">/{link.shortCode}</p>
+                      <p className="font-medium text-blue-600">/{getShortCode(link.shortUrl)}</p>
                       <p className="text-xs text-gray-500 truncate max-w-xs">
-                        {link.targetUrl}
+                        {link.originalUrl}
                       </p>
                     </div>
                   </td>
                   <td className="px-4 py-3">{getTargetTypeBadge(link.targetType)}</td>
                   <td className="px-4 py-3 text-right font-medium">
-                    {link.clicks.toLocaleString()}
+                    {link.totalClicks.toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-right font-medium">{link.conversions}</td>
                   <td className="px-4 py-3 text-right">
@@ -349,9 +375,7 @@ const Links: React.FC = () => {
                         )}
                       </button>
                       <button
-                        onClick={() =>
-                          window.open(`https://link.neture.co.kr/${link.shortCode}`, '_blank')
-                        }
+                        onClick={() => window.open(link.shortUrl, '_blank')}
                         className="p-2 text-gray-600 hover:bg-gray-100 rounded"
                         title="열기"
                       >

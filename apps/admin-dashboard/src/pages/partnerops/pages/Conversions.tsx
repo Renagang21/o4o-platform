@@ -21,26 +21,35 @@ import {
   XCircle,
 } from 'lucide-react';
 
+/**
+ * Conversion Item (Partner-Core aligned)
+ * Maps to ConversionListItemDto from @o4o/partnerops
+ */
 interface Conversion {
   id: string;
+  partnerId: string;
   orderId: string;
+  orderNumber?: string;
+  productType?: string;
   orderAmount: number;
-  commissionRate: number;
   commissionAmount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'paid';
-  linkId?: string;
-  linkCode?: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'refunded';  // Partner-Core statuses
+  attributionDays?: number;
   createdAt: string;
+  confirmedAt?: string;
 }
 
+/**
+ * Conversion Summary
+ */
 interface ConversionSummary {
   totalConversions: number;
   totalAmount: number;
   totalCommission: number;
   pendingCount: number;
-  approvedCount: number;
-  paidCount: number;
-  rejectedCount: number;
+  confirmedCount: number;
+  cancelledCount: number;
+  refundedCount: number;
 }
 
 const Conversions: React.FC = () => {
@@ -78,52 +87,60 @@ const Conversions: React.FC = () => {
       setConversions([
         {
           id: '1',
+          partnerId: 'demo-partner',
           orderId: 'ORD-2024-001',
+          orderNumber: 'ORD-2024-001',
           orderAmount: 89000,
-          commissionRate: 5,
           commissionAmount: 4450,
-          status: 'paid',
-          linkCode: 'abc123',
+          status: 'confirmed',
+          attributionDays: 7,
           createdAt: new Date().toISOString(),
+          confirmedAt: new Date().toISOString(),
         },
         {
           id: '2',
+          partnerId: 'demo-partner',
           orderId: 'ORD-2024-002',
+          orderNumber: 'ORD-2024-002',
           orderAmount: 156000,
-          commissionRate: 5,
           commissionAmount: 7800,
-          status: 'approved',
-          linkCode: 'xyz789',
+          status: 'confirmed',
+          attributionDays: 7,
           createdAt: new Date().toISOString(),
+          confirmedAt: new Date().toISOString(),
         },
         {
           id: '3',
+          partnerId: 'demo-partner',
           orderId: 'ORD-2024-003',
+          orderNumber: 'ORD-2024-003',
           orderAmount: 45000,
-          commissionRate: 5,
           commissionAmount: 2250,
           status: 'pending',
-          linkCode: 'abc123',
+          attributionDays: 7,
           createdAt: new Date().toISOString(),
         },
         {
           id: '4',
+          partnerId: 'demo-partner',
           orderId: 'ORD-2024-004',
+          orderNumber: 'ORD-2024-004',
           orderAmount: 234000,
-          commissionRate: 5,
           commissionAmount: 11700,
-          status: 'paid',
-          linkCode: 'promo01',
+          status: 'confirmed',
+          attributionDays: 7,
           createdAt: new Date().toISOString(),
+          confirmedAt: new Date().toISOString(),
         },
         {
           id: '5',
+          partnerId: 'demo-partner',
           orderId: 'ORD-2024-005',
+          orderNumber: 'ORD-2024-005',
           orderAmount: 67000,
-          commissionRate: 5,
           commissionAmount: 3350,
-          status: 'rejected',
-          linkCode: 'abc123',
+          status: 'cancelled',
+          attributionDays: 7,
           createdAt: new Date().toISOString(),
         },
       ]);
@@ -132,9 +149,9 @@ const Conversions: React.FC = () => {
         totalAmount: 15420000,
         totalCommission: 771000,
         pendingCount: 23,
-        approvedCount: 45,
-        paidCount: 267,
-        rejectedCount: 7,
+        confirmedCount: 312,
+        cancelledCount: 5,
+        refundedCount: 2,
       });
     } finally {
       setLoading(false);
@@ -147,16 +164,10 @@ const Conversions: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'paid':
+      case 'confirmed':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
-            <CheckCircle className="w-3 h-3" /> 지급완료
-          </span>
-        );
-      case 'approved':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-            <CheckCircle className="w-3 h-3" /> 승인됨
+            <CheckCircle className="w-3 h-3" /> 확정
           </span>
         );
       case 'pending':
@@ -165,10 +176,16 @@ const Conversions: React.FC = () => {
             <Clock className="w-3 h-3" /> 대기중
           </span>
         );
-      case 'rejected':
+      case 'cancelled':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs">
-            <XCircle className="w-3 h-3" /> 거절됨
+            <XCircle className="w-3 h-3" /> 취소됨
+          </span>
+        );
+      case 'refunded':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
+            <XCircle className="w-3 h-3" /> 환불됨
           </span>
         );
       default:
@@ -237,16 +254,16 @@ const Conversions: React.FC = () => {
               <span className="font-medium text-yellow-600">{summary?.pendingCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">승인됨</span>
-              <span className="font-medium text-blue-600">{summary?.approvedCount}</span>
+              <span className="text-gray-600">확정</span>
+              <span className="font-medium text-green-600">{summary?.confirmedCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">지급완료</span>
-              <span className="font-medium text-green-600">{summary?.paidCount}</span>
+              <span className="text-gray-600">취소됨</span>
+              <span className="font-medium text-red-600">{summary?.cancelledCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">거절됨</span>
-              <span className="font-medium text-red-600">{summary?.rejectedCount}</span>
+              <span className="text-gray-600">환불됨</span>
+              <span className="font-medium text-gray-600">{summary?.refundedCount}</span>
             </div>
           </div>
         </div>
@@ -264,9 +281,9 @@ const Conversions: React.FC = () => {
             >
               <option value="all">모든 상태</option>
               <option value="pending">대기중</option>
-              <option value="approved">승인됨</option>
-              <option value="paid">지급완료</option>
-              <option value="rejected">거절됨</option>
+              <option value="confirmed">확정</option>
+              <option value="cancelled">취소됨</option>
+              <option value="refunded">환불됨</option>
             </select>
           </div>
 
@@ -295,33 +312,26 @@ const Conversions: React.FC = () => {
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">주문번호</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">링크</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">주문금액</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">수수료율</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">커미션</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">상태</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">일시</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">생성일</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">확정일</th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {conversions.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   전환 내역이 없습니다.
                 </td>
               </tr>
             ) : (
               conversions.map((conv) => (
                 <tr key={conv.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{conv.orderId}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {conv.linkCode ? `/${conv.linkCode}` : '-'}
-                  </td>
+                  <td className="px-4 py-3 font-medium">{conv.orderNumber || conv.orderId}</td>
                   <td className="px-4 py-3 text-right">
                     {conv.orderAmount.toLocaleString()}원
-                  </td>
-                  <td className="px-4 py-3 text-center text-gray-600">
-                    {conv.commissionRate}%
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-blue-600">
                     {conv.commissionAmount.toLocaleString()}원
@@ -329,6 +339,9 @@ const Conversions: React.FC = () => {
                   <td className="px-4 py-3 text-center">{getStatusBadge(conv.status)}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {new Date(conv.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {conv.confirmedAt ? new Date(conv.confirmedAt).toLocaleDateString() : '-'}
                   </td>
                 </tr>
               ))

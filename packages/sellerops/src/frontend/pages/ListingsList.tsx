@@ -17,6 +17,7 @@ import {
 import type { ListingDetailDto } from '../../dto/index.js';
 
 type ListingStatusFilter = 'all' | 'active' | 'draft' | 'paused' | 'sold_out' | 'delisted';
+type ProductTypeFilter = 'all' | 'general' | 'cosmetics' | 'food' | 'health' | 'electronics';
 
 interface ListingsListProps {
   sellerId: string;
@@ -35,10 +36,11 @@ export const ListingsList: React.FC<ListingsListProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<ListingStatusFilter>('all');
+  const [productTypeFilter, setProductTypeFilter] = useState<ProductTypeFilter>('all');
 
   useEffect(() => {
     fetchListings();
-  }, [sellerId, statusFilter]);
+  }, [sellerId, statusFilter, productTypeFilter]);
 
   const fetchListings = async () => {
     setLoading(true);
@@ -46,6 +48,9 @@ export const ListingsList: React.FC<ListingsListProps> = ({
       let url = `${apiBaseUrl}/listings?sellerId=${sellerId}`;
       if (statusFilter !== 'all') {
         url += `&status=${statusFilter}`;
+      }
+      if (productTypeFilter !== 'all') {
+        url += `&productType=${productTypeFilter}`;
       }
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch listings');
@@ -151,12 +156,24 @@ export const ListingsList: React.FC<ListingsListProps> = ({
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as ListingStatusFilter)}
             >
-              <option value="all">전체</option>
+              <option value="all">전체 상태</option>
               <option value="active">판매중</option>
               <option value="draft">작성중</option>
               <option value="paused">일시중지</option>
               <option value="sold_out">품절</option>
               <option value="delisted">판매종료</option>
+            </select>
+            <select
+              className="px-4 py-2 border rounded-lg"
+              value={productTypeFilter}
+              onChange={(e) => setProductTypeFilter(e.target.value as ProductTypeFilter)}
+            >
+              <option value="all">전체 상품유형</option>
+              <option value="general">일반</option>
+              <option value="cosmetics">화장품</option>
+              <option value="food">식품</option>
+              <option value="health">건강식품</option>
+              <option value="electronics">전자제품</option>
             </select>
           </div>
         </div>

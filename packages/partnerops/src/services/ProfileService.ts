@@ -1,180 +1,180 @@
 /**
  * Profile Service
  *
- * 파트너 프로필 관리 서비스
+ * 파트너 프로필 관리 서비스 (Partner-Core 기반)
+ *
+ * @package @o4o/partnerops
  */
 
-import type { DataSource } from 'typeorm';
-
-export interface PartnerProfile {
-  id: string;
-  userId: string;
-  displayName: string;
-  bio?: string;
-  avatar?: string;
-  socialLinks?: Record<string, string>;
-  status: 'pending' | 'approved' | 'rejected' | 'suspended';
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { Repository } from 'typeorm';
+import {
+  Partner,
+  PartnerService,
+  PartnerLevel,
+} from '@o4o/partner-core';
+import type { PartnerProfileDto } from '../dto/index.js';
 
 export interface CreateProfileDto {
   userId: string;
-  displayName: string;
-  bio?: string;
+  name: string;
+  profileImage?: string;
+  socialLinks?: Partner['socialLinks'];
+  bankInfo?: Partner['bankInfo'];
 }
 
 export interface UpdateProfileDto {
-  displayName?: string;
-  bio?: string;
-  avatar?: string;
-  socialLinks?: Record<string, string>;
+  name?: string;
+  profileImage?: string;
+  socialLinks?: Partner['socialLinks'];
+  bankInfo?: Partner['bankInfo'];
 }
 
 export class ProfileService {
-  constructor(private readonly dataSource?: DataSource) {}
+  private partnerService: PartnerService;
 
-  /**
-   * 프로필 조회
-   */
-  async getProfile(tenantId: string, partnerId: string): Promise<PartnerProfile | null> {
-    if (!this.dataSource) {
-      return null;
-    }
-
-    try {
-      const result = await this.dataSource.query(
-        `SELECT id, user_id as "userId", display_name as "displayName",
-                bio, avatar, social_links as "socialLinks", status,
-                created_at as "createdAt", updated_at as "updatedAt"
-         FROM partnerops_partners
-         WHERE id = $1 AND tenant_id = $2`,
-        [partnerId, tenantId]
-      );
-      return result[0] || null;
-    } catch (error) {
-      console.error('ProfileService getProfile error:', error);
-      return null;
-    }
+  constructor(private readonly partnerRepository: Repository<Partner>) {
+    this.partnerService = new PartnerService(partnerRepository);
   }
 
   /**
-   * 사용자 ID로 프로필 조회
+   * 파트너 프로필 조회 (Partner ID)
    */
-  async getProfileByUserId(tenantId: string, userId: string): Promise<PartnerProfile | null> {
-    if (!this.dataSource) {
-      return null;
-    }
-
-    try {
-      const result = await this.dataSource.query(
-        `SELECT id, user_id as "userId", display_name as "displayName",
-                bio, avatar, social_links as "socialLinks", status,
-                created_at as "createdAt", updated_at as "updatedAt"
-         FROM partnerops_partners
-         WHERE user_id = $1 AND tenant_id = $2`,
-        [userId, tenantId]
-      );
-      return result[0] || null;
-    } catch (error) {
-      console.error('ProfileService getProfileByUserId error:', error);
-      return null;
-    }
+  async getProfile(partnerId: string): Promise<PartnerProfileDto | null> {
+    const partner = await this.partnerService.findById(partnerId);
+    if (!partner) return null;
+    return this.toProfileDto(partner);
   }
 
   /**
-   * 프로필 생성 (파트너 신청)
+   * 파트너 프로필 조회 (User ID)
    */
-  async createProfile(tenantId: string, dto: CreateProfileDto): Promise<PartnerProfile> {
-    if (!this.dataSource) {
-      return this.createEmptyProfile(dto);
-    }
-
-    try {
-      const result = await this.dataSource.query(
-        `INSERT INTO partnerops_partners
-         (tenant_id, user_id, display_name, bio, status, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, 'pending', NOW(), NOW())
-         RETURNING id, user_id as "userId", display_name as "displayName",
-                   bio, avatar, social_links as "socialLinks", status,
-                   created_at as "createdAt", updated_at as "updatedAt"`,
-        [tenantId, dto.userId, dto.displayName, dto.bio || null]
-      );
-      return result[0];
-    } catch (error) {
-      console.error('ProfileService createProfile error:', error);
-      return this.createEmptyProfile(dto);
-    }
-  }
-
-  /**
-   * 프로필 수정
-   */
-  async updateProfile(tenantId: string, partnerId: string, dto: UpdateProfileDto): Promise<PartnerProfile> {
-    if (!this.dataSource) {
-      return this.createEmptyProfile({ userId: '', displayName: dto.displayName || '' });
-    }
-
-    try {
-      const updates: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
-
-      if (dto.displayName !== undefined) {
-        updates.push(`display_name = $${paramIndex++}`);
-        values.push(dto.displayName);
-      }
-      if (dto.bio !== undefined) {
-        updates.push(`bio = $${paramIndex++}`);
-        values.push(dto.bio);
-      }
-      if (dto.avatar !== undefined) {
-        updates.push(`avatar = $${paramIndex++}`);
-        values.push(dto.avatar);
-      }
-      if (dto.socialLinks !== undefined) {
-        updates.push(`social_links = $${paramIndex++}`);
-        values.push(JSON.stringify(dto.socialLinks));
-      }
-
-      updates.push(`updated_at = NOW()`);
-      values.push(partnerId, tenantId);
-
-      const result = await this.dataSource.query(
-        `UPDATE partnerops_partners
-         SET ${updates.join(', ')}
-         WHERE id = $${paramIndex++} AND tenant_id = $${paramIndex}
-         RETURNING id, user_id as "userId", display_name as "displayName",
-                   bio, avatar, social_links as "socialLinks", status,
-                   created_at as "createdAt", updated_at as "updatedAt"`,
-        values
-      );
-      return result[0];
-    } catch (error) {
-      console.error('ProfileService updateProfile error:', error);
-      throw error;
-    }
+  async getProfileByUserId(userId: string): Promise<PartnerProfileDto | null> {
+    const partner = await this.partnerService.findByUserId(userId);
+    if (!partner) return null;
+    return this.toProfileDto(partner);
   }
 
   /**
    * 파트너 신청
    */
-  async applyAsPartner(tenantId: string, userId: string, dto: CreateProfileDto): Promise<PartnerProfile> {
-    return this.createProfile(tenantId, { ...dto, userId });
+  async applyAsPartner(dto: CreateProfileDto): Promise<PartnerProfileDto> {
+    // 이미 파트너인지 확인
+    const existing = await this.partnerService.findByUserId(dto.userId);
+    if (existing) {
+      throw new Error('Already registered as partner');
+    }
+
+    const partner = await this.partnerService.create({
+      userId: dto.userId,
+      name: dto.name,
+      profileImage: dto.profileImage,
+      socialLinks: dto.socialLinks,
+      bankInfo: dto.bankInfo,
+    });
+
+    return this.toProfileDto(partner);
   }
 
-  private createEmptyProfile(dto: CreateProfileDto): PartnerProfile {
+  /**
+   * 프로필 업데이트
+   */
+  async updateProfile(
+    partnerId: string,
+    dto: UpdateProfileDto
+  ): Promise<PartnerProfileDto | null> {
+    const partner = await this.partnerService.update(partnerId, {
+      name: dto.name,
+      profileImage: dto.profileImage,
+      socialLinks: dto.socialLinks,
+      bankInfo: dto.bankInfo,
+    });
+
+    if (!partner) return null;
+    return this.toProfileDto(partner);
+  }
+
+  /**
+   * 레벨 정보 조회
+   */
+  async getLevelInfo(partnerId: string): Promise<{
+    currentLevel: PartnerLevel;
+    nextLevel?: PartnerLevel;
+    progress: number;
+    requirements: {
+      totalCommission: number;
+      conversionCount: number;
+    };
+  } | null> {
+    const partner = await this.partnerService.findById(partnerId);
+    if (!partner) return null;
+
+    const levelThresholds: Record<PartnerLevel, { totalCommission: number; conversionCount: number }> = {
+      [PartnerLevel.NEWBIE]: { totalCommission: 0, conversionCount: 0 },
+      [PartnerLevel.STANDARD]: { totalCommission: 100000, conversionCount: 10 },
+      [PartnerLevel.PRO]: { totalCommission: 1000000, conversionCount: 100 },
+      [PartnerLevel.ELITE]: { totalCommission: 10000000, conversionCount: 1000 },
+    };
+
+    const levels = [
+      PartnerLevel.NEWBIE,
+      PartnerLevel.STANDARD,
+      PartnerLevel.PRO,
+      PartnerLevel.ELITE,
+    ];
+
+    const currentIndex = levels.indexOf(partner.level);
+    const nextLevel = currentIndex < levels.length - 1 ? levels[currentIndex + 1] : undefined;
+
+    // 진행률 계산
+    let progress = 100;
+    if (nextLevel) {
+      const nextThreshold = levelThresholds[nextLevel];
+      const commissionProgress =
+        nextThreshold.totalCommission > 0
+          ? (Number(partner.totalCommission) / nextThreshold.totalCommission) * 100
+          : 100;
+      const conversionProgress =
+        nextThreshold.conversionCount > 0
+          ? (partner.conversionCount / nextThreshold.conversionCount) * 100
+          : 100;
+      progress = Math.min(100, Math.max(commissionProgress, conversionProgress));
+    }
+
     return {
-      id: '',
-      userId: dto.userId,
-      displayName: dto.displayName,
-      bio: dto.bio,
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      currentLevel: partner.level,
+      nextLevel,
+      progress: Math.round(progress),
+      requirements: nextLevel
+        ? levelThresholds[nextLevel]
+        : { totalCommission: 0, conversionCount: 0 },
+    };
+  }
+
+  /**
+   * Partner → ProfileDto 변환
+   */
+  private toProfileDto(partner: Partner): PartnerProfileDto {
+    return {
+      id: partner.id,
+      userId: partner.userId,
+      name: partner.name,
+      profileImage: partner.profileImage,
+      socialLinks: partner.socialLinks,
+      level: partner.level,
+      status: partner.status,
+      commissionRate: Number(partner.commissionRate),
+      clickCount: partner.clickCount,
+      conversionCount: partner.conversionCount,
+      totalCommission: Number(partner.totalCommission),
+      createdAt: partner.createdAt,
+      updatedAt: partner.updatedAt,
     };
   }
 }
 
-export const profileService = new ProfileService();
-export default profileService;
+// Factory function
+export function createProfileService(
+  partnerRepository: Repository<Partner>
+): ProfileService {
+  return new ProfileService(partnerRepository);
+}

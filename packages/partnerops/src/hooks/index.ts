@@ -1,5 +1,7 @@
 /**
  * PartnerOps Hooks
+ *
+ * @package @o4o/partnerops
  */
 
-export * from './event-handlers';
+export * from './event-handlers.js';

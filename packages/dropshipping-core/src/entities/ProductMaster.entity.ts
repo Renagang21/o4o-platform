@@ -27,27 +27,29 @@ export enum ProductStatus {
 }
 
 /**
- * ProductType - 산업별 상품 타입
+ * ProductType - 산업별 상품 타입 (정식 Enum)
  *
  * Core는 이 값의 비즈니스 의미를 해석하지 않음.
  * 확장앱(Cosmetics, Pharmacy, Tourism 등)이 Hook을 통해 각 타입별 로직을 처리.
  *
- * 예시:
- * - "general": 일반 상품
- * - "cosmetics": 화장품
- * - "food": 식품
- * - "pharmaceutical": 의약품
- * - "tourism": 관광 상품
- * - "partner": 파트너 상품
+ * 사용 예시:
+ * - GENERAL: 일반 상품
+ * - COSMETICS: 화장품 (화장품 확장앱에서 추가 검증)
+ * - FOOD: 식품
+ * - HEALTH: 건강기능식품
+ * - ELECTRONICS: 전자제품
+ * - PHARMACEUTICAL: 의약품 (파트너 링크 생성 제한 등)
+ * - CUSTOM: 확장앱이 정의하는 커스텀 타입
  */
-export type ProductType =
-  | 'general'
-  | 'cosmetics'
-  | 'food'
-  | 'pharmaceutical'
-  | 'tourism'
-  | 'partner'
-  | string; // 확장 가능
+export enum ProductType {
+  GENERAL = 'general',
+  COSMETICS = 'cosmetics',
+  FOOD = 'food',
+  HEALTH = 'health',
+  ELECTRONICS = 'electronics',
+  PHARMACEUTICAL = 'pharmaceutical',
+  CUSTOM = 'custom',
+}
 
 @Entity('dropshipping_product_masters')
 export class ProductMaster {
@@ -79,7 +81,11 @@ export class ProductMaster {
    * 확장앱이 Validation Hook을 통해 productType별 규칙을 적용함.
    */
   @Index()
-  @Column({ type: 'varchar', length: 50, default: 'general' })
+  @Column({
+    type: 'enum',
+    enum: ProductType,
+    default: ProductType.GENERAL,
+  })
   productType!: ProductType;
 
   @Column({

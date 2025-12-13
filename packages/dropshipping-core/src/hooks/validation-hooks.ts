@@ -98,29 +98,47 @@ export interface CommissionContext {
 
 export interface OfferValidationHook {
   /**
-   * Offer 생성 전 검증
+   * Offer 생성 전 검증 (before hook)
    * 기본 구현: always allow
    * 확장앱(Cosmetics/Pharmacy 등)이 override 가능
    */
-  validateOfferCreation(context: OfferCreationContext): Promise<ValidationResult>;
+  beforeOfferCreate(context: OfferCreationContext): Promise<ValidationResult>;
+
+  /**
+   * Offer 생성 후 처리 (after hook)
+   * 확장앱에서 추가 처리 가능 (알림, 로깅 등)
+   */
+  afterOfferCreate(context: OfferCreationContext & { offerId: string }): Promise<void>;
 }
 
 export interface ListingValidationHook {
   /**
-   * Listing 생성 전 검증
+   * Listing 생성 전 검증 (before hook)
    * 기본 구현: always allow
    * Pharmacy Extension 등에서 Listing 금지 구현 가능
    */
-  validateListingCreation(context: ListingCreationContext): Promise<ValidationResult>;
+  beforeListingCreate(context: ListingCreationContext): Promise<ValidationResult>;
+
+  /**
+   * Listing 생성 후 처리 (after hook)
+   * 확장앱에서 추가 처리 가능 (가격 동기화 등)
+   */
+  afterListingCreate(context: ListingCreationContext & { listingId: string }): Promise<void>;
 }
 
 export interface OrderValidationHook {
   /**
-   * Order 생성 전 검증
+   * Order 생성 전 검증 (before hook)
    * 기본 구현: allow
    * Pharmacy Extension에서 약국만 구매 허용 등 구현 가능
    */
-  validateOrderCreation(context: OrderCreationContext): Promise<ValidationResult>;
+  beforeOrderCreate(context: OrderCreationContext): Promise<ValidationResult>;
+
+  /**
+   * Order 생성 후 처리 (after hook)
+   * 확장앱에서 추가 처리 가능 (재고 업데이트 등)
+   */
+  afterOrderCreate(context: OrderCreationContext & { orderId: string }): Promise<void>;
 }
 
 export interface SettlementValidationHook {
@@ -147,20 +165,29 @@ export interface CommissionValidationHook {
 // ============================================
 
 export const defaultOfferValidation: OfferValidationHook = {
-  async validateOfferCreation(_context: OfferCreationContext): Promise<ValidationResult> {
+  async beforeOfferCreate(_context: OfferCreationContext): Promise<ValidationResult> {
     return { valid: true, errors: [] };
+  },
+  async afterOfferCreate(_context: OfferCreationContext & { offerId: string }): Promise<void> {
+    // No-op by default
   },
 };
 
 export const defaultListingValidation: ListingValidationHook = {
-  async validateListingCreation(_context: ListingCreationContext): Promise<ValidationResult> {
+  async beforeListingCreate(_context: ListingCreationContext): Promise<ValidationResult> {
     return { valid: true, errors: [] };
+  },
+  async afterListingCreate(_context: ListingCreationContext & { listingId: string }): Promise<void> {
+    // No-op by default
   },
 };
 
 export const defaultOrderValidation: OrderValidationHook = {
-  async validateOrderCreation(_context: OrderCreationContext): Promise<ValidationResult> {
+  async beforeOrderCreate(_context: OrderCreationContext): Promise<ValidationResult> {
     return { valid: true, errors: [] };
+  },
+  async afterOrderCreate(_context: OrderCreationContext & { orderId: string }): Promise<void> {
+    // No-op by default
   },
 };
 
@@ -218,15 +245,21 @@ export class ValidationHookRegistry {
     this.offerHooks.delete(appId);
   }
 
-  async validateOfferCreation(context: OfferCreationContext): Promise<ValidationResult> {
+  async beforeOfferCreate(context: OfferCreationContext): Promise<ValidationResult> {
     const results: ValidationResult[] = [];
 
     for (const [, hook] of this.offerHooks) {
-      const result = await hook.validateOfferCreation(context);
+      const result = await hook.beforeOfferCreate(context);
       results.push(result);
     }
 
     return this.mergeResults(results);
+  }
+
+  async afterOfferCreate(context: OfferCreationContext & { offerId: string }): Promise<void> {
+    for (const [, hook] of this.offerHooks) {
+      await hook.afterOfferCreate(context);
+    }
   }
 
   // ===== Listing Hooks =====
@@ -239,15 +272,21 @@ export class ValidationHookRegistry {
     this.listingHooks.delete(appId);
   }
 
-  async validateListingCreation(context: ListingCreationContext): Promise<ValidationResult> {
+  async beforeListingCreate(context: ListingCreationContext): Promise<ValidationResult> {
     const results: ValidationResult[] = [];
 
     for (const [, hook] of this.listingHooks) {
-      const result = await hook.validateListingCreation(context);
+      const result = await hook.beforeListingCreate(context);
       results.push(result);
     }
 
     return this.mergeResults(results);
+  }
+
+  async afterListingCreate(context: ListingCreationContext & { listingId: string }): Promise<void> {
+    for (const [, hook] of this.listingHooks) {
+      await hook.afterListingCreate(context);
+    }
   }
 
   // ===== Order Hooks =====
@@ -260,15 +299,21 @@ export class ValidationHookRegistry {
     this.orderHooks.delete(appId);
   }
 
-  async validateOrderCreation(context: OrderCreationContext): Promise<ValidationResult> {
+  async beforeOrderCreate(context: OrderCreationContext): Promise<ValidationResult> {
     const results: ValidationResult[] = [];
 
     for (const [, hook] of this.orderHooks) {
-      const result = await hook.validateOrderCreation(context);
+      const result = await hook.beforeOrderCreate(context);
       results.push(result);
     }
 
     return this.mergeResults(results);
+  }
+
+  async afterOrderCreate(context: OrderCreationContext & { orderId: string }): Promise<void> {
+    for (const [, hook] of this.orderHooks) {
+      await hook.afterOrderCreate(context);
+    }
   }
 
   // ===== Settlement Hooks =====

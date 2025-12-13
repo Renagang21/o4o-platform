@@ -11,8 +11,17 @@ import {
   OrderRelay,
   SellerListing,
   OrderRelayStatus,
+  ProductType,
 } from '@o4o/dropshipping-core';
 import type { OrderListItemDto, OrderDetailDto } from '../dto/index.js';
+
+/**
+ * SellerOps에서 차단해야 하는 productType 목록
+ * PHARMACEUTICAL 등 일반 판매 불가 상품 제외
+ */
+const BLOCKED_PRODUCT_TYPES: ProductType[] = [
+  ProductType.PHARMACEUTICAL,
+];
 
 @Injectable()
 export class OrderOpsService {
@@ -25,6 +34,8 @@ export class OrderOpsService {
 
   /**
    * 주문 목록 조회
+   *
+   * PHARMACEUTICAL 등 차단된 productType은 자동 제외됩니다.
    */
   async getOrders(
     sellerId: string,
@@ -32,6 +43,7 @@ export class OrderOpsService {
       status?: string;
       dateFrom?: Date;
       dateTo?: Date;
+      productType?: ProductType;
     }
   ): Promise<OrderListItemDto[]> {
     const query = this.orderRelayRepository
@@ -55,11 +67,24 @@ export class OrderOpsService {
       query.andWhere('relay.createdAt <= :dateTo', { dateTo: filters.dateTo });
     }
 
+    // productType 필터
+    if (filters?.productType) {
+      query.andWhere('product.productType = :productType', {
+        productType: filters.productType,
+      });
+    }
+
     query.orderBy('relay.createdAt', 'DESC');
 
     const orders = await query.getMany();
 
-    return orders.map((order) => ({
+    // PHARMACEUTICAL 등 차단된 productType 제외
+    const filteredOrders = orders.filter(order => {
+      const productType = order.listing?.offer?.productMaster?.productType as ProductType;
+      return !productType || !BLOCKED_PRODUCT_TYPES.includes(productType);
+    });
+
+    return filteredOrders.map((order) => ({
       id: order.id,
       listingId: order.listingId,
       productName: order.listing?.offer?.productMaster?.name || 'Unknown',

@@ -145,8 +145,12 @@ export const CosmeticsRecommendationPanel: React.FC<RecommendationPanelProps> = 
         {products.map(product => (
           <CosmeticsProductCard
             key={product.id}
-            product={product}
-            apiBaseUrl={apiBaseUrl}
+            id={product.id}
+            name={product.name}
+            brand={product.brand}
+            price={product.price}
+            image={product.image}
+            metadata={product.metadata}
           />
         ))}
       </div>
