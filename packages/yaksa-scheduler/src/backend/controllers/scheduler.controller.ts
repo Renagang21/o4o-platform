@@ -2,6 +2,7 @@
  * Scheduler Controller
  * Phase 19-A: Central Scheduler Infrastructure
  * Phase 19-C: Integrated Admin Dashboard
+ * Phase 19-E: Job Seeding & Notifications
  *
  * Admin API endpoints for scheduler management.
  */
@@ -10,6 +11,7 @@ import type { Router, Request, Response } from 'express';
 import { schedulerService, ListJobsOptions, ListFailureQueueOptions } from '../services/SchedulerService.js';
 import { jobMonitorService } from '../services/JobMonitorService.js';
 import { integratedDashboardService } from '../services/IntegratedDashboardService.js';
+import { seedJobsForOrganization } from '../../lifecycle/install.js';
 import type { JobStatus, JobTargetService, JobActionType } from '../entities/ScheduledJob.js';
 import type { FailureQueueStatus } from '../entities/JobFailureQueue.js';
 
@@ -472,6 +474,50 @@ export function createSchedulerRoutes(router: Router): void {
       res.json({ success: true, data: { processed } });
     } catch (error) {
       console.error('[Scheduler] Process queue error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
+  // ============================================
+  // Job Seeding (Phase 19-E)
+  // ============================================
+
+  /**
+   * POST /yaksa-scheduler/seed-jobs
+   * Seed default jobs for an organization
+   */
+  router.post('/seed-jobs', async (req: Request, res: Response) => {
+    try {
+      const { organizationId } = req.body;
+
+      if (!organizationId) {
+        return res.status(400).json({
+          success: false,
+          error: 'organizationId is required',
+        });
+      }
+
+      // Get entity manager from scheduler service
+      const entityManager = schedulerService.getEntityManager();
+      if (!entityManager) {
+        return res.status(500).json({
+          success: false,
+          error: 'Database not initialized',
+        });
+      }
+
+      const result = await seedJobsForOrganization(entityManager, organizationId);
+
+      res.json({
+        success: true,
+        data: result,
+        message: `Created ${result.created} jobs, skipped ${result.skipped} existing jobs`,
+      });
+    } catch (error) {
+      console.error('[Scheduler] Seed jobs error:', error);
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
