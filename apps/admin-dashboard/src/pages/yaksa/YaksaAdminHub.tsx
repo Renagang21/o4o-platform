@@ -34,6 +34,8 @@ import {
   Building,
   CheckCircle,
   XCircle,
+  Bell,
+  X,
 } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import {
@@ -45,6 +47,7 @@ import {
   PendingReportWidget,
   FailureQueueWidget,
   SchedulerHealthWidget,
+  AdminAlert,
 } from '@/lib/api/yaksaScheduler';
 
 // Mock data for development/fallback
@@ -111,12 +114,41 @@ export default function YaksaAdminHub() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(undefined);
+  const [alerts, setAlerts] = useState<AdminAlert[]>([]);
+  const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set());
 
   const organizationId = selectedOrgId || user?.organizationId;
 
   useEffect(() => {
     fetchDashboard();
+    fetchAlerts();
   }, [organizationId]);
+
+  const fetchAlerts = async () => {
+    try {
+      const response = await yaksaSchedulerApi.getAlerts(organizationId, false);
+      if (response.success && response.data) {
+        // Filter to show only high/critical priority alerts
+        const importantAlerts = response.data.alerts.filter(
+          (alert) => alert.priority === 'high' || alert.priority === 'critical'
+        );
+        setAlerts(importantAlerts);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch alerts:', err);
+    }
+  };
+
+  const handleDismissAlert = async (alertId: string) => {
+    setDismissedAlerts((prev) => new Set([...prev, alertId]));
+    try {
+      await yaksaSchedulerApi.markAlertAsRead(alertId);
+    } catch (err) {
+      console.warn('Failed to mark alert as read:', err);
+    }
+  };
+
+  const visibleAlerts = alerts.filter((alert) => !dismissedAlerts.has(alert.id));
 
   const fetchDashboard = async () => {
     setIsLoading(true);
@@ -141,7 +173,7 @@ export default function YaksaAdminHub() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchDashboard();
+    await Promise.all([fetchDashboard(), fetchAlerts()]);
     setIsRefreshing(false);
   };
 
@@ -194,6 +226,60 @@ export default function YaksaAdminHub() {
           </Badge>
         </div>
       </div>
+
+      {/* Alert Banner - Critical/High Priority Alerts */}
+      {visibleAlerts.length > 0 && (
+        <div className="space-y-2">
+          {visibleAlerts.map((alert) => (
+            <Alert
+              key={alert.id}
+              variant={alert.priority === 'critical' ? 'destructive' : 'default'}
+              className={`relative ${
+                alert.priority === 'critical'
+                  ? 'border-red-500 bg-red-50'
+                  : 'border-orange-400 bg-orange-50'
+              }`}
+            >
+              <Bell className={`h-4 w-4 ${
+                alert.priority === 'critical' ? 'text-red-600' : 'text-orange-600'
+              }`} />
+              <AlertTitle className={`flex items-center gap-2 ${
+                alert.priority === 'critical' ? 'text-red-800' : 'text-orange-800'
+              }`}>
+                {alert.priority === 'critical' && (
+                  <Badge variant="destructive" className="text-xs">Critical</Badge>
+                )}
+                {alert.priority === 'high' && (
+                  <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
+                    High
+                  </Badge>
+                )}
+                {alert.title}
+              </AlertTitle>
+              <AlertDescription className={
+                alert.priority === 'critical' ? 'text-red-700' : 'text-orange-700'
+              }>
+                {alert.message}
+                {alert.actionUrl && (
+                  <Link
+                    to={alert.actionUrl}
+                    className="ml-2 underline hover:no-underline"
+                  >
+                    상세보기
+                  </Link>
+                )}
+              </AlertDescription>
+              <button
+                onClick={() => handleDismissAlert(alert.id)}
+                className="absolute top-3 right-3 p-1 rounded hover:bg-white/50 transition-colors"
+                aria-label="알림 닫기"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </Alert>
+          ))}
+        </div>
+      )}
 
       {/* 6 Widget Grid - 2 rows x 3 columns */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
