@@ -155,6 +155,9 @@ const OnboardingHome = lazy(() => import('@/pages/marketing/onboarding/Onboardin
 const SupplierProfileForm = lazy(() => import('@/pages/marketing/onboarding/SupplierProfileForm'));
 const AutomationSettings = lazy(() => import('@/pages/marketing/automation/AutomationSettings'));
 
+// Digital Signage Management (Phase 6)
+const DigitalSignageRouter = lazy(() => import('@/pages/digital-signage/DigitalSignageRouter'));
+
 // Yaksa Admin Hub (Phase 19-D)
 const YaksaAdminHub = lazy(() => import('@/pages/yaksa/YaksaAdminHub'));
 
@@ -1257,6 +1260,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['marketing.manage']}>
                         <Suspense fallback={<PageLoader />}>
                           <AutomationSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Digital Signage Management (Phase 6) */}
+                    <Route path="/admin/digital-signage/*" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DigitalSignageRouter />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
