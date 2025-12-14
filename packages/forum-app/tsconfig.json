@@ -21,8 +21,7 @@
     "src/index.ts",
     "src/manifest.ts",
     "src/lifecycle/**/*",
-    "src/backend/entities/**/*",
-    "src/backend/types/**/*",
+    "src/backend/**/*",
     "src/public-ui/**/*",
     "src/templates/**/*"
   ],

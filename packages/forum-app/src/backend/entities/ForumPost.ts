@@ -9,7 +9,6 @@ import {
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
-import type { User } from '../../../../../apps/api-server/src/entities/User.js';
 import type { Block } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 
@@ -112,11 +111,11 @@ export class ForumPost {
 
   @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
-  author?: User;
+  author?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'lastCommentBy' })
-  lastCommenter?: User;
+  lastCommenter?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('Organization', { nullable: true })
   @JoinColumn({ name: 'organizationId' })

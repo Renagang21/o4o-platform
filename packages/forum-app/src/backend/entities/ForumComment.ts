@@ -9,7 +9,6 @@ import {
   Index
 } from 'typeorm';
 import { ForumPost } from './ForumPost.js';
-import type { User } from '../../../../../apps/api-server/src/entities/User.js';
 
 export enum CommentStatus {
   PUBLISHED = 'publish',
@@ -60,7 +59,7 @@ export class ForumComment {
 
   @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
-  author?: User;
+  author?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('ForumComment', { nullable: true, lazy: true })
   @JoinColumn({ name: 'parent_id' })
