@@ -17,3 +17,9 @@ export type {
   PartnerDecisionDto,
   DecisionResult,
 } from './MarketTrialDecisionService.js';
+
+export { MarketTrialForumService, ForumUserRole } from './MarketTrialForumService.js';
+export type {
+  ForumAccessInfo,
+  ForumUserContext,
+} from './MarketTrialForumService.js';
