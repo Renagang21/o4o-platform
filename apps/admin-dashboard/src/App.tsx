@@ -30,9 +30,38 @@ import EditorLayout from '@/layouts/EditorLayout';
 import InitialRedirect from '@/components/InitialRedirect';
 import { AppRouteGuard } from '@/components/AppRouteGuard';
 
+/**
+ * Phase P0 Task B: Dynamic Routing Infrastructure
+ *
+ * DynamicRouteLoader and ViewComponentRegistry provide the foundation for
+ * manifest-based dynamic routing. Routes defined in app manifests (viewTemplates)
+ * can be automatically loaded via the Routes API.
+ *
+ * MIGRATION PATH:
+ * 1. Apps define routes in manifest.viewTemplates
+ * 2. Components are registered in ViewComponentRegistry
+ * 3. DynamicRouteLoader fetches and renders routes
+ * 4. Gradually move hardcoded routes below to dynamic
+ * 5. Eventually remove hardcoded routes when migration complete
+ *
+ * @see apps/api-server/src/routes/routes.routes.ts - Routes API
+ * @see apps/admin-dashboard/src/components/routing/ViewComponentRegistry.ts
+ * @see apps/admin-dashboard/src/components/routing/DynamicRouteLoader.tsx
+ */
+// Dynamic Routing exports (for future use when migrating routes)
+export { viewComponentRegistry, DynamicRouteLoader, useDynamicRoutes } from '@/components/routing';
+
 // Import EditorRouteWrapper to handle route-based remounting
 import EditorRouteWrapper from '@/pages/editor/EditorRouteWrapper';
 
+/**
+ * @deprecated Phase P0 Task B: Hardcoded lazy imports will be migrated to ViewComponentRegistry.
+ *
+ * Page Components - Lazy loaded (FALLBACK during transition)
+ *
+ * MIGRATION: Move lazy imports to ViewComponentRegistry.ts and remove from here.
+ * System routes (Login, ForgotPassword, etc.) will remain hardcoded.
+ */
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
