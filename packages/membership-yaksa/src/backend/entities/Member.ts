@@ -75,6 +75,11 @@ export class Member {
   @Column({ type: 'varchar', length: 50, unique: true })
   licenseNumber!: string;
 
+  /**
+   * @deprecated Phase P0 Task D: Use User.name via userId JOIN instead
+   * This field will be removed after migration is complete.
+   * Query with: LEFT JOIN users u ON u.id = member.userId
+   */
   @Column({ type: 'varchar', length: 100 })
   name!: string;
 
@@ -95,9 +100,17 @@ export class Member {
   @JoinColumn({ name: 'categoryId' })
   category?: MemberCategory;
 
+  /**
+   * @deprecated Phase P0 Task D: Use User.phone via userId JOIN instead
+   * This field will be removed after migration is complete.
+   */
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone?: string;
 
+  /**
+   * @deprecated Phase P0 Task D: Use User.email via userId JOIN instead
+   * This field will be removed after migration is complete.
+   */
   @Column({ type: 'varchar', length: 255, nullable: true })
   email?: string;
 
