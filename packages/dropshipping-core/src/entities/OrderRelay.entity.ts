@@ -5,6 +5,11 @@
  *
  * 판매자의 채널에서 발생한 주문을 공급자에게 relay하고,
  * 전체 주문 lifecycle을 추적합니다.
+ *
+ * NOTE: Phase 2 - E-commerce Core Integration
+ * - ecommerceOrderId: E-commerce Core의 EcommerceOrder에 대한 FK 참조
+ * - EcommerceOrder가 판매 원장(Source of Truth)으로서 주문/결제를 통합 관리
+ * - OrderRelay는 Dropshipping 특화 Relay 정보만 담당
  */
 
 import {
@@ -34,6 +39,14 @@ export enum OrderRelayStatus {
 export class OrderRelay {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+
+  /**
+   * E-commerce Core의 EcommerceOrder에 대한 FK 참조
+   * - EcommerceOrder가 판매 원장(Source of Truth)
+   * - nullable: 기존 데이터 호환성 및 점진적 마이그레이션 지원
+   */
+  @Column({ type: 'uuid', nullable: true })
+  ecommerceOrderId?: string;
 
   @Column({ type: 'uuid' })
   listingId!: string;

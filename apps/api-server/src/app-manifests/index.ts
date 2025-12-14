@@ -12,10 +12,7 @@ import { supplieropsManifest } from './supplierops.manifest.js';
 import { partneropsManifest } from './partnerops.manifest.js';
 import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
 import { manifest as cmsCoreManifest } from '@o4o-apps/cms-core';
-import { manifest as lmsYaksaManifest } from '@o4o/lms-yaksa';
-import { manifest as yaksaSchedulerManifest } from '@o4o/yaksa-scheduler';
-import { manifest as lmsMarketingManifest } from '@o4o-extensions/lms-marketing';
-import { manifest as marketTrialManifest } from '@o4o/market-trial';
+import { ecommerceCoreManifest } from '@o4o/ecommerce-core';
 
 /**
  * App Manifest Registry
@@ -39,8 +36,6 @@ const manifestRegistry: Record<string, AppManifest> = {
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
   'membership-yaksa': membershipYaksaManifest as any,
-  'lms-yaksa': lmsYaksaManifest as any,
-  'yaksa-scheduler': yaksaSchedulerManifest as any,
   // Dropshipping
   'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,
@@ -51,10 +46,8 @@ const manifestRegistry: Record<string, AppManifest> = {
   partnerops: partneropsManifest as any,
   // CMS
   'cms-core': cmsCoreManifest as any,
-  // Marketing
-  'lms-marketing': lmsMarketingManifest as any,
-  // Market Trial
-  'market-trial': marketTrialManifest as any,
+  // E-commerce
+  'ecommerce-core': ecommerceCoreManifest as any,
 };
 
 /**

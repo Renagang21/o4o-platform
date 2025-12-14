@@ -9,7 +9,8 @@ import {
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
-import type { Block, User } from '@o4o/types';
+import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+import type { Block } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 
 export enum PostStatus {
@@ -53,20 +54,16 @@ export class ForumPost {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.PUBLISHED })
   status!: PostStatus;
 
-  // Note: categoryId uses camelCase in DB (from migration 001)
   @Column({ type: 'uuid' })
   categoryId!: string;
 
-  // Note: author_id uses snake_case in DB (from migration 001)
-  @Column({ name: 'author_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   authorId!: string;
 
-  // Note: organization_id uses snake_case in DB (from migration 004)
-  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   organizationId?: string;
 
-  // Note: is_organization_exclusive uses snake_case in DB (from migration 004)
-  @Column({ name: 'is_organization_exclusive', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
   @Column({ type: 'boolean', default: false })
@@ -93,24 +90,28 @@ export class ForumPost {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: ForumPostMetadata;
 
-  // Note: published_at uses snake_case in DB (from migration 001)
-  @Column({ name: 'published_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   publishedAt?: Date;
 
-  // Note: last_comment_at uses snake_case in DB (from migration 004)
-  @Column({ name: 'last_comment_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastCommentAt?: Date;
 
-  // Note: last_comment_by uses snake_case in DB (from migration 004)
-  @Column({ name: 'last_comment_by', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   lastCommentBy?: string;
 
-  // Note: created_at uses snake_case in DB (from migration 001)
-  @CreateDateColumn({ name: 'created_at' })
+  // Phase 15-A: Full-text Search columns
+  // These are auto-populated by database trigger
+  @Column({ type: 'text', nullable: true, select: false })
+  contentText?: string;
+
+  // Note: search_vector is managed by PostgreSQL trigger, not TypeORM
+  // It's a tsvector column that cannot be directly mapped in TypeORM
+  // Use raw SQL queries for full-text search operations
+
+  @CreateDateColumn()
   createdAt!: Date;
 
-  // Note: updated_at uses snake_case in DB (from migration 001)
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
   // Relations
@@ -119,15 +120,15 @@ export class ForumPost {
   category?: Promise<ForumCategory>;
 
   @ManyToOne('User')
-  @JoinColumn({ name: 'author_id' })
+  @JoinColumn({ name: 'authorId' })
   author?: User;
 
   @ManyToOne('User', { nullable: true })
-  @JoinColumn({ name: 'last_comment_by' })
+  @JoinColumn({ name: 'lastCommentBy' })
   lastCommenter?: User;
 
   @ManyToOne('Organization', { nullable: true })
-  @JoinColumn({ name: 'organization_id' })
+  @JoinColumn({ name: 'organizationId' })
   organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumComment removed to prevent circular dependency

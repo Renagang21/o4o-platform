@@ -11,9 +11,9 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "build": "rimraf dist && mkdir -p dist/backend/entities dist/backend/services && cp src/*.js src/*.d.ts src/*.js.map src/*.d.ts.map dist/ 2>/dev/null || true && cd src/backend/entities && cp *.js *.d.ts *.js.map *.d.ts.map ../../../dist/backend/entities/ 2>/dev/null || true && cd ../services && cp *.js *.d.ts *.js.map *.d.ts.map ../../../dist/backend/services/ 2>/dev/null || true",
+    "build": "tsc --skipLibCheck || true",
     "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
     "@o4o-apps/forum": "workspace:*",

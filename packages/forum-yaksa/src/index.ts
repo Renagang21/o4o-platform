@@ -26,6 +26,9 @@ export const entities = Object.values(Entities).filter(
   (item) => typeof item === 'function' && item.prototype
 );
 
+// Import route factories
+import { createYaksaSearchRoutes } from './backend/routes/index.js';
+
 /**
  * Routes factory compatible with Module Loader
  */
@@ -35,6 +38,16 @@ export function routes(dataSource?: DataSource | any): Router {
   router.get('/health', (req, res) => {
     res.json({ status: 'ok', app: 'forum-yaksa' });
   });
+
+  // Mount search routes if dataSource is provided
+  if (dataSource) {
+    try {
+      const searchRoutes = createYaksaSearchRoutes(dataSource);
+      router.use('/search', searchRoutes);
+    } catch (error) {
+      console.error('[forum-yaksa] Failed to initialize search routes:', error);
+    }
+  }
 
   return router;
 }

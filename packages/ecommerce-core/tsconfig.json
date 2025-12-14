@@ -4,21 +4,25 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,
+    "noEmit": false,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "jsx": "react-jsx",
-    "noEmit": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
-    "strict": false,
     "skipLibCheck": true,
-    "isolatedModules": false,
-    "lib": ["ES2022", "DOM"]
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
   "include": [
     "src/**/*"
   ],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "exclude": [
+    "src/migrations/**/*",
+    "dist",
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

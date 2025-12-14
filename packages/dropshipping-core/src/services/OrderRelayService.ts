@@ -57,43 +57,15 @@ export class OrderRelayService {
   }
 
   /**
-   * E-commerce Order ID로 조회 (Phase 4)
-   *
-   * E-commerce Core의 EcommerceOrder와 연결된 OrderRelay를 조회합니다.
-   *
-   * @param ecommerceOrderId - E-commerce Core의 주문 ID
+   * E-commerce Order ID로 조회
+   * - E-commerce Core의 EcommerceOrder와 연결된 OrderRelay 목록 반환
    */
-  async findByEcommerceOrderId(
-    ecommerceOrderId: string
-  ): Promise<OrderRelay | null> {
-    return await this.orderRepository.findOne({
+  async findByEcommerceOrderId(ecommerceOrderId: string): Promise<OrderRelay[]> {
+    return await this.orderRepository.find({
       where: { ecommerceOrderId },
       relations: ['listing', 'listing.seller', 'listing.offer'],
+      order: { createdAt: 'DESC' },
     });
-  }
-
-  /**
-   * E-commerce Order ID 목록으로 조회 (Phase 4)
-   *
-   * 여러 EcommerceOrder에 연결된 OrderRelay 목록을 조회합니다.
-   * SellerOps의 OrderIntegrationService에서 사용합니다.
-   *
-   * @param ecommerceOrderIds - E-commerce Core 주문 ID 배열
-   */
-  async findByEcommerceOrderIds(
-    ecommerceOrderIds: string[]
-  ): Promise<OrderRelay[]> {
-    if (ecommerceOrderIds.length === 0) {
-      return [];
-    }
-
-    return await this.orderRepository
-      .createQueryBuilder('relay')
-      .leftJoinAndSelect('relay.listing', 'listing')
-      .leftJoinAndSelect('listing.seller', 'seller')
-      .leftJoinAndSelect('listing.offer', 'offer')
-      .where('relay.ecommerceOrderId IN (:...ids)', { ids: ecommerceOrderIds })
-      .getMany();
   }
 
   /**
