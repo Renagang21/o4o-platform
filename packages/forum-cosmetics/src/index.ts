@@ -35,11 +35,8 @@ export const entities = Object.values(Entities).filter(
   (item) => typeof item === 'function' && item.prototype
 );
 
-// Import route factories
-import { createCosmeticsForumRoutes, createCosmeticsSearchRoutes } from './backend/routes/index.js';
-
-// Export route factories for external use
-export { createCosmeticsForumRoutes, createCosmeticsSearchRoutes };
+// Import route factory
+import { createCosmeticsForumRoutes } from './backend/routes/index.js';
 
 /**
  * Routes factory compatible with Module Loader
@@ -55,13 +52,8 @@ export function routes(dataSource?: DataSource | any): Router {
   // If dataSource is provided, mount the full routes
   if (dataSource) {
     try {
-      // Main cosmetics forum routes
       const cosmeticsRoutes = createCosmeticsForumRoutes(dataSource);
       router.use('/', cosmeticsRoutes);
-
-      // Search routes (Phase 15-A)
-      const searchRoutes = createCosmeticsSearchRoutes(dataSource);
-      router.use('/search', searchRoutes);
     } catch (error) {
       console.error('[forum-cosmetics] Failed to initialize routes:', error);
     }

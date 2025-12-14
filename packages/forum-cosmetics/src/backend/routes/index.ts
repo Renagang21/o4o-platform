@@ -1,5 +1,4 @@
 /**
- * Forum Cosmetics Routes Index
+ * Forum Cosmetics Routes
  */
-
-export { createCosmeticsSearchRoutes } from './cosmetics.search.routes.js';
+export { createCosmeticsForumRoutes, default } from './cosmetics.forum.routes.js';

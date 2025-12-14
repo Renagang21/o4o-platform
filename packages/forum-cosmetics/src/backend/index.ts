@@ -14,4 +14,4 @@ export * from './services/index.js';
 export * from './controllers/index.js';
 
 // Routes
-export { createCosmeticsForumRoutes, createCosmeticsSearchRoutes } from './routes/index.js';
+export { createCosmeticsForumRoutes } from './routes/index.js';
