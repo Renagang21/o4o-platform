@@ -23,13 +23,39 @@ import { EcommerceOrderItem } from './EcommerceOrderItem.entity.js';
 import { EcommercePayment } from './EcommercePayment.entity.js';
 
 /**
- * 주문 유형
+ * 주문 유형 (OrderType)
+ *
+ * E-commerce Core에서 모든 판매를 분류하는 핵심 열거형입니다.
+ * Service Extension이 주문 생성 시 이 값을 결정합니다.
+ *
+ * ## OrderType 결정 원칙
+ *
+ * 1. **Service App/Extension이 결정**: OrderType은 주문을 생성하는
+ *    Service App 또는 Extension이 비즈니스 로직에 따라 결정합니다.
+ *
+ * 2. **변경 불가**: 한번 설정된 OrderType은 주문 생명주기 동안 변경되지 않습니다.
+ *
+ * 3. **분기 기준**: Core App(Dropshipping Core, Retail Core 등)은
+ *    OrderType을 확인하여 자신이 처리해야 할 주문인지 판단합니다.
+ *
+ * ## 각 타입별 처리 주체
+ *
+ * | OrderType     | 처리 주체              | 주요 특징                         |
+ * |---------------|----------------------|----------------------------------|
+ * | retail        | Retail Core (향후)    | 직접 재고, 단일 판매자              |
+ * | dropshipping  | Dropshipping Core    | Offer→Listing→Relay 구조, 다중 공급 |
+ * | b2b           | B2B Core (향후)       | 대량 주문, 견적, 신용 거래           |
+ * | subscription  | Subscription Core (향후) | 정기 결제, 반복 주문              |
  */
 export enum OrderType {
-  RETAIL = 'retail',             // 일반 소매
-  DROPSHIPPING = 'dropshipping', // 드랍쉬핑
-  B2B = 'b2b',                   // B2B 거래
-  SUBSCRIPTION = 'subscription', // 정기 구독
+  /** 일반 소매 - 직접 재고 보유 판매 */
+  RETAIL = 'retail',
+  /** 드랍쉬핑 - 공급자→판매자→구매자 Relay 구조 */
+  DROPSHIPPING = 'dropshipping',
+  /** B2B 거래 - 사업자 간 대량 거래 */
+  B2B = 'b2b',
+  /** 정기 구독 - 반복 주문, 자동 갱신 */
+  SUBSCRIPTION = 'subscription',
 }
 
 /**

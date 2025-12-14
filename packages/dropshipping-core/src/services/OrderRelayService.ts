@@ -2,6 +2,38 @@
  * OrderRelayService
  *
  * 주문 relay 전체 로직 처리
+ *
+ * ## E-commerce Core 연계 (Phase 3)
+ *
+ * Dropshipping Core는 E-commerce Core의 `OrderType === 'dropshipping'`인
+ * 주문만 처리합니다.
+ *
+ * ### 연계 흐름
+ *
+ * ```
+ * EcommerceOrder (orderType: 'dropshipping')
+ *        ↓
+ *        ↓ ecommerceOrderId (FK)
+ *        ↓
+ * OrderRelay (Dropshipping 특화 Relay 정보)
+ *        ↓
+ * SellerListing → SupplierOffer
+ * ```
+ *
+ * ### 핵심 연계 메서드
+ *
+ * - `createOrder({ ecommerceOrderId })`: EcommerceOrder와 연결된 OrderRelay 생성
+ * - `findByEcommerceOrderId()`: EcommerceOrder ID로 관련 OrderRelay 목록 조회
+ *
+ * ### 역할 분담
+ *
+ * | 책임 영역         | E-commerce Core | Dropshipping Core |
+ * |------------------|-----------------|-------------------|
+ * | 판매 원장         | ✓               |                   |
+ * | 결제 처리         | ✓               |                   |
+ * | 공급자 Relay      |                 | ✓                 |
+ * | 배송 추적         |                 | ✓                 |
+ * | 판매자-공급자 정산 |                 | ✓                 |
  */
 
 import { Injectable } from '@nestjs/common';
