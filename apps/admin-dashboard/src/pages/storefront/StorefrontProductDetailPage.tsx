@@ -85,7 +85,7 @@ export default function StorefrontProductDetailPage() {
         setRelatedRoutines(data.relatedRoutines || []);
         setSimilarProducts(data.similarProducts || []);
       }
-    } catch (err) {
+    } catch {
       console.error('Error loading product detail:', err);
       // Demo data
       setPartner({
@@ -180,8 +180,8 @@ export default function StorefrontProductDetailPage() {
           text: product?.description,
           url: window.location.href,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch {
+        // Share cancelled by user - no action needed
       }
     }
   };

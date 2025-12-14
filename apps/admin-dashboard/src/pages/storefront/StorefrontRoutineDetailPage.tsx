@@ -114,7 +114,7 @@ export default function StorefrontRoutineDetailPage() {
         setRoutine(data.routine);
         setProducts(data.products || []);
       }
-    } catch (err) {
+    } catch {
       console.error('Error loading routine detail:', err);
       // Demo data
       setPartner({
@@ -237,8 +237,8 @@ export default function StorefrontRoutineDetailPage() {
           text: routine?.description,
           url: window.location.href,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch {
+        // Share cancelled by user - no action needed
       }
     }
   };
