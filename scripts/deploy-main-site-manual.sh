@@ -37,7 +37,7 @@ NODE_ENV=production \
 NODE_OPTIONS='--max-old-space-size=4096' \
 GENERATE_SOURCEMAP=false \
 VITE_API_URL=https://api.neture.co.kr \
-pnpm run build --silent 2>&1 | grep -E "(✅|❌|vite|built|error|warning)" || true
+pnpm run build 2>&1 | tail -20
 
 cd ../..
 
@@ -51,12 +51,12 @@ echo ""
 
 # Copy to web server
 echo "📤 Uploading to web server..."
-ssh o4o-web "mkdir -p /tmp/main-site-deploy"
-scp "$TARBALL" o4o-web:/tmp/main-site-deploy/latest.tar.gz
+ssh o4o-webserver "mkdir -p /tmp/main-site-deploy"
+scp "$TARBALL" o4o-webserver:/tmp/main-site-deploy/latest.tar.gz
 
 # Deploy on web server
 echo "🚀 Deploying on web server..."
-ssh o4o-web << 'EOF'
+ssh o4o-webserver << 'EOF'
   set -e
 
   echo "📋 Extracting files..."
