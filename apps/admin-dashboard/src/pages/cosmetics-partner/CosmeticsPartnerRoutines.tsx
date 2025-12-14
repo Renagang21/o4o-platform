@@ -502,14 +502,14 @@ const CosmeticsPartnerRoutines: React.FC = () => {
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* KPI Stats */}
         <AGKPIGrid columns={4}>
-          <AGKPIBlock label="전체 루틴" value={stats.total} icon={<Sparkles />} color="blue" />
-          <AGKPIBlock label="공개 루틴" value={stats.published} icon={<Eye />} color="green" />
-          <AGKPIBlock label="비공개 루틴" value={stats.draft} icon={<X />} color="gray" />
+          <AGKPIBlock title="전체 루틴" value={stats.total} icon={<Sparkles className="w-5 h-5 text-blue-500" />} colorMode="info" />
+          <AGKPIBlock title="공개 루틴" value={stats.published} icon={<Eye className="w-5 h-5 text-green-500" />} colorMode="positive" />
+          <AGKPIBlock title="비공개 루틴" value={stats.draft} icon={<X className="w-5 h-5 text-gray-500" />} colorMode="neutral" />
           <AGKPIBlock
-            label="총 조회수"
+            title="총 조회수"
             value={stats.totalViews.toLocaleString()}
-            icon={<Heart />}
-            color="pink"
+            icon={<Heart className="w-5 h-5 text-pink-500" />}
+            colorMode="positive"
           />
         </AGKPIGrid>
 
