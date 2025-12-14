@@ -13,11 +13,15 @@ import type { DataSource } from 'typeorm';
 // Manifest
 export { lmsCoreManifest, manifest, default as manifestDefault } from './manifest.js';
 
-// Backend entities, services, and utils
+// Backend entities and utils (imported directly by API server from src/)
 export * from './entities/index.js';
-export * from './services/index.js';
-export * from './controllers/index.js';
 export * from './utils/index.js';
+
+// Services
+export * from './services/index.js';
+
+// Controllers
+export * from './controllers/index.js';
 
 // Entity list for TypeORM
 import * as Entities from './entities/index.js';
@@ -25,8 +29,11 @@ export const entities = Object.values(Entities).filter(
   (item) => typeof item === 'function' && item.prototype
 );
 
-// Import routes factory
-import { createRoutes as createBackendRoutes } from './backend/index.js';
+// Service initialization
+import { initContentBundleService } from './services/ContentBundleService.js';
+
+// Controller routes
+import { createContentBundleRoutes } from './controllers/ContentBundleController.js';
 
 /**
  * Routes factory compatible with Module Loader
@@ -36,15 +43,18 @@ import { createRoutes as createBackendRoutes } from './backend/index.js';
 export function routes(dataSource?: DataSource | any): Router {
   const router = Router();
 
+  // Initialize services with data source
+  if (dataSource) {
+    initContentBundleService(dataSource);
+  }
+
   // Health check
   router.get('/health', (req, res) => {
     res.json({ status: 'ok', app: 'lms-core' });
   });
 
-  // Mount quiz and survey routes if dataSource is available
-  if (dataSource) {
-    router.use('/', createBackendRoutes(dataSource));
-  }
+  // ContentBundle routes - /api/v1/lms/bundles
+  router.use('/bundles', createContentBundleRoutes());
 
   return router;
 }
