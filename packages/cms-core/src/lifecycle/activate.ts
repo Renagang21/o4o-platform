@@ -8,6 +8,60 @@ import {
 import type { NavigationItem, ViewRegistrationOptions } from '../view-system/types.js';
 
 /**
+ * Menu admin item interface (nested structure with children)
+ * Used by menus.admin in manifests
+ */
+interface MenuAdminItem {
+  id: string;
+  label: string;
+  path?: string;
+  icon?: string;
+  order?: number;
+  permissions?: string[];
+  roles?: string[];
+  children?: MenuAdminItem[];
+}
+
+/**
+ * Flatten nested menu items to flat structure with parentId
+ * Phase P0 Task A: Convert menus.admin to navigation format
+ */
+function flattenMenuItems(
+  items: MenuAdminItem[],
+  appId: string,
+  parentId?: string
+): NavigationItem[] {
+  const result: NavigationItem[] = [];
+
+  for (const item of items) {
+    // Create navigation item with proper ID format
+    const navId = parentId ? `${appId}.${item.id}` : `${appId}.${item.id}`;
+    const navParentId = parentId ? `${appId}.${parentId}` : undefined;
+
+    const navItem: NavigationItem = {
+      id: navId,
+      label: item.label,
+      path: item.path || '',
+      icon: item.icon,
+      order: item.order,
+      permissions: item.permissions,
+      parentId: navParentId,
+      appId,
+    };
+
+    result.push(navItem);
+
+    // Recursively flatten children
+    if (item.children && item.children.length > 0) {
+      const childItems = flattenMenuItems(item.children, appId, item.id);
+      result.push(...childItems);
+    }
+  }
+
+  return result;
+}
+
+/**
  * Activate Hook
  *
  * cms-core 앱 활성화 시 실행됩니다.
@@ -44,12 +98,15 @@ export async function activate(context: ActivateContext): Promise<void> {
 
 /**
  * manifest의 viewTemplates와 navigation을 ViewSystem에 등록
+ * Supports both navigation.admin (flat) and menus.admin (nested) patterns
  */
 async function initializeViewSystemFromManifest(context: ActivateContext): Promise<void> {
   const { manifest, logger } = context;
   const appId = manifest.appId;
 
-  // 1. Register navigation items
+  let navCount = 0;
+
+  // 1a. Register navigation items from navigation.admin (flat structure with parentId)
   const navigation = manifest.navigation as { admin?: Array<{
     id: string;
     label: string;
@@ -73,8 +130,24 @@ async function initializeViewSystemFromManifest(context: ActivateContext): Promi
         appId,
       };
       navigationRegistry.registerNav(item);
+      navCount++;
     }
-    logger.info(`[${appId}] Registered ${navigation.admin.length} navigation items`);
+  }
+
+  // 1b. Register navigation items from menus.admin (nested structure with children)
+  // Phase P0 Task A: Support both patterns for backward compatibility
+  const menus = manifest.menus as { admin?: Array<MenuAdminItem> } | undefined;
+
+  if (menus?.admin) {
+    const flattenedItems = flattenMenuItems(menus.admin, appId);
+    for (const item of flattenedItems) {
+      navigationRegistry.registerNav(item);
+      navCount++;
+    }
+  }
+
+  if (navCount > 0) {
+    logger.info(`[${appId}] Registered ${navCount} navigation items`);
   }
 
   // 2. Register dynamic routes from viewTemplates

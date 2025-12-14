@@ -53,9 +53,57 @@ export function getViewSystemStats() {
 }
 
 /**
+ * Menu admin item interface (nested structure with children)
+ * Phase P0 Task A: Support menus.admin pattern
+ */
+interface MenuAdminItem {
+  id: string;
+  label: string;
+  path?: string;
+  icon?: string;
+  order?: number;
+  permissions?: string[];
+  children?: MenuAdminItem[];
+}
+
+/**
+ * Flatten nested menu items to flat structure with parentId
+ */
+function flattenMenuItems(
+  items: MenuAdminItem[],
+  appId: string,
+  parentId?: string
+): NavigationItem[] {
+  const result: NavigationItem[] = [];
+
+  for (const item of items) {
+    const navId = `${appId}.${item.id}`;
+    const navParentId = parentId ? `${appId}.${parentId}` : undefined;
+
+    result.push({
+      id: navId,
+      label: item.label,
+      path: item.path || '',
+      icon: item.icon,
+      order: item.order,
+      permissions: item.permissions,
+      parentId: navParentId,
+      appId,
+    });
+
+    if (item.children?.length) {
+      result.push(...flattenMenuItems(item.children, appId, item.id));
+    }
+  }
+
+  return result;
+}
+
+/**
  * 앱 manifest에서 ViewSystem 등록을 위한 헬퍼 함수
  *
  * 다른 앱들이 activate 시 사용할 수 있는 공통 함수
+ * Phase P0 Task A: Supports both navigation.admin and menus.admin patterns
  *
  * @param appId - 앱 ID
  * @param manifest - 앱 manifest
@@ -74,6 +122,9 @@ export function registerAppToViewSystem(
         permissions?: string[];
       }>;
     };
+    menus?: {
+      admin?: MenuAdminItem[];
+    };
     viewTemplates?: Array<{
       viewId: string;
       route: string;
@@ -87,7 +138,7 @@ export function registerAppToViewSystem(
   let navCount = 0;
   let routeCount = 0;
 
-  // 1. Register navigation items
+  // 1a. Register navigation items from navigation.admin (flat structure)
   if (manifest.navigation?.admin) {
     for (const navItem of manifest.navigation.admin) {
       const item: NavigationItem = {
@@ -100,6 +151,15 @@ export function registerAppToViewSystem(
         permissions: navItem.permissions,
         appId,
       };
+      navigationRegistry.registerNav(item);
+      navCount++;
+    }
+  }
+
+  // 1b. Register navigation items from menus.admin (nested structure)
+  if (manifest.menus?.admin) {
+    const flattenedItems = flattenMenuItems(manifest.menus.admin, appId);
+    for (const item of flattenedItems) {
       navigationRegistry.registerNav(item);
       navCount++;
     }
