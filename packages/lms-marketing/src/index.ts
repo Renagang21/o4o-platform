@@ -21,6 +21,23 @@ export {
   entities,
 } from './backend/index.js';
 
+// Re-export entities for direct import
+export { ProductContent, MarketingQuizCampaign } from './backend/entities/index.js';
+
+// Re-export types
+export type {
+  TargetAudience,
+  ProductContentTargeting,
+  QuizTargetAudience,
+  QuizQuestionType,
+  QuizQuestion,
+  QuizOption,
+  QuizCampaignTargeting,
+  RewardType,
+  QuizReward,
+  CampaignStatus,
+} from './backend/entities/index.js';
+
 // Lifecycle
 export { onInstall } from './lifecycle/install.js';
 export { onActivate } from './lifecycle/activate.js';
