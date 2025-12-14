@@ -599,4 +599,202 @@ export const actionApi = {
       return { success: false, error: 'Failed to resume action' };
     }
   },
+
+  async listWithFilters(params: {
+    status?: ExecutionStatus;
+    displaySlotId?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Promise<ApiResponse<PaginatedResponse<ActionExecution>>> {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.status) searchParams.append('status', params.status);
+      if (params.displaySlotId) searchParams.append('displaySlotId', params.displaySlotId);
+      if (params.startDate) searchParams.append('startDate', params.startDate);
+      if (params.endDate) searchParams.append('endDate', params.endDate);
+      const query = searchParams.toString();
+      const url = query ? `${API_BASE}/action-executions?${query}` : `${API_BASE}/action-executions`;
+      const response = await authClient.api.get(url);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to list action executions with filters:', error);
+      return { success: false, error: 'Failed to list action executions' };
+    }
+  },
+};
+
+// ===== Operations API (Phase 12) =====
+
+export interface OperationsSummary {
+  totalDisplays: number;
+  onlineDisplays: number;
+  offlineDisplays: number;
+  runningActions: number;
+  failedActionsLast24h: number;
+  totalSlots: number;
+  busySlots: number;
+}
+
+export interface OperationsStats {
+  totalExecutions: number;
+  totalRuntime: number; // in seconds
+  failedCount: number;
+  stoppedCount: number;
+  completedCount: number;
+}
+
+export const operationsApi = {
+  async getSummary(): Promise<ApiResponse<OperationsSummary>> {
+    try {
+      // Aggregate from existing APIs
+      const [displaysRes, slotsRes, actionsRes] = await Promise.all([
+        displayApi.list(),
+        displaySlotApi.list(),
+        actionApi.listExecutions(),
+      ]);
+
+      if (!displaysRes.success || !slotsRes.success || !actionsRes.success) {
+        return { success: false, error: 'Failed to fetch data for summary' };
+      }
+
+      const displays = displaysRes.data?.data || [];
+      const slots = slotsRes.data?.data || [];
+      const actions = actionsRes.data?.data || [];
+
+      const now = new Date();
+      const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+      const summary: OperationsSummary = {
+        totalDisplays: displays.length,
+        onlineDisplays: displays.filter(d => d.status === 'online').length,
+        offlineDisplays: displays.filter(d => d.status === 'offline').length,
+        runningActions: actions.filter(a => a.status === 'running').length,
+        failedActionsLast24h: actions.filter(a =>
+          a.status === 'failed' &&
+          a.createdAt && new Date(a.createdAt) >= last24h
+        ).length,
+        totalSlots: slots.length,
+        busySlots: slots.filter(s => s.status === 'playing' || s.status === 'paused').length,
+      };
+
+      return { success: true, data: summary };
+    } catch (error) {
+      console.error('Failed to get operations summary:', error);
+      return { success: false, error: 'Failed to get operations summary' };
+    }
+  },
+
+  async getStats(params?: { startDate?: string; endDate?: string }): Promise<ApiResponse<OperationsStats>> {
+    try {
+      const actionsRes = await actionApi.listExecutions();
+      if (!actionsRes.success) {
+        return { success: false, error: 'Failed to fetch actions for stats' };
+      }
+
+      let actions = actionsRes.data?.data || [];
+
+      // Filter by date range if provided
+      if (params?.startDate) {
+        const start = new Date(params.startDate);
+        actions = actions.filter(a => a.createdAt && new Date(a.createdAt) >= start);
+      }
+      if (params?.endDate) {
+        const end = new Date(params.endDate);
+        actions = actions.filter(a => a.createdAt && new Date(a.createdAt) <= end);
+      }
+
+      // Calculate total runtime
+      let totalRuntime = 0;
+      actions.forEach(a => {
+        if (a.startedAt) {
+          const start = new Date(a.startedAt);
+          const end = a.completedAt ? new Date(a.completedAt) : new Date();
+          totalRuntime += Math.floor((end.getTime() - start.getTime()) / 1000);
+        }
+      });
+
+      const stats: OperationsStats = {
+        totalExecutions: actions.length,
+        totalRuntime,
+        failedCount: actions.filter(a => a.status === 'failed').length,
+        stoppedCount: actions.filter(a => a.status === 'stopped').length,
+        completedCount: actions.filter(a => a.status === 'completed').length,
+      };
+
+      return { success: true, data: stats };
+    } catch (error) {
+      console.error('Failed to get operations stats:', error);
+      return { success: false, error: 'Failed to get operations stats' };
+    }
+  },
+
+  async getFailedActions(): Promise<ApiResponse<ActionExecution[]>> {
+    try {
+      const actionsRes = await actionApi.listExecutions();
+      if (!actionsRes.success) {
+        return { success: false, error: 'Failed to fetch actions' };
+      }
+
+      const failedActions = (actionsRes.data?.data || [])
+        .filter(a => a.status === 'failed')
+        .sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
+
+      return { success: true, data: failedActions };
+    } catch (error) {
+      console.error('Failed to get failed actions:', error);
+      return { success: false, error: 'Failed to get failed actions' };
+    }
+  },
+
+  async getOfflineDisplays(): Promise<ApiResponse<Display[]>> {
+    try {
+      const displaysRes = await displayApi.list();
+      if (!displaysRes.success) {
+        return { success: false, error: 'Failed to fetch displays' };
+      }
+
+      const offlineDisplays = (displaysRes.data?.data || [])
+        .filter(d => d.status === 'offline')
+        .sort((a, b) => {
+          const dateA = a.lastHeartbeat ? new Date(a.lastHeartbeat).getTime() : 0;
+          const dateB = b.lastHeartbeat ? new Date(b.lastHeartbeat).getTime() : 0;
+          return dateB - dateA;
+        });
+
+      return { success: true, data: offlineDisplays };
+    } catch (error) {
+      console.error('Failed to get offline displays:', error);
+      return { success: false, error: 'Failed to get offline displays' };
+    }
+  },
+
+  async getDisplaysWithSlots(): Promise<ApiResponse<(Display & { slots: DisplaySlot[] })[]>> {
+    try {
+      const [displaysRes, slotsRes] = await Promise.all([
+        displayApi.list(),
+        displaySlotApi.list(),
+      ]);
+
+      if (!displaysRes.success || !slotsRes.success) {
+        return { success: false, error: 'Failed to fetch data' };
+      }
+
+      const displays = displaysRes.data?.data || [];
+      const slots = slotsRes.data?.data || [];
+
+      const displaysWithSlots = displays.map(display => ({
+        ...display,
+        slots: slots.filter(s => s.displayId === display.id),
+      }));
+
+      return { success: true, data: displaysWithSlots };
+    } catch (error) {
+      console.error('Failed to get displays with slots:', error);
+      return { success: false, error: 'Failed to get displays with slots' };
+    }
+  },
 };

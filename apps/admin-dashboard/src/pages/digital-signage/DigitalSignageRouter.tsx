@@ -3,6 +3,7 @@
  *
  * Main router for Digital Signage Core management UI
  * Phase 6: Operations/Management UI
+ * Phase 12: Operations convenience features
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -28,6 +29,12 @@ const ScheduleDetail = lazy(() => import('./schedule/ScheduleDetail'));
 const ActionExecutionList = lazy(() => import('./action/ActionExecutionList'));
 const ActionExecutionDetail = lazy(() => import('./action/ActionExecutionDetail'));
 
+// Operations pages (Phase 12)
+const OperationsDashboard = lazy(() => import('./operations/OperationsDashboard'));
+const ActionHistory = lazy(() => import('./operations/ActionHistory'));
+const DisplayStatusMap = lazy(() => import('./operations/DisplayStatusMap'));
+const ProblemTracking = lazy(() => import('./operations/ProblemTracking'));
+
 const PageLoader = () => (
   <div className="p-6 space-y-4">
     <Skeleton className="h-8 w-64" />
@@ -39,8 +46,14 @@ export default function DigitalSignageRouter() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to="media/sources" replace />} />
+        {/* Default redirect - now goes to Operations Dashboard */}
+        <Route path="/" element={<Navigate to="operations" replace />} />
+
+        {/* Operations routes (Phase 12) */}
+        <Route path="operations" element={<OperationsDashboard />} />
+        <Route path="operations/history" element={<ActionHistory />} />
+        <Route path="operations/display-status" element={<DisplayStatusMap />} />
+        <Route path="operations/problems" element={<ProblemTracking />} />
 
         {/* Media routes */}
         <Route path="media/sources" element={<MediaSourceList />} />
