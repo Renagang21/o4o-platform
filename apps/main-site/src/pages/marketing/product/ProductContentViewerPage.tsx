@@ -69,8 +69,7 @@ export function ProductContentViewerPage() {
   }
 
   function handleComplete() {
-    console.log('[ProductContentViewerPage] Content viewing completed');
-    // Could navigate to next content or show completion message
+    // Content viewing completed - could navigate to next content or show completion message
   }
 
   function handleBack() {

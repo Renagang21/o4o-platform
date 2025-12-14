@@ -55,16 +55,15 @@ export function BundleViewerPage() {
   };
 
   const handleComplete = () => {
-    console.log('Bundle completed');
-    // Could show a toast notification or redirect
+    // Bundle completed - could show a toast notification or redirect
   };
 
-  const handleQuizComplete = (attempt: any) => {
-    console.log('Quiz completed:', attempt);
+  const handleQuizComplete = (_attempt: any) => {
+    // Quiz completed - attempt data available for further processing
   };
 
-  const handleSurveyComplete = (response: any) => {
-    console.log('Survey completed:', response);
+  const handleSurveyComplete = (_response: any) => {
+    // Survey completed - response data available for further processing
   };
 
   // Loading state
