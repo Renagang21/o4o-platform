@@ -257,36 +257,99 @@ export class MemberService {
 
   /**
    * 회원 조회 (ID)
+   * Phase P0 Task D: Enriched with User data (name/phone/email)
    */
   async findById(id: string): Promise<Member | null> {
-    return await this.memberRepo.findOne({
+    const member = await this.memberRepo.findOne({
       where: { id },
       relations: ['category', 'affiliations', 'membershipYears', 'verifications'],
     });
+    if (!member) return null;
+    const [enriched] = await this.enrichMembersWithUserData([member]);
+    return enriched;
   }
 
   /**
    * 회원 조회 (User ID)
+   * Phase P0 Task D: Enriched with User data (name/phone/email)
    */
   async findByUserId(userId: string): Promise<Member | null> {
-    return await this.memberRepo.findOne({
+    const member = await this.memberRepo.findOne({
       where: { userId },
       relations: ['category', 'affiliations', 'membershipYears', 'verifications'],
     });
+    if (!member) return null;
+    const [enriched] = await this.enrichMembersWithUserData([member]);
+    return enriched;
   }
 
   /**
    * 회원 조회 (면허번호)
+   * Phase P0 Task D: Enriched with User data (name/phone/email)
    */
   async findByLicenseNumber(licenseNumber: string): Promise<Member | null> {
-    return await this.memberRepo.findOne({
+    const member = await this.memberRepo.findOne({
       where: { licenseNumber },
       relations: ['category'],
     });
+    if (!member) return null;
+    const [enriched] = await this.enrichMembersWithUserData([member]);
+    return enriched;
+  }
+
+  /**
+   * Phase P0 Task D: Enrich members with User data
+   * Fetches user name/phone/email from users table and merges into member results
+   */
+  private async enrichMembersWithUserData(members: Member[]): Promise<Member[]> {
+    if (members.length === 0) return members;
+
+    const userIds = members.map(m => m.userId).filter(Boolean);
+    if (userIds.length === 0) return members;
+
+    try {
+      // Query users table directly
+      const users = await this.dataSource.query(`
+        SELECT id, name, email, phone
+        FROM users
+        WHERE id = ANY($1)
+      `, [userIds]);
+
+      // Create a map for quick lookup
+      const userMap = new Map<string, { name?: string; email?: string; phone?: string }>();
+      for (const user of users) {
+        userMap.set(user.id, { name: user.name, email: user.email, phone: user.phone });
+      }
+
+      // Enrich members with user data
+      // Priority: User data > Member data (for backward compatibility during transition)
+      for (const member of members) {
+        const userData = userMap.get(member.userId);
+        if (userData) {
+          // Store original member values in metadata for debugging if needed
+          if (!member.metadata) member.metadata = {};
+          member.metadata._memberName = member.name;
+          member.metadata._memberEmail = member.email;
+          member.metadata._memberPhone = member.phone;
+
+          // Override with user data if available
+          if (userData.name) member.name = userData.name;
+          if (userData.email) member.email = userData.email;
+          if (userData.phone) member.phone = userData.phone;
+        }
+      }
+    } catch (error) {
+      // Log error but don't fail - member data is still available
+      console.warn('[MemberService] Failed to enrich members with user data:', error);
+    }
+
+    return members;
   }
 
   /**
    * 회원 목록 조회 (고급 필터링 지원)
+   *
+   * Phase P0 Task D: Results are enriched with User data (name/phone/email)
    */
   async list(filter?: MemberFilterDto): Promise<{ data: Member[]; total: number }> {
     const queryBuilder = this.memberRepo.createQueryBuilder('member')
@@ -436,7 +499,10 @@ export class MemberService {
 
     const data = await queryBuilder.getMany();
 
-    return { data, total };
+    // Phase P0 Task D: Enrich members with User data (name/phone/email)
+    const enrichedData = await this.enrichMembersWithUserData(data);
+
+    return { data: enrichedData, total };
   }
 
   /**

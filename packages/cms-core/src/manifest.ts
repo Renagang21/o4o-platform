@@ -8,6 +8,9 @@
  * - Menu system with locations
  * - Media library with folders
  * - CMS settings management
+ *
+ * @status FROZEN - Phase A/B complete (2025-12-14)
+ * @note Core structure is stable. Do not modify without Phase review.
  */
 
 export const cmsCoreManifest = {

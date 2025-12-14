@@ -1,21 +1,112 @@
-import { wordpressMenuItems } from '@/config/wordpressMenuFinal';
+/**
+ * useAdminMenu - Dynamic Admin Navigation Hook
+ *
+ * Phase P0 Task A: Dynamic Navigation System
+ *
+ * This hook provides admin menu items by:
+ * 1. Fetching from Navigation API (NavigationRegistry)
+ * 2. Falling back to hardcoded menu if API fails
+ * 3. Injecting CPT menus dynamically
+ * 4. Filtering based on app status and permissions
+ */
+
+import React from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import {
+  LayoutDashboard as LayoutDashboardIcon,
+  Database as DatabaseIcon,
+  FileText as FileTextIcon,
+  Package as PackageIcon,
+  Settings as SettingsIcon,
+  Menu as MenuIcon,
+  Image as ImageIcon,
+  Users as UsersIcon,
+  Globe as GlobeIcon,
+  Truck as TruckIcon,
+  Activity as ActivityIcon,
+  Monitor as MonitorIcon,
+  Calendar as CalendarIcon,
+  BarChart2 as BarChart2Icon,
+} from 'lucide-react';
+import { wordpressMenuItems, MenuItem } from '@/config/wordpressMenuFinal';
 import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
-import { hasMenuPermission, getAccessibleMenus } from '@/config/rolePermissions';
-import { useEffect, useState } from 'react';
+import { hasMenuPermission } from '@/config/rolePermissions';
 import { unifiedApi } from '@/api/unified-client';
 import { useAppStatus } from './useAppStatus';
 
+interface NavigationApiResponse {
+  success: boolean;
+  data: MenuItem[];
+  total: number;
+  context?: {
+    serviceGroup?: string;
+    tenantId?: string;
+    userRoles?: string[];
+    authenticated?: boolean;
+  };
+}
+
 /**
- * Admin menu hook that dynamically filters menus based on user roles and permissions
- * Fetches user permissions from database/API
+ * Admin menu hook that provides dynamic navigation
+ * - Fetches from NavigationRegistry API
+ * - Falls back to hardcoded menu during transition
+ * - Injects CPT menus
+ * - Filters by app status and permissions
  */
 export const useAdminMenu = () => {
   const { user } = useAuth();
   const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
   const { isActive: isAppActive, isLoading: appStatusLoading } = useAppStatus();
+
+  const [dynamicMenuItems, setDynamicMenuItems] = useState<MenuItem[] | null>(null);
+  const [apiLoading, setApiLoading] = useState(true);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [permissionsLoading, setPermissionsLoading] = useState(true);
+
+  // Get user roles (support multiple roles)
+  const rawRoles = (user as any)?.roles || (user?.role ? [{ name: user.role }] : []);
+  const userRoles: string[] = rawRoles.map((r: any) => typeof r === 'string' ? r : r.name).filter(Boolean);
+
+  // Fetch navigation from API
+  useEffect(() => {
+    const fetchNavigation = async () => {
+      setApiLoading(true);
+
+      try {
+        // Fetch from Navigation API
+        const response = await unifiedApi.raw.get<NavigationApiResponse>('/v1/navigation/admin');
+
+        if (response.data?.success && response.data.data?.length > 0) {
+          // Transform API response to MenuItem format with icons
+          const menuItems = transformApiMenuItems(response.data.data);
+          setDynamicMenuItems(menuItems);
+
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[useAdminMenu] Loaded from API:', menuItems.length, 'items');
+          }
+        } else {
+          // API returned empty or failed - use fallback
+          setDynamicMenuItems(null);
+
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[useAdminMenu] API returned empty, using fallback menu');
+          }
+        }
+      } catch (error) {
+        // API call failed - use fallback
+        setDynamicMenuItems(null);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[useAdminMenu] API failed, using fallback menu:', error);
+        }
+      } finally {
+        setApiLoading(false);
+      }
+    };
+
+    fetchNavigation();
+  }, [user?.id]);
 
   // Fetch user permissions from API
   useEffect(() => {
@@ -27,29 +118,17 @@ export const useAdminMenu = () => {
       }
 
       try {
-        // Fetch user permissions from API with authentication (unifiedApi handles token)
-        // unifiedApi.raw uses the base API URL (e.g. /api), so we need to add /v1 if needed
-        // But unifiedApi.raw is just the axios instance.
-        // Let's check unifiedApi implementation again.
-        // unifiedApi.client.baseURL is set to .../api
-        // And v1 method adds /v1 prefix.
-        // So we should probably use unifiedApi.raw.get('/v1/userRole/...')
         const response = await unifiedApi.raw.get(`/v1/userRole/${user.id}/permissions`);
         if (response.data?.success) {
           setUserPermissions(response.data.data?.permissions || []);
         } else {
-          // Fallback to user's permissions property if API response is not successful
           setUserPermissions(user.permissions || []);
         }
       } catch (error) {
-        console.error('Failed to fetch user permissions:', error);
-
-        // Use user's permissions property as fallback
-        // If user has no permissions, grant content.view by default to show basic menus
+        // Use fallback permissions
         const fallbackPermissions = user.permissions?.length
           ? user.permissions
           : ['content.view', 'dashboard:view'];
-
         setUserPermissions(fallbackPermissions);
       } finally {
         setPermissionsLoading(false);
@@ -59,17 +138,14 @@ export const useAdminMenu = () => {
     fetchPermissions();
   }, [user]);
 
-  // Inject CPT menus into static menu
-  const allMenuItems = injectCPTMenuItems([...wordpressMenuItems], cptMenuItems);
+  // Determine base menu items - API or fallback
+  const baseMenuItems = dynamicMenuItems || [...wordpressMenuItems];
 
-  // Get user roles (support multiple roles)
-  // user.roles is array of objects with {id, name, displayName}
-  // Extract name strings for permission checking
-  const rawRoles = (user as any)?.roles || (user?.role ? [{ name: user.role }] : []);
-  const userRoles = rawRoles.map((r: any) => typeof r === 'string' ? r : r.name).filter(Boolean);
+  // Inject CPT menus into base menu
+  const allMenuItems = injectCPTMenuItems(baseMenuItems, cptMenuItems);
 
   // Filter menu items based on permissions and app status
-  const filterMenuItems = (items: any[]): any[] => {
+  const filterMenuItems = useCallback((items: MenuItem[]): MenuItem[] => {
     return items.map(item => {
       // Skip separators - always show
       if (item.separator) {
@@ -82,29 +158,30 @@ export const useAdminMenu = () => {
       }
 
       // Check app status - if menu has appId, only show if app is active
-      if (item.appId && !isAppActive(item.appId)) {
+      if ((item as any).appId && !isAppActive((item as any).appId)) {
         if (process.env.NODE_ENV === 'development') {
-          console.debug(`[Menu Filter] App inactive: ${item.id} (appId: ${item.appId})`);
+          console.debug(`[Menu Filter] App inactive: ${item.id} (appId: ${(item as any).appId})`);
         }
-        return null;
+        return null as unknown as MenuItem;
       }
 
       // Check if user has permission for this menu item
-      const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id || item.key);
+      // Only apply local permission filtering if using fallback menu
+      // API-sourced menus are already filtered by the server
+      if (!dynamicMenuItems) {
+        const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id);
 
-      // Debug logging for menu filtering (can be removed in production)
-      if (!hasAccess && process.env.NODE_ENV === 'development') {
-        console.debug(`[Menu Filter] No permission: ${item.id} - User roles:`, userRoles, 'Permissions:', userPermissions);
+        if (!hasAccess) {
+          if (process.env.NODE_ENV === 'development') {
+            console.debug(`[Menu Filter] No permission: ${item.id}`);
+          }
+          return null as unknown as MenuItem;
+        }
       }
 
-      if (!hasAccess) {
-        return null;
-      }
-
-      // Recursively filter children - create new object to avoid mutating original
+      // Recursively filter children
       if (item.children && item.children.length > 0) {
         const filteredChildren = filterMenuItems(item.children).filter(Boolean);
-        // Return new object with filtered children
         return {
           ...item,
           children: filteredChildren
@@ -113,84 +190,77 @@ export const useAdminMenu = () => {
 
       return item;
     }).filter(Boolean);
-  };
+  }, [isAppActive, userRoles, userPermissions, dynamicMenuItems]);
 
   const filteredMenuItems = filterMenuItems([...allMenuItems]);
 
-  // Debug log final menu count
+  // Debug log
   if (process.env.NODE_ENV === 'development') {
-    console.debug(`[Menu] Showing ${filteredMenuItems.length}/${allMenuItems.length} menu items`);
+    console.debug(
+      `[Menu] Source: ${dynamicMenuItems ? 'API' : 'Fallback'}, ` +
+      `Showing ${filteredMenuItems.length}/${allMenuItems.length} items`
+    );
   }
 
   return {
     menuItems: filteredMenuItems,
-    isLoading: cptLoading || permissionsLoading || appStatusLoading,
+    isLoading: apiLoading || cptLoading || permissionsLoading || appStatusLoading,
     userRoles,
-    userPermissions
+    userPermissions,
+    isUsingFallback: !dynamicMenuItems
   };
 };
 
 /**
- * Get default permissions for a role
- * This is a fallback when API is not available
- * In production, all permissions should come from database
+ * Transform API menu items to MenuItem format with React icons
+ * API returns icon as string name, needs to be converted to React element
  */
-function getDefaultPermissions(role: string): string[] {
-  // Basic fallback permissions
-  // These should be replaced with API data
-  switch (role) {
-    case 'admin':
-      // Admin gets all permissions
-      return [
-        'dashboard:view',
-        'users:manage',
-        'users:read',
-        'users:create',
-        'users:update',
-        'roles:manage',
-        'permissions:manage',
-        'settings:manage',
-        'appearance:manage',
-        'cms:read',
-        'cms:write',
-        'ecommerce:read',
-        'ecommerce:write',
-        'forum:read',
-        'forum:moderate',
-        'reports:read',
-        'analytics:read',
-        'tools:access',
-        'database:manage',
-        'system:admin'
-      ];
-    case 'manager':
-      return [
-        'dashboard:view',
-        'users:read',
-        'ecommerce:read',
-        'ecommerce:write',
-        'products:manage',
-        'orders:manage',
-        'reports:read',
-        'analytics:read'
-      ];
-    case 'vendor':
-    case 'seller':
-    case 'supplier':
-      return [
-        'dashboard:view',
-        'products:read',
-        'products:manage',
-        'orders:read',
-        'reports:sales'
-      ];
-    case 'customer':
-      return [
-        'dashboard:view',
-        'orders:read'
-      ];
-    default:
-      // Minimal permissions for unknown roles
-      return ['dashboard:view'];
-  }
+function transformApiMenuItems(items: any[]): MenuItem[] {
+  return items.map(item => {
+    const menuItem: MenuItem = {
+      id: item.id,
+      label: item.label,
+      icon: getIconComponent(item.icon),
+      path: item.path,
+      roles: item.roles,
+      children: item.children ? transformApiMenuItems(item.children) : undefined
+    };
+
+    // Preserve appId for app status filtering
+    if (item.appId) {
+      (menuItem as any).appId = item.appId;
+    }
+
+    return menuItem;
+  });
+}
+
+/**
+ * Convert icon string name to Lucide React icon component
+ * Falls back to a default icon if not found
+ */
+function getIconComponent(iconName?: string): React.ReactElement {
+  // Icon map using React.createElement (no JSX in .ts file)
+  const iconMap: Record<string, React.ComponentType> = {
+    'layout': LayoutDashboardIcon,
+    'dashboard': LayoutDashboardIcon,
+    'database': DatabaseIcon,
+    'document': FileTextIcon,
+    'collection': PackageIcon,
+    'adjustments': SettingsIcon,
+    'menu': MenuIcon,
+    'photograph': ImageIcon,
+    'users': UsersIcon,
+    'settings': SettingsIcon,
+    'package': PackageIcon,
+    'globe': GlobeIcon,
+    'truck': TruckIcon,
+    'activity': ActivityIcon,
+    'monitor': MonitorIcon,
+    'calendar': CalendarIcon,
+    'chart': BarChart2Icon,
+  };
+
+  const IconComponent = iconMap[iconName || ''] || FileTextIcon;
+  return React.createElement(IconComponent, { className: 'w-5 h-5' });
 }

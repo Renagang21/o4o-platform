@@ -5,6 +5,9 @@
  * - 계층 구조 조직 관리
  * - 멤버 관리
  * - 조직 스코프 권한
+ *
+ * @status FROZEN - Phase A/B complete (2025-12-14)
+ * @note Foundation Core. Do not modify without Phase review.
  */
 
 export const organizationCoreManifest = {

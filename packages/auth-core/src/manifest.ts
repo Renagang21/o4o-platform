@@ -10,6 +10,9 @@
  * - OAuth linked accounts (linked_accounts table)
  * - Refresh tokens (refresh_tokens table)
  * - Login attempts tracking (login_attempts table)
+ *
+ * @status FROZEN - Phase A/B complete (2025-12-14)
+ * @note Foundation Core. Do not modify without Phase review.
  */
 
 export const authCoreManifest = {

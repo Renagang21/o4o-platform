@@ -2,6 +2,8 @@
   "name": "@o4o/slide-app",
   "version": "1.0.0",
   "description": "Unified slide/carousel component for o4o platform - Embla Carousel based",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. UI component library.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

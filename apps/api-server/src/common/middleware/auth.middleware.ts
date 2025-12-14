@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import { RoleAssignment } from '../../modules/auth/entities/RoleAssignment.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -71,10 +72,11 @@ export const requireAuth = async (
     ) as any;
 
     // Get user from database
+    // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
       where: { id: decoded.userId || decoded.sub },
-      relations: ['linkedAccounts', 'dbRoles', 'dbRoles.permissions'],
+      relations: ['linkedAccounts'],
     });
 
     if (!user) {
@@ -114,6 +116,7 @@ export const requireAuth = async (
  *
  * Requires the user to be authenticated AND have admin/operator role.
  * This should be chained after requireAuth or used standalone (it calls requireAuth internally).
+ * Uses RoleAssignment table (P0 RBAC) for role checking.
  *
  * Returns 403 if user lacks admin privileges.
  *
@@ -134,35 +137,49 @@ export const requireAdmin = async (
 
   const user = req.user as User;
 
-  // Check if user has admin/operator role
-  const isAdmin =
-    user.hasRole('admin') ||
-    user.hasRole('super_admin') ||
-    user.hasRole('operator');
+  try {
+    // P0 RBAC: Check roles using RoleAssignment service
+    const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
+      'admin',
+      'super_admin',
+      'operator'
+    ]);
 
-  if (!isAdmin) {
-    logger.warn('[requireAdmin] Unauthorized admin access attempt', {
-      userId: user.id,
-      email: user.email,
-      path: req.path,
-      method: req.method,
+    if (!isAdmin) {
+      logger.warn('[requireAdmin] Unauthorized admin access attempt', {
+        userId: user.id,
+        email: user.email,
+        path: req.path,
+        method: req.method,
+      });
+
+      return res.status(403).json({
+        success: false,
+        error: 'Admin privileges required',
+        code: 'FORBIDDEN',
+      });
+    }
+
+    next();
+  } catch (error) {
+    logger.error('[requireAdmin] Error checking admin role', {
+      error: error instanceof Error ? error.message : String(error),
+      userId: user.id
     });
 
-    return res.status(403).json({
+    return res.status(500).json({
       success: false,
-      error: 'Admin privileges required',
-      code: 'FORBIDDEN',
+      error: 'Error verifying admin access',
+      code: 'INTERNAL_ERROR',
     });
   }
-
-  next();
 };
 
 /**
  * Require Specific Role(s) Middleware
  *
  * Requires the user to have one of the specified roles.
- * Checks both legacy role system and new RoleAssignment table.
+ * Uses P0 role_assignments table via RoleAssignmentService as the sole source of truth.
  *
  * @param roles - Single role string or array of role strings
  *
@@ -187,38 +204,8 @@ export const requireRole = (roles: string | string[]) => {
     const roleList = Array.isArray(roles) ? roles : [roles];
 
     try {
-      let hasActiveRole = false;
-      let matchedAssignment: RoleAssignment | null = null;
-
-      // First check legacy role system
-      for (const role of roleList) {
-        if (user.hasRole(role)) {
-          hasActiveRole = true;
-          break;
-        }
-      }
-
-      // If not found in legacy system, check RoleAssignment table
-      if (!hasActiveRole) {
-        const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
-
-        for (const role of roleList) {
-          const assignment = await assignmentRepo.findOne({
-            where: {
-              userId: user.id,
-              role: role,
-              isActive: true,
-            },
-          });
-
-          // Check validity period if assignment exists
-          if (assignment && assignment.isValidNow()) {
-            hasActiveRole = true;
-            matchedAssignment = assignment;
-            break;
-          }
-        }
-      }
+      // P0 RBAC: Check roles using RoleAssignment service only
+      const hasActiveRole = await roleAssignmentService.hasAnyRole(user.id, roleList);
 
       if (!hasActiveRole) {
         logger.warn('[requireRole] Unauthorized role access attempt', {
@@ -242,7 +229,9 @@ export const requireRole = (roles: string | string[]) => {
         });
       }
 
-      // Attach role assignment to request for downstream use
+      // Get active roles for request context
+      const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
+      const matchedAssignment = activeRoles.find(a => roleList.includes(a.role));
       if (matchedAssignment) {
         req.roleAssignment = matchedAssignment;
       }
@@ -295,10 +284,11 @@ export const optionalAuth = async (
     ) as any;
 
     // Get user from database
+    // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
       where: { id: decoded.userId || decoded.sub },
-      relations: ['linkedAccounts', 'dbRoles', 'dbRoles.permissions'],
+      relations: ['linkedAccounts'],
     });
 
     if (user && user.isActive) {
@@ -316,7 +306,7 @@ export const optionalAuth = async (
  * Require Permission Middleware
  *
  * Requires the user to have a specific permission.
- * Checks user's roles against the SSOT permission mapping.
+ * Uses RoleAssignmentService to check user's roles against permissions.
  *
  * @param permission - Permission key (e.g., 'cms.templates.edit')
  *
@@ -344,33 +334,11 @@ export const requirePermission = (permission: string) => {
         return next();
       }
 
-      // Check if user has permission through their role
-      // Import dynamically to avoid circular dependencies
-      const { roleHasPermission, ADMIN_ROLES } = await import('@o4o/types');
+      // P0 RBAC: Check permissions using RoleAssignment service
+      const hasPermission = await roleAssignmentService.hasPermission(user.id, permission);
 
-      // Admin roles have all permissions
-      if (ADMIN_ROLES.includes(user.role as any)) {
+      if (hasPermission) {
         return next();
-      }
-
-      // Check legacy role
-      if (roleHasPermission(user.role, permission)) {
-        return next();
-      }
-
-      // Check RoleAssignment-based roles
-      const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
-      const assignments = await assignmentRepo.find({
-        where: {
-          userId: user.id,
-          isActive: true,
-        },
-      });
-
-      for (const assignment of assignments) {
-        if (assignment.isValidNow() && roleHasPermission(assignment.role, permission)) {
-          return next();
-        }
       }
 
       // No permission found
@@ -410,6 +378,7 @@ export const requirePermission = (permission: string) => {
  * Require Any Permission Middleware
  *
  * Requires the user to have at least one of the specified permissions.
+ * Uses RoleAssignmentService to check user's roles against permissions.
  *
  * @param permissions - Array of permission keys
  *
@@ -431,13 +400,6 @@ export const requireAnyPermission = (permissions: string[]) => {
     const user = req.user as User;
 
     try {
-      const { roleHasPermission, ADMIN_ROLES } = await import('@o4o/types');
-
-      // Admin roles have all permissions
-      if (ADMIN_ROLES.includes(user.role as any)) {
-        return next();
-      }
-
       // Check direct permissions
       for (const permission of permissions) {
         if (user.permissions?.includes(permission)) {
@@ -445,30 +407,11 @@ export const requireAnyPermission = (permissions: string[]) => {
         }
       }
 
-      // Check role-based permissions
-      for (const permission of permissions) {
-        if (roleHasPermission(user.role, permission)) {
-          return next();
-        }
-      }
+      // P0 RBAC: Check permissions using RoleAssignment service
+      const hasAnyPermission = await roleAssignmentService.hasAnyPermission(user.id, permissions);
 
-      // Check RoleAssignment-based roles
-      const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
-      const assignments = await assignmentRepo.find({
-        where: {
-          userId: user.id,
-          isActive: true,
-        },
-      });
-
-      for (const assignment of assignments) {
-        if (assignment.isValidNow()) {
-          for (const permission of permissions) {
-            if (roleHasPermission(assignment.role, permission)) {
-              return next();
-            }
-          }
-        }
+      if (hasAnyPermission) {
+        return next();
       }
 
       // No permission found

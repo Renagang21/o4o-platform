@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../modules/auth/entities/User.js';
 import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 
@@ -60,10 +61,11 @@ export const requireAuth = async (
     logger.info('[requireAuth] Token verified', { userId: decoded.userId || decoded.sub });
 
     // Get user from database
+    // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
       where: { id: decoded.userId || decoded.sub },
-      relations: ['linkedAccounts', 'dbRoles', 'dbRoles.permissions']
+      relations: ['linkedAccounts']
     });
 
     if (!user) {
@@ -102,6 +104,7 @@ export const requireAuth = async (
  *
  * Requires user to be authenticated AND have admin/operator role.
  * Returns 403 if user lacks admin privileges.
+ * Uses RoleAssignment table (P0 RBAC) for role checking.
  */
 export const requireAdmin = async (
   req: AuthRequest,
@@ -117,36 +120,50 @@ export const requireAdmin = async (
 
   const user = req.user as User;
 
-  // Check if user has admin/operator role (legacy or new system)
-  const isAdmin = user.hasRole('admin') ||
-                  user.hasRole('super_admin') ||
-                  user.hasRole('operator');
+  try {
+    // P0 RBAC: Check roles using RoleAssignment service
+    const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
+      'admin',
+      'super_admin',
+      'operator'
+    ]);
 
-  if (!isAdmin) {
-    // Log unauthorized access attempt
-    logger.warn('Unauthorized admin access attempt', {
-      userId: user.id,
-      email: user.email,
-      path: req.path,
-      method: req.method,
-      ip: req.ip,
-      timestamp: new Date().toISOString()
+    if (!isAdmin) {
+      // Log unauthorized access attempt
+      logger.warn('Unauthorized admin access attempt', {
+        userId: user.id,
+        email: user.email,
+        path: req.path,
+        method: req.method,
+        ip: req.ip,
+        timestamp: new Date().toISOString()
+      });
+
+      return res.status(403).json({
+        code: 'FORBIDDEN',
+        message: 'Admin privileges required'
+      });
+    }
+
+    next();
+  } catch (error) {
+    logger.error('Error checking admin role', {
+      error: error instanceof Error ? error.message : String(error),
+      userId: user.id
     });
 
-    return res.status(403).json({
-      code: 'FORBIDDEN',
-      message: 'Admin privileges required'
+    return res.status(500).json({
+      code: 'INTERNAL_ERROR',
+      message: 'Error verifying admin access'
     });
   }
-
-  next();
 };
 
 /**
  * P0 RBAC: requireRole - Role-based authorization check
  *
  * Requires user to have an active RoleAssignment for one of the specified roles.
- * Uses new P0 role_assignments table as source of truth.
+ * Uses P0 role_assignments table via RoleAssignmentService as the sole source of truth.
  *
  * @param roles - Role name(s) to check (e.g., 'supplier', ['admin', 'staff'])
  */
@@ -163,39 +180,8 @@ export const requireRole = (roles: string | string[]) => {
     const roleList = Array.isArray(roles) ? roles : [roles];
 
     try {
-      // Check if user has ANY of the required roles
-      let hasActiveRole = false;
-      let matchedAssignment: RoleAssignment | null = null;
-
-      // First check legacy role system (User.hasRole)
-      for (const role of roleList) {
-        if (user.hasRole(role)) {
-          hasActiveRole = true;
-          break;
-        }
-      }
-
-      // If not found in legacy system, check P0 role_assignments table
-      if (!hasActiveRole) {
-        const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
-
-        for (const role of roleList) {
-          const assignment = await assignmentRepo.findOne({
-            where: {
-              userId: user.id,
-              role: role,
-              isActive: true
-            }
-          });
-
-          // Check validity period if assignment exists
-          if (assignment && assignment.isValidNow()) {
-            hasActiveRole = true;
-            matchedAssignment = assignment;
-            break;
-          }
-        }
-      }
+      // P0 RBAC: Check roles using RoleAssignment service only
+      const hasActiveRole = await roleAssignmentService.hasAnyRole(user.id, roleList);
 
       if (!hasActiveRole) {
         // Log unauthorized role access attempt
@@ -219,10 +205,13 @@ export const requireRole = (roles: string | string[]) => {
         });
       }
 
-      // Attach assignment to request for downstream use (if found)
+      // Get active roles for request context
+      const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
+      const matchedAssignment = activeRoles.find(a => roleList.includes(a.role));
       if (matchedAssignment) {
         (req as any).roleAssignment = matchedAssignment;
       }
+
       next();
     } catch (error) {
       logger.error('Error checking role assignment', {
@@ -259,10 +248,11 @@ export const optionalAuth = async (
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
 
     // Get user from database
+    // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
       where: { id: decoded.userId || decoded.sub },
-      relations: ['linkedAccounts', 'dbRoles', 'dbRoles.permissions']
+      relations: ['linkedAccounts']
     });
 
     if (user && user.isActive) {
