@@ -230,6 +230,11 @@ export class User {
   }
 
   // Role helper methods
+  /**
+   * @deprecated Phase P0: Use RoleAssignmentService.hasRole() instead
+   * This method relies on deprecated dbRoles, roles, role fields.
+   * @see RoleAssignmentService
+   */
   hasRole(role: UserRole | string): boolean {
     // Check database roles first
     const hasDbRole = this.dbRoles?.some(r => r.name === role) || false;
@@ -240,15 +245,27 @@ export class User {
     return hasDbRole || hasLegacyRoles || hasLegacyRole;
   }
 
+  /**
+   * @deprecated Phase P0: Use RoleAssignmentService.hasAnyRole() instead
+   * @see RoleAssignmentService
+   */
   hasAnyRole(roles: (UserRole | string)[]): boolean {
     return roles.some((role: any) => this.hasRole(role));
   }
 
+  /**
+   * @deprecated Phase P0: Use RoleAssignmentService.isAdmin() instead
+   * @see RoleAssignmentService
+   */
   isAdmin(): boolean {
     return this.hasAnyRole([UserRole.SUPER_ADMIN, UserRole.ADMIN]);
   }
 
-  // Get all permissions from database roles and direct permissions
+  /**
+   * Get all permissions from database roles and direct permissions
+   * @deprecated Phase P0: Use RoleAssignmentService.getPermissions() instead
+   * @see RoleAssignmentService
+   */
   getAllPermissions(): string[] {
     // Legacy admin users (role = 'admin' or 'super_admin') get all permissions
     if (this.isAdmin()) {
@@ -280,24 +297,40 @@ export class User {
     return [...new Set([...rolePermissions, ...directPermissions])];
   }
 
-  // Check if user has a specific permission
+  /**
+   * Check if user has a specific permission
+   * @deprecated Phase P0: Use RoleAssignmentService.hasPermission() instead
+   * @see RoleAssignmentService
+   */
   hasPermission(permission: string): boolean {
     return this.getAllPermissions().includes(permission);
   }
 
-  // Check if user has any of the permissions
+  /**
+   * Check if user has any of the permissions
+   * @deprecated Phase P0: Use RoleAssignmentService.hasAnyPermission() instead
+   * @see RoleAssignmentService
+   */
   hasAnyPermission(permissions: string[]): boolean {
     const userPermissions = this.getAllPermissions();
     return permissions.some(p => userPermissions.includes(p));
   }
 
-  // Check if user has all of the permissions
+  /**
+   * Check if user has all of the permissions
+   * @deprecated Phase P0: Use RoleAssignmentService.hasAllPermissions() instead
+   * @see RoleAssignmentService
+   */
   hasAllPermissions(permissions: string[]): boolean {
     const userPermissions = this.getAllPermissions();
     return permissions.every(p => userPermissions.includes(p));
   }
 
-  // Get role names as string array (for backward compatibility)
+  /**
+   * Get role names as string array (for backward compatibility)
+   * @deprecated Phase P0: Use RoleAssignmentService.getRoleNames() instead
+   * @see RoleAssignmentService
+   */
   getRoleNames(): string[] {
     if (this.dbRoles && this.dbRoles.length > 0) {
       return this.dbRoles.map(r => r.name);
@@ -313,20 +346,38 @@ export class User {
     return this.status === UserStatus.ACTIVE || this.status === UserStatus.APPROVED;
   }
 
-  // Dropshipping role helper methods
+  /**
+   * Check if user is a supplier
+   * @deprecated Phase P0: Use RoleAssignmentService.isSupplier() instead
+   * @see RoleAssignmentService
+   */
   isSupplier(): boolean {
     return this.hasRole('supplier') || !!this.supplier;
   }
 
+  /**
+   * Check if user is a seller
+   * @deprecated Phase P0: Use RoleAssignmentService.isSeller() instead
+   * @see RoleAssignmentService
+   */
   isSeller(): boolean {
     return this.hasRole('seller') || !!this.seller;
   }
 
+  /**
+   * Check if user is a partner
+   * @deprecated Phase P0: Use RoleAssignmentService.isPartner() instead
+   * @see RoleAssignmentService
+   */
   isPartner(): boolean {
     return this.hasRole('partner') || !!this.partner;
   }
 
-  // Get active dropshipping roles
+  /**
+   * Get active dropshipping roles
+   * @deprecated Phase P0: Use RoleAssignmentService.getRoleNames() instead
+   * @see RoleAssignmentService
+   */
   getDropshippingRoles(): string[] {
     const roles: string[] = [];
     if (this.isSupplier()) roles.push('supplier');
@@ -335,7 +386,11 @@ export class User {
     return roles;
   }
 
-  // Get active role (with fallback to first dbRole)
+  /**
+   * Get active role (with fallback to first dbRole)
+   * @deprecated Phase P0: Use RoleAssignmentService.getActiveRoles() instead
+   * @see RoleAssignmentService
+   */
   getActiveRole(): Role | null {
     // If activeRole is explicitly set, use it
     if (this.activeRole) {
@@ -350,7 +405,11 @@ export class User {
     return null;
   }
 
-  // Check if user can switch to a specific role
+  /**
+   * Check if user can switch to a specific role
+   * @deprecated Phase P0: Use RoleAssignmentService.hasRole() instead
+   * @see RoleAssignmentService
+   */
   canSwitchToRole(roleId: string): boolean {
     if (!this.dbRoles || this.dbRoles.length === 0) {
       return false;
@@ -358,12 +417,22 @@ export class User {
     return this.dbRoles.some(r => r.id === roleId);
   }
 
-  // Check if user has multiple roles
+  /**
+   * Check if user has multiple roles
+   * @deprecated Phase P0: Use RoleAssignmentService.getActiveRoles() instead
+   * @see RoleAssignmentService
+   */
   hasMultipleRoles(): boolean {
     return this.dbRoles ? this.dbRoles.length > 1 : false;
   }
 
-  // 민감 정보 제거한 공개 데이터
+  /**
+   * 민감 정보 제거한 공개 데이터
+   *
+   * Note: role, roles, dbRoles, activeRole fields are deprecated.
+   * Use RoleAssignmentService to get accurate role information.
+   * @see RoleAssignmentService
+   */
   toPublicData() {
     const activeRole = this.getActiveRole();
     return {
@@ -373,6 +442,7 @@ export class User {
       lastName: this.lastName,
       fullName: this.fullName,
       phone: this.phone, // Phase 3-3: Include phone for checkout auto-fill
+      // Note: role/roles/dbRoles are deprecated - use RoleAssignment data
       role: this.role,
       roles: this.getRoleNames(), // Return role names as string array
       activeRole: activeRole ? {

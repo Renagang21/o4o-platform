@@ -51,6 +51,7 @@
     "migration:run": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run",
     "migration:run:prod": "node scripts/run-migrations.mjs",
     "migration:roles": "npx tsx src/scripts/migrate-user-roles-to-assignments.ts",
+    "migration:roles:verify": "npx tsx src/scripts/verify-rbac-migration.ts",
     "migration:show": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts migration:show",
     "migration:sync": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts schema:sync",
     "backfill:order-items": "npx tsx src/database/backfill-order-items.ts",
