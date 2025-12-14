@@ -47,5 +47,20 @@ export type {
   SurveyCampaignStatistics,
 } from './SurveyCampaignService.js';
 
-// Phase R9: Analytics Service (placeholder)
-// export { AnalyticsService } from './AnalyticsService.js';
+// Phase R9: Supplier Insights Service
+export {
+  SupplierInsightsService,
+  getSupplierInsightsService,
+  initSupplierInsightsService,
+} from './SupplierInsightsService.js';
+export type {
+  CampaignTypeSummary,
+  SupplierDashboardSummary,
+  RecentActivityItem,
+  CampaignPerformance,
+  EngagementTrends,
+  TrendDataPoint,
+  ExportFormat,
+  ExportData,
+  DateRangeFilter,
+} from './SupplierInsightsService.js';

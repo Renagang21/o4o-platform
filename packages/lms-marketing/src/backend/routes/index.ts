@@ -14,5 +14,5 @@ export { createQuizCampaignRoutes } from './quizCampaign.routes.js';
 // Phase R8: Survey Campaign Routes
 export { createSurveyCampaignRoutes } from './surveyCampaign.routes.js';
 
-// Phase R9: Analytics Routes (placeholder)
-// export { createAnalyticsRoutes } from './analytics.routes.js';
+// Phase R9: Supplier Insights Routes
+export { createSupplierInsightsRoutes } from './supplierInsights.routes.js';

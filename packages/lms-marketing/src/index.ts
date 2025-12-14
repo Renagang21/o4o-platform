@@ -5,8 +5,9 @@
  * - Product info delivery to sellers/consumers
  * - Marketing quiz/survey campaigns
  * - Engagement capture and analytics
+ * - Supplier engagement dashboard
  *
- * Phase R5: Bootstrap skeleton
+ * Phase R9: Engagement Dashboard
  */
 
 // Manifest

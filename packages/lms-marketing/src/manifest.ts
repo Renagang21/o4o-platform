@@ -16,7 +16,7 @@ export const lmsMarketingManifest = {
   appId: 'lms-marketing',
   displayName: 'Marketing LMS Extension',
   name: 'LMS Marketing',
-  version: '0.4.0',
+  version: '0.5.0',
   type: 'extension' as const,
   appType: 'extension' as const,
   category: 'marketing' as const,
@@ -45,8 +45,8 @@ export const lmsMarketingManifest = {
   // ===== Backend =====
   backend: {
     entities: ['ProductContent', 'MarketingQuizCampaign', 'SurveyCampaign'],
-    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService'],
-    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController'],
+    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService', 'SupplierInsightsService'],
+    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController', 'SupplierInsightsController'],
     routesExport: 'createRoutes',
     servicesExport: 'createServices',
     hooksExport: 'createHooks',
@@ -171,8 +171,8 @@ export const lmsMarketingManifest = {
   // ===== Exposes =====
   exposes: {
     entities: ['ProductContent', 'MarketingQuizCampaign', 'SurveyCampaign'],
-    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService'],
-    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController'],
+    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService', 'SupplierInsightsService'],
+    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController', 'SupplierInsightsController'],
     types: [
       'ProductContent',
       'ProductContentTargeting',
@@ -189,6 +189,13 @@ export const lmsMarketingManifest = {
       'SurveyCampaignTargeting',
       'SurveyReward',
       'SurveyCampaignStatus',
+      // Phase R9: Insights types
+      'SupplierDashboardSummary',
+      'CampaignTypeSummary',
+      'CampaignPerformance',
+      'EngagementTrends',
+      'TrendDataPoint',
+      'ExportData',
     ],
     hooks: [
       'publishProductInfo',
@@ -198,6 +205,8 @@ export const lmsMarketingManifest = {
       'createSurveyCampaign',
       'getSurveyCampaignsForUser',
       'getCampaignAnalytics',
+      'getSupplierDashboard',
+      'getEngagementTrends',
     ],
     events: [
       'product-content.created',
