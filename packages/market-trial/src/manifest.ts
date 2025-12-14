@@ -40,8 +40,8 @@ export const marketTrialManifest = {
       'MarketTrialParticipant',
       'MarketTrialForum',
     ],
-    services: [],  // Phase 2
-    controllers: [], // Phase 2
+    services: ['MarketTrialService'],
+    controllers: ['MarketTrialController'],
     routesExport: 'createRoutes',
   },
 
@@ -89,7 +89,7 @@ export const marketTrialManifest = {
 
   // ===== Exposes =====
   exposes: {
-    services: [],  // Phase 2
+    services: ['MarketTrialService'],
     types: ['MarketTrial', 'MarketTrialParticipant', 'MarketTrialForum'],
     events: [],  // Future
   },
