@@ -64,6 +64,7 @@ export const manifest = {
           { id: 'pharmacyops-orders', label: '주문 관리', path: '/pharmacyops/orders', icon: 'shopping_cart' },
           { id: 'pharmacyops-dispatch', label: '배송 조회', path: '/pharmacyops/dispatch', icon: 'local_shipping' },
           { id: 'pharmacyops-settlement', label: '구매 내역', path: '/pharmacyops/settlement', icon: 'receipt_long' },
+          { id: 'pharmacyops-partner', label: '파트너 추천', path: '/pharmacyops/partner-recommendations', icon: 'recommend' },
         ],
       },
     ],
@@ -77,17 +78,19 @@ export const manifest = {
       '/pharmacyops/orders/:orderId',
       '/pharmacyops/dispatch',
       '/pharmacyops/settlement',
+      '/pharmacyops/partner-recommendations',
     ],
   },
 
   // 약국 전용 설정
   config: {
-    // PHARMACEUTICAL 제품만 표시
+    // PHARMACEUTICAL 제품만 표시 (의약품 목록용)
     productTypeFilter: ['pharmaceutical'],
     // B2C Listing 기능 비활성화
     enableListing: false,
-    // 파트너 추천 비활성화
-    enablePartnerRecommendation: false,
+    // 파트너 추천 활성화 (의약품 제외, 화장품/건강식품/일반 제품만)
+    enablePartnerRecommendation: true,
+    partnerRecommendationFilter: ['cosmetics', 'health', 'general'],
     // 정산 타입 (약국은 구매자이므로 지출 기반)
     settlementViewMode: 'expense',
   },

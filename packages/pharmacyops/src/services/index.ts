@@ -10,6 +10,7 @@ import { PharmacyOfferService } from './PharmacyOfferService.js';
 import { PharmacyOrderService } from './PharmacyOrderService.js';
 import { PharmacyDispatchService } from './PharmacyDispatchService.js';
 import { PharmacySettlementService } from './PharmacySettlementService.js';
+import { PartnerRecommendationService } from './PartnerRecommendationService.js';
 
 // Re-export services
 export { PharmacyDashboardService };
@@ -18,6 +19,7 @@ export { PharmacyOfferService };
 export { PharmacyOrderService };
 export { PharmacyDispatchService };
 export { PharmacySettlementService };
+export { PartnerRecommendationService, partnerRecommendationService } from './PartnerRecommendationService.js';
 
 // Re-export types
 export type { ProductSearchParams, ProductSearchResult } from './PharmacyProductService.js';
@@ -25,6 +27,11 @@ export type { OfferSearchParams, OfferSearchResult } from './PharmacyOfferServic
 export type { OrderSearchParams, OrderSearchResult, OrderValidationResult } from './PharmacyOrderService.js';
 export type { DispatchSearchParams, DispatchSearchResult } from './PharmacyDispatchService.js';
 export type { SettlementSearchParams, SettlementSearchResult } from './PharmacySettlementService.js';
+export type {
+  PartnerRecommendation,
+  RecommendationFilter,
+  RecommendationStats,
+} from './PartnerRecommendationService.js';
 
 // Service array for module registration
 export const pharmacyOpsServices = [
@@ -34,4 +41,5 @@ export const pharmacyOpsServices = [
   PharmacyOrderService,
   PharmacyDispatchService,
   PharmacySettlementService,
+  PartnerRecommendationService,
 ];

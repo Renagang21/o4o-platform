@@ -57,7 +57,7 @@ export class ForumPost {
   @Column({ type: 'uuid' })
   categoryId!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
   @Column({ type: 'uuid', nullable: true })
@@ -90,7 +90,7 @@ export class ForumPost {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: ForumPostMetadata;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'published_at', type: 'timestamp', nullable: true })
   publishedAt?: Date;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -99,19 +99,10 @@ export class ForumPost {
   @Column({ type: 'uuid', nullable: true })
   lastCommentBy?: string;
 
-  // Phase 15-A: Full-text Search columns
-  // These are auto-populated by database trigger
-  @Column({ type: 'text', nullable: true, select: false })
-  contentText?: string;
-
-  // Note: search_vector is managed by PostgreSQL trigger, not TypeORM
-  // It's a tsvector column that cannot be directly mapped in TypeORM
-  // Use raw SQL queries for full-text search operations
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Relations
@@ -120,7 +111,7 @@ export class ForumPost {
   category?: Promise<ForumCategory>;
 
   @ManyToOne('User')
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author?: User;
 
   @ManyToOne('User', { nullable: true })
