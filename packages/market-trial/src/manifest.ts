@@ -24,6 +24,7 @@ export const marketTrialManifest = {
     'market_trials',
     'market_trial_participants',
     'market_trial_forums',
+    'market_trial_decisions',
   ],
 
   // ===== Uninstall Policy =====
@@ -39,8 +40,9 @@ export const marketTrialManifest = {
       'MarketTrial',
       'MarketTrialParticipant',
       'MarketTrialForum',
+      'MarketTrialDecision',
     ],
-    services: ['MarketTrialService'],
+    services: ['MarketTrialService', 'MarketTrialDecisionService'],
     controllers: ['MarketTrialController'],
     routesExport: 'createRoutes',
   },
@@ -80,6 +82,12 @@ export const marketTrialManifest = {
       description: 'Market Trial 전체 관리 권한',
       category: 'market-trial',
     },
+    {
+      id: 'market-trial.decision',
+      name: 'Market Trial 의사 표현',
+      description: 'Market Trial 의사 표현(계속/중단) 권한',
+      category: 'market-trial',
+    },
   ],
 
   // ===== Menus =====
@@ -89,8 +97,8 @@ export const marketTrialManifest = {
 
   // ===== Exposes =====
   exposes: {
-    services: ['MarketTrialService'],
-    types: ['MarketTrial', 'MarketTrialParticipant', 'MarketTrialForum'],
+    services: ['MarketTrialService', 'MarketTrialDecisionService'],
+    types: ['MarketTrial', 'MarketTrialParticipant', 'MarketTrialForum', 'MarketTrialDecision'],
     events: [],  // Future
   },
 
