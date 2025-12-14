@@ -2,6 +2,8 @@
   "name": "@o4o/appearance-system",
   "version": "1.0.0",
   "description": "Design tokens and appearance system for O4O Platform - Single Source of Truth (SSOT)",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. Visual design token system.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

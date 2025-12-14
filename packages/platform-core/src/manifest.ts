@@ -5,6 +5,9 @@
  * - App Registry (app installation/status tracking)
  * - Platform Settings (global configuration)
  * - Account Activities (user activity logging)
+ *
+ * @status FROZEN - Phase A/B complete (2025-12-14)
+ * @note Foundation Core. Do not modify without Phase review.
  */
 
 export const platformCoreManifest = {

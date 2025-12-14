@@ -2,6 +2,8 @@
   "name": "@o4o/cpt-registry",
   "version": "1.0.0",
   "description": "Central CPT schema registry and validation",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. CPT schema runtime.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

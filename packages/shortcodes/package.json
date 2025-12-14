@@ -2,6 +2,8 @@
   "name": "@o4o/shortcodes",
   "version": "1.0.0",
   "description": "Shortcode system for O4O Platform",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. Shortcode parser/renderer.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

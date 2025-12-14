@@ -51,15 +51,6 @@ export class OrderRelay {
   @Column({ type: 'uuid' })
   listingId!: string;
 
-  /**
-   * E-commerce Core 주문 ID (Phase 4)
-   *
-   * E-commerce Core의 EcommerceOrder와 연결됩니다.
-   * null인 경우 레거시 주문 또는 직접 API 호출 주문입니다.
-   */
-  @Column({ type: 'uuid', nullable: true })
-  ecommerceOrderId?: string;
-
   @Column({ type: 'varchar', length: 255, nullable: true })
   externalOrderId?: string; // 외부 채널의 주문 ID
 
