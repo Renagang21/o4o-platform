@@ -63,14 +63,7 @@ import publicRoutes from './routes/public.routes.js';
 // User Role Routes
 import userRoleRoutes from './routes/user-role.routes.js';
 
-// Auth Routes
-import authRoutes from './routes/auth.js';
-
-// Admin Apps Routes
-import adminAppsRoutes from './routes/admin/apps.routes.js';
-
-// Forum Routes (Phase 17 - AI Recommendations)
-import forumRoutes from './routes/forum/forum.routes.js';
+// NOTE: authRoutes, adminAppsRoutes, forumRoutes are imported in CORE ROUTES SETUP section below
 
 // Linked Accounts Routes (SSO check, sessions)
 import linkedAccountsRoutes from './routes/linked-accounts.js';
