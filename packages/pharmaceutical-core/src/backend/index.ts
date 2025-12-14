@@ -24,6 +24,11 @@ export {
   PharmaPaymentStatus,
 } from '../entities/PharmaOrder.entity.js';
 export {
+  PharmaDispatch,
+  PharmaDispatchStatus,
+  TemperatureControlType,
+} from '../entities/PharmaDispatch.entity.js';
+export {
   PharmaSettlementBatch,
   PharmaSettlementStatus,
   PharmaSettlementType,
@@ -48,11 +53,27 @@ export type {
   UpdatePharmaOrderDto,
   PharmaOrderFilter,
 } from '../services/PharmaOrderService.js';
+export { PharmaDispatchService } from '../services/PharmaDispatchService.js';
+export type {
+  CreatePharmaDispatchDto,
+  UpdatePharmaDispatchDto,
+  PharmaDispatchFilter,
+} from '../services/PharmaDispatchService.js';
 export { PharmaSettlementService } from '../services/PharmaSettlementService.js';
 export type {
   CreateSettlementBatchDto,
   SettlementBatchFilter,
 } from '../services/PharmaSettlementService.js';
+
+// Controllers
+export {
+  ProductsController,
+  OffersController,
+  OrdersController,
+  DispatchController,
+  SettlementController,
+  pharmaControllers,
+} from '../controllers/index.js';
 
 // Lifecycle
 export { onInstall } from '../lifecycle/install.js';
