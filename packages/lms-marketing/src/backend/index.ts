@@ -5,6 +5,7 @@
  * Phase R6: Product Content delivery implementation
  * Phase R7: Quiz Campaign implementation
  * Phase R8: Survey Campaign implementation
+ * Phase R9: Supplier Insights / Engagement Dashboard
  */
 
 import { Router } from 'express';
@@ -12,9 +13,11 @@ import type { DataSource } from 'typeorm';
 import { createProductContentRoutes } from './routes/productContent.routes.js';
 import { createQuizCampaignRoutes } from './routes/quizCampaign.routes.js';
 import { createSurveyCampaignRoutes } from './routes/surveyCampaign.routes.js';
+import { createSupplierInsightsRoutes } from './routes/supplierInsights.routes.js';
 import { initProductContentService } from './services/ProductContentService.js';
 import { initMarketingQuizCampaignService } from './services/MarketingQuizCampaignService.js';
 import { initSurveyCampaignService } from './services/SurveyCampaignService.js';
+import { initSupplierInsightsService } from './services/SupplierInsightsService.js';
 import { ProductContent } from './entities/ProductContent.entity.js';
 import { MarketingQuizCampaign } from './entities/MarketingQuizCampaign.entity.js';
 import { SurveyCampaign } from './entities/SurveyCampaign.entity.js';
@@ -36,8 +39,8 @@ export function routes(dataSource: DataSource): Router {
     res.json({
       status: 'ok',
       app: 'lms-marketing',
-      version: '0.4.0',
-      phase: 'R8-survey-campaign',
+      version: '0.5.0',
+      phase: 'R9-engagement-dashboard',
     });
   });
 
@@ -50,8 +53,8 @@ export function routes(dataSource: DataSource): Router {
   // Phase R8: Survey Campaign routes
   router.use('/survey-campaign', createSurveyCampaignRoutes(dataSource));
 
-  // Phase R9: Analytics routes
-  // router.use('/analytics', createAnalyticsRoutes(dataSource));
+  // Phase R9: Supplier Insights routes
+  router.use('/insights', createSupplierInsightsRoutes(dataSource));
 
   return router;
 }
@@ -70,8 +73,8 @@ export function createServices(dataSource: DataSource) {
     // Phase R8: Survey Campaign Service
     surveyCampaign: initSurveyCampaignService(dataSource),
 
-    // Phase R9: Analytics Service
-    // analytics: initAnalyticsService(dataSource),
+    // Phase R9: Supplier Insights Service
+    supplierInsights: initSupplierInsightsService(dataSource),
   };
 }
 
@@ -83,6 +86,7 @@ export function createHooks(dataSource: DataSource) {
   const productContentService = initProductContentService(dataSource);
   const quizCampaignService = initMarketingQuizCampaignService(dataSource);
   const surveyCampaignService = initSurveyCampaignService(dataSource);
+  const supplierInsightsService = initSupplierInsightsService(dataSource);
 
   return {
     /**
@@ -340,20 +344,91 @@ export function createHooks(dataSource: DataSource) {
 
     /**
      * Get campaign analytics
-     * Usage: context.hooks.getCampaignAnalytics({ campaignId })
+     * Usage: context.hooks.getCampaignAnalytics({ campaignId, type })
      */
     getCampaignAnalytics: async (payload: {
       campaignId: string;
-      startDate?: Date;
-      endDate?: Date;
+      type: 'quiz' | 'survey';
     }) => {
-      console.log('[lms-marketing] getCampaignAnalytics hook called (Phase R9)', payload);
-      // Phase R9: Actual implementation
-      return {
-        success: true,
-        message: 'Hook registered (Phase R9 implementation pending)',
-        data: null,
-      };
+      console.log('[lms-marketing] getCampaignAnalytics hook called', payload);
+      try {
+        const analytics = await supplierInsightsService.getCampaignAnalytics(
+          payload.campaignId,
+          payload.type
+        );
+
+        if (!analytics) {
+          return {
+            success: false,
+            error: 'Campaign not found',
+            data: null,
+          };
+        }
+
+        return {
+          success: true,
+          data: analytics,
+        };
+      } catch (error) {
+        console.error('[lms-marketing] getCampaignAnalytics error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          data: null,
+        };
+      }
+    },
+
+    /**
+     * Get supplier dashboard summary
+     * Usage: context.hooks.getSupplierDashboard({ supplierId })
+     */
+    getSupplierDashboard: async (payload: { supplierId: string }) => {
+      console.log('[lms-marketing] getSupplierDashboard hook called', payload);
+      try {
+        const dashboard = await supplierInsightsService.getDashboardSummary(
+          payload.supplierId
+        );
+        return {
+          success: true,
+          data: dashboard,
+        };
+      } catch (error) {
+        console.error('[lms-marketing] getSupplierDashboard error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          data: null,
+        };
+      }
+    },
+
+    /**
+     * Get engagement trends for supplier
+     * Usage: context.hooks.getEngagementTrends({ supplierId, period })
+     */
+    getEngagementTrends: async (payload: {
+      supplierId: string;
+      period?: 'day' | 'week' | 'month';
+    }) => {
+      console.log('[lms-marketing] getEngagementTrends hook called', payload);
+      try {
+        const trends = await supplierInsightsService.getEngagementTrends(
+          payload.supplierId,
+          payload.period || 'week'
+        );
+        return {
+          success: true,
+          data: trends,
+        };
+      } catch (error) {
+        console.error('[lms-marketing] getEngagementTrends error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          data: null,
+        };
+      }
     },
   };
 }

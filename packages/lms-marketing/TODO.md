@@ -54,13 +54,20 @@ Marketing LMS Extension for O4O Platform
 - [x] Frontend viewer: SurveyCampaignViewerPage in main-site
 - [x] Survey question types: single_choice, multiple_choice, text, textarea, rating, scale, date, email, phone
 
-### Phase R9 – Engagement Dashboard for Suppliers
-- [ ] AnalyticsService
-- [ ] AnalyticsController
-- [ ] Dashboard UI components
-- [ ] Real-time engagement metrics
-- [ ] Campaign performance reports
-- [ ] Export functionality
+### ✅ Phase R9 – Engagement Dashboard for Suppliers (Complete)
+- [x] SupplierInsightsService with analytics methods
+  - getDashboardSummary (overview, by type, recent activity)
+  - getCampaignPerformance (filterable by type, status, date range)
+  - getEngagementTrends (day/week/month period)
+  - getCampaignAnalytics (detailed quiz/survey analytics)
+  - exportCampaignData (JSON/CSV export)
+  - getTopCampaigns
+  - getRecentActivity
+- [x] SupplierInsightsController with REST API
+- [x] API endpoints at /api/v1/lms-marketing/insights
+- [x] Hooks: getCampaignAnalytics, getSupplierDashboard, getEngagementTrends
+- [x] Campaign performance reports
+- [x] Export functionality (JSON/CSV)
 
 ### Phase R10 – Supplier Content Publishing UI (Admin)
 - [ ] Admin dashboard pages
@@ -128,12 +135,15 @@ POST   /api/v1/lms-marketing/survey-campaign/:id/end   # End campaign
 DELETE /api/v1/lms-marketing/survey-campaign/:id       # Delete (soft)
 ```
 
-### Phase R9
+### Phase R9 (Implemented)
 ```
-GET    /api/v1/marketing/analytics/campaigns/:id
-GET    /api/v1/marketing/analytics/supplier/:supplierId
-GET    /api/v1/marketing/analytics/engagement/summary
-GET    /api/v1/marketing/analytics/engagement/trends
+GET    /api/v1/lms-marketing/insights/dashboard/:supplierId        # Dashboard summary
+GET    /api/v1/lms-marketing/insights/performance/:supplierId      # Campaign performance list
+GET    /api/v1/lms-marketing/insights/trends/:supplierId           # Engagement trends
+GET    /api/v1/lms-marketing/insights/activity/:supplierId         # Recent activity
+GET    /api/v1/lms-marketing/insights/top/:supplierId              # Top campaigns
+GET    /api/v1/lms-marketing/insights/campaign/:type/:campaignId   # Campaign analytics
+GET    /api/v1/lms-marketing/insights/export/:supplierId           # Export data
 ```
 
 ---
