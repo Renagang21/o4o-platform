@@ -31,27 +31,29 @@ export { LocalPlayer, PlayerType, PlayerStatus, MediaPayload } from './player/Lo
  */
 async function main(): Promise<void> {
   const { AgentBootstrap } = await import('./agent/AgentBootstrap');
+  const { AgentLogger } = await import('./agent/AgentLogger');
 
-  console.log('========================================');
-  console.log('  Digital Signage Device Agent v0.1.0');
-  console.log('========================================');
-  console.log('');
+  const logger = new AgentLogger('info', '[Agent]');
+
+  logger.info('========================================');
+  logger.info('  Digital Signage Device Agent v0.1.0');
+  logger.info('========================================');
 
   const agent = new AgentBootstrap();
 
   // Handle state changes
   agent.on('stateChange', (state) => {
-    console.log(`[Agent] State: ${state}`);
+    logger.info(`State: ${state}`);
   });
 
   // Handle errors
   agent.on('error', (error) => {
-    console.error(`[Agent] Error: ${error.message}`);
+    logger.error(`Error: ${error.message}`);
   });
 
   // Handle graceful shutdown
   const shutdown = async () => {
-    console.log('\n[Agent] Shutting down...');
+    logger.info('Shutting down...');
     await agent.stop();
     process.exit(0);
   };
@@ -61,14 +63,16 @@ async function main(): Promise<void> {
 
   try {
     await agent.start();
-    console.log('[Agent] Running. Press Ctrl+C to stop.');
+    logger.info('Running. Press Ctrl+C to stop.');
   } catch (error) {
-    console.error('[Agent] Failed to start:', error);
+    logger.error('Failed to start:', { error: String(error) });
     process.exit(1);
   }
 }
 
 // Run if this is the main module
 if (require.main === module) {
-  main().catch(console.error);
+  const { AgentLogger } = require('./agent/AgentLogger');
+  const logger = new AgentLogger('error', '[Agent]');
+  main().catch((err) => logger.error('Fatal error', { error: String(err) }));
 }
