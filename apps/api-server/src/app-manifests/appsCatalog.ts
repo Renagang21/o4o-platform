@@ -278,6 +278,18 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['cosmetics'],
     incompatibleWith: ['dropshipping-yaksa'], // 다른 dropshipping extension과 충돌
   },
+  {
+    appId: 'cosmetics-partner-extension',
+    name: 'Cosmetics Partner Extension',
+    version: '1.0.0',
+    description: '화장품 파트너/인플루언서 관리 - 루틴 추천, 샘플 관리, AI 도구',
+    category: 'commerce',
+    tags: ['화장품', 'cosmetics', 'partner', 'influencer', 'routine', 'sample'],
+    type: 'extension',
+    dependencies: { 'dropshipping-cosmetics': '>=1.0.0' },
+    author: 'O4O Platform',
+    serviceGroups: ['cosmetics', 'partnerops'],
+  },
 
   // ============================================
   // Yaksa Organization Apps (yaksa)
