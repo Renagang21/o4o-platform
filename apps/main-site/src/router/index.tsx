@@ -30,6 +30,13 @@ const BundleViewerPage = lazy(() =>
   import('@/pages/lms/bundle/BundleViewerPage').then((m) => ({ default: m.BundleViewerPage }))
 );
 
+// Marketing pages
+const ProductContentViewerPage = lazy(() =>
+  import('@/pages/marketing/product/ProductContentViewerPage').then((m) => ({
+    default: m.ProductContentViewerPage,
+  }))
+);
+
 // Member Portal
 const MemberHome = lazy(() =>
   import('@/pages/member/MemberHome').then((m) => ({ default: m.MemberHome }))
@@ -123,6 +130,9 @@ export function AppRouter() {
                   />
                   {/* LMS ContentBundle Viewer */}
                   <Route path="/lms/bundle/:bundleId" element={<BundleViewerPage />} />
+
+                  {/* Marketing - Product Content Viewer */}
+                  <Route path="/marketing/product/:id" element={<ProductContentViewerPage />} />
 
                   {/* 회원 포털 (Member Portal) */}
                   <Route

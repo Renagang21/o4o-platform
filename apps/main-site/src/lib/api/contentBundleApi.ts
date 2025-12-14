@@ -240,8 +240,28 @@ export const surveyApi = {
   },
 };
 
+// ============================================
+// ContentBundle API
+// ============================================
+
+// Use 'any' for ContentBundle since the API returns a flexible format
+// that will be compatible with the viewer's ContentBundle type
+export async function getContentBundle(bundleId: string): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiClient.get(`${BASE_PATH}/bundles/${bundleId}`);
+    return response.data;
+  } catch (error) {
+    console.error('[contentBundleApi] getContentBundle error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get content bundle',
+    };
+  }
+}
+
 // Default export
 export default {
   quiz: quizApi,
   survey: surveyApi,
+  getContentBundle,
 };

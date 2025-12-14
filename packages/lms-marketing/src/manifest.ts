@@ -15,7 +15,7 @@ export const lmsMarketingManifest = {
   appId: 'lms-marketing',
   displayName: 'Marketing LMS Extension',
   name: 'LMS Marketing',
-  version: '0.1.0',
+  version: '0.2.0',
   type: 'extension' as const,
   appType: 'extension' as const,
   category: 'marketing' as const,
@@ -29,9 +29,8 @@ export const lmsMarketingManifest = {
   },
 
   // ===== Owned Tables =====
-  // Phase R5: No custom tables yet
-  // Future phases may add marketing-specific tables
-  ownsTables: [] as string[],
+  // Phase R6: ProductContent table for product info delivery
+  ownsTables: ['lms_marketing_product_contents'] as string[],
 
   // ===== Uninstall Policy =====
   uninstallPolicy: {
@@ -42,12 +41,13 @@ export const lmsMarketingManifest = {
 
   // ===== Backend =====
   backend: {
-    entities: [],
-    services: ['MarketingCampaignService', 'ProductInfoService'],
-    controllers: ['MarketingCampaignController', 'ProductInfoController'],
+    entities: ['ProductContent'],
+    services: ['ProductContentService'],
+    controllers: ['ProductContentController'],
     routesExport: 'createRoutes',
     servicesExport: 'createServices',
     hooksExport: 'createHooks',
+    migrationsPath: './migrations',
   },
 
   // ===== Frontend =====
@@ -167,13 +167,24 @@ export const lmsMarketingManifest = {
 
   // ===== Exposes =====
   exposes: {
-    services: ['MarketingCampaignService', 'ProductInfoService'],
-    types: ['MarketingCampaign', 'ProductInfoBundle'],
+    entities: ['ProductContent'],
+    services: ['ProductContentService'],
+    controllers: ['ProductContentController'],
+    types: ['ProductContent', 'ProductContentTargeting', 'TargetAudience'],
+    hooks: [
+      'publishProductInfo',
+      'getProductContentsForUser',
+      'createQuizCampaign',
+      'createSurveyCampaign',
+      'getCampaignAnalytics',
+    ],
     events: [
+      'product-content.created',
+      'product-content.published',
+      'product-content.deactivated',
       'campaign.created',
       'campaign.published',
       'campaign.completed',
-      'product-info.published',
       'engagement.campaign-view',
       'engagement.campaign-complete',
     ],

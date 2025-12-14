@@ -2,17 +2,16 @@
  * LMS-Marketing Backend Entry Point
  *
  * AppStore 표준 준수를 위한 backend exports
- * Phase R5: Bootstrap skeleton
- * Phase R6+: Actual implementation
+ * Phase R6: Product Content delivery implementation
  */
 
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
+import { createProductContentRoutes } from './routes/productContent.routes.js';
+import { initProductContentService } from './services/ProductContentService.js';
 
 /**
  * Create routes for marketing extension
- * Phase R5: Empty router skeleton
- * Phase R6+: Product info, campaign routes
  */
 export function createRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -22,13 +21,13 @@ export function createRoutes(dataSource: DataSource): Router {
     res.json({
       status: 'ok',
       app: 'lms-marketing',
-      version: '0.1.0',
-      phase: 'R5-bootstrap',
+      version: '0.2.0',
+      phase: 'R6-product-info',
     });
   });
 
-  // Phase R6: Product Info routes
-  // router.use('/product-info', createProductInfoRoutes(dataSource));
+  // Phase R6: Product Content routes
+  router.use('/product', createProductContentRoutes(dataSource));
 
   // Phase R7: Quiz Campaign routes
   // router.use('/campaigns/quiz', createQuizCampaignRoutes(dataSource));
@@ -44,13 +43,11 @@ export function createRoutes(dataSource: DataSource): Router {
 
 /**
  * Create services for marketing extension
- * Phase R5: Empty service registry
- * Phase R6+: Actual services
  */
 export function createServices(dataSource: DataSource) {
   return {
-    // Phase R6: Product Info Service
-    // productInfo: initProductInfoService(dataSource),
+    // Phase R6: Product Content Service
+    productContent: initProductContentService(dataSource),
 
     // Phase R7: Quiz Campaign Service
     // quizCampaign: initQuizCampaignService(dataSource),
@@ -66,10 +63,10 @@ export function createServices(dataSource: DataSource) {
 /**
  * Create hooks for extension apps
  * These hooks allow other extensions to interact with marketing features
- * Phase R5: Empty hooks registry
- * Phase R6+: Actual hooks
  */
 export function createHooks(dataSource: DataSource) {
+  const productContentService = initProductContentService(dataSource);
+
   return {
     /**
      * Publish product info content
@@ -78,12 +75,67 @@ export function createHooks(dataSource: DataSource) {
     publishProductInfo: async (payload: {
       supplierId: string;
       bundleId: string;
-      targetAudience?: string[];
+      title: string;
+      targeting?: {
+        targets: ('seller' | 'consumer' | 'pharmacist' | 'all')[];
+        regions?: string[];
+        tags?: string[];
+        sellerTypes?: string[];
+      };
       metadata?: Record<string, unknown>;
     }) => {
-      console.log('[lms-marketing] publishProductInfo hook called (Phase R6)', payload);
-      // Phase R6: Actual implementation
-      return { success: true, message: 'Hook registered (Phase R6 implementation pending)' };
+      console.log('[lms-marketing] publishProductInfo hook called', payload);
+      try {
+        const content = await productContentService.create({
+          supplierId: payload.supplierId,
+          bundleId: payload.bundleId,
+          title: payload.title,
+          targeting: payload.targeting,
+          metadata: payload.metadata,
+        });
+
+        // Auto-publish
+        const published = await productContentService.publish(content.id);
+
+        return {
+          success: true,
+          data: published,
+          message: 'Product content published successfully'
+        };
+      } catch (error) {
+        console.error('[lms-marketing] publishProductInfo error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    },
+
+    /**
+     * Get product contents for user
+     * Usage: context.hooks.getProductContentsForUser({ role, region, ... })
+     */
+    getProductContentsForUser: async (payload: {
+      role: 'seller' | 'consumer' | 'pharmacist' | 'all';
+      region?: string;
+      sellerType?: string;
+      tags?: string[];
+    }) => {
+      console.log('[lms-marketing] getProductContentsForUser hook called', payload);
+      try {
+        const contents = await productContentService.getForUser(payload);
+        return {
+          success: true,
+          data: contents,
+          total: contents.length
+        };
+      } catch (error) {
+        console.error('[lms-marketing] getProductContentsForUser error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
     },
 
     /**
@@ -144,3 +196,4 @@ export function createHooks(dataSource: DataSource) {
 export * from './entities/index.js';
 export * from './services/index.js';
 export * from './controllers/index.js';
+export * from './routes/index.js';
