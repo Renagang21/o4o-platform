@@ -291,7 +291,6 @@ const SampleTrackingPage: React.FC = () => {
   const handleReceive = () => {
     if (!selectedItem || receiveQuantity <= 0) return;
     // TODO: API call to receive inventory
-    console.log('Receive:', selectedItem.id, receiveQuantity);
     setShowReceiveModal(false);
     setSelectedItem(null);
     setReceiveQuantity(0);
@@ -301,7 +300,6 @@ const SampleTrackingPage: React.FC = () => {
   const handleUse = () => {
     if (!selectedItem || useQuantity <= 0) return;
     // TODO: API call to use inventory
-    console.log('Use:', selectedItem.id, useQuantity);
     setShowUseModal(false);
     setSelectedItem(null);
     setUseQuantity(0);
