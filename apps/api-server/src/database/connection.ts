@@ -159,6 +159,12 @@ import {
   YaksaCourseAssignment,
 } from '@o4o/lms-yaksa';
 
+// ✅ NEW: LMS-Marketing entities (Phase R7)
+import {
+  ProductContent,
+  MarketingQuizCampaign,
+} from '@o4o-extensions/lms-marketing';
+
 // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
 // import {
 //   PartnerProfile,
@@ -348,6 +354,9 @@ export const AppDataSource = new DataSource({
     RequiredCoursePolicy,
     CreditRecord,
     YaksaCourseAssignment,
+    // ✅ NEW: LMS-Marketing entities (Phase R7)
+    ProductContent,
+    MarketingQuizCampaign,
     // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
     // PartnerProfile,
     // PartnerLink,
