@@ -143,6 +143,9 @@ const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/Cosm
 // Cosmetics Products Pages (Phase 7-H)
 const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
 
+// Storefront Pages (Phase 7-I)
+const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
+
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
@@ -387,7 +390,14 @@ function App() {
                 <ViewPreview />
               </Suspense>
             } />
-            
+
+            {/* Storefront Routes (Phase 7-I) - Consumer-facing, no auth required */}
+            <Route path="/storefront/*" element={
+              <Suspense fallback={<PageLoader />}>
+                <StorefrontRouter />
+              </Suspense>
+            } />
+
             {/* 보호된 관리자 라우트들 */}
             <Route path="/*" element={
               <AdminProtectedRoute 

@@ -19,3 +19,6 @@ export * from './AGAppLayout';
 export * from './AGPageHeader';
 export * from './AGBreadcrumb';
 export * from './AGContent';
+
+// Storefront layout components (Phase 7-I)
+export * from './AGStorefrontLayout';
