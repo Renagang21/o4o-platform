@@ -37,3 +37,9 @@ export type {
   SurveyAnswer,
   SurveyCampaignResponse,
 } from './SurveyCampaign.entity.js';
+
+export { SupplierProfile } from './SupplierProfile.entity.js';
+export type {
+  OnboardingStatus,
+  OnboardingChecklistItem,
+} from './SupplierProfile.entity.js';

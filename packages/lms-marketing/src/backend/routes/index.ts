@@ -16,3 +16,9 @@ export { createSurveyCampaignRoutes } from './surveyCampaign.routes.js';
 
 // Phase R9: Supplier Insights Routes
 export { createSupplierInsightsRoutes } from './supplierInsights.routes.js';
+
+// Phase R11: Supplier Onboarding Routes
+export { createOnboardingRoutes } from './onboarding.routes.js';
+
+// Phase R11: Campaign Automation Routes
+export { createAutomationRoutes } from './automation.routes.js';

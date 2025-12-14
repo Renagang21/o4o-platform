@@ -64,3 +64,28 @@ export type {
   ExportData,
   DateRangeFilter,
 } from './SupplierInsightsService.js';
+
+// Phase R11: Supplier Onboarding Service
+export {
+  SupplierOnboardingService,
+  getSupplierOnboardingService,
+  initSupplierOnboardingService,
+} from './SupplierOnboardingService.js';
+export type {
+  UpdateSupplierProfileDto,
+  OnboardingChecklistResponse,
+} from './SupplierOnboardingService.js';
+
+// Phase R11: Campaign Automation Service
+export {
+  CampaignAutomationService,
+  getCampaignAutomationService,
+  initCampaignAutomationService,
+} from './CampaignAutomationService.js';
+export type {
+  AutomationRuleType,
+  AutomationRule,
+  AutomationSettings,
+  AutomationLogEntry,
+  AutomationRunResult,
+} from './CampaignAutomationService.js';
