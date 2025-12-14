@@ -1,3 +1,22 @@
+/**
+ * @deprecated Phase P0 Task A: This file is deprecated.
+ *
+ * MIGRATION GUIDE:
+ * Navigation should be defined in app manifests using either:
+ * 1. navigation.admin (flat structure with parentId)
+ * 2. menus.admin (nested structure with children)
+ *
+ * These are automatically registered to NavigationRegistry during app activation.
+ * useAdminMenu hook fetches navigation from /api/v1/navigation/admin API.
+ *
+ * This file is kept as a FALLBACK during the transition period.
+ * It will be removed after all apps migrate their navigation to manifests.
+ *
+ * @see packages/cms-core/src/lifecycle/activate.ts
+ * @see packages/cms-core/src/view-system/navigation-registry.ts
+ * @see apps/api-server/src/routes/navigation.routes.ts
+ */
+
 import { ReactElement } from 'react';
 import {
   LayoutDashboard,
@@ -38,6 +57,9 @@ export interface MenuItem {
 }
 
 /**
+ * @deprecated This menu structure is deprecated.
+ * Use manifest.navigation.admin or manifest.menus.admin instead.
+ *
  * NextGen O4O Platform Menu Structure (Phase D-0)
  *
  * Clean, minimal menu focused on:
