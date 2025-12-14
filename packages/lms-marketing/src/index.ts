@@ -22,7 +22,7 @@ export {
 } from './backend/index.js';
 
 // Re-export entities for direct import
-export { ProductContent, MarketingQuizCampaign } from './backend/entities/index.js';
+export { ProductContent, MarketingQuizCampaign, SurveyCampaign } from './backend/entities/index.js';
 
 // Re-export types
 export type {
@@ -36,6 +36,16 @@ export type {
   RewardType,
   QuizReward,
   CampaignStatus,
+  SurveyTargetAudience,
+  SurveyCampaignStatus,
+  SurveyCampaignTargeting,
+  SurveyRewardType,
+  SurveyReward,
+  SurveyQuestionType,
+  SurveyQuestionOption,
+  SurveyQuestion,
+  SurveyAnswer,
+  SurveyCampaignResponse,
 } from './backend/entities/index.js';
 
 // Lifecycle

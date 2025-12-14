@@ -4,21 +4,25 @@
  * AppStore 표준 준수를 위한 backend exports
  * Phase R6: Product Content delivery implementation
  * Phase R7: Quiz Campaign implementation
+ * Phase R8: Survey Campaign implementation
  */
 
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import { createProductContentRoutes } from './routes/productContent.routes.js';
 import { createQuizCampaignRoutes } from './routes/quizCampaign.routes.js';
+import { createSurveyCampaignRoutes } from './routes/surveyCampaign.routes.js';
 import { initProductContentService } from './services/ProductContentService.js';
 import { initMarketingQuizCampaignService } from './services/MarketingQuizCampaignService.js';
+import { initSurveyCampaignService } from './services/SurveyCampaignService.js';
 import { ProductContent } from './entities/ProductContent.entity.js';
 import { MarketingQuizCampaign } from './entities/MarketingQuizCampaign.entity.js';
+import { SurveyCampaign } from './entities/SurveyCampaign.entity.js';
 
 /**
  * Entities array for ModuleLoader
  */
-export const entities = [ProductContent, MarketingQuizCampaign];
+export const entities = [ProductContent, MarketingQuizCampaign, SurveyCampaign];
 
 /**
  * Create routes for marketing extension
@@ -32,8 +36,8 @@ export function routes(dataSource: DataSource): Router {
     res.json({
       status: 'ok',
       app: 'lms-marketing',
-      version: '0.3.0',
-      phase: 'R7-quiz-campaign',
+      version: '0.4.0',
+      phase: 'R8-survey-campaign',
     });
   });
 
@@ -44,7 +48,7 @@ export function routes(dataSource: DataSource): Router {
   router.use('/quiz-campaign', createQuizCampaignRoutes(dataSource));
 
   // Phase R8: Survey Campaign routes
-  // router.use('/campaigns/survey', createSurveyCampaignRoutes(dataSource));
+  router.use('/survey-campaign', createSurveyCampaignRoutes(dataSource));
 
   // Phase R9: Analytics routes
   // router.use('/analytics', createAnalyticsRoutes(dataSource));
@@ -64,7 +68,7 @@ export function createServices(dataSource: DataSource) {
     quizCampaign: initMarketingQuizCampaignService(dataSource),
 
     // Phase R8: Survey Campaign Service
-    // surveyCampaign: initSurveyCampaignService(dataSource),
+    surveyCampaign: initSurveyCampaignService(dataSource),
 
     // Phase R9: Analytics Service
     // analytics: initAnalyticsService(dataSource),
@@ -78,6 +82,7 @@ export function createServices(dataSource: DataSource) {
 export function createHooks(dataSource: DataSource) {
   const productContentService = initProductContentService(dataSource);
   const quizCampaignService = initMarketingQuizCampaignService(dataSource);
+  const surveyCampaignService = initSurveyCampaignService(dataSource);
 
   return {
     /**
@@ -243,19 +248,94 @@ export function createHooks(dataSource: DataSource) {
 
     /**
      * Create survey campaign
-     * Usage: context.hooks.createSurveyCampaign({ supplierId, surveyId, ... })
+     * Usage: context.hooks.createSurveyCampaign({ supplierId, surveyId, title, ... })
      */
     createSurveyCampaign: async (payload: {
       supplierId: string;
-      surveyId: string;
+      surveyId?: string;
       title: string;
-      startAt?: Date;
-      endAt?: Date;
+      description?: string;
+      bundleId?: string;
+      questions?: Array<{
+        id: string;
+        type: 'single_choice' | 'multiple_choice' | 'text' | 'textarea' | 'rating' | 'scale' | 'date' | 'email' | 'phone';
+        question: string;
+        options?: Array<{ id: string; text: string; imageUrl?: string; value?: string | number }>;
+        required: boolean;
+        order: number;
+      }>;
+      targeting?: {
+        targets: ('seller' | 'consumer' | 'pharmacist' | 'all')[];
+        regions?: string[];
+        tags?: string[];
+        sellerTypes?: string[];
+      };
+      reward?: {
+        type: 'points' | 'coupon' | 'badge' | 'none';
+        value: string;
+        description?: string;
+      };
+      startDate?: Date;
+      endDate?: Date;
+      allowAnonymous?: boolean;
+      maxResponses?: number;
       metadata?: Record<string, unknown>;
     }) => {
-      console.log('[lms-marketing] createSurveyCampaign hook called (Phase R8)', payload);
-      // Phase R8: Actual implementation
-      return { success: true, message: 'Hook registered (Phase R8 implementation pending)' };
+      try {
+        const campaign = await surveyCampaignService.create({
+          supplierId: payload.supplierId,
+          surveyId: payload.surveyId,
+          title: payload.title,
+          description: payload.description,
+          bundleId: payload.bundleId,
+          questions: payload.questions,
+          targeting: payload.targeting,
+          reward: payload.reward,
+          startDate: payload.startDate,
+          endDate: payload.endDate,
+          allowAnonymous: payload.allowAnonymous,
+          maxResponses: payload.maxResponses,
+          metadata: payload.metadata,
+        });
+
+        return {
+          success: true,
+          data: campaign,
+          message: 'Survey campaign created successfully'
+        };
+      } catch (error) {
+        console.error('[lms-marketing] createSurveyCampaign error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    },
+
+    /**
+     * Get survey campaigns for user
+     * Usage: context.hooks.getSurveyCampaignsForUser({ role, region, ... })
+     */
+    getSurveyCampaignsForUser: async (payload: {
+      role: 'seller' | 'consumer' | 'pharmacist' | 'all';
+      region?: string;
+      sellerType?: string;
+      tags?: string[];
+    }) => {
+      try {
+        const campaigns = await surveyCampaignService.getForUser(payload);
+        return {
+          success: true,
+          data: campaigns,
+          total: campaigns.length
+        };
+      } catch (error) {
+        console.error('[lms-marketing] getSurveyCampaignsForUser error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
     },
 
     /**

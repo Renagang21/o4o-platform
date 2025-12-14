@@ -32,8 +32,20 @@ export type {
   QuizAttemptResult,
 } from './MarketingQuizCampaignService.js';
 
-// Phase R8: Survey Campaign Service (placeholder)
-// export { SurveyCampaignService } from './SurveyCampaignService.js';
+// Phase R8: Survey Campaign Service
+export {
+  SurveyCampaignService,
+  getSurveyCampaignService,
+  initSurveyCampaignService,
+} from './SurveyCampaignService.js';
+export type {
+  CreateSurveyCampaignDto,
+  UpdateSurveyCampaignDto,
+  SubmitSurveyResponseDto,
+  SurveyCampaignListOptions,
+  UserCampaignFilter,
+  SurveyCampaignStatistics,
+} from './SurveyCampaignService.js';
 
 // Phase R9: Analytics Service (placeholder)
 // export { AnalyticsService } from './AnalyticsService.js';

@@ -11,8 +11,8 @@ export { ProductContentController } from './ProductContentController.js';
 // Phase R7: Quiz Campaign Controller
 export { MarketingQuizCampaignController } from './MarketingQuizCampaignController.js';
 
-// Phase R8: Survey Campaign Controller (placeholder)
-// export { SurveyCampaignController } from './SurveyCampaignController.js';
+// Phase R8: Survey Campaign Controller
+export { SurveyCampaignController } from './SurveyCampaignController.js';
 
 // Phase R9: Analytics Controller (placeholder)
 // export { AnalyticsController } from './AnalyticsController.js';

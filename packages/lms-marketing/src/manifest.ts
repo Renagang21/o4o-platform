@@ -16,7 +16,7 @@ export const lmsMarketingManifest = {
   appId: 'lms-marketing',
   displayName: 'Marketing LMS Extension',
   name: 'LMS Marketing',
-  version: '0.3.0',
+  version: '0.4.0',
   type: 'extension' as const,
   appType: 'extension' as const,
   category: 'marketing' as const,
@@ -32,7 +32,8 @@ export const lmsMarketingManifest = {
   // ===== Owned Tables =====
   // Phase R6: ProductContent table for product info delivery
   // Phase R7: QuizCampaign table for quiz campaigns
-  ownsTables: ['lms_marketing_product_contents', 'lms_marketing_quiz_campaigns'] as string[],
+  // Phase R8: SurveyCampaign table for survey campaigns
+  ownsTables: ['lms_marketing_product_contents', 'lms_marketing_quiz_campaigns', 'lms_marketing_survey_campaigns'] as string[],
 
   // ===== Uninstall Policy =====
   uninstallPolicy: {
@@ -43,9 +44,9 @@ export const lmsMarketingManifest = {
 
   // ===== Backend =====
   backend: {
-    entities: ['ProductContent', 'MarketingQuizCampaign'],
-    services: ['ProductContentService', 'MarketingQuizCampaignService'],
-    controllers: ['ProductContentController', 'MarketingQuizCampaignController'],
+    entities: ['ProductContent', 'MarketingQuizCampaign', 'SurveyCampaign'],
+    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService'],
+    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController'],
     routesExport: 'createRoutes',
     servicesExport: 'createServices',
     hooksExport: 'createHooks',
@@ -169,9 +170,9 @@ export const lmsMarketingManifest = {
 
   // ===== Exposes =====
   exposes: {
-    entities: ['ProductContent', 'MarketingQuizCampaign'],
-    services: ['ProductContentService', 'MarketingQuizCampaignService'],
-    controllers: ['ProductContentController', 'MarketingQuizCampaignController'],
+    entities: ['ProductContent', 'MarketingQuizCampaign', 'SurveyCampaign'],
+    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService'],
+    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController'],
     types: [
       'ProductContent',
       'ProductContentTargeting',
@@ -182,6 +183,12 @@ export const lmsMarketingManifest = {
       'QuizCampaignTargeting',
       'QuizReward',
       'CampaignStatus',
+      'SurveyCampaign',
+      'SurveyQuestion',
+      'SurveyQuestionOption',
+      'SurveyCampaignTargeting',
+      'SurveyReward',
+      'SurveyCampaignStatus',
     ],
     hooks: [
       'publishProductInfo',
@@ -189,6 +196,7 @@ export const lmsMarketingManifest = {
       'createQuizCampaign',
       'getQuizCampaignsForUser',
       'createSurveyCampaign',
+      'getSurveyCampaignsForUser',
       'getCampaignAnalytics',
     ],
     events: [
@@ -199,6 +207,10 @@ export const lmsMarketingManifest = {
       'quiz-campaign.published',
       'quiz-campaign.completed',
       'quiz-campaign.attempt-recorded',
+      'survey-campaign.created',
+      'survey-campaign.published',
+      'survey-campaign.ended',
+      'survey-campaign.response-recorded',
       'campaign.created',
       'campaign.published',
       'campaign.completed',

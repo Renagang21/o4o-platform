@@ -41,13 +41,18 @@ Marketing LMS Extension for O4O Platform
 
 ## Next Phases
 
-### Phase R8 – Survey Campaign Module
-- [ ] SurveyCampaign entity (wraps Survey with campaign metadata)
-- [ ] SurveyCampaignService
-- [ ] SurveyCampaignController
-- [ ] Market research survey templates
-- [ ] Response aggregation
-- [ ] Engagement logging for survey participation
+### ✅ Phase R8 – Survey Campaign Module (Complete)
+- [x] SurveyCampaign entity (wraps Survey with campaign metadata)
+- [x] SurveyCampaignService (CRUD + publish + response recording + statistics)
+- [x] SurveyCampaignController with REST API
+- [x] API endpoints at /api/v1/lms-marketing/survey-campaign
+- [x] Database table: lms_marketing_survey_campaigns
+- [x] Campaign targeting (by role, region, seller type)
+- [x] Campaign scheduling (start/end dates)
+- [x] Anonymous response support
+- [x] Hooks: createSurveyCampaign, getSurveyCampaignsForUser
+- [x] Frontend viewer: SurveyCampaignViewerPage in main-site
+- [x] Survey question types: single_choice, multiple_choice, text, textarea, rating, scale, date, email, phone
 
 ### Phase R9 – Engagement Dashboard for Suppliers
 - [ ] AnalyticsService
@@ -107,15 +112,20 @@ POST   /api/v1/marketing/campaigns/quiz/:id/publish
 POST   /api/v1/marketing/campaigns/quiz/:id/end
 ```
 
-### Phase R8
+### Phase R8 (Implemented)
 ```
-GET    /api/v1/marketing/campaigns/survey
-POST   /api/v1/marketing/campaigns/survey
-GET    /api/v1/marketing/campaigns/survey/:id
-PUT    /api/v1/marketing/campaigns/survey/:id
-DELETE /api/v1/marketing/campaigns/survey/:id
-POST   /api/v1/marketing/campaigns/survey/:id/publish
-POST   /api/v1/marketing/campaigns/survey/:id/end
+GET    /api/v1/lms-marketing/survey-campaign           # List campaigns
+GET    /api/v1/lms-marketing/survey-campaign/active    # Active campaigns for user
+GET    /api/v1/lms-marketing/survey-campaign/supplier/:supplierId  # By supplier
+GET    /api/v1/lms-marketing/survey-campaign/:id       # Get by ID
+GET    /api/v1/lms-marketing/survey-campaign/:id/stats # Get statistics
+POST   /api/v1/lms-marketing/survey-campaign           # Create campaign
+POST   /api/v1/lms-marketing/survey-campaign/:id/submit # Submit response
+PUT    /api/v1/lms-marketing/survey-campaign/:id       # Update campaign
+POST   /api/v1/lms-marketing/survey-campaign/:id/publish   # Publish
+POST   /api/v1/lms-marketing/survey-campaign/:id/unpublish # Unpublish
+POST   /api/v1/lms-marketing/survey-campaign/:id/end   # End campaign
+DELETE /api/v1/lms-marketing/survey-campaign/:id       # Delete (soft)
 ```
 
 ### Phase R9
