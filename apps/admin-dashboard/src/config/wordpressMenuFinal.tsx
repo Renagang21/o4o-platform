@@ -18,6 +18,11 @@ import {
   Sparkles,
   Percent,
   Activity,
+  Monitor,
+  Image,
+  Calendar,
+  PlayCircle,
+  LayoutGrid,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -149,6 +154,52 @@ export const wordpressMenuItems: MenuItem[] = [
         label: 'Installed Apps',
         icon: <Package className="w-4 h-4" />,
         path: '/admin/appstore/installed',
+      },
+    ],
+  },
+
+  // Digital Signage
+  {
+    id: 'digital-signage',
+    label: 'Digital Signage',
+    icon: <Monitor className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'digital-signage-media-sources',
+        label: 'Media Sources',
+        icon: <Image className="w-4 h-4" />,
+        path: '/admin/digital-signage/media/sources',
+      },
+      {
+        id: 'digital-signage-media-lists',
+        label: 'Media Lists',
+        icon: <Image className="w-4 h-4" />,
+        path: '/admin/digital-signage/media/lists',
+      },
+      {
+        id: 'digital-signage-displays',
+        label: 'Displays',
+        icon: <Monitor className="w-4 h-4" />,
+        path: '/admin/digital-signage/displays',
+      },
+      {
+        id: 'digital-signage-display-slots',
+        label: 'Display Slots',
+        icon: <LayoutGrid className="w-4 h-4" />,
+        path: '/admin/digital-signage/display-slots',
+      },
+      {
+        id: 'digital-signage-schedules',
+        label: 'Schedules',
+        icon: <Calendar className="w-4 h-4" />,
+        path: '/admin/digital-signage/schedules',
+      },
+      {
+        id: 'digital-signage-actions',
+        label: 'Action Monitor',
+        icon: <PlayCircle className="w-4 h-4" />,
+        path: '/admin/digital-signage/actions',
       },
     ],
   },
