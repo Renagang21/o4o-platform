@@ -6,12 +6,23 @@
  * - 최근 샘플 사용 로그
  * - 전환 KPI 카드
  *
- * Phase 6-H: Cosmetics Sample & Display Extension
+ * Phase 7-G: Cosmetics Sample & Display UI Redesign (AG Design System)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
+import {
+  AGPageHeader,
+  AGSection,
+  AGKPIBlock,
+  AGKPIGrid,
+  AGCard,
+  AGButton,
+  AGTable,
+  AGTag,
+} from '@o4o/ui';
+import type { AGTableColumn } from '@o4o/ui';
 import {
   Beaker,
   Package,
@@ -20,10 +31,8 @@ import {
   RefreshCw,
   ArrowRight,
   AlertTriangle,
-  CheckCircle,
-  Clock,
   ShoppingCart,
-  Eye,
+  Clock,
   BarChart2,
 } from 'lucide-react';
 
@@ -121,225 +130,206 @@ const SampleDashboard: React.FC = () => {
     return date.toLocaleDateString('ko-KR');
   };
 
+  // Recent usage table columns
+  const usageColumns: AGTableColumn<DashboardSummary['recentUsage'][0]>[] = [
+    {
+      key: 'productName',
+      header: '제품명',
+      render: (value, row) => (
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+            row.resultedInPurchase ? 'bg-green-100' : 'bg-gray-100'
+          }`}>
+            {row.resultedInPurchase ? (
+              <ShoppingCart className="w-4 h-4 text-green-600" />
+            ) : (
+              <Beaker className="w-4 h-4 text-gray-500" />
+            )}
+          </div>
+          <span className="font-medium">{value}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'usedAt',
+      header: '사용 시간',
+      render: (value) => (
+        <span className="text-gray-500 flex items-center gap-1 text-sm">
+          <Clock className="w-3 h-3" />
+          {formatTimeAgo(value)}
+        </span>
+      ),
+    },
+    {
+      key: 'resultedInPurchase',
+      header: '결과',
+      align: 'center',
+      render: (value) => value ? (
+        <AGTag color="green" size="sm">구매</AGTag>
+      ) : (
+        <AGTag color="gray" size="sm">미구매</AGTag>
+      ),
+    },
+  ];
+
   if (loading) {
     return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="p-6">
+        <AGKPIGrid columns={4}>
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 bg-gray-200 rounded-lg"></div>
+            <AGKPIBlock key={i} title="로딩 중..." value="-" loading />
           ))}
-        </div>
+        </AGKPIGrid>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Sample Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">샘플 재고, 사용, 진열 현황</p>
-        </div>
-        <button
-          onClick={fetchSummary}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-          title="새로고침"
-        >
-          <RefreshCw className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Alerts */}
-      {(summary?.inventory.lowStock || summary?.inventory.outOfStock) ? (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="font-medium text-yellow-800">재고 보충 필요</p>
-            <p className="text-yellow-700 text-sm mt-1">
-              {summary?.inventory.lowStock}개 제품 재고 부족, {summary?.inventory.outOfStock}개 제품 품절
-            </p>
-          </div>
-          <Link
-            to="/cosmetics-sample/tracking"
-            className="px-3 py-1.5 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700"
+    <div className="min-h-screen bg-gray-50">
+      {/* Page Header */}
+      <AGPageHeader
+        title="Sample Dashboard"
+        description="샘플 재고, 사용, 진열 현황"
+        icon={<Beaker className="w-5 h-5" />}
+        actions={
+          <AGButton
+            variant="ghost"
+            size="sm"
+            onClick={fetchSummary}
+            iconLeft={<RefreshCw className="w-4 h-4" />}
           >
-            확인하기
-          </Link>
-        </div>
-      ) : null}
+            새로고침
+          </AGButton>
+        }
+      />
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Inventory Status */}
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">샘플 재고</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {summary?.inventory.totalProducts}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                정상: {summary?.inventory.inStock} | 부족: {summary?.inventory.lowStock}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-              <Package className="w-6 h-6 text-blue-500" />
-            </div>
-          </div>
-        </div>
-
-        {/* Today Usage */}
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">오늘 사용</p>
-              <p className="text-2xl font-bold text-purple-600 mt-1">
-                {summary?.usage.todayUsage}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                주간: {summary?.usage.weekUsage}개
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-              <Beaker className="w-6 h-6 text-purple-500" />
-            </div>
-          </div>
-        </div>
-
-        {/* Conversion Rate */}
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">전환율</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
-                {summary?.conversion.rate}%
-              </p>
-              <p className={`text-xs mt-0.5 ${
-                (summary?.conversion.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {(summary?.conversion.change || 0) >= 0 ? '+' : ''}{summary?.conversion.change}% vs 이전
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-green-500" />
-            </div>
-          </div>
-        </div>
-
-        {/* Display Status */}
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">진열 현황</p>
-              <p className="text-2xl font-bold text-orange-600 mt-1">
-                {summary?.display.verified}/{summary?.display.totalDisplays}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                인증됨 | 보충필요: {summary?.display.needsRefill}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-              <Layout className="w-6 h-6 text-orange-500" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions & Recent Usage */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Actions */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">빠른 실행</h2>
-
-          <Link
-            to="/cosmetics-sample/tracking"
-            className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 hover:border-blue-300 transition-colors group flex items-center gap-4"
-          >
-            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100">
-              <Package className="w-6 h-6 text-blue-500" />
-            </div>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Alert Banner */}
+        {(summary?.inventory.lowStock || summary?.inventory.outOfStock) ? (
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">샘플 입고/사용</h3>
-              <p className="text-sm text-gray-500">재고 입출고 관리</p>
+              <p className="font-medium text-yellow-800">재고 보충 필요</p>
+              <p className="text-yellow-700 text-sm mt-1">
+                {summary?.inventory.lowStock}개 제품 재고 부족, {summary?.inventory.outOfStock}개 제품 품절
+              </p>
             </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
-          </Link>
-
-          <Link
-            to="/cosmetics-sample/display"
-            className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 hover:border-orange-300 transition-colors group flex items-center gap-4"
-          >
-            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center group-hover:bg-orange-100">
-              <Layout className="w-6 h-6 text-orange-500" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">진열 관리</h3>
-              <p className="text-sm text-gray-500">진열 레이아웃 설정</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-orange-500" />
-          </Link>
-
-          <Link
-            to="/cosmetics-sample/analytics"
-            className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 hover:border-green-300 transition-colors group flex items-center gap-4"
-          >
-            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100">
-              <BarChart2 className="w-6 h-6 text-green-500" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">전환율 분석</h3>
-              <p className="text-sm text-gray-500">샘플→구매 분석</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-green-500" />
-          </Link>
-        </div>
-
-        {/* Recent Usage */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">최근 사용 로그</h2>
-            <Link
-              to="/cosmetics-sample/tracking"
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
-            >
-              전체보기 <ArrowRight className="w-4 h-4" />
+            <Link to="/cosmetics-sample/tracking">
+              <AGButton variant="primary" size="sm">
+                확인하기
+              </AGButton>
             </Link>
           </div>
+        ) : null}
 
-          <div className="space-y-3">
-            {summary?.recentUsage.map((usage) => (
-              <div
-                key={usage.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+        {/* KPI Grid */}
+        <AGSection>
+          <AGKPIGrid columns={4}>
+            <AGKPIBlock
+              title="샘플 재고"
+              value={summary?.inventory.totalProducts || 0}
+              subtitle={`정상: ${summary?.inventory.inStock} | 부족: ${summary?.inventory.lowStock}`}
+              colorMode="info"
+              icon={<Package className="w-5 h-5 text-blue-500" />}
+            />
+            <AGKPIBlock
+              title="오늘 사용"
+              value={summary?.usage.todayUsage || 0}
+              subtitle={`주간: ${summary?.usage.weekUsage}개`}
+              colorMode="neutral"
+              icon={<Beaker className="w-5 h-5 text-purple-500" />}
+            />
+            <AGKPIBlock
+              title="전환율"
+              value={`${summary?.conversion.rate || 0}%`}
+              delta={summary?.conversion.change}
+              deltaLabel="vs 이전"
+              colorMode={summary?.conversion.change && summary.conversion.change >= 0 ? 'positive' : 'negative'}
+              trend={summary?.conversion.change && summary.conversion.change >= 0 ? 'up' : 'down'}
+              icon={<TrendingUp className="w-5 h-5 text-green-500" />}
+            />
+            <AGKPIBlock
+              title="진열 현황"
+              value={`${summary?.display.verified || 0}/${summary?.display.totalDisplays || 0}`}
+              subtitle={`인증됨 | 보충필요: ${summary?.display.needsRefill}`}
+              colorMode="neutral"
+              icon={<Layout className="w-5 h-5 text-orange-500" />}
+            />
+          </AGKPIGrid>
+        </AGSection>
+
+        {/* Quick Actions & Recent Usage */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Quick Actions */}
+          <AGSection title="빠른 실행">
+            <div className="space-y-3">
+              <Link to="/cosmetics-sample/tracking" className="block">
+                <AGCard hoverable padding="md">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <Package className="w-6 h-6 text-blue-500" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">샘플 입고/사용</h3>
+                      <p className="text-sm text-gray-500">재고 입출고 관리</p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </AGCard>
+              </Link>
+
+              <Link to="/cosmetics-sample/display" className="block">
+                <AGCard hoverable padding="md">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
+                      <Layout className="w-6 h-6 text-orange-500" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">진열 관리</h3>
+                      <p className="text-sm text-gray-500">진열 레이아웃 설정</p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </AGCard>
+              </Link>
+
+              <Link to="/cosmetics-sample/analytics" className="block">
+                <AGCard hoverable padding="md">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                      <BarChart2 className="w-6 h-6 text-green-500" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">전환율 분석</h3>
+                      <p className="text-sm text-gray-500">샘플→구매 분석</p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </AGCard>
+              </Link>
+            </div>
+          </AGSection>
+
+          {/* Recent Usage */}
+          <AGSection
+            title="최근 사용 로그"
+            action={
+              <Link
+                to="/cosmetics-sample/tracking"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    usage.resultedInPurchase ? 'bg-green-100' : 'bg-gray-200'
-                  }`}>
-                    {usage.resultedInPurchase ? (
-                      <ShoppingCart className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Beaker className="w-4 h-4 text-gray-500" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{usage.productName}</p>
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {formatTimeAgo(usage.usedAt)}
-                    </p>
-                  </div>
-                </div>
-                {usage.resultedInPurchase && (
-                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">
-                    구매
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+                전체보기 <ArrowRight className="w-4 h-4" />
+              </Link>
+            }
+          >
+            <AGCard padding="none">
+              <AGTable
+                columns={usageColumns}
+                data={summary?.recentUsage || []}
+                emptyMessage="최근 사용 기록이 없습니다"
+              />
+            </AGCard>
+          </AGSection>
         </div>
       </div>
     </div>

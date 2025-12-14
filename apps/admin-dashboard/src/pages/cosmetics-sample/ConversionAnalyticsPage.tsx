@@ -6,11 +6,22 @@
  * - 매장 순위 (Top Stores)
  * - 제품별 전환율
  *
- * Phase 6-H: Cosmetics Sample & Display Extension
+ * Phase 7-G: Cosmetics Sample & Display UI Redesign (AG Design System)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { authClient } from '@o4o/auth-client';
+import {
+  AGPageHeader,
+  AGSection,
+  AGKPIBlock,
+  AGKPIGrid,
+  AGCard,
+  AGButton,
+  AGSelect,
+  AGTable,
+} from '@o4o/ui';
+import type { AGTableColumn } from '@o4o/ui';
 import {
   TrendingUp,
   TrendingDown,
@@ -26,6 +37,7 @@ import {
 } from 'lucide-react';
 
 type PeriodType = 'daily' | 'weekly' | 'monthly';
+type TabType = 'overview' | 'products' | 'stores';
 
 interface ConversionData {
   period: string;
@@ -58,6 +70,7 @@ const ConversionAnalyticsPage: React.FC = () => {
   const api = authClient.api;
   const [loading, setLoading] = useState(true);
   const [periodType, setPeriodType] = useState<PeriodType>('weekly');
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [conversionTrend, setConversionTrend] = useState<ConversionData[]>([]);
   const [storeRankings, setStoreRankings] = useState<StoreRanking[]>([]);
   const [productConversions, setProductConversions] = useState<ProductConversion[]>([]);
@@ -139,251 +152,338 @@ const ConversionAnalyticsPage: React.FC = () => {
   // Simple bar chart visualization
   const maxRate = Math.max(...conversionTrend.map((d) => d.conversionRate), 1);
 
+  // Product table columns
+  const productColumns: AGTableColumn<ProductConversion>[] = [
+    {
+      key: 'productName',
+      header: '제품명',
+      render: (value) => <span className="font-medium">{value}</span>,
+    },
+    {
+      key: 'sampleUsed',
+      header: '샘플 사용',
+      align: 'center',
+    },
+    {
+      key: 'purchases',
+      header: '구매 건수',
+      align: 'center',
+    },
+    {
+      key: 'conversionRate',
+      header: '전환율',
+      align: 'center',
+      render: (value) => (
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-16 bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-green-500 h-2 rounded-full"
+              style={{ width: `${value}%` }}
+            />
+          </div>
+          <span className="font-bold text-green-600 w-12">{value}%</span>
+        </div>
+      ),
+    },
+    {
+      key: 'avgPurchaseAmount',
+      header: '평균 구매액',
+      align: 'right',
+      render: (value) => formatCurrency(value),
+    },
+  ];
+
+  const tabs: { key: TabType; label: string }[] = [
+    { key: 'overview', label: '전체' },
+    { key: 'products', label: '제품별' },
+    { key: 'stores', label: '매장별' },
+  ];
+
   if (loading) {
     return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-        <div className="grid grid-cols-4 gap-4">
+      <div className="p-6">
+        <AGKPIGrid columns={4}>
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
+            <AGKPIBlock key={i} title="로딩 중..." value="-" loading />
           ))}
-        </div>
-        <div className="h-64 bg-gray-200 rounded-lg"></div>
+        </AGKPIGrid>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Conversion Analytics</h1>
-          <p className="text-gray-500 text-sm mt-1">샘플→구매 전환율 분석</p>
-        </div>
-        <div className="flex gap-2">
-          <select
-            value={periodType}
-            onChange={(e) => setPeriodType(e.target.value as PeriodType)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="daily">일별</option>
-            <option value="weekly">주별</option>
-            <option value="monthly">월별</option>
-          </select>
-          <button
-            onClick={fetchAnalytics}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-            title="새로고침"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Overall Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">전체 전환율</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
-                {overallStats.overallRate}%
-              </p>
-              <p className={`text-xs mt-0.5 ${overallStats.rateChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {overallStats.rateChange >= 0 ? '+' : ''}{overallStats.rateChange}% vs 이전
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-green-500" />
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Page Header */}
+      <AGPageHeader
+        title="Conversion Analytics"
+        description="샘플→구매 전환율 분석"
+        icon={<BarChart2 className="w-5 h-5" />}
+        actions={
+          <div className="flex gap-2">
+            <AGSelect
+              value={periodType}
+              onChange={(e) => setPeriodType(e.target.value as PeriodType)}
+              className="w-28"
+            >
+              <option value="daily">일별</option>
+              <option value="weekly">주별</option>
+              <option value="monthly">월별</option>
+            </AGSelect>
+            <AGButton
+              variant="ghost"
+              size="sm"
+              onClick={fetchAnalytics}
+              iconLeft={<RefreshCw className="w-4 h-4" />}
+            >
+              새로고침
+            </AGButton>
           </div>
-        </div>
+        }
+      />
 
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">총 샘플 사용</p>
-              <p className="text-2xl font-bold text-purple-600 mt-1">
-                {overallStats.totalSamples}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">이번 기간</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-              <Package className="w-6 h-6 text-purple-500" />
-            </div>
-          </div>
-        </div>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Overall Stats */}
+        <AGSection>
+          <AGKPIGrid columns={4}>
+            <AGKPIBlock
+              title="전체 전환율"
+              value={`${overallStats.overallRate}%`}
+              delta={overallStats.rateChange}
+              deltaLabel="vs 이전"
+              colorMode={overallStats.rateChange >= 0 ? 'positive' : 'negative'}
+              trend={overallStats.rateChange >= 0 ? 'up' : 'down'}
+              icon={<TrendingUp className="w-5 h-5 text-green-500" />}
+            />
+            <AGKPIBlock
+              title="총 샘플 사용"
+              value={overallStats.totalSamples}
+              subtitle="이번 기간"
+              colorMode="neutral"
+              icon={<Package className="w-5 h-5 text-purple-500" />}
+            />
+            <AGKPIBlock
+              title="전환 구매"
+              value={overallStats.totalPurchases}
+              subtitle="건"
+              colorMode="info"
+              icon={<BarChart2 className="w-5 h-5 text-blue-500" />}
+            />
+            <AGKPIBlock
+              title="전환 매출"
+              value={formatCurrency(overallStats.totalRevenue)}
+              subtitle="이번 기간"
+              colorMode="neutral"
+              icon={<Award className="w-5 h-5 text-orange-500" />}
+            />
+          </AGKPIGrid>
+        </AGSection>
 
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">전환 구매</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">
-                {overallStats.totalPurchases}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">건</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-              <BarChart2 className="w-6 h-6 text-blue-500" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">전환 매출</p>
-              <p className="text-2xl font-bold text-orange-600 mt-1">
-                {formatCurrency(overallStats.totalRevenue)}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">이번 기간</p>
-            </div>
-            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-              <Award className="w-6 h-6 text-orange-500" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Conversion Trend Chart */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-gray-400" />
-            전환율 추이
-          </h2>
-        </div>
-
-        {/* Simple Bar Chart */}
-        <div className="flex items-end gap-2 h-48">
-          {conversionTrend.map((data, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center">
-              <div
-                className="w-full bg-gradient-to-t from-green-500 to-green-300 rounded-t-lg transition-all hover:from-green-600 hover:to-green-400 relative group"
-                style={{ height: `${(data.conversionRate / maxRate) * 100}%`, minHeight: 20 }}
+        {/* Tabs */}
+        <AGSection>
+          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeTab === tab.key
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                  {data.conversionRate}% ({data.purchases}/{data.sampleUsed})
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">{data.period}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Legend */}
-        <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500">
-          <span className="flex items-center gap-2">
-            <span className="w-3 h-3 bg-green-500 rounded"></span>
-            전환율 (%)
-          </span>
-        </div>
-      </div>
-
-      {/* Rankings Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Store Rankings */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Store className="w-5 h-5 text-gray-400" />
-              매장별 전환율 순위
-            </h2>
+                {tab.label}
+              </button>
+            ))}
           </div>
+        </AGSection>
 
-          <div className="space-y-3">
-            {storeRankings.map((store, index) => (
-              <div
-                key={store.storeId}
-                className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                  index === 1 ? 'bg-gray-200 text-gray-700' :
-                  index === 2 ? 'bg-orange-100 text-orange-700' :
-                  'bg-gray-100 text-gray-500'
-                }`}>
-                  {index + 1}
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Conversion Trend Chart */}
+            <AGSection title="전환율 추이" action={<Calendar className="w-5 h-5 text-gray-400" />}>
+              <AGCard>
+                <div className="flex items-end gap-2 h-48 pt-8">
+                  {conversionTrend.map((data, index) => (
+                    <div key={index} className="flex-1 flex flex-col items-center">
+                      <div
+                        className="w-full bg-gradient-to-t from-green-500 to-green-300 rounded-t-lg transition-all hover:from-green-600 hover:to-green-400 relative group cursor-pointer"
+                        style={{ height: `${(data.conversionRate / maxRate) * 100}%`, minHeight: 20 }}
+                      >
+                        <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                          {data.conversionRate}% ({data.purchases}/{data.sampleUsed})
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">{data.period}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">{store.storeName}</p>
-                  <p className="text-xs text-gray-500">
-                    {store.purchases}/{store.sampleUsed} 전환 | {formatCurrency(store.revenue)}
-                  </p>
+                <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500 border-t pt-4">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 bg-green-500 rounded"></span>
+                    전환율 (%)
+                  </span>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-green-600">{store.conversionRate}%</p>
-                  <div className="flex items-center justify-end">
-                    {getTrendIcon(store.trend)}
+              </AGCard>
+            </AGSection>
+
+            {/* Rankings Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Store Rankings */}
+              <AGSection title="매장별 전환율 순위" action={<Store className="w-5 h-5 text-gray-400" />}>
+                <AGCard padding="none">
+                  <div className="divide-y divide-gray-100">
+                    {storeRankings.map((store, index) => (
+                      <div
+                        key={store.storeId}
+                        className="flex items-center gap-4 p-4 hover:bg-gray-50"
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                          index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                          index === 1 ? 'bg-gray-200 text-gray-700' :
+                          index === 2 ? 'bg-orange-100 text-orange-700' :
+                          'bg-gray-100 text-gray-500'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{store.storeName}</p>
+                          <p className="text-xs text-gray-500">
+                            {store.purchases}/{store.sampleUsed} 전환 | {formatCurrency(store.revenue)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">{store.conversionRate}%</p>
+                          <div className="flex items-center justify-end">
+                            {getTrendIcon(store.trend)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                </AGCard>
+              </AGSection>
 
-        {/* Product Conversions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Package className="w-5 h-5 text-gray-400" />
-              제품별 전환율
-            </h2>
-          </div>
+              {/* Product Conversions */}
+              <AGSection title="제품별 전환율" action={<Package className="w-5 h-5 text-gray-400" />}>
+                <AGCard padding="none">
+                  <div className="divide-y divide-gray-100">
+                    {productConversions.map((product) => (
+                      <div
+                        key={product.productId}
+                        className="p-4 hover:bg-gray-50"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-medium text-gray-900 text-sm">{product.productName}</p>
+                          <p className="font-bold text-green-600">{product.conversionRate}%</p>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full"
+                            style={{ width: `${product.conversionRate}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between mt-1 text-xs text-gray-500">
+                          <span>{product.purchases}/{product.sampleUsed} 전환</span>
+                          <span>평균 {formatCurrency(product.avgPurchaseAmount)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </AGCard>
+              </AGSection>
+            </div>
+          </>
+        )}
 
-          <div className="space-y-3">
-            {productConversions.map((product) => (
-              <div
-                key={product.productId}
-                className="p-3 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-900 text-sm">{product.productName}</p>
-                  <p className="font-bold text-green-600">{product.conversionRate}%</p>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full"
-                    style={{ width: `${product.conversionRate}%` }}
-                  />
-                </div>
-                <div className="flex justify-between mt-1 text-xs text-gray-500">
-                  <span>{product.purchases}/{product.sampleUsed} 전환</span>
-                  <span>평균 {formatCurrency(product.avgPurchaseAmount)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+        {activeTab === 'products' && (
+          <AGSection title="제품별 전환율 분석">
+            <AGCard padding="none">
+              <AGTable
+                columns={productColumns}
+                data={productConversions}
+                emptyMessage="데이터가 없습니다"
+              />
+            </AGCard>
+          </AGSection>
+        )}
 
-      {/* Insights */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-5 border border-green-100">
-        <h3 className="font-semibold text-gray-900 mb-3">💡 인사이트</h3>
-        <ul className="space-y-2 text-sm text-gray-700">
-          <li className="flex items-start gap-2">
-            <TrendingUp className="w-4 h-4 text-green-500 mt-0.5" />
-            <span>
-              <strong>하이드로 부스팅 세럼</strong>이 40% 전환율로 가장 높은 성과를 보이고 있습니다.
-              해당 제품의 샘플 수량을 늘리는 것을 권장합니다.
-            </span>
-          </li>
-          <li className="flex items-start gap-2">
-            <Store className="w-4 h-4 text-blue-500 mt-0.5" />
-            <span>
-              <strong>강남 플래그십</strong>이 35.2%로 최고 전환율을 기록 중입니다.
-              성공 요인을 분석하여 다른 매장에 적용해 보세요.
-            </span>
-          </li>
-          <li className="flex items-start gap-2">
-            <TrendingDown className="w-4 h-4 text-red-500 mt-0.5" />
-            <span>
-              <strong>신촌 유플렉스</strong>의 전환율이 하락 추세입니다.
-              진열 상태 및 샘플 품질을 점검해 주세요.
-            </span>
-          </li>
-        </ul>
+        {activeTab === 'stores' && (
+          <AGSection title="매장별 전환율 분석">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {storeRankings.map((store, index) => (
+                <AGCard key={store.storeId} padding="lg">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
+                        index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                        index === 1 ? 'bg-gray-200 text-gray-700' :
+                        index === 2 ? 'bg-orange-100 text-orange-700' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{store.storeName}</h3>
+                        <div className="flex items-center gap-1 text-sm text-gray-500">
+                          {getTrendIcon(store.trend)}
+                          <span>{store.trend === 'up' ? '상승' : store.trend === 'down' ? '하락' : '유지'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-2xl font-bold text-green-600">{store.conversionRate}%</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-center border-t pt-4">
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900">{store.sampleUsed}</p>
+                      <p className="text-xs text-gray-500">샘플 사용</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900">{store.purchases}</p>
+                      <p className="text-xs text-gray-500">구매 전환</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900">{formatCurrency(store.revenue).replace('₩', '')}</p>
+                      <p className="text-xs text-gray-500">매출</p>
+                    </div>
+                  </div>
+                </AGCard>
+              ))}
+            </div>
+          </AGSection>
+        )}
+
+        {/* Insights */}
+        <AGSection>
+          <AGCard className="bg-gradient-to-r from-green-50 to-blue-50 border-green-100">
+            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-xl">💡</span> 인사이트
+            </h3>
+            <ul className="space-y-3 text-sm text-gray-700">
+              <li className="flex items-start gap-3">
+                <TrendingUp className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>하이드로 부스팅 세럼</strong>이 40% 전환율로 가장 높은 성과를 보이고 있습니다.
+                  해당 제품의 샘플 수량을 늘리는 것을 권장합니다.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Store className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>강남 플래그십</strong>이 35.2%로 최고 전환율을 기록 중입니다.
+                  성공 요인을 분석하여 다른 매장에 적용해 보세요.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <TrendingDown className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>신촌 유플렉스</strong>의 전환율이 하락 추세입니다.
+                  진열 상태 및 샘플 품질을 점검해 주세요.
+                </span>
+              </li>
+            </ul>
+          </AGCard>
+        </AGSection>
       </div>
     </div>
   );

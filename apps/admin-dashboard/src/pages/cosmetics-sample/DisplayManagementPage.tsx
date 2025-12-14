@@ -6,11 +6,23 @@
  * - 사진 업로드
  * - 페이싱 관리
  *
- * Phase 6-H: Cosmetics Sample & Display Extension
+ * Phase 7-G: Cosmetics Sample & Display UI Redesign (AG Design System)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { authClient } from '@o4o/auth-client';
+import {
+  AGPageHeader,
+  AGSection,
+  AGKPIBlock,
+  AGKPIGrid,
+  AGCard,
+  AGButton,
+  AGModal,
+  AGInput,
+  AGSelect,
+  AGTag,
+} from '@o4o/ui';
 import {
   Layout,
   Plus,
@@ -28,6 +40,8 @@ import {
 
 type ShelfPosition = 'eye_level' | 'top_shelf' | 'middle_shelf' | 'bottom_shelf' | 'end_cap' | 'counter';
 type DisplayStatus = 'active' | 'inactive' | 'pending_setup' | 'needs_refill';
+type ViewMode = 'grid' | 'list';
+type FilterTab = 'all' | 'verified' | 'unverified';
 
 interface DisplayItem {
   id: string;
@@ -56,10 +70,12 @@ const DisplayManagementPage: React.FC = () => {
   const api = authClient.api;
   const [displays, setDisplays] = useState<DisplayItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [positionFilter, setPositionFilter] = useState<ShelfPosition | 'all'>('all');
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedDisplay, setSelectedDisplay] = useState<DisplayItem | null>(null);
 
   const fetchDisplays = useCallback(async () => {
@@ -128,6 +144,17 @@ const DisplayManagementPage: React.FC = () => {
           verifiedAt: '2024-12-07T00:00:00Z',
           updatedAt: '2024-12-10T16:00:00Z',
         },
+        {
+          id: '6',
+          productId: 'prod-6',
+          productName: '토너',
+          categoryName: '토너',
+          shelfPosition: 'top_shelf',
+          facingCount: 3,
+          status: 'pending_setup',
+          isVerified: false,
+          updatedAt: '2024-12-12T15:00:00Z',
+        },
       ]);
     } catch (err) {
       console.error('Failed to fetch displays:', err);
@@ -140,32 +167,16 @@ const DisplayManagementPage: React.FC = () => {
     fetchDisplays();
   }, [fetchDisplays]);
 
-  const getStatusBadge = (status: DisplayStatus) => {
+  const getStatusTag = (status: DisplayStatus) => {
     switch (status) {
       case 'active':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            활성
-          </span>
-        );
+        return <AGTag color="green" size="sm">활성</AGTag>;
       case 'needs_refill':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            보충필요
-          </span>
-        );
+        return <AGTag color="yellow" size="sm">보충필요</AGTag>;
       case 'pending_setup':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            설정중
-          </span>
-        );
+        return <AGTag color="blue" size="sm">설정중</AGTag>;
       case 'inactive':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            비활성
-          </span>
-        );
+        return <AGTag color="gray" size="sm">비활성</AGTag>;
     }
   };
 
@@ -174,6 +185,8 @@ const DisplayManagementPage: React.FC = () => {
     if (searchTerm && !item.productName.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
+    if (activeTab === 'verified' && !item.isVerified) return false;
+    if (activeTab === 'unverified' && item.isVerified) return false;
     return true;
   });
 
@@ -184,283 +197,405 @@ const DisplayManagementPage: React.FC = () => {
     needsRefill: displays.filter((d) => d.status === 'needs_refill').length,
   };
 
+  const tabs: { key: FilterTab; label: string; count: number }[] = [
+    { key: 'all', label: '전체', count: displays.length },
+    { key: 'verified', label: '인증완료', count: summary.verified },
+    { key: 'unverified', label: '미인증', count: displays.length - summary.verified },
+  ];
+
   if (loading) {
     return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-        <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
+      <div className="p-6">
+        <AGKPIGrid columns={4}>
+          {[1, 2, 3, 4].map((i) => (
+            <AGKPIBlock key={i} title="로딩 중..." value="-" loading />
           ))}
-        </div>
+        </AGKPIGrid>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Display Management</h1>
-          <p className="text-gray-500 text-sm mt-1">진열 레이아웃 관리</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={fetchDisplays}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-            title="새로고침"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </button>
-          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
+    <div className="min-h-screen bg-gray-50">
+      {/* Page Header */}
+      <AGPageHeader
+        title="Display Management"
+        description="진열 레이아웃 관리"
+        icon={<Layout className="w-5 h-5" />}
+        actions={
+          <div className="flex gap-2">
+            <AGButton
+              variant="ghost"
+              size="sm"
+              onClick={fetchDisplays}
+              iconLeft={<RefreshCw className="w-4 h-4" />}
             >
-              <Grid className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 ${viewMode === 'list' ? 'bg-gray-100' : ''}`}
+              새로고침
+            </AGButton>
+            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+            <AGButton
+              variant="primary"
+              size="sm"
+              iconLeft={<Plus className="w-4 h-4" />}
             >
-              <List className="w-5 h-5" />
-            </button>
+              진열 추가
+            </AGButton>
           </div>
-          <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            진열 추가
-          </button>
-        </div>
-      </div>
+        }
+      />
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <div className="flex items-center gap-3">
-            <Layout className="w-8 h-8 text-orange-500" />
-            <div>
-              <p className="text-2xl font-bold">{summary.total}</p>
-              <p className="text-sm text-gray-500">전체 진열</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-8 h-8 text-green-500" />
-            <div>
-              <p className="text-2xl font-bold text-green-600">{summary.verified}</p>
-              <p className="text-sm text-gray-500">인증됨</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <div className="flex items-center gap-3">
-            <Camera className="w-8 h-8 text-blue-500" />
-            <div>
-              <p className="text-2xl font-bold text-blue-600">{summary.needsPhoto}</p>
-              <p className="text-sm text-gray-500">사진 필요</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <div className="flex items-center gap-3">
-            <Layout className="w-8 h-8 text-yellow-500" />
-            <div>
-              <p className="text-2xl font-bold text-yellow-600">{summary.needsRefill}</p>
-              <p className="text-sm text-gray-500">보충 필요</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Stats */}
+        <AGSection>
+          <AGKPIGrid columns={4}>
+            <AGKPIBlock
+              title="전체 진열"
+              value={summary.total}
+              colorMode="neutral"
+              icon={<Layout className="w-5 h-5 text-orange-500" />}
+            />
+            <AGKPIBlock
+              title="인증됨"
+              value={summary.verified}
+              colorMode="positive"
+              icon={<CheckCircle className="w-5 h-5 text-green-500" />}
+            />
+            <AGKPIBlock
+              title="사진 필요"
+              value={summary.needsPhoto}
+              colorMode="info"
+              icon={<Camera className="w-5 h-5 text-blue-500" />}
+            />
+            <AGKPIBlock
+              title="보충 필요"
+              value={summary.needsRefill}
+              colorMode="neutral"
+              icon={<Layout className="w-5 h-5 text-yellow-500" />}
+            />
+          </AGKPIGrid>
+        </AGSection>
 
-      {/* Filters */}
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="제품명으로 검색..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-          />
-        </div>
-        <select
-          value={positionFilter}
-          onChange={(e) => setPositionFilter(e.target.value as ShelfPosition | 'all')}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-        >
-          <option value="all">전체 위치</option>
-          {Object.entries(shelfPositionLabels).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
-      </div>
+        {/* Filter Tabs */}
+        <AGSection>
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            {/* Tabs */}
+            <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === tab.key
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              ))}
+            </div>
 
-      {/* Display Grid/List */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredDisplays.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-            >
-              {/* Photo */}
-              <div className="relative h-40 bg-gray-100">
-                {item.photoUrl ? (
-                  <img
-                    src={item.photoUrl}
-                    alt={item.productName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                    <Camera className="w-12 h-12 mb-2" />
-                    <span className="text-sm">사진 없음</span>
-                  </div>
-                )}
-                {item.isVerified && (
-                  <div className="absolute top-2 right-2">
-                    <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" /> 인증됨
-                    </span>
-                  </div>
-                )}
+            {/* Filters */}
+            <div className="flex gap-3 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <AGInput
+                  type="text"
+                  placeholder="제품명으로 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-
-              {/* Info */}
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900">{item.productName}</h3>
-                  {getStatusBadge(item.status)}
-                </div>
-                <p className="text-sm text-gray-500 mb-3">{item.categoryName}</p>
-
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">
-                    {shelfPositionLabels[item.shelfPosition]}
-                  </span>
-                  <span className="font-medium">
-                    Facing: {item.facingCount}
-                  </span>
-                </div>
-
-                <div className="flex gap-2 mt-4">
-                  <button
-                    onClick={() => {
-                      setSelectedDisplay(item);
-                      setShowEditModal(true);
-                    }}
-                    className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1"
-                  >
-                    <Edit className="w-4 h-4" />
-                    편집
-                  </button>
-                  <button className="flex-1 px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center justify-center gap-1">
-                    <Upload className="w-4 h-4" />
-                    사진
-                  </button>
-                </div>
-              </div>
+              <AGSelect
+                value={positionFilter}
+                onChange={(e) => setPositionFilter(e.target.value as ShelfPosition | 'all')}
+                className="w-32"
+              >
+                <option value="all">전체 위치</option>
+                {Object.entries(shelfPositionLabels).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </AGSelect>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredDisplays.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-5"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                  {item.photoUrl ? (
-                    <img
-                      src={item.photoUrl}
-                      alt={item.productName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Camera className="w-8 h-8 text-gray-400" />
-                    </div>
-                  )}
-                </div>
+          </div>
+        </AGSection>
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900">{item.productName}</h3>
-                    {getStatusBadge(item.status)}
+        {/* Display Grid/List */}
+        <AGSection>
+          {filteredDisplays.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <Layout className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p>해당하는 진열이 없습니다</p>
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredDisplays.map((item) => (
+                <AGCard key={item.id} padding="none" className="overflow-hidden">
+                  {/* Photo */}
+                  <div className="relative h-40 bg-gray-100">
+                    {item.photoUrl ? (
+                      <img
+                        src={item.photoUrl}
+                        alt={item.productName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                        <Camera className="w-12 h-12 mb-2" />
+                        <span className="text-sm">사진 없음</span>
+                      </div>
+                    )}
                     {item.isVerified && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
-                        <CheckCircle className="w-3 h-3" /> 인증됨
-                      </span>
+                      <div className="absolute top-2 right-2">
+                        <AGTag color="green" size="sm">
+                          <CheckCircle className="w-3 h-3 mr-1" /> 인증됨
+                        </AGTag>
+                      </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500">{item.categoryName}</p>
-                  <div className="flex gap-4 mt-2 text-sm text-gray-600">
-                    <span>위치: {shelfPositionLabels[item.shelfPosition]}</span>
-                    <span>Facing: {item.facingCount}</span>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900">{item.productName}</h3>
+                      {getStatusTag(item.status)}
+                    </div>
+                    <p className="text-sm text-gray-500 mb-3">{item.categoryName}</p>
+
+                    <div className="flex items-center justify-between text-sm mb-4">
+                      <span className="text-gray-500">
+                        {shelfPositionLabels[item.shelfPosition]}
+                      </span>
+                      <span className="font-medium">
+                        Facing: {item.facingCount}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <AGButton
+                        variant="outline"
+                        size="sm"
+                        fullWidth
+                        onClick={() => {
+                          setSelectedDisplay(item);
+                          setShowEditModal(true);
+                        }}
+                        iconLeft={<Edit className="w-4 h-4" />}
+                      >
+                        편집
+                      </AGButton>
+                      <AGButton
+                        variant="primary"
+                        size="sm"
+                        fullWidth
+                        onClick={() => {
+                          setSelectedDisplay(item);
+                          setShowPhotoModal(true);
+                        }}
+                        iconLeft={<Upload className="w-4 h-4" />}
+                      >
+                        사진
+                      </AGButton>
+                    </div>
                   </div>
-                </div>
+                </AGCard>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredDisplays.map((item) => (
+                <AGCard key={item.id} padding="md">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      {item.photoUrl ? (
+                        <img
+                          src={item.photoUrl}
+                          alt={item.productName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Camera className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
 
-                <div className="flex gap-2">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded">
-                    <Eye className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedDisplay(item);
-                      setShowEditModal(true);
-                    }}
-                    className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-gray-900">{item.productName}</h3>
+                        {getStatusTag(item.status)}
+                        {item.isVerified && (
+                          <AGTag color="green" size="sm">
+                            <CheckCircle className="w-3 h-3 mr-1" /> 인증됨
+                          </AGTag>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500">{item.categoryName}</p>
+                      <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                        <span>위치: {shelfPositionLabels[item.shelfPosition]}</span>
+                        <span>Facing: {item.facingCount}</span>
+                      </div>
+                    </div>
 
-      {/* Edit Modal Placeholder */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">진열 편집</h2>
-              <button
-                onClick={() => {
-                  setShowEditModal(false);
-                  setSelectedDisplay(null);
-                }}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <X className="w-5 h-5" />
-              </button>
+                    <div className="flex gap-2">
+                      <AGButton
+                        variant="ghost"
+                        size="sm"
+                        iconLeft={<Eye className="w-4 h-4" />}
+                      >
+                        보기
+                      </AGButton>
+                      <AGButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDisplay(item);
+                          setShowEditModal(true);
+                        }}
+                        iconLeft={<Edit className="w-4 h-4" />}
+                      >
+                        편집
+                      </AGButton>
+                    </div>
+                  </div>
+                </AGCard>
+              ))}
             </div>
-            <p className="text-gray-500 text-sm mb-4">
-              {selectedDisplay?.productName}
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setShowEditModal(false);
-                  setSelectedDisplay(null);
-                }}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-              >
-                취소
-              </button>
-              <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
-                저장
-              </button>
-            </div>
+          )}
+        </AGSection>
+      </div>
+
+      {/* Edit Modal */}
+      <AGModal
+        open={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedDisplay(null);
+        }}
+        title="진열 편집"
+        size="md"
+        footer={
+          <div className="flex justify-end gap-3">
+            <AGButton
+              variant="outline"
+              onClick={() => {
+                setShowEditModal(false);
+                setSelectedDisplay(null);
+              }}
+            >
+              취소
+            </AGButton>
+            <AGButton variant="primary">
+              저장
+            </AGButton>
           </div>
+        }
+      >
+        <div className="space-y-4">
+          {selectedDisplay && (
+            <>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="font-medium">{selectedDisplay.productName}</p>
+                <p className="text-sm text-gray-500">{selectedDisplay.categoryName}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">진열 위치</label>
+                <AGSelect defaultValue={selectedDisplay.shelfPosition} className="w-full">
+                  {Object.entries(shelfPositionLabels).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </AGSelect>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">페이싱 수</label>
+                <AGInput
+                  type="number"
+                  min={1}
+                  max={10}
+                  defaultValue={selectedDisplay.facingCount}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                <AGSelect defaultValue={selectedDisplay.status} className="w-full">
+                  <option value="active">활성</option>
+                  <option value="inactive">비활성</option>
+                  <option value="pending_setup">설정중</option>
+                  <option value="needs_refill">보충필요</option>
+                </AGSelect>
+              </div>
+            </>
+          )}
         </div>
-      )}
+      </AGModal>
+
+      {/* Photo Upload Modal */}
+      <AGModal
+        open={showPhotoModal}
+        onClose={() => {
+          setShowPhotoModal(false);
+          setSelectedDisplay(null);
+        }}
+        title="진열 사진 업데이트"
+        size="md"
+        footer={
+          <div className="flex justify-end gap-3">
+            <AGButton
+              variant="outline"
+              onClick={() => {
+                setShowPhotoModal(false);
+                setSelectedDisplay(null);
+              }}
+            >
+              취소
+            </AGButton>
+            <AGButton variant="primary" iconLeft={<Upload className="w-4 h-4" />}>
+              업로드
+            </AGButton>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {selectedDisplay && (
+            <>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="font-medium">{selectedDisplay.productName}</p>
+              </div>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-2">사진을 드래그하여 업로드하거나</p>
+                <AGButton variant="outline" size="sm">
+                  파일 선택
+                </AGButton>
+                <p className="text-xs text-gray-400 mt-2">
+                  PNG, JPG, WEBP (최대 5MB)
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">비고</label>
+                <AGInput
+                  type="text"
+                  placeholder="진열 상태나 특이사항을 기록하세요"
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </AGModal>
     </div>
   );
 };
