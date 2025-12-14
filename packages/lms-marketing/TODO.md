@@ -18,25 +18,28 @@ Marketing LMS Extension for O4O Platform
 - [x] Lifecycle hooks (install, activate, deactivate, uninstall)
 - [x] AppStore registration
 
+### ✅ Phase R6 – Product Info Delivery Module (Complete)
+- [x] ProductContent entity with targeting support
+- [x] ProductContentService (CRUD + publish + getForUser)
+- [x] ProductContentController with REST API
+- [x] API endpoints at /api/v1/lms-marketing/product
+- [x] Database table: lms_marketing_product_contents
+- [x] Hook: publishProductInfo, getProductContentsForUser
+
+### ✅ Phase R7 – Marketing Quiz Campaign Module (Complete)
+- [x] MarketingQuizCampaign entity with questions, rewards, targeting
+- [x] MarketingQuizCampaignService (CRUD + publish + attempt recording)
+- [x] MarketingQuizCampaignController with REST API
+- [x] API endpoints at /api/v1/lms-marketing/quiz-campaign
+- [x] Database table: lms_marketing_quiz_campaigns
+- [x] Campaign targeting (by role, region, seller type)
+- [x] Campaign scheduling (start/end dates)
+- [x] Hooks: createQuizCampaign, getQuizCampaignsForUser
+- [x] Frontend viewer: QuizCampaignViewerPage in main-site
+
 ---
 
 ## Next Phases
-
-### Phase R6 – Product Info Delivery Module
-- [ ] ProductInfoBundle entity (if needed, or use ContentBundle)
-- [ ] ProductInfoService
-- [ ] ProductInfoController
-- [ ] Supplier publishing UI
-- [ ] Consumer/Seller viewing integration
-- [ ] Engagement logging for product info views
-
-### Phase R7 – Marketing Quiz Campaign Module
-- [ ] QuizCampaign entity (wraps Quiz with campaign metadata)
-- [ ] QuizCampaignService
-- [ ] QuizCampaignController
-- [ ] Campaign targeting (by user segment, organization)
-- [ ] Campaign scheduling (start/end dates)
-- [ ] Engagement logging for quiz participation
 
 ### Phase R8 – Survey Campaign Module
 - [ ] SurveyCampaign entity (wraps Survey with campaign metadata)
