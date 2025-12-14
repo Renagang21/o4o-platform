@@ -14,6 +14,7 @@ export { lmsMarketingManifest, manifest } from './manifest.js';
 
 // Backend
 export {
+  routes,
   createRoutes,
   createServices,
   createHooks,

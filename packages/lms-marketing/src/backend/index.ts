@@ -15,8 +15,9 @@ import { initMarketingQuizCampaignService } from './services/MarketingQuizCampai
 
 /**
  * Create routes for marketing extension
+ * Exported as 'routes' for ModuleLoader compatibility
  */
-export function createRoutes(dataSource: DataSource): Router {
+export function routes(dataSource: DataSource): Router {
   const router = Router();
 
   // Health check endpoint
@@ -269,6 +270,9 @@ export function createHooks(dataSource: DataSource) {
     },
   };
 }
+
+// Alias for backward compatibility
+export { routes as createRoutes };
 
 // Re-export for convenience
 export * from './entities/index.js';
