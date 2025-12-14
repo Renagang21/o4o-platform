@@ -51,6 +51,9 @@ import { AppDataSource } from './database/connection.js';
 // AppStore Routes
 import appstoreRoutes from './routes/appstore.routes.js';
 
+// Navigation Routes (Phase P0 Task A - Dynamic Navigation)
+import navigationRoutes from './routes/navigation.routes.js';
+
 // Service Provisioning Routes (Phase 7)
 import serviceProvisioningRoutes from './routes/service-provisioning.routes.js';
 
@@ -450,6 +453,10 @@ const startServer = async () => {
     // 4. Register AppStore routes for app lifecycle management
     app.use('/api/v1/appstore', appstoreRoutes);
     logger.info('✅ AppStore routes registered at /api/v1/appstore');
+
+    // 4.1 Register Navigation routes (Phase P0 Task A - Dynamic Navigation)
+    app.use('/api/v1/navigation', navigationRoutes);
+    logger.info('✅ Navigation routes registered at /api/v1/navigation');
 
     // 5. Load Service Templates and register provisioning routes (Phase 7)
     try {
