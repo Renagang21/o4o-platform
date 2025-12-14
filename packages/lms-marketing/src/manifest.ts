@@ -12,6 +12,7 @@
 
 export const lmsMarketingManifest = {
   // ===== Basic Info =====
+  id: 'lms-marketing',
   appId: 'lms-marketing',
   displayName: 'Marketing LMS Extension',
   name: 'LMS Marketing',
