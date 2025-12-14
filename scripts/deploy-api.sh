@@ -21,7 +21,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Configuration
-API_SERVER="o4o-api"
+API_SERVER="o4o-apiserver"
 API_HOST="43.202.242.215"
 
 echo -e "${GREEN}======================================${NC}"

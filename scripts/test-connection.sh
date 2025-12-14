@@ -12,10 +12,10 @@ echo "========================================"
 
 # Test API Server
 echo -e "\n1. API Server (43.202.242.215):"
-if ssh -o ConnectTimeout=5 o4o-api "echo '   Status: Connected'" 2>/dev/null; then
-    ssh o4o-api "echo '   User: '\$(whoami)"
-    ssh o4o-api "echo '   Hostname: '\$(hostname)"
-    ssh o4o-api "pm2 list | grep o4o-api | head -1" 2>/dev/null && echo "   PM2: Running" || echo "   PM2: Not found"
+if ssh -o ConnectTimeout=5 o4o-apiserver "echo '   Status: Connected'" 2>/dev/null; then
+    ssh o4o-apiserver "echo '   User: '\$(whoami)"
+    ssh o4o-apiserver "echo '   Hostname: '\$(hostname)"
+    ssh o4o-apiserver "pm2 list | grep o4o-api | head -1" 2>/dev/null && echo "   PM2: Running" || echo "   PM2: Not found"
     echo -e "${GREEN}   ✓ API Server OK${NC}"
 else
     echo -e "${RED}   ✗ Cannot connect to API Server${NC}"
@@ -23,10 +23,10 @@ fi
 
 # Test Web Server
 echo -e "\n2. Web Server (13.125.144.8):"
-if ssh -o ConnectTimeout=5 o4o-web "echo '   Status: Connected'" 2>/dev/null; then
-    ssh o4o-web "echo '   User: '\$(whoami)"
-    ssh o4o-web "echo '   Hostname: '\$(hostname)"
-    ssh o4o-web "sudo systemctl is-active nginx | sed 's/^/   Nginx: /'" 2>/dev/null
+if ssh -o ConnectTimeout=5 o4o-webserver "echo '   Status: Connected'" 2>/dev/null; then
+    ssh o4o-webserver "echo '   User: '\$(whoami)"
+    ssh o4o-webserver "echo '   Hostname: '\$(hostname)"
+    ssh o4o-webserver "sudo systemctl is-active nginx | sed 's/^/   Nginx: /'" 2>/dev/null
     echo -e "${GREEN}   ✓ Web Server OK${NC}"
 else
     echo -e "${RED}   ✗ Cannot connect to Web Server${NC}"
