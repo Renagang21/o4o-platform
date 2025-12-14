@@ -16,7 +16,7 @@ export const lmsMarketingManifest = {
   appId: 'lms-marketing',
   displayName: 'Marketing LMS Extension',
   name: 'LMS Marketing',
-  version: '0.6.0',
+  version: '0.5.0',
   type: 'extension' as const,
   appType: 'extension' as const,
   category: 'marketing' as const,
@@ -34,12 +34,7 @@ export const lmsMarketingManifest = {
   // Phase R7: QuizCampaign table for quiz campaigns
   // Phase R8: SurveyCampaign table for survey campaigns
   // Phase R11: SupplierProfile table for onboarding
-  ownsTables: [
-    'lms_marketing_product_contents',
-    'lms_marketing_quiz_campaigns',
-    'lms_marketing_survey_campaigns',
-    'lms_marketing_supplier_profiles',
-  ] as string[],
+  ownsTables: ['lms_marketing_product_contents', 'lms_marketing_quiz_campaigns', 'lms_marketing_survey_campaigns', 'lms_marketing_supplier_profiles'] as string[],
 
   // ===== Uninstall Policy =====
   uninstallPolicy: {
@@ -51,22 +46,8 @@ export const lmsMarketingManifest = {
   // ===== Backend =====
   backend: {
     entities: ['ProductContent', 'MarketingQuizCampaign', 'SurveyCampaign', 'SupplierProfile'],
-    services: [
-      'ProductContentService',
-      'MarketingQuizCampaignService',
-      'SurveyCampaignService',
-      'SupplierInsightsService',
-      'SupplierOnboardingService',
-      'CampaignAutomationService',
-    ],
-    controllers: [
-      'ProductContentController',
-      'MarketingQuizCampaignController',
-      'SurveyCampaignController',
-      'SupplierInsightsController',
-      'SupplierOnboardingController',
-      'CampaignAutomationController',
-    ],
+    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService', 'SupplierInsightsService', 'SupplierOnboardingService', 'CampaignAutomationService'],
+    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController', 'SupplierInsightsController', 'SupplierOnboardingController', 'CampaignAutomationController'],
     routesExport: 'createRoutes',
     servicesExport: 'createServices',
     hooksExport: 'createHooks',
@@ -81,10 +62,6 @@ export const lmsMarketingManifest = {
         { path: '/admin/marketing/campaigns', component: 'CampaignList' },
         { path: '/admin/marketing/campaigns/:id', component: 'CampaignDetail' },
         { path: '/admin/marketing/product-info', component: 'ProductInfoList' },
-        // Phase R11: Onboarding & Automation pages
-        { path: '/admin/marketing/onboarding', component: 'OnboardingHome' },
-        { path: '/admin/marketing/onboarding/profile', component: 'SupplierProfileForm' },
-        { path: '/admin/marketing/automation', component: 'AutomationSettings' },
       ],
     },
     supplier: {
@@ -159,18 +136,6 @@ export const lmsMarketingManifest = {
             path: '/admin/marketing/product-info',
             icon: 'package',
           },
-          {
-            id: 'marketing-onboarding',
-            label: '온보딩',
-            path: '/admin/marketing/onboarding',
-            icon: 'rocket',
-          },
-          {
-            id: 'marketing-automation',
-            label: '자동화',
-            path: '/admin/marketing/automation',
-            icon: 'zap',
-          },
         ],
       },
     ],
@@ -207,22 +172,8 @@ export const lmsMarketingManifest = {
   // ===== Exposes =====
   exposes: {
     entities: ['ProductContent', 'MarketingQuizCampaign', 'SurveyCampaign', 'SupplierProfile'],
-    services: [
-      'ProductContentService',
-      'MarketingQuizCampaignService',
-      'SurveyCampaignService',
-      'SupplierInsightsService',
-      'SupplierOnboardingService',
-      'CampaignAutomationService',
-    ],
-    controllers: [
-      'ProductContentController',
-      'MarketingQuizCampaignController',
-      'SurveyCampaignController',
-      'SupplierInsightsController',
-      'SupplierOnboardingController',
-      'CampaignAutomationController',
-    ],
+    services: ['ProductContentService', 'MarketingQuizCampaignService', 'SurveyCampaignService', 'SupplierInsightsService', 'SupplierOnboardingService', 'CampaignAutomationService'],
+    controllers: ['ProductContentController', 'MarketingQuizCampaignController', 'SurveyCampaignController', 'SupplierInsightsController', 'SupplierOnboardingController', 'CampaignAutomationController'],
     types: [
       'ProductContent',
       'ProductContentTargeting',
@@ -307,11 +258,6 @@ export const lmsMarketingManifest = {
     enableProductInfo: true,
     defaultCampaignDuration: 30, // days
     maxConcurrentCampaigns: 10,
-    // Phase R11: Automation settings
-    autoPublishScheduled: true,
-    autoEndExpired: true,
-    autoPauseLowEngagement: false,
-    lowEngagementThreshold: 5, // percent
   },
 };
 

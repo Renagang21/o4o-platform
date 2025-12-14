@@ -16,3 +16,9 @@ export { SurveyCampaignController } from './SurveyCampaignController.js';
 
 // Phase R9: Supplier Insights Controller
 export { SupplierInsightsController } from './SupplierInsightsController.js';
+
+// Phase R11: Supplier Onboarding Controller
+export { SupplierOnboardingController } from './SupplierOnboardingController.js';
+
+// Phase R11: Campaign Automation Controller
+export { CampaignAutomationController } from './CampaignAutomationController.js';
