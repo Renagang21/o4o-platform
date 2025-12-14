@@ -23,6 +23,8 @@ import {
   Calendar,
   PlayCircle,
   LayoutGrid,
+  Clock,
+  AlertTriangle,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -165,6 +167,30 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <Monitor className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
     children: [
+      {
+        id: 'digital-signage-operations',
+        label: 'Operations',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/admin/digital-signage/operations',
+      },
+      {
+        id: 'digital-signage-display-status',
+        label: 'Display Status',
+        icon: <Activity className="w-4 h-4" />,
+        path: '/admin/digital-signage/operations/display-status',
+      },
+      {
+        id: 'digital-signage-action-history',
+        label: 'Action History',
+        icon: <Clock className="w-4 h-4" />,
+        path: '/admin/digital-signage/operations/history',
+      },
+      {
+        id: 'digital-signage-problems',
+        label: 'Problems',
+        icon: <AlertTriangle className="w-4 h-4" />,
+        path: '/admin/digital-signage/operations/problems',
+      },
       {
         id: 'digital-signage-media-sources',
         label: 'Media Sources',

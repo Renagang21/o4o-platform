@@ -42,7 +42,7 @@ export const marketTrialManifest = {
       'MarketTrialForum',
       'MarketTrialDecision',
     ],
-    services: ['MarketTrialService', 'MarketTrialDecisionService'],
+    services: ['MarketTrialService', 'MarketTrialDecisionService', 'MarketTrialForumService'],
     controllers: ['MarketTrialController'],
     routesExport: 'createRoutes',
   },
@@ -88,6 +88,12 @@ export const marketTrialManifest = {
       description: 'Market Trial 의사 표현(계속/중단) 권한',
       category: 'market-trial',
     },
+    {
+      id: 'market-trial.forum',
+      name: 'Market Trial Forum 접근',
+      description: 'Market Trial Forum 조회/작성 권한',
+      category: 'market-trial',
+    },
   ],
 
   // ===== Menus =====
@@ -97,7 +103,7 @@ export const marketTrialManifest = {
 
   // ===== Exposes =====
   exposes: {
-    services: ['MarketTrialService', 'MarketTrialDecisionService'],
+    services: ['MarketTrialService', 'MarketTrialDecisionService', 'MarketTrialForumService'],
     types: ['MarketTrial', 'MarketTrialParticipant', 'MarketTrialForum', 'MarketTrialDecision'],
     events: [],  // Future
   },
