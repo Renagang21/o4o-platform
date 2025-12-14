@@ -149,6 +149,12 @@ const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
+// LMS-Marketing Pages (Phase R10 & R11)
+const MarketingPublisherRouter = lazy(() => import('@/pages/marketing/publisher/MarketingPublisherRouter'));
+const OnboardingHome = lazy(() => import('@/pages/marketing/onboarding/OnboardingHome'));
+const SupplierProfileForm = lazy(() => import('@/pages/marketing/onboarding/SupplierProfileForm'));
+const AutomationSettings = lazy(() => import('@/pages/marketing/automation/AutomationSettings'));
+
 // Yaksa Admin Hub (Phase 19-D)
 const YaksaAdminHub = lazy(() => import('@/pages/yaksa/YaksaAdminHub'));
 
@@ -1220,6 +1226,38 @@ function App() {
                             <YaksaAdminHub />
                           </Suspense>
                         </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* LMS-Marketing - Publisher (Phase R10) */}
+                    <Route path="/admin/marketing/publisher/*" element={
+                      <AdminProtectedRoute requiredPermissions={['marketing.write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MarketingPublisherRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* LMS-Marketing - Onboarding & Automation (Phase R11) */}
+                    <Route path="/admin/marketing/onboarding" element={
+                      <AdminProtectedRoute requiredPermissions={['marketing.read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OnboardingHome />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/marketing/onboarding/profile" element={
+                      <AdminProtectedRoute requiredPermissions={['marketing.write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierProfileForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/marketing/automation" element={
+                      <AdminProtectedRoute requiredPermissions={['marketing.manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AutomationSettings />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
 

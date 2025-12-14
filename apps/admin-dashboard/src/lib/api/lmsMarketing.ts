@@ -193,6 +193,76 @@ export interface UpdateSurveyCampaignDto {
   metadata?: Record<string, unknown>;
 }
 
+// Phase R11: Onboarding Types
+export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
+
+export interface OnboardingChecklistItem {
+  id: string;
+  label: string;
+  completed: boolean;
+  completedAt?: string;
+}
+
+export interface SupplierProfile {
+  id: string;
+  supplierId: string;
+  brandName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  categories: string[];
+  productTypes: string[];
+  region?: string;
+  onboardingStatus: OnboardingStatus;
+  onboardingChecklist: OnboardingChecklistItem[];
+  onboardingCompletedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateSupplierProfileDto {
+  supplierId: string;
+  brandName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  categories?: string[];
+  productTypes?: string[];
+  region?: string;
+}
+
+export interface OnboardingChecklistResponse {
+  items: OnboardingChecklistItem[];
+  completedCount: number;
+  totalCount: number;
+  progressPercent: number;
+}
+
+// Phase R11: Automation Types
+export interface AutomationSettings {
+  autoPublishScheduled: boolean;
+  autoEndExpired: boolean;
+  autoPauseLowEngagement: boolean;
+  lowEngagementThreshold: number;
+}
+
+export interface AutomationLogEntry {
+  timestamp: string;
+  ruleType: string;
+  campaignId: string;
+  campaignTitle: string;
+  campaignType: 'product' | 'quiz' | 'survey';
+  action: string;
+  success: boolean;
+  error?: string;
+}
+
+export interface AutomationRunResult {
+  rulesExecuted: string[];
+  totalProcessed: number;
+  totalSuccessful: number;
+  totalFailed: number;
+  logs: AutomationLogEntry[];
+}
+
 // Insights Types
 export interface SupplierDashboardSummary {
   supplierId: string;
@@ -540,6 +610,117 @@ export const insightsApi = {
     } catch (error) {
       console.error('Failed to export data:', error);
       return { success: false, error: 'Failed to export data' };
+    }
+  },
+};
+
+// ===== Onboarding API (Phase R11) =====
+
+export const onboardingApi = {
+  async getProfile(supplierId: string): Promise<ApiResponse<SupplierProfile>> {
+    try {
+      const response = await authClient.api.get(`${API_BASE}/onboarding/profile?supplierId=${supplierId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to get profile:', error);
+      return { success: false, error: 'Failed to get profile' };
+    }
+  },
+
+  async updateProfile(dto: UpdateSupplierProfileDto): Promise<ApiResponse<SupplierProfile>> {
+    try {
+      const response = await authClient.api.post(`${API_BASE}/onboarding/profile`, dto);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      return { success: false, error: 'Failed to update profile' };
+    }
+  },
+
+  async getChecklist(supplierId: string): Promise<ApiResponse<OnboardingChecklistResponse>> {
+    try {
+      const response = await authClient.api.get(`${API_BASE}/onboarding/checklist?supplierId=${supplierId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to get checklist:', error);
+      return { success: false, error: 'Failed to get checklist' };
+    }
+  },
+
+  async markComplete(supplierId: string): Promise<ApiResponse<SupplierProfile>> {
+    try {
+      const response = await authClient.api.post(`${API_BASE}/onboarding/complete`, { supplierId });
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to mark complete:', error);
+      return { success: false, error: 'Failed to mark complete' };
+    }
+  },
+
+  async trackDashboardView(supplierId: string): Promise<ApiResponse<SupplierProfile>> {
+    try {
+      const response = await authClient.api.post(`${API_BASE}/onboarding/track-dashboard`, { supplierId });
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to track dashboard view:', error);
+      return { success: false, error: 'Failed to track dashboard view' };
+    }
+  },
+};
+
+// ===== Automation API (Phase R11) =====
+
+export const automationApi = {
+  async getSettings(): Promise<ApiResponse<AutomationSettings>> {
+    try {
+      const response = await authClient.api.get(`${API_BASE}/automation/settings`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to get automation settings:', error);
+      return { success: false, error: 'Failed to get automation settings' };
+    }
+  },
+
+  async updateSettings(settings: Partial<AutomationSettings>): Promise<ApiResponse<AutomationSettings>> {
+    try {
+      const response = await authClient.api.post(`${API_BASE}/automation/settings`, settings);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to update automation settings:', error);
+      return { success: false, error: 'Failed to update automation settings' };
+    }
+  },
+
+  async getLogs(options?: { limit?: number }): Promise<ApiResponse<AutomationLogEntry[]>> {
+    try {
+      const params = new URLSearchParams();
+      if (options?.limit) params.append('limit', options.limit.toString());
+      const url = `${API_BASE}/automation/logs${params.toString() ? `?${params}` : ''}`;
+      const response = await authClient.api.get(url);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to get automation logs:', error);
+      return { success: false, error: 'Failed to get automation logs' };
+    }
+  },
+
+  async clearLogs(): Promise<ApiResponse<void>> {
+    try {
+      await authClient.api.delete(`${API_BASE}/automation/logs`);
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to clear automation logs:', error);
+      return { success: false, error: 'Failed to clear automation logs' };
+    }
+  },
+
+  async runAutomation(): Promise<ApiResponse<AutomationRunResult>> {
+    try {
+      const response = await authClient.api.post(`${API_BASE}/automation/run`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Failed to run automation:', error);
+      return { success: false, error: 'Failed to run automation' };
     }
   },
 };
