@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
-import type { Block, User } from '@o4o/types';
+import type { Block } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 
 export enum PostStatus {
@@ -53,20 +53,16 @@ export class ForumPost {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.PUBLISHED })
   status!: PostStatus;
 
-  // Note: categoryId uses camelCase in DB (from migration 001)
   @Column({ type: 'uuid' })
   categoryId!: string;
 
-  // Note: author_id uses snake_case in DB (from migration 001)
   @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
-  // Note: organization_id uses snake_case in DB (from migration 004)
-  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   organizationId?: string;
 
-  // Note: is_organization_exclusive uses snake_case in DB (from migration 004)
-  @Column({ name: 'is_organization_exclusive', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
   @Column({ type: 'boolean', default: false })
@@ -93,23 +89,18 @@ export class ForumPost {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: ForumPostMetadata;
 
-  // Note: published_at uses snake_case in DB (from migration 001)
   @Column({ name: 'published_at', type: 'timestamp', nullable: true })
   publishedAt?: Date;
 
-  // Note: last_comment_at uses snake_case in DB (from migration 004)
-  @Column({ name: 'last_comment_at', type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastCommentAt?: Date;
 
-  // Note: last_comment_by uses snake_case in DB (from migration 004)
-  @Column({ name: 'last_comment_by', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   lastCommentBy?: string;
 
-  // Note: created_at uses snake_case in DB (from migration 001)
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  // Note: updated_at uses snake_case in DB (from migration 001)
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
@@ -120,14 +111,14 @@ export class ForumPost {
 
   @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
-  author?: User;
+  author?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('User', { nullable: true })
-  @JoinColumn({ name: 'last_comment_by' })
-  lastCommenter?: User;
+  @JoinColumn({ name: 'lastCommentBy' })
+  lastCommenter?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('Organization', { nullable: true })
-  @JoinColumn({ name: 'organization_id' })
+  @JoinColumn({ name: 'organizationId' })
   organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumComment removed to prevent circular dependency

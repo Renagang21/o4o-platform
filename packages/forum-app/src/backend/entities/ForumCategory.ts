@@ -8,7 +8,6 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from '@o4o/types';
 
 @Entity('forum_category')
 @Index(['isActive', 'sortOrder'])
@@ -44,30 +43,28 @@ export class ForumCategory {
   @Column({ type: 'int', default: 0 })
   postCount!: number;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'created_by', type: 'uuid', nullable: true })
   createdBy?: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
   organizationId?: string;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'is_organization_exclusive', type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
-  // Note: created_at uses snake_case in DB (from migration 001)
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  // Note: updated_at uses snake_case in DB (from migration 001)
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Relations
   @ManyToOne('User', { nullable: true })
-  @JoinColumn({ name: 'createdBy' })
-  creator?: User;
+  @JoinColumn({ name: 'created_by' })
+  creator?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('Organization', { nullable: true })
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumPost removed to prevent circular dependency

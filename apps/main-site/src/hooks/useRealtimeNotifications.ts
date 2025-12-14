@@ -67,11 +67,14 @@ const SSE_ENDPOINT = '/api/v1/forum/notifications/stream';
  * Automatically handles connection, reconnection, and cleanup.
  *
  * @example
+ * ```tsx
  * const { isConnected, lastNotification } = useRealtimeNotifications({
  *   onNotification: (data) => {
+ *     // Increment unread count, show toast, etc.
  *     console.log('New notification:', data.message);
  *   },
  * });
+ * ```
  */
 export function useRealtimeNotifications(
   options: UseRealtimeNotificationsOptions = {}
@@ -113,8 +116,8 @@ export function useRealtimeNotifications(
           onNotification?.(parsed.data);
         }
         // Heartbeat is just for keeping connection alive
-      } catch (err) {
-        console.error('[SSE] Failed to parse message:', err);
+      } catch {
+        // Ignore parse errors
       }
     },
     [onNotification]
@@ -127,14 +130,12 @@ export function useRealtimeNotifications(
 
     try {
       const url = buildUrl();
-      // SSE connection initiated
 
       const eventSource = new EventSource(url, {
         withCredentials: true, // Include auth cookies
       });
 
       eventSource.onopen = () => {
-        // SSE connected successfully
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;
@@ -143,8 +144,7 @@ export function useRealtimeNotifications(
 
       eventSource.onmessage = handleMessage;
 
-      eventSource.onerror = (event) => {
-        console.error('[SSE] Connection error:', event);
+      eventSource.onerror = () => {
         setIsConnected(false);
         onConnectionChange?.(false);
 
@@ -156,7 +156,6 @@ export function useRealtimeNotifications(
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           const delay = reconnectDelay * reconnectAttemptsRef.current;
-          // SSE reconnecting after delay
 
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
@@ -168,7 +167,6 @@ export function useRealtimeNotifications(
 
       eventSourceRef.current = eventSource;
     } catch (err) {
-      console.error('[SSE] Failed to connect:', err);
       setError(err instanceof Error ? err : new Error('Connection failed'));
     }
   }, [

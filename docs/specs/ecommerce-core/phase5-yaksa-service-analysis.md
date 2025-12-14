@@ -107,7 +107,7 @@ MembershipYear 동기화
 ### 4.2 결제 Entity 구조
 
 ```typescript
-// FeePayment Entity
+// FeePayment Entity (Phase Y 완료 후)
 {
   id: string;
   invoiceId: string;         // 청구서 FK
@@ -116,16 +116,17 @@ MembershipYear 동기화
   method: PaymentMethod;
   status: PaymentStatus;
   receiptNumber: string;
+  ecommerceOrderId?: string; // ✅ Phase Y에서 Service 연결 완료
   // ... PG 정보
-  // ❌ ecommerceOrderId 없음
 }
 ```
 
-### 4.3 문제점
+### 4.3 현황 (Phase Y 완료)
 
-- E-commerce Core와 완전 분리
-- 매출 집계 시 별도 조회 필요
-- 통합 결제 통계 불가
+- ✅ Entity에 ecommerceOrderId 필드 추가됨 (Phase 5)
+- ✅ CreatePaymentDto에 ecommerceOrderId 필드 추가됨 (Phase Y)
+- ✅ findByEcommerceOrderId() 메서드 추가됨 (Phase Y)
+- ✅ 통합 결제 통계 가능
 
 ---
 

@@ -1,12 +1,16 @@
 /**
  * Influencer Routine Controller
  *
+ * Phase 9-C: Core v2 정렬
+ * - DTO import 정리
+ *
  * Handles HTTP requests for influencer routine management
+ * API: /api/v1/partner/routines/*
  */
 
 import type { Request, Response } from 'express';
 import { InfluencerRoutineService } from '../services/influencer-routine.service.js';
-import type { CreateRoutineDto, UpdateRoutineDto } from '../../types.js';
+import type { CreateRoutineDto, UpdateRoutineDto } from '../dto/index.js';
 
 export class InfluencerRoutineController {
   private routineService: InfluencerRoutineService;

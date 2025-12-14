@@ -193,76 +193,6 @@ export interface UpdateSurveyCampaignDto {
   metadata?: Record<string, unknown>;
 }
 
-// Phase R11: Onboarding Types
-export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
-
-export interface OnboardingChecklistItem {
-  id: string;
-  label: string;
-  completed: boolean;
-  completedAt?: string;
-}
-
-export interface SupplierProfile {
-  id: string;
-  supplierId: string;
-  brandName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  categories: string[];
-  productTypes: string[];
-  region?: string;
-  onboardingStatus: OnboardingStatus;
-  onboardingChecklist: OnboardingChecklistItem[];
-  onboardingCompletedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UpdateSupplierProfileDto {
-  supplierId: string;
-  brandName?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  categories?: string[];
-  productTypes?: string[];
-  region?: string;
-}
-
-export interface OnboardingChecklistResponse {
-  items: OnboardingChecklistItem[];
-  completedCount: number;
-  totalCount: number;
-  progressPercent: number;
-}
-
-// Phase R11: Automation Types
-export interface AutomationSettings {
-  autoPublishScheduled: boolean;
-  autoEndExpired: boolean;
-  autoPauseLowEngagement: boolean;
-  lowEngagementThreshold: number;
-}
-
-export interface AutomationLogEntry {
-  timestamp: string;
-  ruleType: string;
-  campaignId: string;
-  campaignTitle: string;
-  campaignType: 'product' | 'quiz' | 'survey';
-  action: string;
-  success: boolean;
-  error?: string;
-}
-
-export interface AutomationRunResult {
-  rulesExecuted: string[];
-  totalProcessed: number;
-  totalSuccessful: number;
-  totalFailed: number;
-  logs: AutomationLogEntry[];
-}
-
 // Insights Types
 export interface SupplierDashboardSummary {
   supplierId: string;
@@ -614,7 +544,54 @@ export const insightsApi = {
   },
 };
 
-// ===== Onboarding API (Phase R11) =====
+// ===== Onboarding Types =====
+
+export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
+
+export interface OnboardingChecklistItem {
+  id: string;
+  label: string;
+  completed: boolean;
+  completedAt?: string;
+}
+
+export interface SupplierProfile {
+  id: string;
+  supplierId: string;
+  brandName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  categories: string[];
+  productTypes: string[];
+  region: string | null;
+  onboardingStatus: OnboardingStatus;
+  onboardingChecklist: OnboardingChecklistItem[];
+  onboardingCompletedAt: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateSupplierProfileDto {
+  supplierId: string;
+  brandName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  categories?: string[];
+  productTypes?: string[];
+  region?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface OnboardingChecklistResponse {
+  items: OnboardingChecklistItem[];
+  completedCount: number;
+  totalCount: number;
+  progressPercent: number;
+  status: OnboardingStatus;
+}
+
+// ===== Onboarding API =====
 
 export const onboardingApi = {
   async getProfile(supplierId: string): Promise<ApiResponse<SupplierProfile>> {
@@ -622,8 +599,8 @@ export const onboardingApi = {
       const response = await authClient.api.get(`${API_BASE}/onboarding/profile?supplierId=${supplierId}`);
       return { success: true, data: response.data };
     } catch (error) {
-      console.error('Failed to get profile:', error);
-      return { success: false, error: 'Failed to get profile' };
+      console.error('Failed to get supplier profile:', error);
+      return { success: false, error: 'Failed to get supplier profile' };
     }
   },
 
@@ -632,8 +609,8 @@ export const onboardingApi = {
       const response = await authClient.api.post(`${API_BASE}/onboarding/profile`, dto);
       return { success: true, data: response.data };
     } catch (error) {
-      console.error('Failed to update profile:', error);
-      return { success: false, error: 'Failed to update profile' };
+      console.error('Failed to update supplier profile:', error);
+      return { success: false, error: 'Failed to update supplier profile' };
     }
   },
 
@@ -642,8 +619,8 @@ export const onboardingApi = {
       const response = await authClient.api.get(`${API_BASE}/onboarding/checklist?supplierId=${supplierId}`);
       return { success: true, data: response.data };
     } catch (error) {
-      console.error('Failed to get checklist:', error);
-      return { success: false, error: 'Failed to get checklist' };
+      console.error('Failed to get onboarding checklist:', error);
+      return { success: false, error: 'Failed to get onboarding checklist' };
     }
   },
 
@@ -652,15 +629,15 @@ export const onboardingApi = {
       const response = await authClient.api.post(`${API_BASE}/onboarding/complete`, { supplierId });
       return { success: true, data: response.data };
     } catch (error) {
-      console.error('Failed to mark complete:', error);
-      return { success: false, error: 'Failed to mark complete' };
+      console.error('Failed to mark onboarding complete:', error);
+      return { success: false, error: 'Failed to mark onboarding complete' };
     }
   },
 
-  async trackDashboardView(supplierId: string): Promise<ApiResponse<SupplierProfile>> {
+  async trackDashboardView(supplierId: string): Promise<ApiResponse<void>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/onboarding/track-dashboard`, { supplierId });
-      return { success: true, data: response.data };
+      await authClient.api.post(`${API_BASE}/onboarding/track-dashboard`, { supplierId });
+      return { success: true };
     } catch (error) {
       console.error('Failed to track dashboard view:', error);
       return { success: false, error: 'Failed to track dashboard view' };
@@ -668,7 +645,44 @@ export const onboardingApi = {
   },
 };
 
-// ===== Automation API (Phase R11) =====
+// ===== Automation Types =====
+
+export type AutomationRuleType =
+  | 'auto_publish_scheduled'
+  | 'auto_end_expired'
+  | 'auto_pause_low_engagement'
+  | 'auto_boost_high_performing';
+
+export interface AutomationSettings {
+  autoPublishScheduled: boolean;
+  autoEndExpired: boolean;
+  autoPauseLowEngagement: boolean;
+  lowEngagementThreshold: number;
+  autoPauseDaysWithoutEngagement: number;
+  autoBoostHighPerforming: boolean;
+  highPerformingThreshold: number;
+}
+
+export interface AutomationLogEntry {
+  timestamp: string;
+  ruleType: AutomationRuleType;
+  campaignType: 'quiz' | 'survey';
+  campaignId: string;
+  campaignTitle: string;
+  action: string;
+  success: boolean;
+  error?: string;
+}
+
+export interface AutomationRunResult {
+  ruleType: AutomationRuleType;
+  processed: number;
+  successful: number;
+  failed: number;
+  logs: AutomationLogEntry[];
+}
+
+// ===== Automation API =====
 
 export const automationApi = {
   async getSettings(): Promise<ApiResponse<AutomationSettings>> {
@@ -691,10 +705,11 @@ export const automationApi = {
     }
   },
 
-  async getLogs(options?: { limit?: number }): Promise<ApiResponse<AutomationLogEntry[]>> {
+  async getLogs(options?: { limit?: number; ruleType?: AutomationRuleType }): Promise<ApiResponse<AutomationLogEntry[]>> {
     try {
       const params = new URLSearchParams();
-      if (options?.limit) params.append('limit', options.limit.toString());
+      if (options?.limit) params.append('limit', String(options.limit));
+      if (options?.ruleType) params.append('ruleType', options.ruleType);
       const url = `${API_BASE}/automation/logs${params.toString() ? `?${params}` : ''}`;
       const response = await authClient.api.get(url);
       return { success: true, data: response.data };
@@ -714,7 +729,7 @@ export const automationApi = {
     }
   },
 
-  async runAutomation(): Promise<ApiResponse<AutomationRunResult>> {
+  async runAutomation(): Promise<ApiResponse<{ results: AutomationRunResult[]; totalProcessed: number; totalSuccessful: number; totalFailed: number }>> {
     try {
       const response = await authClient.api.post(`${API_BASE}/automation/run`);
       return { success: true, data: response.data };

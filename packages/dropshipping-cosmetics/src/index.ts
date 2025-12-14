@@ -1,6 +1,11 @@
 /**
  * Dropshipping Cosmetics Extension
  *
+ * Phase 9-C: Core v2 정렬
+ * - ProductType.COSMETICS 기반 확장
+ * - before/after hooks 패턴 사용
+ * - Core Validation Hook 시스템 통합
+ *
  * Main entry point for the cosmetics extension package
  *
  * @package @o4o-apps/dropshipping-cosmetics
@@ -15,8 +20,14 @@ export { cosmeticsExtensionManifest, manifest, default as manifestDefault } from
 export * from './types.js';
 export * as lifecycle from './lifecycle/index.js';
 
-// Extension (Phase 2)
+// Extension (Phase 9-C: Core v2 hooks)
 export { cosmeticsExtension } from './extension.js';
+export type {
+  CosmeticsProductMetadata,
+} from './extension.js';
+
+// DTOs (Phase 9-C)
+export * from './backend/dto/index.js';
 
 /**
  * Routes factory compatible with Module Loader

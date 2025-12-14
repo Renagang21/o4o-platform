@@ -9,7 +9,6 @@ import {
   Index
 } from 'typeorm';
 import { ForumPost } from './ForumPost.js';
-import type { User } from '@o4o/types';
 
 export enum CommentStatus {
   PUBLISHED = 'publish',
@@ -26,47 +25,44 @@ export class ForumComment {
   @Column({ type: 'text' })
   content!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ name: 'post_id', type: 'uuid' })
   postId!: string;
 
-  // Note: author_id uses snake_case in DB (from migration 001)
   @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'parent_id', type: 'uuid', nullable: true })
   parentId?: string;
 
   @Column({ type: 'enum', enum: CommentStatus, default: CommentStatus.PUBLISHED })
   status!: CommentStatus;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ name: 'like_count', type: 'int', default: 0 })
   likeCount!: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ name: 'reply_count', type: 'int', default: 0 })
   replyCount!: number;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'is_edited', type: 'boolean', default: false })
   isEdited!: boolean;
 
-  // Note: created_at uses snake_case in DB (from migration 001)
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  // Note: updated_at uses snake_case in DB (from migration 001)
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Relations
   @ManyToOne('ForumPost', { lazy: true })
-  @JoinColumn({ name: 'postId' })
+  @JoinColumn({ name: 'post_id' })
   post?: Promise<ForumPost>;
 
   @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
-  author?: User;
+  author?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('ForumComment', { nullable: true, lazy: true })
-  @JoinColumn({ name: 'parentId' })
+  @JoinColumn({ name: 'parent_id' })
   parent?: Promise<ForumComment>;
 
   // Note: OneToMany relationship with replies removed to prevent circular dependency

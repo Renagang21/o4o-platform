@@ -12,7 +12,11 @@ import {
   SettlementBatchStatus,
 } from '../entities/PartnerSettlementBatch.entity.js';
 import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.entity.js';
+import { ConversionSource } from '../entities/PartnerConversion.entity.js';
 import { Partner } from '../entities/Partner.entity.js';
+
+// 정산 대상에서 제외되는 전환 소스
+const SETTLEMENT_EXCLUDED_SOURCES = [ConversionSource.PHARMACY];
 
 export interface CreateSettlementBatchDto {
   partnerId: string;
@@ -161,6 +165,9 @@ export class PartnerSettlementService {
 
   /**
    * 확정 커미션을 배치에 추가
+   *
+   * NOTE: pharmacy 소스의 전환에서 발생한 커미션은 정산 대상에서 제외됩니다.
+   * (약국 활동은 단순 기록 용도이며 커미션 대상이 아님)
    */
   async addCommissionsToBatch(batchId: string): Promise<PartnerSettlementBatch | null> {
     const batch = await this.findById(batchId);
@@ -171,6 +178,7 @@ export class PartnerSettlementService {
     }
 
     // 확정된 커미션 중 정산되지 않은 것들을 배치에 추가
+    // IMPORTANT: pharmacy 소스의 전환에서 발생한 커미션은 제외
     const result = await this.commissionRepository
       .createQueryBuilder()
       .update(PartnerCommission)
@@ -179,6 +187,15 @@ export class PartnerSettlementService {
       .andWhere('status = :status', { status: CommissionStatus.CONFIRMED })
       .andWhere('settlementBatchId IS NULL')
       .andWhere('createdAt <= :periodEnd', { periodEnd: batch.periodEnd })
+      // pharmacy 소스 제외 (conversionId로 연결된 전환의 소스 확인)
+      // NOTE: conversionId가 NULL이거나 pharmacy 소스가 아닌 경우만 포함
+      .andWhere(
+        `(conversionId IS NULL OR conversionId NOT IN (
+          SELECT id FROM partner_conversions
+          WHERE conversion_source IN (:...excludedSources)
+        ))`,
+        { excludedSources: SETTLEMENT_EXCLUDED_SOURCES.map(s => s.toString()) }
+      )
       .execute();
 
     // 배치 통계 업데이트

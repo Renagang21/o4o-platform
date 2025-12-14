@@ -2,6 +2,38 @@
  * OrderRelayService
  *
  * 주문 relay 전체 로직 처리
+ *
+ * ## E-commerce Core 연계 (Phase 3)
+ *
+ * Dropshipping Core는 E-commerce Core의 `OrderType === 'dropshipping'`인
+ * 주문만 처리합니다.
+ *
+ * ### 연계 흐름
+ *
+ * ```
+ * EcommerceOrder (orderType: 'dropshipping')
+ *        ↓
+ *        ↓ ecommerceOrderId (FK)
+ *        ↓
+ * OrderRelay (Dropshipping 특화 Relay 정보)
+ *        ↓
+ * SellerListing → SupplierOffer
+ * ```
+ *
+ * ### 핵심 연계 메서드
+ *
+ * - `createOrder({ ecommerceOrderId })`: EcommerceOrder와 연결된 OrderRelay 생성
+ * - `findByEcommerceOrderId()`: EcommerceOrder ID로 관련 OrderRelay 목록 조회
+ *
+ * ### 역할 분담
+ *
+ * | 책임 영역         | E-commerce Core | Dropshipping Core |
+ * |------------------|-----------------|-------------------|
+ * | 판매 원장         | ✓               |                   |
+ * | 결제 처리         | ✓               |                   |
+ * | 공급자 Relay      |                 | ✓                 |
+ * | 배송 추적         |                 | ✓                 |
+ * | 판매자-공급자 정산 |                 | ✓                 |
  */
 
 import { Injectable } from '@nestjs/common';
@@ -57,43 +89,15 @@ export class OrderRelayService {
   }
 
   /**
-   * E-commerce Order ID로 조회 (Phase 4)
-   *
-   * E-commerce Core의 EcommerceOrder와 연결된 OrderRelay를 조회합니다.
-   *
-   * @param ecommerceOrderId - E-commerce Core의 주문 ID
+   * E-commerce Order ID로 조회
+   * - E-commerce Core의 EcommerceOrder와 연결된 OrderRelay 목록 반환
    */
-  async findByEcommerceOrderId(
-    ecommerceOrderId: string
-  ): Promise<OrderRelay | null> {
-    return await this.orderRepository.findOne({
+  async findByEcommerceOrderId(ecommerceOrderId: string): Promise<OrderRelay[]> {
+    return await this.orderRepository.find({
       where: { ecommerceOrderId },
       relations: ['listing', 'listing.seller', 'listing.offer'],
+      order: { createdAt: 'DESC' },
     });
-  }
-
-  /**
-   * E-commerce Order ID 목록으로 조회 (Phase 4)
-   *
-   * 여러 EcommerceOrder에 연결된 OrderRelay 목록을 조회합니다.
-   * SellerOps의 OrderIntegrationService에서 사용합니다.
-   *
-   * @param ecommerceOrderIds - E-commerce Core 주문 ID 배열
-   */
-  async findByEcommerceOrderIds(
-    ecommerceOrderIds: string[]
-  ): Promise<OrderRelay[]> {
-    if (ecommerceOrderIds.length === 0) {
-      return [];
-    }
-
-    return await this.orderRepository
-      .createQueryBuilder('relay')
-      .leftJoinAndSelect('relay.listing', 'listing')
-      .leftJoinAndSelect('listing.seller', 'seller')
-      .leftJoinAndSelect('listing.offer', 'offer')
-      .where('relay.ecommerceOrderId IN (:...ids)', { ids: ecommerceOrderIds })
-      .getMany();
   }
 
   /**

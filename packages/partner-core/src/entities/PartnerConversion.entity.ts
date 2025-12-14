@@ -33,6 +33,17 @@ export enum ConversionStatus {
   REFUNDED = 'refunded',     // 환불됨
 }
 
+/**
+ * 전환 소스
+ *
+ * 어디에서 발생한 전환인지 구분합니다.
+ */
+export enum ConversionSource {
+  PARTNER = 'partner',     // 파트너 링크를 통한 전환 (기본값)
+  PHARMACY = 'pharmacy',   // 약국 오프라인 터치포인트를 통한 전환
+  SYSTEM = 'system',       // 시스템 자동 생성 (배치 처리 등)
+}
+
 @Entity('partner_conversions')
 export class PartnerConversion {
   @PrimaryGeneratedColumn('uuid')
@@ -92,6 +103,24 @@ export class PartnerConversion {
     default: ConversionStatus.PENDING,
   })
   status!: ConversionStatus;
+
+  /**
+   * 전환 소스 (partner, pharmacy, system)
+   */
+  @Index()
+  @Column({
+    type: 'varchar',
+    length: 20,
+    default: ConversionSource.PARTNER,
+  })
+  conversionSource!: ConversionSource;
+
+  /**
+   * 약국 ID (pharmacy 소스인 경우)
+   */
+  @Index()
+  @Column({ type: 'uuid', nullable: true })
+  pharmacyId?: string;
 
   /**
    * 귀속 기간 (클릭 후 며칠 내 전환인지)

@@ -23,13 +23,6 @@ export interface PharmacyUser {
   pharmacyLicenseNumber?: string;
   pharmacyLicenseExpiry?: Date;
   pharmacyName?: string;
-  // 마약류 취급 관련
-  narcoticsLicenseNumber?: string;
-  narcoticsLicenseExpiry?: Date;
-  narcoticsLicenseType?: 'type1' | 'type2' | 'type3'; // 마약류 관리자 유형
-  // 콜드체인 취급 관련
-  coldChainCertified?: boolean;
-  coldChainCertificationExpiry?: Date;
 }
 
 export interface PharmacyAuthOptions {
@@ -39,20 +32,12 @@ export interface PharmacyAuthOptions {
   checkExpiry?: boolean;
   /** 허용된 역할 목록 (기본: ['pharmacy']) */
   allowedRoles?: string[];
-  /** 마약류 취급 라이선스 필요 여부 */
-  requireNarcoticsLicense?: boolean;
-  /** 마약류 관리자 유형 제한 (특정 유형만 허용) */
-  allowedNarcoticsTypes?: ('type1' | 'type2' | 'type3')[];
-  /** 콜드체인 인증 필요 여부 */
-  requireColdChainCertification?: boolean;
 }
 
 const DEFAULT_OPTIONS: PharmacyAuthOptions = {
   requireLicense: true,
   checkExpiry: true,
   allowedRoles: ['pharmacy'],
-  requireNarcoticsLicense: false,
-  requireColdChainCertification: false,
 };
 
 @Injectable()
@@ -87,22 +72,10 @@ export class PharmacyAuthGuard implements CanActivate {
       this.validateLicense(user, options.checkExpiry || true);
     }
 
-    // 6. 마약류 라이선스 검증
-    if (options.requireNarcoticsLicense) {
-      this.validateNarcoticsLicense(user, options.allowedNarcoticsTypes);
-    }
-
-    // 7. 콜드체인 인증 검증
-    if (options.requireColdChainCertification) {
-      this.validateColdChainCertification(user, options.checkExpiry || true);
-    }
-
-    // 8. Request에 약국 정보 추가
+    // 6. Request에 약국 정보 추가
     request.pharmacyId = user.pharmacyId;
     request.pharmacyLicenseNumber = user.pharmacyLicenseNumber;
     request.pharmacyName = user.pharmacyName;
-    request.narcoticsLicenseNumber = user.narcoticsLicenseNumber;
-    request.coldChainCertified = user.coldChainCertified;
 
     return true;
   }
@@ -156,59 +129,6 @@ export class PharmacyAuthGuard implements CanActivate {
       if (user.pharmacyLicenseExpiry < now) {
         throw new ForbiddenException(
           'Pharmacy license has expired. Please renew your license.',
-        );
-      }
-    }
-  }
-
-  private validateNarcoticsLicense(
-    user: PharmacyUser,
-    allowedTypes?: ('type1' | 'type2' | 'type3')[],
-  ): void {
-    // 마약류 라이선스 번호 확인
-    if (!user.narcoticsLicenseNumber) {
-      throw new ForbiddenException(
-        'Narcotics handling license required. Please register your narcotics license.',
-      );
-    }
-
-    // 마약류 관리자 유형 확인
-    if (allowedTypes && allowedTypes.length > 0) {
-      if (!user.narcoticsLicenseType || !allowedTypes.includes(user.narcoticsLicenseType)) {
-        throw new ForbiddenException(
-          `Narcotics license type must be one of: ${allowedTypes.join(', ')}`,
-        );
-      }
-    }
-
-    // 마약류 라이선스 만료일 확인
-    if (user.narcoticsLicenseExpiry) {
-      const now = new Date();
-      if (user.narcoticsLicenseExpiry < now) {
-        throw new ForbiddenException(
-          'Narcotics license has expired. Please renew your narcotics license.',
-        );
-      }
-    }
-  }
-
-  private validateColdChainCertification(
-    user: PharmacyUser,
-    checkExpiry: boolean,
-  ): void {
-    // 콜드체인 인증 확인
-    if (!user.coldChainCertified) {
-      throw new ForbiddenException(
-        'Cold chain certification required for this product.',
-      );
-    }
-
-    // 인증 만료일 확인
-    if (checkExpiry && user.coldChainCertificationExpiry) {
-      const now = new Date();
-      if (user.coldChainCertificationExpiry < now) {
-        throw new ForbiddenException(
-          'Cold chain certification has expired. Please renew your certification.',
         );
       }
     }

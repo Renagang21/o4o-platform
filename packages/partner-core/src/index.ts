@@ -28,6 +28,7 @@ export { PartnerClick } from './entities/PartnerClick.entity.js';
 export {
   PartnerConversion,
   ConversionStatus,
+  ConversionSource,
 } from './entities/PartnerConversion.entity.js';
 
 export {
@@ -128,6 +129,39 @@ export type {
   DeactivateContext,
   UninstallContext,
 } from './lifecycle/index.js';
+
+// ========================================
+// Receivers (Event Handlers)
+// ========================================
+export {
+  PharmacyEventReceiver,
+  type PharmacyEventPayload,
+  type PharmacyOrderEventPayload,
+  type CreatePharmacyConversionDto,
+  type PharmacyActivitySummary,
+} from './receivers/index.js';
+
+// ========================================
+// Utilities
+// ========================================
+export {
+  PARTNER_ALLOWED_PRODUCT_TYPES,
+  PARTNER_EXCLUDED_PRODUCT_TYPES,
+  isPartnerEligibleProductType,
+  isPartnerExcludedProductType,
+  isPharmaceuticalProductType,
+  validateProductTypeForPartner,
+  filterPartnerEligibleProducts,
+  filterPartnerExcludedProducts,
+  getProductTypeStats,
+  getAllowedProductTypes,
+  getExcludedProductTypes,
+  type PartnerAllowedProductType,
+  type PartnerExcludedProductType,
+  type ProductType,
+  type ProductTypeValidationResult,
+  type ProductTypeStats,
+} from './utils/index.js';
 
 // ========================================
 // Manifest

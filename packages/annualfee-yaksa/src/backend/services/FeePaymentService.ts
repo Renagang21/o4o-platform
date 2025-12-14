@@ -10,6 +10,8 @@ export interface CreatePaymentDto {
   amount: number;
   method: PaymentMethod;
   paidAt?: Date;
+  /** E-commerce Core 주문 ID - 연회비: subscription, 단일 결제: retail */
+  ecommerceOrderId?: string;
   // PG 결제 정보
   pgProvider?: string;
   transactionId?: string;
@@ -35,9 +37,12 @@ export interface PaymentFilters {
 }
 
 /**
- * FeePaymentService
+ * FeePaymentService - 회비 납부 관리 서비스
  *
- * 회비 납부 관리 서비스
+ * E-commerce Core 통합 (Phase Y):
+ * - 연회비 납부: OrderType = 'subscription'
+ * - 단일 결제: OrderType = 'retail'
+ * - ecommerceOrderId로 EcommerceOrder 연결
  */
 export class FeePaymentService {
   private repo: Repository<FeePayment>;
@@ -159,6 +164,14 @@ export class FeePaymentService {
   async findByReceiptNumber(receiptNumber: string): Promise<FeePayment | null> {
     return await this.repo.findOne({
       where: { receiptNumber },
+      relations: ['invoice'],
+    });
+  }
+
+  /** E-commerce Order ID로 조회 (Phase Y) */
+  async findByEcommerceOrderId(ecommerceOrderId: string): Promise<FeePayment | null> {
+    return await this.repo.findOne({
+      where: { ecommerceOrderId },
       relations: ['invoice'],
     });
   }

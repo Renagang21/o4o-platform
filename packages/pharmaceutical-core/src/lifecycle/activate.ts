@@ -29,12 +29,13 @@ export async function onActivate(dataSource: DataSource): Promise<void> {
   console.log('[pharmaceutical-core] - pharma.order.created');
   console.log('[pharmaceutical-core] - pharma.settlement.created');
 
-  // 3. Validation hooks 활성화
-  console.log('[pharmaceutical-core] Validation hooks enabled:');
-  console.log('[pharmaceutical-core] - validateOfferCreation: Only WHOLESALER/MANUFACTURER');
-  console.log('[pharmaceutical-core] - validateListingCreation: ALWAYS BLOCK');
-  console.log('[pharmaceutical-core] - validateOrderCreation: Only PHARMACY');
-  console.log('[pharmaceutical-core] - beforeCommissionApply: Max 2%');
+  // 3. Core v2 Hooks 활성화
+  console.log('[pharmaceutical-core] Core v2 hooks enabled:');
+  console.log('[pharmaceutical-core] - beforeOfferCreate: Only WHOLESALER/MANUFACTURER with license');
+  console.log('[pharmaceutical-core] - beforeListingCreate: ALWAYS BLOCKED (B2C prohibited)');
+  console.log('[pharmaceutical-core] - beforeOrderCreate: Only PHARMACY with license');
+  console.log('[pharmaceutical-core] - beforeSettlementCreate: SUPPLIER only (no seller settlement)');
+  console.log('[pharmaceutical-core] - beforeCommissionApply: Max 2% rate');
 
   console.log('[pharmaceutical-core] Activation completed');
 }

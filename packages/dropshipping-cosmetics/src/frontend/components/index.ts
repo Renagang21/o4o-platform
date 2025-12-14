@@ -1,6 +1,10 @@
 /**
  * Dropshipping-Cosmetics Frontend Components
  *
+ * Phase 9-C: Core v2 정렬
+ * - 화장품 Extension 전용 UI 컴포넌트
+ * - ProductType.COSMETICS 기반 제품 표시
+ *
  * Export all frontend components
  */
 

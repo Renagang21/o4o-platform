@@ -6,6 +6,44 @@
  * @package @o4o/pharmacyops
  */
 
+// =====================================================
+// Partner-Core Event Bridge
+// =====================================================
+export {
+  pharmacyEvents,
+  emitProductViewed,
+  emitProductClicked,
+  emitOrderCreated,
+  emitOrderCompleted,
+  emitOrderCancelled,
+  onPartnerEvent,
+  onPharmacyEvent,
+  onAllPharmacyEvents,
+  isPartnerEligibleProductType,
+  isPartnerExcludedProductType,
+  PARTNER_ALLOWED_PRODUCT_TYPES,
+  PARTNER_EXCLUDED_PRODUCT_TYPES,
+} from './pharmacy-events.js';
+
+export type {
+  PharmacyEvent,
+  PharmacyEventBase,
+  ProductViewedEvent,
+  ProductClickedEvent,
+  OrderCreatedEvent,
+  OrderCompletedEvent,
+  OrderCancelledEvent,
+  PartnerEligibleEvent,
+  PartnerAllowedProductType,
+  PartnerExcludedProductType,
+  ProductType,
+  PartnerEventHandler,
+} from './pharmacy-events.js';
+
+// =====================================================
+// Pharmacy Business Logic Hooks
+// =====================================================
+
 /**
  * 약국 라이선스 검증 훅
  *
@@ -179,94 +217,6 @@ export async function onSettlementAlert(
   // 2. 이메일/SMS 발송 (필요시)
 }
 
-// ========================================
-// Auto-Reorder Event Hooks (Phase 13-C)
-// ========================================
-
-/**
- * Auto-Reorder 생성 이벤트 타입
- */
-export interface AutoReorderGeneratedEvent {
-  pharmacyId: string;
-  candidateCount: number;
-  totalAmount: number;
-  criticalItems: number;
-  generatedAt: Date;
-}
-
-/**
- * Auto-Reorder 확정 이벤트 타입
- */
-export interface AutoReorderConfirmedEvent {
-  pharmacyId: string;
-  orderId: string;
-  items: Array<{
-    productId: string;
-    productName: string;
-    quantity: number;
-    supplierId: string;
-    unitPrice: number;
-  }>;
-  totalAmount: number;
-  confirmedAt: Date;
-}
-
-/**
- * 재고 부족 알림 이벤트 타입
- */
-export interface LowStockAlertEvent {
-  pharmacyId: string;
-  productId: string;
-  productName: string;
-  currentStock: number;
-  safetyStock: number;
-  urgency: 'critical' | 'high' | 'medium' | 'low';
-  detectedAt: Date;
-}
-
-/**
- * 자동발주 추천 생성 후 훅
- *
- * @param event 자동발주 생성 이벤트
- */
-export async function onAutoReorderGenerated(
-  event: AutoReorderGeneratedEvent,
-): Promise<void> {
-  // TODO: Implement auto-reorder generated actions
-  // 1. 관리자 대시보드 알림
-  // 2. 긴급 품목은 별도 알림
-  console.log('[PharmacyOps] Auto-reorder recommendations generated:', event);
-}
-
-/**
- * 자동발주 확정 후 훅
- *
- * @param event 자동발주 확정 이벤트
- */
-export async function onAutoReorderConfirmed(
-  event: AutoReorderConfirmedEvent,
-): Promise<void> {
-  // TODO: Implement auto-reorder confirmed actions
-  // 1. 주문 생성 (PharmacyOrderService 연동)
-  // 2. 재고 예약
-  // 3. 공급자 알림
-  console.log('[PharmacyOps] Auto-reorder confirmed:', event);
-}
-
-/**
- * 재고 부족 알림 훅
- *
- * @param event 재고 부족 이벤트
- */
-export async function onLowStockAlert(
-  event: LowStockAlertEvent,
-): Promise<void> {
-  // TODO: Implement low stock alert
-  // 1. 대시보드 위젯 업데이트
-  // 2. Critical 레벨은 즉시 알림
-  console.log('[PharmacyOps] Low stock alert:', event);
-}
-
 // Export all hooks
 export const pharmacyOpsHooks = {
   validatePharmacyLicense,
@@ -277,7 +227,4 @@ export const pharmacyOpsHooks = {
   onPharmacyDeliveryConfirm,
   onTemperatureAlert,
   onSettlementAlert,
-  onAutoReorderGenerated,
-  onAutoReorderConfirmed,
-  onLowStockAlert,
 };

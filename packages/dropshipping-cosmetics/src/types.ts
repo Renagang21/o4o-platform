@@ -1,7 +1,18 @@
 /**
  * Cosmetics Extension Types
+ *
+ * Phase 9-C: Core v2 정렬
+ * - ProductType enum 사용
+ * - CosmeticsMetadata를 Core와 정렬
  */
 
+// Re-export Core types
+export { ProductType, ProductStatus } from '@o4o/dropshipping-core';
+
+/**
+ * 화장품 메타데이터 타입
+ * Core ProductMaster.attributes의 cosmetics 확장 필드
+ */
 export interface CosmeticsMetadata {
   skinType?: string[];
   concerns?: string[];
@@ -77,17 +88,5 @@ export interface InfluencerRoutine {
   updatedAt: Date;
 }
 
-export interface CreateRoutineDto {
-  partnerId: string;
-  title: string;
-  description?: string;
-  skinType: string[];
-  concerns: string[];
-  timeOfUse: 'morning' | 'evening' | 'both';
-  routine: RoutineStep[];
-  tags?: string[];
-}
-
-export interface UpdateRoutineDto extends Partial<CreateRoutineDto> {
-  isPublished?: boolean;
-}
+// CreateRoutineDto, UpdateRoutineDto are now in backend/dto/index.ts
+// Re-exported from there via main index.ts
