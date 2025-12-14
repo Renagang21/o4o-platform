@@ -114,11 +114,11 @@ const ProductDetailPage: React.FC = () => {
         brandName: '네이처리퍼블릭',
         category: '세럼',
         price: 45000,
-        imageUrl: 'https://via.placeholder.com/400x400/e0f2fe/0891b2?text=Serum',
+        imageUrl: 'https://placehold.co/400x400/e0f2fe/0891b2?text=Serum',
         images: [
-          'https://via.placeholder.com/400x400/e0f2fe/0891b2?text=Main',
-          'https://via.placeholder.com/400x400/e0f2fe/0891b2?text=Side',
-          'https://via.placeholder.com/400x400/e0f2fe/0891b2?text=Back',
+          'https://placehold.co/400x400/e0f2fe/0891b2?text=Main',
+          'https://placehold.co/400x400/e0f2fe/0891b2?text=Side',
+          'https://placehold.co/400x400/e0f2fe/0891b2?text=Back',
         ],
         description:
           '히알루론산과 세라마이드가 풍부하게 함유된 고보습 세럼입니다. 건조하고 민감한 피부에 깊은 수분을 공급하고, 피부 장벽을 강화하여 외부 자극으로부터 보호합니다. 가볍고 산뜻한 텍스처로 끈적임 없이 빠르게 흡수됩니다.',
@@ -147,7 +147,7 @@ const ProductDetailPage: React.FC = () => {
             name: '비타민C 브라이트닝 앰플',
             brandName: '이니스프리',
             price: 52000,
-            imageUrl: 'https://via.placeholder.com/200x200/fef3c7/d97706?text=Ampoule',
+            imageUrl: 'https://placehold.co/200x200/fef3c7/d97706?text=Ampoule',
             rating: 4.6,
           },
           {
@@ -155,7 +155,7 @@ const ProductDetailPage: React.FC = () => {
             name: '수분 크림 50ml',
             brandName: '네이처리퍼블릭',
             price: 38000,
-            imageUrl: 'https://via.placeholder.com/200x200/dcfce7/16a34a?text=Cream',
+            imageUrl: 'https://placehold.co/200x200/dcfce7/16a34a?text=Cream',
             rating: 4.5,
           },
           {
@@ -163,7 +163,7 @@ const ProductDetailPage: React.FC = () => {
             name: '선스크린 SPF50+',
             brandName: '라로슈포제',
             price: 28000,
-            imageUrl: 'https://via.placeholder.com/200x200/fef9c3/ca8a04?text=Sun',
+            imageUrl: 'https://placehold.co/200x200/fef9c3/ca8a04?text=Sun',
             rating: 4.9,
           },
         ],

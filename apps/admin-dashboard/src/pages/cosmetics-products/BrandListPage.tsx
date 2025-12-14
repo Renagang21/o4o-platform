@@ -61,7 +61,7 @@ const BrandListPage: React.FC = () => {
         {
           id: 'brand-1',
           name: '네이처리퍼블릭',
-          logoUrl: 'https://via.placeholder.com/120x120/dcfce7/16a34a?text=NR',
+          logoUrl: 'https://placehold.co/120x120/dcfce7/16a34a?text=NR',
           country: '대한민국',
           description: '자연에서 찾은 건강한 아름다움을 추구하는 천연 화장품 브랜드',
           categories: ['스킨케어', '클렌저', '마스크팩'],
@@ -73,7 +73,7 @@ const BrandListPage: React.FC = () => {
         {
           id: 'brand-2',
           name: '이니스프리',
-          logoUrl: 'https://via.placeholder.com/120x120/e0f2fe/0891b2?text=INF',
+          logoUrl: 'https://placehold.co/120x120/e0f2fe/0891b2?text=INF',
           country: '대한민국',
           description: '제주의 청정 자연을 담은 천연 화장품 브랜드',
           categories: ['스킨케어', '메이크업', '바디케어'],
@@ -85,7 +85,7 @@ const BrandListPage: React.FC = () => {
         {
           id: 'brand-3',
           name: '라로슈포제',
-          logoUrl: 'https://via.placeholder.com/120x120/fef9c3/ca8a04?text=LRP',
+          logoUrl: 'https://placehold.co/120x120/fef9c3/ca8a04?text=LRP',
           country: '프랑스',
           description: '민감하고 까다로운 피부를 위한 더마 코스메틱 브랜드',
           categories: ['선케어', '스킨케어', '클렌저'],
@@ -97,7 +97,7 @@ const BrandListPage: React.FC = () => {
         {
           id: 'brand-4',
           name: '달바',
-          logoUrl: 'https://via.placeholder.com/120x120/fce7f3/ec4899?text=DBA',
+          logoUrl: 'https://placehold.co/120x120/fce7f3/ec4899?text=DBA',
           country: '대한민국',
           description: '화이트 트러플과 프리미엄 원료를 사용한 럭셔리 스킨케어',
           categories: ['스킨케어', '미스트'],
@@ -109,7 +109,7 @@ const BrandListPage: React.FC = () => {
         {
           id: 'brand-5',
           name: '코스알엑스',
-          logoUrl: 'https://via.placeholder.com/120x120/e0e7ff/6366f1?text=CSX',
+          logoUrl: 'https://placehold.co/120x120/e0e7ff/6366f1?text=CSX',
           country: '대한민국',
           description: '효능과 안전성을 중시하는 더마 코스메틱 브랜드',
           categories: ['스킨케어', '클렌저'],
@@ -121,7 +121,7 @@ const BrandListPage: React.FC = () => {
         {
           id: 'brand-6',
           name: '에스티로더',
-          logoUrl: 'https://via.placeholder.com/120x120/fef3c7/d97706?text=EL',
+          logoUrl: 'https://placehold.co/120x120/fef3c7/d97706?text=EL',
           country: '미국',
           description: '1946년 설립된 글로벌 프레스티지 뷰티 브랜드',
           categories: ['스킨케어', '메이크업', '향수'],
