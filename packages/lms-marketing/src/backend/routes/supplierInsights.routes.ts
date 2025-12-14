@@ -9,8 +9,12 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import { SupplierInsightsController } from '../controllers/SupplierInsightsController.js';
+import { initSupplierInsightsService } from '../services/SupplierInsightsService.js';
 
-export function createSupplierInsightsRoutes(_dataSource: DataSource): Router {
+export function createSupplierInsightsRoutes(dataSource: DataSource): Router {
+  // Initialize the service singleton
+  initSupplierInsightsService(dataSource);
+
   const router = Router();
   const controller = new SupplierInsightsController();
 
