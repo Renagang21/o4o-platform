@@ -36,6 +36,9 @@ const ProductContentViewerPage = lazy(() =>
     default: m.ProductContentViewerPage,
   }))
 );
+const QuizCampaignViewerPage = lazy(() =>
+  import('@/pages/marketing/quiz/QuizCampaignViewerPage')
+);
 
 // Member Portal
 const MemberHome = lazy(() =>
@@ -133,6 +136,9 @@ export function AppRouter() {
 
                   {/* Marketing - Product Content Viewer */}
                   <Route path="/marketing/product/:id" element={<ProductContentViewerPage />} />
+
+                  {/* Marketing - Quiz Campaign Viewer */}
+                  <Route path="/marketing/quiz/:id" element={<QuizCampaignViewerPage />} />
 
                   {/* 회원 포털 (Member Portal) */}
                   <Route

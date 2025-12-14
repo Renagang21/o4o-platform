@@ -2,6 +2,7 @@
  * LMS-Marketing Services
  *
  * Phase R6: ProductContentService for product info delivery
+ * Phase R7: MarketingQuizCampaignService for quiz campaigns
  */
 
 // Phase R6: Product Content Service
@@ -17,8 +18,19 @@ export type {
   ProductContentListOptions,
 } from './ProductContentService.js';
 
-// Phase R7: Quiz Campaign Service (placeholder)
-// export { QuizCampaignService } from './QuizCampaignService.js';
+// Phase R7: Quiz Campaign Service
+export {
+  MarketingQuizCampaignService,
+  getMarketingQuizCampaignService,
+  initMarketingQuizCampaignService,
+} from './MarketingQuizCampaignService.js';
+export type {
+  CreateQuizCampaignDto,
+  UpdateQuizCampaignDto,
+  QuizUserContext,
+  QuizCampaignListOptions,
+  QuizAttemptResult,
+} from './MarketingQuizCampaignService.js';
 
 // Phase R8: Survey Campaign Service (placeholder)
 // export { SurveyCampaignService } from './SurveyCampaignService.js';
