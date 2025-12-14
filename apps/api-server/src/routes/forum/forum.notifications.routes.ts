@@ -11,7 +11,6 @@ import { ForumNotificationController } from '../../controllers/forum/ForumNotifi
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { notificationEventHub } from '../../services/forum/NotificationEventHub.js';
 import { v4 as uuidv4 } from 'uuid';
-import logger from '../../utils/logger.js';
 
 const router: Router = Router();
 const controller = new ForumNotificationController();
@@ -61,7 +60,7 @@ router.get('/stream', (req: Request, res: Response) => {
   const userId = user.id;
   const organizationId = req.query.organizationId as string | undefined;
 
-  logger.debug(`[SSE] New connection request from user ${userId}`);
+  console.log(`[SSE] New connection request from user ${userId}`);
 
   // Subscribe to notification events
   notificationEventHub.subscribe(clientId, userId, res, organizationId);

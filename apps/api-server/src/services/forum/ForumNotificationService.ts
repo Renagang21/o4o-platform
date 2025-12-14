@@ -19,6 +19,7 @@ import {
   ForumNotificationType,
   ForumNotificationTarget,
 } from '../../entities/ForumNotification.js';
+import { notificationEventHub } from './NotificationEventHub.js';
 
 // Notification payload interface
 export interface NotificationPayload {

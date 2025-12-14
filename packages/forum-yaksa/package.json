@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o-apps/forum": "workspace:*"
+    "@o4o-apps/forum": "workspace:*",
+    "@o4o/types": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0",

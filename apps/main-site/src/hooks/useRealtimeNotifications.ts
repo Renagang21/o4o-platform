@@ -67,11 +67,14 @@ const SSE_ENDPOINT = '/api/v1/forum/notifications/stream';
  * Automatically handles connection, reconnection, and cleanup.
  *
  * @example
+ * ```tsx
  * const { isConnected, lastNotification } = useRealtimeNotifications({
  *   onNotification: (data) => {
+ *     // Increment unread count, show toast, etc.
  *     console.log('New notification:', data.message);
  *   },
  * });
+ * ```
  */
 export function useRealtimeNotifications(
   options: UseRealtimeNotificationsOptions = {}
@@ -127,14 +130,14 @@ export function useRealtimeNotifications(
 
     try {
       const url = buildUrl();
-      // SSE connection initiated
+      console.log('[SSE] Connecting to:', url);
 
       const eventSource = new EventSource(url, {
         withCredentials: true, // Include auth cookies
       });
 
       eventSource.onopen = () => {
-        // SSE connected successfully
+        console.log('[SSE] Connected');
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;
@@ -156,7 +159,7 @@ export function useRealtimeNotifications(
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           const delay = reconnectDelay * reconnectAttemptsRef.current;
-          // SSE reconnecting after delay
+          console.log(`[SSE] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();

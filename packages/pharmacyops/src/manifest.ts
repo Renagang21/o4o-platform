@@ -12,7 +12,7 @@ export const manifest = {
     name: 'Pharmacy Operations',
     displayName: '약국 운영',
     description: '의약품 B2B 주문, 배송 추적, 정산 관리를 위한 약국 전용 운영 시스템',
-    version: '2.5.0',
+    version: '1.0.0',
     type: 'service' as const,
     author: 'O4O Platform',
     icon: 'pharmacy',
@@ -38,7 +38,7 @@ export const manifest = {
   },
 
   backend: {
-    entities: ['PharmacyInventory'],
+    entities: [],
     services: [
       'PharmacyDashboardService',
       'PharmacyProductService',
@@ -46,10 +46,8 @@ export const manifest = {
       'PharmacyOrderService',
       'PharmacyDispatchService',
       'PharmacySettlementService',
-      'PharmacyInventoryService',
-      'AutoReorderService',
     ],
-    routes: ['/api/v1/pharmacyops/*', '/api/v1/pharmacy/inventory/*', '/api/v1/pharmacy/auto-reorder/*'],
+    routes: ['/api/v1/pharmacyops/*'],
   },
 
   navigation: {
@@ -61,7 +59,6 @@ export const manifest = {
         icon: 'pharmacy',
         children: [
           { id: 'pharmacyops-dashboard', label: '대시보드', path: '/pharmacyops/dashboard', icon: 'dashboard' },
-          { id: 'pharmacyops-auto-reorder', label: '자동발주', path: '/pharmacyops/auto-reorder', icon: 'autorenew' },
           { id: 'pharmacyops-products', label: '의약품 목록', path: '/pharmacyops/products', icon: 'medication' },
           { id: 'pharmacyops-offers', label: '도매 Offer', path: '/pharmacyops/offers', icon: 'local_offer' },
           { id: 'pharmacyops-orders', label: '주문 관리', path: '/pharmacyops/orders', icon: 'shopping_cart' },
@@ -73,8 +70,6 @@ export const manifest = {
     adminRoutes: [
       '/pharmacyops',
       '/pharmacyops/dashboard',
-      '/pharmacyops/auto-reorder',
-      '/pharmacyops/auto-reorder/review',
       '/pharmacyops/products',
       '/pharmacyops/offers',
       '/pharmacyops/orders',
