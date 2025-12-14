@@ -116,8 +116,8 @@ export function useRealtimeNotifications(
           onNotification?.(parsed.data);
         }
         // Heartbeat is just for keeping connection alive
-      } catch (err) {
-        console.error('[SSE] Failed to parse message:', err);
+      } catch {
+        // Ignore parse errors
       }
     },
     [onNotification]
@@ -130,14 +130,12 @@ export function useRealtimeNotifications(
 
     try {
       const url = buildUrl();
-      console.log('[SSE] Connecting to:', url);
 
       const eventSource = new EventSource(url, {
         withCredentials: true, // Include auth cookies
       });
 
       eventSource.onopen = () => {
-        console.log('[SSE] Connected');
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;
@@ -146,8 +144,7 @@ export function useRealtimeNotifications(
 
       eventSource.onmessage = handleMessage;
 
-      eventSource.onerror = (event) => {
-        console.error('[SSE] Connection error:', event);
+      eventSource.onerror = () => {
         setIsConnected(false);
         onConnectionChange?.(false);
 
@@ -159,7 +156,6 @@ export function useRealtimeNotifications(
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           const delay = reconnectDelay * reconnectAttemptsRef.current;
-          console.log(`[SSE] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
@@ -171,7 +167,6 @@ export function useRealtimeNotifications(
 
       eventSourceRef.current = eventSource;
     } catch (err) {
-      console.error('[SSE] Failed to connect:', err);
       setError(err instanceof Error ? err : new Error('Connection failed'));
     }
   }, [
