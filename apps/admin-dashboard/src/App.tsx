@@ -140,6 +140,9 @@ const PartnerOpsRouter = lazy(() => import('@/pages/partnerops/PartnerOpsRouter'
 // Cosmetics Partner Extension Pages
 const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/CosmeticsPartnerRouter'));
 
+// Cosmetics Products Pages (Phase 7-H)
+const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
+
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
@@ -1176,6 +1179,15 @@ function App() {
                             <CosmeticsPartnerRouter />
                           </Suspense>
                         </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Cosmetics Products - Products/Brands Management (Phase 7-H) */}
+                    <Route path="/cosmetics-products/*" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CosmeticsProductsRouter />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
 
