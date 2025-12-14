@@ -12,6 +12,13 @@ import { createProductContentRoutes } from './routes/productContent.routes.js';
 import { createQuizCampaignRoutes } from './routes/quizCampaign.routes.js';
 import { initProductContentService } from './services/ProductContentService.js';
 import { initMarketingQuizCampaignService } from './services/MarketingQuizCampaignService.js';
+import { ProductContent } from './entities/ProductContent.entity.js';
+import { MarketingQuizCampaign } from './entities/MarketingQuizCampaign.entity.js';
+
+/**
+ * Entities array for ModuleLoader
+ */
+export const entities = [ProductContent, MarketingQuizCampaign];
 
 /**
  * Create routes for marketing extension

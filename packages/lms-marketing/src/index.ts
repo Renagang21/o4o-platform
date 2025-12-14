@@ -18,6 +18,7 @@ export {
   createRoutes,
   createServices,
   createHooks,
+  entities,
 } from './backend/index.js';
 
 // Lifecycle
