@@ -1,7 +1,7 @@
 /**
  * MarketTrialController
  *
- * Phase 1 & 2 API: REST endpoints for Market Trial operations.
+ * Phase 1, 2 & 3 API: REST endpoints for Market Trial operations.
  *
  * Phase 1 Endpoints:
  * - POST   /                      - Create trial
@@ -14,12 +14,16 @@
  * - POST   /:id/decision/seller   - Submit seller decision
  * - POST   /:id/decision/partner  - Submit partner decision
  * - GET    /:id/decisions         - Get decisions for trial
+ *
+ * Phase 3 Endpoints (Forum):
+ * - GET    /:id/forum             - Get forum access info
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { MarketTrialService } from '../services/MarketTrialService.js';
 import { MarketTrialDecisionService } from '../services/MarketTrialDecisionService.js';
+import { MarketTrialForumService } from '../services/MarketTrialForumService.js';
 import { MarketTrialStatus, ParticipantType, DecisionType } from '../entities/index.js';
 import {
   validateCreateRequest,
@@ -35,6 +39,7 @@ export function createMarketTrialController(dataSource: DataSource): Router {
   const router = Router();
   const service = new MarketTrialService(dataSource);
   const decisionService = new MarketTrialDecisionService(dataSource);
+  const forumService = new MarketTrialForumService(dataSource);
 
   /**
    * POST /api/market-trials
@@ -338,6 +343,53 @@ export function createMarketTrialController(dataSource: DataSource): Router {
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
+  // =====================================================
+  // Phase 3: Forum Integration Endpoints
+  // =====================================================
+
+  /**
+   * GET /api/market-trials/:id/forum
+   * Get forum access info for a trial
+   * Permission: Authenticated users (access based on role)
+   */
+  router.get('/:id/forum', async (req: Request, res: Response) => {
+    try {
+      // Build user context from request
+      const user = (req as any).user || {};
+      const userContext = {
+        userId: user.id || req.body.userId || '',
+        supplierId: user.supplierId || req.query.supplierId as string,
+        sellerId: user.sellerId || req.query.sellerId as string,
+        partnerId: user.partnerId || req.query.partnerId as string,
+      };
+
+      // Require at least userId for access check
+      if (!userContext.userId && !userContext.supplierId && !userContext.sellerId && !userContext.partnerId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+        });
+      }
+
+      const accessInfo = await forumService.getForumAccessInfo(
+        req.params.id,
+        userContext
+      );
+
+      res.json({
+        success: true,
+        data: accessInfo,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const status = message.includes('not found') ? 404 : 500;
+      res.status(status).json({
+        success: false,
+        error: message,
       });
     }
   });
