@@ -1,12 +1,18 @@
 /**
  * CosmeticsProductListController
  *
+ * Phase 9-C: Core v2 정렬
+ * - ProductType.COSMETICS 기반 제품 리스트
+ * - 화장품 메타데이터 필터링
+ *
  * HTTP request handler for product list endpoint
+ * API: GET /api/v1/cosmetics/products
  */
 
 import { Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { CosmeticsProductListService, ProductListParams } from '../services/cosmetics-product-list.service.js';
+import type { CosmeticsFiltersDto } from '../dto/index.js';
 
 export class CosmeticsProductListController {
   private service: CosmeticsProductListService;

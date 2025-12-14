@@ -1,6 +1,10 @@
 /**
  * Cosmetics Extension Backend
  *
+ * Phase 9-C: Core v2 정렬
+ * - DTO 레이어 추가
+ * - ProductType.COSMETICS 기반 서비스
+ *
  * Main export for backend functionality
  */
 
@@ -8,18 +12,36 @@ import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import { createCosmeticsModule, CosmeticsEntities } from './module.js';
 
+// DTOs (Phase 9-C)
+export * from './dto/index.js';
+
+// Entities
 export * from './entities/index.js';
+
+// Services
 export * from './services/cosmetics-filter.service.js';
 export * from './services/influencer-routine.service.js';
 export * from './services/recommendation-engine.service.js';
 export * from './services/brand.service.js';
+export * from './services/cosmetics-product.service.js';
+export * from './services/cosmetics-product-list.service.js';
+export * from './services/seller-workflow.service.js';
+
+// Controllers
 export * from './controllers/cosmetics-filter.controller.js';
 export * from './controllers/influencer-routine.controller.js';
 export * from './controllers/signage.controller.js';
 export * from './controllers/recommendation.controller.js';
 export * from './controllers/brand.controller.js';
+export * from './controllers/cosmetics-product.controller.js';
+export * from './controllers/cosmetics-product-list.controller.js';
+export * from './controllers/seller-workflow.controller.js';
+
+// Middleware & Hooks
 export * from './middleware/permissions.middleware.js';
 export * from './hooks/product-filter.hook.js';
+
+// Module
 export { createCosmeticsModule, CosmeticsEntities } from './module.js';
 export { default as CosmeticsModule } from './module.js';
 

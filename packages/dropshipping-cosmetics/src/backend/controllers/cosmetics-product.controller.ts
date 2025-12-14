@@ -1,12 +1,18 @@
 /**
  * CosmeticsProduct Controller
  *
+ * Phase 9-C: Core v2 정렬
+ * - ProductType.COSMETICS 기반 제품 상세
+ * - 화장품 메타데이터 통합
+ *
  * Handles HTTP requests for cosmetics product detail
+ * API: GET /api/v1/cosmetics/product/:id
  */
 
 import { Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { CosmeticsProductService } from '../services/cosmetics-product.service.js';
+import type { CosmeticsProductDto } from '../dto/index.js';
 
 export class CosmeticsProductController {
   private service: CosmeticsProductService;

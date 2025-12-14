@@ -1,5 +1,9 @@
 /**
  * Cosmetics Extension Entities
+ *
+ * Phase 9-C: Core v2 정렬
+ * - 화장품 Extension 전용 엔티티
+ * - Core ProductMaster와 연동
  */
 
 export { CosmeticsFilter } from './cosmetics-filter.entity.js';

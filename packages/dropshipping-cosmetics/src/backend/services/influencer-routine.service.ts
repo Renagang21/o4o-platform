@@ -1,16 +1,16 @@
 /**
  * Influencer Routine Service (DB-based)
  *
+ * Phase 9-C: Core v2 정렬
+ * - DTO import 정리
+ *
  * Manages influencer beauty routines using TypeORM
  */
 
 import type { Repository, DataSource } from 'typeorm';
 import { CosmeticsRoutine } from '../entities/cosmetics-routine.entity.js';
-import type {
-  CreateRoutineDto,
-  UpdateRoutineDto,
-  RoutineStep,
-} from '../../types.js';
+import type { CreateRoutineDto, UpdateRoutineDto, RoutineStepDto } from '../dto/index.js';
+import type { RoutineStep } from '../../types.js';
 
 export class InfluencerRoutineService {
   private repository: Repository<CosmeticsRoutine>;
