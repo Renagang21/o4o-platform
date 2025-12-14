@@ -39,6 +39,7 @@ const PACKAGE_MAP: Record<string, string> = {
   'sellerops': 'sellerops',
   'supplierops': 'supplierops',
   'cms-core': 'cms-core',
+  'market-trial': 'market-trial',
 };
 
 /**

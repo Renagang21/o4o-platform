@@ -439,6 +439,23 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['global', 'cosmetics', 'supplierops'],
   },
+
+  // ============================================
+  // Market Trial App
+  // Supplier product trial funding
+  // ============================================
+  {
+    appId: 'market-trial',
+    name: 'Market Trial',
+    version: '1.0.0',
+    description: '공급자 상품 시범판매 펀딩 - 판매자/파트너 참여형 시장 테스트',
+    category: 'commerce',
+    tags: ['market-trial', '시범판매', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner'],
+    type: 'extension',
+    dependencies: { 'dropshipping-core': '>=1.0.0' },
+    author: 'O4O Platform',
+    serviceGroups: ['cosmetics', 'supplierops', 'sellerops'],
+  },
 ];
 
 /**
