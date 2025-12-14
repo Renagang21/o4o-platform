@@ -1,11 +1,11 @@
 /**
  * Market Trial DTOs
  *
- * Phase 1 API: Request/Response DTOs for Market Trial endpoints.
+ * Phase 1 & 2 API: Request/Response DTOs for Market Trial endpoints.
  * Minimal validation, required fields only.
  */
 
-import { ParticipantType } from '../entities/index.js';
+import { ParticipantType, DecisionType } from '../entities/index.js';
 
 /**
  * Create Market Trial Request
@@ -109,5 +109,90 @@ export function validateParticipateRequest(data: any): ParticipateRequest {
 
   return {
     contributionAmount: Number(data.contributionAmount),
+  };
+}
+
+// =====================================================
+// Phase 2: Decision (의사 표현) DTOs
+// =====================================================
+
+/**
+ * Seller Decision Request
+ */
+export interface SellerDecisionRequest {
+  decision: string; // 'continue' | 'stop'
+}
+
+/**
+ * Partner Decision Request
+ */
+export interface PartnerDecisionRequest {
+  decision: string; // 'continue' | 'stop'
+  sellerIds?: string[]; // Required when decision = 'continue'
+}
+
+/**
+ * Decision Response
+ */
+export interface DecisionResponse {
+  id: string;
+  marketTrialId: string;
+  participantId: string;
+  participantType: string;
+  decision: string;
+  selectedSellerIds: string[] | null;
+  createdAt: string;
+}
+
+/**
+ * Submit Decision Result Response
+ */
+export interface DecisionResultResponse {
+  decision: DecisionResponse;
+  applicationsCreated: number;
+  applicationIds: string[];
+}
+
+/**
+ * Validate Seller Decision Request
+ */
+export function validateSellerDecisionRequest(data: any): SellerDecisionRequest {
+  if (!data.decision) {
+    throw new Error('decision is required');
+  }
+
+  const validDecisions = [DecisionType.CONTINUE, DecisionType.STOP];
+  if (!validDecisions.includes(data.decision as DecisionType)) {
+    throw new Error('decision must be "continue" or "stop"');
+  }
+
+  return {
+    decision: data.decision,
+  };
+}
+
+/**
+ * Validate Partner Decision Request
+ */
+export function validatePartnerDecisionRequest(data: any): PartnerDecisionRequest {
+  if (!data.decision) {
+    throw new Error('decision is required');
+  }
+
+  const validDecisions = [DecisionType.CONTINUE, DecisionType.STOP];
+  if (!validDecisions.includes(data.decision as DecisionType)) {
+    throw new Error('decision must be "continue" or "stop"');
+  }
+
+  // sellerIds is required when decision = CONTINUE
+  if (data.decision === DecisionType.CONTINUE) {
+    if (!data.sellerIds || !Array.isArray(data.sellerIds) || data.sellerIds.length === 0) {
+      throw new Error('sellerIds is required when decision is "continue"');
+    }
+  }
+
+  return {
+    decision: data.decision,
+    sellerIds: data.sellerIds,
   };
 }

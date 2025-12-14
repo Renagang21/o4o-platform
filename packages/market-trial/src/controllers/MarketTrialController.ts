@@ -1,23 +1,31 @@
 /**
  * MarketTrialController
  *
- * Phase 1 API: REST endpoints for Market Trial operations.
+ * Phase 1 & 2 API: REST endpoints for Market Trial operations.
  *
- * Endpoints:
- * - POST   /                 - Create trial
- * - GET    /                 - List trials
- * - GET    /:id              - Get trial details
- * - POST   /:id/participate  - Participate in trial
- * - GET    /:id/participants - Get participants
+ * Phase 1 Endpoints:
+ * - POST   /                      - Create trial
+ * - GET    /                      - List trials
+ * - GET    /:id                   - Get trial details
+ * - POST   /:id/participate       - Participate in trial
+ * - GET    /:id/participants      - Get participants
+ *
+ * Phase 2 Endpoints (Decision):
+ * - POST   /:id/decision/seller   - Submit seller decision
+ * - POST   /:id/decision/partner  - Submit partner decision
+ * - GET    /:id/decisions         - Get decisions for trial
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { MarketTrialService } from '../services/MarketTrialService.js';
-import { MarketTrialStatus, ParticipantType } from '../entities/index.js';
+import { MarketTrialDecisionService } from '../services/MarketTrialDecisionService.js';
+import { MarketTrialStatus, ParticipantType, DecisionType } from '../entities/index.js';
 import {
   validateCreateRequest,
   validateParticipateRequest,
+  validateSellerDecisionRequest,
+  validatePartnerDecisionRequest,
 } from '../dto/index.js';
 
 /**
@@ -26,6 +34,7 @@ import {
 export function createMarketTrialController(dataSource: DataSource): Router {
   const router = Router();
   const service = new MarketTrialService(dataSource);
+  const decisionService = new MarketTrialDecisionService(dataSource);
 
   /**
    * POST /api/market-trials
@@ -217,11 +226,127 @@ export function createMarketTrialController(dataSource: DataSource): Router {
     }
   });
 
+  // =====================================================
+  // Phase 2: Decision (의사 표현) Endpoints
+  // =====================================================
+
+  /**
+   * POST /api/market-trials/:id/decision/seller
+   * Submit seller decision (CONTINUE or STOP)
+   * Permission: SELLER only
+   */
+  router.post('/:id/decision/seller', async (req: Request, res: Response) => {
+    try {
+      // Validate request
+      const validatedData = validateSellerDecisionRequest(req.body);
+
+      // Get participant ID from request context or body
+      const participantId = (req as any).user?.id || req.body.participantId;
+
+      if (!participantId) {
+        return res.status(400).json({
+          success: false,
+          error: 'participantId is required',
+        });
+      }
+
+      const result = await decisionService.submitSellerDecision(req.params.id, {
+        participantId,
+        decision: validatedData.decision as DecisionType,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          decision: toDecisionResponse(result.decision),
+          applicationsCreated: result.applicationsCreated,
+          applicationIds: result.applicationIds,
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const status = message.includes('not found') ? 404 :
+                     message.includes('already') ? 409 : 400;
+      res.status(status).json({
+        success: false,
+        error: message,
+      });
+    }
+  });
+
+  /**
+   * POST /api/market-trials/:id/decision/partner
+   * Submit partner decision (CONTINUE or STOP)
+   * Permission: PARTNER only
+   */
+  router.post('/:id/decision/partner', async (req: Request, res: Response) => {
+    try {
+      // Validate request
+      const validatedData = validatePartnerDecisionRequest(req.body);
+
+      // Get participant ID from request context or body
+      const participantId = (req as any).user?.id || req.body.participantId;
+
+      if (!participantId) {
+        return res.status(400).json({
+          success: false,
+          error: 'participantId is required',
+        });
+      }
+
+      const result = await decisionService.submitPartnerDecision(req.params.id, {
+        participantId,
+        decision: validatedData.decision as DecisionType,
+        sellerIds: validatedData.sellerIds,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          decision: toDecisionResponse(result.decision),
+          applicationsCreated: result.applicationsCreated,
+          applicationIds: result.applicationIds,
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const status = message.includes('not found') ? 404 :
+                     message.includes('already') ? 409 :
+                     message.includes('required') ? 400 : 400;
+      res.status(status).json({
+        success: false,
+        error: message,
+      });
+    }
+  });
+
+  /**
+   * GET /api/market-trials/:id/decisions
+   * Get all decisions for a trial
+   * Permission: Supplier / Admin
+   */
+  router.get('/:id/decisions', async (req: Request, res: Response) => {
+    try {
+      const decisions = await decisionService.getDecisionsByTrial(req.params.id);
+
+      res.json({
+        success: true,
+        data: decisions.map(toDecisionResponse),
+        total: decisions.length,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
   return router;
 }
 
 /**
- * Convert entity to response format
+ * Convert trial entity to response format
  */
 function toResponse(trial: any): any {
   return {
@@ -239,6 +364,23 @@ function toResponse(trial: any): any {
     status: trial.status,
     createdAt: new Date(trial.createdAt).toISOString(),
     updatedAt: new Date(trial.updatedAt).toISOString(),
+  };
+}
+
+/**
+ * Convert decision entity to response format
+ */
+function toDecisionResponse(decision: any): any {
+  return {
+    id: decision.id,
+    marketTrialId: decision.marketTrialId,
+    participantId: decision.participantId,
+    participantType: decision.participantType,
+    decision: decision.decision,
+    selectedSellerIds: decision.selectedSellerIds
+      ? JSON.parse(decision.selectedSellerIds)
+      : null,
+    createdAt: new Date(decision.createdAt).toISOString(),
   };
 }
 

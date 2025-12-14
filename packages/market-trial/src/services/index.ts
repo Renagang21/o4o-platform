@@ -10,3 +10,10 @@ export type {
   ParticipateDto,
   ListTrialsFilter,
 } from './MarketTrialService.js';
+
+export { MarketTrialDecisionService } from './MarketTrialDecisionService.js';
+export type {
+  SellerDecisionDto,
+  PartnerDecisionDto,
+  DecisionResult,
+} from './MarketTrialDecisionService.js';
