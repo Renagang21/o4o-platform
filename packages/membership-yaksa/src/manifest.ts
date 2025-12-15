@@ -10,6 +10,7 @@
 
 export const membershipYaksaManifest = {
   // ===== 필수 기본 정보 =====
+  id: 'membership-yaksa',
   appId: 'membership-yaksa',
   displayName: '약사회 회원관리',
   version: '1.0.0',
