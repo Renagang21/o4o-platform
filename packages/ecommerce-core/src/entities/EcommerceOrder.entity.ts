@@ -19,8 +19,8 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import type { EcommerceOrderItem } from './EcommerceOrderItem.entity.js';
-import type { EcommercePayment } from './EcommercePayment.entity.js';
+
+
 
 /**
  * 주문 유형 (OrderType)
@@ -289,8 +289,8 @@ export class EcommerceOrder {
   // ===== Relations =====
 
   @OneToMany('EcommerceOrderItem', 'order')
-  items?: EcommerceOrderItem[];
+  items?: unknown[];
 
   @OneToMany('EcommercePayment', 'order')
-  payments?: EcommercePayment[];
+  payments?: unknown[];
 }
