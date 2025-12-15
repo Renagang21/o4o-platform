@@ -8,8 +8,8 @@
  */
 
 import type { Repository } from 'typeorm';
-import type { CommissionPolicy, PolicyType } from '../entities/commission-policy.entity';
-import type { EventType } from '../entities/partner-earnings.entity';
+import type { CommissionPolicy, PolicyType } from '../entities/commission-policy.entity.js';
+import type { EventType } from '../entities/partner-earnings.entity.js';
 
 export interface CommissionCalculationInput {
   partnerId: string;

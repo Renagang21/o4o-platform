@@ -5,8 +5,8 @@
  */
 
 import type { Request, Response } from 'express';
-import type { CommissionPolicyService } from '../services/commission-policy.service';
-import type { CommissionEngineService } from '../services/commission-engine.service';
+import type { CommissionPolicyService } from '../services/commission-policy.service.js';
+import type { CommissionEngineService } from '../services/commission-engine.service.js';
 
 export class CommissionPolicyController {
   constructor(

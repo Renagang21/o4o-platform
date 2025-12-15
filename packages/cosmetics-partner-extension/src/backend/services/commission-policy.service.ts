@@ -5,7 +5,7 @@
  */
 
 import type { Repository, FindOptionsWhere } from 'typeorm';
-import { CommissionPolicy, PolicyType, PolicyMetadata } from '../entities/commission-policy.entity';
+import { CommissionPolicy, PolicyType, PolicyMetadata } from '../entities/commission-policy.entity.js';
 
 export interface CreateCommissionPolicyDto {
   name: string;

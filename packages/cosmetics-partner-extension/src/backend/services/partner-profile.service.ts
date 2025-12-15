@@ -5,7 +5,7 @@
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerProfile, PartnerType, PartnerStatus, SocialLinks } from '../entities/partner-profile.entity';
+import { PartnerProfile, PartnerType, PartnerStatus, SocialLinks } from '../entities/partner-profile.entity.js';
 
 export interface CreatePartnerProfileDto {
   userId: string;

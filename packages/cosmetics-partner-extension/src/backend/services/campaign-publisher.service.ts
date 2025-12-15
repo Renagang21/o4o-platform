@@ -8,8 +8,8 @@
  */
 
 import { DataSource, Repository } from 'typeorm';
-import { PartnerProfile } from '../entities/partner-profile.entity';
-import { PartnerLink } from '../entities/partner-link.entity';
+import { PartnerProfile } from '../entities/partner-profile.entity.js';
+import { PartnerLink } from '../entities/partner-link.entity.js';
 
 // Types for Campaign Publisher
 export interface CampaignDto {

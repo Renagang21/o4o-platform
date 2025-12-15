@@ -9,8 +9,8 @@
  */
 
 import { Repository, DataSource } from 'typeorm';
-import { PartnerLink } from '../entities/partner-link.entity';
-import { PartnerProfile } from '../entities/partner-profile.entity';
+import { PartnerLink } from '../entities/partner-link.entity.js';
+import { PartnerProfile } from '../entities/partner-profile.entity.js';
 
 // Types for QR/Landing
 export interface GenerateQRDto {

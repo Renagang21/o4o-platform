@@ -5,7 +5,7 @@
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerRoutine, RoutineType, RoutineStep } from '../entities/partner-routine.entity';
+import { PartnerRoutine, RoutineType, RoutineStep } from '../entities/partner-routine.entity.js';
 
 export interface CreatePartnerRoutineDto {
   partnerId: string;

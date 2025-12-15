@@ -8,8 +8,8 @@
  */
 
 import { DataSource } from 'typeorm';
-import { PartnerLink } from '../entities/partner-link.entity';
-import { PartnerRoutine } from '../entities/partner-routine.entity';
+import { PartnerLink } from '../entities/partner-link.entity.js';
+import { PartnerRoutine } from '../entities/partner-routine.entity.js';
 
 // Types for Social Share
 export interface GenerateShareContentDto {

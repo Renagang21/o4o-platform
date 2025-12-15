@@ -8,7 +8,7 @@
  */
 
 import { Request, Response } from 'express';
-import { SocialShareService, GenerateShareContentDto } from '../services/social-share.service';
+import { SocialShareService, GenerateShareContentDto } from '../services/social-share.service.js';
 
 export class SocialShareController {
   constructor(private socialShareService: SocialShareService) {}

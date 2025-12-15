@@ -7,7 +7,7 @@
  */
 
 import { Request, Response } from 'express';
-import { AIRoutineService, GenerateRoutineDto } from '../services/ai-routine.service';
+import { AIRoutineService, GenerateRoutineDto } from '../services/ai-routine.service.js';
 
 export class AIRoutineController {
   constructor(private aiRoutineService: AIRoutineService) {}

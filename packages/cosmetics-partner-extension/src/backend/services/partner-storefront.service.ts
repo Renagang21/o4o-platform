@@ -8,9 +8,9 @@
  */
 
 import { Repository, DataSource } from 'typeorm';
-import { PartnerProfile } from '../entities/partner-profile.entity';
-import { PartnerLink } from '../entities/partner-link.entity';
-import { PartnerRoutine } from '../entities/partner-routine.entity';
+import { PartnerProfile } from '../entities/partner-profile.entity.js';
+import { PartnerLink } from '../entities/partner-link.entity.js';
+import { PartnerRoutine } from '../entities/partner-routine.entity.js';
 
 // Types for Storefront
 export interface StorefrontConfig {

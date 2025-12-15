@@ -8,8 +8,8 @@
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerEarnings, EarningsType, EarningsStatus, EventType } from '../entities/partner-earnings.entity';
-import type { CommissionEngineService, CommissionCalculationInput } from './commission-engine.service';
+import { PartnerEarnings, EarningsType, EarningsStatus, EventType } from '../entities/partner-earnings.entity.js';
+import type { CommissionEngineService, CommissionCalculationInput } from './commission-engine.service.js';
 
 export interface CreatePartnerEarningsDto {
   partnerId: string;

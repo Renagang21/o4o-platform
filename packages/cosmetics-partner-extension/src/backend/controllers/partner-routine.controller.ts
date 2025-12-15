@@ -10,7 +10,7 @@ import type {
   CreatePartnerRoutineDto,
   UpdatePartnerRoutineDto,
   RoutineFilter,
-} from '../services/partner-routine.service';
+} from '../services/partner-routine.service.js';
 
 export class PartnerRoutineController {
   constructor(private readonly routineService: PartnerRoutineService) {}

@@ -12,7 +12,7 @@ import type {
   UpdatePartnerEarningsDto,
   RecordCommissionDto,
   EarningsFilter,
-} from '../services/partner-earnings.service';
+} from '../services/partner-earnings.service.js';
 
 export class PartnerEarningsController {
   constructor(private readonly earningsService: PartnerEarningsService) {}

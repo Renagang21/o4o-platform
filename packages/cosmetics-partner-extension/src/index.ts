@@ -17,20 +17,20 @@ import type { DataSource } from 'typeorm';
 export {
   cosmeticsPartnerExtensionManifest,
   cosmeticsPartnerExtensionManifest as manifest,
-} from './manifest';
-export { cosmeticsPartnerExtensionManifest as default } from './manifest';
+} from './manifest.js';
+export { cosmeticsPartnerExtensionManifest as default } from './manifest.js';
 
 // Backend
-export * from './backend';
+export * from './backend/index.js';
 
 // Frontend
-export * from './frontend';
+export * from './frontend/index.js';
 
 // Shortcodes
-export { shortcodes } from './shortcodes';
+export { shortcodes } from './shortcodes/index.js';
 
 // Lifecycle
-export * from './lifecycle';
+export * from './lifecycle/index.js';
 
 /**
  * Create Express routes for Cosmetics Partner Extension
