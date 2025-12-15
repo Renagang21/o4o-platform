@@ -43,13 +43,13 @@ export class ForumCategory {
   @Column({ type: 'int', default: 0 })
   postCount!: number;
 
-  @Column({ name: 'created_by', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   createdBy?: string;
 
-  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   organizationId?: string;
 
-  @Column({ name: 'is_organization_exclusive', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -60,11 +60,11 @@ export class ForumCategory {
 
   // Relations
   @ManyToOne('User', { nullable: true })
-  @JoinColumn({ name: 'created_by' })
+  @JoinColumn({ name: 'createdBy' })
   creator?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('Organization', { nullable: true })
-  @JoinColumn({ name: 'organization_id' })
+  @JoinColumn({ name: 'organizationId' })
   organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumPost removed to prevent circular dependency
