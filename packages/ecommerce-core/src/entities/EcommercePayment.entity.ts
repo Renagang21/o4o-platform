@@ -17,7 +17,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { EcommerceOrder } from './EcommerceOrder.entity.js';
+import type { EcommerceOrder } from './EcommerceOrder.entity.js';
 
 /**
  * 결제 트랜잭션 상태
@@ -191,7 +191,7 @@ export class EcommercePayment {
 
   // ===== Relations =====
 
-  @ManyToOne(() => EcommerceOrder, (order) => order.payments, { onDelete: 'CASCADE' })
+  @ManyToOne('EcommerceOrder', 'payments', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
   order?: EcommerceOrder;
 }
