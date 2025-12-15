@@ -1,18 +1,47 @@
 /**
- * Layout Components - Antigravity Design System
+ * ═══════════════════════════════════════════════════════════════════════════
+ * O4O Platform - Design Core Layout System v1.0
+ * ═══════════════════════════════════════════════════════════════════════════
  *
- * Phase 7-A: Container & Section
- * Phase 7-B: Global Layout System
+ * @status OFFICIAL - Design Core Phase 1 공식 레이아웃 시스템
+ * @version 1.0.0
+ * @date 2025-12-15
+ *
+ * 이 모듈은 O4O Platform의 **공식 레이아웃 컴포넌트**입니다.
+ * 모든 앱은 이 레이아웃 시스템을 표준으로 사용합니다.
+ *
+ * ⚠️ 사용 규칙:
+ * - 신규 앱은 반드시 AGAppLayout 사용
+ * - 앱별 커스텀 레이아웃 생성 ❌
+ * - 레이아웃 수정 시 Design Core 담당자 승인 필수
+ *
+ * 레이아웃 구조:
+ * ┌─────────────────────────────────────────┐
+ * │              AGHeader                   │
+ * ├───────────┬─────────────────────────────┤
+ * │           │         AGContent           │
+ * │ AGSidebar │  ┌─────────────────────┐    │
+ * │           │  │   AGPageHeader      │    │
+ * │           │  ├─────────────────────┤    │
+ * │           │  │   AGSection/Card    │    │
+ * │           │  └─────────────────────┘    │
+ * └───────────┴─────────────────────────────┘
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 // Types
 export * from './types';
 
-// Container components (Phase 7-A)
+// ═══════════════════════════════════════════════════════════════════════════
+// Container Components - 기본 컨테이너
+// ═══════════════════════════════════════════════════════════════════════════
 export * from './AGContainer';
 export * from './AGSection';
 
-// Layout system components (Phase 7-B)
+// ═══════════════════════════════════════════════════════════════════════════
+// Admin Layout System - 관리자 레이아웃 (표준)
+// ═══════════════════════════════════════════════════════════════════════════
 export * from './AGHeader';
 export * from './AGSidebar';
 export * from './AGAppLayout';
@@ -20,5 +49,11 @@ export * from './AGPageHeader';
 export * from './AGBreadcrumb';
 export * from './AGContent';
 
-// Storefront layout components (Phase 7-I)
+// ═══════════════════════════════════════════════════════════════════════════
+// Storefront Layout - 소비자향 레이아웃
+// ═══════════════════════════════════════════════════════════════════════════
 export * from './AGStorefrontLayout';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Design Core Layout System v1.0 - End of File
+// ═══════════════════════════════════════════════════════════════════════════

@@ -1,12 +1,27 @@
 /**
- * O4O Design System - Theme Tokens
+ * ═══════════════════════════════════════════════════════════════════════════
+ * O4O Platform - Design Core Token v1.0
+ * ═══════════════════════════════════════════════════════════════════════════
  *
- * Phase 7-A: 핵심 디자인 토큰 정의
- * 모든 AG 컴포넌트가 참조하는 기본 값
+ * @status OFFICIAL - Design Core Phase 1 공식 토큰
+ * @version 1.0.0
+ * @date 2025-12-15
+ *
+ * 이 파일은 O4O Platform의 **공식 디자인 토큰**입니다.
+ * 모든 AG 컴포넌트와 View-Level UI가 이 토큰을 참조합니다.
+ *
+ * ⚠️ 수정 규칙:
+ * - 신규 앱에서 임의 토큰 추가 ❌
+ * - 앱별 커스텀 토큰 정의 ❌
+ * - 기존 토큰 값 변경 시 Design Core 담당자 승인 필수
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 export const tokens = {
-  // Border radius
+  // ═══════════════════════════════════════════════════════════════════════
+  // Border Radius - 모서리 둥글기
+  // ═══════════════════════════════════════════════════════════════════════
   radius: {
     none: 0,
     sm: 4,
@@ -16,7 +31,9 @@ export const tokens = {
     full: 9999,
   },
 
-  // Spacing scale
+  // ═══════════════════════════════════════════════════════════════════════
+  // Spacing Scale - 여백/간격 (px 단위)
+  // ═══════════════════════════════════════════════════════════════════════
   spacing: {
     xs: 4,
     sm: 8,
@@ -27,7 +44,9 @@ export const tokens = {
     '3xl': 48,
   },
 
-  // Typography
+  // ═══════════════════════════════════════════════════════════════════════
+  // Typography - 타이포그래피 스케일
+  // ═══════════════════════════════════════════════════════════════════════
   typography: {
     h1: { fontSize: 28, fontWeight: 700, lineHeight: 1.2 },
     h2: { fontSize: 24, fontWeight: 600, lineHeight: 1.3 },
@@ -40,9 +59,11 @@ export const tokens = {
     label: { fontSize: 13, fontWeight: 500, lineHeight: 1.4 },
   },
 
-  // Colors (semantic)
+  // ═══════════════════════════════════════════════════════════════════════
+  // Colors - Semantic Color Palette
+  // ═══════════════════════════════════════════════════════════════════════
   colors: {
-    // Primary
+    // Primary - 주요 액션/브랜드 컬러
     primary: {
       50: '#eff6ff',
       100: '#dbeafe',
@@ -55,7 +76,7 @@ export const tokens = {
       800: '#1e40af',
       900: '#1e3a8a',
     },
-    // Success
+    // Success - 성공/완료 상태
     success: {
       50: '#f0fdf4',
       100: '#dcfce7',
@@ -64,7 +85,7 @@ export const tokens = {
       600: '#16a34a',
       700: '#15803d',
     },
-    // Warning
+    // Warning - 경고/주의 상태
     warning: {
       50: '#fffbeb',
       100: '#fef3c7',
@@ -73,7 +94,7 @@ export const tokens = {
       600: '#d97706',
       700: '#b45309',
     },
-    // Danger/Error
+    // Danger/Error - 에러/위험 상태
     danger: {
       50: '#fef2f2',
       100: '#fee2e2',
@@ -82,7 +103,16 @@ export const tokens = {
       600: '#dc2626',
       700: '#b91c1c',
     },
-    // Neutral
+    // Info - 정보/안내 상태
+    info: {
+      50: '#f0f9ff',
+      100: '#e0f2fe',
+      200: '#bae6fd',
+      500: '#0ea5e9',
+      600: '#0284c7',
+      700: '#0369a1',
+    },
+    // Neutral - 중립/기본 컬러
     neutral: {
       50: '#f9fafb',
       100: '#f3f4f6',
@@ -97,7 +127,9 @@ export const tokens = {
     },
   },
 
-  // Shadows
+  // ═══════════════════════════════════════════════════════════════════════
+  // Shadows - 그림자 스케일
+  // ═══════════════════════════════════════════════════════════════════════
   shadows: {
     none: 'none',
     sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -106,14 +138,32 @@ export const tokens = {
     xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
   },
 
-  // Transitions
+  // ═══════════════════════════════════════════════════════════════════════
+  // Z-Index - 레이어 순서
+  // ═══════════════════════════════════════════════════════════════════════
+  zIndex: {
+    base: 0,
+    dropdown: 10,
+    sticky: 20,
+    fixed: 30,
+    modalBackdrop: 40,
+    modal: 50,
+    popover: 60,
+    tooltip: 70,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Transitions - 애니메이션 타이밍
+  // ═══════════════════════════════════════════════════════════════════════
   transitions: {
     fast: '150ms ease',
     normal: '200ms ease',
     slow: '300ms ease',
   },
 
-  // Breakpoints
+  // ═══════════════════════════════════════════════════════════════════════
+  // Breakpoints - 반응형 기준점 (px)
+  // ═══════════════════════════════════════════════════════════════════════
   breakpoints: {
     sm: 640,
     md: 768,
@@ -123,9 +173,17 @@ export const tokens = {
   },
 } as const;
 
-// Type exports
+// ═══════════════════════════════════════════════════════════════════════════
+// Type Exports - 타입 안전성을 위한 타입 정의
+// ═══════════════════════════════════════════════════════════════════════════
 export type TokenRadius = keyof typeof tokens.radius;
 export type TokenSpacing = keyof typeof tokens.spacing;
 export type TokenColor = keyof typeof tokens.colors;
 export type TokenShadow = keyof typeof tokens.shadows;
+export type TokenZIndex = keyof typeof tokens.zIndex;
 export type TokenBreakpoint = keyof typeof tokens.breakpoints;
+export type TokenTransition = keyof typeof tokens.transitions;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Design Core Token v1.0 - End of File
+// ═══════════════════════════════════════════════════════════════════════════

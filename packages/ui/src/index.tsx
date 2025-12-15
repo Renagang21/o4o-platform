@@ -1,5 +1,28 @@
-// @o4o/ui - Shared UI Components
-// Export all UI components here
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * O4O Platform - Design Core v1.0
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * @status OFFICIAL - Design Core Phase 1 공식 UI 라이브러리
+ * @version 1.0.0
+ * @date 2025-12-15
+ * @package @o4o/ui
+ *
+ * 이 패키지는 O4O Platform의 **공식 UI/Design 라이브러리**입니다.
+ *
+ * ⚠️ 중요:
+ * - 모든 신규 앱은 이 패키지의 컴포넌트만 사용
+ * - 앱별 커스텀 UI 컴포넌트 생성 ❌
+ * - 기존 앱 UI 수정 ❌
+ *
+ * 구성:
+ * - Primitive Components: Card, Button, Input, Badge 등 (shadcn 스타일)
+ * - AG Components: AGButton, AGCard, AGTable 등 (View-Level)
+ * - Layout System: AGAppLayout, AGSidebar, AGHeader 등
+ * - Design Tokens: colors, spacing, typography 등
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 
 import React, { HTMLAttributes, forwardRef, ButtonHTMLAttributes } from 'react';
 
