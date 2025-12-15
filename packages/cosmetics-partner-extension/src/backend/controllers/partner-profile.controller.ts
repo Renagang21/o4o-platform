@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response } from 'express';
-import type { PartnerProfileService } from '../services/partner-profile.service';
+import type { PartnerProfileService } from '../services/partner-profile.service.js';
 
 export class PartnerProfileController {
   constructor(private readonly service: PartnerProfileService) {}

@@ -12,7 +12,7 @@
  */
 
 import { Request, Response } from 'express';
-import { CampaignPublisherService, CampaignDto } from '../services/campaign-publisher.service';
+import { CampaignPublisherService, CampaignDto } from '../services/campaign-publisher.service.js';
 
 export class CampaignPublisherController {
   constructor(private campaignService: CampaignPublisherService) {}

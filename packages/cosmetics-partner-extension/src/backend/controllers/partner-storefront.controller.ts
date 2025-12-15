@@ -10,7 +10,7 @@
  */
 
 import { Request, Response } from 'express';
-import { PartnerStorefrontService, UpdateStorefrontDto } from '../services/partner-storefront.service';
+import { PartnerStorefrontService, UpdateStorefrontDto } from '../services/partner-storefront.service.js';
 
 export class PartnerStorefrontController {
   constructor(private storefrontService: PartnerStorefrontService) {}

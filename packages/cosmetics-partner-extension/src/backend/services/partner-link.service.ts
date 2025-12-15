@@ -5,7 +5,7 @@
  */
 
 import type { Repository } from 'typeorm';
-import { PartnerLink, LinkType } from '../entities/partner-link.entity';
+import { PartnerLink, LinkType } from '../entities/partner-link.entity.js';
 
 export interface CreatePartnerLinkDto {
   partnerId: string;

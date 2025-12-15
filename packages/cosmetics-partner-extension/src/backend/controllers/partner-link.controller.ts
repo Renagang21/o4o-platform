@@ -9,7 +9,7 @@ import type {
   PartnerLinkService,
   CreatePartnerLinkDto,
   UpdatePartnerLinkDto,
-} from '../services/partner-link.service';
+} from '../services/partner-link.service.js';
 
 export class PartnerLinkController {
   constructor(private readonly linkService: PartnerLinkService) {}

@@ -2,67 +2,67 @@
  * Cosmetics Partner Extension Services
  */
 
-export { PartnerProfileService } from './partner-profile.service';
-export type { CreatePartnerProfileDto, UpdatePartnerProfileDto } from './partner-profile.service';
+export { PartnerProfileService } from './partner-profile.service.js';
+export type { CreatePartnerProfileDto, UpdatePartnerProfileDto } from './partner-profile.service.js';
 
-export { PartnerLinkService } from './partner-link.service';
-export type { CreatePartnerLinkDto, UpdatePartnerLinkDto, LinkFilter } from './partner-link.service';
+export { PartnerLinkService } from './partner-link.service.js';
+export type { CreatePartnerLinkDto, UpdatePartnerLinkDto, LinkFilter } from './partner-link.service.js';
 
-export { PartnerRoutineService } from './partner-routine.service';
+export { PartnerRoutineService } from './partner-routine.service.js';
 export type {
   CreatePartnerRoutineDto,
   UpdatePartnerRoutineDto,
   RoutineFilter,
-} from './partner-routine.service';
+} from './partner-routine.service.js';
 
-export { PartnerEarningsService } from './partner-earnings.service';
+export { PartnerEarningsService } from './partner-earnings.service.js';
 export type {
   CreatePartnerEarningsDto,
   UpdatePartnerEarningsDto,
   EarningsFilter,
   EarningsSummary,
-} from './partner-earnings.service';
+} from './partner-earnings.service.js';
 
 // Phase 6-F: Influencer Tools
-export { AIRoutineService } from './ai-routine.service';
+export { AIRoutineService } from './ai-routine.service.js';
 export type {
   GenerateRoutineDto,
   GeneratedRoutine,
   AIRoutineStep,
-} from './ai-routine.service';
+} from './ai-routine.service.js';
 
-export { AIDescriptionService } from './ai-description.service';
+export { AIDescriptionService } from './ai-description.service.js';
 export type {
   GenerateDescriptionDto,
   GeneratedDescription,
-} from './ai-description.service';
+} from './ai-description.service.js';
 
-export { PartnerStorefrontService } from './partner-storefront.service';
+export { PartnerStorefrontService } from './partner-storefront.service.js';
 export type {
   StorefrontConfig,
   StorefrontSection,
   StorefrontData,
   CreateStorefrontDto,
   UpdateStorefrontDto,
-} from './partner-storefront.service';
+} from './partner-storefront.service.js';
 
-export { QRLandingService } from './qr-landing.service';
+export { QRLandingService } from './qr-landing.service.js';
 export type {
   GenerateQRDto,
   QRCodeResult,
   LandingPageData,
   CreateShortLinkDto,
   ShortLinkResult,
-} from './qr-landing.service';
+} from './qr-landing.service.js';
 
-export { SocialShareService } from './social-share.service';
+export { SocialShareService } from './social-share.service.js';
 export type {
   GenerateShareContentDto,
   ShareContent,
   ShareAnalytics,
-} from './social-share.service';
+} from './social-share.service.js';
 
-export { CampaignPublisherService } from './campaign-publisher.service';
+export { CampaignPublisherService } from './campaign-publisher.service.js';
 export type {
   CampaignDto,
   Campaign,
@@ -71,4 +71,4 @@ export type {
   CampaignGoals,
   CampaignStats,
   CampaignTemplate,
-} from './campaign-publisher.service';
+} from './campaign-publisher.service.js';

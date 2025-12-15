@@ -8,34 +8,34 @@ import { Router } from 'express';
 import type { Repository, DataSource } from 'typeorm';
 
 // Entities
-import { PartnerProfile } from '../entities/partner-profile.entity';
-import { PartnerLink } from '../entities/partner-link.entity';
-import { PartnerRoutine } from '../entities/partner-routine.entity';
-import { PartnerEarnings } from '../entities/partner-earnings.entity';
+import { PartnerProfile } from '../entities/partner-profile.entity.js';
+import { PartnerLink } from '../entities/partner-link.entity.js';
+import { PartnerRoutine } from '../entities/partner-routine.entity.js';
+import { PartnerEarnings } from '../entities/partner-earnings.entity.js';
 
 // Services
-import { PartnerProfileService } from '../services/partner-profile.service';
-import { PartnerLinkService } from '../services/partner-link.service';
-import { PartnerRoutineService } from '../services/partner-routine.service';
-import { PartnerEarningsService } from '../services/partner-earnings.service';
-import { AIRoutineService } from '../services/ai-routine.service';
-import { AIDescriptionService } from '../services/ai-description.service';
-import { PartnerStorefrontService } from '../services/partner-storefront.service';
-import { QRLandingService } from '../services/qr-landing.service';
-import { SocialShareService } from '../services/social-share.service';
-import { CampaignPublisherService } from '../services/campaign-publisher.service';
+import { PartnerProfileService } from '../services/partner-profile.service.js';
+import { PartnerLinkService } from '../services/partner-link.service.js';
+import { PartnerRoutineService } from '../services/partner-routine.service.js';
+import { PartnerEarningsService } from '../services/partner-earnings.service.js';
+import { AIRoutineService } from '../services/ai-routine.service.js';
+import { AIDescriptionService } from '../services/ai-description.service.js';
+import { PartnerStorefrontService } from '../services/partner-storefront.service.js';
+import { QRLandingService } from '../services/qr-landing.service.js';
+import { SocialShareService } from '../services/social-share.service.js';
+import { CampaignPublisherService } from '../services/campaign-publisher.service.js';
 
 // Controllers
-import { PartnerProfileController } from '../controllers/partner-profile.controller';
-import { PartnerLinkController } from '../controllers/partner-link.controller';
-import { PartnerRoutineController } from '../controllers/partner-routine.controller';
-import { PartnerEarningsController } from '../controllers/partner-earnings.controller';
-import { AIRoutineController } from '../controllers/ai-routine.controller';
-import { AIDescriptionController } from '../controllers/ai-description.controller';
-import { PartnerStorefrontController } from '../controllers/partner-storefront.controller';
-import { QRLandingController } from '../controllers/qr-landing.controller';
-import { SocialShareController } from '../controllers/social-share.controller';
-import { CampaignPublisherController } from '../controllers/campaign-publisher.controller';
+import { PartnerProfileController } from '../controllers/partner-profile.controller.js';
+import { PartnerLinkController } from '../controllers/partner-link.controller.js';
+import { PartnerRoutineController } from '../controllers/partner-routine.controller.js';
+import { PartnerEarningsController } from '../controllers/partner-earnings.controller.js';
+import { AIRoutineController } from '../controllers/ai-routine.controller.js';
+import { AIDescriptionController } from '../controllers/ai-description.controller.js';
+import { PartnerStorefrontController } from '../controllers/partner-storefront.controller.js';
+import { QRLandingController } from '../controllers/qr-landing.controller.js';
+import { SocialShareController } from '../controllers/social-share.controller.js';
+import { CampaignPublisherController } from '../controllers/campaign-publisher.controller.js';
 
 export interface PartnerExtensionRoutesDeps {
   profileRepository: Repository<PartnerProfile>;

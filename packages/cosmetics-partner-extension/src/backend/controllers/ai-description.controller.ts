@@ -8,7 +8,7 @@
  */
 
 import { Request, Response } from 'express';
-import { AIDescriptionService, GenerateDescriptionDto } from '../services/ai-description.service';
+import { AIDescriptionService, GenerateDescriptionDto } from '../services/ai-description.service.js';
 
 export class AIDescriptionController {
   constructor(private aiDescriptionService: AIDescriptionService) {}

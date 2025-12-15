@@ -10,7 +10,7 @@
  */
 
 import { Request, Response } from 'express';
-import { QRLandingService, GenerateQRDto, CreateShortLinkDto } from '../services/qr-landing.service';
+import { QRLandingService, GenerateQRDto, CreateShortLinkDto } from '../services/qr-landing.service.js';
 
 export class QRLandingController {
   constructor(private qrLandingService: QRLandingService) {}
