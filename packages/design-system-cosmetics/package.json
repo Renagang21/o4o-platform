@@ -1,0 +1,43 @@
+{
+    "name": "@o4o/design-system-cosmetics",
+    "version": "1.0.0",
+    "description": "Antigravity Design System for Cosmetics Suite",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./layouts": {
+            "types": "./dist/layouts/index.d.ts",
+            "import": "./dist/layouts/index.js"
+        },
+        "./components": {
+            "types": "./dist/components/index.d.ts",
+            "import": "./dist/components/index.js"
+        },
+        "./theme": {
+            "types": "./dist/theme/index.d.ts",
+            "import": "./dist/theme/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "clean": "rimraf dist",
+        "type-check": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.79",
+        "@types/react-dom": "^18.2.25",
+        "typescript": "^5.4.5",
+        "rimraf": "^5.0.5"
+    },
+    "dependencies": {}
+}

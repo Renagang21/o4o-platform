@@ -19,8 +19,8 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import { EcommerceOrderItem } from './EcommerceOrderItem.entity.js';
-import { EcommercePayment } from './EcommercePayment.entity.js';
+import type { EcommerceOrderItem } from './EcommerceOrderItem.entity.js';
+import type { EcommercePayment } from './EcommercePayment.entity.js';
 
 /**
  * 주문 유형 (OrderType)
@@ -288,9 +288,9 @@ export class EcommerceOrder {
 
   // ===== Relations =====
 
-  @OneToMany(() => EcommerceOrderItem, (item) => item.order)
+  @OneToMany('EcommerceOrderItem', 'order')
   items?: EcommerceOrderItem[];
 
-  @OneToMany(() => EcommercePayment, (payment) => payment.order)
+  @OneToMany('EcommercePayment', 'order')
   payments?: EcommercePayment[];
 }

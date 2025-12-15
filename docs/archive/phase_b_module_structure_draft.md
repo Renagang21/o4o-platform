@@ -1,7 +1,16 @@
+> ⚠️ **ARCHIVED DOCUMENT** - Phase B 분석 문서
+>
+> 본 문서는 CLAUDE.md v2.0 Constitution으로 대체되었습니다.
+> Phase C Baseline 이후 개발 규칙은 CLAUDE.md를 우선 참조하세요.
+>
+> **아카이브 일자**: 2025-12-15
+
+---
+
 # Step 25 Phase B: Module Structure Analysis & Refactoring Plan
 
 **Date**: 2025-12-03
-**Status**: Draft
+**Status**: ARCHIVED (superseded by CLAUDE.md v2.0)
 **Phase**: Analysis Complete, Implementation Planning
 
 ---

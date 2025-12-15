@@ -9,17 +9,28 @@ import { PartnerProfile, PartnerType, PartnerStatus, SocialLinks } from '../enti
 
 export interface CreatePartnerProfileDto {
   userId: string;
-  referralCode: string;
+  referralCode?: string;
   partnerType: PartnerType;
+  displayName?: string;
+  introduction?: string;
   socialLinks?: SocialLinks;
   bio?: string;
+  profileImageUrl?: string;
+  instagramHandle?: string;
+  youtubeChannel?: string;
   metadata?: Record<string, unknown>;
 }
 
 export interface UpdatePartnerProfileDto {
   partnerType?: PartnerType;
+  displayName?: string;
+  introduction?: string;
   socialLinks?: SocialLinks;
   bio?: string;
+  profileImageUrl?: string;
+  defaultCommissionRate?: number;
+  instagramHandle?: string;
+  youtubeChannel?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -77,13 +88,14 @@ export class PartnerProfileService {
     return this.profileRepository.save(profile);
   }
 
-  async updateStatus(id: string, status: PartnerStatus): Promise<PartnerProfile> {
+  async updateStatus(id: string, status: PartnerStatus, _approvedBy?: string): Promise<PartnerProfile> {
     const profile = await this.findById(id);
     if (!profile) {
       throw new Error('Partner profile not found');
     }
 
     profile.status = status;
+    // TODO: Track approvedBy in metadata if needed
     return this.profileRepository.save(profile);
   }
 
@@ -123,6 +135,25 @@ export class PartnerProfileService {
     return this.profileRepository.find({
       where: { status },
       order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findAll(options?: {
+    status?: PartnerStatus;
+    partnerType?: PartnerType;
+    page?: number;
+    limit?: number;
+    offset?: number;
+  }): Promise<PartnerProfile[]> {
+    const where: any = {};
+    if (options?.status) where.status = options.status;
+    if (options?.partnerType) where.partnerType = options.partnerType;
+
+    return this.profileRepository.find({
+      where: Object.keys(where).length > 0 ? where : undefined,
+      order: { createdAt: 'DESC' },
+      take: options?.limit,
+      skip: options?.offset ?? (options?.page ? (options.page - 1) * (options.limit || 10) : undefined),
     });
   }
 

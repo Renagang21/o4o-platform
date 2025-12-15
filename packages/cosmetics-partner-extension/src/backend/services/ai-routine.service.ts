@@ -19,7 +19,7 @@ export interface GenerateRoutineDto {
   stepCount?: number;
 }
 
-export interface RoutineStep {
+export interface AIRoutineStep {
   order: number;
   category: string;
   productName: string;
@@ -35,7 +35,7 @@ export interface GeneratedRoutine {
   routineType: 'morning' | 'evening' | 'weekly' | 'special';
   skinTypes: string[];
   concerns: string[];
-  steps: RoutineStep[];
+  steps: AIRoutineStep[];
   reasoning: string;
   estimatedTime: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
@@ -175,8 +175,8 @@ export class AIRoutineService {
     concerns: string[],
     skinTypes: string[],
     maxSteps?: number
-  ): RoutineStep[] {
-    const steps: RoutineStep[] = [];
+  ): AIRoutineStep[] {
+    const steps: AIRoutineStep[] = [];
 
     // Determine which categories are priority based on concerns
     const priorityCategories = new Set<string>();
@@ -374,7 +374,7 @@ export class AIRoutineService {
   private generateReasoning(
     concerns: string[],
     skinTypes: string[],
-    steps: RoutineStep[]
+    steps: AIRoutineStep[]
   ): string {
     const parts: string[] = [];
 

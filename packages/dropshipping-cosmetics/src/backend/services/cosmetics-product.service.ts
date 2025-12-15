@@ -11,7 +11,7 @@
 
 import { DataSource, Repository } from 'typeorm';
 import { type Product, isCosmeticsProduct } from '../types/product.types.js';
-import { CosmeticsRoutine } from '../entities/cosmetics-routine.entity.js';
+import { RoutineReaderService, type ReadOnlyRoutine } from './routine-reader.service.js';
 
 export interface CosmeticsProductDetail {
   id: string;
@@ -37,11 +37,12 @@ export interface CosmeticsProductDetail {
 
 export class CosmeticsProductService {
   private productRepo: Repository<Product>;
-  private routineRepo: Repository<CosmeticsRoutine>;
+  private routineReader: RoutineReaderService;
 
   constructor(private dataSource: DataSource) {
     this.productRepo = dataSource.getRepository('Product') as Repository<Product>;
-    this.routineRepo = dataSource.getRepository(CosmeticsRoutine);
+    // Use read-only RoutineReaderService for PartnerRoutine access (Phase 7-Y)
+    this.routineReader = new RoutineReaderService(dataSource);
   }
 
   /**
@@ -120,20 +121,11 @@ export class CosmeticsProductService {
 
   /**
    * Find routines that include this product
+   * Uses read-only RoutineReaderService for PartnerRoutine access (Phase 7-Y)
    */
-  private async findRoutinesByProduct(productId: string): Promise<CosmeticsRoutine[]> {
+  private async findRoutinesByProduct(productId: string): Promise<ReadOnlyRoutine[]> {
     try {
-      // Query routines where steps contain this productId
-      const routines = await this.routineRepo
-        .createQueryBuilder('routine')
-        .where('routine.isPublished = :isPublished', { isPublished: true })
-        .andWhere(`routine.steps::text LIKE :productId`, {
-          productId: `%${productId}%`
-        })
-        .select(['routine.id', 'routine.title', 'routine.partnerId'])
-        .getMany();
-
-      return routines;
+      return await this.routineReader.findRoutinesByProduct(productId);
     } catch (error) {
       console.error('[CosmeticsProduct] Error finding routine matches:', error);
       return [];

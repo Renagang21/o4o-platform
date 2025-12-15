@@ -1,6 +1,10 @@
 # Manifest Guideline
 
-**버전:** 2.0.0
+> ⚠ 본 문서는 CLAUDE.md v2.0을 기준으로 하며,
+> 충돌 시 CLAUDE.md를 우선한다.
+> 상세 규격은 `manifest-specification.md`를 참조한다.
+
+**버전:** 2.1.0
 **상태:** Active
 
 ---
@@ -20,7 +24,7 @@ manifest는 AppStore와 Module Loader가 해석하는 앱의 "설계도"이다.
 |------|------|------|------|
 | `appId` | string | Y | 앱 고유 식별자 |
 | `name` | string | Y | 앱 표시 이름 |
-| `type` | enum | Y | core / extension / service |
+| `type` | enum | Y | CLAUDE.md §2.2 참조 (core/feature/extension/standalone 등) |
 | `version` | string | Y | 버전 (semver) |
 | `dependencies` | string[] | N | 의존 앱 목록 |
 | `cpt` | CPTDef[] | N | Custom Post Types |
@@ -82,7 +86,7 @@ export const manifest: AppManifest = {
 ## 5. Rules
 
 1. **appId 고유성**: appId는 플랫폼 전체에서 고유해야 한다.
-2. **type 정확성**: core/extension/service 중 정확한 타입을 선택한다.
+2. **type 정확성**: CLAUDE.md §2.2의 App 유형 체계에서 정확한 타입을 선택한다.
 3. **dependencies 정확성**: 의존 앱은 정확하게 명시해야 순서 충돌이 없다.
 4. **route prefix 규칙**: `/api/v1/{app-name}` 형식을 따른다.
 5. **lifecycle 경로**: lifecycle 훅은 상대 경로로 지정한다.
