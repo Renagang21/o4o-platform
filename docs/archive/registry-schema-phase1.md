@@ -1,8 +1,17 @@
+> ⚠️ **ARCHIVED DOCUMENT** - Phase 1 설계 문서
+>
+> 본 문서는 CLAUDE.md v2.0으로 대체되었습니다.
+> 현재 AppType 체계는 CLAUDE.md §2.2 및 `docs/app-guidelines/manifest-specification.md`를 참조하세요.
+>
+> **아카이브 일자**: 2025-12-15
+
+---
+
 # App Registry 데이터베이스 스키마 설계
 
 **작성일**: 2025-11-28
 **Phase**: AM2 – App Market V1 설계
-**상태**: ✅ 설계 완료
+**상태**: ⏸️ ARCHIVED (CLAUDE.md v2.0으로 대체)
 **데이터베이스**: PostgreSQL 14+
 
 ---
