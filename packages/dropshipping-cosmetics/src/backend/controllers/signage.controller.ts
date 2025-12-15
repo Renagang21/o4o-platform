@@ -7,7 +7,7 @@
 
 import type { Request, Response } from 'express';
 import { CosmeticsFilterService } from '../services/cosmetics-filter.service.js';
-import { InfluencerRoutineService } from '../services/influencer-routine.service.js';
+import { RoutineReaderService, type ReadOnlyRoutine } from '../services/routine-reader.service.js';
 
 export interface SignageProductData {
   id: string;
@@ -39,14 +39,14 @@ export interface SignageRoutineData {
 
 export class SignageController {
   private filterService: CosmeticsFilterService;
-  private routineService: InfluencerRoutineService;
+  private routineReader: RoutineReaderService;
 
   constructor(
     filterService: CosmeticsFilterService,
-    routineService: InfluencerRoutineService
+    routineReader: RoutineReaderService
   ) {
     this.filterService = filterService;
-    this.routineService = routineService;
+    this.routineReader = routineReader;
   }
 
   /**
@@ -102,40 +102,50 @@ export class SignageController {
   /**
    * GET /api/v1/cosmetics/routines/signage
    * Get routines formatted for digital signage display
+   *
+   * Uses RoutineReaderService (read-only) to access PartnerRoutine data.
+   * @see Phase 7-Y: Routine Entity Consolidation
    */
   async getRoutinesForSignage(req: Request, res: Response): Promise<void> {
     try {
       const { skinType, concerns, timeOfUse, limit = 5 } = req.query;
 
-      // Build filters
-      const filters: any = {};
-      if (skinType)
-        filters.skinType = Array.isArray(skinType) ? skinType : [skinType];
-      if (concerns)
-        filters.concerns = Array.isArray(concerns) ? concerns : [concerns];
-      if (timeOfUse) filters.timeOfUse = timeOfUse;
+      // Build filters for RoutineReaderService
+      const filters = {
+        skinType: skinType
+          ? Array.isArray(skinType)
+            ? (skinType as string[])
+            : [skinType as string]
+          : undefined,
+        concerns: concerns
+          ? Array.isArray(concerns)
+            ? (concerns as string[])
+            : [concerns as string]
+          : undefined,
+        timeOfUse: timeOfUse as string | undefined,
+      };
 
-      // Get published routines
-      const routines = await this.routineService.getPublishedRoutines(filters);
+      // Get published routines via read-only service
+      const routines = await this.routineReader.getPublishedRoutines(filters);
 
-      // Format for signage
+      // Format for signage - map PartnerRoutine fields
       const signageRoutines: SignageRoutineData[] = routines
         .slice(0, Number(limit))
-        .map((routine) => ({
+        .map((routine: ReadOnlyRoutine) => ({
           id: routine.id,
           title: routine.title,
           partnerId: routine.partnerId,
           partnerName: undefined, // TODO: Get from partner service
-          skinType: routine.metadata.skinType || [],
-          concerns: routine.metadata.concerns || [],
-          timeOfUse: routine.metadata.timeOfUse || 'both',
-          steps: routine.steps.map((step: any) => ({
-            order: step.orderInRoutine,
-            category: step.category,
-            productName: step.product?.name || 'Unknown Product',
+          skinType: routine.skinTypes || [],
+          concerns: routine.skinConcerns || [],
+          timeOfUse: routine.routineType || 'morning',
+          steps: routine.steps.map((step) => ({
+            order: step.order,
+            category: step.description || 'Unknown',
+            productName: step.productId, // TODO: Resolve product name
           })),
           viewCount: routine.viewCount,
-          recommendCount: routine.recommendCount,
+          recommendCount: routine.likeCount,
         }));
 
       res.json({

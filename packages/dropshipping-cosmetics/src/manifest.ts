@@ -31,15 +31,8 @@ export const cosmeticsExtensionManifest = {
   extendsCPT: ['ds_product'],
 
   // Custom Post Types owned by this extension
-  cpt: [
-    {
-      name: 'cosmetics_influencer_routine',
-      storage: 'entity',
-      primaryKey: 'id',
-      label: 'Influencer Routine',
-      supports: ['title', 'metadata'],
-    },
-  ],
+  // cosmetics_influencer_routine CPT REMOVED (Phase 7-Y) - PartnerRoutine is canonical
+  cpt: [],
 
   // ACF field groups for cosmetics metadata
   acf: [
@@ -218,121 +211,14 @@ export const cosmeticsExtensionManifest = {
       ],
     },
 
-    // Influencer Routine metadata
-    {
-      groupId: 'influencer_routine_metadata',
-      label: 'Influencer Routine Information',
-      appliesTo: 'cosmetics_influencer_routine',
-      fields: [
-        {
-          key: 'partnerId',
-          label: 'Partner ID',
-          type: 'string',
-          required: true,
-        },
-        {
-          key: 'title',
-          label: 'Routine Title',
-          type: 'string',
-          required: true,
-        },
-        {
-          key: 'description',
-          label: 'Description',
-          type: 'text',
-          required: false,
-        },
-        {
-          key: 'skinType',
-          label: 'Skin Type',
-          type: 'multiselect',
-          required: true,
-          choices: {
-            dry: '건성',
-            oily: '지성',
-            combination: '복합성',
-            sensitive: '민감성',
-            normal: '정상',
-          },
-        },
-        {
-          key: 'concerns',
-          label: 'Skin Concerns',
-          type: 'multiselect',
-          required: true,
-          choices: {
-            acne: '여드름',
-            whitening: '미백',
-            wrinkle: '주름',
-            pore: '모공',
-            soothing: '진정',
-            moisturizing: '보습',
-            elasticity: '탄력',
-            trouble: '트러블',
-          },
-        },
-        {
-          key: 'timeOfUse',
-          label: 'Time of Use',
-          type: 'select',
-          required: true,
-          choices: {
-            morning: '아침',
-            evening: '저녁',
-            both: '아침/저녁 모두',
-          },
-        },
-        {
-          key: 'routine',
-          label: 'Routine Steps',
-          type: 'array',
-          required: true,
-        },
-        {
-          key: 'tags',
-          label: 'Tags',
-          type: 'multiselect',
-          required: false,
-          choices: {
-            beginner: '초보자 추천',
-            sensitive: '민감성',
-            budget: '가성비',
-            premium: '프리미엄',
-            simple: '간단한 루틴',
-            complete: '완전한 루틴',
-          },
-        },
-        {
-          key: 'isPublished',
-          label: 'Published',
-          type: 'boolean',
-          required: true,
-          defaultValue: false,
-        },
-        {
-          key: 'viewCount',
-          label: 'View Count',
-          type: 'number',
-          required: false,
-          defaultValue: 0,
-        },
-        {
-          key: 'recommendCount',
-          label: 'Recommend Count',
-          type: 'number',
-          required: false,
-          defaultValue: 0,
-        },
-      ],
-    },
+    // Influencer Routine metadata REMOVED (Phase 7-Y) - PartnerRoutine manages routine metadata
   ],
 
   // Routes - extending core routes
   routes: [
     '/api/v1/cosmetics',
     '/api/v1/cosmetics/*',
-    '/api/v1/partner/routines',
-    '/api/v1/partner/routines/*',
+    // '/api/v1/partner/routines' REMOVED (Phase 7-Y) - Routine CRUD moved to cosmetics-partner-extension
   ],
 
   // Permissions (extending core permissions)
@@ -439,7 +325,7 @@ export const cosmeticsExtensionManifest = {
   // ===== 소유 테이블 =====
   ownsTables: [
     'cosmetics_filters',
-    'cosmetics_routines',
+    // 'cosmetics_routines' REMOVED (Phase 7-Y) - PartnerRoutine owns cosmetics_partner_routines
     'cosmetics_brands',
     'cosmetics_skin_types',
     'cosmetics_concerns',
@@ -461,7 +347,7 @@ export const cosmeticsExtensionManifest = {
   backend: {
     entities: [
       './backend/entities/cosmetics-filter.entity',
-      './backend/entities/cosmetics-routine.entity',
+      // cosmetics-routine.entity REMOVED (Phase 7-Y) - PartnerRoutine is canonical
       './backend/entities/brand.entity',
       './backend/entities/skin-type.entity',
       './backend/entities/concern.entity',
@@ -473,7 +359,7 @@ export const cosmeticsExtensionManifest = {
     ],
     services: [
       'CosmeticsMetadataService',
-      'RoutineService',
+      // 'RoutineService' REMOVED (Phase 7-Y) - Use PartnerRoutine from partner-extension
     ],
     controllers: [],
     routesExport: 'createRoutes',

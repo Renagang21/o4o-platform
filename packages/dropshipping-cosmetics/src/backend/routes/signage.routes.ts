@@ -8,13 +8,14 @@ import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import { SignageController } from '../controllers/signage.controller.js';
 import { CosmeticsFilterService } from '../services/cosmetics-filter.service.js';
-import { InfluencerRoutineService } from '../services/influencer-routine.service.js';
+import { RoutineReaderService } from '../services/routine-reader.service.js';
 
 export function createSignageRoutes(dataSource: DataSource): Router {
   const router = Router();
   const filterService = new CosmeticsFilterService(dataSource);
-  const routineService = new InfluencerRoutineService(dataSource);
-  const controller = new SignageController(filterService, routineService);
+  // Use read-only RoutineReaderService for PartnerRoutine access (Phase 7-Y)
+  const routineReader = new RoutineReaderService(dataSource);
+  const controller = new SignageController(filterService, routineReader);
 
   // GET /api/v1/cosmetics/products/signage - Get products for signage
   // Query params: skinType, concerns, category, limit, featured

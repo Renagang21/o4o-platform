@@ -486,18 +486,36 @@ DROP TABLE cosmetics_routines;
 | Boundary Map 완료 | ✅ |
 | 중복 제거 제안서 문서화 | ✅ |
 | develop에 영향 없는 조사-only 작업 | ✅ |
-| Phase 8 진입 조건 충족 | ⚠️ P1, P2 조치 필요 |
+| Phase 8 진입 조건 충족 | ✅ **Phase 7-Y 완료** |
 
 ---
 
 ## 11. Phase 8 진입 조건
 
-### 필수 조치 (Blocking)
+### 필수 조치 (Blocking) - **✅ ALL RESOLVED**
 
-| ID | 조치 | 담당 | 예상 공수 |
-|----|------|------|-----------|
-| P1 | Routine Entity 통합 | Backend | 1일 |
-| P2 | API Route Conflict 해결 | Backend | 0.5일 |
+| ID | 조치 | 담당 | 상태 | 해결 방법 |
+|----|------|------|------|-----------|
+| P1 | Routine Entity 통합 | Backend | ✅ 완료 | CosmeticsRoutine 제거, PartnerRoutine으로 통합 |
+| P2 | API Route Conflict 해결 | Backend | ✅ 완료 | Core `/api/v1/partner/routines` 제거, Extension에서 단일 소유 |
+
+#### P1 해결 상세 (Phase 7-Y-1)
+- **삭제된 파일:**
+  - `cosmetics-routine.entity.ts`
+  - `influencer-routine.service.ts`
+  - `influencer-routine.controller.ts`
+  - `influencer-routine.routes.ts`
+- **신규 생성:**
+  - `routine-reader.service.ts` (read-only PartnerRoutine 접근)
+  - Migration scripts (`migrate-cosmetics-routines.sql`, `MigrateCosmeticsRoutines.ts`)
+- **업데이트:**
+  - Signage 컨트롤러가 RoutineReaderService 사용
+  - Frontend shortcode가 Extension API 사용
+
+#### P2 해결 상세 (Phase 7-Y-2)
+- Core의 `/api/v1/partner/routines` 라우트 완전 제거
+- Extension의 `/api/v1/partner/routine` 라우트가 유일한 Routine CRUD 담당
+- Frontend shortcode 업데이트로 새 엔드포인트 사용
 
 ### 권장 조치 (Non-Blocking)
 
@@ -511,7 +529,7 @@ DROP TABLE cosmetics_routines;
 
 ## 부록 A: 전체 API 엔드포인트 목록
 
-### dropshipping-cosmetics (102 endpoints)
+### dropshipping-cosmetics (102 → ~95 endpoints after Phase 7-Y)
 <details>
 <summary>펼치기</summary>
 
@@ -523,9 +541,9 @@ DROP TABLE cosmetics_routines;
 /api/v1/cosmetics/product/:id (detail)
 /api/v1/cosmetics/recommendations
 /api/v1/cosmetics/dictionary/* (skin-types, concerns, ingredients, categories)
-/api/v1/partner/routines/* (influencer routines)
+# /api/v1/partner/routines/* REMOVED (Phase 7-Y) → use partner-extension
 /api/v1/cosmetics/seller-workflow/*
-/api/v1/cosmetics/signage/*
+/api/v1/cosmetics/signage/* (read-only via RoutineReaderService)
 ```
 </details>
 

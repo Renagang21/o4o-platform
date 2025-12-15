@@ -3,11 +3,54 @@
  *
  * Shortcode: [cosmetics-routine partner_id="xxx"]
  *
- * Displays influencer beauty routines
+ * Displays partner beauty routines.
+ * Uses cosmetics-partner-extension API (Phase 7-Y).
  */
 
 import React, { useState, useEffect } from 'react';
-import type { InfluencerRoutine } from '../../types.js';
+
+/**
+ * Display-friendly routine interface
+ * Mapped from PartnerRoutine API response
+ */
+interface DisplayRoutine {
+  id: string;
+  partnerId: string;
+  title: string;
+  description?: string;
+  skinType: string[];
+  concerns: string[];
+  timeOfUse: string;
+  routine: Array<{
+    step: number;
+    category: string;
+    product: any;
+    description: string;
+    orderInRoutine: number;
+  }>;
+  viewCount: number;
+  recommendCount: number;
+}
+
+/**
+ * PartnerRoutine API response structure
+ */
+interface PartnerRoutineResponse {
+  id: string;
+  partnerId: string;
+  title: string;
+  description?: string;
+  routineType: string;
+  skinTypes?: string[];
+  skinConcerns?: string[];
+  steps: Array<{
+    order: number;
+    productId: string;
+    description: string;
+  }>;
+  viewCount: number;
+  likeCount: number;
+}
 
 export interface CosmeticsRoutineProps {
   partnerId?: string;
@@ -22,38 +65,71 @@ export const CosmeticsRoutine: React.FC<CosmeticsRoutineProps> = ({
   skinType,
   concerns,
 }) => {
-  const [routines, setRoutines] = useState<InfluencerRoutine[]>([]);
+  const [routines, setRoutines] = useState<DisplayRoutine[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchRoutines();
   }, [partnerId, routineId, skinType, concerns]);
 
+  /**
+   * Map PartnerRoutine API response to display format
+   */
+  const mapToDisplayRoutine = (routine: PartnerRoutineResponse): DisplayRoutine => ({
+    id: routine.id,
+    partnerId: routine.partnerId,
+    title: routine.title,
+    description: routine.description,
+    skinType: routine.skinTypes || [],
+    concerns: routine.skinConcerns || [],
+    timeOfUse: routine.routineType || 'morning',
+    routine: (routine.steps || []).map((step, index) => ({
+      step: index + 1,
+      category: step.description || 'Unknown',
+      product: { id: step.productId },
+      description: step.description || '',
+      orderInRoutine: step.order,
+    })),
+    viewCount: routine.viewCount || 0,
+    recommendCount: routine.likeCount || 0,
+  });
+
   const fetchRoutines = async () => {
     setLoading(true);
 
     try {
-      let url = '/api/v1/partner/routines';
+      // Use cosmetics-partner-extension API (Phase 7-Y)
+      let url = '/api/v1/partner/routine';
 
-      // Build query params
+      if (routineId) {
+        // Fetch single routine
+        url += `/${routineId}`;
+      } else if (partnerId) {
+        // Fetch by partner
+        url += `/partner/${partnerId}`;
+      } else {
+        // Fetch public routines
+        url += '/public/all';
+      }
+
+      // Build query params for filtering
       const params = new URLSearchParams();
-      if (partnerId) params.append('partnerId', partnerId);
       if (skinType) skinType.forEach((t) => params.append('skinType', t));
       if (concerns) concerns.forEach((c) => params.append('concerns', c));
 
-      if (routineId) {
-        url += `/${routineId}`;
-      } else if (params.toString()) {
+      if (params.toString()) {
         url += `?${params.toString()}`;
       }
 
       const response = await fetch(url);
-      const data = await response.json() as { data?: InfluencerRoutine | InfluencerRoutine[] };
+      const data = await response.json() as { data?: PartnerRoutineResponse | PartnerRoutineResponse[] };
 
       if (routineId) {
-        setRoutines(data.data ? [data.data as InfluencerRoutine] : []);
+        const single = data.data as PartnerRoutineResponse;
+        setRoutines(single ? [mapToDisplayRoutine(single)] : []);
       } else {
-        setRoutines((data.data as InfluencerRoutine[]) || []);
+        const list = (data.data as PartnerRoutineResponse[]) || [];
+        setRoutines(list.map(mapToDisplayRoutine));
       }
     } catch (error) {
       console.error('Error fetching routines:', error);

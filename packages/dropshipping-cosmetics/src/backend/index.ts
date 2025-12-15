@@ -10,11 +10,12 @@ import { createCosmeticsModule, CosmeticsEntities } from './module.js';
 
 export * from './entities/index.js';
 export * from './services/cosmetics-filter.service.js';
-export * from './services/influencer-routine.service.js';
+// influencer-routine.service REMOVED (Phase 7-Y) - Routine CRUD moved to cosmetics-partner-extension
+export * from './services/routine-reader.service.js'; // Read-only PartnerRoutine access (Phase 7-Y)
 export * from './services/recommendation-engine.service.js';
 export * from './services/brand.service.js';
 export * from './controllers/cosmetics-filter.controller.js';
-export * from './controllers/influencer-routine.controller.js';
+// influencer-routine.controller REMOVED (Phase 7-Y) - Routine CRUD moved to cosmetics-partner-extension
 export * from './controllers/signage.controller.js';
 export * from './controllers/recommendation.controller.js';
 export * from './controllers/brand.controller.js';
