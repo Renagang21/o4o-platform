@@ -24,3 +24,6 @@ export {
 } from './types.js';
 
 export * from './backend/index.js';
+
+// Lifecycle
+export * from './lifecycle/index.js';

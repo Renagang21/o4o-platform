@@ -17,6 +17,15 @@ export interface ActivateContext {
 export async function activate(context: ActivateContext): Promise<void> {
   console.log('[yaksa-scheduler] Activating...');
 
+  // Check if entityManager is provided (ModuleLoader may not provide it)
+  if (!context?.entityManager) {
+    console.log('[yaksa-scheduler] EntityManager not provided - scheduler will initialize on first API call');
+    // Register handlers anyway so they're ready when services are initialized
+    registerAllHandlers();
+    console.log('[yaksa-scheduler] Activation complete (deferred initialization)');
+    return;
+  }
+
   // Initialize services
   schedulerService.initialize(context.entityManager);
   jobMonitorService.initialize(context.entityManager);
