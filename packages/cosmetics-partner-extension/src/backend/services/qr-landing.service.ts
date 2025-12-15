@@ -310,11 +310,11 @@ export class QRLandingService {
           id: profile?.id || link.partnerId,
           name: profile?.userId || 'Partner',
           profileImage: undefined,
-          verified: profile?.status === 'approved',
+          verified: profile?.status === 'active',
         },
         link: {
           id: link.id,
-          title: link.title,
+          title: link.title || 'Link',
           description: link.description || undefined,
           productId: link.productId || undefined,
           targetUrl: link.targetUrl || undefined,
@@ -338,7 +338,7 @@ export class QRLandingService {
           id: profile.id,
           name: profile.userId,
           profileImage: undefined,
-          verified: profile.status === 'approved',
+          verified: profile.status === 'active',
         },
         meta: {
           title: `${profile.userId}의 뷰티 스토어`,

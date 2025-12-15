@@ -244,7 +244,7 @@ export class SocialShareService {
     if (!link) return null;
 
     return {
-      title: link.title,
+      title: link.title || 'Product Link',
       description: link.description || undefined,
       shareUrl: `https://neture.co.kr/p/${link.slug}`,
       category: link.metadata?.category as string | undefined,

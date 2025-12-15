@@ -343,10 +343,12 @@ export class CampaignPublisherService {
     const linkRepo = this.dataSource.getRepository(PartnerLink);
     const links = await linkRepo.findByIds(productIds);
 
-    return links.map((link) => ({
-      title: link.title,
-      description: link.description || undefined,
-    }));
+    return links
+      .filter((link) => link.title)
+      .map((link) => ({
+        title: link.title!,
+        description: link.description || undefined,
+      }));
   }
 
   /**

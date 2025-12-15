@@ -162,14 +162,14 @@ export class PartnerStorefrontService {
         bio: profile.bio || undefined,
         profileImage: undefined, // TODO: Add profile image support
         socialLinks: this.parseSocialLinks(profile),
-        verified: profile.status === 'approved',
+        verified: profile.status === 'active',
         totalFollowers: undefined, // TODO: Add follower count
       },
       config,
       sections,
       links: links.map((link) => ({
         id: link.id,
-        title: link.title,
+        title: link.title || 'Untitled Link',
         slug: link.slug,
         productId: link.productId || undefined,
         productImage: undefined, // TODO: Add product image
@@ -180,7 +180,7 @@ export class PartnerStorefrontService {
         id: routine.id,
         title: routine.title,
         description: routine.description || undefined,
-        skinTypes: routine.skinTypes,
+        skinTypes: routine.skinTypes || [],
         concerns: routine.concerns,
         steps: routine.steps,
         viewCount: routine.viewCount,
@@ -290,7 +290,7 @@ export class PartnerStorefrontService {
     };
 
     if (dto.sections) {
-      newMetadata.storefrontSections = dto.sections;
+      (newMetadata as any).storefrontSections = dto.sections;
     }
 
     await profileRepo.update(partnerId, {

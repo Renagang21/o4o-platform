@@ -33,6 +33,9 @@ export class PartnerLink {
   @Column({ type: 'varchar', length: 255 })
   partnerId!: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  title?: string;
+
   @Column({ type: 'varchar', length: 100, unique: true })
   urlSlug!: string;
 
@@ -42,11 +45,23 @@ export class PartnerLink {
   @Column({ type: 'varchar', length: 255 })
   targetId!: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  productId?: string;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  targetUrl?: string;
+
   @Column({ type: 'int', default: 0 })
   totalClicks!: number;
 
   @Column({ type: 'int', default: 0 })
+  clickCount!: number;
+
+  @Column({ type: 'int', default: 0 })
   conversions!: number;
+
+  @Column({ type: 'int', default: 0 })
+  conversionCount!: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   totalEarnings!: number;
@@ -68,4 +83,13 @@ export class PartnerLink {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  // Alias getter for urlSlug (backwards compatibility)
+  get slug(): string {
+    return this.urlSlug;
+  }
+
+  set slug(value: string) {
+    this.urlSlug = value;
+  }
 }
