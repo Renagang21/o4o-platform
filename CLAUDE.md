@@ -226,6 +226,27 @@ docs/app-guidelines/work-order-standard-header.md
 > ⚠ 해당 헤더가 없는 Work Order는 **무효**로 간주한다.
 > ⚠ 본 규칙을 위반한 개발 작업은 즉시 중단한다.
 
+### 6.4 신규 서비스 생성 표준 Work Order 규칙 (강제)
+
+모든 신규 서비스 생성 작업은 반드시 아래 표준 Work Order 템플릿을 사용해야 한다.
+
+```
+docs/app-guidelines/new-service-workorder-template.md
+```
+
+> ⚠ 본 템플릿을 사용하지 않은 신규 서비스 생성 작업은 **무효**로 간주한다.
+> ⚠ Service Template / InitPack / AppStore 정합성 판단은 본 템플릿을 기준으로 수행한다.
+
+**적용 대상**
+* 새로운 ServiceGroup 기반 서비스
+* 기존 서비스의 신규 버전/변형
+* Development → Active 전환을 목표로 하는 모든 서비스
+
+**금지 사항**
+* 템플릿 없이 임의로 Service Template 생성
+* InitPack 없이 Active 서비스 전환
+* Phase C Baseline을 벗어난 상태 지정
+
 ---
 
 ## 7. E-commerce Core 절대 규칙
@@ -298,6 +319,17 @@ docs/
 ├── guides/          # 사용자 매뉴얼
 └── plan/active/     # 진행 중인 작업
 ```
+
+### 9.2 표준 템플릿 참조 원칙
+
+CLAUDE.md가 참조하는 표준 템플릿 문서는 실무 실행 기준이며,
+모든 개발 에이전트는 이를 우선 적용한다.
+
+| 템플릿 | 용도 |
+|--------|------|
+| `work-order-standard-header.md` | 모든 Work Order 필수 헤더 |
+| `new-service-workorder-template.md` | 신규 서비스 생성 표준 |
+| `phase-d-new-app-checklist.md` | 신규 앱 개발 체크리스트 |
 
 ---
 

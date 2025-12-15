@@ -1,5 +1,8 @@
 # AppStore Overview
 
+> ⚠ 본 문서는 CLAUDE.md v2.0을 기준으로 하며,
+> 충돌 시 CLAUDE.md를 우선한다.
+
 > O4O Platform AppStore Architecture Specification
 
 ## 1. 목적 (Purpose)
@@ -24,13 +27,20 @@ WordPress의 플러그인/테마 시스템을 현대적으로 재해석하여, �
 
 앱의 메타정보, 의존성, 라우트, 메뉴, CPT/ACF, View 등을 선언하는 인터페이스
 
-### 3.2 Core App / Extension App / Service App
+### 3.2 App 유형 체계 (CLAUDE.md §2.2 참조)
 
-| 앱 타입 | 설명 | 예시 |
-|---------|------|------|
-| **Core App** | 플랫폼 기본 기능, 다른 앱에 의존하지 않음 | cms-core, organization-core, forum-core |
-| **Extension App** | Core 기능 확장, Core에만 의존 | forum-yaksa, membership-yaksa, sellerops |
-| **Service App** | 사용자 대면 서비스, Core+Extension 조합 | cosmetics-store, yaksa-intranet |
+> ⚠ 전체 8가지 App Type은 CLAUDE.md §2.2를 참조
+
+| 앱 타입 | AppStore 등록 | 설명 |
+|---------|---------------|------|
+| **core** | ✅ 필수 | 플랫폼/도메인 핵심 기능 |
+| **feature** | ✅ 필수 | 역할 기반 기능 |
+| **extension** | 서비스 Active 시 | Core 확장 기능 |
+| **standalone** | ✅ 필수 | 독립 서비스 |
+| **infra-core** | ❌ 비대상 | 빌드/런타임 인프라 |
+| **utility** | ❌ 비대상 | 보조 도구 |
+| **application** | ❌ 비대상 | /apps 실행체 |
+| **legacy** | ❌ 비대상 | 폐기 예정 |
 
 ### 3.3 Lifecycle Hooks
 
