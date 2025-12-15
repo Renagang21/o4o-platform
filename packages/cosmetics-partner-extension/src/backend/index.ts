@@ -7,26 +7,26 @@
 
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
-import { createPartnerExtensionRoutes } from './routes/partner-extension.routes';
+import { createPartnerExtensionRoutes } from './routes/partner-extension.routes.js';
 
 // Entities
-export * from './entities';
+export * from './entities/index.js';
 
 // Import entities for Module Loader
-import { PartnerProfile } from './entities/partner-profile.entity';
-import { PartnerLink } from './entities/partner-link.entity';
-import { PartnerRoutine } from './entities/partner-routine.entity';
-import { PartnerEarnings } from './entities/partner-earnings.entity';
-import { CommissionPolicy } from './entities/commission-policy.entity';
+import { PartnerProfile } from './entities/partner-profile.entity.js';
+import { PartnerLink } from './entities/partner-link.entity.js';
+import { PartnerRoutine } from './entities/partner-routine.entity.js';
+import { PartnerEarnings } from './entities/partner-earnings.entity.js';
+import { CommissionPolicy } from './entities/commission-policy.entity.js';
 
 // Services
-export * from './services';
+export * from './services/index.js';
 
 // Controllers
-export * from './controllers';
+export * from './controllers/index.js';
 
 // Routes
-export * from './routes';
+export * from './routes/index.js';
 
 /**
  * Routes factory compatible with Module Loader
