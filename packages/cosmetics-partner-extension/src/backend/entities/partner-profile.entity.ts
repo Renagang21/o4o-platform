@@ -65,6 +65,15 @@ export class PartnerProfile {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, unknown>;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  instagramHandle?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  youtubeChannel?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  displayName?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 

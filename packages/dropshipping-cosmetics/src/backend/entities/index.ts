@@ -7,7 +7,7 @@
  */
 
 export { CosmeticsFilter } from './cosmetics-filter.entity.js';
-export { CosmeticsRoutine } from './cosmetics-routine.entity.js';
+// CosmeticsRoutine REMOVED - Use PartnerRoutine from cosmetics-partner-extension (Phase 7-Y)
 export { CosmeticsBrand } from './brand.entity.js';
 
 // Dictionary Entities

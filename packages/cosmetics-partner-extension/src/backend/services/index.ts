@@ -28,7 +28,7 @@ export { AIRoutineService } from './ai-routine.service';
 export type {
   GenerateRoutineDto,
   GeneratedRoutine,
-  RoutineStep,
+  AIRoutineStep,
 } from './ai-routine.service';
 
 export { AIDescriptionService } from './ai-description.service';

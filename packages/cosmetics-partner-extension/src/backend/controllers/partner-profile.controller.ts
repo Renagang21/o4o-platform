@@ -216,4 +216,59 @@ export class PartnerProfileController {
       res.status(500).json({ success: false, message: 'Failed to delete partner profile', errorCode: 'INTERNAL_ERROR' });
     }
   }
+
+  /**
+   * GET /api/v1/partner/profile/user/:userId
+   * 사용자 ID로 프로필 조회
+   */
+  async findByUserId(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const profile = await this.service.findByUserId(userId);
+
+      if (!profile) {
+        res.status(404).json({ success: false, message: 'Partner profile not found', errorCode: 'NOT_FOUND' });
+        return;
+      }
+
+      res.json({ success: true, data: profile });
+    } catch (error) {
+      console.error('[PartnerProfileController] findByUserId error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get partner profile', errorCode: 'INTERNAL_ERROR' });
+    }
+  }
+
+  /**
+   * PUT /api/v1/partner/profile/:id
+   * 프로필 업데이트 (by ID)
+   */
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      const updated = await this.service.updateProfile(id, updateData);
+
+      res.json({ success: true, data: updated });
+    } catch (error) {
+      console.error('[PartnerProfileController] update error:', error);
+      res.status(500).json({ success: false, message: 'Failed to update partner profile', errorCode: 'INTERNAL_ERROR' });
+    }
+  }
+
+  /**
+   * GET /api/v1/partner/profile/top/earners
+   * 상위 수익자 목록 조회
+   */
+  async getTopEarners(req: Request, res: Response): Promise<void> {
+    try {
+      const { limit } = req.query;
+      const profiles = await this.service.getTopEarners(limit ? parseInt(limit as string) : 10);
+
+      res.json({ success: true, data: profiles });
+    } catch (error) {
+      console.error('[PartnerProfileController] getTopEarners error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get top earners', errorCode: 'INTERNAL_ERROR' });
+    }
+  }
 }

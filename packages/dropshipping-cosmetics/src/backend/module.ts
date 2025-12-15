@@ -7,7 +7,7 @@
 import type { DataSource } from 'typeorm';
 import {
   CosmeticsFilter,
-  CosmeticsRoutine,
+  // CosmeticsRoutine REMOVED - Use PartnerRoutine from cosmetics-partner-extension (Phase 7-Y)
   CosmeticsBrand,
   CosmeticsSkinType,
   CosmeticsConcern,
@@ -18,7 +18,7 @@ import {
   CosmeticsCampaign,
 } from './entities/index.js';
 import { createCosmeticsFilterRoutes } from './routes/cosmetics-filter.routes.js';
-import { createInfluencerRoutineRoutes } from './routes/influencer-routine.routes.js';
+// createInfluencerRoutineRoutes REMOVED - Routine CRUD moved to cosmetics-partner-extension (Phase 7-Y)
 import { createSignageRoutes } from './routes/signage.routes.js';
 import { createRecommendationRoutes } from './routes/recommendation.routes.js';
 import { createBrandRoutes } from './routes/brand.routes.js';
@@ -35,7 +35,7 @@ export function createCosmeticsModule(dataSource: DataSource) {
     // TypeORM entities
     entities: [
       CosmeticsFilter,
-      CosmeticsRoutine,
+      // CosmeticsRoutine REMOVED (Phase 7-Y) - PartnerRoutine is canonical
       CosmeticsBrand,
       CosmeticsSkinType,
       CosmeticsConcern,
@@ -52,10 +52,7 @@ export function createCosmeticsModule(dataSource: DataSource) {
         path: '/api/v1/cosmetics',
         router: createCosmeticsFilterRoutes(dataSource),
       },
-      {
-        path: '/api/v1/partner/routines',
-        router: createInfluencerRoutineRoutes(dataSource),
-      },
+      // /api/v1/partner/routines REMOVED (Phase 7-Y) - CRUD moved to cosmetics-partner-extension
       {
         path: '/api/v1/cosmetics',
         router: createSignageRoutes(dataSource),
@@ -91,7 +88,7 @@ export function createCosmeticsModule(dataSource: DataSource) {
 // Export for convenience
 export const CosmeticsEntities = [
   CosmeticsFilter,
-  CosmeticsRoutine,
+  // CosmeticsRoutine REMOVED (Phase 7-Y) - PartnerRoutine is canonical
   CosmeticsBrand,
   CosmeticsSkinType,
   CosmeticsConcern,

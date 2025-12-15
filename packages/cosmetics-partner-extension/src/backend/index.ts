@@ -60,7 +60,7 @@ export function routes(dataSource?: DataSource | any): Router {
     linkRepository,
     routineRepository,
     earningsRepository,
-    policyRepository,
+    dataSource,
   });
 }
 

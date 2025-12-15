@@ -80,4 +80,13 @@ export class PartnerRoutine {
 
   @Column({ type: 'timestamp', nullable: true })
   publishedAt?: Date;
+
+  // Alias getter for skinConcerns (backwards compatibility)
+  get concerns(): string[] {
+    return this.skinConcerns || [];
+  }
+
+  set concerns(value: string[]) {
+    this.skinConcerns = value;
+  }
 }
