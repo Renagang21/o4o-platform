@@ -59,10 +59,10 @@ export class ForumPost {
   @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
   organizationId?: string;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'is_organization_exclusive', type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
   @Column({ type: 'boolean', default: false })
@@ -92,10 +92,10 @@ export class ForumPost {
   @Column({ name: 'published_at', type: 'timestamp', nullable: true })
   publishedAt?: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'last_comment_at', type: 'timestamp', nullable: true })
   lastCommentAt?: Date;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'last_comment_by', type: 'uuid', nullable: true })
   lastCommentBy?: string;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -114,11 +114,11 @@ export class ForumPost {
   author?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('User', { nullable: true })
-  @JoinColumn({ name: 'lastCommentBy' })
+  @JoinColumn({ name: 'last_comment_by' })
   lastCommenter?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('Organization', { nullable: true })
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumComment removed to prevent circular dependency
