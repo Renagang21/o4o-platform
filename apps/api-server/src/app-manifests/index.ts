@@ -13,6 +13,17 @@ import { partneropsManifest } from './partnerops.manifest.js';
 import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
 import { manifest as cmsCoreManifest } from '@o4o-apps/cms-core';
 import { ecommerceCoreManifest } from '@o4o/ecommerce-core';
+// Additional Yaksa/Cosmetics packages
+import { manifest as annualfeeYaksaManifest } from '@o4o/annualfee-yaksa';
+import { manifest as yaksaSchedulerManifest } from '@o4o/yaksa-scheduler';
+import { manifest as cosmeticsPartnerExtensionManifest } from '@o4o/cosmetics-partner-extension';
+import { manifest as cosmeticsSellerExtensionManifest } from '@o4o/cosmetics-seller-extension';
+import { manifest as cosmeticsSupplierExtensionManifest } from '@o4o/cosmetics-supplier-extension';
+import { manifest as lmsYaksaManifest } from '@o4o/lms-yaksa';
+import { manifest as lmsMarketingManifest } from '@o4o/lms-marketing';
+import { manifest as healthExtensionManifest } from '@o4o/health-extension';
+import { manifest as platformCoreManifest } from '@o4o/platform-core';
+import { manifest as authCoreManifest } from '@o4o/auth-core';
 
 /**
  * App Manifest Registry
@@ -32,14 +43,23 @@ const manifestRegistry: Record<string, AppManifest> = {
   'digitalsignage': signageManifest as any, // Alias for backward compatibility
   // LMS
   'lms-core': lmsCoreManifest as any,
+  'lms-yaksa': lmsYaksaManifest as any,
+  'lms-marketing': lmsMarketingManifest as any,
   // Organization
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
   'membership-yaksa': membershipYaksaManifest as any,
+  // Yaksa Services
+  'annualfee-yaksa': annualfeeYaksaManifest as any,
+  'yaksa-scheduler': yaksaSchedulerManifest as any,
   // Dropshipping
   'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,
   'dropshipping-cosmetics': cosmeticsExtensionManifest as any,
+  // Cosmetics Extensions
+  'cosmetics-partner-extension': cosmeticsPartnerExtensionManifest as any,
+  'cosmetics-seller-extension': cosmeticsSellerExtensionManifest as any,
+  'cosmetics-supplier-extension': cosmeticsSupplierExtensionManifest as any,
   // Operations
   sellerops: selleropsManifest as any,
   supplierops: supplieropsManifest as any,
@@ -48,6 +68,10 @@ const manifestRegistry: Record<string, AppManifest> = {
   'cms-core': cmsCoreManifest as any,
   // E-commerce
   'ecommerce-core': ecommerceCoreManifest as any,
+  // Platform Core
+  'platform-core': platformCoreManifest as any,
+  'auth-core': authCoreManifest as any,
+  'health-extension': healthExtensionManifest as any,
 };
 
 /**
