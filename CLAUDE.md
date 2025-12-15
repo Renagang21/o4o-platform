@@ -173,6 +173,18 @@ packages/<app>/
     index.ts
 ```
 
+### 3.5 UI / Design Core 규칙 (강제)
+
+플랫폼의 UI/디자인은 **Design Core v1.0**을 기준으로 한다.
+
+- Design Core v1.0은 `packages/ui`에 정의된 코드 기준이다.
+- 모든 신규 App / View / Dashboard UI는
+  반드시 `packages/ui`의 Design Token, View Component, Layout System을 사용해야 한다.
+- App 내부에서 **독자적인 디자인 시스템을 생성하는 것을 금지**한다.
+- 디자인 변경은 Design Core 전용 Work Order를 통해서만 허용된다.
+
+> ⚠ 본 규칙을 위반한 UI/디자인 변경은 **기준 위반**으로 간주한다.
+
 ---
 
 ## 4. Schema & Data 규칙
