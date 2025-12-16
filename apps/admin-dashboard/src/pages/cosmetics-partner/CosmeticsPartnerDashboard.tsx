@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
+import { AppGuard } from '@/components/common/AppGuard';
 import {
   TrendingUp,
   TrendingDown,
@@ -71,7 +72,7 @@ const periodOptions: { value: PeriodFilter; label: string }[] = [
   { value: 'all', label: '전체' },
 ];
 
-const CosmeticsPartnerDashboard: React.FC = () => {
+const CosmeticsPartnerDashboardContent: React.FC = () => {
   const api = authClient.api;
   const navigate = useNavigate();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -531,5 +532,15 @@ const CosmeticsPartnerDashboard: React.FC = () => {
     </div>
   );
 };
+
+/**
+ * Wrapped export with AppGuard
+ * Only renders dashboard content if cosmetics-partner app is installed
+ */
+const CosmeticsPartnerDashboard: React.FC = () => (
+  <AppGuard appId="cosmetics-partner" appName="화장품 파트너">
+    <CosmeticsPartnerDashboardContent />
+  </AppGuard>
+);
 
 export default CosmeticsPartnerDashboard;

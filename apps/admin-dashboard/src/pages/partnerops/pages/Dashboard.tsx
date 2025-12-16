@@ -5,11 +5,14 @@
  * - Total conversions and commission
  * - Link performance
  * - Recent activity
+ *
+ * Guarded by AppGuard to prevent API calls when app is not installed.
  */
 
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { authClient } from '@o4o/auth-client';
+import { AppGuard } from '@/components/common/AppGuard';
 import {
   TrendingUp,
   DollarSign,
@@ -51,7 +54,7 @@ interface DashboardSummary {
   }>;
 }
 
-const Dashboard: React.FC = () => {
+const DashboardContent: React.FC = () => {
   const { user } = useAuthStore();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -274,5 +277,15 @@ const Dashboard: React.FC = () => {
     </div>
   );
 };
+
+/**
+ * Wrapped export with AppGuard
+ * Only renders dashboard content if partnerops app is installed
+ */
+const Dashboard: React.FC = () => (
+  <AppGuard appId="partnerops" appName="PartnerOps">
+    <DashboardContent />
+  </AppGuard>
+);
 
 export default Dashboard;
