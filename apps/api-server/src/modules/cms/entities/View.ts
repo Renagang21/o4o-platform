@@ -3,8 +3,17 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 /**
  * View Entity
  *
- * Matches cms_views table created by cms-core/lifecycle/install.ts
- * Used for CMS view template management
+ * @contract docs/contracts/cms-view-schema.md
+ * @table cms_views
+ * @owner cms-core (lifecycle creates table)
+ *
+ * This entity MUST match the schema defined in cms-core/lifecycle/install.ts.
+ * Any schema changes require following the Contract change protocol:
+ *   1. Update Contract document first
+ *   2. Update cms-core lifecycle
+ *   3. Update this Entity
+ *
+ * DO NOT add fields that don't exist in the database.
  */
 @Entity('cms_views')
 @Index(['organizationId', 'slug'], { unique: true })

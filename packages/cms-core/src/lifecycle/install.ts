@@ -70,6 +70,15 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
     )
   `);
 
+  /**
+   * cms_views table
+   * @contract docs/contracts/cms-view-schema.md
+   *
+   * Schema changes require following the Contract change protocol:
+   *   1. Update Contract document first
+   *   2. Update this table definition
+   *   3. Update api-server View Entity
+   */
   await dataSource.query(`
     CREATE TABLE IF NOT EXISTS cms_views (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

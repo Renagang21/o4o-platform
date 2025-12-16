@@ -6,7 +6,9 @@ import logger from '../../../utils/logger.js';
 
 /**
  * CreateViewRequest
- * Matches cms_views table structure from cms-core
+ *
+ * @contract docs/contracts/cms-view-schema.md
+ * Matches cms_views table structure from cms-core lifecycle.
  */
 export interface CreateViewRequest {
   organizationId: string;
