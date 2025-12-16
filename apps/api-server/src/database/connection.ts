@@ -183,7 +183,7 @@ import {
   FeeExemption,
   FeeSettlement,
   FeeLog,
-} from '@o4o/annualfee-yaksa/backend/entities';
+} from '@o4o/annualfee-yaksa/backend/entities/index.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
