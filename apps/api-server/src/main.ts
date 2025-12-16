@@ -348,6 +348,8 @@ import forumRoutes from './routes/forum/forum.routes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import adminAppsRoutes from './routes/admin/apps.routes.js';
 import serviceMonitorRoutes from './routes/service-monitor.routes.js';
+// Membership Routes (WO-MEMBERSHIP-STATS-API)
+import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
 
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
@@ -525,6 +527,17 @@ const startServer = async () => {
     // 13. Register Linked Accounts routes (SSO check, sessions)
     app.use('/api/accounts', linkedAccountsRoutes);
     logger.info('✅ Linked Accounts routes registered at /api/accounts');
+
+    // 14. Register Membership routes (WO-MEMBERSHIP-STATS-API)
+    // Note: membership-yaksa는 moduleId 기반으로 /api/v1/membership-yaksa에 마운트되지만,
+    // Dashboard는 /api/v1/membership을 호출하므로 별도로 /api/v1/membership에 마운트
+    try {
+      const membershipRoutes = createMembershipRoutes(AppDataSource);
+      app.use('/api/v1/membership', membershipRoutes);
+      logger.info('✅ Membership routes registered at /api/v1/membership');
+    } catch (membershipError) {
+      logger.error('Failed to register membership routes:', membershipError);
+    }
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
