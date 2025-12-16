@@ -14,6 +14,14 @@
       "types": "./dist/backend/index.d.ts",
       "import": "./dist/backend/index.js"
     },
+    "./backend/*": {
+      "types": "./dist/backend/*.d.ts",
+      "import": "./dist/backend/*.js"
+    },
+    "./backend/routes/*": {
+      "types": "./dist/backend/routes/*.d.ts",
+      "import": "./dist/backend/routes/*.js"
+    },
     "./backend/entities": {
       "types": "./dist/backend/entities/index.d.ts",
       "import": "./dist/backend/entities/index.js"
