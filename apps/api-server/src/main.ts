@@ -420,6 +420,7 @@ const startServer = async () => {
 
   // ============================================================================
   // MODULE LOADER — Load and Activate Apps (Phase 5)
+  // WO-APPSTORE-CONTEXT-FIX: install → activate 순서 적용, dataSource 전달
   // ============================================================================
   logger.info('📦 Loading app modules...');
   try {
@@ -428,11 +429,25 @@ const startServer = async () => {
     const loadedModules = Array.from(moduleLoader.getRegistry().keys());
     logger.info(`✅ Loaded ${loadedModules.length} app modules: ${loadedModules.join(', ')}`);
 
-    // 2. Activate all modules (with dependency resolution)
+    // 2. WO-APPSTORE-CONTEXT-FIX: Install all modules (멱등성 전제)
+    let installedCount = 0;
+    for (const moduleId of loadedModules) {
+      try {
+        await moduleLoader.installModule(moduleId, AppDataSource);
+        installedCount++;
+      } catch (installError) {
+        // Install 실패는 경고만 남기고 계속 진행 (이미 설치된 경우 등)
+        logger.warn(`Install hook failed for ${moduleId}, continuing:`, installError);
+      }
+    }
+    logger.info(`✅ Install hooks ran for ${installedCount}/${loadedModules.length} modules`);
+
+    // 3. Activate all modules (with dependency resolution and dataSource)
     let activatedCount = 0;
     for (const moduleId of loadedModules) {
       try {
-        await moduleLoader.activateModule(moduleId);
+        // WO-APPSTORE-CONTEXT-FIX: dataSource 전달
+        await moduleLoader.activateModule(moduleId, AppDataSource);
         activatedCount++;
       } catch (activationError) {
         logger.error(`Failed to activate module ${moduleId}:`, activationError);
@@ -440,7 +455,7 @@ const startServer = async () => {
     }
     logger.info(`✅ Activated ${activatedCount}/${loadedModules.length} modules`);
 
-    // 3. Register dynamic routes from activated modules
+    // 4. Register dynamic routes from activated modules
     const routesRegistered: string[] = [];
     for (const moduleId of loadedModules) {
       const router = moduleLoader.getModuleRouter(moduleId, AppDataSource);

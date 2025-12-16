@@ -9,12 +9,20 @@ import type { ServiceGroup } from '../middleware/tenant-context.middleware.js';
 
 /**
  * Lifecycle Context passed to lifecycle hooks
+ *
+ * WO-APPSTORE-CONTEXT-FIX: Context 전달 정상화
+ * - dataSource: DB 작업을 위한 TypeORM DataSource
+ * - logger: 로깅을 위한 logger 인스턴스
  */
 export interface LifecycleContext {
   /** App identifier */
   appId: string;
-  /** Full manifest (optional) */
+  /** Full manifest */
   manifest?: AppModule;
+  /** TypeORM DataSource for DB operations */
+  dataSource?: any;
+  /** Logger instance */
+  logger?: any;
   /** Additional context data */
   [key: string]: any;
 }

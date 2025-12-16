@@ -40,9 +40,12 @@ export class AppStoreService {
   /**
    * Install an app
    *
+   * WO-APPSTORE-CONTEXT-FIX: dataSource 선택적 파라미터 추가
+   *
    * @param appId - App identifier from catalog
+   * @param dataSource - Optional TypeORM DataSource for lifecycle hooks
    */
-  async installApp(appId: string): Promise<void> {
+  async installApp(appId: string, dataSource?: any): Promise<void> {
     logger.info(`[AppStore] Installing app: ${appId}`);
 
     // Check if app exists in catalog
@@ -83,20 +86,11 @@ export class AppStoreService {
       }
     }
 
-    // Run install lifecycle hook
-    if (appModule.lifecycle?.install) {
-      try {
-        const installContext = { appId };
-        await appModule.lifecycle.install(installContext);
-        logger.info(`[AppStore] Ran install hook for ${appId}`);
-      } catch (installError) {
-        logger.error(`[AppStore] Install hook failed for ${appId}:`, installError);
-        throw installError;
-      }
-    }
+    // WO-APPSTORE-CONTEXT-FIX: ModuleLoader.installModule() 사용
+    await moduleLoader.installModule(appId, dataSource);
 
     // Activate the app
-    await this.activateApp(appId);
+    await this.activateApp(appId, dataSource);
 
     logger.info(`[AppStore] ✅ App ${appId} installed successfully`);
   }
@@ -104,9 +98,12 @@ export class AppStoreService {
   /**
    * Uninstall an app
    *
+   * WO-APPSTORE-CONTEXT-FIX: dataSource 선택적 파라미터 추가
+   *
    * @param appId - App identifier
+   * @param dataSource - Optional TypeORM DataSource for lifecycle hooks
    */
-  async uninstallApp(appId: string): Promise<void> {
+  async uninstallApp(appId: string, dataSource?: any): Promise<void> {
     logger.info(`[AppStore] Uninstalling app: ${appId}`);
 
     const module = moduleLoader.getModule(appId);
@@ -118,17 +115,28 @@ export class AppStoreService {
 
     // Deactivate first
     if (module.status === 'active') {
-      await this.deactivateApp(appId);
+      await this.deactivateApp(appId, dataSource);
     }
 
-    // Run uninstall lifecycle hook
+    // WO-APPSTORE-CONTEXT-FIX: Context에 dataSource, manifest, logger 포함
     if (appModule.lifecycle?.uninstall) {
       try {
-        const uninstallContext = { appId };
+        const uninstallContext = {
+          appId,
+          manifest: appModule,
+          dataSource,
+          logger,
+        };
         await appModule.lifecycle.uninstall(uninstallContext);
         logger.info(`[AppStore] Ran uninstall hook for ${appId}`);
       } catch (uninstallError) {
-        logger.error(`[AppStore] Uninstall hook failed for ${appId}:`, uninstallError);
+        // WO-APPSTORE-CONTEXT-FIX: 실패 로그 강화
+        logger.error(`[AppStore] Uninstall hook FAILED for ${appId}:`, {
+          stage: 'uninstall',
+          appId,
+          error: uninstallError instanceof Error ? uninstallError.message : String(uninstallError),
+          hasDataSource: !!dataSource,
+        });
         throw uninstallError;
       }
     }
@@ -142,9 +150,12 @@ export class AppStoreService {
   /**
    * Activate an app
    *
+   * WO-APPSTORE-CONTEXT-FIX: dataSource 선택적 파라미터 추가
+   *
    * @param appId - App identifier
+   * @param dataSource - Optional TypeORM DataSource for lifecycle hooks
    */
-  async activateApp(appId: string): Promise<void> {
+  async activateApp(appId: string, dataSource?: any): Promise<void> {
     logger.info(`[AppStore] Activating app: ${appId}`);
 
     const module = moduleLoader.getModule(appId);
@@ -157,7 +168,8 @@ export class AppStoreService {
       return;
     }
 
-    await moduleLoader.activateModule(appId);
+    // WO-APPSTORE-CONTEXT-FIX: dataSource 전달
+    await moduleLoader.activateModule(appId, dataSource);
 
     logger.info(`[AppStore] ✅ App ${appId} activated`);
   }
@@ -165,9 +177,12 @@ export class AppStoreService {
   /**
    * Deactivate an app
    *
+   * WO-APPSTORE-CONTEXT-FIX: dataSource 선택적 파라미터 추가
+   *
    * @param appId - App identifier
+   * @param dataSource - Optional TypeORM DataSource for lifecycle hooks
    */
-  async deactivateApp(appId: string): Promise<void> {
+  async deactivateApp(appId: string, dataSource?: any): Promise<void> {
     logger.info(`[AppStore] Deactivating app: ${appId}`);
 
     const module = moduleLoader.getModule(appId);
@@ -180,7 +195,8 @@ export class AppStoreService {
       return;
     }
 
-    await moduleLoader.deactivateModule(appId);
+    // WO-APPSTORE-CONTEXT-FIX: dataSource 전달
+    await moduleLoader.deactivateModule(appId, dataSource);
 
     logger.info(`[AppStore] ✅ App ${appId} deactivated`);
   }

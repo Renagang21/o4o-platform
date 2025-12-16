@@ -173,6 +173,53 @@ export class ModuleLoader {
   }
 
   /**
+   * Install a module (run install lifecycle hook)
+   *
+   * WO-APPSTORE-CONTEXT-FIX: install hook 실행 메서드 추가
+   * - 멱등성 전제: 이미 설치된 테이블에 대해 실패하지 않아야 함
+   *
+   * @param moduleId - Module ID to install
+   * @param dataSource - TypeORM DataSource for lifecycle hooks
+   */
+  async installModule(moduleId: string, dataSource?: any): Promise<void> {
+    const entry = this.registry.get(moduleId);
+
+    if (!entry) {
+      throw new Error(`Module ${moduleId} not found in registry`);
+    }
+
+    const { module } = entry;
+
+    // Run install lifecycle hook
+    if (module.lifecycle?.install) {
+      try {
+        // WO-APPSTORE-CONTEXT-FIX: Context에 dataSource, manifest, logger 포함
+        const installContext = {
+          appId: moduleId,
+          manifest: module,
+          dataSource,
+          logger,
+        };
+        await module.lifecycle.install(installContext);
+        logger.info(`[ModuleLoader] ✅ Ran install hook for ${moduleId}`);
+      } catch (installError) {
+        // WO-APPSTORE-CONTEXT-FIX: 실패 로그 강화
+        logger.error(`[ModuleLoader] Install hook FAILED for ${moduleId}:`, {
+          stage: 'install',
+          appId: moduleId,
+          error: installError instanceof Error ? installError.message : String(installError),
+          hasDataSource: !!dataSource,
+        });
+        entry.status = 'error';
+        entry.error = String(installError);
+        throw installError;
+      }
+    } else {
+      logger.debug(`[ModuleLoader] No install hook for ${moduleId}, skipping`);
+    }
+  }
+
+  /**
    * Verify module dependencies are satisfied
    *
    * @param moduleId - Module ID to check
@@ -200,9 +247,12 @@ export class ModuleLoader {
   /**
    * Activate a module (with dependency chain)
    *
+   * WO-APPSTORE-CONTEXT-FIX: dataSource 선택적 파라미터 추가
+   *
    * @param moduleId - Module ID to activate
+   * @param dataSource - Optional TypeORM DataSource for lifecycle hooks
    */
-  async activateModule(moduleId: string): Promise<void> {
+  async activateModule(moduleId: string, dataSource?: any): Promise<void> {
     const entry = this.registry.get(moduleId);
 
     if (!entry) {
@@ -224,22 +274,30 @@ export class ModuleLoader {
     const { module } = entry;
     if (module.dependsOn) {
       for (const depId of module.dependsOn) {
-        await this.activateModule(depId);
+        await this.activateModule(depId, dataSource);
       }
     }
 
     // Run activate lifecycle hook
     if (module.lifecycle?.activate) {
       try {
-        // Pass context with appId to lifecycle hook
+        // WO-APPSTORE-CONTEXT-FIX: Context에 dataSource, logger 포함
         const activateContext = {
           appId: moduleId,
           manifest: module,
+          dataSource,
+          logger,
         };
         await module.lifecycle.activate(activateContext);
         logger.debug(`[ModuleLoader] Ran activate hook for ${moduleId}`);
       } catch (activateError) {
-        logger.error(`[ModuleLoader] Activate hook failed for ${moduleId}:`, activateError);
+        // WO-APPSTORE-CONTEXT-FIX: 실패 로그 강화
+        logger.error(`[ModuleLoader] Activate hook FAILED for ${moduleId}:`, {
+          stage: 'activate',
+          appId: moduleId,
+          error: activateError instanceof Error ? activateError.message : String(activateError),
+          hasDataSource: !!dataSource,
+        });
         entry.status = 'error';
         entry.error = String(activateError);
         throw activateError;
@@ -257,9 +315,12 @@ export class ModuleLoader {
   /**
    * Deactivate a module
    *
+   * WO-APPSTORE-CONTEXT-FIX: dataSource 선택적 파라미터 추가
+   *
    * @param moduleId - Module ID to deactivate
+   * @param dataSource - Optional TypeORM DataSource for lifecycle hooks
    */
-  async deactivateModule(moduleId: string): Promise<void> {
+  async deactivateModule(moduleId: string, dataSource?: any): Promise<void> {
     const entry = this.registry.get(moduleId);
 
     if (!entry) {
@@ -271,14 +332,23 @@ export class ModuleLoader {
     // Run deactivate lifecycle hook
     if (module.lifecycle?.deactivate) {
       try {
-        // Pass context with appId to lifecycle hook
+        // WO-APPSTORE-CONTEXT-FIX: Context에 dataSource, manifest, logger 포함
         const deactivateContext = {
           appId: moduleId,
+          manifest: module,
+          dataSource,
+          logger,
         };
         await module.lifecycle.deactivate(deactivateContext);
         logger.debug(`[ModuleLoader] Ran deactivate hook for ${moduleId}`);
       } catch (deactivateError) {
-        logger.error(`[ModuleLoader] Deactivate hook failed for ${moduleId}:`, deactivateError);
+        // WO-APPSTORE-CONTEXT-FIX: 실패 로그 강화
+        logger.error(`[ModuleLoader] Deactivate hook FAILED for ${moduleId}:`, {
+          stage: 'deactivate',
+          appId: moduleId,
+          error: deactivateError instanceof Error ? deactivateError.message : String(deactivateError),
+          hasDataSource: !!dataSource,
+        });
       }
     }
 
