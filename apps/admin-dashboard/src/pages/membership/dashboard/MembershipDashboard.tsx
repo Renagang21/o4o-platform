@@ -8,9 +8,12 @@
  * - 임원 현황
  * - 연회비 현황
  * - 최근 활동 통계
+ *
+ * Guarded by AppGuard to prevent API calls when app is not installed.
  */
 
 import React, { useState, useEffect } from 'react';
+import { AppGuard } from '@/components/common/AppGuard';
 import {
   Users,
   CheckCircle,
@@ -120,7 +123,7 @@ const PHARMACIST_TYPE_COLORS: Record<string, string> = {
   unset: 'bg-slate-300',
 };
 
-const MembershipDashboard = () => {
+const MembershipDashboardContent = () => {
   const [stats, setStats] = useState<ExtendedDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -711,5 +714,15 @@ const MembershipDashboard = () => {
     </div>
   );
 };
+
+/**
+ * Wrapped export with AppGuard
+ * Only renders dashboard content if membership-yaksa app is installed
+ */
+const MembershipDashboard = () => (
+  <AppGuard appId="membership-yaksa" appName="회원 관리">
+    <MembershipDashboardContent />
+  </AppGuard>
+);
 
 export default MembershipDashboard;

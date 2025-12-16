@@ -2,9 +2,12 @@
  * Reporting-Yaksa: Dashboard Page
  *
  * Main dashboard for viewing annual report statistics
+ *
+ * Guarded by AppGuard to prevent API calls when app is not installed.
  */
 
 import React, { useState, useEffect } from 'react';
+import { AppGuard } from '@/components/common/AppGuard';
 import {
   FileText,
   CheckCircle,
@@ -27,7 +30,7 @@ interface ReportingStats {
   revision_requested: number;
 }
 
-const ReportingDashboard = () => {
+const ReportingDashboardContent = () => {
   const [stats, setStats] = useState<ReportingStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -278,5 +281,15 @@ const ReportingDashboard = () => {
     </div>
   );
 };
+
+/**
+ * Wrapped export with AppGuard
+ * Only renders dashboard content if reporting-yaksa app is installed
+ */
+const ReportingDashboard = () => (
+  <AppGuard appId="reporting-yaksa" appName="신상신고">
+    <ReportingDashboardContent />
+  </AppGuard>
+);
 
 export default ReportingDashboard;

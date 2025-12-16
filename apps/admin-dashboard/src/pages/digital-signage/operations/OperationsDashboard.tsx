@@ -3,6 +3,8 @@
  *
  * Summary view for Digital Signage Core operations.
  * Phase 12: Operations convenience features
+ *
+ * Guarded by AppGuard to prevent API calls when app is not installed.
  */
 
 import { useEffect, useState } from 'react';
@@ -11,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AppGuard } from '@/components/common/AppGuard';
 import {
   operationsApi,
   OperationsSummary,
@@ -25,7 +28,7 @@ function formatDuration(seconds: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-export default function OperationsDashboard() {
+function OperationsDashboardContent() {
   const [summary, setSummary] = useState<OperationsSummary | null>(null);
   const [stats, setStats] = useState<OperationsStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -278,5 +281,17 @@ export default function OperationsDashboard() {
         </Card>
       </div>
     </div>
+  );
+}
+
+/**
+ * Wrapped export with AppGuard
+ * Only renders dashboard content if digital-signage app is installed
+ */
+export default function OperationsDashboard() {
+  return (
+    <AppGuard appId="digital-signage" appName="Digital Signage">
+      <OperationsDashboardContent />
+    </AppGuard>
   );
 }
