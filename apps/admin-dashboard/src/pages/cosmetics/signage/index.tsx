@@ -54,7 +54,7 @@ export default function CosmeticsSignagePage() {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get('/api/v1/cosmetics/signage/playlists');
+      const response = await authClient.api.get('/cosmetics/signage/playlists');
 
       if (response.data.success) {
         setPlaylists(response.data.data || []);
@@ -74,13 +74,13 @@ export default function CosmeticsSignagePage() {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.post('/api/v1/cosmetics/signage/auto-playlist', autoFilters);
+      const response = await authClient.api.post('/cosmetics/signage/auto-playlist', autoFilters);
 
       if (response.data.success) {
         alert(`플레이리스트 생성 완료: ${response.data.data.totalItems}개 항목, 총 ${response.data.data.totalDuration}초`);
 
         // Create playlist with generated items
-        const createResponse = await authClient.api.post('/api/v1/cosmetics/signage/playlists', {
+        const createResponse = await authClient.api.post('/cosmetics/signage/playlists', {
           name: `Auto Playlist - ${new Date().toLocaleString('ko-KR')}`,
           description: `자동 생성됨 (${autoFilters.brand || autoFilters.category || '추천'})`,
           items: response.data.data.items,
@@ -109,7 +109,7 @@ export default function CosmeticsSignagePage() {
     }
 
     try {
-      const response = await authClient.api.delete(`/api/v1/cosmetics/signage/playlists/${id}`);
+      const response = await authClient.api.delete(`/cosmetics/signage/playlists/${id}`);
 
       if (response.data.success) {
         await loadPlaylists();

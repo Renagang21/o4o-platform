@@ -9,6 +9,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AppGuard } from '@/components/common/AppGuard';
 
 // Media pages
 const MediaSourceList = lazy(() => import('./media/MediaSourceList'));
@@ -44,8 +45,9 @@ const PageLoader = () => (
 
 export default function DigitalSignageRouter() {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
+    <AppGuard appId="digital-signage-core" appName="Digital Signage">
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         {/* Default redirect - now goes to Operations Dashboard */}
         <Route path="/" element={<Navigate to="operations" replace />} />
 
@@ -73,7 +75,8 @@ export default function DigitalSignageRouter() {
         {/* Action routes */}
         <Route path="actions" element={<ActionExecutionList />} />
         <Route path="actions/:id" element={<ActionExecutionDetail />} />
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+    </AppGuard>
   );
 }

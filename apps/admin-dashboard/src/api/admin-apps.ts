@@ -346,7 +346,7 @@ export const adminAppsApi = {
     if (filters?.activeOnly) params.append('activeOnly', 'true');
 
     const queryString = params.toString();
-    const response = await api.get(`/v1/service/templates${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(`/service/templates${queryString ? `?${queryString}` : ''}`);
     return response.data.data;
   },
 
@@ -357,7 +357,7 @@ export const adminAppsApi = {
     template: ServiceTemplate;
     apps: { coreApps: string[]; extensionApps: string[] };
   }> => {
-    const response = await api.get(`/v1/service/templates/${templateId}`);
+    const response = await api.get(`/service/templates/${templateId}`);
     return response.data.data;
   },
 
@@ -378,7 +378,7 @@ export const adminAppsApi = {
     if (options?.additionalExtensions) params.append('additionalExtensions', options.additionalExtensions.join(','));
 
     const queryString = params.toString();
-    const response = await api.get(`/v1/service/templates/${templateId}/preview${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(`/service/templates/${templateId}/preview${queryString ? `?${queryString}` : ''}`);
     return response.data.data;
   },
 
@@ -398,7 +398,7 @@ export const adminAppsApi = {
     skipped: string[];
     failed: Array<{ appId: string; error: string }>;
   }> => {
-    const response = await api.post(`/v1/service/templates/${templateId}/install`, options || {});
+    const response = await api.post(`/service/templates/${templateId}/install`, options || {});
     return response.data.data;
   },
 
@@ -406,7 +406,7 @@ export const adminAppsApi = {
    * Provision a complete service
    */
   provisionService: async (request: ServiceProvisioningRequest): Promise<ServiceProvisioningResult> => {
-    const response = await api.post('/v1/service/create', request);
+    const response = await api.post('/service/create', request);
     return response.data.data;
   },
 
@@ -414,7 +414,7 @@ export const adminAppsApi = {
    * Get recommended templates for a service group
    */
   getRecommendedTemplates: async (serviceGroup: ServiceGroup): Promise<ServiceTemplate[]> => {
-    const response = await api.get(`/v1/service/templates/recommend/${serviceGroup}`);
+    const response = await api.get(`/service/templates/recommend/${serviceGroup}`);
     return response.data.data;
   },
 
@@ -422,7 +422,7 @@ export const adminAppsApi = {
    * Get template statistics
    */
   getTemplateStats: async (): Promise<TemplateStats> => {
-    const response = await api.get('/v1/service/stats');
+    const response = await api.get('/service/stats');
     return response.data.data;
   },
 

@@ -7,7 +7,7 @@
 
 import { authClient } from '@o4o/auth-client';
 
-const API_BASE = '/api/signage';
+const API_BASE = '/signage';
 
 // ===== Types =====
 
