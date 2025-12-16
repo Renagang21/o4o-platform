@@ -26,7 +26,7 @@
     "db:seed": "ts-node src/database/seeds/index.ts",
     "db:seed:roles": "ts-node scripts/seed-roles-permissions.ts",
     "db:seed:users": "npx tsx scripts/seed-users.ts",
-    "db:seed:users:prod": "NODE_ENV=production DB_HOST=localhost DB_PORT=5432 DB_USERNAME=postgres DB_PASSWORD=postgres DB_NAME=o4o_platform npx tsx scripts/seed-users.ts",
+    "db:seed:users:prod": "NODE_ENV=production npx tsx scripts/seed-users.ts",
     "db:setup": "pnpm run migration:run && pnpm run db:seed",
     "db:start": "sudo systemctl start postgresql",
     "db:stop": "sudo systemctl stop postgresql",
