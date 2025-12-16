@@ -14,8 +14,8 @@ import { manifest as membershipYaksaManifest } from '@o4o/membership-yaksa';
 import { manifest as cmsCoreManifest } from '@o4o-apps/cms-core';
 import { ecommerceCoreManifest } from '@o4o/ecommerce-core';
 // Additional Yaksa/Cosmetics packages
-import { manifest as annualfeeYaksaManifest } from '@o4o/annualfee-yaksa';
 // TODO: Fix build/runtime errors in these packages
+// import { manifest as annualfeeYaksaManifest } from '@o4o/annualfee-yaksa';
 // import { manifest as yaksaSchedulerManifest } from '@o4o/yaksa-scheduler';
 // import { manifest as cosmeticsPartnerExtensionManifest } from '@o4o/cosmetics-partner-extension';
 // import { manifest as cosmeticsSellerExtensionManifest } from '@o4o/cosmetics-seller-extension';
@@ -51,9 +51,9 @@ const manifestRegistry: Record<string, AppManifest> = {
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
   'membership-yaksa': membershipYaksaManifest as any,
-  // Yaksa Services
-  'annualfee-yaksa': annualfeeYaksaManifest as any,
-  // 'yaksa-scheduler': yaksaSchedulerManifest as any, // TODO: Fix build errors
+  // Yaksa Services - TODO: Fix build/runtime errors
+  // 'annualfee-yaksa': annualfeeYaksaManifest as any,
+  // 'yaksa-scheduler': yaksaSchedulerManifest as any,
   // Dropshipping
   'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,
