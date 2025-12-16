@@ -1,5 +1,14 @@
+/**
+ * FeeDashboard
+ *
+ * 회비 관리 대시보드
+ *
+ * Guarded by AppGuard to prevent API calls when app is not installed.
+ */
+
 import { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
+import { AppGuard } from '@/components/common/AppGuard';
 
 interface FeeStats {
   totalInvoices: number;
@@ -19,12 +28,7 @@ interface PaymentStats {
   byMonth: Array<{ month: number; count: number; amount: number }>;
 }
 
-/**
- * FeeDashboard
- *
- * 회비 관리 대시보드
- */
-export default function FeeDashboard() {
+function FeeDashboardContent() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [invoiceStats, setInvoiceStats] = useState<FeeStats | null>(null);
   const [paymentStats, setPaymentStats] = useState<PaymentStats | null>(null);
@@ -186,5 +190,17 @@ export default function FeeDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Wrapped export with AppGuard
+ * Only renders dashboard content if annualfee-yaksa app is installed
+ */
+export default function FeeDashboard() {
+  return (
+    <AppGuard appId="annualfee-yaksa" appName="연회비 관리">
+      <FeeDashboardContent />
+    </AppGuard>
   );
 }
