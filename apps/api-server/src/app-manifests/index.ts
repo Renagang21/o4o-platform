@@ -23,8 +23,9 @@ import { manifest as annualfeeYaksaManifest } from '@o4o/annualfee-yaksa';
 import { manifest as lmsYaksaManifest } from '@o4o/lms-yaksa';
 // import { manifest as lmsMarketingManifest } from '@o4o/lms-marketing';
 // import { manifest as healthExtensionManifest } from '@o4o/health-extension';
-import { manifest as platformCoreManifest } from '@o4o/platform-core';
-import { manifest as authCoreManifest } from '@o4o/auth-core';
+// TODO: Add these packages to api-server dependencies before enabling
+// import { manifest as platformCoreManifest } from '@o4o/platform-core';
+// import { manifest as authCoreManifest } from '@o4o/auth-core';
 
 /**
  * App Manifest Registry
@@ -69,9 +70,9 @@ const manifestRegistry: Record<string, AppManifest> = {
   'cms-core': cmsCoreManifest as any,
   // E-commerce
   'ecommerce-core': ecommerceCoreManifest as any,
-  // Platform Core
-  'platform-core': platformCoreManifest as any,
-  'auth-core': authCoreManifest as any,
+  // Platform Core - TODO: Add to api-server dependencies before enabling
+  // 'platform-core': platformCoreManifest as any,
+  // 'auth-core': authCoreManifest as any,
   // 'health-extension': healthExtensionManifest as any, // TODO: Fix build errors
 };
 
