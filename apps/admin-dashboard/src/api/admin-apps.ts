@@ -187,6 +187,38 @@ export interface SecurityValidationResult {
 }
 
 /**
+ * Disabled App Status
+ * @see docs/platform/disabled-app-policy.md
+ */
+export type DisabledAppStatus = 'broken' | 'incomplete' | 'paused' | 'deprecated';
+
+/**
+ * Disabled App Entry
+ */
+export interface DisabledAppEntry {
+  appId: string;
+  name: string;
+  disabled: {
+    status: DisabledAppStatus;
+    reason: string;
+    nextAction: string;
+    disabledAt: string;
+    trackingId?: string;
+  };
+}
+
+/**
+ * Disabled Apps Summary
+ */
+export interface DisabledAppsSummary {
+  total: number;
+  broken: number;
+  incomplete: number;
+  paused: number;
+  deprecated: number;
+}
+
+/**
  * Admin Apps API Client
  */
 export const adminAppsApi = {
@@ -204,6 +236,18 @@ export const adminAppsApi = {
   getMarketApps: async (): Promise<AppCatalogItem[]> => {
     const response = await api.get('/admin/apps/market');
     return response.data.apps;
+  },
+
+  /**
+   * Get disabled apps registry
+   * @see docs/platform/disabled-app-policy.md
+   */
+  getDisabledApps: async (): Promise<{
+    apps: DisabledAppEntry[];
+    summary: DisabledAppsSummary;
+  }> => {
+    const response = await api.get('/admin/apps/disabled');
+    return { apps: response.data.apps, summary: response.data.summary };
   },
 
   /**

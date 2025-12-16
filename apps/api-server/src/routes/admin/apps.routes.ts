@@ -15,6 +15,7 @@ import {
   type ServiceGroup,
 } from '../../app-manifests/appsCatalog.js';
 import { loadLocalManifest, hasManifest } from '../../app-manifests/index.js';
+import { disabledAppsRegistry, getDisabledAppsSummary } from '../../app-manifests/disabled-apps.registry.js';
 import { isNewerVersion } from '../../utils/semver.js';
 import { remoteManifestLoader, ManifestFetchError, ManifestHashMismatchError, ManifestValidationError } from '../../services/RemoteManifestLoader.js';
 import { appSecurityValidator } from '../../services/AppSecurityValidator.js';
@@ -39,6 +40,30 @@ router.get('/market', async (req: Request, res: Response, next: NextFunction) =>
     res.json({ apps: APPS_CATALOG });
   } catch (error) {
     next(error);
+  }
+});
+
+/**
+ * GET /api/admin/apps/disabled
+ * Get disabled apps registry with status and reasons
+ *
+ * @see docs/platform/disabled-app-policy.md
+ */
+router.get('/disabled', async (req: Request, res: Response) => {
+  try {
+    const summary = getDisabledAppsSummary();
+    return res.json({
+      ok: true,
+      apps: disabledAppsRegistry,
+      summary,
+    });
+  } catch (error: any) {
+    logger.error('[DisabledApps] Failed to get disabled apps:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message || 'Unknown error',
+    });
   }
 });
 

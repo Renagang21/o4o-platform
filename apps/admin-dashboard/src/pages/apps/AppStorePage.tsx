@@ -1,14 +1,14 @@
 import { FC, useState, useEffect, useMemo } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers, Grid3X3, Settings, Sparkles, Building, Heart, Truck, Users, ShoppingBag, Tv, GlobeIcon } from 'lucide-react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers, Grid3X3, Settings, Sparkles, Building, Heart, Truck, Users, ShoppingBag, Tv, GlobeIcon, AlertOctagon, Construction, Pause, Archive } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult, ServiceGroup, ServiceGroupMeta } from '@/api/admin-apps';
+import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult, ServiceGroup, ServiceGroupMeta, DisabledAppEntry, DisabledAppsSummary } from '@/api/admin-apps';
 import ServiceTemplateSelector from '@/components/apps/ServiceTemplateSelector';
 
-type Tab = 'market' | 'installed' | 'templates';
+type Tab = 'market' | 'installed' | 'templates' | 'disabled';
 
 // Service Group Icons mapping
 const SERVICE_GROUP_ICONS: Record<ServiceGroup, React.ComponentType<{ className?: string }>> = {
@@ -43,6 +43,8 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
   const [marketApps, setMarketApps] = useState<AppCatalogItem[]>([]);
   const [installedApps, setInstalledApps] = useState<AppRegistryEntry[]>([]);
+  const [disabledApps, setDisabledApps] = useState<DisabledAppEntry[]>([]);
+  const [disabledSummary, setDisabledSummary] = useState<DisabledAppsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [lifecycleStatus, setLifecycleStatus] = useState<Record<string, LifecycleStatus>>({});
@@ -148,6 +150,15 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       } catch {
         // Use default empty array if API fails
         console.warn('Failed to load service group metadata, using defaults');
+      }
+
+      // Load disabled apps (best effort)
+      try {
+        const { apps: disabled, summary } = await adminAppsApi.getDisabledApps();
+        setDisabledApps(disabled);
+        setDisabledSummary(summary);
+      } catch {
+        console.warn('Failed to load disabled apps, using empty list');
       }
     } catch (error) {
       console.error('Failed to load apps:', error);
@@ -517,6 +528,17 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         >
           <CheckCircle className="inline-block w-4 h-4 mr-2" />
           설치된 앱 ({installedApps.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('disabled')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            activeTab === 'disabled'
+              ? 'border-red-500 text-red-600'
+              : 'border-transparent text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <AlertOctagon className="inline-block w-4 h-4 mr-2" />
+          비활성 앱 ({disabledApps.length})
         </button>
       </div>
 
@@ -1118,6 +1140,110 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
               );
             })
           )}
+        </div>
+      )}
+
+      {/* Disabled Apps Tab */}
+      {activeTab === 'disabled' && (
+        <div className="space-y-6">
+          {/* Summary Stats */}
+          {disabledSummary && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <AlertOctagon className="w-5 h-5 text-red-500" />
+                    <span className="text-sm text-gray-600">Broken</span>
+                  </div>
+                  <div className="text-2xl font-bold text-red-600">{disabledSummary.broken}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-yellow-200 bg-yellow-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Construction className="w-5 h-5 text-yellow-600" />
+                    <span className="text-sm text-gray-600">Incomplete</span>
+                  </div>
+                  <div className="text-2xl font-bold text-yellow-600">{disabledSummary.incomplete}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-orange-200 bg-orange-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Pause className="w-5 h-5 text-orange-500" />
+                    <span className="text-sm text-gray-600">Paused</span>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600">{disabledSummary.paused}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-gray-200 bg-gray-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Archive className="w-5 h-5 text-gray-500" />
+                    <span className="text-sm text-gray-600">Deprecated</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-600">{disabledSummary.deprecated}</div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Disabled Apps List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {disabledApps.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                비활성화된 앱이 없습니다.
+              </div>
+            ) : (
+              disabledApps.map((app) => {
+                const statusConfig = {
+                  broken: { color: 'border-red-300 bg-red-50', badge: 'bg-red-500', icon: AlertOctagon, label: 'Broken' },
+                  incomplete: { color: 'border-yellow-300 bg-yellow-50', badge: 'bg-yellow-500', icon: Construction, label: 'Incomplete' },
+                  paused: { color: 'border-orange-300 bg-orange-50', badge: 'bg-orange-500', icon: Pause, label: 'Paused' },
+                  deprecated: { color: 'border-gray-300 bg-gray-50', badge: 'bg-gray-500', icon: Archive, label: 'Deprecated' },
+                }[app.disabled.status];
+
+                const StatusIcon = statusConfig.icon;
+
+                return (
+                  <Card key={app.appId} className={statusConfig.color}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <StatusIcon className="w-5 h-5" />
+                          {app.name}
+                        </span>
+                        <Badge className={statusConfig.badge}>
+                          {statusConfig.label}
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription className="font-mono text-xs">
+                        {app.appId}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 text-sm">
+                        <div>
+                          <span className="font-medium text-gray-700">사유:</span>
+                          <p className="text-gray-600 mt-1">{app.disabled.reason}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700">다음 조치:</span>
+                          <p className="text-gray-600 mt-1">{app.disabled.nextAction}</p>
+                        </div>
+                        <div className="text-xs text-gray-400 pt-2 border-t">
+                          비활성화 일자: {app.disabled.disabledAt}
+                          {app.disabled.trackingId && (
+                            <span className="ml-2">| {app.disabled.trackingId}</span>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
         </div>
       )}
     </div>
