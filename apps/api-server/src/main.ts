@@ -350,6 +350,10 @@ import adminAppsRoutes from './routes/admin/apps.routes.js';
 import serviceMonitorRoutes from './routes/service-monitor.routes.js';
 // Membership Routes (WO-MEMBERSHIP-STATS-API)
 import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
+// Reporting Routes (신상신고)
+import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
+// AnnualFee Routes (연회비)
+import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index.js';
 
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
@@ -537,6 +541,24 @@ const startServer = async () => {
       logger.info('✅ Membership routes registered at /api/v1/membership');
     } catch (membershipError) {
       logger.error('Failed to register membership routes:', membershipError);
+    }
+
+    // 15. Register Reporting routes (신상신고)
+    try {
+      const reportingRoutes = createReportingRoutes(AppDataSource);
+      app.use('/api/reporting', reportingRoutes);
+      logger.info('✅ Reporting routes registered at /api/reporting');
+    } catch (reportingError) {
+      logger.error('Failed to register reporting routes:', reportingError);
+    }
+
+    // 16. Register AnnualFee routes (연회비)
+    try {
+      const annualfeeRoutes = createAnnualfeeRoutes(AppDataSource);
+      app.use('/api/annualfee', annualfeeRoutes);
+      logger.info('✅ AnnualFee routes registered at /api/annualfee');
+    } catch (annualfeeError) {
+      logger.error('Failed to register annualfee routes:', annualfeeError);
     }
 
     // 6. Core routes now registered via dynamic module loader
