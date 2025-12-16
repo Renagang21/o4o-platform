@@ -206,6 +206,46 @@ export interface AppManifest {
 }
 
 /**
+ * Disabled App Status
+ *
+ * @see docs/platform/disabled-app-policy.md
+ */
+export type DisabledAppStatus = 'broken' | 'incomplete' | 'paused' | 'deprecated';
+
+/**
+ * Disabled App Metadata
+ *
+ * Information about why an app is disabled and what needs to happen
+ * for it to be re-enabled.
+ */
+export interface DisabledAppMetadata {
+  /** Why this app is disabled */
+  status: DisabledAppStatus;
+  /** Human-readable reason */
+  reason: string;
+  /** What needs to happen next */
+  nextAction: string;
+  /** When this was disabled (ISO date string) */
+  disabledAt: string;
+  /** Related issue or tracking ID */
+  trackingId?: string;
+}
+
+/**
+ * Disabled App Entry
+ *
+ * Entry in the disabled apps registry
+ */
+export interface DisabledAppEntry {
+  /** App identifier */
+  appId: string;
+  /** Display name */
+  name: string;
+  /** Disabled metadata */
+  disabled: DisabledAppMetadata;
+}
+
+/**
  * App Registry Entry Status
  */
 export type AppRegistryStatus = 'installed' | 'active' | 'inactive';
