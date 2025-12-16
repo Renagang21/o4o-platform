@@ -120,11 +120,14 @@ jobs:
             sudo cp -r "$WEB_ROOT" "$BACKUP_DIR"
           fi
 
-          # Clear temp directory
-          rm -rf /tmp/admin-build
+          # Clear and recreate temp directory with proper permissions
+          rm -rf /tmp/admin-build || true
           mkdir -p /tmp/admin-build
+          chmod 777 /tmp/admin-build
 
           echo "✅ Preparation complete"
+          echo "📁 Temp directory:"
+          ls -la /tmp/admin-build
 
     - name: Copy build files
       if: steps.check_changes.outputs.deploy == 'true'
