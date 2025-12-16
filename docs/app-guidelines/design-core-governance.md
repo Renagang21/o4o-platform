@@ -1,7 +1,7 @@
 # Design Core v1.0 적용 운영 규칙
 
-> **Status**: ACTIVE (Phase 3 확정)
-> **Version**: 1.0.0
+> **Status**: ACTIVE (Phase 5 확정)
+> **Version**: 1.1.0
 > **Date**: 2025-12-16
 
 ---
@@ -160,9 +160,60 @@ Phase 4+ 에서 처리
 - 파일: `apps/admin-dashboard/src/pages/lms-yaksa/dashboard/`
 - 결과: 기존 화면과 공존하며 Variant 전환 성공
 
+### Phase 4-B: Inner Page Variant 적용
+
+- 대상: Required Policy (필수 교육 정책 관리) 페이지
+- 파일: `apps/admin-dashboard/src/pages/lms-yaksa/required-policy/`
+- 결과: 설정/관리 페이지에서도 Design Core 적용 가능 확인
+
 ---
 
-## 9. 위반 경로
+## 9. Design Core 기본 서비스 (Default Services)
+
+### 📣 Yaksa 서비스 선언 (Phase 5 확정)
+
+**Yaksa 서비스**는 **Design Core v1.0 기본 서비스**로 지정한다.
+
+#### 선언 내용
+
+| 항목 | 기준 |
+|------|------|
+| 신규 화면 | Design Core UI **기본값** |
+| 기존 화면 | Variant → default 단계적 전환 |
+| default UI 생성 | ❌ 금지 |
+| Variant 분기 (신규) | ❌ 금지 |
+
+#### 적용 범위
+
+- LMS-Yaksa (교육/학습 관리)
+- Membership-Yaksa (회원 관리)
+- Forum-Yaksa (포럼/커뮤니티)
+- Reporting-Yaksa (리포팅)
+- Annualfee-Yaksa (연회비)
+
+#### 기존 화면 전환 로드맵
+
+**1단계 (Low Risk)** - 완료/진행 중
+
+- [x] 관리자 대시보드
+- [x] 설정/관리 페이지 (required-policy)
+
+**2단계 (Medium Risk)**
+
+- [ ] 조회 중심 리스트 화면
+- [ ] 통계/리포트 화면
+
+**3단계 (High Risk)**
+
+- [ ] 입력/업무 핵심 플로우
+- [ ] 외부 사용자 노출 화면
+
+> ⚠ 단계 건너뛰기 ❌
+> ⚠ 동시 다중 전환 ❌
+
+---
+
+## 10. 위반 경로
 
 다음 경로는 **Design Core 기준 위반**으로 간주한다:
 
@@ -173,4 +224,4 @@ Phase 4+ 에서 처리
 
 ---
 
-*Design Core Phase 3 - 운영 규칙 고정 완료*
+*Design Core Phase 5 - Yaksa 서비스 기본 서비스 선언 완료*
