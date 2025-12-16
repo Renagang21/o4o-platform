@@ -2,9 +2,18 @@
  * Required Course Policy Management Page
  *
  * Manage organization-specific required course policies
+ *
+ * @variant default - Original UI implementation
+ * @variant design-core-v1 - Design Core v1.0 UI (Phase 4-B)
  */
 
 import { useEffect, useState, useCallback } from 'react';
+
+// ViewVariant type definition for Design Core transition
+type ViewVariant = 'default' | 'design-core-v1';
+
+// Design Core v1.0 Variant
+import RequiredPolicyDesignCoreV1 from './RequiredPolicyDesignCoreV1';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,7 +62,23 @@ import { policiesApi, RequiredCoursePolicy } from '@/lib/api/lmsYaksa';
 import { CoursePicker } from '@/components/lms-yaksa';
 import { useAuth } from '@o4o/auth-context';
 
-export default function RequiredPolicyPage() {
+// Props interface with variant support
+interface RequiredPolicyPageProps {
+  variant?: ViewVariant;
+}
+
+export default function RequiredPolicyPage({ variant = 'default' }: RequiredPolicyPageProps) {
+  // Design Core v1.0 Variant branching
+  if (variant === 'design-core-v1') {
+    return <RequiredPolicyDesignCoreV1 />;
+  }
+
+  // Default variant continues below
+  return <RequiredPolicyDefault />;
+}
+
+// Original (default) implementation
+function RequiredPolicyDefault() {
   const { user } = useAuth();
   const [policies, setPolicies] = useState<RequiredCoursePolicy[]>([]);
   const [selectedPolicy, setSelectedPolicy] = useState<RequiredCoursePolicy | null>(null);
