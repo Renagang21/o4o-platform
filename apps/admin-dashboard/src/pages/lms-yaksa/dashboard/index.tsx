@@ -21,8 +21,16 @@ import {
 } from 'lucide-react';
 import { adminApi, DashboardData } from '@/lib/api/lmsYaksa';
 import { useAuth } from '@o4o/auth-context';
+import { YaksaDashboardDesignCoreV1 } from './YaksaDashboardDesignCoreV1';
 
-export default function YaksaDashboardPage() {
+// Variant Type Definition
+export type ViewVariant = 'default' | 'design-core-v1';
+
+interface YaksaDashboardPageProps {
+  variant?: ViewVariant;
+}
+
+export default function YaksaDashboardPage({ variant = 'default' }: YaksaDashboardPageProps) {
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +79,11 @@ export default function YaksaDashboardPage() {
 
   if (!dashboardData) {
     return null;
+  }
+
+  // Variant 분기: Design Core v1 렌더링
+  if (variant === 'design-core-v1') {
+    return <YaksaDashboardDesignCoreV1 dashboardData={dashboardData} />;
   }
 
   const { overview, assignments, credits, alerts } = dashboardData;
