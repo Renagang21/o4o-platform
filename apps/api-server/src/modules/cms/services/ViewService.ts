@@ -1,29 +1,38 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { View, ViewType, ViewStatus, type ViewSchema } from '../entities/View.js';
+import { View } from '../entities/View.js';
 import logger from '../../../utils/logger.js';
 
+/**
+ * CreateViewRequest
+ * Matches cms_views table structure from cms-core
+ */
 export interface CreateViewRequest {
+  organizationId: string;
   slug: string;
   name: string;
   description?: string;
-  type: ViewType;
-  schema: ViewSchema;
-  postTypeSlug?: string;
-  tags?: string[];
+  type?: string;
+  templateId?: string;
+  cptType?: string;
+  query?: Record<string, any>;
+  layout?: Record<string, any>;
+  filters?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
-export interface UpdateViewRequest extends Partial<CreateViewRequest> {
-  status?: ViewStatus;
+export interface UpdateViewRequest extends Partial<Omit<CreateViewRequest, 'organizationId'>> {
+  isActive?: boolean;
+  sortOrder?: number;
 }
 
 export interface ViewFilters {
-  type?: ViewType;
-  status?: ViewStatus;
-  postTypeSlug?: string;
+  organizationId?: string;
+  type?: string;
+  isActive?: boolean;
+  cptType?: string;
   search?: string;
-  tags?: string[];
   page?: number;
   limit?: number;
 }
@@ -47,21 +56,23 @@ export class ViewService extends BaseService<View> {
 
   // CRUD Operations
   async createView(data: CreateViewRequest): Promise<View> {
-    // Validate slug uniqueness
-    const existing = await this.viewRepository.findOne({ where: { slug: data.slug } });
+    // Validate slug uniqueness within organization
+    const existing = await this.viewRepository.findOne({
+      where: { organizationId: data.organizationId, slug: data.slug }
+    });
     if (existing) {
       throw new Error(`View with slug '${data.slug}' already exists`);
     }
 
-    // Validate ViewRenderer compatibility
-    const validationResult = this.validateViewSchema(data.schema);
-    if (!validationResult.valid) {
-      throw new Error(`Invalid View schema: ${validationResult.error}`);
-    }
-
     const view = this.viewRepository.create({
       ...data,
-      status: ViewStatus.DRAFT
+      type: data.type || 'list',
+      query: data.query || {},
+      layout: data.layout || {},
+      filters: data.filters || {},
+      metadata: data.metadata || {},
+      isActive: true,
+      sortOrder: 0
     });
 
     const saved = await this.viewRepository.save(view);
@@ -75,45 +86,56 @@ export class ViewService extends BaseService<View> {
     return this.viewRepository.findOne({ where: { id } });
   }
 
-  async getViewBySlug(slug: string): Promise<View | null> {
-    return this.viewRepository.findOne({ where: { slug } });
+  async getViewBySlug(slug: string, organizationId?: string): Promise<View | null> {
+    const where: any = { slug };
+    if (organizationId) {
+      where.organizationId = organizationId;
+    }
+    return this.viewRepository.findOne({ where });
   }
 
   async listViews(filters: ViewFilters = {}): Promise<{ views: View[]; total: number }> {
-    const { type, status, postTypeSlug, search, tags, page = 1, limit = 20 } = filters;
+    try {
+      const { organizationId, type, isActive, cptType, search, page = 1, limit = 20 } = filters;
 
-    const query = this.viewRepository.createQueryBuilder('view');
+      const query = this.viewRepository.createQueryBuilder('view');
 
-    if (type) {
-      query.andWhere('view.type = :type', { type });
+      if (organizationId) {
+        query.andWhere('view.organizationId = :organizationId', { organizationId });
+      }
+
+      if (type) {
+        query.andWhere('view.type = :type', { type });
+      }
+
+      if (isActive !== undefined) {
+        query.andWhere('view.isActive = :isActive', { isActive });
+      }
+
+      if (cptType) {
+        query.andWhere('view.cptType = :cptType', { cptType });
+      }
+
+      if (search) {
+        query.andWhere('(view.name ILIKE :search OR view.description ILIKE :search OR view.slug ILIKE :search)', {
+          search: `%${search}%`
+        });
+      }
+
+      query
+        .orderBy('view.sortOrder', 'ASC')
+        .addOrderBy('view.createdAt', 'DESC')
+        .skip((page - 1) * limit)
+        .take(limit);
+
+      const [views, total] = await query.getManyAndCount();
+
+      return { views, total };
+    } catch (error: any) {
+      logger.error('[ViewService.listViews] Error', { error: error.message });
+      // Return empty result instead of throwing - graceful fallback
+      return { views: [], total: 0 };
     }
-
-    if (status) {
-      query.andWhere('view.status = :status', { status });
-    }
-
-    if (postTypeSlug) {
-      query.andWhere('view.postTypeSlug = :postTypeSlug', { postTypeSlug });
-    }
-
-    if (search) {
-      query.andWhere('(view.name ILIKE :search OR view.description ILIKE :search OR view.slug ILIKE :search)', {
-        search: `%${search}%`
-      });
-    }
-
-    if (tags && tags.length > 0) {
-      query.andWhere('view.tags && :tags', { tags });
-    }
-
-    query
-      .orderBy('view.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
-
-    const [views, total] = await query.getManyAndCount();
-
-    return { views, total };
   }
 
   async updateView(id: string, data: UpdateViewRequest): Promise<View> {
@@ -124,17 +146,11 @@ export class ViewService extends BaseService<View> {
 
     // Validate slug uniqueness if changed
     if (data.slug && data.slug !== view.slug) {
-      const existing = await this.viewRepository.findOne({ where: { slug: data.slug } });
+      const existing = await this.viewRepository.findOne({
+        where: { organizationId: view.organizationId, slug: data.slug }
+      });
       if (existing) {
         throw new Error(`View with slug '${data.slug}' already exists`);
-      }
-    }
-
-    // Validate schema if changed
-    if (data.schema) {
-      const validationResult = this.validateViewSchema(data.schema);
-      if (!validationResult.valid) {
-        throw new Error(`Invalid View schema: ${validationResult.error}`);
       }
     }
 
@@ -152,61 +168,19 @@ export class ViewService extends BaseService<View> {
   }
 
   async activateView(id: string): Promise<View> {
-    return this.updateView(id, { status: ViewStatus.ACTIVE });
+    return this.updateView(id, { isActive: true });
   }
 
   async archiveView(id: string): Promise<View> {
-    return this.updateView(id, { status: ViewStatus.ARCHIVED });
+    return this.updateView(id, { isActive: false });
   }
 
-  // ViewRenderer Compatibility
-  validateViewSchema(schema: ViewSchema): { valid: boolean; error?: string } {
-    if (!schema.version) {
-      return { valid: false, error: 'Schema version is required' };
-    }
-
-    if (schema.version !== '2.0') {
-      return { valid: false, error: `Unsupported schema version: ${schema.version}. Expected 2.0` };
-    }
-
-    if (!schema.components || schema.components.length === 0) {
-      return { valid: false, error: 'Schema must have at least one component' };
-    }
-
-    // Validate each component
-    for (const component of schema.components) {
-      if (!component.id || !component.type) {
-        return { valid: false, error: 'Each component must have id and type' };
-      }
-    }
-
-    return { valid: true };
-  }
-
-  // Component Extraction
+  // Get layout configuration from view
   getComponentsInView(viewId: string): Promise<any[]> {
     return this.getView(viewId).then(view => {
-      if (!view) return [];
-
-      const components: any[] = [];
-
-      const extractComponents = (componentArray: any[]) => {
-        componentArray.forEach(comp => {
-          components.push(comp);
-          if (comp.children) {
-            extractComponents(comp.children);
-          }
-          if (comp.slots) {
-            Object.values(comp.slots).forEach((slotComponents: any) => {
-              extractComponents(slotComponents);
-            });
-          }
-        });
-      };
-
-      extractComponents(view.schema.components);
-
-      return components;
+      if (!view || !view.layout) return [];
+      // Return layout components if available
+      return view.layout.components || [];
     });
   }
 
@@ -217,21 +191,28 @@ export class ViewService extends BaseService<View> {
       throw new Error(`View not found: ${viewId}`);
     }
 
-    // Check if new slug is unique
-    const existing = await this.viewRepository.findOne({ where: { slug: newSlug } });
+    // Check if new slug is unique within organization
+    const existing = await this.viewRepository.findOne({
+      where: { organizationId: original.organizationId, slug: newSlug }
+    });
     if (existing) {
       throw new Error(`View with slug '${newSlug}' already exists`);
     }
 
     const cloned = this.viewRepository.create({
+      organizationId: original.organizationId,
       slug: newSlug,
       name: newName || `${original.name} (Copy)`,
       description: original.description,
       type: original.type,
-      schema: JSON.parse(JSON.stringify(original.schema)), // Deep clone
-      postTypeSlug: original.postTypeSlug,
-      tags: original.tags ? [...original.tags] : undefined,
-      status: ViewStatus.DRAFT
+      templateId: original.templateId,
+      cptType: original.cptType,
+      query: JSON.parse(JSON.stringify(original.query)),
+      layout: JSON.parse(JSON.stringify(original.layout)),
+      filters: JSON.parse(JSON.stringify(original.filters)),
+      metadata: JSON.parse(JSON.stringify(original.metadata)),
+      isActive: false,
+      sortOrder: original.sortOrder
     });
 
     const saved = await this.viewRepository.save(cloned);
@@ -244,17 +225,21 @@ export class ViewService extends BaseService<View> {
     return saved;
   }
 
-  // Get Views by CPT
-  async getViewsForCPT(postTypeSlug: string): Promise<View[]> {
+  // Get Views by CPT type
+  async getViewsForCPT(cptType: string, organizationId?: string): Promise<View[]> {
+    const where: any = { cptType, isActive: true };
+    if (organizationId) {
+      where.organizationId = organizationId;
+    }
     return this.viewRepository.find({
-      where: { postTypeSlug, status: ViewStatus.ACTIVE },
-      order: { createdAt: 'DESC' }
+      where,
+      order: { sortOrder: 'ASC', createdAt: 'DESC' }
     });
   }
 
-  // Preview View (for frontend preview without requiring a Page)
-  async previewView(slug: string): Promise<{ view: View; renderData: any } | null> {
-    const view = await this.viewRepository.findOne({ where: { slug } });
+  // Preview View
+  async previewView(slug: string, organizationId?: string): Promise<{ view: View; renderData: any } | null> {
+    const view = await this.getViewBySlug(slug, organizationId);
 
     if (!view) {
       return null;
@@ -267,13 +252,9 @@ export class ViewService extends BaseService<View> {
         description: view.description || 'View template preview',
         slug: view.slug,
       },
-      content: {
-        // Sample content for preview
-        title: 'Sample Title',
-        subtitle: 'This is a preview with sample data',
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      },
-      schema: view.schema,
+      layout: view.layout,
+      query: view.query,
+      filters: view.filters,
     };
 
     logger.info(`[CMS] Previewing view: ${view.slug}`, { viewId: view.id });

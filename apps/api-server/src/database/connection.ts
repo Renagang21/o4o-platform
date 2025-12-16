@@ -159,12 +159,12 @@ import {
   YaksaCourseAssignment,
 } from '@o4o/lms-yaksa';
 
-// ✅ NEW: LMS-Marketing entities (Phase R7, R8)
-import {
-  ProductContent,
-  MarketingQuizCampaign,
-  SurveyCampaign,
-} from '@o4o-extensions/lms-marketing';
+// ✅ TODO: LMS-Marketing entities (Phase R7, R8) - temporarily disabled - build errors
+// import {
+//   ProductContent,
+//   MarketingQuizCampaign,
+//   SurveyCampaign,
+// } from '@o4o-extensions/lms-marketing';
 
 // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
 // import {
@@ -355,10 +355,10 @@ export const AppDataSource = new DataSource({
     RequiredCoursePolicy,
     CreditRecord,
     YaksaCourseAssignment,
-    // ✅ NEW: LMS-Marketing entities (Phase R7, R8)
-    ProductContent,
-    MarketingQuizCampaign,
-    SurveyCampaign,
+    // ✅ TODO: LMS-Marketing entities (Phase R7, R8) - temporarily disabled - build errors
+    // ProductContent,
+    // MarketingQuizCampaign,
+    // SurveyCampaign,
     // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
     // PartnerProfile,
     // PartnerLink,

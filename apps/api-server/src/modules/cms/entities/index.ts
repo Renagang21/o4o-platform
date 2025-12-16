@@ -3,5 +3,5 @@
 
 export { CustomPostType, CPTStatus, type CPTSchema } from './CustomPostType.js';
 export { CustomField, FieldType, type FieldValidation, type FieldConditional } from './CustomField.js';
-export { View, ViewType, ViewStatus, type ViewSchema } from './View.js';
+export { View } from './View.js';
 export { Page, PageStatus, type PageVersion } from './Page.js';

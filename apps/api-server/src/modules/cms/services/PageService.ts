@@ -69,8 +69,8 @@ export class PageService extends BaseService<Page> {
       if (!view) {
         throw new Error(`View not found: ${data.viewId}`);
       }
-      if (!view.isCompatibleWithViewRenderer()) {
-        throw new Error('Selected View is not compatible with ViewRenderer V2');
+      if (!view.isActive) {
+        throw new Error('Selected View is not active');
       }
     }
 
@@ -159,8 +159,8 @@ export class PageService extends BaseService<Page> {
       if (!view) {
         throw new Error(`View not found: ${data.viewId}`);
       }
-      if (!view.isCompatibleWithViewRenderer()) {
-        throw new Error('Selected View is not compatible with ViewRenderer V2');
+      if (!view.isActive) {
+        throw new Error('Selected View is not active');
       }
     }
 
