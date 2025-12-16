@@ -6,26 +6,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./backend": {
-      "types": "./dist/backend/index.d.ts",
-      "import": "./dist/backend/index.js"
-    },
-    "./backend/entities": {
-      "types": "./dist/backend/entities/index.d.ts",
-      "import": "./dist/backend/entities/index.js"
-    },
-    "./backend/entities/*": {
-      "types": "./dist/backend/entities/*.d.ts",
-      "import": "./dist/backend/entities/*.js"
-    },
-    "./manifest": {
-      "types": "./dist/manifest.d.ts",
-      "import": "./dist/manifest.js"
-    }
+    ".": "./dist/index.js",
+    "./src/*": "./src/*",
+    "./backend/*": "./dist/backend/*"
   },
   "scripts": {
     "build": "tsc",
