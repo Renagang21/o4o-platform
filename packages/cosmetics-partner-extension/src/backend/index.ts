@@ -3,6 +3,7 @@
  *
  * 화장품 파트너 확장 기능 백엔드 모듈
  * - Phase 6-D: Commission Policy System 추가
+ * - Phase 10: Security hardening - Partner Auth middleware
  */
 
 import { Router } from 'express';
@@ -11,6 +12,9 @@ import { createPartnerExtensionRoutes } from './routes/partner-extension.routes.
 
 // Entities
 export * from './entities/index.js';
+
+// Middleware (Phase 10)
+export * from './middleware/partner-auth.middleware.js';
 
 // Import entities for Module Loader
 import { PartnerProfile } from './entities/partner-profile.entity.js';

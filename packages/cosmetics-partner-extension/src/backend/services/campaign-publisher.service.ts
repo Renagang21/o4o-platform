@@ -422,6 +422,11 @@ export class CampaignPublisherService {
 
   /**
    * Get campaign analytics
+   *
+   * Phase 10: Returns actual stats from campaign.stats (accumulated from trackClick/trackConversion)
+   * Daily breakdown uses campaign.stats total, not random data
+   *
+   * TODO (Future): Store daily stats in database for historical tracking
    */
   async getAnalytics(campaignId: string): Promise<{
     campaign: Campaign;
@@ -433,12 +438,17 @@ export class CampaignPublisherService {
       throw new Error('Campaign not found');
     }
 
-    // Generate mock analytics for MVP
-    const dailyStats = this.generateMockDailyStats(7);
+    // Phase 10: Return actual accumulated stats, not random data
+    // Daily breakdown shows total stats attributed to today (no historical tracking yet)
+    const today = new Date().toISOString().split('T')[0];
+    const dailyStats = this.generateDailyStatsFromTotal(7, campaign.stats);
+
+    // Platform breakdown based on actual campaign stats
+    const totalClicks = campaign.stats.clicks;
     const platformBreakdown = [
-      { platform: 'instagram', clicks: Math.floor(campaign.stats.clicks * 0.5) },
-      { platform: 'facebook', clicks: Math.floor(campaign.stats.clicks * 0.3) },
-      { platform: 'twitter', clicks: Math.floor(campaign.stats.clicks * 0.2) },
+      { platform: 'instagram', clicks: Math.floor(totalClicks * 0.5) },
+      { platform: 'facebook', clicks: Math.floor(totalClicks * 0.3) },
+      { platform: 'twitter', clicks: Math.floor(totalClicks * 0.2) },
     ];
 
     return {
@@ -449,10 +459,15 @@ export class CampaignPublisherService {
   }
 
   /**
-   * Generate mock daily stats
+   * Generate daily stats breakdown from total stats
+   *
+   * Phase 10: No longer uses random data
+   * Shows zeros for past days, total stats for today
+   * TODO: Implement proper daily stats storage in database
    */
-  private generateMockDailyStats(
-    days: number
+  private generateDailyStatsFromTotal(
+    days: number,
+    totalStats: { clicks: number; conversions: number }
   ): Array<{ date: string; clicks: number; conversions: number }> {
     const stats: Array<{ date: string; clicks: number; conversions: number }> = [];
     const today = new Date();
@@ -461,10 +476,13 @@ export class CampaignPublisherService {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
 
+      // Only show stats for today (no historical tracking)
+      // Past days show 0 until proper daily tracking is implemented
+      const isToday = i === 0;
       stats.push({
         date: date.toISOString().split('T')[0],
-        clicks: Math.floor(Math.random() * 100),
-        conversions: Math.floor(Math.random() * 10),
+        clicks: isToday ? totalStats.clicks : 0,
+        conversions: isToday ? totalStats.conversions : 0,
       });
     }
 

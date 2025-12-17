@@ -3,6 +3,7 @@
  *
  * 파트너 수익 관리 API 컨트롤러
  * - Commission Engine 통합 (Phase 6-D)
+ * - Phase 10: Security hardening - partnerId from auth context
  */
 
 import type { Request, Response } from 'express';
@@ -13,6 +14,7 @@ import type {
   RecordCommissionDto,
   EarningsFilter,
 } from '../services/partner-earnings.service.js';
+import type { PartnerAuthenticatedRequest } from '../middleware/partner-auth.middleware.js';
 
 export class PartnerEarningsController {
   constructor(private readonly earningsService: PartnerEarningsService) {}
@@ -73,7 +75,15 @@ export class PartnerEarningsController {
 
   async findByPartnerId(req: Request, res: Response): Promise<void> {
     try {
-      const { partnerId } = req.params;
+      // Phase 10: Use partnerId from auth context, fallback to params for legacy routes
+      const authReq = req as PartnerAuthenticatedRequest;
+      const partnerId = authReq.partnerId || req.params.partnerId;
+
+      if (!partnerId) {
+        res.status(400).json({ success: false, message: 'Partner ID is required' });
+        return;
+      }
+
       const earnings = await this.earningsService.findByPartnerId(partnerId);
       res.json({ success: true, data: earnings });
     } catch (error: any) {
@@ -119,12 +129,24 @@ export class PartnerEarningsController {
   }
 
   /**
-   * POST /api/v1/cosmetics-partner/earnings/:partnerId/withdrawal
-   * 인출 요청
+   * POST /api/v1/cosmetics-partner/earnings/my/withdraw
+   * 인출 요청 (Phase 10: partnerId from auth context)
    */
   async requestWithdrawal(req: Request, res: Response): Promise<void> {
     try {
-      const { partnerId } = req.params;
+      // Phase 10: Use partnerId from auth context, fallback to params for legacy routes
+      const authReq = req as PartnerAuthenticatedRequest;
+      const partnerId = authReq.partnerId || req.params.partnerId;
+
+      if (!partnerId) {
+        res.status(400).json({
+          success: false,
+          message: 'Partner ID is required',
+          errorCode: 'VALIDATION_ERROR',
+        });
+        return;
+      }
+
       const { amount } = req.body;
 
       if (!amount || amount <= 0) {
@@ -155,12 +177,20 @@ export class PartnerEarningsController {
   }
 
   /**
-   * GET /api/v1/cosmetics-partner/earnings/:partnerId/summary
-   * 수익 요약
+   * GET /api/v1/cosmetics-partner/earnings/my/summary
+   * 수익 요약 (Phase 10: partnerId from auth context)
    */
   async getSummary(req: Request, res: Response): Promise<void> {
     try {
-      const { partnerId } = req.params;
+      // Phase 10: Use partnerId from auth context, fallback to params for legacy routes
+      const authReq = req as PartnerAuthenticatedRequest;
+      const partnerId = authReq.partnerId || req.params.partnerId;
+
+      if (!partnerId) {
+        res.status(400).json({ success: false, message: 'Partner ID is required' });
+        return;
+      }
+
       const summary = await this.earningsService.getEarningsSummary(partnerId);
       res.json({ success: true, data: summary });
     } catch (error: any) {
@@ -170,12 +200,20 @@ export class PartnerEarningsController {
   }
 
   /**
-   * GET /api/v1/cosmetics-partner/earnings/:partnerId/balance
-   * 인출 가능 잔액 조회
+   * GET /api/v1/cosmetics-partner/earnings/my/balance
+   * 인출 가능 잔액 조회 (Phase 10: partnerId from auth context)
    */
   async getAvailableBalance(req: Request, res: Response): Promise<void> {
     try {
-      const { partnerId } = req.params;
+      // Phase 10: Use partnerId from auth context, fallback to params for legacy routes
+      const authReq = req as PartnerAuthenticatedRequest;
+      const partnerId = authReq.partnerId || req.params.partnerId;
+
+      if (!partnerId) {
+        res.status(400).json({ success: false, message: 'Partner ID is required' });
+        return;
+      }
+
       const balance = await this.earningsService.getAvailableBalance(partnerId);
       res.json({ success: true, data: { partnerId, availableBalance: balance } });
     } catch (error: any) {

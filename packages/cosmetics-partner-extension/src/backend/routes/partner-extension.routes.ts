@@ -2,6 +2,10 @@
  * Cosmetics Partner Extension Routes
  *
  * 파트너 확장 기능 API 라우트 정의
+ *
+ * Phase 10: Security hardening
+ * - Partner authentication required for protected routes
+ * - partnerId extracted from authenticated user, not URL params
  */
 
 import { Router } from 'express';
@@ -37,6 +41,9 @@ import { QRLandingController } from '../controllers/qr-landing.controller.js';
 import { SocialShareController } from '../controllers/social-share.controller.js';
 import { CampaignPublisherController } from '../controllers/campaign-publisher.controller.js';
 
+// Middleware (Phase 10)
+import { createRequirePartnerAuth, type PartnerAuthenticatedRequest } from '../middleware/partner-auth.middleware.js';
+
 export interface PartnerExtensionRoutesDeps {
   profileRepository: Repository<PartnerProfile>;
   linkRepository: Repository<PartnerLink>;
@@ -71,6 +78,9 @@ export function createPartnerExtensionRoutes(deps: PartnerExtensionRoutesDeps): 
   const qrLandingController = new QRLandingController(qrLandingService);
   const socialShareController = new SocialShareController(socialShareService);
   const campaignController = new CampaignPublisherController(campaignService);
+
+  // Phase 10: Create authentication middleware
+  const requirePartnerAuth = createRequirePartnerAuth(deps.profileRepository);
 
   // ===================
   // Profile Routes
@@ -116,18 +126,42 @@ export function createPartnerExtensionRoutes(deps: PartnerExtensionRoutesDeps): 
   router.delete('/routine/:id', (req, res) => routineController.delete(req, res));
 
   // ===================
-  // Earnings Routes
+  // Earnings Routes (Phase 10: Security hardened)
   // ===================
-  router.post('/earnings', (req, res) => earningsController.create(req, res));
-  router.get('/earnings/:id', (req, res) => earningsController.findById(req, res));
-  router.get('/earnings/partner/:partnerId', (req, res) => earningsController.findByPartnerId(req, res));
-  router.get('/earnings/filter/all', (req, res) => earningsController.findByFilter(req, res));
-  router.put('/earnings/:id', (req, res) => earningsController.update(req, res));
-  router.post('/earnings/:id/approve', (req, res) => earningsController.approve(req, res));
-  router.post('/earnings/partner/:partnerId/withdraw', (req, res) => earningsController.requestWithdrawal(req, res));
-  router.get('/earnings/partner/:partnerId/summary', (req, res) => earningsController.getSummary(req, res));
-  router.get('/earnings/pending/all', (req, res) => earningsController.getPendingApprovals(req, res));
-  router.delete('/earnings/:id', (req, res) => earningsController.delete(req, res));
+  // Partner-authenticated routes: partnerId from req.partnerId, not URL
+  router.get('/earnings/my', requirePartnerAuth, (req, res) =>
+    earningsController.findByPartnerId(req as PartnerAuthenticatedRequest, res)
+  );
+  router.get('/earnings/my/summary', requirePartnerAuth, (req, res) =>
+    earningsController.getSummary(req as PartnerAuthenticatedRequest, res)
+  );
+  router.get('/earnings/my/balance', requirePartnerAuth, (req, res) =>
+    earningsController.getAvailableBalance(req as PartnerAuthenticatedRequest, res)
+  );
+  router.post('/earnings/my/withdraw', requirePartnerAuth, (req, res) =>
+    earningsController.requestWithdrawal(req as PartnerAuthenticatedRequest, res)
+  );
+
+  // Individual earnings access (ownership verified in controller)
+  router.get('/earnings/:id', requirePartnerAuth, (req, res) =>
+    earningsController.findById(req as PartnerAuthenticatedRequest, res)
+  );
+
+  // Admin-only routes
+  router.post('/earnings', requirePartnerAuth, (req, res) => earningsController.create(req, res));
+  router.post('/earnings/record', requirePartnerAuth, (req, res) => earningsController.recordCommission(req, res));
+  router.get('/earnings/filter/all', requirePartnerAuth, (req, res) => earningsController.findByFilter(req, res));
+  router.put('/earnings/:id', requirePartnerAuth, (req, res) => earningsController.update(req, res));
+  router.post('/earnings/:id/approve', requirePartnerAuth, (req, res) => earningsController.approve(req, res));
+  router.post('/earnings/approve-batch', requirePartnerAuth, (req, res) => earningsController.approveBatch(req, res));
+  router.get('/earnings/pending/all', requirePartnerAuth, (req, res) => earningsController.getPendingApprovals(req, res));
+  router.delete('/earnings/:id', requirePartnerAuth, (req, res) => earningsController.delete(req, res));
+
+  // Legacy routes (deprecated, kept for backward compatibility)
+  // TODO: Remove after frontend migration
+  router.get('/earnings/partner/:partnerId', requirePartnerAuth, (req, res) => earningsController.findByPartnerId(req, res));
+  router.get('/earnings/partner/:partnerId/summary', requirePartnerAuth, (req, res) => earningsController.getSummary(req, res));
+  router.post('/earnings/partner/:partnerId/withdraw', requirePartnerAuth, (req, res) => earningsController.requestWithdrawal(req, res));
 
   // ===================
   // AI Routes (Phase 6-F)
