@@ -13,6 +13,7 @@
 import type { AppRegistryEntry, LoadedApp, AppStoreState } from './types';
 import { loadManifest } from './manifestLoader';
 import { AppRegistry, getEnabledApps } from './registry';
+import { mergeApp } from './registryMerger';
 
 // Development-only logging (currently disabled for production)
 // const isDev = import.meta.env.DEV;
@@ -150,17 +151,11 @@ export async function loadAllApps(): Promise<void> {
  * Merge loaded apps into global registries
  */
 function mergeIntoRegistries(): void {
-
-  // Import registry merger functions
-  const { mergeApp } = require('./registryMerger');
-
   // Merge each loaded app
   appStoreState.apps.forEach((loadedApp, appId) => {
-
     // Merge into registries
     mergeApp(appId, loadedApp);
   });
-
 }
 
 /**
