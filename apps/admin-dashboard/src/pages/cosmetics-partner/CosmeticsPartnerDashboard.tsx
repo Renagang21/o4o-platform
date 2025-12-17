@@ -8,12 +8,21 @@
  * - Empty state 지원
  *
  * Phase 6-E: UX Enhancement
+ *
+ * @variant default - Original UI implementation
+ * @variant design-core-v1 - Design Core v1.0 UI (Phase 4-A Cosmetics)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { AppGuard } from '@/components/common/AppGuard';
+
+// ViewVariant type definition for Design Core transition
+type ViewVariant = 'default' | 'design-core-v1';
+
+// Design Core v1.0 Variant
+import CosmeticsPartnerDashboardDesignCoreV1 from './CosmeticsPartnerDashboardDesignCoreV1';
 import {
   TrendingUp,
   TrendingDown,
@@ -537,9 +546,19 @@ const CosmeticsPartnerDashboardContent: React.FC = () => {
  * Wrapped export with AppGuard
  * Only renders dashboard content if cosmetics-partner app is installed
  */
-const CosmeticsPartnerDashboard: React.FC = () => (
+interface CosmeticsPartnerDashboardProps {
+  variant?: ViewVariant;
+}
+
+const CosmeticsPartnerDashboard: React.FC<CosmeticsPartnerDashboardProps> = ({
+  variant = 'default',
+}) => (
   <AppGuard appId="cosmetics-partner" appName="화장품 파트너">
-    <CosmeticsPartnerDashboardContent />
+    {variant === 'design-core-v1' ? (
+      <CosmeticsPartnerDashboardDesignCoreV1 />
+    ) : (
+      <CosmeticsPartnerDashboardContent />
+    )}
   </AppGuard>
 );
 
