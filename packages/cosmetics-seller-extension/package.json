@@ -18,8 +18,9 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "echo 'Skipping independent build - compiled by api-server'",
-    "type-check": "tsc --noEmit"
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "@o4o/types": "workspace:*",
