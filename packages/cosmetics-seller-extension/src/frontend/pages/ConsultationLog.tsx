@@ -2,9 +2,20 @@
  * ConsultationLog Page
  *
  * 상담 로그 페이지 - 고객 상담 내역 관리
+ * Design Core v1.0 적용
  */
 
 import React, { useState, useEffect } from 'react';
+import {
+  AGPageHeader,
+  AGSection,
+  AGKPIGrid,
+  AGKPIBlock,
+  AGTable,
+  AGTableColumn,
+  Badge,
+  Button,
+} from '@o4o/ui';
 
 interface ConsultationItem {
   id: string;
@@ -72,8 +83,8 @@ export const ConsultationLog: React.FC<ConsultationLogProps> = ({
       if (statsData.success) {
         setStats(statsData.data);
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -92,90 +103,126 @@ export const ConsultationLog: React.FC<ConsultationLogProps> = ({
     }
   };
 
-  const getStatusClass = (status: string) => {
+  const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
     switch (status) {
       case 'completed':
-        return 'status-success';
+        return 'default';
       case 'no_purchase':
-        return 'status-warning';
+        return 'secondary';
       case 'cancelled':
-        return 'status-danger';
+        return 'destructive';
       default:
-        return 'status-pending';
+        return 'outline';
     }
   };
 
-  if (loading) {
-    return <div className="loading">상담 로그 로딩 중...</div>;
-  }
-
-  if (error) {
-    return <div className="error">오류: {error}</div>;
-  }
+  const columns: AGTableColumn<ConsultationItem>[] = [
+    {
+      key: 'createdAt',
+      header: '일시',
+      width: '15%',
+      render: (value: string) => new Date(value).toLocaleString('ko-KR'),
+    },
+    {
+      key: 'resultStatus',
+      header: '상태',
+      width: '12%',
+      align: 'center',
+      render: (value: string) => (
+        <Badge variant={getStatusVariant(value)}>
+          {getStatusLabel(value)}
+        </Badge>
+      ),
+    },
+    {
+      key: 'recommendedProducts',
+      header: '추천 상품',
+      width: '12%',
+      align: 'center',
+      render: (value: ConsultationItem['recommendedProducts']) => `${value?.length || 0}개`,
+    },
+    {
+      key: 'purchasedProducts',
+      header: '구매 상품',
+      width: '12%',
+      align: 'center',
+      render: (value: ConsultationItem['purchasedProducts']) => `${value?.length || 0}개`,
+    },
+    {
+      key: 'consultationDurationMinutes',
+      header: '상담 시간',
+      width: '12%',
+      align: 'center',
+      render: (value: number | undefined) => value ? `${value}분` : '-',
+    },
+    {
+      key: 'notes',
+      header: '비고',
+      width: '25%',
+      render: (value: string | undefined) => value || '-',
+    },
+  ];
 
   return (
-    <div className="consultation-log">
-      <h2>상담 로그</h2>
+    <div>
+      <AGPageHeader
+        title="상담 로그"
+        description="고객 상담 내역을 확인합니다"
+        actions={
+          <Button variant="outline" onClick={() => fetchData()}>
+            새로고침
+          </Button>
+        }
+      />
 
-      {stats && (
-        <div className="stats-summary">
-          <div className="stat-card">
-            <span className="stat-value">{stats.totalConsultations}</span>
-            <span className="stat-label">총 상담</span>
+      {/* Section 1: 상담 통계 */}
+      <AGSection title="상담 성과" spacing="md">
+        <AGKPIGrid columns={4}>
+          <AGKPIBlock
+            title="총 상담"
+            value={stats?.totalConsultations || 0}
+            colorMode="info"
+            loading={loading}
+          />
+          <AGKPIBlock
+            title="구매 전환"
+            value={stats?.completedConsultations || 0}
+            colorMode="positive"
+            loading={loading}
+          />
+          <AGKPIBlock
+            title="전환율"
+            value={`${stats?.conversionRate?.toFixed(1) || 0}%`}
+            colorMode={stats?.conversionRate && stats.conversionRate >= 50 ? 'positive' : 'negative'}
+            loading={loading}
+          />
+          <AGKPIBlock
+            title="평균 상담 시간"
+            value={`${stats?.averageDuration?.toFixed(0) || 0}분`}
+            colorMode="neutral"
+            loading={loading}
+          />
+        </AGKPIGrid>
+      </AGSection>
+
+      {/* Section 2: 상담 목록 */}
+      <AGSection title="상담 내역" spacing="md">
+        <AGTable<ConsultationItem>
+          columns={columns}
+          data={logs}
+          loading={loading}
+          emptyMessage="상담 기록이 없습니다."
+        />
+      </AGSection>
+
+      {/* Error Display */}
+      {error && (
+        <AGSection spacing="md">
+          <div style={{ color: '#ef4444', padding: '1rem', backgroundColor: '#fef2f2', borderRadius: '0.5rem' }}>
+            오류: {error}
           </div>
-          <div className="stat-card">
-            <span className="stat-value">{stats.completedConsultations}</span>
-            <span className="stat-label">구매 전환</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-value">{stats.conversionRate}%</span>
-            <span className="stat-label">전환율</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-value">{stats.averageDuration}분</span>
-            <span className="stat-label">평균 상담 시간</span>
-          </div>
-        </div>
+        </AGSection>
       )}
-
-      <div className="log-list">
-        {logs.length === 0 ? (
-          <p>상담 기록이 없습니다.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>일시</th>
-                <th>상태</th>
-                <th>추천 상품</th>
-                <th>구매 상품</th>
-                <th>상담 시간</th>
-                <th>비고</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map((log) => (
-                <tr key={log.id}>
-                  <td>{new Date(log.createdAt).toLocaleString()}</td>
-                  <td>
-                    <span className={getStatusClass(log.resultStatus)}>
-                      {getStatusLabel(log.resultStatus)}
-                    </span>
-                  </td>
-                  <td>{log.recommendedProducts.length}개</td>
-                  <td>{log.purchasedProducts.length}개</td>
-                  <td>
-                    {log.consultationDurationMinutes
-                      ? `${log.consultationDurationMinutes}분`
-                      : '-'}
-                  </td>
-                  <td>{log.notes || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
     </div>
   );
 };
