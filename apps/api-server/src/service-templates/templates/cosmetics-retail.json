@@ -10,6 +10,7 @@
     "supplierops"
   ],
   "extensionApps": [
+    "cosmetics-partner-extension",
     "partnerops",
     "signage"
   ],

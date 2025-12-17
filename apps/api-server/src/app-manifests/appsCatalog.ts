@@ -142,6 +142,12 @@ export const SERVICE_GROUP_META: ServiceGroupMeta[] = [
   },
 ];
 
+/**
+ * App Status - 앱의 운영 상태
+ * @description Phase C Baseline 기반 서비스 상태 체계
+ */
+export type AppStatus = 'active' | 'development' | 'experimental' | 'planned' | 'legacy' | 'deprecated';
+
 export interface AppCatalogItem {
   appId: string;
   name: string;
@@ -154,6 +160,8 @@ export interface AppCatalogItem {
   homepage?: string;
   author?: string;
   type?: AppType;
+  /** App operational status (Phase C Baseline) */
+  status?: AppStatus;
   dependencies?: Record<string, string>; // { appId: versionRange }
   /** Service Groups this app belongs to */
   serviceGroups?: ServiceGroup[];
@@ -353,6 +361,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['화장품', 'cosmetics', 'dropshipping', 'skincare'],
     type: 'extension',
+    status: 'active', // Phase 8 완료 - 2024-12 Active 전환
     dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics'],
@@ -366,6 +375,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['화장품', 'cosmetics', 'partner', 'influencer', 'routine', 'sample'],
     type: 'extension',
+    status: 'active', // Phase 8 완료 - 2024-12 Active 전환
     dependencies: { 'dropshipping-cosmetics': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'partnerops'],
