@@ -194,7 +194,17 @@ label {
 input[type="text"],
 input[type="email"],
 input[type="password"],
-textarea,
+textarea {
+  width: 100% !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  background: white !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Select 요소는 appearance-none으로 브라우저 기본 화살표 제거 */
 select {
   width: 100% !important;
   padding: 10px 12px !important;
@@ -203,6 +213,9 @@ select {
   border-radius: 6px !important;
   background: white !important;
   transition: all 0.2s ease !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
 .form-control:focus,
