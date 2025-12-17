@@ -2,8 +2,23 @@
   "name": "@o4o/cosmetics-supplier-extension",
   "version": "1.0.0",
   "description": "Cosmetics Supplier Extension - 브랜드/공급사 관리 확장앱",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
+    "./backend/*": {
+      "types": "./dist/backend/*.d.ts",
+      "import": "./dist/backend/*.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

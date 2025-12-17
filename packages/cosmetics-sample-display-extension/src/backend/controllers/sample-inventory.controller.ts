@@ -2,22 +2,46 @@
  * Sample Inventory Controller
  *
  * 샘플 재고 관리 API
+ * WO-COSMETICS-SUPPLIER-INTEGRATION: Supplier 정책 체크 추가
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { SampleInventoryService } from '../services/sample-inventory.service';
+import { SupplierProfileService } from '@o4o/cosmetics-supplier-extension';
 
 export function createSampleInventoryController(dataSource: DataSource): Router {
   const router = Router();
   const service = new SampleInventoryService(dataSource);
+  const supplierProfileService = new SupplierProfileService(dataSource);
 
   /**
    * POST /inventory/receive
    * 샘플 입고 기록
+   * WO-COSMETICS-SUPPLIER-INTEGRATION: Supplier 정책 체크 추가
    */
   router.post('/receive', async (req: Request, res: Response) => {
     try {
+      const { supplierId } = req.body;
+
+      // Supplier 정책 체크: supplierId가 제공된 경우 승인 상태 확인
+      if (supplierId) {
+        const supplier = await supplierProfileService.findById(supplierId);
+        if (!supplier) {
+          return res.status(403).json({
+            error: 'Supplier not found',
+            code: 'SUPPLIER_NOT_FOUND',
+          });
+        }
+        if (supplier.status !== 'approved') {
+          return res.status(403).json({
+            error: 'Supplier is not approved for sample supply',
+            code: 'SUPPLIER_NOT_APPROVED',
+            supplierStatus: supplier.status,
+          });
+        }
+      }
+
       const inventory = await service.recordShipment(req.body);
       res.status(201).json(inventory);
     } catch (error) {
