@@ -354,6 +354,15 @@ import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/ind
 import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
 // AnnualFee Routes (연회비)
 import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index.js';
+// Cosmetics Seller Extension Routes (WO-COSMETICS-SELLER-RUNTIME-ACTIVATE)
+import {
+  createSellerExtensionRoutes,
+  SellerDisplay,
+  SellerSample,
+  SellerInventory,
+  SellerConsultationLog,
+  SellerKPI,
+} from '@o4o/cosmetics-seller-extension';
 
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
@@ -559,6 +568,21 @@ const startServer = async () => {
       logger.info('✅ AnnualFee routes registered at /api/annualfee');
     } catch (annualfeeError) {
       logger.error('Failed to register annualfee routes:', annualfeeError);
+    }
+
+    // 17. Register Cosmetics Seller Extension routes (WO-COSMETICS-SELLER-RUNTIME-ACTIVATE)
+    try {
+      const cosmeticsSellerRoutes = createSellerExtensionRoutes({
+        displayRepository: AppDataSource.getRepository(SellerDisplay),
+        sampleRepository: AppDataSource.getRepository(SellerSample),
+        inventoryRepository: AppDataSource.getRepository(SellerInventory),
+        consultationRepository: AppDataSource.getRepository(SellerConsultationLog),
+        kpiRepository: AppDataSource.getRepository(SellerKPI),
+      });
+      app.use('/api/v1/cosmetics-seller', cosmeticsSellerRoutes as any);
+      logger.info('✅ Cosmetics Seller routes registered at /api/v1/cosmetics-seller');
+    } catch (cosmeticsSellerError) {
+      logger.error('Failed to register cosmetics-seller routes:', cosmeticsSellerError);
     }
 
     // 6. Core routes now registered via dynamic module loader
