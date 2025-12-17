@@ -4,6 +4,11 @@
 
 ## 문서 목록
 
+### 운영 문서 (Active)
+- `seller-operation-scenarios.md` - **Seller Mode 운영 시나리오 정의서** (v1.0.0)
+- `seller-kpi-quick-guide.md` - **KPI 빠른 해석 가이드** (현장용)
+
+### 개발 문서
 - `cosmetics_development_plan.md` - 화장품 서비스 개발 계획
 - `cosmetics_api_spec.md` - 화장품 서비스 API 명세
 - `cosmetics_extension_manifest.md` - 익스텐션 Manifest 스펙
@@ -56,6 +61,17 @@ export const cosmeticsExtensionManifest: AppManifest = {
 
 1. ✅ Step 1: Dropshipping Core 패키지 완성
 2. ✅ Step 2: Core/Extension 패턴 정립
-3. ⏳ Step 3: Cosmetics Extension 스펙 작성 (현재 단계)
-4. ⏳ Step 4: Cosmetics Extension 개발
-5. ⏳ Step 5: 통합 테스트 및 배포
+3. ✅ Step 3: Cosmetics Extension 스펙 작성
+4. ✅ Step 4: Cosmetics Extension 개발
+5. ✅ Step 5: Seller Mode KPI 시각화 완료
+6. ✅ Step 6: **운영 표준 단계 전환** (2025-12-17)
+
+---
+
+## 운영 기준 고정 선언 (5줄 요약)
+
+> 1. Cosmetics Seller Mode는 "기능 개발 단계"를 공식 종료한다.
+> 2. 이후 신규 개발은 "운영 데이터 기반"으로만 진행한다.
+> 3. 운영 시나리오 5개와 KPI 기준은 6개월간 변경 없이 유지한다.
+> 4. 운영 중 발견된 개선점은 별도 Work Order로만 처리한다.
+> 5. 본 기준을 따르지 않는 운영 행위는 비표준으로 간주한다.

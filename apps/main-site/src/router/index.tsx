@@ -5,10 +5,11 @@
  */
 
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useParams } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { RequireAuth } from '@/context';
 import { PageLoading } from '@/components/common';
+import { SellerDashboard } from '@/pages/seller/dashboard';
 
 // Lazy load pages
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
@@ -69,9 +70,20 @@ const LmsMemberAssignments = lazy(() =>
   }))
 );
 
+// Seller pages
+const SellerDashboardPage = lazy(() =>
+  import('@/pages/seller/dashboard').then((m) => ({ default: m.SellerDashboard }))
+);
+
 // Loading fallback
 function PageFallback() {
   return <PageLoading message="페이지를 불러오는 중..." />;
+}
+
+// Seller Dashboard Wrapper (URL 파라미터에서 sellerId 추출)
+function SellerDashboardWrapper() {
+  const { sellerId } = useParams<{ sellerId: string }>();
+  return <SellerDashboard sellerId={sellerId || 'test-seller-001'} />;
 }
 
 export function AppRouter() {
@@ -205,6 +217,24 @@ export function AppRouter() {
                     element={
                       <RequireAuth>
                         <LmsMemberDashboard />
+                      </RequireAuth>
+                    }
+                  />
+
+                  {/* Seller Dashboard (관리자/판매원 접근 가능) */}
+                  <Route
+                    path="/seller/dashboard"
+                    element={
+                      <RequireAuth>
+                        <SellerDashboardPage sellerId="test-seller-001" />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/seller/dashboard/:sellerId"
+                    element={
+                      <RequireAuth>
+                        <SellerDashboardWrapper />
                       </RequireAuth>
                     }
                   />

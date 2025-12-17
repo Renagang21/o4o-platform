@@ -367,6 +367,9 @@ import {
 // Cosmetics Sample Display Extension Routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
 import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
 
+// Cosmetics Supplier Extension Routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
+import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -595,6 +598,15 @@ const startServer = async () => {
       logger.info('✅ Cosmetics Sample Display routes registered at /api/v1/cosmetics-sample');
     } catch (cosmeticsSampleDisplayError) {
       logger.error('Failed to register cosmetics-sample-display routes:', cosmeticsSampleDisplayError);
+    }
+
+    // 19. Register Cosmetics Supplier Extension routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
+    try {
+      const cosmeticsSupplierRoutes = createSupplierExtensionRoutes(AppDataSource);
+      app.use('/api/v1/cosmetics-supplier', cosmeticsSupplierRoutes);
+      logger.info('✅ Cosmetics Supplier routes registered at /api/v1/cosmetics-supplier');
+    } catch (cosmeticsSupplierError) {
+      logger.error('Failed to register cosmetics-supplier routes:', cosmeticsSupplierError);
     }
 
     // 6. Core routes now registered via dynamic module loader
