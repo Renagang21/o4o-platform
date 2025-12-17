@@ -662,6 +662,9 @@ importers:
       '@o4o/block-renderer':
         specifier: workspace:*
         version: link:../../packages/block-renderer
+      '@o4o/cosmetics-sample-display-extension':
+        specifier: workspace:*
+        version: link:../../packages/cosmetics-sample-display-extension
       '@o4o/cosmetics-seller-extension':
         specifier: workspace:*
         version: link:../../packages/cosmetics-seller-extension

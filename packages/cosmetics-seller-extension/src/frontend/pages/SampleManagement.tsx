@@ -2,6 +2,11 @@
  * SampleManagement Page
  *
  * 샘플 관리 페이지 - 매장 샘플 재고 및 사용 현황 관리
+ *
+ * Uses cosmetics-sample-display-extension API:
+ * - GET /api/v1/cosmetics-sample/inventory/:storeId
+ * - GET /api/v1/cosmetics-sample/inventory/:storeId/stats
+ * - POST /api/v1/cosmetics-sample/inventory/receive
  */
 
 import React, { useState, useEffect } from 'react';
@@ -10,72 +15,97 @@ interface SampleItem {
   id: string;
   productId: string;
   productName?: string;
-  sampleCount: number;
-  minStockLevel: number;
+  quantityRemaining: number;  // Updated field name from API
+  minimumStock: number;       // Updated field name from API
+  sampleType: string;
+  status: string;
   lastRefilledAt?: string;
-  lastRefillQuantity?: number;
+  expiryDate?: string;
 }
 
 interface SampleStats {
-  totalSamples: number;
-  totalProducts: number;
-  lowStockCount: number;
-  recentUsage: number;
+  totalItems: number;
+  totalQuantity: number;
+  lowStockItems: number;
+  outOfStockItems: number;
 }
 
 interface SampleManagementProps {
   sellerId: string;
+  storeId?: string;  // Added storeId for store-based API
   apiBaseUrl?: string;
 }
 
 export const SampleManagement: React.FC<SampleManagementProps> = ({
   sellerId,
-  apiBaseUrl = '/api/v1/cosmetics-seller',
+  storeId,
+  apiBaseUrl = '/api/v1/cosmetics-sample',  // Updated to use new API
 }) => {
   const [samples, setSamples] = useState<SampleItem[]>([]);
   const [stats, setStats] = useState<SampleStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Use storeId if provided, fallback to sellerId
+  const effectiveStoreId = storeId || sellerId;
+
   useEffect(() => {
     fetchData();
-  }, [sellerId]);
+  }, [effectiveStoreId]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
+
+      // Use new cosmetics-sample-display-extension API endpoints
       const [samplesRes, statsRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/sample/seller/${sellerId}`),
-        fetch(`${apiBaseUrl}/sample/seller/${sellerId}/stats`),
+        fetch(`${apiBaseUrl}/inventory/${effectiveStoreId}`),
+        fetch(`${apiBaseUrl}/inventory/${effectiveStoreId}/stats`),
       ]);
+
+      if (!samplesRes.ok) {
+        throw new Error(`Failed to fetch samples: ${samplesRes.statusText}`);
+      }
+      if (!statsRes.ok) {
+        throw new Error(`Failed to fetch stats: ${statsRes.statusText}`);
+      }
 
       const samplesData = await samplesRes.json();
       const statsData = await statsRes.json();
 
-      if (samplesData.success) {
-        setSamples(samplesData.data);
-      }
-      if (statsData.success) {
-        setStats(statsData.data);
-      }
+      // Handle both array response and wrapped response
+      setSamples(Array.isArray(samplesData) ? samplesData : (samplesData.data || []));
+      setStats(statsData.stats || statsData.data || statsData);
     } catch (err: any) {
+      console.error('Sample fetch error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRefill = async (sampleId: string, quantity: number) => {
+  const handleRefill = async (inventoryId: string, productId: string, quantity: number) => {
     try {
-      const response = await fetch(`${apiBaseUrl}/sample/${sampleId}/refill`, {
+      // Use new receive endpoint for refill
+      const response = await fetch(`${apiBaseUrl}/inventory/receive`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify({
+          storeId: effectiveStoreId,
+          productId,
+          quantity,
+          sampleType: 'trial',
+        }),
       });
-      const result = await response.json();
-      if (result.success) {
-        fetchData();
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to record refill');
       }
+
+      // Refresh data after successful refill
+      fetchData();
     } catch (err: any) {
       setError(err.message);
     }
@@ -96,16 +126,20 @@ export const SampleManagement: React.FC<SampleManagementProps> = ({
       {stats && (
         <div className="stats-summary">
           <div className="stat-card">
-            <span className="stat-value">{stats.totalSamples}</span>
-            <span className="stat-label">총 샘플 수</span>
+            <span className="stat-value">{stats.totalItems || 0}</span>
+            <span className="stat-label">총 품목 수</span>
           </div>
           <div className="stat-card">
-            <span className="stat-value">{stats.lowStockCount}</span>
+            <span className="stat-value">{stats.totalQuantity || 0}</span>
+            <span className="stat-label">총 샘플 수량</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-value">{stats.lowStockItems || 0}</span>
             <span className="stat-label">부족 품목</span>
           </div>
           <div className="stat-card">
-            <span className="stat-value">{stats.recentUsage}</span>
-            <span className="stat-label">최근 사용량</span>
+            <span className="stat-value">{stats.outOfStockItems || 0}</span>
+            <span className="stat-label">품절 품목</span>
           </div>
         </div>
       )}
@@ -129,26 +163,26 @@ export const SampleManagement: React.FC<SampleManagementProps> = ({
               {samples.map((sample) => (
                 <tr
                   key={sample.id}
-                  className={sample.sampleCount <= sample.minStockLevel ? 'low-stock' : ''}
+                  className={sample.quantityRemaining <= sample.minimumStock ? 'low-stock' : ''}
                 >
                   <td>{sample.productName || sample.productId}</td>
-                  <td>{sample.sampleCount}</td>
-                  <td>{sample.minStockLevel}</td>
+                  <td>{sample.quantityRemaining}</td>
+                  <td>{sample.minimumStock}</td>
                   <td>
-                    {sample.sampleCount <= sample.minStockLevel ? (
-                      <span className="status-warning">부족</span>
-                    ) : (
-                      <span className="status-ok">정상</span>
-                    )}
+                    <span className={`status-${sample.status || 'in_stock'}`}>
+                      {sample.status === 'low_stock' ? '부족' :
+                       sample.status === 'out_of_stock' ? '품절' :
+                       sample.status === 'pending_refill' ? '보충대기' : '정상'}
+                    </span>
                   </td>
                   <td>
                     {sample.lastRefilledAt
-                      ? `${new Date(sample.lastRefilledAt).toLocaleDateString()} (+${sample.lastRefillQuantity})`
+                      ? new Date(sample.lastRefilledAt).toLocaleDateString()
                       : '-'}
                   </td>
                   <td>
                     <button
-                      onClick={() => handleRefill(sample.id, 10)}
+                      onClick={() => handleRefill(sample.id, sample.productId, 10)}
                       className="btn-refill"
                     >
                       보충
