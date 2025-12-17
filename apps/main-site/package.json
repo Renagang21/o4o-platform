@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
+    "@o4o/ui": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
     "axios": "^1.6.0",
     "react": "^19.1.1",
