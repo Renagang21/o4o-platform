@@ -27,6 +27,7 @@
     "db:seed:roles": "ts-node scripts/seed-roles-permissions.ts",
     "db:seed:users": "npx tsx scripts/seed-users.ts",
     "db:seed:users:prod": "NODE_ENV=production npx tsx scripts/seed-users.ts",
+    "db:seed:seller-dashboard": "npx tsx src/scripts/seed-seller-dashboard.ts",
     "db:setup": "pnpm run migration:run && pnpm run db:seed",
     "db:start": "sudo systemctl start postgresql",
     "db:stop": "sudo systemctl stop postgresql",
