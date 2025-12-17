@@ -1,7 +1,7 @@
 # Design Core v1.0 적용 운영 규칙
 
 > **Status**: ACTIVE (Phase 5 확정)
-> **Version**: 1.2.0
+> **Version**: 1.1.0
 > **Date**: 2025-12-16
 
 ---
@@ -160,67 +160,56 @@ Phase 4+ 에서 처리
 - 파일: `apps/admin-dashboard/src/pages/lms-yaksa/dashboard/`
 - 결과: 기존 화면과 공존하며 Variant 전환 성공
 
-### Phase 4-A: Cosmetics 파트너 대시보드 Variant
+### Phase 4-B: Inner Page Variant 적용
 
-- 대상: Cosmetics Partner Dashboard
-- 파일: `apps/admin-dashboard/src/pages/cosmetics-partner/CosmeticsPartnerDashboardDesignCoreV1.tsx`
-- 결과: KPI Grid, 활동 로그, 링크 성과 등 대시보드 전체 Design Core 전환 성공
-
-### Phase 4-B: Yaksa Inner Page Variant
-
-- 대상: 필수 교육 정책 관리 페이지
-- 파일: `apps/admin-dashboard/src/pages/lms-yaksa/required-policy/RequiredPolicyDesignCoreV1.tsx`
-- 결과: CRUD 기능 포함 Inner Page의 Design Core Variant 적용 성공
+- 대상: Required Policy (필수 교육 정책 관리) 페이지
+- 파일: `apps/admin-dashboard/src/pages/lms-yaksa/required-policy/`
+- 결과: 설정/관리 페이지에서도 Design Core 적용 가능 확인
 
 ---
 
-## 9. Design Core Default Services
+## 9. Design Core 기본 서비스 (Default Services)
 
-Phase 5부터 특정 서비스를 **Design Core Default Service**로 선언한다.
+### 📣 Yaksa 서비스 선언 (Phase 5 확정)
 
-### 9.1 Default Service 정의
+**Yaksa 서비스**는 **Design Core v1.0 기본 서비스**로 지정한다.
 
-Default Service로 선언된 서비스는 다음 규칙을 따른다:
+#### 선언 내용
 
-| 구분 | 규칙 |
+| 항목 | 기준 |
 |------|------|
-| **신규 화면** | Design Core v1.0 필수 (Variant 분기 ❌) |
-| **기존 화면** | 단계적 Variant → default 전환 |
-| **확장 요청** | 별도 Work Order로만 처리 |
+| 신규 화면 | Design Core UI **기본값** |
+| 기존 화면 | Variant → default 단계적 전환 |
+| default UI 생성 | ❌ 금지 |
+| Variant 분기 (신규) | ❌ 금지 |
 
-### 9.2 선언된 Default Services
+#### 적용 범위
 
-#### Yaksa (LMS-Yaksa)
+- LMS-Yaksa (교육/학습 관리)
+- Membership-Yaksa (회원 관리)
+- Forum-Yaksa (포럼/커뮤니티)
+- Reporting-Yaksa (리포팅)
+- Annualfee-Yaksa (연회비)
 
-```
-선언일: 2025-12-16
-상태: Design Core Default Service
-전환 로드맵: docs/specs/yaksa-design-core-transition.md
-```
+#### 기존 화면 전환 로드맵
 
-> Yaksa 서비스는 Design Core v1.0 기본 서비스다.
-> 신규 화면은 Design Core 기본값,
-> 기존 화면은 단계적 Variant → default 전환만 허용한다.
+**1단계 (Low Risk)** - 완료/진행 중
 
-#### Cosmetics (화장품 서비스)
+- [x] 관리자 대시보드
+- [x] 설정/관리 페이지 (required-policy)
 
-```
-선언일: 2025-12-16
-상태: Design Core Default Service
-전환 로드맵: docs/specs/cosmetics-design-core-transition.md
-```
+**2단계 (Medium Risk)**
 
-> Cosmetics 서비스는 Design Core v1.0 기본 서비스다.
-> 신규 화면은 Design Core 기본값,
-> 기존 화면은 단계적 Variant → default 전환만 허용한다.
+- [ ] 조회 중심 리스트 화면
+- [ ] 통계/리포트 화면
 
-### 9.3 Default Service 추가 조건
+**3단계 (High Risk)**
 
-새로운 서비스를 Default Service로 추가하려면:
+- [ ] 입력/업무 핵심 플로우
+- [ ] 외부 사용자 노출 화면
 
-- [ ] 해당 서비스에 Design Core Variant 적용 사례 1건 이상 완료
-- [ ] 플랫폼 총괄 승인
-- [ ] 전환 로드맵 문서 작성
+> ⚠ 단계 건너뛰기 ❌
+> ⚠ 동시 다중 전환 ❌
 
 ---
 
@@ -235,4 +224,4 @@ Default Service로 선언된 서비스는 다음 규칙을 따른다:
 
 ---
 
-*Design Core Phase 5 - Yaksa/Cosmetics Default Service 선언 완료*
+*Design Core Phase 5 - Yaksa 서비스 기본 서비스 선언 완료*

@@ -1,137 +1,185 @@
-# Yaksa Design Core v1.0 전환 로드맵
+# Yaksa 서비스 - Design Core v1.0 전환 로드맵
 
-> **Status**: ACTIVE
-> **Version**: 1.0.0
+> **Status**: ACTIVE (Phase 5 확정)
+> **Service**: Yaksa (약사 서비스군)
 > **Date**: 2025-12-16
-> **Service**: LMS-Yaksa (약사 교육 관리)
+> **Version**: 1.0.0
 
 ---
 
-## 1. 서비스 개요
+## 1. 서비스 선언
 
-Yaksa 서비스는 약사 교육 관리 기능을 담당하며 다음 화면을 포함한다:
+### 📣 공식 선언
 
-| 화면 | 설명 | 파일 |
+**Yaksa 서비스는 Design Core v1.0 기본 서비스(Default Service)로 지정한다.**
+
+이 선언에 따라:
+
+- 모든 **신규 화면**은 Design Core v1.0 UI를 **기본값**으로 사용
+- 신규 화면에서 default/legacy UI 생성 **금지**
+- 신규 화면에서 Variant 분기 **금지**
+- 기존 화면은 **Variant → default 단계적 전환**만 허용
+
+---
+
+## 2. 적용 범위
+
+### 대상 패키지
+
+| 패키지 | 설명 | 상태 |
+|--------|------|------|
+| `lms-yaksa` | 약사 보수교육 LMS | Development |
+| `membership-yaksa` | 약사 회원 관리 | Development |
+| `forum-yaksa` | 약사 포럼/커뮤니티 | Development |
+| `reporting-yaksa` | 약사 리포팅 | Development |
+| `annualfee-yaksa` | 연회비 관리 | Development |
+
+### 대상 화면 (admin-dashboard)
+
+- `/lms-yaksa/*` - LMS 관리 화면
+- `/yaksa/*` - Yaksa Admin Hub
+
+---
+
+## 3. 전환 로드맵
+
+### Phase 진행 현황
+
+| Phase | 내용 | 상태 |
+|-------|------|------|
+| Phase 2-B | Dashboard Variant 적용 | ✅ 완료 |
+| Phase 4-B | Inner Page Variant 적용 | ✅ 완료 |
+| Phase 5 | 기본 서비스 선언 | ✅ 완료 |
+| Phase 6 | 확장 (필요시) | 대기 |
+
+### 화면별 전환 단계
+
+#### 1단계: Low Risk (완료/진행 중)
+
+| 화면 | 경로 | 상태 |
 |------|------|------|
-| Dashboard | 대시보드 | `dashboard/index.tsx` |
-| Required Policy | 필수 교육 정책 관리 | `required-policy/index.tsx` |
-| Assignments | 교육 배정 관리 | `assignments/index.tsx` |
-| Credits | 학점 관리 | `credits/index.tsx` |
-| Reports | 보고서 | `reports/index.tsx` |
-| License Profiles | 면허 프로필 | `license-profiles/index.tsx` |
+| 대시보드 | `/lms-yaksa/dashboard` | ✅ Variant 적용 |
+| 필수 정책 관리 | `/lms-yaksa/required-policy` | ✅ Variant 적용 |
 
-**총 대상 화면**: 6개
+#### 2단계: Medium Risk (다음 대상)
 
----
+| 화면 | 경로 | 우선순위 |
+|------|------|----------|
+| 학점 관리 | `/lms-yaksa/credits` | 높음 |
+| 과제 관리 | `/lms-yaksa/assignments` | 중간 |
+| 리포트 | `/lms-yaksa/reports` | 중간 |
+| 면허 프로필 | `/lms-yaksa/license-profiles` | 낮음 |
 
-## 2. 전환 원칙
+#### 3단계: High Risk (후순위)
 
-### 2.1 기본 규칙
-
-```
-신규 화면 → Design Core v1.0 필수
-기존 화면 → Variant 방식으로 단계적 전환
-```
-
-### 2.2 금지 사항
-
-- 기존 UI 즉시 제거 ❌
-- Variant 없이 직접 교체 ❌
-- 앱별 커스텀 컴포넌트 생성 ❌
+| 화면 | 경로 | 비고 |
+|------|------|------|
+| Yaksa Admin Hub | `/yaksa` | 통합 허브 |
+| 사용자 향 화면 | (해당시) | 신중히 검토 |
 
 ---
 
-## 3. 전환 단계
+## 4. 전환 규칙
 
-### Stage 1: Low Risk (우선 적용)
-
-대시보드 및 읽기 위주 화면을 우선 전환한다.
-
-| 파일 | 화면명 | 상태 |
-|------|--------|------|
-| `dashboard/index.tsx` | 대시보드 | ✅ Variant 완료 (Phase 2-B) |
-| `reports/index.tsx` | 보고서 | ⬜ 대기 |
-
-### Stage 2: Medium Risk (중순위)
-
-설정/관리 중심 화면을 전환한다.
-
-| 파일 | 화면명 | 상태 |
-|------|--------|------|
-| `required-policy/index.tsx` | 필수 교육 정책 | ⬜ 대기 (Phase 4-B 대상) |
-| `credits/index.tsx` | 학점 관리 | ⬜ 대기 |
-| `license-profiles/index.tsx` | 면허 프로필 | ⬜ 대기 |
-
-### Stage 3: High Risk (후순위)
-
-복잡한 CRUD 및 배정 화면을 전환한다.
-
-| 파일 | 화면명 | 상태 |
-|------|--------|------|
-| `assignments/index.tsx` | 교육 배정 관리 | ⬜ 대기 |
-
----
-
-## 4. 완료된 전환
-
-### Phase 2-B: 대시보드 Variant
-
-- **대상**: `dashboard/index.tsx`
-- **결과**: Design Core Variant 적용 완료
-- **상태**: Variant 병렬 운영 중
-
----
-
-## 5. Variant 운영 규칙
-
-### 5.1 Variant 구현 패턴
+### 4.1 Variant 적용 방식
 
 ```tsx
-// 1. 타입 정의
+// 1. Variant 타입 정의
 type ViewVariant = 'default' | 'design-core-v1';
 
-// 2. Props 추가
-interface PageProps {
-  variant?: ViewVariant;
-}
-
-// 3. 분기 처리
-export default function Page({ variant = 'default' }: PageProps) {
+// 2. Variant 분기 (기존 화면에만)
+export default function Page({ variant = 'default' }: Props) {
   if (variant === 'design-core-v1') {
-    return <PageDesignCoreV1 />;
+    return <PageDesignCoreV1 {...props} />;
   }
-  return <PageDefault />;
+  return <PageDefault {...props} />;
 }
 ```
 
-### 5.2 Variant 활성화
+### 4.2 신규 화면 규칙
 
-- 개발/테스트: Props로 직접 전달
-- 프로덕션: 플랫폼 총괄 승인 후 활성화
+```tsx
+// 신규 화면: Design Core만 사용
+import { AGPageHeader, AGSection, AGCard } from '@o4o/ui';
+
+export default function NewPage() {
+  return (
+    <div>
+      <AGPageHeader title="..." />
+      <AGSection>
+        <AGCard>...</AGCard>
+      </AGSection>
+    </div>
+  );
+}
+
+// ❌ 금지: Variant 분기
+// ❌ 금지: 기존 UI 컴포넌트 사용
+```
+
+### 4.3 금지 사항
+
+- 단계 건너뛰기 ❌
+- 동시 다중 전환 ❌
+- 기존 UI 즉시 제거 ❌
+- 암묵적 자동 전환 ❌
 
 ---
 
-## 6. 확장 요청 처리
+## 5. 확장 요청 처리
 
-Yaksa 서비스에서 Design Core 확장이 필요한 경우:
+### 확장 검토 조건
+
+다음 조건이 **반복적으로 관찰될 경우**만 확장 검토:
+
+1. 동일 UI 요구 2회 이상 반복
+2. AGCard/AGSection 조합으로 해결 불가
+
+### 처리 절차
 
 ```
 즉시 확장 ❌
     ↓
 요구사항 수집
     ↓
-별도 Work Order 작성
+Design Core Phase 6 Work Order 작성
     ↓
-Phase 6+ 에서 처리
+승인 후 확장
 ```
 
 ---
 
-## 7. 참조 문서
+## 6. 운영 관찰 포인트
 
-- Design Core 운영 규칙: `docs/app-guidelines/design-core-governance.md`
-- CLAUDE.md: `CLAUDE.md` (플랫폼 헌법)
+Phase 5 이후 다음 사항을 관찰:
+
+- [ ] 신규 화면이 Design Core 기본값을 따르는가?
+- [ ] Variant가 무분별하게 늘어나고 있는가?
+- [ ] 동일한 UI 요구가 반복되는가?
+- [ ] Design Core로 표현 불가한 패턴이 있는가?
 
 ---
 
-*Yaksa Design Core Transition Roadmap v1.0.0*
+## 7. 다음 단계
+
+### Phase 5 완료 후 가능한 경로
+
+**A. Phase 6 (확장)**
+- 조건: 반복적 확장 요구 발생
+- 내용: Design Core 컴포넌트 확장
+
+**B. 다른 서비스 Phase 4 진입**
+- 대상: Cosmetics, Diabetes-Care 등
+- 방식: Yaksa와 동일한 단계적 적용
+
+---
+
+## 8. 변경 이력
+
+| 날짜 | 버전 | 변경 내용 |
+|------|------|----------|
+| 2025-12-16 | 1.0.0 | Phase 5 초기 문서 작성 |
+
+---
+
+*Yaksa 서비스 - Design Core v1.0 기본 서비스 선언 완료*
