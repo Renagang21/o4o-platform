@@ -9,7 +9,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { Role } from '../entities/Role.js';
-import { UserRole } from '../types/auth.js';
+import { UserRole, UserStatus } from '../types/auth.js';
 import bcrypt from 'bcrypt';
 import logger from '../utils/logger.js';
 
@@ -49,6 +49,17 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
       logger.info(`   Email: ${existingUser.email}`);
       logger.info(`   Name: ${existingUser.name}`);
       logger.info(`   ID: ${existingUser.id}`);
+      logger.info(`   Status: ${existingUser.status}`);
+
+      // WO-AUTH-DEV-RUNTIME-RECOVERY: 기존 계정의 status가 ACTIVE가 아니면 업데이트
+      if (existingUser.status !== UserStatus.ACTIVE) {
+        logger.info(`\n🔄 Updating status from '${existingUser.status}' to 'active'...`);
+        existingUser.status = UserStatus.ACTIVE;
+        existingUser.isActive = true;
+        existingUser.isEmailVerified = true;
+        await userRepo.save(existingUser);
+        logger.info(`✅ Status updated to 'active' - login now enabled!`);
+      }
 
       // Load user with roles
       const userWithRoles = await userRepo.findOne({
@@ -82,6 +93,7 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
       name: adminName,
       role: UserRole.SUPER_ADMIN,
       roles: [UserRole.SUPER_ADMIN],
+      status: UserStatus.ACTIVE,  // WO-AUTH-DEV-RUNTIME-RECOVERY: 로그인 허용을 위해 필수
       isEmailVerified: true,
       isActive: true
     });
