@@ -9,7 +9,7 @@ import {
   SellerInventory,
   AdjustmentReason,
   StockAdjustment,
-} from '../entities/seller-inventory.entity';
+} from '../entities/seller-inventory.entity.js';
 
 export interface CreateInventoryDto {
   sellerId: string;

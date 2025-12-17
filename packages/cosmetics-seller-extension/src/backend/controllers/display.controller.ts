@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response } from 'express';
-import type { DisplayService, CreateDisplayDto, UpdateDisplayDto } from '../services/display.service';
+import type { DisplayService, CreateDisplayDto, UpdateDisplayDto } from '../services/display.service.js';
 
 export class DisplayController {
   constructor(private readonly displayService: DisplayService) {}

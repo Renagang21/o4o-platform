@@ -5,8 +5,8 @@
  */
 
 import type { Repository } from 'typeorm';
-import { SellerKPI, KPIPeriodType } from '../entities/seller-kpi.entity';
-import type { ConsultationLogService } from './consultation-log.service';
+import { SellerKPI, KPIPeriodType } from '../entities/seller-kpi.entity.js';
+import type { ConsultationLogService } from './consultation-log.service.js';
 
 export interface CreateKPIDto {
   sellerId: string;

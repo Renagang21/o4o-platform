@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response } from 'express';
-import type { SampleService, CreateSampleDto, RefillSampleDto, UseSampleDto } from '../services/sample.service';
+import type { SampleService, CreateSampleDto, RefillSampleDto, UseSampleDto } from '../services/sample.service.js';
 
 export class SampleController {
   constructor(private readonly sampleService: SampleService) {}

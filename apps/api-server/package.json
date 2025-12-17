@@ -102,6 +102,7 @@
     "@o4o/membership-yaksa": "workspace:*",
     "@o4o/reporting-yaksa": "workspace:*",
     "@o4o/dropshipping-cosmetics": "workspace:*",
+    "@o4o/cosmetics-seller-extension": "workspace:*",
     "@o4o/ecommerce-core": "workspace:*",
     "@o4o/annualfee-yaksa": "workspace:*",
     "@o4o/yaksa-scheduler": "workspace:*",

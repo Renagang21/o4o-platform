@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response } from 'express';
-import type { KPIService, CreateKPIDto } from '../services/kpi.service';
+import type { KPIService, CreateKPIDto } from '../services/kpi.service.js';
 
 export class KPIController {
   constructor(private readonly kpiService: KPIService) {}

@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response } from 'express';
-import type { InventoryService, CreateInventoryDto, AdjustStockDto } from '../services/inventory.service';
+import type { InventoryService, CreateInventoryDto, AdjustStockDto } from '../services/inventory.service.js';
 
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}

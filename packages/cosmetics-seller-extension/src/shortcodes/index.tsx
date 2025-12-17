@@ -14,7 +14,7 @@ import {
   ConsultationLog,
   KPIDashboard,
   SellerDashboard,
-} from '../frontend';
+} from '../frontend/index.js';
 
 // Seller Dashboard Shortcode
 export const sellerDashboardShortcode: ShortcodeDefinition = {

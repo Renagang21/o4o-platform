@@ -8,25 +8,25 @@ import { Router } from 'express';
 import type { Repository } from 'typeorm';
 
 // Entities
-import { SellerDisplay } from '../entities/seller-display.entity';
-import { SellerSample } from '../entities/seller-sample.entity';
-import { SellerInventory } from '../entities/seller-inventory.entity';
-import { SellerConsultationLog } from '../entities/seller-consultation-log.entity';
-import { SellerKPI } from '../entities/seller-kpi.entity';
+import { SellerDisplay } from '../entities/seller-display.entity.js';
+import { SellerSample } from '../entities/seller-sample.entity.js';
+import { SellerInventory } from '../entities/seller-inventory.entity.js';
+import { SellerConsultationLog } from '../entities/seller-consultation-log.entity.js';
+import { SellerKPI } from '../entities/seller-kpi.entity.js';
 
 // Services
-import { DisplayService } from '../services/display.service';
-import { SampleService } from '../services/sample.service';
-import { InventoryService } from '../services/inventory.service';
-import { ConsultationLogService } from '../services/consultation-log.service';
-import { KPIService } from '../services/kpi.service';
+import { DisplayService } from '../services/display.service.js';
+import { SampleService } from '../services/sample.service.js';
+import { InventoryService } from '../services/inventory.service.js';
+import { ConsultationLogService } from '../services/consultation-log.service.js';
+import { KPIService } from '../services/kpi.service.js';
 
 // Controllers
-import { DisplayController } from '../controllers/display.controller';
-import { SampleController } from '../controllers/sample.controller';
-import { InventoryController } from '../controllers/inventory.controller';
-import { ConsultationController } from '../controllers/consultation.controller';
-import { KPIController } from '../controllers/kpi.controller';
+import { DisplayController } from '../controllers/display.controller.js';
+import { SampleController } from '../controllers/sample.controller.js';
+import { InventoryController } from '../controllers/inventory.controller.js';
+import { ConsultationController } from '../controllers/consultation.controller.js';
+import { KPIController } from '../controllers/kpi.controller.js';
 
 export interface SellerExtensionRoutesDeps {
   displayRepository: Repository<SellerDisplay>;

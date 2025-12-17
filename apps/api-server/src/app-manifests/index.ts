@@ -18,7 +18,7 @@ import { ecommerceCoreManifest } from '@o4o/ecommerce-core';
 // import { manifest as annualfeeYaksaManifest } from '@o4o/annualfee-yaksa';
 // import { manifest as yaksaSchedulerManifest } from '@o4o/yaksa-scheduler';
 // import { manifest as cosmeticsPartnerExtensionManifest } from '@o4o/cosmetics-partner-extension';
-// import { manifest as cosmeticsSellerExtensionManifest } from '@o4o/cosmetics-seller-extension';
+import { manifest as cosmeticsSellerExtensionManifest } from '@o4o/cosmetics-seller-extension';
 // import { manifest as cosmeticsSupplierExtensionManifest } from '@o4o/cosmetics-supplier-extension';
 import { manifest as lmsYaksaManifest } from '@o4o/lms-yaksa';
 // import { manifest as lmsMarketingManifest } from '@o4o/lms-marketing';
@@ -58,9 +58,9 @@ const manifestRegistry: Record<string, AppManifest> = {
   'dropshipping': dropshippingCoreManifest as any, // Alias for backward compatibility
   'dropshipping-core': dropshippingCoreManifest as any,
   'dropshipping-cosmetics': cosmeticsExtensionManifest as any,
-  // Cosmetics Extensions - TODO: Fix runtime errors
+  // Cosmetics Extensions
   // 'cosmetics-partner-extension': cosmeticsPartnerExtensionManifest as any,
-  // 'cosmetics-seller-extension': cosmeticsSellerExtensionManifest as any,
+  'cosmetics-seller-extension': cosmeticsSellerExtensionManifest as any,
   // 'cosmetics-supplier-extension': cosmeticsSupplierExtensionManifest as any,
   // Operations
   sellerops: selleropsManifest as any,

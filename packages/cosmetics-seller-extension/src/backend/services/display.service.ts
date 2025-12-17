@@ -5,7 +5,7 @@
  */
 
 import type { Repository } from 'typeorm';
-import { SellerDisplay, DisplayLocation, FacingQuality } from '../entities/seller-display.entity';
+import { SellerDisplay, DisplayLocation, FacingQuality } from '../entities/seller-display.entity.js';
 
 export interface CreateDisplayDto {
   sellerId: string;

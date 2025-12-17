@@ -2,4 +2,4 @@
  * Cosmetics Seller Extension Frontend
  */
 
-export * from './pages';
+export * from './pages/index.js';

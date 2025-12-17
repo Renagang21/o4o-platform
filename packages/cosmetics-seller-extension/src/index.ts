@@ -15,20 +15,20 @@ import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 
 // Manifest
-export { cosmeticsSellerExtensionManifest, cosmeticsSellerExtensionManifest as manifest } from './manifest';
-export { cosmeticsSellerExtensionManifest as default } from './manifest';
+export { cosmeticsSellerExtensionManifest, cosmeticsSellerExtensionManifest as manifest } from './manifest.js';
+export { cosmeticsSellerExtensionManifest as default } from './manifest.js';
 
 // Backend
-export * from './backend';
+export * from './backend/index.js';
 
 // Frontend
-export * from './frontend';
+export * from './frontend/index.js';
 
 // Shortcodes
-export { shortcodes } from './shortcodes';
+export { shortcodes } from './shortcodes/index.js';
 
 // Lifecycle
-export * from './lifecycle';
+export * from './lifecycle/index.js';
 
 /**
  * Create Express routes for Cosmetics Seller Extension

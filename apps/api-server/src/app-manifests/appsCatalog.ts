@@ -388,6 +388,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['화장품', 'cosmetics', 'seller', 'display', 'sample', 'inventory', 'kpi'],
     type: 'extension',
+    status: 'active', // Phase 1 완료 - 2024-12 Active 전환
     dependencies: { 'dropshipping-core': '>=1.0.0', 'dropshipping-cosmetics': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'sellerops'],

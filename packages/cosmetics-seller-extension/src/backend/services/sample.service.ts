@@ -5,7 +5,7 @@
  */
 
 import type { Repository } from 'typeorm';
-import { SellerSample, SampleUsageType, SampleUsageLog } from '../entities/seller-sample.entity';
+import { SellerSample, SampleUsageType, SampleUsageLog } from '../entities/seller-sample.entity.js';
 
 export interface CreateSampleDto {
   sellerId: string;

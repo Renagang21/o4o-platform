@@ -10,7 +10,7 @@ import {
   ConsultationResultStatus,
   RecommendedProduct,
   PurchasedProduct,
-} from '../entities/seller-consultation-log.entity';
+} from '../entities/seller-consultation-log.entity.js';
 
 export interface CreateConsultationLogDto {
   sellerId: string;

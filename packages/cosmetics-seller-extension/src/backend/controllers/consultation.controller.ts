@@ -9,7 +9,7 @@ import type {
   ConsultationLogService,
   CreateConsultationLogDto,
   UpdateConsultationLogDto,
-} from '../services/consultation-log.service';
+} from '../services/consultation-log.service.js';
 
 export class ConsultationController {
   constructor(private readonly consultationService: ConsultationLogService) {}

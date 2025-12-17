@@ -45,16 +45,6 @@ export const disabledAppsRegistry: DisabledAppEntry[] = [
     },
   },
   {
-    appId: 'cosmetics-seller-extension',
-    name: '화장품 셀러 확장',
-    disabled: {
-      status: 'broken',
-      reason: '런타임 에러 - ESM import 확장자 누락',
-      nextAction: '.js 확장자 추가 후 테스트 필요',
-      disabledAt: '2024-12-15',
-    },
-  },
-  {
     appId: 'cosmetics-supplier-extension',
     name: '화장품 공급자 확장',
     disabled: {
