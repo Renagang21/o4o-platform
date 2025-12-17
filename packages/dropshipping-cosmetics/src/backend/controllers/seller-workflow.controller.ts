@@ -5,6 +5,10 @@
  * - 화장품 오프라인 매장 상담 워크플로우
  * - SellerOps 연동 준비
  *
+ * Phase 10: Security hardening
+ * - sellerId extracted from authenticated user (req.user.id)
+ * - Ownership verification for session access
+ *
  * Handles HTTP requests for seller workflow (in-store consultation)
  * API: /api/v1/cosmetics/seller-workflow/*
  */
@@ -16,6 +20,7 @@ import {
   UpdateSessionDTO,
 } from '../services/seller-workflow.service.js';
 import type { SellerWorkflowSessionDto } from '../dto/index.js';
+import type { AuthenticatedRequest } from '../middleware/permissions.middleware.js';
 
 export class SellerWorkflowController {
   constructor(private workflowService: SellerWorkflowService) {}
@@ -23,23 +28,26 @@ export class SellerWorkflowController {
   /**
    * POST /api/v1/cosmetics/seller-workflow/start
    * Start a new seller workflow session
+   * - sellerId is extracted from authenticated user (req.user.id)
    */
-  async startSession(req: Request, res: Response): Promise<void> {
+  async startSession(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const dto: StartSessionDTO = {
-        sellerId: req.body.sellerId || (req as any).user?.id, // Use authenticated user ID if available
-        customerProfile: req.body.customerProfile,
-        metadata: req.body.metadata,
-      };
+      // Phase 10: Security - sellerId must come from authenticated user, not body
+      const sellerId = req.user?.id;
 
-      // Validate required fields
-      if (!dto.sellerId) {
-        res.status(400).json({
+      if (!sellerId) {
+        res.status(401).json({
           success: false,
-          message: 'Seller ID is required',
+          message: 'Authentication required',
         });
         return;
       }
+
+      const dto: StartSessionDTO = {
+        sellerId,
+        customerProfile: req.body.customerProfile,
+        metadata: req.body.metadata,
+      };
 
       if (!dto.customerProfile || Object.keys(dto.customerProfile).length === 0) {
         res.status(400).json({
@@ -69,10 +77,13 @@ export class SellerWorkflowController {
   /**
    * GET /api/v1/cosmetics/seller-workflow/:id
    * Get session by ID
+   * - Ownership verified: session must belong to authenticated user
    */
-  async getSession(req: Request, res: Response): Promise<void> {
+  async getSession(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const sellerId = req.user?.id;
+      const isAdmin = req.user?.role === 'admin';
 
       const session = await this.workflowService.getSession(id);
 
@@ -80,6 +91,15 @@ export class SellerWorkflowController {
         res.status(404).json({
           success: false,
           message: 'Session not found',
+        });
+        return;
+      }
+
+      // Phase 10: Ownership verification (admin can access any session)
+      if (!isAdmin && session.sellerId !== sellerId) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied: You can only access your own sessions',
         });
         return;
       }
@@ -99,12 +119,23 @@ export class SellerWorkflowController {
   }
 
   /**
-   * GET /api/v1/cosmetics/seller-workflow/seller/:sellerId
-   * List sessions for a specific seller
+   * GET /api/v1/cosmetics/seller-workflow/sessions
+   * List sessions for the authenticated seller
+   * - CHANGED: sellerId from req.user.id, not URL param
    */
-  async listSessionsBySeller(req: Request, res: Response): Promise<void> {
+  async listSessionsBySeller(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const { sellerId } = req.params;
+      // Phase 10: Security - sellerId from authenticated user
+      const sellerId = req.user?.id;
+
+      if (!sellerId) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required',
+        });
+        return;
+      }
+
       const status = req.query.status as string | undefined;
       const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
 
@@ -130,10 +161,34 @@ export class SellerWorkflowController {
   /**
    * PUT /api/v1/cosmetics/seller-workflow/:id
    * Update session
+   * - Ownership verified: session must belong to authenticated user
    */
-  async updateSession(req: Request, res: Response): Promise<void> {
+  async updateSession(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const sellerId = req.user?.id;
+      const isAdmin = req.user?.role === 'admin';
+
+      // First check ownership
+      const existingSession = await this.workflowService.getSession(id);
+
+      if (!existingSession) {
+        res.status(404).json({
+          success: false,
+          message: 'Session not found',
+        });
+        return;
+      }
+
+      // Phase 10: Ownership verification
+      if (!isAdmin && existingSession.sellerId !== sellerId) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied: You can only update your own sessions',
+        });
+        return;
+      }
+
       const dto: UpdateSessionDTO = {
         customerProfile: req.body.customerProfile,
         recommendedProducts: req.body.recommendedProducts,
@@ -142,14 +197,6 @@ export class SellerWorkflowController {
       };
 
       const session = await this.workflowService.updateSession(id, dto);
-
-      if (!session) {
-        res.status(404).json({
-          success: false,
-          message: 'Session not found',
-        });
-        return;
-      }
 
       res.json({
         success: true,
@@ -169,21 +216,36 @@ export class SellerWorkflowController {
   /**
    * POST /api/v1/cosmetics/seller-workflow/:id/complete
    * Complete session
+   * - Ownership verified: session must belong to authenticated user
    */
-  async completeSession(req: Request, res: Response): Promise<void> {
+  async completeSession(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const sellerId = req.user?.id;
+      const isAdmin = req.user?.role === 'admin';
       const purchasedProducts = req.body.purchasedProducts;
 
-      const session = await this.workflowService.completeSession(id, purchasedProducts);
+      // First check ownership
+      const existingSession = await this.workflowService.getSession(id);
 
-      if (!session) {
+      if (!existingSession) {
         res.status(404).json({
           success: false,
           message: 'Session not found',
         });
         return;
       }
+
+      // Phase 10: Ownership verification
+      if (!isAdmin && existingSession.sellerId !== sellerId) {
+        res.status(403).json({
+          success: false,
+          message: 'Access denied: You can only complete your own sessions',
+        });
+        return;
+      }
+
+      const session = await this.workflowService.completeSession(id, purchasedProducts);
 
       res.json({
         success: true,
@@ -201,12 +263,22 @@ export class SellerWorkflowController {
   }
 
   /**
-   * GET /api/v1/cosmetics/seller-workflow/seller/:sellerId/stats
+   * GET /api/v1/cosmetics/seller-workflow/stats
    * Get seller statistics
+   * - CHANGED: sellerId from req.user.id, not URL param
    */
-  async getSellerStats(req: Request, res: Response): Promise<void> {
+  async getSellerStats(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const { sellerId } = req.params;
+      // Phase 10: Security - sellerId from authenticated user
+      const sellerId = req.user?.id;
+
+      if (!sellerId) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required',
+        });
+        return;
+      }
 
       const stats = await this.workflowService.getSellerStats(sellerId);
 

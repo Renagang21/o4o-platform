@@ -14,13 +14,17 @@ export const CosmeticsPermissions = {
   EDIT: 'cosmetics:edit',
   MANAGE_FILTERS: 'cosmetics:manage_filters',
   RECOMMEND_ROUTINE: 'cosmetics:recommend_routine',
+  SELLER_WORKFLOW: 'cosmetics:seller_workflow',
 } as const;
 
 /**
  * Role-based permission mapping
  */
 export const RolePermissions = {
-  seller: [CosmeticsPermissions.VIEW],
+  seller: [
+    CosmeticsPermissions.VIEW,
+    CosmeticsPermissions.SELLER_WORKFLOW,
+  ],
   partner: [
     CosmeticsPermissions.VIEW,
     CosmeticsPermissions.RECOMMEND_ROUTINE,
@@ -30,6 +34,7 @@ export const RolePermissions = {
     CosmeticsPermissions.EDIT,
     CosmeticsPermissions.MANAGE_FILTERS,
     CosmeticsPermissions.RECOMMEND_ROUTINE,
+    CosmeticsPermissions.SELLER_WORKFLOW,
   ],
 } as const;
 
