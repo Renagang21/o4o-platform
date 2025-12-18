@@ -1,6 +1,6 @@
 /**
  * Groupbuy-Yaksa Backend
- * Phase 3: UI Integration
+ * Phase 5: Access Hardening
  */
 
 // Entities
@@ -31,3 +31,13 @@ export {
 
 // Routes
 export { createGroupbuyRoutes } from './routes/index.js';
+
+// Middleware (Phase 5)
+export {
+  createGroupbuyAuthMiddleware,
+  GroupbuyAuthError,
+  type GroupbuyAuthRequest,
+  type GroupbuyAuthMiddleware,
+  type OrganizationMembership,
+  type AuthenticatedUser,
+} from './middleware/index.js';
