@@ -5,6 +5,8 @@
  * - 정책 기반 분배율 자동 적용
  * - 분회 → 지부 → 본회 캐스케이드 정산
  * - 정산 워크플로우 자동화
+ *
+ * Phase R1.1: MembershipReadPort 사용으로 의존성 전환
  */
 
 import { DataSource, Repository, In } from 'typeorm';
@@ -13,6 +15,7 @@ import { FeePolicy } from '../entities/FeePolicy.js';
 import { FeeInvoice } from '../entities/FeeInvoice.js';
 import { FeePayment } from '../entities/FeePayment.js';
 import { FeeLogService } from './FeeLogService.js';
+import type { MembershipReadPort, MemberBasicInfo } from '@o4o/membership-yaksa';
 
 export interface DistributionRates {
   nationalRate: number; // 본회비 비율 (예: 0.6)
@@ -74,6 +77,7 @@ export class SettlementAutomation {
   private invoiceRepo: Repository<FeeInvoice>;
   private paymentRepo: Repository<FeePayment>;
   private logService: FeeLogService;
+  private membershipPort: MembershipReadPort | null = null;
 
   constructor(private dataSource: DataSource) {
     this.settlementRepo = dataSource.getRepository(FeeSettlement);
@@ -81,6 +85,13 @@ export class SettlementAutomation {
     this.invoiceRepo = dataSource.getRepository(FeeInvoice);
     this.paymentRepo = dataSource.getRepository(FeePayment);
     this.logService = new FeeLogService(dataSource);
+  }
+
+  /**
+   * Phase R1.1: MembershipReadPort 주입
+   */
+  setMembershipPort(port: MembershipReadPort): void {
+    this.membershipPort = port;
   }
 
   /**
@@ -720,12 +731,29 @@ export class SettlementAutomation {
       where: { year },
     });
 
-    // 조직에 속한 회원의 청구서만 필터링
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const members = await memberRepo.find({
-      where: { organizationId },
-    });
-    const memberIds = new Set(members.map((m: any) => m.id));
+    // Phase R1.1: MembershipReadPort를 통한 조직 내 회원 조회
+    let members: MemberBasicInfo[];
+    if (this.membershipPort) {
+      members = await this.membershipPort.findMembers({ organizationId });
+    } else {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[SettlementAutomation] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMembers = await memberRepo.find({
+        where: { organizationId },
+      });
+      members = rawMembers.map((m: any) => ({
+        id: m.id,
+        userId: m.userId,
+        organizationId: m.organizationId,
+        name: m.name,
+        email: m.email,
+        phone: m.phone,
+        licenseNumber: m.licenseNumber,
+        registrationNumber: m.registrationNumber,
+      }));
+    }
+    const memberIds = new Set(members.map((m) => m.id));
 
     const orgInvoices = invoices.filter((inv) => memberIds.has(inv.memberId));
 

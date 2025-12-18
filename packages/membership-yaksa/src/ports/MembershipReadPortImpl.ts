@@ -15,6 +15,7 @@ import type {
   MemberStatusInfo,
   MemberNotificationInfo,
   FindMemberOptions,
+  MemberFeeInfo,
 } from './MembershipReadPort.js';
 
 /**
@@ -142,6 +143,40 @@ export class MembershipReadPortImpl implements MembershipReadPort {
     });
   }
 
+  // ============================================
+  // Phase R1.1: 회비 관련 메서드
+  // ============================================
+
+  async getMemberForFeeCalculation(memberId: string): Promise<MemberFeeInfo | null> {
+    const member = await this.memberRepository.findOne({
+      where: { id: memberId },
+      relations: ['category'],
+    });
+
+    if (!member) return null;
+
+    return this.toFeeInfo(member);
+  }
+
+  async getActiveMembersForFee(options?: {
+    organizationId?: string;
+  }): Promise<MemberFeeInfo[]> {
+    const query = this.memberRepository
+      .createQueryBuilder('member')
+      .leftJoinAndSelect('member.category', 'category')
+      .where('member.isActive = :isActive', { isActive: true })
+      .andWhere('member.isVerified = :isVerified', { isVerified: true });
+
+    if (options?.organizationId) {
+      query.andWhere('member.organizationId = :organizationId', {
+        organizationId: options.organizationId,
+      });
+    }
+
+    const members = await query.getMany();
+    return members.map(this.toFeeInfo.bind(this));
+  }
+
   /**
    * Member 엔티티를 MemberBasicInfo DTO로 변환
    */
@@ -155,6 +190,24 @@ export class MembershipReadPortImpl implements MembershipReadPort {
       phone: member.phone,
       licenseNumber: member.licenseNumber,
       registrationNumber: member.registrationNumber,
+    };
+  }
+
+  /**
+   * Phase R1.1: Member 엔티티를 MemberFeeInfo DTO로 변환
+   */
+  private toFeeInfo(member: Member): MemberFeeInfo {
+    return {
+      id: member.id,
+      name: member.name,
+      organizationId: member.organizationId,
+      pharmacistType: member.pharmacistType,
+      officialRole: member.officialRole,
+      birthdate: member.birthdate,
+      requiresAnnualFee: member.category?.requiresAnnualFee ?? true,
+      yaksaJoinDate: member.yaksaJoinDate,
+      isActive: member.isActive,
+      isVerified: member.isVerified,
     };
   }
 }

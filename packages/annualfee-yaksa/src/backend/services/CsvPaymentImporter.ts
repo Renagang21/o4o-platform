@@ -6,12 +6,15 @@
  * - 회원 자동 매칭 (이름, 금액, 입금자명, 면허번호 기반)
  * - 미매칭 항목 예외 처리
  * - 납부 자동 등록
+ *
+ * Phase R1.1: MembershipReadPort 사용으로 의존성 전환
  */
 
 import { DataSource, Repository, In } from 'typeorm';
 import { FeePayment } from '../entities/FeePayment.js';
 import { FeeInvoice } from '../entities/FeeInvoice.js';
 import { FeeLogService } from './FeeLogService.js';
+import type { MembershipReadPort, MemberBasicInfo } from '@o4o/membership-yaksa';
 
 export interface CsvRow {
   // 은행 CSV 공통 필드
@@ -144,11 +147,19 @@ export class CsvPaymentImporter {
   private paymentRepo: Repository<FeePayment>;
   private invoiceRepo: Repository<FeeInvoice>;
   private logService: FeeLogService;
+  private membershipPort: MembershipReadPort | null = null;
 
   constructor(private dataSource: DataSource) {
     this.paymentRepo = dataSource.getRepository(FeePayment);
     this.invoiceRepo = dataSource.getRepository(FeeInvoice);
     this.logService = new FeeLogService(dataSource);
+  }
+
+  /**
+   * Phase R1.1: MembershipReadPort 주입
+   */
+  setMembershipPort(port: MembershipReadPort): void {
+    this.membershipPort = port;
   }
 
   /**
@@ -194,12 +205,31 @@ export class CsvPaymentImporter {
     });
 
     const memberIds = invoices.map((inv) => inv.memberId);
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const members = memberIds.length > 0
-      ? await memberRepo.find({ where: { id: In(memberIds) } })
-      : [];
 
-    const memberMap = new Map(members.map((m: any) => [m.id, m]));
+    // Phase R1.1: MembershipReadPort를 통한 회원 정보 조회
+    let members: MemberBasicInfo[];
+    if (this.membershipPort && memberIds.length > 0) {
+      members = await this.membershipPort.getMembersByIds(memberIds);
+    } else if (memberIds.length > 0) {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[CsvPaymentImporter] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMembers = await memberRepo.find({ where: { id: In(memberIds) } });
+      members = rawMembers.map((m: any) => ({
+        id: m.id,
+        userId: m.userId,
+        organizationId: m.organizationId,
+        name: m.name,
+        email: m.email,
+        phone: m.phone,
+        licenseNumber: m.licenseNumber,
+        registrationNumber: m.registrationNumber,
+      }));
+    } else {
+      members = [];
+    }
+
+    const memberMap = new Map(members.map((m) => [m.id, m]));
 
     // 3. 각 CSV 행에 대해 매칭 수행
     const matches: MatchResult[] = [];
@@ -400,7 +430,7 @@ export class CsvPaymentImporter {
   private async findMatch(
     row: CsvRow,
     invoices: FeeInvoice[],
-    memberMap: Map<string, any>,
+    memberMap: Map<string, MemberBasicInfo>,
     year: number
   ): Promise<MatchResult> {
     const candidates: MatchResult['candidates'] = [];
@@ -494,7 +524,7 @@ export class CsvPaymentImporter {
   private calculateMatchScore(
     row: CsvRow,
     invoice: FeeInvoice,
-    member: any
+    member: MemberBasicInfo
   ): { score: number; reason: string } {
     let score = 0;
     const reasons: string[] = [];

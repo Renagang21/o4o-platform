@@ -86,6 +86,33 @@ export interface FindMemberOptions {
 }
 
 /**
+ * Phase R1.1: 회비 계산용 회원 정보 DTO
+ * annualfee-yaksa의 InvoiceAutoGenerator에서 사용
+ */
+export interface MemberFeeInfo {
+  /** 회원 ID */
+  id: string;
+  /** 이름 */
+  name: string;
+  /** 조직 ID */
+  organizationId: string;
+  /** 약사 유형 */
+  pharmacistType?: string;
+  /** 공식 직책 */
+  officialRole?: string;
+  /** 생년월일 */
+  birthdate?: string;
+  /** 연회비 필요 여부 */
+  requiresAnnualFee: boolean;
+  /** 약사회 가입일 */
+  yaksaJoinDate?: string;
+  /** 활성 여부 */
+  isActive: boolean;
+  /** 검증 완료 여부 */
+  isVerified: boolean;
+}
+
+/**
  * MembershipReadPort Interface
  *
  * 다른 앱이 membership 데이터에 접근하는 유일한 방법
@@ -130,4 +157,21 @@ export interface MembershipReadPort {
    * 조직 내 회원 수 조회
    */
   getMemberCountByOrganization(organizationId: string): Promise<number>;
+
+  // ============================================
+  // Phase R1.1: 회비 관련 메서드
+  // ============================================
+
+  /**
+   * 회비 계산용 회원 정보 조회
+   */
+  getMemberForFeeCalculation(memberId: string): Promise<MemberFeeInfo | null>;
+
+  /**
+   * 회비 납부 대상 회원 목록 조회
+   * 조건: 활성 + 검증 완료 + 회비 필요
+   */
+  getActiveMembersForFee(options?: {
+    organizationId?: string;
+  }): Promise<MemberFeeInfo[]>;
 }

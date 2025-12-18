@@ -5,12 +5,15 @@
  * - 납부 확인 영수증 생성
  * - 약사회 공식 양식 적용
  * - PDF 파일 생성 및 반환
+ *
+ * Phase R1.1: MembershipReadPort 사용으로 의존성 전환
  */
 
 import { DataSource, Repository } from 'typeorm';
 import { FeePayment } from '../entities/FeePayment.js';
 import { FeeInvoice } from '../entities/FeeInvoice.js';
 import { FeeLogService } from './FeeLogService.js';
+import type { MembershipReadPort, MemberBasicInfo } from '@o4o/membership-yaksa';
 
 export interface ReceiptData {
   // 영수증 기본 정보
@@ -54,6 +57,7 @@ export class ReceiptPdfGenerator {
   private paymentRepo: Repository<FeePayment>;
   private invoiceRepo: Repository<FeeInvoice>;
   private logService: FeeLogService;
+  private membershipPort: MembershipReadPort | null = null;
 
   // 발급 기관 정보 (약사회)
   private issuerInfo = {
@@ -67,6 +71,13 @@ export class ReceiptPdfGenerator {
     this.paymentRepo = dataSource.getRepository(FeePayment);
     this.invoiceRepo = dataSource.getRepository(FeeInvoice);
     this.logService = new FeeLogService(dataSource);
+  }
+
+  /**
+   * Phase R1.1: MembershipReadPort 주입
+   */
+  setMembershipPort(port: MembershipReadPort): void {
+    this.membershipPort = port;
   }
 
   /**
@@ -98,11 +109,31 @@ export class ReceiptPdfGenerator {
       return { success: false, error: '청구서 정보를 찾을 수 없습니다.' };
     }
 
-    // 회원 정보 조회
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const member = await memberRepo.findOne({
-      where: { id: payment.memberId },
-    });
+    // Phase R1.1: MembershipReadPort를 통한 회원 정보 조회
+    let member: MemberBasicInfo | null = null;
+    if (this.membershipPort) {
+      member = await this.membershipPort.getMemberById(payment.memberId);
+    } else {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[ReceiptPdfGenerator] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMember = await memberRepo.findOne({
+        where: { id: payment.memberId },
+      });
+      if (rawMember) {
+        const m = rawMember as any;
+        member = {
+          id: m.id,
+          userId: m.userId,
+          organizationId: m.organizationId,
+          name: m.name,
+          email: m.email,
+          phone: m.phone,
+          licenseNumber: m.licenseNumber,
+          registrationNumber: m.registrationNumber,
+        };
+      }
+    }
 
     if (!member) {
       return { success: false, error: '회원 정보를 찾을 수 없습니다.' };
@@ -113,7 +144,7 @@ export class ReceiptPdfGenerator {
     try {
       const orgRepo = this.dataSource.getRepository('Organization');
       const organization = await orgRepo.findOne({
-        where: { id: (member as any).organizationId },
+        where: { id: member.organizationId },
       });
       organizationName = (organization as any)?.name || '';
     } catch {
@@ -124,8 +155,8 @@ export class ReceiptPdfGenerator {
     const receiptData: ReceiptData = {
       receiptNumber: payment.receiptNumber || this.generateReceiptNumber(payment),
       issueDate: new Date(),
-      memberName: (member as any).name,
-      licenseNumber: (member as any).licenseNumber,
+      memberName: member.name,
+      licenseNumber: member.licenseNumber,
       organizationName,
       year: invoice.year,
       paymentDate: payment.paidAt,
@@ -416,8 +447,30 @@ Tel: ${data.issuerPhone}
       return { success: false, error: '청구서 정보를 찾을 수 없습니다.' };
     }
 
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const member = await memberRepo.findOne({ where: { id: payment.memberId } });
+    // Phase R1.1: MembershipReadPort를 통한 회원 정보 조회
+    let member: MemberBasicInfo | null = null;
+    if (this.membershipPort) {
+      member = await this.membershipPort.getMemberById(payment.memberId);
+    } else {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[ReceiptPdfGenerator] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMember = await memberRepo.findOne({ where: { id: payment.memberId } });
+      if (rawMember) {
+        const m = rawMember as any;
+        member = {
+          id: m.id,
+          userId: m.userId,
+          organizationId: m.organizationId,
+          name: m.name,
+          email: m.email,
+          phone: m.phone,
+          licenseNumber: m.licenseNumber,
+          registrationNumber: m.registrationNumber,
+        };
+      }
+    }
+
     if (!member) {
       return { success: false, error: '회원 정보를 찾을 수 없습니다.' };
     }
@@ -426,7 +479,7 @@ Tel: ${data.issuerPhone}
     try {
       const orgRepo = this.dataSource.getRepository('Organization');
       const organization = await orgRepo.findOne({
-        where: { id: (member as any).organizationId },
+        where: { id: member.organizationId },
       });
       organizationName = (organization as any)?.name || '';
     } catch {
@@ -436,8 +489,8 @@ Tel: ${data.issuerPhone}
     const receiptData: ReceiptData = {
       receiptNumber: payment.receiptNumber || this.generateReceiptNumber(payment),
       issueDate: new Date(),
-      memberName: (member as any).name,
-      licenseNumber: (member as any).licenseNumber,
+      memberName: member.name,
+      licenseNumber: member.licenseNumber,
       organizationName,
       year: invoice.year,
       paymentDate: payment.paidAt,
