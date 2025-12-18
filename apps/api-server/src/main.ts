@@ -373,6 +373,12 @@ import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension
 // Groupbuy-Yaksa Routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
 import { createGroupbuyRoutes } from '@o4o/groupbuy-yaksa';
 
+// Market Trial Routes (Phase L-1)
+import marketTrialRoutes from './routes/market-trial.routes.js';
+
+// Partner Routes (Phase K)
+import partnerRoutes from './routes/partner.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -622,6 +628,14 @@ const startServer = async () => {
     } catch (groupbuyError) {
       logger.error('Failed to register groupbuy-yaksa routes:', groupbuyError);
     }
+
+    // 21. Register Partner routes (Phase K)
+    app.use('/api/partner', partnerRoutes);
+    logger.info('✅ Partner routes registered at /api/partner');
+
+    // 22. Register Market Trial routes (Phase L-1)
+    app.use('/api/market-trial', marketTrialRoutes);
+    logger.info('✅ Market Trial routes registered at /api/market-trial');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted

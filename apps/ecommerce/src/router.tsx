@@ -22,6 +22,24 @@ import {
   GroupbuyHistoryPage
 } from './pages/groupbuy';
 
+// Partner pages (Phase K)
+import {
+  PartnerLanding,
+  PartnerSignup,
+  PartnerDashboardLayout,
+  PartnerDashboardHome,
+  PartnerLinks,
+  PartnerEarnings,
+  PartnerContent
+} from './pages/partner';
+
+// Market Trial pages (Phase L-1)
+import {
+  MarketTrialListPage,
+  MarketTrialDetailPage,
+  MarketTrialJoinPage
+} from './pages/market-trial';
+
 // Vendor Dashboard imports
 import VendorLayout from './pages/vendor/layout/VendorLayout';
 // import VendorDashboard from './pages/vendor/Dashboard';
@@ -131,5 +149,64 @@ export const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  },
+  // Partner routes (Phase K)
+  {
+    path: '/partner',
+    children: [
+      {
+        index: true,
+        element: <PartnerLanding />,
+      },
+      {
+        path: 'signup',
+        element: <PartnerSignup />,
+      },
+      {
+        path: 'dashboard',
+        element: <PartnerDashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <PartnerDashboardHome />,
+          },
+          {
+            path: 'links',
+            element: <PartnerLinks />,
+          },
+          {
+            path: 'earnings',
+            element: <PartnerEarnings />,
+          },
+          {
+            path: 'content',
+            element: <PartnerContent />,
+          },
+        ],
+      },
+    ],
+  },
+  // Alias route: /business/partner -> PartnerLanding
+  {
+    path: '/business/partner',
+    element: <PartnerLanding />,
+  },
+  // Market Trial routes (Phase L-1)
+  {
+    path: '/market-trial',
+    children: [
+      {
+        index: true,
+        element: <MarketTrialListPage />,
+      },
+      {
+        path: ':trialId',
+        element: <MarketTrialDetailPage />,
+      },
+      {
+        path: ':trialId/join',
+        element: <MarketTrialJoinPage />,
+      },
+    ],
   },
 ]);
