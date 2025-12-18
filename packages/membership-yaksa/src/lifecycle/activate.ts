@@ -1,18 +1,21 @@
 import { DataSource } from 'typeorm';
 import { jobRegistry, type JobDefinition } from '@o4o/yaksa-scheduler';
+import {
+  verificationExpiryCheckHandler,
+  licenseRenewalReminderHandler,
+} from '../handlers/index.js';
 
 /**
  * Membership-Yaksa Activate Hook
  *
  * 앱 활성화 시 실행
- * Phase R1.1: JobRegistry에 Job 정의 등록
+ * Phase R2: Real handlers implemented
  */
 
 /**
- * Phase R1.1: Membership-Yaksa Job 정의
+ * Phase R2: Membership-Yaksa Job 정의
  *
- * 핸들러는 Phase R2에서 이동 예정
- * 현재는 yaksa-scheduler의 기존 핸들러가 fallback으로 동작
+ * 실제 Handler 구현이 연결됨 (handlers/job-handlers.ts)
  */
 const MEMBERSHIP_JOB_DEFINITIONS: JobDefinition[] = [
   {
@@ -26,17 +29,7 @@ const MEMBERSHIP_JOB_DEFINITIONS: JobDefinition[] = [
     defaultConfig: {
       warningDaysBefore: 30,
     },
-    handler: async (job, context) => {
-      // Phase R2에서 실제 핸들러 구현 이동 예정
-      console.log('[membership-yaksa] verification_expiry_check handler called');
-      return {
-        success: true,
-        itemsProcessed: 0,
-        itemsSucceeded: 0,
-        itemsFailed: 0,
-        summary: 'Placeholder - using fallback handler',
-      };
-    },
+    handler: verificationExpiryCheckHandler,
   },
   {
     id: 'membership-yaksa:license_renewal_reminder',
@@ -49,23 +42,14 @@ const MEMBERSHIP_JOB_DEFINITIONS: JobDefinition[] = [
     defaultConfig: {
       reminderMonthsBefore: 3,
     },
-    handler: async (job, context) => {
-      console.log('[membership-yaksa] license_renewal_reminder handler called');
-      return {
-        success: true,
-        itemsProcessed: 0,
-        itemsSucceeded: 0,
-        itemsFailed: 0,
-        summary: 'Placeholder - using fallback handler',
-      };
-    },
+    handler: licenseRenewalReminderHandler,
   },
 ];
 
 export async function activate(dataSource: DataSource): Promise<void> {
   console.log('[Membership-Yaksa] Activating...');
 
-  // Phase R1.1: JobRegistry에 Job 정의 등록
+  // Phase R2: JobRegistry에 Job 정의 등록 (실제 핸들러 포함)
   let registered = 0;
   for (const definition of MEMBERSHIP_JOB_DEFINITIONS) {
     const result = jobRegistry.registerJobDefinition(definition);

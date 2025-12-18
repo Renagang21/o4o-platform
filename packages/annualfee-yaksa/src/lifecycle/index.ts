@@ -8,10 +8,17 @@
  * - uninstall: 정리
  *
  * Phase R1.1: JobRegistry 등록 추가
+ * Phase R2: 실제 Handler 구현 연결
  */
 
 import { DataSource } from 'typeorm';
 import { jobRegistry, type JobDefinition } from '@o4o/yaksa-scheduler';
+import {
+  invoiceOverdueCheckHandler,
+  invoiceDueDateWarningHandler,
+  exemptionExpiryCheckHandler,
+  settlementReminderHandler,
+} from '../handlers/index.js';
 
 export interface LifecycleContext {
   dataSource: DataSource;
@@ -21,10 +28,9 @@ export interface LifecycleContext {
 }
 
 /**
- * Phase R1.1: AnnualFee-Yaksa Job 정의
+ * Phase R2: AnnualFee-Yaksa Job 정의
  *
- * 핸들러는 Phase R2에서 이동 예정
- * 현재는 yaksa-scheduler의 기존 핸들러가 fallback으로 동작
+ * 실제 Handler 구현이 연결됨 (handlers/job-handlers.ts)
  */
 const ANNUALFEE_JOB_DEFINITIONS: JobDefinition[] = [
   {
@@ -38,18 +44,7 @@ const ANNUALFEE_JOB_DEFINITIONS: JobDefinition[] = [
     defaultConfig: {
       overdueThresholdDays: 0,
     },
-    handler: async (job, context) => {
-      // Phase R2에서 실제 핸들러 구현 이동 예정
-      // 현재는 yaksa-scheduler의 기존 핸들러가 fallback으로 동작
-      console.log('[annualfee-yaksa] invoice_overdue_check handler called');
-      return {
-        success: true,
-        itemsProcessed: 0,
-        itemsSucceeded: 0,
-        itemsFailed: 0,
-        summary: 'Placeholder - using fallback handler',
-      };
-    },
+    handler: invoiceOverdueCheckHandler,
   },
   {
     id: 'annualfee-yaksa:invoice_due_date_warning',
@@ -62,16 +57,7 @@ const ANNUALFEE_JOB_DEFINITIONS: JobDefinition[] = [
     defaultConfig: {
       warningDaysBefore: 7,
     },
-    handler: async (job, context) => {
-      console.log('[annualfee-yaksa] invoice_due_date_warning handler called');
-      return {
-        success: true,
-        itemsProcessed: 0,
-        itemsSucceeded: 0,
-        itemsFailed: 0,
-        summary: 'Placeholder - using fallback handler',
-      };
-    },
+    handler: invoiceDueDateWarningHandler,
   },
   {
     id: 'annualfee-yaksa:exemption_expiry_check',
@@ -81,16 +67,7 @@ const ANNUALFEE_JOB_DEFINITIONS: JobDefinition[] = [
     actionType: 'exemption_expiry_check',
     defaultCronExpression: '0 0 1 * *', // 매월 1일 자정
     timezone: 'Asia/Seoul',
-    handler: async (job, context) => {
-      console.log('[annualfee-yaksa] exemption_expiry_check handler called');
-      return {
-        success: true,
-        itemsProcessed: 0,
-        itemsSucceeded: 0,
-        itemsFailed: 0,
-        summary: 'Placeholder - using fallback handler',
-      };
-    },
+    handler: exemptionExpiryCheckHandler,
   },
   {
     id: 'annualfee-yaksa:settlement_reminder',
@@ -100,16 +77,7 @@ const ANNUALFEE_JOB_DEFINITIONS: JobDefinition[] = [
     actionType: 'settlement_reminder',
     defaultCronExpression: '0 9 1 * *', // 매월 1일 오전 9시
     timezone: 'Asia/Seoul',
-    handler: async (job, context) => {
-      console.log('[annualfee-yaksa] settlement_reminder handler called');
-      return {
-        success: true,
-        itemsProcessed: 0,
-        itemsSucceeded: 0,
-        itemsFailed: 0,
-        summary: 'Placeholder - using fallback handler',
-      };
-    },
+    handler: settlementReminderHandler,
   },
 ];
 
