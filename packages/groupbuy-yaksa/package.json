@@ -1,0 +1,39 @@
+{
+  "name": "@o4o/groupbuy-yaksa",
+  "version": "1.0.0",
+  "description": "Groupbuy Extension for Yaksa Service - Division/Branch led group purchasing",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./backend": {
+      "import": "./dist/backend/index.js",
+      "types": "./dist/backend/index.d.ts"
+    },
+    "./lifecycle": {
+      "import": "./dist/lifecycle/index.js",
+      "types": "./dist/lifecycle/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.20"
+  },
+  "peerDependencies": {
+    "@o4o/dropshipping-core": "workspace:*",
+    "@o4o/organization-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.0"
+  }
+}

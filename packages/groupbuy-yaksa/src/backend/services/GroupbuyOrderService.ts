@@ -1,0 +1,439 @@
+/**
+ * GroupbuyOrderService
+ *
+ * 공동구매 주문 관리 서비스
+ * - 공동구매 상품 주문 기록 생성
+ * - dropshipping 주문 ID 연결
+ * - 주문 상태 변경 반영
+ */
+
+import type { EntityManager, Repository } from 'typeorm';
+import {
+  GroupbuyOrder,
+  type GroupbuyOrderStatus,
+} from '../entities/GroupbuyOrder.js';
+import { CampaignProduct } from '../entities/CampaignProduct.js';
+import { GroupbuyCampaign } from '../entities/GroupbuyCampaign.js';
+
+export interface CreateGroupbuyOrderDto {
+  campaignId: string;
+  campaignProductId: string;
+  pharmacyId: string;
+  quantity: number;
+  orderedBy?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface OrderQuantitySummary {
+  totalQuantity: number;
+  bySupplier: Array<{
+    supplierId: string;
+    quantity: number;
+  }>;
+  byProduct: Array<{
+    productId: string;
+    supplierId: string;
+    quantity: number;
+  }>;
+}
+
+export class GroupbuyOrderService {
+  private orderRepository: Repository<GroupbuyOrder>;
+  private productRepository: Repository<CampaignProduct>;
+  private campaignRepository: Repository<GroupbuyCampaign>;
+  private entityManager: EntityManager;
+
+  constructor(entityManager: EntityManager) {
+    this.entityManager = entityManager;
+    this.orderRepository = entityManager.getRepository(GroupbuyOrder);
+    this.productRepository = entityManager.getRepository(CampaignProduct);
+    this.campaignRepository = entityManager.getRepository(GroupbuyCampaign);
+  }
+
+  /**
+   * 공동구매 주문 생성
+   */
+  async createOrder(dto: CreateGroupbuyOrderDto): Promise<GroupbuyOrder> {
+    // 상품 확인
+    const product = await this.productRepository.findOne({
+      where: { id: dto.campaignProductId },
+      relations: ['campaign'],
+    });
+    if (!product) {
+      throw new Error('상품을 찾을 수 없습니다');
+    }
+
+    // 캠페인 확인
+    if (product.campaign?.status !== 'active') {
+      throw new Error('진행 중인 캠페인의 상품만 주문할 수 있습니다');
+    }
+
+    // 상품 상태 확인
+    if (product.status === 'closed') {
+      throw new Error('마감된 상품은 주문할 수 없습니다');
+    }
+
+    // 기간 확인
+    const now = new Date();
+    if (now < product.startDate || now > product.endDate) {
+      throw new Error('주문 가능 기간이 아닙니다');
+    }
+
+    // 최대 수량 확인
+    if (
+      product.maxTotalQuantity &&
+      product.orderedQuantity + dto.quantity > product.maxTotalQuantity
+    ) {
+      throw new Error('최대 주문 수량을 초과했습니다');
+    }
+
+    // 수량 검증
+    if (dto.quantity < 1) {
+      throw new Error('주문 수량은 1 이상이어야 합니다');
+    }
+
+    // 트랜잭션으로 주문 생성 및 수량 업데이트
+    return this.entityManager.transaction(async (transactionalEntityManager) => {
+      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
+      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
+      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+
+      // 기존 주문 확인 (동일 약국의 중복 주문 방지)
+      const existingOrder = await txOrderRepo.findOne({
+        where: {
+          campaignProductId: dto.campaignProductId,
+          pharmacyId: dto.pharmacyId,
+          orderStatus: 'pending',
+        },
+      });
+
+      let order: GroupbuyOrder;
+      let isNewParticipant = false;
+
+      if (existingOrder) {
+        // 기존 주문 수량 업데이트
+        const oldQuantity = existingOrder.quantity;
+        existingOrder.quantity = dto.quantity;
+        order = await txOrderRepo.save(existingOrder);
+
+        // 상품 수량 업데이트 (차이만큼)
+        await txProductRepo
+          .createQueryBuilder()
+          .update()
+          .set({
+            orderedQuantity: () =>
+              `"orderedQuantity" + ${dto.quantity - oldQuantity}`,
+          })
+          .where('id = :id', { id: dto.campaignProductId })
+          .execute();
+
+        // 캠페인 수량 업데이트
+        await txCampaignRepo
+          .createQueryBuilder()
+          .update()
+          .set({
+            totalOrderedQuantity: () =>
+              `"totalOrderedQuantity" + ${dto.quantity - oldQuantity}`,
+          })
+          .where('id = :id', { id: dto.campaignId })
+          .execute();
+      } else {
+        // 신규 주문 생성
+        order = txOrderRepo.create({
+          campaignId: dto.campaignId,
+          campaignProductId: dto.campaignProductId,
+          pharmacyId: dto.pharmacyId,
+          supplierId: product.supplierId,
+          quantity: dto.quantity,
+          orderStatus: 'pending',
+          orderedBy: dto.orderedBy,
+          metadata: dto.metadata,
+        });
+        order = await txOrderRepo.save(order);
+
+        // 상품 수량 업데이트
+        await txProductRepo
+          .createQueryBuilder()
+          .update()
+          .set({
+            orderedQuantity: () => `"orderedQuantity" + ${dto.quantity}`,
+          })
+          .where('id = :id', { id: dto.campaignProductId })
+          .execute();
+
+        // 캠페인 수량 업데이트
+        // 새로운 참여자인지 확인
+        const existingParticipation = await txOrderRepo.findOne({
+          where: {
+            campaignId: dto.campaignId,
+            pharmacyId: dto.pharmacyId,
+          },
+        });
+        isNewParticipant = !existingParticipation || existingParticipation.id === order.id;
+
+        await txCampaignRepo
+          .createQueryBuilder()
+          .update()
+          .set({
+            totalOrderedQuantity: () => `"totalOrderedQuantity" + ${dto.quantity}`,
+            ...(isNewParticipant && {
+              participantCount: () => `"participantCount" + 1`,
+            }),
+          })
+          .where('id = :id', { id: dto.campaignId })
+          .execute();
+      }
+
+      // 최소 수량 달성 여부 확인 및 상태 업데이트
+      const updatedProduct = await txProductRepo.findOne({
+        where: { id: dto.campaignProductId },
+      });
+      if (
+        updatedProduct &&
+        updatedProduct.status === 'active' &&
+        updatedProduct.orderedQuantity >= updatedProduct.minTotalQuantity
+      ) {
+        await txProductRepo.update(dto.campaignProductId, {
+          status: 'threshold_met',
+        });
+      }
+
+      return order;
+    });
+  }
+
+  /**
+   * 주문 조회
+   */
+  async getOrderById(id: string): Promise<GroupbuyOrder | null> {
+    return this.orderRepository.findOne({
+      where: { id },
+      relations: ['campaign', 'campaignProduct'],
+    });
+  }
+
+  /**
+   * 약국별 주문 목록 조회
+   */
+  async getOrdersByPharmacy(
+    pharmacyId: string,
+    options?: {
+      campaignId?: string;
+      status?: GroupbuyOrderStatus;
+    }
+  ): Promise<GroupbuyOrder[]> {
+    const query = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.campaign', 'campaign')
+      .leftJoinAndSelect('order.campaignProduct', 'product')
+      .where('order.pharmacyId = :pharmacyId', { pharmacyId });
+
+    if (options?.campaignId) {
+      query.andWhere('order.campaignId = :campaignId', {
+        campaignId: options.campaignId,
+      });
+    }
+
+    if (options?.status) {
+      query.andWhere('order.orderStatus = :status', { status: options.status });
+    }
+
+    return query.orderBy('order.createdAt', 'DESC').getMany();
+  }
+
+  /**
+   * 캠페인별 주문 목록 조회
+   */
+  async getOrdersByCampaign(
+    campaignId: string,
+    options?: {
+      status?: GroupbuyOrderStatus;
+      supplierId?: string;
+    }
+  ): Promise<GroupbuyOrder[]> {
+    const query = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.campaignProduct', 'product')
+      .where('order.campaignId = :campaignId', { campaignId });
+
+    if (options?.status) {
+      query.andWhere('order.orderStatus = :status', { status: options.status });
+    }
+
+    if (options?.supplierId) {
+      query.andWhere('order.supplierId = :supplierId', {
+        supplierId: options.supplierId,
+      });
+    }
+
+    return query.getMany();
+  }
+
+  /**
+   * 주문 취소
+   */
+  async cancelOrder(id: string): Promise<GroupbuyOrder> {
+    const order = await this.getOrderById(id);
+    if (!order) {
+      throw new Error('주문을 찾을 수 없습니다');
+    }
+
+    if (order.orderStatus !== 'pending') {
+      throw new Error('대기 중인 주문만 취소할 수 있습니다');
+    }
+
+    return this.entityManager.transaction(async (transactionalEntityManager) => {
+      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
+      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
+      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+
+      // 주문 상태 변경
+      order.orderStatus = 'cancelled';
+      await txOrderRepo.save(order);
+
+      // 상품 수량 감소
+      await txProductRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          orderedQuantity: () => `"orderedQuantity" - ${order.quantity}`,
+        })
+        .where('id = :id', { id: order.campaignProductId })
+        .execute();
+
+      // 캠페인 수량 감소
+      await txCampaignRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          totalOrderedQuantity: () => `"totalOrderedQuantity" - ${order.quantity}`,
+        })
+        .where('id = :id', { id: order.campaignId })
+        .execute();
+
+      return order;
+    });
+  }
+
+  /**
+   * 주문 확정
+   * - dropshipping 주문 생성 후 호출
+   */
+  async confirmOrder(
+    id: string,
+    dropshippingOrderId: string
+  ): Promise<GroupbuyOrder> {
+    const order = await this.getOrderById(id);
+    if (!order) {
+      throw new Error('주문을 찾을 수 없습니다');
+    }
+
+    if (order.orderStatus !== 'pending') {
+      throw new Error('대기 중인 주문만 확정할 수 있습니다');
+    }
+
+    return this.entityManager.transaction(async (transactionalEntityManager) => {
+      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
+      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
+      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+
+      // 주문 확정
+      order.orderStatus = 'confirmed';
+      order.dropshippingOrderId = dropshippingOrderId;
+      await txOrderRepo.save(order);
+
+      // 상품 확정 수량 업데이트
+      await txProductRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          confirmedQuantity: () => `"confirmedQuantity" + ${order.quantity}`,
+        })
+        .where('id = :id', { id: order.campaignProductId })
+        .execute();
+
+      // 캠페인 확정 수량 업데이트
+      await txCampaignRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          totalConfirmedQuantity: () =>
+            `"totalConfirmedQuantity" + ${order.quantity}`,
+        })
+        .where('id = :id', { id: order.campaignId })
+        .execute();
+
+      return order;
+    });
+  }
+
+  /**
+   * 캠페인별 수량 집계 조회
+   */
+  async getQuantitySummary(campaignId: string): Promise<OrderQuantitySummary> {
+    // 전체 수량
+    const totalResult = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('SUM(order.quantity)', 'total')
+      .where('order.campaignId = :campaignId', { campaignId })
+      .andWhere('order.orderStatus != :cancelled', { cancelled: 'cancelled' })
+      .getRawOne();
+
+    // 공급자별 수량
+    const bySupplierResult = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('order.supplierId', 'supplierId')
+      .addSelect('SUM(order.quantity)', 'quantity')
+      .where('order.campaignId = :campaignId', { campaignId })
+      .andWhere('order.orderStatus != :cancelled', { cancelled: 'cancelled' })
+      .groupBy('order.supplierId')
+      .getRawMany();
+
+    // 상품별 수량
+    const byProductResult = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoin('order.campaignProduct', 'product')
+      .select('product.productId', 'productId')
+      .addSelect('order.supplierId', 'supplierId')
+      .addSelect('SUM(order.quantity)', 'quantity')
+      .where('order.campaignId = :campaignId', { campaignId })
+      .andWhere('order.orderStatus != :cancelled', { cancelled: 'cancelled' })
+      .groupBy('product.productId')
+      .addGroupBy('order.supplierId')
+      .getRawMany();
+
+    return {
+      totalQuantity: parseInt(totalResult?.total || '0', 10),
+      bySupplier: bySupplierResult.map((r) => ({
+        supplierId: r.supplierId,
+        quantity: parseInt(r.quantity, 10),
+      })),
+      byProduct: byProductResult.map((r) => ({
+        productId: r.productId,
+        supplierId: r.supplierId,
+        quantity: parseInt(r.quantity, 10),
+      })),
+    };
+  }
+
+  /**
+   * 약국별 수량 집계 조회
+   */
+  async getQuantityByPharmacy(
+    campaignId: string
+  ): Promise<Array<{ pharmacyId: string; quantity: number }>> {
+    const result = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('order.pharmacyId', 'pharmacyId')
+      .addSelect('SUM(order.quantity)', 'quantity')
+      .where('order.campaignId = :campaignId', { campaignId })
+      .andWhere('order.orderStatus != :cancelled', { cancelled: 'cancelled' })
+      .groupBy('order.pharmacyId')
+      .getRawMany();
+
+    return result.map((r) => ({
+      pharmacyId: r.pharmacyId,
+      quantity: parseInt(r.quantity, 10),
+    }));
+  }
+}
