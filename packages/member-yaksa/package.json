@@ -1,0 +1,54 @@
+{
+  "name": "@o4o-apps/member-yaksa",
+  "version": "1.0.0",
+  "description": "Member app for Yaksa (Pharmacist Association) - Member profile, pharmacy info, and unified home",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
+    "./lifecycle": {
+      "types": "./dist/lifecycle/index.d.ts",
+      "import": "./dist/lifecycle/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0",
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "o4o",
+    "yaksa",
+    "member",
+    "pharmacist",
+    "pharmacy"
+  ],
+  "author": "O4O Platform Team",
+  "license": "MIT"
+}
