@@ -8,6 +8,7 @@
  *
  * @package @o4o-apps/member-yaksa
  * @version 1.0.0
+ * @phase 1
  */
 
 // Manifest
@@ -18,3 +19,6 @@ export * from './lifecycle/index.js';
 
 // Backend
 export * from './backend/index.js';
+
+// Migrations
+export * from './migrations/index.js';

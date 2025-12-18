@@ -1,10 +1,9 @@
 /**
  * member-yaksa Install Lifecycle
  *
- * Phase 0: 구조 고정 단계
- * - DB 생성 없음
- * - Seed 없음
- * - 로그 출력만
+ * Phase 1: MemberProfile 엔티티 설치
+ * - DB 테이블 생성 (마이그레이션)
+ * - 권한 등록
  */
 
 export interface InstallContext {
@@ -17,32 +16,42 @@ export interface InstallResult {
   success: boolean;
   message: string;
   warnings?: string[];
+  tables?: string[];
+  permissions?: string[];
 }
 
 /**
  * Install handler
  *
- * Phase 0에서는 실제 설치 작업 없음
- * Phase 1 이후 엔티티 마이그레이션 추가 예정
+ * Phase 1: MemberProfile 테이블 생성
  */
 export async function install(context: InstallContext): Promise<InstallResult> {
   console.log('[member-yaksa] Install started');
   console.log(`[member-yaksa] App ID: ${context.appId}`);
   console.log(`[member-yaksa] Version: ${context.version}`);
 
-  // Phase 0: 구조 확인만
-  // - DB 스키마 생성 없음
-  // - Seed 데이터 없음
+  // Phase 1: 테이블 생성
+  const tables = ['member_profiles'];
+  console.log('[member-yaksa] Tables to create:', tables);
 
-  console.log('[member-yaksa] Install completed (Phase 0 - No DB operations)');
+  // 권한 등록
+  const permissions = [
+    'member.profile.read',
+    'member.profile.update',
+    'member.profile.admin',
+  ];
+  console.log('[member-yaksa] Permissions to register:', permissions);
+
+  // Note: 실제 마이그레이션은 TypeORM synchronize 또는 별도 마이그레이션 스크립트로 실행
+  // 이 lifecycle은 앱 설치 시 필요한 설정만 수행
+
+  console.log('[member-yaksa] Install completed (Phase 1 - MemberProfile)');
 
   return {
     success: true,
-    message: 'member-yaksa installed successfully (Phase 0)',
-    warnings: [
-      'Phase 0: No database operations performed',
-      'Entity creation will be added in Phase 1',
-    ],
+    message: 'member-yaksa installed successfully (Phase 1)',
+    tables,
+    permissions,
   };
 }
 

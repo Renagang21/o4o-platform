@@ -1,7 +1,17 @@
 /**
  * member-yaksa Backend Exports
  *
- * Phase 0: Route skeleton only
+ * Phase 1: MemberProfile API
  */
 
-export { createMemberRoutes } from './routes/index.js';
+// Routes
+export { createMemberRoutes, createMemberProfileRoutes } from './routes/index.js';
+
+// Entities
+export * from './entities/index.js';
+
+// Services
+export * from './services/index.js';
+
+// Controllers
+export * from './controllers/index.js';
