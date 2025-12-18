@@ -1,11 +1,13 @@
 /**
  * SchedulerService
  * Phase 19-A: Central Scheduler Infrastructure
+ * Phase R1: Job Registry Integration
  *
  * Core service for managing scheduled jobs:
  * - Job registration and management
  * - Cron-based execution
  * - Failure handling and retry queue
+ * - JobRegistry integration for decoupled job definitions
  */
 
 import cron from 'node-cron';
@@ -19,6 +21,7 @@ import {
 } from '../entities/ScheduledJob.js';
 import { JobExecutionLog, ExecutionResult } from '../entities/JobExecutionLog.js';
 import { JobFailureQueue, FailureQueueStatus } from '../entities/JobFailureQueue.js';
+import { jobRegistry } from '../../registry/JobRegistry.js';
 
 /**
  * Job handler function type
@@ -129,6 +132,9 @@ class SchedulerService {
 
   /**
    * Register a job handler
+   *
+   * @deprecated Use jobRegistry.registerJobDefinition() instead for Phase R1+
+   * This method is kept for backward compatibility with existing code.
    */
   registerHandler(
     targetService: JobTargetService,
@@ -138,6 +144,22 @@ class SchedulerService {
     const key = this.getHandlerKey(targetService, actionType);
     this.handlers.set(key, handler);
     console.log(`[SchedulerService] Registered handler: ${key}`);
+  }
+
+  /**
+   * Get handler for a job
+   * Checks JobRegistry first, then falls back to local handlers map
+   */
+  private getHandler(targetService: string, actionType: string): JobHandler | null {
+    // Phase R1: Check JobRegistry first
+    const registryHandler = jobRegistry.getHandler(targetService, actionType);
+    if (registryHandler) {
+      return registryHandler;
+    }
+
+    // Fallback to local handlers map (backward compatibility)
+    const key = this.getHandlerKey(targetService as JobTargetService, actionType as JobActionType);
+    return this.handlers.get(key) || null;
   }
 
   /**
@@ -393,10 +415,8 @@ class SchedulerService {
     item.status = 'retrying';
     await this.failureRepository!.save(item);
 
-    // Get handler and execute
-    const handler = this.handlers.get(
-      this.getHandlerKey(item.targetService, item.actionType)
-    );
+    // Get handler and execute (Phase R1: use getHandler for registry integration)
+    const handler = this.getHandler(item.targetService, item.actionType);
 
     if (!handler) {
       item.recordRetryAttempt('No handler registered for this action');
@@ -541,10 +561,8 @@ class SchedulerService {
     });
 
     try {
-      // Get handler
-      const handler = this.handlers.get(
-        this.getHandlerKey(job.targetService, job.actionType)
-      );
+      // Get handler (Phase R1: use getHandler for registry integration)
+      const handler = this.getHandler(job.targetService, job.actionType);
 
       if (!handler) {
         throw new Error(

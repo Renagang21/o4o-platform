@@ -5,12 +5,18 @@
  * - 마감일 기준 리마인드 발송
  * - 1차/2차/최종 통지 스케줄링
  * - 이메일/알림 발송
+ *
+ * Phase R1: MembershipReadPort 사용으로 의존성 전환
  */
 
 import { DataSource, Repository, In } from 'typeorm';
 import { FeeInvoice } from '../entities/FeeInvoice.js';
 import { FeeLog } from '../entities/FeeLog.js';
 import { FeeLogService } from './FeeLogService.js';
+import type {
+  MembershipReadPort,
+  MemberBasicInfo,
+} from '@o4o/membership-yaksa';
 
 export interface ReminderConfig {
   daysBeforeDue: number;
@@ -73,11 +79,20 @@ export class FeeReminderService {
   private invoiceRepo: Repository<FeeInvoice>;
   private logService: FeeLogService;
   private reminderConfigs: ReminderConfig[];
+  private membershipPort: MembershipReadPort | null = null;
 
   constructor(private dataSource: DataSource) {
     this.invoiceRepo = dataSource.getRepository(FeeInvoice);
     this.logService = new FeeLogService(dataSource);
     this.reminderConfigs = DEFAULT_REMINDER_CONFIGS;
+  }
+
+  /**
+   * Phase R1: MembershipReadPort 주입
+   * 서비스 초기화 시 호출하여 membership 데이터 접근 인터페이스 설정
+   */
+  setMembershipPort(port: MembershipReadPort): void {
+    this.membershipPort = port;
   }
 
   /**
@@ -292,12 +307,29 @@ export class FeeReminderService {
       return [];
     }
 
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const members = await memberRepo.find({
-      where: { id: In(memberIds) },
-    });
+    // Phase R1: MembershipReadPort를 통해 회원 정보 조회
+    let members: MemberBasicInfo[] = [];
+    if (this.membershipPort) {
+      members = await this.membershipPort.getMembersByIds(memberIds);
+    } else {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[FeeReminderService] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMembers = await memberRepo.find({
+        where: { id: In(memberIds) },
+      });
+      members = rawMembers.map((m: any) => ({
+        id: m.id,
+        userId: m.userId,
+        organizationId: m.organizationId,
+        name: m.name,
+        email: m.email,
+        phone: m.phone,
+        licenseNumber: m.licenseNumber,
+      }));
+    }
 
-    const memberMap = new Map(members.map((m: any) => [m.id, m]));
+    const memberMap = new Map(members.map((m) => [m.id, m]));
 
     return invoices
       .map((invoice) => {
@@ -307,10 +339,10 @@ export class FeeReminderService {
         return {
           invoice,
           member: {
-            id: (member as any).id,
-            name: (member as any).name,
-            email: (member as any).email,
-            phone: (member as any).phone,
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            phone: member.phone,
           },
         };
       })
@@ -388,8 +420,28 @@ export class FeeReminderService {
       return { success: false, error: '청구서를 찾을 수 없습니다.' };
     }
 
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const member = await memberRepo.findOne({ where: { id: invoice.memberId } });
+    // Phase R1: MembershipReadPort를 통해 회원 정보 조회
+    let member: MemberBasicInfo | null = null;
+    if (this.membershipPort) {
+      member = await this.membershipPort.getMemberById(invoice.memberId);
+    } else {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[FeeReminderService] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMember = await memberRepo.findOne({ where: { id: invoice.memberId } });
+      if (rawMember) {
+        member = {
+          id: (rawMember as any).id,
+          userId: (rawMember as any).userId,
+          organizationId: (rawMember as any).organizationId,
+          name: (rawMember as any).name,
+          email: (rawMember as any).email,
+          phone: (rawMember as any).phone,
+          licenseNumber: (rawMember as any).licenseNumber,
+        };
+      }
+    }
+
     if (!member) {
       return { success: false, error: '회원을 찾을 수 없습니다.' };
     }
@@ -400,12 +452,12 @@ export class FeeReminderService {
     }
 
     const result = await this.sendNotification({
-      memberId: (member as any).id,
-      email: (member as any).email,
+      memberId: member.id,
+      email: member.email,
       subject: `[테스트] ${config.subject}`,
       template: config.template,
       data: {
-        memberName: (member as any).name,
+        memberName: member.name,
         year: invoice.year,
         amount: invoice.amount,
         dueDate: invoice.dueDate,
@@ -423,7 +475,7 @@ export class FeeReminderService {
         data: {
           testReminder: true,
           reminderType,
-          email: (member as any).email,
+          email: member.email,
         },
         actorId: performedBy,
         actorType: performedBy ? 'admin' : 'system',

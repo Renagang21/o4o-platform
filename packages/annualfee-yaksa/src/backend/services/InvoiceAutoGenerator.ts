@@ -5,6 +5,8 @@
  * - 정책 기반 자동 청구서 생성
  * - 전체 활성 회원 대상 일괄 청구
  * - 감면 대상자 자동 적용
+ *
+ * Phase R1.1: MembershipReadPort 사용으로 의존성 전환
  */
 
 import { DataSource, Repository } from 'typeorm';
@@ -12,6 +14,7 @@ import { FeePolicy } from '../entities/FeePolicy.js';
 import { FeeInvoice, AmountBreakdown } from '../entities/FeeInvoice.js';
 import { FeeCalculationService, MemberFeeContext, FeeCalculationResult } from './FeeCalculationService.js';
 import { FeeLogService } from './FeeLogService.js';
+import type { MembershipReadPort, MemberFeeInfo } from '@o4o/membership-yaksa';
 
 export interface AutoGenerateOptions {
   year: number;
@@ -41,12 +44,20 @@ export class InvoiceAutoGenerator {
   private invoiceRepo: Repository<FeeInvoice>;
   private calculationService: FeeCalculationService;
   private logService: FeeLogService;
+  private membershipPort: MembershipReadPort | null = null;
 
   constructor(private dataSource: DataSource) {
     this.policyRepo = dataSource.getRepository(FeePolicy);
     this.invoiceRepo = dataSource.getRepository(FeeInvoice);
     this.calculationService = new FeeCalculationService(dataSource);
     this.logService = new FeeLogService(dataSource);
+  }
+
+  /**
+   * Phase R1.1: MembershipReadPort 주입
+   */
+  setMembershipPort(port: MembershipReadPort): void {
+    this.membershipPort = port;
   }
 
   /**
@@ -244,26 +255,21 @@ export class InvoiceAutoGenerator {
 
   /**
    * 활성 회원 목록 조회
-   * (Membership-Yaksa 연동)
+   * Phase R1.1: MembershipReadPort를 통한 접근
    */
   private async getActiveMembers(
     year: number,
     organizationId?: string
-  ): Promise<
-    Array<{
-      id: string;
-      name: string;
-      pharmacistType?: string;
-      officialRole?: string;
-      organizationId: string;
-      birthdate?: string;
-      requiresAnnualFee: boolean;
-      yaksaJoinDate?: string;
-      isActive: boolean;
-      isVerified: boolean;
-    }>
-  > {
-    // Membership-Yaksa의 Member 엔티티 조회
+  ): Promise<MemberFeeInfo[]> {
+    // Phase R1.1: MembershipReadPort 사용
+    if (this.membershipPort) {
+      return this.membershipPort.getActiveMembersForFee({
+        organizationId,
+      });
+    }
+
+    // Fallback: 기존 방식 (deprecated)
+    console.warn('[InvoiceAutoGenerator] MembershipReadPort not set. Using legacy repository access.');
     const memberRepo = this.dataSource.getRepository('YaksaMember');
 
     const queryBuilder = memberRepo
@@ -282,9 +288,9 @@ export class InvoiceAutoGenerator {
     return members.map((m: any) => ({
       id: m.id,
       name: m.name,
+      organizationId: m.organizationId,
       pharmacistType: m.pharmacistType,
       officialRole: m.officialRole,
-      organizationId: m.organizationId,
       birthdate: m.birthdate,
       requiresAnnualFee: m.requiresAnnualFee !== false,
       yaksaJoinDate: m.yaksaJoinDate || m.createdAt,
@@ -308,6 +314,7 @@ export class InvoiceAutoGenerator {
   /**
    * 특정 회원에 대한 청구서 재생성
    * (신상신고 변경 시 사용)
+   * Phase R1.1: MembershipReadPort 사용
    */
   async regenerateInvoice(
     memberId: string,
@@ -331,9 +338,31 @@ export class InvoiceAutoGenerator {
       };
     }
 
-    // 회원 정보 조회
-    const memberRepo = this.dataSource.getRepository('YaksaMember');
-    const member = await memberRepo.findOne({ where: { id: memberId } });
+    // Phase R1.1: MembershipReadPort를 통한 회원 정보 조회
+    let member: MemberFeeInfo | null = null;
+    if (this.membershipPort) {
+      member = await this.membershipPort.getMemberForFeeCalculation(memberId);
+    } else {
+      // Fallback: 기존 방식 (deprecated)
+      console.warn('[InvoiceAutoGenerator] MembershipReadPort not set. Using legacy repository access.');
+      const memberRepo = this.dataSource.getRepository('YaksaMember');
+      const rawMember = await memberRepo.findOne({ where: { id: memberId } });
+      if (rawMember) {
+        const m = rawMember as any;
+        member = {
+          id: m.id,
+          name: m.name,
+          organizationId: m.organizationId,
+          pharmacistType: m.pharmacistType,
+          officialRole: m.officialRole,
+          birthdate: m.birthdate,
+          requiresAnnualFee: m.requiresAnnualFee !== false,
+          yaksaJoinDate: m.yaksaJoinDate || m.createdAt,
+          isActive: m.isActive !== false,
+          isVerified: m.isVerified !== false,
+        };
+      }
+    }
 
     if (!member) {
       return {
@@ -355,18 +384,17 @@ export class InvoiceAutoGenerator {
     }
 
     // 회비 재계산
-    const m = member as any;
     const context: MemberFeeContext = {
-      memberId: m.id,
-      memberName: m.name,
-      pharmacistType: m.pharmacistType,
-      officialRole: m.officialRole,
-      organizationId: m.organizationId,
-      birthdate: m.birthdate,
-      requiresAnnualFee: m.requiresAnnualFee !== false,
-      yaksaJoinDate: m.yaksaJoinDate || m.createdAt,
-      isActive: m.isActive !== false,
-      isVerified: m.isVerified !== false,
+      memberId: member.id,
+      memberName: member.name,
+      pharmacistType: member.pharmacistType,
+      officialRole: member.officialRole,
+      organizationId: member.organizationId,
+      birthdate: member.birthdate,
+      requiresAnnualFee: member.requiresAnnualFee,
+      yaksaJoinDate: member.yaksaJoinDate,
+      isActive: member.isActive,
+      isVerified: member.isVerified,
     };
 
     const calculation = await this.calculationService.calculateFee(context, year);
@@ -409,7 +437,7 @@ export class InvoiceAutoGenerator {
     // 새 청구서 생성
     const invoice = this.invoiceRepo.create({
       memberId,
-      organizationId: m.organizationId,
+      organizationId: member.organizationId,
       policyId: policy.id,
       year,
       amount: calculation.breakdown.finalAmount,

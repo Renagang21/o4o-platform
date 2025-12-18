@@ -54,6 +54,7 @@
   },
   "peerDependencies": {
     "@o4o/membership-yaksa": "workspace:*",
-    "@o4o/organization-core": "workspace:*"
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/yaksa-scheduler": "workspace:*"
   }
 }

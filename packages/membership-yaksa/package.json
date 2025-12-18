@@ -22,6 +22,7 @@
     "xlsx": "0.18.5"
   },
   "peerDependencies": {
+    "@o4o/yaksa-scheduler": "workspace:*",
     "class-transformer": "^0.5.0",
     "class-validator": "^0.14.0",
     "react": "^18.0.0",
