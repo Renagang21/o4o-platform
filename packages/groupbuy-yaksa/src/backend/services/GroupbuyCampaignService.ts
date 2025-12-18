@@ -288,39 +288,47 @@ export class GroupbuyCampaignService {
       participantDelta?: number;
     }
   ): Promise<void> {
-    const updates: Record<string, () => string> = {};
-
+    // Phase 4: 음수 방지 guardrail 추가
     if (delta.orderedQuantity) {
+      const expr = delta.orderedQuantity >= 0
+        ? `"totalOrderedQuantity" + ${delta.orderedQuantity}`
+        : `GREATEST(0, "totalOrderedQuantity" + ${delta.orderedQuantity})`;
+
       await this.campaignRepository
         .createQueryBuilder()
         .update()
         .set({
-          totalOrderedQuantity: () =>
-            `"totalOrderedQuantity" + ${delta.orderedQuantity}`,
+          totalOrderedQuantity: () => expr,
         })
         .where('id = :id', { id })
         .execute();
     }
 
     if (delta.confirmedQuantity) {
+      const expr = delta.confirmedQuantity >= 0
+        ? `"totalConfirmedQuantity" + ${delta.confirmedQuantity}`
+        : `GREATEST(0, "totalConfirmedQuantity" + ${delta.confirmedQuantity})`;
+
       await this.campaignRepository
         .createQueryBuilder()
         .update()
         .set({
-          totalConfirmedQuantity: () =>
-            `"totalConfirmedQuantity" + ${delta.confirmedQuantity}`,
+          totalConfirmedQuantity: () => expr,
         })
         .where('id = :id', { id })
         .execute();
     }
 
     if (delta.participantDelta) {
+      const expr = delta.participantDelta >= 0
+        ? `"participantCount" + ${delta.participantDelta}`
+        : `GREATEST(0, "participantCount" + ${delta.participantDelta})`;
+
       await this.campaignRepository
         .createQueryBuilder()
         .update()
         .set({
-          participantCount: () =>
-            `"participantCount" + ${delta.participantDelta}`,
+          participantCount: () => expr,
         })
         .where('id = :id', { id })
         .execute();

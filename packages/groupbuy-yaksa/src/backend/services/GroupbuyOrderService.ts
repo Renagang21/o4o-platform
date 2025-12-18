@@ -60,23 +60,29 @@ export class GroupbuyOrderService {
       relations: ['campaign'],
     });
     if (!product) {
-      throw new Error('상품을 찾을 수 없습니다');
+      throw new Error(`[GB-E001] 공동구매 상품을 찾을 수 없습니다 (productId: ${dto.campaignProductId})`);
     }
 
     // 캠페인 확인
-    if (product.campaign?.status !== 'active') {
-      throw new Error('진행 중인 캠페인의 상품만 주문할 수 있습니다');
+    if (!product.campaign) {
+      throw new Error(`[GB-E002] 캠페인 정보가 없습니다 (productId: ${dto.campaignProductId})`);
+    }
+    if (product.campaign.status !== 'active') {
+      throw new Error(`[GB-E003] 진행 중인 캠페인만 주문 가능합니다 (현재 상태: ${product.campaign.status})`);
     }
 
     // 상품 상태 확인
     if (product.status === 'closed') {
-      throw new Error('마감된 상품은 주문할 수 없습니다');
+      throw new Error(`[GB-E004] 마감된 상품은 주문할 수 없습니다 (productId: ${dto.campaignProductId})`);
     }
 
     // 기간 확인
     const now = new Date();
-    if (now < product.startDate || now > product.endDate) {
-      throw new Error('주문 가능 기간이 아닙니다');
+    if (now < product.startDate) {
+      throw new Error(`[GB-E005] 주문 시작 전입니다 (시작일: ${product.startDate.toISOString()})`);
+    }
+    if (now > product.endDate) {
+      throw new Error(`[GB-E006] 주문 기간이 종료되었습니다 (종료일: ${product.endDate.toISOString()})`);
     }
 
     // 최대 수량 확인
@@ -84,12 +90,13 @@ export class GroupbuyOrderService {
       product.maxTotalQuantity &&
       product.orderedQuantity + dto.quantity > product.maxTotalQuantity
     ) {
-      throw new Error('최대 주문 수량을 초과했습니다');
+      const remaining = product.maxTotalQuantity - product.orderedQuantity;
+      throw new Error(`[GB-E007] 최대 주문 수량 초과 (잔여 가능: ${remaining}개, 요청: ${dto.quantity}개)`);
     }
 
     // 수량 검증
     if (dto.quantity < 1) {
-      throw new Error('주문 수량은 1 이상이어야 합니다');
+      throw new Error('[GB-E008] 주문 수량은 1 이상이어야 합니다');
     }
 
     // 트랜잭션으로 주문 생성 및 수량 업데이트
@@ -280,22 +287,22 @@ export class GroupbuyOrderService {
       order.orderStatus = 'cancelled';
       await txOrderRepo.save(order);
 
-      // 상품 수량 감소
+      // 상품 수량 감소 (음수 방지)
       await txProductRepo
         .createQueryBuilder()
         .update()
         .set({
-          orderedQuantity: () => `"orderedQuantity" - ${order.quantity}`,
+          orderedQuantity: () => `GREATEST(0, "orderedQuantity" - ${order.quantity})`,
         })
         .where('id = :id', { id: order.campaignProductId })
         .execute();
 
-      // 캠페인 수량 감소
+      // 캠페인 수량 감소 (음수 방지)
       await txCampaignRepo
         .createQueryBuilder()
         .update()
         .set({
-          totalOrderedQuantity: () => `"totalOrderedQuantity" - ${order.quantity}`,
+          totalOrderedQuantity: () => `GREATEST(0, "totalOrderedQuantity" - ${order.quantity})`,
         })
         .where('id = :id', { id: order.campaignId })
         .execute();
@@ -396,23 +403,23 @@ export class GroupbuyOrderService {
       order.orderStatus = 'cancelled';
       await txOrderRepo.save(order);
 
-      // 상품 확정 수량 감소
+      // 상품 확정 수량 감소 (음수 방지)
       await txProductRepo
         .createQueryBuilder()
         .update()
         .set({
-          confirmedQuantity: () => `"confirmedQuantity" - ${order.quantity}`,
+          confirmedQuantity: () => `GREATEST(0, "confirmedQuantity" - ${order.quantity})`,
         })
         .where('id = :id', { id: order.campaignProductId })
         .execute();
 
-      // 캠페인 확정 수량 감소
+      // 캠페인 확정 수량 감소 (음수 방지)
       await txCampaignRepo
         .createQueryBuilder()
         .update()
         .set({
           totalConfirmedQuantity: () =>
-            `"totalConfirmedQuantity" - ${order.quantity}`,
+            `GREATEST(0, "totalConfirmedQuantity" - ${order.quantity})`,
         })
         .where('id = :id', { id: order.campaignId })
         .execute();

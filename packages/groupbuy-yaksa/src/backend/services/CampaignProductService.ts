@@ -256,11 +256,11 @@ export class CampaignProductService {
     }
 
     if (delta.orderedQuantity) {
-      product.orderedQuantity += delta.orderedQuantity;
+      product.orderedQuantity = Math.max(0, product.orderedQuantity + delta.orderedQuantity);
     }
 
     if (delta.confirmedQuantity) {
-      product.confirmedQuantity += delta.confirmedQuantity;
+      product.confirmedQuantity = Math.max(0, product.confirmedQuantity + delta.confirmedQuantity);
     }
 
     // Phase 2: 최소 수량 달성 시 상태 업데이트
