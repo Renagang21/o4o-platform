@@ -183,6 +183,11 @@ import {
   DisplayLayout,
 } from '@o4o/cosmetics-sample-display-extension';
 
+// ✅ NEW: Checkout entities (Phase N-2)
+import { CheckoutOrder } from '../entities/checkout/CheckoutOrder.entity.js';
+import { CheckoutPayment } from '../entities/checkout/CheckoutPayment.entity.js';
+import { OrderLog } from '../entities/checkout/OrderLog.entity.js';
+
 // ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
 import {
   FeePolicy,
@@ -385,6 +390,10 @@ export const AppDataSource = new DataSource({
     SampleUsageLog,
     SampleConversion,
     DisplayLayout,
+    // ✅ NEW: Checkout entities (Phase N-2)
+    CheckoutOrder,
+    CheckoutPayment,
+    OrderLog,
   ],
   
   // 마이그레이션 설정

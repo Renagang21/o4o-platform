@@ -191,3 +191,11 @@ export function getUserAttributionMapping(): {
     return null;
   }
 }
+
+/**
+ * Cookie에서 파트너 ID 읽기 (Alias)
+ * Phase N-1 Checkout에서 사용
+ */
+export function getPartnerIdFromCookie(): string | null {
+  return getCurrentPartnerCode();
+}

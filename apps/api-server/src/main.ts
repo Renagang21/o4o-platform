@@ -379,6 +379,12 @@ import marketTrialRoutes from './routes/market-trial.routes.js';
 // Partner Routes (Phase K)
 import partnerRoutes from './routes/partner.routes.js';
 
+// Checkout Routes (Phase N-1)
+import checkoutRoutes from './routes/checkout.routes.js';
+
+// Admin Order Routes (Phase N-2)
+import adminOrderRoutes from './routes/admin-orders.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -636,6 +642,15 @@ const startServer = async () => {
     // 22. Register Market Trial routes (Phase L-1)
     app.use('/api/market-trial', marketTrialRoutes);
     logger.info('✅ Market Trial routes registered at /api/market-trial');
+
+    // 23. Register Checkout routes (Phase N-1)
+    app.use('/api/checkout', checkoutRoutes);
+    app.use('/api/orders', checkoutRoutes); // Also mount orders endpoint
+    logger.info('✅ Checkout routes registered at /api/checkout and /api/orders');
+
+    // 24. Register Admin Order routes (Phase N-2)
+    app.use('/api/admin/orders', adminOrderRoutes);
+    logger.info('✅ Admin Order routes registered at /api/admin/orders');
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted

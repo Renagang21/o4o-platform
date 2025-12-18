@@ -5,6 +5,22 @@ export * from './categories';
 export * from './reviews';
 export * from './suppliers';
 export * from './groupbuy';
+export * from './checkout';
+// admin-orders exports - excluding ShippingAddress (duplicate with checkout)
+export {
+  getAdminOrders,
+  getAdminOrder,
+  refundOrder,
+  getOrderLogs,
+  getOrderStats,
+  type AdminOrder,
+  type AdminPayment,
+  type OrderLog,
+  type OrderStats,
+  type OrderListFilters,
+  type OrderListResponse,
+  type OrderItem,
+} from './admin-orders';
 
 // Re-export as a single API object for convenience
 import { productsApi } from './products';

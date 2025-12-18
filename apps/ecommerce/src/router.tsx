@@ -4,7 +4,7 @@ import { HomePage } from './pages/HomePage';
 import { ProductsPage } from './pages/ProductsPage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CartPage } from './pages/CartPage';
-import { CheckoutPage } from './pages/CheckoutPage';
+import { CheckoutPage, CheckoutResultPage } from './pages/checkout';
 import { OrdersPage } from './pages/OrdersPage';
 import { OrderDetailPage } from './pages/OrderDetailPage';
 import { LoginPage } from './pages/LoginPage';
@@ -40,6 +40,9 @@ import {
   MarketTrialJoinPage
 } from './pages/market-trial';
 
+// Admin pages (Phase N-2)
+import { AdminOrderList, AdminOrderDetail } from './pages/admin/orders';
+
 // Vendor Dashboard imports
 import VendorLayout from './pages/vendor/layout/VendorLayout';
 // import VendorDashboard from './pages/vendor/Dashboard';
@@ -72,6 +75,10 @@ export const router = createBrowserRouter([
       {
         path: 'checkout',
         element: <CheckoutPage />,
+      },
+      {
+        path: 'checkout/result',
+        element: <CheckoutResultPage />,
       },
       {
         path: 'orders',
@@ -206,6 +213,21 @@ export const router = createBrowserRouter([
       {
         path: ':trialId/join',
         element: <MarketTrialJoinPage />,
+      },
+    ],
+  },
+  // Admin routes (Phase N-2)
+  {
+    path: '/admin',
+    element: <Layout />,
+    children: [
+      {
+        path: 'orders',
+        element: <AdminOrderList />,
+      },
+      {
+        path: 'orders/:orderId',
+        element: <AdminOrderDetail />,
       },
     ],
   },
