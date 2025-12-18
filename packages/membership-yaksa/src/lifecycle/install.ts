@@ -1,31 +1,49 @@
 import { DataSource } from 'typeorm';
 import { MemberCategory } from '../backend/entities/MemberCategory.js';
-import * as Entities from '../backend/entities/index.js';
 
 /**
  * Membership-Yaksa Install Hook
  *
- * 앱 설치 시 실행되는 초기화 작업
- * - 테이블 생성 (synchronize)
- * - 기본 회원 분류 생성
+ * Phase R1 변경:
+ * - synchronize() 호출 제거 (위험 작업)
+ * - install()은 "앱이 존재할 수 있는 상태"만 보장
+ * - DB 스키마 변경은 migration을 통해서만 수행
+ *
+ * 설치 시 수행:
+ * - 기본 회원 분류 생성 (데이터 seed)
  */
 export async function install(dataSource: DataSource): Promise<void> {
   console.log('[Membership-Yaksa] Installing...');
 
-  // Step 1: Create tables using synchronize
-  // Note: This is a temporary solution. Proper migrations should be created.
-  // See: docs/reference/guidelines/SCHEMA_DRIFT_PREVENTION_GUIDE.md
-  console.log('[Membership-Yaksa] Creating tables...');
+  // Phase R1: synchronize 제거
+  // DB 스키마는 migration을 통해 관리됨
+  // install()은 앱이 작동하기 위한 기본 데이터만 생성
+  console.log('[Membership-Yaksa] Phase R1: synchronize removed, using migrations for schema');
 
-  const entities = Object.values(Entities);
-  await dataSource.synchronize(false); // false = don't drop existing tables
+  try {
+    // 기본 회원 분류 생성 (데이터 seed)
+    await seedDefaultCategories(dataSource);
+    console.log('[Membership-Yaksa] Installation completed');
+  } catch (error) {
+    // 테이블이 없으면 migration이 먼저 실행되어야 함
+    if (error instanceof Error && error.message.includes('does not exist')) {
+      console.error('[Membership-Yaksa] Tables not found. Please run migrations first.');
+      console.error('[Membership-Yaksa] Migration path: packages/membership-yaksa/src/migrations/');
+      throw new Error('Membership-Yaksa requires migration before install');
+    }
+    throw error;
+  }
+}
 
-  console.log('[Membership-Yaksa] Tables created successfully');
+/**
+ * 기본 회원 분류 데이터 seed
+ */
+async function seedDefaultCategories(dataSource: DataSource): Promise<void> {
+  console.log('[Membership-Yaksa] Seeding default categories...');
 
-  // Step 2: Create default categories
   const categoryRepo = dataSource.getRepository(MemberCategory);
 
-  // 기본 회원 분류 생성
+  // 기본 회원 분류 정의
   const defaultCategories = [
     {
       name: '정회원',
@@ -66,6 +84,4 @@ export async function install(dataSource: DataSource): Promise<void> {
       console.log(`[Membership-Yaksa] Created category: ${categoryData.name}`);
     }
   }
-
-  console.log('[Membership-Yaksa] Installation completed');
 }

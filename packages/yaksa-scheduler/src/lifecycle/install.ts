@@ -1,12 +1,16 @@
 /**
  * Yaksa Scheduler Install Lifecycle Hook
- * Phase 19-A / Phase 19-E
+ * Phase 19-A / Phase R1: Structural Stabilization
  *
- * Registers default job seeds for Yaksa service automation
+ * Phase R1 변경:
+ * - 하드코딩된 DEFAULT_JOB_SEEDS 제거
+ * - JobRegistry를 통해 각 앱이 등록한 Job 정의만 seed
+ * - Scheduler는 특정 앱을 알지 않는다
  */
 
 import type { EntityManager } from 'typeorm';
 import { ScheduledJob } from '../backend/entities/ScheduledJob.js';
+import { jobRegistry } from '../registry/JobRegistry.js';
 
 export interface InstallContext {
   entityManager: EntityManager;
@@ -14,109 +18,27 @@ export interface InstallContext {
 }
 
 /**
- * Default job seeds for Yaksa services
- * Phase 19-E: 6 core automation jobs
+ * Install hook
+ *
+ * Phase R1: Scheduler의 install은 테이블 구조만 보장
+ * Job seeding은 각 앱의 install/activate에서 담당
  */
-const DEFAULT_JOB_SEEDS: Array<Partial<ScheduledJob>> = [
-  // ===== Annualfee-Yaksa Jobs =====
-  {
-    name: '미납 청구서 연체 체크',
-    description: '매일 01:00에 납부기한이 지난 청구서를 연체 상태로 마킹',
-    targetService: 'annualfee-yaksa',
-    actionType: 'invoice_overdue_check',
-    cronExpression: '0 1 * * *', // Every day at 01:00
-    timezone: 'Asia/Seoul',
-    status: 'active',
-    config: {
-      overdueThresholdDays: 0,
-      notifyOnFailure: true,
-    },
-  },
-  {
-    name: '연회비 납부 알림',
-    description: '매일 09:00에 미납 회원에게 납부 리마인더 발송',
-    targetService: 'annualfee-yaksa',
-    actionType: 'settlement_reminder',
-    cronExpression: '0 9 * * *', // Every day at 09:00
-    timezone: 'Asia/Seoul',
-    status: 'active',
-    config: {
-      notifyOnSuccess: false,
-      notifyOnFailure: true,
-    },
-  },
-
-  // ===== Membership-Yaksa Jobs =====
-  {
-    name: '면허 검증 만료 체크',
-    description: '매일 02:00에 만료된 면허 검증을 만료 상태로 마킹',
-    targetService: 'membership-yaksa',
-    actionType: 'verification_expiry_check',
-    cronExpression: '0 2 * * *', // Every day at 02:00
-    timezone: 'Asia/Seoul',
-    status: 'active',
-    config: {
-      expiryWarningDays: 30,
-      notifyOnFailure: true,
-    },
-  },
-  {
-    name: '면허 갱신 리마인더',
-    description: '매일 09:30에 갱신 기한 임박 회원에게 알림 발송',
-    targetService: 'membership-yaksa',
-    actionType: 'license_renewal_reminder',
-    cronExpression: '30 9 * * *', // Every day at 09:30
-    timezone: 'Asia/Seoul',
-    status: 'active',
-    config: {
-      expiryWarningDays: 30,
-      notifyOnSuccess: false,
-      notifyOnFailure: true,
-    },
-  },
-
-  // ===== LMS-Yaksa Jobs =====
-  {
-    name: '교육 배정 만료 체크',
-    description: '매일 03:00에 기한이 지난 교육 배정을 만료 상태로 마킹',
-    targetService: 'lms-yaksa',
-    actionType: 'assignment_expiry_check',
-    cronExpression: '0 3 * * *', // Every day at 03:00
-    timezone: 'Asia/Seoul',
-    status: 'active',
-    config: {
-      notifyOnFailure: true,
-    },
-  },
-
-  // ===== Reporting-Yaksa Jobs =====
-  {
-    name: '실패 제출 재시도',
-    description: '매일 04:00에 외부 제출 실패 건 자동 재시도',
-    targetService: 'reporting-yaksa',
-    actionType: 'failed_submission_retry',
-    cronExpression: '0 4 * * *', // Every day at 04:00
-    timezone: 'Asia/Seoul',
-    status: 'active',
-    config: {
-      maxRetries: 3,
-      retryDelayMinutes: 30,
-      notifyOnFailure: true,
-    },
-  },
-];
-
 export async function install(context: InstallContext): Promise<void> {
   console.log('[yaksa-scheduler] Installing...');
 
   const { entityManager, organizationId } = context;
 
   try {
-    // Seed default jobs if this is an organization install
+    // Phase R1: Scheduler의 install은 인프라 준비만 담당
+    // 각 앱의 Job seed는 해당 앱의 lifecycle에서 처리
+    console.log('[yaksa-scheduler] Phase R1: Scheduler does not seed app-specific jobs');
+    console.log('[yaksa-scheduler] Each app should register and seed its own jobs via JobRegistry');
+
+    // 기존 Job 확인 (마이그레이션 지원)
     if (organizationId) {
-      await seedDefaultJobs(entityManager, organizationId);
-    } else {
-      console.log('[yaksa-scheduler] Skipping job seeding (no organizationId)');
+      const jobRepo = entityManager.getRepository(ScheduledJob);
+      const existingJobs = await jobRepo.count({ where: { organizationId } });
+      console.log(`[yaksa-scheduler] Organization ${organizationId} has ${existingJobs} existing jobs`);
     }
 
     console.log('[yaksa-scheduler] Install complete');
@@ -127,61 +49,93 @@ export async function install(context: InstallContext): Promise<void> {
 }
 
 /**
- * Seed default jobs for an organization
+ * Seed jobs from JobRegistry for a specific organization
+ *
+ * 각 앱의 install()에서 호출하여 자신의 Job을 seed
+ * 예: membership-yaksa.install() -> seedJobsFromRegistry('membership-yaksa', orgId)
+ *
+ * @param entityManager TypeORM EntityManager
+ * @param targetService 앱의 service ID
+ * @param organizationId 조직 ID
  */
-async function seedDefaultJobs(
+export async function seedJobsFromRegistry(
   entityManager: EntityManager,
+  targetService: string,
   organizationId: string
-): Promise<void> {
-  console.log(`[yaksa-scheduler] Seeding default jobs for org: ${organizationId}`);
+): Promise<{ created: number; skipped: number }> {
+  console.log(`[yaksa-scheduler] Seeding jobs from registry for: ${targetService}`);
 
   const jobRepo = entityManager.getRepository(ScheduledJob);
+  const jobDefinitions = jobRegistry.getJobDefinitionsForService(targetService);
 
-  for (const seed of DEFAULT_JOB_SEEDS) {
-    // Check if job already exists
+  let created = 0;
+  let skipped = 0;
+
+  for (const def of jobDefinitions) {
+    // 중복 체크
     const existing = await jobRepo.findOne({
       where: {
         organizationId,
-        targetService: seed.targetService,
-        actionType: seed.actionType,
+        targetService: def.targetService,
+        actionType: def.actionType,
       },
     });
 
     if (existing) {
-      console.log(`[yaksa-scheduler] Job already exists: ${seed.name}`);
+      console.log(`[yaksa-scheduler] Job already exists: ${def.name}`);
+      skipped++;
       continue;
     }
 
-    // Create new job
+    // Job 생성
     const job = jobRepo.create({
-      ...seed,
+      name: def.name,
+      description: def.description,
+      targetService: def.targetService,
+      actionType: def.actionType,
+      cronExpression: def.defaultCronExpression,
+      timezone: def.timezone || 'Asia/Seoul',
+      status: 'active',
+      config: def.defaultConfig,
       organizationId,
     });
 
     await jobRepo.save(job);
-    console.log(`[yaksa-scheduler] Created job: ${seed.name}`);
+    console.log(`[yaksa-scheduler] Created job: ${def.name}`);
+    created++;
   }
 
-  console.log('[yaksa-scheduler] Job seeding complete');
+  return { created, skipped };
 }
 
 /**
- * Seed jobs for a specific organization (callable from admin API)
+ * @deprecated Use seedJobsFromRegistry instead
+ * Kept for backward compatibility during migration
  */
 export async function seedJobsForOrganization(
   entityManager: EntityManager,
   organizationId: string
 ): Promise<{ created: number; skipped: number }> {
+  console.warn('[yaksa-scheduler] seedJobsForOrganization is deprecated. Use seedJobsFromRegistry instead.');
+
+  // Phase R1: 모든 등록된 Job 정의에서 seed
+  const allDefinitions = jobRegistry.getAllJobDefinitions();
+
+  if (allDefinitions.length === 0) {
+    console.warn('[yaksa-scheduler] No job definitions registered in JobRegistry');
+    return { created: 0, skipped: 0 };
+  }
+
   const jobRepo = entityManager.getRepository(ScheduledJob);
   let created = 0;
   let skipped = 0;
 
-  for (const seed of DEFAULT_JOB_SEEDS) {
+  for (const def of allDefinitions) {
     const existing = await jobRepo.findOne({
       where: {
         organizationId,
-        targetService: seed.targetService,
-        actionType: seed.actionType,
+        targetService: def.targetService,
+        actionType: def.actionType,
       },
     });
 
@@ -191,7 +145,14 @@ export async function seedJobsForOrganization(
     }
 
     const job = jobRepo.create({
-      ...seed,
+      name: def.name,
+      description: def.description,
+      targetService: def.targetService,
+      actionType: def.actionType,
+      cronExpression: def.defaultCronExpression,
+      timezone: def.timezone || 'Asia/Seoul',
+      status: 'active',
+      config: def.defaultConfig,
       organizationId,
     });
 

@@ -24,21 +24,32 @@ export type JobStatus = 'active' | 'paused' | 'disabled' | 'error';
 
 /**
  * Target service types for scheduling
+ *
+ * Phase R1: 확장 가능한 타입으로 변경
+ * - 기존 앱 ID들은 Known Services로 유지 (하위 호환)
+ * - 새로운 앱은 string으로 등록 가능
  */
-export type JobTargetService =
+export type KnownJobTargetService =
   | 'annualfee-yaksa'
   | 'membership-yaksa'
   | 'lms-yaksa'
   | 'reporting-yaksa'
   | 'forum-yaksa';
 
+// Phase R1: JobTargetService는 이제 모든 string을 허용
+export type JobTargetService = KnownJobTargetService | (string & {});
+
 /**
  * Job action types
+ *
+ * Phase R1: 확장 가능한 타입으로 변경
+ * - 기존 액션 타입들은 Known Actions로 유지 (하위 호환)
+ * - 새로운 액션은 string으로 등록 가능
  */
-export type JobActionType =
+export type KnownJobActionType =
   // Annualfee actions
   | 'invoice_overdue_check'
-  | 'invoice_due_date_warning' // Phase 20-B: D-7 warning
+  | 'invoice_due_date_warning'
   | 'exemption_expiry_check'
   | 'settlement_reminder'
   // Membership actions
@@ -52,6 +63,9 @@ export type JobActionType =
   | 'report_deadline_reminder'
   // Generic
   | 'custom';
+
+// Phase R1: JobActionType은 이제 모든 string을 허용
+export type JobActionType = KnownJobActionType | (string & {});
 
 @Entity('scheduled_jobs')
 @Index(['organizationId', 'status'])

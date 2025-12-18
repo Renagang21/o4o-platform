@@ -25,6 +25,9 @@ export * from './backend/controllers/index.js';
 // Routes
 export * from './backend/routes/index.js';
 
+// Ports (Phase R1: External access interfaces)
+export * from './ports/index.js';
+
 // Lifecycle
 export { install } from './lifecycle/install.js';
 export { activate } from './lifecycle/activate.js';
