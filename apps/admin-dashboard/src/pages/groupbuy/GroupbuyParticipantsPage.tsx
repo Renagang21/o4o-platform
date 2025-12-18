@@ -1,6 +1,13 @@
+/**
+ * Groupbuy Participants Page
+ * Phase 3: UI Integration
+ *
+ * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ */
+
 import { FC } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, XCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useParticipants, GroupbuyParticipant } from '@/hooks/groupbuy';
 import { useCampaignDetail } from '@/hooks/groupbuy';
 import { PermissionGuard } from '@/components/organization/PermissionGuard';
@@ -10,116 +17,64 @@ const GroupbuyParticipantsPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { campaign, loading: campaignLoading } = useCampaignDetail(id);
-  const { participants, loading: participantsLoading, cancelParticipant } = useParticipants(id);
+  const { participants, loading: participantsLoading } = useParticipants(id);
 
-  const handleCancel = async (participantId: string) => {
-    if (!id || !window.confirm('이 참여를 취소하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      await cancelParticipant(id, participantId);
-    } catch (error) {
-      // Error handled in hook
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const config = {
-      pending: { label: '대기', bg: 'bg-yellow-100', text: 'text-yellow-800' },
-      confirmed: { label: '확정', bg: 'bg-green-100', text: 'text-green-800' },
-      cancelled: { label: '취소', bg: 'bg-red-100', text: 'text-red-800' }
-    }[status] || { label: status, bg: 'bg-gray-100', text: 'text-gray-800' };
-
-    return (
-      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${config.bg} ${config.text}`}>
-        {config.label}
-      </span>
-    );
-  };
-
+  // No price columns - Work Order constraint
   const columns: Column<GroupbuyParticipant>[] = [
     {
-      key: 'joinedAt',
-      title: '참여일시',
-      dataIndex: 'joinedAt',
-      sortable: true,
-      render: (date) => new Date(date).toLocaleString('ko-KR')
-    },
-    {
-      key: 'user',
-      title: '참여자',
-      render: (_, record) => (
+      key: 'pharmacyId',
+      title: '약국 ID',
+      dataIndex: 'pharmacyId',
+      render: (pharmacyId, record) => (
         <div className="flex flex-col">
-          <span className="font-medium text-gray-900">{record.user?.name || '-'}</span>
-          <span className="text-xs text-gray-500">{record.user?.email || ''}</span>
+          <span className="font-medium text-gray-900">{record.pharmacyName || pharmacyId}</span>
+          <span className="text-xs text-gray-500">{pharmacyId}</span>
         </div>
       )
     },
     {
-      key: 'quantity',
-      title: '수량',
-      dataIndex: 'quantity',
+      key: 'totalQuantity',
+      title: '주문 수량',
+      dataIndex: 'totalQuantity',
       align: 'center',
       sortable: true,
       render: (quantity) => `${quantity}개`
     },
     {
-      key: 'unitPrice',
-      title: '단가',
-      dataIndex: 'unitPrice',
-      align: 'right',
-      sortable: true,
-      render: (price) => `${price.toLocaleString()}원`
-    },
-    {
-      key: 'totalAmount',
-      title: '결제 금액',
-      dataIndex: 'totalAmount',
-      align: 'right',
-      sortable: true,
-      render: (amount) => (
-        <span className="font-medium text-gray-900">{amount.toLocaleString()}원</span>
-      )
-    },
-    {
-      key: 'status',
-      title: '상태',
-      dataIndex: 'status',
-      render: (status) => getStatusBadge(status)
-    },
-    {
-      key: 'actions',
-      title: '작업',
+      key: 'pendingQuantity',
+      title: '대기 수량',
+      dataIndex: 'pendingQuantity',
       align: 'center',
-      render: (_, record) => (
-        <div className="flex items-center justify-center gap-2">
-          {record.status !== 'cancelled' && (
-            <PermissionGuard required={['organization.manage']} showMessage={false}>
-              <button
-                onClick={() => handleCancel(record.id)}
-                className="flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
-                title="참여 취소"
-              >
-                <XCircle className="w-3 h-3" />
-                취소
-              </button>
-            </PermissionGuard>
-          )}
-        </div>
+      render: (quantity) => (
+        <span className={quantity > 0 ? 'text-yellow-600' : 'text-gray-400'}>
+          {quantity}개
+        </span>
       )
+    },
+    {
+      key: 'confirmedQuantity',
+      title: '확정 수량',
+      dataIndex: 'confirmedQuantity',
+      align: 'center',
+      render: (quantity) => (
+        <span className={quantity > 0 ? 'text-green-600 font-medium' : 'text-gray-400'}>
+          {quantity}개
+        </span>
+      )
+    },
+    {
+      key: 'orderCount',
+      title: '주문 건수',
+      dataIndex: 'orderCount',
+      align: 'center',
+      render: (count) => `${count}건`
     }
   ];
 
-  const totalAmount = participants
-    .filter(p => p.status !== 'cancelled')
-    .reduce((sum, p) => sum + p.totalAmount, 0);
-
-  const totalQuantity = participants
-    .filter(p => p.status !== 'cancelled')
-    .reduce((sum, p) => sum + p.quantity, 0);
-
-  const confirmedCount = participants.filter(p => p.status === 'confirmed').length;
+  // Calculate summary stats (quantity only, no price)
+  const totalQuantity = participants.reduce((sum, p) => sum + p.totalQuantity, 0);
+  const totalConfirmed = participants.reduce((sum, p) => sum + p.confirmedQuantity, 0);
+  const totalPending = participants.reduce((sum, p) => sum + p.pendingQuantity, 0);
 
   if (campaignLoading) {
     return (
@@ -157,38 +112,38 @@ const GroupbuyParticipantsPage: FC = () => {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">참여자 관리</h1>
-                <p className="text-sm text-gray-500 mt-1">{campaign.name}</p>
+                <h1 className="text-2xl font-semibold text-gray-900">참여자 현황</h1>
+                <p className="text-sm text-gray-500 mt-1">{campaign.title}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Summary Stats */}
+        {/* Summary Stats - No price information */}
         <div className="bg-white border-b px-6 py-4">
           <div className="grid grid-cols-4 gap-6">
             <div>
-              <div className="text-sm text-gray-500">총 참여자</div>
+              <div className="text-sm text-gray-500">참여 약국</div>
               <div className="text-2xl font-bold text-gray-900 mt-1">
-                {participants.length}명
+                {participants.length}개
               </div>
             </div>
             <div>
-              <div className="text-sm text-gray-500">확정된 참여</div>
-              <div className="text-2xl font-bold text-green-600 mt-1">
-                {confirmedCount}명
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">총 수량</div>
+              <div className="text-sm text-gray-500">총 주문 수량</div>
               <div className="text-2xl font-bold text-gray-900 mt-1">
                 {totalQuantity}개
               </div>
             </div>
             <div>
-              <div className="text-sm text-gray-500">총 금액</div>
-              <div className="text-2xl font-bold text-blue-600 mt-1">
-                {totalAmount.toLocaleString()}원
+              <div className="text-sm text-gray-500">대기 수량</div>
+              <div className="text-2xl font-bold text-yellow-600 mt-1">
+                {totalPending}개
+              </div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">확정 수량</div>
+              <div className="text-2xl font-bold text-green-600 mt-1">
+                {totalConfirmed}개
               </div>
             </div>
           </div>
@@ -200,9 +155,9 @@ const GroupbuyParticipantsPage: FC = () => {
             <DataTable
               columns={columns}
               dataSource={participants}
-              rowKey="id"
+              rowKey="pharmacyId"
               loading={participantsLoading}
-              emptyText="참여자가 없습니다"
+              emptyText="참여 약국이 없습니다"
             />
           </div>
         </div>

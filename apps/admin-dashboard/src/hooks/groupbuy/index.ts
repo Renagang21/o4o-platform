@@ -1,5 +1,15 @@
+/**
+ * Groupbuy Hooks Index
+ * Phase 3: UI Integration
+ */
+
 export { useGroupbuyCampaigns } from './useGroupbuyCampaigns';
-export type { GroupbuyCampaign } from './useGroupbuyCampaigns';
+export type {
+  GroupbuyCampaign,
+  CampaignProduct,
+  CampaignStatus,
+  CampaignProductStatus
+} from './useGroupbuyCampaigns';
 
 export { useCampaignDetail } from './useCampaignDetail';
 

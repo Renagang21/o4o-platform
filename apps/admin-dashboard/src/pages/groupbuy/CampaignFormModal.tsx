@@ -1,8 +1,14 @@
+/**
+ * Campaign Form Modal
+ * Phase 3: UI Integration
+ *
+ * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ */
+
 import { FC, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useGroupbuyCampaigns, GroupbuyCampaign } from '@/hooks/groupbuy';
 import { OrganizationSelector } from '@/components/organization/OrganizationSelector';
-import { ProductSelector } from '@/components/product/ProductSelector';
 
 interface CampaignFormModalProps {
   campaign: GroupbuyCampaign | null;
@@ -13,34 +19,23 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
   const { createCampaign, updateCampaign } = useGroupbuyCampaigns({ autoFetch: false });
   const [submitting, setSubmitting] = useState(false);
 
+  // Phase 3: Campaign is a container - no price fields
   const [formData, setFormData] = useState({
     organizationId: '',
-    productId: '',
-    name: '',
+    title: '',
     description: '',
-    groupPrice: 0,
-    regularPrice: 0,
-    minQuantity: 0,
-    maxQuantity: 0,
     startDate: '',
-    endDate: '',
-    isOrganizationExclusive: false
+    endDate: ''
   });
 
   useEffect(() => {
     if (campaign) {
       setFormData({
         organizationId: campaign.organizationId || '',
-        productId: campaign.productId || '',
-        name: campaign.name || '',
+        title: campaign.title || '',
         description: campaign.description || '',
-        groupPrice: campaign.groupPrice || 0,
-        regularPrice: campaign.regularPrice || 0,
-        minQuantity: campaign.minQuantity || 0,
-        maxQuantity: campaign.maxQuantity || 0,
         startDate: campaign.startDate ? new Date(campaign.startDate).toISOString().slice(0, 16) : '',
-        endDate: campaign.endDate ? new Date(campaign.endDate).toISOString().slice(0, 16) : '',
-        isOrganizationExclusive: campaign.isOrganizationExclusive || false
+        endDate: campaign.endDate ? new Date(campaign.endDate).toISOString().slice(0, 16) : ''
       });
     }
   }, [campaign]);
@@ -53,8 +48,7 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
       const payload = {
         ...formData,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
-        maxQuantity: formData.maxQuantity || undefined
+        endDate: new Date(formData.endDate).toISOString()
       };
 
       if (campaign) {
@@ -71,25 +65,12 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-
-    if (type === 'checkbox') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: (e.target as HTMLInputElement).checked
-      }));
-    } else if (type === 'number') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: parseFloat(value) || 0
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -117,15 +98,15 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
-          {/* Campaign Name */}
+          {/* Campaign Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               캠페인명 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -148,96 +129,18 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
 
           {/* Organization */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">조직</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              조직 <span className="text-red-500">*</span>
+            </label>
             <OrganizationSelector
               value={formData.organizationId}
               onChange={(orgId) => setFormData(prev => ({ ...prev, organizationId: orgId }))}
-              placeholder="전체 조직"
+              placeholder="조직을 선택하세요"
               filterByPermission
             />
             <p className="text-xs text-gray-500 mt-1">
-              선택하지 않으면 전체 조직 대상 캠페인입니다
+              공동구매를 진행할 지부/분회를 선택하세요
             </p>
-          </div>
-
-          {/* Product Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              상품 선택 <span className="text-red-500">*</span>
-            </label>
-            <ProductSelector
-              value={formData.productId}
-              onChange={(productId) => setFormData(prev => ({ ...prev, productId }))}
-              placeholder="상품을 검색하거나 선택하세요"
-              required
-            />
-          </div>
-
-          {/* Pricing */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                정가 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="regularPrice"
-                value={formData.regularPrice}
-                onChange={handleChange}
-                required
-                min="0"
-                step="100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="50000"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                공동구매가 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="groupPrice"
-                value={formData.groupPrice}
-                onChange={handleChange}
-                required
-                min="0"
-                step="100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="35000"
-              />
-            </div>
-          </div>
-
-          {/* Quantity */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                최소 수량 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="minQuantity"
-                value={formData.minQuantity}
-                onChange={handleChange}
-                required
-                min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">최대 수량</label>
-              <input
-                type="number"
-                name="maxQuantity"
-                value={formData.maxQuantity}
-                onChange={handleChange}
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="제한 없음"
-              />
-            </div>
           </div>
 
           {/* Dates */}
@@ -270,19 +173,12 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
             </div>
           </div>
 
-          {/* Organization Exclusive */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="isOrganizationExclusive"
-              id="isOrganizationExclusive"
-              checked={formData.isOrganizationExclusive}
-              onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="isOrganizationExclusive" className="ml-2 block text-sm text-gray-900">
-              조직 전용 캠페인 (선택한 조직 멤버만 참여 가능)
-            </label>
+          {/* Note about products */}
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+            <p className="text-sm text-blue-800">
+              캠페인 생성 후 상품을 추가할 수 있습니다.
+              상품별로 최소 수량과 기간을 설정합니다.
+            </p>
           </div>
 
           {/* Actions */}

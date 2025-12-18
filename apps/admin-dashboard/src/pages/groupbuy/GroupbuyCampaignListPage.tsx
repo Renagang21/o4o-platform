@@ -1,12 +1,18 @@
+/**
+ * Groupbuy Campaign List Page
+ * Phase 3: UI Integration
+ *
+ * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ */
+
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Eye, Edit2, Trash2, Users } from 'lucide-react';
+import { Plus, Eye, Edit2, Trash2, Users, CheckCircle, XCircle } from 'lucide-react';
 import { OrganizationSelector } from '@/components/organization/OrganizationSelector';
 import { PermissionGuard } from '@/components/organization/PermissionGuard';
 import { DataTable, Column } from '@/components/common/DataTable';
 import {
   GroupbuyStatusBadge,
-  GroupbuyQuantityProgressBar,
   DeadlineCountdown
 } from '@/components/groupbuy';
 import { useGroupbuyCampaigns, GroupbuyCampaign } from '@/hooks/groupbuy';
@@ -23,7 +29,9 @@ const GroupbuyCampaignListPage: FC = () => {
     loading,
     deleteCampaign,
     activateCampaign,
-    closeCampaign
+    closeCampaign,
+    completeCampaign,
+    cancelCampaign
   } = useGroupbuyCampaigns({
     organizationId: selectedOrg || undefined,
     status: statusFilter || undefined
@@ -70,6 +78,30 @@ const GroupbuyCampaignListPage: FC = () => {
     }
   };
 
+  const handleComplete = async (id: string) => {
+    if (!window.confirm('이 캠페인을 완료 처리하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await completeCampaign(id);
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const handleCancel = async (id: string) => {
+    if (!window.confirm('정말 이 캠페인을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      await cancelCampaign(id);
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
   const handleCreate = () => {
     setSelectedCampaign(null);
     setFormModalOpen(true);
@@ -77,17 +109,17 @@ const GroupbuyCampaignListPage: FC = () => {
 
   const columns: Column<GroupbuyCampaign>[] = [
     {
-      key: 'name',
+      key: 'title',
       title: '캠페인명',
-      dataIndex: 'name',
+      dataIndex: 'title',
       sortable: true,
-      render: (name, record) => (
+      render: (title, record) => (
         <div className="flex flex-col">
           <Link
             to={`/admin/groupbuy/${record.id}`}
             className="font-medium text-blue-600 hover:text-blue-800"
           >
-            {name}
+            {title}
           </Link>
           {record.description && (
             <span className="text-xs text-gray-500 mt-1 line-clamp-1">
@@ -98,35 +130,22 @@ const GroupbuyCampaignListPage: FC = () => {
       )
     },
     {
-      key: 'organization',
-      title: '조직',
-      dataIndex: ['organization', 'name'],
-      render: (orgName) => orgName || <span className="text-gray-400">전체</span>
-    },
-    {
-      key: 'product',
-      title: '상품',
-      dataIndex: ['product', 'name'],
-      render: (productName) => productName || '-'
-    },
-    {
       key: 'status',
       title: '상태',
       dataIndex: 'status',
       render: (status) => <GroupbuyStatusBadge status={status} />
     },
     {
-      key: 'progress',
-      title: '진행도',
+      key: 'quantity',
+      title: '수량',
+      align: 'center',
       render: (_, record) => (
-        <GroupbuyQuantityProgressBar
-          currentQuantity={record.currentQuantity}
-          minQuantity={record.minQuantity}
-          maxQuantity={record.maxQuantity}
-          size="small"
-        />
-      ),
-      width: '200px'
+        <div className="text-sm">
+          <span className="font-medium">{record.totalOrderedQuantity}</span>
+          <span className="text-gray-400 mx-1">/</span>
+          <span className="text-green-600">{record.totalConfirmedQuantity}</span>
+        </div>
+      )
     },
     {
       key: 'deadline',
@@ -136,7 +155,7 @@ const GroupbuyCampaignListPage: FC = () => {
     },
     {
       key: 'participants',
-      title: '참여자',
+      title: '참여',
       dataIndex: 'participantCount',
       align: 'center',
       render: (count) => `${count}명`
@@ -146,7 +165,7 @@ const GroupbuyCampaignListPage: FC = () => {
       title: '작업',
       align: 'center',
       render: (_, record) => (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1">
           <Link
             to={`/admin/groupbuy/${record.id}`}
             className="p-1 text-blue-600 hover:bg-blue-50 rounded"
@@ -172,32 +191,43 @@ const GroupbuyCampaignListPage: FC = () => {
             {record.status === 'draft' && (
               <button
                 onClick={() => handleActivate(record.id)}
-                className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                 title="활성화"
               >
-                활성화
+                <CheckCircle className="w-4 h-4" />
               </button>
             )}
             {record.status === 'active' && (
               <button
                 onClick={() => handleClose(record.id)}
-                className="px-2 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700"
+                className="p-1 text-orange-600 hover:bg-orange-50 rounded"
                 title="마감"
               >
-                마감
+                <XCircle className="w-4 h-4" />
               </button>
             )}
-            <button
-              onClick={() => handleDelete(record.id)}
-              className="p-1 text-red-600 hover:bg-red-50 rounded"
-              title="삭제"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            {record.status === 'closed' && (
+              <button
+                onClick={() => handleComplete(record.id)}
+                className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                title="완료"
+              >
+                완료
+              </button>
+            )}
+            {(record.status === 'draft' || record.status === 'active') && (
+              <button
+                onClick={() => handleCancel(record.id)}
+                className="p-1 text-red-600 hover:bg-red-50 rounded"
+                title="취소"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
           </PermissionGuard>
         </div>
       ),
-      width: '220px'
+      width: '200px'
     }
   ];
 
@@ -243,11 +273,9 @@ const GroupbuyCampaignListPage: FC = () => {
               >
                 <option value="">전체</option>
                 <option value="draft">초안</option>
-                <option value="upcoming">시작 예정</option>
                 <option value="active">진행 중</option>
-                <option value="success">성공</option>
-                <option value="failed">실패</option>
-                <option value="closed">종료</option>
+                <option value="closed">마감</option>
+                <option value="completed">완료</option>
                 <option value="cancelled">취소</option>
               </select>
             </div>

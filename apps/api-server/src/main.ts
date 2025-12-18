@@ -370,6 +370,9 @@ import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extensi
 // Cosmetics Supplier Extension Routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
 import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension';
 
+// Groupbuy-Yaksa Routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
+import { createGroupbuyRoutes } from '@o4o/groupbuy-yaksa';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -607,6 +610,17 @@ const startServer = async () => {
       logger.info('✅ Cosmetics Supplier routes registered at /api/v1/cosmetics-supplier');
     } catch (cosmeticsSupplierError) {
       logger.error('Failed to register cosmetics-supplier routes:', cosmeticsSupplierError);
+    }
+
+    // 20. Register Groupbuy-Yaksa routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
+    try {
+      const groupbuyRoutes = createGroupbuyRoutes(AppDataSource);
+      app.use('/api/v1/yaksa/groupbuy', groupbuyRoutes);
+      // Also mount at /api/groupbuy for backward compatibility with existing hooks
+      app.use('/api/groupbuy', groupbuyRoutes);
+      logger.info('✅ Groupbuy-Yaksa routes registered at /api/v1/yaksa/groupbuy and /api/groupbuy');
+    } catch (groupbuyError) {
+      logger.error('Failed to register groupbuy-yaksa routes:', groupbuyError);
     }
 
     // 6. Core routes now registered via dynamic module loader

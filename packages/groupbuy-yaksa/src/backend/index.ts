@@ -1,6 +1,6 @@
 /**
  * Groupbuy-Yaksa Backend
- * Phase 1: Entity & Domain Model
+ * Phase 3: UI Integration
  */
 
 // Entities
@@ -20,6 +20,7 @@ export {
   GroupbuyCampaignService,
   type CreateCampaignDto,
   type UpdateCampaignDto,
+  type CampaignCloseResult,
   CampaignProductService,
   type CreateCampaignProductDto,
   type UpdateCampaignProductDto,
@@ -27,3 +28,6 @@ export {
   type CreateGroupbuyOrderDto,
   type OrderQuantitySummary,
 } from './services/index.js';
+
+// Routes
+export { createGroupbuyRoutes } from './routes/index.js';

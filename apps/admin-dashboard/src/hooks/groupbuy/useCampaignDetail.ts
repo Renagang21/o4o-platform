@@ -1,3 +1,8 @@
+/**
+ * Groupbuy Campaign Detail Hook
+ * Phase 3: UI Integration
+ */
+
 import { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -14,9 +19,11 @@ export const useCampaignDetail = (campaignId?: string) => {
 
     try {
       const response = await authClient.api.get(`/api/groupbuy/campaigns/${id}`);
-      setCampaign(response.data);
+      // Handle new API response format: { success: true, data: {...} }
+      const data = response.data?.data || response.data;
+      setCampaign(data);
     } catch (err: any) {
-      const message = err.response?.data?.message || '캠페인 정보를 불러오는데 실패했습니다.';
+      const message = err.response?.data?.error || err.response?.data?.message || '캠페인 정보를 불러오는데 실패했습니다.';
       setError(message);
       toast.error(message);
     } finally {

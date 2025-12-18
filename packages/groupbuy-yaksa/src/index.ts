@@ -2,7 +2,7 @@
  * Groupbuy-Yaksa
  *
  * 지부/분회 주도의 공동구매 Extension
- * Phase 2: Operational Flow Completion
+ * Phase 3: UI Integration
  *
  * 핵심 원칙:
  * - 공동구매는 '조건이 붙은 상품'

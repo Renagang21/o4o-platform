@@ -1,22 +1,25 @@
+/**
+ * Groupbuy Participants Hook
+ * Phase 3: UI Integration
+ *
+ * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ */
+
 import { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 
+/**
+ * 참여자(약국) 수량 정보
+ * 금액 필드 없음 (Work Order 제약)
+ */
 export interface GroupbuyParticipant {
-  id: string;
-  campaignId: string;
-  userId: string;
-  quantity: number;
-  unitPrice: number;
-  totalAmount: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  orderId?: string;
-  joinedAt: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-  };
+  pharmacyId: string;
+  pharmacyName?: string;
+  totalQuantity: number;
+  pendingQuantity: number;
+  confirmedQuantity: number;
+  orderCount: number;
 }
 
 export const useParticipants = (campaignId?: string) => {
@@ -30,9 +33,11 @@ export const useParticipants = (campaignId?: string) => {
 
     try {
       const response = await authClient.api.get(`/api/groupbuy/campaigns/${id}/participants`);
-      setParticipants(response.data || []);
+      // Handle new API response format: { success: true, data: [...] }
+      const data = response.data?.data || response.data || [];
+      setParticipants(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      const message = err.response?.data?.message || '참여자 목록을 불러오는데 실패했습니다.';
+      const message = err.response?.data?.error || err.response?.data?.message || '참여자 목록을 불러오는데 실패했습니다.';
       setError(message);
       toast.error(message);
     } finally {
@@ -40,13 +45,15 @@ export const useParticipants = (campaignId?: string) => {
     }
   };
 
-  const cancelParticipant = async (campaignId: string, participantId: string) => {
+  const cancelOrder = async (orderId: string) => {
     try {
-      await authClient.api.post(`/api/groupbuy/campaigns/${campaignId}/participants/${participantId}/cancel`);
-      toast.success('참여가 취소되었습니다.');
-      await fetchParticipants(campaignId);
+      await authClient.api.post(`/api/groupbuy/orders/${orderId}/cancel`);
+      toast.success('주문이 취소되었습니다.');
+      if (campaignId) {
+        await fetchParticipants(campaignId);
+      }
     } catch (err: any) {
-      const message = err.response?.data?.message || '참여 취소에 실패했습니다.';
+      const message = err.response?.data?.error || err.response?.data?.message || '주문 취소에 실패했습니다.';
       toast.error(message);
       throw err;
     }
@@ -63,7 +70,7 @@ export const useParticipants = (campaignId?: string) => {
     loading,
     error,
     fetchParticipants,
-    cancelParticipant,
+    cancelOrder,
     refetch: () => campaignId && fetchParticipants(campaignId)
   };
 };

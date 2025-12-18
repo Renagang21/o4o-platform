@@ -1,3 +1,10 @@
+/**
+ * Groupbuy Campaign Detail Page
+ * Phase 3: UI Integration
+ *
+ * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ */
+
 import { FC, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Edit2, XCircle, CheckCircle, Trash2, Users } from 'lucide-react';
@@ -6,7 +13,6 @@ import { useGroupbuyCampaigns } from '@/hooks/groupbuy';
 import { PermissionGuard } from '@/components/organization/PermissionGuard';
 import {
   GroupbuyStatusBadge,
-  GroupbuyQuantityProgressBar,
   DeadlineCountdown
 } from '@/components/groupbuy';
 import { CampaignFormModal } from './CampaignFormModal';
@@ -14,8 +20,8 @@ import { CampaignFormModal } from './CampaignFormModal';
 const GroupbuyCampaignDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { campaign, loading } = useCampaignDetail(id);
-  const { deleteCampaign, activateCampaign, closeCampaign } = useGroupbuyCampaigns({ autoFetch: false });
+  const { campaign, loading, refetch } = useCampaignDetail(id);
+  const { deleteCampaign, activateCampaign, closeCampaign, completeCampaign, cancelCampaign } = useGroupbuyCampaigns({ autoFetch: false });
 
   const [formModalOpen, setFormModalOpen] = useState(false);
 
@@ -43,6 +49,7 @@ const GroupbuyCampaignDetailPage: FC = () => {
 
     try {
       await activateCampaign(id);
+      refetch();
     } catch (error) {
       // Error handled in hook
     }
@@ -55,6 +62,33 @@ const GroupbuyCampaignDetailPage: FC = () => {
 
     try {
       await closeCampaign(id);
+      refetch();
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!id || !window.confirm('이 캠페인을 완료 처리하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await completeCampaign(id);
+      refetch();
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!id || !window.confirm('정말 이 캠페인을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      await cancelCampaign(id);
+      refetch();
     } catch (error) {
       // Error handled in hook
     }
@@ -82,9 +116,6 @@ const GroupbuyCampaignDetailPage: FC = () => {
     );
   }
 
-  const achievementRate = Math.round((campaign.currentQuantity / campaign.minQuantity) * 100);
-  const discount = Math.round(((campaign.regularPrice - campaign.groupPrice) / campaign.regularPrice) * 100);
-
   return (
     <PermissionGuard required={['organization.read']}>
       <div className="h-full flex flex-col">
@@ -99,7 +130,7 @@ const GroupbuyCampaignDetailPage: FC = () => {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">{campaign.name}</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">{campaign.title}</h1>
                 <p className="text-sm text-gray-500 mt-1">캠페인 상세 정보</p>
               </div>
             </div>
@@ -137,13 +168,24 @@ const GroupbuyCampaignDetailPage: FC = () => {
                     마감
                   </button>
                 )}
-                <button
-                  onClick={handleDelete}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  삭제
-                </button>
+                {campaign.status === 'closed' && (
+                  <button
+                    onClick={handleComplete}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    완료
+                  </button>
+                )}
+                {(campaign.status === 'draft' || campaign.status === 'active') && (
+                  <button
+                    onClick={handleCancel}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    취소
+                  </button>
+                )}
               </PermissionGuard>
             </div>
           </div>
@@ -152,29 +194,27 @@ const GroupbuyCampaignDetailPage: FC = () => {
         {/* Content */}
         <div className="flex-1 p-6 overflow-auto">
           <div className="max-w-5xl mx-auto space-y-6">
-            {/* Status Cards */}
+            {/* Status Cards - No price information */}
             <div className="grid grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-lg shadow">
-                <div className="text-sm text-gray-500 mb-2">총 판매 수량</div>
-                <div className="text-3xl font-bold text-gray-900">{campaign.currentQuantity}</div>
+                <div className="text-sm text-gray-500 mb-2">주문 수량</div>
+                <div className="text-3xl font-bold text-gray-900">{campaign.totalOrderedQuantity}</div>
                 <div className="text-sm text-gray-500 mt-1">
-                  목표: {campaign.minQuantity}개 {campaign.maxQuantity && `(최대 ${campaign.maxQuantity})`}
+                  전체 주문 수량
                 </div>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <div className="text-sm text-gray-500 mb-2">총 판매 금액</div>
-                <div className="text-3xl font-bold text-gray-900">
-                  {(campaign.currentQuantity * campaign.groupPrice).toLocaleString()}원
-                </div>
+                <div className="text-sm text-gray-500 mb-2">확정 수량</div>
+                <div className="text-3xl font-bold text-green-600">{campaign.totalConfirmedQuantity}</div>
                 <div className="text-sm text-gray-500 mt-1">
-                  개당 {campaign.groupPrice.toLocaleString()}원
+                  최종 확정 수량
                 </div>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">
-                <div className="text-sm text-gray-500 mb-2">달성률</div>
-                <div className="text-3xl font-bold text-gray-900">{achievementRate}%</div>
+                <div className="text-sm text-gray-500 mb-2">참여 약국</div>
+                <div className="text-3xl font-bold text-blue-600">{campaign.participantCount}</div>
                 <div className="text-sm text-gray-500 mt-1">
-                  {campaign.participantCount}명 참여
+                  참여 중인 약국 수
                 </div>
               </div>
             </div>
@@ -188,18 +228,6 @@ const GroupbuyCampaignDetailPage: FC = () => {
                   <div className="text-sm text-gray-500">상태</div>
                   <div className="mt-1">
                     <GroupbuyStatusBadge status={campaign.status} />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">조직</div>
-                  <div className="mt-1 text-gray-900">
-                    {campaign.organization?.name || '전체 조직'}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">상품</div>
-                  <div className="mt-1 text-gray-900">
-                    {campaign.product?.name || campaign.productId}
                   </div>
                 </div>
                 <div>
@@ -218,41 +246,46 @@ const GroupbuyCampaignDetailPage: FC = () => {
               )}
             </div>
 
-            {/* Pricing */}
+            {/* Products Info */}
             <div className="bg-white p-6 rounded-lg shadow space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900">가격 정보</h2>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <div className="text-sm text-gray-500">정가</div>
-                  <div className="mt-1 text-gray-900 line-through">
-                    {campaign.regularPrice.toLocaleString()}원
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">공동구매가</div>
-                  <div className="mt-1 text-2xl font-bold text-blue-600">
-                    {campaign.groupPrice.toLocaleString()}원
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">할인율</div>
-                  <div className="mt-1 text-lg font-medium text-red-600">
-                    {discount}% 할인
-                  </div>
-                </div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">캠페인 상품</h2>
+                <span className="text-sm text-gray-500">
+                  {campaign.products?.length || 0}개 상품
+                </span>
               </div>
-            </div>
 
-            {/* Progress */}
-            <div className="bg-white p-6 rounded-lg shadow space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900">진행 상황</h2>
-
-              <GroupbuyQuantityProgressBar
-                currentQuantity={campaign.currentQuantity}
-                minQuantity={campaign.minQuantity}
-                maxQuantity={campaign.maxQuantity}
-              />
+              {campaign.products && campaign.products.length > 0 ? (
+                <div className="space-y-3">
+                  {campaign.products.map((product) => (
+                    <div key={product.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-medium text-gray-900">상품 ID: {product.productId}</div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            최소 수량: {product.minTotalQuantity}개
+                            {product.maxTotalQuantity && ` / 최대: ${product.maxTotalQuantity}개`}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm">
+                            <span className="text-gray-500">주문:</span>{' '}
+                            <span className="font-medium">{product.orderedQuantity}</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="text-gray-500">확정:</span>{' '}
+                            <span className="font-medium text-green-600">{product.confirmedQuantity}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  등록된 상품이 없습니다
+                </div>
+              )}
             </div>
 
             {/* Schedule */}
@@ -281,7 +314,10 @@ const GroupbuyCampaignDetailPage: FC = () => {
         {formModalOpen && (
           <CampaignFormModal
             campaign={campaign}
-            onClose={() => setFormModalOpen(false)}
+            onClose={() => {
+              setFormModalOpen(false);
+              refetch();
+            }}
           />
         )}
       </div>
