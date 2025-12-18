@@ -4,6 +4,7 @@ export * from './orders';
 export * from './categories';
 export * from './reviews';
 export * from './suppliers';
+export * from './groupbuy';
 
 // Re-export as a single API object for convenience
 import { productsApi } from './products';
@@ -12,6 +13,7 @@ import { ordersApi } from './orders';
 import { categoriesApi } from './categories';
 import { reviewsApi } from './reviews';
 import { suppliersApi } from './suppliers';
+import { groupbuyApi } from './groupbuy';
 
 export const api = {
   products: productsApi,
@@ -19,5 +21,6 @@ export const api = {
   orders: ordersApi,
   categories: categoriesApi,
   reviews: reviewsApi,
-  suppliers: suppliersApi
+  suppliers: suppliersApi,
+  groupbuy: groupbuyApi
 };

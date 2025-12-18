@@ -267,13 +267,14 @@ const Badge = forwardRef<HTMLDivElement, BadgeProps>(
 )
 Badge.displayName = "Badge"
 
-export { 
-  Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, 
-  Button, 
+export {
+  Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent,
+  Button,
   Alert, AlertTitle, AlertDescription,
   Input,
   Label,
-  Badge
+  Badge,
+  cn
 };
 
 // ---------------------------------------------------------------------------

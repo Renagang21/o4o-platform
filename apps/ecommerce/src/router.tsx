@@ -15,6 +15,13 @@ import { SupplierStoreSettings } from './pages/supplier/SupplierStoreSettings';
 import { ShortcodeDemo } from './pages/ShortcodeDemo';
 import { VendorRoute } from './components/auth/VendorRoute';
 
+// Groupbuy pages
+import {
+  GroupbuyListPage,
+  GroupbuyCampaignDetailPage,
+  GroupbuyHistoryPage
+} from './pages/groupbuy';
+
 // Vendor Dashboard imports
 import VendorLayout from './pages/vendor/layout/VendorLayout';
 // import VendorDashboard from './pages/vendor/Dashboard';
@@ -71,6 +78,19 @@ export const router = createBrowserRouter([
       {
         path: 'shortcode-demo',
         element: <ShortcodeDemo />,
+      },
+      // Groupbuy routes (Member/Pharmacy)
+      {
+        path: 'groupbuy',
+        element: <GroupbuyListPage />,
+      },
+      {
+        path: 'groupbuy/history',
+        element: <GroupbuyHistoryPage />,
+      },
+      {
+        path: 'groupbuy/:campaignId',
+        element: <GroupbuyCampaignDetailPage />,
       },
     ],
   },
