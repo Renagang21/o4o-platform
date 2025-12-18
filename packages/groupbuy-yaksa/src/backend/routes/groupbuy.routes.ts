@@ -15,7 +15,7 @@ import { Router, Request, Response, NextFunction, RequestHandler } from 'express
 import type { DataSource } from 'typeorm';
 import { GroupbuyCampaignService } from '../services/GroupbuyCampaignService.js';
 import { CampaignProductService } from '../services/CampaignProductService.js';
-import { GroupbuyOrderService } from '../services/GroupbuyOrderService.js';
+import { GroupbuyOrderService, GroupbuyOrderError } from '../services/GroupbuyOrderService.js';
 import {
   createGroupbuyAuthMiddleware,
   type GroupbuyAuthRequest,
@@ -620,6 +620,7 @@ export function createGroupbuyRoutes(
    * POST /orders
    * Create a new order (participate in groupbuy)
    * 권한: 약국 소속 멤버
+   * Phase 5.1: userOrganizationId 전달 (Cross-Org 검증)
    */
   router.post(
     '/orders',
@@ -633,6 +634,8 @@ export function createGroupbuyRoutes(
         const authReq = req as GroupbuyAuthRequest;
         const { campaignId, campaignProductId, pharmacyId, quantity, metadata } = req.body;
         const orderedBy = authReq.groupbuyContext?.userId || req.body.orderedBy;
+        // Phase 5.1: 사용자 소속 조직 ID를 서비스에 전달 (이중 검증)
+        const userOrganizationId = authReq.groupbuyContext?.primaryOrganizationId;
 
         if (!campaignId || !campaignProductId || !pharmacyId || !quantity) {
           res.status(400).json({
@@ -649,17 +652,40 @@ export function createGroupbuyRoutes(
           quantity: parseInt(quantity, 10),
           orderedBy,
           metadata,
+          userOrganizationId, // Phase 5.1
         });
 
         res.status(201).json({
           success: true,
           data: order,
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('[Groupbuy] Create order error:', error);
-        res.status(500).json({
+        // Phase 5.1: 에러 코드 기반 응답
+        const errorCode = error?.code;
+        let statusCode = 500;
+        if (errorCode === GroupbuyOrderError.INVALID_QUANTITY ||
+            errorCode === GroupbuyOrderError.DUPLICATE_ORDER) {
+          statusCode = 400;
+        } else if (errorCode === GroupbuyOrderError.ORG_ACCESS_DENIED ||
+                   errorCode === GroupbuyOrderError.PHARMACY_MISMATCH) {
+          statusCode = 403;
+        } else if (errorCode === GroupbuyOrderError.PRODUCT_NOT_FOUND ||
+                   errorCode === GroupbuyOrderError.CAMPAIGN_NOT_FOUND) {
+          statusCode = 404;
+        } else if (errorCode === GroupbuyOrderError.CAMPAIGN_CLOSED ||
+                   errorCode === GroupbuyOrderError.CAMPAIGN_COMPLETED ||
+                   errorCode === GroupbuyOrderError.CAMPAIGN_CANCELLED ||
+                   errorCode === GroupbuyOrderError.CAMPAIGN_NOT_ACTIVE ||
+                   errorCode === GroupbuyOrderError.PRODUCT_CLOSED ||
+                   errorCode === GroupbuyOrderError.ORDER_PERIOD_ENDED ||
+                   errorCode === GroupbuyOrderError.MAX_QUANTITY_EXCEEDED) {
+          statusCode = 409; // Conflict
+        }
+        res.status(statusCode).json({
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: errorCode || 'UNKNOWN_ERROR',
+          message: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -669,6 +695,7 @@ export function createGroupbuyRoutes(
    * POST /orders/:id/confirm
    * Confirm order with dropshipping order ID
    * 권한: 캠페인 소유 조직 관리자 또는 시스템
+   * Phase 5.1: userOrganizationId 전달 (Cross-Org 검증)
    */
   router.post(
     '/orders/:id/confirm',
@@ -678,8 +705,11 @@ export function createGroupbuyRoutes(
     ),
     async (req: Request, res: Response) => {
       try {
+        const authReq = req as GroupbuyAuthRequest;
         const { id } = req.params;
         const { dropshippingOrderId } = req.body;
+        // Phase 5.1: 사용자 소속 조직 ID를 서비스에 전달
+        const userOrganizationId = authReq.groupbuyContext?.primaryOrganizationId;
 
         if (!dropshippingOrderId) {
           res.status(400).json({
@@ -689,17 +719,28 @@ export function createGroupbuyRoutes(
           return;
         }
 
-        const order = await orderService.confirmOrder(id, dropshippingOrderId);
+        const order = await orderService.confirmOrder(id, dropshippingOrderId, userOrganizationId);
 
         res.json({
           success: true,
           data: order,
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('[Groupbuy] Confirm order error:', error);
-        res.status(500).json({
+        // Phase 5.1: 에러 코드 기반 응답
+        const errorCode = error?.code;
+        let statusCode = 500;
+        if (errorCode === GroupbuyOrderError.ORDER_NOT_FOUND) {
+          statusCode = 404;
+        } else if (errorCode === GroupbuyOrderError.ORG_ACCESS_DENIED) {
+          statusCode = 403;
+        } else if (errorCode === GroupbuyOrderError.INVALID_ORDER_STATUS) {
+          statusCode = 409;
+        }
+        res.status(statusCode).json({
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: errorCode || 'UNKNOWN_ERROR',
+          message: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -709,6 +750,7 @@ export function createGroupbuyRoutes(
    * POST /orders/:id/cancel
    * Cancel pending order
    * 권한: 주문자 본인 또는 캠페인 관리자
+   * Phase 5.1: userOrganizationId 전달 (Cross-Org 검증)
    */
   router.post(
     '/orders/:id/cancel',
@@ -718,18 +760,35 @@ export function createGroupbuyRoutes(
     ),
     async (req: Request, res: Response) => {
       try {
+        const authReq = req as GroupbuyAuthRequest;
         const { id } = req.params;
-        const order = await orderService.cancelOrder(id);
+        // Phase 5.1: 사용자 소속 조직 ID를 서비스에 전달
+        const userOrganizationId = authReq.groupbuyContext?.primaryOrganizationId;
+
+        const order = await orderService.cancelOrder(id, userOrganizationId);
 
         res.json({
           success: true,
           data: order,
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('[Groupbuy] Cancel order error:', error);
-        res.status(500).json({
+        // Phase 5.1: 에러 코드 기반 응답
+        const errorCode = error?.code;
+        let statusCode = 500;
+        if (errorCode === GroupbuyOrderError.ORDER_NOT_FOUND) {
+          statusCode = 404;
+        } else if (errorCode === GroupbuyOrderError.ORG_ACCESS_DENIED) {
+          statusCode = 403;
+        } else if (errorCode === GroupbuyOrderError.INVALID_ORDER_STATUS ||
+                   errorCode === GroupbuyOrderError.CAMPAIGN_CLOSED ||
+                   errorCode === GroupbuyOrderError.CAMPAIGN_COMPLETED) {
+          statusCode = 409;
+        }
+        res.status(statusCode).json({
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: errorCode || 'UNKNOWN_ERROR',
+          message: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }

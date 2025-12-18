@@ -18,6 +18,7 @@ export {
 
 export {
   GroupbuyOrderService,
+  GroupbuyOrderError,
   type CreateGroupbuyOrderDto,
   type OrderQuantitySummary,
 } from './GroupbuyOrderService.js';

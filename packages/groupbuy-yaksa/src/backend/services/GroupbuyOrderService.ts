@@ -5,6 +5,12 @@
  * - 공동구매 상품 주문 기록 생성
  * - dropshipping 주문 ID 연결
  * - 주문 상태 변경 반영
+ *
+ * Phase 5.1: Operational Safety Patch
+ * - Race Condition 방지 (SELECT FOR UPDATE)
+ * - 조직 스코프 이중 검증
+ * - 취소 후 상태 재계산 (Zombie Status 제거)
+ * - 상태 불가 작업 차단
  */
 
 import type { EntityManager, Repository } from 'typeorm';
@@ -15,6 +21,32 @@ import {
 import { CampaignProduct } from '../entities/CampaignProduct.js';
 import { GroupbuyCampaign } from '../entities/GroupbuyCampaign.js';
 
+// =====================================================
+// Error Codes (Phase 5.1)
+// =====================================================
+
+export const GroupbuyOrderError = {
+  // 기존 에러 코드
+  PRODUCT_NOT_FOUND: 'GB-E001',
+  CAMPAIGN_NOT_FOUND: 'GB-E002',
+  CAMPAIGN_NOT_ACTIVE: 'GB-E003',
+  PRODUCT_CLOSED: 'GB-E004',
+  ORDER_NOT_STARTED: 'GB-E005',
+  ORDER_PERIOD_ENDED: 'GB-E006',
+  MAX_QUANTITY_EXCEEDED: 'GB-E007',
+  INVALID_QUANTITY: 'GB-E008',
+  // Phase 5.1 추가
+  ORDER_NOT_FOUND: 'GB-E009',
+  INVALID_ORDER_STATUS: 'GB-E010',
+  DUPLICATE_ORDER: 'GB-E011',
+  CAMPAIGN_CLOSED: 'GB-E012',
+  CAMPAIGN_COMPLETED: 'GB-E013',
+  CAMPAIGN_CANCELLED: 'GB-E014',
+  // 권한 관련
+  ORG_ACCESS_DENIED: 'GB-AUTH-003',
+  PHARMACY_MISMATCH: 'GB-AUTH-004',
+} as const;
+
 export interface CreateGroupbuyOrderDto {
   campaignId: string;
   campaignProductId: string;
@@ -22,6 +54,8 @@ export interface CreateGroupbuyOrderDto {
   quantity: number;
   orderedBy?: string;
   metadata?: Record<string, any>;
+  // Phase 5.1: 조직 검증용
+  userOrganizationId?: string;
 }
 
 export interface OrderQuantitySummary {
@@ -52,61 +86,102 @@ export class GroupbuyOrderService {
 
   /**
    * 공동구매 주문 생성
+   *
+   * Phase 5.1 Safety Patches:
+   * - SELECT FOR UPDATE로 Race Condition 방지
+   * - 조직 스코프 이중 검증
+   * - 상태 기반 작업 차단
+   * - 중복 주문 방지
    */
   async createOrder(dto: CreateGroupbuyOrderDto): Promise<GroupbuyOrder> {
-    // 상품 확인
-    const product = await this.productRepository.findOne({
-      where: { id: dto.campaignProductId },
-      relations: ['campaign'],
-    });
-    if (!product) {
-      throw new Error(`[GB-E001] 공동구매 상품을 찾을 수 없습니다 (productId: ${dto.campaignProductId})`);
+    // 수량 검증 (최우선)
+    if (!dto.quantity || dto.quantity < 1) {
+      const error = new Error(`주문 수량은 1 이상이어야 합니다`);
+      (error as any).code = GroupbuyOrderError.INVALID_QUANTITY;
+      throw error;
     }
 
-    // 캠페인 확인
-    if (!product.campaign) {
-      throw new Error(`[GB-E002] 캠페인 정보가 없습니다 (productId: ${dto.campaignProductId})`);
-    }
-    if (product.campaign.status !== 'active') {
-      throw new Error(`[GB-E003] 진행 중인 캠페인만 주문 가능합니다 (현재 상태: ${product.campaign.status})`);
-    }
+    // 트랜잭션으로 모든 검증과 생성을 원자적으로 처리
+    return this.entityManager.transaction(async (txManager) => {
+      const txOrderRepo = txManager.getRepository(GroupbuyOrder);
+      const txProductRepo = txManager.getRepository(CampaignProduct);
+      const txCampaignRepo = txManager.getRepository(GroupbuyCampaign);
 
-    // 상품 상태 확인
-    if (product.status === 'closed') {
-      throw new Error(`[GB-E004] 마감된 상품은 주문할 수 없습니다 (productId: ${dto.campaignProductId})`);
-    }
+      // Phase 5.1: SELECT FOR UPDATE로 상품 Row Lock 획득
+      const product = await txProductRepo
+        .createQueryBuilder('product')
+        .setLock('pessimistic_write')
+        .leftJoinAndSelect('product.campaign', 'campaign')
+        .where('product.id = :id', { id: dto.campaignProductId })
+        .getOne();
 
-    // 기간 확인
-    const now = new Date();
-    if (now < product.startDate) {
-      throw new Error(`[GB-E005] 주문 시작 전입니다 (시작일: ${product.startDate.toISOString()})`);
-    }
-    if (now > product.endDate) {
-      throw new Error(`[GB-E006] 주문 기간이 종료되었습니다 (종료일: ${product.endDate.toISOString()})`);
-    }
+      if (!product) {
+        const error = new Error(`공동구매 상품을 찾을 수 없습니다 (productId: ${dto.campaignProductId})`);
+        (error as any).code = GroupbuyOrderError.PRODUCT_NOT_FOUND;
+        throw error;
+      }
 
-    // 최대 수량 확인
-    if (
-      product.maxTotalQuantity &&
-      product.orderedQuantity + dto.quantity > product.maxTotalQuantity
-    ) {
-      const remaining = product.maxTotalQuantity - product.orderedQuantity;
-      throw new Error(`[GB-E007] 최대 주문 수량 초과 (잔여 가능: ${remaining}개, 요청: ${dto.quantity}개)`);
-    }
+      // 캠페인 확인
+      const campaign = product.campaign;
+      if (!campaign) {
+        const error = new Error(`캠페인 정보가 없습니다 (productId: ${dto.campaignProductId})`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_NOT_FOUND;
+        throw error;
+      }
 
-    // 수량 검증
-    if (dto.quantity < 1) {
-      throw new Error('[GB-E008] 주문 수량은 1 이상이어야 합니다');
-    }
+      // Phase 5.1: 캠페인 상태 기반 작업 차단
+      if (campaign.status === 'closed') {
+        const error = new Error(`마감된 캠페인에는 주문할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_CLOSED;
+        throw error;
+      }
+      if (campaign.status === 'completed') {
+        const error = new Error(`완료된 캠페인에는 주문할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_COMPLETED;
+        throw error;
+      }
+      if (campaign.status === 'cancelled') {
+        const error = new Error(`취소된 캠페인에는 주문할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_CANCELLED;
+        throw error;
+      }
+      if (campaign.status !== 'active') {
+        const error = new Error(`진행 중인 캠페인만 주문 가능합니다 (현재 상태: ${campaign.status})`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_NOT_ACTIVE;
+        throw error;
+      }
 
-    // 트랜잭션으로 주문 생성 및 수량 업데이트
-    return this.entityManager.transaction(async (transactionalEntityManager) => {
-      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
-      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
-      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+      // Phase 5.1: 조직 스코프 이중 검증 (Service 레벨)
+      // pharmacyId가 campaign.organizationId와 일치해야 함 (같은 조직 내 약국)
+      // Note: 약사회 서비스에서 pharmacyId는 조직 ID와 같은 개념
+      if (dto.userOrganizationId && dto.userOrganizationId !== campaign.organizationId) {
+        const error = new Error(`타 조직의 캠페인에는 참여할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
+        throw error;
+      }
 
-      // 기존 주문 확인 (동일 약국의 중복 주문 방지)
-      const existingOrder = await txOrderRepo.findOne({
+      // 상품 상태 확인
+      if (product.status === 'closed') {
+        const error = new Error(`마감된 상품은 주문할 수 없습니다 (productId: ${dto.campaignProductId})`);
+        (error as any).code = GroupbuyOrderError.PRODUCT_CLOSED;
+        throw error;
+      }
+
+      // 기간 확인 (서버 시간 기준)
+      const now = new Date();
+      if (now < product.startDate) {
+        const error = new Error(`주문 시작 전입니다 (시작일: ${product.startDate.toISOString()})`);
+        (error as any).code = GroupbuyOrderError.ORDER_NOT_STARTED;
+        throw error;
+      }
+      if (now > product.endDate) {
+        const error = new Error(`주문 기간이 종료되었습니다 (종료일: ${product.endDate.toISOString()})`);
+        (error as any).code = GroupbuyOrderError.ORDER_PERIOD_ENDED;
+        throw error;
+      }
+
+      // Phase 5.1: 중복 주문 확인 (활성 주문만)
+      const existingActiveOrder = await txOrderRepo.findOne({
         where: {
           campaignProductId: dto.campaignProductId,
           pharmacyId: dto.pharmacyId,
@@ -116,35 +191,38 @@ export class GroupbuyOrderService {
 
       let order: GroupbuyOrder;
       let isNewParticipant = false;
+      let quantityDelta = dto.quantity;
 
-      if (existingOrder) {
-        // 기존 주문 수량 업데이트
-        const oldQuantity = existingOrder.quantity;
-        existingOrder.quantity = dto.quantity;
-        order = await txOrderRepo.save(existingOrder);
+      if (existingActiveOrder) {
+        // 기존 주문이 있으면 수량 업데이트
+        const oldQuantity = existingActiveOrder.quantity;
+        quantityDelta = dto.quantity - oldQuantity;
 
-        // 상품 수량 업데이트 (차이만큼)
-        await txProductRepo
-          .createQueryBuilder()
-          .update()
-          .set({
-            orderedQuantity: () =>
-              `"orderedQuantity" + ${dto.quantity - oldQuantity}`,
-          })
-          .where('id = :id', { id: dto.campaignProductId })
-          .execute();
+        // Phase 5.1: 최대 수량 체크 (Atomic)
+        if (
+          product.maxTotalQuantity &&
+          product.orderedQuantity + quantityDelta > product.maxTotalQuantity
+        ) {
+          const remaining = product.maxTotalQuantity - product.orderedQuantity;
+          const error = new Error(`최대 주문 수량 초과 (현재 추가 가능: ${remaining + oldQuantity}개, 요청: ${dto.quantity}개)`);
+          (error as any).code = GroupbuyOrderError.MAX_QUANTITY_EXCEEDED;
+          throw error;
+        }
 
-        // 캠페인 수량 업데이트
-        await txCampaignRepo
-          .createQueryBuilder()
-          .update()
-          .set({
-            totalOrderedQuantity: () =>
-              `"totalOrderedQuantity" + ${dto.quantity - oldQuantity}`,
-          })
-          .where('id = :id', { id: dto.campaignId })
-          .execute();
+        existingActiveOrder.quantity = dto.quantity;
+        order = await txOrderRepo.save(existingActiveOrder);
       } else {
+        // Phase 5.1: 최대 수량 체크 (Atomic)
+        if (
+          product.maxTotalQuantity &&
+          product.orderedQuantity + dto.quantity > product.maxTotalQuantity
+        ) {
+          const remaining = product.maxTotalQuantity - product.orderedQuantity;
+          const error = new Error(`최대 주문 수량 초과 (현재 가능: ${remaining}개, 요청: ${dto.quantity}개)`);
+          (error as any).code = GroupbuyOrderError.MAX_QUANTITY_EXCEEDED;
+          throw error;
+        }
+
         // 신규 주문 생성
         order = txOrderRepo.create({
           campaignId: dto.campaignId,
@@ -158,17 +236,6 @@ export class GroupbuyOrderService {
         });
         order = await txOrderRepo.save(order);
 
-        // 상품 수량 업데이트
-        await txProductRepo
-          .createQueryBuilder()
-          .update()
-          .set({
-            orderedQuantity: () => `"orderedQuantity" + ${dto.quantity}`,
-          })
-          .where('id = :id', { id: dto.campaignProductId })
-          .execute();
-
-        // 캠페인 수량 업데이트
         // 새로운 참여자인지 확인
         const existingParticipation = await txOrderRepo.findOne({
           where: {
@@ -177,22 +244,44 @@ export class GroupbuyOrderService {
           },
         });
         isNewParticipant = !existingParticipation || existingParticipation.id === order.id;
-
-        await txCampaignRepo
-          .createQueryBuilder()
-          .update()
-          .set({
-            totalOrderedQuantity: () => `"totalOrderedQuantity" + ${dto.quantity}`,
-            ...(isNewParticipant && {
-              participantCount: () => `"participantCount" + 1`,
-            }),
-          })
-          .where('id = :id', { id: dto.campaignId })
-          .execute();
       }
 
-      // Phase 2: threshold_met 상태는 confirmOrder에서 confirmedQuantity 기준으로 판단
-      // createOrder에서는 orderedQuantity만 업데이트 (threshold 상태 변경 안함)
+      // Phase 5.1: Atomic Update로 수량 업데이트 (조건부)
+      // 상품 수량 업데이트
+      const productUpdateResult = await txProductRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          orderedQuantity: () => `"orderedQuantity" + ${quantityDelta}`,
+        })
+        .where('id = :id', { id: dto.campaignProductId })
+        // maxTotalQuantity 제약 조건 재확인 (동시성 보호)
+        .andWhere(
+          product.maxTotalQuantity
+            ? `"orderedQuantity" + ${quantityDelta} <= ${product.maxTotalQuantity}`
+            : '1=1'
+        )
+        .execute();
+
+      // Phase 5.1: 업데이트 실패 시 롤백 (Race Condition 감지)
+      if (productUpdateResult.affected === 0 && product.maxTotalQuantity) {
+        const error = new Error(`동시 주문으로 인해 최대 수량을 초과했습니다. 다시 시도해주세요.`);
+        (error as any).code = GroupbuyOrderError.MAX_QUANTITY_EXCEEDED;
+        throw error;
+      }
+
+      // 캠페인 수량 업데이트
+      await txCampaignRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          totalOrderedQuantity: () => `"totalOrderedQuantity" + ${quantityDelta}`,
+          ...(isNewParticipant && {
+            participantCount: () => `"participantCount" + 1`,
+          }),
+        })
+        .where('id = :id', { id: dto.campaignId })
+        .execute();
 
       return order;
     });
@@ -266,22 +355,71 @@ export class GroupbuyOrderService {
   }
 
   /**
-   * 주문 취소
+   * 주문 취소 (pending 상태)
+   *
+   * Phase 5.1 Safety Patches:
+   * - 상태 불가 작업 차단
+   * - Row Lock으로 동시성 보호
+   * - 조직 검증
    */
-  async cancelOrder(id: string): Promise<GroupbuyOrder> {
-    const order = await this.getOrderById(id);
-    if (!order) {
-      throw new Error('주문을 찾을 수 없습니다');
-    }
+  async cancelOrder(id: string, userOrganizationId?: string): Promise<GroupbuyOrder> {
+    return this.entityManager.transaction(async (txManager) => {
+      const txOrderRepo = txManager.getRepository(GroupbuyOrder);
+      const txProductRepo = txManager.getRepository(CampaignProduct);
+      const txCampaignRepo = txManager.getRepository(GroupbuyCampaign);
 
-    if (order.orderStatus !== 'pending') {
-      throw new Error('대기 중인 주문만 취소할 수 있습니다');
-    }
+      // Phase 5.1: SELECT FOR UPDATE로 주문 Row Lock
+      const order = await txOrderRepo
+        .createQueryBuilder('order')
+        .setLock('pessimistic_write')
+        .leftJoinAndSelect('order.campaign', 'campaign')
+        .leftJoinAndSelect('order.campaignProduct', 'product')
+        .where('order.id = :id', { id })
+        .getOne();
 
-    return this.entityManager.transaction(async (transactionalEntityManager) => {
-      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
-      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
-      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+      if (!order) {
+        const error = new Error(`주문을 찾을 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.ORDER_NOT_FOUND;
+        throw error;
+      }
+
+      // Phase 5.1: 조직 스코프 이중 검증
+      if (userOrganizationId && order.campaign) {
+        if (userOrganizationId !== order.campaign.organizationId) {
+          const error = new Error(`타 조직의 주문을 취소할 수 없습니다`);
+          (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
+          throw error;
+        }
+      }
+
+      // Phase 5.1: 상태 기반 작업 차단
+      if (order.orderStatus === 'cancelled') {
+        const error = new Error(`이미 취소된 주문입니다`);
+        (error as any).code = GroupbuyOrderError.INVALID_ORDER_STATUS;
+        throw error;
+      }
+      if (order.orderStatus === 'confirmed') {
+        const error = new Error(`확정된 주문은 cancelOrder로 취소할 수 없습니다. cancelConfirmedOrder를 사용하세요.`);
+        (error as any).code = GroupbuyOrderError.INVALID_ORDER_STATUS;
+        throw error;
+      }
+      if (order.orderStatus !== 'pending') {
+        const error = new Error(`대기 중인 주문만 취소할 수 있습니다 (현재 상태: ${order.orderStatus})`);
+        (error as any).code = GroupbuyOrderError.INVALID_ORDER_STATUS;
+        throw error;
+      }
+
+      // Phase 5.1: 캠페인 상태 확인 (closed/completed에서 취소 불가)
+      if (order.campaign?.status === 'closed') {
+        const error = new Error(`마감된 캠페인의 주문은 취소할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_CLOSED;
+        throw error;
+      }
+      if (order.campaign?.status === 'completed') {
+        const error = new Error(`완료된 캠페인의 주문은 취소할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_COMPLETED;
+        throw error;
+      }
 
       // 주문 상태 변경
       order.orderStatus = 'cancelled';
@@ -315,29 +453,68 @@ export class GroupbuyOrderService {
    * 주문 확정
    * - dropshipping 주문 생성 후 호출
    * - Phase 2: confirmedQuantity 기준 threshold_met 상태 업데이트
+   *
+   * Phase 5.1 Safety Patches:
+   * - Row Lock으로 동시성 보호
+   * - 조직 검증
    */
   async confirmOrder(
     id: string,
-    dropshippingOrderId: string
+    dropshippingOrderId: string,
+    userOrganizationId?: string
   ): Promise<GroupbuyOrder> {
-    const order = await this.getOrderById(id);
-    if (!order) {
-      throw new Error('주문을 찾을 수 없습니다');
-    }
+    return this.entityManager.transaction(async (txManager) => {
+      const txOrderRepo = txManager.getRepository(GroupbuyOrder);
+      const txProductRepo = txManager.getRepository(CampaignProduct);
+      const txCampaignRepo = txManager.getRepository(GroupbuyCampaign);
 
-    if (order.orderStatus !== 'pending') {
-      throw new Error('대기 중인 주문만 확정할 수 있습니다');
-    }
+      // Phase 5.1: SELECT FOR UPDATE로 주문 Row Lock
+      const order = await txOrderRepo
+        .createQueryBuilder('order')
+        .setLock('pessimistic_write')
+        .leftJoinAndSelect('order.campaign', 'campaign')
+        .leftJoinAndSelect('order.campaignProduct', 'product')
+        .where('order.id = :id', { id })
+        .getOne();
 
-    return this.entityManager.transaction(async (transactionalEntityManager) => {
-      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
-      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
-      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+      if (!order) {
+        const error = new Error(`주문을 찾을 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.ORDER_NOT_FOUND;
+        throw error;
+      }
+
+      // Phase 5.1: 조직 스코프 이중 검증
+      if (userOrganizationId && order.campaign) {
+        if (userOrganizationId !== order.campaign.organizationId) {
+          const error = new Error(`타 조직의 주문을 확정할 수 없습니다`);
+          (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
+          throw error;
+        }
+      }
+
+      if (order.orderStatus !== 'pending') {
+        const error = new Error(`대기 중인 주문만 확정할 수 있습니다 (현재 상태: ${order.orderStatus})`);
+        (error as any).code = GroupbuyOrderError.INVALID_ORDER_STATUS;
+        throw error;
+      }
 
       // 주문 확정
       order.orderStatus = 'confirmed';
       order.dropshippingOrderId = dropshippingOrderId;
       await txOrderRepo.save(order);
+
+      // Phase 5.1: SELECT FOR UPDATE로 상품 Row Lock
+      const product = await txProductRepo
+        .createQueryBuilder('product')
+        .setLock('pessimistic_write')
+        .where('product.id = :id', { id: order.campaignProductId })
+        .getOne();
+
+      if (!product) {
+        const error = new Error(`상품을 찾을 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.PRODUCT_NOT_FOUND;
+        throw error;
+      }
 
       // 상품 확정 수량 업데이트
       await txProductRepo
@@ -360,14 +537,11 @@ export class GroupbuyOrderService {
         .where('id = :id', { id: order.campaignId })
         .execute();
 
-      // Phase 2: threshold_met 상태 체크 (confirmedQuantity 기준)
-      const updatedProduct = await txProductRepo.findOne({
-        where: { id: order.campaignProductId },
-      });
+      // Phase 5.1: threshold_met 상태 체크 (Row Lock 상태에서 계산)
+      const newConfirmedQuantity = product.confirmedQuantity + order.quantity;
       if (
-        updatedProduct &&
-        updatedProduct.status === 'active' &&
-        updatedProduct.confirmedQuantity >= updatedProduct.minTotalQuantity
+        product.status === 'active' &&
+        newConfirmedQuantity >= product.minTotalQuantity
       ) {
         await txProductRepo.update(order.campaignProductId, {
           status: 'threshold_met',
@@ -383,27 +557,64 @@ export class GroupbuyOrderService {
    * - dropshipping 주문 취소 시 호출
    * - confirmedQuantity 롤백
    * - threshold 상태 재계산
+   *
+   * Phase 5.1 Safety Patches:
+   * - Row Lock으로 동시성 보호
+   * - Zombie Status 제거 (완전한 상태 재계산)
    */
   async cancelConfirmedOrder(id: string): Promise<GroupbuyOrder> {
-    const order = await this.getOrderById(id);
-    if (!order) {
-      throw new Error('주문을 찾을 수 없습니다');
-    }
+    return this.entityManager.transaction(async (txManager) => {
+      const txOrderRepo = txManager.getRepository(GroupbuyOrder);
+      const txProductRepo = txManager.getRepository(CampaignProduct);
+      const txCampaignRepo = txManager.getRepository(GroupbuyCampaign);
 
-    if (order.orderStatus !== 'confirmed') {
-      throw new Error('확정된 주문만 취소할 수 있습니다');
-    }
+      // Phase 5.1: SELECT FOR UPDATE로 주문 Row Lock
+      const order = await txOrderRepo
+        .createQueryBuilder('order')
+        .setLock('pessimistic_write')
+        .leftJoinAndSelect('order.campaign', 'campaign')
+        .leftJoinAndSelect('order.campaignProduct', 'product')
+        .where('order.id = :id', { id })
+        .getOne();
 
-    return this.entityManager.transaction(async (transactionalEntityManager) => {
-      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
-      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
-      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+      if (!order) {
+        const error = new Error(`주문을 찾을 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.ORDER_NOT_FOUND;
+        throw error;
+      }
+
+      if (order.orderStatus !== 'confirmed') {
+        const error = new Error(`확정된 주문만 취소할 수 있습니다 (현재 상태: ${order.orderStatus})`);
+        (error as any).code = GroupbuyOrderError.INVALID_ORDER_STATUS;
+        throw error;
+      }
+
+      // Phase 5.1: completed 상태에서 취소 차단
+      if (order.campaign?.status === 'completed') {
+        const error = new Error(`완료된 캠페인의 확정 주문은 취소할 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.CAMPAIGN_COMPLETED;
+        throw error;
+      }
 
       // 주문 상태 변경
       order.orderStatus = 'cancelled';
       await txOrderRepo.save(order);
 
+      // Phase 5.1: SELECT FOR UPDATE로 상품 Row Lock
+      const product = await txProductRepo
+        .createQueryBuilder('product')
+        .setLock('pessimistic_write')
+        .where('product.id = :id', { id: order.campaignProductId })
+        .getOne();
+
+      if (!product) {
+        const error = new Error(`상품을 찾을 수 없습니다`);
+        (error as any).code = GroupbuyOrderError.PRODUCT_NOT_FOUND;
+        throw error;
+      }
+
       // 상품 확정 수량 감소 (음수 방지)
+      const newConfirmedQuantity = Math.max(0, product.confirmedQuantity - order.quantity);
       await txProductRepo
         .createQueryBuilder()
         .update()
@@ -424,20 +635,23 @@ export class GroupbuyOrderService {
         .where('id = :id', { id: order.campaignId })
         .execute();
 
-      // threshold 상태 재계산 (confirmedQuantity 감소로 인해 미달이 될 수 있음)
-      const updatedProduct = await txProductRepo.findOne({
-        where: { id: order.campaignProductId },
-      });
+      // Phase 5.1: Zombie Status 제거 - 완전한 상태 재계산
+      // threshold_met에서 취소로 인해 미달이 된 경우
       if (
-        updatedProduct &&
-        updatedProduct.status === 'threshold_met' &&
-        updatedProduct.confirmedQuantity < updatedProduct.minTotalQuantity
+        product.status === 'threshold_met' &&
+        newConfirmedQuantity < product.minTotalQuantity
       ) {
-        // threshold 미달로 다시 active 상태로 변경
-        await txProductRepo.update(order.campaignProductId, {
-          status: 'active',
-        });
+        // closed가 아니면 active로 복귀
+        if (order.campaign?.status !== 'closed') {
+          await txProductRepo.update(order.campaignProductId, {
+            status: 'active',
+          });
+        }
       }
+
+      // Phase 5.1: 캠페인 상태도 재계산 필요 여부 체크
+      // (모든 상품이 threshold 미달이 되면 캠페인 상태도 조정 가능)
+      // Note: 현재는 상품 레벨만 재계산, 캠페인 레벨은 closeCampaign에서 처리
 
       return order;
     });
