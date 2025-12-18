@@ -12,6 +12,8 @@ import {
   GroupbuyCampaign,
   type CampaignStatus,
 } from '../entities/GroupbuyCampaign.js';
+import { CampaignProduct } from '../entities/CampaignProduct.js';
+import { GroupbuyOrder } from '../entities/GroupbuyOrder.js';
 
 export interface CreateCampaignDto {
   organizationId: string;
@@ -31,11 +33,24 @@ export interface UpdateCampaignDto {
   metadata?: Record<string, any>;
 }
 
+export interface CampaignCloseResult {
+  campaign: GroupbuyCampaign;
+  thresholdMetProducts: string[];
+  failedProducts: string[];
+  cancelledOrderCount: number;
+}
+
 export class GroupbuyCampaignService {
   private campaignRepository: Repository<GroupbuyCampaign>;
+  private productRepository: Repository<CampaignProduct>;
+  private orderRepository: Repository<GroupbuyOrder>;
+  private entityManager: EntityManager;
 
   constructor(entityManager: EntityManager) {
+    this.entityManager = entityManager;
     this.campaignRepository = entityManager.getRepository(GroupbuyCampaign);
+    this.productRepository = entityManager.getRepository(CampaignProduct);
+    this.orderRepository = entityManager.getRepository(GroupbuyOrder);
   }
 
   /**
@@ -124,6 +139,7 @@ export class GroupbuyCampaignService {
   /**
    * 캠페인 활성화
    * - draft → active
+   * - 현재 날짜가 startDate 이상이어야 활성화 가능
    */
   async activateCampaign(id: string): Promise<GroupbuyCampaign> {
     const campaign = await this.getCampaignById(id);
@@ -140,6 +156,12 @@ export class GroupbuyCampaignService {
       throw new Error('최소 1개 이상의 상품을 등록해야 활성화할 수 있습니다');
     }
 
+    // Phase 2: 현재 날짜가 시작일 이상이어야 활성화 가능
+    const now = new Date();
+    if (now < campaign.startDate) {
+      throw new Error('캠페인 시작일 이후에만 활성화할 수 있습니다');
+    }
+
     campaign.status = 'active';
     return this.campaignRepository.save(campaign);
   }
@@ -147,8 +169,10 @@ export class GroupbuyCampaignService {
   /**
    * 캠페인 마감
    * - active → closed
+   * - 각 상품별 threshold 달성 여부 확인
+   * - 미달성 상품의 주문은 취소 처리
    */
-  async closeCampaign(id: string): Promise<GroupbuyCampaign> {
+  async closeCampaign(id: string): Promise<CampaignCloseResult> {
     const campaign = await this.getCampaignById(id);
     if (!campaign) {
       throw new Error('캠페인을 찾을 수 없습니다');
@@ -158,8 +182,62 @@ export class GroupbuyCampaignService {
       throw new Error('진행 중인 캠페인만 마감할 수 있습니다');
     }
 
-    campaign.status = 'closed';
-    return this.campaignRepository.save(campaign);
+    return this.entityManager.transaction(async (txManager) => {
+      const txCampaignRepo = txManager.getRepository(GroupbuyCampaign);
+      const txProductRepo = txManager.getRepository(CampaignProduct);
+      const txOrderRepo = txManager.getRepository(GroupbuyOrder);
+
+      // 캠페인의 모든 상품 조회
+      const products = await txProductRepo.find({
+        where: { campaignId: id },
+      });
+
+      const thresholdMetProducts: string[] = [];
+      const failedProducts: string[] = [];
+      let cancelledOrderCount = 0;
+
+      for (const product of products) {
+        // threshold 달성 여부 판단: confirmedQuantity 기준
+        const isThresholdMet = product.confirmedQuantity >= product.minTotalQuantity;
+
+        if (isThresholdMet) {
+          // 달성 상품: closed로 변경 (성공적 마감)
+          product.status = 'closed';
+          thresholdMetProducts.push(product.id);
+        } else {
+          // 미달성 상품: closed로 변경 + 관련 주문 취소
+          product.status = 'closed';
+          failedProducts.push(product.id);
+
+          // 해당 상품의 pending 주문 모두 취소
+          const pendingOrders = await txOrderRepo.find({
+            where: {
+              campaignProductId: product.id,
+              orderStatus: 'pending',
+            },
+          });
+
+          for (const order of pendingOrders) {
+            order.orderStatus = 'cancelled';
+            await txOrderRepo.save(order);
+            cancelledOrderCount++;
+          }
+        }
+
+        await txProductRepo.save(product);
+      }
+
+      // 캠페인 상태 변경
+      campaign.status = 'closed';
+      await txCampaignRepo.save(campaign);
+
+      return {
+        campaign,
+        thresholdMetProducts,
+        failedProducts,
+        cancelledOrderCount,
+      };
+    });
   }
 
   /**

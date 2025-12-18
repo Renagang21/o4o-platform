@@ -184,19 +184,8 @@ export class GroupbuyOrderService {
           .execute();
       }
 
-      // 최소 수량 달성 여부 확인 및 상태 업데이트
-      const updatedProduct = await txProductRepo.findOne({
-        where: { id: dto.campaignProductId },
-      });
-      if (
-        updatedProduct &&
-        updatedProduct.status === 'active' &&
-        updatedProduct.orderedQuantity >= updatedProduct.minTotalQuantity
-      ) {
-        await txProductRepo.update(dto.campaignProductId, {
-          status: 'threshold_met',
-        });
-      }
+      // Phase 2: threshold_met 상태는 confirmOrder에서 confirmedQuantity 기준으로 판단
+      // createOrder에서는 orderedQuantity만 업데이트 (threshold 상태 변경 안함)
 
       return order;
     });
@@ -318,6 +307,7 @@ export class GroupbuyOrderService {
   /**
    * 주문 확정
    * - dropshipping 주문 생성 후 호출
+   * - Phase 2: confirmedQuantity 기준 threshold_met 상태 업데이트
    */
   async confirmOrder(
     id: string,
@@ -362,6 +352,85 @@ export class GroupbuyOrderService {
         })
         .where('id = :id', { id: order.campaignId })
         .execute();
+
+      // Phase 2: threshold_met 상태 체크 (confirmedQuantity 기준)
+      const updatedProduct = await txProductRepo.findOne({
+        where: { id: order.campaignProductId },
+      });
+      if (
+        updatedProduct &&
+        updatedProduct.status === 'active' &&
+        updatedProduct.confirmedQuantity >= updatedProduct.minTotalQuantity
+      ) {
+        await txProductRepo.update(order.campaignProductId, {
+          status: 'threshold_met',
+        });
+      }
+
+      return order;
+    });
+  }
+
+  /**
+   * Phase 2: 확정된 주문 취소
+   * - dropshipping 주문 취소 시 호출
+   * - confirmedQuantity 롤백
+   * - threshold 상태 재계산
+   */
+  async cancelConfirmedOrder(id: string): Promise<GroupbuyOrder> {
+    const order = await this.getOrderById(id);
+    if (!order) {
+      throw new Error('주문을 찾을 수 없습니다');
+    }
+
+    if (order.orderStatus !== 'confirmed') {
+      throw new Error('확정된 주문만 취소할 수 있습니다');
+    }
+
+    return this.entityManager.transaction(async (transactionalEntityManager) => {
+      const txOrderRepo = transactionalEntityManager.getRepository(GroupbuyOrder);
+      const txProductRepo = transactionalEntityManager.getRepository(CampaignProduct);
+      const txCampaignRepo = transactionalEntityManager.getRepository(GroupbuyCampaign);
+
+      // 주문 상태 변경
+      order.orderStatus = 'cancelled';
+      await txOrderRepo.save(order);
+
+      // 상품 확정 수량 감소
+      await txProductRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          confirmedQuantity: () => `"confirmedQuantity" - ${order.quantity}`,
+        })
+        .where('id = :id', { id: order.campaignProductId })
+        .execute();
+
+      // 캠페인 확정 수량 감소
+      await txCampaignRepo
+        .createQueryBuilder()
+        .update()
+        .set({
+          totalConfirmedQuantity: () =>
+            `"totalConfirmedQuantity" - ${order.quantity}`,
+        })
+        .where('id = :id', { id: order.campaignId })
+        .execute();
+
+      // threshold 상태 재계산 (confirmedQuantity 감소로 인해 미달이 될 수 있음)
+      const updatedProduct = await txProductRepo.findOne({
+        where: { id: order.campaignProductId },
+      });
+      if (
+        updatedProduct &&
+        updatedProduct.status === 'threshold_met' &&
+        updatedProduct.confirmedQuantity < updatedProduct.minTotalQuantity
+      ) {
+        // threshold 미달로 다시 active 상태로 변경
+        await txProductRepo.update(order.campaignProductId, {
+          status: 'active',
+        });
+      }
 
       return order;
     });

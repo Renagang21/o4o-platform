@@ -1,12 +1,13 @@
 /**
  * Groupbuy-Yaksa Services
- * Phase 1: Entity & Domain Model
+ * Phase 2: Operational Flow Completion
  */
 
 export {
   GroupbuyCampaignService,
   type CreateCampaignDto,
   type UpdateCampaignDto,
+  type CampaignCloseResult,
 } from './GroupbuyCampaignService.js';
 
 export {

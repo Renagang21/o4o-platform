@@ -1,6 +1,6 @@
 /**
  * Groupbuy-Yaksa Lifecycle Hooks
- * Phase 1: Entity & Domain Model
+ * Phase 2: Operational Flow Completion
  */
 
 import { install } from './install.js';

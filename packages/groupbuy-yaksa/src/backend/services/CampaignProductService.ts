@@ -263,12 +263,39 @@ export class CampaignProductService {
       product.confirmedQuantity += delta.confirmedQuantity;
     }
 
-    // 최소 수량 달성 시 상태 업데이트
+    // Phase 2: 최소 수량 달성 시 상태 업데이트
+    // confirmedQuantity 기준으로 threshold 달성 여부 판단
     if (
       product.status === 'active' &&
-      product.orderedQuantity >= product.minTotalQuantity
+      product.confirmedQuantity >= product.minTotalQuantity
     ) {
       product.status = 'threshold_met';
+    }
+
+    return this.productRepository.save(product);
+  }
+
+  /**
+   * Phase 2: threshold 달성 여부 재계산
+   * - 확정 수량 기준으로 상태 업데이트
+   */
+  async recheckThreshold(id: string): Promise<CampaignProduct> {
+    const product = await this.getProductById(id);
+    if (!product) {
+      throw new Error('상품을 찾을 수 없습니다');
+    }
+
+    if (product.status === 'closed') {
+      throw new Error('마감된 상품은 상태를 변경할 수 없습니다');
+    }
+
+    const isThresholdMet = product.confirmedQuantity >= product.minTotalQuantity;
+
+    if (isThresholdMet && product.status === 'active') {
+      product.status = 'threshold_met';
+    } else if (!isThresholdMet && product.status === 'threshold_met') {
+      // 취소로 인해 threshold 미달이 된 경우 active로 복귀
+      product.status = 'active';
     }
 
     return this.productRepository.save(product);
