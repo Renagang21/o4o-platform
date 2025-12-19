@@ -2109,6 +2109,34 @@ importers:
         specifier: ^5.3.0
         version: 5.4.5
 
+  packages/groupbuy-yaksa:
+    dependencies:
+      '@o4o/dropshipping-core':
+        specifier: workspace:*
+        version: link:../dropshipping-core
+      '@o4o/organization-core':
+        specifier: workspace:*
+        version: link:../organization-core
+      express:
+        specifier: ^4.18.0
+        version: 4.21.2
+      typeorm:
+        specifier: ^0.3.20
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.23
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.24
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
+
   packages/health-extension:
     dependencies:
       '@o4o/dropshipping-core':
@@ -2789,6 +2817,49 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
+
+  packages/yaksa-admin:
+    dependencies:
+      '@o4o-apps/forum-yaksa':
+        specifier: workspace:*
+        version: link:../forum-yaksa
+      '@o4o/membership-yaksa':
+        specifier: workspace:*
+        version: link:../membership-yaksa
+      '@o4o/organization-core':
+        specifier: workspace:*
+        version: link:../organization-core
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      class-transformer:
+        specifier: ^0.5.0
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.0
+        version: 0.14.2
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      typeorm:
+        specifier: ^0.3.0
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.24
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
 
   packages/yaksa-scheduler:
     dependencies:
