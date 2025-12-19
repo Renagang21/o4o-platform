@@ -8,7 +8,7 @@ import { AppDataSource } from '../database/connection.js';
 import { BlockPattern } from '../entities/BlockPattern.js';
 import { User } from '../entities/User.js';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import { ILike } from 'typeorm';
 import logger from '../utils/logger.js';
 import { PAGINATION_DEFAULTS, BLOCK_DUPLICATE, BLOCK_PATTERN_CATEGORIES } from '../config/editor.constants.js';

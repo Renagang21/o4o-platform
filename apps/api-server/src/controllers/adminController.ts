@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { AppDataSource } from '../database/connection.js';
 import { User, UserStatus } from '../entities/User.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import { Like, SelectQueryBuilder } from 'typeorm';
 import { emailService } from '../services/email.service.js';
 import logger from '../utils/logger.js';

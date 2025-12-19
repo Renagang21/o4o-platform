@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { cptService } from '../../../services/cpt/cpt.service.js';
 import { metaDataService } from '../../../services/MetaDataService.js';
-import { AuthRequest } from '../../../types/auth.js';
+import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 
 /**

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { Form } from '../../entities/Form.js';
 import { FormSubmission } from '../../entities/FormSubmission.js';
-import { AuthRequest } from '../../types/auth.js';
+import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
 import type { FormField, FormSettings, FormNotification, FormConfirmation } from '../../types/form-builder.js';
 

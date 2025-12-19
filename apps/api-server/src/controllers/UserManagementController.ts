@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { UserRepository, UserFilters, PaginationOptions } from '../repositories/UserRepository.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { AppDataSource } from '../database/connection.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import * as bcrypt from 'bcryptjs';
 import { Parser } from 'json2csv';
 

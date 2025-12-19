@@ -4,7 +4,7 @@ import { Form } from '../entities/Form.js';
 import { FormSubmission } from '../entities/FormSubmission.js';
 import { User } from '../entities/User.js';
 import type { FormField, FormNotification } from '../types/index.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import { sendEmail } from '../utils/email.js';
 import { evaluateConditionalLogic } from '../utils/conditionalLogic.js';
 import { calculateFormula } from '../utils/formula.js';

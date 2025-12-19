@@ -9,7 +9,7 @@ import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../en
 import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert.js';
 // NOTE: BetaUser entity removed - beta feature deprecated
 // import { BetaUser } from '../entities/BetaUser.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 
 export class AnalyticsController {
   private analyticsService: AnalyticsService;

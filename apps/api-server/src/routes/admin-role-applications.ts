@@ -12,7 +12,7 @@ import { RoleApplication, RoleApplicationStatus } from '../entities/RoleApplicat
 import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { User } from '../modules/auth/entities/User.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import { emailService } from '../services/email.service.js';
 import { notificationService } from '../services/NotificationService.js';
 import logger from '../utils/logger.js';

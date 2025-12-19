@@ -5,7 +5,7 @@ import { User } from '../entities/User.js';
 // import { MockDataService } from '../services/MockDataService.js';
 import path from 'path';
 import fs from 'fs/promises';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 
 export class TemplatesController {
   private templateRepository = AppDataSource.getRepository(Template);

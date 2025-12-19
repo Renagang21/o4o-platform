@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { BaseController } from '../../../common/base.controller.js';
-import { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { authenticationService } from '../../../services/authentication.service.js';
 import { PasswordResetService } from '../../../services/passwordResetService.js';
 import { AppDataSource } from '../../../database/connection.js';

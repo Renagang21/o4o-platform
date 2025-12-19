@@ -19,7 +19,7 @@ import { Router, Request, Response } from 'express';
 import { body, param } from 'express-validator';
 import { validateDto } from '../middleware/validateDto.js';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware.js';
 import { aiProxyService } from '../services/ai-proxy.service.js';
 import { aiJobQueue } from '../services/ai-job-queue.service.js';
