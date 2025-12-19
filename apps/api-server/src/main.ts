@@ -365,7 +365,8 @@ import {
 } from '@o4o/cosmetics-seller-extension/backend';
 
 // Cosmetics Sample Display Extension Routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
+// TODO: Re-enable after ESM migration of cosmetics-supplier-extension is complete
+// import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
 
 // Cosmetics Supplier Extension Routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
 // TODO: Re-enable after ESM migration is complete
@@ -593,13 +594,14 @@ const startServer = async () => {
     }
 
     // 18. Register Cosmetics Sample Display Extension routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-    try {
-      const cosmeticsSampleDisplayRoutes = createSampleDisplayRoutes(AppDataSource);
-      app.use('/api/v1/cosmetics-sample', cosmeticsSampleDisplayRoutes);
-      logger.info('✅ Cosmetics Sample Display routes registered at /api/v1/cosmetics-sample');
-    } catch (cosmeticsSampleDisplayError) {
-      logger.error('Failed to register cosmetics-sample-display routes:', cosmeticsSampleDisplayError);
-    }
+    // TODO: Re-enable after ESM migration of cosmetics-supplier-extension is complete
+    // try {
+    //   const cosmeticsSampleDisplayRoutes = createSampleDisplayRoutes(AppDataSource);
+    //   app.use('/api/v1/cosmetics-sample', cosmeticsSampleDisplayRoutes);
+    //   logger.info('✅ Cosmetics Sample Display routes registered at /api/v1/cosmetics-sample');
+    // } catch (cosmeticsSampleDisplayError) {
+    //   logger.error('Failed to register cosmetics-sample-display routes:', cosmeticsSampleDisplayError);
+    // }
 
     // 19. Register Cosmetics Supplier Extension routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
     // TODO: Re-enable after ESM migration is complete
