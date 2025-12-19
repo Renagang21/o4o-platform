@@ -94,10 +94,30 @@ export class GroupbuyOrderService {
    * - 중복 주문 방지
    */
   async createOrder(dto: CreateGroupbuyOrderDto): Promise<GroupbuyOrder> {
-    // 수량 검증 (최우선)
-    if (!dto.quantity || dto.quantity < 1) {
-      const error = new Error(`주문 수량은 1 이상이어야 합니다`);
+    // ============================================
+    // HARDENING S-08: 수량 검증 강화
+    // DTO + Service 이중 방어 (NaN, Infinity, 음수, 0, 비정수 차단)
+    // ============================================
+    if (
+      dto.quantity === undefined ||
+      dto.quantity === null ||
+      !Number.isFinite(dto.quantity) ||
+      !Number.isInteger(dto.quantity) ||
+      dto.quantity < 1
+    ) {
+      const error = new Error(`수량은 1 이상의 정수여야 합니다 (입력값: ${dto.quantity})`);
       (error as any).code = GroupbuyOrderError.INVALID_QUANTITY;
+      throw error;
+    }
+
+    // ============================================
+    // HARDENING S-07: 조직 검증 필수화
+    // 관리자라도 조직 불일치 시 참여 불가
+    // userOrganizationId가 없으면 즉시 거부
+    // ============================================
+    if (!dto.userOrganizationId) {
+      const error = new Error(`조직 정보가 필요합니다. 로그인 상태를 확인해주세요.`);
+      (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
       throw error;
     }
 
@@ -151,11 +171,11 @@ export class GroupbuyOrderService {
         throw error;
       }
 
-      // Phase 5.1: 조직 스코프 이중 검증 (Service 레벨)
-      // pharmacyId가 campaign.organizationId와 일치해야 함 (같은 조직 내 약국)
-      // Note: 약사회 서비스에서 pharmacyId는 조직 ID와 같은 개념
-      if (dto.userOrganizationId && dto.userOrganizationId !== campaign.organizationId) {
-        const error = new Error(`타 조직의 캠페인에는 참여할 수 없습니다`);
+      // HARDENING S-07: 조직 검증 강화 (필수 - optional 아님)
+      // 트랜잭션 내에서 캠페인 조직과 사용자 조직 일치 여부 확인
+      // 관리자라도 조직 불일치 시 참여 불가
+      if (dto.userOrganizationId !== campaign.organizationId) {
+        const error = new Error(`참여 권한이 없습니다`);
         (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
         throw error;
       }
@@ -363,6 +383,13 @@ export class GroupbuyOrderService {
    * - 조직 검증
    */
   async cancelOrder(id: string, userOrganizationId?: string): Promise<GroupbuyOrder> {
+    // HARDENING S-07: 조직 검증 필수화 (취소 시에도 조직 확인 필수)
+    if (!userOrganizationId) {
+      const error = new Error(`조직 정보가 필요합니다. 로그인 상태를 확인해주세요.`);
+      (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
+      throw error;
+    }
+
     return this.entityManager.transaction(async (txManager) => {
       const txOrderRepo = txManager.getRepository(GroupbuyOrder);
       const txProductRepo = txManager.getRepository(CampaignProduct);
@@ -383,13 +410,11 @@ export class GroupbuyOrderService {
         throw error;
       }
 
-      // Phase 5.1: 조직 스코프 이중 검증
-      if (userOrganizationId && order.campaign) {
-        if (userOrganizationId !== order.campaign.organizationId) {
-          const error = new Error(`타 조직의 주문을 취소할 수 없습니다`);
-          (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
-          throw error;
-        }
+      // HARDENING S-07: 조직 검증 강화 (필수)
+      if (order.campaign && userOrganizationId !== order.campaign.organizationId) {
+        const error = new Error(`참여 권한이 없습니다`);
+        (error as any).code = GroupbuyOrderError.ORG_ACCESS_DENIED;
+        throw error;
       }
 
       // Phase 5.1: 상태 기반 작업 차단
