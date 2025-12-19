@@ -6,10 +6,10 @@
  */
 
 // Entities
-export * from '../entities';
+export * from '../entities/index.js';
 
 // Types
-export * from '../types';
+export * from '../types/context.js';
 
 // View System
-export * from '../view-system';
+export * from '../view-system/index.js';

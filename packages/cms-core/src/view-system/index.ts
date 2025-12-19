@@ -7,6 +7,7 @@
  * - ViewRegistry: View 컴포넌트 중앙 관리
  * - NavigationRegistry: 메뉴 구조 자동 구성
  * - DynamicRouter: 동적 라우팅 자동 생성
+ * - ViewResolver: CMS View → Frontend 표준 연결 경로 (Phase 3)
  */
 
 import type { NavigationItem, ViewComponent, ViewRegistrationOptions } from './types.js';
@@ -16,6 +17,17 @@ import { dynamicRouter, DynamicRouter } from './dynamic-router.js';
 
 // Types
 export * from './types.js';
+
+// Frontend Types (Phase 3: API 응답 스키마 명확화)
+export * from './frontend-types.js';
+
+// View Resolver (Phase 3: CMS View → Frontend 표준 연결 경로)
+export {
+  resolveCmsView,
+  listCmsViews,
+  getEmptyResolution,
+  CmsViewResolverError,
+} from './view-resolver.js';
 
 // View Registry
 export { ViewRegistry, viewRegistry };
