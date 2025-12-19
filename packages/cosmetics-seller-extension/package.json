@@ -14,6 +14,10 @@
       "types": "./dist/manifest.d.ts",
       "import": "./dist/manifest.js"
     },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
     "./backend/*": "./dist/backend/*"
   },
   "sideEffects": false,
