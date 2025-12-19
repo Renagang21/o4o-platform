@@ -19,8 +19,8 @@
  */
 
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { AlertCircle, RefreshCw, User } from 'lucide-react';
 import { Button, Card, CardContent } from '@o4o/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMemberHome } from '@/hooks/useMemberHome';
@@ -94,11 +94,19 @@ export function MemberHomePage() {
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">내 홈</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          지금 나에게 중요한 것을 한눈에 확인하세요.
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">내 홈</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            지금 나에게 중요한 것을 한눈에 확인하세요.
+          </p>
+        </div>
+        <Link to="/member/profile">
+          <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <User className="h-4 w-4" aria-hidden="true" />
+            내 정보
+          </Button>
+        </Link>
       </div>
 
       {/* Sections - UX Priority 순서 (변경 금지) */}

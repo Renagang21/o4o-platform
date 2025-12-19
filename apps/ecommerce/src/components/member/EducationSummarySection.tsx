@@ -49,14 +49,14 @@ export function EducationSummarySection({ data, isLoading }: EducationSummarySec
       <Card className="opacity-60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-400">
-            <GraduationCap className="h-5 w-5" />
+            <GraduationCap className="h-5 w-5" aria-hidden="true" />
             필수 교육
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            교육 정보를 불러올 수 없습니다.
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <span>교육 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.</span>
           </div>
         </CardContent>
       </Card>
@@ -84,11 +84,16 @@ export function EducationSummarySection({ data, isLoading }: EducationSummarySec
       <CardContent>
         {/* Overdue Warning */}
         {data.hasOverdue && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 rounded-lg mb-4">
-            <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
-            <p className="text-sm text-red-600">
-              미이수 교육 {data.overdueCount}개 (기한 초과)
-            </p>
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mb-4" role="alert">
+            <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-medium text-red-700">
+                미이수 교육 {data.overdueCount}개
+              </p>
+              <p className="text-xs text-red-600">
+                이수 기한이 지났습니다. 빠른 수강이 필요합니다.
+              </p>
+            </div>
           </div>
         )}
 

@@ -107,7 +107,7 @@ export function PharmacyInfoSection({
       await onSave(formData);
       setShowWarning(false);
       setIsEditing(false);
-      setSuccessMessage('약국 정보가 저장되었습니다.');
+      setSuccessMessage('약국 정보가 저장되었습니다. 변경된 내용이 반영되었습니다.');
     } catch (err: any) {
       setFormErrors({ general: err.message || '저장 중 오류가 발생했습니다.' });
     }
@@ -301,14 +301,15 @@ export function PharmacyInfoSection({
             {/* Workplace Type */}
             <div>
               <Label htmlFor="workplaceType" className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-gray-500" />
+                <Briefcase className="h-4 w-4 text-gray-500" aria-hidden="true" />
                 근무지 유형
               </Label>
               <select
                 id="workplaceType"
                 value={formData.workplaceType}
                 onChange={(e) => handleInputChange('workplaceType', e.target.value)}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                aria-label="근무지 유형 선택"
               >
                 <option value="">선택하세요</option>
                 {WORKPLACE_TYPES.map((type) => (

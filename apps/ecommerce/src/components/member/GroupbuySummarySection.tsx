@@ -50,14 +50,14 @@ export function GroupbuySummarySection({ data, isLoading }: GroupbuySummarySecti
       <Card className="opacity-60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-400">
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             공동구매
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            공동구매 정보를 불러올 수 없습니다.
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <span>공동구매 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.</span>
           </div>
         </CardContent>
       </Card>
@@ -68,14 +68,20 @@ export function GroupbuySummarySection({ data, isLoading }: GroupbuySummarySecti
   if (data.activeCampaignCount === 0) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             공동구매
           </CardTitle>
+          <Link to="/groupbuy">
+            <Button variant="ghost" size="sm" className="text-xs">
+              전체보기 <ChevronRight className="h-3 w-3 ml-1" aria-hidden="true" />
+            </Button>
+          </Link>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 text-sm">진행 중인 공동구매 없음</p>
+          <p className="text-gray-500 text-sm">현재 진행 중인 공동구매가 없습니다.</p>
+          <p className="text-gray-400 text-xs mt-1">새로운 공동구매가 시작되면 여기에 표시됩니다.</p>
         </CardContent>
       </Card>
     );

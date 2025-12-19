@@ -101,9 +101,10 @@ export function ProfileSummarySection({
           {/* License Number - READ-ONLY */}
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
             <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
-              <IdCard className="h-4 w-4" />
-              면허번호
-              <Lock className="h-3 w-3 text-gray-400" />
+              <IdCard className="h-4 w-4" aria-hidden="true" />
+              <span>면허번호</span>
+              <Lock className="h-3 w-3 text-gray-400" aria-hidden="true" />
+              <span className="sr-only">(수정 불가)</span>
             </div>
             <div className="font-mono text-lg font-medium text-gray-900">
               {license?.licenseNumber || profile?.licenseNumber || '-'}
@@ -114,7 +115,8 @@ export function ProfileSummarySection({
               </span>
             )}
             <p className="mt-2 text-xs text-gray-400">
-              면허번호는 행정 정보로, 수정할 수 없습니다.
+              면허번호는 약사 인증에 사용되는 행정 정보입니다.
+              수정이 필요하시면 관리자에게 문의하세요.
             </p>
           </div>
 

@@ -49,14 +49,14 @@ export function ForumSummarySection({ data, isLoading }: ForumSummarySectionProp
       <Card className="opacity-60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-400">
-            <MessageSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5" aria-hidden="true" />
             커뮤니티
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            커뮤니티 정보를 불러올 수 없습니다.
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <span>커뮤니티 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.</span>
           </div>
         </CardContent>
       </Card>
@@ -67,14 +67,20 @@ export function ForumSummarySection({ data, isLoading }: ForumSummarySectionProp
   if (data.posts.length === 0) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5" aria-hidden="true" />
             커뮤니티
           </CardTitle>
+          <Link to="/forum">
+            <Button variant="ghost" size="sm" className="text-xs">
+              커뮤니티 방문 <ChevronRight className="h-3 w-3 ml-1" aria-hidden="true" />
+            </Button>
+          </Link>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 text-sm">최신 글이 없습니다.</p>
+          <p className="text-gray-500 text-sm">아직 등록된 글이 없습니다.</p>
+          <p className="text-gray-400 text-xs mt-1">커뮤니티에서 다른 약사들과 소통해 보세요.</p>
         </CardContent>
       </Card>
     );

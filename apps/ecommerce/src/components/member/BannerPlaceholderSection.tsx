@@ -44,14 +44,14 @@ export function BannerPlaceholderSection({ data, isLoading }: BannerPlaceholderS
       <Card className="opacity-60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-400">
-            <Info className="h-5 w-5" />
+            <Info className="h-5 w-5" aria-hidden="true" />
             안내
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            정보를 불러올 수 없습니다.
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <span>안내 정보를 불러올 수 없습니다.</span>
           </div>
         </CardContent>
       </Card>

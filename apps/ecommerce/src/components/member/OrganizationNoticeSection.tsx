@@ -51,14 +51,14 @@ export function OrganizationNoticeSection({ data, isLoading }: OrganizationNotic
       <Card className="opacity-60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-400">
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5" aria-hidden="true" />
             지부/분회 공지
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-gray-400 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            공지사항을 불러올 수 없습니다.
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <span>공지사항을 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.</span>
           </div>
         </CardContent>
       </Card>
@@ -71,12 +71,12 @@ export function OrganizationNoticeSection({ data, isLoading }: OrganizationNotic
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5" aria-hidden="true" />
             지부/분회 공지
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 text-sm">공지 없음</p>
+          <p className="text-gray-500 text-sm">현재 등록된 공지가 없습니다.</p>
         </CardContent>
       </Card>
     );
