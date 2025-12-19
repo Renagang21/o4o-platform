@@ -362,7 +362,7 @@ import {
   SellerInventory,
   SellerConsultationLog,
   SellerKPI,
-} from '@o4o/cosmetics-seller-extension';
+} from '@o4o/cosmetics-seller-extension/backend';
 
 // Cosmetics Sample Display Extension Routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
 import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
