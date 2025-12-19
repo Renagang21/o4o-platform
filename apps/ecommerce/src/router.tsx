@@ -15,6 +15,9 @@ import { SupplierStoreSettings } from './pages/supplier/SupplierStoreSettings';
 import { ShortcodeDemo } from './pages/ShortcodeDemo';
 import { VendorRoute } from './components/auth/VendorRoute';
 
+// Member Dashboard imports (Phase 3)
+import { MemberHomePage } from './pages/member';
+
 // Vendor Dashboard imports
 import VendorLayout from './pages/vendor/layout/VendorLayout';
 // import VendorDashboard from './pages/vendor/Dashboard';
@@ -71,6 +74,11 @@ export const router = createBrowserRouter([
       {
         path: 'shortcode-demo',
         element: <ShortcodeDemo />,
+      },
+      // Member Routes (Phase 3)
+      {
+        path: 'member/home',
+        element: <MemberHomePage />,
       },
     ],
   },

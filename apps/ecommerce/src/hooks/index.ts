@@ -15,3 +15,6 @@ export * from './useReviews';
 
 // Supplier hooks
 export * from './useSuppliers';
+
+// Member hooks (Phase 3)
+export * from './useMemberHome';
