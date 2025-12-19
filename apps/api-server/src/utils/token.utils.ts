@@ -9,6 +9,15 @@ import logger from './logger.js';
  *
  * Centralized token generation and verification logic.
  * Used by all auth services to ensure consistency.
+ *
+ * === Phase 2.5 Server Isolation ===
+ * JWT tokens include issuer (iss) and audience (aud) claims
+ * to ensure tokens from one server cannot be used on another.
+ *
+ * - JWT_ISSUER: Identifies the server that issued the token
+ * - JWT_AUDIENCE: Identifies the intended recipient of the token
+ *
+ * Cross-server token usage is BLOCKED at verification time.
  */
 
 // Token configuration
@@ -16,11 +25,18 @@ const ACCESS_TOKEN_EXPIRES_IN = 15 * 60; // 15 minutes in seconds
 const REFRESH_TOKEN_EXPIRES_IN = 7 * 24 * 60 * 60; // 7 days in seconds
 
 /**
- * Get JWT secrets from environment
+ * Get JWT configuration from environment
+ *
+ * issuer/audience are used to isolate tokens between servers
+ * (e.g., Cosmetics vs Yaksa servers)
  */
-function getJwtSecrets() {
+function getJwtConfig() {
   const jwtSecret = process.env.JWT_SECRET;
   const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+  // Server isolation: issuer identifies who created the token
+  const jwtIssuer = process.env.JWT_ISSUER || 'o4o-platform';
+  // Server isolation: audience identifies who should accept the token
+  const jwtAudience = process.env.JWT_AUDIENCE || 'o4o-api';
 
   if (!jwtSecret) {
     throw new Error('JWT_SECRET environment variable is required');
@@ -29,7 +45,16 @@ function getJwtSecrets() {
     throw new Error('JWT_REFRESH_SECRET environment variable is required');
   }
 
-  return { jwtSecret, jwtRefreshSecret };
+  return { jwtSecret, jwtRefreshSecret, jwtIssuer, jwtAudience };
+}
+
+/**
+ * Get JWT secrets from environment (legacy alias)
+ * @deprecated Use getJwtConfig() instead
+ */
+function getJwtSecrets() {
+  const config = getJwtConfig();
+  return { jwtSecret: config.jwtSecret, jwtRefreshSecret: config.jwtRefreshSecret };
 }
 
 /**
@@ -38,9 +63,12 @@ function getJwtSecrets() {
  * @param user - User entity
  * @param domain - Domain for the token (default: neture.co.kr)
  * @returns JWT access token string
+ *
+ * === Phase 2.5: Server Isolation ===
+ * Token includes iss (issuer) and aud (audience) for cross-server protection
  */
 export function generateAccessToken(user: User, domain: string = 'neture.co.kr'): string {
-  const { jwtSecret } = getJwtSecrets();
+  const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
   const payload: AccessTokenPayload = {
     userId: user.id,
@@ -49,6 +77,8 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
     role: user.role,
     permissions: user.permissions || [],
     domain,
+    iss: jwtIssuer,     // Phase 2.5: Server isolation
+    aud: jwtAudience,   // Phase 2.5: Server isolation
     exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
     iat: Math.floor(Date.now() / 1000)
   };
@@ -62,15 +92,20 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
  * @param user - User entity
  * @param tokenFamily - Token family ID for refresh token rotation
  * @returns JWT refresh token string
+ *
+ * === Phase 2.5: Server Isolation ===
+ * Token includes iss (issuer) and aud (audience) for cross-server protection
  */
 export function generateRefreshToken(user: User, tokenFamily?: string): string {
-  const { jwtRefreshSecret } = getJwtSecrets();
+  const { jwtRefreshSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
   const payload: RefreshTokenPayload = {
     userId: user.id,
     sub: user.id,
     tokenVersion: 1,
     tokenFamily: tokenFamily || uuidv4(),
+    iss: jwtIssuer,     // Phase 2.5: Server isolation
+    aud: jwtAudience,   // Phase 2.5: Server isolation
     exp: Math.floor(Date.now() / 1000) + REFRESH_TOKEN_EXPIRES_IN,
     iat: Math.floor(Date.now() / 1000)
   };
@@ -103,11 +138,20 @@ export function generateTokens(user: User, domain: string = 'neture.co.kr'): Aut
  *
  * @param token - JWT access token string
  * @returns Decoded payload or null if invalid
+ *
+ * === Phase 2.5: Server Isolation ===
+ * Verifies issuer and audience to prevent cross-server token usage.
+ * Tokens from a different server will be rejected (returns null).
  */
 export function verifyAccessToken(token: string): AccessTokenPayload | null {
   try {
-    const { jwtSecret } = getJwtSecrets();
-    const payload = jwt.verify(token, jwtSecret) as AccessTokenPayload;
+    const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
+
+    // Phase 2.5: Verify with issuer/audience for server isolation
+    const payload = jwt.verify(token, jwtSecret, {
+      issuer: jwtIssuer,
+      audience: jwtAudience
+    }) as AccessTokenPayload;
 
     // Ensure userId is set (handle both userId and sub)
     return {
@@ -117,9 +161,17 @@ export function verifyAccessToken(token: string): AccessTokenPayload | null {
       ...payload
     };
   } catch (error) {
-    logger.debug('Access token verification failed', {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    // Phase 2.5: Log specific error for debugging server isolation issues
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('issuer') || errorMessage.includes('audience')) {
+      logger.warn('Access token rejected: server isolation mismatch', {
+        error: errorMessage
+      });
+    } else {
+      logger.debug('Access token verification failed', {
+        error: errorMessage
+      });
+    }
     return null;
   }
 }
@@ -129,11 +181,20 @@ export function verifyAccessToken(token: string): AccessTokenPayload | null {
  *
  * @param token - JWT refresh token string
  * @returns Decoded payload or null if invalid
+ *
+ * === Phase 2.5: Server Isolation ===
+ * Verifies issuer and audience to prevent cross-server token usage.
+ * Tokens from a different server will be rejected (returns null).
  */
 export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
   try {
-    const { jwtRefreshSecret } = getJwtSecrets();
-    const payload = jwt.verify(token, jwtRefreshSecret) as RefreshTokenPayload;
+    const { jwtRefreshSecret, jwtIssuer, jwtAudience } = getJwtConfig();
+
+    // Phase 2.5: Verify with issuer/audience for server isolation
+    const payload = jwt.verify(token, jwtRefreshSecret, {
+      issuer: jwtIssuer,
+      audience: jwtAudience
+    }) as RefreshTokenPayload;
 
     return {
       userId: payload.userId || payload.sub || '',
@@ -144,9 +205,17 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
       iat: payload.iat
     };
   } catch (error) {
-    logger.debug('Refresh token verification failed', {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    // Phase 2.5: Log specific error for debugging server isolation issues
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('issuer') || errorMessage.includes('audience')) {
+      logger.warn('Refresh token rejected: server isolation mismatch', {
+        error: errorMessage
+      });
+    } else {
+      logger.debug('Refresh token verification failed', {
+        error: errorMessage
+      });
+    }
     return null;
   }
 }

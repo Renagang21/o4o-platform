@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import { RoleAssignment } from '../../modules/auth/entities/RoleAssignment.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
+import { verifyAccessToken } from '../../utils/token.utils.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -35,14 +35,17 @@ function extractToken(req: Request): string | null {
 /**
  * Require Authentication Middleware
  *
- * Verifies that the request includes a valid JWT token and the user exists.
- * Attaches the user object to req.user for downstream use.
+ * === Phase 2.5: Server Isolation & Unified Error Handling ===
+ * Uses token.utils.verifyAccessToken which includes:
+ * - JWT signature verification
+ * - Issuer/Audience validation (server isolation)
+ * - Expiration check
  *
  * Returns 401 if:
- * - No token provided
- * - Token is invalid or expired
- * - User not found in database
- * - User account is inactive
+ * - No token provided (AUTH_REQUIRED)
+ * - Token is invalid, expired, or from different server (INVALID_TOKEN)
+ * - User not found in database (INVALID_USER)
+ * - User account is inactive (USER_INACTIVE)
  *
  * @example
  * ```typescript
@@ -65,17 +68,23 @@ export const requireAuth = async (
       });
     }
 
-    // Verify JWT token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'your-secret-key'
-    ) as any;
+    // Phase 2.5: Use token.utils for verification (includes issuer/audience check)
+    const payload = verifyAccessToken(token);
+
+    if (!payload) {
+      // Token is invalid, expired, or from a different server
+      return res.status(401).json({
+        success: false,
+        error: 'Access token is invalid or has expired',
+        code: 'INVALID_TOKEN',
+      });
+    }
 
     // Get user from database
     // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
-      where: { id: decoded.userId || decoded.sub },
+      where: { id: payload.userId },
       relations: ['linkedAccounts'],
     });
 
@@ -256,6 +265,10 @@ export const requireRole = (roles: string | string[]) => {
 /**
  * Optional Authentication Middleware
  *
+ * === Phase 2.5: Server Isolation ===
+ * Uses token.utils.verifyAccessToken for consistent token validation.
+ * Tokens from different servers will be silently rejected.
+ *
  * Attempts to authenticate the user but doesn't fail if no token is present.
  * Useful for endpoints that have different behavior for authenticated vs anonymous users.
  *
@@ -277,17 +290,18 @@ export const optionalAuth = async (
       return next(); // No token, continue without authentication
     }
 
-    // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'your-secret-key'
-    ) as any;
+    // Phase 2.5: Use token.utils for verification (includes issuer/audience check)
+    const payload = verifyAccessToken(token);
+
+    if (!payload) {
+      return next(); // Invalid token, continue without authentication
+    }
 
     // Get user from database
     // Note: dbRoles relation is deprecated - use RoleAssignment for RBAC
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
-      where: { id: decoded.userId || decoded.sub },
+      where: { id: payload.userId },
       relations: ['linkedAccounts'],
     });
 

@@ -388,44 +388,78 @@ export class AuthenticationService {
   /**
    * Refresh tokens
    *
+   * === Phase 2.5: Unified Error Handling ===
+   * Returns specific error codes for frontend handling:
+   * - REFRESH_TOKEN_EXPIRED: Token has expired (do NOT retry)
+   * - REFRESH_TOKEN_INVALID: Token is malformed or signature invalid (do NOT retry)
+   * - TOKEN_FAMILY_MISMATCH: Token rotation detected, possible theft (do NOT retry)
+   * - USER_NOT_FOUND: User does not exist or is inactive (do NOT retry)
+   *
    * @param refreshToken - Current refresh token
-   * @returns New tokens
+   * @returns New tokens or throws error with specific code
    */
-  async refreshTokens(refreshToken: string): Promise<AuthTokens | null> {
-    try {
-      const payload = tokenUtils.verifyRefreshToken(refreshToken);
+  async refreshTokens(refreshToken: string): Promise<AuthTokens> {
+    // Phase 2.5: Verify JWT token (includes issuer/audience check for server isolation)
+    const payload = tokenUtils.verifyRefreshToken(refreshToken);
 
-      if (!payload) {
-        return null;
+    if (!payload) {
+      // Token is invalid, expired, or from a different server
+      const error = new Error('Invalid or expired refresh token') as Error & { code: string };
+      error.code = 'REFRESH_TOKEN_INVALID';
+      throw error;
+    }
+
+    // Check token expiration explicitly for clearer error
+    if (tokenUtils.isTokenExpired(refreshToken)) {
+      const error = new Error('Refresh token has expired') as Error & { code: string };
+      error.code = 'REFRESH_TOKEN_EXPIRED';
+      throw error;
+    }
+
+    // Find user with matching token family
+    const user = await this.userRepository.findOne({
+      where: {
+        id: payload.userId,
+        isActive: true
       }
+    });
 
-      const user = await this.userRepository.findOne({
-        where: {
-          id: payload.userId,
-          isActive: true,
-          refreshTokenFamily: payload.tokenFamily
-        }
+    if (!user) {
+      const error = new Error('User not found or inactive') as Error & { code: string };
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    // Phase 2.5: Token family check for rotation security
+    // If token family doesn't match, this could indicate token theft
+    if (user.refreshTokenFamily && payload.tokenFamily &&
+        user.refreshTokenFamily !== payload.tokenFamily) {
+      logger.warn('Token family mismatch - possible token theft detected', {
+        userId: user.id,
+        expectedFamily: user.refreshTokenFamily,
+        receivedFamily: payload.tokenFamily
       });
 
-      if (!user) {
-        return null;
-      }
+      // Invalidate all tokens for this user (security measure)
+      user.refreshTokenFamily = null;
+      await this.userRepository.save(user);
 
-      // Generate new tokens (with rotation)
-      const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
-
-      // Update token family
-      const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
-      if (tokenFamily) {
-        user.refreshTokenFamily = tokenFamily;
-        await this.userRepository.save(user);
-      }
-
-      return tokens;
-    } catch (error) {
-      logger.debug('Refresh token error:', error);
-      return null;
+      const error = new Error('Token family mismatch - please login again') as Error & { code: string };
+      error.code = 'TOKEN_FAMILY_MISMATCH';
+      throw error;
     }
+
+    // Generate new tokens (with rotation)
+    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+
+    // Update token family
+    const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+    if (tokenFamily) {
+      user.refreshTokenFamily = tokenFamily;
+      await this.userRepository.save(user);
+    }
+
+    return tokens;
   }
 
   /**

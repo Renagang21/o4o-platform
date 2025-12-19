@@ -197,9 +197,20 @@ export class AuthController extends BaseController {
    * POST /api/v1/auth/refresh
    * Refresh access token
    *
-   * Response format (unified):
+   * === Phase 2.5: Unified Error Response ===
+   * All refresh failures return 401 with specific error codes.
+   * Frontend should NOT retry on these errors - redirect to login instead.
+   *
+   * Error codes:
+   * - NO_REFRESH_TOKEN: Token not provided in request
+   * - REFRESH_TOKEN_INVALID: Token malformed, signature invalid, or from different server
+   * - REFRESH_TOKEN_EXPIRED: Token has expired
+   * - TOKEN_FAMILY_MISMATCH: Token rotation detected (possible theft)
+   * - USER_NOT_FOUND: User does not exist or is inactive
+   *
+   * Response format:
    * - Success: { success: true, data: { accessToken, refreshToken, expiresIn } }
-   * - Error: { success: false, error: "ERROR_CODE", code: "ERROR_CODE" }
+   * - Error: { success: false, error: "message", code: "ERROR_CODE", retryable: false }
    */
   static async refresh(req: Request, res: Response): Promise<any> {
     const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
@@ -210,20 +221,12 @@ export class AuthController extends BaseController {
         success: false,
         error: 'Refresh token not provided',
         code: 'NO_REFRESH_TOKEN',
+        retryable: false,  // Phase 2.5: Frontend should NOT retry
       });
     }
 
     try {
       const tokens = await authenticationService.refreshTokens(refreshToken);
-
-      if (!tokens) {
-        authenticationService.clearAuthCookies(res);
-        return res.status(401).json({
-          success: false,
-          error: 'Invalid or expired refresh token',
-          code: 'INVALID_REFRESH_TOKEN',
-        });
-      }
 
       authenticationService.setAuthCookies(res, tokens);
 
@@ -236,16 +239,20 @@ export class AuthController extends BaseController {
     } catch (error: any) {
       logger.error('[AuthController.refresh] Token refresh error', {
         error: error.message,
+        code: error.code,
       });
 
+      // Phase 2.5: Always clear cookies on refresh failure
       authenticationService.clearAuthCookies(res);
 
-      // Return specific error code for FE handling
-      const errorCode = error.code || 'TOKEN_EXPIRED';
+      // Phase 2.5: Return specific error code for FE handling
+      // All these errors are non-retryable - frontend should redirect to login
+      const errorCode = error.code || 'REFRESH_TOKEN_INVALID';
       return res.status(401).json({
         success: false,
         error: error.message || 'Invalid or expired refresh token',
         code: errorCode,
+        retryable: false,  // Phase 2.5: Frontend should NOT retry - redirect to login
       });
     }
   }

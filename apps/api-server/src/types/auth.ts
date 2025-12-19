@@ -133,6 +133,9 @@ export interface AccessTokenPayload {
   permissions?: string[];
   domain?: string;
   sub?: string; // JWT standard claim
+  // Phase 2.5: Server isolation claims
+  iss?: string; // Issuer - identifies the server that issued the token
+  aud?: string; // Audience - identifies the intended recipient
   createdAt?: Date | string;
   updatedAt?: Date | string;
   lastLoginAt?: Date | string;
@@ -145,6 +148,9 @@ export interface RefreshTokenPayload {
   tokenVersion: number;
   sub?: string; // JWT standard claim
   tokenFamily?: string;
+  // Phase 2.5: Server isolation claims
+  iss?: string; // Issuer - identifies the server that issued the token
+  aud?: string; // Audience - identifies the intended recipient
   iat?: number;
   exp?: number;
 }
