@@ -198,6 +198,12 @@ const OfficerManagePage = lazy(() => import('@/pages/yaksa-admin/OfficerManagePa
 const EducationOverviewPage = lazy(() => import('@/pages/yaksa-admin/EducationOverviewPage'));
 const FeeOverviewPage = lazy(() => import('@/pages/yaksa-admin/FeeOverviewPage'));
 
+// Yaksa Accounting - Phase 2 Expense UI & Export
+const AccountingDashboard = lazy(() => import('@/pages/yaksa-admin/accounting/AccountingDashboard'));
+const ExpenseListPage = lazy(() => import('@/pages/yaksa-admin/accounting/ExpenseListPage'));
+const ClosingPage = lazy(() => import('@/pages/yaksa-admin/accounting/ClosingPage'));
+const ExportPage = lazy(() => import('@/pages/yaksa-admin/accounting/ExportPage'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1315,6 +1321,36 @@ function App() {
                     <Route path="/admin/yaksa/forum" element={
                       <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
                         <Navigate to="/forum/boards" replace />
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Yaksa Accounting - Phase 2 */}
+                    <Route path="/admin/yaksa/accounting" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AccountingDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/accounting/expenses" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ExpenseListPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/accounting/close" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ClosingPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/accounting/export" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ExportPage />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
 
