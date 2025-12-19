@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
-import { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { PasswordResetService } from '../../../services/passwordResetService.js';
 import { EmailVerificationDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';

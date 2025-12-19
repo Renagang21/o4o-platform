@@ -1,58 +1,22 @@
-/**
- * member-yaksa Install Lifecycle
- *
- * Phase 1: MemberProfile 엔티티 설치
- * - DB 테이블 생성 (마이그레이션)
- * - 권한 등록
- */
-
-export interface InstallContext {
-  appId: string;
-  version: string;
-  dataSource?: unknown;
-}
-
-export interface InstallResult {
-  success: boolean;
-  message: string;
-  warnings?: string[];
-  tables?: string[];
-  permissions?: string[];
-}
+import type { DataSource } from 'typeorm';
 
 /**
- * Install handler
+ * Member-Yaksa Install Hook
  *
- * Phase 1: MemberProfile 테이블 생성
+ * 앱 설치 시 실행
+ *
+ * Phase 0:
+ * - DB 생성 없음 (membership-yaksa 데이터 활용)
+ * - Seed 없음
+ * - 로그만 출력
  */
-export async function install(context: InstallContext): Promise<InstallResult> {
-  console.log('[member-yaksa] Install started');
-  console.log(`[member-yaksa] App ID: ${context.appId}`);
-  console.log(`[member-yaksa] Version: ${context.version}`);
+export async function install(dataSource: DataSource): Promise<void> {
+  console.log('[Member-Yaksa] Installing...');
 
-  // Phase 1: 테이블 생성
-  const tables = ['member_profiles'];
-  console.log('[member-yaksa] Tables to create:', tables);
+  // Phase 0: 설치 로그만 출력
+  // 실제 테이블 생성은 membership-yaksa가 담당
+  // member-yaksa는 해당 데이터를 "읽기/수정(본인만)" 하는 역할
 
-  // 권한 등록
-  const permissions = [
-    'member.profile.read',
-    'member.profile.update',
-    'member.profile.admin',
-  ];
-  console.log('[member-yaksa] Permissions to register:', permissions);
-
-  // Note: 실제 마이그레이션은 TypeORM synchronize 또는 별도 마이그레이션 스크립트로 실행
-  // 이 lifecycle은 앱 설치 시 필요한 설정만 수행
-
-  console.log('[member-yaksa] Install completed (Phase 1 - MemberProfile)');
-
-  return {
-    success: true,
-    message: 'member-yaksa installed successfully (Phase 1)',
-    tables,
-    permissions,
-  };
+  console.log('[Member-Yaksa] No tables to create (uses membership-yaksa data)');
+  console.log('[Member-Yaksa] Install completed');
 }
-
-export default install;

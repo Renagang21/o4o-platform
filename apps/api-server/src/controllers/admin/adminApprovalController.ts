@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { getRepository } from 'typeorm';
 import { User } from '../../entities/User.js';
 import { ApprovalLog } from '../../entities/ApprovalLog.js';
-import { AuthRequest } from '../../types/auth.js';
+import type { AuthRequest } from '../../types/auth.js';
 import logger from '../../utils/logger.js';
 
 export class AdminApprovalController {

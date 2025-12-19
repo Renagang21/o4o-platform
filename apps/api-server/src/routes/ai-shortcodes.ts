@@ -7,7 +7,7 @@
 import { Router, Request, Response } from 'express';
 import { shortcodeRegistry } from '../services/shortcode-registry.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware.js';
 import logger from '../utils/logger.js';
 

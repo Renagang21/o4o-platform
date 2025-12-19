@@ -43,6 +43,9 @@ import {
 // Admin pages (Phase N-2)
 import { AdminOrderList, AdminOrderDetail } from './pages/admin/orders';
 
+// Member Dashboard imports (Phase 3)
+import { MemberHomePage } from './pages/member';
+
 // Vendor Dashboard imports
 import VendorLayout from './pages/vendor/layout/VendorLayout';
 // import VendorDashboard from './pages/vendor/Dashboard';
@@ -116,6 +119,11 @@ export const router = createBrowserRouter([
       {
         path: 'groupbuy/:campaignId',
         element: <GroupbuyCampaignDetailPage />,
+      },
+      // Member Routes (Phase 3)
+      {
+        path: 'member/home',
+        element: <MemberHomePage />,
       },
     ],
   },

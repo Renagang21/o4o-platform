@@ -18,3 +18,6 @@ export * from './useSuppliers';
 
 // Groupbuy hooks
 export * from './useGroupbuy';
+
+// Member hooks (Phase 3)
+export * from './useMemberHome';

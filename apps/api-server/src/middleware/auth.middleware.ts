@@ -4,11 +4,11 @@ import { AppDataSource } from '../database/connection.js';
 import { User } from '../modules/auth/entities/User.js';
 import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
-import { AuthRequest } from '../types/auth.js';
+import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 
 // Re-export AuthRequest for backward compatibility
-export { AuthRequest };
+export type { AuthRequest };
 
 /**
  * Extract JWT token from Authorization header or httpOnly cookie

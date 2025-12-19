@@ -6,6 +6,7 @@ export * from './reviews';
 export * from './suppliers';
 export * from './groupbuy';
 export * from './checkout';
+export * from './member';
 // admin-orders exports - excluding ShippingAddress (duplicate with checkout)
 export {
   getAdminOrders,
@@ -30,6 +31,7 @@ import { categoriesApi } from './categories';
 import { reviewsApi } from './reviews';
 import { suppliersApi } from './suppliers';
 import { groupbuyApi } from './groupbuy';
+import { memberApi } from './member';
 
 export const api = {
   products: productsApi,
@@ -38,5 +40,6 @@ export const api = {
   categories: categoriesApi,
   reviews: reviewsApi,
   suppliers: suppliersApi,
-  groupbuy: groupbuyApi
+  groupbuy: groupbuyApi,
+  member: memberApi,
 };

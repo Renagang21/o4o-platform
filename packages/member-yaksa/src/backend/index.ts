@@ -1,17 +1,42 @@
 /**
- * member-yaksa Backend Exports
+ * Member-Yaksa Backend Entry Point
  *
- * Phase 1: MemberProfile API
+ * Phase 1: Core Services and Routes
+ * Phase 2: Home Read Model
  */
 
 // Routes
-export { createMemberRoutes, createMemberProfileRoutes } from './routes/index.js';
+export { createMemberYaksaRoutes, createRoutes } from './routes/index.js';
 
-// Entities
-export * from './entities/index.js';
+// Services (Phase 1)
+export {
+  LicenseQueryService,
+  PharmacyInfoService,
+  MemberProfileService,
+} from './services/index.js';
 
-// Services
-export * from './services/index.js';
+// Home Query Service (Phase 2)
+export {
+  MemberHomeQueryService,
+  UX_PRIORITY,
+} from './home/index.js';
 
-// Controllers
-export * from './controllers/index.js';
+// Types (Phase 1)
+export type {
+  PharmacyInfoData,
+  PharmacyUpdateRequest,
+  PharmacyUpdateResponse,
+  MemberProfileData,
+} from './services/index.js';
+
+// Types (Phase 2)
+export type {
+  HomeQueryOptions,
+  MemberHomeDTO,
+  OrganizationNoticeSummary,
+  GroupbuySummary,
+  EducationSummary,
+  ForumSummary,
+  BannerSummary,
+  UXPriorityKey,
+} from './home/index.js';

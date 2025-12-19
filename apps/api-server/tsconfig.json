@@ -34,6 +34,8 @@
       "@o4o/dropshipping-cosmetics/*": ["../../packages/dropshipping-cosmetics/dist/*"],
       "@o4o/annualfee-yaksa": ["../../packages/annualfee-yaksa/dist"],
       "@o4o/annualfee-yaksa/*": ["../../packages/annualfee-yaksa/dist/*"],
+      "@o4o/cosmetics-seller-extension/backend": ["../../packages/cosmetics-seller-extension/dist/backend"],
+      "@o4o/cosmetics-seller-extension/manifest": ["../../packages/cosmetics-seller-extension/dist/manifest"],
       "@o4o/*": ["../../packages/*/dist"],
       "@o4o-apps/forum": ["../../packages/forum-app/dist"],
       "@o4o-apps/forum/*": ["../../packages/forum-app/dist/*"],

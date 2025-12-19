@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../../entities/CustomField.js';
-import { AuthRequest } from '../../types/auth.js';
+import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
 
 export class FieldGroupsController {

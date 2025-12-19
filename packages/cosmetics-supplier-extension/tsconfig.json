@@ -6,8 +6,9 @@
     "declaration": true,
     "declarationMap": true,
     "noEmit": false,
-    "module": "CommonJS",
-    "moduleResolution": "node"
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "target": "ES2022"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

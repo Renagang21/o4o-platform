@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
-import { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { ActivityQueryDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';

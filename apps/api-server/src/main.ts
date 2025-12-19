@@ -353,7 +353,7 @@ import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/ind
 // Reporting Routes (신상신고)
 import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
 // AnnualFee Routes (연회비)
-import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index.js';
+import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index';
 // Cosmetics Seller Extension Routes (WO-COSMETICS-SELLER-RUNTIME-ACTIVATE)
 import {
   createSellerExtensionRoutes,
@@ -362,13 +362,15 @@ import {
   SellerInventory,
   SellerConsultationLog,
   SellerKPI,
-} from '@o4o/cosmetics-seller-extension';
+} from '@o4o/cosmetics-seller-extension/backend';
 
 // Cosmetics Sample Display Extension Routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
+// TODO: Re-enable after ESM migration of cosmetics-supplier-extension is complete
+// import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
 
 // Cosmetics Supplier Extension Routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
-import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension';
+// TODO: Re-enable after ESM migration is complete
+// import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension';
 
 // Groupbuy-Yaksa Routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
 import { createGroupbuyRoutes } from '@o4o/groupbuy-yaksa';
@@ -607,22 +609,24 @@ const startServer = async () => {
     }
 
     // 18. Register Cosmetics Sample Display Extension routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-    try {
-      const cosmeticsSampleDisplayRoutes = createSampleDisplayRoutes(AppDataSource);
-      app.use('/api/v1/cosmetics-sample', cosmeticsSampleDisplayRoutes);
-      logger.info('✅ Cosmetics Sample Display routes registered at /api/v1/cosmetics-sample');
-    } catch (cosmeticsSampleDisplayError) {
-      logger.error('Failed to register cosmetics-sample-display routes:', cosmeticsSampleDisplayError);
-    }
+    // TODO: Re-enable after ESM migration of cosmetics-supplier-extension is complete
+    // try {
+    //   const cosmeticsSampleDisplayRoutes = createSampleDisplayRoutes(AppDataSource);
+    //   app.use('/api/v1/cosmetics-sample', cosmeticsSampleDisplayRoutes);
+    //   logger.info('✅ Cosmetics Sample Display routes registered at /api/v1/cosmetics-sample');
+    // } catch (cosmeticsSampleDisplayError) {
+    //   logger.error('Failed to register cosmetics-sample-display routes:', cosmeticsSampleDisplayError);
+    // }
 
     // 19. Register Cosmetics Supplier Extension routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
-    try {
-      const cosmeticsSupplierRoutes = createSupplierExtensionRoutes(AppDataSource);
-      app.use('/api/v1/cosmetics-supplier', cosmeticsSupplierRoutes);
-      logger.info('✅ Cosmetics Supplier routes registered at /api/v1/cosmetics-supplier');
-    } catch (cosmeticsSupplierError) {
-      logger.error('Failed to register cosmetics-supplier routes:', cosmeticsSupplierError);
-    }
+    // TODO: Re-enable after ESM migration is complete
+    // try {
+    //   const cosmeticsSupplierRoutes = createSupplierExtensionRoutes(AppDataSource);
+    //   app.use('/api/v1/cosmetics-supplier', cosmeticsSupplierRoutes);
+    //   logger.info('✅ Cosmetics Supplier routes registered at /api/v1/cosmetics-supplier');
+    // } catch (cosmeticsSupplierError) {
+    //   logger.error('Failed to register cosmetics-supplier routes:', cosmeticsSupplierError);
+    // }
 
     // 20. Register Groupbuy-Yaksa routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
     try {

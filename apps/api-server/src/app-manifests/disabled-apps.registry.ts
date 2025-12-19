@@ -55,6 +55,16 @@ export const disabledAppsRegistry: DisabledAppEntry[] = [
     },
   },
   {
+    appId: 'cosmetics-sample-display-extension',
+    name: '화장품 샘플/진열 확장',
+    disabled: {
+      status: 'broken',
+      reason: '런타임 에러 - cosmetics-supplier-extension 의존성으로 인한 ESM/CommonJS 충돌',
+      nextAction: 'cosmetics-supplier-extension ESM 수정 완료 후 활성화',
+      disabledAt: '2024-12-19',
+    },
+  },
+  {
     appId: 'lms-marketing',
     name: 'LMS 마케팅',
     disabled: {

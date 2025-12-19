@@ -1,115 +1,259 @@
+import type { Router, Request, Response, NextFunction } from 'express';
+import type { DataSource } from 'typeorm';
+import { LicenseQueryService } from '../services/license-query.service.js';
+import { PharmacyInfoService } from '../services/pharmacy-info.service.js';
+import { MemberProfileService } from '../services/member-profile.service.js';
+import { MemberHomeQueryService } from '../home/member-home-query.service.js';
+import { UX_PRIORITY } from '../home/dto.js';
+
 /**
- * member-yaksa Routes
+ * Member-Yaksa Routes
  *
- * Phase 1: MemberProfile API 구현
+ * Phase 1: Core API Endpoints
+ * Phase 2: Home Read Model
  *
- * Base path: /api/v1/yaksa/member
+ * Policy Enforcement:
+ * - All endpoints require authentication
+ * - All data access is scoped to self (본인 데이터만)
+ * - License number: READ-ONLY (no update endpoint)
+ * - Pharmacy info: Member-only edit (no admin override)
  *
- * @package @o4o-apps/member-yaksa
- * @phase 1
+ * @see manifest.ts - Policy Fixation
  */
 
-import { Router, Request, Response, RequestHandler } from 'express';
-import type { DataSource } from 'typeorm';
-import { createMemberProfileRoutes } from './memberProfileRoutes.js';
+/**
+ * Auth Request Type
+ * Extends Express Request with authenticated user info
+ */
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email?: string;
+    roles?: string[];
+  };
+}
+
+/**
+ * Authentication Guard
+ * Ensures user is logged in
+ */
+function requireAuth(req: AuthRequest, res: Response, next: NextFunction): void {
+  if (!req.user || !req.user.id) {
+    res.status(401).json({
+      success: false,
+      error: '로그인이 필요합니다.',
+    });
+    return;
+  }
+  next();
+}
 
 /**
  * Create member-yaksa routes
- *
- * @param dataSource - TypeORM DataSource
- * @param options - Route options
  */
-export function createMemberRoutes(
-  dataSource?: DataSource,
-  options?: {
-    authMiddleware?: RequestHandler;
-  }
-): Router {
-  const router = Router();
+export function createMemberYaksaRoutes(router: Router, dataSource: DataSource): Router {
+  // Initialize services (Phase 1)
+  const licenseService = new LicenseQueryService(dataSource);
+  const pharmacyService = new PharmacyInfoService(dataSource);
+  const profileService = new MemberProfileService(dataSource);
 
-  // =====================================================
-  // Health Check
-  // =====================================================
+  // Initialize services (Phase 2)
+  const homeQueryService = new MemberHomeQueryService(dataSource);
+
+  // ===== Profile Routes =====
 
   /**
-   * GET /health
-   * Health check endpoint
+   * GET /api/v1/member/profile
+   * 본인 프로필 조회
    */
-  router.get('/health', (_req: Request, res: Response) => {
-    res.json({
-      success: true,
-      app: 'member-yaksa',
-      version: '1.0.0',
-      phase: 1,
-      status: 'development',
-      message: 'member-yaksa is running (Phase 1 - MemberProfile)',
-    });
-  });
+  router.get('/api/v1/member/profile', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const result = await profileService.getMyProfile(userId);
 
-  // =====================================================
-  // Profile Routes (Phase 1)
-  // =====================================================
-
-  if (dataSource) {
-    // MemberProfile API 라우트 연결
-    router.use('/profile', createMemberProfileRoutes(dataSource, options));
-  } else {
-    // DataSource 없을 때 placeholder
-    router.use('/profile', (_req: Request, res: Response) => {
-      res.status(503).json({
-        success: false,
-        error: 'SERVICE_UNAVAILABLE',
-        message: 'DataSource not initialized',
+      res.json({
+        success: true,
+        data: result.profile,
+        policies: result.policies,
       });
-    });
-  }
-
-  // =====================================================
-  // Home Routes (Phase 2+)
-  // =====================================================
-
-  /**
-   * GET /home
-   * 통합 홈 화면 데이터
-   *
-   * Phase 1: Placeholder
-   * Phase 2+: 공지, 공동구매, 교육, 게시판 데이터 통합
-   */
-  router.get('/home', (_req: Request, res: Response) => {
-    res.json({
-      success: true,
-      message: 'Home endpoint - Implementation in Phase 2+',
-      data: {
-        notice: [],       // Phase 2+: Organization notices
-        groupbuy: [],     // Phase 2+: Active campaigns
-        lms: [],          // Phase 2+: Pending courses
-        forum: [],        // Phase 2+: Recent posts
-        banner: [],       // Phase 2+: Banners
-      },
-    });
+    } catch (error: any) {
+      res.status(404).json({
+        success: false,
+        error: error.message,
+      });
+    }
   });
 
-  // =====================================================
-  // Pharmacy Routes (Alias to Profile)
-  // =====================================================
+  // ===== License Routes =====
 
   /**
-   * GET /pharmacy
-   * 약국 정보 조회 (Profile의 약국 정보 반환)
-   *
-   * Note: 약국 정보는 MemberProfile 엔티티에 포함
+   * GET /api/v1/member/license
+   * 본인 면허번호 조회 (READ-ONLY)
    */
-  router.get('/pharmacy', (_req: Request, res: Response) => {
-    res.json({
-      success: true,
-      message: '약국 정보는 /profile/me API를 사용하세요',
-      redirect: '/api/v1/yaksa/member/profile/me',
-    });
+  router.get('/api/v1/member/license', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const result = await licenseService.getMyLicenseNumber(userId);
+
+      res.json({
+        success: true,
+        data: {
+          licenseNumber: result.licenseNumber,
+          licenseIssuedAt: result.licenseIssuedAt,
+          licenseRenewalAt: result.licenseRenewalAt,
+          isVerified: result.isVerified,
+        },
+        policy: {
+          editable: false,
+          message: result.message,
+        },
+      });
+    } catch (error: any) {
+      res.status(404).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+
+  // ⚠️ NO PUT/PATCH for license - Intentionally omitted per policy
+
+  // ===== Pharmacy Routes =====
+
+  /**
+   * GET /api/v1/member/pharmacy
+   * 본인 약국 정보 조회
+   */
+  router.get('/api/v1/member/pharmacy', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const result = await pharmacyService.getMyPharmacyInfo(userId);
+
+      res.json({
+        success: true,
+        data: result.data,
+        canEdit: result.canEdit,
+        editWarning: result.editWarning,
+      });
+    } catch (error: any) {
+      res.status(404).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+
+  /**
+   * PATCH /api/v1/member/pharmacy
+   * 본인 약국 정보 수정 (본인만 가능)
+   *
+   * Request Body:
+   * - pharmacyName?: string
+   * - pharmacyAddress?: string
+   * - workplaceName?: string
+   * - workplaceAddress?: string
+   * - workplaceType?: string
+   */
+  router.patch('/api/v1/member/pharmacy', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const ipAddress = req.ip || req.socket?.remoteAddress;
+
+      // Validate request body
+      const allowedFields = ['pharmacyName', 'pharmacyAddress', 'workplaceName', 'workplaceAddress', 'workplaceType'];
+      const updateData: Record<string, string> = {};
+
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updateData[field] = req.body[field];
+        }
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        res.status(400).json({
+          success: false,
+          error: '수정할 필드가 없습니다.',
+        });
+        return;
+      }
+
+      const result = await pharmacyService.updateMyPharmacyInfo(userId, updateData, ipAddress);
+
+      res.json({
+        success: result.success,
+        data: result.data,
+        warning: result.warning, // 본인 책임 안내
+        updatedFields: result.updatedFields,
+        timestamp: result.timestamp,
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+
+  // ===== Home Routes (Phase 2: Read Model) =====
+
+  /**
+   * GET /api/v1/member/home
+   * 홈 대시보드 데이터
+   *
+   * Phase 2: Home Read Model
+   * - 각 영역 독립 조회
+   * - 한 영역 실패 시 해당 영역만 null (전체 실패 아님)
+   * - 읽기 전용 (쓰기/수정 경로 없음)
+   */
+  router.get('/api/v1/member/home', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.id;
+
+      // Check membership and get organization info
+      const hasMembership = await profileService.hasMembership(userId);
+      if (!hasMembership) {
+        res.status(403).json({
+          success: false,
+          error: '회원 정보가 없습니다.',
+        });
+        return;
+      }
+
+      // Get member's organization info for scoped queries
+      const profile = await profileService.getMyProfile(userId);
+      const organizationId = profile?.profile?.organizationId;
+      const memberId = profile?.profile?.id;
+
+      // Query home data (resilient - each section fails independently)
+      const homeData = await homeQueryService.getHomeData({
+        userId,
+        organizationId,
+        memberId,
+      });
+
+      res.json({
+        success: true,
+        data: homeData,
+        uxPriority: UX_PRIORITY,
+        // 각 영역의 성공/실패 상태
+        sectionStatus: {
+          organizationNotice: homeData.organizationNotice !== null,
+          groupbuySummary: homeData.groupbuySummary !== null,
+          educationSummary: homeData.educationSummary !== null,
+          forumSummary: homeData.forumSummary !== null,
+          bannerSummary: homeData.bannerSummary !== null,
+        },
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
   });
 
   return router;
 }
 
-export { createMemberProfileRoutes } from './memberProfileRoutes.js';
-
-export default createMemberRoutes;
+// Alias for backward compatibility
+export const createRoutes = createMemberYaksaRoutes;
