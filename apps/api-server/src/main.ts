@@ -353,7 +353,7 @@ import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/ind
 // Reporting Routes (신상신고)
 import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
 // AnnualFee Routes (연회비)
-import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index.js';
+import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index';
 // Cosmetics Seller Extension Routes (WO-COSMETICS-SELLER-RUNTIME-ACTIVATE)
 import {
   createSellerExtensionRoutes,
