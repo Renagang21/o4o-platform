@@ -3,11 +3,14 @@ import type { DataSource } from 'typeorm';
 import { LicenseQueryService } from '../services/license-query.service.js';
 import { PharmacyInfoService } from '../services/pharmacy-info.service.js';
 import { MemberProfileService } from '../services/member-profile.service.js';
+import { MemberHomeQueryService } from '../home/member-home-query.service.js';
+import { UX_PRIORITY } from '../home/dto.js';
 
 /**
  * Member-Yaksa Routes
  *
  * Phase 1: Core API Endpoints
+ * Phase 2: Home Read Model
  *
  * Policy Enforcement:
  * - All endpoints require authentication
@@ -49,10 +52,13 @@ function requireAuth(req: AuthRequest, res: Response, next: NextFunction): void 
  * Create member-yaksa routes
  */
 export function createMemberYaksaRoutes(router: Router, dataSource: DataSource): Router {
-  // Initialize services
+  // Initialize services (Phase 1)
   const licenseService = new LicenseQueryService(dataSource);
   const pharmacyService = new PharmacyInfoService(dataSource);
   const profileService = new MemberProfileService(dataSource);
+
+  // Initialize services (Phase 2)
+  const homeQueryService = new MemberHomeQueryService(dataSource);
 
   // ===== Profile Routes =====
 
@@ -188,18 +194,22 @@ export function createMemberYaksaRoutes(router: Router, dataSource: DataSource):
     }
   });
 
-  // ===== Home Routes (Placeholder for Phase 2) =====
+  // ===== Home Routes (Phase 2: Read Model) =====
 
   /**
    * GET /api/v1/member/home
    * 홈 대시보드 데이터
-   * Phase 2에서 구현 예정
+   *
+   * Phase 2: Home Read Model
+   * - 각 영역 독립 조회
+   * - 한 영역 실패 시 해당 영역만 null (전체 실패 아님)
+   * - 읽기 전용 (쓰기/수정 경로 없음)
    */
   router.get('/api/v1/member/home', requireAuth, async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.id;
 
-      // Check membership
+      // Check membership and get organization info
       const hasMembership = await profileService.hasMembership(userId);
       if (!hasMembership) {
         res.status(403).json({
@@ -209,25 +219,30 @@ export function createMemberYaksaRoutes(router: Router, dataSource: DataSource):
         return;
       }
 
-      // Phase 2에서 구현할 내용들
+      // Get member's organization info for scoped queries
+      const profile = await profileService.getMyProfile(userId);
+      const organizationId = profile?.profile?.organizationId;
+      const memberId = profile?.profile?.id;
+
+      // Query home data (resilient - each section fails independently)
+      const homeData = await homeQueryService.getHomeData({
+        userId,
+        organizationId,
+        memberId,
+      });
+
       res.json({
         success: true,
-        data: {
-          // UX Priority 순서대로
-          organizationNotice: [], // Phase 2
-          groupbuy: [], // Phase 2
-          lms: [], // Phase 2
-          forum: [], // Phase 2
-          banner: [], // Phase 2
+        data: homeData,
+        uxPriority: UX_PRIORITY,
+        // 각 영역의 성공/실패 상태
+        sectionStatus: {
+          organizationNotice: homeData.organizationNotice !== null,
+          groupbuySummary: homeData.groupbuySummary !== null,
+          educationSummary: homeData.educationSummary !== null,
+          forumSummary: homeData.forumSummary !== null,
+          bannerSummary: homeData.bannerSummary !== null,
         },
-        uxPriority: [
-          'organizationNotice',
-          'groupbuy',
-          'lms',
-          'forum',
-          'banner',
-        ],
-        message: 'Phase 1 - 홈 데이터는 Phase 2에서 구현됩니다.',
       });
     } catch (error: any) {
       res.status(500).json({
