@@ -4,7 +4,7 @@
  * Digital Cashbook for Yaksa Division/Branch Office Expenses
  * (지부/분회 사무실 운영비 디지털 출납 기록장)
  *
- * Phase 0: App Bootstrap & Scope Fixation
+ * Phase 1: Expense Entry & Cashbook Core
  *
  * === 정체성 고정 ===
  * - ERP 아님 ❌
@@ -18,6 +18,7 @@ export { manifest } from './manifest';
 
 // Lifecycle
 export { install, activate, deactivate } from './lifecycle';
+export { getEntities } from './lifecycle/install';
 
 // Backend
-export { routes } from './backend';
+export * from './backend';
