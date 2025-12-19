@@ -21,3 +21,6 @@ export * from './useGroupbuy';
 
 // Member hooks (Phase 3)
 export * from './useMemberHome';
+
+// Member Profile hooks (Phase 4)
+export * from './useMemberProfile';
