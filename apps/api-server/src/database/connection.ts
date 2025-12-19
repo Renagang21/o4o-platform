@@ -175,13 +175,13 @@ import {
 //   CommissionPolicy,
 // } from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
 
-// ✅ NEW: Cosmetics-Sample-Display-Extension entities (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-import {
-  SampleInventory,
-  SampleUsageLog,
-  SampleConversion,
-  DisplayLayout,
-} from '@o4o/cosmetics-sample-display-extension';
+// ✅ TODO: Cosmetics-Sample-Display-Extension entities (temporarily disabled - ESM import issues)
+// import {
+//   SampleInventory,
+//   SampleUsageLog,
+//   SampleConversion,
+//   DisplayLayout,
+// } from '@o4o/cosmetics-sample-display-extension';
 
 // ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
 import {
@@ -380,11 +380,11 @@ export const AppDataSource = new DataSource({
     FeeExemption,
     FeeSettlement,
     FeeLog,
-    // ✅ NEW: Cosmetics-Sample-Display-Extension entities (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-    SampleInventory,
-    SampleUsageLog,
-    SampleConversion,
-    DisplayLayout,
+    // ✅ TODO: Cosmetics-Sample-Display-Extension entities (temporarily disabled - ESM import issues)
+    // SampleInventory,
+    // SampleUsageLog,
+    // SampleConversion,
+    // DisplayLayout,
   ],
   
   // 마이그레이션 설정
