@@ -190,6 +190,14 @@ const DigitalSignageRouter = lazy(() => import('@/pages/digital-signage/DigitalS
 // Yaksa Admin Hub (Phase 19-D)
 const YaksaAdminHub = lazy(() => import('@/pages/yaksa/YaksaAdminHub'));
 
+// Yaksa Admin - Phase 1 Approval & Overview UI
+const YaksaAdminDashboard = lazy(() => import('@/pages/yaksa-admin/YaksaAdminDashboard'));
+const MemberApprovalPage = lazy(() => import('@/pages/yaksa-admin/MemberApprovalPage'));
+const ReportReviewPage = lazy(() => import('@/pages/yaksa-admin/ReportReviewPage'));
+const OfficerManagePage = lazy(() => import('@/pages/yaksa-admin/OfficerManagePage'));
+const EducationOverviewPage = lazy(() => import('@/pages/yaksa-admin/EducationOverviewPage'));
+const FeeOverviewPage = lazy(() => import('@/pages/yaksa-admin/FeeOverviewPage'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -1258,6 +1266,55 @@ function App() {
                             <YaksaAdminHub />
                           </Suspense>
                         </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Yaksa Admin - Phase 1 Approval & Overview UI */}
+                    <Route path="/admin/yaksa" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <YaksaAdminDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/members" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.members.approve']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MemberApprovalPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/reports" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.reports.review']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReportReviewPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/officers" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.officers.assign']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OfficerManagePage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/education" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.education.view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EducationOverviewPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/fees" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.fees.view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <FeeOverviewPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/yaksa/forum" element={
+                      <AdminProtectedRoute requiredPermissions={['yaksa-admin.access']}>
+                        <Navigate to="/forum/boards" replace />
                       </AdminProtectedRoute>
                     } />
 
