@@ -1,24 +1,28 @@
-# Node.js LTS
-FROM node:20-alpine
+# Node.js (workspace 요구사항 충족)
+FROM node:22-alpine
 
 # pnpm 활성화
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 작업 디렉토리
-WORKDIR /app
+# 작업 디렉토리 = repo 루트
+WORKDIR /repo
 
-# 현재 컨텍스트(= apps/api-server)의 package.json 복사
-COPY package.json ./
+# workspace 메타 파일 복사
+COPY pnpm-workspace.yaml package.json ./
 
-# 의존성 설치
-RUN pnpm install
+# 모든 패키지 메타 복사
+COPY apps ./apps
+COPY packages ./packages
 
-# 소스 전체 복사 (apps/api-server 내부)
-COPY . .
+# workspace 전체 의존성 설치
+RUN pnpm install --frozen-lockfile=false
+
+# 실행 디렉토리 이동
+WORKDIR /repo/apps/api-server
 
 # Cloud Run 포트
 ENV PORT=8080
 EXPOSE 8080
 
-# 서버 실행
+# API 서버 실행
 CMD ["pnpm", "run", "start"]
