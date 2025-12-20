@@ -8,7 +8,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # pnpm workspace 설정 복사
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-workspace.yaml package.json ./
 
 # packages 폴더 구조 복사 (workspace 의존성)
 COPY packages ./packages
