@@ -18,11 +18,14 @@ COPY services ./services
 # workspace 전체 의존성 설치
 RUN pnpm install
 
-# api-server 빌드 (TypeScript -> JavaScript)
-WORKDIR /repo/apps/api-server
-RUN pnpm run build
+# 1단계: 모든 의존 패키지 빌드 (루트에서)
+WORKDIR /repo
+RUN pnpm run build:packages
 
-# 실행 디렉토리 확인
+# 2단계: api-server 빌드
+RUN pnpm run build:api
+
+# 실행 디렉토리 이동
 WORKDIR /repo/apps/api-server
 
 # Cloud Run 포트
