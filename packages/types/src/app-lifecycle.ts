@@ -7,7 +7,7 @@
  */
 
 import { DataSource } from 'typeorm';
-import type { AppManifest } from '@o4o/types';
+import type { AppManifest } from './app-manifest.js';
 import type { Logger } from 'winston';
 
 /**
