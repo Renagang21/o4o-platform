@@ -35,9 +35,11 @@ export class StartupService {
    * Initialize database connection with retry logic
    */
   private async initializeDatabase(): Promise<void> {
+    console.log('>>> initializeDatabase() CALLED');
     logger.info('Initializing database...');
 
     if (AppDataSource.isInitialized) {
+      console.log('>>> Database already initialized, skipping');
       logger.info('Database already initialized');
       return;
     }
@@ -50,6 +52,10 @@ export class StartupService {
       database: env.getString('DB_NAME')
     };
 
+    console.log('>>> DB Config:', JSON.stringify({
+      ...dbConfig,
+      password: dbConfig.password ? '***' : 'NOT SET'
+    }));
     logger.info('Database configuration:', {
       ...dbConfig,
       password: dbConfig.password ? '***' : 'NOT SET'
@@ -60,18 +66,22 @@ export class StartupService {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        console.log(`>>> Database connection attempt ${attempt}/${maxRetries}`);
         logger.info(`Database connection attempt ${attempt}/${maxRetries}`);
 
+        console.log('>>> Calling AppDataSource.initialize()');
         const dbConnectionPromise = AppDataSource.initialize();
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Database connection timeout')), 10000);
         });
 
         await Promise.race([dbConnectionPromise, timeoutPromise]);
+        console.log('>>> Database connection successful!');
         logger.info('✅ Database connection successful');
         dbConnected = true;
         break;
       } catch (connectionError) {
+        console.log('>>> Database connection FAILED:', connectionError);
         logger.warn(`Database connection attempt ${attempt} failed:`, connectionError);
 
         if (attempt < maxRetries) {
