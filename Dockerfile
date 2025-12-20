@@ -10,6 +10,9 @@ WORKDIR /repo
 # workspace 메타 파일 복사
 COPY pnpm-workspace.yaml package.json ./
 
+# TypeScript 설정 파일 복사 (패키지 빌드에 필수)
+COPY tsconfig.json tsconfig.base.json tsconfig.packages.json ./
+
 # 전체 소스 복사
 COPY apps ./apps
 COPY packages ./packages
