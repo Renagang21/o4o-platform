@@ -23,3 +23,6 @@ export * from './lifecycle/index.js';
 
 // DTOs
 export * from './backend/dto/index.js';
+
+// Frontend Pages (WO-MENU-ROUTE-WIRING)
+export * from './frontend/pages/index.js';

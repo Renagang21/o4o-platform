@@ -1,11 +1,13 @@
 import { FC, useState, useEffect, useMemo } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle, Loader2, Search, Filter, ChevronDown, Info, RotateCcw, Globe, Link, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers, Grid3X3, Settings, Sparkles, Building, Heart, Truck, Users, ShoppingBag, Tv, GlobeIcon, AlertOctagon, Construction, Pause, Archive } from 'lucide-react';
+// WO-APPSTORE-UI-DEMOTION: Removed unused icons (Download, Power, PowerOff, Trash2, RefreshCw, RotateCcw, Link, Loader2)
+import { Package, CheckCircle, Search, Filter, ChevronDown, Info, Globe, Shield, ShieldAlert, ShieldCheck, ShieldX, Layers, Grid3X3, Settings, Sparkles, Building, Heart, Truck, Users, ShoppingBag, Tv, GlobeIcon, AlertOctagon, Construction, Pause, Archive } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { adminAppsApi, AppRegistryEntry, AppCatalogItem, SecurityValidationResult, ServiceGroup, ServiceGroupMeta, DisabledAppEntry, DisabledAppsSummary } from '@/api/admin-apps';
+// WO-APPSTORE-UI-DEMOTION: SecurityValidationResult removed - runtime control not supported
+import { adminAppsApi, AppRegistryEntry, AppCatalogItem, ServiceGroup, ServiceGroupMeta, DisabledAppEntry, DisabledAppsSummary } from '@/api/admin-apps';
 import ServiceTemplateSelector from '@/components/apps/ServiceTemplateSelector';
 
 type Tab = 'market' | 'installed' | 'templates' | 'disabled';
@@ -24,20 +26,20 @@ const SERVICE_GROUP_ICONS: Record<ServiceGroup, React.ComponentType<{ className?
   'global': Grid3X3,
 };
 
-// Lifecycle action status for UI feedback
-type LifecycleStatus = 'idle' | 'installing' | 'activating' | 'deactivating' | 'uninstalling' | 'updating' | 'rolling_back';
+// WO-APPSTORE-UI-DEMOTION: LifecycleStatus type removed - runtime control not supported
 
 interface AppStorePageProps {
   defaultTab?: Tab;
 }
 
 /**
- * App Store Page
+ * App Store Page (Demoted to Module Explorer)
  *
- * Allows admins to:
- * - Browse available apps in the catalog
- * - Install/uninstall apps
- * - Activate/deactivate installed apps
+ * WO-APPSTORE-UI-DEMOTION: This UI is READ-ONLY.
+ * - Browse available modules in the catalog
+ * - View registered modules on this server
+ * - NO runtime control (install/activate/deactivate/uninstall)
+ * - Module composition is determined at server deployment time
  */
 const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
@@ -46,8 +48,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   const [disabledApps, setDisabledApps] = useState<DisabledAppEntry[]>([]);
   const [disabledSummary, setDisabledSummary] = useState<DisabledAppsSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [lifecycleStatus, setLifecycleStatus] = useState<Record<string, LifecycleStatus>>({});
+  // WO-APPSTORE-UI-DEMOTION: actionLoading, lifecycleStatus removed - runtime control not supported
   const { toast } = useToast();
 
   // Search and filter state
@@ -58,14 +59,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
   const [showDependencies, setShowDependencies] = useState<string | null>(null);
   const [sourceFilter, setSourceFilter] = useState<'all' | 'local' | 'remote'>('all');
 
-  // Remote app install state
-  const [showRemoteInstall, setShowRemoteInstall] = useState(false);
-  const [remoteUrl, setRemoteUrl] = useState('');
-  const [remoteValidating, setRemoteValidating] = useState(false);
-  const [remoteValidation, setRemoteValidation] = useState<{
-    manifest: AppCatalogItem;
-    validation: SecurityValidationResult;
-  } | null>(null);
+  // WO-APPSTORE-UI-DEMOTION: Remote install state removed - runtime control not supported
 
   // Extract unique categories from apps
   const categories = useMemo(() => {
@@ -172,285 +166,9 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
     }
   };
 
-  const handleInstall = async (appId: string) => {
-    setActionLoading(appId);
-    setLifecycleStatus(prev => ({ ...prev, [appId]: 'installing' }));
-    try {
-      await adminAppsApi.installApp(appId);
-      await loadData();
-      toast({
-        title: '설치 완료',
-        description: `${appId} 앱이 설치되었습니다.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to install app:', error);
-
-      // Extract error details from response
-      const errorCode = error.response?.data?.error;
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-
-      // Handle ownership validation errors
-      if (errorCode === 'OWNERSHIP_VIOLATION') {
-        const violations = error.response.data.violations || [];
-        toast({
-          title: '소유권 충돌',
-          description: `${appId} 설치 실패: ${violations.map((v: any) => v.reason).join(', ')}`,
-          variant: 'destructive',
-        });
-      } else if (errorCode === 'DEPENDENCY_ERROR') {
-        toast({
-          title: '의존성 오류',
-          description: errorMessage,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: '설치 실패',
-          description: `${appId}: ${errorMessage}`,
-          variant: 'destructive',
-        });
-      }
-    } finally {
-      setActionLoading(null);
-      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
-    }
-  };
-
-  const handleActivate = async (appId: string) => {
-    setActionLoading(appId);
-    setLifecycleStatus(prev => ({ ...prev, [appId]: 'activating' }));
-    try {
-      await adminAppsApi.activateApp(appId);
-      await loadData();
-      toast({
-        title: '활성화 완료',
-        description: `${appId} 앱이 활성화되었습니다.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to activate app:', error);
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-      toast({
-        title: '활성화 실패',
-        description: `${appId}: ${errorMessage}`,
-        variant: 'destructive',
-      });
-    } finally {
-      setActionLoading(null);
-      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
-    }
-  };
-
-  const handleDeactivate = async (appId: string) => {
-    setActionLoading(appId);
-    setLifecycleStatus(prev => ({ ...prev, [appId]: 'deactivating' }));
-    try {
-      await adminAppsApi.deactivateApp(appId);
-      await loadData();
-      toast({
-        title: '비활성화 완료',
-        description: `${appId} 앱이 비활성화되었습니다.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to deactivate app:', error);
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-      toast({
-        title: '비활성화 실패',
-        description: `${appId}: ${errorMessage}`,
-        variant: 'destructive',
-      });
-    } finally {
-      setActionLoading(null);
-      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
-    }
-  };
-
-  const handleUninstall = async (appId: string, purge: boolean = false) => {
-    // Find app to get ownership information
-    const app = installedApps.find(a => a.appId === appId);
-    const ownsTables = app?.ownsTables || [];
-    const ownsCPT = app?.ownsCPT || [];
-    const ownsACF = app?.ownsACF || [];
-    const hasOwnedData = ownsTables.length > 0 || ownsCPT.length > 0 || ownsACF.length > 0;
-
-    // Confirm with appropriate message based on purge option
-    let confirmMessage = '';
-    if (purge) {
-      confirmMessage = `${appId} 앱과 데이터를 완전히 삭제하시겠습니까?\n\n⚠️ 경고: 이 작업은 되돌릴 수 없습니다.\n`;
-      if (hasOwnedData) {
-        confirmMessage += `\n삭제될 데이터:\n`;
-        if (ownsTables.length > 0) {
-          confirmMessage += `\n테이블 (${ownsTables.length}개):\n${ownsTables.map(t => `  • ${t}`).join('\n')}`;
-        }
-        if (ownsCPT.length > 0) {
-          confirmMessage += `\n\nCPT (${ownsCPT.length}개):\n${ownsCPT.map(c => `  • ${c}`).join('\n')}`;
-        }
-        if (ownsACF.length > 0) {
-          confirmMessage += `\n\nACF 그룹 (${ownsACF.length}개):\n${ownsACF.map(a => `  • ${a}`).join('\n')}`;
-        }
-      } else {
-        confirmMessage += `\n이 앱은 소유한 데이터가 없습니다.`;
-      }
-    } else {
-      confirmMessage = `${appId} 앱을 삭제하시겠습니까?\n\n(데이터는 유지됩니다)`;
-    }
-
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-
-    setActionLoading(appId);
-    setLifecycleStatus(prev => ({ ...prev, [appId]: 'uninstalling' }));
-    try {
-      await adminAppsApi.uninstallApp(appId, purge);
-      await loadData();
-      toast({
-        title: '삭제 완료',
-        description: purge
-          ? `${appId} 앱과 데이터가 완전히 삭제되었습니다.`
-          : `${appId} 앱이 삭제되었습니다. (데이터는 유지됨)`,
-      });
-    } catch (error: any) {
-      console.error('Failed to uninstall app:', error);
-
-      const errorCode = error.response?.data?.error;
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-
-      // Handle dependency errors
-      if (errorCode === 'DEPENDENTS_EXIST') {
-        const dependents = error.response.data.dependents || [];
-        toast({
-          title: '의존성 오류',
-          description: `${appId}에 의존하는 앱: ${dependents.join(', ')}. 먼저 삭제하세요.`,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: '삭제 실패',
-          description: `${appId}: ${errorMessage}`,
-          variant: 'destructive',
-        });
-      }
-    } finally {
-      setActionLoading(null);
-      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
-    }
-  };
-
-  const handleUpdate = async (appId: string) => {
-    setActionLoading(appId);
-    setLifecycleStatus(prev => ({ ...prev, [appId]: 'updating' }));
-    try {
-      await adminAppsApi.updateApp(appId);
-      await loadData();
-      toast({
-        title: '업데이트 완료',
-        description: `${appId} 앱이 업데이트되었습니다.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to update app:', error);
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-      toast({
-        title: '업데이트 실패',
-        description: `${appId}: ${errorMessage}`,
-        variant: 'destructive',
-      });
-    } finally {
-      setActionLoading(null);
-      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
-    }
-  };
-
-  const handleRollback = async (appId: string, previousVersion: string) => {
-    if (!confirm(`${appId} 앱을 이전 버전(${previousVersion})으로 롤백하시겠습니까?`)) {
-      return;
-    }
-
-    setActionLoading(appId);
-    setLifecycleStatus(prev => ({ ...prev, [appId]: 'rolling_back' }));
-    try {
-      const result = await adminAppsApi.rollbackApp(appId);
-      await loadData();
-      toast({
-        title: '롤백 완료',
-        description: `${appId} 앱이 버전 ${result.revertedTo}로 롤백되었습니다.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to rollback app:', error);
-      const errorCode = error.response?.data?.error;
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-
-      if (errorCode === 'NO_ROLLBACK_AVAILABLE') {
-        toast({
-          title: '롤백 불가',
-          description: '이전 버전 정보가 없습니다.',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: '롤백 실패',
-          description: `${appId}: ${errorMessage}`,
-          variant: 'destructive',
-        });
-      }
-    } finally {
-      setActionLoading(null);
-      setLifecycleStatus(prev => ({ ...prev, [appId]: 'idle' }));
-    }
-  };
-
-  // Validate remote manifest
-  const handleValidateRemote = async () => {
-    if (!remoteUrl.trim()) return;
-
-    setRemoteValidating(true);
-    setRemoteValidation(null);
-
-    try {
-      const result = await adminAppsApi.validateRemoteManifest(remoteUrl.trim());
-      setRemoteValidation(result);
-    } catch (error: any) {
-      console.error('Failed to validate remote manifest:', error);
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-      toast({
-        title: '검증 실패',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setRemoteValidating(false);
-    }
-  };
-
-  // Install remote app
-  const handleInstallRemote = async () => {
-    if (!remoteValidation) return;
-
-    setActionLoading('remote');
-    try {
-      await adminAppsApi.installRemoteApp({
-        manifestUrl: remoteUrl.trim(),
-        expectedHash: remoteValidation.manifest.hash,
-      });
-      await loadData();
-      setShowRemoteInstall(false);
-      setRemoteUrl('');
-      setRemoteValidation(null);
-      toast({
-        title: '설치 완료',
-        description: `${remoteValidation.manifest.name} 앱이 설치되었습니다.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to install remote app:', error);
-      const errorMessage = error.response?.data?.message || error.message || '알 수 없는 오류';
-      toast({
-        title: '설치 실패',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setActionLoading(null);
-    }
-  };
+  // WO-APPSTORE-UI-DEMOTION: Lifecycle handlers removed - runtime control not supported
+  // Previous functions removed: handleInstall, handleActivate, handleDeactivate,
+  // handleUninstall, handleUpdate, handleRollback, handleValidateRemote, handleInstallRemote
 
   // Get risk level badge
   const getRiskBadge = (riskLevel?: 'low' | 'medium' | 'high' | 'critical') => {
@@ -488,13 +206,18 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {/* Header - Demoted to Module Explorer (WO-APPSTORE-UI-DEMOTION) */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">앱 장터</h1>
-        <p className="text-gray-600">플랫폼에 설치할 앱을 관리합니다.</p>
+        <h1 className="text-3xl font-bold mb-2">시스템 모듈 현황</h1>
+        <p className="text-gray-600">
+          서버에 포함된 모듈을 확인합니다.
+          <span className="text-amber-600 ml-1">
+            런타임 제어는 지원되지 않으며, 모듈 구성은 서버 배포 시 결정됩니다.
+          </span>
+        </p>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs - WO-APPSTORE-UI-DEMOTION: Read-only module explorer */}
       <div className="flex space-x-4 border-b">
         <button
           onClick={() => setActiveTab('templates')}
@@ -516,7 +239,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
           }`}
         >
           <Package className="inline-block w-4 h-4 mr-2" />
-          앱 마켓
+          모듈 카탈로그
         </button>
         <button
           onClick={() => setActiveTab('installed')}
@@ -527,18 +250,18 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
           }`}
         >
           <CheckCircle className="inline-block w-4 h-4 mr-2" />
-          설치된 앱 ({installedApps.length})
+          등록된 모듈 ({installedApps.length})
         </button>
         <button
           onClick={() => setActiveTab('disabled')}
           className={`px-4 py-2 font-medium border-b-2 transition-colors ${
             activeTab === 'disabled'
-              ? 'border-red-500 text-red-600'
+              ? 'border-amber-500 text-amber-600'
               : 'border-transparent text-gray-600 hover:text-gray-800'
           }`}
         >
           <AlertOctagon className="inline-block w-4 h-4 mr-2" />
-          비활성 앱 ({disabledApps.length})
+          미등록 모듈 ({disabledApps.length})
         </button>
       </div>
 
@@ -636,133 +359,20 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
             </div>
 
-            {/* Remote Install Button */}
-            <Button
-              variant="outline"
-              onClick={() => setShowRemoteInstall(true)}
-              className="whitespace-nowrap"
-            >
-              <Link className="w-4 h-4 mr-2" />
-              URL로 설치
-            </Button>
+            {/* WO-APPSTORE-UI-DEMOTION: Remote Install Button removed - runtime control not supported */}
           </>
         )}
       </div>
       )}
 
-      {/* Remote Install Modal */}
-      {showRemoteInstall && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-4 space-y-4">
-            <h3 className="text-lg font-bold">원격 앱 설치</h3>
-            <p className="text-sm text-gray-600">
-              앱 매니페스트 URL을 입력하여 원격 앱을 설치합니다.
-            </p>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">매니페스트 URL</label>
-              <div className="flex gap-2">
-                <Input
-                  type="url"
-                  placeholder="https://example.com/app/manifest.json"
-                  value={remoteUrl}
-                  onChange={(e) => setRemoteUrl(e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleValidateRemote}
-                  disabled={remoteValidating || !remoteUrl.trim()}
-                >
-                  {remoteValidating ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    '검증'
-                  )}
-                </Button>
-              </div>
-            </div>
-
-            {/* Validation Result */}
-            {remoteValidation && (
-              <div className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{remoteValidation.manifest.name}</span>
-                  {getRiskBadge(remoteValidation.validation.riskLevel)}
-                </div>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <div>버전: {remoteValidation.manifest.version}</div>
-                  {remoteValidation.manifest.vendor && (
-                    <div>벤더: {remoteValidation.manifest.vendor}</div>
-                  )}
-                  {remoteValidation.manifest.description && (
-                    <div>{remoteValidation.manifest.description}</div>
-                  )}
-                </div>
-
-                {/* Warnings */}
-                {remoteValidation.validation.warnings.length > 0 && (
-                  <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
-                    <div className="font-medium mb-1">경고:</div>
-                    {remoteValidation.validation.warnings.map((w, i) => (
-                      <div key={i}>• {w.message}</div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Errors */}
-                {remoteValidation.validation.errors.length > 0 && (
-                  <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
-                    <div className="font-medium mb-1">오류:</div>
-                    {remoteValidation.validation.errors.map((e, i) => (
-                      <div key={i}>• {e.message}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowRemoteInstall(false);
-                  setRemoteUrl('');
-                  setRemoteValidation(null);
-                }}
-              >
-                취소
-              </Button>
-              <Button
-                onClick={handleInstallRemote}
-                disabled={
-                  !remoteValidation ||
-                  !remoteValidation.validation.valid ||
-                  actionLoading === 'remote'
-                }
-              >
-                {actionLoading === 'remote' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    설치 중...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4 mr-2" />
-                    설치
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* WO-APPSTORE-UI-DEMOTION: Remote Install Modal removed - runtime control not supported */}
 
       {/* Filter Results Info */}
       {activeTab !== 'templates' && (searchQuery || selectedCategory !== 'all' || selectedServiceGroup !== 'all') && (
         <div className="text-sm text-gray-500">
           {activeTab === 'market' ? (
             <>
-              {filteredMarketApps.length}개 앱 표시 중
+              {filteredMarketApps.length}개 모듈 표시 중
               {searchQuery && <span> (검색: "{searchQuery}")</span>}
               {selectedServiceGroup !== 'all' && (
                 <span> (서비스: {serviceGroupMeta.find(g => g.id === selectedServiceGroup)?.nameKo || selectedServiceGroup})</span>
@@ -771,7 +381,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
             </>
           ) : (
             <>
-              {filteredInstalledApps.length}개 앱 표시 중
+              {filteredInstalledApps.length}개 모듈 표시 중
               {searchQuery && <span> (검색: "{searchQuery}")</span>}
             </>
           )}
@@ -788,11 +398,11 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMarketApps.length === 0 ? (
             <div className="col-span-full text-center py-12 text-gray-500">
-              {searchQuery || selectedCategory !== 'all' ? '검색 결과가 없습니다.' : '사용 가능한 앱이 없습니다.'}
+              {searchQuery || selectedCategory !== 'all' ? '검색 결과가 없습니다.' : '카탈로그에 모듈이 없습니다.'}
             </div>
           ) : filteredMarketApps.map((app) => {
             const installed = getInstallStatus(app.appId);
-            const status = lifecycleStatus[app.appId] || 'idle';
+            // WO-APPSTORE-UI-DEMOTION: lifecycleStatus removed - runtime control not supported
             // Updated type badge colors to include 'feature' type
             const typeBadgeColor =
               app.type === 'core' ? 'bg-blue-500' :
@@ -805,7 +415,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
               app.type === 'extension' ? '확장' :
               '독립';
             return (
-              <Card key={app.appId} className={status !== 'idle' ? 'ring-2 ring-blue-300' : ''}>
+              <Card key={app.appId}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
@@ -891,38 +501,32 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                         </div>
                       )}
                     </div>
+                    {/* WO-APPSTORE-UI-DEMOTION: Read-only module status display */}
                     {installed ? (
                       <div className="space-y-2">
                         <div className="flex items-center text-green-600 text-sm">
                           <CheckCircle className="w-4 h-4 mr-1" />
-                          설치됨 ({installed.status})
+                          {app.type === 'core'
+                            ? '상태: Always Enabled (Core Module)'
+                            : '상태: Registered Module'}
                         </div>
-                        {installed.hasUpdate && (
-                          <div className="flex items-center space-x-2">
-                            <Badge variant="default" className="bg-orange-500">
-                              업데이트 가능: {installed.availableVersion}
-                            </Badge>
-                          </div>
-                        )}
+                        <p className="text-xs text-gray-500">
+                          이 모듈은 서버에 포함되어 있습니다.
+                        </p>
                       </div>
                     ) : (
-                      <Button
-                        onClick={() => handleInstall(app.appId)}
-                        disabled={actionLoading === app.appId}
-                        className="w-full"
-                      >
-                        {actionLoading === app.appId ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            설치 중...
-                          </>
-                        ) : (
-                          <>
-                            <Download className="w-4 h-4 mr-2" />
-                            설치
-                          </>
-                        )}
-                      </Button>
+                      <div className="space-y-2">
+                        <div className="flex items-center text-gray-500 text-sm">
+                          <Package className="w-4 h-4 mr-1" />
+                          {app.type === 'core'
+                            ? '상태: Core Module (카탈로그)'
+                            : '상태: Available Module'}
+                        </div>
+                        <p className="text-xs text-amber-600">
+                          이 앱은 서버 배포 시 결정됩니다.
+                          App Store에서는 런타임 제어를 지원하지 않습니다.
+                        </p>
+                      </div>
                     )}
                   </div>
                 </CardContent>
@@ -937,60 +541,22 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredInstalledApps.length === 0 ? (
             <div className="col-span-full text-center py-12 text-gray-500">
-              {searchQuery ? '검색 결과가 없습니다.' : '설치된 앱이 없습니다.'}
+              {searchQuery ? '검색 결과가 없습니다.' : '등록된 모듈이 없습니다.'}
             </div>
           ) : (
             filteredInstalledApps.map((app) => {
-              const status = lifecycleStatus[app.appId] || 'idle';
-              const statusLabel: Record<LifecycleStatus, string> = {
-                idle: '',
-                installing: '설치 중...',
-                activating: '활성화 중...',
-                deactivating: '비활성화 중...',
-                uninstalling: '삭제 중...',
-                updating: '업데이트 중...',
-                rolling_back: '롤백 중...',
-              };
-              const canRollback = !!app.previousVersion;
+              // WO-APPSTORE-UI-DEMOTION: Removed lifecycle status tracking (runtime control not supported)
               return (
-              <Card key={app.id} className={status !== 'idle' ? 'ring-2 ring-blue-300' : ''}>
+              <Card key={app.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{app.name}</span>
+                    {/* WO-APPSTORE-UI-DEMOTION: Read-only module status badges */}
                     <div className="flex items-center space-x-2">
-                      {status !== 'idle' && (
-                        <Badge variant="default" className="bg-blue-500 animate-pulse">
-                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                          {statusLabel[status]}
-                        </Badge>
-                      )}
-                      {app.hasUpdate && status === 'idle' && (
-                        <Badge variant="default" className="bg-orange-500">
-                          업데이트 가능
-                        </Badge>
-                      )}
-                      {canRollback && status === 'idle' && (
-                        <Badge variant="outline" className="text-purple-600 border-purple-300">
-                          롤백 가능
-                        </Badge>
-                      )}
-                      {status === 'idle' && (
-                        <Badge
-                          variant={
-                            app.status === 'active'
-                              ? 'default'
-                              : app.status === 'inactive'
-                              ? 'secondary'
-                              : 'outline'
-                          }
-                        >
-                          {app.status === 'active'
-                            ? '활성'
-                            : app.status === 'inactive'
-                            ? '비활성'
-                            : '설치됨'}
-                        </Badge>
-                      )}
+                      <Badge variant="default" className="bg-green-500">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        등록됨
+                      </Badge>
                     </div>
                   </CardTitle>
                   <CardDescription>App ID: {app.appId}</CardDescription>
@@ -1041,97 +607,14 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                         </div>
                       ) : null}
                     </div>
-                    {/* Update and Rollback buttons */}
-                    <div className="flex space-x-2">
-                      {app.hasUpdate && (
-                        <Button
-                          onClick={() => handleUpdate(app.appId)}
-                          disabled={actionLoading === app.appId}
-                          variant="default"
-                          className="flex-1 bg-orange-500 hover:bg-orange-600"
-                        >
-                          {status === 'updating' ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              업데이트 중...
-                            </>
-                          ) : (
-                            <>
-                              <RefreshCw className="w-4 h-4 mr-2" />
-                              업데이트
-                            </>
-                          )}
-                        </Button>
-                      )}
-                      {canRollback && (
-                        <Button
-                          onClick={() => handleRollback(app.appId, app.previousVersion!)}
-                          disabled={actionLoading === app.appId}
-                          variant="outline"
-                          className="flex-1 border-purple-300 text-purple-600 hover:bg-purple-50"
-                        >
-                          {status === 'rolling_back' ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              롤백 중...
-                            </>
-                          ) : (
-                            <>
-                              <RotateCcw className="w-4 h-4 mr-2" />
-                              롤백 ({app.previousVersion})
-                            </>
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                    <div className="flex space-x-2">
-                      {app.status === 'active' ? (
-                        <Button
-                          onClick={() => handleDeactivate(app.appId)}
-                          disabled={actionLoading === app.appId}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          <PowerOff className="w-4 h-4 mr-2" />
-                          비활성화
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => handleActivate(app.appId)}
-                          disabled={actionLoading === app.appId}
-                          variant="default"
-                          className="flex-1"
-                        >
-                          <Power className="w-4 h-4 mr-2" />
-                          활성화
-                        </Button>
-                      )}
-                      <div className="relative group">
-                        <Button
-                          onClick={() => handleUninstall(app.appId, false)}
-                          disabled={actionLoading === app.appId}
-                          variant="destructive"
-                          title="앱 삭제 (데이터 유지)"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                        {/* Dropdown menu for purge option */}
-                        <div className="absolute right-0 bottom-full mb-1 hidden group-hover:block bg-white border border-gray-200 rounded shadow-lg z-10 min-w-[180px]">
-                          <button
-                            onClick={() => handleUninstall(app.appId, false)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            데이터 유지 삭제
-                          </button>
-                          <button
-                            onClick={() => handleUninstall(app.appId, true)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600 flex items-center border-t"
-                          >
-                            <AlertTriangle className="w-4 h-4 mr-2" />
-                            완전 삭제 (데이터 포함)
-                          </button>
-                        </div>
+                    {/* WO-APPSTORE-UI-DEMOTION: Control buttons removed - read-only status display */}
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+                        <p className="text-xs text-amber-700">
+                          <Info className="w-3 h-3 inline mr-1" />
+                          이 앱은 서버 배포 시 결정됩니다.
+                          App Store에서는 런타임 제어를 지원하지 않습니다.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1192,7 +675,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {disabledApps.length === 0 ? (
               <div className="col-span-full text-center py-12 text-gray-500">
-                비활성화된 앱이 없습니다.
+                미등록 모듈이 없습니다.
               </div>
             ) : (
               disabledApps.map((app) => {

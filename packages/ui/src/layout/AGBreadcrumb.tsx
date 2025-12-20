@@ -91,8 +91,9 @@ export function AGBreadcrumb({
   }
 
   const handleClick = (item: BreadcrumbItem) => {
-    if (item.path && !item.current) {
-      onNavigate?.(item.path);
+    const itemPath = item.path ?? item.href;
+    if (itemPath && !item.current) {
+      onNavigate?.(itemPath);
     }
   };
 
@@ -153,7 +154,7 @@ export function AGBreadcrumb({
             </li>
             {/* Remaining items */}
             {displayItems.slice(1).map((item, index) => (
-              <li key={item.path || index} className="flex items-center">
+              <li key={item.path ?? item.href ?? index} className="flex items-center">
                 {index > 0 && (
                   <span className="mr-2">
                     <Separator />
@@ -185,7 +186,7 @@ export function AGBreadcrumb({
         {/* Normal rendering without ellipsis */}
         {!hasEllipsis &&
           displayItems.map((item, index) => (
-            <li key={item.path || index} className="flex items-center">
+            <li key={item.path ?? item.href ?? index} className="flex items-center">
               {index > 0 && (
                 <span className="mr-2">
                   <Separator />

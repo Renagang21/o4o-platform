@@ -42,6 +42,12 @@ export interface User {
 
   // Metadata
   metadata?: Record<string, unknown>;
+
+  // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
+  organizationId?: string;
+  organizationName?: string;
+  supplierId?: string;
+  phone?: string;
 }
 
 export interface SessionStatus {

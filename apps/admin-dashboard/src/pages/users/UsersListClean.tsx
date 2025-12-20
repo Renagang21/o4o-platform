@@ -29,6 +29,11 @@ interface User {
   lastLogin?: string;
   status: 'active' | 'inactive' | 'pending';
   avatar?: string;
+  // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
+  organizationId?: string;
+  organizationName?: string;
+  supplierId?: string;
+  phone?: string;
 }
 
 type SortField = 'username' | 'email' | 'role' | 'registeredDate' | null;

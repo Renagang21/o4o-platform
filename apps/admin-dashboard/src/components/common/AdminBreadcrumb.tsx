@@ -4,7 +4,10 @@ import { ChevronRight, Home } from 'lucide-react'
 
 interface BreadcrumbItem {
   label: string
+  /** Route path (preferred) */
   path?: string
+  /** Route path (alias for path) */
+  href?: string
 }
 
 interface AdminBreadcrumbProps {
@@ -134,9 +137,9 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
         <Fragment key={index}>
           {index > 0 && <ChevronRight className="w-4 h-4 text-wp-text-secondary" />}
           
-          {item.path ? (
+          {(item.path ?? item.href) ? (
             <Link
-              to={item.path}
+              to={(item.path ?? item.href)!}
               className="hover:text-admin-blue transition-colors duration-200 font-medium"
             >
               {item.label}

@@ -46,12 +46,7 @@
     "../../packages/auth-client/src/**/*",
     "../../packages/types/src/**/*",
     "../../packages/utils/src/**/*",
-    "../../packages/ui/src/**/*",
-    "../../packages/dropshipping-core/src/**/*",
-    "../../packages/dropshipping-cosmetics/src/**/*",
-    "../../packages/forum-app/src/**/*",
-    "../../packages/forum-neture/src/**/*",
-    "../../packages/forum-yaksa/src/**/*"
+    "../../packages/ui/src/**/*"
   ],
   "exclude": [
     "**/*.test.tsx",

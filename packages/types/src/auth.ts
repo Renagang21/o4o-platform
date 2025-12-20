@@ -39,6 +39,11 @@ export interface User {
   avatar?: string;
   lastLoginAt?: Date;
   status?: 'active' | 'inactive' | 'pending';
+  // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
+  organizationId?: string;
+  organizationName?: string;
+  supplierId?: string;
+  phone?: string;
 }
 
 export interface AuthToken {

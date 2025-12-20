@@ -13,9 +13,17 @@
 
 import React, { ReactNode } from 'react';
 
+// Helper to get column header text (supports both header and label)
+function getColumnHeader<T>(col: AGTableColumn<T>): string {
+  return col.header ?? col.label ?? '';
+}
+
 export interface AGTableColumn<T> {
   key: string;
-  header: string;
+  /** Column header text (preferred) */
+  header?: string;
+  /** Column header text (alias for header) */
+  label?: string;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
   sortable?: boolean;
@@ -115,7 +123,7 @@ export function AGTable<T extends Record<string, any>>({
                   className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                   style={{ width: col.width }}
                 >
-                  {col.header}
+                  {getColumnHeader(col)}
                 </th>
               ))}
             </tr>
@@ -149,7 +157,7 @@ export function AGTable<T extends Record<string, any>>({
                   className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                   style={{ width: col.width }}
                 >
-                  {col.header}
+                  {getColumnHeader(col)}
                 </th>
               ))}
             </tr>
@@ -193,7 +201,7 @@ export function AGTable<T extends Record<string, any>>({
                 onClick={() => col.sortable && onSort?.(col.key)}
               >
                 <span className="inline-flex items-center">
-                  {col.header}
+                  {getColumnHeader(col)}
                   {renderSortIcon(col)}
                 </span>
               </th>
@@ -231,20 +239,33 @@ export function AGTable<T extends Record<string, any>>({
 
 // Pagination component to use with AGTable
 export interface AGTablePaginationProps {
-  currentPage: number;
+  /** Current page (1-indexed, preferred) */
+  currentPage?: number;
+  /** Current page (1-indexed, alias for currentPage) */
+  page?: number;
   totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
+  /** Total number of items */
+  totalItems?: number;
+  /** Items per page (preferred) */
+  itemsPerPage?: number;
+  /** Items per page (alias for itemsPerPage) */
+  pageSize?: number;
   onPageChange: (page: number) => void;
 }
 
 export function AGTablePagination({
-  currentPage,
+  currentPage: currentPageProp,
+  page,
   totalPages,
-  totalItems,
-  itemsPerPage,
+  totalItems: totalItemsProp,
+  itemsPerPage: itemsPerPageProp,
+  pageSize,
   onPageChange,
 }: AGTablePaginationProps) {
+  // Support alias props
+  const currentPage = currentPageProp ?? page ?? 1;
+  const itemsPerPage = itemsPerPageProp ?? pageSize ?? 10;
+  const totalItems = totalItemsProp ?? 0;
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 

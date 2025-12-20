@@ -60,7 +60,10 @@ export interface LayoutUser {
  */
 export interface BreadcrumbItem {
   label: string;
+  /** Route path (preferred) */
   path?: string;
+  /** Route path (alias for path) */
+  href?: string;
   icon?: ReactNode;
   /** Whether this is the current page (non-clickable) */
   current?: boolean;

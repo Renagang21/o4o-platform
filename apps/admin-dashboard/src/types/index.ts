@@ -16,6 +16,11 @@ export interface User {
   updatedAt: string
   approvedAt?: string
   approvedBy?: string
+  // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
+  organizationId?: string
+  organizationName?: string
+  supplierId?: string
+  phone?: string
 }
 
 export interface Product {

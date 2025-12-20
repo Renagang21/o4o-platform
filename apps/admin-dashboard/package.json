@@ -42,6 +42,8 @@
     "@o4o/block-renderer": "file:../../packages/block-renderer",
     "@o4o/shortcodes": "file:../../packages/shortcodes",
     "@o4o/slide-app": "file:../../packages/slide-app",
+    "@o4o/diabetes-pharmacy": "file:../../packages/diabetes-pharmacy",
+    "@o4o/partner-ai-builder": "file:../../packages/partner-ai-builder",
     "@o4o/types": "file:../../packages/types",
     "@o4o/utils": "file:../../packages/utils",
     "@radix-ui/react-accordion": "^1.2.12",
