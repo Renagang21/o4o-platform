@@ -6,9 +6,13 @@
  * to perform installation, activation, deactivation, and uninstallation tasks.
  */
 
-import { DataSource } from 'typeorm';
 import type { AppManifest } from './app-manifest.js';
-import type { Logger } from 'winston';
+
+// Use generic types to avoid requiring typeorm/winston as dependencies
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DataSource = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Logger = any;
 
 /**
  * Base context for all lifecycle hooks
