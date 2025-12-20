@@ -1,6 +1,8 @@
 // MUST be first: Load environment variables before anything else
 import './env-loader.js';
 
+console.log('>>> main.ts ENTRY POINT REACHED - TOP OF FILE');
+
 // Initialize OpenTelemetry before any other imports
 import { initTelemetry } from './utils/telemetry.js';
 const telemetrySDK = initTelemetry();
@@ -437,9 +439,12 @@ const startServer = async () => {
   }
 
   // Initialize all services (including database)
+  console.log('>>> BEFORE startupService.initialize()');
   try {
     await startupService.initialize();
+    console.log('>>> AFTER startupService.initialize() - SUCCESS');
   } catch (error) {
+    console.log('>>> startupService.initialize() FAILED:', error);
     logger.error('Service initialization failed:', error);
     if (process.env.NODE_ENV === 'production') {
       process.exit(1);

@@ -18,7 +18,11 @@ COPY services ./services
 # workspace 전체 의존성 설치
 RUN pnpm install
 
-# 실행 디렉토리 이동
+# api-server 빌드 (TypeScript -> JavaScript)
+WORKDIR /repo/apps/api-server
+RUN pnpm run build
+
+# 실행 디렉토리 확인
 WORKDIR /repo/apps/api-server
 
 # Cloud Run 포트
