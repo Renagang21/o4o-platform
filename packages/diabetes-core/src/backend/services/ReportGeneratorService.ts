@@ -241,7 +241,7 @@ export class ReportGeneratorService {
     // 변동성 기반 권장사항
     if (metrics.cv > 36) {
       recommendations.push({
-        category: 'lifestyle',
+        category: 'exercise',
         priority: 'medium',
         title: '혈당 변동성 관리',
         description: '혈당 변동성이 높습니다. 규칙적인 식사와 활동 패턴을 유지하세요.',

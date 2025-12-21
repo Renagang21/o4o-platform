@@ -18,8 +18,10 @@ const Links = lazy(() => import('./pages/Links'));
 const Conversions = lazy(() => import('./pages/Conversions'));
 const Settlement = lazy(() => import('./pages/Settlement'));
 
-// Partner AI Builder (WO-MENU-ROUTE-WIRING)
-const AiBuilderPage = lazy(() => import('@o4o/partner-ai-builder').then(m => ({ default: m.AiBuilderPage })));
+// Partner AI Builder - Placeholder (package not yet ready for production build)
+const AiBuilderPage: React.FC = () => (
+  <div className="p-4 text-center text-gray-500">AI Builder is coming soon...</div>
+);
 
 // Loading component
 const PageLoader: React.FC = () => (

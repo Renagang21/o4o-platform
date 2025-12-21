@@ -1,6 +1,6 @@
-import type { LifecycleContext } from '@o4o/types';
+import type { AppLifecycleContext } from '@o4o/types';
 
-export async function activate(context: LifecycleContext): Promise<void> {
+export async function activate(context: AppLifecycleContext): Promise<void> {
   const { logger } = context;
 
   logger?.info('[diabetes-core] Activating...');

@@ -1,7 +1,7 @@
 import type { DataSource } from 'typeorm';
-import type { LifecycleContext } from '@o4o/types';
+import type { AppLifecycleContext } from '@o4o/types';
 
-export async function install(context: LifecycleContext): Promise<void> {
+export async function install(context: AppLifecycleContext): Promise<void> {
   const { dataSource, logger } = context;
 
   logger?.info('[diabetes-core] Starting installation...');
