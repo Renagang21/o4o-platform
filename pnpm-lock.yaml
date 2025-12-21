@@ -288,9 +288,6 @@ importers:
       '@o4o/diabetes-pharmacy':
         specifier: file:../../packages/diabetes-pharmacy
         version: file:packages/diabetes-pharmacy(express@4.21.2)(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))
-      '@o4o/partner-ai-builder':
-        specifier: file:../../packages/partner-ai-builder
-        version: file:packages/partner-ai-builder(react@18.2.0)
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
         version: file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -4664,11 +4661,6 @@ packages:
       express: ^4.0.0
       react: ^19.0.0
       typeorm: ^0.3.0
-
-  '@o4o/partner-ai-builder@file:packages/partner-ai-builder':
-    resolution: {directory: packages/partner-ai-builder, type: directory}
-    peerDependencies:
-      react: ^18.0.0
 
   '@o4o/shortcodes@file:packages/shortcodes':
     resolution: {directory: packages/shortcodes, type: directory}
@@ -15005,11 +14997,6 @@ snapshots:
       express: 4.21.2
       react: 18.2.0
       typeorm: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))
-
-  '@o4o/partner-ai-builder@file:packages/partner-ai-builder(react@18.2.0)':
-    dependencies:
-      '@o4o/partnerops': link:packages/partnerops
-      react: 18.2.0
 
   '@o4o/shortcodes@file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
