@@ -104,7 +104,8 @@
     "verify:blocks": "ts-node scripts/verify-blocks.ts",
     "verify:cpts": "ts-node scripts/verify-cpts.ts",
     "verify:registry": "pnpm run verify:shortcodes && pnpm run verify:blocks && pnpm run verify:cpts",
-    "verify": "pnpm run verify:registry"
+    "verify": "pnpm run verify:registry",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
@@ -138,6 +139,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "glob": "^11.0.3",
+    "husky": "^9.1.7",
     "jest": "29.7.0",
     "pnpm": "^9.12.3",
     "postcss": "~8.4.31",
