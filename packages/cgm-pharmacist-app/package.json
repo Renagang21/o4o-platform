@@ -1,0 +1,51 @@
+{
+  "name": "@o4o/cgm-pharmacist-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CGM 약사용 관리 앱 - 환자 CGM 데이터 요약, 상담/코칭 도구",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
+    "./frontend": {
+      "types": "./dist/frontend/index.d.ts",
+      "import": "./dist/frontend/index.js"
+    },
+    "./lifecycle": {
+      "types": "./dist/lifecycle/index.d.ts",
+      "import": "./dist/lifecycle/index.js"
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc && tsup --clean",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*",
+    "@o4o/utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0",
+    "express": "^4.0.0",
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/express": "^4.17.0",
+    "@types/react": "^18.2.79",
+    "typescript": "^5.3.0",
+    "tsup": "^8.0.0",
+    "rimraf": "^5.0.0"
+  }
+}
