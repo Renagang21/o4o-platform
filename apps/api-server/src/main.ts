@@ -373,7 +373,8 @@ import {
 // import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension';
 
 // Groupbuy-Yaksa Routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
-import { createGroupbuyRoutes } from '@o4o/groupbuy-yaksa';
+// TODO: Fix circular reference in groupbuy-yaksa
+// import { createGroupbuyRoutes } from '@o4o/groupbuy-yaksa';
 
 // Market Trial Routes (Phase L-1)
 import marketTrialRoutes from './routes/market-trial.routes.js';
@@ -630,11 +631,11 @@ const startServer = async () => {
 
     // 20. Register Groupbuy-Yaksa routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
     try {
-      const groupbuyRoutes = createGroupbuyRoutes(AppDataSource);
-      app.use('/api/v1/yaksa/groupbuy', groupbuyRoutes);
+      // const groupbuyRoutes = createGroupbuyRoutes(AppDataSource);
+      // app.use('/api/v1/yaksa/groupbuy', groupbuyRoutes);
       // Also mount at /api/groupbuy for backward compatibility with existing hooks
-      app.use('/api/groupbuy', groupbuyRoutes);
-      logger.info('✅ Groupbuy-Yaksa routes registered at /api/v1/yaksa/groupbuy and /api/groupbuy');
+      // app.use('/api/groupbuy', groupbuyRoutes);
+      logger.info('⚠️ Groupbuy-Yaksa routes disabled (circular reference fix pending) at /api/v1/yaksa/groupbuy and /api/groupbuy');
     } catch (groupbuyError) {
       logger.error('Failed to register groupbuy-yaksa routes:', groupbuyError);
     }
