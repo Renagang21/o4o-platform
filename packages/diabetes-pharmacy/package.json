@@ -4,13 +4,26 @@
   "private": true,
   "description": "DiabetesCare Pharmacy Extension - 혈당관리 세미프랜차이즈 약국 운영 실행 App",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./backend": "./dist/backend/index.js",
-    "./frontend": "./dist/frontend/index.js",
-    "./lifecycle": "./dist/lifecycle/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
+    "./frontend": {
+      "types": "./dist/frontend/index.d.ts",
+      "import": "./dist/frontend/index.js"
+    },
+    "./lifecycle": {
+      "types": "./dist/lifecycle/index.d.ts",
+      "import": "./dist/lifecycle/index.js"
+    }
   },
   "files": ["dist", "src"],
   "scripts": {

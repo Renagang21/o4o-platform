@@ -43,6 +43,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o-apps/forum-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
       // Dropshipping core - map to source for subpath imports
       '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
+      // Diabetes packages
+      '@o4o/diabetes-core': path.resolve(__dirname, '../../packages/diabetes-core/dist'),
+      '@o4o/diabetes-pharmacy': path.resolve(__dirname, '../../packages/diabetes-pharmacy/dist'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
