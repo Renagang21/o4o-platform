@@ -1,7 +1,8 @@
 /**
  * Signage Content Mapper Service
  *
- * MVP Phase 1: Sample/Display 데이터 기반 Signage 콘텐츠 생성
+ * Phase 1: Sample/Display 데이터 기반 Signage 콘텐츠 생성
+ * Phase 2: 메시지 템플릿 적용 + 안정성 강화
  *
  * 매핑 규칙:
  * 1. 우선순위: OPERATION_ALERT > SAMPLE_PROMO > DISPLAY_HIGHLIGHT
@@ -18,6 +19,7 @@ import {
   OperationAlertContent,
   StoreSignageResponse,
   ContentGenerationOptions,
+  MESSAGE_TEMPLATES,
 } from '../types/signage-content.types.js';
 
 // Priority constants
@@ -28,6 +30,11 @@ const PRIORITY = {
   SAMPLE_PROMO: 50,
   DISPLAY_HIGHLIGHT: 30,
 };
+
+// Phase 2: Template helper
+function pickRandom<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 export class SignageContentMapperService {
   constructor(private dataSource: DataSource) {}
@@ -110,14 +117,14 @@ export class SignageContentMapperService {
       const lowStockSamples = await this.getLowStockSamples(storeId);
       for (const sample of lowStockSamples) {
         const isOutOfStock = sample.currentStock <= 0;
+        const alertType = isOutOfStock ? 'out_of_stock' : 'low_stock';
+        const templates = MESSAGE_TEMPLATES.OPERATION_ALERT[alertType];
         alerts.push({
           type: 'OPERATION_ALERT',
-          alertType: isOutOfStock ? 'out_of_stock' : 'low_stock',
+          alertType,
           severity: isOutOfStock ? 'critical' : 'warning',
-          title: isOutOfStock ? '샘플 소진' : '샘플 보충 필요',
-          message: isOutOfStock
-            ? `${sample.productName} 샘플이 모두 소진되었습니다`
-            : `${sample.productName} 샘플이 부족합니다 (잔여: ${sample.currentStock}개)`,
+          title: sample.productName,
+          message: pickRandom(templates),
           targetId: sample.productId,
           targetName: sample.productName,
           priority: isOutOfStock
@@ -129,12 +136,13 @@ export class SignageContentMapperService {
       // 2. Check low stock inventory
       const lowStockInventory = await this.getLowStockInventory(storeId);
       for (const item of lowStockInventory) {
+        const templates = MESSAGE_TEMPLATES.OPERATION_ALERT.refill_needed;
         alerts.push({
           type: 'OPERATION_ALERT',
           alertType: 'refill_needed',
           severity: 'warning',
-          title: '재고 보충 필요',
-          message: `${item.productName} 재고가 부족합니다 (잔여: ${item.currentStock}개)`,
+          title: item.productName,
+          message: pickRandom(templates),
           targetId: item.productId,
           targetName: item.productName,
           priority: PRIORITY.OPERATION_ALERT_WARNING,
@@ -158,10 +166,11 @@ export class SignageContentMapperService {
       const popularSamples = await this.getPopularSamples(storeId);
 
       for (const sample of popularSamples.slice(0, 3)) {
+        const template = pickRandom(MESSAGE_TEMPLATES.SAMPLE_PROMO);
         promos.push({
           type: 'SAMPLE_PROMO',
           title: '지금 체험 가능',
-          message: `${sample.productName} - 고객님들이 가장 많이 체험하고 있어요!`,
+          message: `${sample.productName} - ${template}`,
           productId: sample.productId,
           productName: sample.productName,
           usageCount: sample.usageCount,
@@ -187,12 +196,11 @@ export class SignageContentMapperService {
       const activeDisplays = await this.getActiveDisplays(storeId);
 
       for (const display of activeDisplays.slice(0, 2)) {
+        const template = pickRandom(MESSAGE_TEMPLATES.DISPLAY_HIGHLIGHT);
         highlights.push({
           type: 'DISPLAY_HIGHLIGHT',
-          title: '추천 진열대',
-          message: display.displayName
-            ? `${display.displayName}에서 특별 상품을 만나보세요`
-            : '지금 주목받는 상품을 확인하세요',
+          title: display.displayName || '추천 진열대',
+          message: template,
           displayId: display.displayId,
           displayName: display.displayName,
           category: display.category,
