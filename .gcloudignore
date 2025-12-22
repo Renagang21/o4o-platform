@@ -1,10 +1,12 @@
-# Dependencies
+# Do not inherit from .gitignore
+#!include:.gitignore
+
+# Dependencies (will be installed in Docker)
 node_modules
 **/node_modules
 
-# Build outputs (will be generated in Docker)
-# **/dist  # Include pre-built packages
-**/build
+# Keep dist folders for pre-built packages
+# **/dist - NOT ignored, we need pre-built packages
 
 # Development files
 .git
@@ -33,41 +35,15 @@ docs
 # Logs
 logs
 *.log
-npm-debug.log*
-pnpm-debug.log*
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Backup files
-*.backup
-**/*.backup
 
 # Legacy folders
 legacy
 
-# Development tools
-scripts/dev*
-scripts/test*
-
-# IDE
-*.swp
-*.swo
-*~
-
 # Temporary files
 tmp
 temp
-*.tmp
 
 # Build cache
 .turbo
 .next
 .nuxt
-
-# Misc
-*.tgz
-*.tar.gz
-.eslintcache
-.prettierignore

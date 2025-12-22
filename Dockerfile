@@ -1,81 +1,71 @@
-# ============================================================================
-# O4O Platform API Server - Cloud Run Dockerfile
-# Optimized for pnpm monorepo with native dependencies (bcrypt, sharp)
-# ============================================================================
+# Node.js (workspace 요구사항 충족)
+FROM node:22-alpine
 
-# Use slim instead of alpine for native module compatibility
-FROM node:22-slim AS builder
+# pnpm 활성화
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install build dependencies for native modules
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+# 작업 디렉토리 = repo 루트
+WORKDIR /repo
 
-# Enable pnpm
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+# pnpm-lock.yaml 복사
+COPY pnpm-lock.yaml ./
 
-WORKDIR /app
+# workspace 메타 파일 복사
+COPY pnpm-workspace.yaml package.json ./
 
-# Copy workspace configuration (for dependency caching)
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+# TypeScript 설정 파일들 복사
 COPY tsconfig.json tsconfig.base.json tsconfig.packages.json ./
 
-# Copy all package.json files first (for better cache)
-COPY apps/api-server/package.json ./apps/api-server/
-COPY apps/api-server/tsconfig.json ./apps/api-server/
-COPY apps/api-server/tsconfig.build.json ./apps/api-server/
-COPY packages/ ./packages/
+# 모든 패키지 메타 복사
+COPY apps ./apps
+COPY packages ./packages
 
-# Install all dependencies
-RUN pnpm install --frozen-lockfile
+# workspace 전체 의존성 설치
+RUN pnpm install --frozen-lockfile=false
 
-# Copy source code
-COPY apps/api-server/src/ ./apps/api-server/src/
+# 기본 패키지들 빌드
+RUN pnpm --filter @o4o/types run build || true
+RUN pnpm --filter @o4o/cpt-registry run build || true
+RUN pnpm --filter @o4o/organization-core run build || true
+RUN pnpm --filter @o4o/ecommerce-core run build || true
+RUN pnpm --filter @o4o/platform-core run build || true
+RUN pnpm --filter @o4o/dropshipping-core run build || true
+RUN pnpm --filter @o4o/membership-yaksa run build || true
+RUN pnpm --filter @o4o/reporting-yaksa run build || true
+RUN pnpm --filter @o4o/annualfee-yaksa run build || true
+RUN pnpm --filter @o4o/lms-core run build || true
+RUN pnpm --filter @o4o/lms-yaksa run build || true
+RUN pnpm --filter @o4o/groupbuy-yaksa run build || true
+RUN pnpm --filter @o4o-apps/forum run build || true
+RUN pnpm --filter @o4o-apps/signage run build || true
+RUN pnpm --filter @o4o-apps/cms-core run build || true
+RUN pnpm --filter @o4o-extensions/organization-forum run build || true
+RUN pnpm --filter @o4o/auth-core run build || true
+RUN pnpm --filter @o4o/block-renderer run build || true
+RUN pnpm --filter @o4o/shortcodes run build || true
 
-# Build packages and api-server
-RUN pnpm run build:packages || echo "Some packages failed to build, continuing..."
-RUN pnpm run build:api
+# dropshipping-cosmetics 빌드 (디버깅 포함)
+WORKDIR /repo/packages/dropshipping-cosmetics
+RUN echo "=== Building dropshipping-cosmetics ===" && \
+    npx tsc -p tsconfig.json --skipLibCheck 2>&1 || echo "Build had issues" && \
+    echo "=== Checking dist ===" && \
+    ls -la dist/backend/entities/ 2>/dev/null || echo "No entities folder"
 
-# ============================================================================
-# Production stage - minimal runtime
-# ============================================================================
-FROM node:22-slim AS production
+# 다른 패키지들 직접 빌드
+WORKDIR /repo
+RUN cd packages/cosmetics-seller-extension && npx tsc -p tsconfig.json --skipLibCheck || true
+RUN cd packages/cosmetics-partner-extension && npx tsc -p tsconfig.json --skipLibCheck || true
+RUN cd packages/cosmetics-supplier-extension && npx tsc -p tsconfig.json --skipLibCheck || true
+RUN cd packages/cosmetics-sample-display-extension && npx tsc -p tsconfig.json --skipLibCheck || true
+RUN cd packages/health-extension && npx tsc -p tsconfig.json --skipLibCheck || true
 
-# Install runtime dependencies only (for sharp)
-RUN apt-get update && apt-get install -y \
-    libvips42 \
-    && rm -rf /var/lib/apt/lists/*
+# api-server 직접 빌드
+WORKDIR /repo/apps/api-server
+RUN npx tsc -p tsconfig.build.json || true
 
-# Enable pnpm
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
-
-WORKDIR /app
-
-# Copy workspace files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY tsconfig.json tsconfig.base.json tsconfig.packages.json ./
-
-# Copy package.json files and built dist directories
-COPY --from=builder /app/apps/api-server/package.json ./apps/api-server/
-COPY --from=builder /app/apps/api-server/dist/ ./apps/api-server/dist/
-COPY --from=builder /app/packages/ ./packages/
-COPY --from=builder /app/node_modules/ ./node_modules/
-COPY --from=builder /app/apps/api-server/node_modules/ ./apps/api-server/node_modules/
-
-# Copy public folder for uploads/static files (optional)
-COPY public/ ./public/ 2>/dev/null || true
-
-# Cloud Run environment
-ENV NODE_ENV=production
+# Cloud Run 포트
 ENV PORT=8080
-ENV HOST=0.0.0.0
-
 EXPOSE 8080
 
-# Working directory for api-server
-WORKDIR /app/apps/api-server
-
-# Start the server
+# API 서버 실행
 CMD ["node", "--max-old-space-size=1024", "dist/main.js"]

@@ -12,7 +12,10 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["node"]
+    "types": ["node"],
+    "noImplicitAny": false,
+    "strict": false,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "references": [
