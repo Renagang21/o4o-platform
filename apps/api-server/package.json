@@ -109,6 +109,7 @@
     "@o4o/ecommerce-core": "workspace:*",
     "@o4o/annualfee-yaksa": "workspace:*",
     "@o4o/yaksa-scheduler": "workspace:*",
+    "@o4o/groupbuy-yaksa": "workspace:*",
     "@o4o-extensions/lms-marketing": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
