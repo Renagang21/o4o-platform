@@ -169,6 +169,17 @@ export function usePlaylists() {
     return result.success;
   };
 
+  const clonePlaylist = async (playlistId: string, newName?: string) => {
+    const result = await fetchApi<PharmacyPlaylistDto>(`/playlists/${playlistId}/clone`, {
+      method: 'POST',
+      body: JSON.stringify({ newName }),
+    });
+    if (result.success) {
+      fetchPlaylists();
+    }
+    return result;
+  };
+
   return {
     playlists,
     loading,
@@ -176,6 +187,7 @@ export function usePlaylists() {
     refresh: fetchPlaylists,
     createPlaylist,
     deletePlaylist,
+    clonePlaylist,
   };
 }
 

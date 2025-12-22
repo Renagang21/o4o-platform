@@ -9,6 +9,7 @@
  * - 디스플레이 상태 확인 (Display Status)
  *
  * Phase 2 MVP - 약국이 "지금 당장 쓸 수 있는" 최소 기능 세트
+ * Phase 3 UX - 프리셋 템플릿, 긴급 공지, 복제 기능, 가이드
  */
 
 export const signagePharmacyExtensionManifest = {
@@ -17,7 +18,7 @@ export const signagePharmacyExtensionManifest = {
   appId: 'signage-pharmacy-extension',
   displayName: '약국 디지털 사이니지',
   name: 'Signage Pharmacy Extension',
-  version: '1.0.0',
+  version: '1.1.0',
   type: 'extension' as const,
   appType: 'extension' as const,
   category: 'signage' as const,
@@ -78,6 +79,11 @@ export const signagePharmacyExtensionManifest = {
         icon: 'ListVideo',
       },
       {
+        label: '프리셋 템플릿',
+        path: '/pharmacy-signage/templates',
+        icon: 'LayoutTemplate',
+      },
+      {
         label: '편성표',
         path: '/pharmacy-signage/schedule',
         icon: 'Calendar',
@@ -86,6 +92,16 @@ export const signagePharmacyExtensionManifest = {
         label: '즉시 실행',
         path: '/pharmacy-signage/quick-action',
         icon: 'Play',
+      },
+      {
+        label: '긴급 공지',
+        path: '/pharmacy-signage/emergency',
+        icon: 'AlertTriangle',
+      },
+      {
+        label: '사용 가이드',
+        path: '/pharmacy-signage/help',
+        icon: 'HelpCircle',
       },
     ],
     member: [],
