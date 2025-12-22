@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "@o4o-apps/forum": "workspace:*",
+    "@o4o/forum-core": "workspace:*",
     "@o4o/types": "workspace:*"
   },
   "peerDependencies": {

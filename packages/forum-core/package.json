@@ -1,8 +1,8 @@
 {
-  "name": "@o4o-apps/forum",
+  "name": "@o4o/forum-core",
   "version": "1.0.0",
   "private": true,
-  "description": "Forum app for O4O Platform - Community forum with posts, comments, categories, and tags",
+  "description": "Forum Core for O4O Platform - Community forum with posts, comments, categories, and tags",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

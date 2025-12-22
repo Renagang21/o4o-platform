@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumPost, PostStatus } from '@o4o-apps/forum';
-import { ForumCategory } from '@o4o-apps/forum';
-import { ForumComment, CommentStatus } from '@o4o-apps/forum';
-import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o-apps/forum';
-import type { ForumPostMetadata } from '@o4o-apps/forum';
+import { ForumPost, PostStatus } from '@o4o/forum-core';
+import { ForumCategory } from '@o4o/forum-core';
+import { ForumComment, CommentStatus } from '@o4o/forum-core';
+import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o/forum-core';
+import type { ForumPostMetadata } from '@o4o/forum-core';
 import { User } from '../../modules/auth/entities/User.js';
 import { MoreThanOrEqual } from 'typeorm';
 import logger from '../../utils/logger.js';

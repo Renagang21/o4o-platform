@@ -191,25 +191,25 @@ viewComponentRegistry.register(
 
 viewComponentRegistry.register(
   'forum.boards-list',
-  lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumBoardList')),
+  lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumBoardList')),
   { appId: 'forum', description: 'Forum Board List' }
 );
 
 viewComponentRegistry.register(
   'forum.categories',
-  lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumCategories')),
+  lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumCategories')),
   { appId: 'forum', description: 'Forum Categories' }
 );
 
 viewComponentRegistry.register(
   'forum.post-detail',
-  lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostDetail')),
+  lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostDetail')),
   { appId: 'forum', description: 'Forum Post Detail' }
 );
 
 viewComponentRegistry.register(
   'forum.post-form',
-  lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostForm')),
+  lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostForm')),
   { appId: 'forum', description: 'Forum Post Form' }
 );
 

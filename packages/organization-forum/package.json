@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@o4o/organization-core": "workspace:*",
-    "@o4o-apps/forum": "workspace:*"
+    "@o4o/forum-core": "workspace:*"
   },
   "peerDependencies": {
     "typeorm": "^0.3.0"

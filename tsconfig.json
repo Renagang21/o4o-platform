@@ -52,7 +52,7 @@
     { "path": "./packages/types" },
     { "path": "./packages/ui" },
     { "path": "./packages/utils" },
-    { "path": "./packages/forum-app" },
+    { "path": "./packages/forum-core" },
     { "path": "./packages/forum-neture" },
     { "path": "./packages/forum-yaksa" }
   ]

@@ -35,7 +35,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "7.3.1",
     "@mui/material": "7.3.1",
-    "@o4o-apps/forum": "file:../../packages/forum-app",
+    "@o4o/forum-core": "file:../../packages/forum-core",
     "@o4o/appearance-system": "workspace:^",
     "@o4o/auth-client": "file:../../packages/auth-client",
     "@o4o/auth-context": "file:../../packages/auth-context",

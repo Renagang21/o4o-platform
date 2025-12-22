@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
 import { YaksaCommunity, CommunityType } from '../entities/YaksaCommunity.js';
 import { YaksaCommunityMember, CommunityMemberRole } from '../entities/YaksaCommunityMember.js';
-import type { ForumPost } from '@o4o-apps/forum';
-import { normalizeContent } from '@o4o-apps/forum';
+import type { ForumPost } from '@o4o/forum-core';
+import { normalizeContent } from '@o4o/forum-core';
 
 /**
  * YaksaCommunityService

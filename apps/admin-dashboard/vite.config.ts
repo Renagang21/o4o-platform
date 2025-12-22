@@ -39,8 +39,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
       '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist'),
       // Forum app packages - map to source directories for lazy loading
-      '@o4o-apps/forum': path.resolve(__dirname, '../../packages/forum-app'),
-      '@o4o-apps/forum-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
+      '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core'),
+      '@o4o/forum-core-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
       // Dropshipping core - map to source for subpath imports
       '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
       // Pharmacy AI Insight - map to source for lazy loading
@@ -99,8 +99,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/slide-app', // Workspace package - pre-bundling 방지
       '@o4o/dropshipping-core', // Dropshipping core - source imports
       '@o4o/pharmacy-ai-insight', // Pharmacy AI Insight - dist imports
-      '@o4o-apps/forum', // Forum app packages - source imports
-      '@o4o-apps/forum-yaksa'
+      '@o4o/forum-core', // Forum app packages - source imports
+      '@o4o/forum-core-yaksa'
     ],
     esbuildOptions: {
       define: {

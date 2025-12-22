@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o-apps/forum": "workspace:*"
+    "@o4o/forum-core": "workspace:*"
   },
   "peerDependencies": {
     "express": "^4.18.0",

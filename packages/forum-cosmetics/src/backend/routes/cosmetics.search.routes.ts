@@ -10,7 +10,7 @@
 
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { ForumSearchService } from '@o4o-apps/forum/src/backend/services/forum.search.service.js';
+import { ForumSearchService } from '@o4o/forum-core/src/backend/services/forum.search.service.js';
 
 /**
  * Create cosmetics-specific search routes

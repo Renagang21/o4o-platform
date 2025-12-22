@@ -140,16 +140,16 @@ const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 // Site Builder (Step 24)
 const SiteBuilder = lazy(() => import('@/pages/site-builder/SiteBuilder'));
 
-// Forum Pages (from @o4o-apps/forum package - source imports)
-const ForumBoardList = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumBoardList'));
-const ForumCategories = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumCategories'));
-const ForumPostDetail = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostDetail'));
-const ForumPostForm = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostForm'));
+// Forum Pages (from @o4o/forum-core package - source imports)
+const ForumBoardList = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumBoardList'));
+const ForumCategories = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumCategories'));
+const ForumPostDetail = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostDetail'));
+const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostForm'));
 
-// Yaksa Community Pages (from @o4o-apps/forum-yaksa package - source imports)
-const YaksaCommunityList = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityList'));
-const YaksaCommunityDetail = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
-const YaksaCommunityFeed = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
+// Yaksa Community Pages (from @o4o/forum-core-yaksa package - source imports)
+const YaksaCommunityList = lazy(() => import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityList'));
+const YaksaCommunityDetail = lazy(() => import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
+const YaksaCommunityFeed = lazy(() => import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
 
 // Groupbuy Pages
 const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));

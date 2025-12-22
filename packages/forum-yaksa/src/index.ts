@@ -4,7 +4,7 @@
  * Entry point for the Yaksa organization forum extension.
  * This app extends forum-core with pharmacy-specific features.
  *
- * @package @o4o-apps/forum-yaksa
+ * @package @o4o/forum-core-yaksa
  * @version 1.0.0
  */
 
@@ -55,4 +55,4 @@ export function routes(dataSource?: DataSource | any): Router {
 export const createRoutes = routes;
 
 // Note: Admin UI components will be imported directly by admin-dashboard via:
-// import('@o4o-apps/forum-yaksa/src/admin-ui/pages/ForumYaksaApp')
+// import('@o4o/forum-core-yaksa/src/admin-ui/pages/ForumYaksaApp')

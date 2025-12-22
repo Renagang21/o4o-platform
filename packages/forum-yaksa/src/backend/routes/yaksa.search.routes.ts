@@ -10,8 +10,8 @@
 
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { ForumSearchService } from '@o4o-apps/forum/src/backend/services/forum.search.service.js';
-import { PostType } from '@o4o-apps/forum/src/backend/entities/ForumPost.js';
+import { ForumSearchService } from '@o4o/forum-core/src/backend/services/forum.search.service.js';
+import { PostType } from '@o4o/forum-core/src/backend/entities/ForumPost.js';
 
 /**
  * Create yaksa-specific search routes

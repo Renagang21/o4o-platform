@@ -100,5 +100,5 @@ export type { ForumPostSummary as ForumPostSummaryTemplate } from './templates/F
 export type { ForumComment as ForumCommentTemplate } from './public-ui/components/CommentSection.js';
 
 // Note: Admin UI components and services are source-only and imported directly via:
-// import('@o4o-apps/forum/src/admin-ui/pages/ComponentName')
-// import from '@o4o-apps/forum/src/backend/services/forum.service'
+// import('@o4o/forum-core/src/admin-ui/pages/ComponentName')
+// import from '@o4o/forum-core/src/backend/services/forum.service'

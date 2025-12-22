@@ -273,9 +273,6 @@ importers:
       '@mui/material':
         specifier: 7.3.1
         version: 7.3.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@o4o-apps/forum':
-        specifier: file:../../packages/forum-app
-        version: file:packages/forum-app(@tanstack/react-query@5.87.1(react@18.2.0))(class-transformer@0.5.1)(class-validator@0.14.2)(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))
       '@o4o/appearance-system':
         specifier: workspace:^
         version: link:../../packages/appearance-system
@@ -288,6 +285,9 @@ importers:
       '@o4o/block-renderer':
         specifier: file:../../packages/block-renderer
         version: file:packages/block-renderer(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@o4o/forum-core':
+        specifier: file:../../packages/forum-core
+        version: file:packages/forum-core(@tanstack/react-query@5.87.1(react@18.2.0))(class-transformer@0.5.1)(class-validator@0.14.2)(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))
       '@o4o/pharmacy-ai-insight':
         specifier: file:../../packages/pharmacy-ai-insight
         version: file:packages/pharmacy-ai-insight(express@4.21.2)(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))
@@ -644,9 +644,6 @@ importers:
       '@o4o-apps/cms-core':
         specifier: workspace:*
         version: link:../../packages/cms-core
-      '@o4o-apps/forum':
-        specifier: workspace:*
-        version: link:../../packages/forum-app
       '@o4o-apps/forum-yaksa':
         specifier: workspace:*
         version: link:../../packages/forum-yaksa
@@ -686,6 +683,9 @@ importers:
       '@o4o/ecommerce-core':
         specifier: workspace:*
         version: link:../../packages/ecommerce-core
+      '@o4o/forum-core':
+        specifier: workspace:*
+        version: link:../../packages/forum-core
       '@o4o/groupbuy-yaksa':
         specifier: workspace:*
         version: link:../../packages/groupbuy-yaksa
@@ -1957,7 +1957,7 @@ importers:
         specifier: ^5.3.0
         version: 5.9.2
 
-  packages/forum-app:
+  packages/forum-core:
     dependencies:
       '@o4o/organization-core':
         specifier: workspace:*
@@ -1982,7 +1982,7 @@ importers:
         version: 6.30.1(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
-        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.4.5))
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1995,13 +1995,13 @@ importers:
         version: 5.0.10
       typescript:
         specifier: ^5.3.0
-        version: 5.4.5
+        version: 5.9.2
 
   packages/forum-cosmetics:
     dependencies:
-      '@o4o-apps/forum':
+      '@o4o/forum-core':
         specifier: workspace:*
-        version: link:../forum-app
+        version: link:../forum-core
       express:
         specifier: ^4.18.0
         version: 4.21.2
@@ -2024,9 +2024,9 @@ importers:
 
   packages/forum-yaksa:
     dependencies:
-      '@o4o-apps/forum':
+      '@o4o/forum-core':
         specifier: workspace:*
-        version: link:../forum-app
+        version: link:../forum-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../types
@@ -2355,9 +2355,9 @@ importers:
 
   packages/organization-forum:
     dependencies:
-      '@o4o-apps/forum':
+      '@o4o/forum-core':
         specifier: workspace:*
-        version: link:../forum-app
+        version: link:../forum-core
       '@o4o/organization-core':
         specifier: workspace:*
         version: link:../organization-core
@@ -4635,16 +4635,6 @@ packages:
     engines: {node: '>=8.0.0', npm: '>=5.0.0'}
     hasBin: true
 
-  '@o4o-apps/forum@file:packages/forum-app':
-    resolution: {directory: packages/forum-app, type: directory}
-    peerDependencies:
-      '@tanstack/react-query': ^5.0.0
-      class-transformer: ^0.5.0
-      class-validator: ^0.14.0
-      react: ^18.0.0
-      react-router-dom: ^6.0.0
-      typeorm: ^0.3.0
-
   '@o4o/auth-client@file:packages/auth-client':
     resolution: {directory: packages/auth-client, type: directory}
     engines: {node: '>=20.0.0', npm: '>=10.0.0'}
@@ -4660,6 +4650,16 @@ packages:
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
+
+  '@o4o/forum-core@file:packages/forum-core':
+    resolution: {directory: packages/forum-core, type: directory}
+    peerDependencies:
+      '@tanstack/react-query': ^5.0.0
+      class-transformer: ^0.5.0
+      class-validator: ^0.14.0
+      react: ^18.0.0
+      react-router-dom: ^6.0.0
+      typeorm: ^0.3.0
 
   '@o4o/pharmacy-ai-insight@file:packages/pharmacy-ai-insight':
     resolution: {directory: packages/pharmacy-ai-insight, type: directory}
@@ -13764,12 +13764,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
+  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
-      '@emotion/react': 11.14.0(@types/react@18.2.79)(react@18.2.0)
+      '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.2.0)
       '@emotion/utils': 1.4.2
@@ -14969,17 +14969,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@o4o-apps/forum@file:packages/forum-app(@tanstack/react-query@5.87.1(react@18.2.0))(class-transformer@0.5.1)(class-validator@0.14.2)(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))':
-    dependencies:
-      '@o4o/organization-core': link:packages/organization-core
-      '@o4o/types': link:packages/types
-      '@tanstack/react-query': 5.87.1(react@18.2.0)
-      class-transformer: 0.5.1
-      class-validator: 0.14.2
-      react: 18.2.0
-      react-router-dom: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      typeorm: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))
-
   '@o4o/auth-client@file:packages/auth-client(react@18.2.0)':
     dependencies:
       '@o4o/types': link:packages/types
@@ -15000,6 +14989,17 @@ snapshots:
       marked: 11.2.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@o4o/forum-core@file:packages/forum-core(@tanstack/react-query@5.87.1(react@18.2.0))(class-transformer@0.5.1)(class-validator@0.14.2)(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))':
+    dependencies:
+      '@o4o/organization-core': link:packages/organization-core
+      '@o4o/types': link:packages/types
+      '@tanstack/react-query': 5.87.1(react@18.2.0)
+      class-transformer: 0.5.1
+      class-validator: 0.14.2
+      react: 18.2.0
+      react-router-dom: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      typeorm: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))
 
   '@o4o/pharmacy-ai-insight@file:packages/pharmacy-ai-insight(express@4.21.2)(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))':
     dependencies:
@@ -18083,7 +18083,7 @@ snapshots:
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
       '@emotion/utils': 1.4.2
       '@floating-ui/react-dom': 2.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/gradient-parser': 0.1.3
@@ -24687,27 +24687,6 @@ snapshots:
       babel-jest: 29.7.0(@babel/core@7.28.4)
       jest-util: 30.0.5
 
-  ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.4.5):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.11
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 20.19.24
-      acorn: 8.15.0
-      acorn-walk: 8.3.4
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.4.5
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    optionalDependencies:
-      '@swc/core': 1.13.5(@swc/helpers@0.5.17)
-    optional: true
-
   ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
@@ -24994,34 +24973,6 @@ snapshots:
       redis: 5.8.2
       sqlite3: 5.1.7
       ts-node: 10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@22.17.2)(typescript@5.4.5)
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
-
-  typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.4.5)):
-    dependencies:
-      '@sqltools/formatter': 1.2.5
-      ansis: 3.17.0
-      app-root-path: 3.1.0
-      buffer: 6.0.3
-      dayjs: 1.11.18
-      debug: 4.4.3(supports-color@8.1.1)
-      dedent: 1.7.0(babel-plugin-macros@3.1.0)
-      dotenv: 16.6.1
-      glob: 10.4.5
-      reflect-metadata: 0.2.2
-      sha.js: 2.4.12
-      sql-highlight: 6.1.0
-      tslib: 2.8.1
-      uuid: 11.1.0
-      yargs: 17.7.2
-    optionalDependencies:
-      better-sqlite3: 12.5.0
-      ioredis: 5.7.0
-      pg: 8.16.3
-      redis: 5.8.2
-      sqlite3: 5.1.7
-      ts-node: 10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.4.5)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color

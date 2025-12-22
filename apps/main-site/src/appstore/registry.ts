@@ -52,22 +52,22 @@ export const AppRegistry: AppRegistryEntry[] = [
     id: 'forum',
     label: 'Forum',
     enabled: true,
-    manifestPath: '@o4o-apps/forum/manifest.json',
-    packageName: '@o4o-apps/forum',
+    manifestPath: '@o4o/forum-core/manifest.json',
+    packageName: '@o4o/forum-core',
   },
   {
     id: 'forum-neture',
     label: 'Neture Forum',
     enabled: true,
-    manifestPath: '@o4o-apps/forum-neture/manifest.json',
-    packageName: '@o4o-apps/forum-neture',
+    manifestPath: '@o4o/forum-core-neture/manifest.json',
+    packageName: '@o4o/forum-core-neture',
   },
   {
     id: 'forum-yaksa',
     label: 'Yaksa Forum',
     enabled: true,
-    manifestPath: '@o4o-apps/forum-yaksa/manifest.json',
-    packageName: '@o4o-apps/forum-yaksa',
+    manifestPath: '@o4o/forum-core-yaksa/manifest.json',
+    packageName: '@o4o/forum-core-yaksa',
   },
 
   // Future apps can be added here

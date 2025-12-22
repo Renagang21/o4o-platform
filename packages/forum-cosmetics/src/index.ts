@@ -4,7 +4,7 @@
  * Entry point for the Cosmetics forum extension.
  * This app extends forum-core with cosmetics-specific features.
  *
- * @package @o4o-apps/forum-cosmetics
+ * @package @o4o/forum-core-cosmetics
  * @version 1.0.0
  */
 
@@ -65,4 +65,4 @@ export function routes(dataSource?: DataSource | any): Router {
 export const createRoutes = routes;
 
 // Note: Admin UI components will be imported directly by admin-dashboard via:
-// import('@o4o-apps/forum-cosmetics/src/admin-ui/pages/ForumCosmeticsApp')
+// import('@o4o/forum-core-cosmetics/src/admin-ui/pages/ForumCosmeticsApp')

@@ -89,8 +89,8 @@ import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-// Forum App entities (from @o4o-apps/forum package)
-import { ForumPost, ForumCategory, ForumComment } from '@o4o-apps/forum';
+// Forum App entities (from @o4o/forum-core package)
+import { ForumPost, ForumCategory, ForumComment } from '@o4o/forum-core';
 // Forum Notification entity (Phase 13)
 import { ForumNotification } from '../entities/ForumNotification.js';
 // Dropshipping Core entities (from @o4o/dropshipping-core package)
@@ -311,7 +311,7 @@ export const AppDataSource = new DataSource({
     RoleApplication,
     KycDocument,
     // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-    // Forum App entities (from @o4o-apps/forum package)
+    // Forum App entities (from @o4o/forum-core package)
     ForumPost,
     ForumCategory,
     ForumComment,

@@ -1,6 +1,6 @@
 /**
  * Forum Types for API Server
- * Local type definitions to avoid circular dependency with @o4o-apps/forum
+ * Local type definitions to avoid circular dependency with @o4o/forum-core
  */
 
 // =============================================================================

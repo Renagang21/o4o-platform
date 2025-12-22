@@ -1,7 +1,7 @@
 /**
  * Forum Yaksa Extension App Manifest (Local Copy)
  *
- * This is a local copy for when @o4o-apps/forum-yaksa package is not built.
+ * This is a local copy for when @o4o/forum-core-yaksa package is not built.
  * Should be replaced with package import when available.
  */
 
