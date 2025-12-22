@@ -24,66 +24,13 @@ import { DisabledAppEntry } from '@o4o/types';
  */
 export const disabledAppsRegistry: DisabledAppEntry[] = [
   // === BROKEN: Build/Runtime Errors ===
-  {
-    appId: 'yaksa-scheduler',
-    name: '약사 스케줄러',
-    disabled: {
-      status: 'broken',
-      reason: 'TypeScript 빌드 에러 - 타입 정의 불일치',
-      nextAction: '타입 정의 수정 후 빌드 확인 필요',
-      disabledAt: '2024-12-15',
-    },
-  },
-  {
-    appId: 'cosmetics-partner-extension',
-    name: '화장품 파트너 확장',
-    disabled: {
-      status: 'broken',
-      reason: '런타임 에러 - ESM import 확장자 누락',
-      nextAction: '.js 확장자 추가 후 테스트 필요',
-      disabledAt: '2024-12-15',
-    },
-  },
-  {
-    appId: 'cosmetics-supplier-extension',
-    name: '화장품 공급자 확장',
-    disabled: {
-      status: 'broken',
-      reason: '런타임 에러 - ESM import 확장자 누락',
-      nextAction: '.js 확장자 추가 후 테스트 필요',
-      disabledAt: '2024-12-15',
-    },
-  },
-  {
-    appId: 'cosmetics-sample-display-extension',
-    name: '화장품 샘플/진열 확장',
-    disabled: {
-      status: 'broken',
-      reason: '런타임 에러 - cosmetics-supplier-extension 의존성으로 인한 ESM/CommonJS 충돌',
-      nextAction: 'cosmetics-supplier-extension ESM 수정 완료 후 활성화',
-      disabledAt: '2024-12-19',
-    },
-  },
-  {
-    appId: 'lms-marketing',
-    name: 'LMS 마케팅',
-    disabled: {
-      status: 'broken',
-      reason: 'TypeScript 빌드 에러',
-      nextAction: '타입 에러 수정 후 빌드 확인 필요',
-      disabledAt: '2024-12-15',
-    },
-  },
-  {
-    appId: 'health-extension',
-    name: '헬스 확장',
-    disabled: {
-      status: 'broken',
-      reason: '존재하지 않는 타입 export 참조',
-      nextAction: '잘못된 export 제거 후 빌드 확인 필요',
-      disabledAt: '2024-12-15',
-    },
-  },
+  // WO-MENU-BROKEN-FIX (2024-12-20): All broken apps have been fixed
+  // - yaksa-scheduler: TypeScript errors fixed
+  // - cosmetics-partner-extension: ESM imports fixed, design system dependency removed
+  // - cosmetics-supplier-extension: ESM imports fixed
+  // - cosmetics-sample-display-extension: Dependencies now working
+  // - lms-marketing: TypeScript errors fixed
+  // - health-extension: Type export errors fixed
 
   // === INCOMPLETE: Development Not Finished ===
   {

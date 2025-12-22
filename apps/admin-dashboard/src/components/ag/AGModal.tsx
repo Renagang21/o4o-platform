@@ -194,37 +194,59 @@ export function AGModal({
  * AGConfirmModal - Confirmation Dialog
  */
 export interface AGConfirmModalProps {
-  /** Open state */
-  isOpen: boolean;
+  /** Open state (preferred) */
+  isOpen?: boolean;
+  /** Open state (alias for isOpen) */
+  open?: boolean;
   /** Close handler */
   onClose: () => void;
   /** Confirm handler */
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   /** Modal title */
   title: string;
   /** Confirmation message */
-  message: string;
+  message?: string;
+  /** Confirmation message (alias for message) */
+  description?: string;
   /** Confirm button text */
   confirmLabel?: string;
+  /** Confirm button text (alias for confirmLabel) */
+  confirmText?: string;
   /** Cancel button text */
   cancelLabel?: string;
+  /** Cancel button text (alias for cancelLabel) */
+  cancelText?: string;
   /** Confirm button variant */
-  variant?: 'primary' | 'danger';
+  variant?: 'primary' | 'danger' | 'destructive' | string;
+  /** Confirm button variant (alias for variant) */
+  confirmVariant?: string;
   /** Loading state */
   loading?: boolean;
 }
 
 export function AGConfirmModal({
   isOpen,
+  open,
   onClose,
   onConfirm,
   title,
-  message,
-  confirmLabel = '확인',
-  cancelLabel = '취소',
-  variant = 'primary',
+  message: messageProp,
+  description,
+  confirmLabel: confirmLabelProp,
+  confirmText,
+  cancelLabel: cancelLabelProp,
+  cancelText,
+  variant: variantProp,
+  confirmVariant,
   loading = false,
 }: AGConfirmModalProps) {
+  // Support alias props
+  const isModalOpen = isOpen ?? open ?? false;
+  const message = messageProp ?? description ?? '';
+  const confirmLabel = confirmLabelProp ?? confirmText ?? '확인';
+  const cancelLabel = cancelLabelProp ?? cancelText ?? '취소';
+  const rawVariant = variantProp ?? confirmVariant ?? 'primary';
+  const variant: 'primary' | 'danger' = rawVariant === 'danger' || rawVariant === 'destructive' ? 'danger' : 'primary';
   const confirmButtonClasses =
     variant === 'danger'
       ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
@@ -232,7 +254,7 @@ export function AGConfirmModal({
 
   return (
     <AGModal
-      isOpen={isOpen}
+      isOpen={isModalOpen}
       onClose={onClose}
       size="sm"
       showCloseButton={false}

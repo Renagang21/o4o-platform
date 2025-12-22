@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check if any package.json was modified
+PACKAGE_JSON_CHANGED=$(git diff --cached --name-only | grep -E "package\.json$" || true)
+
+if [ -n "$PACKAGE_JSON_CHANGED" ]; then
+  echo "📦 package.json changed, updating lockfile..."
+  pnpm install --no-frozen-lockfile
+  git add pnpm-lock.yaml
+  echo "✅ Lockfile updated and staged"
+fi

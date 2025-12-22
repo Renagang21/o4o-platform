@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean",
+    "build": "tsc -p tsconfig.json",
     "dev": "tsup src/index.ts --format esm --dts --watch",
     "type-check": "tsc --noEmit"
   },

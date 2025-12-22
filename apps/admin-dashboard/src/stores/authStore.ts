@@ -11,6 +11,11 @@ export interface User {
   permissions?: string[]
   avatar?: string
   createdAt?: string
+  // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
+  organizationId?: string
+  organizationName?: string
+  supplierId?: string
+  phone?: string
 }
 
 interface AuthState {

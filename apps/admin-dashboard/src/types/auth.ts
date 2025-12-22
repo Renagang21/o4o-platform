@@ -6,6 +6,11 @@ export interface User {
   avatar?: string
   createdAt: string
   updatedAt: string
+  // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
+  organizationId?: string
+  organizationName?: string
+  supplierId?: string
+  phone?: string
 }
 
 export interface AuthState {

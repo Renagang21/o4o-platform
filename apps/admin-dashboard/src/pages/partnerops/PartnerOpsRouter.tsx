@@ -3,6 +3,8 @@
  *
  * Main router for PartnerOps app pages
  * Manages partners, affiliate links, conversions, and commissions
+ *
+ * WO-MENU-ROUTE-WIRING: Added AI Builder routes
  */
 
 import React, { Suspense, lazy } from 'react';
@@ -15,6 +17,11 @@ const Routines = lazy(() => import('./pages/Routines'));
 const Links = lazy(() => import('./pages/Links'));
 const Conversions = lazy(() => import('./pages/Conversions'));
 const Settlement = lazy(() => import('./pages/Settlement'));
+
+// Partner AI Builder - Placeholder (package not yet ready for production build)
+const AiBuilderPage: React.FC = () => (
+  <div className="p-4 text-center text-gray-500">AI Builder is coming soon...</div>
+);
 
 // Loading component
 const PageLoader: React.FC = () => (
@@ -39,6 +46,10 @@ const PartnerOpsRouter: React.FC = () => {
         <Route path="links/new" element={<Links />} />
         <Route path="conversions" element={<Conversions />} />
         <Route path="settlement" element={<Settlement />} />
+        {/* AI Builder Routes (WO-MENU-ROUTE-WIRING) */}
+        <Route path="ai-builder" element={<AiBuilderPage />} />
+        <Route path="ai-builder/routine" element={<AiBuilderPage />} />
+        <Route path="ai-builder/recommend" element={<AiBuilderPage />} />
         <Route path="*" element={<Dashboard />} />
       </Routes>
     </Suspense>

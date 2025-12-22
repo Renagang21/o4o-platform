@@ -1,6 +1,5 @@
-import type { AppManifest } from '@o4o/types';
-
-export const manifest: AppManifest = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const manifest: any = {
   meta: {
     appId: 'diabetes-core',
     name: 'DiabetesCare Core',
@@ -11,8 +10,8 @@ export const manifest: AppManifest = {
     license: 'proprietary',
   },
   dependencies: {
-    core: [],
-    extension: [],
+    core: '',
+    extension: '',
   },
   cms: {
     cpt: [],

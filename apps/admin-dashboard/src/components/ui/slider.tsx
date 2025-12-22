@@ -2,6 +2,8 @@ import { forwardRef, MouseEvent, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface SliderProps {
+  /** Unique identifier for the slider */
+  id?: string;
   className?: string;
   value?: number[];
   defaultValue?: number[];

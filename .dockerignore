@@ -1,0 +1,73 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs (will be generated in Docker)
+**/dist
+**/build
+
+# Development files
+.git
+.github
+.vscode
+.idea
+
+# Test files
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+**/coverage
+**/jest.config.*
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+**/*.backup
+
+# Legacy folders
+legacy
+
+# Development tools
+scripts/dev*
+scripts/test*
+
+# IDE
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Build cache
+.turbo
+.next
+.nuxt
+
+# Misc
+*.tgz
+*.tar.gz
+.eslintcache
+.prettierignore

@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "site": "neture-cosmetics",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "cosmetics-api",
+          "region": "asia-northeast3"
+        }
+      }
+    ]
+  }
+}

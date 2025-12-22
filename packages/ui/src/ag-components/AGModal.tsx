@@ -18,7 +18,10 @@ import { createPortal } from 'react-dom';
 export type AGModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 export interface AGModalProps {
-  open: boolean;
+  /** Open state (preferred) */
+  open?: boolean;
+  /** Open state (alias for open) */
+  isOpen?: boolean;
   onClose: () => void;
   title?: ReactNode;
   children: ReactNode;
@@ -39,7 +42,8 @@ const sizeStyles: Record<AGModalSize, string> = {
 };
 
 export function AGModal({
-  open,
+  open: openProp,
+  isOpen,
   onClose,
   title,
   children,
@@ -50,6 +54,8 @@ export function AGModal({
   showCloseButton = true,
   className = '',
 }: AGModalProps) {
+  // Support both open and isOpen
+  const open = openProp ?? isOpen ?? false;
   // Handle escape key
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -151,28 +157,45 @@ export function AGModal({
 
 // Convenience components for common patterns
 export interface AGConfirmModalProps {
-  open: boolean;
+  /** Open state (preferred) */
+  open?: boolean;
+  /** Open state (alias for open) */
+  isOpen?: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   title?: string;
-  message: ReactNode;
+  /** Message content */
+  message?: ReactNode;
+  /** Message content (alias for message) */
+  description?: ReactNode;
   confirmText?: string;
   cancelText?: string;
-  confirmVariant?: 'primary' | 'danger';
+  /** Confirm button variant (preferred) */
+  confirmVariant?: 'primary' | 'danger' | string;
+  /** Confirm button variant (alias for confirmVariant) */
+  variant?: string;
   loading?: boolean;
 }
 
 export function AGConfirmModal({
-  open,
+  open: openProp,
+  isOpen,
   onClose,
   onConfirm,
   title = '확인',
-  message,
+  message: messageProp,
+  description,
   confirmText = '확인',
   cancelText = '취소',
-  confirmVariant = 'primary',
+  confirmVariant: confirmVariantProp,
+  variant,
   loading = false,
 }: AGConfirmModalProps) {
+  // Support alias props
+  const open = openProp ?? isOpen ?? false;
+  const message = messageProp ?? description ?? '';
+  const rawVariant = confirmVariantProp ?? variant ?? 'primary';
+  const confirmVariant: 'primary' | 'danger' = rawVariant === 'danger' ? 'danger' : 'primary';
   const confirmButtonClass =
     confirmVariant === 'danger'
       ? 'bg-red-600 hover:bg-red-700 text-white'

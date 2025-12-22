@@ -19,8 +19,10 @@ export type SortDirection = 'asc' | 'desc' | null;
 export interface AGTableColumn<T> {
   /** Unique key for the column */
   key: string;
-  /** Column header label */
-  label: string;
+  /** Column header label (preferred) */
+  label?: string;
+  /** Column header label (alias for label) */
+  header?: string;
   /** Whether column is sortable */
   sortable?: boolean;
   /** Column width (e.g., '200px', '20%') */
@@ -247,7 +249,7 @@ export function AGTable<T extends Record<string, unknown>>({
                 onClick={() => column.sortable && handleSort(column.key)}
               >
                 <div className={`flex items-center gap-1 ${column.align === 'right' ? 'justify-end' : column.align === 'center' ? 'justify-center' : ''}`}>
-                  <span>{column.label}</span>
+                  <span>{column.label || column.header || ''}</span>
                   {column.sortable && (
                     <SortIcon direction={currentSortKey === column.key ? currentSortDir : null} />
                   )}
@@ -331,14 +333,18 @@ export function AGTable<T extends Record<string, unknown>>({
  * AGTablePagination - Table Pagination Component
  */
 export interface AGTablePaginationProps {
-  /** Current page (1-indexed) */
-  page: number;
+  /** Current page (1-indexed, preferred) */
+  page?: number;
+  /** Current page (1-indexed, alias for page) */
+  currentPage?: number;
   /** Total number of pages */
   totalPages: number;
   /** Total number of items */
   totalItems?: number;
   /** Items per page */
   pageSize?: number;
+  /** Items per page (alias for pageSize) */
+  itemsPerPage?: number;
   /** Page change handler */
   onPageChange: (page: number) => void;
   /** Page size options */
@@ -352,16 +358,21 @@ export interface AGTablePaginationProps {
 }
 
 export function AGTablePagination({
-  page,
+  page: pageProp,
+  currentPage,
   totalPages,
   totalItems,
-  pageSize = 10,
+  pageSize: pageSizeProp,
+  itemsPerPage,
   onPageChange,
   pageSizeOptions = [10, 20, 50, 100],
   onPageSizeChange,
   showPageSize = true,
   showItemCount = true,
 }: AGTablePaginationProps) {
+  // Support both page/currentPage and pageSize/itemsPerPage
+  const page = pageProp ?? currentPage ?? 1;
+  const pageSize = pageSizeProp ?? itemsPerPage ?? 10;
   const startItem = (page - 1) * pageSize + 1;
   const endItem = Math.min(page * pageSize, totalItems || 0);
 
