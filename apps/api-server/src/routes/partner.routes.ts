@@ -15,20 +15,20 @@ const partnerOrAdmin = requireAnyRole([UserRole.PARTNER, UserRole.ADMIN, UserRol
 // ====================================
 
 // Partner signup (authenticated users)
-router.post('/signup', authenticate, PartnerController.signup);
+// router.post('/signup', authenticate, PartnerController.signup);
 
 // Get current partner info
-router.get('/me', authenticate, PartnerController.getMe);
+// router.get('/me', authenticate, PartnerController.getMe);
 
 // Partner dashboard summary (for Partner Dashboard Home)
-router.get('/dashboard', authenticate, PartnerController.getPartnerDashboard);
+// router.get('/dashboard', authenticate, PartnerController.getPartnerDashboard);
 
 // Partner links CRUD
-router.get('/links', authenticate, PartnerController.getLinks);
-router.post('/links', authenticate, PartnerController.createLink);
+// router.get('/links', authenticate, PartnerController.getLinks);
+// router.post('/links', authenticate, PartnerController.createLink);
 
 // Partner earnings
-router.get('/earnings', authenticate, PartnerController.getEarnings);
+// router.get('/earnings', authenticate, PartnerController.getEarnings);
 
 // ====================================
 // Legacy routes (existing)
