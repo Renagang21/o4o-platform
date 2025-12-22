@@ -43,8 +43,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o-apps/forum-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
       // Dropshipping core - map to source for subpath imports
       '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
-      // Pharmacy AI Insight
-      '@o4o/pharmacy-ai-insight': path.resolve(__dirname, '../../packages/pharmacy-ai-insight/dist'),
+      // Pharmacy AI Insight - map to source for lazy loading
+      '@o4o/pharmacy-ai-insight': path.resolve(__dirname, '../../packages/pharmacy-ai-insight/src'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
