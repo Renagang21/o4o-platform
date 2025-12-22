@@ -175,6 +175,9 @@ const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/Co
 // Storefront Pages (Phase 7-I)
 const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
 
+// Pharmacy AI Insight (Phase 5 - Active)
+const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
+
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
@@ -1195,6 +1198,26 @@ function App() {
                         <AppRouteGuard appId="forum-yaksa">
                           <Suspense fallback={<PageLoader />}>
                             <YaksaCommunityFeed />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Pharmacy AI Insight - 약사 전용 AI 인사이트 (Phase 5) */}
+                    <Route path="/pharmacy-ai-insight" element={
+                      <AdminProtectedRoute requiredPermissions={['pharmacy-ai-insight.read']}>
+                        <AppRouteGuard appId="pharmacy-ai-insight">
+                          <Suspense fallback={<PageLoader />}>
+                            <PharmacyAiInsightSummary />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/pharmacy-ai-insight/summary" element={
+                      <AdminProtectedRoute requiredPermissions={['pharmacy-ai-insight.read']}>
+                        <AppRouteGuard appId="pharmacy-ai-insight">
+                          <Suspense fallback={<PageLoader />}>
+                            <PharmacyAiInsightSummary />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

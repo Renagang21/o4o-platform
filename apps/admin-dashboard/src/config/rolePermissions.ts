@@ -79,6 +79,21 @@ export const menuPermissions: MenuPermission[] = [
 
   // Forum - No restriction (allow all)
 
+  // Yaksa Tools - Permission based
+  {
+    menuId: 'yaksa-tools',
+    roles: ['admin', 'super_admin', 'pharmacist'],
+  },
+  {
+    menuId: 'yaksa-forum',
+    // No restriction - accessible to all authenticated users
+  },
+  {
+    menuId: 'pharmacy-ai-insight',
+    roles: ['admin', 'super_admin', 'pharmacist'],
+    permissions: ['pharmacy-ai-insight.read'],
+  },
+
   // Crowdfunding - No restriction (allow all)
 
   // CMS - No restriction (allow all)

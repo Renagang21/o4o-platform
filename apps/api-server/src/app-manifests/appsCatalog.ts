@@ -19,7 +19,6 @@ export type ServiceGroup =
   | 'supplierops'         // 공급자 운영 (Supplier Operations)
   | 'partnerops'          // 파트너 운영 (Partner/Affiliate Operations)
   | 'signage'             // 디지털 사이니지 (Digital Signage)
-  | 'diabetes-care-pharmacy' // 당뇨 케어 약국 (Diabetes Care Pharmacy)
   | 'platform-core'       // 플랫폼 코어 (Platform Infrastructure)
   | 'global';             // 모든 서비스 공통 (Available to all)
 
@@ -76,15 +75,6 @@ export const SERVICE_GROUP_META: ServiceGroupMeta[] = [
     icon: 'building-library',
     color: '#10B981',
     priority: 2,
-  },
-  {
-    id: 'diabetes-care-pharmacy',
-    name: 'Diabetes Care Pharmacy',
-    nameKo: '당뇨 케어 약국',
-    description: 'Specialized pharmacy services for diabetes care',
-    icon: 'heart',
-    color: '#3B82F6',
-    priority: 3,
   },
   {
     id: 'tourist',
@@ -309,17 +299,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['yaksa'],
   },
   {
-    appId: 'diabetes-core',
-    name: 'DiabetesCare Core',
-    version: '0.1.0',
-    description: '혈당관리 Core - CGM/BGM 데이터 처리, 분석, 코칭, 리포트 생성',
-    category: 'healthcare',
-    tags: ['혈당', 'diabetes', 'CGM', 'BGM', 'glucose', 'healthcare'],
-    type: 'core',
-    author: 'O4O Platform',
-    serviceGroups: ['diabetes-care-pharmacy'],
-  },
-  {
     appId: 'digital-signage-core',
     name: 'Digital Signage Core',
     version: '0.1.0',
@@ -494,6 +473,19 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['yaksa'],
   },
+  {
+    appId: 'pharmacy-ai-insight',
+    name: 'Pharmacy AI Insight',
+    version: '0.1.0',
+    description: '약사 전용 AI 인사이트 도구 - 데이터 해석, 패턴 설명, 제품 연계',
+    category: 'healthcare',
+    tags: ['AI', 'pharmacy', 'insight', 'glucose', 'pattern', '약사', 'CGM', 'BGM'],
+    type: 'feature',
+    status: 'active',
+    dependencies: { 'organization-core': '>=1.0.0' },
+    author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
+  },
 
   // ============================================
   // Signage Apps (signage)
@@ -624,19 +616,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     dependencies: { 'forum-core': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics'],
-    // Note: Hidden - Development status
-  },
-  {
-    appId: 'diabetes-pharmacy',
-    name: '혈당관리 약국',
-    version: '0.1.0',
-    description: '혈당관리 세미프랜차이즈 약국 운영 - Pattern 결과를 Action으로 전환',
-    category: 'healthcare',
-    tags: ['혈당', 'diabetes', 'pharmacy', 'action', 'healthcare'],
-    type: 'extension',
-    dependencies: { 'diabetes-core': '>=0.1.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['diabetes-care-pharmacy'],
     // Note: Hidden - Development status
   },
   {

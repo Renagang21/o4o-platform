@@ -44,6 +44,8 @@ import {
   LayoutGrid,
   Clock,
   AlertTriangle,
+  Brain,
+  MessageSquare,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -86,6 +88,28 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <Activity className="w-5 h-5" />,
     path: '/admin/yaksa-hub',
     roles: ['admin', 'super_admin'],
+  },
+
+  // Yaksa Tools (Forum Context → Tools)
+  {
+    id: 'yaksa-tools',
+    label: 'Yaksa Tools',
+    icon: <MessageSquare className="w-5 h-5" />,
+    roles: ['admin', 'super_admin', 'pharmacist'],
+    children: [
+      {
+        id: 'yaksa-forum',
+        label: 'Forum',
+        icon: <MessageSquare className="w-4 h-4" />,
+        path: '/forum/boards',
+      },
+      {
+        id: 'pharmacy-ai-insight',
+        label: 'AI Insight (Pharmacy)',
+        icon: <Brain className="w-4 h-4" />,
+        path: '/pharmacy-ai-insight',
+      },
+    ],
   },
 
   // CMS V2
