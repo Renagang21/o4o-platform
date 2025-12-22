@@ -3,11 +3,15 @@
  *
  * Provides API endpoints for displaying cosmetics products and routines
  * on digital signage displays in stores
+ *
+ * MVP Phase 1: Store 기반 Sample/Display 연계 콘텐츠 추가
  */
 
 import type { Request, Response } from 'express';
 import { CosmeticsFilterService } from '../services/cosmetics-filter.service.js';
 import { RoutineReaderService, type ReadOnlyRoutine } from '../services/routine-reader.service.js';
+import { SignageContentMapperService } from '../services/signage-content-mapper.service.js';
+import type { ContentGenerationOptions } from '../types/signage-content.types.js';
 
 export interface SignageProductData {
   id: string;
@@ -40,13 +44,16 @@ export interface SignageRoutineData {
 export class SignageController {
   private filterService: CosmeticsFilterService;
   private routineReader: RoutineReaderService;
+  private contentMapper?: SignageContentMapperService;
 
   constructor(
     filterService: CosmeticsFilterService,
-    routineReader: RoutineReaderService
+    routineReader: RoutineReaderService,
+    contentMapper?: SignageContentMapperService
   ) {
     this.filterService = filterService;
     this.routineReader = routineReader;
+    this.contentMapper = contentMapper;
   }
 
   /**
@@ -198,6 +205,125 @@ export class SignageController {
       res.status(500).json({
         success: false,
         message: 'Failed to fetch featured content for signage',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  // ============================================
+  // MVP Phase 1: Store-based Content API
+  // ============================================
+
+  /**
+   * GET /api/v1/cosmetics/signage/store/:storeId/contents
+   * Get signage contents for a specific store
+   *
+   * MVP Phase 1 콘텐츠 타입:
+   * - SAMPLE_PROMO: 샘플 체험 유도
+   * - DISPLAY_HIGHLIGHT: 진열 강조
+   * - OPERATION_ALERT: 운영 경고
+   *
+   * Query params:
+   * - maxItems: 최대 콘텐츠 수 (default: 10)
+   * - includeAlerts: 운영 경고 포함 (default: true)
+   * - includeSamplePromo: 샘플 프로모 포함 (default: true)
+   * - includeDisplayHighlight: 진열 강조 포함 (default: true)
+   */
+  async getStoreContents(req: Request, res: Response): Promise<void> {
+    try {
+      const { storeId } = req.params;
+      const {
+        maxItems = '10',
+        includeAlerts = 'true',
+        includeSamplePromo = 'true',
+        includeDisplayHighlight = 'true',
+      } = req.query;
+
+      if (!storeId) {
+        res.status(400).json({
+          success: false,
+          message: 'storeId is required',
+        });
+        return;
+      }
+
+      if (!this.contentMapper) {
+        res.status(500).json({
+          success: false,
+          message: 'Content mapper service not initialized',
+        });
+        return;
+      }
+
+      const options: ContentGenerationOptions = {
+        storeId,
+        maxItems: Number(maxItems),
+        includeAlerts: includeAlerts === 'true',
+        includeSamplePromo: includeSamplePromo === 'true',
+        includeDisplayHighlight: includeDisplayHighlight === 'true',
+      };
+
+      const response = await this.contentMapper.generateStoreContents(options);
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching store signage contents:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch store signage contents',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/cosmetics/signage/store/:storeId/alerts
+   * Get only operation alerts for a store
+   */
+  async getStoreAlerts(req: Request, res: Response): Promise<void> {
+    try {
+      const { storeId } = req.params;
+
+      if (!storeId) {
+        res.status(400).json({
+          success: false,
+          message: 'storeId is required',
+        });
+        return;
+      }
+
+      if (!this.contentMapper) {
+        res.status(500).json({
+          success: false,
+          message: 'Content mapper service not initialized',
+        });
+        return;
+      }
+
+      const response = await this.contentMapper.generateStoreContents({
+        storeId,
+        maxItems: 20,
+        includeAlerts: true,
+        includeSamplePromo: false,
+        includeDisplayHighlight: false,
+      });
+
+      // Filter to only OPERATION_ALERT type
+      const alertsOnly = response.contents.filter(
+        (c) => c.type === 'OPERATION_ALERT'
+      );
+
+      res.json({
+        success: true,
+        storeId,
+        alerts: alertsOnly,
+        count: alertsOnly.length,
+        generatedAt: response.generatedAt,
+      });
+    } catch (error) {
+      console.error('Error fetching store alerts:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch store alerts',
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
