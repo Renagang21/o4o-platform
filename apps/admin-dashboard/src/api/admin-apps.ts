@@ -19,7 +19,6 @@ export type ServiceGroup =
   | 'supplierops'
   | 'partnerops'
   | 'signage'
-  | 'diabetes-care-pharmacy'
   | 'platform-core'
   | 'global';
 

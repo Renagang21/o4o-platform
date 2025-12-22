@@ -17,7 +17,6 @@ const SERVICE_GROUP_ICONS: Record<ServiceGroup, React.ComponentType<{ className?
   'platform-core': Settings,
   'cosmetics': Sparkles,
   'yaksa': Building,
-  'diabetes-care-pharmacy': Heart,
   'tourist': GlobeIcon,
   'signage': Tv,
   'sellerops': ShoppingBag,

@@ -288,9 +288,6 @@ importers:
       '@o4o/block-renderer':
         specifier: file:../../packages/block-renderer
         version: file:packages/block-renderer(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@o4o/diabetes-pharmacy':
-        specifier: file:../../packages/diabetes-pharmacy
-        version: file:packages/diabetes-pharmacy(express@4.21.2)(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
         version: file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -543,7 +540,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../../packages/types
-        version: link:../../packages/types
+        version: file:packages/types(react@19.1.1)
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: file:packages/utils
@@ -601,7 +598,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@types/compression':
         specifier: ^1.7.5
         version: 1.8.1
@@ -926,7 +923,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@types/bcryptjs':
         specifier: 2.4.6
         version: 2.4.6
@@ -1361,7 +1358,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
@@ -1395,7 +1392,7 @@ importers:
         version: 19.1.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1634,7 +1631,7 @@ importers:
         version: 19.1.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1792,7 +1789,7 @@ importers:
         version: 19.1.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -1827,74 +1824,6 @@ importers:
         version: 5.0.10
       typescript:
         specifier: ^5.4.5
-        version: 5.9.2
-
-  packages/diabetes-core:
-    dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      '@o4o/utils':
-        specifier: workspace:*
-        version: link:../utils
-      express:
-        specifier: ^4.18.2
-        version: 4.21.2
-      typeorm:
-        specifier: ^0.3.17
-        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.9.2))
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
-    devDependencies:
-      '@types/express':
-        specifier: ^4.17.17
-        version: 4.17.23
-      '@types/uuid':
-        specifier: ^9.0.2
-        version: 9.0.8
-      tsup:
-        specifier: ^8.0.1
-        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.2
-
-  packages/diabetes-pharmacy:
-    dependencies:
-      '@o4o/diabetes-core':
-        specifier: workspace:*
-        version: link:../diabetes-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      express:
-        specifier: ^4.0.0
-        version: 4.21.2
-      react:
-        specifier: ^19.0.0
-        version: 19.1.1
-      typeorm:
-        specifier: ^0.3.0
-        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
-    devDependencies:
-      '@types/express':
-        specifier: ^4.17.0
-        version: 4.17.23
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.24
-      '@types/react':
-        specifier: ^19.0.0
-        version: 19.2.2
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
-      typescript:
-        specifier: ^5.3.0
         version: 5.9.2
 
   packages/digital-signage-contract:
@@ -2047,7 +1976,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0
-        version: 6.30.1(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 6.30.1(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.4.5))
@@ -2103,7 +2032,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -2326,7 +2255,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
@@ -2369,7 +2298,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
@@ -2960,7 +2889,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
@@ -4729,19 +4658,18 @@ packages:
       react: ^18.0.0
       react-dom: ^18.0.0
 
-  '@o4o/diabetes-pharmacy@file:packages/diabetes-pharmacy':
-    resolution: {directory: packages/diabetes-pharmacy, type: directory}
-    peerDependencies:
-      express: ^4.0.0
-      react: ^19.0.0
-      typeorm: ^0.3.0
-
   '@o4o/shortcodes@file:packages/shortcodes':
     resolution: {directory: packages/shortcodes, type: directory}
     engines: {node: '>=20.0.0', npm: '>=10.0.0'}
     peerDependencies:
       react: 18.2.0
       react-dom: 18.2.0
+
+  '@o4o/types@file:packages/types':
+    resolution: {directory: packages/types, type: directory}
+    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
+    peerDependencies:
+      react: 18.2.0
 
   '@o4o/utils@file:packages/utils':
     resolution: {directory: packages/utils, type: directory}
@@ -15063,14 +14991,6 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  '@o4o/diabetes-pharmacy@file:packages/diabetes-pharmacy(express@4.21.2)(react@18.2.0)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5)))':
-    dependencies:
-      '@o4o/diabetes-core': link:packages/diabetes-core
-      '@o4o/types': link:packages/types
-      express: 4.21.2
-      react: 18.2.0
-      typeorm: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))
-
   '@o4o/shortcodes@file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@o4o/auth-client': link:packages/auth-client
@@ -15078,6 +14998,10 @@ snapshots:
       '@o4o/utils': link:packages/utils
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@o4o/types@file:packages/types(react@19.1.1)':
+    dependencies:
+      react: 19.1.1
 
   '@o4o/utils@file:packages/utils':
     dependencies:
@@ -16986,12 +16910,12 @@ snapshots:
       '@types/react': 18.2.79
       '@types/react-dom': 18.2.25
 
-  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@testing-library/dom': 10.4.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
     optionalDependencies:
       '@types/react': 19.2.2
       '@types/react-dom': 19.2.2(@types/react@19.2.2)
@@ -23372,17 +23296,16 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-dom@18.2.0(react@19.1.1):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 19.1.1
-      scheduler: 0.23.2
-
   react-dom@18.3.1(react@18.3.1):
     dependencies:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-dom@19.1.1(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      scheduler: 0.26.0
 
   react-dom@19.1.1(react@19.1.1):
     dependencies:
@@ -23467,11 +23390,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.2.79
 
-  react-router-dom@6.30.1(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  react-router-dom@6.30.1(react-dom@19.1.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@remix-run/router': 1.23.0
       react: 18.3.1
-      react-dom: 18.2.0(react@18.3.1)
+      react-dom: 19.1.1(react@18.3.1)
       react-router: 6.30.1(react@18.3.1)
 
   react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
@@ -23480,17 +23403,11 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
       react-router: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
 
-  react-router-dom@7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  react-router-dom@7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
-      react-dom: 18.2.0(react@18.3.1)
-      react-router: 7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
-
-  react-router-dom@7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1):
-    dependencies:
-      react: 19.1.1
-      react-dom: 18.2.0(react@19.1.1)
-      react-router: 7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1)
+      react-dom: 19.1.1(react@18.3.1)
+      react-router: 7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1)
 
   react-router-dom@7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
@@ -23511,21 +23428,13 @@ snapshots:
     optionalDependencies:
       react-dom: 18.2.0(react@18.2.0)
 
-  react-router@7.8.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  react-router@7.8.2(react-dom@19.1.1(react@18.3.1))(react@18.3.1):
     dependencies:
       cookie: 1.0.2
       react: 18.3.1
       set-cookie-parser: 2.7.1
     optionalDependencies:
-      react-dom: 18.2.0(react@18.3.1)
-
-  react-router@7.8.2(react-dom@18.2.0(react@19.1.1))(react@19.1.1):
-    dependencies:
-      cookie: 1.0.2
-      react: 19.1.1
-      set-cookie-parser: 2.7.1
-    optionalDependencies:
-      react-dom: 18.2.0(react@19.1.1)
+      react-dom: 19.1.1(react@18.3.1)
 
   react-router@7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:

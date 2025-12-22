@@ -43,7 +43,6 @@ const SERVICE_GROUP_LABELS: Record<ServiceGroup, string> = {
   supplierops: '공급사 운영',
   partnerops: '파트너 운영',
   signage: '디지털 사이니지',
-  'diabetes-care-pharmacy': '당뇨 케어 약국',
   'platform-core': '플랫폼 코어',
   global: '전역',
 };
@@ -67,7 +66,6 @@ const SERVICE_GROUP_COLORS: Record<ServiceGroup, string> = {
   supplierops: 'bg-teal-500',
   partnerops: 'bg-indigo-500',
   signage: 'bg-violet-500',
-  'diabetes-care-pharmacy': 'bg-blue-500',
   'platform-core': 'bg-gray-600',
   global: 'bg-gray-500',
 };

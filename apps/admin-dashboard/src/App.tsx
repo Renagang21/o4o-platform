@@ -172,10 +172,6 @@ const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/Cosm
 // Cosmetics Products Pages (Phase 7-H)
 const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
 
-// Diabetes Pharmacy Pages (WO-MENU-ROUTE-WIRING)
-const DiabetesPharmacyDashboard = lazy(() => import('@o4o/diabetes-pharmacy').then(m => ({ default: m.DashboardPage })));
-const DiabetesPharmacyActions = lazy(() => import('@o4o/diabetes-pharmacy').then(m => ({ default: m.ActionsPage })));
-
 // Storefront Pages (Phase 7-I)
 const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
 
@@ -1254,35 +1250,6 @@ function App() {
                         <Suspense fallback={<PageLoader />}>
                           <CosmeticsProductsRouter />
                         </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-
-                    {/* Diabetes Pharmacy - 혈당관리 약국 (WO-MENU-ROUTE-WIRING) */}
-                    <Route path="/diabetes-pharmacy" element={
-                      <AdminProtectedRoute requiredPermissions={['diabetes-pharmacy.dashboard.view']}>
-                        <AppRouteGuard appId="diabetes-pharmacy">
-                          <Suspense fallback={<PageLoader />}>
-                            <DiabetesPharmacyDashboard />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/diabetes-pharmacy/dashboard" element={
-                      <AdminProtectedRoute requiredPermissions={['diabetes-pharmacy.dashboard.view']}>
-                        <AppRouteGuard appId="diabetes-pharmacy">
-                          <Suspense fallback={<PageLoader />}>
-                            <DiabetesPharmacyDashboard />
-                          </Suspense>
-                        </AppRouteGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/diabetes-pharmacy/actions" element={
-                      <AdminProtectedRoute requiredPermissions={['diabetes-pharmacy.actions.manage']}>
-                        <AppRouteGuard appId="diabetes-pharmacy">
-                          <Suspense fallback={<PageLoader />}>
-                            <DiabetesPharmacyActions />
-                          </Suspense>
-                        </AppRouteGuard>
                       </AdminProtectedRoute>
                     } />
 
