@@ -13,6 +13,17 @@
 import { DataSource } from 'typeorm';
 
 /**
+ * Read-only routine step interface (different from types.ts RoutineStep)
+ */
+export interface ReadOnlyRoutineStep {
+  order: number;
+  productId: string;
+  description: string;
+  quantity?: string;
+  duration?: string;
+}
+
+/**
  * Read-only interface matching PartnerRoutine structure
  */
 export interface ReadOnlyRoutine {
@@ -21,7 +32,7 @@ export interface ReadOnlyRoutine {
   title: string;
   routineType: 'morning' | 'evening' | 'weekly' | 'special';
   description?: string;
-  steps: RoutineStep[];
+  steps: ReadOnlyRoutineStep[];
   skinTypes: string[];
   skinConcerns: string[];
   viewCount: number;
@@ -32,14 +43,6 @@ export interface ReadOnlyRoutine {
   createdAt: Date;
   updatedAt: Date;
   publishedAt?: Date;
-}
-
-export interface RoutineStep {
-  order: number;
-  productId: string;
-  description: string;
-  quantity?: string;
-  duration?: string;
 }
 
 export interface RoutineFilters {
