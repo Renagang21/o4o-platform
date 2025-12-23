@@ -158,15 +158,22 @@ export default defineConfig({
     // Misc
     'tail',
     'ua-parser-js',
+    'semver',
 
     // NestJS (optional dependencies that may be referenced)
     '@nestjs/core',
     '@nestjs/common',
+    '@nestjs/typeorm',
+    '@nestjs/event-emitter',
     '@nestjs/websockets',
     '@nestjs/microservices',
     '@nestjs/platform-express',
     '@nestjs/websockets/socket-module',
     '@nestjs/microservices/microservices-module',
+
+    // NestJS peer dependencies
+    'rxjs',
+    'iterare',
   ],
 
   // Include all @o4o/* packages inline (they will be bundled)
