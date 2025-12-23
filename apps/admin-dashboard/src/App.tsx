@@ -178,6 +178,12 @@ const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
+// CGM Pharmacist App (Phase 1 - Development)
+const CGMPatientListPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.PatientListPage })));
+const CGMPatientDetailPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.PatientDetailPage })));
+const CGMCoachingPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.CoachingPage })));
+const CGMAlertsPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.AlertsPage })));
+
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
@@ -1218,6 +1224,53 @@ function App() {
                         <AppRouteGuard appId="pharmacy-ai-insight">
                           <Suspense fallback={<PageLoader />}>
                             <PharmacyAiInsightSummary />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CGM Pharmacist App - 약사용 CGM 환자 관리 (Phase 1 - Development) */}
+                    <Route path="/cgm-pharmacist" element={
+                      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.patients.read']}>
+                        <AppRouteGuard appId="cgm-pharmacist-app">
+                          <Suspense fallback={<PageLoader />}>
+                            <CGMPatientListPage />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cgm-pharmacist/patients" element={
+                      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.patients.read']}>
+                        <AppRouteGuard appId="cgm-pharmacist-app">
+                          <Suspense fallback={<PageLoader />}>
+                            <CGMPatientListPage />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cgm-pharmacist/patients/:patientId" element={
+                      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.patients.read']}>
+                        <AppRouteGuard appId="cgm-pharmacist-app">
+                          <Suspense fallback={<PageLoader />}>
+                            <CGMPatientDetailPage />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cgm-pharmacist/patients/:patientId/coaching" element={
+                      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.coaching.write']}>
+                        <AppRouteGuard appId="cgm-pharmacist-app">
+                          <Suspense fallback={<PageLoader />}>
+                            <CGMCoachingPage />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cgm-pharmacist/alerts" element={
+                      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.alerts.read']}>
+                        <AppRouteGuard appId="cgm-pharmacist-app">
+                          <Suspense fallback={<PageLoader />}>
+                            <CGMAlertsPage />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

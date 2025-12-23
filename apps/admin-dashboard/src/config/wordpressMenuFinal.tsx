@@ -109,6 +109,12 @@ export const wordpressMenuItems: MenuItem[] = [
         icon: <Brain className="w-4 h-4" />,
         path: '/pharmacy-ai-insight',
       },
+      {
+        id: 'cgm-pharmacist',
+        label: 'CGM 환자 관리',
+        icon: <Heart className="w-4 h-4" />,
+        path: '/cgm-pharmacist',
+      },
     ],
   },
 

@@ -486,6 +486,18 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['yaksa'],
   },
+  {
+    appId: 'cgm-pharmacist-app',
+    name: 'CGM Pharmacist App',
+    version: '0.1.0',
+    description: '약사용 CGM 환자 관리 앱 - 환자 CGM 데이터 요약, 코칭 도구, 위험 모니터링',
+    category: 'healthcare',
+    tags: ['CGM', 'glucose', '혈당', 'pharmacist', '약사', 'coaching', '코칭', 'patient', 'monitoring'],
+    type: 'feature',
+    status: 'development',
+    author: 'O4O Platform',
+    serviceGroups: ['yaksa'],
+  },
 
   // ============================================
   // Signage Apps (signage)

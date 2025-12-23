@@ -93,6 +93,11 @@ export const menuPermissions: MenuPermission[] = [
     roles: ['admin', 'super_admin', 'pharmacist'],
     permissions: ['pharmacy-ai-insight.read'],
   },
+  {
+    menuId: 'cgm-pharmacist',
+    roles: ['admin', 'super_admin', 'pharmacist'],
+    permissions: ['cgm-pharmacist.patients.read'],
+  },
 
   // Crowdfunding - No restriction (allow all)
 

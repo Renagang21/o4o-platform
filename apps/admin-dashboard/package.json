@@ -43,6 +43,7 @@
     "@o4o/shortcodes": "file:../../packages/shortcodes",
     "@o4o/slide-app": "file:../../packages/slide-app",
     "@o4o/pharmacy-ai-insight": "file:../../packages/pharmacy-ai-insight",
+    "@o4o/cgm-pharmacist-app": "file:../../packages/cgm-pharmacist-app",
     "@o4o/types": "file:../../packages/types",
     "@o4o/utils": "file:../../packages/utils",
     "@radix-ui/react-accordion": "^1.2.12",

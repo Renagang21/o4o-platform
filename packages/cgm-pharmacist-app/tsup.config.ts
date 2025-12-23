@@ -1,16 +1,22 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: [
-    'src/index.ts',
-    'src/backend/index.ts',
-    'src/frontend/index.ts',
-    'src/lifecycle/index.ts',
-  ],
+  entry: {
+    index: 'src/index.ts',
+    'backend/index': 'src/backend/index.ts',
+    'frontend/index': 'src/frontend/index.ts',
+    'lifecycle/index': 'src/lifecycle/index.ts',
+  },
   format: ['esm'],
   dts: true,
-  splitting: false,
-  sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', 'express', 'typeorm'],
+  sourcemap: true,
+  external: [
+    'react',
+    'react-dom',
+    'express',
+    'typeorm',
+    '@o4o/types',
+    '@o4o/utils',
+  ],
 });
