@@ -36,7 +36,8 @@ RUN pnpm --filter @o4o/annualfee-yaksa run build || true
 RUN pnpm --filter @o4o/lms-core run build || true
 RUN pnpm --filter @o4o/lms-yaksa run build || true
 RUN pnpm --filter @o4o/groupbuy-yaksa run build || true
-RUN pnpm --filter @o4o-apps/forum run build || true
+RUN pnpm --filter @o4o/yaksa-scheduler run build || true
+RUN pnpm --filter @o4o/forum-core run build || true
 RUN pnpm --filter @o4o-apps/signage run build || true
 RUN pnpm --filter @o4o-apps/cms-core run build || true
 RUN pnpm --filter @o4o-extensions/organization-forum run build || true
@@ -59,9 +60,9 @@ RUN cd packages/cosmetics-supplier-extension && npx tsc -p tsconfig.json --skipL
 RUN cd packages/cosmetics-sample-display-extension && npx tsc -p tsconfig.json --skipLibCheck || true
 RUN cd packages/health-extension && npx tsc -p tsconfig.json --skipLibCheck || true
 
-# api-server 직접 빌드
+# api-server tsup 번들 빌드 (모든 @o4o/* 패키지 인라인 포함)
 WORKDIR /repo/apps/api-server
-RUN npx tsc -p tsconfig.build.json || true
+RUN npx tsup --config tsup.config.ts
 
 # Cloud Run 포트
 ENV PORT=8080

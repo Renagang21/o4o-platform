@@ -124,7 +124,7 @@ import {
 
 // ✅ NEW: Dropshipping-Cosmetics entities
 import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';
-import { CosmeticsRoutine } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-routine.entity.js';
+// CosmeticsRoutine entity does not exist - removed to fix build
 
 // ✅ NEW: Organization-Core entities
 import {
@@ -341,7 +341,7 @@ export const AppDataSource = new DataSource({
     Verification,
     // ✅ NEW: Dropshipping-Cosmetics entities
     CosmeticsFilter,
-    CosmeticsRoutine,
+    // CosmeticsRoutine removed - entity does not exist
     // ✅ NEW: Organization-Core entities
     Organization,
     OrganizationMember,
