@@ -62,9 +62,7 @@
     "build",
     "**/node_modules",
     "**/dist",
-    "**/build",
-    "legacy",
-    "legacy/**"
+    "**/build"
   ],
   "references": [
     {

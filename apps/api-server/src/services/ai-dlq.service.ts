@@ -38,6 +38,20 @@ class AIDLQService {
       password: process.env.REDIS_PASSWORD,
       db: parseInt(process.env.REDIS_DB || '0'),
       maxRetriesPerRequest: null,
+      // Phase 2.5: GRACEFUL_STARTUP - don't crash on connection failure
+      lazyConnect: true,
+      retryStrategy: (times) => {
+        if (process.env.GRACEFUL_STARTUP !== 'false' && times > 3) {
+          logger.warn('🔄 GRACEFUL_STARTUP: DLQ Redis connection retries exhausted');
+          return null;
+        }
+        return Math.min(times * 500, 3000);
+      },
+    });
+
+    // CRITICAL: Attach error handler immediately to prevent unhandled error crashes
+    this.redis.on('error', (error: Error) => {
+      logger.error('DLQ Redis connection error:', { error: error.message });
     });
 
     // Create DLQ queue (no worker attached)
@@ -287,4 +301,26 @@ class AIDLQService {
   }
 }
 
-export const aiDLQ = AIDLQService.getInstance();
+// Phase 2.5: LAZY initialization - don't create DLQ on module import
+// This prevents Redis connection attempts during startup when Redis is unavailable
+let _aiDLQ: AIDLQService | null = null;
+
+export function getAIDLQ(): AIDLQService {
+  if (!_aiDLQ) {
+    _aiDLQ = AIDLQService.getInstance();
+  }
+  return _aiDLQ;
+}
+
+// For backwards compatibility - lazy getter
+export const aiDLQ = {
+  get instance() {
+    return getAIDLQ();
+  },
+  // Expose methods through lazy accessor
+  moveToDLQ: (...args: Parameters<AIDLQService['moveToDLQ']>) => getAIDLQ().moveToDLQ(...args),
+  getDLQEntries: (...args: Parameters<AIDLQService['getDLQEntries']>) => getAIDLQ().getDLQEntries(...args),
+  retryFromDLQ: (...args: Parameters<AIDLQService['retryFromDLQ']>) => getAIDLQ().retryFromDLQ(...args),
+  getDLQStats: () => getAIDLQ().getDLQStats(),
+  cleanup: () => getAIDLQ().cleanup(),
+};

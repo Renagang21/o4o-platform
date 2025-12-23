@@ -44,33 +44,80 @@ export interface WebhookResult {
   attempt: number;
 }
 
-// Redis connection for BullMQ
-const connection = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: null, // Required for BullMQ
-  enableReadyCheck: false
-});
+// Phase 2.5: LAZY Redis connection - don't connect at import time
+let _redisConnection: Redis | null = null;
+let _webhookQueue: Queue<WebhookJobData> | null = null;
+let _webhookWorker: Worker<WebhookJobData, WebhookResult> | null = null;
 
-// Webhook queue
-export const webhookQueue = new Queue<WebhookJobData>('webhooks', {
-  connection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 1000 // Start with 1 second, doubles each retry
-    },
-    removeOnComplete: {
-      age: 3600, // Keep completed jobs for 1 hour
-      count: 1000 // Keep last 1000 completed jobs
-    },
-    removeOnFail: {
-      age: 86400 // Keep failed jobs for 24 hours
-    }
+function getRedisConnection(): Redis {
+  if (!_redisConnection) {
+    _redisConnection = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+      maxRetriesPerRequest: null, // Required for BullMQ
+      enableReadyCheck: false,
+      // Phase 2.5: GRACEFUL_STARTUP - don't crash on connection failure
+      lazyConnect: true,
+      retryStrategy: (times) => {
+        if (process.env.GRACEFUL_STARTUP !== 'false' && times > 3) {
+          logger.warn('🔄 GRACEFUL_STARTUP: Webhook Redis connection retries exhausted');
+          return null;
+        }
+        return Math.min(times * 500, 3000);
+      },
+    });
+
+    // CRITICAL: Attach error handler immediately to prevent unhandled error crashes
+    _redisConnection.on('error', (error: Error) => {
+      logger.error('Webhook queue Redis error:', { error: error.message });
+    });
   }
-});
+  return _redisConnection;
+}
+
+// Lazy webhook queue getter
+export function getWebhookQueue(): Queue<WebhookJobData> {
+  if (!_webhookQueue) {
+    _webhookQueue = new Queue<WebhookJobData>('webhooks', {
+      connection: getRedisConnection(),
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1000 // Start with 1 second, doubles each retry
+        },
+        removeOnComplete: {
+          age: 3600, // Keep completed jobs for 1 hour
+          count: 1000 // Keep last 1000 completed jobs
+        },
+        removeOnFail: {
+          age: 86400 // Keep failed jobs for 24 hours
+        }
+      }
+    });
+  }
+  return _webhookQueue;
+}
+
+// For backwards compatibility - lazy getter
+export const webhookQueue = {
+  get queue() {
+    return getWebhookQueue();
+  },
+  add: (...args: Parameters<Queue<WebhookJobData>['add']>) => getWebhookQueue().add(...args),
+  getWaitingCount: () => getWebhookQueue().getWaitingCount(),
+  getActiveCount: () => getWebhookQueue().getActiveCount(),
+  getCompletedCount: () => getWebhookQueue().getCompletedCount(),
+  getFailedCount: () => getWebhookQueue().getFailedCount(),
+  getDelayedCount: () => getWebhookQueue().getDelayedCount(),
+  getFailed: (...args: Parameters<Queue<WebhookJobData>['getFailed']>) => getWebhookQueue().getFailed(...args),
+  getJob: (...args: Parameters<Queue<WebhookJobData>['getJob']>) => getWebhookQueue().getJob(...args),
+  clean: (...args: Parameters<Queue<WebhookJobData>['clean']>) => getWebhookQueue().clean(...args),
+  pause: () => getWebhookQueue().pause(),
+  resume: () => getWebhookQueue().resume(),
+  close: () => getWebhookQueue().close(),
+};
 
 /**
  * Generate HMAC signature for webhook
@@ -83,152 +130,154 @@ function generateSignature(payload: any, secret: string): string {
     .digest('hex');
 }
 
-/**
- * Webhook worker
- *
- * Processes webhook jobs from the queue.
- */
-export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
-  'webhooks',
-  async (job: Job<WebhookJobData>) => {
-    const { partnerId, event, payload, webhookUrl, webhookSecret, attempt = 1 } = job.data;
-    const startTime = Date.now();
+// Webhook worker processor function
+async function processWebhookJob(job: Job<WebhookJobData>): Promise<WebhookResult> {
+  const { partnerId, event, payload, webhookUrl, webhookSecret, attempt = 1 } = job.data;
+  const startTime = Date.now();
 
-    try {
-      logger.info(`[Webhook] Processing ${event} for partner ${partnerId} (attempt ${attempt})`);
-
-      // If webhook URL not provided in job data, fetch from database
-      let url = webhookUrl;
-      let secret = webhookSecret;
-
-      if (!url) {
-        // TODO: Fetch partner webhook URL and secret from database
-        // const partner = await partnerRepo.findOne({ where: { id: partnerId } });
-        // url = partner.webhookUrl;
-        // secret = partner.webhookSecret;
-        throw new Error('Partner webhook URL not configured');
-      }
-
-      // Prepare webhook request
-      const webhookPayload = {
-        event,
-        timestamp: new Date().toISOString(),
-        data: payload,
-        partnerId
-      };
-
-      const signature = secret ? generateSignature(webhookPayload, secret) : undefined;
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'O4O-Webhook/1.0',
-        'X-Webhook-ID': job.id || 'unknown',
-        'X-Webhook-Attempt': String(attempt)
-      };
-
-      if (signature) {
-        headers['X-Webhook-Signature'] = signature;
-      }
-
-      // Send webhook with timeout
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(webhookPayload),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeout);
-
-      const duration = Date.now() - startTime;
-
-      if (!response.ok) {
-        throw new Error(`Webhook failed with status ${response.status}: ${response.statusText}`);
-      }
-
-      logger.info(`[Webhook] ✅ Delivered ${event} to partner ${partnerId} in ${duration}ms`);
-
-      return {
-        success: true,
-        statusCode: response.status,
-        duration,
-        attempt
-      };
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : String(error);
-
-      logger.error(`[Webhook] ❌ Failed to deliver ${event} to partner ${partnerId}:`, errorMessage);
-
-      // Job will automatically retry with incremented attempt count
-      // BullMQ handles retry logic internally
-
-      return {
-        success: false,
-        duration,
-        error: errorMessage,
-        attempt
-      };
-    }
-  },
-  {
-    connection,
-    concurrency: 10, // Process 10 webhooks concurrently
-    limiter: {
-      max: 100, // Max 100 webhooks
-      duration: 1000 // Per second
-    }
-  }
-);
-
-/**
- * Webhook worker event handlers
- */
-webhookWorker.on('completed', async (job, result) => {
-  logger.info(`[Webhook] Job ${job.id} completed:`, result);
-
-  // Record metrics
   try {
-    const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
-    const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
-    const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+    logger.info(`[Webhook] Processing ${event} for partner ${partnerId} (attempt ${attempt})`);
 
-    const status = result.success ? 'success' : 'failed';
-    const durationSeconds = result.duration / 1000;
-    metricsInstance.recordWebhookDelivery(job.data.event, status, durationSeconds);
-  } catch (metricsError) {
-    logger.warn('[Webhook] Failed to record metrics:', metricsError);
-  }
-});
+    // If webhook URL not provided in job data, fetch from database
+    let url = webhookUrl;
+    let secret = webhookSecret;
 
-webhookWorker.on('failed', async (job, error) => {
-  logger.error(`[Webhook] Job ${job?.id} failed:`, error.message);
-
-  // If this was the last attempt, move to dead letter queue
-  if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
-    logger.error(`[Webhook] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`);
-  }
-
-  // Record metrics
-  if (job) {
-    try {
-      const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
-      const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
-      const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
-
-      metricsInstance.recordWebhookFailure(job.data.event, error.name || 'UnknownError');
-    } catch (metricsError) {
-      logger.warn('[Webhook] Failed to record failure metrics:', metricsError);
+    if (!url) {
+      throw new Error('Partner webhook URL not configured');
     }
-  }
-});
 
-webhookWorker.on('error', (error) => {
-  logger.error('[Webhook] Worker error:', error);
-});
+    // Prepare webhook request
+    const webhookPayload = {
+      event,
+      timestamp: new Date().toISOString(),
+      data: payload,
+      partnerId
+    };
+
+    const signature = secret ? generateSignature(webhookPayload, secret) : undefined;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'O4O-Webhook/1.0',
+      'X-Webhook-ID': job.id || 'unknown',
+      'X-Webhook-Attempt': String(attempt)
+    };
+
+    if (signature) {
+      headers['X-Webhook-Signature'] = signature;
+    }
+
+    // Send webhook with timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(webhookPayload),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    const duration = Date.now() - startTime;
+
+    if (!response.ok) {
+      throw new Error(`Webhook failed with status ${response.status}: ${response.statusText}`);
+    }
+
+    logger.info(`[Webhook] ✅ Delivered ${event} to partner ${partnerId} in ${duration}ms`);
+
+    return {
+      success: true,
+      statusCode: response.status,
+      duration,
+      attempt
+    };
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    logger.error(`[Webhook] ❌ Failed to deliver ${event} to partner ${partnerId}:`, errorMessage);
+
+    return {
+      success: false,
+      duration,
+      error: errorMessage,
+      attempt
+    };
+  }
+}
+
+/**
+ * Webhook worker - lazy initialization
+ */
+export function getWebhookWorker(): Worker<WebhookJobData, WebhookResult> {
+  if (!_webhookWorker) {
+    _webhookWorker = new Worker<WebhookJobData, WebhookResult>(
+      'webhooks',
+      processWebhookJob,
+      {
+        connection: getRedisConnection(),
+        concurrency: 10,
+        limiter: {
+          max: 100,
+          duration: 1000
+        }
+      }
+    );
+
+    // Attach event handlers
+    _webhookWorker.on('completed', async (job, result) => {
+      logger.info(`[Webhook] Job ${job.id} completed:`, result);
+
+      try {
+        const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
+        const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+        const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+
+        const status = result.success ? 'success' : 'failed';
+        const durationSeconds = result.duration / 1000;
+        metricsInstance.recordWebhookDelivery(job.data.event, status, durationSeconds);
+      } catch (metricsError) {
+        logger.warn('[Webhook] Failed to record metrics:', metricsError);
+      }
+    });
+
+    _webhookWorker.on('failed', async (job, error) => {
+      logger.error(`[Webhook] Job ${job?.id} failed:`, error.message);
+
+      if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
+        logger.error(`[Webhook] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`);
+      }
+
+      if (job) {
+        try {
+          const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
+          const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+          const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+
+          metricsInstance.recordWebhookFailure(job.data.event, error.name || 'UnknownError');
+        } catch (metricsError) {
+          logger.warn('[Webhook] Failed to record failure metrics:', metricsError);
+        }
+      }
+    });
+
+    _webhookWorker.on('error', (error) => {
+      logger.error('[Webhook] Worker error:', error);
+    });
+  }
+  return _webhookWorker;
+}
+
+// For backwards compatibility - lazy wrapper
+export const webhookWorker = {
+  get worker() {
+    return getWebhookWorker();
+  },
+  close: () => _webhookWorker ? _webhookWorker.close() : Promise.resolve(),
+};
 
 /**
  * Enqueue webhook for delivery
@@ -363,22 +412,20 @@ export async function resumeWebhookQueue(): Promise<void> {
 
 /**
  * Close webhook queue and worker (for graceful shutdown)
+ * Phase 2.5: Only close if already initialized (don't instantiate just to close)
  */
 export async function closeWebhookQueue(): Promise<void> {
-  await webhookWorker.close();
-  await webhookQueue.close();
+  if (_webhookWorker) {
+    await _webhookWorker.close();
+  }
+  if (_webhookQueue) {
+    await _webhookQueue.close();
+  }
+  if (_redisConnection) {
+    await _redisConnection.quit();
+  }
   logger.info('[Webhook] Queue and worker closed');
 }
 
-// Graceful shutdown on process termination
-process.on('SIGTERM', async () => {
-  logger.info('[Webhook] SIGTERM received, closing queue...');
-  await closeWebhookQueue();
-  process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  logger.info('[Webhook] SIGINT received, closing queue...');
-  await closeWebhookQueue();
-  process.exit(0);
-});
+// Note: SIGTERM/SIGINT handlers removed to prevent startup issues
+// Graceful shutdown is handled by the main application

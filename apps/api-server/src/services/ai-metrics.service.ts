@@ -82,13 +82,40 @@ class AIMetricsService {
   private redis: Redis;
 
   private constructor() {
-    this.queue = aiJobQueue.getQueue();
+    // Phase 2.5: Lazy queue access - don't create immediately
+    // The queue will be accessed when methods are called
+    this.queue = null as any; // Will be lazily initialized
+
     this.redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
       port: parseInt(process.env.REDIS_PORT || '6379'),
       password: process.env.REDIS_PASSWORD,
       db: parseInt(process.env.REDIS_DB || '0'),
+      // Phase 2.5: GRACEFUL_STARTUP - don't crash on connection failure
+      lazyConnect: true,
+      retryStrategy: (times) => {
+        if (process.env.GRACEFUL_STARTUP !== 'false' && times > 3) {
+          logger.warn('🔄 GRACEFUL_STARTUP: AI metrics Redis connection retries exhausted');
+          return null;
+        }
+        return Math.min(times * 500, 3000);
+      },
     });
+
+    // CRITICAL: Attach error handler immediately to prevent unhandled error crashes
+    this.redis.on('error', (error: Error) => {
+      logger.error('AI metrics Redis error:', { error: error.message });
+    });
+  }
+
+  /**
+   * Get queue lazily
+   */
+  private getQueueLazy(): Queue {
+    if (!this.queue) {
+      this.queue = aiJobQueue.getQueue();
+    }
+    return this.queue;
   }
 
   static getInstance(): AIMetricsService {
@@ -104,11 +131,11 @@ class AIMetricsService {
   async collectMetrics(timeRangeMs?: number): Promise<AIJobMetrics> {
     try {
       // Get queue counts
-      const queueCounts = await this.queue.getJobCounts('waiting', 'active', 'completed', 'failed', 'delayed');
+      const queueCounts = await this.getQueueLazy().getJobCounts('waiting', 'active', 'completed', 'failed', 'delayed');
 
       // Get completed and failed jobs for analysis
-      const completedJobs = await this.queue.getJobs(['completed'], 0, 1000);
-      const failedJobs = await this.queue.getJobs(['failed'], 0, 1000);
+      const completedJobs = await this.getQueueLazy().getJobs(['completed'], 0, 1000);
+      const failedJobs = await this.getQueueLazy().getJobs(['failed'], 0, 1000);
 
       // Filter by time range if specified
       const now = Date.now();
@@ -292,8 +319,8 @@ class AIMetricsService {
    */
   async getRecentJobs(limit: number = 50): Promise<any[]> {
     try {
-      const completedJobs = await this.queue.getJobs(['completed'], 0, limit);
-      const failedJobs = await this.queue.getJobs(['failed'], 0, limit);
+      const completedJobs = await this.getQueueLazy().getJobs(['completed'], 0, limit);
+      const failedJobs = await this.getQueueLazy().getJobs(['failed'], 0, limit);
 
       const allJobs = [...completedJobs, ...failedJobs]
         .sort((a, b) => (b.finishedOn || 0) - (a.finishedOn || 0))
@@ -402,4 +429,22 @@ class AIMetricsService {
   }
 }
 
-export const aiMetrics = AIMetricsService.getInstance();
+// Phase 2.5: LAZY initialization - don't create metrics service on module import
+let _aiMetrics: AIMetricsService | null = null;
+
+export function getAIMetrics(): AIMetricsService {
+  if (!_aiMetrics) {
+    _aiMetrics = AIMetricsService.getInstance();
+  }
+  return _aiMetrics;
+}
+
+// For backwards compatibility - lazy proxy
+export const aiMetrics = {
+  get instance() {
+    return getAIMetrics();
+  },
+  collectMetrics: (...args: Parameters<AIMetricsService['collectMetrics']>) => getAIMetrics().collectMetrics(...args),
+  getRecentErrors: (...args: Parameters<AIMetricsService['getRecentErrors']>) => getAIMetrics().getRecentErrors(...args),
+  cleanup: () => getAIMetrics().cleanup(),
+};

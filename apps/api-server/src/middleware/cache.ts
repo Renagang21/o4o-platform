@@ -1,29 +1,21 @@
+/**
+ * Cache Middleware
+ *
+ * Phase 2.5: GRACEFUL_STARTUP 호환
+ * - Import 시점에 Redis 연결하지 않음
+ * - Redis 없으면 메모리 캐시 사용
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import NodeCache from 'node-cache';
-import Redis from 'ioredis';
+import { getRedisClient, isRedisAvailable } from '../infrastructure/redis.guard.js';
+import logger from '../utils/logger.js';
 
-// In-memory cache for development
-const memoryCache = new NodeCache({ 
+// In-memory cache (항상 사용 가능)
+const memoryCache = new NodeCache({
   stdTTL: 300, // 5 minutes default TTL
   checkperiod: 60 // Check for expired keys every 60 seconds
 });
-
-// Redis cache for production
-let redisClient: Redis | null = null;
-
-if (process.env.NODE_ENV === 'production' && process.env.REDIS_HOST) {
-  redisClient = new Redis({
-    host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    password: process.env.REDIS_PASSWORD
-  });
-
-  redisClient.on('error', (err) => {
-    // Error log removed
-    // Fallback to memory cache if Redis fails
-    redisClient = null;
-  });
-}
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
@@ -48,7 +40,7 @@ export const cache = (options: CacheOptions = {}) => {
     }
 
     // Generate cache key
-    const cacheKey = typeof options.key === 'function' 
+    const cacheKey = typeof options.key === 'function'
       ? options.key(req)
       : options.key || `cache:${req.originalUrl}`;
 
@@ -56,9 +48,19 @@ export const cache = (options: CacheOptions = {}) => {
       // Try to get from cache
       let cachedData: string | null = null;
 
-      if (redisClient) {
-        cachedData = await redisClient.get(cacheKey);
+      // Try Redis first if available
+      if (isRedisAvailable()) {
+        const redisClient = getRedisClient();
+        if (redisClient) {
+          try {
+            cachedData = await redisClient.get(cacheKey);
+          } catch (error) {
+            // Redis failed, fallback to memory
+            cachedData = memoryCache.get(cacheKey) as string;
+          }
+        }
       } else {
+        // Use memory cache
         cachedData = memoryCache.get(cacheKey) as string;
       }
 
@@ -76,16 +78,23 @@ export const cache = (options: CacheOptions = {}) => {
       const originalSend = res.send.bind(res);
 
       // Override send function to cache the response
-      res.send = function(data: any) {
+      res.send = function (data: any) {
         // Only cache successful responses
         if (res.statusCode >= 200 && res.statusCode < 300) {
           const dataToCache = typeof data === 'string' ? data : JSON.stringify(data);
           const ttl = options.ttl || 300; // Default 5 minutes
 
-          if (redisClient) {
-            redisClient.setex(cacheKey, ttl, dataToCache).catch(err => {
-              // Error log removed
-            });
+          // Try to cache in Redis if available
+          if (isRedisAvailable()) {
+            const redisClient = getRedisClient();
+            if (redisClient) {
+              redisClient.setex(cacheKey, ttl, dataToCache).catch(err => {
+                // Fallback to memory cache
+                memoryCache.set(cacheKey, dataToCache, ttl);
+              });
+            } else {
+              memoryCache.set(cacheKey, dataToCache, ttl);
+            }
           } else {
             memoryCache.set(cacheKey, dataToCache, ttl);
           }
@@ -96,7 +105,6 @@ export const cache = (options: CacheOptions = {}) => {
 
       next();
     } catch (error) {
-      // Error log removed
       next();
     }
   };
@@ -106,47 +114,75 @@ export const cache = (options: CacheOptions = {}) => {
  * Invalidate cache by pattern
  */
 export const invalidateCache = async (pattern: string) => {
-  if (redisClient) {
-    const keys = await redisClient.keys(pattern);
-    if (keys.length > 0) {
-      await redisClient.del(...keys);
-    }
-  } else {
-    // For memory cache, we need to iterate through all keys
-    const keys = memoryCache.keys();
-    const regex = new RegExp(pattern.replace(/\*/g, '.*'));
-    keys.forEach(key => {
-      if (regex.test(key)) {
-        memoryCache.del(key);
+  // Try Redis first
+  if (isRedisAvailable()) {
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        const keys = await redisClient.keys(pattern);
+        if (keys.length > 0) {
+          await redisClient.del(...keys);
+        }
+        return;
+      } catch (error) {
+        // Fallback to memory cache
       }
-    });
+    }
   }
+
+  // Memory cache fallback
+  const keys = memoryCache.keys();
+  const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+  keys.forEach(key => {
+    if (regex.test(key)) {
+      memoryCache.del(key);
+    }
+  });
 };
 
 /**
  * Clear all cache
  */
 export const clearCache = async () => {
-  if (redisClient) {
-    await redisClient.flushdb();
-  } else {
-    memoryCache.flushAll();
+  // Try Redis first
+  if (isRedisAvailable()) {
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        await redisClient.flushdb();
+        return;
+      } catch (error) {
+        // Fallback to memory cache
+      }
+    }
   }
+
+  // Memory cache fallback
+  memoryCache.flushAll();
 };
 
 /**
  * Cache statistics
  */
-export const getCacheStats = () => {
-  if (redisClient) {
-    return redisClient.info('stats');
-  } else {
-    return {
-      keys: memoryCache.keys().length,
-      hits: memoryCache.getStats().hits,
-      misses: memoryCache.getStats().misses,
-      ksize: memoryCache.getStats().ksize,
-      vsize: memoryCache.getStats().vsize
-    };
+export const getCacheStats = async () => {
+  // Try Redis first
+  if (isRedisAvailable()) {
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        return await redisClient.info('stats');
+      } catch (error) {
+        // Fallback to memory cache
+      }
+    }
   }
+
+  // Memory cache stats
+  return {
+    keys: memoryCache.keys().length,
+    hits: memoryCache.getStats().hits,
+    misses: memoryCache.getStats().misses,
+    ksize: memoryCache.getStats().ksize,
+    vsize: memoryCache.getStats().vsize
+  };
 };

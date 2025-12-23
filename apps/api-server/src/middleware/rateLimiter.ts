@@ -1,15 +1,50 @@
-import rateLimit, { Store } from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
-import { Redis } from 'ioredis';
-import { Request, Response } from 'express';
+/**
+ * Rate Limiter Middleware
+ *
+ * Phase 2.5: GRACEFUL_STARTUP 호환
+ * - Import 시점에 Redis 연결하지 않음
+ * - Redis 없으면 메모리 기반 rate limiting 사용
+ */
 
-// Redis 클라이언트 (기존 redis 설정 사용)
-const redisClient = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  db: parseInt(process.env.REDIS_DB || '0'),
-});
+import rateLimit, { Store, MemoryStore } from 'express-rate-limit';
+import { Request, Response } from 'express';
+import { getRedisClient, isRedisAvailable } from '../infrastructure/redis.guard.js';
+import logger from '../utils/logger.js';
+
+// Lazy RedisStore 생성
+let _redisStore: Store | null = null;
+
+function getRedisStore(prefix: string): Store | undefined {
+  // Redis가 사용 불가능하면 undefined 반환 (memory store 사용)
+  if (!isRedisAvailable()) {
+    return undefined;
+  }
+
+  const client = getRedisClient();
+  if (!client) {
+    return undefined;
+  }
+
+  // Dynamic import to avoid loading RedisStore when Redis is not available
+  try {
+    const RedisStore = require('rate-limit-redis').default;
+    return new RedisStore({
+      sendCommand: async (...args: string[]) => {
+        try {
+          const result = await client.call.apply(client, args);
+          return result as boolean | number | string | (boolean | number | string)[];
+        } catch (error) {
+          logger.warn('[RateLimiter] Redis command failed, fallback to memory store');
+          return null;
+        }
+      },
+      prefix,
+    }) as unknown as Store;
+  } catch (error) {
+    logger.warn('[RateLimiter] RedisStore not available, using memory store');
+    return undefined;
+  }
+}
 
 // 기본 레이트 리밋 설정
 export const defaultLimiter = rateLimit({
@@ -18,13 +53,7 @@ export const defaultLimiter = rateLimit({
   message: '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
   standardHeaders: true,
   legacyHeaders: false,
-  store: new RedisStore({
-    sendCommand: async (...args: string[]) => {
-      const result = await redisClient.call.apply(redisClient, args);
-      return result as boolean | number | string | (boolean | number | string)[];
-    },
-    prefix: 'rl:default:',
-  }) as unknown as Store,
+  store: getRedisStore('rl:default:'),
 });
 
 // 엄격한 레이트 리밋 (로그인, 회원가입 등)
@@ -34,14 +63,8 @@ export const strictLimiter = rateLimit({
   message: '너무 많은 시도가 감지되었습니다. 15분 후 다시 시도해주세요.',
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: true, // 성공한 요청은 카운트하지 않음
-  store: new RedisStore({
-    sendCommand: async (...args: string[]) => {
-      const result = await redisClient.call.apply(redisClient, args);
-      return result as boolean | number | string | (boolean | number | string)[];
-    },
-    prefix: 'rl:strict:',
-  }) as unknown as Store,
+  skipSuccessfulRequests: true,
+  store: getRedisStore('rl:strict:'),
 });
 
 // API 엔드포인트별 레이트 리밋
@@ -54,32 +77,19 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  store: new RedisStore({
-    sendCommand: async (...args: string[]) => {
-      const result = await redisClient.call.apply(redisClient, args);
-      return result as boolean | number | string | (boolean | number | string)[];
-    },
-    prefix: 'rl:api:',
-  }) as unknown as Store,
+  store: getRedisStore('rl:api:'),
   keyGenerator: (req: Request) => {
-    // IP + User ID 조합으로 키 생성
     const userId = (req as any).user?.id || 'anonymous';
     return `${req.ip}:${userId}`;
   },
 });
 
-// 파일 업로드 레이트 리밋 (미디어 업로드 지원을 위해 증가)
+// 파일 업로드 레이트 리밋
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간
-  max: 100, // 시간당 100개 파일로 증가
+  max: 100, // 시간당 100개 파일
   message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
-  store: new RedisStore({
-    sendCommand: async (...args: string[]) => {
-      const result = await redisClient.call.apply(redisClient, args);
-      return result as boolean | number | string | (boolean | number | string)[];
-    },
-    prefix: 'rl:upload:',
-  }) as unknown as Store,
+  store: getRedisStore('rl:upload:'),
 });
 
 // 동적 레이트 리밋 (사용자 티어별)
@@ -96,13 +106,7 @@ export const dynamicLimiter = (tier: 'free' | 'basic' | 'premium' = 'free') => {
     windowMs: config.windowMs,
     max: config.max,
     message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
-    store: new RedisStore({
-      sendCommand: async (...args: string[]) => {
-        const result = await redisClient.call.apply(redisClient, args);
-        return result as boolean | number | string | (boolean | number | string)[];
-      },
-      prefix: `rl:${tier}:`,
-    }) as unknown as Store,
+    store: getRedisStore(`rl:${tier}:`),
     keyGenerator: (req: Request) => {
       const userId = (req as any).user?.id || req.ip;
       return `${userId}`;
@@ -110,17 +114,16 @@ export const dynamicLimiter = (tier: 'free' | 'basic' | 'premium' = 'free') => {
   });
 };
 
-// 스마트 레이트 리밋 (자동 조절)
+// 스마트 레이트 리밋 (자동 조절) - 메모리 기반
 export class SmartRateLimiter {
   private requestCounts: Map<string, number[]> = new Map();
   private suspiciousIPs: Set<string> = new Set();
 
   middleware() {
     return async (req: Request, res: Response, next: Function) => {
-      const ip = req.ip;
+      const ip = req.ip || 'unknown';
       const now = Date.now();
-      
-      // 의심스러운 IP 체크
+
       if (this.suspiciousIPs.has(ip)) {
         return res.status(429).json({
           error: '비정상적인 활동이 감지되었습니다.',
@@ -128,7 +131,6 @@ export class SmartRateLimiter {
         });
       }
 
-      // 요청 기록
       if (!this.requestCounts.has(ip)) {
         this.requestCounts.set(ip, []);
       }
@@ -136,18 +138,12 @@ export class SmartRateLimiter {
       const requests = this.requestCounts.get(ip)!;
       requests.push(now);
 
-      // 1분 이내 요청만 유지
       const oneMinuteAgo = now - 60000;
       const recentRequests = requests.filter(time => time > oneMinuteAgo);
       this.requestCounts.set(ip, recentRequests);
 
-      // 패턴 분석
       if (recentRequests.length > 100) {
-        // 1분에 100개 이상 요청 시 의심
         this.suspiciousIPs.add(ip);
-        // Warning log removed
-        
-        // 30분 후 자동 해제
         setTimeout(() => {
           this.suspiciousIPs.delete(ip);
         }, 30 * 60 * 1000);
@@ -158,7 +154,6 @@ export class SmartRateLimiter {
         });
       }
 
-      // 버스트 패턴 감지 (1초에 10개 이상)
       const oneSecondAgo = now - 1000;
       const burstRequests = recentRequests.filter(time => time > oneSecondAgo);
       if (burstRequests.length > 10) {
@@ -172,7 +167,6 @@ export class SmartRateLimiter {
     };
   }
 
-  // 수동으로 IP 차단/해제
   blockIP(ip: string) {
     this.suspiciousIPs.add(ip);
   }

@@ -36,6 +36,22 @@ class AIJobWorker {
       maxRetriesPerRequest: null,
       enableReadyCheck: true,
       enableOfflineQueue: false,
+      // Phase 2.5: GRACEFUL_STARTUP - don't crash on connection failure
+      lazyConnect: true,
+      retryStrategy: (times) => {
+        // Stop retrying after 3 attempts in GRACEFUL_STARTUP mode
+        if (process.env.GRACEFUL_STARTUP !== 'false' && times > 3) {
+          logger.warn('🔄 GRACEFUL_STARTUP: Redis connection retries exhausted, worker disabled');
+          return null; // Stop retrying
+        }
+        return Math.min(times * 500, 3000);
+      },
+    });
+
+    // CRITICAL: Attach error handler immediately to prevent unhandled error crashes
+    this.redis.on('error', (error: Error) => {
+      logger.error('AI worker Redis connection error:', { error: error.message });
+      // Don't crash - just log the error
     });
 
     // Create worker
@@ -245,5 +261,20 @@ class AIJobWorker {
   }
 }
 
-// Start worker (singleton)
-export const aiJobWorker = AIJobWorker.getInstance();
+// Phase 2.5: LAZY initialization - don't create worker on module import
+// This prevents Redis connection attempts during startup when Redis is unavailable
+let _aiJobWorker: AIJobWorker | null = null;
+
+export function getAIJobWorker(): AIJobWorker {
+  if (!_aiJobWorker) {
+    _aiJobWorker = AIJobWorker.getInstance();
+  }
+  return _aiJobWorker;
+}
+
+// For backwards compatibility - lazy getter
+export const aiJobWorker = {
+  get instance() {
+    return getAIJobWorker();
+  }
+};

@@ -20,8 +20,8 @@ FROM node:22-slim AS deps
 WORKDIR /app
 
 # Copy the production package.json (external dependencies only)
-# Using minimal version for Cloud Run deployment validation
-COPY package.production-minimal.json ./package.json
+# Full API version with all runtime dependencies
+COPY package.production.json ./package.json
 
 # Install production dependencies only
 # Using npm for simplicity in Docker (no pnpm workspace complexity)
@@ -46,9 +46,9 @@ RUN addgroup --system --gid 1001 nodejs \
 # Copy node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy the bundled application (minimal version for Cloud Run validation)
-COPY dist/main-minimal.js ./dist/main.js
-COPY dist/main-minimal.js.map ./dist/main.js.map
+# Copy the bundled application (Full API)
+COPY dist/main.js ./dist/main.js
+COPY dist/main.js.map ./dist/main.js.map
 
 # Set ownership
 RUN chown -R o4oapi:nodejs /app

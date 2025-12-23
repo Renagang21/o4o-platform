@@ -5,7 +5,3 @@ packages:
   - 'services/*'
   - '!apps/*.backup'
   - '!packages/*.backup'
-  - '!legacy/**'
-  - '!legacy/*'
-  - '!legacy/apps/*'
-  - '!legacy/packages/*'

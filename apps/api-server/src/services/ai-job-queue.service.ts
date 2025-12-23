@@ -36,6 +36,20 @@ class AIJobQueueService {
       password: process.env.REDIS_PASSWORD,
       db: parseInt(process.env.REDIS_DB || '0'),
       maxRetriesPerRequest: null, // Required for BullMQ
+      // Phase 2.5: GRACEFUL_STARTUP - don't crash on connection failure
+      lazyConnect: true,
+      retryStrategy: (times) => {
+        if (process.env.GRACEFUL_STARTUP !== 'false' && times > 3) {
+          logger.warn('🔄 GRACEFUL_STARTUP: Redis connection retries exhausted, queue disabled');
+          return null;
+        }
+        return Math.min(times * 500, 3000);
+      },
+    });
+
+    // CRITICAL: Attach error handler immediately to prevent unhandled error crashes
+    this.redis.on('error', (error: Error) => {
+      logger.error('AI job queue Redis error:', { error: error.message });
     });
 
     // Create queue
@@ -240,4 +254,28 @@ class AIJobQueueService {
   }
 }
 
-export const aiJobQueue = AIJobQueueService.getInstance();
+// Phase 2.5: LAZY initialization - don't create queue on module import
+// This prevents Redis connection attempts during startup when Redis is unavailable
+let _aiJobQueue: AIJobQueueService | null = null;
+
+export function getAIJobQueue(): AIJobQueueService {
+  if (!_aiJobQueue) {
+    _aiJobQueue = AIJobQueueService.getInstance();
+  }
+  return _aiJobQueue;
+}
+
+// For backwards compatibility - lazy proxy
+export const aiJobQueue = {
+  get instance() {
+    return getAIJobQueue();
+  },
+  // Expose key methods for backwards compatibility
+  getQueue: () => getAIJobQueue().getQueue(),
+  getQueueEvents: () => getAIJobQueue().getQueueEvents(),
+  enqueueJob: (...args: Parameters<AIJobQueueService['enqueueJob']>) => getAIJobQueue().enqueueJob(...args),
+  getJobStatus: (...args: Parameters<AIJobQueueService['getJobStatus']>) => getAIJobQueue().getJobStatus(...args),
+  cancelJob: (...args: Parameters<AIJobQueueService['cancelJob']>) => getAIJobQueue().cancelJob(...args),
+  calculateBackoff: (...args: Parameters<AIJobQueueService['calculateBackoff']>) => getAIJobQueue().calculateBackoff(...args),
+  cleanup: () => getAIJobQueue().cleanup(),
+};
