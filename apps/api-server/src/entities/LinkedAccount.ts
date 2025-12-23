@@ -9,7 +9,7 @@ import {
   Unique
 } from 'typeorm';
 import type { User } from './User.js';
-import { AuthProvider } from '../types/account-linking.js';
+import type { AuthProvider } from '../types/account-linking.js';
 
 @Entity('linked_accounts')
 @Unique(['userId', 'provider', 'providerId'])

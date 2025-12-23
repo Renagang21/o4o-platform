@@ -8,8 +8,29 @@ import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
 
 /**
- * Startup Service
- * Handles all initialization logic for the application
+ * ============================================================================
+ * Startup Service - Phase 2.5 GRACEFUL_STARTUP Policy
+ * ============================================================================
+ *
+ * GRACEFUL_STARTUP Policy:
+ * - Default: true (GRACEFUL_STARTUP !== 'false')
+ * - When true: DB/Redis/external service failures are logged but don't crash
+ * - When false: Fail-fast behavior for strict production requirements
+ *
+ * Responsibilities:
+ * 1. "기동 책임" (Startup Responsibility):
+ *    - Express server MUST start and listen on PORT
+ *    - /health endpoint MUST always respond
+ *
+ * 2. "의존성 책임" (Dependency Responsibility):
+ *    - DB/Redis/external services are optional
+ *    - Failures are logged with warnings
+ *    - Server continues with degraded functionality
+ *
+ * Usage:
+ * - Cloud Run: GRACEFUL_STARTUP=true (default) - server always starts
+ * - Production with DB: GRACEFUL_STARTUP=false - fail-fast if DB unavailable
+ * ============================================================================
  */
 export class StartupService {
   /**
@@ -83,25 +104,42 @@ export class StartupService {
 
     if (!dbConnected) {
       const errorMessage = 'Failed to connect to database after multiple attempts';
-      logger.error(errorMessage);
+      logger.error(`⚠️ ${errorMessage}`);
 
-      if (process.env.NODE_ENV === 'development') {
-        logger.warn('Continuing without database in development mode');
+      // GRACEFUL_STARTUP Policy: Default to true (only false when explicitly set)
+      const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+
+      if (gracefulStartup) {
+        logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing without database');
+        logger.warn('   → /health will respond, but DB-dependent features are unavailable');
         return;
       } else {
+        logger.error('GRACEFUL_STARTUP=false: Failing due to database connection failure');
         throw new Error(errorMessage);
       }
     }
 
     // Database health check
     if (AppDataSource.isInitialized) {
-      const dbChecker = new DatabaseChecker(AppDataSource);
-      const healthCheck = await dbChecker.performHealthCheck();
-      if (!healthCheck.healthy) {
-        logger.error('Database health check failed', healthCheck.details);
-        if (env.isProduction()) {
-          throw new Error('Database health check failed');
+      try {
+        const dbChecker = new DatabaseChecker(AppDataSource);
+        const healthCheck = await dbChecker.performHealthCheck();
+        if (!healthCheck.healthy) {
+          logger.error('Database health check failed', healthCheck.details);
+          // GRACEFUL_STARTUP Policy: Only throw if explicitly disabled
+          const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+          if (!gracefulStartup) {
+            throw new Error('Database health check failed');
+          }
+          logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing despite health check failure');
         }
+      } catch (healthCheckError) {
+        logger.error('Database health check error:', healthCheckError);
+        const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+        if (!gracefulStartup) {
+          throw healthCheckError;
+        }
+        logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing despite health check error');
       }
     }
 

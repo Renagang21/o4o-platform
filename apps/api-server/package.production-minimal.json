@@ -1,0 +1,13 @@
+{
+  "name": "@o4o/api-server-runtime-minimal",
+  "version": "0.5.0",
+  "description": "O4O API Server - Minimal Runtime for Cloud Run Health Check",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

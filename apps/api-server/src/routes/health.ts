@@ -4,21 +4,48 @@ import * as os from 'os';
 
 const router: Router = Router();
 
-// Basic health check endpoint
+/**
+ * ============================================================================
+ * Health Check Routes - Phase 2.5 GRACEFUL_STARTUP Compatible
+ * ============================================================================
+ *
+ * Cloud Run / Container Orchestration Strategy:
+ * - /health (GET): ALWAYS returns 200 - server is running and accepting requests
+ *   This is the primary health check for Cloud Run startup/liveness probes
+ *
+ * - /health/live (GET): Liveness probe - process is alive
+ * - /health/ready (GET): Readiness probe - all dependencies are ready (may return 503)
+ * - /health/detailed (GET): Detailed health with all component statuses
+ *
+ * IMPORTANT: /health MUST return 200 even if DB is not connected.
+ * DB status is included as optional info in the response.
+ * ============================================================================
+ */
+
+// Basic health check endpoint - ALWAYS returns 200
 router.get('/', async (req: Request, res: Response) => {
   try {
     const health = await performHealthCheck();
-    
-    if (health.status === 'healthy') {
-      res.json(health);
-    } else {
-      res.status(503).json(health);
-    }
+    // Always return 200 - server is alive and can serve requests
+    // DB status is informational only
+    res.status(200).json(health);
   } catch (error: any) {
-    res.status(503).json({
-      status: 'unhealthy',
+    // Even on error, return 200 with error info - server is still running
+    res.status(200).json({
+      status: 'alive',
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error'
+      uptime: process.uptime(),
+      version: process.env.npm_package_version || '0.5.0',
+      environment: process.env.NODE_ENV || 'development',
+      database: {
+        status: 'unknown',
+        error: error instanceof Error ? error.message : 'Health check error'
+      },
+      memory: {
+        used: Math.round(process.memoryUsage().rss / 1024 / 1024),
+        total: Math.round(os.totalmem() / 1024 / 1024),
+        percentage: Math.round((process.memoryUsage().rss / os.totalmem()) * 100)
+      }
     });
   }
 });
@@ -149,27 +176,36 @@ interface HealthCheckResponse {
 
 async function performHealthCheck(): Promise<HealthCheckResponse> {
   const start = Date.now();
-  
-  // Check database connectivity
-  let dbStatus = 'healthy';
+
+  // Check database connectivity (optional - doesn't affect overall status)
+  let dbStatus = 'not_connected';
   let dbError: string | undefined;
-  
+
   try {
-    await AppDataSource.query('SELECT 1');
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.query('SELECT 1');
+      dbStatus = 'healthy';
+    } else {
+      dbStatus = 'not_initialized';
+      dbError = 'Database connection not initialized (GRACEFUL_STARTUP mode)';
+    }
   } catch (error: any) {
     dbStatus = 'unhealthy';
     dbError = error instanceof Error ? error.message : 'Database connection failed';
   }
-  
+
   const responseTime = Date.now() - start;
-  const status = dbStatus === 'healthy' ? 'healthy' : 'unhealthy';
-  
+
+  // Server is always "alive" if we reach this point
+  // DB status is informational only
+  const status = 'alive';
+
   return {
     status,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     responseTime,
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env.npm_package_version || '0.5.0',
     environment: process.env.NODE_ENV || 'development',
     database: {
       status: dbStatus,

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import type { Post } from './Post.js';
+import type { CustomPost } from './CustomPost.js';
 import type { User } from './User.js';
 
 export interface RevisionChanges {
@@ -22,9 +22,9 @@ export class PostRevision {
   @Column({ type: 'uuid' })
   postId!: string;
 
-  @ManyToOne('Post', { onDelete: 'CASCADE' })
+  @ManyToOne('CustomPost', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
-  post!: Post;
+  post!: CustomPost;
 
   @Column({ type: 'int' })
   revisionNumber!: number;

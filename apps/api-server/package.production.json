@@ -1,0 +1,89 @@
+{
+  "name": "@o4o/api-server-runtime",
+  "version": "0.5.0",
+  "description": "O4O API Server - Production Runtime Dependencies",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "helmet": "^6.2.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "express-session": "^1.18.2",
+    "express-rate-limit": "^6.11.2",
+    "express-validator": "^6.15.0",
+    "connect-redis": "^9.0.0",
+    "rate-limit-redis": "^4.2.2",
+    "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-kakao": "^1.0.1",
+    "passport-naver-v2": "^2.0.8",
+
+    "typeorm": "^0.3.26",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.1.14",
+
+    "ioredis": "^5.7.0",
+    "redis": "^5.0.0",
+    "bullmq": "^5.61.0",
+
+    "socket.io": "^4.8.1",
+
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+
+    "axios": "^1.11.0",
+    "dayjs": "^1.11.18",
+    "uuid": "^9.0.1",
+    "slugify": "^1.6.6",
+    "dotenv": "^16.6.1",
+    "zod": "^3.23.8",
+    "joi": "^18.0.1",
+    "class-validator": "^0.14.2",
+    "class-transformer": "^0.5.1",
+    "lru-cache": "^11.1.0",
+    "node-cache": "^5.1.2",
+
+    "sharp": "^0.34.3",
+    "pdfkit": "^0.17.2",
+    "exceljs": "^4.4.0",
+    "xlsx": "^0.18.5",
+    "csv-writer": "^1.6.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "adm-zip": "^0.5.16",
+    "xml2js": "^0.6.2",
+    "js-yaml": "^4.1.0",
+
+    "cron": "^4.3.3",
+    "node-cron": "^4.2.1",
+
+    "winston": "^3.17.0",
+    "prom-client": "^15.1.3",
+
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.206.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.65.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.206.0",
+
+    "node-fetch": "^2.7.0",
+
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+
+    "nodemailer": "^7.0.6",
+
+    "tail": "^2.2.6",
+    "ua-parser-js": "^2.0.4",
+
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "rxjs": "^7.8.1"
+  }
+}

@@ -7,7 +7,8 @@ import {
   Index
 } from 'typeorm';
 import type { User } from './User.js';
-import { AuthProvider, LinkingStatus } from '../../../types/account-linking.js';
+import type { AuthProvider } from '../../../types/account-linking.js';
+import { LinkingStatus } from '../../../types/account-linking.js';
 
 @Entity('linking_sessions')
 @Index(['userId', 'status'])

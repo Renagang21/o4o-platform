@@ -10,7 +10,7 @@ import type { AuthRequest } from '../types/auth.js'
 import AppDataSource from '../database/connection.js'
 import { User } from '../entities/User.js'
 import logger from '../utils/logger.js'
-import { Post } from '../entities/Post.js'
+import { CustomPost } from '../entities/CustomPost.js'
 import fs from 'fs/promises'
 import path from 'path'
 import { previewTokenService } from '../services/preview-token.service.js'
@@ -144,7 +144,7 @@ router.get('/',
 
       // Get repositories
       const userRepository = AppDataSource.getRepository(User)
-      const postRepository = AppDataSource.getRepository(Post)
+      const postRepository = AppDataSource.getRepository(CustomPost)
 
       // Get user for customization
       const user = await userRepository.findOne({ where: { id: userId } })

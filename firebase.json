@@ -11,7 +11,7 @@
       {
         "source": "**",
         "run": {
-          "serviceId": "cosmetics-api",
+          "serviceId": "neture-api",
           "region": "asia-northeast3"
         }
       }

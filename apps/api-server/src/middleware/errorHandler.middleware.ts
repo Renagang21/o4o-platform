@@ -211,15 +211,29 @@ export const asyncHandler = (fn: any): any => {
   };
 };
 
+// ============================================================================
+// GRACEFUL_STARTUP Policy for Error Handlers (Phase 2.5)
+// ============================================================================
+// When GRACEFUL_STARTUP=true (default):
+//   - Log errors but don't crash the server
+//   - Allows server to continue serving health checks
+// When GRACEFUL_STARTUP=false:
+//   - Fail-fast behavior (original behavior)
+// ============================================================================
+
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason: Error | any) => {
   logger.error('Unhandled Promise Rejection', {
     reason: reason.message || reason,
     stack: reason.stack
   });
-  
-  // Close server gracefully
-  process.exit(1);
+
+  // GRACEFUL_STARTUP Policy: Only exit if explicitly disabled
+  if (process.env.GRACEFUL_STARTUP === 'false') {
+    logger.error('GRACEFUL_STARTUP=false: Exiting due to unhandled rejection');
+    process.exit(1);
+  }
+  logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing despite unhandled rejection');
 });
 
 // Handle uncaught exceptions
@@ -228,9 +242,13 @@ process.on('uncaughtException', (error: Error) => {
     message: error.message,
     stack: error.stack
   });
-  
-  // Close server gracefully
-  process.exit(1);
+
+  // GRACEFUL_STARTUP Policy: Only exit if explicitly disabled
+  if (process.env.GRACEFUL_STARTUP === 'false') {
+    logger.error('GRACEFUL_STARTUP=false: Exiting due to uncaught exception');
+    process.exit(1);
+  }
+  logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing despite uncaught exception');
 });
 
 export default errorHandler;

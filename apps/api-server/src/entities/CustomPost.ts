@@ -59,6 +59,9 @@ export class CustomPost {
     featured?: boolean;
     thumbnail?: string;
     tags?: string[];
+    zones?: Record<string, { blocks?: unknown[] }>;
+    themeCustomizations?: Record<string, unknown>;
+    [key: string]: unknown;
   };
 
   @Column({ type: 'uuid', nullable: true, name: 'authorid' })

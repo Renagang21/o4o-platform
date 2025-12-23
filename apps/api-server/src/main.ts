@@ -437,14 +437,28 @@ const startServer = async () => {
     // Continue server startup even if CPT init fails
   }
 
+  // ============================================================================
+  // GRACEFUL_STARTUP Policy (Phase 2.5)
+  // ============================================================================
+  // When GRACEFUL_STARTUP=true (default in Cloud Run):
+  //   - DB/Redis connection failures are logged but don't crash the server
+  //   - Server continues with degraded functionality
+  //   - /health endpoint always responds
+  // When GRACEFUL_STARTUP=false:
+  //   - Fail-fast behavior for production with strict requirements
+  // ============================================================================
+  const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+
   // Initialize all services (including database)
   try {
     await startupService.initialize();
   } catch (error) {
-    logger.error('Service initialization failed:', error);
-    if (process.env.NODE_ENV === 'production') {
+    logger.error('⚠️ Service initialization failed:', error);
+    if (!gracefulStartup) {
+      logger.error('GRACEFUL_STARTUP=false: Exiting due to initialization failure');
       process.exit(1);
     }
+    logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing with degraded functionality');
   }
 
   // Channel Connectors removed - legacy commerce system (Phase 8-3)
@@ -720,7 +734,12 @@ const startServer = async () => {
 
 startServer().catch((error) => {
   logger.error('Failed to start server:', error);
-  process.exit(1);
+  // GRACEFUL_STARTUP Policy: Only exit if explicitly disabled
+  // This allows the server to attempt recovery or at least respond to health checks
+  if (process.env.GRACEFUL_STARTUP === 'false') {
+    process.exit(1);
+  }
+  logger.warn('🔄 Server startup failed but GRACEFUL_STARTUP=true: Process will continue');
 });
 
 // ============================================================================

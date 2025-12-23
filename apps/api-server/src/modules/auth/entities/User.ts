@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
 import { UserRole, UserStatus } from '../../../types/auth.js';
-import { BusinessInfo } from '../../../types/user.js';
+import type { BusinessInfo } from '../../../types/user.js';
 import type { Role } from './Role.js';
 import bcrypt from 'bcryptjs';
 

@@ -11,6 +11,7 @@
   "scripts": {
     "prebuild": "echo '🔨 Building required packages...' && pnpm --filter '@o4o/forum-core*' run build && pnpm --filter '@o4o-apps/signage' run build && pnpm --filter '@o4o/lms-core' run build && pnpm --filter '@o4o/lms-yaksa' run build && pnpm --filter '@o4o-extensions/lms-marketing' run build && pnpm --filter '@o4o/organization-core' run build && pnpm --filter '@o4o/membership-yaksa' run build && pnpm --filter '@o4o/reporting-yaksa' run build && pnpm --filter '@o4o/dropshipping-cosmetics' run build && pnpm --filter '@o4o/annualfee-yaksa' run build && pnpm --filter '@o4o/yaksa-scheduler' run build",
     "build": "pnpm run clean:dist && tsc -p tsconfig.build.json",
+    "build:api": "pnpm run prebuild && tsup",
     "build:optimized": "bash ../../scripts/build-api-optimized.sh",
     "build:prod": "NODE_ENV=production pnpm run build",
     "build:watch": "npx tsc -p tsconfig.build.json --watch",
@@ -220,6 +221,7 @@
     "supertest": "7.1.4",
     "ts-jest": "29.4.1",
     "ts-node": "10.9.2",
+    "tsup": "^8.5.0",
     "typescript": "5.4.5",
     "typescript-eslint": "8.42.0",
     "vite": "5.4.19",
