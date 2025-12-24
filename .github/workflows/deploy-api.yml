@@ -1,6 +1,7 @@
-name: Deploy API Server
+name: Deploy API Server (Cloud Run)
 
-# Auto-deploy API server on push to main branch
+# Deploy API server to Cloud Run on push to main branch
+# Phase R5: Cloud Run 단일 배포 체계
 
 concurrency:
   group: deploy-api-${{ github.ref }}
@@ -21,9 +22,20 @@ on:
         required: false
         default: 'false'
 
+env:
+  PROJECT_ID: netureyoutube
+  REGION: asia-northeast3
+  SERVICE_NAME: o4o-core-api
+  REPOSITORY_NAME: o4o-api
+  IMAGE_NAME: api-server
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write  # Required for Workload Identity Federation
 
     steps:
     - name: Checkout code
@@ -37,103 +49,117 @@ jobs:
     - name: Install pnpm
       run: npm install -g pnpm
 
-    - name: Deploy to API server
-      uses: appleboy/ssh-action@v1.0.3
-      timeout-minutes: 15
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build packages
+      run: pnpm run build:packages
+
+    - name: Build API server
+      run: |
+        cd apps/api-server
+        pnpm run build
+
+        # Verify build output
+        if [ ! -f "dist/main.js" ]; then
+          echo "❌ Build failed: dist/main.js not found"
+          exit 1
+        fi
+
+        echo "✅ API server build complete"
+        echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
       with:
-        host: ${{ secrets.API_HOST }}
-        username: ${{ secrets.API_USER }}
-        key: ${{ secrets.API_SSH_KEY }}
-        command_timeout: 10m
-        script: |
-          cd /home/ubuntu/o4o-platform
-          
-          # Pull latest code
-          git fetch origin
-          git pull origin main
-          
-          # Install pnpm if not exists
-          if ! command -v pnpm &> /dev/null; then
-            echo "📦 Installing pnpm..."
-            npm install -g pnpm
-            # Add npm global bin to PATH for current session
-            export PATH="$PATH:$(npm config get prefix)/bin"
-          fi
-          
-          # Install dependencies
-          pnpm install --frozen-lockfile
+        workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
-          # ESM import validation (회귀 방지 5/7)
-          echo "🔍 Validating ESM imports..."
-          if git ls-files 'packages/{auth-client,types,utils,shortcodes}/src/**/*.{ts,tsx}' | xargs grep -nE "from ['\"]\\./[^'\"]+['\"]" | grep -v "\\.js['\"]"; then
-            echo "❌ Found relative imports without .js extension"
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Configure Docker for Artifact Registry
+      run: |
+        gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+    - name: Build and Push Docker image
+      run: |
+        cd apps/api-server
+
+        IMAGE_TAG="${{ github.sha }}"
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+        LATEST_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest"
+
+        echo "🐳 Building Docker image..."
+        docker build \
+          --platform linux/amd64 \
+          --tag "${FULL_IMAGE}" \
+          --tag "${LATEST_IMAGE}" \
+          --file Dockerfile \
+          .
+
+        echo "📤 Pushing to Artifact Registry..."
+        docker push "${FULL_IMAGE}"
+        docker push "${LATEST_IMAGE}"
+
+        echo "✅ Image pushed: ${FULL_IMAGE}"
+        echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+
+    - name: Deploy to Cloud Run
+      run: |
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+        echo "🚀 Deploying to Cloud Run..."
+        gcloud run deploy ${{ env.SERVICE_NAME }} \
+          --image="${FULL_IMAGE}" \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --port=8080 \
+          --memory=1Gi \
+          --cpu=1 \
+          --min-instances=0 \
+          --max-instances=10 \
+          --concurrency=80 \
+          --timeout=300 \
+          --set-env-vars="NODE_ENV=production" \
+          --set-env-vars="PORT=8080" \
+          --set-env-vars="GRACEFUL_STARTUP=true" \
+          --set-env-vars="EMAIL_SERVICE_ENABLED=false"
+
+    - name: Verify deployment
+      run: |
+        echo "🔍 Verifying deployment..."
+
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --format="value(status.url)")
+
+        echo "🌐 Service URL: ${SERVICE_URL}"
+
+        # Health check with retry
+        for i in {1..5}; do
+          echo "Health check attempt $i..."
+          if curl -sf "${SERVICE_URL}/health" > /dev/null; then
+            echo "✅ Health check passed!"
+            break
+          fi
+          if [ $i -eq 5 ]; then
+            echo "❌ Health check failed after 5 attempts"
             exit 1
           fi
-          echo "✅ All ESM imports valid"
+          sleep 10
+        done
 
-          # Build packages
-          pnpm run build:packages
-
-          # Build smoke test (회귀 방지 6/7)
-          echo "🧪 Running build smoke tests..."
-          node -e "import('./packages/auth-client/dist/index.js').then(() => console.log('✅ auth-client OK'))"
-          node -e "import('./packages/types/dist/index.js').then(() => console.log('✅ types OK'))"
-          node -e "import('./packages/utils/dist/index.js').then(() => console.log('✅ utils OK'))"
-          node -e "import('./packages/shortcodes/dist/index.js').then(() => console.log('✅ shortcodes OK'))"
-          
-          # Build API server
-          cd apps/api-server
-          pnpm run build
-          
-          # Check build success
-          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
-            echo "❌ Build failed: dist folder is empty"
-            exit 1
-          fi
-          
-          echo "✅ API server build complete!"
-          
-          # Database migration check
-          echo "🗄️ Running database migrations..."
-          pnpm run migration:run:prod || echo "⚠️ Migration failed (may already be applied)"
-          
-          # Ensure AI Settings table exists
-          echo "🤖 Ensuring AI Settings table exists..."
-          if [ -f "/home/ubuntu/o4o-platform/scripts/ensure-ai-settings.sh" ]; then
-            bash /home/ubuntu/o4o-platform/scripts/ensure-ai-settings.sh
-          else
-            echo "⚠️ AI settings script not found, creating table directly..."
-            npx typeorm-ts-node-commonjs -d src/database/data-source.ts query "CREATE TABLE IF NOT EXISTS ai_settings (id SERIAL PRIMARY KEY, provider VARCHAR(255) NOT NULL UNIQUE, apiKey TEXT, defaultModel VARCHAR(255), settings JSON, isActive BOOLEAN DEFAULT true, createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)" 2>/dev/null || echo "Table may already exist"
-          fi
-          
-          # Restart PM2 API server
-          echo "♻️ Restarting PM2 API server..."
-          cd ../..
-
-          # Check if PM2 process exists
-          pm2 list | grep -q "o4o-api-server" || echo "⚠️ PM2 process o4o-api-server not found"
-
-          # Restart API server
-          if pm2 restart o4o-api-server 2>/dev/null; then
-            echo "✅ PM2 restart successful"
-          else
-            echo "🔧 Starting with PM2 config file..."
-            pm2 start ecosystem.config.apiserver.cjs
-          fi
-
-          # Health check
-          echo "🏥 Health check..."
-          sleep 5
-
-          if curl -f http://localhost:4000/api/health 2>/dev/null; then
-            echo "✅ API server is running normally"
-          else
-            echo "⚠️ Health check failed - check logs"
-            echo "📋 PM2 logs: pm2 logs o4o-api-production"
-          fi
-
-          echo "🎉 API server deployment complete!"
-          echo "🌐 Local: http://localhost:4000"
-          echo "🌐 External: https://api.neture.co.kr"
-          echo "📅 Deploy time: $(date)"
-          echo "📝 Commit: $(git rev-parse HEAD)"
+        echo ""
+        echo "=========================================="
+        echo "✅ API Server Deployed Successfully!"
+        echo "=========================================="
+        echo "🌐 URL: ${SERVICE_URL}"
+        echo "🏥 Health: ${SERVICE_URL}/health"
+        echo "📅 Time: $(date)"
+        echo "📝 Commit: ${{ github.sha }}"

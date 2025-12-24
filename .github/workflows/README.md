@@ -1,8 +1,8 @@
 # GitHub Actions Workflows
 
-**Last Updated:** 2025-10-31
+**Last Updated:** 2025-12-24
 **Total Workflows:** 8
-**Status:** ✅ Optimized
+**Status:** ✅ Optimized (Cloud Run Migration Complete)
 
 ---
 
@@ -13,7 +13,7 @@
 | **CI Pipeline** | `ci-pipeline.yml` | Push to main/develop, PRs | Quality checks, tests, builds |
 | **Security Analysis** | `ci-security.yml` | Weekly + PRs | CodeQL security scanning |
 | **Deploy Admin** | `deploy-admin.yml` | Push to main (admin/packages changed) | Admin dashboard deployment |
-| **Deploy API** | `deploy-api.yml` | Push to main (api/packages changed) | API server deployment |
+| **Deploy API** | `deploy-api.yml` | Push to main (api/packages changed) | API server deployment (Cloud Run) |
 | **Deploy Main Site** | `deploy-main-site.yml` | Push to main (main-site/packages changed) | Main site deployment |
 | **Deploy Nginx** | `deploy-nginx.yml` | Push to main (nginx configs changed) | Nginx configuration deployment |
 | **PR Labeler** | `automation-pr-labeler.yml` | PR opened/synchronized | Auto-label PRs by size |
@@ -42,11 +42,11 @@
              │   └─► Update Nginx config
              │
              ├─► Deploy API (if api files changed)
-             │   ├─► SSH to API server
-             │   ├─► Git pull
              │   ├─► Build packages + API
-             │   ├─► Run migrations
-             │   └─► Restart PM2
+             │   ├─► Build Docker image
+             │   ├─► Push to Artifact Registry
+             │   ├─► Deploy to Cloud Run
+             │   └─► Health check verification
              │
              ├─► Deploy Main Site (if main-site files changed)
              │   ├─► Build packages
@@ -120,9 +120,11 @@
 | `WEB_HOST` | Admin, Main Site, Nginx | Web server hostname |
 | `WEB_USER` | Admin, Main Site, Nginx | SSH username |
 | `WEB_SSH_KEY` | Admin, Main Site, Nginx | SSH private key |
-| `API_HOST` | API deployment | API server hostname |
-| `API_USER` | API deployment | SSH username |
-| `API_SSH_KEY` | API deployment | SSH private key |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | API deployment | GCP Workload Identity Federation provider |
+| `GCP_SERVICE_ACCOUNT` | API deployment | GCP service account for Cloud Run |
+
+> **Note:** AWS API server secrets (`API_HOST`, `API_USER`, `API_SSH_KEY`) are deprecated as of 2025-12-24.
+> API server now deploys to Google Cloud Run.
 
 ---
 
