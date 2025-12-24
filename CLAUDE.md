@@ -311,26 +311,36 @@ docs/app-guidelines/new-service-workorder-template.md
 
 ## 8. 인프라 정보
 
+> **GCP 단일 운영 체계** (Phase R5 확정)
+> 상세: `docs/_platform/infra-migration-gcp.md`
+
 ### 8.1 서버 정보
 
-| 서버 | IP | SSH | 역할 |
-|------|-----|-----|------|
-| 웹서버 | 13.125.144.8 | `ssh o4o-web` | Nginx 프록시 |
-| API 서버 | 43.202.242.215 | `ssh o4o-api` | Node.js (PM2) |
+| 서버 | 위치 | 역할 |
+|------|------|------|
+| **API 서버** | GCP Cloud Run (asia-northeast3) | o4o-core-api |
+| 웹서버 | 13.125.144.8 (`ssh o4o-web`) | Nginx 프록시 + Static |
 
 ### 8.2 배포 경로
 
-| 앱 | 경로 | 서버 |
-|----|------|------|
-| API | `/home/ubuntu/o4o-platform` | o4o-api |
+| 앱 | 배포 대상 | 방식 |
+|----|-----------|------|
+| API | Cloud Run (o4o-core-api) | GitHub Actions 자동 |
 | Admin (개발) | `/var/www/dev-admin.neture.co.kr` | o4o-web |
 | Admin (프로덕션) | `/var/www/admin.neture.co.kr` | o4o-web |
 | Main Site | `/var/www/neture.co.kr` | o4o-web |
 
 ### 8.3 배포 규칙
 
-* `apps/main-site/**` 또는 `apps/admin-dashboard/**` 변경 시 **수동 배포 필수**
+* **API 서버**: `main` 브랜치 push 시 Cloud Run 자동 배포
+* **프론트엔드**: `apps/main-site/**` 또는 `apps/admin-dashboard/**` 변경 시 수동 배포
 * 스크립트: `./scripts/deploy-admin-manual.sh`, `./scripts/deploy-main-site-manual.sh`
+
+### 8.4 금지 사항
+
+* ❌ AWS EC2로의 배포 시도
+* ❌ 신규 AWS 리소스 생성
+* ❌ `43.202.242.215` (구 API 서버) 참조
 
 ---
 
