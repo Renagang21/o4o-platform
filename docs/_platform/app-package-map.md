@@ -2,7 +2,8 @@
 
 > **Status**: Active
 > **Created**: 2025-12-24
-> **Phase**: R4 App Structure Cleanup
+> **Updated**: 2025-12-25
+> **Phase**: R7 Legacy Package Cleanup
 
 ---
 
@@ -10,9 +11,11 @@
 
 | 구분 | 수량 |
 |------|------|
-| 총 패키지 (packages/) | 60개 |
+| 총 패키지 (packages/) | 54개 |
 | 총 앱 (apps/) | 11개 |
-| **전체** | **71개** |
+| **전체** | **65개** |
+
+> R7에서 Legacy 패키지 4개 삭제: admin, commerce, customer, lms-marketing
 
 ---
 
@@ -152,12 +155,11 @@ packages/
 ```
 packages/
 ├── @o4o-apps/           # 앱 메타 패키지
-├── admin/               # 관리자 공통
-├── commerce/            # 커머스 공통
-├── customer/            # 고객 공통
 ├── market-trial/        # 마켓 트라이얼
 └── partner-ai-builder/  # AI 빌더
 ```
+
+> R7 삭제: ~~admin~~, ~~commerce~~, ~~customer~~, ~~lms-marketing~~
 
 ---
 
@@ -208,5 +210,5 @@ reporting-yaksa ───→ organization-core
 
 ---
 
-*Phase R4: WO-R4-APP-STRUCTURE-CLEANUP-V1*
-*Updated: 2025-12-24*
+*Phase R7: WO-GEN-PLATFORM-APP-CONSOLIDATION-R7*
+*Updated: 2025-12-25*

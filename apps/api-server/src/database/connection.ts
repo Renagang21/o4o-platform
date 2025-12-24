@@ -129,7 +129,7 @@ import { Organization, OrganizationMember } from '@o4o/organization-core';
 // - @o4o/annualfee-yaksa (FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog)
 // - @o4o/cosmetics-partner-extension
 // - @o4o/cosmetics-sample-display-extension
-// - @o4o-extensions/lms-marketing
+// (lms-marketing은 R7에서 삭제됨)
 //
 // These will be handled in Phase R4+ (domain service separation).
 // ============================================================================
