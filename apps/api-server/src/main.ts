@@ -339,42 +339,31 @@ app.use(httpMetrics.middleware());
 // ============================================================================
 // Core routes are registered here, while dynamic app routes are registered via module loader
 import authRoutes from './modules/auth/routes/auth.routes.js';
-import cmsRoutes from './modules/cms/routes/cms.routes.js';
-import lmsRoutes from './modules/lms/routes/lms.routes.js';
+// CMS routes - REMOVED (Phase R1: Domain separation)
+// import cmsRoutes from './modules/cms/routes/cms.routes.js';
+// LMS routes - REMOVED (Phase R1: Domain separation)
+// import lmsRoutes from './modules/lms/routes/lms.routes.js';
 import usersRoutes from './routes/users.routes.js';
 import cptRoutes from './routes/cpt.js';
 import healthRoutes from './routes/health.js';
-import forumRoutes from './routes/forum/forum.routes.js';
+// Forum routes - REMOVED (Phase R1: Domain separation)
+// import forumRoutes from './routes/forum/forum.routes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import adminAppsRoutes from './routes/admin/apps.routes.js';
 import serviceMonitorRoutes from './routes/service-monitor.routes.js';
-// Membership Routes (WO-MEMBERSHIP-STATS-API)
-import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
-// Reporting Routes (신상신고)
-import { createReportingRoutes } from '@o4o/reporting-yaksa/backend/routes/index.js';
-// AnnualFee Routes (연회비)
-import { createRoutes as createAnnualfeeRoutes } from '@o4o/annualfee-yaksa/backend/routes/index';
-// Cosmetics Seller Extension Routes (WO-COSMETICS-SELLER-RUNTIME-ACTIVATE)
-import {
-  createSellerExtensionRoutes,
-  SellerDisplay,
-  SellerSample,
-  SellerInventory,
-  SellerConsultationLog,
-  SellerKPI,
-} from '@o4o/cosmetics-seller-extension/backend';
-
-// Cosmetics Sample Display Extension Routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-// TODO: Re-enable after ESM migration of cosmetics-supplier-extension is complete
-// import { createSampleDisplayRoutes } from '@o4o/cosmetics-sample-display-extension';
-
-// Cosmetics Supplier Extension Routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
-// TODO: Re-enable after ESM migration is complete
-// import { createSupplierExtensionRoutes } from '@o4o/cosmetics-supplier-extension';
-
-// Groupbuy-Yaksa Routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
-// TODO: Fix circular reference in groupbuy-yaksa
-// import { createGroupbuyRoutes } from '@o4o/groupbuy-yaksa';
+// ============================================================================
+// DOMAIN ROUTES REMOVED (Phase R1: Execution Boundary Cleanup)
+// ============================================================================
+// The following domain route factories have been removed from api-server:
+// - @o4o/membership-yaksa (createMembershipRoutes)
+// - @o4o/reporting-yaksa (createReportingRoutes)
+// - @o4o/annualfee-yaksa (createAnnualfeeRoutes)
+// - @o4o/cosmetics-seller-extension (createSellerExtensionRoutes)
+// - @o4o/cosmetics-sample-display-extension
+// - @o4o/cosmetics-supplier-extension
+// - @o4o/groupbuy-yaksa
+// These will be handled in Phase R2 (domain service separation).
+// ============================================================================
 
 // Market Trial Routes (Phase L-1)
 import marketTrialRoutes from './routes/market-trial.routes.js';
@@ -391,12 +380,13 @@ import adminOrderRoutes from './routes/admin-orders.routes.js';
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
-app.use('/api/v1/cms', cmsRoutes);
-app.use('/api/v1/lms', lmsRoutes);
+// CMS/LMS/Forum routes - REMOVED (Phase R1: Domain separation)
+// app.use('/api/v1/cms', cmsRoutes);
+// app.use('/api/v1/lms', lmsRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);
 app.use('/api/health', healthRoutes);
-app.use('/api/v1/forum', forumRoutes);
+// app.use('/api/v1/forum', forumRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/admin/apps', adminAppsRoutes);
 app.use('/api/v1/service/monitor', serviceMonitorRoutes);
@@ -571,88 +561,27 @@ const startServer = async () => {
     app.use('/api/v1/admin/apps', adminAppsRoutes);
     logger.info('✅ Admin Apps routes registered at /api/v1/admin/apps');
 
-    // 12. Register Forum routes (Phase 17 - AI Recommendations)
-    app.use('/api/v1/forum', forumRoutes);
-    logger.info('✅ Forum routes registered at /api/v1/forum');
+    // 12. Forum routes - REMOVED (Phase R1: Domain separation)
+    // app.use('/api/v1/forum', forumRoutes);
+    // logger.info('✅ Forum routes registered at /api/v1/forum');
 
     // 13. Register Linked Accounts routes (SSO check, sessions)
     app.use('/api/accounts', linkedAccountsRoutes);
     logger.info('✅ Linked Accounts routes registered at /api/accounts');
 
-    // 14. Register Membership routes (WO-MEMBERSHIP-STATS-API)
-    // Note: membership-yaksa는 moduleId 기반으로 /api/v1/membership-yaksa에 마운트되지만,
-    // Dashboard는 /api/v1/membership을 호출하므로 별도로 /api/v1/membership에 마운트
-    try {
-      const membershipRoutes = createMembershipRoutes(AppDataSource);
-      app.use('/api/v1/membership', membershipRoutes);
-      logger.info('✅ Membership routes registered at /api/v1/membership');
-    } catch (membershipError) {
-      logger.error('Failed to register membership routes:', membershipError);
-    }
-
-    // 15. Register Reporting routes (신상신고)
-    try {
-      const reportingRoutes = createReportingRoutes(AppDataSource);
-      app.use('/api/reporting', reportingRoutes);
-      logger.info('✅ Reporting routes registered at /api/reporting');
-    } catch (reportingError) {
-      logger.error('Failed to register reporting routes:', reportingError);
-    }
-
-    // 16. Register AnnualFee routes (연회비)
-    try {
-      const annualfeeRoutes = createAnnualfeeRoutes(AppDataSource);
-      app.use('/api/annualfee', annualfeeRoutes);
-      logger.info('✅ AnnualFee routes registered at /api/annualfee');
-    } catch (annualfeeError) {
-      logger.error('Failed to register annualfee routes:', annualfeeError);
-    }
-
-    // 17. Register Cosmetics Seller Extension routes (WO-COSMETICS-SELLER-RUNTIME-ACTIVATE)
-    try {
-      const cosmeticsSellerRoutes = createSellerExtensionRoutes({
-        displayRepository: AppDataSource.getRepository(SellerDisplay),
-        sampleRepository: AppDataSource.getRepository(SellerSample),
-        inventoryRepository: AppDataSource.getRepository(SellerInventory),
-        consultationRepository: AppDataSource.getRepository(SellerConsultationLog),
-        kpiRepository: AppDataSource.getRepository(SellerKPI),
-      });
-      app.use('/api/v1/cosmetics-seller', cosmeticsSellerRoutes as any);
-      logger.info('✅ Cosmetics Seller routes registered at /api/v1/cosmetics-seller');
-    } catch (cosmeticsSellerError) {
-      logger.error('Failed to register cosmetics-seller routes:', cosmeticsSellerError);
-    }
-
-    // 18. Register Cosmetics Sample Display Extension routes (WO-COSMETICS-SAMPLE-DISPLAY-INTEGRATION)
-    // TODO: Re-enable after ESM migration of cosmetics-supplier-extension is complete
-    // try {
-    //   const cosmeticsSampleDisplayRoutes = createSampleDisplayRoutes(AppDataSource);
-    //   app.use('/api/v1/cosmetics-sample', cosmeticsSampleDisplayRoutes);
-    //   logger.info('✅ Cosmetics Sample Display routes registered at /api/v1/cosmetics-sample');
-    // } catch (cosmeticsSampleDisplayError) {
-    //   logger.error('Failed to register cosmetics-sample-display routes:', cosmeticsSampleDisplayError);
-    // }
-
-    // 19. Register Cosmetics Supplier Extension routes (WO-COSMETICS-SUPPLIER-INTEGRATION)
-    // TODO: Re-enable after ESM migration is complete
-    // try {
-    //   const cosmeticsSupplierRoutes = createSupplierExtensionRoutes(AppDataSource);
-    //   app.use('/api/v1/cosmetics-supplier', cosmeticsSupplierRoutes);
-    //   logger.info('✅ Cosmetics Supplier routes registered at /api/v1/cosmetics-supplier');
-    // } catch (cosmeticsSupplierError) {
-    //   logger.error('Failed to register cosmetics-supplier routes:', cosmeticsSupplierError);
-    // }
-
-    // 20. Register Groupbuy-Yaksa routes (WO-GROUPBUY-YAKSA-PHASE3-UI-INTEGRATION)
-    try {
-      // const groupbuyRoutes = createGroupbuyRoutes(AppDataSource);
-      // app.use('/api/v1/yaksa/groupbuy', groupbuyRoutes);
-      // Also mount at /api/groupbuy for backward compatibility with existing hooks
-      // app.use('/api/groupbuy', groupbuyRoutes);
-      logger.info('⚠️ Groupbuy-Yaksa routes disabled (circular reference fix pending) at /api/v1/yaksa/groupbuy and /api/groupbuy');
-    } catch (groupbuyError) {
-      logger.error('Failed to register groupbuy-yaksa routes:', groupbuyError);
-    }
+    // ============================================================================
+    // DOMAIN ROUTES REMOVED (Phase R1: Execution Boundary Cleanup)
+    // ============================================================================
+    // 14. Membership routes (/api/v1/membership) - @o4o/membership-yaksa
+    // 15. Reporting routes (/api/reporting) - @o4o/reporting-yaksa
+    // 16. AnnualFee routes (/api/annualfee) - @o4o/annualfee-yaksa
+    // 17. Cosmetics Seller routes (/api/v1/cosmetics-seller) - @o4o/cosmetics-seller-extension
+    // 18. Cosmetics Sample Display routes - @o4o/cosmetics-sample-display-extension
+    // 19. Cosmetics Supplier routes - @o4o/cosmetics-supplier-extension
+    // 20. Groupbuy-Yaksa routes - @o4o/groupbuy-yaksa
+    // These will be handled in Phase R2 (domain service separation).
+    // ============================================================================
+    logger.info('⚠️ Domain routes disabled (Phase R1: Execution Boundary Cleanup)');
 
     // 21. Register Partner routes (Phase K)
     app.use('/api/partner', partnerRoutes);

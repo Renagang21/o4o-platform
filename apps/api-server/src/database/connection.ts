@@ -89,12 +89,10 @@ import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-// Forum App entities (from @o4o/forum-core package)
-import { ForumPost, ForumCategory, ForumComment } from '@o4o/forum-core';
+// Forum App entities - REMOVED (Phase R1: Domain separation)
+// import { ForumPost, ForumCategory, ForumComment } from '@o4o/forum-core';
 // Forum Notification entity (Phase 13)
 import { ForumNotification } from '../entities/ForumNotification.js';
-// Dropshipping Core entities (from @o4o/dropshipping-core package)
-// import { dropshippingEntities } from '@o4o/dropshipping-core';
 // Digital Signage entities
 import { SignageDevice } from '../entities/SignageDevice.js';
 import { SignageSlide } from '../entities/SignageSlide.js';
@@ -111,87 +109,23 @@ import { CustomField as CMSCustomField } from '../modules/cms/entities/CustomFie
 import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
-// ✅ NEW: Membership-Yaksa entities
-// Import from index to ensure correct loading order and prevent circular dependency
-import {
-  MemberCategory,
-  Member,
-  Affiliation,
-  MembershipRoleAssignment,
-  MembershipYear,
-  Verification,
-} from '@o4o/membership-yaksa/backend/entities/index.js';
-
-// ✅ NEW: Dropshipping-Cosmetics entities
-import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';
-// CosmeticsRoutine entity does not exist - removed to fix build
-
-// ✅ NEW: Organization-Core entities
-import {
-  Organization,
-  OrganizationMember,
-} from '@o4o/organization-core';
-
-// ✅ NEW: LMS-Core entities
-import {
-  Course,
-  Lesson,
-  Enrollment,
-  Progress,
-  Certificate,
-  LMSEvent,
-  Attendance,
-} from '@o4o/lms-core';
-
-// ✅ NEW: Reporting-Yaksa entities
-import {
-  AnnualReport,
-  ReportFieldTemplate,
-  ReportLog,
-  ReportAssignment,
-} from '@o4o/reporting-yaksa/backend/entities/index.js';
-
-// ✅ NEW: LMS-Yaksa entities
-import {
-  YaksaLicenseProfile,
-  RequiredCoursePolicy,
-  CreditRecord,
-  YaksaCourseAssignment,
-} from '@o4o/lms-yaksa';
-
-// ✅ TODO: LMS-Marketing entities (Phase R7, R8) - temporarily disabled - build errors
-// import {
-//   ProductContent,
-//   MarketingQuizCampaign,
-//   SurveyCampaign,
-// } from '@o4o-extensions/lms-marketing';
-
-// ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
-// import {
-//   PartnerProfile,
-//   PartnerLink,
-//   PartnerRoutine,
-//   PartnerEarnings,
-//   CommissionPolicy,
-// } from '@o4o/cosmetics-partner-extension/backend/entities/index.js';
-
-// ✅ TODO: Cosmetics-Sample-Display-Extension entities (temporarily disabled - ESM import issues)
-// import {
-//   SampleInventory,
-//   SampleUsageLog,
-//   SampleConversion,
-//   DisplayLayout,
-// } from '@o4o/cosmetics-sample-display-extension';
-
-// ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
-import {
-  FeePolicy,
-  FeeInvoice,
-  FeePayment,
-  FeeExemption,
-  FeeSettlement,
-  FeeLog,
-} from '@o4o/annualfee-yaksa/backend/entities/index';
+// ============================================================================
+// DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
+// ============================================================================
+// The following domain package entities have been removed from api-server:
+// - @o4o/membership-yaksa (MemberCategory, Member, Affiliation, etc.)
+// - @o4o/dropshipping-cosmetics (CosmeticsFilter)
+// - @o4o/organization-core (Organization, OrganizationMember)
+// - @o4o/lms-core (Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance)
+// - @o4o/reporting-yaksa (AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment)
+// - @o4o/lms-yaksa (YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment)
+// - @o4o/annualfee-yaksa (FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog)
+// - @o4o/cosmetics-partner-extension
+// - @o4o/cosmetics-sample-display-extension
+// - @o4o-extensions/lms-marketing
+//
+// These will be handled in Phase R2 (domain service separation).
+// ============================================================================
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -311,11 +245,9 @@ export const AppDataSource = new DataSource({
     RoleApplication,
     KycDocument,
     // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-    // Forum App entities (from @o4o/forum-core package)
-    ForumPost,
-    ForumCategory,
-    ForumComment,
-    // Forum Notification entity (Phase 13)
+    // Forum App entities - REMOVED (Phase R1)
+    // ForumPost, ForumCategory, ForumComment moved to domain service
+    // Forum Notification entity (Phase 13) - local entity, kept
     ForumNotification,
     // Digital Signage entities
     SignageDevice,
@@ -327,64 +259,22 @@ export const AppDataSource = new DataSource({
     DeploymentInstance,
     // Site entities
     Site,
-    // ✅ CMS Module V2 entities (Phase C-2)
-    // Note: CMSCustomPostType removed - CustomPostType now uses cms_cpt_types table
+    // ✅ CMS Module V2 entities (Phase C-2) - local entities, kept
     CMSCustomField,
     CMSView,
     CMSPage,
-    // ✅ NEW: Membership-Yaksa entities
-    MemberCategory,
-    Member,
-    Affiliation,
-    MembershipRoleAssignment,
-    MembershipYear,
-    Verification,
-    // ✅ NEW: Dropshipping-Cosmetics entities
-    CosmeticsFilter,
-    // CosmeticsRoutine removed - entity does not exist
-    // ✅ NEW: Organization-Core entities
-    Organization,
-    OrganizationMember,
-    // ✅ NEW: LMS-Core entities
-    Course,
-    Lesson,
-    Enrollment,
-    Progress,
-    Certificate,
-    LMSEvent,
-    Attendance,
-    // ✅ NEW: Reporting-Yaksa entities
-    AnnualReport,
-    ReportFieldTemplate,
-    ReportLog,
-    ReportAssignment,
-    // ✅ NEW: LMS-Yaksa entities
-    YaksaLicenseProfile,
-    RequiredCoursePolicy,
-    CreditRecord,
-    YaksaCourseAssignment,
-    // ✅ TODO: LMS-Marketing entities (Phase R7, R8) - temporarily disabled - build errors
-    // ProductContent,
-    // MarketingQuizCampaign,
-    // SurveyCampaign,
-    // ✅ TODO: Cosmetics-Partner-Extension entities (temporarily disabled - build errors)
-    // PartnerProfile,
-    // PartnerLink,
-    // PartnerRoutine,
-    // PartnerEarnings,
-    // CommissionPolicy,
-    // ✅ NEW: AnnualFee-Yaksa entities (Phase 2)
-    FeePolicy,
-    FeeInvoice,
-    FeePayment,
-    FeeExemption,
-    FeeSettlement,
-    FeeLog,
-    // ✅ TODO: Cosmetics-Sample-Display-Extension entities (temporarily disabled - ESM import issues)
-    // SampleInventory,
-    // SampleUsageLog,
-    // SampleConversion,
-    // DisplayLayout,
+    // ============================================================================
+    // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
+    // ============================================================================
+    // Membership-Yaksa: MemberCategory, Member, Affiliation, MembershipRoleAssignment, MembershipYear, Verification
+    // Dropshipping-Cosmetics: CosmeticsFilter
+    // Organization-Core: Organization, OrganizationMember
+    // LMS-Core: Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance
+    // Reporting-Yaksa: AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment
+    // LMS-Yaksa: YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment
+    // AnnualFee-Yaksa: FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog
+    // These entities will be handled in Phase R2 (domain service separation).
+    // ============================================================================
   ],
   
   // 마이그레이션 설정

@@ -24,7 +24,7 @@ export class WebSocketSessionSync {
 
   private async setupRedisSubscriber() {
     // Create a separate Redis client for subscribing (required by Redis)
-    this.sessionSubscriber = redisClient.duplicate();
+    this.sessionSubscriber = redisClient.client.duplicate();
     await this.sessionSubscriber.connect();
 
     // Subscribe to session events
@@ -167,7 +167,7 @@ export class WebSocketSessionSync {
     };
 
     // Publish to Redis for other servers
-    redisClient.publish('session:events', JSON.stringify(eventData));
+    redisClient.client.publish('session:events', JSON.stringify(eventData));
     
     // Handle locally
     this.handleSessionEvent(eventData);

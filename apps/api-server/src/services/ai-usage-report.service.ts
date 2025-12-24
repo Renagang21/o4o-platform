@@ -448,7 +448,10 @@ export const aiUsageReport = {
     return getAIUsageReport();
   },
   generateReport: (...args: Parameters<AIUsageReportService['generateReport']>) => getAIUsageReport().generateReport(...args),
-  exportReport: (...args: Parameters<AIUsageReportService['exportReport']>) => getAIUsageReport().exportReport(...args),
-  getRecentUsage: (...args: Parameters<AIUsageReportService['getRecentUsage']>) => getAIUsageReport().getRecentUsage(...args),
+  exportReport: (report: any) => getAIUsageReport().exportAsCSV(report),
+  exportAsCSV: (report: any) => getAIUsageReport().exportAsCSV(report),
+  getCurrentMonthReport: () => getAIUsageReport().getCurrentMonthReport(),
+  getLastNDaysReport: (...args: Parameters<AIUsageReportService['getLastNDaysReport']>) => getAIUsageReport().getLastNDaysReport(...args),
+  getRecentUsage: (...args: any) => getAIUsageReport().getCurrentMonthReport(),
   cleanup: () => getAIUsageReport().cleanup(),
 };

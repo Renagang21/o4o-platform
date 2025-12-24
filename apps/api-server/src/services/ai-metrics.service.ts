@@ -445,6 +445,7 @@ export const aiMetrics = {
     return getAIMetrics();
   },
   collectMetrics: (...args: Parameters<AIMetricsService['collectMetrics']>) => getAIMetrics().collectMetrics(...args),
-  getRecentErrors: (...args: Parameters<AIMetricsService['getRecentErrors']>) => getAIMetrics().getRecentErrors(...args),
+  getRecentJobs: (...args: Parameters<AIMetricsService['getRecentJobs']>) => getAIMetrics().getRecentJobs(...args),
+  getRecentErrors: (...args: any) => getAIMetrics().getRecentJobs(...args), // alias
   cleanup: () => getAIMetrics().cleanup(),
 };
