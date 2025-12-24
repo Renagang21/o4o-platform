@@ -4,6 +4,7 @@
  */
 
 import express from 'express';
+import logger from './utils/logger.js';
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -28,5 +29,5 @@ app.get('/', (req, res) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`🚀 Minimal API Server running on port ${port}`);
+  logger.info(`🚀 Minimal API Server running on port ${port}`);
 });
