@@ -386,6 +386,7 @@ app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);
 app.use('/api/health', healthRoutes);
+app.use('/health', healthRoutes); // Cloud Run HEALTHCHECK compatibility
 // app.use('/api/v1/forum', forumRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/admin/apps', adminAppsRoutes);
