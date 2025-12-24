@@ -9,7 +9,7 @@ import { AppManifest } from '@o4o/types';
 // Removed manifests:
 // - Forum: forum, forum-core, forum-yaksa
 // - Display: signage, digitalsignage
-// - LMS: lms-core, lms-yaksa, lms-marketing
+// - LMS: lms-core, lms-yaksa (lms-marketing R7에서 삭제됨)
 // - Organization: organization-core, organization-forum, membership-yaksa
 // - Dropshipping: dropshipping, dropshipping-core, dropshipping-cosmetics
 // - Cosmetics: cosmetics-seller-extension, cosmetics-partner-extension, cosmetics-supplier-extension

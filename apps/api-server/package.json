@@ -9,7 +9,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "prebuild": "echo '🔨 Building required packages...' && pnpm --filter '@o4o/forum-core*' run build && pnpm --filter '@o4o-apps/signage' run build && pnpm --filter '@o4o/lms-core' run build && pnpm --filter '@o4o/lms-yaksa' run build && pnpm --filter '@o4o-extensions/lms-marketing' run build && pnpm --filter '@o4o/organization-core' run build && pnpm --filter '@o4o/membership-yaksa' run build && pnpm --filter '@o4o/reporting-yaksa' run build && pnpm --filter '@o4o/dropshipping-cosmetics' run build && pnpm --filter '@o4o/annualfee-yaksa' run build && pnpm --filter '@o4o/yaksa-scheduler' run build",
+    "prebuild": "echo '🔨 Building required packages...' && pnpm --filter '@o4o/forum-core*' run build && pnpm --filter '@o4o-apps/signage' run build && pnpm --filter '@o4o/lms-core' run build && pnpm --filter '@o4o/lms-yaksa' run build && pnpm --filter '@o4o/organization-core' run build && pnpm --filter '@o4o/membership-yaksa' run build && pnpm --filter '@o4o/reporting-yaksa' run build && pnpm --filter '@o4o/dropshipping-cosmetics' run build && pnpm --filter '@o4o/annualfee-yaksa' run build && pnpm --filter '@o4o/yaksa-scheduler' run build",
     "build": "pnpm run clean:dist && tsc -p tsconfig.build.json",
     "build:api": "pnpm run prebuild && tsup",
     "build:optimized": "bash ../../scripts/build-api-optimized.sh",
@@ -120,7 +120,6 @@
     "@o4o/annualfee-yaksa": "workspace:*",
     "@o4o/yaksa-scheduler": "workspace:*",
     "@o4o/groupbuy-yaksa": "workspace:*",
-    "@o4o-extensions/lms-marketing": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
     "@opentelemetry/api": "^1.9.0",

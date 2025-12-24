@@ -29,8 +29,8 @@ export const disabledAppsRegistry: DisabledAppEntry[] = [
   // - cosmetics-partner-extension: ESM imports fixed, design system dependency removed
   // - cosmetics-supplier-extension: ESM imports fixed
   // - cosmetics-sample-display-extension: Dependencies now working
-  // - lms-marketing: TypeScript errors fixed
   // - health-extension: Type export errors fixed
+  // R7 (2025-12-25): lms-marketing 패키지 삭제됨
 
   // === INCOMPLETE: Development Not Finished ===
   {
