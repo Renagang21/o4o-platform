@@ -7,14 +7,28 @@ import logger from './logger.js';
 
 class EnvironmentValidator {
   private env: { [key: string]: string | undefined };
-  private requiredVars: string[] = [
+  // Base required vars (always needed)
+  private baseRequiredVars: string[] = [
+    'JWT_SECRET',
+  ];
+
+  // DB vars (only required if GRACEFUL_STARTUP is not true)
+  private dbRequiredVars: string[] = [
     'DB_HOST',
     'DB_PORT',
     'DB_USERNAME',
     'DB_PASSWORD',
     'DB_NAME',
-    'JWT_SECRET',
   ];
+
+  // Computed required vars based on GRACEFUL_STARTUP
+  private get requiredVars(): string[] {
+    // If GRACEFUL_STARTUP is enabled, skip DB vars
+    if (process.env.GRACEFUL_STARTUP === 'true') {
+      return this.baseRequiredVars;
+    }
+    return [...this.baseRequiredVars, ...this.dbRequiredVars];
+  }
   
   private optionalVars: string[] = [
     'NODE_ENV',
