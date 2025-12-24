@@ -69,6 +69,9 @@ import publicRoutes from './routes/public.routes.js';
 // User Role Routes
 import userRoleRoutes from './routes/user-role.routes.js';
 
+// Organization Routes (Phase R3.5: Organization Core Absorption)
+import organizationRoutes from './routes/organization.routes.js';
+
 // NOTE: authRoutes, adminAppsRoutes, forumRoutes are imported in CORE ROUTES SETUP section below
 
 // Linked Accounts Routes (SSO check, sessions)
@@ -553,6 +556,10 @@ const startServer = async () => {
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);
     logger.info('✅ User Role routes registered at /api/v1/userRole');
+
+    // 9.5. Register Organization routes (Phase R3.5: Organization Core Absorption)
+    app.use('/api/v1/organizations', organizationRoutes);
+    logger.info('✅ Organization routes registered at /api/v1/organizations');
 
     // 10. Register Auth routes
     app.use('/api/auth', authRoutes);

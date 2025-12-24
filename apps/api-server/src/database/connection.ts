@@ -110,12 +110,19 @@ import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
 // ============================================================================
+// ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
+// ============================================================================
+// Organization and OrganizationMember are absorbed into Core API as the
+// foundational structure for all organization-based services.
+// ============================================================================
+import { Organization, OrganizationMember } from '@o4o/organization-core';
+
+// ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
 // ============================================================================
-// The following domain package entities have been removed from api-server:
+// The following domain package entities remain removed:
 // - @o4o/membership-yaksa (MemberCategory, Member, Affiliation, etc.)
 // - @o4o/dropshipping-cosmetics (CosmeticsFilter)
-// - @o4o/organization-core (Organization, OrganizationMember)
 // - @o4o/lms-core (Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance)
 // - @o4o/reporting-yaksa (AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment)
 // - @o4o/lms-yaksa (YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment)
@@ -124,7 +131,7 @@ import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 // - @o4o/cosmetics-sample-display-extension
 // - @o4o-extensions/lms-marketing
 //
-// These will be handled in Phase R2 (domain service separation).
+// These will be handled in Phase R4+ (domain service separation).
 // ============================================================================
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
@@ -264,16 +271,20 @@ export const AppDataSource = new DataSource({
     CMSView,
     CMSPage,
     // ============================================================================
-    // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
+    // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
+    // ============================================================================
+    Organization,
+    OrganizationMember,
+    // ============================================================================
+    // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
     // Membership-Yaksa: MemberCategory, Member, Affiliation, MembershipRoleAssignment, MembershipYear, Verification
     // Dropshipping-Cosmetics: CosmeticsFilter
-    // Organization-Core: Organization, OrganizationMember
     // LMS-Core: Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance
     // Reporting-Yaksa: AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment
     // LMS-Yaksa: YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment
     // AnnualFee-Yaksa: FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog
-    // These entities will be handled in Phase R2 (domain service separation).
+    // These entities will be handled in Phase R4+ (domain service separation).
     // ============================================================================
   ],
   
