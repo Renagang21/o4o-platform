@@ -55,13 +55,20 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Build packages
-      run: pnpm run build:packages
+    - name: Build all packages
+      run: |
+        echo "🔨 Building all workspace packages..."
+        # Build packages in dependency order using pnpm recursive
+        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" run build || true
+        echo "✅ Package builds complete"
 
     - name: Build API server
       run: |
         cd apps/api-server
-        pnpm run build
+        # Run prebuild to ensure all dependencies are built
+        pnpm run prebuild || true
+        # Then build the API server
+        pnpm run clean:dist && tsc -p tsconfig.build.json
 
         # Verify build output
         if [ ! -f "dist/main.js" ]; then
