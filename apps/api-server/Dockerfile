@@ -66,7 +66,10 @@ USER o4oapi
 EXPOSE 8080
 
 # Health check (Cloud Run uses HTTP health checks)
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+# NOTE: Cloud Run ignores HEALTHCHECK - it uses its own probing
+# This is for local Docker testing only
+# Increased start-period to 60s to allow for DB connection attempts
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD node -e "require('http').get('http://localhost:8080/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))" || exit 1
 
 # Start the application

@@ -234,15 +234,23 @@ export class StartupService {
 
   /**
    * Initialize upload directories
+   * NOTE: Skipped in Cloud Run (read-only filesystem, uses memory storage)
    */
   private async initializeUploadDirectories(): Promise<void> {
+    // Cloud Run uses read-only filesystem - skip directory creation
+    // K_SERVICE is set by Cloud Run to identify the service
+    if (process.env.K_SERVICE) {
+      logger.info('✅ Upload directories skipped (Cloud Run uses memory storage)');
+      return;
+    }
+
     try {
       const { ensureUploadDirectories } = await import('../middleware/upload.middleware.js');
       ensureUploadDirectories();
       logger.info('✅ Upload directories initialized');
     } catch (uploadError) {
-      logger.error('Failed to initialize upload directories:', uploadError);
-      // Don't throw - directories might already exist
+      logger.warn('Failed to initialize upload directories (non-critical):', uploadError);
+      // Don't throw - directories might already exist or filesystem is read-only
     }
   }
 

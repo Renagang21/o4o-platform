@@ -1,5 +1,19 @@
 import winston from 'winston';
 import path from 'path';
+import fs from 'fs';
+
+// =============================================================================
+// Cloud Run Compatible Logger
+// =============================================================================
+// Cloud Run has a read-only filesystem (except /tmp)
+// K_SERVICE env var is set by Cloud Run to identify the service
+// When running in Cloud Run, we use console-only logging
+// When running locally or on traditional servers, we use file logging
+// =============================================================================
+
+// Detect Cloud Run environment
+const isCloudRun = !!process.env.K_SERVICE;
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Define log levels
 const levels = {
@@ -26,8 +40,8 @@ const colors = {
 // Tell winston about our colors
 winston.addColors(colors);
 
-// Define log format
-const format = winston.format.combine(
+// Define log format for production (structured JSON for Cloud Logging)
+const productionFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.splat(),
@@ -43,38 +57,73 @@ const consoleFormat = winston.format.combine(
   )
 );
 
+// Build transports array based on environment
+const transports: winston.transport[] = [
+  // Always include console transport
+  new winston.transports.Console({
+    format: isProduction ? productionFormat : consoleFormat
+  })
+];
+
+// Only add file transports when NOT running in Cloud Run
+if (!isCloudRun) {
+  const logsDir = path.join(process.cwd(), 'logs');
+
+  // Ensure logs directory exists (only for non-Cloud Run environments)
+  try {
+    if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir, { recursive: true });
+    }
+
+    // Add file transports
+    transports.push(
+      new winston.transports.File({
+        filename: path.join(logsDir, 'error.log'),
+        level: 'error'
+      }),
+      new winston.transports.File({
+        filename: path.join(logsDir, 'combined.log')
+      })
+    );
+  } catch (err) {
+    // If we can't create logs directory, continue with console only
+    console.warn('Could not create logs directory, using console only:', err);
+  }
+}
+
+// Build exception/rejection handlers based on environment
+const exceptionHandlers: winston.transport[] = isCloudRun
+  ? [new winston.transports.Console({ format: productionFormat })]
+  : [
+      new winston.transports.File({
+        filename: path.join(process.cwd(), 'logs', 'exceptions.log')
+      })
+    ];
+
+const rejectionHandlers: winston.transport[] = isCloudRun
+  ? [new winston.transports.Console({ format: productionFormat })]
+  : [
+      new winston.transports.File({
+        filename: path.join(process.cwd(), 'logs', 'rejections.log')
+      })
+    ];
+
 // Create logger instance
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   levels,
-  format,
-  transports: [
-    // Write all logs to console
-    new winston.transports.Console({
-      format: process.env.NODE_ENV === 'production' ? format : consoleFormat
-    }),
-    // Write all logs with level 'error' and below to error.log
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'error.log'),
-      level: 'error'
-    }),
-    // Write all logs to combined.log
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'combined.log')
-    })
-  ],
-  // Handle exceptions and rejections
-  exceptionHandlers: [
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'exceptions.log')
-    })
-  ],
-  rejectionHandlers: [
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'rejections.log')
-    })
-  ]
+  format: productionFormat,
+  transports,
+  exceptionHandlers,
+  rejectionHandlers
 });
+
+// Log environment info on startup (helps with debugging)
+if (isCloudRun) {
+  logger.info('Running in Cloud Run environment (console-only logging)');
+} else if (isProduction) {
+  logger.info('Running in production mode with file logging');
+}
 
 // Export logger
 export default logger;
