@@ -97,6 +97,12 @@ jobs:
       run: |
         cd apps/api-server
 
+        # Debug: Check dist folder contents
+        echo "📂 Checking dist folder contents:"
+        ls -la dist/ || echo "dist folder not found!"
+        echo "📋 Key files check:"
+        ls -la dist/main.js dist/env-loader.js dist/env-validator.js 2>/dev/null || echo "Some required files missing!"
+
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
         LATEST_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest"
