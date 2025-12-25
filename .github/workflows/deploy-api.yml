@@ -2,7 +2,7 @@ name: Deploy API Server (Cloud Run)
 
 # Deploy API server to Cloud Run on push to main branch
 # Phase R5: Cloud Run 단일 배포 체계
-# Phase G1-1: Operational 전환 준비 (Cloud SQL 연결 시 GRACEFUL_STARTUP=false로 변경)
+# Phase G1-2: Operational Mode (GRACEFUL_STARTUP=false, Cloud SQL 연결 필수)
 
 concurrency:
   group: deploy-api-${{ github.ref }}
@@ -139,11 +139,10 @@ jobs:
         echo "🚀 Deploying to Cloud Run..."
 
         # ============================================================
-        # G1-1 Phase: Testing with GRACEFUL_STARTUP=true first
+        # G1-2 Phase: Operational Mode - DB Connection Required
         # ============================================================
-        # GRACEFUL_STARTUP=true allows app to start without DB
-        # This helps identify if the issue is DB connection or app startup
-        # Once confirmed working, change to GRACEFUL_STARTUP=false
+        # GRACEFUL_STARTUP=false means app will fail if DB is unavailable
+        # This is the production-ready configuration
         # ============================================================
 
         gcloud run deploy ${{ env.SERVICE_NAME }} \
@@ -160,7 +159,7 @@ jobs:
           --concurrency=80 \
           --timeout=300 \
           --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="GRACEFUL_STARTUP=true" \
+          --set-env-vars="GRACEFUL_STARTUP=false" \
           --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
           --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
           --set-env-vars="DB_PORT=5432" \
