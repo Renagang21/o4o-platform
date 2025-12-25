@@ -79,21 +79,43 @@ AWS 월 비용 목표: $0
 
 ## 4. 운영 기준 (확정)
 
-### 4.1 "운영 서버"의 정의
+### 4.1 배포 ≠ 운영 (D0 Phase 확정)
+
+> **GCP Cloud Run에 배포되었다는 사실은 운영 개시를 의미하지 않는다.**
+
+배포 상태와 운영 상태는 별개이다:
+- **배포됨 (Deployed)**: Cloud Run에 컨테이너가 실행 중
+- **운영 중 (Operational)**: 모든 의존성 연결, 서비스 제공 가능
+
+자세한 정의는 [deployment-status-definition.md](./deployment-status-definition.md) 참조.
+
+### 4.2 현재 Core API 상태 (2025-12-25 기준)
+
+| 항목 | 값 |
+|------|-----|
+| **배포 상태** | Deployed (Non-Operational) |
+| **Cloud Run** | o4o-core-api (실행 중) |
+| **/health** | 200 응답 |
+| **DB 연결** | 미연결 (Cloud SQL 미설정) |
+| **/health/ready** | 503 응답 (정상) |
+
+> 이 상태에서 DB 연결 에러는 **정상**이다. 장애가 아니다.
+
+### 4.3 "운영 서버"의 정의
 
 | 용어 | 의미 |
 |------|------|
-| **운영 서버** | Cloud Run (o4o-core-api) |
-| **운영 API** | Cloud Run 서비스 URL (배포 시 자동 할당) |
-| **프로덕션 배포** | main 브랜치 push → Cloud Run 자동 배포 |
+| **운영 서버** | Cloud Run (o4o-core-api) - Operational 상태일 때 |
+| **운영 API** | Cloud Run 서비스 URL + /health/ready 200 |
+| **프로덕션 배포** | main 브랜치 push → Cloud Run 자동 배포 (상태 전환 아님) |
 
-### 4.2 금지 사항
+### 4.4 금지 사항
 
 - AWS EC2로의 배포 시도
 - 신규 AWS 리소스 생성
 - AWS 관련 GitHub Secrets 추가
 
-### 4.3 허용 사항
+### 4.5 허용 사항
 
 - Cloud Run 서비스 스케일링 조정
 - GCP 리소스 추가 (필요시)
@@ -102,6 +124,17 @@ AWS 월 비용 목표: $0
 ---
 
 ## 5. 참조 문서
+
+### 5.1 D0 동시 확정 문서군
+
+| 문서 | 역할 |
+|------|------|
+| [deployment-status-definition.md](./deployment-status-definition.md) | 중앙 기준 (헌법) |
+| [ci-cd-interpretation.md](./ci-cd-interpretation.md) | CI/CD 결과 해석 규칙 |
+| [g1-entry-criteria.md](./g1-entry-criteria.md) | G1 진입 조건 |
+| **infra-migration-gcp.md** (본 문서) | GCP 운영 기준 |
+
+### 5.2 기타 참조
 
 - `.github/workflows/deploy-api.yml` - Cloud Run 배포 워크플로우
 - `cloud-deploy/` - Cloud Run 설정 파일
@@ -113,8 +146,10 @@ AWS 월 비용 목표: $0
 
 | 날짜 | 변경 내용 | 담당 |
 |------|-----------|------|
-| 2024-12-24 | 문서 생성, GCP 단일 운영 선언 | WO-GEN-PLATFORM-INFRA-MIGRATION-CLOSE |
+| 2025-12-24 | 문서 생성, GCP 단일 운영 선언 | WO-GEN-PLATFORM-INFRA-MIGRATION-CLOSE |
+| 2025-12-25 | D0 Phase: 배포≠운영 기준 추가 | WO-GEN-PLATFORM-DEPLOYMENT-MEANING-D0 |
 
 ---
 
 *이 문서는 CLAUDE.md에 종속되며, 인프라 운영의 공식 기준입니다.*
+*D0 Phase 동시 확정 문서 4종 중 하나입니다.*

@@ -194,14 +194,40 @@
 
 ---
 
-## 9. 관련 문서
+## 9. 금지된 오해 (명시적 금지)
 
+다음 해석은 **모두 틀렸다**:
+
+- "Cloud Run에 올라가 있으면 운영 중이다" ❌
+- "/health가 200이면 서비스다" ❌
+- "푸시가 성공하면 운영이다" ❌
+- "배포 완료 = 서비스 시작" ❌
+
+---
+
+## 10. 이 문서의 효력
+
+- 모든 Work Order에서 "배포", "운영"이라는 단어는 **이 문서의 정의를 따른다**
+- G1 이후 생성되는 모든 서버는 이 기준으로 상태를 판정한다
+- 이 문서와 다른 해석을 하는 문서가 있으면, **이 문서가 우선한다**
+
+---
+
+## 11. 관련 문서 (D0 동시 확정 문서군)
+
+| 문서 | 역할 |
+|------|------|
+| **deployment-status-definition.md** (본 문서) | 중앙 기준 (헌법) |
+| [ci-cd-interpretation.md](./ci-cd-interpretation.md) | CI/CD 결과 해석 규칙 |
+| [g1-entry-criteria.md](./g1-entry-criteria.md) | G1 진입 조건 |
+| [infra-migration-gcp.md](./infra-migration-gcp.md) | GCP 운영 기준 |
+
+기타 참조:
 - [CLAUDE.md](../../CLAUDE.md) - 플랫폼 헌법 (섹션 8: 인프라)
-- [infra-migration-gcp.md](./infra-migration-gcp.md) - GCP 단일 운영 선언
 - `.github/workflows/deploy-api.yml` - Cloud Run 배포 워크플로우
 - `apps/api-server/src/routes/health.ts` - Health Check 구현
 
 ---
 
 *이 문서는 CLAUDE.md에 종속되며, 배포 상태 판단의 공식 기준입니다.*
-*D0 Phase 이후 모든 배포 관련 논의는 이 문서를 참조합니다.*
+*D0 Phase 동시 확정 문서 4종 중 중앙 기준 문서입니다.*
