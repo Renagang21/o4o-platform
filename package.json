@@ -105,6 +105,8 @@
     "verify:cpts": "ts-node scripts/verify-cpts.ts",
     "verify:registry": "pnpm run verify:shortcodes && pnpm run verify:blocks && pnpm run verify:cpts",
     "verify": "pnpm run verify:registry",
+    "// === Phase R10: AppStore Guard ===": "",
+    "verify:appstore": "npx ts-node --esm scripts/appstore-guard.ts",
     "prepare": "husky"
   },
   "devDependencies": {
