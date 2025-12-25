@@ -46,8 +46,14 @@ RUN addgroup --system --gid 1001 nodejs \
 # Copy node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
+# Cache bust argument - pass --build-arg CACHEBUST=$(date +%s) to invalidate cache
+ARG CACHEBUST=1
+
 # Copy the entire dist folder (includes env-loader.js and other required modules)
 COPY dist/ ./dist/
+
+# Verify critical files exist (fail build if missing)
+RUN ls -la /app/dist/main.js /app/dist/env-loader.js || (echo "CRITICAL: Required files missing!" && exit 1)
 
 # Set ownership
 RUN chown -R o4oapi:nodejs /app

@@ -109,11 +109,18 @@ jobs:
 
         echo "🐳 Building Docker image..."
         docker build \
+          --no-cache \
+          --build-arg CACHEBUST=$(date +%s) \
           --platform linux/amd64 \
           --tag "${FULL_IMAGE}" \
           --tag "${LATEST_IMAGE}" \
           --file Dockerfile \
           .
+
+        # Verify the image contains required files
+        echo "🔍 Verifying Docker image contents..."
+        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/ | head -20
+        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/env-loader.js /app/dist/main.js || echo "❌ Required files missing in container!"
 
         echo "📤 Pushing to Artifact Registry..."
         docker push "${FULL_IMAGE}"
