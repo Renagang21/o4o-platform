@@ -21,6 +21,7 @@ export const signagePharmacyExtensionManifest = {
   version: '1.1.0',
   type: 'extension' as const,
   appType: 'extension' as const,
+  status: 'experimental' as const,
   category: 'signage' as const,
   description: '약국 디지털 사이니지 - 콘텐츠 선택, 플레이리스트 관리, 편성, 즉시 실행',
 

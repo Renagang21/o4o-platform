@@ -84,8 +84,8 @@ CLAUDE.md §2.2에 정의된 App Type 체계에 따라 모든 패키지를 분�
 | `annualfee-yaksa` | organization-core | Active |
 | `groupbuy-yaksa` | ecommerce-core | Development |
 | `yaksa-accounting` | organization-core | Development |
-| `yaksa-admin` | organization-core | Active |
-| `yaksa-scheduler` | organization-core | Development |
+| `yaksa-admin` | organization-core | Development |
+| `yaksa-scheduler` | organization-core | Active |
 
 ### 4.3 Healthcare Extensions
 | 패키지 | 연결 Core | 상태 |

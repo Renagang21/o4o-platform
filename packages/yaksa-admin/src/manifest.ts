@@ -29,6 +29,7 @@ export const yaksaAdminManifest = {
   displayName: '지부/분회 관리자 센터',
   version: '1.0.0',
   appType: 'extension' as const,
+  status: 'development' as const,
   description: '지부/분회 관리자를 위한 관제 센터 - 승인 및 조회 전용',
 
   // ===== 대상 사용자 =====

@@ -66,32 +66,23 @@ paths:
 
 ## 4. 현재 Baseline (R10)
 
-### 4.1 정상 상태
+### 4.1 정상 상태 (C1 정비 후 업데이트)
 
 - 38개 패키지 manifest.ts 보유
-- 31개 패키지 lifecycle 완결
-- 31/37개 Catalog 등록
+- **38개 패키지 lifecycle 완결** (C1 Phase에서 100% 완료)
+- 31/35개 Catalog 등록
 - FROZEN Core 무결성 유지
 - 모든 패키지 명명 규칙 준수
 
 ### 4.2 허용된 Warning (정책상 허용)
 
-**Lifecycle 미완성** (7개):
-- signage-pharmacy-extension
-- organization-lms
-- organization-forum
-- cosmetics-supplier-extension
-- cosmetics-seller-extension
-- cosmetics-sample-display-extension
-- annualfee-yaksa
+**Lifecycle 미완성**: 없음 (C1 Phase에서 모두 수정됨)
 
-**Catalog 미등록** (6개 - Development/Experimental):
-- yaksa-admin
-- yaksa-accounting
-- signage-pharmacy-extension
-- partner-ai-builder
-- member-yaksa
-- groupbuy-yaksa
+**Catalog 미등록** (4개 - Development/Experimental):
+- yaksa-admin (development)
+- yaksa-accounting (development)
+- member-yaksa (development)
+- groupbuy-yaksa (development)
 
 > CLAUDE.md §2.3에 따라 Development/Experimental 상태 앱은 Catalog 등록 선택
 
@@ -101,7 +92,7 @@ paths:
 
 ### 5.1 단기 (권고)
 
-- [ ] lifecycle 미완성 패키지 보완 (Active 전환 시 필수)
+- [x] lifecycle 미완성 패키지 보완 (**C1 Phase에서 완료**)
 - [ ] Development → Active 전환 시 Catalog 등록
 
 ### 5.2 중기 (선택)
@@ -121,10 +112,10 @@ paths:
 📦 Found 38 packages with manifest.ts
 
 [1/4] Manifest + Lifecycle Completeness
-   ✅ 31 packages complete, 7 with warnings
+   ✅ 38 packages complete, 0 with warnings
 
 [2/4] AppsCatalog Consistency
-   ✅ 31/37 required apps in Catalog
+   ✅ 31/35 required apps in Catalog
 
 [3/4] FROZEN Core Dependency Guard
    ✅ FROZEN Core integrity maintained
@@ -135,6 +126,8 @@ paths:
 ────────────────────────────────────────────────────────────
 ✅ AppStore Guard: PASSED
 ```
+
+> **Note**: C1 Phase 이후 업데이트된 결과
 
 ---
 

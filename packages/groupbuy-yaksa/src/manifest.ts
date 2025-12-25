@@ -12,6 +12,7 @@ export const manifest = {
   description: '지부/분회 주도의 공동구매 캠페인 및 상품 관리',
 
   type: 'extension' as const,
+  status: 'development' as const,
 
   category: 'commerce',
 

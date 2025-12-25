@@ -53,6 +53,7 @@ export const memberYaksaManifest = {
   displayName: '약사 회원앱',
   version: '1.0.0',
   appType: 'extension' as const,
+  status: 'development' as const,
   description: '약사회 회원용 앱 - 프로필, 약국정보, 홈 대시보드',
 
   // ===== 대상 사용자 =====

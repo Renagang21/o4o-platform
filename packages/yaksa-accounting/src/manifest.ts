@@ -56,6 +56,7 @@ export const manifest: AppManifest = {
    * - 지부/분회 스코프에서만 동작
    */
   type: 'extension',
+  status: 'development' as const,
 
   /**
    * 대상 사용자

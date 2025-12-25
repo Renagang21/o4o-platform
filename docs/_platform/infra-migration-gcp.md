@@ -1,7 +1,7 @@
 # O4O Platform Infrastructure Migration: GCP 단일 운영 선언
 
 > **문서 상태**: Active
-> **작성일**: 2024-12-24
+> **작성일**: 2025-12-24
 > **Work Order**: WO-GEN-PLATFORM-INFRA-MIGRATION-CLOSE
 > **Phase**: R5 완료
 
@@ -84,7 +84,7 @@ AWS 월 비용 목표: $0
 | 용어 | 의미 |
 |------|------|
 | **운영 서버** | Cloud Run (o4o-core-api) |
-| **운영 API** | https://o4o-core-api-xxxxxxxxxx.asia-northeast3.run.app |
+| **운영 API** | Cloud Run 서비스 URL (배포 시 자동 할당) |
 | **프로덕션 배포** | main 브랜치 push → Cloud Run 자동 배포 |
 
 ### 4.2 금지 사항

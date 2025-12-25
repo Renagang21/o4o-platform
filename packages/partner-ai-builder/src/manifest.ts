@@ -14,6 +14,7 @@ export const manifest = {
     description: 'AI 기반 파트너 콘텐츠(루틴, 추천) 자동 생성 엔진',
     version: '1.0.0',
     type: 'extension' as const,
+    status: 'experimental' as const,
     author: 'O4O Platform',
     icon: 'smart_toy',
     category: 'ai',
