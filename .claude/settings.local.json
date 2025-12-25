@@ -112,7 +112,18 @@
       "Bash(do if [ -d \"C:/Users/home/coding/o4o-platform/packages/$pkg/dist/lifecycle\" ])",
       "Bash(then echo \"$pkg: OK\")",
       "Bash(else echo \"$pkg: MISSING\")",
-      "Bash(scp:*)"
+      "Bash(scp:*)",
+      "Bash(pnpm -r build:*)",
+      "Bash(pnpm -F @o4o/ui build:*)",
+      "Bash(pnpm -F api-server build:*)",
+      "Bash(pnpm -F main-site build:*)",
+      "Bash(pnpm -F @o4o/main-site build:*)",
+      "Bash(pnpm build:*)",
+      "Bash(git merge:*)",
+      "Bash(for pkg in \"admin\" \"commerce\" \"customer\" \"lms-marketing\" \"design-system-cosmetics\")",
+      "Bash(for pkg in groupbuy-yaksa member-yaksa partner-ai-builder signage-pharmacy-extension yaksa-accounting yaksa-admin)",
+      "Bash(do echo \"=== $pkg ===\" grep -E \"type:|status:\" packages/$pkg/src/manifest.ts)",
+      "Bash(npx ts-node:*)"
     ],
     "deny": []
   }
