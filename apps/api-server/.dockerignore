@@ -2,19 +2,15 @@
 # Docker Ignore - O4O API Server
 # =============================================================================
 # Only include files needed for production runtime:
-# - dist/main.js (bundled app)
-# - dist/main.js.map (source map)
+# - dist/** (compiled TypeScript files)
 # - package.production.json (runtime dependencies)
 # =============================================================================
 
 # Ignore everything by default
 *
 
-# Allow only production files
-!dist/main.js
-!dist/main.js.map
-!dist/main-minimal.js
-!dist/main-minimal.js.map
+# Allow production files
+!dist/**
 !package.production.json
 !package.production-minimal.json
 !Dockerfile
