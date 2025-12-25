@@ -2,6 +2,7 @@ name: Deploy API Server (Cloud Run)
 
 # Deploy API server to Cloud Run on push to main branch
 # Phase R5: Cloud Run 단일 배포 체계
+# Phase G1-1: Operational 전환 준비 (Cloud SQL 연결 시 GRACEFUL_STARTUP=false로 변경)
 
 concurrency:
   group: deploy-api-${{ github.ref }}
@@ -112,6 +113,27 @@ jobs:
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
         echo "🚀 Deploying to Cloud Run..."
+
+        # ============================================================
+        # G1-1 Operational 전환 가이드
+        # ============================================================
+        # 현재 상태: Deployed (Non-Operational) - GRACEFUL_STARTUP=true
+        #
+        # Cloud SQL 연결 후 다음 변경 필요:
+        # 1. GRACEFUL_STARTUP=true → false
+        # 2. DB 환경변수 추가 (GitHub Secrets에서 주입)
+        # 3. Cloud SQL 연결 추가: --add-cloudsql-instances
+        #
+        # 변경 예시:
+        # --set-env-vars="GRACEFUL_STARTUP=false" \
+        # --set-env-vars="DB_HOST=${{ secrets.GCP_DB_SOCKET_PATH }}" \
+        # --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
+        # --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
+        # --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+        # --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
+        # --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
+        # ============================================================
+
         gcloud run deploy ${{ env.SERVICE_NAME }} \
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
@@ -128,7 +150,8 @@ jobs:
           --set-env-vars="NODE_ENV=production" \
           --set-env-vars="PORT=8080" \
           --set-env-vars="GRACEFUL_STARTUP=true" \
-          --set-env-vars="EMAIL_SERVICE_ENABLED=false"
+          --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
+          --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET || 'dev-jwt-secret' }}"
 
     - name: Verify deployment
       run: |
