@@ -46,9 +46,8 @@ RUN addgroup --system --gid 1001 nodejs \
 # Copy node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy the bundled application (Full API)
-COPY dist/main.js ./dist/main.js
-COPY dist/main.js.map ./dist/main.js.map
+# Copy the entire dist folder (includes env-loader.js and other required modules)
+COPY dist/ ./dist/
 
 # Set ownership
 RUN chown -R o4oapi:nodejs /app
