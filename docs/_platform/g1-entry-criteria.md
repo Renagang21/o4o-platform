@@ -140,14 +140,26 @@ D0 Phase 완료 후, 다음 Work Order로 G1을 시작할 수 있습니다.
 
 ---
 
-## 8. 금지 사항
+## 8. G1-1 진행 상태 (2025-12-25)
 
-G1 진입 전까지:
+### 8.1 현재 상태
 
-- ❌ Cloud SQL 생성 시도
-- ❌ Production 환경변수 설정
-- ❌ 외부 트래픽 허용
-- ❌ "운영 중" 표현 사용
+| 항목 | 상태 |
+|------|------|
+| G1 진입 승인 | ✅ 완료 |
+| Cloud SQL Setup Guide 작성 | ✅ 완료 |
+| deploy-api.yml G1 준비 | ✅ 완료 |
+| Cloud SQL 인스턴스 생성 | ⏳ 대기 (GCP 콘솔 작업 필요) |
+| Core API Operational 전환 | ⏳ 대기 |
+
+### 8.2 다음 액션 (수동 작업 필요)
+
+1. GCP 콘솔에서 Cloud SQL 인스턴스 생성
+2. GitHub Secrets에 DB 환경변수 설정
+3. deploy-api.yml에서 GRACEFUL_STARTUP=false로 변경
+4. 재배포 후 /health/ready 200 확인
+
+자세한 가이드: [g1-cloud-sql-setup-guide.md](./g1-cloud-sql-setup-guide.md)
 
 ---
 
@@ -158,8 +170,10 @@ G1 진입 전까지:
 | [deployment-status-definition.md](./deployment-status-definition.md) | 상위 기준 문서 |
 | [ci-cd-interpretation.md](./ci-cd-interpretation.md) | CI/CD 해석 규칙 |
 | [infra-migration-gcp.md](./infra-migration-gcp.md) | GCP 운영 기준 |
+| [g1-cloud-sql-setup-guide.md](./g1-cloud-sql-setup-guide.md) | Cloud SQL 설정 가이드 |
 
 ---
 
 *이 문서는 deployment-status-definition.md에 종속되며, G1 진입의 공식 기준입니다.*
 *D0 Phase 동시 확정 문서 4종 중 하나입니다.*
+*G1-1 Work Order: WO-GEN-PLATFORM-CORE-OPERATIONAL-G1-1*
