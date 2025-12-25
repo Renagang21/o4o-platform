@@ -139,10 +139,11 @@ jobs:
         echo "🚀 Deploying to Cloud Run..."
 
         # ============================================================
-        # G1-1 Operational Mode (2025-12-25)
+        # G1-1 Phase: Testing with GRACEFUL_STARTUP=true first
         # ============================================================
-        # 상태: Operational - Cloud SQL 연결 활성화
-        # Cloud SQL: o4o-platform-db (netureyoutube:asia-northeast3)
+        # GRACEFUL_STARTUP=true allows app to start without DB
+        # This helps identify if the issue is DB connection or app startup
+        # Once confirmed working, change to GRACEFUL_STARTUP=false
         # ============================================================
 
         gcloud run deploy ${{ env.SERVICE_NAME }} \
@@ -159,7 +160,7 @@ jobs:
           --concurrency=80 \
           --timeout=300 \
           --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="GRACEFUL_STARTUP=false" \
+          --set-env-vars="GRACEFUL_STARTUP=true" \
           --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
           --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
           --set-env-vars="DB_PORT=5432" \
