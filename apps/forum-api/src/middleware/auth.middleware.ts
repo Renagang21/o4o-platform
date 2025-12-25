@@ -18,6 +18,7 @@ import { env } from '../config/env.js';
 export interface UserContext {
   id: string;
   email: string;
+  name?: string;
   roles: string[];
 }
 
