@@ -143,7 +143,6 @@ jobs:
           --concurrency=80 \
           --timeout=300 \
           --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="PORT=8080" \
           --set-env-vars="GRACEFUL_STARTUP=false" \
           --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
           --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
