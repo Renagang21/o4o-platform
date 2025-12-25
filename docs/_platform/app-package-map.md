@@ -3,7 +3,7 @@
 > **Status**: Active
 > **Created**: 2025-12-24
 > **Updated**: 2025-12-25
-> **Phase**: R7 Legacy Package Cleanup
+> **Phase**: R8 Unused Package Drop
 
 ---
 
@@ -11,11 +11,12 @@
 
 | 구분 | 수량 |
 |------|------|
-| 총 패키지 (packages/) | 54개 |
+| 총 패키지 (packages/) | 53개 |
 | 총 앱 (apps/) | 11개 |
-| **전체** | **65개** |
+| **전체** | **64개** |
 
 > R7에서 Legacy 패키지 4개 삭제: admin, commerce, customer, lms-marketing
+> R8에서 미사용 패키지 1개 삭제: design-system-cosmetics
 
 ---
 
@@ -79,9 +80,10 @@ packages/
 ├── cosmetics-partner-extension/
 ├── cosmetics-sample-display-extension/
 ├── dropshipping-cosmetics/
-├── forum-cosmetics/
-└── design-system-cosmetics/
+└── forum-cosmetics/
 ```
+
+> R8 삭제: ~~design-system-cosmetics~~ (미사용, ui 패키지로 통합)
 
 ### 5.2 Yaksa Extensions
 ```
@@ -210,5 +212,5 @@ reporting-yaksa ───→ organization-core
 
 ---
 
-*Phase R7: WO-GEN-PLATFORM-APP-CONSOLIDATION-R7*
+*Phase R8: WO-GEN-PLATFORM-R8-DROP-DESIGN-SYSTEM-COSMETICS*
 *Updated: 2025-12-25*

@@ -3,7 +3,7 @@
 > **Status**: Active
 > **Created**: 2025-12-24
 > **Updated**: 2025-12-25
-> **Phase**: R7 Legacy Package Cleanup
+> **Phase**: R8 Unused Package Drop
 
 ---
 
@@ -71,7 +71,7 @@ CLAUDE.md §2.2에 정의된 App Type 체계에 따라 모든 패키지를 분�
 | `cosmetics-sample-display-extension` | dropshipping-core | Active |
 | `dropshipping-cosmetics` | dropshipping-core | Active |
 | `forum-cosmetics` | forum-core | Active |
-| `design-system-cosmetics` | ui | Active |
+| ~~`design-system-cosmetics`~~ | ~~ui~~ | DELETED (R8) |
 
 ### 4.2 Yaksa Domain Extensions
 | 패키지 | 연결 Core | 상태 |
@@ -164,14 +164,15 @@ CLAUDE.md §2.2에 정의된 App Type 체계에 따라 모든 패키지를 분�
 
 ## 9. Legacy/Deprecated 패키지
 
-> **R7에서 모든 Legacy 패키지 삭제 완료** (2025-12-25)
+> **R7에서 Legacy 패키지 4개 삭제, R8에서 미사용 패키지 1개 삭제 완료** (2025-12-25)
 
 | 패키지 | 상태 | 삭제일 | 비고 |
 |--------|------|--------|------|
 | ~~`admin`~~ | DELETED | 2025-12-25 | admin-dashboard로 통합 |
 | ~~`commerce`~~ | DELETED | 2025-12-25 | ecommerce-core로 이전 |
 | ~~`customer`~~ | DELETED | 2025-12-25 | 사용 중단 |
-| ~~`lms-marketing`~~ | DELETED | 2025-12-25 | 미사용 |
+| ~~`lms-marketing`~~ | DELETED | 2025-12-25 | 미사용 (R7) |
+| ~~`design-system-cosmetics`~~ | DELETED | 2025-12-25 | 미사용, ui로 통합 (R8) |
 
 ---
 
@@ -180,13 +181,13 @@ CLAUDE.md §2.2에 정의된 App Type 체계에 따라 모든 패키지를 분�
 | 상태 | 수량 | 비고 |
 |------|------|------|
 | FROZEN | 4 | 변경 금지 |
-| Active | 28 | 운영 중 |
+| Active | 27 | 운영 중 |
 | Development | 12 | 개발 중 |
 | Experimental | 10 | 실험적 |
-| ~~Legacy~~ | ~~0~~ | R7 삭제 완료 |
+| ~~Legacy~~ | ~~0~~ | R7/R8 삭제 완료 |
 | Planned | 2 | 계획됨 |
 
 ---
 
-*Phase R7: WO-GEN-PLATFORM-APP-CONSOLIDATION-R7*
+*Phase R8: WO-GEN-PLATFORM-R8-DROP-DESIGN-SYSTEM-COSMETICS*
 *Updated: 2025-12-25*
