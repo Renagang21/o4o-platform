@@ -62,13 +62,14 @@ jobs:
         pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" run build || true
         echo "✅ Package builds complete"
 
-    - name: Build API server
+    - name: Build API server (bundled with tsup)
       run: |
         cd apps/api-server
-        # Run prebuild to ensure all dependencies are built
-        pnpm run prebuild || true
-        # Then build the API server
-        pnpm run clean:dist && tsc -p tsconfig.build.json
+
+        # Use tsup to bundle the API server with all @o4o/* packages inline
+        # This creates a single bundle that doesn't depend on workspace packages
+        echo "🔨 Building API server with tsup (bundled build)..."
+        pnpm run build:api
 
         # Verify build output
         if [ ! -f "dist/main.js" ]; then
@@ -78,6 +79,10 @@ jobs:
 
         echo "✅ API server build complete"
         echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
+
+        # List generated files
+        echo "📋 Generated files:"
+        ls -la dist/
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
@@ -97,11 +102,10 @@ jobs:
       run: |
         cd apps/api-server
 
-        # Debug: Check dist folder contents
-        echo "📂 Checking dist folder contents:"
-        ls -la dist/ || echo "dist folder not found!"
-        echo "📋 Key files check:"
-        ls -la dist/main.js dist/env-loader.js dist/env-validator.js 2>/dev/null || echo "Some required files missing!"
+        # Verify tsup bundle exists
+        echo "📂 Checking bundled output:"
+        ls -la dist/main.js dist/main.js.map || (echo "❌ Bundle not found!" && exit 1)
+        echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
 
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
@@ -117,10 +121,9 @@ jobs:
           --file Dockerfile \
           .
 
-        # Verify the image contains required files
+        # Verify the image contains the bundle
         echo "🔍 Verifying Docker image contents..."
-        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/ | head -20
-        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/env-loader.js /app/dist/main.js || echo "❌ Required files missing in container!"
+        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/
 
         echo "📤 Pushing to Artifact Registry..."
         docker push "${FULL_IMAGE}"

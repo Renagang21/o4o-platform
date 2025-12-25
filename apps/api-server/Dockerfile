@@ -49,11 +49,12 @@ COPY --from=deps /app/node_modules ./node_modules
 # Cache bust argument - pass --build-arg CACHEBUST=$(date +%s) to invalidate cache
 ARG CACHEBUST=1
 
-# Copy the entire dist folder (includes env-loader.js and other required modules)
-COPY dist/ ./dist/
+# Copy the bundled application (tsup creates a single bundled main.js)
+COPY dist/main.js ./dist/main.js
+COPY dist/main.js.map ./dist/main.js.map
 
-# Verify critical files exist (fail build if missing)
-RUN ls -la /app/dist/main.js /app/dist/env-loader.js || (echo "CRITICAL: Required files missing!" && exit 1)
+# Verify the bundle exists
+RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
 
 # Set ownership
 RUN chown -R o4oapi:nodejs /app

@@ -1,16 +1,19 @@
 # =============================================================================
 # Docker Ignore - O4O API Server
 # =============================================================================
-# Only include files needed for production runtime:
-# - dist/** (compiled TypeScript files)
-# - package.production.json (runtime dependencies)
+# tsup builds a single bundled main.js with all @o4o/* packages inlined.
+# Only external npm dependencies are needed at runtime.
 # =============================================================================
 
 # Ignore everything by default
 *
 
-# Allow production files
-!dist/**
+# Allow bundled output from tsup
+!dist/main.js
+!dist/main.js.map
+
+# Allow production dependencies manifest
 !package.production.json
-!package.production-minimal.json
+
+# Allow Dockerfile
 !Dockerfile
