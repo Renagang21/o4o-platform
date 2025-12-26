@@ -27,7 +27,7 @@ on:
         default: 'all'
 
 env:
-  PROJECT_ID: neture-services
+  PROJECT_ID: netureyoutube
   REGION: asia-northeast3
   VITE_API_BASE_URL: https://o4o-core-api-117791934476.asia-northeast3.run.app
 
