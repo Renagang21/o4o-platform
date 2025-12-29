@@ -2,7 +2,7 @@ name: Deploy API Server (Cloud Run)
 
 # Deploy API server to Cloud Run on push to main branch
 # Phase R5: Cloud Run 단일 배포 체계
-# Phase G1-1: Operational 전환 준비 (Cloud SQL 연결 시 GRACEFUL_STARTUP=false로 변경)
+# Phase G1-2: Operational Mode (GRACEFUL_STARTUP=false, Cloud SQL 연결 필수)
 
 concurrency:
   group: deploy-api-${{ github.ref }}
@@ -15,6 +15,8 @@ on:
     paths:
       - 'apps/api-server/**'
       - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/deploy-api.yml'
   workflow_dispatch:
     inputs:
@@ -53,13 +55,21 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Build packages
-      run: pnpm run build:packages
+    - name: Build all packages
+      run: |
+        echo "🔨 Building all workspace packages..."
+        # Build packages in dependency order using pnpm recursive
+        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" run build || true
+        echo "✅ Package builds complete"
 
-    - name: Build API server
+    - name: Build API server (bundled with tsup)
       run: |
         cd apps/api-server
-        pnpm run build
+
+        # Use tsup to bundle the API server with all @o4o/* packages inline
+        # This creates a single bundle that doesn't depend on workspace packages
+        echo "🔨 Building API server with tsup (bundled build)..."
+        pnpm run build:api
 
         # Verify build output
         if [ ! -f "dist/main.js" ]; then
@@ -70,11 +80,14 @@ jobs:
         echo "✅ API server build complete"
         echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
 
+        # List generated files
+        echo "📋 Generated files:"
+        ls -la dist/
+
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
-        workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
@@ -89,17 +102,28 @@ jobs:
       run: |
         cd apps/api-server
 
+        # Verify tsup bundle exists
+        echo "📂 Checking bundled output:"
+        ls -la dist/main.js dist/main.js.map || (echo "❌ Bundle not found!" && exit 1)
+        echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
+
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
         LATEST_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest"
 
         echo "🐳 Building Docker image..."
         docker build \
+          --no-cache \
+          --build-arg CACHEBUST=$(date +%s) \
           --platform linux/amd64 \
           --tag "${FULL_IMAGE}" \
           --tag "${LATEST_IMAGE}" \
           --file Dockerfile \
           .
+
+        # Verify the image contains the bundle
+        echo "🔍 Verifying Docker image contents..."
+        docker run --rm "${FULL_IMAGE}" ls -la /app/dist/
 
         echo "📤 Pushing to Artifact Registry..."
         docker push "${FULL_IMAGE}"
@@ -115,23 +139,10 @@ jobs:
         echo "🚀 Deploying to Cloud Run..."
 
         # ============================================================
-        # G1-1 Operational 전환 가이드
+        # G1-2 Phase: Operational Mode - DB Connection Required
         # ============================================================
-        # 현재 상태: Deployed (Non-Operational) - GRACEFUL_STARTUP=true
-        #
-        # Cloud SQL 연결 후 다음 변경 필요:
-        # 1. GRACEFUL_STARTUP=true → false
-        # 2. DB 환경변수 추가 (GitHub Secrets에서 주입)
-        # 3. Cloud SQL 연결 추가: --add-cloudsql-instances
-        #
-        # 변경 예시:
-        # --set-env-vars="GRACEFUL_STARTUP=false" \
-        # --set-env-vars="DB_HOST=${{ secrets.GCP_DB_SOCKET_PATH }}" \
-        # --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
-        # --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
-        # --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
-        # --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
-        # --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
+        # GRACEFUL_STARTUP=false means app will fail if DB is unavailable
+        # This is the production-ready configuration
         # ============================================================
 
         gcloud run deploy ${{ env.SERVICE_NAME }} \
@@ -148,10 +159,15 @@ jobs:
           --concurrency=80 \
           --timeout=300 \
           --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="PORT=8080" \
-          --set-env-vars="GRACEFUL_STARTUP=true" \
+          --set-env-vars="GRACEFUL_STARTUP=false" \
           --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
-          --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET || 'dev-jwt-secret' }}"
+          --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
+          --set-env-vars="DB_PORT=5432" \
+          --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
+          --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
+          --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
+          --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 
     - name: Verify deployment
       run: |

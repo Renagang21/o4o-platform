@@ -1,0 +1,32 @@
+# =============================================================================
+# Docker Ignore - App API Reference
+# =============================================================================
+
+# Dependencies
+node_modules
+
+# Build output (we build in Docker)
+dist
+
+# Development files
+.env
+.env.*
+*.log
+
+# IDE
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs
+
+# Tests
+*.test.ts
+*.spec.ts
+__tests__
+coverage

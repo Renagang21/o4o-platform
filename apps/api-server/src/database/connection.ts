@@ -156,14 +156,32 @@ if (DB_TYPE === 'sqlite') {
   const DB_PASSWORD = process.env.DB_PASSWORD;
   const DB_NAME = process.env.DB_NAME;
 
-  dataSourceConfig = {
-    type: 'postgres',
-    host: DB_HOST,
-    port: DB_PORT,
-    username: DB_USERNAME,
-    password: DB_PASSWORD,
-    database: DB_NAME,
-  };
+  // Cloud SQL Unix Socket 연결 감지
+  // Cloud Run에서 Cloud SQL 연결 시 DB_HOST가 /cloudsql/... 형식
+  const isCloudSQLSocket = DB_HOST?.startsWith('/cloudsql/');
+
+  if (isCloudSQLSocket) {
+    // Cloud SQL Unix Socket 연결 (Cloud Run 환경)
+    // pg 드라이버는 host 옵션에 socket 디렉토리 경로를 사용
+    dataSourceConfig = {
+      type: 'postgres',
+      host: DB_HOST,  // /cloudsql/PROJECT:REGION:INSTANCE
+      username: DB_USERNAME,
+      password: DB_PASSWORD,
+      database: DB_NAME,
+      // Cloud SQL socket 연결 시 port는 사용되지 않음
+    };
+  } else {
+    // 일반 TCP 연결 (로컬 개발, 기타 환경)
+    dataSourceConfig = {
+      type: 'postgres',
+      host: DB_HOST,
+      port: DB_PORT,
+      username: DB_USERNAME,
+      password: DB_PASSWORD,
+      database: DB_NAME,
+    };
+  }
 }
 
 // TypeORM 데이터소스 설정
@@ -295,8 +313,9 @@ export const AppDataSource = new DataSource({
   migrationsTableName: 'typeorm_migrations',
   migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
   
-  // SSL 설정 (PostgreSQL 프로덕션 환경에서만)
-  ...(DB_TYPE === 'postgres' && NODE_ENV === 'production' ? {
+  // SSL 설정 (PostgreSQL TCP 연결 프로덕션 환경에서만)
+  // Cloud SQL Unix Socket 연결 시에는 SSL 불필요 (이미 암호화됨)
+  ...(DB_TYPE === 'postgres' && NODE_ENV === 'production' && !process.env.DB_HOST?.startsWith('/cloudsql/') ? {
     ssl: {
       rejectUnauthorized: false
     }
