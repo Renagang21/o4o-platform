@@ -18,9 +18,12 @@ import {
   RotateCcw,
   FileText,
   CreditCard,
+  Settings,
 } from 'lucide-react';
 import { erpConnectorAPI, ErpTransmission } from '../../api/erp-connector';
 import { toast } from 'react-hot-toast';
+import PageHeader from '../../components/common/PageHeader';
+import { DataTable, Column } from '../../components/common/DataTable';
 
 const ErpTransmissionHistory: React.FC = () => {
   const [transmissions, setTransmissions] = useState<ErpTransmission[]>([]);
@@ -149,28 +152,112 @@ const ErpTransmissionHistory: React.FC = () => {
     pending: transmissions.filter((t) => t.status === 'PENDING').length,
   };
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'back', label: '상태 보기', icon: <ArrowLeft className="w-4 h-4" />, onClick: () => window.location.href = '/dropshipping/erp-status', variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchTransmissions, variant: 'primary' as const },
+  ];
+
+  const columns: Column<ErpTransmission>[] = [
+    {
+      key: 'eventType',
+      title: '이벤트 유형',
+      dataIndex: 'eventType',
+      render: (value: string) => getEventTypeBadge(value),
+    },
+    {
+      key: 'voucherType',
+      title: '전표 유형',
+      dataIndex: 'voucherType',
+      render: (value: string) => getVoucherTypeBadge(value),
+    },
+    {
+      key: 'batchNumber',
+      title: '배치번호',
+      dataIndex: 'batchNumber',
+      render: (value: string) => (
+        <span className="font-mono text-sm">{value || '-'}</span>
+      ),
+    },
+    {
+      key: 'supplier',
+      title: '공급사',
+      render: (_: unknown, record: ErpTransmission) => (
+        <div className="text-sm">
+          <p className="font-medium">{record.supplierName || '-'}</p>
+          <p className="text-gray-500">{record.supplierCode}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'amount',
+      title: '금액',
+      dataIndex: 'amount',
+      align: 'right' as const,
+      render: (value: number) => (
+        <span className="font-medium">{formatCurrency(value)}</span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center' as const,
+      render: (value: string, record: ErpTransmission) => (
+        <div>
+          {getStatusBadge(value)}
+          {value === 'FAILURE' && record.errorMessage && (
+            <p className="text-xs text-red-600 mt-1 truncate" title={record.errorMessage}>
+              {record.errorMessage}
+            </p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'voucherNo',
+      title: '전표번호',
+      dataIndex: 'voucherNo',
+      render: (value: string) => value ? (
+        <span className="font-mono text-sm text-green-700">{value}</span>
+      ) : (
+        <span className="text-gray-400">-</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      title: '일시',
+      dataIndex: 'createdAt',
+      render: (value: string) => (
+        <span className="text-sm text-gray-500">{formatDateTime(value)}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '액션',
+      align: 'center' as const,
+      render: (_: unknown, record: ErpTransmission) => (
+        record.status === 'FAILURE' ? (
+          <button
+            onClick={() => handleRetry(record.id)}
+            disabled={retrying === record.id}
+            className="p-1 text-wordpress-blue hover:bg-blue-50 rounded transition disabled:opacity-50"
+            title="재시도"
+          >
+            <RotateCcw className={`w-4 h-4 ${retrying === record.id ? 'animate-spin' : ''}`} />
+          </button>
+        ) : null
+      ),
+    },
+  ];
+
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/dropshipping/erp-status"
-            className="text-gray-600 hover:text-gray-900 transition"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-2xl font-normal text-gray-900">ERP 전송 내역</h1>
-        </div>
-        <button
-          onClick={fetchTransmissions}
-          disabled={loading}
-          className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 inline mr-1 ${loading ? 'animate-spin' : ''}`} />
-          새로고침
-        </button>
-      </div>
+      <PageHeader
+        title="ERP 전송 내역"
+        subtitle="ERP로 전송된 전표 내역을 확인합니다"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -219,109 +306,13 @@ const ErpTransmissionHistory: React.FC = () => {
         <div className="text-sm text-gray-600">총 {stats.total}건</div>
       </div>
 
-      {/* Transmissions Table */}
-      <div className="bg-white border-x border-b border-gray-300 rounded-b-lg">
-        <table className="w-full wp-list-table widefat fixed striped">
-          <thead>
-            <tr>
-              <th className="manage-column column-primary" style={{ width: '15%' }}>
-                이벤트 유형
-              </th>
-              <th className="manage-column" style={{ width: '12%' }}>
-                전표 유형
-              </th>
-              <th className="manage-column" style={{ width: '12%' }}>
-                배치번호
-              </th>
-              <th className="manage-column" style={{ width: '12%' }}>
-                공급사
-              </th>
-              <th className="manage-column" style={{ width: '12%' }}>
-                금액
-              </th>
-              <th className="manage-column" style={{ width: '10%' }}>
-                상태
-              </th>
-              <th className="manage-column" style={{ width: '12%' }}>
-                전표번호
-              </th>
-              <th className="manage-column" style={{ width: '10%' }}>
-                일시
-              </th>
-              <th className="manage-column" style={{ width: '5%' }}>
-                액션
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={9} className="text-center py-8">
-                  <RefreshCw className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  <p className="text-gray-500 mt-2">로딩중...</p>
-                </td>
-              </tr>
-            ) : transmissions.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="text-center py-8">
-                  <FileText className="w-12 h-12 mx-auto text-gray-300" />
-                  <p className="text-gray-500 mt-2">전송 내역이 없습니다</p>
-                </td>
-              </tr>
-            ) : (
-              transmissions.map((tx) => (
-                <tr key={tx.id}>
-                  <td className="column-primary">{getEventTypeBadge(tx.eventType)}</td>
-                  <td>{getVoucherTypeBadge(tx.voucherType)}</td>
-                  <td>
-                    <span className="font-mono text-sm">{tx.batchNumber || '-'}</span>
-                  </td>
-                  <td>
-                    <div className="text-sm">
-                      <p className="font-medium">{tx.supplierName || '-'}</p>
-                      <p className="text-gray-500">{tx.supplierCode}</p>
-                    </div>
-                  </td>
-                  <td className="font-medium">{formatCurrency(tx.amount)}</td>
-                  <td>
-                    {getStatusBadge(tx.status)}
-                    {tx.status === 'FAILURE' && tx.errorMessage && (
-                      <p
-                        className="text-xs text-red-600 mt-1 truncate"
-                        title={tx.errorMessage}
-                      >
-                        {tx.errorMessage}
-                      </p>
-                    )}
-                  </td>
-                  <td>
-                    {tx.voucherNo ? (
-                      <span className="font-mono text-sm text-green-700">{tx.voucherNo}</span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="text-sm text-gray-500">{formatDateTime(tx.createdAt)}</td>
-                  <td>
-                    {tx.status === 'FAILURE' && (
-                      <button
-                        onClick={() => handleRetry(tx.id)}
-                        disabled={retrying === tx.id}
-                        className="p-1 text-wordpress-blue hover:bg-blue-50 rounded transition disabled:opacity-50"
-                        title="재시도"
-                      >
-                        <RotateCcw
-                          className={`w-4 h-4 ${retrying === tx.id ? 'animate-spin' : ''}`}
-                        />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* DataTable */}
+      <DataTable<ErpTransmission>
+        columns={columns}
+        data={transmissions}
+        loading={loading}
+        emptyMessage="전송 내역이 없습니다"
+      />
     </div>
   );
 };

@@ -17,9 +17,11 @@ import {
   AlertTriangle,
   Database,
   List,
+  Settings,
 } from 'lucide-react';
 import { erpConnectorAPI, ErpConnectionStatus } from '../../api/erp-connector';
 import { toast } from 'react-hot-toast';
+import PageHeader from '../../components/common/PageHeader';
 
 const ErpConnectorStatusPage: React.FC = () => {
   const [status, setStatus] = useState<ErpConnectionStatus | null>(null);
@@ -92,32 +94,21 @@ const ErpConnectorStatusPage: React.FC = () => {
     );
   }
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'transmissions', label: '전송 내역', icon: <List className="w-4 h-4" />, onClick: () => window.location.href = '/dropshipping/erp-transmissions', variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: handleRefresh, variant: 'primary' as const },
+  ];
+
   // 미연결 상태 화면
   if (!status?.connected) {
     return (
       <div className="p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-normal text-gray-900">ERP 연계 상태</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 inline mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-              새로고침
-            </button>
-            {/* 개발용 토글 버튼 */}
-            <button
-              onClick={handleToggleMock}
-              className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition"
-              title="개발용: Mock 상태 토글"
-            >
-              Mock 토글
-            </button>
-          </div>
-        </div>
+        <PageHeader
+          title="ERP 연계 상태"
+          subtitle="Ecount ERP 연동 상태를 확인합니다"
+          actions={headerActions}
+        />
 
         {/* 미연결 상태 카드 */}
         <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
@@ -161,35 +152,11 @@ const ErpConnectorStatusPage: React.FC = () => {
   // 연결 상태 화면
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-normal text-gray-900">ERP 연계 상태</h1>
-        <div className="flex gap-2">
-          <Link
-            to="/dropshipping/erp-transmissions"
-            className="px-3 py-1 border border-gray-300 text-gray-700 text-sm rounded hover:bg-gray-50 transition"
-          >
-            <List className="w-4 h-4 inline mr-1" />
-            전송 내역
-          </Link>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 inline mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-            새로고침
-          </button>
-          {/* 개발용 토글 버튼 */}
-          <button
-            onClick={handleToggleMock}
-            className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition"
-            title="개발용: Mock 상태 토글"
-          >
-            Mock 토글
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="ERP 연계 상태"
+        subtitle="Ecount ERP 연동 상태를 확인합니다"
+        actions={headerActions}
+      />
 
       {/* 상태 카드 그리드 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

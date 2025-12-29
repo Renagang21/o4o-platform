@@ -1,9 +1,13 @@
 /**
  * SupplierOps Products Page
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Package } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Settings } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 interface Product {
   id: string;
@@ -69,18 +73,108 @@ const Products: React.FC = () => {
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // DataTable column definitions
+  const columns: Column<Product>[] = [
+    {
+      key: 'productInfo',
+      title: '상품 정보',
+      render: (_: unknown, record: Product) => (
+        <div>
+          <p className="font-medium">{record.name}</p>
+          <p className="text-sm text-gray-500">{record.description}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'sku',
+      title: 'SKU',
+      dataIndex: 'sku',
+      render: (value: string) => (
+        <span className="text-sm text-gray-600">{value}</span>
+      ),
+    },
+    {
+      key: 'category',
+      title: '카테고리',
+      dataIndex: 'category',
+      render: (value: string) => (
+        <span className="text-sm text-gray-600">{value}</span>
+      ),
+    },
+    {
+      key: 'basePrice',
+      title: '기본가',
+      dataIndex: 'basePrice',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'isActive',
+      title: '상태',
+      dataIndex: 'isActive',
+      align: 'center',
+      render: (value: boolean) => (
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${
+            value
+              ? 'bg-green-100 text-green-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
+        >
+          {value ? '활성' : '비활성'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '관리',
+      align: 'center',
+      render: () => (
+        <div className="flex items-center justify-center gap-2">
+          <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+            <Edit className="w-4 h-4" />
+          </button>
+          <button className="p-1 text-red-600 hover:bg-red-50 rounded">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'add-product',
+      label: '상품 추가',
+      icon: <Plus className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Add product clicked');
+      },
+      variant: 'primary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">상품 관리</h1>
-          <p className="text-gray-600">등록된 상품(ProductMaster)을 관리하세요</p>
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          <Plus className="w-4 h-4" />
-          상품 추가
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="상품 관리"
+        subtitle="등록된 상품(ProductMaster)을 관리하세요"
+        actions={headerActions}
+      />
 
       {/* Search */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -96,81 +190,15 @@ const Products: React.FC = () => {
         </div>
       </div>
 
-      {/* Products Table */}
+      {/* Products DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>등록된 상품이 없습니다</p>
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  상품 정보
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  SKU
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  카테고리
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  기본가
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  관리
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-500">{product.description}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{product.sku}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                  <td className="px-6 py-4 text-sm font-medium">
-                    {product.basePrice.toLocaleString()}원
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        product.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {product.isActive ? '활성' : '비활성'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="p-1 text-red-600 hover:bg-red-50 rounded">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <DataTable<Product>
+          columns={columns}
+          dataSource={filteredProducts}
+          rowKey="id"
+          loading={loading}
+          emptyText="등록된 상품이 없습니다"
+        />
       </div>
     </div>
   );

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Users, Award, TrendingUp, DollarSign, UserPlus, Mail, Phone, Calendar } from 'lucide-react';
+import { Plus, Edit2, Trash2, Users, Award, TrendingUp, DollarSign, UserPlus, Mail, Phone, Calendar, Settings, RefreshCw } from 'lucide-react';
 import { UserApi } from '../../api/userApi';
 import { User, UserRole } from '../../types/user';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '@/lib/utils';
+import PageHeader from '../../components/common/PageHeader';
+import { DataTable, Column } from '../../components/common/DataTable';
 
 interface PartnerStats {
   total: number;
@@ -140,7 +142,7 @@ const PartnersList: React.FC = () => {
     // This would be based on actual partner data
     const grades = ['bronze', 'silver', 'gold', 'platinum'];
     const grade = grades[Math.floor(Math.random() * grades.length)];
-    
+
     const gradeColors = {
       bronze: 'bg-orange-100 text-orange-800',
       silver: 'bg-gray-100 text-gray-800',
@@ -155,23 +157,107 @@ const PartnersList: React.FC = () => {
     );
   };
 
-  return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">파트너 관리</h1>
-            <p className="text-gray-600">드롭쉬핑 파트너 목록 및 관리</p>
-          </div>
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchPartners, variant: 'secondary' as const },
+    { id: 'add-partner', label: '새 파트너 추가', icon: <UserPlus className="w-4 h-4" />, onClick: () => navigate('/users/new?role=partner'), variant: 'primary' as const },
+  ];
+
+  const columns: Column<User>[] = [
+    {
+      key: 'info',
+      title: '파트너 정보',
+      render: (_: unknown, record: User) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{record.name}</div>
+          <div className="text-sm text-gray-500">{record.email}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'grade',
+      title: '등급',
+      align: 'center' as const,
+      render: (_: unknown, record: User) => getGradeBadge(record),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center' as const,
+      render: (value: string) => (
+        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+          value === 'active'
+            ? 'bg-green-100 text-green-800'
+            : value === 'pending'
+            ? 'bg-yellow-100 text-yellow-800'
+            : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value === 'active' ? '활성' : value === 'pending' ? '승인 대기' : value}
+        </span>
+      ),
+    },
+    {
+      key: 'phone',
+      title: '연락처',
+      dataIndex: 'phone',
+      render: (value: string) => value ? (
+        <span className="flex items-center gap-1 text-sm text-gray-500">
+          <Phone className="w-3 h-3" />
+          {value}
+        </span>
+      ) : <span className="text-gray-400">-</span>,
+    },
+    {
+      key: 'createdAt',
+      title: '가입일',
+      dataIndex: 'createdAt',
+      render: (value: string) => (
+        <div className="flex items-center gap-1 text-sm text-gray-500">
+          <Calendar className="w-3 h-3" />
+          {formatDate(value)}
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'center' as const,
+      render: (_: unknown, record: User) => (
+        <div className="flex gap-2 justify-center">
+          {record.status === 'pending' ? (
+            <button
+              onClick={() => handleApprove(record.id)}
+              className="text-green-600 hover:text-green-900"
+            >
+              승인
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate(`/users/${record.id}`)}
+              className="text-blue-600 hover:text-blue-900"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+          )}
           <button
-            onClick={() => navigate('/users/new?role=partner')}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            onClick={() => handleDelete(record.id)}
+            className="text-red-600 hover:text-red-900"
           >
-            <UserPlus className="w-4 h-4" />
-            새 파트너 추가
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="p-6">
+      <PageHeader
+        title="파트너 관리"
+        subtitle="드롭쉬핑 파트너 목록 및 관리"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -226,7 +312,7 @@ const PartnersList: React.FC = () => {
           <select
             className="px-4 py-2 border rounded-lg"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'pending')}
           >
             <option value="all">전체 상태</option>
             <option value="active">활성</option>
@@ -243,155 +329,19 @@ const PartnersList: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left">
-                <input
-                  type="checkbox"
-                  checked={selectedPartners.size === partners.length && partners.length > 0}
-                  onChange={toggleSelectAll}
-                  className="rounded"
-                />
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                파트너 정보
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                등급
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                연락처
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                가입일
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                작업
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : partners.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8 text-gray-500">
-                  파트너가 없습니다
-                </td>
-              </tr>
-            ) : (
-              partners.map((partner) => (
-                <tr key={partner.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedPartners.has(partner.id)}
-                      onChange={() => toggleSelection(partner.id)}
-                      className="rounded"
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{partner.name}</div>
-                      <div className="text-sm text-gray-500">{partner.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {getGradeBadge(partner)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      partner.status === 'active' 
-                        ? 'bg-green-100 text-green-800' 
-                        : partner.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {partner.status === 'active' ? '활성' : partner.status === 'pending' ? '승인 대기' : partner.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-4">
-                      {partner.phone && (
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          {partner.phone}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDate(partner.createdAt)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex gap-2">
-                      {partner.status === 'pending' ? (
-                        <button
-                          onClick={() => handleApprove(partner.id)}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          승인
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => navigate(`/users/${partner.id}`)}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(partner.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex justify-center gap-2">
-          <button
-            onClick={() => setPage(Math.max(1, page - 1))}
-            disabled={page === 1}
-            className="px-4 py-2 border rounded-lg disabled:opacity-50"
-          >
-            이전
-          </button>
-          <span className="px-4 py-2">
-            {page} / {totalPages}
-          </span>
-          <button
-            onClick={() => setPage(Math.min(totalPages, page + 1))}
-            disabled={page === totalPages}
-            className="px-4 py-2 border rounded-lg disabled:opacity-50"
-          >
-            다음
-          </button>
-        </div>
-      )}
+      {/* DataTable */}
+      <DataTable<User>
+        columns={columns}
+        data={partners}
+        loading={loading}
+        emptyMessage="파트너가 없습니다"
+        pagination={{
+          current: page,
+          total: stats.total,
+          pageSize: 20,
+          onChange: setPage,
+        }}
+      />
     </div>
   );
 };

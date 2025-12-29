@@ -1,16 +1,16 @@
+/**
+ * Admin Order List Page
+ *
+ * Refactored: PageHeader + DataTable pattern applied
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
-import { Search, Filter, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-
-/**
- * Admin Order List Page (Phase 4)
- *
- * Administrator/Operator only page for viewing all orders
- * Features: filtering, search, pagination
- * Read-only (no status changes in Phase 4)
- */
+import { Search, Calendar, Download, Eye, Settings } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 interface OrderItem {
   id: string;
@@ -212,15 +212,111 @@ const OrderListPage: React.FC = () => {
     return labels[method] || method;
   };
 
+  // DataTable column definitions
+  const columns: Column<Order>[] = [
+    {
+      key: 'orderNumber',
+      title: '주문번호',
+      dataIndex: 'orderNumber',
+      sortable: true,
+      render: (value: string) => (
+        <span className="font-medium text-blue-600">{value}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      title: '주문일시',
+      dataIndex: 'createdAt',
+      sortable: true,
+      render: (value: string) => (
+        <span className="text-sm text-gray-900">{formatDate(value)}</span>
+      ),
+    },
+    {
+      key: 'buyer',
+      title: '고객명',
+      render: (_: unknown, record: Order) => (
+        <div>
+          <div className="text-sm text-gray-900">{record.buyerName}</div>
+          <div className="text-xs text-gray-500">{record.buyerEmail}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'paymentMethod',
+      title: '결제방법',
+      dataIndex: 'paymentMethod',
+      render: (value: string) => (
+        <span className="text-sm text-gray-900">{getPaymentMethodLabel(value)}</span>
+      ),
+    },
+    {
+      key: 'total',
+      title: '주문금액',
+      align: 'right',
+      sortable: true,
+      render: (_: unknown, record: Order) => (
+        <span className="text-sm font-medium text-gray-900">
+          {formatCurrency(record.summary.total)}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '상세',
+      align: 'center',
+      render: (_: unknown, record: Order) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/admin/orders/${record.id}`);
+          }}
+          className="text-blue-600 hover:text-blue-900 p-1"
+          title="상세 보기"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'export',
+      label: '내보내기',
+      icon: <Download className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Export clicked');
+      },
+      variant: 'secondary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">주문 관리</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          전체 주문을 조회하고 관리합니다
-        </p>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="주문 관리"
+        subtitle="전체 주문을 조회하고 관리합니다"
+        actions={headerActions}
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -296,139 +392,22 @@ const OrderListPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* Orders DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">주문 목록을 불러오는 중...</p>
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            조회된 주문이 없습니다
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      주문번호
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      주문일시
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      고객명
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      상태
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      결제방법
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      주문금액
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {orders.map((order) => (
-                    <tr
-                      key={order.id}
-                      onClick={() => navigate(`/admin/orders/${order.id}`)}
-                      className="hover:bg-gray-50 cursor-pointer transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                        {order.orderNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatDate(order.createdAt)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div>{order.buyerName}</div>
-                        <div className="text-xs text-gray-500">{order.buyerEmail}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(order.status)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {getPaymentMethodLabel(order.paymentMethod)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
-                        {formatCurrency(order.summary.total)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  이전
-                </button>
-                <button
-                  onClick={() => setPage(page + 1)}
-                  disabled={page >= totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  다음
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    전체 <span className="font-medium">{total}</span>건 중{' '}
-                    <span className="font-medium">{(page - 1) * limit + 1}</span>-
-                    <span className="font-medium">{Math.min(page * limit, total)}</span>
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <button
-                      onClick={() => setPage(page - 1)}
-                      disabled={page === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                      const pageNum = i + 1;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            page === pageNum
-                              ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                    <button
-                      onClick={() => setPage(page + 1)}
-                      disabled={page >= totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
-                  </nav>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+        <DataTable<Order>
+          columns={columns}
+          dataSource={orders}
+          rowKey="id"
+          loading={loading}
+          emptyText="조회된 주문이 없습니다"
+          onRowClick={(record) => navigate(`/admin/orders/${record.id}`)}
+          pagination={{
+            current: page,
+            pageSize: limit,
+            total: total,
+            onChange: (newPage) => setPage(newPage),
+          }}
+        />
       </div>
     </div>
   );

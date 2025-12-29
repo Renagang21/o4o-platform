@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, AlertTriangle, Filter } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, AlertTriangle, Filter, RefreshCw, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +45,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@o4o/auth-context';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
+import PageHeader from '../../components/common/PageHeader';
 
 interface AuthorizationRequest {
   id: string;
@@ -253,15 +254,18 @@ const SupplierAuthorizationInbox = () => {
     );
   };
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: () => { fetchRequests(); fetchProducts(); }, variant: 'primary' as const },
+  ];
+
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">승인 요청함</h1>
-          <p className="text-gray-600 mt-1">판매자의 상품 승인 요청을 관리하세요</p>
-        </div>
-      </div>
+      <PageHeader
+        title="승인 요청함"
+        subtitle="판매자의 상품 승인 요청을 관리하세요"
+        actions={headerActions}
+      />
 
       {/* Filters */}
       <Card>

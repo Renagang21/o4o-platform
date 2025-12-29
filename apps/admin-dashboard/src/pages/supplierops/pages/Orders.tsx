@@ -1,9 +1,13 @@
 /**
  * SupplierOps Orders Page
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Truck, CheckCircle, Clock, AlertCircle, Eye } from 'lucide-react';
+import { Search, Filter, Truck, CheckCircle, Clock, AlertCircle, Eye, Settings } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 interface OrderRelay {
   id: string;
@@ -113,12 +117,88 @@ const Orders: React.FC = () => {
     o.productName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // DataTable column definitions
+  const columns: Column<OrderRelay>[] = [
+    {
+      key: 'orderInfo',
+      title: '주문 정보',
+      render: (_: unknown, record: OrderRelay) => (
+        <div>
+          <p className="font-medium">{record.productName}</p>
+          <p className="text-xs text-gray-500">#{record.orderId}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'sellerName',
+      title: '판매자',
+      dataIndex: 'sellerName',
+    },
+    {
+      key: 'quantity',
+      title: '수량',
+      dataIndex: 'quantity',
+      align: 'center',
+      sortable: true,
+    },
+    {
+      key: 'totalPrice',
+      title: '금액',
+      dataIndex: 'totalPrice',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'trackingNumber',
+      title: '운송장',
+      dataIndex: 'trackingNumber',
+      render: (value: string | undefined) => (
+        <span className="text-sm text-gray-600">{value || '-'}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '상세',
+      align: 'center',
+      render: () => (
+        <button className="text-blue-600 hover:text-blue-800">
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">주문/Relay 모니터링</h1>
-        <p className="text-gray-600">주문 Relay 현황을 확인하고 배송 정보를 업데이트하세요</p>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="주문/Relay 모니터링"
+        subtitle="주문 Relay 현황을 확인하고 배송 정보를 업데이트하세요"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -170,77 +250,15 @@ const Orders: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* Orders DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                주문 정보
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                판매자
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                수량
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                금액
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                운송장
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                상세
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : filteredOrders.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8 text-gray-500">
-                  주문이 없습니다
-                </td>
-              </tr>
-            ) : (
-              filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-medium">{order.productName}</p>
-                      <p className="text-xs text-gray-500">#{order.orderId}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">{order.sellerName}</td>
-                  <td className="px-6 py-4 text-sm">{order.quantity}</td>
-                  <td className="px-6 py-4 text-sm font-medium">
-                    {order.totalPrice.toLocaleString()}원
-                  </td>
-                  <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {order.trackingNumber || '-'}
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-800">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<OrderRelay>
+          columns={columns}
+          dataSource={filteredOrders}
+          rowKey="id"
+          loading={loading}
+          emptyText="주문이 없습니다"
+        />
       </div>
     </div>
   );

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, AlertCircle, Filter, Search } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, AlertCircle, Filter, Search, Settings, RefreshCw } from 'lucide-react';
 import { dropshippingAPI } from '../../api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 import { authClient } from '@o4o/auth-client';
+import PageHeader from '../../components/common/PageHeader';
+import { DataTable, Column } from '../../components/common/DataTable';
 
 interface ApprovalLog {
   id: string;
@@ -111,12 +113,95 @@ const Approvals: React.FC = () => {
     return matchesStatus && matchesType && matchesSearch;
   });
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchApprovals, variant: 'secondary' as const },
+  ];
+
+  const columns: Column<ApprovalLog>[] = [
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      render: (value: string) => (
+        <div className="flex items-center">
+          {getStatusIcon(value)}
+          <span className="ml-2 text-sm">
+            {value === 'pending' ? '대기 중' : value === 'approved' ? '승인됨' : '반려됨'}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'type',
+      title: '유형',
+      dataIndex: 'type',
+      align: 'center' as const,
+      render: (value: string) => (
+        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+          {getTypeLabel(value)}
+        </span>
+      ),
+    },
+    {
+      key: 'title',
+      title: '제목',
+      dataIndex: 'title',
+      render: (value: string, record: ApprovalLog) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{value}</div>
+          {record.details.reason && (
+            <div className="text-xs text-gray-500">사유: {record.details.reason}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'requestedBy',
+      title: '요청자',
+      dataIndex: 'requestedBy',
+    },
+    {
+      key: 'requestedAt',
+      title: '요청 일시',
+      dataIndex: 'requestedAt',
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'center' as const,
+      render: (_: unknown, record: ApprovalLog) => (
+        record.status === 'pending' ? (
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => handleApprove(record.id)}
+              className="text-green-600 hover:text-green-900"
+            >
+              승인
+            </button>
+            <button
+              onClick={() => handleReject(record.id)}
+              className="text-red-600 hover:text-red-900"
+            >
+              반려
+            </button>
+          </div>
+        ) : (
+          <span className="text-gray-400 text-sm">
+            {record.reviewedBy} ({record.reviewedAt})
+          </span>
+        )
+      ),
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">승인 관리</h1>
-        <p className="text-gray-600">가격 변경, 파트너 신청 등 승인이 필요한 항목을 관리합니다</p>
-      </div>
+      <PageHeader
+        title="승인 관리"
+        subtitle="가격 변경, 파트너 신청 등 승인이 필요한 항목을 관리합니다"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -203,103 +288,13 @@ const Approvals: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                유형
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                제목
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                요청자
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                요청 일시
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                작업
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="text-center py-8">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : filteredApprovals.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-8 text-gray-500">
-                  승인 요청이 없습니다
-                </td>
-              </tr>
-            ) : (
-              filteredApprovals.map((approval) => (
-                <tr key={approval.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {getStatusIcon(approval.status)}
-                      <span className="ml-2 text-sm">
-                        {approval.status === 'pending' ? '대기 중' :
-                         approval.status === 'approved' ? '승인됨' : '반려됨'}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {getTypeLabel(approval.type)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{approval.title}</div>
-                    {approval.details.reason && (
-                      <div className="text-xs text-gray-500">사유: {approval.details.reason}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {approval.requestedBy}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {approval.requestedAt}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {approval.status === 'pending' ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleApprove(approval.id)}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          승인
-                        </button>
-                        <button
-                          onClick={() => handleReject(approval.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          반려
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">
-                        {approval.reviewedBy} ({approval.reviewedAt})
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* DataTable */}
+      <DataTable<ApprovalLog>
+        columns={columns}
+        data={filteredApprovals}
+        loading={loading}
+        emptyMessage="승인 요청이 없습니다"
+      />
     </div>
   );
 };

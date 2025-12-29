@@ -5,6 +5,8 @@
  * - Settlement batches
  * - Pending/paid status
  * - Transaction history
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
@@ -18,6 +20,8 @@ import {
   FileText,
   CreditCard,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 /**
  * Settlement Batch Item (Partner-Core aligned)
@@ -186,6 +190,95 @@ const Settlement: React.FC = () => {
     }
   };
 
+  // DataTable column definitions
+  const columns: Column<SettlementBatch>[] = [
+    {
+      key: 'batchNumber',
+      title: '정산번호',
+      dataIndex: 'batchNumber',
+      render: (value: string) => (
+        <span className="font-medium">{value}</span>
+      ),
+    },
+    {
+      key: 'period',
+      title: '정산기간',
+      render: (_: unknown, record: SettlementBatch) => (
+        <span className="text-sm text-gray-600">
+          {new Date(record.periodStart).toLocaleDateString()} ~{' '}
+          {new Date(record.periodEnd).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'conversionCount',
+      title: '전환수',
+      dataIndex: 'conversionCount',
+      align: 'center',
+      sortable: true,
+    },
+    {
+      key: 'netAmount',
+      title: '정산금액',
+      dataIndex: 'netAmount',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'paidAt',
+      title: '지급일',
+      dataIndex: 'paidAt',
+      align: 'center',
+      render: (value: string | undefined) => (
+        <span className="text-sm text-gray-600">
+          {value ? new Date(value).toLocaleDateString() : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '영수증',
+      align: 'center',
+      render: (_: unknown, record: SettlementBatch) => (
+        record.status === 'paid' ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('Download receipt:', record.id);
+            }}
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded"
+            title="영수증 다운로드"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        ) : null
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'download-all',
+      label: '전체 다운로드',
+      icon: <Download className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Download all settlements');
+      },
+      variant: 'secondary' as const,
+    },
+  ];
+
   if (loading) {
     return (
       <div className="p-6 flex justify-center items-center min-h-[400px]">
@@ -196,12 +289,12 @@ const Settlement: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">정산 관리</h1>
-          <p className="text-gray-600">커미션 정산 내역을 확인합니다</p>
-        </div>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="정산 관리"
+        subtitle="커미션 정산 내역을 확인합니다"
+        actions={headerActions}
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -269,59 +362,15 @@ const Settlement: React.FC = () => {
         </div>
       </div>
 
-      {/* Settlement Batches */}
+      {/* Settlement Batches DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-semibold">정산 내역</h2>
-        </div>
-
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">정산번호</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">정산기간</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">전환수</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">정산금액</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">상태</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">지급일</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">영수증</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {batches.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                  정산 내역이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              batches.map((batch) => (
-                <tr key={batch.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{batch.batchNumber}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {new Date(batch.periodStart).toLocaleDateString()} ~{' '}
-                    {new Date(batch.periodEnd).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-center">{batch.conversionCount}</td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {batch.netAmount.toLocaleString()}원
-                  </td>
-                  <td className="px-4 py-3 text-center">{getStatusBadge(batch.status)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {batch.paidAt ? new Date(batch.paidAt).toLocaleDateString() : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {batch.status === 'paid' && (
-                      <button className="p-2 text-gray-600 hover:bg-gray-100 rounded">
-                        <Download className="w-4 h-4" />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<SettlementBatch>
+          columns={columns}
+          dataSource={batches}
+          rowKey="id"
+          loading={false}
+          emptyText="정산 내역이 없습니다"
+        />
       </div>
 
       {/* Bank Account Info */}

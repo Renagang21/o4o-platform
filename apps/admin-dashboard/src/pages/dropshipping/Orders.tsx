@@ -1,7 +1,14 @@
+/**
+ * Dropshipping Orders Page
+ *
+ * Refactored: PageHeader pattern applied (Master-Detail layout - DataTable not applicable)
+ */
+
 import React, { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, DollarSign, ShoppingCart } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, DollarSign, ShoppingCart, RefreshCw, Settings } from 'lucide-react';
 import { dropshippingAPI } from '../../api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
+import PageHeader from '../../components/common/PageHeader';
 
 interface OrderItem {
   product_id: string;
@@ -325,18 +332,34 @@ const Orders: React.FC = () => {
     );
   }
 
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'refresh',
+      label: '새로고침',
+      icon: <RefreshCw className="w-4 h-4" />,
+      onClick: fetchOrders,
+      variant: 'secondary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-normal text-gray-900">주문 관리</h1>
-        <button
-          onClick={fetchOrders}
-          className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition"
-        >
-          새로고침
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="주문 관리"
+        subtitle="드롭쉬핑 주문 목록 및 상세"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
