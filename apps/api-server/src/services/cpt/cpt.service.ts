@@ -37,6 +37,7 @@ export class CPTService {
 
   /**
    * Get all Custom Post Types
+   * Returns empty array if table doesn't exist (graceful degradation)
    */
   async getAllCPTs(active?: boolean) {
     try {
@@ -55,6 +56,19 @@ export class CPTService {
         total: cpts.length
       };
     } catch (error: any) {
+      // Graceful degradation: if table doesn't exist, return empty array
+      // This happens when cms-core has not been installed yet
+      const errorMessage = error?.message || '';
+      if (errorMessage.includes('does not exist') ||
+          errorMessage.includes('relation') ||
+          error?.code === '42P01') { // PostgreSQL: undefined_table
+        logger.warn('CPT table does not exist - cms-core may not be installed. Returning empty array.');
+        return {
+          success: true,
+          data: [],
+          total: 0
+        };
+      }
       logger.error('Error fetching CPTs:', error);
       throw new Error('Failed to fetch custom post types');
     }
