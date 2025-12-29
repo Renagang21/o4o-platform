@@ -63,9 +63,17 @@ export const yaksaAdminManifest = {
 
   // ===== 백엔드 =====
   backend: {
-    entities: [],
-    services: [],
-    controllers: [],
+    entities: [], // yaksa-admin은 자체 Entity 없음 (organization-core 사용)
+    services: [
+      'OrganizationReadService',
+      'MemberReadService',
+      'OfficerReadService',
+    ],
+    controllers: [
+      'OrganizationController',
+      'MemberController',
+      'OfficerController',
+    ],
     routesExport: 'createRoutes',
   },
 
@@ -190,8 +198,16 @@ export const yaksaAdminManifest = {
 
   // ===== 외부 노출 =====
   exposes: {
-    services: [],
-    types: [],
+    services: [
+      'OrganizationReadService',
+      'MemberReadService',
+      'OfficerReadService',
+    ],
+    types: [
+      'OrganizationDto',
+      'OrganizationMemberDto',
+      'OfficerAssignmentDto',
+    ],
     events: [],
   },
 

@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, Ban, AlertCircle, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Ban, AlertCircle, Plus, Trash2, RefreshCw, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,7 @@ import {
 import { useAuth } from '@o4o/auth-context';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
+import PageHeader from '../../components/common/PageHeader';
 
 interface Authorization {
   id: string;
@@ -141,19 +142,19 @@ const SellerAuthorizations = () => {
     return `${days}일 남음`;
   };
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: () => { fetchAuthorizations(); fetchLimits(); }, variant: 'secondary' as const },
+    { id: 'request', label: '승인 요청', icon: <Plus className="w-4 h-4" />, onClick: () => {}, variant: 'primary' as const },
+  ];
+
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">판매 승인 관리</h1>
-          <p className="text-gray-600 mt-1">공급자 상품 판매 승인 현황을 확인하고 관리하세요</p>
-        </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          승인 요청
-        </Button>
-      </div>
+      <PageHeader
+        title="판매 승인 관리"
+        subtitle="공급자 상품 판매 승인 현황을 확인하고 관리하세요"
+        actions={headerActions}
+      />
 
       {/* Limits Card */}
       {limits && (

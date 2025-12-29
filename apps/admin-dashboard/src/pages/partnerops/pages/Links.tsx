@@ -5,6 +5,8 @@
  * - Create tracking links
  * - View link statistics
  * - Copy/share links
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
@@ -16,9 +18,11 @@ import {
   ExternalLink,
   MousePointer,
   TrendingUp,
-  BarChart2,
   Check,
+  Settings,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 /**
  * Tracking Link (Partner-Core aligned)
@@ -175,29 +179,140 @@ const Links: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // DataTable column definitions
+  const columns: Column<TrackingLink>[] = [
+    {
+      key: 'link',
+      title: '링크',
+      render: (_: unknown, record: TrackingLink) => (
+        <div>
+          <p className="font-medium text-blue-600">/{getShortCode(record.shortUrl)}</p>
+          <p className="text-xs text-gray-500 truncate max-w-xs">
+            {record.originalUrl}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: 'targetType',
+      title: '유형',
+      dataIndex: 'targetType',
+      render: (value: string) => getTargetTypeBadge(value),
+    },
+    {
+      key: 'totalClicks',
+      title: '클릭',
+      dataIndex: 'totalClicks',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value.toLocaleString()}</span>
+      ),
+    },
+    {
+      key: 'conversions',
+      title: '전환',
+      dataIndex: 'conversions',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value}</span>
+      ),
+    },
+    {
+      key: 'conversionRate',
+      title: '전환율',
+      dataIndex: 'conversionRate',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span
+          className={`font-medium ${
+            value >= 3
+              ? 'text-green-600'
+              : value >= 2
+                ? 'text-blue-600'
+                : 'text-gray-600'
+          }`}
+        >
+          {value.toFixed(2)}%
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'center',
+      render: (_: unknown, record: TrackingLink) => (
+        <div className="flex items-center justify-center gap-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              copyLink(record);
+            }}
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded"
+            title="복사"
+          >
+            {copiedId === record.id ? (
+              <Check className="w-4 h-4 text-green-600" />
+            ) : (
+              <Copy className="w-4 h-4" />
+            )}
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(record.shortUrl, '_blank');
+            }}
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded"
+            title="열기"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(record.id);
+            }}
+            className="p-2 text-red-600 hover:bg-red-50 rounded"
+            title="삭제"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        // Screen options toggle (placeholder)
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'new-link',
+      label: '새 링크',
+      icon: <Plus className="w-4 h-4" />,
+      onClick: () => setShowForm(true),
+      variant: 'primary' as const,
+    },
+  ];
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">추적 링크 관리</h1>
-          <p className="text-gray-600">파트너 링크를 생성하고 성과를 추적합니다</p>
-        </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" />
-          새 링크
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="추적 링크 관리"
+        subtitle="파트너 링크를 생성하고 성과를 추적합니다"
+        actions={headerActions}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -312,89 +427,15 @@ const Links: React.FC = () => {
         </div>
       )}
 
-      {/* Links List */}
+      {/* Links DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">링크</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">유형</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">클릭</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">전환</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">전환율</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {links.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  아직 생성된 링크가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              links.map((link) => (
-                <tr key={link.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <div>
-                      <p className="font-medium text-blue-600">/{getShortCode(link.shortUrl)}</p>
-                      <p className="text-xs text-gray-500 truncate max-w-xs">
-                        {link.originalUrl}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{getTargetTypeBadge(link.targetType)}</td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {link.totalClicks.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 text-right font-medium">{link.conversions}</td>
-                  <td className="px-4 py-3 text-right">
-                    <span
-                      className={`font-medium ${
-                        link.conversionRate >= 3
-                          ? 'text-green-600'
-                          : link.conversionRate >= 2
-                            ? 'text-blue-600'
-                            : 'text-gray-600'
-                      }`}
-                    >
-                      {link.conversionRate.toFixed(2)}%
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-1">
-                      <button
-                        onClick={() => copyLink(link)}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-                        title="복사"
-                      >
-                        {copiedId === link.id ? (
-                          <Check className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => window.open(link.shortUrl, '_blank')}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-                        title="열기"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(link.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<TrackingLink>
+          columns={columns}
+          dataSource={links}
+          rowKey="id"
+          loading={loading}
+          emptyText="아직 생성된 링크가 없습니다."
+        />
       </div>
     </div>
   );

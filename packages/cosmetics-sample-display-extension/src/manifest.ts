@@ -3,6 +3,12 @@
  *
  * 샘플/테스터, 진열(Display), 전환율 관리 확장앱
  * Seller Extension + Supplier Extension을 연결하는 핵심 운영 계층
+ *
+ * === 역할 ===
+ * - 샘플 재고 관리 (Sample Inventory)
+ * - 샘플 사용 로그 (Sample Usage Log)
+ * - 진열 레이아웃 관리 (Display Layout)
+ * - 샘플→구매 전환율 분석 (Sample Conversion Analytics)
  */
 
 export interface ExtensionManifest {
@@ -13,6 +19,7 @@ export interface ExtensionManifest {
   displayName: string;
   description: string;
   dependsOn: string[];
+  ownsTables: string[];
   adminMenu: Array<{
     label: string;
     path: string;
@@ -47,6 +54,20 @@ export const manifest: ExtensionManifest = {
     'cosmetics-seller-extension',
     'cosmetics-supplier-extension',
     'dropshipping-cosmetics',
+  ],
+
+  /**
+   * 소유 테이블
+   * - cosmetics_sample_inventory: 샘플 재고 (SampleInventory Entity)
+   * - cosmetics_sample_usage_logs: 샘플 사용 로그 (SampleUsageLog Entity)
+   * - cosmetics_display_layouts: 진열 레이아웃 (DisplayLayout Entity)
+   * - cosmetics_sample_conversion: 전환율 통계 (SampleConversion Entity)
+   */
+  ownsTables: [
+    'cosmetics_sample_inventory',
+    'cosmetics_sample_usage_logs',
+    'cosmetics_display_layouts',
+    'cosmetics_sample_conversion',
   ],
 
   adminMenu: [
@@ -103,10 +124,10 @@ export const manifest: ExtensionManifest = {
   ],
 
   lifecycle: {
-    install: 'dist/backend/lifecycle/install.js',
-    activate: 'dist/backend/lifecycle/activate.js',
-    deactivate: 'dist/backend/lifecycle/deactivate.js',
-    uninstall: 'dist/backend/lifecycle/uninstall.js',
+    install: './lifecycle/install',
+    activate: './lifecycle/activate',
+    deactivate: './lifecycle/deactivate',
+    uninstall: './lifecycle/uninstall',
   },
 };
 

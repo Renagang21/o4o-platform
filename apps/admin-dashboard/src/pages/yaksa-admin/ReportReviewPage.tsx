@@ -12,7 +12,7 @@
  * - 신규 신고 생성 ❌
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -23,6 +23,8 @@ import {
   AlertCircle,
   Eye,
 } from 'lucide-react';
+import PageHeader from '@/components/common/PageHeader';
+import DataTable from '@/components/common/DataTable';
 import {
   getReports,
   approveReport,
@@ -112,34 +114,95 @@ export function ReportReviewPage() {
     { id: 'REJECTED' as const, label: '반려' },
   ];
 
+  const columns = useMemo(() => [
+    {
+      key: 'reportType',
+      title: '신고 유형',
+      render: (_: any, report: YaksaReport) => (
+        <div className="font-medium text-gray-900">
+          {REPORT_TYPE_LABELS[report.reportType] || report.reportType}
+        </div>
+      )
+    },
+    {
+      key: 'member',
+      title: '회원',
+      render: (_: any, report: YaksaReport) => (
+        <div className="text-sm text-gray-900">
+          {report.memberName || report.memberId}
+        </div>
+      )
+    },
+    {
+      key: 'status',
+      title: '상태',
+      render: (_: any, report: YaksaReport) => (
+        <span className={`
+          inline-flex px-2 py-1 text-xs font-medium rounded
+          ${report.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-700' : ''}
+          ${report.status === 'REVIEWED' ? 'bg-blue-100 text-blue-700' : ''}
+          ${report.status === 'APPROVED' ? 'bg-green-100 text-green-700' : ''}
+          ${report.status === 'REJECTED' ? 'bg-red-100 text-red-700' : ''}
+        `}>
+          {STATUS_LABELS[report.status]}
+        </span>
+      )
+    },
+    {
+      key: 'createdAt',
+      title: '제출일',
+      dataIndex: 'createdAt' as keyof YaksaReport,
+      render: (value: string) => new Date(value).toLocaleDateString('ko-KR')
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'right' as const,
+      render: (_: any, report: YaksaReport) => (
+        <div className="space-x-2">
+          {(activeTab === 'DRAFT' || activeTab === 'REVIEWED') && (
+            <>
+              <button
+                onClick={() => handleApprove(report.id)}
+                disabled={actionInProgress === report.id}
+                className="inline-flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 disabled:opacity-50"
+              >
+                <CheckCircle className="h-4 w-4 mr-1" />
+                승인
+              </button>
+              <button
+                onClick={() => setShowRejectModal(report.id)}
+                disabled={actionInProgress === report.id}
+                className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 disabled:opacity-50"
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                반려
+              </button>
+            </>
+          )}
+        </div>
+      )
+    }
+  ], [activeTab, actionInProgress]);
+
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="mb-6">
-        <Link
-          to="/admin/yaksa"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          관리자 센터로 돌아가기
-        </Link>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">신상신고 승인</h1>
-            <p className="text-gray-500 mt-1">
-              제출된 신상신고서를 검토하고 승인합니다.
-            </p>
-          </div>
-          <button
-            onClick={loadReports}
-            disabled={isLoading}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            새로고침
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="신상신고 승인"
+        subtitle="제출된 신상신고서를 검토하고 승인합니다."
+        backUrl="/admin/yaksa"
+        backLabel="관리자 센터로 돌아가기"
+        actions={[
+          {
+            id: 'refresh',
+            label: '새로고침',
+            icon: <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />,
+            onClick: loadReports,
+            disabled: isLoading,
+          },
+        ]}
+      />
 
       {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">
@@ -170,95 +233,15 @@ export function ReportReviewPage() {
       )}
 
       {/* Content */}
-      {isLoading ? (
-        <div className="text-center py-12">
-          <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">데이터를 불러오는 중...</p>
-        </div>
-      ) : reports.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">
-            {STATUS_LABELS[activeTab]} 상태의 신상신고가 없습니다.
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  신고 유형
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  회원
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  제출일
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  작업
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {reports.map((report) => (
-                <tr key={report.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">
-                      {REPORT_TYPE_LABELS[report.reportType] || report.reportType}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">
-                      {report.memberName || report.memberId}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`
-                      inline-flex px-2 py-1 text-xs font-medium rounded
-                      ${report.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-700' : ''}
-                      ${report.status === 'REVIEWED' ? 'bg-blue-100 text-blue-700' : ''}
-                      ${report.status === 'APPROVED' ? 'bg-green-100 text-green-700' : ''}
-                      ${report.status === 'REJECTED' ? 'bg-red-100 text-red-700' : ''}
-                    `}>
-                      {STATUS_LABELS[report.status]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(report.createdAt).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    {(activeTab === 'DRAFT' || activeTab === 'REVIEWED') && (
-                      <>
-                        <button
-                          onClick={() => handleApprove(report.id)}
-                          disabled={actionInProgress === report.id}
-                          className="inline-flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 disabled:opacity-50"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          승인
-                        </button>
-                        <button
-                          onClick={() => setShowRejectModal(report.id)}
-                          disabled={actionInProgress === report.id}
-                          className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 disabled:opacity-50"
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          반려
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <DataTable
+          columns={columns}
+          dataSource={reports}
+          rowKey="id"
+          loading={isLoading}
+          emptyText={`${STATUS_LABELS[activeTab]} 상태의 신상신고가 없습니다.`}
+        />
+      </div>
 
       {/* Reject Modal */}
       {showRejectModal && (

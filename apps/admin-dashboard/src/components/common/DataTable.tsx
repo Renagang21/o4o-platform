@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 export interface Column<T> {
@@ -26,6 +26,16 @@ interface DataTableProps<T> {
     onClick?: () => void;
     className?: string;
   };
+  rowSelection?: {
+    selectedRowKeys: string[];
+    onChange: (selectedRowKeys: string[]) => void;
+  };
+  expandable?: {
+    expandedRowRender: (record: T) => ReactNode;
+    rowExpandable?: (record: T) => boolean;
+    expandedRowKeys?: string[];
+    onExpand?: (expanded: boolean, record: T) => void;
+  };
   emptyText?: string;
   className?: string;
 }
@@ -37,17 +47,51 @@ export function DataTable<T extends Record<string, any>>({
   loading = false,
   pagination,
   onRow,
+  rowSelection,
+  expandable,
   emptyText = '데이터가 없습니다',
   className = ''
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+  const [internalExpandedKeys, setInternalExpandedKeys] = useState<string[]>([]);
 
   const getRowKey = (record: T, index: number): string => {
     if (typeof rowKey === 'function') {
       return rowKey(record);
     }
     return String(record[rowKey]) || `row-${index}`;
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (rowSelection) {
+      if (checked) {
+        const allKeys = dataSource.map((record, index) => getRowKey(record, index));
+        rowSelection.onChange(allKeys);
+      } else {
+        rowSelection.onChange([]);
+      }
+    }
+  };
+
+  const handleSelectRow = (key: string, checked: boolean) => {
+    if (rowSelection) {
+      const selected = new Set(rowSelection.selectedRowKeys);
+      if (checked) {
+        selected.add(key);
+      } else {
+        selected.delete(key);
+      }
+      rowSelection.onChange(Array.from(selected));
+    }
+  };
+
+  const isExpanded = (record: T, index: number) => {
+    const key = getRowKey(record, index);
+    if (expandable?.expandedRowKeys) {
+      return expandable.expandedRowKeys.includes(key);
+    }
+    return internalExpandedKeys.includes(key);
   };
 
   const getValue = (record: T, dataIndex: keyof T | string[] | undefined): any => {
@@ -136,13 +180,22 @@ export function DataTable<T extends Record<string, any>>({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {rowSelection && (
+                <th className="px-6 py-3 w-4">
+                  <input
+                    type="checkbox"
+                    checked={dataSource.length > 0 && rowSelection.selectedRowKeys.length === dataSource.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                </th>
+              )}
               {columns.map(column => (
                 <th
                   key={column.key}
                   style={{ width: column.width }}
-                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignClass(column.align)} ${
-                    column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
-                  }`}
+                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignClass(column.align)} ${column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
+                    }`}
                   onClick={() => column.sortable && handleSort(column.key)}
                 >
                   <div className="flex items-center gap-1">
@@ -157,7 +210,7 @@ export function DataTable<T extends Record<string, any>>({
             {sortedData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={columns.length + (rowSelection ? 1 : 0)}
                   className="px-6 py-12 text-center text-sm text-gray-500"
                 >
                   {emptyText}
@@ -166,32 +219,53 @@ export function DataTable<T extends Record<string, any>>({
             ) : (
               sortedData.map((record, index) => {
                 const rowProps = onRow?.(record) || {};
-                return (
-                  <tr
-                    key={getRowKey(record, index)}
-                    onClick={rowProps.onClick}
-                    className={`hover:bg-gray-50 ${rowProps.onClick ? 'cursor-pointer' : ''} ${
-                      rowProps.className || ''
-                    }`}
-                  >
-                    {columns.map(column => {
-                      const value = getValue(record, column.dataIndex);
-                      const content = column.render
-                        ? column.render(value, record, index)
-                        : value;
+                const key = getRowKey(record, index);
+                const expanded = isExpanded(record, index);
 
-                      return (
-                        <td
-                          key={column.key}
-                          className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${getAlignClass(
-                            column.align
-                          )}`}
-                        >
-                          {content}
+                return (
+                  <React.Fragment key={key}>
+                    <tr
+                      onClick={rowProps.onClick}
+                      className={`hover:bg-gray-50 ${rowProps.onClick ? 'cursor-pointer' : ''} ${rowProps.className || ''
+                        }`}
+                    >
+                      {rowSelection && (
+                        <td className="px-6 py-4 whitespace-nowrap w-4">
+                          <input
+                            type="checkbox"
+                            checked={rowSelection.selectedRowKeys.includes(key)}
+                            onChange={(e) => handleSelectRow(key, e.target.checked)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="rounded border-gray-300"
+                          />
                         </td>
-                      );
-                    })}
-                  </tr>
+                      )}
+                      {columns.map(column => {
+                        const value = getValue(record, column.dataIndex);
+                        const content = column.render
+                          ? column.render(value, record, index)
+                          : value;
+
+                        return (
+                          <td
+                            key={column.key}
+                            className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${getAlignClass(
+                              column.align
+                            )}`}
+                          >
+                            {content}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    {expanded && expandable && (
+                      <tr className="bg-gray-50">
+                        <td colSpan={columns.length + (rowSelection ? 1 : 0)} className="px-6 py-4">
+                          {expandable.expandedRowRender(record)}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 );
               })
             )}

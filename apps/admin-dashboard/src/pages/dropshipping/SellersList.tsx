@@ -1,10 +1,18 @@
+/**
+ * Dropshipping Sellers List Page
+ *
+ * Refactored: PageHeader + DataTable pattern applied
+ */
+
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Store, Package, TrendingUp, DollarSign, UserPlus, Mail, Phone, Calendar, ShoppingBag } from 'lucide-react';
+import { Edit2, Trash2, Store, TrendingUp, DollarSign, UserPlus, Phone, Calendar, ShoppingBag, Settings, CheckCircle } from 'lucide-react';
 import { UserApi } from '../../api/userApi';
 import { User } from '../../types/user';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '@/lib/utils';
+import PageHeader from '../../components/common/PageHeader';
+import { DataTable, Column } from '../../components/common/DataTable';
 
 interface SellerStats {
   total: number;
@@ -19,13 +27,14 @@ const SellersList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [stats, setStats] = useState<SellerStats>({
     total: 0,
     active: 0,
     pending: 0,
     totalSales: 0
   });
-  const [selectedSellers, setSelectedSellers] = useState<Set<string>>(new Set());
+  const [selectedSellers, setSelectedSellers] = useState<string[]>([]);
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'pending'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -45,13 +54,14 @@ const SellersList: React.FC = () => {
       }
 
       const response = await UserApi.getUsers(page, 20, filters);
-      
+
       // Handle PaginatedResponse structure and ensure data is an array
       const sellerData = Array.isArray(response?.data) ? response.data : [];
-      
+
       setSellers(sellerData);
       setTotalPages(Math.ceil((response?.total || 0) / 20));
-      
+      setTotalCount(response?.total || 0);
+
       // Calculate stats with safe array operations
       setStats({
         total: response?.total || 0,
@@ -60,7 +70,7 @@ const SellersList: React.FC = () => {
         totalSales: 0 // This would come from a separate API
       });
     } catch (error) {
-      
+
       toast.error('판매자 목록을 불러오는데 실패했습니다');
       // Set empty data on error
       setSellers([]);
@@ -83,26 +93,26 @@ const SellersList: React.FC = () => {
       toast.success('판매자가 삭제되었습니다');
       fetchSellers();
     } catch (error) {
-      
+
       toast.error('판매자 삭제에 실패했습니다');
     }
   };
 
   const handleBulkDelete = async () => {
-    if (selectedSellers.size === 0) {
+    if (selectedSellers.length === 0) {
       toast.error('삭제할 판매자를 선택해주세요');
       return;
     }
 
-    if (!confirm(`선택한 ${selectedSellers.size}명의 판매자를 삭제하시겠습니까?`)) return;
+    if (!confirm(`선택한 ${selectedSellers.length}명의 판매자를 삭제하시겠습니까?`)) return;
 
     try {
-      await Promise.all(Array.from(selectedSellers).map(id => UserApi.deleteUser(id)));
+      await Promise.all(selectedSellers.map(id => UserApi.deleteUser(id)));
       toast.success('선택한 판매자가 삭제되었습니다');
-      setSelectedSellers(new Set());
+      setSelectedSellers([]);
       fetchSellers();
     } catch (error) {
-      
+
       toast.error('일괄 삭제에 실패했습니다');
     }
   };
@@ -113,26 +123,8 @@ const SellersList: React.FC = () => {
       toast.success('판매자가 승인되었습니다');
       fetchSellers();
     } catch (error) {
-      
+
       toast.error('판매자 승인에 실패했습니다');
-    }
-  };
-
-  const toggleSelection = (userId: string) => {
-    const newSelection = new Set(selectedSellers);
-    if (newSelection.has(userId)) {
-      newSelection.delete(userId);
-    } else {
-      newSelection.add(userId);
-    }
-    setSelectedSellers(newSelection);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedSellers.size === sellers.length) {
-      setSelectedSellers(new Set());
-    } else {
-      setSelectedSellers(new Set(sellers.map(s => s.id)));
     }
   };
 
@@ -140,7 +132,7 @@ const SellersList: React.FC = () => {
     // This would be based on actual seller performance data
     const levels = ['beginner', 'intermediate', 'expert', 'master'];
     const level = levels[Math.floor(Math.random() * levels.length)];
-    
+
     const levelColors = {
       beginner: 'bg-green-100 text-green-800',
       intermediate: 'bg-blue-100 text-blue-800',
@@ -162,23 +154,148 @@ const SellersList: React.FC = () => {
     );
   };
 
-  return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">판매자 관리</h1>
-            <p className="text-gray-600">드롭쉬핑 판매자 목록 및 관리</p>
-          </div>
+  const getStatusBadge = (status: string) => {
+    const statusColors: Record<string, string> = {
+      active: 'bg-green-100 text-green-800',
+      pending: 'bg-yellow-100 text-yellow-800',
+    };
+
+    const statusLabels: Record<string, string> = {
+      active: '활성',
+      pending: '승인 대기',
+    };
+
+    return (
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+        {statusLabels[status] || status}
+      </span>
+    );
+  };
+
+  // DataTable column definitions
+  const columns: Column<User>[] = [
+    {
+      key: 'info',
+      title: '판매자 정보',
+      render: (_: unknown, record: User) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{record.name}</div>
+          <div className="text-sm text-gray-500">{record.email}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'level',
+      title: '등급',
+      align: 'center',
+      render: (_: unknown, record: User) => getSellerBadge(record),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'phone',
+      title: '연락처',
+      dataIndex: 'phone',
+      render: (value: string) => (
+        value ? (
+          <span className="flex items-center gap-1 text-sm text-gray-500">
+            <Phone className="w-3 h-3" />
+            {value}
+          </span>
+        ) : (
+          <span className="text-gray-400">-</span>
+        )
+      ),
+    },
+    {
+      key: 'createdAt',
+      title: '가입일',
+      dataIndex: 'createdAt',
+      sortable: true,
+      render: (value: string) => (
+        <div className="flex items-center gap-1 text-sm text-gray-500">
+          <Calendar className="w-3 h-3" />
+          {formatDate(value)}
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'center',
+      render: (_: unknown, record: User) => (
+        <div className="flex gap-2 justify-center">
+          {record.status === 'pending' ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleApprove(record.id);
+              }}
+              className="text-green-600 hover:text-green-900 p-1"
+              title="승인"
+            >
+              <CheckCircle className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/users/${record.id}`);
+              }}
+              className="text-blue-600 hover:text-blue-900 p-1"
+              title="수정"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+          )}
           <button
-            onClick={() => navigate('/users/new?role=seller')}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(record.id);
+            }}
+            className="text-red-600 hover:text-red-900 p-1"
+            title="삭제"
           >
-            <UserPlus className="w-4 h-4" />
-            새 판매자 추가
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </div>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'add-seller',
+      label: '새 판매자 추가',
+      icon: <UserPlus className="w-4 h-4" />,
+      onClick: () => navigate('/users/new?role=seller'),
+      variant: 'primary' as const,
+    },
+  ];
+
+  return (
+    <div className="p-6">
+      {/* PageHeader */}
+      <PageHeader
+        title="판매자 관리"
+        subtitle="드롭쉬핑 판매자 목록 및 관리"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -239,166 +356,37 @@ const SellersList: React.FC = () => {
             <option value="active">활성</option>
             <option value="pending">승인 대기</option>
           </select>
-          {selectedSellers.size > 0 && (
+          {selectedSellers.length > 0 && (
             <button
               onClick={handleBulkDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             >
-              선택 삭제 ({selectedSellers.size})
+              선택 삭제 ({selectedSellers.length})
             </button>
           )}
         </div>
       </div>
 
-      {/* Table */}
+      {/* Sellers DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left">
-                <input
-                  type="checkbox"
-                  checked={selectedSellers.size === sellers.length && sellers.length > 0}
-                  onChange={toggleSelectAll}
-                  className="rounded"
-                />
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                판매자 정보
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                등급
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                연락처
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                가입일
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                작업
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : sellers.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8 text-gray-500">
-                  판매자가 없습니다
-                </td>
-              </tr>
-            ) : (
-              sellers.map((seller) => (
-                <tr key={seller.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedSellers.has(seller.id)}
-                      onChange={() => toggleSelection(seller.id)}
-                      className="rounded"
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{seller.name}</div>
-                      <div className="text-sm text-gray-500">{seller.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {getSellerBadge(seller)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      seller.status === 'active' 
-                        ? 'bg-green-100 text-green-800' 
-                        : seller.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {seller.status === 'active' ? '활성' : seller.status === 'pending' ? '승인 대기' : seller.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-4">
-                      {seller.phone && (
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          {seller.phone}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDate(seller.createdAt)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex gap-2">
-                      {seller.status === 'pending' ? (
-                        <button
-                          onClick={() => handleApprove(seller.id)}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          승인
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => navigate(`/users/${seller.id}`)}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(seller.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<User>
+          columns={columns}
+          dataSource={sellers}
+          rowKey="id"
+          loading={loading}
+          emptyText="판매자가 없습니다"
+          rowSelection={{
+            selectedRowKeys: selectedSellers,
+            onChange: setSelectedSellers,
+          }}
+          pagination={{
+            current: page,
+            pageSize: 20,
+            total: totalCount,
+            onChange: (newPage) => setPage(newPage),
+          }}
+        />
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex justify-center gap-2">
-          <button
-            onClick={() => setPage(Math.max(1, page - 1))}
-            disabled={page === 1}
-            className="px-4 py-2 border rounded-lg disabled:opacity-50"
-          >
-            이전
-          </button>
-          <span className="px-4 py-2">
-            {page} / {totalPages}
-          </span>
-          <button
-            onClick={() => setPage(Math.min(totalPages, page + 1))}
-            disabled={page === totalPages}
-            className="px-4 py-2 border rounded-lg disabled:opacity-50"
-          >
-            다음
-          </button>
-        </div>
-      )}
     </div>
   );
 };

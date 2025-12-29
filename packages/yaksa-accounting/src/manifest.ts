@@ -83,6 +83,16 @@ export const manifest: AppManifest = {
   },
 
   /**
+   * 소유 테이블
+   * - yaksa_expense_record: 지출 기록 (ExpenseRecord Entity)
+   * - yaksa_monthly_close: 월별 마감 상태 (MonthlyClose Entity)
+   */
+  ownsTables: [
+    'yaksa_expense_record',
+    'yaksa_monthly_close',
+  ],
+
+  /**
    * 선택적 의존성 (연동 대상)
    * 별도 필드로 관리 (AppManifest [key: string]: any 활용)
    */

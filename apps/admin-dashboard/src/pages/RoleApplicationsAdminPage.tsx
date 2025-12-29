@@ -1,6 +1,8 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useMemo } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { CheckCircle, XCircle, User, Building, Hash, Calendar } from 'lucide-react';
+import PageHeader from '@/components/common/PageHeader';
+import DataTable from '@/components/common/DataTable';
 
 interface RoleApplication {
   id: string;
@@ -152,43 +154,148 @@ const RoleApplicationsAdminPage: FC = () => {
     );
   };
 
+  const columns = useMemo(() => [
+    {
+      key: 'user',
+      title: '사용자',
+      render: (_: any, application: RoleApplication) => (
+        <div className="flex items-center">
+          <User className="w-4 h-4 text-gray-400 mr-2" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">
+              {application.user?.name || 'Unknown'}
+            </div>
+            <div className="text-sm text-gray-500">
+              {application.user?.email || 'No email'}
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'role',
+      title: '역할',
+      dataIndex: 'role' as keyof RoleApplication,
+      render: (role: string) => <span className="text-sm text-gray-900">{getRoleName(role)}</span>
+    },
+    {
+      key: 'business',
+      title: '사업자 정보',
+      render: (_: any, application: RoleApplication) => (
+        <div className="text-sm text-gray-900">
+          {application.businessName && (
+            <div className="flex items-center mb-1">
+              <Building className="w-4 h-4 text-gray-400 mr-2" />
+              {application.businessName}
+            </div>
+          )}
+          {application.businessNumber && (
+            <div className="flex items-center text-gray-500">
+              <Hash className="w-4 h-4 text-gray-400 mr-2" />
+              {application.businessNumber}
+            </div>
+          )}
+          {!application.businessName && !application.businessNumber && (
+            <span className="text-gray-400">정보 없음</span>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'appliedAt',
+      title: '신청일',
+      dataIndex: 'appliedAt' as keyof RoleApplication,
+      render: (date: string) => (
+        <div className="flex items-center text-sm text-gray-500">
+          <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+          {formatDate(date)}
+        </div>
+      )
+    },
+    {
+      key: 'status',
+      title: '상태',
+      render: (_: any, application: RoleApplication) => (
+        <div>
+          {getStatusBadge(application.status)}
+          {application.status === 'rejected' && application.rejectionReason && (
+            <div className="text-xs text-gray-500 mt-1">
+              사유: {application.rejectionReason}
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      render: (_: any, application: RoleApplication) => (
+        activeTab === 'pending' ? (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleApprove(application.id)}
+              disabled={actionLoading === application.id}
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {actionLoading === application.id ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
+              승인
+            </button>
+            <button
+              onClick={() => handleReject(application.id)}
+              disabled={actionLoading === application.id}
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {actionLoading === application.id ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <XCircle className="w-4 h-4" />
+              )}
+              거부
+            </button>
+          </div>
+        ) : null
+      )
+    }
+  ], [activeTab, actionLoading]);
+
   return (
     <div className="wordpress-admin-page">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">역할 신청 관리</h1>
-        <p className="text-sm text-gray-600 mt-1">사용자의 역할 신청을 검토하고 승인/거부할 수 있습니다.</p>
-      </div>
+      <PageHeader
+        title="역할 신청 관리"
+        subtitle="사용자의 역할 신청을 검토하고 승인/거부할 수 있습니다."
+      />
 
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
         <nav className="flex gap-8">
           <button
             onClick={() => setActiveTab('pending')}
-            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'pending'
+            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'pending'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             대기중
           </button>
           <button
             onClick={() => setActiveTab('approved')}
-            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'approved'
+            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'approved'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             승인됨
           </button>
           <button
             onClick={() => setActiveTab('rejected')}
-            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'rejected'
+            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'rejected'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             거부됨
           </button>
@@ -197,11 +304,7 @@ const RoleApplicationsAdminPage: FC = () => {
 
       {/* Content */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="p-6 text-center text-red-600">
             <p>{error}</p>
             <button
@@ -211,128 +314,18 @@ const RoleApplicationsAdminPage: FC = () => {
               다시 시도
             </button>
           </div>
-        ) : applications.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            {activeTab === 'pending' && '대기 중인 역할 신청이 없습니다.'}
-            {activeTab === 'approved' && '승인된 역할 신청이 없습니다.'}
-            {activeTab === 'rejected' && '거부된 역할 신청이 없습니다.'}
-          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    사용자
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    역할
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    사업자 정보
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    신청일
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    상태
-                  </th>
-                  {activeTab === 'pending' && (
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      작업
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {applications.map((application) => (
-                  <tr key={application.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <User className="w-4 h-4 text-gray-400 mr-2" />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {application.user?.name || 'Unknown'}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {application.user?.email || 'No email'}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {getRoleName(application.role)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {application.businessName && (
-                          <div className="flex items-center mb-1">
-                            <Building className="w-4 h-4 text-gray-400 mr-2" />
-                            {application.businessName}
-                          </div>
-                        )}
-                        {application.businessNumber && (
-                          <div className="flex items-center text-gray-500">
-                            <Hash className="w-4 h-4 text-gray-400 mr-2" />
-                            {application.businessNumber}
-                          </div>
-                        )}
-                        {!application.businessName && !application.businessNumber && (
-                          <span className="text-gray-400">정보 없음</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                        {formatDate(application.appliedAt)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(application.status)}
-                      {application.status === 'rejected' && application.rejectionReason && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          사유: {application.rejectionReason}
-                        </div>
-                      )}
-                    </td>
-                    {activeTab === 'pending' && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleApprove(application.id)}
-                            disabled={actionLoading === application.id}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {actionLoading === application.id ? (
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <CheckCircle className="w-4 h-4" />
-                            )}
-                            승인
-                          </button>
-                          <button
-                            onClick={() => handleReject(application.id)}
-                            disabled={actionLoading === application.id}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {actionLoading === application.id ? (
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <XCircle className="w-4 h-4" />
-                            )}
-                            거부
-                          </button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={columns}
+            dataSource={applications}
+            rowKey="id"
+            loading={loading}
+            emptyText={
+              activeTab === 'pending' ? '대기 중인 역할 신청이 없습니다.' :
+                activeTab === 'approved' ? '승인된 역할 신청이 없습니다.' :
+                  '거부된 역할 신청이 없습니다.'
+            }
+          />
         )}
       </div>
     </div>

@@ -1,9 +1,12 @@
 /**
  * SupplierOps Offers Page
+ *
+ * Refactored: PageHeader pattern applied (card grid layout preserved)
  */
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Tag, Users } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
 
 interface Offer {
   id: string;
@@ -64,18 +67,27 @@ const Offers: React.FC = () => {
     o.productName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'create-offer',
+      label: 'Offer 생성',
+      icon: <Plus className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Create offer clicked');
+      },
+      variant: 'primary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Offer 관리</h1>
-          <p className="text-gray-600">Seller에게 제공하는 가격/재고 Offer를 관리하세요</p>
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          <Plus className="w-4 h-4" />
-          Offer 생성
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="Offer 관리"
+        subtitle="Seller에게 제공하는 가격/재고 Offer를 관리하세요"
+        actions={headerActions}
+      />
 
       {/* Search */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">

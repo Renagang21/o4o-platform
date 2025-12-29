@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, RefreshCw, Database, Loader, AlertTriangle, Play, Zap } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw, Database, Loader, AlertTriangle, Play, Zap, Settings } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { apiClient as api } from '../../services/api';
 import { authClient } from '@o4o/auth-client';
+import PageHeader from '../../components/common/PageHeader';
 
 interface SystemStatus {
   cpts: {
@@ -107,12 +107,18 @@ const SystemSetup: React.FC = () => {
     );
   }
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: checkSystemStatus, variant: 'secondary' as const },
+  ];
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">드롭쉬핑 시스템 설정</h1>
-        <p className="text-gray-600">CPT/ACF 기반 드롭쉬핑 플랫폼 초기화 및 관리</p>
-      </div>
+      <PageHeader
+        title="드롭쉬핑 시스템 설정"
+        subtitle="CPT/ACF 기반 드롭쉬핑 플랫폼 초기화 및 관리"
+        actions={headerActions}
+      />
 
       {/* System Status Card */}
       <div className="bg-white border border-gray-300 rounded-lg p-6 mb-6">

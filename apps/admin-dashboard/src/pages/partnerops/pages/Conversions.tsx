@@ -5,13 +5,14 @@
  * - Conversion list with status
  * - Funnel analysis
  * - Period-based filtering
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import {
   TrendingUp,
-  TrendingDown,
   Filter,
   Download,
   Calendar,
@@ -19,7 +20,10 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  Settings,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 /**
  * Conversion Item (Partner-Core aligned)
@@ -193,26 +197,95 @@ const Conversions: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // DataTable column definitions
+  const columns: Column<Conversion>[] = [
+    {
+      key: 'orderNumber',
+      title: '주문번호',
+      render: (_: unknown, record: Conversion) => (
+        <span className="font-medium">{record.orderNumber || record.orderId}</span>
+      ),
+    },
+    {
+      key: 'orderAmount',
+      title: '주문금액',
+      dataIndex: 'orderAmount',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span>{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'commissionAmount',
+      title: '커미션',
+      dataIndex: 'commissionAmount',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium text-blue-600">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'createdAt',
+      title: '생성일',
+      dataIndex: 'createdAt',
+      sortable: true,
+      render: (value: string) => (
+        <span className="text-sm text-gray-600">
+          {new Date(value).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'confirmedAt',
+      title: '확정일',
+      dataIndex: 'confirmedAt',
+      render: (value: string | undefined) => (
+        <span className="text-sm text-gray-600">
+          {value ? new Date(value).toLocaleDateString() : '-'}
+        </span>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'export',
+      label: '내보내기',
+      icon: <Download className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Export clicked');
+      },
+      variant: 'secondary' as const,
+    },
+  ];
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">전환 분석</h1>
-          <p className="text-gray-600">파트너 링크를 통한 전환 내역을 확인합니다</p>
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
-          <Download className="w-4 h-4" />
-          내보내기
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="전환 분석"
+        subtitle="파트너 링크를 통한 전환 내역을 확인합니다"
+        actions={headerActions}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -306,48 +379,15 @@ const Conversions: React.FC = () => {
         </div>
       </div>
 
-      {/* Conversions Table */}
+      {/* Conversions DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">주문번호</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">주문금액</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">커미션</th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">상태</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">생성일</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">확정일</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {conversions.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  전환 내역이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              conversions.map((conv) => (
-                <tr key={conv.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{conv.orderNumber || conv.orderId}</td>
-                  <td className="px-4 py-3 text-right">
-                    {conv.orderAmount.toLocaleString()}원
-                  </td>
-                  <td className="px-4 py-3 text-right font-medium text-blue-600">
-                    {conv.commissionAmount.toLocaleString()}원
-                  </td>
-                  <td className="px-4 py-3 text-center">{getStatusBadge(conv.status)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {new Date(conv.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {conv.confirmedAt ? new Date(conv.confirmedAt).toLocaleDateString() : '-'}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<Conversion>
+          columns={columns}
+          dataSource={conversions}
+          rowKey="id"
+          loading={loading}
+          emptyText="전환 내역이 없습니다."
+        />
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 /**
  * SellerOps Orders Page
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
@@ -11,7 +13,10 @@ import {
   Clock,
   AlertCircle,
   Eye,
+  RefreshCw,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 interface Order {
   id: string;
@@ -114,12 +119,106 @@ const OrdersList: React.FC = () => {
     o.productName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // DataTable column definitions
+  const columns: Column<Order>[] = [
+    {
+      key: 'orderInfo',
+      title: '주문 정보',
+      render: (_: unknown, record: Order) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">
+            {record.productName}
+          </div>
+          <div className="text-xs text-gray-500">
+            #{record.id.slice(0, 8)}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'quantity',
+      title: '수량',
+      dataIndex: 'quantity',
+      align: 'center',
+      sortable: true,
+    },
+    {
+      key: 'totalPrice',
+      title: '금액',
+      dataIndex: 'totalPrice',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '주문 상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'relayStatus',
+      title: '배송 상태',
+      dataIndex: 'relayStatus',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'createdAt',
+      title: '주문일',
+      dataIndex: 'createdAt',
+      align: 'center',
+      sortable: true,
+      render: (value: Date) => (
+        <span className="text-sm text-gray-500">
+          {value.toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '상세',
+      align: 'center',
+      render: (_: unknown, record: Order) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('View order:', record.id);
+          }}
+          className="text-blue-600 hover:text-blue-900 p-1"
+          title="상세 보기"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'refresh',
+      label: '새로고침',
+      icon: <RefreshCw className="w-4 h-4" />,
+      onClick: () => {
+        setLoading(true);
+        setTimeout(() => setLoading(false), 500);
+      },
+      variant: 'secondary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">주문/배송 관리</h1>
-        <p className="text-gray-600">주문 현황 및 배송 상태 조회</p>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="주문/배송 관리"
+        subtitle="주문 현황 및 배송 상태 조회"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -179,83 +278,15 @@ const OrdersList: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* Orders DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                주문 정보
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                수량
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                금액
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                주문 상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                배송 상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                주문일
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상세
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : filteredOrders.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8 text-gray-500">
-                  주문이 없습니다
-                </td>
-              </tr>
-            ) : (
-              filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {order.productName}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      #{order.id.slice(0, 8)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {order.quantity}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {order.totalPrice.toLocaleString()}원
-                  </td>
-                  <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
-                  <td className="px-6 py-4">
-                    {getStatusBadge(order.relayStatus)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {order.createdAt.toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-900">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<Order>
+          columns={columns}
+          dataSource={filteredOrders}
+          rowKey="id"
+          loading={loading}
+          emptyText="주문이 없습니다"
+        />
       </div>
     </div>
   );
