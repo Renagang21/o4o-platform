@@ -11,7 +11,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/main-site-nextgen/**'
+      - 'apps/main-site/**'
       - '.github/workflows/deploy-main-site.yml'
   workflow_dispatch:
     inputs:
@@ -45,10 +45,10 @@ jobs:
       with:
         node-version: '22.18.0'
 
-    - name: Build main site (NextGen)
+    - name: Build main site
       run: |
-        echo "🔨 Building main site (NextGen)..."
-        cd apps/main-site-nextgen
+        echo "🔨 Building main site..."
+        cd apps/main-site
 
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
@@ -74,7 +74,7 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        cd apps/main-site-nextgen
+        cd apps/main-site
 
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
