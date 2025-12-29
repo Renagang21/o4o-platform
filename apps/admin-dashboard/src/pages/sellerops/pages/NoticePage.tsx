@@ -1,9 +1,12 @@
 /**
  * SellerOps Notice Page
+ *
+ * Refactored: PageHeader pattern applied (master-detail layout preserved)
  */
 
 import React, { useState, useEffect } from 'react';
 import { FileText, ChevronRight, Book, Bell, Info } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
 
 interface Document {
   id: string;
@@ -89,10 +92,11 @@ const NoticePage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">공지사항</h1>
-        <p className="text-gray-600">플랫폼 공지 및 이용 가이드</p>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="공지사항"
+        subtitle="플랫폼 공지 및 이용 가이드"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Document List */}

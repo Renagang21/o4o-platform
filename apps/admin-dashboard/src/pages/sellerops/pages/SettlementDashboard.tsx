@@ -1,5 +1,7 @@
 /**
  * SellerOps Settlement Dashboard
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
@@ -9,7 +11,11 @@ import {
   Clock,
   CheckCircle,
   Calendar,
+  Download,
+  Eye,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 interface SettlementBatch {
   id: string;
@@ -99,12 +105,100 @@ const SettlementDashboard: React.FC = () => {
     }
   };
 
+  // DataTable column definitions
+  const columns: Column<SettlementBatch>[] = [
+    {
+      key: 'period',
+      title: '정산 기간',
+      render: (_: unknown, record: SettlementBatch) => (
+        <div>
+          <p className="font-medium">
+            {record.periodStart.toLocaleDateString()} ~{' '}
+            {record.periodEnd.toLocaleDateString()}
+          </p>
+          <p className="text-sm text-gray-500">
+            거래 {record.transactionCount}건
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: 'totalAmount',
+      title: '매출',
+      dataIndex: 'totalAmount',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span>{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'commissionAmount',
+      title: '수수료',
+      dataIndex: 'commissionAmount',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="text-orange-600">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'netAmount',
+      title: '정산액',
+      dataIndex: 'netAmount',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium text-blue-600">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'actions',
+      title: '상세',
+      align: 'center',
+      render: (_: unknown, record: SettlementBatch) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('View settlement:', record.id);
+          }}
+          className="text-blue-600 hover:text-blue-900 p-1"
+          title="상세 보기"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'download',
+      label: '내역 다운로드',
+      icon: <Download className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Download settlement history');
+      },
+      variant: 'secondary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">정산 관리</h1>
-        <p className="text-gray-600">정산 현황 및 수수료 내역</p>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="정산 관리"
+        subtitle="정산 현황 및 수수료 내역"
+        actions={headerActions}
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -157,51 +251,15 @@ const SettlementDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Settlement Batches */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-semibold">정산 내역</h2>
-        </div>
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          </div>
-        ) : (
-          <div className="divide-y">
-            {batches.map((batch) => (
-              <div
-                key={batch.id}
-                className="p-4 hover:bg-gray-50 cursor-pointer"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="font-medium">
-                      {batch.periodStart.toLocaleDateString()} ~{' '}
-                      {batch.periodEnd.toLocaleDateString()}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      거래 {batch.transactionCount}건
-                    </p>
-                  </div>
-                  {getStatusBadge(batch.status)}
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">
-                    매출: {batch.totalAmount.toLocaleString()}원
-                  </span>
-                  <span className="text-gray-600">
-                    수수료: {batch.commissionAmount.toLocaleString()}원
-                  </span>
-                </div>
-                <div className="text-right mt-1">
-                  <span className="font-medium text-blue-600">
-                    정산액: {batch.netAmount.toLocaleString()}원
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Settlement Batches DataTable */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <DataTable<SettlementBatch>
+          columns={columns}
+          dataSource={batches}
+          rowKey="id"
+          loading={loading}
+          emptyText="정산 내역이 없습니다"
+        />
       </div>
     </div>
   );

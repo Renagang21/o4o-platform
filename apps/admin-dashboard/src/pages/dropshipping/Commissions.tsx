@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, DollarSign, Users, Calendar, TrendingUp, Settings, Award } from 'lucide-react';
+import { Plus, DollarSign, Users, Calendar, TrendingUp, Settings, Award, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { authClient } from '@o4o/auth-client';
+import PageHeader from '../../components/common/PageHeader';
+import { DataTable, Column } from '../../components/common/DataTable';
 
 interface CommissionPolicy {
   id: string;
@@ -109,22 +111,111 @@ const Commissions: React.FC = () => {
     scheduled: policies.filter(p => p.status === 'scheduled').length
   };
 
+  const headerActions = [
+    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchCommissionPolicies, variant: 'secondary' as const },
+    { id: 'add-policy', label: '새로 추가', icon: <Plus className="w-4 h-4" />, onClick: handleCreate, variant: 'primary' as const },
+  ];
+
+  const columns: Column<CommissionPolicy>[] = [
+    {
+      key: 'title',
+      title: '정책명',
+      dataIndex: 'title',
+      render: (value: string, record: CommissionPolicy) => (
+        <div>
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); handleEdit(record); }}
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            {value}
+          </a>
+          <div className="text-sm text-gray-500 mt-1">공급자: {record.supplier}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'partnerGrades',
+      title: '적용 등급',
+      dataIndex: 'partnerGrades',
+      render: (value: string[]) => (
+        <span className="text-sm">{getGradeLabels(value)}</span>
+      ),
+    },
+    {
+      key: 'commissionRate',
+      title: '수수료율',
+      dataIndex: 'commissionRate',
+      align: 'center' as const,
+      render: (value: number) => (
+        <strong className="text-lg text-blue-600">{value}%</strong>
+      ),
+    },
+    {
+      key: 'minOrderAmount',
+      title: '최소 주문금액',
+      dataIndex: 'minOrderAmount',
+      align: 'right' as const,
+      render: (value: number) => value > 0 ? (
+        <span>₩{value.toLocaleString()}</span>
+      ) : (
+        <span className="text-gray-400">제한 없음</span>
+      ),
+    },
+    {
+      key: 'period',
+      title: '기간',
+      render: (_: unknown, record: CommissionPolicy) => (
+        <div className="text-sm">
+          <div>{new Date(record.startDate).toLocaleDateString('ko-KR')}</div>
+          {record.endDate && (
+            <div className="text-gray-500">~ {new Date(record.endDate).toLocaleDateString('ko-KR')}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center' as const,
+      render: (value: string) => getStatusBadge(value),
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'center' as const,
+      render: (_: unknown, record: CommissionPolicy) => (
+        <div className="flex gap-2 justify-center">
+          <button
+            onClick={() => handleEdit(record)}
+            className="text-blue-600 hover:text-blue-800 text-sm"
+          >
+            편집
+          </button>
+          <button
+            onClick={() => handleDelete(record.id)}
+            className="text-red-600 hover:text-red-800 text-sm"
+          >
+            삭제
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   if (showForm) {
     return <CommissionPolicyForm policy={selectedPolicy} onClose={() => setShowForm(false)} />;
   }
 
   return (
     <div className="p-6">
-      {/* WordPress Admin Style Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-normal text-gray-900">수수료 정책</h1>
-        <button
-          onClick={handleCreate}
-          className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition"
-        >
-          새로 추가
-        </button>
-      </div>
+      <PageHeader
+        title="수수료 정책"
+        subtitle="파트너 수수료 정책을 관리합니다"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -169,126 +260,13 @@ const Commissions: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white border border-gray-300 rounded-t-lg p-3 flex justify-between items-center">
-        <div className="flex gap-2">
-          <select className="px-3 py-1 border border-gray-300 rounded text-sm">
-            <option value="">일괄 작업</option>
-            <option value="delete">삭제</option>
-            <option value="deactivate">비활성화</option>
-          </select>
-          <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">
-            적용
-          </button>
-        </div>
-        
-        <div className="flex gap-2 items-center">
-          <select className="px-3 py-1 border border-gray-300 rounded text-sm">
-            <option value="">모든 상태</option>
-            <option value="active">활성</option>
-            <option value="scheduled">예약됨</option>
-            <option value="expired">만료됨</option>
-          </select>
-          <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">
-            필터
-          </button>
-        </div>
-      </div>
-
-      {/* WordPress Style Table */}
-      <div className="bg-white border-x border-b border-gray-300 rounded-b-lg">
-        <table className="w-full wp-list-table widefat fixed striped">
-          <thead>
-            <tr>
-              <td className="manage-column check-column">
-                <input 
-                  type="checkbox" 
-                  onChange={toggleSelectAll}
-                  checked={bulkSelection.length === policies.length && policies.length > 0}
-                />
-              </td>
-              <th className="manage-column column-title column-primary">
-                <span>정책명</span>
-              </th>
-              <th className="manage-column">적용 등급</th>
-              <th className="manage-column">수수료율</th>
-              <th className="manage-column">최소 주문금액</th>
-              <th className="manage-column">기간</th>
-              <th className="manage-column">상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            {policies.map((policy) => (
-              <tr key={policy.id}>
-                <th scope="row" className="check-column">
-                  <input 
-                    type="checkbox"
-                    checked={bulkSelection.includes(policy.id)}
-                    onChange={() => toggleBulkSelect(policy.id)}
-                  />
-                </th>
-                <td className="title column-title column-primary page-title">
-                  <strong>
-                    <a 
-                      href="#" 
-                      onClick={(e) => { e.preventDefault(); handleEdit(policy); }}
-                      className="row-title"
-                    >
-                      {policy.title}
-                    </a>
-                  </strong>
-                  <div className="text-sm text-gray-500 mt-1">
-                    공급자: {policy.supplier}
-                  </div>
-                  <div className="row-actions">
-                    <span className="edit">
-                      <a href="#" onClick={(e) => { e.preventDefault(); handleEdit(policy); }}>
-                        편집
-                      </a>
-                    </span>
-                    {' | '}
-                    <span className="trash">
-                      <a 
-                        href="#" 
-                        onClick={(e) => { e.preventDefault(); handleDelete(policy.id); }}
-                        className="submitdelete"
-                      >
-                        휴지통
-                      </a>
-                    </span>
-                  </div>
-                </td>
-                <td>
-                  <span className="text-sm">
-                    {getGradeLabels(policy.partnerGrades)}
-                  </span>
-                </td>
-                <td>
-                  <strong className="text-lg text-wordpress-blue">
-                    {policy.commissionRate}%
-                  </strong>
-                </td>
-                <td>
-                  {policy.minOrderAmount > 0 ? (
-                    <span>₩{policy.minOrderAmount.toLocaleString()}</span>
-                  ) : (
-                    <span className="text-gray-400">제한 없음</span>
-                  )}
-                </td>
-                <td className="text-sm">
-                  <div>{new Date(policy.startDate).toLocaleDateString('ko-KR')}</div>
-                  {policy.endDate && (
-                    <div className="text-gray-500">
-                      ~ {new Date(policy.endDate).toLocaleDateString('ko-KR')}
-                    </div>
-                  )}
-                </td>
-                <td>{getStatusBadge(policy.status)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* DataTable */}
+      <DataTable<CommissionPolicy>
+        columns={columns}
+        data={policies}
+        loading={loading}
+        emptyMessage="수수료 정책이 없습니다"
+      />
     </div>
   );
 };

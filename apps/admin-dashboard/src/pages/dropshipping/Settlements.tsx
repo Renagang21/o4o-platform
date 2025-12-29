@@ -1,7 +1,14 @@
+/**
+ * Dropshipping Settlements Page
+ *
+ * Refactored: PageHeader pattern applied (Master-Detail layout - DataTable not applicable)
+ */
+
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, Clock, CheckCircle, CreditCard, Building } from 'lucide-react';
+import { DollarSign, TrendingUp, Clock, CheckCircle, CreditCard, Building, RefreshCw, Settings } from 'lucide-react';
 import { dropshippingAPI } from '../../api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
+import PageHeader from '../../components/common/PageHeader';
 
 interface Settlement {
   id: string;
@@ -256,23 +263,43 @@ const Settlements: React.FC = () => {
     );
   }
 
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'refresh',
+      label: '새로고침',
+      icon: <RefreshCw className="w-4 h-4" />,
+      onClick: fetchSettlements,
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'bulk-settle',
+      label: '일괄 정산',
+      icon: <DollarSign className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Bulk settlement clicked');
+      },
+      variant: 'primary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-normal text-gray-900">정산 관리</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={fetchSettlements}
-            className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition"
-          >
-            새로고침
-          </button>
-          <button className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">
-            일괄 정산
-          </button>
-        </div>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="정산 관리"
+        subtitle="드롭쉬핑 정산 목록 및 상세"
+        actions={headerActions}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">

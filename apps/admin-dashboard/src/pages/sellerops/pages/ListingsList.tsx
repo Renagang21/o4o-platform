@@ -1,5 +1,7 @@
 /**
  * SellerOps Listings Page
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
@@ -12,7 +14,10 @@ import {
   PowerOff,
   Search,
   Filter,
+  Settings,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 
 interface Listing {
   id: string;
@@ -93,21 +98,140 @@ const ListingsList: React.FC = () => {
       l.productName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+  // DataTable column definitions
+  const columns: Column<Listing>[] = [
+    {
+      key: 'productInfo',
+      title: '상품 정보',
+      render: (_: unknown, record: Listing) => (
+        <div>
+          <p className="font-medium">{record.productName}</p>
+          <p className="text-sm text-gray-500">SKU: {record.sku}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'supplyPrice',
+      title: '공급가',
+      dataIndex: 'supplyPrice',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span>{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'sellingPrice',
+      title: '판매가',
+      dataIndex: 'sellingPrice',
+      align: 'right',
+      sortable: true,
+      render: (value: number) => (
+        <span className="font-medium">{value.toLocaleString()}원</span>
+      ),
+    },
+    {
+      key: 'margin',
+      title: '마진',
+      render: (_: unknown, record: Listing) => (
+        <div className="text-sm">
+          <span className={`font-medium ${record.margin > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {record.margin.toLocaleString()}원
+          </span>
+          <span className="text-gray-500 ml-1">({record.marginRate}%)</span>
+        </div>
+      ),
+    },
+    {
+      key: 'stock',
+      title: '재고',
+      dataIndex: 'stock',
+      align: 'center',
+      sortable: true,
+      render: (value: number) => (
+        <span className={value < 10 ? 'text-red-600 font-medium' : ''}>
+          {value}
+        </span>
+      ),
+    },
+    {
+      key: 'isActive',
+      title: '상태',
+      dataIndex: 'isActive',
+      align: 'center',
+      render: (value: boolean) => (
+        <span
+          className={`px-2 py-1 text-xs font-medium rounded-full ${
+            value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }`}
+        >
+          {value ? '판매중' : '판매중지'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      title: '작업',
+      align: 'center',
+      render: (_: unknown, record: Listing) => (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleActive(record);
+            }}
+            className={`p-1 rounded ${
+              record.isActive
+                ? 'text-gray-600 hover:bg-gray-100'
+                : 'text-green-600 hover:bg-green-50'
+            }`}
+            title={record.isActive ? '판매 중지' : '판매 시작'}
+          >
+            {record.isActive ? (
+              <PowerOff className="w-4 h-4" />
+            ) : (
+              <Power className="w-4 h-4" />
+            )}
+          </button>
+          <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button className="p-1 text-red-600 hover:bg-red-50 rounded">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'add-listing',
+      label: '새 리스팅 등록',
+      icon: <Plus className="w-4 h-4" />,
+      onClick: () => navigate('/sellerops/listings/new'),
+      variant: 'primary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">리스팅 관리</h1>
-          <p className="text-gray-600">등록한 상품 리스팅 관리</p>
-        </div>
-        <button
-          onClick={() => navigate('/sellerops/listings/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" />
-          새 리스팅 등록
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="리스팅 관리"
+        subtitle="등록한 상품 리스팅 관리"
+        actions={headerActions}
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -127,7 +251,7 @@ const ListingsList: React.FC = () => {
             <select
               className="px-4 py-2 border rounded-lg"
               value={filterActive}
-              onChange={(e) => setFilterActive(e.target.value as any)}
+              onChange={(e) => setFilterActive(e.target.value as 'all' | 'active' | 'inactive')}
             >
               <option value="all">전체</option>
               <option value="active">판매중</option>
@@ -137,132 +261,15 @@ const ListingsList: React.FC = () => {
         </div>
       </div>
 
-      {/* Listings Table */}
+      {/* Listings DataTable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상품 정보
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                공급가
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                판매가
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                마진
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                재고
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상태
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                작업
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : filteredListings.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-8 text-gray-500">
-                  등록된 리스팅이 없습니다
-                </td>
-              </tr>
-            ) : (
-              filteredListings.map((listing) => (
-                <tr key={listing.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {listing.productName}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        SKU: {listing.sku}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {listing.supplyPrice.toLocaleString()}원
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                    {listing.sellingPrice.toLocaleString()}원
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm">
-                      <span
-                        className={`font-medium ${listing.margin > 0 ? 'text-green-600' : 'text-red-600'}`}
-                      >
-                        {listing.margin.toLocaleString()}원
-                      </span>
-                      <span className="text-gray-500 ml-1">
-                        ({listing.marginRate}%)
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <span
-                      className={
-                        listing.stock < 10
-                          ? 'text-red-600 font-medium'
-                          : 'text-gray-900'
-                      }
-                    >
-                      {listing.stock}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        listing.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {listing.isActive ? '판매중' : '판매중지'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleToggleActive(listing)}
-                        className={`p-1 rounded ${
-                          listing.isActive
-                            ? 'text-gray-600 hover:text-gray-900'
-                            : 'text-green-600 hover:text-green-900'
-                        }`}
-                        title={listing.isActive ? '판매 중지' : '판매 시작'}
-                      >
-                        {listing.isActive ? (
-                          <PowerOff className="w-4 h-4" />
-                        ) : (
-                          <Power className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button className="p-1 text-blue-600 hover:text-blue-900">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button className="p-1 text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable<Listing>
+          columns={columns}
+          dataSource={filteredListings}
+          rowKey="id"
+          loading={loading}
+          emptyText="등록된 리스팅이 없습니다"
+        />
       </div>
     </div>
   );

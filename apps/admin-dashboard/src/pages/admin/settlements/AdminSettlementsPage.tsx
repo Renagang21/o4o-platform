@@ -1,11 +1,15 @@
 /**
  * Admin Settlements Page
  * Phase SETTLE-ADMIN: Admin 정산 관리 대시보드 - 목록 페이지
+ *
+ * Refactored: PageHeader + DataTable pattern applied
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, AlertCircle, RefreshCw, FileText, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { Eye, AlertCircle, RefreshCw, FileText, DollarSign, Clock, CheckCircle, Settings } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
+import { DataTable, Column } from '../../../components/common/DataTable';
 import type {
   AdminSettlementView,
   SettlementPartyType,
@@ -180,22 +184,129 @@ export const AdminSettlementsPage: React.FC = () => {
     };
   }, [settlements]);
 
+  // DataTable column definitions
+  const columns: Column<AdminSettlementView>[] = [
+    {
+      key: 'id',
+      title: '정산 ID',
+      dataIndex: 'id',
+      render: (value: string) => (
+        <span className="font-medium text-blue-600">{value}</span>
+      ),
+    },
+    {
+      key: 'partyType',
+      title: '대상 유형',
+      dataIndex: 'partyType',
+      align: 'center',
+      render: (value: SettlementPartyType) => getPartyTypeBadge(value),
+    },
+    {
+      key: 'party',
+      title: '대상 이름/ID',
+      render: (_: unknown, record: AdminSettlementView) => (
+        <div>
+          <div className="font-medium">{record.partyName || record.partyId}</div>
+          {record.partyName && (
+            <div className="text-xs text-gray-500 font-mono">{record.partyId}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'period',
+      title: '정산 기간',
+      render: (_: unknown, record: AdminSettlementView) => {
+        const periodStart = (record as any).periodStart || (record as any).period_start;
+        const periodEnd = (record as any).periodEnd || (record as any).period_end;
+        return (
+          <span className="text-sm">
+            {formatDate(periodStart)} ~ {formatDate(periodEnd)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'amount',
+      title: '정산 금액',
+      align: 'right',
+      render: (_: unknown, record: AdminSettlementView) => {
+        const payableAmount = (record as any).payableAmount || (record as any).net_payout_amount;
+        return (
+          <span className="font-medium">{formatCurrency(payableAmount, record.currency)}</span>
+        );
+      },
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value: SettlementStatus) => getStatusBadge(value),
+    },
+    {
+      key: 'paidAt',
+      title: '지급일',
+      render: (_: unknown, record: AdminSettlementView) => {
+        const paidAt = (record as any).paidAt || (record as any).paid_at;
+        return <span className="text-sm">{formatDate(paidAt)}</span>;
+      },
+    },
+    {
+      key: 'createdAt',
+      title: '생성일',
+      render: (_: unknown, record: AdminSettlementView) => {
+        const createdAt = (record as any).createdAt || (record as any).created_at;
+        return <span className="text-sm">{formatDate(createdAt)}</span>;
+      },
+    },
+    {
+      key: 'actions',
+      title: '상세',
+      align: 'center',
+      render: (_: unknown, record: AdminSettlementView) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/admin/settlements/${record.id}`);
+          }}
+          className="text-blue-600 hover:text-blue-900 p-1"
+          title="상세 보기"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
+
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'screen-options',
+      label: 'Screen Options',
+      icon: <Settings className="w-4 h-4" />,
+      onClick: () => {
+        console.log('Screen options clicked');
+      },
+      variant: 'secondary' as const,
+    },
+    {
+      id: 'refresh',
+      label: '새로고침',
+      icon: <RefreshCw className="w-4 h-4" />,
+      onClick: handleRetry,
+      variant: 'secondary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-normal text-gray-900">정산 관리</h1>
-          <p className="text-sm text-gray-600 mt-1">Seller/Supplier 정산 통합 관리 대시보드</p>
-        </div>
-        <button
-          onClick={handleRetry}
-          className="flex items-center gap-2 px-4 py-2 bg-wordpress-blue text-white rounded hover:bg-wordpress-blue-hover transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          새로고침
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="정산 관리"
+        subtitle="Seller/Supplier 정산 통합 관리 대시보드"
+        actions={headerActions}
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -312,135 +423,41 @@ export const AdminSettlementsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Settlements Table */}
-      <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-gray-500">정산 내역을 불러오는 중입니다...</div>
-        ) : error ? (
-          <div className="p-12 text-center">
-            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">정산 내역을 불러올 수 없습니다</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button
-              onClick={handleRetry}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-            >
-              <RefreshCw className="w-5 h-5" />
-              다시 시도
-            </button>
-          </div>
-        ) : settlements.length === 0 ? (
-          <div className="p-12 text-center">
-            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">정산 내역이 없습니다</h3>
-            <p className="text-gray-600">필터 조건에 맞는 정산 내역이 없습니다.</p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full wp-list-table widefat fixed striped">
-                <thead>
-                  <tr>
-                    <th className="manage-column column-primary">정산 ID</th>
-                    <th className="manage-column">대상 유형</th>
-                    <th className="manage-column">대상 이름/ID</th>
-                    <th className="manage-column">정산 기간</th>
-                    <th className="manage-column">정산 금액</th>
-                    <th className="manage-column">상태</th>
-                    <th className="manage-column">지급일</th>
-                    <th className="manage-column">생성일</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {settlements.map((settlement) => {
-                    const periodStart = (settlement as any).periodStart || (settlement as any).period_start;
-                    const periodEnd = (settlement as any).periodEnd || (settlement as any).period_end;
-                    const payableAmount = (settlement as any).payableAmount || (settlement as any).net_payout_amount;
-                    const createdAt = (settlement as any).createdAt || (settlement as any).created_at;
-                    const paidAt = (settlement as any).paidAt || (settlement as any).paid_at;
+      {/* Error State */}
+      {error && (
+        <div className="bg-white border border-gray-300 rounded-lg p-12 text-center mb-6">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">정산 내역을 불러올 수 없습니다</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={handleRetry}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+          >
+            <RefreshCw className="w-5 h-5" />
+            다시 시도
+          </button>
+        </div>
+      )}
 
-                    return (
-                      <tr key={settlement.id}>
-                        <td className="title column-title column-primary">
-                          <strong>
-                            <a
-                              href="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                navigate(`/admin/settlements/${settlement.id}`);
-                              }}
-                              className="row-title"
-                            >
-                              {settlement.id}
-                            </a>
-                          </strong>
-                          <div className="row-actions">
-                            <span className="view">
-                              <a
-                                href="#"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  navigate(`/admin/settlements/${settlement.id}`);
-                                }}
-                              >
-                                상세보기
-                              </a>
-                            </span>
-                          </div>
-                        </td>
-                        <td>{getPartyTypeBadge(settlement.partyType)}</td>
-                        <td>
-                          <div className="font-medium">{settlement.partyName || settlement.partyId}</div>
-                          {settlement.partyName && (
-                            <div className="text-xs text-gray-500 font-mono">{settlement.partyId}</div>
-                          )}
-                        </td>
-                        <td className="text-sm">
-                          {formatDate(periodStart)} ~ {formatDate(periodEnd)}
-                        </td>
-                        <td className="font-medium">{formatCurrency(payableAmount, settlement.currency)}</td>
-                        <td>{getStatusBadge(settlement.status)}</td>
-                        <td className="text-sm">{formatDate(paidAt)}</td>
-                        <td className="date column-date">
-                          <abbr title={formatDate(createdAt)}>{formatDate(createdAt)}</abbr>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  전체 {total}개 중 {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, total)}개 표시
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    이전
-                  </button>
-                  <span className="px-3 py-1 text-sm text-gray-700">
-                    {currentPage} / {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    다음
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      {/* Settlements DataTable */}
+      {!error && (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <DataTable<AdminSettlementView>
+            columns={columns}
+            dataSource={settlements}
+            rowKey="id"
+            loading={loading}
+            emptyText="필터 조건에 맞는 정산 내역이 없습니다"
+            onRowClick={(record) => navigate(`/admin/settlements/${record.id}`)}
+            pagination={{
+              current: currentPage,
+              pageSize: limit,
+              total: total,
+              onChange: (newPage) => setCurrentPage(newPage),
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

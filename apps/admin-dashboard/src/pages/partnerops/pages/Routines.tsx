@@ -5,6 +5,8 @@
  * - Create/edit routines (product recommendations)
  * - Link products to routines
  * - View routine performance
+ *
+ * Refactored: PageHeader pattern applied (card-based layout preserved)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -20,6 +22,7 @@ import {
   TrendingUp,
   Link as LinkIcon,
 } from 'lucide-react';
+import PageHeader from '../../../components/common/PageHeader';
 
 /**
  * Partner Routine (Partner-Core aligned)
@@ -189,25 +192,29 @@ const Routines: React.FC = () => {
     );
   }
 
+  // PageHeader actions
+  const headerActions = [
+    {
+      id: 'new-routine',
+      label: '새 루틴',
+      icon: <Plus className="w-4 h-4" />,
+      onClick: () => {
+        setShowForm(true);
+        setEditingId(null);
+        setFormData({ title: '', description: '', productIds: '' });
+      },
+      variant: 'primary' as const,
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">콘텐츠/루틴 관리</h1>
-          <p className="text-gray-600">상품 추천 루틴을 만들고 관리합니다</p>
-        </div>
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingId(null);
-            setFormData({ title: '', description: '', productIds: '' });
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" />
-          새 루틴
-        </button>
-      </div>
+      {/* PageHeader */}
+      <PageHeader
+        title="콘텐츠/루틴 관리"
+        subtitle="상품 추천 루틴을 만들고 관리합니다"
+        actions={headerActions}
+      />
 
       {/* Form Modal */}
       {showForm && (

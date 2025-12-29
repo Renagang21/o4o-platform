@@ -1,6 +1,7 @@
 import { useState, FC, ReactElement, ChangeEvent } from 'react';
-import { Plus, Search, Filter, MoreVertical } from 'lucide-react';
+import { Plus, Search, Filter, MoreVertical, ArrowLeft } from 'lucide-react';
 import { clsx } from 'clsx';
+import { Link } from 'react-router-dom';
 
 interface PageHeaderAction {
   id: string;
@@ -21,6 +22,8 @@ interface PageHeaderProps {
   onSearch?: (query: string) => void;
   onFilter?: () => void;
   className?: string;
+  backUrl?: string;
+  backLabel?: string;
 }
 
 /**
@@ -36,7 +39,9 @@ const PageHeader: FC<PageHeaderProps> = ({
   searchPlaceholder = "검색...",
   onSearch,
   onFilter,
-  className
+  className,
+  backUrl,
+  backLabel = "뒤로 가기"
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -48,7 +53,7 @@ const PageHeader: FC<PageHeaderProps> = ({
 
   const getActionButtonClass = (variant: PageHeaderAction['variant'] = 'secondary') => {
     const baseClass = 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+
     switch (variant) {
       case 'primary':
         return clsx(baseClass, 'bg-admin-blue text-white border-admin-blue hover:bg-admin-blue-dark hover:border-admin-blue-dark');
@@ -67,6 +72,17 @@ const PageHeader: FC<PageHeaderProps> = ({
   return (
     <div className={clsx('wp-card mb-6', className)}>
       <div className="wp-card-header">
+        {/* Back Link */}
+        {backUrl && (
+          <Link
+            to={backUrl}
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            {backLabel}
+          </Link>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Title and Subtitle */}
           <div className="flex-1">
@@ -109,7 +125,7 @@ const PageHeader: FC<PageHeaderProps> = ({
                       <span className="hidden sm:inline">{action.label}</span>
                     </button>
                   ))}
-                  
+
                   {/* More Actions Dropdown */}
                   {secondaryActions.length > 2 && (
                     <div className="relative">
