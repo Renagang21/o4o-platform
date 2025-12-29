@@ -159,7 +159,7 @@ const Settlement: React.FC = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log('View settlement:', record.id);
+            navigate(`/supplierops/settlements/${record.id}`);
           }}
           className="text-blue-600 hover:text-blue-900 p-1"
           title="상세 보기"
@@ -177,7 +177,7 @@ const Settlement: React.FC = () => {
       label: '내역 다운로드',
       icon: <Download className="w-4 h-4" />,
       onClick: () => {
-        console.log('Download settlement history');
+        // TODO: Implement download settlement history
       },
       variant: 'secondary' as const,
     },

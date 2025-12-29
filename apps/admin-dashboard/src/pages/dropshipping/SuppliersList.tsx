@@ -270,7 +270,7 @@ const SuppliersList: React.FC = () => {
       label: 'Screen Options',
       icon: <Settings className="w-4 h-4" />,
       onClick: () => {
-        console.log('Screen options clicked');
+        // TODO: Implement screen options
       },
       variant: 'secondary' as const,
     },

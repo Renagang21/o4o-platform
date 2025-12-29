@@ -152,7 +152,7 @@ const Products: React.FC = () => {
       label: 'Screen Options',
       icon: <Settings className="w-4 h-4" />,
       onClick: () => {
-        console.log('Screen options clicked');
+        // TODO: Implement screen options
       },
       variant: 'secondary' as const,
     },
@@ -161,7 +161,7 @@ const Products: React.FC = () => {
       label: '상품 추가',
       icon: <Plus className="w-4 h-4" />,
       onClick: () => {
-        console.log('Add product clicked');
+        navigate('/supplierops/products/new');
       },
       variant: 'primary' as const,
     },

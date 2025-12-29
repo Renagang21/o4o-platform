@@ -74,7 +74,7 @@ const Offers: React.FC = () => {
       label: 'Offer 생성',
       icon: <Plus className="w-4 h-4" />,
       onClick: () => {
-        console.log('Create offer clicked');
+        navigate('/supplierops/offers/new');
       },
       variant: 'primary' as const,
     },

@@ -186,7 +186,7 @@ const OrdersList: React.FC = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log('View order:', record.id);
+            navigate(`/sellerops/orders/${record.id}`);
           }}
           className="text-blue-600 hover:text-blue-900 p-1"
           title="상세 보기"

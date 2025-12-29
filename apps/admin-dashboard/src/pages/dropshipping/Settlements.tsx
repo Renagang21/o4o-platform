@@ -270,7 +270,7 @@ const Settlements: React.FC = () => {
       label: 'Screen Options',
       icon: <Settings className="w-4 h-4" />,
       onClick: () => {
-        console.log('Screen options clicked');
+        // TODO: Implement screen options
       },
       variant: 'secondary' as const,
     },
@@ -286,7 +286,7 @@ const Settlements: React.FC = () => {
       label: '일괄 정산',
       icon: <DollarSign className="w-4 h-4" />,
       onClick: () => {
-        console.log('Bulk settlement clicked');
+        // TODO: Implement bulk settlement
       },
       variant: 'primary' as const,
     },

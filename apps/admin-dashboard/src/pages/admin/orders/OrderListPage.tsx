@@ -294,7 +294,7 @@ const OrderListPage: React.FC = () => {
       label: 'Screen Options',
       icon: <Settings className="w-4 h-4" />,
       onClick: () => {
-        console.log('Screen options clicked');
+        // TODO: Implement screen options
       },
       variant: 'secondary' as const,
     },
@@ -303,7 +303,7 @@ const OrderListPage: React.FC = () => {
       label: '내보내기',
       icon: <Download className="w-4 h-4" />,
       onClick: () => {
-        console.log('Export clicked');
+        // TODO: Implement export
       },
       variant: 'secondary' as const,
     },

@@ -254,7 +254,7 @@ const Settlement: React.FC = () => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              console.log('Download receipt:', record.id);
+              // TODO: Implement receipt download
             }}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded"
             title="영수증 다운로드"
@@ -273,7 +273,7 @@ const Settlement: React.FC = () => {
       label: '전체 다운로드',
       icon: <Download className="w-4 h-4" />,
       onClick: () => {
-        console.log('Download all settlements');
+        // TODO: Implement download all settlements
       },
       variant: 'secondary' as const,
     },
