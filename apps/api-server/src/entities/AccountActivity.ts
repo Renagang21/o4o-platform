@@ -14,14 +14,14 @@ export class AccountActivity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'uuid' })
-  userId!: string;
+  @Column({ type: 'uuid', nullable: true })
+  userId?: string;
 
   @ManyToOne('User', { onDelete: 'CASCADE', lazy: true })
   user!: Promise<User>;
 
-  // DB column is 'type', not 'action'
-  @Column({ type: 'varchar', length: 50 })
+  // DB column is 'action', Entity property is 'type'
+  @Column({ name: 'action', type: 'varchar', length: 50 })
   type!: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
