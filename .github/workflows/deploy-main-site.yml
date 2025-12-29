@@ -1,4 +1,7 @@
-name: Deploy Main Site
+name: Deploy Main Site (Cloud Run)
+
+# Deploy Main Site to Cloud Run
+# Migrated from AWS Lightsail SSH to GCP Cloud Run (2025-12-29)
 
 concurrency:
   group: deploy-main-site-${{ github.ref }}
@@ -10,13 +13,28 @@ on:
     paths:
       - 'apps/main-site-nextgen/**'
       - '.github/workflows/deploy-main-site.yml'
-      - 'nginx-configs/neture.co.kr.conf'
-  workflow_dispatch:  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment'
+        required: false
+        default: 'false'
+
+env:
+  PROJECT_ID: netureyoutube
+  REGION: asia-northeast3
+  REPOSITORY_NAME: o4o-api
+  SERVICE_NAME: o4o-main-site
+  IMAGE_NAME: main-site
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
     - name: Checkout code
@@ -40,93 +58,122 @@ jobs:
         echo "📋 Build output:"
         ls -lh dist/
 
-        echo "📄 Version info (if exists):"
-        cat dist/version.json 2>/dev/null || echo "No version.json found"
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    - name: Prepare Nginx config for deployment
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Configure Docker for Artifact Registry
       run: |
-        mkdir -p apps/main-site-nextgen/dist/nginx-config
-        cp nginx-configs/neture.co.kr.conf apps/main-site-nextgen/dist/nginx-config/
+        gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
-    - name: Deploy to web server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.WEB_HOST }}
-        username: ${{ secrets.WEB_USER }}
-        key: ${{ secrets.WEB_SSH_KEY }}
-        script: |
-          # Backup current deployment
-          sudo cp -r /var/www/neture.co.kr /var/www/neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) || true
-          
-          # Clear current files
-          sudo rm -rf /var/www/neture.co.kr/*
-          
-          # Create temp directory
-          mkdir -p /tmp/main-site-build
+    - name: Build and Push Docker image
+      run: |
+        cd apps/main-site-nextgen
 
-    - name: Copy build files
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.WEB_HOST }}
-        username: ${{ secrets.WEB_USER }}
-        key: ${{ secrets.WEB_SSH_KEY }}
-        source: "apps/main-site-nextgen/dist/*"
-        target: "/tmp/main-site-build/"
-        strip_components: 3
+        IMAGE_TAG="${{ github.sha }}"
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+        LATEST_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest"
 
-    - name: Move files to web directory
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.WEB_HOST }}
-        username: ${{ secrets.WEB_USER }}
-        key: ${{ secrets.WEB_SSH_KEY }}
-        script: |
-          # Move files from temp to web directory
-          echo "📦 Deploying build files..."
-          sudo cp -r /tmp/main-site-build/* /var/www/neture.co.kr/
+        echo "🐳 Building Docker image..."
 
-          # Update Nginx configuration
-          echo "🔧 Updating Nginx configuration..."
-          echo "📋 Checking deployment artifacts..."
-          ls -la /var/www/neture.co.kr/ || true
-          if [ -f /var/www/neture.co.kr/nginx-config/neture.co.kr.conf ]; then
-            echo "✅ Found Nginx config in deployment artifacts"
+        # Create production Dockerfile for pre-built assets
+        cat > Dockerfile.cloudrun << 'EOF'
+        FROM nginx:alpine
 
-            # Backup current nginx config
-            sudo cp /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-available/neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+        # Copy pre-built assets
+        COPY dist /usr/share/nginx/html
 
-            # Copy new config (remove .conf extension for consistency)
-            sudo cp /var/www/neture.co.kr/nginx-config/neture.co.kr.conf /etc/nginx/sites-available/neture.co.kr
+        # Nginx config for SPA routing
+        RUN echo 'server { \
+            listen 8080; \
+            server_name _; \
+            root /usr/share/nginx/html; \
+            index index.html; \
+            gzip on; \
+            gzip_types text/plain text/css application/json application/javascript text/xml application/xml; \
+            location / { \
+                try_files $uri $uri/ /index.html; \
+            } \
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { \
+                expires 1y; \
+                add_header Cache-Control "public, immutable"; \
+            } \
+        }' > /etc/nginx/conf.d/default.conf
 
-            # Test nginx configuration
-            if sudo nginx -t; then
-              echo "✅ Nginx configuration is valid"
-            else
-              echo "❌ Nginx configuration test failed, restoring backup"
-              latest_backup=$(ls -t /etc/nginx/sites-available/neture.co.kr.backup.* 2>/dev/null | head -1)
-              if [ -n "$latest_backup" ]; then
-                sudo cp "$latest_backup" /etc/nginx/sites-available/neture.co.kr
-              fi
-              exit 1
-            fi
+        EXPOSE 8080
+        CMD ["nginx", "-g", "daemon off;"]
+        EOF
 
-            # Clean up nginx config from web directory
-            sudo rm -rf /var/www/neture.co.kr/nginx-config
-          else
-            echo "⚠️ Nginx config not found in deployment artifacts at /var/www/neture.co.kr/nginx-config/"
-            echo "📋 Listing /var/www/neture.co.kr/ contents:"
-            ls -la /var/www/neture.co.kr/ || true
+        docker build \
+          --platform linux/amd64 \
+          --tag "${FULL_IMAGE}" \
+          --tag "${LATEST_IMAGE}" \
+          --file Dockerfile.cloudrun \
+          .
+
+        echo "📤 Pushing to Artifact Registry..."
+        docker push "${FULL_IMAGE}"
+        docker push "${LATEST_IMAGE}"
+
+        echo "✅ Image pushed: ${FULL_IMAGE}"
+        echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+
+    - name: Deploy to Cloud Run
+      run: |
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+        echo "🚀 Deploying to Cloud Run..."
+
+        gcloud run deploy ${{ env.SERVICE_NAME }} \
+          --image="${FULL_IMAGE}" \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --port=8080 \
+          --memory=256Mi \
+          --cpu=1 \
+          --min-instances=0 \
+          --max-instances=5 \
+          --concurrency=80 \
+          --timeout=60
+
+    - name: Verify deployment
+      run: |
+        echo "🔍 Verifying deployment..."
+
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --format="value(status.url)")
+
+        echo "🌐 Service URL: ${SERVICE_URL}"
+
+        # Health check
+        for i in {1..3}; do
+          echo "Health check attempt $i..."
+          if curl -sf "${SERVICE_URL}/" > /dev/null; then
+            echo "✅ Health check passed!"
+            break
           fi
+          if [ $i -eq 3 ]; then
+            echo "⚠️ Health check did not succeed, but deployment completed"
+          fi
+          sleep 5
+        done
 
-          # Set permissions
-          sudo chown -R www-data:www-data /var/www/neture.co.kr/
-          sudo chmod -R 755 /var/www/neture.co.kr/
-
-          # Clean up temp build files
-          rm -rf /tmp/main-site-build
-
-          # Reload nginx to apply changes
-          echo "🔄 Reloading Nginx..."
-          sudo systemctl reload nginx
-
-          echo "✅ Main site deployed successfully!"
+        echo ""
+        echo "=========================================="
+        echo "✅ Main Site Deployed Successfully!"
+        echo "=========================================="
+        echo "🌐 Cloud Run URL: ${SERVICE_URL}"
+        echo "📅 Time: $(date)"
+        echo "📝 Commit: ${{ github.sha }}"
+        echo ""
+        echo "⚠️ Note: Custom domain mapping required for https://neture.co.kr"
