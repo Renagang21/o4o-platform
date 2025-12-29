@@ -20,31 +20,23 @@ export const useRoleApplicationsCount = () => {
     try {
       setIsLoading(true);
       // Phase 2-4: Use dedicated metrics endpoint for better performance
-      const response = await authClient.api.get('/admin/roles/metrics/pending', {
-        validateStatus: (status) => status < 500 // Don't throw on 401/403
-      });
-
-      if (response.status === 401 || response.status === 403) {
-        // Stop polling if unauthorized
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        setCount(0);
-        setError(null); // Don't show error for non-admins
-        return;
-      }
+      // Note: This endpoint is registered at /api/v2, so we need full path
+      const response = await authClient.api.get('/v2/admin/roles/metrics/pending');
 
       const pendingCount = response.data?.data?.pendingCount || 0;
       setCount(pendingCount);
       setError(null);
     } catch (err: any) {
-      // Stop polling on auth errors
-      if (err?.response?.status === 401 || err?.response?.status === 403) {
+      // Stop polling on auth errors (401/403)
+      const status = err?.response?.status;
+      if (status === 401 || status === 403 || status === 404) {
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
         }
+        setCount(0);
+        setError(null); // Don't show error for auth/not-found issues
+        return;
       }
       setError(err as Error);
       setCount(0);

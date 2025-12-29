@@ -5,7 +5,7 @@
  * - 브랜드 카드 그리드
  * - 검색/필터
  *
- * Phase 7-H: Cosmetics Products/Brands/Routines UI Redesign (AG Design System)
+ * Phase 7-A-2: Cosmetics API Integration
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -17,153 +17,93 @@ import {
   AGCard,
   AGButton,
   AGInput,
-  AGSelect,
   AGTag,
 } from '@o4o/ui';
 import {
   Building2,
   Search,
   RefreshCw,
-  Globe,
   Package,
-  Star,
+  AlertCircle,
   ChevronRight,
-  Award,
-  MapPin,
 } from 'lucide-react';
 
-interface Brand {
+/**
+ * API Response Types (OpenAPI 계약 기반)
+ */
+interface LineSummary {
   id: string;
   name: string;
-  logoUrl?: string;
-  country: string;
-  description: string;
-  categories: string[];
-  productCount: number;
-  rating: number;
-  certifications: string[];
-  isFeatured: boolean;
+  product_count?: number;
+}
+
+interface BrandDetail {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  logo_url?: string;
+  is_active: boolean;
+  lines?: LineSummary[];
+  product_count?: number;
+}
+
+interface BrandListResponse {
+  data: BrandDetail[];
 }
 
 const BrandListPage: React.FC = () => {
   const api = authClient.api;
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brands, setBrands] = useState<BrandDetail[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [countryFilter, setCountryFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   const fetchBrands = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      // Demo data
-      setBrands([
-        {
-          id: 'brand-1',
-          name: '네이처리퍼블릭',
-          logoUrl: 'https://placehold.co/120x120/dcfce7/16a34a?text=NR',
-          country: '대한민국',
-          description: '자연에서 찾은 건강한 아름다움을 추구하는 천연 화장품 브랜드',
-          categories: ['스킨케어', '클렌저', '마스크팩'],
-          productCount: 128,
-          rating: 4.6,
-          certifications: ['KFDA', 'EWG Verified'],
-          isFeatured: true,
-        },
-        {
-          id: 'brand-2',
-          name: '이니스프리',
-          logoUrl: 'https://placehold.co/120x120/e0f2fe/0891b2?text=INF',
-          country: '대한민국',
-          description: '제주의 청정 자연을 담은 천연 화장품 브랜드',
-          categories: ['스킨케어', '메이크업', '바디케어'],
-          productCount: 256,
-          rating: 4.5,
-          certifications: ['KFDA'],
-          isFeatured: true,
-        },
-        {
-          id: 'brand-3',
-          name: '라로슈포제',
-          logoUrl: 'https://placehold.co/120x120/fef9c3/ca8a04?text=LRP',
-          country: '프랑스',
-          description: '민감하고 까다로운 피부를 위한 더마 코스메틱 브랜드',
-          categories: ['선케어', '스킨케어', '클렌저'],
-          productCount: 89,
-          rating: 4.8,
-          certifications: ['Dermatologist Tested', 'EWG Verified'],
-          isFeatured: true,
-        },
-        {
-          id: 'brand-4',
-          name: '달바',
-          logoUrl: 'https://placehold.co/120x120/fce7f3/ec4899?text=DBA',
-          country: '대한민국',
-          description: '화이트 트러플과 프리미엄 원료를 사용한 럭셔리 스킨케어',
-          categories: ['스킨케어', '미스트'],
-          productCount: 45,
-          rating: 4.7,
-          certifications: ['KFDA'],
-          isFeatured: false,
-        },
-        {
-          id: 'brand-5',
-          name: '코스알엑스',
-          logoUrl: 'https://placehold.co/120x120/e0e7ff/6366f1?text=CSX',
-          country: '대한민국',
-          description: '효능과 안전성을 중시하는 더마 코스메틱 브랜드',
-          categories: ['스킨케어', '클렌저'],
-          productCount: 67,
-          rating: 4.6,
-          certifications: ['KFDA', 'Vegan'],
-          isFeatured: false,
-        },
-        {
-          id: 'brand-6',
-          name: '에스티로더',
-          logoUrl: 'https://placehold.co/120x120/fef3c7/d97706?text=EL',
-          country: '미국',
-          description: '1946년 설립된 글로벌 프레스티지 뷰티 브랜드',
-          categories: ['스킨케어', '메이크업', '향수'],
-          productCount: 312,
-          rating: 4.7,
-          certifications: [],
-          isFeatured: true,
-        },
-      ]);
-    } catch (err) {
+      const params = new URLSearchParams();
+      if (activeFilter === 'active') {
+        params.set('is_active', 'true');
+      } else if (activeFilter === 'inactive') {
+        params.set('is_active', 'false');
+      }
+
+      const response = await api.get<BrandListResponse>(`/api/v1/cosmetics/brands?${params.toString()}`);
+      if (response.data) {
+        setBrands(response.data.data);
+      }
+    } catch (err: any) {
       console.error('Failed to fetch brands:', err);
+      setError(err.message || '브랜드 목록을 불러오는데 실패했습니다.');
+      setBrands([]);
     } finally {
       setLoading(false);
     }
-  }, [api]);
+  }, [api, activeFilter]);
 
   useEffect(() => {
     fetchBrands();
   }, [fetchBrands]);
 
-  // Get unique countries and categories
-  const countries = [...new Set(brands.map((b) => b.country))];
-  const categories = [...new Set(brands.flatMap((b) => b.categories))];
-
-  // Filtering
+  // Client-side filtering for search
   const filteredBrands = brands.filter((brand) => {
     if (searchTerm && !brand.name.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
-    if (countryFilter !== 'all' && brand.country !== countryFilter) return false;
-    if (categoryFilter !== 'all' && !brand.categories.includes(categoryFilter)) return false;
     return true;
   });
 
-  // Sort featured first
+  // Sort active brands first
   const sortedBrands = [...filteredBrands].sort((a, b) => {
-    if (a.isFeatured && !b.isFeatured) return -1;
-    if (!a.isFeatured && b.isFeatured) return 1;
+    if (a.is_active && !b.is_active) return -1;
+    if (!a.is_active && b.is_active) return 1;
     return a.name.localeCompare(b.name);
   });
 
-  if (loading) {
+  if (loading && brands.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -191,7 +131,7 @@ const BrandListPage: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={fetchBrands}
-            iconLeft={<RefreshCw className="w-4 h-4" />}
+            iconLeft={<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />}
           >
             새로고침
           </AGButton>
@@ -199,6 +139,14 @@ const BrandListPage: React.FC = () => {
       />
 
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
         {/* Filters */}
         <AGSection>
           <div className="flex flex-col sm:flex-row gap-4">
@@ -212,37 +160,39 @@ const BrandListPage: React.FC = () => {
                 className="pl-10"
               />
             </div>
-            <AGSelect
-              value={countryFilter}
-              onChange={(e) => setCountryFilter(e.target.value)}
-              className="w-40"
-            >
-              <option value="all">전체 국가</option>
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </AGSelect>
-            <AGSelect
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-40"
-            >
-              <option value="all">전체 카테고리</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </AGSelect>
+            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setActiveFilter('all')}
+                className={`px-4 py-2 text-sm transition-colors ${
+                  activeFilter === 'all' ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'
+                }`}
+              >
+                전체
+              </button>
+              <button
+                onClick={() => setActiveFilter('active')}
+                className={`px-4 py-2 text-sm transition-colors border-l ${
+                  activeFilter === 'active' ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'
+                }`}
+              >
+                활성
+              </button>
+              <button
+                onClick={() => setActiveFilter('inactive')}
+                className={`px-4 py-2 text-sm transition-colors border-l ${
+                  activeFilter === 'inactive' ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'
+                }`}
+              >
+                비활성
+              </button>
+            </div>
           </div>
         </AGSection>
 
         {/* Results */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            총 <span className="font-medium">{filteredBrands.length}</span>개 브랜드
+            총 <span className="font-medium">{sortedBrands.length}</span>개 브랜드
           </p>
         </div>
 
@@ -257,76 +207,69 @@ const BrandListPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedBrands.map((brand) => (
                 <Link key={brand.id} to={`/cosmetics-products/brands/${brand.id}`}>
-                  <AGCard hoverable padding="lg" className="text-center group">
-                    {/* Featured Badge */}
-                    {brand.isFeatured && (
-                      <div className="absolute top-3 right-3">
-                        <AGTag color="yellow" size="sm">
-                          <Award className="w-3 h-3 mr-1" />
-                          Featured
-                        </AGTag>
-                      </div>
-                    )}
+                  <AGCard hoverable padding="lg" className="relative group">
+                    {/* Status Badge */}
+                    <div className="absolute top-3 right-3">
+                      <AGTag color={brand.is_active ? 'green' : 'gray'} size="sm">
+                        {brand.is_active ? '활성' : '비활성'}
+                      </AGTag>
+                    </div>
 
-                    {/* Logo */}
-                    <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-xl overflow-hidden">
-                      {brand.logoUrl ? (
-                        <img
-                          src={brand.logoUrl}
-                          alt={brand.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Building2 className="w-10 h-10 text-gray-300" />
+                    <div className="flex items-start gap-4">
+                      {/* Logo */}
+                      <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                        {brand.logo_url ? (
+                          <img
+                            src={brand.logo_url}
+                            alt={brand.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Building2 className="w-10 h-10 text-gray-300" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-lg text-gray-900 mb-1">{brand.name}</h3>
+                        <p className="text-xs text-gray-400 mb-2">/{brand.slug}</p>
+                        {brand.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">{brand.description}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Lines & Product Count */}
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                          <Package className="w-4 h-4 text-gray-400" />
+                          <span>{brand.product_count || 0}개 제품</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      </div>
+
+                      {/* Lines */}
+                      {brand.lines && brand.lines.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {brand.lines.slice(0, 3).map((line) => (
+                            <span
+                              key={line.id}
+                              className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded"
+                            >
+                              {line.name}
+                            </span>
+                          ))}
+                          {brand.lines.length > 3 && (
+                            <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">
+                              +{brand.lines.length - 3}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
-
-                    {/* Name & Country */}
-                    <h3 className="font-bold text-lg text-gray-900 mb-1">{brand.name}</h3>
-                    <p className="text-sm text-gray-500 flex items-center justify-center gap-1 mb-3">
-                      <MapPin className="w-3 h-3" />
-                      {brand.country}
-                    </p>
-
-                    {/* Description */}
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">{brand.description}</p>
-
-                    {/* Categories */}
-                    <div className="flex flex-wrap justify-center gap-1 mb-4">
-                      {brand.categories.slice(0, 3).map((cat) => (
-                        <span
-                          key={cat}
-                          className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded"
-                        >
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Stats */}
-                    <div className="flex items-center justify-center gap-4 pt-4 border-t text-sm">
-                      <div className="flex items-center gap-1">
-                        <Package className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{brand.productCount}개 제품</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span className="font-medium">{brand.rating}</span>
-                      </div>
-                    </div>
-
-                    {/* Certifications */}
-                    {brand.certifications.length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-1 mt-3">
-                        {brand.certifications.map((cert) => (
-                          <AGTag key={cert} color="green" size="sm">
-                            {cert}
-                          </AGTag>
-                        ))}
-                      </div>
-                    )}
                   </AGCard>
                 </Link>
               ))}

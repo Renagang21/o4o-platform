@@ -289,6 +289,13 @@ export const AppDataSource = new DataSource({
     CMSView,
     CMSPage,
     // ============================================================================
+    // COSMETICS ENTITIES (Phase 7-A-1: Cosmetics API Implementation)
+    // ============================================================================
+    // Note: These entities use 'cosmetics' schema, isolated from Core
+    // CosmeticsBrand, CosmeticsLine, CosmeticsProduct, CosmeticsPricePolicy,
+    // CosmeticsProductLog, CosmeticsPriceLog are imported from routes/cosmetics/entities
+    // ============================================================================
+    // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
     // ============================================================================
     Organization,

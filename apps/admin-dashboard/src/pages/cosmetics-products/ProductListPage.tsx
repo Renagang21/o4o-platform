@@ -6,7 +6,7 @@
  * - 필터/검색/정렬
  * - 반응형 레이아웃
  *
- * Phase 7-H: Cosmetics Products/Brands/Routines UI Redesign (AG Design System)
+ * Phase 7-A-2: Cosmetics API Integration
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -26,230 +26,194 @@ import {
   Package,
   Search,
   RefreshCw,
-  Filter,
   Grid,
   List,
-  Star,
   ChevronRight,
-  Heart,
-  Droplet,
-  Sun,
-  Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 
-interface CosmeticsProduct {
+/**
+ * API Response Types (OpenAPI 계약 기반)
+ */
+interface BrandSummary {
   id: string;
   name: string;
-  brandId: string;
-  brandName: string;
-  category: string;
-  price: number;
-  imageUrl?: string;
-  skinTypes: string[];
-  concerns: string[];
-  certifications: string[];
-  rating: number;
-  reviewCount: number;
-  isNew: boolean;
-  isBestSeller: boolean;
+  slug: string;
 }
 
-const skinTypeLabels: Record<string, string> = {
-  dry: '건성',
-  oily: '지성',
-  combination: '복합성',
-  sensitive: '민감성',
-  normal: '중성',
+interface LineSummary {
+  id: string;
+  name: string;
+  product_count?: number;
+}
+
+interface Price {
+  base: number;
+  sale?: number | null;
+  currency: string;
+}
+
+interface ProductImage {
+  url: string;
+  alt?: string;
+  is_primary: boolean;
+  order?: number;
+}
+
+type ProductStatus = 'draft' | 'visible' | 'hidden' | 'sold_out';
+
+interface ProductSummary {
+  id: string;
+  name: string;
+  brand: BrandSummary;
+  line?: LineSummary;
+  description?: string;
+  status: ProductStatus;
+  price: Price;
+  images?: ProductImage[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  total_pages: number;
+  has_next?: boolean;
+  has_prev?: boolean;
+}
+
+interface ProductListResponse {
+  data: ProductSummary[];
+  meta: PaginationMeta;
+}
+
+interface BrandDetail {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  logo_url?: string;
+  is_active: boolean;
+  lines?: LineSummary[];
+  product_count?: number;
+}
+
+interface BrandListResponse {
+  data: BrandDetail[];
+}
+
+const statusLabels: Record<ProductStatus, string> = {
+  draft: '초안',
+  visible: '공개',
+  hidden: '숨김',
+  sold_out: '품절',
 };
 
-const concernLabels: Record<string, string> = {
-  wrinkle: '주름',
-  pigmentation: '색소침착',
-  pore: '모공',
-  acne: '여드름',
-  dryness: '건조',
-  oiliness: '유수분',
+const statusColors: Record<ProductStatus, 'gray' | 'green' | 'yellow' | 'red'> = {
+  draft: 'gray',
+  visible: 'green',
+  hidden: 'yellow',
+  sold_out: 'red',
 };
 
 const ProductListPage: React.FC = () => {
   const api = authClient.api;
-  const [products, setProducts] = useState<CosmeticsProduct[]>([]);
+  const [products, setProducts] = useState<ProductSummary[]>([]);
+  const [brands, setBrands] = useState<BrandDetail[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [brandFilter, setBrandFilter] = useState('all');
-  const [skinTypeFilter, setSkinTypeFilter] = useState('all');
-  const [concernFilter, setConcernFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
+  const [statusFilter, setStatusFilter] = useState<ProductStatus | 'all'>('all');
+  const [sortBy, setSortBy] = useState<'created_at' | 'price' | 'name'>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 12;
 
+  // Fetch brands for filter dropdown
+  const fetchBrands = useCallback(async () => {
+    try {
+      const response = await api.get<BrandListResponse>('/api/v1/cosmetics/brands');
+      if (response.data) {
+        setBrands(response.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch brands:', err);
+    }
+  }, [api]);
+
+  // Fetch products with filters
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      // Demo data
-      setProducts([
-        {
-          id: 'prod-1',
-          name: '하이드로 부스팅 세럼 30ml',
-          brandId: 'brand-1',
-          brandName: '네이처리퍼블릭',
-          category: '세럼',
-          price: 45000,
-          imageUrl: 'https://placehold.co/200x200/e0f2fe/0891b2?text=Serum',
-          skinTypes: ['dry', 'sensitive'],
-          concerns: ['dryness', 'wrinkle'],
-          certifications: ['KFDA'],
-          rating: 4.8,
-          reviewCount: 1245,
-          isNew: true,
-          isBestSeller: true,
-        },
-        {
-          id: 'prod-2',
-          name: '비타민C 브라이트닝 앰플 15ml',
-          brandId: 'brand-2',
-          brandName: '이니스프리',
-          category: '앰플',
-          price: 52000,
-          imageUrl: 'https://placehold.co/200x200/fef3c7/d97706?text=Ampoule',
-          skinTypes: ['oily', 'combination'],
-          concerns: ['pigmentation', 'acne'],
-          certifications: ['EWG'],
-          rating: 4.6,
-          reviewCount: 892,
-          isNew: false,
-          isBestSeller: true,
-        },
-        {
-          id: 'prod-3',
-          name: '수분 크림 50ml',
-          brandId: 'brand-1',
-          brandName: '네이처리퍼블릭',
-          category: '크림',
-          price: 38000,
-          imageUrl: 'https://placehold.co/200x200/dcfce7/16a34a?text=Cream',
-          skinTypes: ['dry', 'normal'],
-          concerns: ['dryness'],
-          certifications: [],
-          rating: 4.5,
-          reviewCount: 567,
-          isNew: false,
-          isBestSeller: false,
-        },
-        {
-          id: 'prod-4',
-          name: '선스크린 SPF50+ PA++++ 50ml',
-          brandId: 'brand-3',
-          brandName: '라로슈포제',
-          category: '선케어',
-          price: 28000,
-          imageUrl: 'https://placehold.co/200x200/fef9c3/ca8a04?text=Sunscreen',
-          skinTypes: ['oily', 'sensitive'],
-          concerns: ['pigmentation'],
-          certifications: ['KFDA', 'Dermatologist Tested'],
-          rating: 4.9,
-          reviewCount: 2341,
-          isNew: false,
-          isBestSeller: true,
-        },
-        {
-          id: 'prod-5',
-          name: '클렌징 폼 150ml',
-          brandId: 'brand-2',
-          brandName: '이니스프리',
-          category: '클렌저',
-          price: 22000,
-          imageUrl: 'https://placehold.co/200x200/f0fdf4/22c55e?text=Cleanser',
-          skinTypes: ['combination', 'normal'],
-          concerns: ['pore', 'oiliness'],
-          certifications: [],
-          rating: 4.3,
-          reviewCount: 456,
-          isNew: true,
-          isBestSeller: false,
-        },
-        {
-          id: 'prod-6',
-          name: '레티놀 안티에이징 크림 30ml',
-          brandId: 'brand-3',
-          brandName: '라로슈포제',
-          category: '크림',
-          price: 68000,
-          imageUrl: 'https://placehold.co/200x200/fce7f3/ec4899?text=Retinol',
-          skinTypes: ['normal', 'dry'],
-          concerns: ['wrinkle'],
-          certifications: ['Dermatologist Tested'],
-          rating: 4.7,
-          reviewCount: 789,
-          isNew: false,
-          isBestSeller: false,
-        },
-      ]);
-    } catch (err) {
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.set('page', String(currentPage));
+      params.set('limit', String(itemsPerPage));
+      params.set('sort', sortBy);
+      params.set('order', sortOrder);
+
+      if (brandFilter !== 'all') {
+        params.set('brand_id', brandFilter);
+      }
+      if (statusFilter !== 'all') {
+        params.set('status', statusFilter);
+      }
+
+      // Use search endpoint if search term provided
+      let response: { data: ProductListResponse };
+      if (searchTerm.length >= 2) {
+        params.set('q', searchTerm);
+        response = await api.get<ProductListResponse>(`/api/v1/cosmetics/products/search?${params.toString()}`);
+      } else {
+        response = await api.get<ProductListResponse>(`/api/v1/cosmetics/products?${params.toString()}`);
+      }
+
+      if (response.data) {
+        setProducts(response.data.data);
+        setTotalItems(response.data.meta.total);
+        setTotalPages(response.data.meta.total_pages);
+      }
+    } catch (err: any) {
       console.error('Failed to fetch products:', err);
+      setError(err.message || '상품 목록을 불러오는데 실패했습니다.');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
-  }, [api]);
+  }, [api, currentPage, brandFilter, statusFilter, sortBy, sortOrder, searchTerm]);
+
+  useEffect(() => {
+    fetchBrands();
+  }, [fetchBrands]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Filtering
-  const filteredProducts = products.filter((product) => {
-    if (searchTerm && !product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-    if (brandFilter !== 'all' && product.brandId !== brandFilter) return false;
-    if (skinTypeFilter !== 'all' && !product.skinTypes.includes(skinTypeFilter)) return false;
-    if (concernFilter !== 'all' && !product.concerns.includes(concernFilter)) return false;
-    return true;
-  });
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [brandFilter, statusFilter, sortBy, sortOrder, searchTerm]);
 
-  // Sorting
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'price_asc':
-        return a.price - b.price;
-      case 'price_desc':
-        return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
-      case 'reviews':
-        return b.reviewCount - a.reviewCount;
-      default:
-        return a.name.localeCompare(b.name);
-    }
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
-  const paginatedProducts = sortedProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Unique brands for filter
-  const brands = [...new Set(products.map((p) => ({ id: p.brandId, name: p.brandName })))];
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(price);
+  const formatPrice = (price: Price) => {
+    const displayPrice = price.sale ?? price.base;
+    return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: price.currency || 'KRW' }).format(displayPrice);
   };
 
-  const getConcernIcon = (concern: string) => {
-    switch (concern) {
-      case 'dryness':
-        return <Droplet className="w-3 h-3" />;
-      case 'pigmentation':
-        return <Sun className="w-3 h-3" />;
-      default:
-        return <Sparkles className="w-3 h-3" />;
-    }
+  const getPrimaryImage = (images?: ProductImage[]) => {
+    if (!images || images.length === 0) return null;
+    const primary = images.find(img => img.is_primary);
+    return primary || images[0];
   };
 
-  if (loading) {
+  if (loading && products.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -278,7 +242,7 @@ const ProductListPage: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={fetchProducts}
-              iconLeft={<RefreshCw className="w-4 h-4" />}
+              iconLeft={<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />}
             >
               새로고침
             </AGButton>
@@ -301,6 +265,14 @@ const ProductListPage: React.FC = () => {
       />
 
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
         {/* Filters */}
         <AGSection>
           <div className="flex flex-col lg:flex-row gap-4">
@@ -308,22 +280,16 @@ const ProductListPage: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <AGInput
                 type="text"
-                placeholder="제품명 검색..."
+                placeholder="제품명 검색 (2자 이상)..."
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="flex flex-wrap gap-3">
               <AGSelect
                 value={brandFilter}
-                onChange={(e) => {
-                  setBrandFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => setBrandFilter(e.target.value)}
                 className="w-40"
               >
                 <option value="all">전체 브랜드</option>
@@ -334,45 +300,32 @@ const ProductListPage: React.FC = () => {
                 ))}
               </AGSelect>
               <AGSelect
-                value={skinTypeFilter}
-                onChange={(e) => {
-                  setSkinTypeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as ProductStatus | 'all')}
                 className="w-32"
               >
-                <option value="all">피부 타입</option>
-                {Object.entries(skinTypeLabels).map(([key, label]) => (
+                <option value="all">전체 상태</option>
+                {Object.entries(statusLabels).map(([key, label]) => (
                   <option key={key} value={key}>
                     {label}
                   </option>
                 ))}
               </AGSelect>
               <AGSelect
-                value={concernFilter}
+                value={`${sortBy}_${sortOrder}`}
                 onChange={(e) => {
-                  setConcernFilter(e.target.value);
-                  setCurrentPage(1);
+                  const [sort, order] = e.target.value.split('_') as ['created_at' | 'price' | 'name', 'asc' | 'desc'];
+                  setSortBy(sort);
+                  setSortOrder(order);
                 }}
-                className="w-32"
-              >
-                <option value="all">피부 고민</option>
-                {Object.entries(concernLabels).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </AGSelect>
-              <AGSelect
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
                 className="w-36"
               >
-                <option value="name">이름순</option>
+                <option value="created_at_desc">최신순</option>
+                <option value="created_at_asc">오래된순</option>
+                <option value="name_asc">이름순</option>
+                <option value="name_desc">이름역순</option>
                 <option value="price_asc">가격 낮은순</option>
                 <option value="price_desc">가격 높은순</option>
-                <option value="rating">평점순</option>
-                <option value="reviews">리뷰순</option>
               </AGSelect>
             </div>
           </div>
@@ -381,153 +334,145 @@ const ProductListPage: React.FC = () => {
         {/* Results Count */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            총 <span className="font-medium">{filteredProducts.length}</span>개 제품
+            총 <span className="font-medium">{totalItems}</span>개 제품
           </p>
         </div>
 
         {/* Product Grid/List */}
         <AGSection>
-          {paginatedProducts.length === 0 ? (
+          {products.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p>검색 결과가 없습니다</p>
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {paginatedProducts.map((product) => (
-                <Link key={product.id} to={`/cosmetics-products/${product.id}`}>
-                  <AGCard hoverable padding="none" className="overflow-hidden group">
-                    {/* Image */}
-                    <div className="relative h-48 bg-gray-100">
-                      {product.imageUrl ? (
-                        <img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-12 h-12 text-gray-300" />
-                        </div>
-                      )}
-                      {/* Badges */}
-                      <div className="absolute top-2 left-2 flex flex-col gap-1">
-                        {product.isNew && (
-                          <AGTag color="blue" size="sm">NEW</AGTag>
-                        )}
-                        {product.isBestSeller && (
-                          <AGTag color="red" size="sm">BEST</AGTag>
-                        )}
-                      </div>
-                      {/* Wishlist */}
-                      <button className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Heart className="w-4 h-4 text-gray-400" />
-                      </button>
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-4">
-                      <p className="text-xs text-gray-500 mb-1">{product.brandName}</p>
-                      <h3 className="font-medium text-gray-900 line-clamp-2 mb-2 min-h-[40px]">
-                        {product.name}
-                      </h3>
-
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {product.skinTypes.slice(0, 2).map((type) => (
-                          <span
-                            key={type}
-                            className="px-1.5 py-0.5 text-xs bg-blue-50 text-blue-600 rounded"
-                          >
-                            {skinTypeLabels[type]}
-                          </span>
-                        ))}
-                        {product.concerns.slice(0, 1).map((concern) => (
-                          <span
-                            key={concern}
-                            className="px-1.5 py-0.5 text-xs bg-green-50 text-green-600 rounded flex items-center gap-0.5"
-                          >
-                            {getConcernIcon(concern)}
-                            {concernLabels[concern]}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Rating & Price */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-sm">
-                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                          <span className="font-medium">{product.rating}</span>
-                          <span className="text-gray-400">({product.reviewCount})</span>
-                        </div>
-                        <span className="font-bold text-gray-900">{formatPrice(product.price)}</span>
-                      </div>
-                    </div>
-                  </AGCard>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {paginatedProducts.map((product) => (
-                <Link key={product.id} to={`/cosmetics-products/${product.id}`}>
-                  <AGCard hoverable padding="md">
-                    <div className="flex items-center gap-4">
-                      <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        {product.imageUrl ? (
+              {products.map((product) => {
+                const primaryImage = getPrimaryImage(product.images);
+                return (
+                  <Link key={product.id} to={`/cosmetics-products/${product.id}`}>
+                    <AGCard hoverable padding="none" className="overflow-hidden group">
+                      {/* Image */}
+                      <div className="relative h-48 bg-gray-100">
+                        {primaryImage ? (
                           <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
+                            src={primaryImage.url}
+                            alt={primaryImage.alt || product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Package className="w-8 h-8 text-gray-300" />
+                            <Package className="w-12 h-12 text-gray-300" />
+                          </div>
+                        )}
+                        {/* Status Badge */}
+                        <div className="absolute top-2 left-2">
+                          <AGTag color={statusColors[product.status]} size="sm">
+                            {statusLabels[product.status]}
+                          </AGTag>
+                        </div>
+                        {/* Sale Badge */}
+                        {product.price.sale && (
+                          <div className="absolute top-2 right-2">
+                            <AGTag color="red" size="sm">SALE</AGTag>
                           </div>
                         )}
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-gray-500">{product.brandName}</span>
-                          {product.isNew && <AGTag color="blue" size="sm">NEW</AGTag>}
-                          {product.isBestSeller && <AGTag color="red" size="sm">BEST</AGTag>}
-                        </div>
-                        <h3 className="font-medium text-gray-900 mb-2">{product.name}</h3>
-                        <div className="flex flex-wrap gap-1">
-                          {product.skinTypes.map((type) => (
-                            <span
-                              key={type}
-                              className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded"
-                            >
-                              {skinTypeLabels[type]}
+                      {/* Info */}
+                      <div className="p-4">
+                        <p className="text-xs text-gray-500 mb-1">{product.brand.name}</p>
+                        <h3 className="font-medium text-gray-900 line-clamp-2 mb-2 min-h-[40px]">
+                          {product.name}
+                        </h3>
+
+                        {/* Line */}
+                        {product.line && (
+                          <div className="mb-3">
+                            <span className="px-1.5 py-0.5 text-xs bg-blue-50 text-blue-600 rounded">
+                              {product.line.name}
                             </span>
-                          ))}
-                          {product.concerns.map((concern) => (
-                            <span
-                              key={concern}
-                              className="px-2 py-0.5 text-xs bg-green-50 text-green-600 rounded"
-                            >
-                              {concernLabels[concern]}
-                            </span>
-                          ))}
+                          </div>
+                        )}
+
+                        {/* Price */}
+                        <div className="flex items-center justify-end">
+                          {product.price.sale ? (
+                            <div className="text-right">
+                              <span className="text-xs text-gray-400 line-through mr-2">
+                                {new Intl.NumberFormat('ko-KR').format(product.price.base)}원
+                              </span>
+                              <span className="font-bold text-red-600">{formatPrice(product.price)}</span>
+                            </div>
+                          ) : (
+                            <span className="font-bold text-gray-900">{formatPrice(product.price)}</span>
+                          )}
                         </div>
                       </div>
-
-                      <div className="text-right flex-shrink-0">
-                        <div className="flex items-center gap-1 text-sm mb-1">
-                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                          <span className="font-medium">{product.rating}</span>
-                          <span className="text-gray-400">({product.reviewCount})</span>
+                    </AGCard>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {products.map((product) => {
+                const primaryImage = getPrimaryImage(product.images);
+                return (
+                  <Link key={product.id} to={`/cosmetics-products/${product.id}`}>
+                    <AGCard hoverable padding="md">
+                      <div className="flex items-center gap-4">
+                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                          {primaryImage ? (
+                            <img
+                              src={primaryImage.url}
+                              alt={primaryImage.alt || product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-300" />
+                            </div>
+                          )}
                         </div>
-                        <span className="font-bold text-lg text-gray-900">{formatPrice(product.price)}</span>
-                      </div>
 
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </AGCard>
-                </Link>
-              ))}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs text-gray-500">{product.brand.name}</span>
+                            <AGTag color={statusColors[product.status]} size="sm">
+                              {statusLabels[product.status]}
+                            </AGTag>
+                            {product.price.sale && (
+                              <AGTag color="red" size="sm">SALE</AGTag>
+                            )}
+                          </div>
+                          <h3 className="font-medium text-gray-900 mb-2">{product.name}</h3>
+                          {product.line && (
+                            <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded">
+                              {product.line.name}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-right flex-shrink-0">
+                          {product.price.sale ? (
+                            <>
+                              <div className="text-xs text-gray-400 line-through">
+                                {new Intl.NumberFormat('ko-KR').format(product.price.base)}원
+                              </div>
+                              <span className="font-bold text-lg text-red-600">{formatPrice(product.price)}</span>
+                            </>
+                          ) : (
+                            <span className="font-bold text-lg text-gray-900">{formatPrice(product.price)}</span>
+                          )}
+                        </div>
+
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
+                      </div>
+                    </AGCard>
+                  </Link>
+                );
+              })}
             </div>
           )}
 
@@ -537,7 +482,7 @@ const ProductListPage: React.FC = () => {
               <AGTablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                totalItems={filteredProducts.length}
+                totalItems={totalItems}
                 itemsPerPage={itemsPerPage}
                 onPageChange={setCurrentPage}
               />

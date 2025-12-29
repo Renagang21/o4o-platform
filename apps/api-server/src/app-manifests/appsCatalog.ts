@@ -487,17 +487,19 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['yaksa'],
   },
   {
-    appId: 'cgm-pharmacist-app',
-    name: 'CGM Pharmacist App',
-    version: '0.1.0',
-    description: '약사용 CGM 환자 관리 앱 - 환자 CGM 데이터 요약, 코칭 도구, 위험 모니터링',
+    appId: 'cgm-glucoseview',
+    name: 'CGM GlucoseView',
+    version: '1.0.0',
+    description: '약사용 CGM 혈당 분석 서비스 - 환자 혈당 패턴 모니터링 및 인사이트 제공',
     category: 'healthcare',
-    tags: ['CGM', 'glucose', '혈당', 'pharmacist', '약사', 'coaching', '코칭', 'patient', 'monitoring'],
-    type: 'feature',
-    status: 'development',
+    tags: ['CGM', 'glucose', '혈당', 'pharmacist', '약사', 'patient', 'monitoring', 'insight', '패턴'],
+    type: 'standalone',
+    status: 'active',
+    dependencies: { 'auth-core': '>=1.0.0', 'organization-core': '>=1.0.0' },
     author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
+    serviceGroups: ['yaksa'], // temporary - pending pharmacy serviceGroup decision
   },
+
 
   // ============================================
   // Signage Apps (signage)

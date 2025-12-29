@@ -380,6 +380,9 @@ import checkoutRoutes from './routes/checkout.routes.js';
 // Admin Order Routes (Phase N-2)
 import adminOrderRoutes from './routes/admin-orders.routes.js';
 
+// Cosmetics Routes (Phase 7-A-1)
+import { createCosmeticsRoutes } from './routes/cosmetics/cosmetics.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -607,6 +610,15 @@ const startServer = async () => {
     // 24. Register Admin Order routes (Phase N-2)
     app.use('/api/admin/orders', adminOrderRoutes);
     logger.info('✅ Admin Order routes registered at /api/admin/orders');
+
+    // 25. Register Cosmetics routes (Phase 7-A-1)
+    try {
+      const cosmeticsRoutes = createCosmeticsRoutes(AppDataSource);
+      app.use('/api/v1/cosmetics', cosmeticsRoutes);
+      logger.info('✅ Cosmetics routes registered at /api/v1/cosmetics');
+    } catch (cosmeticsError) {
+      logger.error('Failed to register Cosmetics routes:', cosmeticsError);
+    }
 
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted

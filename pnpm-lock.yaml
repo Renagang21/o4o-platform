@@ -1118,49 +1118,6 @@ importers:
         specifier: ^5.7.2
         version: 5.9.2
 
-  apps/commerce-api:
-    dependencies:
-      axios:
-        specifier: ^1.11.0
-        version: 1.11.0
-      compression:
-        specifier: ^1.8.1
-        version: 1.8.1
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.5
-      dotenv:
-        specifier: ^16.6.1
-        version: 16.6.1
-      express:
-        specifier: ^4.21.2
-        version: 4.21.2
-      helmet:
-        specifier: ^6.2.0
-        version: 6.2.0
-    devDependencies:
-      '@types/compression':
-        specifier: ^1.7.5
-        version: 1.8.1
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.19
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.23
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.17.2
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
-      tsx:
-        specifier: ^4.19.2
-        version: 4.21.0
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.2
-
   apps/digital-signage-agent:
     dependencies:
       axios:
@@ -1187,49 +1144,6 @@ importers:
         version: 10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2)
       typescript:
         specifier: ^5.3.0
-        version: 5.9.2
-
-  apps/dropshipping-api:
-    dependencies:
-      axios:
-        specifier: ^1.11.0
-        version: 1.11.0
-      compression:
-        specifier: ^1.8.1
-        version: 1.8.1
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.5
-      dotenv:
-        specifier: ^16.6.1
-        version: 16.6.1
-      express:
-        specifier: ^4.21.2
-        version: 4.21.2
-      helmet:
-        specifier: ^6.2.0
-        version: 6.2.0
-    devDependencies:
-      '@types/compression':
-        specifier: ^1.7.5
-        version: 1.8.1
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.19
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.23
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.17.2
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
-      tsx:
-        specifier: ^4.19.2
-        version: 4.21.0
-      typescript:
-        specifier: ^5.7.2
         version: 5.9.2
 
   apps/ecommerce:
@@ -1415,49 +1329,6 @@ importers:
         specifier: ~5.4.19
         version: 5.4.19(@types/node@24.2.1)(lightningcss@1.30.1)(terser@5.44.0)
 
-  apps/lms-api:
-    dependencies:
-      axios:
-        specifier: ^1.11.0
-        version: 1.11.0
-      compression:
-        specifier: ^1.8.1
-        version: 1.8.1
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.5
-      dotenv:
-        specifier: ^16.6.1
-        version: 16.6.1
-      express:
-        specifier: ^4.21.2
-        version: 4.21.2
-      helmet:
-        specifier: ^6.2.0
-        version: 6.2.0
-    devDependencies:
-      '@types/compression':
-        specifier: ^1.7.5
-        version: 1.8.1
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.19
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.23
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.17.2
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
-      tsx:
-        specifier: ^4.19.2
-        version: 4.21.0
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.2
-
   apps/main-site:
     dependencies:
       '@o4o/auth-client':
@@ -1589,49 +1460,6 @@ importers:
       vite:
         specifier: ^5.0.8
         version: 5.4.19(@types/node@20.19.24)(lightningcss@1.30.1)(terser@5.44.0)
-
-  apps/supplier-api:
-    dependencies:
-      axios:
-        specifier: ^1.11.0
-        version: 1.11.0
-      compression:
-        specifier: ^1.8.1
-        version: 1.8.1
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.5
-      dotenv:
-        specifier: ^16.6.1
-        version: 16.6.1
-      express:
-        specifier: ^4.21.2
-        version: 4.21.2
-      helmet:
-        specifier: ^6.2.0
-        version: 6.2.0
-    devDependencies:
-      '@types/compression':
-        specifier: ^1.7.5
-        version: 1.8.1
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.19
-      '@types/express':
-        specifier: ^4.17.21
-        version: 4.17.23
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.17.2
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.0(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.1)
-      tsx:
-        specifier: ^4.19.2
-        version: 4.21.0
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.2
 
   apps/vscode-extension:
     dependencies:
@@ -1950,6 +1778,19 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
+
+  packages/cgm-glucoseview:
+    dependencies:
+      typeorm:
+        specifier: ^0.3.20
+        version: 0.3.26(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.24)(typescript@5.9.2))
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
 
   packages/cgm-pharmacist-app:
     dependencies:

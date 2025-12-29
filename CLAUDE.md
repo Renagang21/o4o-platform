@@ -707,11 +707,22 @@ vim openapi.yaml
 
 | Web | 상태 |
 |-----|------|
-| cosmetics-web | Planned (템플릿 원본) |
+| cosmetics-web | **Active (Reference Implementation)** |
 | yaksa-web | Planned |
 | dropshipping-web | Planned |
 | tourism-web | Planned |
 | 이후 모든 business-web | 필수 적용 |
+
+**Reference Implementation**:
+```
+apps/admin-dashboard/src/pages/cosmetics-products/
+├── ProductListPage.tsx      # 상품 목록 + 검색 + 필터
+├── ProductDetailPage.tsx    # 상품 상세
+├── BrandListPage.tsx        # 브랜드 목록
+├── BrandDetailPage.tsx      # 브랜드 상세 + 라인 목록
+```
+
+> 📄 상세 정의서: `docs/architecture/web-business-template.md`
 
 ### 16.2 역할 정의
 

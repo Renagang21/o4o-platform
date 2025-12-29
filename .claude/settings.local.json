@@ -166,7 +166,8 @@
       "Bash(dir:*)",
       "Bash(pnpm -F yaksa-accounting build:*)",
       "Bash(pnpm -F yaksa-admin build:*)",
-      "Bash(pnpm -F cosmetics-sample-display-extension build:*)"
+      "Bash(pnpm -F cosmetics-sample-display-extension build:*)",
+      "Bash(pnpm -F admin-dashboard build:*)"
     ],
     "deny": []
   }
