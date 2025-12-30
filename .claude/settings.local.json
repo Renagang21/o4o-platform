@@ -167,7 +167,24 @@
       "Bash(pnpm -F yaksa-accounting build:*)",
       "Bash(pnpm -F yaksa-admin build:*)",
       "Bash(pnpm -F cosmetics-sample-display-extension build:*)",
-      "Bash(pnpm -F admin-dashboard build:*)"
+      "Bash(pnpm -F admin-dashboard build:*)",
+      "Bash(pnpm --filter=api-server run build)",
+      "Bash(gcloud run services list:*)",
+      "Bash(gcloud run domain-mappings list:*)",
+      "Bash(gcloud beta run domain-mappings list:*)",
+      "Bash(apps/admin-dashboard/src/App.tsx )",
+      "Bash(apps/admin-dashboard/src/config/wordpressMenuFinal.tsx )",
+      "Bash(apps/admin-dashboard/src/pages/neture/ )",
+      "Bash(apps/api-server/src/database/connection.ts )",
+      "Bash(apps/api-server/src/main.ts )",
+      "Bash(apps/api-server/src/database/migrations/1735567200000-CreateNetureTables.ts )",
+      "Bash(apps/api-server/src/database/migrations/1735567200001-SeedNetureData.ts )",
+      "Bash(apps/api-server/src/routes/neture/ )",
+      "Bash(apps/neture-web/)",
+      "Bash(gcloud beta run domain-mappings create:*)",
+      "Bash(gcloud domains list-user-verified:*)",
+      "Bash(bash:*)",
+      "Bash(gcloud run:*)"
     ],
     "deny": []
   }

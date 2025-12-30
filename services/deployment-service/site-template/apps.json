@@ -1,7 +1,0 @@
-{
-  "default": ["commerce", "customer", "admin"],
-  "ecommerce": ["commerce", "customer", "admin", "cart", "wishlist"],
-  "forum": ["forum", "customer", "admin"],
-  "pharmacy": ["commerce", "customer", "admin", "forum-yaksa"],
-  "signage": ["signage", "admin"]
-}

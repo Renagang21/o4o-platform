@@ -12,6 +12,23 @@ import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
 
 /**
+ * Classify error for observability
+ */
+function classifyAuthError(error: Error): string {
+  const msg = error.message?.toLowerCase() || '';
+  if (msg.includes('jwt_secret') || msg.includes('jwt_refresh_secret')) {
+    return 'jwt-config-missing';
+  }
+  if (msg.includes('database') || msg.includes('connection') || msg.includes('typeorm') || msg.includes('repository')) {
+    return 'db-connection-failed';
+  }
+  if (msg.includes('timeout')) {
+    return 'timeout';
+  }
+  return 'unknown';
+}
+
+/**
  * Auth Controller - NextGen Pattern
  *
  * Handles authentication operations:
@@ -31,6 +48,35 @@ export class AuthController extends BaseController {
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
 
+    // P0 Fix: Check DB initialization before attempting login
+    if (!AppDataSource.isInitialized) {
+      logger.error('[AuthController.login] Database not initialized (GRACEFUL_STARTUP mode)', {
+        tag: 'db-not-initialized',
+        email,
+      });
+      return res.status(503).json({
+        success: false,
+        error: 'Service temporarily unavailable. Please try again later.',
+        code: 'SERVICE_UNAVAILABLE',
+        retryable: true,
+      });
+    }
+
+    // P0 Fix: Check JWT configuration before attempting login
+    if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+      logger.error('[AuthController.login] JWT configuration missing', {
+        tag: 'jwt-config-missing',
+        hasJwtSecret: !!process.env.JWT_SECRET,
+        hasJwtRefreshSecret: !!process.env.JWT_REFRESH_SECRET,
+      });
+      return res.status(503).json({
+        success: false,
+        error: 'Service configuration error. Please contact administrator.',
+        code: 'CONFIG_ERROR',
+        retryable: false,
+      });
+    }
+
     try {
       const result = await authenticationService.login({
         provider: 'email',
@@ -49,10 +95,15 @@ export class AuthController extends BaseController {
         refreshToken: result.tokens.refreshToken,
       });
     } catch (error: any) {
+      // P1 Fix: Enhanced error logging with classification
+      const errorTag = classifyAuthError(error);
       logger.error('[AuthController.login] Login error', {
         error: error.message,
+        name: error.name,
         code: error.code,
+        tag: errorTag,
         email,
+        stack: error.stack?.split('\n').slice(0, 3).join(' | '),
       });
 
       // Handle specific auth errors
@@ -65,6 +116,17 @@ export class AuthController extends BaseController {
       if (error.code === 'TOO_MANY_ATTEMPTS') {
         return BaseController.error(res, error.message, 429);
       }
+
+      // P0 Fix: Return more specific error for config issues (should not reach here after pre-checks)
+      if (errorTag === 'jwt-config-missing' || errorTag === 'db-connection-failed') {
+        return res.status(503).json({
+          success: false,
+          error: 'Service temporarily unavailable. Please try again later.',
+          code: 'SERVICE_UNAVAILABLE',
+          retryable: errorTag === 'db-connection-failed',
+        });
+      }
+
       return BaseController.error(res, 'Login failed');
     }
   }
