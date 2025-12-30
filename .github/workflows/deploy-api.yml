@@ -76,9 +76,13 @@ jobs:
         pnpm --filter '@o4o/ecommerce-core' run build || true
         pnpm --filter '@o4o-apps/cms-core' run build || true
 
-        # Step 3: Build remaining packages (excluding frontend apps)
-        echo "📦 Step 3: Building remaining packages..."
-        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" --filter "!@o4o/neture-web" --filter "!@o4o/types" --filter "!@o4o/utils" run build || true
+        # Step 3: Build scheduler (required by membership-yaksa and others)
+        echo "📦 Step 3: Building scheduler packages..."
+        pnpm --filter '@o4o/yaksa-scheduler' run build || true
+
+        # Step 4: Build remaining packages (excluding frontend apps)
+        echo "📦 Step 4: Building remaining packages..."
+        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" --filter "!@o4o/neture-web" --filter "!@o4o/types" --filter "!@o4o/utils" --filter "!@o4o/yaksa-scheduler" run build || true
 
         echo "✅ Package builds complete"
 
