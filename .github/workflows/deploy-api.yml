@@ -55,36 +55,75 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Build all packages
+    - name: Build all packages for api-server
       run: |
-        echo "🔨 Building all workspace packages..."
+        echo "🔨 Building workspace packages required by api-server..."
+        echo "============================================================"
+        echo "Build order: foundational → infra → core → extensions → apps"
+        echo "============================================================"
 
         # ============================================================
-        # IMPORTANT: Build order matters!
-        # foundational → core → extensions → apps
+        # Layer 1: Foundational (no dependencies)
         # ============================================================
-
-        # Step 1: Build foundational packages (types, utils) FIRST
-        # These have NO dependencies and other packages depend on them
-        echo "📦 Step 1: Building foundational packages..."
+        echo ""
+        echo "📦 Layer 1: Foundational packages..."
         pnpm --filter '@o4o/types' run build
         pnpm --filter '@o4o/utils' run build
 
-        # Step 2: Build core packages that depend on types/utils
-        echo "📦 Step 2: Building core packages..."
-        pnpm --filter '@o4o/organization-core' run build || true
-        pnpm --filter '@o4o/ecommerce-core' run build || true
-        pnpm --filter '@o4o-apps/cms-core' run build || true
+        # ============================================================
+        # Layer 2: Infrastructure Core (depends on types/utils only)
+        # ============================================================
+        echo ""
+        echo "📦 Layer 2: Infrastructure Core packages..."
+        pnpm --filter '@o4o/cpt-registry' run build
+        pnpm --filter '@o4o/shortcodes' run build
+        pnpm --filter '@o4o/auth-client' run build
+        pnpm --filter '@o4o/block-renderer' run build
 
-        # Step 3: Build scheduler (required by membership-yaksa and others)
-        echo "📦 Step 3: Building scheduler packages..."
-        pnpm --filter '@o4o/yaksa-scheduler' run build || true
+        # ============================================================
+        # Layer 3: Domain Core (depends on Layer 1-2)
+        # ============================================================
+        echo ""
+        echo "📦 Layer 3: Domain Core packages..."
+        pnpm --filter '@o4o/organization-core' run build
+        pnpm --filter '@o4o/ecommerce-core' run build
+        pnpm --filter '@o4o-apps/cms-core' run build
+        pnpm --filter '@o4o/forum-core' run build
+        pnpm --filter '@o4o/lms-core' run build
 
-        # Step 4: Build remaining packages (excluding frontend apps)
-        echo "📦 Step 4: Building remaining packages..."
-        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" --filter "!@o4o/neture-web" --filter "!@o4o/types" --filter "!@o4o/utils" --filter "!@o4o/yaksa-scheduler" run build || true
+        # ============================================================
+        # Layer 4: Scheduler & Shared Services
+        # ============================================================
+        echo ""
+        echo "📦 Layer 4: Scheduler & Shared Services..."
+        pnpm --filter '@o4o/yaksa-scheduler' run build
 
-        echo "✅ Package builds complete"
+        # ============================================================
+        # Layer 5: Extensions & Features (depends on Core)
+        # ============================================================
+        echo ""
+        echo "📦 Layer 5: Extensions & Features..."
+        pnpm --filter '@o4o-apps/signage' run build
+        pnpm --filter '@o4o-extensions/organization-forum' run build
+        pnpm --filter '@o4o/lms-yaksa' run build
+        pnpm --filter '@o4o/membership-yaksa' run build
+        pnpm --filter '@o4o/reporting-yaksa' run build
+        pnpm --filter '@o4o/annualfee-yaksa' run build
+        pnpm --filter '@o4o/groupbuy-yaksa' run build
+        pnpm --filter '@o4o-apps/forum-yaksa' run build || true
+
+        # ============================================================
+        # Layer 6: Cosmetics Extensions
+        # ============================================================
+        echo ""
+        echo "📦 Layer 6: Cosmetics Extensions..."
+        pnpm --filter '@o4o/cosmetics-seller-extension' run build
+        pnpm --filter '@o4o/cosmetics-supplier-extension' run build
+        pnpm --filter '@o4o/cosmetics-sample-display-extension' run build
+        # Note: dropshipping-cosmetics is compiled by api-server (no independent build)
+
+        echo ""
+        echo "✅ All required packages built successfully!"
 
     - name: Build API server (bundled with tsup)
       run: |
