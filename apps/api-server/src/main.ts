@@ -383,6 +383,15 @@ import adminOrderRoutes from './routes/admin-orders.routes.js';
 // Cosmetics Routes (Phase 7-A-1)
 import { createCosmeticsRoutes } from './routes/cosmetics/cosmetics.routes.js';
 
+// Yaksa Routes (Phase A-1)
+import { createYaksaRoutes } from './routes/yaksa/yaksa.routes.js';
+
+// Glycopharm Routes (Phase B-1)
+import { createGlycopharmRoutes } from './routes/glycopharm/glycopharm.routes.js';
+
+// GlucoseView Routes (Phase C-1)
+import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -618,6 +627,33 @@ const startServer = async () => {
       logger.info('✅ Cosmetics routes registered at /api/v1/cosmetics');
     } catch (cosmeticsError) {
       logger.error('Failed to register Cosmetics routes:', cosmeticsError);
+    }
+
+    // 26. Register Yaksa routes (Phase A-1)
+    try {
+      const yaksaRoutes = createYaksaRoutes(AppDataSource);
+      app.use('/api/v1/yaksa', yaksaRoutes);
+      logger.info('✅ Yaksa routes registered at /api/v1/yaksa');
+    } catch (yaksaError) {
+      logger.error('Failed to register Yaksa routes:', yaksaError);
+    }
+
+    // 27. Register Glycopharm routes (Phase B-1)
+    try {
+      const glycopharmRoutes = createGlycopharmRoutes(AppDataSource);
+      app.use('/api/v1/glycopharm', glycopharmRoutes);
+      logger.info('✅ Glycopharm routes registered at /api/v1/glycopharm');
+    } catch (glycopharmError) {
+      logger.error('Failed to register Glycopharm routes:', glycopharmError);
+    }
+
+    // 28. Register GlucoseView routes (Phase C-1)
+    try {
+      const glucoseviewRoutes = createGlucoseViewRoutes(AppDataSource);
+      app.use('/api/v1/glucoseview', glucoseviewRoutes);
+      logger.info('✅ GlucoseView routes registered at /api/v1/glucoseview');
+    } catch (glucoseviewError) {
+      logger.error('Failed to register GlucoseView routes:', glucoseviewError);
     }
 
     // 6. Core routes now registered via dynamic module loader

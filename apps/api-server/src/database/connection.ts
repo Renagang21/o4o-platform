@@ -110,6 +110,45 @@ import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
 // ============================================================================
+// COSMETICS ENTITIES (Phase 7-A-1)
+// ============================================================================
+import {
+  CosmeticsBrand,
+  CosmeticsLine,
+  CosmeticsProduct,
+  CosmeticsPricePolicy,
+  CosmeticsProductLog,
+  CosmeticsPriceLog,
+} from '../routes/cosmetics/entities/index.js';
+
+// ============================================================================
+// YAKSA ENTITIES (Phase A-1)
+// ============================================================================
+import {
+  YaksaCategory,
+  YaksaPost,
+  YaksaPostLog,
+} from '../routes/yaksa/entities/index.js';
+
+// ============================================================================
+// GLYCOPHARM ENTITIES (Phase B-1)
+// ============================================================================
+import {
+  GlycopharmPharmacy,
+  GlycopharmProduct,
+  GlycopharmProductLog,
+} from '../routes/glycopharm/entities/index.js';
+
+// ============================================================================
+// GLUCOSEVIEW ENTITIES (Phase C-1)
+// ============================================================================
+import {
+  GlucoseViewVendor,
+  GlucoseViewViewProfile,
+  GlucoseViewConnection,
+} from '../routes/glucoseview/entities/index.js';
+
+// ============================================================================
 // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
 // ============================================================================
 // Organization and OrganizationMember are absorbed into Core API as the
@@ -291,10 +330,30 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     // COSMETICS ENTITIES (Phase 7-A-1: Cosmetics API Implementation)
     // ============================================================================
-    // Note: These entities use 'cosmetics' schema, isolated from Core
-    // CosmeticsBrand, CosmeticsLine, CosmeticsProduct, CosmeticsPricePolicy,
-    // CosmeticsProductLog, CosmeticsPriceLog are imported from routes/cosmetics/entities
+    CosmeticsBrand,
+    CosmeticsLine,
+    CosmeticsProduct,
+    CosmeticsPricePolicy,
+    CosmeticsProductLog,
+    CosmeticsPriceLog,
     // ============================================================================
+    // YAKSA ENTITIES (Phase A-1: Yaksa API Implementation)
+    // ============================================================================
+    YaksaCategory,
+    YaksaPost,
+    YaksaPostLog,
+    // ============================================================================
+    // GLYCOPHARM ENTITIES (Phase B-1: Glycopharm API Implementation)
+    // ============================================================================
+    GlycopharmPharmacy,
+    GlycopharmProduct,
+    GlycopharmProductLog,
+    // ============================================================================
+    // GLUCOSEVIEW ENTITIES (Phase C-1: GlucoseView API Implementation)
+    // ============================================================================
+    GlucoseViewVendor,
+    GlucoseViewViewProfile,
+    GlucoseViewConnection,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
     // ============================================================================

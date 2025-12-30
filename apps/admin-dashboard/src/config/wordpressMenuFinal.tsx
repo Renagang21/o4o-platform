@@ -344,6 +344,56 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
+  // Glycopharm (약국 혈당관리)
+  {
+    id: 'glycopharm',
+    label: 'Glycopharm',
+    icon: <Activity className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'glycopharm-pharmacies',
+        label: '약국 관리',
+        icon: <Heart className="w-4 h-4" />,
+        path: '/glycopharm/pharmacies',
+      },
+      {
+        id: 'glycopharm-products',
+        label: '제품 관리',
+        icon: <Package className="w-4 h-4" />,
+        path: '/glycopharm/products',
+      },
+    ],
+  },
+
+  // GlucoseView (CGM 데이터 뷰)
+  {
+    id: 'glucoseview',
+    label: 'GlucoseView',
+    icon: <Activity className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'glucoseview-vendors',
+        label: 'CGM 제조사',
+        icon: <Monitor className="w-4 h-4" />,
+        path: '/glucoseview/vendors',
+      },
+      {
+        id: 'glucoseview-profiles',
+        label: '표현 규칙',
+        icon: <LayoutGrid className="w-4 h-4" />,
+        path: '/glucoseview/view-profiles',
+      },
+      {
+        id: 'glucoseview-connections',
+        label: '연동 상태',
+        icon: <Link2 className="w-4 h-4" />,
+        path: '/glucoseview/connections',
+      },
+    ],
+  },
+
   // Cosmetics Partner (파트너/인플루언서)
   {
     id: 'cosmetics-partner',

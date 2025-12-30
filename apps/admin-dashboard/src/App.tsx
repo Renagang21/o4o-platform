@@ -172,6 +172,12 @@ const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/Cosm
 // Cosmetics Products Pages (Phase 7-H)
 const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
 
+// Glycopharm Pages (Phase B-3)
+const GlycopharmRouter = lazy(() => import('@/pages/glycopharm/GlycopharmRouter'));
+
+// GlucoseView Pages (Phase C-3)
+const GlucoseViewRouter = lazy(() => import('@/pages/glucoseview/GlucoseViewRouter'));
+
 // Storefront Pages (Phase 7-I)
 const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
 
@@ -1325,6 +1331,24 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <CosmeticsProductsRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Glycopharm - Pharmacy Blood Glucose Products (Phase B-3) */}
+                    <Route path="/glycopharm/*" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GlycopharmRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* GlucoseView - CGM Data View Configuration (Phase C-3) */}
+                    <Route path="/glucoseview/*" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GlucoseViewRouter />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
