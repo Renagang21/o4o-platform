@@ -1,19 +1,26 @@
 /**
  * Neture Product Detail Page
  *
- * Phase D-2: Neture Web Server (B2C) 구축
- * 상품 상세 페이지
+ * Phase G-2: B2C 핵심 기능 확장
+ * 상품 상세 + 장바구니 담기 + 파트너 정보
  */
 
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { netureApi } from '@/api/neture.api';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const { addToCart, isInCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['neture', 'product', productId],
@@ -23,8 +30,8 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="aspect-square bg-gray-200 rounded-lg" />
@@ -73,27 +80,27 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: `/products/${productId}` } });
+      return;
+    }
+    addToCart(product, quantity);
+    navigate('/cart');
+  };
+
   const isOutOfStock = product.stock === 0;
+  const alreadyInCart = isInCart(product.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-xl font-bold text-blue-600">
-              Neture
-            </Link>
-            <nav className="flex items-center gap-4">
-              <Link to="/products" className="text-gray-600 hover:text-gray-900">
-                상품 목록
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm">
           <ol className="flex items-center gap-2 text-gray-500">
@@ -109,7 +116,7 @@ export default function ProductDetailPage() {
               </Link>
             </li>
             <li>/</li>
-            <li className="text-gray-900">{product.name}</li>
+            <li className="text-gray-900 truncate max-w-[200px]">{product.name}</li>
           </ol>
         </nav>
 
@@ -229,16 +236,24 @@ export default function ProductDetailPage() {
             {/* Action Buttons */}
             <div className="flex gap-4">
               <button
+                onClick={handleBuyNow}
                 disabled={isOutOfStock}
                 className="flex-1 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                {isOutOfStock ? '품절' : '구매하기'}
+                {isOutOfStock ? '품절' : isAuthenticated ? '바로 구매' : '로그인하고 구매'}
               </button>
               <button
+                onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className="px-6 py-4 border-2 border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed"
+                className={`px-6 py-4 border-2 font-bold rounded-lg transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed ${
+                  addedToCart
+                    ? 'border-green-500 text-green-500 bg-green-50'
+                    : alreadyInCart
+                    ? 'border-gray-400 text-gray-600'
+                    : 'border-blue-600 text-blue-600 hover:bg-blue-50'
+                }`}
               >
-                장바구니
+                {addedToCart ? '✓ 담김' : alreadyInCart ? '장바구니에 있음' : '장바구니'}
               </button>
             </div>
 
@@ -268,44 +283,56 @@ export default function ProductDetailPage() {
           </div>
         )}
 
-        {/* Partner Info */}
+        {/* Partner Info - Enhanced */}
         {product.partner && (
           <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">판매자 정보</h2>
-            <div className="flex items-center gap-4">
+            <div className="flex items-start gap-4">
               {product.partner.logo ? (
                 <img
                   src={product.partner.logo}
                   alt={product.partner.name}
-                  className="w-16 h-16 rounded-full object-cover"
+                  className="w-20 h-20 rounded-lg object-cover border"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
+                <div className="w-20 h-20 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold">
                   {product.partner.name.charAt(0)}
                 </div>
               )}
-              <div>
-                <p className="font-medium text-gray-900">{product.partner.name}</p>
+              <div className="flex-1">
+                <p className="font-bold text-lg text-gray-900">{product.partner.name}</p>
                 {product.partner.business_name && (
                   <p className="text-sm text-gray-500">{product.partner.business_name}</p>
                 )}
+                {product.partner.description && (
+                  <p className="mt-2 text-gray-600 text-sm line-clamp-2">
+                    {product.partner.description}
+                  </p>
+                )}
+                <div className="mt-3 flex items-center gap-4 text-sm">
+                  <span className={`px-2 py-1 rounded ${
+                    product.partner.status === 'active'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {product.partner.status === 'active' ? '인증된 판매자' : '판매자'}
+                  </span>
+                  {product.partner.website && (
+                    <a
+                      href={product.partner.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      웹사이트 방문
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         )}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-xl font-bold mb-2">Neture</p>
-            <p className="text-gray-400 text-sm">
-              &copy; 2025 Neture. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 }

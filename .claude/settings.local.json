@@ -184,7 +184,12 @@
       "Bash(gcloud beta run domain-mappings create:*)",
       "Bash(gcloud domains list-user-verified:*)",
       "Bash(bash:*)",
-      "Bash(gcloud run:*)"
+      "Bash(gcloud run:*)",
+      "Bash(winget install:*)",
+      "Bash(choco install:*)",
+      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" run list --limit=5)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI\")",
+      "Bash(gh:*)"
     ],
     "deny": []
   }

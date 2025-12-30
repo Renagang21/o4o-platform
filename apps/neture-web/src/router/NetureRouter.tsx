@@ -1,17 +1,24 @@
 /**
  * Neture Router
  *
- * Phase D-2: Neture Web Server (B2C) 구축
- * React Router 설정
+ * Phase G-2: B2C 핵심 기능 확장
+ * React Router 설정 + 레이아웃 통합
  */
 
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
-import { HomePage, ProductListPage, ProductDetailPage } from '@/pages';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { MainLayout } from '@/layouts';
+import {
+  HomePage,
+  ProductListPage,
+  ProductDetailPage,
+  LoginPage,
+  CartPage,
+} from '@/pages';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Outlet />,
+    element: <MainLayout />,
     children: [
       {
         index: true,
@@ -25,7 +32,16 @@ const router = createBrowserRouter([
         path: 'products/:productId',
         element: <ProductDetailPage />,
       },
+      {
+        path: 'cart',
+        element: <CartPage />,
+      },
     ],
+  },
+  {
+    // Login은 별도 레이아웃 (Header/Footer 없음)
+    path: '/login',
+    element: <LoginPage />,
   },
 ]);
 

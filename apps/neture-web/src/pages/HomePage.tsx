@@ -1,7 +1,7 @@
 /**
  * Neture Home Page
  *
- * Phase D-2: Neture Web Server (B2C) 구축
+ * Phase G-2: B2C 핵심 기능 확장
  * 서비스 정체성 + 진입 페이지
  */
 
@@ -92,7 +92,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
@@ -173,17 +173,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-white font-bold text-xl mb-2">Neture</h3>
-            <p className="text-sm">© 2024 Neture. All rights reserved.</p>
-            <p className="text-sm mt-2">O4O Platform Service</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
