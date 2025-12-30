@@ -58,8 +58,28 @@ jobs:
     - name: Build all packages
       run: |
         echo "🔨 Building all workspace packages..."
-        # Build packages in dependency order using pnpm recursive
-        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" run build || true
+
+        # ============================================================
+        # IMPORTANT: Build order matters!
+        # foundational → core → extensions → apps
+        # ============================================================
+
+        # Step 1: Build foundational packages (types, utils) FIRST
+        # These have NO dependencies and other packages depend on them
+        echo "📦 Step 1: Building foundational packages..."
+        pnpm --filter '@o4o/types' run build
+        pnpm --filter '@o4o/utils' run build
+
+        # Step 2: Build core packages that depend on types/utils
+        echo "📦 Step 2: Building core packages..."
+        pnpm --filter '@o4o/organization-core' run build || true
+        pnpm --filter '@o4o/ecommerce-core' run build || true
+        pnpm --filter '@o4o-apps/cms-core' run build || true
+
+        # Step 3: Build remaining packages (excluding frontend apps)
+        echo "📦 Step 3: Building remaining packages..."
+        pnpm -r --filter "!@o4o/admin-dashboard" --filter "!@o4o/main-site" --filter "!@o4o/ecommerce" --filter "!@o4o/neture-web" --filter "!@o4o/types" --filter "!@o4o/utils" run build || true
+
         echo "✅ Package builds complete"
 
     - name: Build API server (bundled with tsup)
