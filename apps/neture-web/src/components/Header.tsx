@@ -88,6 +88,12 @@ export default function Header() {
               <div className="w-20 h-8 bg-gray-100 rounded animate-pulse" />
             ) : isAuthenticated ? (
               <div className="flex items-center space-x-3">
+                <Link
+                  to="/orders"
+                  className="text-sm text-gray-600 hover:text-gray-900 hidden sm:block"
+                >
+                  주문내역
+                </Link>
                 <span className="text-sm text-gray-600 hidden sm:block">
                   {user?.name}님
                 </span>

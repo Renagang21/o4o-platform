@@ -2,6 +2,7 @@
  * Neture DTOs
  *
  * Phase D-1: Neture API Server 골격 구축
+ * Phase G-3: 주문/결제 플로우 구현
  */
 
 import {
@@ -17,6 +18,11 @@ import {
   NeturePartnerAddress,
 } from '../entities/neture-partner.entity.js';
 import { NetureLogAction } from '../entities/neture-product-log.entity.js';
+import {
+  NetureOrderStatus,
+  NeturePaymentMethod,
+  NetureShippingAddress,
+} from '../entities/neture-order.entity.js';
 
 // ============================================================================
 // Common DTOs
@@ -213,4 +219,87 @@ export interface ListLogsQueryDto {
 export interface ListLogsResponseDto {
   data: ProductLogDto[];
   meta: PaginationMeta;
+}
+
+// ============================================================================
+// Order DTOs (Phase G-3)
+// ============================================================================
+
+export interface OrderItemDto {
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_image: NetureProductImage | null;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  options: Record<string, any> | null;
+}
+
+export interface OrderDto {
+  id: string;
+  order_number: string;
+  user_id: string;
+  status: NetureOrderStatus;
+  total_amount: number;
+  discount_amount: number;
+  shipping_fee: number;
+  final_amount: number;
+  currency: NetureCurrency;
+  payment_method: NeturePaymentMethod | null;
+  payment_key: string | null;
+  paid_at: string | null;
+  shipping: NetureShippingAddress | null;
+  orderer_name: string | null;
+  orderer_phone: string | null;
+  orderer_email: string | null;
+  note: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  items?: OrderItemDto[];
+}
+
+export interface CreateOrderItemDto {
+  product_id: string;
+  quantity: number;
+  options?: Record<string, any>;
+}
+
+export interface CreateOrderRequestDto {
+  items: CreateOrderItemDto[];
+  shipping: NetureShippingAddress;
+  orderer_name: string;
+  orderer_phone: string;
+  orderer_email?: string;
+  note?: string;
+}
+
+export interface CreateOrderResponseDto {
+  data: OrderDto;
+}
+
+export interface ListOrdersQueryDto {
+  page?: number;
+  limit?: number;
+  status?: NetureOrderStatus;
+  sort?: 'created_at' | 'final_amount';
+  order?: 'asc' | 'desc';
+}
+
+export interface ListOrdersResponseDto {
+  data: OrderDto[];
+  meta: PaginationMeta;
+}
+
+export interface UpdateOrderStatusRequestDto {
+  status: NetureOrderStatus;
+  cancel_reason?: string;
+}
+
+export interface OrderPaymentRequestDto {
+  payment_key: string;
+  order_id: string;
+  amount: number;
 }

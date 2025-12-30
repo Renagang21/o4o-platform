@@ -113,8 +113,7 @@ export default function CartPage() {
       navigate('/login', { state: { from: '/cart' } });
       return;
     }
-    // TODO: Phase G-3에서 결제 플로우 연결
-    alert('결제 기능은 곧 오픈 예정입니다!');
+    navigate('/checkout');
   };
 
   return (

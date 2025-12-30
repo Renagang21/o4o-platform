@@ -2,12 +2,14 @@
  * Neture Routes
  *
  * Phase D-1: Neture API Server 골격 구축
+ * Phase G-3: 주문/결제 플로우 구현
  * Main entry point for Neture API routes
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { createNetureController } from './controllers/neture.controller.js';
+import { createPaymentController } from './controllers/payment.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 
@@ -54,8 +56,15 @@ export function createNetureRoutes(dataSource: DataSource): Router {
     requireNetureScope
   );
 
-  // Mount controller
+  // Create payment controller
+  const paymentController = createPaymentController(
+    dataSource,
+    coreRequireAuth as any
+  );
+
+  // Mount controllers
   router.use('/', netureController);
+  router.use('/payments', paymentController);
 
   return router;
 }

@@ -2,6 +2,7 @@
  * Neture Repository
  *
  * Phase D-1: Neture API Server 골격 구축
+ * Phase G-3: 주문/결제 플로우 구현
  * Data access layer for Neture entities
  */
 
@@ -20,16 +21,22 @@ import {
   NetureProductLog,
   NetureLogAction,
 } from '../entities/neture-product-log.entity.js';
+import { NetureOrder, NetureOrderStatus } from '../entities/neture-order.entity.js';
+import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
 
 export class NetureRepository {
   private productRepo: Repository<NetureProduct>;
   private partnerRepo: Repository<NeturePartner>;
   private logRepo: Repository<NetureProductLog>;
+  private orderRepo: Repository<NetureOrder>;
+  private orderItemRepo: Repository<NetureOrderItem>;
 
   constructor(private dataSource: DataSource) {
     this.productRepo = dataSource.getRepository(NetureProduct);
     this.partnerRepo = dataSource.getRepository(NeturePartner);
     this.logRepo = dataSource.getRepository(NetureProductLog);
+    this.orderRepo = dataSource.getRepository(NetureOrder);
+    this.orderItemRepo = dataSource.getRepository(NetureOrderItem);
   }
 
   // ============================================================================
@@ -203,5 +210,88 @@ export class NetureRepository {
     });
 
     return { logs, total };
+  }
+
+  // ============================================================================
+  // Order Operations (Phase G-3)
+  // ============================================================================
+
+  async findOrders(options: {
+    page?: number;
+    limit?: number;
+    userId?: string;
+    status?: NetureOrderStatus;
+    sort?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<{ orders: NetureOrder[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (options.userId) where.userId = options.userId;
+    if (options.status) where.status = options.status;
+
+    const orderField = options.sort || 'createdAt';
+    const orderDir = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const [orders, total] = await this.orderRepo.findAndCount({
+      where,
+      relations: ['items'],
+      skip,
+      take: limit,
+      order: { [orderField]: orderDir } as any,
+    });
+
+    return { orders, total };
+  }
+
+  async findOrderById(id: string): Promise<NetureOrder | null> {
+    return this.orderRepo.findOne({
+      where: { id },
+      relations: ['items'],
+    });
+  }
+
+  async findOrderByNumber(orderNumber: string): Promise<NetureOrder | null> {
+    return this.orderRepo.findOne({
+      where: { orderNumber },
+      relations: ['items'],
+    });
+  }
+
+  async createOrder(data: Partial<NetureOrder>): Promise<NetureOrder> {
+    const order = this.orderRepo.create(data);
+    return this.orderRepo.save(order);
+  }
+
+  async createOrderItems(items: Partial<NetureOrderItem>[]): Promise<NetureOrderItem[]> {
+    const orderItems = this.orderItemRepo.create(items);
+    return this.orderItemRepo.save(orderItems);
+  }
+
+  async updateOrder(id: string, data: Partial<NetureOrder>): Promise<NetureOrder | null> {
+    await this.orderRepo.update(id, data);
+    return this.findOrderById(id);
+  }
+
+  async generateOrderNumber(): Promise<string> {
+    const date = new Date();
+    const prefix = `NTR${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `${prefix}-${random}`;
+  }
+
+  async findProductsByIds(ids: string[]): Promise<NetureProduct[]> {
+    if (ids.length === 0) return [];
+    return this.productRepo.findByIds(ids);
+  }
+
+  async decrementStock(productId: string, quantity: number): Promise<void> {
+    await this.productRepo.decrement({ id: productId }, 'stock', quantity);
+  }
+
+  async restoreStock(productId: string, quantity: number): Promise<void> {
+    await this.productRepo.increment({ id: productId }, 'stock', quantity);
   }
 }

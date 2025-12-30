@@ -149,12 +149,14 @@ import {
 } from '../routes/glucoseview/entities/index.js';
 
 // ============================================================================
-// NETURE ENTITIES (Phase D-1)
+// NETURE ENTITIES (Phase D-1, G-3)
 // ============================================================================
 import {
   NetureProduct,
   NeturePartner,
   NetureProductLog,
+  NetureOrder,
+  NetureOrderItem,
 } from '../routes/neture/entities/index.js';
 
 // ============================================================================
@@ -364,11 +366,13 @@ export const AppDataSource = new DataSource({
     GlucoseViewViewProfile,
     GlucoseViewConnection,
     // ============================================================================
-    // NETURE ENTITIES (Phase D-1: Neture API Implementation)
+    // NETURE ENTITIES (Phase D-1, G-3: Neture API Implementation + Orders)
     // ============================================================================
     NetureProduct,
     NeturePartner,
     NetureProductLog,
+    NetureOrder,
+    NetureOrderItem,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
     // ============================================================================

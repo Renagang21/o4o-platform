@@ -2,6 +2,7 @@
  * Neture Controller
  *
  * Phase D-1: Neture API Server 골격 구축
+ * Phase G-3: 주문/결제 플로우 구현
  * Express router with all Neture endpoints
  */
 
@@ -17,6 +18,7 @@ import {
   NeturePartnerType,
   NeturePartnerStatus,
 } from '../entities/neture-partner.entity.js';
+import { NetureOrderStatus } from '../entities/neture-order.entity.js';
 import {
   ErrorResponseDto,
   ListProductsQueryDto,
@@ -29,6 +31,9 @@ import {
   UpdatePartnerRequestDto,
   UpdatePartnerStatusRequestDto,
   ListLogsQueryDto,
+  CreateOrderRequestDto,
+  ListOrdersQueryDto,
+  UpdateOrderStatusRequestDto,
 } from '../dto/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
@@ -552,6 +557,273 @@ export function createNetureController(
         res.json(result);
       } catch (error: any) {
         console.error('[Neture] List logs error:', error);
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  // ============================================================================
+  // ORDER ENDPOINTS (Phase G-3)
+  // ============================================================================
+
+  /**
+   * POST /neture/orders
+   * Create new order (requires auth)
+   */
+  router.post(
+    '/orders',
+    requireAuth,
+    [
+      body('items').isArray({ min: 1 }),
+      body('items.*.product_id').isUUID(),
+      body('items.*.quantity').isInt({ min: 1 }),
+      body('shipping').isObject(),
+      body('shipping.recipient_name').notEmpty().isString(),
+      body('shipping.phone').notEmpty().isString(),
+      body('shipping.postal_code').notEmpty().isString(),
+      body('shipping.address').notEmpty().isString(),
+      body('orderer_name').notEmpty().isString(),
+      body('orderer_phone').notEmpty().isString(),
+      body('orderer_email').optional().isEmail(),
+      body('note').optional().isString(),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          return errorResponse(res, 401, 'NETURE_401', 'Authentication required');
+        }
+
+        const createDto: CreateOrderRequestDto = req.body;
+        const order = await service.createOrder(createDto, userId);
+
+        res.status(201).json({ data: order });
+      } catch (error: any) {
+        console.error('[Neture] Create order error:', error);
+        if (error.message.includes('not found') || error.message.includes('Insufficient')) {
+          return errorResponse(res, 400, 'NETURE_400', error.message);
+        }
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  /**
+   * GET /neture/orders
+   * List user's orders (requires auth)
+   */
+  router.get(
+    '/orders',
+    requireAuth,
+    [
+      query('page').optional().isInt({ min: 1 }).toInt(),
+      query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+      query('status').optional().isIn(Object.values(NetureOrderStatus)),
+      query('sort').optional().isIn(['created_at', 'final_amount']),
+      query('order').optional().isIn(['asc', 'desc']),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          return errorResponse(res, 401, 'NETURE_401', 'Authentication required');
+        }
+
+        const queryDto: ListOrdersQueryDto = {
+          page: req.query.page ? Number(req.query.page) : undefined,
+          limit: req.query.limit ? Number(req.query.limit) : undefined,
+          status: req.query.status as NetureOrderStatus | undefined,
+          sort: req.query.sort as 'created_at' | 'final_amount' | undefined,
+          order: req.query.order as 'asc' | 'desc' | undefined,
+        };
+
+        const result = await service.listOrders(queryDto, userId);
+        res.json(result);
+      } catch (error: any) {
+        console.error('[Neture] List orders error:', error);
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  /**
+   * GET /neture/orders/:id
+   * Get single order details (requires auth)
+   */
+  router.get(
+    '/orders/:id',
+    requireAuth,
+    [param('id').isUUID()],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          return errorResponse(res, 401, 'NETURE_401', 'Authentication required');
+        }
+
+        const order = await service.getOrder(req.params.id, userId);
+        if (!order) {
+          return errorResponse(res, 404, 'NETURE_404', 'Order not found');
+        }
+
+        res.json({ data: order });
+      } catch (error: any) {
+        console.error('[Neture] Get order error:', error);
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  /**
+   * POST /neture/orders/:id/cancel
+   * Cancel order (requires auth)
+   */
+  router.post(
+    '/orders/:id/cancel',
+    requireAuth,
+    [
+      param('id').isUUID(),
+      body('cancel_reason').optional().isString(),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          return errorResponse(res, 401, 'NETURE_401', 'Authentication required');
+        }
+
+        // 소유권 확인
+        const existingOrder = await service.getOrder(req.params.id, userId);
+        if (!existingOrder) {
+          return errorResponse(res, 404, 'NETURE_404', 'Order not found');
+        }
+
+        const order = await service.updateOrderStatus(req.params.id, {
+          status: NetureOrderStatus.CANCELLED,
+          cancel_reason: req.body.cancel_reason,
+        });
+
+        if (!order) {
+          return errorResponse(res, 404, 'NETURE_404', 'Order not found');
+        }
+
+        res.json({ data: order });
+      } catch (error: any) {
+        console.error('[Neture] Cancel order error:', error);
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  // ============================================================================
+  // ADMIN ORDER ENDPOINTS (Phase G-3)
+  // ============================================================================
+
+  /**
+   * GET /neture/admin/orders
+   * List all orders (admin)
+   */
+  router.get(
+    '/admin/orders',
+    requireAuth,
+    requireScope('neture:read'),
+    [
+      query('page').optional().isInt({ min: 1 }).toInt(),
+      query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
+      query('status').optional().isIn(Object.values(NetureOrderStatus)),
+      query('sort').optional().isIn(['created_at', 'final_amount']),
+      query('order').optional().isIn(['asc', 'desc']),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const queryDto: ListOrdersQueryDto = {
+          page: req.query.page ? Number(req.query.page) : undefined,
+          limit: req.query.limit ? Number(req.query.limit) : undefined,
+          status: req.query.status as NetureOrderStatus | undefined,
+          sort: req.query.sort as 'created_at' | 'final_amount' | undefined,
+          order: req.query.order as 'asc' | 'desc' | undefined,
+        };
+
+        const result = await service.listAllOrders(queryDto);
+        res.json(result);
+      } catch (error: any) {
+        console.error('[Neture] Admin list orders error:', error);
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  /**
+   * GET /neture/admin/orders/:id
+   * Get single order details (admin)
+   */
+  router.get(
+    '/admin/orders/:id',
+    requireAuth,
+    requireScope('neture:read'),
+    [param('id').isUUID()],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const order = await service.getOrder(req.params.id);
+        if (!order) {
+          return errorResponse(res, 404, 'NETURE_404', 'Order not found');
+        }
+
+        res.json({ data: order });
+      } catch (error: any) {
+        console.error('[Neture] Admin get order error:', error);
+        errorResponse(res, 500, 'NETURE_500', 'Internal server error');
+      }
+    }
+  );
+
+  /**
+   * PATCH /neture/admin/orders/:id/status
+   * Update order status (admin)
+   */
+  router.patch(
+    '/admin/orders/:id/status',
+    requireAuth,
+    requireScope('neture:write'),
+    [
+      param('id').isUUID(),
+      body('status').isIn(Object.values(NetureOrderStatus)),
+      body('cancel_reason').optional().isString(),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const statusDto: UpdateOrderStatusRequestDto = req.body;
+        const order = await service.updateOrderStatus(req.params.id, statusDto);
+
+        if (!order) {
+          return errorResponse(res, 404, 'NETURE_404', 'Order not found');
+        }
+
+        res.json({ data: order });
+      } catch (error: any) {
+        console.error('[Neture] Admin update order status error:', error);
         errorResponse(res, 500, 'NETURE_500', 'Internal server error');
       }
     }
