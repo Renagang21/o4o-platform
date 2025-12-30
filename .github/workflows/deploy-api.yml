@@ -79,6 +79,7 @@ jobs:
         pnpm --filter '@o4o/shortcodes' run build
         pnpm --filter '@o4o/auth-client' run build
         pnpm --filter '@o4o/block-renderer' run build
+        pnpm --filter '@o4o/ui' run build
 
         # ============================================================
         # Layer 3: Domain Core (depends on Layer 1-2)
