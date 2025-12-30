@@ -1,0 +1,207 @@
+/**
+ * Neture Repository
+ *
+ * Phase D-1: Neture API Server 골격 구축
+ * Data access layer for Neture entities
+ */
+
+import { DataSource, Repository, FindManyOptions, ILike } from 'typeorm';
+import {
+  NetureProduct,
+  NetureProductStatus,
+  NetureProductCategory,
+} from '../entities/neture-product.entity.js';
+import {
+  NeturePartner,
+  NeturePartnerType,
+  NeturePartnerStatus,
+} from '../entities/neture-partner.entity.js';
+import {
+  NetureProductLog,
+  NetureLogAction,
+} from '../entities/neture-product-log.entity.js';
+
+export class NetureRepository {
+  private productRepo: Repository<NetureProduct>;
+  private partnerRepo: Repository<NeturePartner>;
+  private logRepo: Repository<NetureProductLog>;
+
+  constructor(private dataSource: DataSource) {
+    this.productRepo = dataSource.getRepository(NetureProduct);
+    this.partnerRepo = dataSource.getRepository(NeturePartner);
+    this.logRepo = dataSource.getRepository(NetureProductLog);
+  }
+
+  // ============================================================================
+  // Product Operations
+  // ============================================================================
+
+  async findProducts(options: {
+    page?: number;
+    limit?: number;
+    partnerId?: string;
+    category?: NetureProductCategory;
+    status?: NetureProductStatus;
+    isFeatured?: boolean;
+    sort?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<{ products: NetureProduct[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (options.partnerId) where.partnerId = options.partnerId;
+    if (options.category) where.category = options.category;
+    if (options.status) where.status = options.status;
+    if (options.isFeatured !== undefined) where.isFeatured = options.isFeatured;
+
+    const orderField = options.sort || 'createdAt';
+    const orderDir = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const findOptions: FindManyOptions<NetureProduct> = {
+      where,
+      relations: ['partner'],
+      skip,
+      take: limit,
+      order: { [orderField === 'price' ? 'basePrice' : orderField]: orderDir } as any,
+    };
+
+    const [products, total] = await this.productRepo.findAndCount(findOptions);
+    return { products, total };
+  }
+
+  async searchProducts(options: {
+    query: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ products: NetureProduct[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await this.productRepo.findAndCount({
+      where: [
+        { name: ILike(`%${options.query}%`) },
+        { description: ILike(`%${options.query}%`) },
+      ],
+      relations: ['partner'],
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return { products, total };
+  }
+
+  async findProductById(id: string): Promise<NetureProduct | null> {
+    return this.productRepo.findOne({
+      where: { id },
+      relations: ['partner'],
+    });
+  }
+
+  async createProduct(data: Partial<NetureProduct>): Promise<NetureProduct> {
+    const product = this.productRepo.create(data);
+    return this.productRepo.save(product);
+  }
+
+  async updateProduct(id: string, data: Partial<NetureProduct>): Promise<NetureProduct | null> {
+    await this.productRepo.update(id, data);
+    return this.findProductById(id);
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await this.productRepo.delete(id);
+    return (result.affected || 0) > 0;
+  }
+
+  async incrementViewCount(id: string): Promise<void> {
+    await this.productRepo.increment({ id }, 'viewCount', 1);
+  }
+
+  // ============================================================================
+  // Partner Operations
+  // ============================================================================
+
+  async findPartners(options: {
+    page?: number;
+    limit?: number;
+    type?: NeturePartnerType;
+    status?: NeturePartnerStatus;
+    sort?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<{ partners: NeturePartner[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (options.type) where.type = options.type;
+    if (options.status) where.status = options.status;
+
+    const orderField = options.sort || 'createdAt';
+    const orderDir = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const [partners, total] = await this.partnerRepo.findAndCount({
+      where,
+      skip,
+      take: limit,
+      order: { [orderField]: orderDir } as any,
+    });
+
+    return { partners, total };
+  }
+
+  async findPartnerById(id: string): Promise<NeturePartner | null> {
+    return this.partnerRepo.findOne({ where: { id } });
+  }
+
+  async createPartner(data: Partial<NeturePartner>): Promise<NeturePartner> {
+    const partner = this.partnerRepo.create(data);
+    return this.partnerRepo.save(partner);
+  }
+
+  async updatePartner(id: string, data: Partial<NeturePartner>): Promise<NeturePartner | null> {
+    await this.partnerRepo.update(id, data);
+    return this.findPartnerById(id);
+  }
+
+  async deletePartner(id: string): Promise<boolean> {
+    const result = await this.partnerRepo.delete(id);
+    return (result.affected || 0) > 0;
+  }
+
+  // ============================================================================
+  // Log Operations
+  // ============================================================================
+
+  async createLog(data: Partial<NetureProductLog>): Promise<NetureProductLog> {
+    const log = this.logRepo.create(data);
+    return this.logRepo.save(log);
+  }
+
+  async findLogs(options: {
+    page?: number;
+    limit?: number;
+    productId?: string;
+    action?: NetureLogAction;
+  }): Promise<{ logs: NetureProductLog[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (options.productId) where.productId = options.productId;
+    if (options.action) where.action = options.action;
+
+    const [logs, total] = await this.logRepo.findAndCount({
+      where,
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return { logs, total };
+  }
+}
