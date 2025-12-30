@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:prod": "tsc && vite build --mode production",
+    "prebuild": "node -e \"const fs=require('fs');const pkg=require('./package.json');fs.mkdirSync('public',{recursive:true});fs.writeFileSync('public/version.json',JSON.stringify({version:new Date().toISOString().slice(0,10).replace(/-/g,'.')+'-'+new Date().toTimeString().slice(0,5).replace(':',''),buildDate:new Date().toISOString(),environment:'production'},null,2));\"",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
