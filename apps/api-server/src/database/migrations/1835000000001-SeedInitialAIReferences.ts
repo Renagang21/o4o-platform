@@ -1,72 +1,20 @@
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { AIReference } from '../../entities/AIReference.js';
-import * as fs from 'fs';
-import * as path from 'path';
 
 /**
  * Migration: Seed Initial AI References
  *
- * Imports existing documentation from /docs folder into database:
- * - docs/manual/blocks-reference.md -> blocks reference
- * - docs/ai/shortcode-registry.md -> shortcodes reference
+ * Note: This migration no longer seeds data from docs folder.
+ * The ai_references table should be seeded via admin UI or separate seed script.
+ *
+ * This migration is kept as a no-op for backwards compatibility with
+ * existing migration history.
  */
 export class SeedInitialAIReferences1835000000001 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    const aiReferenceRepository = queryRunner.manager.getRepository(AIReference);
-
-    // Path to docs folder (adjust based on runtime location)
-    const docsPath = path.resolve(__dirname, '../../../docs');
-
-    try {
-      // 1. Blocks Reference
-      const blocksRefPath = path.join(docsPath, 'manual/blocks-reference.md');
-      if (fs.existsSync(blocksRefPath)) {
-        const blocksContent = fs.readFileSync(blocksRefPath, 'utf-8');
-
-        const blocksRef = aiReferenceRepository.create({
-          type: 'blocks',
-          name: 'blocks-reference',
-          description: 'Complete block reference for AI page generation (Korean)',
-          content: blocksContent,
-          format: 'markdown',
-          version: '0.7.0',
-          schemaVersion: '1.0',
-          appSlug: null, // Available to all apps
-          status: 'active'
-        });
-
-        await aiReferenceRepository.save(blocksRef);
-      }
-
-      // 2. Shortcode Registry
-      const shortcodeRefPath = path.join(docsPath, 'ai/shortcode-registry.md');
-      if (fs.existsSync(shortcodeRefPath)) {
-        const shortcodeContent = fs.readFileSync(shortcodeRefPath, 'utf-8');
-
-        const shortcodeRef = aiReferenceRepository.create({
-          type: 'shortcodes',
-          name: 'shortcode-registry',
-          description: 'Complete shortcode registry for AI (19 shortcodes)',
-          content: shortcodeContent,
-          format: 'markdown',
-          version: '1.0',
-          schemaVersion: '1.0',
-          appSlug: null, // Available to all apps
-          status: 'active'
-        });
-
-        await aiReferenceRepository.save(shortcodeRef);
-      }
-    } catch (error) {
-      // Don't throw - allow migration to continue even if seeding fails
-      // This is useful in production where docs folder might not be available
-    }
+  public async up(_queryRunner: QueryRunner): Promise<void> {
+    // No-op: AI references should be seeded via admin UI or seed script
+    // This migration previously tried to read from docs folder which
+    // is not available in Docker/production environment
+    console.log('Migration 1835000000001: AI references seeding skipped (use admin UI)');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
