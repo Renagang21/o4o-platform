@@ -355,7 +355,7 @@ jobs:
             --cpu=1 \
             --min-instances=0 \
             --max-instances=5 \
-            --set-env-vars="VITE_API_URL=https://api.neture.co.kr/api"
+            --set-env-vars="VITE_API_URL=https://o4o-core-api-117791934476.asia-northeast3.run.app/api"
 
           echo "✅ glucoseview-web deployed successfully!"
 
