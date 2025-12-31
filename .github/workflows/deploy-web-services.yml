@@ -60,11 +60,11 @@ jobs:
               echo "glycopharm=true" >> $GITHUB_OUTPUT
               echo "glucoseview=true" >> $GITHUB_OUTPUT
             else
-              echo "neture=$( [ '$SERVICE' = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-              echo "k-cosmetics=$( [ '$SERVICE' = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-              echo "kpa-society=$( [ '$SERVICE' = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-              echo "glycopharm=$( [ '$SERVICE' = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-              echo "glucoseview=$( [ '$SERVICE' = 'glucoseview' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "k-cosmetics=$( [ "$SERVICE" = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "kpa-society=$( [ "$SERVICE" = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "glycopharm=$( [ "$SERVICE" = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "glucoseview=$( [ "$SERVICE" = 'glucoseview' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
           fi
