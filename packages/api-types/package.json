@@ -1,0 +1,49 @@
+{
+  "name": "@o4o/api-types",
+  "version": "1.0.0",
+  "description": "OpenAPI 계약 기반 자동 생성 TypeScript 타입 (수동 수정 금지)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cosmetics": {
+      "import": "./dist/cosmetics.js",
+      "types": "./dist/cosmetics.d.ts"
+    },
+    "./yaksa": {
+      "import": "./dist/yaksa.js",
+      "types": "./dist/yaksa.d.ts"
+    },
+    "./dropshipping": {
+      "import": "./dist/dropshipping.js",
+      "types": "./dist/dropshipping.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "generate": "tsx ../../scripts/generators/openapi-types-generator.ts"
+  },
+  "keywords": [
+    "o4o",
+    "openapi",
+    "types",
+    "generated"
+  ],
+  "author": "O4O Platform Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "openapi-typescript": "^7.0.0",
+    "rimraf": "^6.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

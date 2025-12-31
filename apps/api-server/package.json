@@ -9,9 +9,11 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "prebuild": "echo '🔨 Building required packages...' && pnpm --filter '@o4o/forum-core*' run build && pnpm --filter '@o4o-apps/signage' run build && pnpm --filter '@o4o/lms-core' run build && pnpm --filter '@o4o/lms-yaksa' run build && pnpm --filter '@o4o/organization-core' run build && pnpm --filter '@o4o/membership-yaksa' run build && pnpm --filter '@o4o/reporting-yaksa' run build && pnpm --filter '@o4o/dropshipping-cosmetics' run build && pnpm --filter '@o4o/annualfee-yaksa' run build && pnpm --filter '@o4o/yaksa-scheduler' run build",
+    "prebuild": "echo 'Prebuild skipped - packages should be built by CI workflow or manually'",
     "build": "pnpm run clean:dist && tsc -p tsconfig.build.json",
-    "build:api": "pnpm run prebuild && tsup",
+    "build:api": "tsup",
+    "build:api:full": "pnpm run build:deps && tsup",
+    "build:deps": "pnpm --filter '@o4o/types' run build && pnpm --filter '@o4o/utils' run build && pnpm --filter '@o4o/cpt-registry' run build && pnpm --filter '@o4o/shortcodes' run build && pnpm --filter '@o4o/auth-client' run build && pnpm --filter '@o4o/block-renderer' run build && pnpm --filter '@o4o/ui' run build && pnpm --filter '@o4o/organization-core' run build && pnpm --filter '@o4o/ecommerce-core' run build && pnpm --filter '@o4o-apps/cms-core' run build && pnpm --filter '@o4o/forum-core' run build && pnpm --filter '@o4o/lms-core' run build && pnpm --filter '@o4o/yaksa-scheduler' run build && pnpm --filter '@o4o-apps/signage' run build && pnpm --filter '@o4o-extensions/organization-forum' run build && pnpm --filter '@o4o/lms-yaksa' run build && pnpm --filter '@o4o/membership-yaksa' run build && pnpm --filter '@o4o/reporting-yaksa' run build && pnpm --filter '@o4o/annualfee-yaksa' run build && pnpm --filter '@o4o/groupbuy-yaksa' run build && pnpm --filter '@o4o/cosmetics-seller-extension' run build && pnpm --filter '@o4o/cosmetics-supplier-extension' run build && pnpm --filter '@o4o/cosmetics-sample-display-extension' run build",
     "build:optimized": "bash ../../scripts/build-api-optimized.sh",
     "build:prod": "NODE_ENV=production pnpm run build",
     "build:watch": "npx tsc -p tsconfig.build.json --watch",

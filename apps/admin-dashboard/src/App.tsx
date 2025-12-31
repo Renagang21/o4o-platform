@@ -178,6 +178,9 @@ const GlycopharmRouter = lazy(() => import('@/pages/glycopharm/GlycopharmRouter'
 // GlucoseView Pages (Phase C-3)
 const GlucoseViewRouter = lazy(() => import('@/pages/glucoseview/GlucoseViewRouter'));
 
+// Neture Pages (Phase D-3)
+const NetureRouter = lazy(() => import('@/pages/neture/NetureRouter'));
+
 // Storefront Pages (Phase 7-I)
 const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
 
@@ -1349,6 +1352,15 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <GlucoseViewRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Neture - B2C Reference Service Management (Phase D-3) */}
+                    <Route path="/neture/*" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <NetureRouter />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

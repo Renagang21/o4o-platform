@@ -394,6 +394,28 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
+  // Neture (B2C 대표 서비스)
+  {
+    id: 'neture',
+    label: 'Neture',
+    icon: <Package className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'neture-products',
+        label: '상품 관리',
+        icon: <Package className="w-4 h-4" />,
+        path: '/neture/products',
+      },
+      {
+        id: 'neture-partners',
+        label: '파트너 관리',
+        icon: <Users className="w-4 h-4" />,
+        path: '/neture/partners',
+      },
+    ],
+  },
+
   // Cosmetics Partner (파트너/인플루언서)
   {
     id: 'cosmetics-partner',

@@ -392,6 +392,9 @@ import { createGlycopharmRoutes } from './routes/glycopharm/glycopharm.routes.js
 // GlucoseView Routes (Phase C-1)
 import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes.js';
 
+// Neture Routes (Phase D-1)
+import { createNetureRoutes } from './routes/neture/neture.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -654,6 +657,15 @@ const startServer = async () => {
       logger.info('✅ GlucoseView routes registered at /api/v1/glucoseview');
     } catch (glucoseviewError) {
       logger.error('Failed to register GlucoseView routes:', glucoseviewError);
+    }
+
+    // 29. Register Neture routes (Phase D-1)
+    try {
+      const netureRoutes = createNetureRoutes(AppDataSource);
+      app.use('/api/v1/neture', netureRoutes);
+      logger.info('✅ Neture routes registered at /api/v1/neture');
+    } catch (netureError) {
+      logger.error('Failed to register Neture routes:', netureError);
     }
 
     // 6. Core routes now registered via dynamic module loader
