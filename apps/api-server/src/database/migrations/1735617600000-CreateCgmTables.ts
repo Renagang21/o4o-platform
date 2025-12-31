@@ -98,14 +98,11 @@ export class CreateCgmTables1735617600000 implements MigrationInterface {
         ON "cgm_glucose_insights" ("insight_type")
     `);
 
-    console.log('[Migration] CGM tables created successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE IF EXISTS "cgm_glucose_insights" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "cgm_patient_summaries" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "cgm_patients" CASCADE`);
-
-    console.log('[Migration] CGM tables dropped');
   }
 }

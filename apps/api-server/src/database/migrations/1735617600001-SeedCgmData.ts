@@ -60,14 +60,11 @@ export class SeedCgmData1735617600001 implements MigrationInterface {
       ON CONFLICT (id) DO NOTHING
     `);
 
-    console.log('[Migration] CGM demo data seeded successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DELETE FROM "cgm_glucose_insights" WHERE patient_id IN ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')`);
     await queryRunner.query(`DELETE FROM "cgm_patient_summaries" WHERE patient_id IN ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')`);
     await queryRunner.query(`DELETE FROM "cgm_patients" WHERE id IN ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')`);
-
-    console.log('[Migration] CGM demo data removed');
   }
 }
