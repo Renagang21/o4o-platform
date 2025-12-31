@@ -255,6 +255,12 @@ const ViewDesigner = lazy(() => import('@/pages/cms/designer/ViewDesigner'));
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
+// DS-4: Dropshipping Admin Pages (Order Relay & Settlement)
+const DropshippingOrderRelayListPage = lazy(() => import('@/pages/dropshipping/OrderRelayListPage'));
+const DropshippingOrderRelayDetailPage = lazy(() => import('@/pages/dropshipping/OrderRelayDetailPage'));
+const DropshippingSettlementListPage = lazy(() => import('@/pages/dropshipping/SettlementListPage'));
+const DropshippingSettlementDetailPage = lazy(() => import('@/pages/dropshipping/SettlementDetailPage'));
+
 // Admin Order Pages (Phase 4)
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'));
@@ -1025,6 +1031,36 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } /> */}
+
+                    {/* DS-4: Dropshipping Admin Routes (Order Relay & Settlement) */}
+                    <Route path="/admin/dropshipping/order-relays" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DropshippingOrderRelayListPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/dropshipping/order-relays/:id" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DropshippingOrderRelayDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/dropshipping/settlements" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DropshippingSettlementListPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/dropshipping/settlements/:id" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DropshippingSettlementDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
 
                     {/* Admin Order Management (Phase 4) */}
                     <Route path="/admin/orders" element={

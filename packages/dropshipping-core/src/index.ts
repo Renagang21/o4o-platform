@@ -38,6 +38,9 @@ export * from './services/index.js';
 // Controllers
 export * from './controllers/index.js';
 
+// Utils (DS-4: State Machine)
+export * from './utils/index.js';
+
 // Lifecycle
 export * from './lifecycle/index.js';
 
@@ -56,6 +59,9 @@ export const entities = [
   Entities.SettlementBatch,
   Entities.CommissionRule,
   Entities.CommissionTransaction,
+  // DS-4: Log Entities
+  Entities.OrderRelayLog,
+  Entities.SettlementLog,
 ];
 
 // Service registry
