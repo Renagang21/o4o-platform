@@ -135,6 +135,11 @@ jobs:
         echo "🔨 Building API server with tsup (bundled build)..."
         pnpm run build:api
 
+        # Also compile migrations with tsc (tsup only bundles main.js)
+        echo "🔨 Compiling migrations with tsc..."
+        npx tsc -p tsconfig.build.json --outDir dist --declaration false
+        echo "✅ Migrations compiled"
+
         # Verify build output
         if [ ! -f "dist/main.js" ]; then
           echo "❌ Build failed: dist/main.js not found"

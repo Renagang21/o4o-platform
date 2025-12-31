@@ -53,8 +53,12 @@ ARG CACHEBUST=1
 COPY dist/main.js ./dist/main.js
 COPY dist/main.js.map ./dist/main.js.map
 
-# Verify the bundle exists
+# Copy migrations for TypeORM auto-migration on startup
+COPY dist/database/migrations ./dist/database/migrations
+
+# Verify the bundle and migrations exist
 RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
+RUN ls -la /app/dist/database/migrations/*.js | head -5 || echo "WARNING: No migrations found"
 
 # Set ownership
 RUN chown -R o4oapi:nodejs /app
