@@ -6,24 +6,21 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
-
 # Copy package files
 COPY package.json ./
 
-# Install dependencies
-RUN pnpm install
+# Install dependencies using npm (standalone build)
+RUN npm install
 
 # Copy source
 COPY . .
 
 # Build-time environment variable for Vite
-ARG VITE_API_URL=https://api.neture.co.kr/api
+ARG VITE_API_URL=https://o4o-core-api-117791934476.asia-northeast3.run.app/api
 ENV VITE_API_URL=$VITE_API_URL
 
-# Build
-RUN pnpm build
+# Build using npm
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS runner
