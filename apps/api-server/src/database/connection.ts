@@ -396,7 +396,7 @@ export const AppDataSource = new DataSource({
     ? ['dist/database/migrations/*.js']
     : [__dirname + '/migrations/*.ts', __dirname + '/migrations/*.js'],
   migrationsTableName: 'typeorm_migrations',
-  migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
+  migrationsRun: NODE_ENV === 'production', // 프로덕션에서 서버 시작 시 자동 실행
   
   // SSL 설정 (PostgreSQL TCP 연결 프로덕션 환경에서만)
   // Cloud SQL Unix Socket 연결 시에는 SSL 불필요 (이미 암호화됨)
