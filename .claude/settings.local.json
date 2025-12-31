@@ -240,7 +240,10 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20614019685 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20614019685 --log-failed -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20614208630 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20614208630 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20614208630 -R Renagang21/o4o-platform)",
+      "Bash(pnpm -F @o4o/dropshipping-core build:*)",
+      "Bash(\"C:\\\\\\\\Program Files\\\\\\\\GitHub CLI\\\\\\\\gh.exe\" run list:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": []
   }
