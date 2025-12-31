@@ -355,7 +355,7 @@ jobs:
             --cpu=1 \
             --min-instances=0 \
             --max-instances=5 \
-            --set-env-vars="VITE_API_URL=https://o4o-core-api-117791934476.asia-northeast3.run.app/api"
+            --set-env-vars="VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}"
 
           echo "✅ glucoseview-web deployed successfully!"
 

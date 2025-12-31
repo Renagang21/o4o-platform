@@ -380,9 +380,11 @@ export const AppDataSource = new DataSource({
   ],
   
   // 마이그레이션 설정
+  // 프로덕션: dist/database/migrations/*.js (컴파일된 JS)
+  // 개발: src/database/migrations/*.ts (TypeScript 소스)
   migrations: NODE_ENV === 'production'
     ? ['dist/database/migrations/*.js']
-    : [__dirname + '/migrations/*.ts', __dirname + '/migrations/*.js'],
+    : [__dirname + '/migrations/*.ts'],
   migrationsTableName: 'typeorm_migrations',
   migrationsRun: NODE_ENV === 'production', // 프로덕션에서 서버 시작 시 자동 실행
   

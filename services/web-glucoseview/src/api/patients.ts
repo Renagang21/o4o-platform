@@ -10,9 +10,9 @@ import type { PatientSummary, PatientsResponse, PatientDetail } from '../types/p
 /**
  * API Base URL
  * - 개발 환경: Vite proxy 사용 (/api)
- * - 프로덕션: 환경변수 사용
+ * - 프로덕션: 환경변수 사용 (VITE_API_BASE_URL)
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 /**
  * API 응답 타입 (Backend 응답 형식)

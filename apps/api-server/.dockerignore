@@ -12,6 +12,12 @@
 !dist/main.js
 !dist/main.js.map
 
+# Allow migrations for TypeORM auto-migration on startup
+!dist/database
+!dist/database/migrations
+!dist/database/migrations/*.js
+!dist/database/migrations/*.js.map
+
 # Allow production dependencies manifest
 !package.production.json
 
