@@ -130,15 +130,42 @@ jobs:
       run: |
         cd apps/api-server
 
-        # Use tsup to bundle the API server with all @o4o/* packages inline
-        # This creates a single bundle that doesn't depend on workspace packages
-        echo "🔨 Building API server with tsup (bundled build)..."
+        # ============================================================
+        # Build Strategy:
+        # 1. First build with tsc (compiles migrations with decorators)
+        # 2. Backup migrations folder
+        # 3. Build with tsup (creates bundled main.js, may clean dist)
+        # 4. Restore migrations from backup
+        # ============================================================
+
+        # Step 1: Build everything with tsc first (handles decorators properly)
+        echo "🔨 Step 1: Building with tsc (includes migrations)..."
+        pnpm run build
+
+        # Step 2: Backup migrations folder before tsup might clean dist
+        echo "📦 Step 2: Backing up migrations..."
+        if [ -d "dist/database/migrations" ]; then
+          cp -r dist/database/migrations /tmp/migrations-backup
+          echo "✅ Migrations backed up: $(ls /tmp/migrations-backup/*.js 2>/dev/null | wc -l) files"
+          ls -la /tmp/migrations-backup/
+        else
+          echo "⚠️ No migrations found to backup"
+          ls -la dist/
+        fi
+
+        # Step 3: Build with tsup (creates bundled main.js)
+        echo "🔨 Step 3: Building API server with tsup (bundled build)..."
         pnpm run build:api
 
-        # Also compile migrations with tsc (tsup only bundles main.js)
-        echo "🔨 Compiling migrations with tsc..."
-        npx tsc src/database/migrations/*.ts --outDir dist/database/migrations --module ESNext --moduleResolution node --esModuleInterop --target ES2022 --skipLibCheck
-        echo "✅ Migrations compiled"
+        # Step 4: Restore migrations from backup
+        echo "📦 Step 4: Restoring migrations..."
+        if [ -d "/tmp/migrations-backup" ]; then
+          mkdir -p dist/database
+          cp -r /tmp/migrations-backup dist/database/migrations
+          echo "✅ Migrations restored: $(ls dist/database/migrations/*.js 2>/dev/null | wc -l) files"
+        else
+          echo "⚠️ No migrations backup found"
+        fi
 
         # Verify build output
         if [ ! -f "dist/main.js" ]; then
@@ -152,6 +179,9 @@ jobs:
         # List generated files
         echo "📋 Generated files:"
         ls -la dist/
+        echo ""
+        echo "📋 Migrations:"
+        ls -la dist/database/migrations/ 2>/dev/null || echo "⚠️ No migrations directory"
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
