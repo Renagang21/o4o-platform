@@ -14,7 +14,6 @@ export class SeedInitialAIReferences1835000000001 implements MigrationInterface 
     // No-op: AI references should be seeded via admin UI or seed script
     // This migration previously tried to read from docs folder which
     // is not available in Docker/production environment
-    console.log('Migration 1835000000001: AI references seeding skipped (use admin UI)');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

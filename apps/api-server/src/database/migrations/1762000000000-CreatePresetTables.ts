@@ -1,5 +1,4 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey } from 'typeorm';
-import logger from '../../utils/logger.js';
 
 export class CreatePresetTables1762000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -316,8 +315,6 @@ export class CreatePresetTables1762000000000 implements MigrationInterface {
       })
     );
 
-    // Migration output
-    logger.info('✅ Preset tables created successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -344,7 +341,5 @@ export class CreatePresetTables1762000000000 implements MigrationInterface {
     await queryRunner.dropTable('view_presets');
     await queryRunner.dropTable('template_presets');
 
-    // Migration output
-    logger.info('✅ Preset tables dropped successfully');
   }
 }
