@@ -160,9 +160,13 @@ jobs:
         # Step 4: Restore migrations from backup
         echo "📦 Step 4: Restoring migrations..."
         if [ -d "/tmp/migrations-backup" ]; then
+          # Remove any existing migrations folder (may be empty from tsup)
+          rm -rf dist/database/migrations
           mkdir -p dist/database
+          # Copy backup contents to migrations folder
           cp -r /tmp/migrations-backup dist/database/migrations
           echo "✅ Migrations restored: $(ls dist/database/migrations/*.js 2>/dev/null | wc -l) files"
+          ls -la dist/database/migrations/ | head -10
         else
           echo "⚠️ No migrations backup found"
         fi
