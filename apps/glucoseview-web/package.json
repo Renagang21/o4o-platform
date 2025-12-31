@@ -1,0 +1,32 @@
+{
+  "name": "@o4o/glucoseview-web",
+  "version": "0.1.0",
+  "description": "GlucoseView - CGM Data Visualization Web App",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 4101",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^7.6.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "@vitejs/plugin-react": "~4.7.0",
+    "autoprefixer": "10.4.16",
+    "postcss": "8.4.31",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.4.5",
+    "vite": "~5.4.19"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "pnpm": ">=9.0.0"
+  }
+}

@@ -185,3 +185,71 @@ export interface PaginatedResponse<T> {
 export interface SingleResponse<T> {
   data: T;
 }
+
+// ============================================================================
+// Patient DTOs (CGM Summary Data)
+// ============================================================================
+
+/** 환자 상태 */
+export type PatientStatus = 'normal' | 'warning' | 'risk';
+
+/** 변화 방향 */
+export type TrendDirection = 'improving' | 'worsening' | 'stable';
+
+/** 인사이트 유형 */
+export type InsightType = 'meal_pattern' | 'nocturnal_pattern' | 'improvement' | 'pharmacist_comment';
+
+/** 인사이트 생성 주체 */
+export type InsightSource = 'system' | 'pharmacist' | 'ai';
+
+/** 환자 요약 정보 (리스트용) */
+export interface PatientSummaryDto {
+  id: string;
+  alias: string;
+  status: PatientStatus;
+  periodDays: number;
+  trend: TrendDirection;
+  lastUpdated: string;
+}
+
+/** 인사이트 DTO */
+export interface PatientInsightDto {
+  id: string;
+  type: InsightType;
+  description: string;
+  source: InsightSource;
+  referencePeriod: string;
+}
+
+/** 기간 요약 DTO */
+export interface PeriodSummaryDto {
+  periodStart: string;
+  periodEnd: string;
+  status: PatientStatus;
+  summaryText: string;
+}
+
+/** 기간 비교 DTO */
+export interface PeriodComparisonDto {
+  previousPeriod: string;
+  currentPeriod: string;
+  trend: TrendDirection;
+  description: string;
+}
+
+/** 환자 상세 정보 DTO */
+export interface PatientDetailDto {
+  id: string;
+  alias: string;
+  registeredAt: string;
+  currentSummary: PeriodSummaryDto;
+  previousSummary?: PeriodSummaryDto;
+  insights: PatientInsightDto[];
+  comparison?: PeriodComparisonDto;
+}
+
+/** 환자 목록 쿼리 DTO */
+export interface ListPatientsQueryDto {
+  page?: number;
+  limit?: number;
+}

@@ -29,7 +29,22 @@ import type {
   UpdateConnectionRequestDto,
   ListConnectionsQueryDto,
   PaginatedResponse,
+  PatientSummaryDto,
+  PatientDetailDto,
+  PatientInsightDto,
+  PeriodSummaryDto,
+  PeriodComparisonDto,
+  ListPatientsQueryDto,
+  PatientStatus,
+  TrendDirection,
+  InsightType,
+  InsightSource,
 } from '../dto/index.js';
+import type {
+  CgmPatientRow,
+  CgmPatientSummaryRow,
+  CgmGlucoseInsightRow,
+} from '../repositories/glucoseview.repository.js';
 
 export class GlucoseViewService {
   private repository: GlucoseViewRepository;
@@ -344,5 +359,225 @@ export class GlucoseViewService {
       created_at: connection.created_at?.toISOString(),
       updated_at: connection.updated_at?.toISOString(),
     };
+  }
+
+  // ============================================================================
+  // Patient Methods (CGM Summary Data - Read Only)
+  // ============================================================================
+
+  /**
+   * List all patients with their latest summary
+   * Returns data formatted for PatientListPage
+   */
+  async listPatients(query: ListPatientsQueryDto): Promise<PaginatedResponse<PatientSummaryDto>> {
+    const { page = 1, limit = 20 } = query;
+
+    const { patients, total } = await this.repository.findAllPatients({ page, limit });
+
+    // For each patient, get their latest summary to determine status/trend
+    const patientSummaries = await Promise.all(
+      patients.map(async (patient) => {
+        const summaries = await this.repository.findPatientSummaries(patient.id, 2);
+        return this.mapPatientToSummaryDto(patient, summaries);
+      })
+    );
+
+    return {
+      data: patientSummaries,
+      pagination: {
+        page,
+        limit,
+        total,
+        total_pages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
+   * Get patient detail with summaries, insights, and comparison
+   * Returns data formatted for PatientDetailPage
+   */
+  async getPatientById(id: string): Promise<PatientDetailDto | null> {
+    const patient = await this.repository.findPatientById(id);
+    if (!patient) {
+      return null;
+    }
+
+    const summaries = await this.repository.findPatientSummaries(id, 2);
+    const insights = await this.repository.findPatientInsights(id, 3);
+
+    return this.mapPatientToDetailDto(patient, summaries, insights);
+  }
+
+  // ============================================================================
+  // Patient Mappers
+  // ============================================================================
+
+  /**
+   * Create alias from patient name (mask middle characters)
+   */
+  private createAlias(name: string): string {
+    if (name.length <= 2) {
+      return name[0] + 'O';
+    }
+    return name[0] + 'OO';
+  }
+
+  /**
+   * Determine trend direction by comparing two summaries
+   */
+  private determineTrend(
+    currentSummary: CgmPatientSummaryRow | undefined,
+    previousSummary: CgmPatientSummaryRow | undefined
+  ): TrendDirection {
+    if (!currentSummary || !previousSummary) {
+      return 'stable';
+    }
+
+    const statusOrder: Record<string, number> = { normal: 0, warning: 1, risk: 2 };
+    const currentScore = statusOrder[currentSummary.status] ?? 1;
+    const previousScore = statusOrder[previousSummary.status] ?? 1;
+
+    if (currentScore < previousScore) {
+      return 'improving';
+    } else if (currentScore > previousScore) {
+      return 'worsening';
+    }
+    return 'stable';
+  }
+
+  /**
+   * Calculate period days from summary
+   */
+  private calculatePeriodDays(summary: CgmPatientSummaryRow | undefined): number {
+    if (!summary) return 7;
+    const start = new Date(summary.period_start);
+    const end = new Date(summary.period_end);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  }
+
+  /**
+   * Format date to YYYY-MM-DD
+   */
+  private formatDate(date: Date | string): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  }
+
+  /**
+   * Format date range for display (e.g., "12/15 ~ 12/21")
+   */
+  private formatDateRange(start: Date | string, end: Date | string): string {
+    const s = new Date(start);
+    const e = new Date(end);
+    return `${s.getMonth() + 1}/${s.getDate()} ~ ${e.getMonth() + 1}/${e.getDate()}`;
+  }
+
+  /**
+   * Map patient + summaries to PatientSummaryDto (for list)
+   */
+  private mapPatientToSummaryDto(
+    patient: CgmPatientRow,
+    summaries: CgmPatientSummaryRow[]
+  ): PatientSummaryDto {
+    const currentSummary = summaries[0];
+    const previousSummary = summaries[1];
+
+    return {
+      id: patient.id,
+      alias: this.createAlias(patient.name),
+      status: (currentSummary?.status as PatientStatus) || 'normal',
+      periodDays: this.calculatePeriodDays(currentSummary),
+      trend: this.determineTrend(currentSummary, previousSummary),
+      lastUpdated: this.formatDate(currentSummary?.updated_at || patient.updated_at),
+    };
+  }
+
+  /**
+   * Map insight row to InsightDto
+   */
+  private mapInsightToDto(insight: CgmGlucoseInsightRow): PatientInsightDto {
+    return {
+      id: insight.id,
+      type: insight.insight_type as InsightType,
+      description: insight.description,
+      source: insight.generated_by as InsightSource,
+      referencePeriod: insight.reference_period || '',
+    };
+  }
+
+  /**
+   * Map summary row to PeriodSummaryDto
+   */
+  private mapSummaryToPeriodDto(summary: CgmPatientSummaryRow): PeriodSummaryDto {
+    return {
+      periodStart: this.formatDate(summary.period_start),
+      periodEnd: this.formatDate(summary.period_end),
+      status: summary.status as PatientStatus,
+      summaryText: summary.summary_text || '',
+    };
+  }
+
+  /**
+   * Map patient + summaries + insights to PatientDetailDto
+   */
+  private mapPatientToDetailDto(
+    patient: CgmPatientRow,
+    summaries: CgmPatientSummaryRow[],
+    insights: CgmGlucoseInsightRow[]
+  ): PatientDetailDto {
+    const currentSummary = summaries[0];
+    const previousSummary = summaries[1];
+    const trend = this.determineTrend(currentSummary, previousSummary);
+
+    const result: PatientDetailDto = {
+      id: patient.id,
+      alias: this.createAlias(patient.name),
+      registeredAt: this.formatDate(patient.registered_at),
+      currentSummary: currentSummary
+        ? this.mapSummaryToPeriodDto(currentSummary)
+        : {
+            periodStart: this.formatDate(new Date()),
+            periodEnd: this.formatDate(new Date()),
+            status: 'normal',
+            summaryText: '데이터가 없습니다.',
+          },
+      insights: insights.map((i) => this.mapInsightToDto(i)),
+    };
+
+    // Add previous summary if exists
+    if (previousSummary) {
+      result.previousSummary = this.mapSummaryToPeriodDto(previousSummary);
+    }
+
+    // Add comparison if both summaries exist
+    if (currentSummary && previousSummary) {
+      result.comparison = {
+        previousPeriod: this.formatDateRange(previousSummary.period_start, previousSummary.period_end),
+        currentPeriod: this.formatDateRange(currentSummary.period_start, currentSummary.period_end),
+        trend,
+        description: this.generateComparisonDescription(currentSummary, previousSummary, trend),
+      };
+    }
+
+    return result;
+  }
+
+  /**
+   * Generate comparison description based on trend
+   */
+  private generateComparisonDescription(
+    current: CgmPatientSummaryRow,
+    previous: CgmPatientSummaryRow,
+    trend: TrendDirection
+  ): string {
+    switch (trend) {
+      case 'improving':
+        return '이전 기간 대비 혈당 관리가 개선되었습니다.';
+      case 'worsening':
+        return '이전 기간 대비 혈당 변동이 증가했습니다. 주의가 필요합니다.';
+      default:
+        return '이전 기간과 유사한 상태를 유지하고 있습니다.';
+    }
   }
 }

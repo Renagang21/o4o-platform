@@ -17,12 +17,51 @@ import type {
   ConnectionStatus,
 } from '../entities/index.js';
 
+// Raw query result types for CGM tables
+export interface CgmPatientRow {
+  id: string;
+  user_id: string;
+  pharmacy_id: string | null;
+  name: string;
+  registered_at: Date;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface CgmPatientSummaryRow {
+  id: string;
+  patient_id: string;
+  period_start: Date;
+  period_end: Date;
+  status: string;
+  avg_glucose: number;
+  time_in_range: number;
+  time_above_range: number | null;
+  time_below_range: number | null;
+  summary_text: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface CgmGlucoseInsightRow {
+  id: string;
+  patient_id: string;
+  insight_type: string;
+  description: string;
+  generated_by: string;
+  reference_period: string | null;
+  created_at: Date;
+}
+
 export class GlucoseViewRepository {
   private vendorRepo: Repository<GlucoseViewVendor>;
   private viewProfileRepo: Repository<GlucoseViewViewProfile>;
   private connectionRepo: Repository<GlucoseViewConnection>;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.vendorRepo = dataSource.getRepository(GlucoseViewVendor);
     this.viewProfileRepo = dataSource.getRepository(GlucoseViewViewProfile);
     this.connectionRepo = dataSource.getRepository(GlucoseViewConnection);
@@ -198,5 +237,78 @@ export class GlucoseViewRepository {
   ): Promise<GlucoseViewConnection | null> {
     await this.connectionRepo.update(id, data);
     return this.findConnectionById(id);
+  }
+
+  // ============================================================================
+  // CGM Patient Methods (Read-only from cgm_* tables)
+  // ============================================================================
+
+  /**
+   * Find all active patients with their latest summary
+   */
+  async findAllPatients(options: {
+    page?: number;
+    limit?: number;
+  }): Promise<{ patients: CgmPatientRow[]; total: number }> {
+    const { page = 1, limit = 20 } = options;
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const countResult = await this.dataSource.query<{ count: string }[]>(`
+      SELECT COUNT(*) as count FROM cgm_patients WHERE is_active = true
+    `);
+    const total = parseInt(countResult[0]?.count || '0', 10);
+
+    // Get patients
+    const patients = await this.dataSource.query<CgmPatientRow[]>(`
+      SELECT * FROM cgm_patients
+      WHERE is_active = true
+      ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+
+    return { patients, total };
+  }
+
+  /**
+   * Find patient by ID
+   */
+  async findPatientById(id: string): Promise<CgmPatientRow | null> {
+    const result = await this.dataSource.query<CgmPatientRow[]>(`
+      SELECT * FROM cgm_patients WHERE id = $1 AND is_active = true
+    `, [id]);
+    return result[0] || null;
+  }
+
+  /**
+   * Find summaries for a patient, ordered by period_end DESC
+   */
+  async findPatientSummaries(patientId: string, limit = 2): Promise<CgmPatientSummaryRow[]> {
+    return this.dataSource.query<CgmPatientSummaryRow[]>(`
+      SELECT * FROM cgm_patient_summaries
+      WHERE patient_id = $1
+      ORDER BY period_end DESC
+      LIMIT $2
+    `, [patientId, limit]);
+  }
+
+  /**
+   * Find latest summary for a patient
+   */
+  async findLatestPatientSummary(patientId: string): Promise<CgmPatientSummaryRow | null> {
+    const result = await this.findPatientSummaries(patientId, 1);
+    return result[0] || null;
+  }
+
+  /**
+   * Find insights for a patient, ordered by created_at DESC
+   */
+  async findPatientInsights(patientId: string, limit = 3): Promise<CgmGlucoseInsightRow[]> {
+    return this.dataSource.query<CgmGlucoseInsightRow[]>(`
+      SELECT * FROM cgm_glucose_insights
+      WHERE patient_id = $1
+      ORDER BY created_at DESC
+      LIMIT $2
+    `, [patientId, limit]);
   }
 }
