@@ -1,13 +1,13 @@
 /**
  * Yaksa Forum Post Detail Page
  *
- * 약사 포럼 게시글 상세 페이지
+ * 약사 포럼 게시글 상세 페이지 (Admin)
  * - 게시글 내용
- * - 댓글 목록
  * - 작성자 정보
+ * - 관리 기능
  *
- * Phase 9-B: Web Business Template 복제 검증
- * Template Reference: cosmetics-products/ProductDetailPage.tsx
+ * Phase A-3: Yaksa API Integration
+ * API Endpoint: /api/v1/yaksa/admin/posts/:id
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -25,74 +25,61 @@ import {
   ArrowLeft,
   AlertCircle,
   Eye,
-  ThumbsUp,
   Clock,
   User,
+  Pin,
+  Bell,
 } from 'lucide-react';
 
 /**
- * API Response Types (OpenAPI 계약 기반)
+ * API Response Types (Phase A-1 Yaksa API)
  */
-interface Author {
-  id: string;
-  name: string;
-  avatar?: string;
-}
-
 interface Category {
   id: string;
   name: string;
   slug: string;
   description?: string;
+  status: 'active' | 'inactive';
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
-interface Comment {
-  id: string;
-  content: string;
-  author: Author;
-  createdAt: string;
-  updatedAt: string;
-}
-
-type PostStatus = 'draft' | 'published' | 'archived' | 'hidden';
+type PostStatus = 'draft' | 'published' | 'hidden' | 'deleted';
 
 interface PostDetail {
   id: string;
+  category_id: string;
+  category?: Category;
   title: string;
   content: string;
-  excerpt?: string;
-  author: Author;
-  category?: Category;
   status: PostStatus;
-  viewCount: number;
-  likeCount: number;
-  commentCount: number;
-  isPinned?: boolean;
-  tags?: string[];
-  createdAt: string;
-  updatedAt: string;
+  is_pinned: boolean;
+  is_notice: boolean;
+  view_count: number;
+  created_by_user_id?: string;
+  created_by_user_name?: string;
+  created_at: string;
+  updated_at: string;
+  published_at?: string;
 }
 
 interface PostDetailResponse {
   data: PostDetail;
 }
 
-interface CommentListResponse {
-  data: Comment[];
-}
-
 const statusLabels: Record<PostStatus, string> = {
   draft: '초안',
   published: '게시됨',
-  archived: '보관됨',
   hidden: '숨김',
+  deleted: '삭제됨',
 };
 
 const statusColors: Record<PostStatus, 'gray' | 'green' | 'yellow' | 'red'> = {
   draft: 'gray',
   published: 'green',
-  archived: 'yellow',
-  hidden: 'red',
+  hidden: 'yellow',
+  deleted: 'red',
 };
 
 const PostDetailPage: React.FC = () => {
@@ -100,7 +87,6 @@ const PostDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const api = authClient.api;
   const [post, setPost] = useState<PostDetail | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,7 +100,7 @@ const PostDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<PostDetailResponse>(`/api/v1/forum/posts/${postId}`);
+      const response = await api.get<PostDetailResponse>(`/api/v1/yaksa/admin/posts/${postId}`);
       if (response.data) {
         setPost(response.data.data);
       }
@@ -130,23 +116,9 @@ const PostDetailPage: React.FC = () => {
     }
   }, [api, postId]);
 
-  const fetchComments = useCallback(async () => {
-    if (!postId) return;
-
-    try {
-      const response = await api.get<CommentListResponse>(`/api/v1/forum/posts/${postId}/comments`);
-      if (response.data) {
-        setComments(response.data.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch comments:', err);
-    }
-  }, [api, postId]);
-
   useEffect(() => {
     fetchPost();
-    fetchComments();
-  }, [fetchPost, fetchComments]);
+  }, [fetchPost]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ko-KR', {
@@ -232,8 +204,15 @@ const PostDetailPage: React.FC = () => {
         }
         actions={
           <div className="flex items-center gap-2">
-            {post.isPinned && (
-              <AGTag color="blue" size="md">고정</AGTag>
+            {post.is_pinned && (
+              <AGTag color="blue" size="md">
+                <Pin className="w-3 h-3 inline mr-1" />고정
+              </AGTag>
+            )}
+            {post.is_notice && (
+              <AGTag color="purple" size="md">
+                <Bell className="w-3 h-3 inline mr-1" />공지
+              </AGTag>
             )}
             <AGTag color={statusColors[post.status]} size="md">
               {statusLabels[post.status]}
@@ -249,36 +228,26 @@ const PostDetailPage: React.FC = () => {
             {/* Author & Meta */}
             <div className="flex items-center justify-between pb-4 border-b mb-6">
               <div className="flex items-center gap-3">
-                {post.author.avatar ? (
-                  <img
-                    src={post.author.avatar}
-                    alt={post.author.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-gray-400" />
-                  </div>
-                )}
+                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-gray-400" />
+                </div>
                 <div>
-                  <p className="font-medium text-gray-900">{post.author.name}</p>
-                  <p className="text-sm text-gray-500">{formatDate(post.createdAt)}</p>
+                  <p className="font-medium text-gray-900">{post.created_by_user_name || '알 수 없음'}</p>
+                  <p className="text-sm text-gray-500">{formatDate(post.created_at)}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
-                  {post.viewCount}
+                  {post.view_count}
                 </span>
-                <span className="flex items-center gap-1">
-                  <ThumbsUp className="w-4 h-4" />
-                  {post.likeCount}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="w-4 h-4" />
-                  {post.commentCount}
-                </span>
+                {post.published_at && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    게시: {formatDate(post.published_at)}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -286,67 +255,7 @@ const PostDetailPage: React.FC = () => {
             <div className="prose prose-gray max-w-none">
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </div>
-
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="mt-6 pt-6 border-t">
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-full"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </AGCard>
-        </AGSection>
-
-        {/* Comments Section */}
-        <AGSection title={`댓글 (${comments.length})`}>
-          {comments.length === 0 ? (
-            <AGCard>
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>아직 댓글이 없습니다</p>
-              </div>
-            </AGCard>
-          ) : (
-            <div className="space-y-4">
-              {comments.map((comment) => (
-                <AGCard key={comment.id}>
-                  <div className="flex items-start gap-3">
-                    {comment.author.avatar ? (
-                      <img
-                        src={comment.author.avatar}
-                        alt={comment.author.name}
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-gray-900 text-sm">
-                          {comment.author.name}
-                        </span>
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {formatRelativeTime(comment.createdAt)}
-                        </span>
-                      </div>
-                      <p className="text-gray-700 text-sm">{comment.content}</p>
-                    </div>
-                  </div>
-                </AGCard>
-              ))}
-            </div>
-          )}
         </AGSection>
       </div>
     </div>

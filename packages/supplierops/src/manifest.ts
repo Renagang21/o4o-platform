@@ -1,11 +1,28 @@
 /**
  * SupplierOps Manifest
  *
- * AppStore 표준 manifest - 범용 공급자 운영 앱
+ * S2S 구조에서 Supplier(공급자) 역할의 운영 앱
  *
- * Phase 2 업데이트:
- * - Core Extension Interface 구현
- * - Hook 기반 Validation 지원
+ * ## Ops 서비스 책임 범위
+ * - 자격 관리: Supplier 프로필, 상태
+ * - 상태 관리: Product Master, Offer 활성화/비활성화
+ * - 관계 관리: Seller 취급 요청 승인/거절
+ *
+ * ## Ops 서비스가 하지 않는 것
+ * - 업무 방식 판단 (서비스별 정책)
+ * - 정책 결정 (승인 조건, 수수료율 등)
+ * - 비즈니스 로직 (서비스별 Extension에서 처리)
+ *
+ * ## S2S 흐름에서의 역할
+ * 1. Supplier가 Product Master 생성 (상품 원본)
+ * 2. Product Master 기반으로 Offer 생성 (공급 조건)
+ * 3. Seller 취급 요청 승인/거절
+ * 4. Order Relay를 통해 주문 수신 및 처리
+ * 5. 정산 대시보드 조회
+ *
+ * ## Product 소유권 (S2S 핵심)
+ * - Product Master의 Source of Truth는 Supplier에 있음
+ * - SupplierOps가 Product Master 생성/수정 담당
  */
 
 export const supplieropsManifest = {
@@ -15,7 +32,7 @@ export const supplieropsManifest = {
   version: '1.0.0',
   appType: 'extension' as const,
   description:
-    'Universal Supplier Operations App - Product management, Offer creation, Order relay monitoring, Settlement dashboard',
+    'S2S Supplier 운영 앱 - Product Master 관리, Offer 생성, Seller 관계 관리, 주문 수신, 정산 조회',
 
   // ===== 의존성 =====
   dependencies: {

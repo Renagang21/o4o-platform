@@ -1,12 +1,13 @@
 /**
  * Yaksa Forum Category List Page
  *
- * 약사 포럼 카테고리 목록 페이지
+ * 약사 포럼 카테고리 목록 페이지 (Admin)
  * - 카테고리 카드 그리드
  * - 카테고리별 게시글 수
+ * - 카테고리 관리
  *
- * Phase 9-B: Web Business Template 복제 검증
- * Template Reference: cosmetics-products/BrandListPage.tsx
+ * Phase A-3: Yaksa API Integration
+ * API Endpoint: /api/v1/yaksa/admin/categories
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -17,6 +18,7 @@ import {
   AGSection,
   AGCard,
   AGButton,
+  AGTag,
 } from '@o4o/ui';
 import {
   FolderOpen,
@@ -27,15 +29,18 @@ import {
 } from 'lucide-react';
 
 /**
- * API Response Types (OpenAPI 계약 기반)
+ * API Response Types (Phase A-1 Yaksa API)
  */
 interface Category {
   id: string;
   name: string;
   slug: string;
   description?: string;
-  postCount?: number;
-  isActive?: boolean;
+  status: 'active' | 'inactive';
+  sort_order: number;
+  post_count?: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface CategoryListResponse {
@@ -52,7 +57,7 @@ const CategoryListPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<CategoryListResponse>('/api/v1/forum/categories');
+      const response = await api.get<CategoryListResponse>('/api/v1/yaksa/admin/categories');
       if (response.data) {
         setCategories(response.data.data);
       }
@@ -142,6 +147,12 @@ const CategoryListPage: React.FC = () => {
                           <h3 className="font-semibold text-gray-900">
                             {category.name}
                           </h3>
+                          <AGTag
+                            color={category.status === 'active' ? 'green' : 'gray'}
+                            size="sm"
+                          >
+                            {category.status === 'active' ? '활성' : '비활성'}
+                          </AGTag>
                         </div>
                         {category.description && (
                           <p className="text-sm text-gray-500 line-clamp-2 mb-3">
@@ -150,7 +161,7 @@ const CategoryListPage: React.FC = () => {
                         )}
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           <MessageSquare className="w-4 h-4" />
-                          <span>{category.postCount || 0}개 게시글</span>
+                          <span>{category.post_count || 0}개 게시글</span>
                         </div>
                       </div>
                       <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />

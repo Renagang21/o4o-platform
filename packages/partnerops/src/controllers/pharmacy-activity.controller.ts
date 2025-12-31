@@ -4,6 +4,15 @@
  * 약국 활동 데이터 조회 API (Read-only)
  * PHARMACEUTICAL 제품은 자동으로 필터링됩니다.
  *
+ * ## TODO: Extension 이동 대상
+ * 이 컨트롤러는 약국(Pharmacy) 특화 로직을 포함하고 있습니다.
+ * Ops 서비스 중립성 원칙에 따라, 향후 다음 중 하나로 이동해야 합니다:
+ * - yaksa-partner-extension
+ * - pharmacy-partner-extension
+ *
+ * 현재는 PartnerOps 내부에 위치하여 기능을 제공하지만,
+ * 이는 임시 배치이며, 서비스별 특화 로직 분리 Phase에서 정리됩니다.
+ *
  * @package @o4o/partnerops
  */
 

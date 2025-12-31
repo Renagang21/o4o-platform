@@ -1,7 +1,22 @@
 /**
  * Partner Core Manifest
  *
- * AppStore 등록을 위한 Manifest 정의
+ * S2S 구조에서 파트너/제휴 프로그램의 Core 엔진
+ *
+ * ## Core 책임 범위
+ * - 파트너 등록/승인/상태 관리
+ * - 링크 생성 및 클릭 추적
+ * - 전환(Conversion) 기록 및 확정
+ * - 커미션 계산 및 정산 배치 관리
+ *
+ * ## Core가 하지 않는 것
+ * - 서비스별 커미션율 결정 (Extension에서 Hook으로 처리)
+ * - 특정 서비스 비즈니스 로직 (Cosmetics, Yaksa 등)
+ * - 파트너 자격 조건 판단 (서비스별 Extension)
+ *
+ * ## 하드코딩 상수 (역사적 결정)
+ * - 기본 커미션율, 정산 주기 등은 현재 하드코딩됨
+ * - 추후 일반화 대상이나, 현재는 유지
  *
  * @package @o4o/partner-core
  */
@@ -15,7 +30,7 @@ export const partnerCoreManifest: AppManifest = {
   type: 'core',
   source: 'local',
   description:
-    'O4O 플랫폼 파트너 프로그램 엔진. 클릭→전환→커미션→정산 전체 워크플로우를 관리합니다.',
+    'S2S 파트너 프로그램 엔진 - 링크 추적, 전환 기록, 커미션 계산, 정산 관리',
 
   // 독립적인 Core App - 다른 앱에 의존하지 않음
   dependencies: {},

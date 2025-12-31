@@ -1,0 +1,41 @@
+{
+  "name": "@o4o/block-core",
+  "version": "1.0.0",
+  "description": "Core block plugin system for O4O Platform",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. Block editor engine.",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "build:js": "tsup --no-dts",
+    "dev": "tsup --watch",
+    "test": "jest --passWithNoTests",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "tsup": "^8.0.1",
+    "typescript": "5.4.5"
+  },
+  "peerDependencies": {
+    "@wordpress/block-editor": "*",
+    "@wordpress/blocks": "*",
+    "@wordpress/components": "*",
+    "@wordpress/element": "*",
+    "@wordpress/i18n": "*"
+  },
+  "files": [
+    "dist",
+    "types"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

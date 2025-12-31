@@ -395,6 +395,9 @@ import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes
 // Neture Routes (Phase D-1)
 import { createNetureRoutes } from './routes/neture/neture.routes.js';
 
+// Dropshipping Admin Routes (DS-3)
+import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/dropshipping-admin.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -666,6 +669,15 @@ const startServer = async () => {
       logger.info('✅ Neture routes registered at /api/v1/neture');
     } catch (netureError) {
       logger.error('Failed to register Neture routes:', netureError);
+    }
+
+    // 30. Register Dropshipping Admin routes (DS-3)
+    try {
+      const dropshippingAdminRoutes = createDropshippingAdminRoutes(AppDataSource);
+      app.use('/api/v1/dropshipping', dropshippingAdminRoutes);
+      logger.info('✅ Dropshipping Admin routes registered at /api/v1/dropshipping/admin');
+    } catch (dropshippingError) {
+      logger.error('Failed to register Dropshipping Admin routes:', dropshippingError);
     }
 
     // 6. Core routes now registered via dynamic module loader

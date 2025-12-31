@@ -1,0 +1,61 @@
+{
+  "name": "@o4o/shortcodes",
+  "version": "1.0.0",
+  "description": "Shortcode system for O4O Platform",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. Shortcode parser/renderer.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./metadata": {
+      "import": "./dist/metadata.js",
+      "require": "./dist/metadata.js",
+      "types": "./dist/metadata.d.ts",
+      "default": "./dist/metadata.js"
+    },
+    "./dynamic": {
+      "import": "./dist/dynamic/index.js",
+      "require": "./dist/dynamic/index.js",
+      "types": "./dist/dynamic/index.d.ts",
+      "default": "./dist/dynamic/index.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "npx tsc --build --force",
+    "type-check": "tsc --noEmit",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@o4o/auth-client": "workspace:*",
+    "@o4o/types": "workspace:*",
+    "@o4o/utils": "workspace:*",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "typescript": "5.4.5"
+  },
+  "peerDependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

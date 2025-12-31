@@ -1,8 +1,25 @@
 /**
  * Seller Entity
  *
- * 판매자 등록 및 승인 구조
- * Dropshipping 생태계에서 상품을 판매하는 판매자를 나타냅니다.
+ * S2S 구조에서 판매 측(Sell Side)을 담당
+ *
+ * ## S2S 역할
+ * - Supplier의 Offer를 선택하여 Listing 생성
+ * - 자신의 채널(스마트스토어, 쿠팡 등)에 상품 노출
+ * - Product Master를 직접 소유하지 않음 (파생 데이터만 관리)
+ *
+ * ## 소유 데이터
+ * - Seller Listing (Offer 기반의 판매 상품)
+ * - Channel Configs (채널별 설정)
+ *
+ * ## 파생 데이터 (Listing에서 관리)
+ * - 판매가 (sellingPrice)
+ * - 상품 설명 (Offer 기반으로 가공)
+ * - 채널별 특화 데이터
+ *
+ * ## 비고
+ * - Seller의 자격/승인 조건은 서비스별 Extension에서 정의
+ * - Core는 상태(status) 관리만 담당
  */
 
 import {

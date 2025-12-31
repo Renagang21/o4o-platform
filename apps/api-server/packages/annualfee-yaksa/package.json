@@ -1,0 +1,60 @@
+{
+  "name": "@o4o/annualfee-yaksa",
+  "version": "1.0.0",
+  "description": "약사회 연회비 시스템 - 회비 정책, 청구, 납부, 감면, 정산 관리",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./src/*": "./src/*",
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
+    "./backend/*": {
+      "types": "./dist/backend/*.d.ts",
+      "import": "./dist/backend/*.js"
+    },
+    "./backend/routes/*": {
+      "types": "./dist/backend/routes/*.d.ts",
+      "import": "./dist/backend/routes/*.js"
+    },
+    "./backend/entities": {
+      "types": "./dist/backend/entities/index.d.ts",
+      "import": "./dist/backend/entities/index.js"
+    },
+    "./backend/entities/*": {
+      "types": "./dist/backend/entities/*.d.ts",
+      "import": "./dist/backend/entities/*.js"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.2"
+  },
+  "peerDependencies": {
+    "@o4o/membership-yaksa": "workspace:*",
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/yaksa-scheduler": "workspace:*"
+  }
+}

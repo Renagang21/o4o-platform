@@ -1,9 +1,25 @@
 /**
  * SupplierProductOffer Entity
  *
- * 공급자가 판매자에게 제시하는 가격/재고/조건
+ * S2S 구조에서 Supplier가 Seller에게 제시하는 공급 조건
  *
- * 하나의 ProductMaster에 대해 여러 Supplier가 각각의 조건으로 Offer를 제공할 수 있습니다.
+ * ## S2S 역할
+ * - Supplier가 소유하는 데이터 (Supplier 측 Source of Truth)
+ * - Product Master를 기반으로 가격, 재고, 배송 조건 정의
+ * - Seller는 이 Offer를 선택하여 Listing 생성
+ *
+ * ## 소유권 구조
+ * - ProductMaster (Supplier 소유) → Offer (Supplier 소유) → Listing (Seller 소유)
+ *
+ * ## Supplier 소유 필드
+ * - supplierPrice (공급가)
+ * - suggestedRetailPrice (권장 소비자가)
+ * - stockQuantity (재고)
+ * - shippingOptions (배송 조건)
+ *
+ * ## 비고
+ * - 하나의 ProductMaster에 여러 Supplier의 Offer 가능
+ * - Offer 승인 조건은 서비스별 Extension에서 정의
  */
 
 import {

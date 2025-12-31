@@ -1,0 +1,42 @@
+{
+  "name": "@o4o/dropshipping-cosmetics",
+  "version": "1.0.0",
+  "description": "Cosmetics extension for Dropshipping Core",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./backend/*": "./dist/backend/*"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "echo 'Skipping independent build - compiled by api-server'",
+    "type-check": "tsc --noEmit",
+    "test": "jest --config jest.config.cjs"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "5.4.5"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "pnpm": ">=9.0.0"
+  }
+}

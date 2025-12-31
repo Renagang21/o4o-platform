@@ -1,11 +1,22 @@
 /**
  * ProductMaster Entity
  *
- * 산업 중립적 상품 원본 정보
- * attributes(JSON)으로 확장성 확보
+ * S2S 구조에서 상품 정보의 Source of Truth
  *
- * 모든 산업(화장품, 건강식품, 관광, 일반 상품 등)의 공통 상품 메타데이터를 저장합니다.
- * 산업별 특화 정보는 attributes 필드에 JSON으로 저장하여 확장성을 보장합니다.
+ * ## 소유권 기준 (S2S 핵심 원칙)
+ * - ProductMaster는 Supplier(공급자)가 소유
+ * - Supplier가 상품의 이름, 설명, SKU, 브랜드, 카테고리 등 원본 정보를 관리
+ * - Seller는 이 정보를 직접 수정할 수 없음
+ *
+ * ## 데이터 흐름
+ * ProductMaster (Supplier 소유)
+ *   → SupplierProductOffer (Supplier가 제시하는 공급 조건)
+ *     → SellerListing (Seller가 자신의 채널에 등록한 파생 데이터)
+ *
+ * ## 확장성
+ * - attributes(JSON)으로 산업별 특화 정보 저장
+ * - productType으로 산업 구분 (cosmetics, pharmaceutical, general 등)
+ * - Extension이 Validation Hook을 통해 산업별 규칙 적용
  */
 
 import {
@@ -29,17 +40,22 @@ export enum ProductStatus {
 /**
  * ProductType - 산업별 상품 타입 (정식 Enum)
  *
- * Core는 이 값의 비즈니스 의미를 해석하지 않음.
- * 확장앱(Cosmetics, Pharmacy, Tourism 등)이 Hook을 통해 각 타입별 로직을 처리.
+ * ## S2S 관점
+ * - Core는 이 값의 비즈니스 의미를 해석하지 않음 (단순 분류자)
+ * - 각 서비스의 Extension/Core가 Hook을 통해 타입별 규칙 적용
  *
- * 사용 예시:
- * - GENERAL: 일반 상품
- * - COSMETICS: 화장품 (화장품 확장앱에서 추가 검증)
+ * ## 현재 정의된 타입 (역사적 결정, 추후 일반화 대상)
+ * - GENERAL: 일반 상품 (기본값)
+ * - COSMETICS: 화장품 → dropshipping-cosmetics Extension
  * - FOOD: 식품
  * - HEALTH: 건강기능식품
  * - ELECTRONICS: 전자제품
- * - PHARMACEUTICAL: 의약품 (파트너 링크 생성 제한 등)
+ * - PHARMACEUTICAL: 의약품 → pharmaceutical-core (규제 도메인)
  * - CUSTOM: 확장앱이 정의하는 커스텀 타입
+ *
+ * ## 비고
+ * - 하드코딩된 타입은 역사적 결정으로 유지
+ * - 신규 타입 추가 시 Extension 패턴 권장
  */
 export enum ProductType {
   GENERAL = 'general',

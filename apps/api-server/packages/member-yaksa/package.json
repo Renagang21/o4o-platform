@@ -1,0 +1,51 @@
+{
+  "name": "@o4o/member-yaksa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Member App for Yaksa Organization - Member-facing profile, pharmacy, home dashboard",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./manifest": "./dist/manifest.js",
+    "./backend": "./dist/backend/index.js",
+    "./backend/*": "./dist/backend/*",
+    "./lifecycle": "./dist/lifecycle/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/membership-yaksa": "workspace:*",
+    "@o4o/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "@o4o/lms-yaksa": "workspace:*",
+    "@o4o-apps/forum-yaksa": "workspace:*",
+    "class-transformer": "^0.5.0",
+    "class-validator": "^0.14.0",
+    "react": "^18.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "typeorm": "^0.3.0",
+    "express": "^4.18.0"
+  },
+  "peerDependenciesMeta": {
+    "@o4o/lms-yaksa": {
+      "optional": true
+    },
+    "@o4o-apps/forum-yaksa": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.3.0"
+  }
+}

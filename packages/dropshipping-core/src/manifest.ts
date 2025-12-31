@@ -1,20 +1,40 @@
 /**
  * Dropshipping-Core Manifest
  *
- * Industry-neutral extensible dropshipping engine:
- * - Supplier/Seller management
- * - Product catalog (Master, Offers, Listings)
- * - Order relay workflow
- * - Settlement and commission
+ * Industry-neutral S2S (Supplier-to-Seller) Engine
+ *
+ * ## S2S 해석 가이드
+ *
+ * 본 Core는 "Dropshipping"이라는 이름을 사용하지만, 실제로는 산업 중립적인
+ * S2S(Supplier-to-Seller) 구조를 제공합니다.
+ *
+ * ### 핵심 개념
+ * - **Supplier (공급자)**: Product Master의 소유자. 상품 정보, 가격, 재고의 원천.
+ * - **Seller (판매자)**: Supplier의 Offer를 기반으로 자신의 채널에 Listing을 생성.
+ * - **Product Master**: Supplier가 소유하는 상품 원본 정보 (Source of Truth)
+ * - **Offer**: Supplier가 Seller에게 제시하는 공급 조건 (가격, 재고, 배송 등)
+ * - **Listing**: Seller가 자신의 채널에 등록한 판매 상품 (Offer 기반)
+ *
+ * ### S2S 흐름
+ * 1. Supplier가 Product Master 생성 (상품 원본)
+ * 2. Supplier가 Offer 생성 (판매자에게 제시하는 조건)
+ * 3. Seller가 Offer 선택 후 Listing 생성 (자신의 채널에 등록)
+ * 4. 주문 발생 시 Order Relay를 통해 Supplier에게 전달
+ * 5. 정산은 Settlement/Commission 시스템을 통해 처리
+ *
+ * ### 비고
+ * - "즉시 판매", "B2C 전제", "플랫폼 중재" 개념은 본 Core의 책임이 아님
+ * - 각 서비스(Cosmetics, Pharmaceutical, Yaksa 등)는 Extension/Core를 통해 특수성 구현
+ * - 본 Core는 S2S 관계 관리에만 집중하며, 비즈니스 정책 판단은 하지 않음
  */
 
 export const dropshippingCoreManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'dropshipping-core',
-  displayName: 'Dropshipping 엔진',
+  displayName: 'S2S 엔진',
   version: '1.0.0',
   appType: 'core' as const,
-  description: '산업 중립적 확장형 Dropshipping 엔진 - Supplier/Seller/Product/Order/Settlement/Commission',
+  description: '산업 중립적 S2S(Supplier-to-Seller) 엔진 - 공급자/판매자 관계, 상품/Offer/Listing, 주문 릴레이, 정산',
 
   // ===== 의존성 =====
   dependencies: {

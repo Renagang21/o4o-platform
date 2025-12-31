@@ -1,0 +1,42 @@
+{
+  "name": "@o4o/cosmetics-supplier-extension",
+  "version": "1.0.0",
+  "description": "Cosmetics Supplier Extension - 브랜드/공급사 관리 확장앱",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend/index.d.ts",
+      "import": "./dist/backend/index.js"
+    },
+    "./backend/*": {
+      "types": "./dist/backend/*.d.ts",
+      "import": "./dist/backend/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@o4o/dropshipping-core": "workspace:*",
+    "@o4o/dropshipping-cosmetics": "workspace:*",
+    "@o4o/cosmetics-partner-extension": "workspace:*",
+    "typeorm": "^0.3.17",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/express": "^4.17.17"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0"
+  }
+}

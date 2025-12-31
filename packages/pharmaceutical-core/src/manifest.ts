@@ -1,11 +1,28 @@
 /**
  * Pharmaceutical Core Manifest
  *
- * AppStore 표준 manifest - 의약품 B2B 유통 Core App
+ * S2S 구조에서 의약품(Pharmaceutical) 규제 도메인의 Core App
  *
- * Core App으로서 독립적인 의약품 유통 워크플로우를 제공합니다.
- * Dropshipping Core와 연동하여 productType='pharmaceutical'에 대한
- * 검증 Hook을 제공합니다.
+ * ## S2S 관점에서의 역할
+ * - S2S 구조 위에서 의약품 규제 특수성 구현
+ * - productType = 'pharmaceutical' 상품에 대한 독립 워크플로우
+ * - 규제 도메인으로서 별도 Core App으로 분리됨 (Extension이 아님)
+ *
+ * ## 규제 도메인 특수성 (Core에서 직접 관리)
+ * - 약국/도매상 라이선스 검증
+ * - 약품코드(표준코드) 관리
+ * - 의약품 전용 주문 워크플로우
+ * - 콜드체인 추적
+ *
+ * ## S2S Core(dropshipping-core)와의 관계
+ * - pharmaceutical-core는 dropshipping-core에 의존
+ * - productType='pharmaceutical' 상품은 이 Core에서 검증
+ * - Listing 생성 차단 (B2B 전용, 일반 판매 불가)
+ *
+ * ## 하드코딩 상수 (역사적 결정, 추후 일반화 대상)
+ * - defaultPlatformFeeRate: 2%
+ * - maxCommissionRate: 2%
+ * - settlementPeriodDays: 7일
  *
  * @package @o4o/pharmaceutical-core
  */
@@ -13,11 +30,11 @@
 export const pharmaceuticalCoreManifest = {
   // ===== 필수 기본 정보 =====
   appId: 'pharmaceutical-core',
-  displayName: '의약품 유통',
+  displayName: '의약품 S2S',
   version: '1.0.0',
   appType: 'core' as const,
   description:
-    'Pharmaceutical B2B Distribution Core - 의약품 도매상/제조사와 약국 간 B2B 거래 관리',
+    'S2S 의약품 규제 도메인 Core - 라이선스 검증, 약품코드 관리, B2B 주문 워크플로우',
 
   // ===== 의존성 =====
   dependencies: {

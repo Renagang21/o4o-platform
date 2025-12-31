@@ -1,30 +1,36 @@
 /**
  * Dropshipping Cosmetics Extension Manifest
  *
- * This extension adds cosmetics-specific metadata and features to the Dropshipping Core app.
- * It extends the core dropshipping functionality with cosmetics-focused features like:
- * - Skin type matching
- * - Ingredient information
- * - Routine recommendations
- * - Product certifications
+ * S2S 구조에서 화장품(Cosmetics) 서비스의 Extension
  *
- * Phase 2 업데이트:
- * - Core Extension Interface 구현
- * - productType = 'cosmetics' 특화 Validation
- * - Hook 기반 Offer/Listing/Order 검증
+ * ## S2S 관점에서의 역할
+ * - S2S Core(dropshipping-core) 위에서 화장품 특화 기능 제공
+ * - productType = 'cosmetics' 상품에 대한 메타데이터 확장
+ * - 마케팅/샘플 중심의 서비스 특수성 구현
+ *
+ * ## 서비스 특수성 (Extension에서 흡수)
+ * - 피부타입 매칭 (Skin Type)
+ * - 성분 정보 (Ingredients)
+ * - 루틴 추천 (Routine)
+ * - 제품 인증 (Certifications)
+ *
+ * ## S2S Core와의 관계
+ * - Product Master: S2S Core에서 관리 (Supplier 소유)
+ * - 화장품 메타데이터: 이 Extension에서 확장
+ * - Validation Hook: productType='cosmetics' 검증 로직 제공
  */
 
 export const cosmeticsExtensionManifest = {
   // ===== 필수 기본 정보 =====
   id: 'dropshipping-cosmetics', // ModuleLoader compatibility
   appId: 'dropshipping-cosmetics',
-  displayName: '화장품 Dropshipping',
-  name: 'Dropshipping Cosmetics Extension',
+  displayName: '화장품 S2S',
+  name: 'Cosmetics S2S Extension',
   version: '1.0.0',
   type: 'extension' as const,
   appType: 'extension' as const, // Legacy compatibility
   category: 'commerce' as const,
-  description: 'Cosmetics-specific features for dropshipping platform',
+  description: 'S2S 화장품 Extension - 피부타입/성분/루틴/인증 메타데이터, 마케팅/샘플 기능',
 
   // ===== 의존성 =====
   dependencies: {

@@ -1,0 +1,38 @@
+{
+  "name": "@o4o/membership-yaksa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Membership Extension for Yaksa Organization - Member management, verification, and affiliation system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./src/*": "./src/*",
+    "./backend/*": "./dist/backend/*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/types": "workspace:*",
+    "xlsx": "0.18.5"
+  },
+  "peerDependencies": {
+    "@o4o/yaksa-scheduler": "workspace:*",
+    "class-transformer": "^0.5.0",
+    "class-validator": "^0.14.0",
+    "react": "^18.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.3.0"
+  }
+}

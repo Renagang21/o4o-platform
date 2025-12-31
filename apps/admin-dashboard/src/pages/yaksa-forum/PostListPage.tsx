@@ -1,14 +1,14 @@
 /**
  * Yaksa Forum Post List Page
  *
- * 약사 포럼 게시글 목록 페이지
+ * 약사 포럼 게시글 목록 페이지 (Admin)
  * - 게시글 카드 그리드/리스트
  * - 카테고리 필터
  * - 검색/정렬
  * - 반응형 레이아웃
  *
- * Phase 9-B: Web Business Template 복제 검증
- * Template Reference: cosmetics-products/ProductListPage.tsx
+ * Phase A-3: Yaksa API Integration
+ * API Endpoint: /api/v1/yaksa/admin/posts
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -33,43 +33,41 @@ import {
   ChevronRight,
   AlertCircle,
   Eye,
-  ThumbsUp,
   Clock,
+  Pin,
+  Bell,
+  Plus,
 } from 'lucide-react';
 
 /**
- * API Response Types (OpenAPI 계약 기반)
+ * API Response Types (Phase A-1 Yaksa API)
  */
-interface Author {
-  id: string;
-  name: string;
-  avatar?: string;
-}
-
 interface Category {
   id: string;
   name: string;
   slug: string;
   description?: string;
-  postCount?: number;
+  status: 'active' | 'inactive';
+  sort_order: number;
+  post_count?: number;
+  created_at: string;
+  updated_at: string;
 }
 
-type PostStatus = 'draft' | 'published' | 'archived' | 'hidden';
+type PostStatus = 'draft' | 'published' | 'hidden' | 'deleted';
 
-interface PostSummary {
+interface PostListItem {
   id: string;
+  category_id: string;
+  category_name?: string;
   title: string;
-  content?: string;
-  excerpt?: string;
-  author: Author;
-  category?: Category;
   status: PostStatus;
-  viewCount: number;
-  likeCount: number;
-  commentCount: number;
-  isPinned?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  is_pinned: boolean;
+  is_notice: boolean;
+  view_count: number;
+  created_by_user_name?: string;
+  created_at: string;
+  published_at?: string;
 }
 
 interface PaginationMeta {
@@ -77,12 +75,10 @@ interface PaginationMeta {
   limit: number;
   total: number;
   totalPages: number;
-  hasNext?: boolean;
-  hasPrev?: boolean;
 }
 
 interface PostListResponse {
-  data: PostSummary[];
+  data: PostListItem[];
   meta: PaginationMeta;
 }
 
@@ -93,20 +89,20 @@ interface CategoryListResponse {
 const statusLabels: Record<PostStatus, string> = {
   draft: '초안',
   published: '게시됨',
-  archived: '보관됨',
   hidden: '숨김',
+  deleted: '삭제됨',
 };
 
 const statusColors: Record<PostStatus, 'gray' | 'green' | 'yellow' | 'red'> = {
   draft: 'gray',
   published: 'green',
-  archived: 'yellow',
-  hidden: 'red',
+  hidden: 'yellow',
+  deleted: 'red',
 };
 
 const PostListPage: React.FC = () => {
   const api = authClient.api;
-  const [posts, setPosts] = useState<PostSummary[]>([]);
+  const [posts, setPosts] = useState<PostListItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +120,7 @@ const PostListPage: React.FC = () => {
   // Fetch categories for filter dropdown
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await api.get<CategoryListResponse>('/api/v1/forum/categories');
+      const response = await api.get<CategoryListResponse>('/api/v1/yaksa/admin/categories');
       if (response.data) {
         setCategories(response.data.data);
       }
@@ -155,7 +151,7 @@ const PostListPage: React.FC = () => {
         params.set('q', searchTerm);
       }
 
-      const response = await api.get<PostListResponse>(`/api/v1/forum/posts?${params.toString()}`);
+      const response = await api.get<PostListResponse>(`/api/v1/yaksa/admin/posts?${params.toString()}`);
 
       if (response.data) {
         setPosts(response.data.data);
@@ -344,14 +340,21 @@ const PostListPage: React.FC = () => {
                     <div className="flex flex-col h-full">
                       {/* Header */}
                       <div className="flex items-center gap-2 mb-2">
-                        {post.isPinned && (
-                          <AGTag color="blue" size="sm">고정</AGTag>
+                        {post.is_pinned && (
+                          <AGTag color="blue" size="sm">
+                            <Pin className="w-3 h-3 inline mr-1" />고정
+                          </AGTag>
+                        )}
+                        {post.is_notice && (
+                          <AGTag color="purple" size="sm">
+                            <Bell className="w-3 h-3 inline mr-1" />공지
+                          </AGTag>
                         )}
                         <AGTag color={statusColors[post.status]} size="sm">
                           {statusLabels[post.status]}
                         </AGTag>
-                        {post.category && (
-                          <span className="text-xs text-gray-500">{post.category.name}</span>
+                        {post.category_name && (
+                          <span className="text-xs text-gray-500">{post.category_name}</span>
                         )}
                       </div>
 
@@ -360,28 +363,17 @@ const PostListPage: React.FC = () => {
                         {post.title}
                       </h3>
 
-                      {/* Excerpt */}
-                      {post.excerpt && (
-                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                          {post.excerpt}
-                        </p>
-                      )}
-
                       {/* Meta */}
                       <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t">
-                        <span>{post.author.name}</span>
+                        <span>{post.created_by_user_name || '알 수 없음'}</span>
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1">
                             <Eye className="w-3 h-3" />
-                            {post.viewCount}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <ThumbsUp className="w-3 h-3" />
-                            {post.likeCount}
+                            {post.view_count}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            {formatRelativeTime(post.createdAt)}
+                            {formatRelativeTime(post.created_at)}
                           </span>
                         </div>
                       </div>
@@ -399,22 +391,29 @@ const PostListPage: React.FC = () => {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          {post.isPinned && (
-                            <AGTag color="blue" size="sm">고정</AGTag>
+                          {post.is_pinned && (
+                            <AGTag color="blue" size="sm">
+                              <Pin className="w-3 h-3 inline mr-1" />고정
+                            </AGTag>
+                          )}
+                          {post.is_notice && (
+                            <AGTag color="purple" size="sm">
+                              <Bell className="w-3 h-3 inline mr-1" />공지
+                            </AGTag>
                           )}
                           <AGTag color={statusColors[post.status]} size="sm">
                             {statusLabels[post.status]}
                           </AGTag>
-                          {post.category && (
+                          {post.category_name && (
                             <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                              {post.category.name}
+                              {post.category_name}
                             </span>
                           )}
                         </div>
                         <h3 className="font-medium text-gray-900 truncate">{post.title}</h3>
                         <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                          <span>{post.author.name}</span>
-                          <span>{formatRelativeTime(post.createdAt)}</span>
+                          <span>{post.created_by_user_name || '알 수 없음'}</span>
+                          <span>{formatRelativeTime(post.created_at)}</span>
                         </div>
                       </div>
 
@@ -422,15 +421,7 @@ const PostListPage: React.FC = () => {
                       <div className="flex items-center gap-4 text-sm text-gray-400 flex-shrink-0">
                         <span className="flex items-center gap-1">
                           <Eye className="w-4 h-4" />
-                          {post.viewCount}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <ThumbsUp className="w-4 h-4" />
-                          {post.likeCount}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" />
-                          {post.commentCount}
+                          {post.view_count}
                         </span>
                       </div>
 

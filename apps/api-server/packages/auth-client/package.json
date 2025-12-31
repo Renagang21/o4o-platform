@@ -1,0 +1,42 @@
+{
+  "name": "@o4o/auth-client",
+  "version": "1.0.0",
+  "description": "Authentication client for O4O Platform",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. Client-side auth library.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "npx tsc --build",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*",
+    "axios": "^1.10.0",
+    "js-cookie": "^3.0.5"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
+    "typescript": "5.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

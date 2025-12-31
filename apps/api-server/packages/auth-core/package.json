@@ -1,0 +1,32 @@
+{
+  "name": "@o4o/auth-core",
+  "version": "1.0.0",
+  "description": "Authentication & RBAC Core - User, Role, Permission management",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./lifecycle": {
+      "import": "./dist/lifecycle/index.js",
+      "types": "./dist/lifecycle/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0"
+  }
+}

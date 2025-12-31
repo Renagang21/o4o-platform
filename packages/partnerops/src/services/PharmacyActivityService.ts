@@ -6,6 +6,15 @@
  *
  * IMPORTANT: PHARMACEUTICAL 제품은 표시되지 않습니다 (read-only).
  *
+ * ## TODO: Extension 이동 대상
+ * 이 서비스는 약국(Pharmacy) 특화 로직을 포함하고 있습니다.
+ * Ops 서비스 중립성 원칙에 따라, 향후 다음 중 하나로 이동해야 합니다:
+ * - yaksa-partner-extension
+ * - pharmacy-partner-extension
+ *
+ * 현재는 PartnerOps 내부에 위치하여 기능을 제공하지만,
+ * 이는 임시 배치이며, 서비스별 특화 로직 분리 Phase에서 정리됩니다.
+ *
  * @package @o4o/partnerops
  */
 

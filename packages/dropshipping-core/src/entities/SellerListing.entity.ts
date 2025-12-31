@@ -1,10 +1,26 @@
 /**
  * SellerListing Entity
  *
- * 판매자가 특정 채널에 등록한 판매용 상품
+ * S2S 구조에서 Seller가 소유하는 파생 데이터
  *
- * 하나의 SupplierProductOffer를 기반으로 Seller가 자신의 채널(스마트스토어, 쿠팡 등)에
- * 등록한 상품을 나타냅니다.
+ * ## S2S 역할
+ * - Seller가 Offer를 선택하여 자신의 채널에 등록한 판매 상품
+ * - Product Master/Offer의 정보를 기반으로 표현(Presentation) 생성
+ * - 원본 데이터를 직접 수정하지 않음
+ *
+ * ## 소유권 구조
+ * - ProductMaster (Supplier 소유) → Offer (Supplier 소유) → Listing (Seller 소유)
+ *
+ * ## Seller 소유 필드 (파생 데이터)
+ * - title (판매 제목 - Offer 기반으로 가공)
+ * - description (판매 설명 - Offer 기반으로 가공)
+ * - sellingPrice (판매가 - Seller가 결정)
+ * - channel (판매 채널)
+ * - channelSpecificData (채널별 특화 데이터)
+ *
+ * ## 비고
+ * - Listing은 Offer에 종속 (Offer 비활성화 시 Listing도 영향)
+ * - Listing 생성 조건은 서비스별 Extension에서 정의
  */
 
 import {

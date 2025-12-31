@@ -1,0 +1,45 @@
+{
+  "name": "@o4o/auth-context",
+  "version": "1.0.0",
+  "description": "Authentication context for O4O Platform",
+  "o4o:packageType": "infra-core",
+  "o4o:note": "Infrastructure Core - NOT an AppStore app. React auth context provider.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "node build.js",
+    "build:ci": "node build-ci.js",
+    "build:fallback": "node build.js",
+    "build:server": "node build-server.js",
+    "build:tsc": "npx tsc",
+    "type-check": "npx tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/auth-client": "file:../auth-client",
+    "@o4o/types": "file:../types",
+    "react": "18.2.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@types/react": "^18.2.79",
+    "@types/socket.io-client": "^1.4.36",
+    "typescript": "5.4.5"
+  },
+  "peerDependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^7.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

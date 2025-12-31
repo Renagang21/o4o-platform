@@ -1,11 +1,24 @@
 /**
  * SellerOps Manifest
  *
- * 범용 판매자 운영 앱 - Dropshipping Core Extension
+ * S2S 구조에서 Seller(판매자) 역할의 운영 앱
  *
- * Phase 2 업데이트:
- * - Core Extension Interface 구현
- * - Hook 기반 Validation 지원
+ * ## Ops 서비스 책임 범위
+ * - 자격 관리: Seller 프로필, 상태
+ * - 상태 관리: Listing 활성화/비활성화
+ * - 관계 관리: Supplier 승인 요청, Offer 선택
+ *
+ * ## Ops 서비스가 하지 않는 것
+ * - 업무 방식 판단 (서비스별 정책)
+ * - 정책 결정 (승인 조건, 수수료율 등)
+ * - 비즈니스 로직 (서비스별 Extension에서 처리)
+ *
+ * ## S2S 흐름에서의 역할
+ * 1. Seller가 Supplier에게 취급 요청
+ * 2. Supplier 승인 후 Offer 선택 가능
+ * 3. Offer 선택 → Listing 생성
+ * 4. 주문 발생 시 Order Relay 모니터링
+ * 5. 정산 대시보드 조회
  */
 
 export const selleropsManifest = {
@@ -14,7 +27,7 @@ export const selleropsManifest = {
   displayName: '판매자 운영',
   version: '1.0.0',
   appType: 'extension' as const,
-  description: '범용 판매자 운영 앱 - 공급자 승인, Offer 선택, 리스팅 관리, 주문 추적, 정산',
+  description: 'S2S Seller 운영 앱 - 공급자 관계 관리, Offer 선택, Listing 관리, 주문 모니터링, 정산 조회',
 
   // ===== 의존성 =====
   dependencies: {

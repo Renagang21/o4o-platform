@@ -1,0 +1,37 @@
+{
+  "name": "@o4o/lms-yaksa",
+  "version": "1.0.0",
+  "description": "LMS Extension for Yaksa Organization - 약사회 교육/연수 시스템",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./manifest": {
+      "import": "./dist/manifest.js",
+      "types": "./dist/manifest.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/lms-core": "workspace:*",
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/membership-yaksa": "workspace:*",
+    "@o4o/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0",
+    "typeorm": "^0.3.0"
+  }
+}
