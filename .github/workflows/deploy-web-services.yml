@@ -1,7 +1,7 @@
 name: Deploy Web Services (Cloud Run)
 
 # Deploy web services to Cloud Run on push to main/develop
-# Phase 1: 4개 웹서버 자동 배포
+# Phase 1: 5개 웹서버 자동 배포 (glucoseview 추가)
 # 변경된 웹서버만 배포됨
 
 concurrency:
@@ -18,11 +18,12 @@ on:
       - 'services/web-k-cosmetics/**'
       - 'services/web-kpa-society/**'
       - 'services/web-glycopharm/**'
+      - 'services/web-glucoseview/**'
       - '.github/workflows/deploy-web-services.yml'
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, glucoseview)'
         required: false
         default: 'all'
 
@@ -39,6 +40,7 @@ jobs:
       k-cosmetics: ${{ steps.changes.outputs.k-cosmetics }}
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
       glycopharm: ${{ steps.changes.outputs.glycopharm }}
+      glucoseview: ${{ steps.changes.outputs.glucoseview }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,11 +58,13 @@ jobs:
               echo "k-cosmetics=true" >> $GITHUB_OUTPUT
               echo "kpa-society=true" >> $GITHUB_OUTPUT
               echo "glycopharm=true" >> $GITHUB_OUTPUT
+              echo "glucoseview=true" >> $GITHUB_OUTPUT
             else
               echo "neture=$( [ '$SERVICE' = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "k-cosmetics=$( [ '$SERVICE' = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-society=$( [ '$SERVICE' = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "glycopharm=$( [ '$SERVICE' = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "glucoseview=$( [ '$SERVICE' = 'glucoseview' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
           fi
@@ -94,6 +98,12 @@ jobs:
             echo "glycopharm=true" >> $GITHUB_OUTPUT
           else
             echo "glycopharm=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^services/web-glucoseview/"; then
+            echo "glucoseview=true" >> $GITHUB_OUTPUT
+          else
+            echo "glucoseview=false" >> $GITHUB_OUTPUT
           fi
 
   deploy-neture:
@@ -307,8 +317,66 @@ jobs:
 
           echo "🌐 Service URL: ${SERVICE_URL}"
 
+  deploy-glucoseview:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.glucoseview == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Deploy glucoseview-web
+        run: |
+          echo "🚀 Deploying glucoseview-web..."
+
+          cd services/web-glucoseview
+
+          gcloud run deploy glucoseview-web \
+            --source . \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5 \
+            --set-env-vars="VITE_API_URL=https://api.neture.co.kr/api"
+
+          echo "✅ glucoseview-web deployed successfully!"
+
+      - name: Verify deployment
+        run: |
+          SERVICE_URL=$(gcloud run services describe glucoseview-web \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)")
+
+          echo "🌐 Service URL: ${SERVICE_URL}"
+
+          # Simple health check
+          if curl -sf "${SERVICE_URL}" > /dev/null; then
+            echo "✅ glucoseview-web is accessible!"
+          else
+            echo "⚠️ glucoseview-web may need a moment to start"
+          fi
+
   summary:
-    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm]
+    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-glucoseview]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -323,6 +391,7 @@ jobs:
           echo "  - k-cosmetics-web: ${{ needs.detect-changes.outputs.k-cosmetics }}"
           echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
           echo "  - glycopharm-web: ${{ needs.detect-changes.outputs.glycopharm }}"
+          echo "  - glucoseview-web: ${{ needs.detect-changes.outputs.glucoseview }}"
           echo ""
           echo "📅 Time: $(date)"
           echo "📝 Commit: ${{ github.sha }}"
