@@ -137,7 +137,7 @@ jobs:
 
         # Also compile migrations with tsc (tsup only bundles main.js)
         echo "🔨 Compiling migrations with tsc..."
-        npx tsc -p tsconfig.build.json --outDir dist --declaration false
+        npx tsc src/database/migrations/*.ts --outDir dist/database/migrations --module ESNext --moduleResolution node --esModuleInterop --target ES2022 --skipLibCheck
         echo "✅ Migrations compiled"
 
         # Verify build output
