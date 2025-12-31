@@ -2,93 +2,45 @@
 
 이 문서는 O4O Platform의 CI/CD 파이프라인에 필요한 GitHub Secrets 설정을 안내합니다.
 
+## 인프라 구성 (2025-12 기준)
+
+- **API 서버**: GCP Cloud Run (`o4o-core-api`)
+- **데이터베이스**: GCP Cloud SQL (PostgreSQL)
+- **웹서버**: 13.125.144.8 (Nginx 프록시 + Static)
+
 ## 필수 Secrets
 
-### 1. SSH 키 설정
+### 1. GCP 인증
 
-#### API_SERVER_SSH_KEY
-- **설명**: API 서버(43.202.242.215) 접속용 SSH 개인키
+#### GCP_SA_KEY
+- **설명**: GCP 서비스 계정 JSON 키 (Cloud Run 배포용)
 - **생성 방법**:
-  ```bash
-  # 로컬에서 새 SSH 키 생성
-  ssh-keygen -t rsa -b 4096 -f ~/.ssh/o4o-api-server -C "github-actions@o4o-platform"
-  
-  # 공개키를 서버에 추가
-  ssh-copy-id -i ~/.ssh/o4o-api-server.pub ubuntu@43.202.242.215
-  
-  # 개인키 내용 복사 (이것을 GitHub Secret에 추가)
-  cat ~/.ssh/o4o-api-server
-  ```
+  1. GCP Console → IAM & Admin → Service Accounts
+  2. 서비스 계정 생성 또는 선택
+  3. Keys → Add Key → Create New Key → JSON
+  4. 다운로드된 JSON 파일 전체 내용을 Secret에 저장
+
+### 2. 데이터베이스 (Cloud SQL)
+
+#### GCP_DB_USERNAME
+- **설명**: Cloud SQL PostgreSQL 사용자명
+
+#### GCP_DB_PASSWORD
+- **설명**: Cloud SQL PostgreSQL 비밀번호
+
+#### GCP_DB_NAME
+- **설명**: Cloud SQL 데이터베이스 이름
+
+### 3. 인증 관련
+
+#### GCP_JWT_SECRET
+- **설명**: JWT 토큰 서명 시크릿 키
+
+### 4. 웹서버 SSH (프론트엔드 배포용)
 
 #### WEB_SERVER_SSH_KEY
-- **설명**: 웹 서버(13.125.144.8) 접속용 SSH 개인키
-- **생성 방법**:
-  ```bash
-  # 로컬에서 새 SSH 키 생성
-  ssh-keygen -t rsa -b 4096 -f ~/.ssh/o4o-web-server -C "github-actions@o4o-platform"
-  
-  # 공개키를 서버에 추가
-  ssh-copy-id -i ~/.ssh/o4o-web-server.pub ubuntu@13.125.144.8
-  
-  # 개인키 내용 복사 (이것을 GitHub Secret에 추가)
-  cat ~/.ssh/o4o-web-server
-  ```
-
-### 2. 환경 변수 (Production)
-
-#### API_SERVER_ENV
-- **설명**: API 서버 production 환경변수
-- **형식**: `.env` 파일 전체 내용
-- **예시**:
-  ```env
-  NODE_ENV=production
-  PORT=4000
-  
-  # Database
-  DB_HOST=localhost
-  DB_PORT=5432
-  DB_USERNAME=o4o_user
-  DB_PASSWORD=실제_비밀번호
-  DB_NAME=o4o_platform
-  
-  # Auth
-  JWT_SECRET=실제_JWT_시크릿_키
-  JWT_EXPIRES_IN=7d
-  
-  # Redis
-  REDIS_HOST=localhost
-  REDIS_PORT=6379
-  REDIS_PASSWORD=실제_Redis_비밀번호
-  
-  # OAuth (선택사항)
-  GOOGLE_CLIENT_ID=구글_클라이언트_ID
-  GOOGLE_CLIENT_SECRET=구글_클라이언트_시크릿
-  KAKAO_CLIENT_ID=카카오_클라이언트_ID
-  KAKAO_CLIENT_SECRET=카카오_클라이언트_시크릿
-  
-  # Email
-  SMTP_HOST=smtp.gmail.com
-  SMTP_PORT=587
-  SMTP_USER=이메일_주소
-  SMTP_PASS=앱_비밀번호
-  
-  # Session
-  SESSION_SECRET=실제_세션_시크릿_키
-  COOKIE_DOMAIN=.neture.co.kr
-  ```
-
-### 3. 추가 Secrets (선택사항)
-
-#### SLACK_WEBHOOK_URL
-- **설명**: 배포 알림용 Slack Webhook URL
-- **형식**: `https://hooks.slack.com/services/xxx/xxx/xxx`
-
-#### SENTRY_DSN
-- **설명**: 에러 추적용 Sentry DSN
-- **형식**: `https://xxx@xxx.ingest.sentry.io/xxx`
-
-#### CDN_API_KEY
-- **설명**: CDN 캐시 삭제용 API 키 (CloudFlare 등)
+- **설명**: 웹서버(13.125.144.8) 접속용 SSH 개인키
+- **용도**: Admin Dashboard, Main Site 배포 시 사용
 
 ## GitHub에서 Secrets 추가하기
 
@@ -100,25 +52,18 @@
 ## 보안 주의사항
 
 1. **절대 커밋하지 마세요**: 실제 값을 코드에 포함시키지 마세요
-2. **정기적으로 교체**: SSH 키와 비밀번호는 정기적으로 교체하세요
+2. **정기적으로 교체**: 비밀번호와 키는 정기적으로 교체하세요
 3. **최소 권한 원칙**: 각 키/계정은 필요한 최소한의 권한만 부여
-4. **접근 로그 모니터링**: 서버 접근 로그를 정기적으로 확인
 
 ## 문제 해결
 
-### SSH 키가 작동하지 않을 때
-```bash
-# 서버에서 authorized_keys 확인
-cat ~/.ssh/authorized_keys
+### Cloud Run 배포 실패 시
+- GitHub Actions 로그에서 GCP 인증 단계 확인
+- 서비스 계정 권한 확인 (Cloud Run Admin, Artifact Registry Writer 등)
 
-# 권한 확인
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/authorized_keys
-```
-
-### 환경변수가 적용되지 않을 때
-- GitHub Actions 로그에서 환경변수 주입 단계 확인
-- 서버에서 `.env` 파일 존재 및 내용 확인
+### 데이터베이스 연결 실패 시
+- Cloud SQL 연결 확인 (`--add-cloudsql-instances` 옵션)
+- DB 자격증명 확인
 
 ## 연락처
 

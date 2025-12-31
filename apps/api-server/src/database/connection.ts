@@ -2,24 +2,12 @@ import { DataSource } from 'typeorm';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { SnakeNamingStrategy } from './SnakeNamingStrategy.js';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables for migrations
-// In production, load .env-apiserver; in development, load .env.development
-const envFile = process.env.NODE_ENV === 'production'
-  ? '.env-apiserver'
-  : '.env.development';
-
-// When compiled, this file is in dist/src/database/, need to go up 3 levels to api-server root
-const envPath = path.resolve(__dirname, '../../../', envFile);
-dotenv.config({
-  path: envPath
-});
+// Note: Environment variables are loaded by main.ts at startup
+// In Cloud Run, env vars are injected via workflow (no .env files needed)
 // AUTH Module entities (migrated to src/modules/auth/entities/)
 import { User } from '../modules/auth/entities/User.js';
 import { Role } from '../modules/auth/entities/Role.js';

@@ -1,1 +1,0 @@
-{"version":3,"file":"AddTypeFieldToPosts.d.ts","sourceRoot":"","sources":["../../src/migrations/AddTypeFieldToPosts.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,WAAW,EAAe,MAAM,SAAS,CAAC;AAEvE,qBAAa,gCAAiC,YAAW,kBAAkB;IACvE,IAAI,SAAsC;IAE7B,EAAE,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;IAiB3C,IAAI,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;CAS7D"}

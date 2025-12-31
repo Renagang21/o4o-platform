@@ -1,1 +1,0 @@
-{"version":3,"file":"1750000000000-CreateACFTables.d.ts","sourceRoot":"","sources":["../../../src/database/migrations/1750000000000-CreateACFTables.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,WAAW,EAAqB,MAAM,SAAS,CAAC;AAE7E,qBAAa,4BAA6B,YAAW,kBAAkB;IACxD,EAAE,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;IAggB3C,IAAI,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;CAe3D"}

@@ -252,7 +252,7 @@ router.delete('/:id', authenticateToken as any, requireAdmin, async (req: Reques
       });
     }
 
-    // TODO: Implement actual instance deletion (Lightsail, etc.)
+    // TODO: Implement actual instance deletion (Cloud Run, etc.)
     await deploymentRepo.remove(instance);
 
     res.json({
