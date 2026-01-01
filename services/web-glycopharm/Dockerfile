@@ -6,14 +6,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
-
 # Copy package files
 COPY package.json ./
 
-# Install dependencies
-RUN pnpm install
+# Install dependencies using npm (not pnpm for standalone build)
+RUN npm install
 
 # Copy source
 COPY . .
@@ -23,7 +20,7 @@ ARG VITE_API_BASE_URL=https://o4o-core-api-117791934476.asia-northeast3.run.app
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build
-RUN pnpm build
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS runner
