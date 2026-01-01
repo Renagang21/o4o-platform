@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './LoginModal';
+import { AIChatButton } from './ai';
 
 const navItems = [
   { path: '/', label: 'Home', protected: false },
@@ -179,6 +180,16 @@ export default function Layout() {
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
       />
+
+      {/* AI Chat Button - 로그인한 승인 사용자에게만 표시 */}
+      {isAuthenticated && isApproved && (
+        <AIChatButton
+          userName={user?.displayName || user?.name}
+          context={{
+            patientCount: 0, // TODO: 실제 환자 수 연동
+          }}
+        />
+      )}
     </div>
   );
 }
