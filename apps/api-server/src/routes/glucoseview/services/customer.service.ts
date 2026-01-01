@@ -108,7 +108,7 @@ export class CustomerService {
       name: dto.name,
       phone: dto.phone,
       email: dto.email,
-      age: dto.age,
+      birth_year: dto.birth_year,
       gender: dto.gender,
       kakao_id: dto.kakao_id,
       notes: dto.notes,
@@ -145,7 +145,7 @@ export class CustomerService {
     if (dto.name !== undefined) customer.name = dto.name;
     if (dto.phone !== undefined) customer.phone = dto.phone;
     if (dto.email !== undefined) customer.email = dto.email;
-    if (dto.age !== undefined) customer.age = dto.age;
+    if (dto.birth_year !== undefined) customer.birth_year = dto.birth_year;
     if (dto.gender !== undefined) customer.gender = dto.gender;
     if (dto.kakao_id !== undefined) customer.kakao_id = dto.kakao_id;
     if (dto.notes !== undefined) customer.notes = dto.notes;
@@ -240,7 +240,7 @@ export class CustomerService {
       name: customer.name,
       phone: customer.phone,
       email: customer.email,
-      age: customer.age,
+      birth_year: customer.birth_year,
       gender: customer.gender,
       kakao_id: customer.kakao_id,
       last_visit: customer.last_visit?.toISOString(),
