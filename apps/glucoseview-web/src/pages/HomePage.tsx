@@ -179,82 +179,84 @@ export default function HomePage() {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Slide Banner Section */}
+      {/* Slide Banner Section - 컴팩트 버전 */}
       {banners.length > 0 && (
-        <section className="relative overflow-hidden">
-          <div className="relative h-64 md:h-80">
-            {banners.map((banner, index) => (
-              <div
-                key={banner.id}
-                className={`absolute inset-0 transition-opacity duration-500 ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                } ${banner.bgColor}`}
-              >
-                {banner.linkUrl ? (
-                  <a
-                    href={banner.linkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block h-full"
-                  >
-                    <div className="max-w-3xl mx-auto h-full flex flex-col items-center justify-center px-6 text-center">
-                      <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${banner.textColor}`}>
+        <section className="pt-4 pb-2 px-4 bg-slate-50">
+          <div className="max-w-2xl mx-auto">
+            <div className="relative overflow-hidden rounded-xl h-24 md:h-28 shadow-sm">
+              {banners.map((banner, index) => (
+                <div
+                  key={banner.id}
+                  className={`absolute inset-0 transition-opacity duration-500 ${
+                    index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  } ${banner.bgColor}`}
+                >
+                  {banner.linkUrl ? (
+                    <a
+                      href={banner.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block h-full"
+                    >
+                      <div className="h-full flex flex-col items-center justify-center px-4 text-center">
+                        <h2 className={`text-lg md:text-xl font-bold mb-1 ${banner.textColor}`}>
+                          {banner.title}
+                        </h2>
+                        <p className={`text-xs md:text-sm opacity-90 ${banner.textColor}`}>
+                          {banner.subtitle}
+                        </p>
+                      </div>
+                    </a>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center px-4 text-center">
+                      <h2 className={`text-lg md:text-xl font-bold mb-1 ${banner.textColor}`}>
                         {banner.title}
                       </h2>
-                      <p className={`text-lg md:text-xl opacity-90 ${banner.textColor}`}>
+                      <p className={`text-xs md:text-sm opacity-90 ${banner.textColor}`}>
                         {banner.subtitle}
                       </p>
                     </div>
-                  </a>
-                ) : (
-                  <div className="max-w-3xl mx-auto h-full flex flex-col items-center justify-center px-6 text-center">
-                    <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${banner.textColor}`}>
-                      {banner.title}
-                    </h2>
-                    <p className={`text-lg md:text-xl opacity-90 ${banner.textColor}`}>
-                      {banner.subtitle}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  )}
+                </div>
+              ))}
 
-          {/* 슬라이드 컨트롤 */}
-          {banners.length > 1 && (
-            <>
-              {/* 이전/다음 버튼 */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
-              >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
-              >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-
-              {/* 인디케이터 */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {banners.map((_, index) => (
+              {/* 슬라이드 컨트롤 - 배너 내부로 이동 */}
+              {banners.length > 1 && (
+                <>
+                  {/* 이전/다음 버튼 */}
                   <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentSlide ? 'bg-white' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+                    onClick={prevSlide}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+
+                  {/* 인디케이터 */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {banners.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                          index === currentSlide ? 'bg-white' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </section>
       )}
 
@@ -412,14 +414,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 흐르는 배너 */}
+      {/* Partner Section - 컴팩트 버전 */}
       {partners.length > 0 && (
-        <section className="py-8 bg-white border-t border-b border-slate-100 overflow-hidden">
-          <div className="max-w-5xl mx-auto px-6 mb-4">
-            <h3 className="text-sm font-medium text-slate-500 text-center">파트너 & 관련 기관</h3>
+        <section className="py-4 bg-slate-50 border-t border-slate-100 overflow-hidden">
+          <div className="max-w-2xl mx-auto px-4 mb-2">
+            <h3 className="text-xs font-medium text-slate-400 text-center">파트너 & 관련 기관</h3>
           </div>
 
-          {/* 무한 스크롤 배너 */}
+          {/* 무한 스크롤 배너 - 컴팩트 */}
           <div className="relative">
             <div className="flex animate-marquee">
               {/* 첫 번째 세트 */}
@@ -429,19 +431,18 @@ export default function HomePage() {
                   href={partner.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 mx-4 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors min-w-[200px]"
+                  className="flex-shrink-0 mx-2 px-3 py-2 bg-white hover:bg-slate-50 rounded-lg transition-colors min-w-[140px] border border-slate-100"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
                       {partner.logoUrl ? (
-                        <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                        <img src={partner.logoUrl} alt={partner.name} className="w-4 h-4 object-contain" />
                       ) : (
-                        <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                        <span className="text-sm font-bold text-slate-400">{partner.name.charAt(0)}</span>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">{partner.name}</p>
-                      <p className="text-xs text-slate-500 truncate">{partner.description}</p>
+                      <p className="text-xs font-medium text-slate-700 truncate">{partner.name}</p>
                     </div>
                   </div>
                 </a>
@@ -453,19 +454,18 @@ export default function HomePage() {
                   href={partner.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 mx-4 p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors min-w-[200px]"
+                  className="flex-shrink-0 mx-2 px-3 py-2 bg-white hover:bg-slate-50 rounded-lg transition-colors min-w-[140px] border border-slate-100"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
                       {partner.logoUrl ? (
-                        <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                        <img src={partner.logoUrl} alt={partner.name} className="w-4 h-4 object-contain" />
                       ) : (
-                        <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                        <span className="text-sm font-bold text-slate-400">{partner.name.charAt(0)}</span>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">{partner.name}</p>
-                      <p className="text-xs text-slate-500 truncate">{partner.description}</p>
+                      <p className="text-xs font-medium text-slate-700 truncate">{partner.name}</p>
                     </div>
                   </div>
                 </a>
