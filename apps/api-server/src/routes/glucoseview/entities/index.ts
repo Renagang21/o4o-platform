@@ -2,6 +2,8 @@
  * GlucoseView Entities Index
  *
  * Phase C-1: GlucoseView API Implementation
+ * Phase C-2: Customer Management
+ * Phase C-3: Pharmacist Membership System
  */
 
 export { GlucoseViewVendor } from './glucoseview-vendor.entity.js';
@@ -12,3 +14,13 @@ export type { ViewProfileStatus, SummaryLevel, ChartType } from './glucoseview-v
 
 export { GlucoseViewConnection } from './glucoseview-connection.entity.js';
 export type { ConnectionStatus } from './glucoseview-connection.entity.js';
+
+export { GlucoseViewCustomer } from './glucoseview-customer.entity.js';
+export type { CustomerGender, CustomerSyncStatus } from './glucoseview-customer.entity.js';
+
+export { GlucoseViewBranch } from './glucoseview-branch.entity.js';
+
+export { GlucoseViewChapter } from './glucoseview-chapter.entity.js';
+
+export { GlucoseViewPharmacist } from './glucoseview-pharmacist.entity.js';
+export type { PharmacistApprovalStatus, PharmacistRole } from './glucoseview-pharmacist.entity.js';

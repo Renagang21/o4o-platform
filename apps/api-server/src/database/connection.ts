@@ -128,12 +128,16 @@ import {
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
-// GLUCOSEVIEW ENTITIES (Phase C-1)
+// GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3)
 // ============================================================================
 import {
   GlucoseViewVendor,
   GlucoseViewViewProfile,
   GlucoseViewConnection,
+  GlucoseViewCustomer,
+  GlucoseViewBranch,
+  GlucoseViewChapter,
+  GlucoseViewPharmacist,
 } from '../routes/glucoseview/entities/index.js';
 
 // ============================================================================
@@ -348,11 +352,15 @@ export const AppDataSource = new DataSource({
     GlycopharmProduct,
     GlycopharmProductLog,
     // ============================================================================
-    // GLUCOSEVIEW ENTITIES (Phase C-1: GlucoseView API Implementation)
+    // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================
     GlucoseViewVendor,
     GlucoseViewViewProfile,
     GlucoseViewConnection,
+    GlucoseViewCustomer,
+    GlucoseViewBranch,
+    GlucoseViewChapter,
+    GlucoseViewPharmacist,
     // ============================================================================
     // NETURE ENTITIES (Phase D-1, G-3: Neture API Implementation + Orders)
     // ============================================================================

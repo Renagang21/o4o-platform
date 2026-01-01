@@ -1,0 +1,229 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import LoginModal from '../components/LoginModal';
+
+export default function HomePage() {
+  const { isAuthenticated, isApproved, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // 보호된 기능 클릭 핸들러
+  const handleProtectedClick = (path: string) => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+    } else if (!isApproved) {
+      navigate('/pending');
+    } else {
+      navigate(path);
+    }
+  };
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      {/* Hero Section */}
+      <section className="py-20 px-6 bg-white border-b border-slate-100">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+            GlucoseView
+          </h1>
+          <p className="text-lg text-slate-500 mb-2">
+            약국을 위한 CGM 데이터 정리 도구
+          </p>
+          <p className="text-sm text-slate-400">
+            glucoseview.co.kr
+          </p>
+
+          {/* 로그인 상태에 따른 CTA */}
+          {!isAuthenticated ? (
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                약사 로그인
+              </button>
+              <Link
+                to="/register"
+                className="px-6 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                회원가입
+              </Link>
+            </div>
+          ) : isApproved ? (
+            <div className="mt-8">
+              <Link
+                to="/patients"
+                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                환자 관리 시작하기
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {/* Preview Cards */}
+      <section className="py-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="grid gap-4">
+            {/* Card 1 - Patients */}
+            <button
+              onClick={() => handleProtectedClick('/patients')}
+              className="block w-full text-left bg-white rounded-xl border border-slate-200 p-6 hover:border-slate-300 transition-colors"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-medium text-slate-900">환자별 데이터</h3>
+                    {!isAuthenticated && (
+                      <span className="px-2 py-0.5 text-xs font-medium text-blue-600 bg-blue-50 rounded">로그인 필요</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-slate-500 mt-1">
+                    개별 환자의 CGM 데이터를 정리하여 확인합니다
+                  </p>
+                </div>
+                <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+
+            {/* Card 2 - Insights */}
+            <button
+              onClick={() => handleProtectedClick('/insights')}
+              className="block w-full text-left bg-white rounded-xl border border-slate-200 p-6 hover:border-slate-300 transition-colors"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-medium text-slate-900">전체 현황</h3>
+                    {!isAuthenticated && (
+                      <span className="px-2 py-0.5 text-xs font-medium text-blue-600 bg-blue-50 rounded">로그인 필요</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-slate-500 mt-1">
+                    관리 중인 환자들의 전체 흐름을 파악합니다
+                  </p>
+                </div>
+                <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+
+            {/* Card 3 - About (공개) */}
+            <Link
+              to="/about"
+              className="block bg-white rounded-xl border border-slate-200 p-6 hover:border-slate-300 transition-colors"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-medium text-slate-900 mb-1">서비스 안내</h3>
+                  <p className="text-sm text-slate-500">
+                    GlucoseView가 하는 일과 하지 않는 일
+                  </p>
+                </div>
+                <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Card 4 - Admin (관리자만) */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="block bg-white rounded-xl border border-slate-200 p-6 hover:border-slate-300 transition-colors"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-medium text-slate-900">관리자</h3>
+                      <span className="px-2 py-0.5 text-xs font-medium text-red-600 bg-red-50 rounded">Admin</span>
+                    </div>
+                    <p className="text-sm text-slate-500 mt-1">
+                      회원 승인 및 시스템 관리
+                    </p>
+                  </div>
+                  <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer note */}
+      <section className="pb-8 px-6">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-center text-xs text-slate-400">
+            본 서비스는 의료 진단이나 치료를 목적으로 하지 않습니다
+          </p>
+        </div>
+      </section>
+
+      {/* Test Account Info - 비로그인 시에만 표시 */}
+      {!isAuthenticated && (
+        <section className="pb-16 px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-amber-800 mb-2">테스트 계정 안내</p>
+                  <div className="grid grid-cols-2 gap-3 text-xs text-amber-700">
+                    <div className="p-2 bg-white/50 rounded">
+                      <p className="font-medium mb-1">약사 계정</p>
+                      <p>이메일: pharmacist@test.test</p>
+                      <p>비밀번호: testID1234</p>
+                    </div>
+                    <div className="p-2 bg-white/50 rounded">
+                      <p className="font-medium mb-1">관리자 계정</p>
+                      <p>이메일: admin@test.test</p>
+                      <p>비밀번호: adminID1234</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Login Modal */}
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+    </div>
+  );
+}
