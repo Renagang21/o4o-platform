@@ -250,6 +250,139 @@ export default function SettingsPage() {
             )}
           </div>
 
+          {/* Statistics Dashboard - 약사용 */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">이용 현황</h2>
+                <p className="text-sm text-slate-500">내 약국 고객 관리 통계</p>
+              </div>
+            </div>
+
+            {/* 통계 카드 그리드 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-xs text-blue-600 font-medium mb-1">등록 고객</p>
+                <p className="text-2xl font-bold text-blue-700">
+                  {(() => {
+                    try {
+                      const key = `glucoseview_customers_${user?.id}`;
+                      const data = localStorage.getItem(key);
+                      return data ? JSON.parse(data).length : 0;
+                    } catch {
+                      return 0;
+                    }
+                  })()}
+                </p>
+                <p className="text-xs text-blue-500 mt-1">명</p>
+              </div>
+
+              <div className="bg-green-50 rounded-lg p-4">
+                <p className="text-xs text-green-600 font-medium mb-1">이번 달 방문</p>
+                <p className="text-2xl font-bold text-green-700">
+                  {(() => {
+                    try {
+                      const key = `glucoseview_customers_${user?.id}`;
+                      const data = localStorage.getItem(key);
+                      if (!data) return 0;
+                      const customers = JSON.parse(data);
+                      const now = new Date();
+                      const thisMonth = customers.filter((c: { lastVisit: string }) => {
+                        const visit = new Date(c.lastVisit);
+                        return visit.getMonth() === now.getMonth() && visit.getFullYear() === now.getFullYear();
+                      });
+                      return thisMonth.length;
+                    } catch {
+                      return 0;
+                    }
+                  })()}
+                </p>
+                <p className="text-xs text-green-500 mt-1">명</p>
+              </div>
+
+              <div className="bg-amber-50 rounded-lg p-4">
+                <p className="text-xs text-amber-600 font-medium mb-1">CGM 연동</p>
+                <p className="text-2xl font-bold text-amber-700">
+                  {(() => {
+                    try {
+                      const key = `glucoseview_customers_${user?.id}`;
+                      const data = localStorage.getItem(key);
+                      if (!data) return 0;
+                      const customers = JSON.parse(data);
+                      return customers.filter((c: { lastSync: string }) => c.lastSync === '동기화됨').length;
+                    } catch {
+                      return 0;
+                    }
+                  })()}
+                </p>
+                <p className="text-xs text-amber-500 mt-1">명</p>
+              </div>
+
+              <div className="bg-purple-50 rounded-lg p-4">
+                <p className="text-xs text-purple-600 font-medium mb-1">총 방문 횟수</p>
+                <p className="text-2xl font-bold text-purple-700">
+                  {(() => {
+                    try {
+                      const key = `glucoseview_customers_${user?.id}`;
+                      const data = localStorage.getItem(key);
+                      if (!data) return 0;
+                      const customers = JSON.parse(data);
+                      return customers.reduce((sum: number, c: { visitCount: number }) => sum + (c.visitCount || 0), 0);
+                    } catch {
+                      return 0;
+                    }
+                  })()}
+                </p>
+                <p className="text-xs text-purple-500 mt-1">회</p>
+              </div>
+            </div>
+
+            {/* 최근 활동 요약 */}
+            <div className="border-t border-slate-100 pt-4">
+              <h3 className="text-sm font-medium text-slate-700 mb-3">최근 방문 고객</h3>
+              <div className="space-y-2">
+                {(() => {
+                  try {
+                    const key = `glucoseview_customers_${user?.id}`;
+                    const data = localStorage.getItem(key);
+                    if (!data) return <p className="text-sm text-slate-400">등록된 고객이 없습니다</p>;
+
+                    const customers = JSON.parse(data);
+                    if (customers.length === 0) return <p className="text-sm text-slate-400">등록된 고객이 없습니다</p>;
+
+                    const sorted = [...customers].sort((a: { lastVisit: string }, b: { lastVisit: string }) =>
+                      new Date(b.lastVisit).getTime() - new Date(a.lastVisit).getTime()
+                    ).slice(0, 3);
+
+                    return sorted.map((c: { id: number; name: string; lastVisit: string; visitCount: number }) => (
+                      <div key={c.id} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+                            <span className="text-xs text-slate-600">{c.name.slice(0, 1)}</span>
+                          </div>
+                          <span className="text-sm text-slate-700">{c.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-slate-500">
+                            {new Date(c.lastVisit).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                          </p>
+                          <p className="text-xs text-slate-400">{c.visitCount}회 방문</p>
+                        </div>
+                      </div>
+                    ));
+                  } catch {
+                    return <p className="text-sm text-slate-400">데이터를 불러올 수 없습니다</p>;
+                  }
+                })()}
+              </div>
+            </div>
+          </div>
+
           {/* Data Settings */}
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-4">
