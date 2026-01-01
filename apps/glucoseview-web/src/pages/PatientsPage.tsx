@@ -228,29 +228,35 @@ export default function PatientsPage() {
     window.print();
   };
 
-  const handleKakaoShare = () => {
+  const handleShare = async () => {
     const shareUrl = window.location.href;
+    const shareTitle = '혈당 관리 현황 리포트';
     const shareText = '약국에서 전달드리는 혈당 관리 현황 리포트입니다.';
 
-    // 카카오톡 공유 URL (모바일/PC 모두 지원)
-    const _kakaoShareUrl = `https://sharer.kakao.com/talk/friends/picker/link?app_key=javascript_key&request_url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-    void _kakaoShareUrl; // Reserved for future use
-
-    // 카카오톡 앱이 없는 경우를 대비한 웹 공유
-    const kakaoWebUrl = `https://story.kakao.com/share?url=${encodeURIComponent(shareUrl)}`;
-
-    // 모바일에서는 카카오톡 앱 스킴 시도
-    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      const message = encodeURIComponent(`혈당 관리 현황 리포트\n\n${shareText}\n\n${shareUrl}`);
-      window.location.href = `kakaotalk://msg?text=${message}`;
-
-      // 앱이 없으면 3초 후 웹으로 이동
-      setTimeout(() => {
-        window.open(kakaoWebUrl, '_blank');
-      }, 2000);
+    // Web Share API 지원 여부 확인 (모바일에서 주로 지원)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        // 사용자가 공유 취소한 경우 무시
+        if ((err as Error).name !== 'AbortError') {
+          console.error('공유 실패:', err);
+        }
+      }
     } else {
-      // PC에서는 카카오스토리 공유 페이지로 이동
-      window.open(kakaoWebUrl, '_blank', 'width=600,height=400');
+      // Web Share API 미지원 시 클립보드 복사
+      const fullText = `${shareTitle}\n\n${shareText}\n\n${shareUrl}`;
+      try {
+        await navigator.clipboard.writeText(fullText);
+        alert('링크가 클립보드에 복사되었습니다.\n카카오톡이나 메시지 앱에 붙여넣기 하세요.');
+      } catch {
+        // 클립보드도 안 되면 prompt로 보여주기
+        prompt('아래 내용을 복사하세요:', fullText);
+      }
     }
   };
 
@@ -626,15 +632,15 @@ export default function PatientsPage() {
                   </p>
 
                   <div className="grid grid-cols-3 gap-2">
-                    {/* 카카오톡 */}
+                    {/* 공유 */}
                     <button
-                      onClick={handleKakaoShare}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-[#FEE500] hover:bg-[#FDD800] text-[#3C1E1E] text-sm font-medium rounded-lg transition-colors"
+                      onClick={handleShare}
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
                     >
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.47 1.607 4.647 4.023 5.912-.125.455-.456 1.652-.522 1.91-.082.32.118.316.248.23.102-.068 1.629-1.073 2.29-1.51.635.097 1.29.148 1.961.148 5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                       </svg>
-                      카카오톡
+                      공유
                     </button>
 
                     {/* 인쇄 */}

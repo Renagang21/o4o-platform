@@ -34,7 +34,7 @@ const features: Feature[] = [
   { name: '약물-혈당 상관 분석', description: '복용 약물과 혈당 패턴 연관성', status: 'not-planned', category: 'analysis' },
 
   // 공유/리포트 (Sharing)
-  { name: '카카오톡 공유', description: '리포트 카카오톡 전송', status: 'done', category: 'sharing' },
+  { name: '공유 기능', description: '리포트 공유 (카카오톡, 문자 등)', status: 'done', category: 'sharing' },
   { name: '리포트 인쇄', description: '환자용 리포트 출력', status: 'done', category: 'sharing' },
   { name: '이메일 전송', description: '리포트 이메일 발송', status: 'done', category: 'sharing' },
   { name: 'PDF 리포트 생성', description: 'PDF 파일 다운로드', status: 'planned', category: 'sharing' },
