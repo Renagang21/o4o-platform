@@ -28,3 +28,11 @@ export {
   CommissionRuleStatus,
 } from './CommissionRule.entity.js';
 export { CommissionTransaction } from './CommissionTransaction.entity.js';
+export {
+  OrderRelayLog,
+  OrderRelayLogAction,
+} from './OrderRelayLog.entity.js';
+export {
+  SettlementLog,
+  SettlementLogAction,
+} from './SettlementLog.entity.js';

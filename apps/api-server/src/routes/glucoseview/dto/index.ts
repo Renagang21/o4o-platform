@@ -11,6 +11,8 @@ import type {
   SummaryLevel,
   ChartType,
   ConnectionStatus,
+  CustomerGender,
+  CustomerSyncStatus,
 } from '../entities/index.js';
 
 // ============================================================================
@@ -252,4 +254,166 @@ export interface PatientDetailDto {
 export interface ListPatientsQueryDto {
   page?: number;
   limit?: number;
+}
+
+// ============================================================================
+// Customer DTOs (Phase C-2: Customer Management)
+// ============================================================================
+
+/** 고객 정보 응답 DTO */
+export interface CustomerDto {
+  id: string;
+  pharmacist_id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  birth_year?: number;
+  gender?: CustomerGender;
+  kakao_id?: string;
+  last_visit?: string;
+  visit_count: number;
+  sync_status: CustomerSyncStatus;
+  last_sync_at?: string;
+  notes?: string;
+  data_sharing_consent: boolean;
+  consent_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 고객 등록 요청 DTO */
+export interface CreateCustomerRequestDto {
+  name: string;
+  phone?: string;
+  email?: string;
+  birth_year?: number;
+  gender?: CustomerGender;
+  kakao_id?: string;
+  notes?: string;
+}
+
+/** 고객 수정 요청 DTO */
+export interface UpdateCustomerRequestDto {
+  name?: string;
+  phone?: string;
+  email?: string;
+  birth_year?: number;
+  gender?: CustomerGender;
+  kakao_id?: string;
+  notes?: string;
+}
+
+/** 고객 방문 기록 요청 DTO */
+export interface RecordVisitRequestDto {
+  notes?: string;
+}
+
+/** 고객 목록 쿼리 DTO */
+export interface ListCustomersQueryDto {
+  search?: string;
+  sort_by?: 'recent' | 'frequent' | 'name';
+  page?: number;
+  limit?: number;
+}
+
+// ============================================================================
+// Branch DTOs (Phase C-3: Pharmacist Membership)
+// ============================================================================
+
+import type { PharmacistApprovalStatus, PharmacistRole } from '../entities/index.js';
+
+/** 지부 응답 DTO */
+export interface BranchDto {
+  id: string;
+  name: string;
+  code: string;
+  sort_order: number;
+  is_active: boolean;
+  chapters?: ChapterDto[];
+}
+
+/** 분회 응답 DTO */
+export interface ChapterDto {
+  id: string;
+  branch_id: string;
+  name: string;
+  code: string;
+  sort_order: number;
+  is_active: boolean;
+  branch?: BranchDto;
+}
+
+// ============================================================================
+// Pharmacist DTOs (Phase C-3: Pharmacist Membership)
+// ============================================================================
+
+/** 약사 프로필 응답 DTO */
+export interface PharmacistDto {
+  id: string;
+  user_id: string;
+  license_number: string;
+  real_name: string;
+  display_name: string;
+  phone: string;
+  email: string;
+  chapter_id: string;
+  pharmacy_name: string;
+  role: PharmacistRole;
+  approval_status: PharmacistApprovalStatus;
+  approved_by?: string;
+  approved_at?: string;
+  rejection_reason?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  chapter?: ChapterDto;
+}
+
+/** 약사 회원가입 요청 DTO */
+export interface RegisterPharmacistRequestDto {
+  license_number: string;
+  real_name: string;
+  display_name: string;
+  phone: string;
+  email: string;
+  password: string;
+  chapter_id: string;
+  pharmacy_name: string;
+}
+
+/** 약사 정보 수정 요청 DTO */
+export interface UpdatePharmacistRequestDto {
+  display_name?: string;
+  phone?: string;
+  pharmacy_name?: string;
+}
+
+/** 약사 승인/거절 요청 DTO */
+export interface ApprovePharmacistRequestDto {
+  action: 'approve' | 'reject';
+  rejection_reason?: string;
+}
+
+/** 약사 목록 쿼리 DTO */
+export interface ListPharmacistsQueryDto {
+  search?: string;
+  branch_id?: string;
+  chapter_id?: string;
+  approval_status?: PharmacistApprovalStatus;
+  role?: PharmacistRole;
+  page?: number;
+  limit?: number;
+}
+
+/** 지부 목록 쿼리 DTO */
+export interface ListBranchesQueryDto {
+  include_chapters?: boolean;
+  active_only?: boolean;
+}
+
+/** 분회 목록 쿼리 DTO */
+export interface ListChaptersQueryDto {
+  branch_id?: string;
+  search?: string;
+  active_only?: boolean;
 }

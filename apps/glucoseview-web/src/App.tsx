@@ -1,48 +1,99 @@
-import { Routes, Route, Link } from 'react-router-dom'
-import HomePage from './pages/HomePage'
-import PatientListPage from './pages/PatientListPage'
-import PatientDetailPage from './pages/PatientDetailPage'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Layout from './components/Layout';
+import HomePage from './pages/HomePage';
+import PatientsPage from './pages/PatientsPage';
+import InsightsPage from './pages/InsightsPage';
+import SettingsPage from './pages/SettingsPage';
+import AboutPage from './pages/AboutPage';
+import RegisterPage from './pages/RegisterPage';
+import PendingPage from './pages/PendingPage';
+import AdminPage from './pages/AdminPage';
+import './index.css';
+
+// 인증이 필요한 라우트를 보호하는 컴포넌트
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isPending, isRejected } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  // 승인 대기 중이거나 거절된 경우 pending 페이지로 이동
+  if (isPending || isRejected) {
+    return <Navigate to="/pending" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// 승인 대기/거절 사용자용 라우트
+function PendingRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isPending, isRejected } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!isPending && !isRejected) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      {/* 공개 페이지 */}
+      <Route path="/register" element={
+        isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
+      } />
+
+      {/* 승인 대기 페이지 */}
+      <Route path="/pending" element={
+        <PendingRoute>
+          <PendingPage />
+        </PendingRoute>
+      } />
+
+      {/* 관리자 페이지 */}
+      <Route path="/admin" element={<AdminPage />} />
+
+      {/* 메인 레이아웃 (홈은 공개, 나머지는 보호) */}
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="patients" element={
+          <ProtectedRoute>
+            <PatientsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="insights" element={
+          <ProtectedRoute>
+            <InsightsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="settings" element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="about" element={<AboutPage />} />
+      </Route>
+    </Routes>
+  );
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <Link to="/" className="flex items-center px-2 text-xl font-bold text-blue-600">
-                GlucoseView
-              </Link>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link
-                  to="/"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-blue-500"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/patients"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-blue-500 hover:text-gray-900"
-                >
-                  Patients
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/patients" element={<PatientListPage />} />
-          <Route path="/patients/:id" element={<PatientDetailPage />} />
-        </Routes>
-      </main>
-    </div>
-  )
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
