@@ -42,7 +42,8 @@ const features: Feature[] = [
 
   // 관리 기능 (Admin)
   { name: '회원 목록 조회', description: '전체 약사 회원 관리', status: 'done', category: 'admin' },
-  { name: '통계 대시보드', description: '이용 현황 통계', status: 'planned', category: 'admin' },
+  { name: '약사용 통계 대시보드', description: '내 고객 현황 및 방문 통계', status: 'done', category: 'admin' },
+  { name: '관리자용 통계 대시보드', description: '전체 서비스 이용 현황 통계', status: 'done', category: 'admin' },
 ];
 
 const categoryLabels: Record<Feature['category'], string> = {

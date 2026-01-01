@@ -95,6 +95,120 @@ export default function AdminPage() {
           <p className="text-slate-500">회원 승인 및 시스템 관리</p>
         </div>
 
+        {/* Admin Statistics Dashboard */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">서비스 이용 현황</h2>
+              <p className="text-sm text-slate-500">전체 시스템 통계</p>
+            </div>
+          </div>
+
+          {/* 통계 카드 그리드 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 rounded-lg p-4">
+              <p className="text-xs text-blue-600 font-medium mb-1">등록 약사</p>
+              <p className="text-2xl font-bold text-blue-700">12</p>
+              <p className="text-xs text-blue-500 mt-1">명</p>
+            </div>
+
+            <div className="bg-amber-50 rounded-lg p-4">
+              <p className="text-xs text-amber-600 font-medium mb-1">승인 대기</p>
+              <p className="text-2xl font-bold text-amber-700">{pendingMembers.length}</p>
+              <p className="text-xs text-amber-500 mt-1">명</p>
+            </div>
+
+            <div className="bg-green-50 rounded-lg p-4">
+              <p className="text-xs text-green-600 font-medium mb-1">등록 고객</p>
+              <p className="text-2xl font-bold text-green-700">156</p>
+              <p className="text-xs text-green-500 mt-1">명 (전체)</p>
+            </div>
+
+            <div className="bg-purple-50 rounded-lg p-4">
+              <p className="text-xs text-purple-600 font-medium mb-1">이번 달 방문</p>
+              <p className="text-2xl font-bold text-purple-700">42</p>
+              <p className="text-xs text-purple-500 mt-1">회</p>
+            </div>
+          </div>
+
+          {/* 지부별 현황 */}
+          <div className="border-t border-slate-100 pt-4">
+            <h3 className="text-sm font-medium text-slate-700 mb-3">지부별 약사 현황</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="text-sm text-slate-600">서울지부</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500" style={{ width: '50%' }}></div>
+                  </div>
+                  <span className="text-sm text-slate-500 w-16 text-right">6명</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                  <span className="text-sm text-slate-600">경기지부</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-500" style={{ width: '33%' }}></div>
+                  </div>
+                  <span className="text-sm text-slate-500 w-16 text-right">4명</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span className="text-sm text-slate-600">부산지부</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-500" style={{ width: '17%' }}></div>
+                  </div>
+                  <span className="text-sm text-slate-500 w-16 text-right">2명</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 최근 가입 승인 */}
+          <div className="border-t border-slate-100 pt-4 mt-4">
+            <h3 className="text-sm font-medium text-slate-700 mb-3">최근 가입 승인</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-slate-700">박약사 (행복약국)</span>
+                </div>
+                <span className="text-xs text-slate-400">2일 전</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-slate-700">최약사 (미소약국)</span>
+                </div>
+                <span className="text-xs text-slate-400">5일 전</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Pending Members */}
         <div className="bg-white rounded-xl border border-slate-200">
           <div className="px-6 py-4 border-b border-slate-100">
