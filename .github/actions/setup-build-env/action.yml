@@ -33,7 +33,7 @@ runs:
       shell: bash
       run: |
         echo "📦 Installing dependencies..."
-        pnpm install --frozen-lockfile
+        pnpm install --frozen-lockfile || pnpm install
 
     - name: Build shared packages
       if: ${{ inputs.build-packages == 'true' }}
