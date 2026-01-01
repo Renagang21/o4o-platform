@@ -414,21 +414,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 사이트 폭에 맞춤 */}
+      {/* Partner Section - 사이트 폭에 맞춘 무한 스크롤 */}
       {partners.length > 0 && (
         <section className="py-6 bg-slate-50 border-t border-slate-100">
-          <div className="max-w-5xl mx-auto px-4 md:px-6">
-            <h3 className="text-sm font-medium text-slate-500 text-center mb-4">파트너 & 관련 기관</h3>
+          <div className="max-w-5xl mx-auto px-4 md:px-6 mb-4">
+            <h3 className="text-sm font-medium text-slate-500 text-center">파트너 & 관련 기관</h3>
+          </div>
 
-            {/* 그리드 레이아웃 - 중앙 정렬 */}
-            <div className="flex flex-wrap justify-center gap-3">
+          {/* 무한 스크롤 마퀴 - 사이트 폭에 맞춤 */}
+          <div className="max-w-5xl mx-auto overflow-hidden">
+            <div className="flex animate-marquee">
+              {/* 첫 번째 세트 */}
               {partners.map((partner) => (
                 <a
                   key={partner.id}
                   href={partner.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                  className="flex-shrink-0 mx-3 flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
                 >
                   <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
                     {partner.logoUrl ? (
@@ -438,8 +441,30 @@ export default function HomePage() {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-700">{partner.name}</p>
-                    <p className="text-xs text-slate-500">{partner.description}</p>
+                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
+                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
+                  </div>
+                </a>
+              ))}
+              {/* 두 번째 세트 (무한 스크롤 효과) */}
+              {partners.map((partner) => (
+                <a
+                  key={`${partner.id}-dup`}
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 mx-3 flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {partner.logoUrl ? (
+                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                    ) : (
+                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
+                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
                   </div>
                 </a>
               ))}
