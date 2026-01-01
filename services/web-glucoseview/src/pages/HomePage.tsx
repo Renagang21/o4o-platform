@@ -179,11 +179,11 @@ export default function HomePage() {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Slide Banner Section - 컴팩트 버전 */}
+      {/* Slide Banner Section - 사이트 폭에 맞춤 */}
       {banners.length > 0 && (
-        <section className="pt-4 pb-2 px-4 bg-slate-50">
-          <div className="max-w-2xl mx-auto">
-            <div className="relative overflow-hidden rounded-xl h-24 md:h-28 shadow-sm">
+        <section className="pt-6 pb-4 px-4 md:px-6 bg-slate-50">
+          <div className="max-w-5xl mx-auto">
+            <div className="relative overflow-hidden rounded-2xl h-32 sm:h-40 md:h-48 shadow-md">
               {banners.map((banner, index) => (
                 <div
                   key={banner.id}
@@ -198,21 +198,21 @@ export default function HomePage() {
                       rel="noopener noreferrer"
                       className="block h-full"
                     >
-                      <div className="h-full flex flex-col items-center justify-center px-4 text-center">
-                        <h2 className={`text-lg md:text-xl font-bold mb-1 ${banner.textColor}`}>
+                      <div className="h-full flex flex-col items-center justify-center px-6 text-center">
+                        <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${banner.textColor}`}>
                           {banner.title}
                         </h2>
-                        <p className={`text-xs md:text-sm opacity-90 ${banner.textColor}`}>
+                        <p className={`text-sm sm:text-base md:text-lg opacity-90 ${banner.textColor}`}>
                           {banner.subtitle}
                         </p>
                       </div>
                     </a>
                   ) : (
-                    <div className="h-full flex flex-col items-center justify-center px-4 text-center">
-                      <h2 className={`text-lg md:text-xl font-bold mb-1 ${banner.textColor}`}>
+                    <div className="h-full flex flex-col items-center justify-center px-6 text-center">
+                      <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${banner.textColor}`}>
                         {banner.title}
                       </h2>
-                      <p className={`text-xs md:text-sm opacity-90 ${banner.textColor}`}>
+                      <p className={`text-sm sm:text-base md:text-lg opacity-90 ${banner.textColor}`}>
                         {banner.subtitle}
                       </p>
                     </div>
@@ -220,34 +220,34 @@ export default function HomePage() {
                 </div>
               ))}
 
-              {/* 슬라이드 컨트롤 - 배너 내부로 이동 */}
+              {/* 슬라이드 컨트롤 - 배너 내부 */}
               {banners.length > 1 && (
                 <>
                   {/* 이전/다음 버튼 */}
                   <button
                     onClick={prevSlide}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
+                    className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
                   >
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
                   <button
                     onClick={nextSlide}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
+                    className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
                   >
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
 
                   {/* 인디케이터 */}
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                     {banners.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => goToSlide(index)}
-                        className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                        className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-colors ${
                           index === currentSlide ? 'bg-white' : 'bg-white/50'
                         }`}
                       />
@@ -414,59 +414,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 컴팩트 버전 */}
+      {/* Partner Section - 사이트 폭에 맞춤 */}
       {partners.length > 0 && (
-        <section className="py-4 bg-slate-50 border-t border-slate-100 overflow-hidden">
-          <div className="max-w-2xl mx-auto px-4 mb-2">
-            <h3 className="text-xs font-medium text-slate-400 text-center">파트너 & 관련 기관</h3>
-          </div>
+        <section className="py-6 bg-slate-50 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
+            <h3 className="text-sm font-medium text-slate-500 text-center mb-4">파트너 & 관련 기관</h3>
 
-          {/* 무한 스크롤 배너 - 컴팩트 */}
-          <div className="relative">
-            <div className="flex animate-marquee">
-              {/* 첫 번째 세트 */}
+            {/* 그리드 레이아웃 - 중앙 정렬 */}
+            <div className="flex flex-wrap justify-center gap-3">
               {partners.map((partner) => (
                 <a
                   key={partner.id}
                   href={partner.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 mx-2 px-3 py-2 bg-white hover:bg-slate-50 rounded-lg transition-colors min-w-[140px] border border-slate-100"
+                  className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
-                      {partner.logoUrl ? (
-                        <img src={partner.logoUrl} alt={partner.name} className="w-4 h-4 object-contain" />
-                      ) : (
-                        <span className="text-sm font-bold text-slate-400">{partner.name.charAt(0)}</span>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-700 truncate">{partner.name}</p>
-                    </div>
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {partner.logoUrl ? (
+                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                    ) : (
+                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                    )}
                   </div>
-                </a>
-              ))}
-              {/* 두 번째 세트 (무한 스크롤 효과) */}
-              {partners.map((partner) => (
-                <a
-                  key={`${partner.id}-dup`}
-                  href={partner.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 mx-2 px-3 py-2 bg-white hover:bg-slate-50 rounded-lg transition-colors min-w-[140px] border border-slate-100"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
-                      {partner.logoUrl ? (
-                        <img src={partner.logoUrl} alt={partner.name} className="w-4 h-4 object-contain" />
-                      ) : (
-                        <span className="text-sm font-bold text-slate-400">{partner.name.charAt(0)}</span>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-700 truncate">{partner.name}</p>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-700">{partner.name}</p>
+                    <p className="text-xs text-slate-500">{partner.description}</p>
                   </div>
                 </a>
               ))}
