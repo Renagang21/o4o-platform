@@ -18,6 +18,12 @@ import {
   Shield,
   Bell,
   Search,
+  Activity,
+  Home,
+  MessageSquare,
+  BookOpen,
+  Tv,
+  FileCheck,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -34,6 +40,7 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/pharmacy/products', label: '상품 관리', icon: Package },
       { path: '/pharmacy/orders', label: '주문 관리', icon: ShoppingCart },
       { path: '/pharmacy/patients', label: '고객 관리', icon: Users },
+      { path: '/pharmacy/smart-display', label: '스마트 디스플레이', icon: Tv },
       { path: '/pharmacy/settings', label: '설정', icon: Settings },
     ],
   },
@@ -67,6 +74,7 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/operator', label: '대시보드', icon: LayoutDashboard },
       { path: '/operator/users', label: '회원 관리', icon: Users },
       { path: '/operator/approvals', label: '승인 관리', icon: ShoppingCart },
+      { path: '/operator/forum-requests', label: '포럼 신청 관리', icon: FileCheck },
       { path: '/operator/settings', label: '사이트 설정', icon: Settings },
     ],
   },
@@ -88,6 +96,74 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-slate-100">
+      {/* Global Top Navigation */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200/50">
+        <div className="flex items-center justify-between px-4 h-14">
+          {/* Logo */}
+          <NavLink to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md shadow-primary-500/25">
+              <Activity className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-lg text-slate-800">GlycoPharm</span>
+          </NavLink>
+
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              <Home className="w-4 h-4" />
+              홈
+            </NavLink>
+            <NavLink
+              to="/forum"
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              <MessageSquare className="w-4 h-4" />
+              포럼
+            </NavLink>
+            <NavLink
+              to="/education"
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              <BookOpen className="w-4 h-4" />
+              교육/자료
+            </NavLink>
+            <span className="mx-2 h-5 w-px bg-slate-200" />
+            <span className={`px-3 py-1.5 rounded-lg text-sm font-medium bg-${config.color}-100 text-${config.color}-700`}>
+              {config.title}
+            </span>
+          </nav>
+
+          {/* Mobile - Current Section */}
+          <div className="md:hidden flex items-center gap-2">
+            <span className={`px-2 py-1 rounded-lg text-xs font-medium bg-${config.color}-100 text-${config.color}-700`}>
+              {config.title}
+            </span>
+          </div>
+        </div>
+      </header>
+
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
@@ -98,7 +174,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-14 left-0 z-40 h-[calc(100vh-56px)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -160,9 +236,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-white border-b">
+      <div className="lg:ml-64 pt-14">
+        {/* Dashboard Header */}
+        <header className="sticky top-14 z-30 bg-white border-b">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Mobile Menu Button */}
             <button

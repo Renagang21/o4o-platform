@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   Search,
   Plus,
   MessageSquare,
   ThumbsUp,
   Eye,
-  Clock,
   Tag,
   TrendingUp,
+  MessageSquarePlus,
+  FileText,
 } from 'lucide-react';
 
 // Mock forum posts
@@ -256,6 +258,33 @@ export default function ForumPage() {
                     </div>
                   </div>
                 ))}
+            </div>
+          </div>
+
+          {/* Forum Request */}
+          <div className="bg-white rounded-2xl shadow-sm p-5">
+            <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+              <MessageSquarePlus className="w-5 h-5 text-primary-600" />
+              포럼 신청
+            </h3>
+            <p className="text-sm text-slate-500 mb-4">
+              원하는 포럼이 없나요? 새 포럼을 신청해보세요!
+            </p>
+            <div className="space-y-2">
+              <NavLink
+                to="/forum/request-category"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <MessageSquarePlus className="w-4 h-4" />
+                새 포럼 신청
+              </NavLink>
+              <NavLink
+                to="/forum/my-requests"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                내 신청 내역
+              </NavLink>
             </div>
           </div>
 

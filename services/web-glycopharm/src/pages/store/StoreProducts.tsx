@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useParams, useSearchParams } from 'react-router-dom';
-import { Search, Filter, Package, Star, ShoppingCart } from 'lucide-react';
+import { Search, Package, Star } from 'lucide-react';
 
 // Mock products
 const allProducts = [

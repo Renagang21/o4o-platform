@@ -42,7 +42,7 @@ const mockProduct = {
 };
 
 export default function StoreProductDetail() {
-  const { pharmacyId, productId } = useParams();
+  const { pharmacyId } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
 

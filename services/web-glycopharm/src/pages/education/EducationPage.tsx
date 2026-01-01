@@ -282,13 +282,13 @@ export default function EducationPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-1">
-                  {'views' in content && (
+                  {'views' in content && content.views !== undefined && (
                     <>
                       <Eye className="w-4 h-4" />
                       {content.views.toLocaleString()}
                     </>
                   )}
-                  {'downloads' in content && (
+                  {'downloads' in content && content.downloads !== undefined && (
                     <>
                       <Download className="w-4 h-4" />
                       {content.downloads.toLocaleString()}

@@ -1,3 +1,7 @@
+// Re-export from other type files
+export * from './signage';
+export * from './categoryRequest';
+
 // User Roles
 export type UserRole = 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';
 
@@ -13,6 +17,7 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   profileImage?: string;
+  pharmacyId?: string;  // Associated pharmacy ID (for pharmacy role users)
   createdAt: string;
   updatedAt: string;
 }

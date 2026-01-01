@@ -6,8 +6,6 @@ import {
   Truck,
   Shield,
   Save,
-  Eye,
-  EyeOff,
 } from 'lucide-react';
 
 export default function PharmacySettings() {

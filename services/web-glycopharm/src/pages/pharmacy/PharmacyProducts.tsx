@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Search,
   Plus,
-  Filter,
   Package,
   Edit2,
   Trash2,

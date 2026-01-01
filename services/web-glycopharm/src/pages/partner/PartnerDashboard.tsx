@@ -2,7 +2,6 @@ import {
   TrendingUp,
   Users,
   FileText,
-  BarChart3,
   Eye,
   Download,
   ArrowRight,

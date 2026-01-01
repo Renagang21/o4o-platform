@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
+import { authApi, apiClient } from '@/services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -12,98 +13,60 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users for development
-const mockUsers: Record<string, User> = {
-  'pharmacy@test.com': {
-    id: '1',
-    email: 'pharmacy@test.com',
-    name: '김약사',
-    phone: '010-1234-5678',
-    role: 'pharmacy',
-    status: 'approved',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  'supplier@test.com': {
-    id: '2',
-    email: 'supplier@test.com',
-    name: '이공급',
-    phone: '010-2345-6789',
-    role: 'supplier',
-    status: 'approved',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  'partner@test.com': {
-    id: '3',
-    email: 'partner@test.com',
-    name: '박파트너',
-    phone: '010-3456-7890',
-    role: 'partner',
-    status: 'approved',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  'operator@test.com': {
-    id: '4',
-    email: 'operator@test.com',
-    name: '최운영자',
-    phone: '010-4567-8901',
-    role: 'operator',
-    status: 'approved',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  'consumer@test.com': {
-    id: '5',
-    email: 'consumer@test.com',
-    name: '정소비자',
-    phone: '010-5678-9012',
-    role: 'consumer',
-    status: 'approved',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check for existing session
-    const storedUser = localStorage.getItem('glycopharm_user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem('glycopharm_user');
+    const checkSession = async () => {
+      const token = localStorage.getItem('glycopharm_token');
+      if (token) {
+        apiClient.setToken(token);
+        const response = await authApi.me();
+        if (response.data) {
+          const userData = response.data.user as User;
+          setUser(userData);
+          localStorage.setItem('glycopharm_user', JSON.stringify(userData));
+        } else {
+          // Token expired or invalid
+          localStorage.removeItem('glycopharm_token');
+          localStorage.removeItem('glycopharm_user');
+          apiClient.setToken(null);
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    checkSession();
   }, []);
 
-  const login = async (email: string, _password: string) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const response = await authApi.login(email, password);
 
-      const mockUser = mockUsers[email.toLowerCase()];
-      if (!mockUser) {
-        throw new Error('Invalid credentials');
+      if (response.error) {
+        throw new Error(response.error.message || 'Login failed');
       }
 
-      setUser(mockUser);
-      localStorage.setItem('glycopharm_user', JSON.stringify(mockUser));
+      if (response.data) {
+        const { user: userData, accessToken } = response.data;
+        apiClient.setToken(accessToken);
+        setUser(userData as User);
+        localStorage.setItem('glycopharm_user', JSON.stringify(userData));
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = () => {
+    authApi.logout();
     setUser(null);
     localStorage.removeItem('glycopharm_user');
+    localStorage.removeItem('glycopharm_token');
+    apiClient.setToken(null);
   };
 
   const selectRole = (role: UserRole) => {

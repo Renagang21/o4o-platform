@@ -19,6 +19,13 @@ import PharmacyOrders from '@/pages/pharmacy/PharmacyOrders';
 import PharmacyPatients from '@/pages/pharmacy/PharmacyPatients';
 import PharmacySettings from '@/pages/pharmacy/PharmacySettings';
 
+// Smart Display
+import SmartDisplayPage from '@/pages/pharmacy/smart-display/SmartDisplayPage';
+import PlaylistsPage from '@/pages/pharmacy/smart-display/PlaylistsPage';
+import SchedulesPage from '@/pages/pharmacy/smart-display/SchedulesPage';
+import MediaLibraryPage from '@/pages/pharmacy/smart-display/MediaLibraryPage';
+import PlaylistForumPage from '@/pages/pharmacy/smart-display/PlaylistForumPage';
+
 // Supplier Dashboard
 import SupplierDashboard from '@/pages/supplier/SupplierDashboard';
 
@@ -27,6 +34,7 @@ import PartnerDashboard from '@/pages/partner/PartnerDashboard';
 
 // Operator Dashboard
 import OperatorDashboard from '@/pages/operator/OperatorDashboard';
+import ForumRequestsPage from '@/pages/operator/ForumRequestsPage';
 
 // Consumer Store
 import StoreFront from '@/pages/store/StoreFront';
@@ -36,6 +44,8 @@ import StoreCart from '@/pages/store/StoreCart';
 
 // Forum & Education
 import ForumPage from '@/pages/forum/ForumPage';
+import RequestCategoryPage from '@/pages/forum/RequestCategoryPage';
+import MyRequestsPage from '@/pages/forum/MyRequestsPage';
 import EducationPage from '@/pages/education/EducationPage';
 
 // Common Pages
@@ -76,6 +86,8 @@ function AppRoutes() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />
         <Route path="forum" element={<ForumPage />} />
+        <Route path="forum/request-category" element={<RequestCategoryPage />} />
+        <Route path="forum/my-requests" element={<MyRequestsPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="mypage" element={
           <ProtectedRoute>
@@ -97,6 +109,11 @@ function AppRoutes() {
         <Route path="products" element={<PharmacyProducts />} />
         <Route path="orders" element={<PharmacyOrders />} />
         <Route path="patients" element={<PharmacyPatients />} />
+        <Route path="smart-display" element={<SmartDisplayPage />} />
+        <Route path="smart-display/playlists" element={<PlaylistsPage />} />
+        <Route path="smart-display/schedules" element={<SchedulesPage />} />
+        <Route path="smart-display/media" element={<MediaLibraryPage />} />
+        <Route path="smart-display/forum" element={<PlaylistForumPage />} />
         <Route path="settings" element={<PharmacySettings />} />
       </Route>
 
@@ -134,6 +151,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<OperatorDashboard />} />
+        <Route path="forum-requests" element={<ForumRequestsPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
