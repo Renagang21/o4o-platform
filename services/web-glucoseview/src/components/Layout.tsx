@@ -85,9 +85,94 @@ export default function Layout() {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-14">
+      <main className="pt-14 pb-24">
         <Outlet />
       </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          {/* 상단 영역 - 서비스 정보 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* 서비스 소개 */}
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">GlucoseView</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                약국을 위한 CGM 데이터 정리 도구입니다.
+                환자별 혈당 데이터를 정리하여 효과적인 상담을 지원합니다.
+              </p>
+            </div>
+
+            {/* 빠른 링크 */}
+            <div>
+              <h4 className="text-sm font-semibold text-slate-700 mb-3">바로가기</h4>
+              <ul className="space-y-2">
+                <li>
+                  <NavLink to="/about" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
+                    서비스 안내
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/register" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
+                    회원가입
+                  </NavLink>
+                </li>
+                <li>
+                  <span className="text-sm text-slate-400">이용약관 (준비중)</span>
+                </li>
+                <li>
+                  <span className="text-sm text-slate-400">개인정보처리방침 (준비중)</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* 문의 및 지원 */}
+            <div>
+              <h4 className="text-sm font-semibold text-slate-700 mb-3">문의 및 지원</h4>
+              <ul className="space-y-2">
+                <li className="text-sm text-slate-500">
+                  <span className="text-slate-400">이메일:</span>{' '}
+                  <a href="mailto:sohae21@naver.com" className="hover:text-blue-600 transition-colors">
+                    sohae21@naver.com
+                  </a>
+                </li>
+                <li className="text-sm text-slate-400">
+                  전화: (준비중)
+                </li>
+                <li className="text-sm text-slate-400">
+                  운영시간: (준비중)
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* 구분선 */}
+          <div className="border-t border-slate-100 pt-6">
+            {/* 하단 영역 - 저작권 및 개발자 정보 */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-center md:text-left">
+                <p className="text-xs text-slate-400">
+                  © 2025 GlucoseView. All rights reserved.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  본 서비스는 의료 진단이나 치료를 목적으로 하지 않습니다.
+                </p>
+              </div>
+
+              <div className="text-center md:text-right">
+                <p className="text-xs text-slate-500">
+                  개발자: <span className="font-medium text-slate-700">서철환</span>
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  <a href="mailto:sohae21@naver.com" className="hover:text-blue-600 transition-colors">
+                    sohae21@naver.com
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* Login Modal */}
       <LoginModal
