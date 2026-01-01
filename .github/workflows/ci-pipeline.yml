@@ -112,7 +112,7 @@ jobs:
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.app }}-dist
         path: |
