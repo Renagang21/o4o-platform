@@ -27,12 +27,8 @@ export {
   SupplierProductEditor
 } from './supplier';
 
-// Seller Shortcodes
-export {
-  SellerDashboard,
-  SellerProducts,
-  SellerSettlement
-} from './seller';
+// Seller Shortcodes - H4-0: Components removed (stub backend deleted)
+// export { SellerDashboard, SellerProducts, SellerSettlement } from './seller';
 
 // Import shortcode arrays
 import { partnerShortcodes } from './partner';
