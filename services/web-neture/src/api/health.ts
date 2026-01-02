@@ -3,7 +3,7 @@
  * Phase 1: 최소 API 연결 확인용
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://o4o-core-api-117791934476.asia-northeast3.run.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://o4o-core-api-3e3aws7zqa-du.a.run.app';
 
 export interface HealthResponse {
   status: string;

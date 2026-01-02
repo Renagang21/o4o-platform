@@ -17,7 +17,7 @@ COPY . .
 
 # Build-time environment variable for Vite
 # Note: VITE_API_BASE_URL is used consistently across all web services
-ARG VITE_API_BASE_URL=https://o4o-core-api-117791934476.asia-northeast3.run.app
+ARG VITE_API_BASE_URL=https://o4o-core-api-3e3aws7zqa-du.a.run.app
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build using npm
