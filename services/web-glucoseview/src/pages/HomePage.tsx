@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from '../components/LoginModal';
@@ -27,7 +27,7 @@ interface Partner {
   order: number;
 }
 
-// 슬라이드 배너 데이터 - 단일 배너
+// 슬라이드 배너 데이터 - 여러 배너 지원
 const sampleBanners: SlideBanner[] = [
   {
     id: '1',
@@ -37,6 +37,24 @@ const sampleBanners: SlideBanner[] = [
     textColor: 'text-white',
     isActive: true,
     order: 1,
+  },
+  {
+    id: '2',
+    title: '혈당 데이터 분석',
+    subtitle: '연속혈당 데이터를 시각화하여 상담에 활용',
+    bgColor: 'bg-indigo-600',
+    textColor: 'text-white',
+    isActive: true,
+    order: 2,
+  },
+  {
+    id: '3',
+    title: '약사 전용 서비스',
+    subtitle: '대한약사회 인증 회원 전용',
+    bgColor: 'bg-slate-700',
+    textColor: 'text-white',
+    isActive: true,
+    order: 3,
   },
 ];
 
@@ -117,14 +135,28 @@ export default function HomePage() {
   const { isAuthenticated, isApproved, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [testAccount, setTestAccount] = useState<{ email: string; password: string } | null>(null);
 
   // 슬라이드 배너 상태
   const [banners] = useState<SlideBanner[]>(() => loadBanners().filter(b => b.isActive).sort((a, b) => a.order - b.order));
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   // 파트너 상태
   const [partners] = useState<Partner[]>(() => loadPartners().filter(p => p.isActive).sort((a, b) => a.order - b.order));
+
+  // 자동 슬라이드 기능
+  const nextSlideAuto = useCallback(() => {
+    if (!isPaused && banners.length > 1) {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }
+  }, [isPaused, banners.length]);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const interval = setInterval(nextSlideAuto, 5000); // 5초마다 자동 전환
+    return () => clearInterval(interval);
+  }, [nextSlideAuto, banners.length]);
 
   // 보호된 기능 클릭 핸들러
   const handleProtectedClick = (path: string) => {
@@ -153,9 +185,13 @@ export default function HomePage() {
     <div className="bg-slate-50 min-h-screen">
       {/* Hero Banner Section - 광고/파트너 대응 가능한 강화된 배너 */}
       {banners.length > 0 && (
-        <section className="bg-slate-50">
+        <section className="bg-white">
           <div className="max-w-6xl mx-auto px-4 md:px-6 pt-8 pb-6">
-            <div className="relative overflow-hidden rounded-2xl h-44 sm:h-56 md:h-64 shadow-lg">
+            <div
+              className="relative overflow-hidden rounded-2xl h-44 sm:h-56 md:h-64 shadow-lg"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
               {banners.map((banner, index) => (
                 <div
                   key={banner.id}
@@ -232,40 +268,22 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* CTA Section - 여유 있는 간격 */}
-      <section className="py-16 px-6 bg-white border-b border-slate-100">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* 로그인 상태에 따른 CTA */}
-          {!isAuthenticated ? (
-            <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                약사 로그인
-              </button>
-              <Link
-                to="/register"
-                className="px-6 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-              >
-                회원가입
-              </Link>
-            </div>
-          ) : isApproved ? (
-            <div>
-              <Link
-                to="/patients"
-                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                환자 관리 시작하기
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          ) : null}
-        </div>
-      </section>
+      {/* CTA Section - 로그인 후에만 표시 */}
+      {isAuthenticated && isApproved && (
+        <section className="py-8 px-6 bg-white border-b border-slate-100">
+          <div className="max-w-4xl mx-auto text-center">
+            <Link
+              to="/patients"
+              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              환자 관리 시작하기
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Feature Cards - 확장된 간격과 컨테이너 */}
       <section className="py-20 px-6">
@@ -382,35 +400,69 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 강화된 파트너 영역 */}
+      {/* Partner Section - 마퀴 애니메이션 */}
       {partners.length > 0 && (
-        <section className="py-12 bg-white border-t border-slate-100">
+        <section className="py-12 bg-white border-t border-slate-100 overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 md:px-6">
             <h3 className="text-sm font-semibold text-slate-500 text-center mb-8 uppercase tracking-wider">파트너</h3>
+          </div>
 
-            {/* 그리드 레이아웃 - 더 넓은 간격 */}
-            <div className="flex flex-wrap justify-center gap-4">
-              {partners.map((partner) => (
-                <a
-                  key={partner.id}
-                  href={partner.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 px-5 py-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
-                    {partner.logoUrl ? (
-                      <img src={partner.logoUrl} alt={partner.name} className="w-7 h-7 object-contain" />
-                    ) : (
-                      <span className="text-xl font-bold text-slate-400">{partner.name.charAt(0)}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-700 whitespace-nowrap">{partner.name}</p>
-                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
-                  </div>
-                </a>
-              ))}
+          {/* 마퀴 컨테이너 */}
+          <div className="relative">
+            {/* 좌우 페이드 그라데이션 */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+            {/* 마퀴 애니메이션 */}
+            <div className="flex animate-marquee">
+              {/* 첫 번째 세트 */}
+              <div className="flex gap-4 px-4 shrink-0">
+                {partners.map((partner) => (
+                  <a
+                    key={partner.id}
+                    href={partner.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 px-5 py-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                      {partner.logoUrl ? (
+                        <img src={partner.logoUrl} alt={partner.name} className="w-7 h-7 object-contain" />
+                      ) : (
+                        <span className="text-xl font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-700 whitespace-nowrap">{partner.name}</p>
+                      <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+              {/* 두 번째 세트 (무한 루프용) */}
+              <div className="flex gap-4 px-4 shrink-0">
+                {partners.map((partner) => (
+                  <a
+                    key={`dup-${partner.id}`}
+                    href={partner.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 px-5 py-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                      {partner.logoUrl ? (
+                        <img src={partner.logoUrl} alt={partner.name} className="w-7 h-7 object-contain" />
+                      ) : (
+                        <span className="text-xl font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-700 whitespace-nowrap">{partner.name}</p>
+                      <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -425,46 +477,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Test Account Buttons - 비로그인 시에만 표시 */}
-      {!isAuthenticated && (
-        <section className="pb-16 px-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-              <p className="text-sm font-medium text-amber-800 mb-3 text-center">테스트 계정으로 로그인</p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={() => {
-                    setTestAccount({ email: 'pharmacist@test.test', password: 'testID1234' });
-                    setShowLoginModal(true);
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
-                >
-                  약사 계정
-                </button>
-                <button
-                  onClick={() => {
-                    setTestAccount({ email: 'admin@test.test', password: 'adminID1234' });
-                    setShowLoginModal(true);
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
-                >
-                  관리자 계정
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Login Modal */}
       <LoginModal
         isOpen={showLoginModal}
-        onClose={() => {
-          setShowLoginModal(false);
-          setTestAccount(null);
-        }}
-        initialEmail={testAccount?.email}
-        initialPassword={testAccount?.password}
+        onClose={() => setShowLoginModal(false)}
       />
     </div>
   );
