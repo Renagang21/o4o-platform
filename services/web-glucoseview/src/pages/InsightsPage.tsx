@@ -322,7 +322,7 @@ function InsightCard({ icon, iconBg, title, subtitle, badge, expanded, onToggle,
                 </span>
               )}
             </div>
-            {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+            {subtitle && <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>}
           </div>
         </div>
         <svg
@@ -360,7 +360,7 @@ function StatItem({ value, label, subValue, color = 'slate' }: StatItemProps) {
     <div className="bg-slate-50 rounded-lg p-3 text-center">
       <div className={`text-xl font-semibold ${colorClasses[color]}`}>{value}</div>
       <div className="text-xs text-slate-500 mt-1">{label}</div>
-      {subValue && <div className="text-xs text-slate-400 mt-0.5">{subValue}</div>}
+      {subValue && <div className="text-sm text-slate-500 mt-0.5">{subValue}</div>}
     </div>
   );
 }
@@ -535,7 +535,7 @@ export default function InsightsPage() {
               </div>
 
               {/* 권장 목표 */}
-              <div className="text-xs text-slate-500 text-center">
+              <div className="text-sm text-slate-600 text-center">
                 권장: TIR 70% 이상 / 저혈당 4% 미만 / 고혈당 25% 미만
               </div>
             </div>
@@ -849,7 +849,7 @@ export default function InsightsPage() {
                   <svg className="w-5 h-5 text-slate-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <div className="text-xs text-slate-600">
+                  <div className="text-sm text-slate-600 leading-relaxed">
                     <strong>CV (Coefficient of Variation)</strong>는 혈당 변동의 정도를 나타냅니다.
                     CV 33% 미만을 목표로 하며, 낮을수록 혈당이 안정적임을 의미합니다.
                   </div>
@@ -862,7 +862,7 @@ export default function InsightsPage() {
 
         {/* Note */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-slate-400">
+          <p className="text-sm text-slate-500">
             숫자를 클릭하면 해당 고객 목록을 확인할 수 있습니다 • 데이터는 샘플입니다
           </p>
         </div>

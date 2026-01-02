@@ -289,7 +289,7 @@ export default function HomePage() {
                       <span className="px-2 py-0.5 text-xs font-medium text-blue-600 bg-blue-50 rounded">로그인 필요</span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                     개별 환자의 CGM 데이터를 정리하여 확인합니다
                   </p>
                 </div>
@@ -317,7 +317,7 @@ export default function HomePage() {
                       <span className="px-2 py-0.5 text-xs font-medium text-blue-600 bg-blue-50 rounded">로그인 필요</span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                     관리 중인 환자들의 전체 흐름을 파악합니다
                   </p>
                 </div>
@@ -340,7 +340,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-medium text-slate-900 mb-1">서비스 안내</h3>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-600 leading-relaxed">
                     GlucoseView가 하는 일과 하지 않는 일
                   </p>
                 </div>
@@ -368,7 +368,7 @@ export default function HomePage() {
                       <h3 className="text-base font-medium text-slate-900">관리자</h3>
                       <span className="px-2 py-0.5 text-xs font-medium text-red-600 bg-red-50 rounded">Admin</span>
                     </div>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                       회원 승인 및 시스템 관리
                     </p>
                   </div>
@@ -386,7 +386,7 @@ export default function HomePage() {
       {partners.length > 0 && (
         <section className="py-6 bg-slate-50 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-4 md:px-6 mb-4">
-            <h3 className="text-sm font-medium text-slate-500 text-center">파트너 & 관련 기관</h3>
+            <h3 className="text-sm font-medium text-slate-600 text-center">파트너 & 관련 기관</h3>
           </div>
 
           {/* 정적 그리드 레이아웃 */}

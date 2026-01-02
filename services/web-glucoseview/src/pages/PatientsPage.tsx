@@ -543,7 +543,7 @@ export default function PatientsPage() {
                         <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">1</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">혈당 패턴 요약</p>
-                          <p className="text-xs text-slate-500 mt-1">전반적으로 안정적인 패턴을 보이나, 식후 2시간 혈당 상승 경향이 관찰됩니다.</p>
+                          <p className="text-sm text-slate-600 mt-1 leading-relaxed">전반적으로 안정적인 패턴을 보이나, 식후 2시간 혈당 상승 경향이 관찰됩니다.</p>
                         </div>
                       </div>
                     </div>
@@ -553,7 +553,7 @@ export default function PatientsPage() {
                         <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">2</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">주의 관찰 포인트</p>
-                          <p className="text-xs text-slate-500 mt-1">야간(02:00-04:00) 저혈당 가능성 - 취침 전 간식 섭취 여부 확인 권장</p>
+                          <p className="text-sm text-slate-600 mt-1 leading-relaxed">야간(02:00-04:00) 저혈당 가능성 - 취침 전 간식 섭취 여부 확인 권장</p>
                         </div>
                       </div>
                     </div>
@@ -563,7 +563,7 @@ export default function PatientsPage() {
                         <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">3</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">긍정적 변화</p>
-                          <p className="text-xs text-slate-500 mt-1">지난 7일간 목표 범위(70-180) 내 시간 비율이 개선되었습니다.</p>
+                          <p className="text-sm text-slate-600 mt-1 leading-relaxed">지난 7일간 목표 범위(70-180) 내 시간 비율이 개선되었습니다.</p>
                         </div>
                       </div>
                     </div>
@@ -573,7 +573,7 @@ export default function PatientsPage() {
                         <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">4</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">상담 시 고려사항</p>
-                          <p className="text-xs text-slate-500 mt-1">복용 중인 약물과 식사 시간의 연관성을 확인하고, 규칙적인 식사를 권장합니다.</p>
+                          <p className="text-sm text-slate-600 mt-1 leading-relaxed">복용 중인 약물과 식사 시간의 연관성을 확인하고, 규칙적인 식사를 권장합니다.</p>
                         </div>
                       </div>
                     </div>
@@ -603,7 +603,7 @@ export default function PatientsPage() {
                         질문
                       </button>
                     </div>
-                    <p className="text-xs text-slate-400 mt-2">
+                    <p className="text-sm text-slate-500 mt-2">
                       AI가 환자 데이터를 기반으로 추가 인사이트를 제공합니다
                     </p>
                   </div>
@@ -626,7 +626,7 @@ export default function PatientsPage() {
                     <span className="text-xs text-slate-400">환자에게 전달</span>
                   </div>
 
-                  <p className="text-xs text-slate-500 mb-4">
+                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">
                     아래 버튼을 통해 환자에게 혈당 관리 현황을 전달할 수 있습니다.
                   </p>
 
@@ -679,8 +679,8 @@ export default function PatientsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
-                <p className="text-slate-500 mb-1">환자를 선택하세요</p>
-                <p className="text-xs text-slate-400">왼쪽 목록에서 환자를 클릭하면 상세 정보가 표시됩니다</p>
+                <p className="text-base text-slate-600 mb-1">환자를 선택하세요</p>
+                <p className="text-sm text-slate-500">왼쪽 목록에서 환자를 클릭하면 상세 정보가 표시됩니다</p>
               </div>
             )}
           </div>
