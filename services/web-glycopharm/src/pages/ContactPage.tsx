@@ -3,10 +3,10 @@ import { Mail, Phone, MapPin, Clock, Building2, FileText } from 'lucide-react';
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero Section - 단정하게 */}
-      <section className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center">
-          <h1 className="text-2xl font-bold text-slate-800 mb-2">문의하기</h1>
+      {/* Hero Section */}
+      <section className="bg-white border-b border-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
+          <h1 className="text-2xl font-bold text-slate-800 mb-3">문의하기</h1>
           <p className="text-slate-500">
             GlycoPharm 서비스 및 제휴에 관한 문의를 받고 있습니다
           </p>
@@ -14,7 +14,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Cards */}
-      <section className="py-12">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {/* 일반 문의 */}
@@ -108,7 +108,7 @@ export default function ContactPage() {
           </div>
 
           {/* 사업자 정보 */}
-          <div className="mt-8 bg-slate-100 rounded-xl p-6">
+          <div className="mt-10 bg-slate-100 rounded-xl p-6">
             <h3 className="text-sm font-semibold text-slate-700 mb-4">사업자 정보</h3>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600">
               <p><span className="text-slate-500">상호:</span> (주)글라이코팜</p>
@@ -119,7 +119,7 @@ export default function ContactPage() {
           </div>
 
           {/* 안내 문구 */}
-          <p className="mt-8 text-center text-xs text-slate-400">
+          <p className="mt-10 text-center text-xs text-slate-400">
             이메일 문의는 영업일 기준 1-2일 내에 답변 드립니다
           </p>
         </div>

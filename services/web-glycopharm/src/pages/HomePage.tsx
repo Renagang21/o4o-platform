@@ -38,25 +38,29 @@ const features = [
     icon: Building2,
     title: '약국 전용 플랫폼',
     description: '약사를 위한 맞춤형 B2B 플랫폼으로 효율적인 상품 관리와 판매가 가능합니다.',
-    color: 'primary',
+    iconBg: 'bg-primary-100',
+    iconColor: 'text-primary-600',
   },
   {
     icon: Truck,
     title: '신뢰할 수 있는 공급망',
     description: '검증된 공급업체로부터 정품 혈당관리 제품을 안정적으로 공급받으세요.',
-    color: 'blue',
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
   },
   {
     icon: ShieldCheck,
     title: '안전한 거래',
     description: '모든 거래는 안전하게 보호되며, 투명한 가격 정책을 운영합니다.',
-    color: 'green',
+    iconBg: 'bg-green-100',
+    iconColor: 'text-green-600',
   },
   {
     icon: Handshake,
     title: '파트너 생태계',
     description: '디바이스 제조사, 컨텐츠 제공자와 함께 성장하는 파트너십을 제공합니다.',
-    color: 'purple',
+    iconBg: 'bg-purple-100',
+    iconColor: 'text-purple-600',
   },
 ];
 
@@ -146,9 +150,9 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-800 mb-4">
               왜 GlycoPharm인가요?
             </h2>
@@ -163,10 +167,10 @@ export default function HomePage() {
               return (
                 <div
                   key={feature.title}
-                  className="group p-6 bg-slate-50 rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-300 hover-lift"
+                  className="group p-6 bg-slate-50 rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-300"
                 >
-                  <div className={`w-14 h-14 rounded-xl bg-${feature.color}-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon className={`w-7 h-7 text-${feature.color}-600`} />
+                  <div className={`w-14 h-14 rounded-xl ${feature.iconBg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <Icon className={`w-7 h-7 ${feature.iconColor}`} />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-800 mb-2">{feature.title}</h3>
                   <p className="text-sm text-slate-500">{feature.description}</p>
@@ -180,7 +184,7 @@ export default function HomePage() {
       {/* Categories Section */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="text-3xl font-bold text-slate-800 mb-2">상품 카테고리</h2>
               <p className="text-slate-500">다양한 혈당관리 제품을 만나보세요</p>
@@ -198,7 +202,7 @@ export default function HomePage() {
             {categories.map((category) => (
               <div
                 key={category.name}
-                className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all cursor-pointer hover-lift"
+                className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all cursor-pointer"
               >
                 <div className="aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden">
                   <div className="w-full h-full bg-gradient-to-br from-primary-100 to-accent-100 flex items-center justify-center">
@@ -214,9 +218,9 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section - For Different Roles */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-slate-800 mb-4">
               함께 성장하세요
             </h2>
@@ -279,13 +283,13 @@ export default function HomePage() {
       </section>
 
       {/* Resources Section */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
             {/* Forum */}
             <NavLink
               to="/forum"
-              className="group flex gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all hover-lift"
+              className="group flex gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all"
             >
               <div className="w-16 h-16 rounded-2xl bg-accent-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 <MessageSquare className="w-8 h-8 text-accent-600" />
@@ -305,7 +309,7 @@ export default function HomePage() {
             {/* Education */}
             <NavLink
               to="/education"
-              className="group flex gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all hover-lift"
+              className="group flex gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all"
             >
               <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 <BookOpen className="w-8 h-8 text-green-600" />
@@ -326,7 +330,7 @@ export default function HomePage() {
       </section>
 
       {/* Partners Marquee */}
-      <section className="py-16 bg-white border-t">
+      <section className="py-12 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-center text-sm text-slate-400 mb-8">
             신뢰할 수 있는 파트너사와 함께합니다
@@ -368,7 +372,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-800">
+      <section className="py-24 bg-gradient-to-br from-slate-900 to-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             지금 바로 시작하세요
