@@ -17,20 +17,18 @@ export default function Footer() {
             </NavLink>
             <p className="text-sm text-slate-400 mb-4">
               약사를 위한 혈당관리 전문 B2B 플랫폼.
-              CGM, 혈당측정기, 건강기능식품 등 다양한 제품을 만나보세요.
+              CGM, 혈당측정기, 건강기능식품을 만나보세요.
             </p>
-            <div className="flex items-center gap-3 text-sm">
-              <a
-                href="mailto:support@glycopharm.co.kr"
-                className="flex items-center gap-1 hover:text-white"
-              >
-                <Mail className="w-4 h-4" />
-                support@glycopharm.co.kr
-              </a>
-            </div>
+            <a
+              href="mailto:support@glycopharm.co.kr"
+              className="flex items-center gap-2 text-sm hover:text-white transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              support@glycopharm.co.kr
+            </a>
           </div>
 
-          {/* Quick Links */}
+          {/* 서비스 */}
           <div>
             <h4 className="font-semibold text-white mb-4">서비스</h4>
             <ul className="space-y-2">
@@ -44,22 +42,12 @@ export default function Footer() {
                   교육/자료
                 </NavLink>
               </li>
-              <li>
-                <a href="#" className="text-sm hover:text-white transition-colors">
-                  제품 카탈로그
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm hover:text-white transition-colors">
-                  파트너 프로그램
-                </a>
-              </li>
             </ul>
           </div>
 
-          {/* For Business */}
+          {/* 참여하기 */}
           <div>
-            <h4 className="font-semibold text-white mb-4">비즈니스</h4>
+            <h4 className="font-semibold text-white mb-4">참여하기</h4>
             <ul className="space-y-2">
               <li>
                 <NavLink to="/register" className="text-sm hover:text-white transition-colors">
@@ -67,47 +55,27 @@ export default function Footer() {
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/register" className="text-sm hover:text-white transition-colors">
-                  공급자 등록
+                <NavLink to="/contact" className="text-sm hover:text-white transition-colors">
+                  제휴/파트너 문의
                 </NavLink>
-              </li>
-              <li>
-                <NavLink to="/register" className="text-sm hover:text-white transition-colors">
-                  파트너 신청
-                </NavLink>
-              </li>
-              <li>
-                <a href="#" className="text-sm hover:text-white transition-colors">
-                  API 문서
-                </a>
               </li>
             </ul>
           </div>
 
-          {/* Support */}
+          {/* 고객지원 */}
           <div>
             <h4 className="font-semibold text-white mb-4">고객지원</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm hover:text-white transition-colors">
-                  자주 묻는 질문
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm hover:text-white transition-colors">
-                  이용가이드
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm hover:text-white transition-colors">
+                <NavLink to="/contact" className="text-sm hover:text-white transition-colors">
                   문의하기
-                </a>
+                </NavLink>
               </li>
             </ul>
             <div className="mt-4 pt-4 border-t border-slate-700">
               <p className="text-sm flex items-center gap-2">
                 <Phone className="w-4 h-4" />
-                1588-0000
+                02-0000-0000
               </p>
               <p className="text-xs text-slate-500 mt-1">
                 평일 09:00 - 18:00
@@ -122,16 +90,19 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-slate-500">
-              <p>© 2025 GlycoPharm. All rights reserved.</p>
-              <div className="flex items-center gap-4">
-                <a href="#" className="hover:text-white">이용약관</a>
-                <a href="#" className="hover:text-white">개인정보처리방침</a>
-              </div>
+              <p>&copy; 2025 GlycoPharm. All rights reserved.</p>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-600">
               <MapPin className="w-3 h-3" />
-              <span>서울특별시 강남구 테헤란로 123, O4O빌딩 5층</span>
+              <span>서울특별시 서초구 강남대로 000, 0층</span>
             </div>
+          </div>
+
+          {/* 사업자 정보 */}
+          <div className="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-600 text-center md:text-left">
+            <p>
+              (주)글라이코팜 | 대표: 홍길동 | 사업자등록번호: 000-00-00000 | 통신판매업: 2025-서울서초-0000
+            </p>
           </div>
         </div>
       </div>

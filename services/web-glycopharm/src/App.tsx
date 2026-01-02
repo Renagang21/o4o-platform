@@ -8,6 +8,7 @@ import StoreLayout from '@/components/layouts/StoreLayout';
 
 // Public Pages
 import HomePage from '@/pages/HomePage';
+import ContactPage from '@/pages/ContactPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import RoleSelectPage from '@/pages/auth/RoleSelectPage';
@@ -89,6 +90,7 @@ function AppRoutes() {
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
         <Route path="education" element={<EducationPage />} />
+        <Route path="contact" element={<ContactPage />} />
         <Route path="mypage" element={
           <ProtectedRoute>
             <MyPage />
