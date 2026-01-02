@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
 import PendingPage from './pages/PendingPage';
 import AdminPage from './pages/AdminPage';
+import MyPage from './pages/MyPage';
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -78,6 +79,11 @@ function AppRoutes() {
         <Route path="settings" element={
           <ProtectedRoute>
             <SettingsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="mypage" element={
+          <ProtectedRoute>
+            <MyPage />
           </ProtectedRoute>
         } />
         <Route path="about" element={<AboutPage />} />

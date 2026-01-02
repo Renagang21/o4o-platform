@@ -1,12 +1,158 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from '../components/LoginModal';
+
+// 슬라이드 배너 타입
+interface SlideBanner {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  bgColor: string;
+  textColor: string;
+  isActive: boolean;
+  order: number;
+}
+
+// 파트너 업체 타입
+interface Partner {
+  id: string;
+  name: string;
+  description: string;
+  logoUrl?: string;
+  websiteUrl: string;
+  isActive: boolean;
+  order: number;
+}
+
+// 샘플 슬라이드 배너 데이터 (나중에 관리자가 수정 가능)
+const sampleBanners: SlideBanner[] = [
+  {
+    id: '1',
+    title: 'GlucoseView',
+    subtitle: '약국을 위한 CGM 데이터 정리 도구',
+    bgColor: 'bg-gradient-to-r from-blue-600 to-blue-400',
+    textColor: 'text-white',
+    isActive: true,
+    order: 1,
+  },
+  {
+    id: '2',
+    title: '혈당 관리의 새로운 패러다임',
+    subtitle: '환자별 CGM 데이터를 한눈에 파악하세요',
+    bgColor: 'bg-gradient-to-r from-purple-600 to-pink-500',
+    textColor: 'text-white',
+    isActive: true,
+    order: 2,
+  },
+  {
+    id: '3',
+    title: '약사님의 상담을 도와드립니다',
+    subtitle: '데이터 기반의 전문 상담 지원',
+    bgColor: 'bg-gradient-to-r from-emerald-600 to-teal-500',
+    textColor: 'text-white',
+    isActive: true,
+    order: 3,
+  },
+];
+
+// 샘플 파트너 데이터 (나중에 관리자가 수정 가능)
+const samplePartners: Partner[] = [
+  {
+    id: '1',
+    name: 'LibreView',
+    description: 'Abbott의 CGM 데이터 플랫폼',
+    websiteUrl: 'https://www.libreview.com',
+    isActive: true,
+    order: 1,
+  },
+  {
+    id: '2',
+    name: 'Dexcom',
+    description: '연속혈당측정 전문 기업',
+    websiteUrl: 'https://www.dexcom.com',
+    isActive: true,
+    order: 2,
+  },
+  {
+    id: '3',
+    name: '대한약사회',
+    description: '약사 직능단체',
+    websiteUrl: 'https://www.kpanet.or.kr',
+    isActive: true,
+    order: 3,
+  },
+  {
+    id: '4',
+    name: '건강보험심사평가원',
+    description: '의료 심사 및 평가 기관',
+    websiteUrl: 'https://www.hira.or.kr',
+    isActive: true,
+    order: 4,
+  },
+  {
+    id: '5',
+    name: '국민건강보험공단',
+    description: '건강보험 운영 기관',
+    websiteUrl: 'https://www.nhis.or.kr',
+    isActive: true,
+    order: 5,
+  },
+];
+
+// localStorage 키
+const BANNERS_KEY = 'glucoseview_banners';
+const PARTNERS_KEY = 'glucoseview_partners';
+
+// 배너/파트너 데이터 로드
+const loadBanners = (): SlideBanner[] => {
+  try {
+    const saved = localStorage.getItem(BANNERS_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch {
+    // ignore
+  }
+  return sampleBanners;
+};
+
+const loadPartners = (): Partner[] => {
+  try {
+    const saved = localStorage.getItem(PARTNERS_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch {
+    // ignore
+  }
+  return samplePartners;
+};
 
 export default function HomePage() {
   const { isAuthenticated, isApproved, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // 슬라이드 배너 상태
+  const [banners] = useState<SlideBanner[]>(() => loadBanners().filter(b => b.isActive).sort((a, b) => a.order - b.order));
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // 파트너 상태
+  const [partners] = useState<Partner[]>(() => loadPartners().filter(p => p.isActive).sort((a, b) => a.order - b.order));
+
+  // 자동 슬라이드
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [banners.length]);
 
   // 보호된 기능 클릭 핸들러
   const handleProtectedClick = (path: string) => {
@@ -19,24 +165,111 @@ export default function HomePage() {
     }
   };
 
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % banners.length);
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Hero Section */}
-      <section className="py-20 px-6 bg-white border-b border-slate-100">
+      {/* Slide Banner Section - 사이트 폭에 맞춤 */}
+      {banners.length > 0 && (
+        <section className="pt-6 pb-4 px-4 md:px-6 bg-slate-50">
+          <div className="max-w-5xl mx-auto">
+            <div className="relative overflow-hidden rounded-2xl h-32 sm:h-40 md:h-48 shadow-md">
+              {banners.map((banner, index) => (
+                <div
+                  key={banner.id}
+                  className={`absolute inset-0 transition-opacity duration-500 ${
+                    index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  } ${banner.bgColor}`}
+                >
+                  {banner.linkUrl ? (
+                    <a
+                      href={banner.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block h-full"
+                    >
+                      <div className="h-full flex flex-col items-center justify-center px-6 text-center">
+                        <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${banner.textColor}`}>
+                          {banner.title}
+                        </h2>
+                        <p className={`text-sm sm:text-base md:text-lg opacity-90 ${banner.textColor}`}>
+                          {banner.subtitle}
+                        </p>
+                      </div>
+                    </a>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center px-6 text-center">
+                      <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${banner.textColor}`}>
+                        {banner.title}
+                      </h2>
+                      <p className={`text-sm sm:text-base md:text-lg opacity-90 ${banner.textColor}`}>
+                        {banner.subtitle}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* 슬라이드 컨트롤 - 배너 내부 */}
+              {banners.length > 1 && (
+                <>
+                  {/* 이전/다음 버튼 */}
+                  <button
+                    onClick={prevSlide}
+                    className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
+                  >
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
+                  >
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+
+                  {/* 인디케이터 */}
+                  <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {banners.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-colors ${
+                          index === currentSlide ? 'bg-white' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Hero Section - CTA */}
+      <section className="py-12 px-6 bg-white border-b border-slate-100">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">
-            GlucoseView
-          </h1>
-          <p className="text-lg text-slate-500 mb-2">
-            약국을 위한 CGM 데이터 정리 도구
-          </p>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-400 mb-2">
             glucoseview.co.kr
           </p>
 
           {/* 로그인 상태에 따른 CTA */}
           {!isAuthenticated ? (
-            <div className="mt-8 flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => setShowLoginModal(true)}
                 className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
@@ -51,7 +284,7 @@ export default function HomePage() {
               </Link>
             </div>
           ) : isApproved ? (
-            <div className="mt-8">
+            <div>
               <Link
                 to="/patients"
                 className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
@@ -181,8 +414,67 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Partner Section - 사이트 폭에 맞춘 무한 스크롤 */}
+      {partners.length > 0 && (
+        <section className="py-6 bg-slate-50 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto px-4 md:px-6 mb-4">
+            <h3 className="text-sm font-medium text-slate-500 text-center">파트너 & 관련 기관</h3>
+          </div>
+
+          {/* 무한 스크롤 마퀴 - 사이트 폭에 맞춤 */}
+          <div className="max-w-5xl mx-auto overflow-hidden">
+            <div className="flex animate-marquee">
+              {/* 첫 번째 세트 */}
+              {partners.map((partner) => (
+                <a
+                  key={partner.id}
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 mx-3 flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {partner.logoUrl ? (
+                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                    ) : (
+                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
+                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
+                  </div>
+                </a>
+              ))}
+              {/* 두 번째 세트 (무한 스크롤 효과) */}
+              {partners.map((partner) => (
+                <a
+                  key={`${partner.id}-dup`}
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 mx-3 flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {partner.logoUrl ? (
+                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                    ) : (
+                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
+                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer note */}
-      <section className="pb-8 px-6">
+      <section className="py-8 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="text-center text-xs text-slate-400">
             본 서비스는 의료 진단이나 치료를 목적으로 하지 않습니다

@@ -33,7 +33,8 @@ runs:
       shell: bash
       run: |
         echo "📦 Installing dependencies..."
-        pnpm install --frozen-lockfile
+        # CI 환경에서는 frozen-lockfile이 기본값이므로 명시적으로 해제 필요
+        pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
     - name: Build shared packages
       if: ${{ inputs.build-packages == 'true' }}

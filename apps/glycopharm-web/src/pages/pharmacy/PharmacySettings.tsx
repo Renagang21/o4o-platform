@@ -32,7 +32,6 @@ export default function PharmacySettings() {
 
   const handleSave = () => {
     // TODO: Implement save API
-    console.log('Save settings:', storeSettings);
     alert('설정이 저장되었습니다.');
   };
 

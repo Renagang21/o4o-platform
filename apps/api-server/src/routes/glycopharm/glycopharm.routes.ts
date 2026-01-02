@@ -8,6 +8,8 @@
 import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { createGlycopharmController } from './controllers/glycopharm.controller.js';
+import { createDisplayController } from './controllers/display.controller.js';
+import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 
 /**
@@ -48,13 +50,29 @@ function requireGlycopharmScope(scope: string): RequestHandler {
 export function createGlycopharmRoutes(dataSource: DataSource): Router {
   const router = Router();
 
+  // Core pharmacy/product routes
   const glycopharmController = createGlycopharmController(
     dataSource,
     coreRequireAuth as any,
     requireGlycopharmScope
   );
-
   router.use('/', glycopharmController);
+
+  // Smart Display routes
+  const displayController = createDisplayController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope
+  );
+  router.use('/display', displayController);
+
+  // Forum Category Request routes
+  const forumRequestController = createForumRequestController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope
+  );
+  router.use('/forum-requests', forumRequestController);
 
   return router;
 }
