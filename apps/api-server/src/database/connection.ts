@@ -163,6 +163,15 @@ import {
 } from '../routes/k-shopping/entities/index.js';
 
 // ============================================================================
+// KPA ENTITIES (Pharmacist Association SaaS)
+// ============================================================================
+import {
+  KpaOrganization,
+  KpaMember,
+  KpaApplication,
+} from '../routes/kpa/entities/index.js';
+
+// ============================================================================
 // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
 // ============================================================================
 // Organization and OrganizationMember are absorbed into Core API as the
@@ -388,6 +397,12 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     KShoppingApplication,
     KShoppingParticipant,
+    // ============================================================================
+    // KPA ENTITIES (Pharmacist Association SaaS)
+    // ============================================================================
+    KpaOrganization,
+    KpaMember,
+    KpaApplication,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
     // ============================================================================

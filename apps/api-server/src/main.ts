@@ -393,6 +393,9 @@ import { createYaksaRoutes } from './routes/yaksa/yaksa.routes.js';
 // Glycopharm Routes (Phase B-1)
 import { createGlycopharmRoutes } from './routes/glycopharm/glycopharm.routes.js';
 
+// KPA Routes (Pharmacist Association SaaS)
+import { createKpaRoutes } from './routes/kpa/kpa.routes.js';
+
 // GlucoseView Routes (Phase C-1)
 import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes.js';
 
@@ -694,6 +697,15 @@ const startServer = async () => {
       logger.info('✅ K-Shopping routes registered at /api/v1/k-shopping');
     } catch (kshoppingError) {
       logger.error('Failed to register K-Shopping routes:', kshoppingError);
+    }
+
+    // 32. Register KPA routes (Pharmacist Association SaaS)
+    try {
+      const kpaRoutes = createKpaRoutes(AppDataSource);
+      app.use('/api/v1/kpa', kpaRoutes);
+      logger.info('✅ KPA routes registered at /api/v1/kpa');
+    } catch (kpaError) {
+      logger.error('Failed to register KPA routes:', kpaError);
     }
 
     // 6. Core routes now registered via dynamic module loader

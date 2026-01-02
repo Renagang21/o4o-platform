@@ -254,7 +254,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20651085960 --log-failed -R Renagang21/o4o-platform)",
       "Bash(pnpm install:*)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" workflow run deploy-web-services.yml --ref main -f service=glycopharm -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20652560705 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20652560705 -R Renagang21/o4o-platform)",
+      "Bash(git rebase:*)"
     ],
     "deny": []
   }
