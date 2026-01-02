@@ -68,64 +68,64 @@ export default function AboutPage() {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Header */}
+      {/* Hero Header - 여유 있는 첫인상 */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <h1 className="text-2xl font-semibold text-slate-900 mb-1">About</h1>
-          <p className="text-slate-500">GlucoseView 서비스 안내 및 기능 현황</p>
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <h1 className="text-3xl font-semibold text-slate-900 mb-3">About</h1>
+          <p className="text-lg text-slate-500">GlucoseView 서비스 안내 및 기능 현황</p>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Definition */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <p className="text-slate-700 leading-relaxed">
+      {/* Content - 확장된 간격 */}
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        {/* Definition - 강조된 소개 */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 mb-8 shadow-sm">
+          <p className="text-lg text-slate-700 leading-relaxed">
             GlucoseView는 약국에서 CGM 데이터를 정리하여 확인할 수 있도록 돕는 도구입니다.
           </p>
         </div>
 
         {/* What we do / don't do */}
-        <div className="grid gap-4 md:grid-cols-2 mb-6">
+        <div className="grid gap-6 md:grid-cols-2 mb-10">
           {/* Don't */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-sm font-medium text-slate-400 mb-4">하지 않는 것</h2>
-            <ul className="space-y-3 text-sm text-slate-600">
-              <li className="flex items-start gap-2">
-                <span className="text-slate-300 mt-0.5">×</span>
+          <div className="bg-white rounded-2xl border border-slate-200 p-7 shadow-sm">
+            <h2 className="text-sm font-semibold text-slate-400 mb-5 uppercase tracking-wide">하지 않는 것</h2>
+            <ul className="space-y-4 text-sm text-slate-600">
+              <li className="flex items-start gap-3">
+                <span className="text-slate-300 text-lg mt-0.5">×</span>
                 <span>원본 CGM 데이터 저장</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-slate-300 mt-0.5">×</span>
+              <li className="flex items-start gap-3">
+                <span className="text-slate-300 text-lg mt-0.5">×</span>
                 <span>의료 진단 또는 치료 제공</span>
               </li>
             </ul>
           </div>
 
           {/* Do */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-sm font-medium text-slate-700 mb-4">하는 것</h2>
-            <ul className="space-y-3 text-sm text-slate-600">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">○</span>
+          <div className="bg-white rounded-2xl border border-slate-200 p-7 shadow-sm">
+            <h2 className="text-sm font-semibold text-slate-700 mb-5 uppercase tracking-wide">하는 것</h2>
+            <ul className="space-y-4 text-sm text-slate-600">
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 text-lg mt-0.5">○</span>
                 <span>연동된 데이터를 정리하여 표시</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">○</span>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 text-lg mt-0.5">○</span>
                 <span>약사의 설명을 보조</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">○</span>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 text-lg mt-0.5">○</span>
                 <span>경향 파악을 위한 요약 제공</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Progress Summary */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">개발 현황</h2>
-          <div className="flex items-center gap-6">
+        {/* Progress Summary - 강조된 진행 현황 */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 mb-10 shadow-sm">
+          <h2 className="text-xl font-semibold text-slate-900 mb-6">개발 현황</h2>
+          <div className="flex flex-wrap items-center gap-6 mb-6">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-green-500"></span>
               <span className="text-sm text-slate-600">구현 완료: {doneCount}개</span>
@@ -139,32 +139,32 @@ export default function AboutPage() {
               <span className="text-sm text-slate-600">미정: {features.length - doneCount - plannedCount}개</span>
             </div>
           </div>
-          <div className="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-green-500"
+              className="h-full bg-green-500 transition-all duration-500"
               style={{ width: `${(doneCount / features.length) * 100}%` }}
             ></div>
           </div>
-          <p className="text-xs text-slate-400 mt-2">
+          <p className="text-sm text-slate-500 mt-3">
             전체 {features.length}개 기능 중 {doneCount}개 완료 ({Math.round((doneCount / features.length) * 100)}%)
           </p>
         </div>
 
-        {/* Feature List by Category */}
-        <div className="space-y-6">
+        {/* Feature List by Category - 확장된 간격 */}
+        <div className="space-y-8">
           {categories.map(category => {
             const categoryFeatures = features.filter(f => f.category === category);
             return (
-              <div key={category} className="bg-white rounded-xl border border-slate-200 p-6">
-                <h2 className="text-base font-semibold text-slate-900 mb-4">{categoryLabels[category]}</h2>
-                <div className="space-y-3">
+              <div key={category} className="bg-white rounded-2xl border border-slate-200 p-7 shadow-sm">
+                <h2 className="text-lg font-semibold text-slate-900 mb-5">{categoryLabels[category]}</h2>
+                <div className="space-y-4">
                   {categoryFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-start justify-between gap-4">
+                    <div key={index} className="flex items-start justify-between gap-4 py-1">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-700">{feature.name}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{feature.description}</p>
+                        <p className="text-xs text-slate-500 mt-1">{feature.description}</p>
                       </div>
-                      <span className={`flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded ${statusLabels[feature.status].className}`}>
+                      <span className={`flex-shrink-0 px-2.5 py-1 text-xs font-medium rounded-lg ${statusLabels[feature.status].className}`}>
                         {statusLabels[feature.status].label}
                       </span>
                     </div>
@@ -175,23 +175,23 @@ export default function AboutPage() {
           })}
         </div>
 
-        {/* Data Flow */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mt-6">
-          <h2 className="text-sm font-medium text-slate-700 mb-4">데이터 흐름</h2>
-          <div className="flex items-center justify-center gap-2 text-sm text-slate-500 py-4">
-            <span className="px-3 py-1.5 bg-slate-100 rounded">CGM 앱</span>
-            <span className="text-slate-300">→</span>
-            <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded border border-blue-100">GlucoseView</span>
-            <span className="text-slate-300">→</span>
-            <span className="px-3 py-1.5 bg-slate-100 rounded">정리된 화면</span>
+        {/* Data Flow - 강화된 시각화 */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 mt-10 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-700 mb-6 text-center">데이터 흐름</h2>
+          <div className="flex items-center justify-center gap-4 text-sm text-slate-500 py-6">
+            <span className="px-4 py-2 bg-slate-100 rounded-lg font-medium">CGM 앱</span>
+            <span className="text-slate-300 text-xl">→</span>
+            <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 font-semibold">GlucoseView</span>
+            <span className="text-slate-300 text-xl">→</span>
+            <span className="px-4 py-2 bg-slate-100 rounded-lg font-medium">정리된 화면</span>
           </div>
-          <p className="text-xs text-slate-400 text-center mt-2">
+          <p className="text-sm text-slate-500 text-center mt-4">
             GlucoseView는 해석 결과만 표시하며, 원본 데이터를 보관하지 않습니다
           </p>
         </div>
 
-        {/* Note */}
-        <p className="text-xs text-slate-400 text-center mt-6">
+        {/* Note - 확장된 여백 */}
+        <p className="text-sm text-slate-400 text-center mt-10 mb-4">
           기능 요청이나 피드백이 있으시면 관리자에게 문의해 주세요.
         </p>
       </div>

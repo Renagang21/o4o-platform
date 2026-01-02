@@ -151,11 +151,11 @@ export default function HomePage() {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Slide Banner Section - 사이트 폭에 맞춤 */}
+      {/* Hero Banner Section - 광고/파트너 대응 가능한 강화된 배너 */}
       {banners.length > 0 && (
-        <section className="pt-6 pb-4 px-4 md:px-6 bg-slate-50">
-          <div className="max-w-5xl mx-auto">
-            <div className="relative overflow-hidden rounded-2xl h-32 sm:h-40 md:h-48 shadow-md">
+        <section className="bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 pt-8 pb-6">
+            <div className="relative overflow-hidden rounded-2xl h-44 sm:h-56 md:h-64 shadow-lg">
               {banners.map((banner, index) => (
                 <div
                   key={banner.id}
@@ -170,21 +170,21 @@ export default function HomePage() {
                       rel="noopener noreferrer"
                       className="block h-full"
                     >
-                      <div className="h-full flex flex-col items-center justify-center px-6 text-center">
-                        <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${banner.textColor}`}>
+                      <div className="h-full flex flex-col items-center justify-center px-8 text-center">
+                        <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-3 ${banner.textColor}`}>
                           {banner.title}
                         </h2>
-                        <p className={`text-sm sm:text-base md:text-lg opacity-90 ${banner.textColor}`}>
+                        <p className={`text-base sm:text-lg md:text-xl opacity-90 ${banner.textColor}`}>
                           {banner.subtitle}
                         </p>
                       </div>
                     </a>
                   ) : (
-                    <div className="h-full flex flex-col items-center justify-center px-6 text-center">
-                      <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${banner.textColor}`}>
+                    <div className="h-full flex flex-col items-center justify-center px-8 text-center">
+                      <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-3 ${banner.textColor}`}>
                         {banner.title}
                       </h2>
-                      <p className={`text-sm sm:text-base md:text-lg opacity-90 ${banner.textColor}`}>
+                      <p className={`text-base sm:text-lg md:text-xl opacity-90 ${banner.textColor}`}>
                         {banner.subtitle}
                       </p>
                     </div>
@@ -232,9 +232,9 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Hero Section - CTA */}
-      <section className="py-12 px-6 bg-white border-b border-slate-100">
-        <div className="max-w-3xl mx-auto text-center">
+      {/* CTA Section - 여유 있는 간격 */}
+      <section className="py-16 px-6 bg-white border-b border-slate-100">
+        <div className="max-w-4xl mx-auto text-center">
           {/* 로그인 상태에 따른 CTA */}
           {!isAuthenticated ? (
             <div className="flex items-center justify-center gap-3">
@@ -267,9 +267,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Preview Cards */}
-      <section className="py-16 px-6">
-        <div className="max-w-3xl mx-auto">
+      {/* Feature Cards - 확장된 간격과 컨테이너 */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
           <div className="grid gap-4">
             {/* Card 1 - Patients */}
             <button
@@ -382,33 +382,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 정적 그리드 */}
+      {/* Partner Section - 강화된 파트너 영역 */}
       {partners.length > 0 && (
-        <section className="py-6 bg-slate-50 border-t border-slate-100">
-          <div className="max-w-5xl mx-auto px-4 md:px-6 mb-4">
-            <h3 className="text-sm font-medium text-slate-600 text-center">파트너</h3>
-          </div>
+        <section className="py-12 bg-white border-t border-slate-100">
+          <div className="max-w-6xl mx-auto px-4 md:px-6">
+            <h3 className="text-sm font-semibold text-slate-500 text-center mb-8 uppercase tracking-wider">파트너</h3>
 
-          {/* 정적 그리드 레이아웃 */}
-          <div className="max-w-5xl mx-auto px-4 md:px-6">
-            <div className="flex flex-wrap justify-center gap-3">
+            {/* 그리드 레이아웃 - 더 넓은 간격 */}
+            <div className="flex flex-wrap justify-center gap-4">
               {partners.map((partner) => (
                 <a
                   key={partner.id}
                   href={partner.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                  className="flex items-center gap-4 px-5 py-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
                     {partner.logoUrl ? (
-                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                      <img src={partner.logoUrl} alt={partner.name} className="w-7 h-7 object-contain" />
                     ) : (
-                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                      <span className="text-xl font-bold text-slate-400">{partner.name.charAt(0)}</span>
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
+                    <p className="text-sm font-semibold text-slate-700 whitespace-nowrap">{partner.name}</p>
                     <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
                   </div>
                 </a>
@@ -418,10 +416,10 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Footer note */}
-      <section className="py-8 px-6">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-center text-xs text-slate-400">
+      {/* Footer note - 확장된 간격 */}
+      <section className="py-12 px-6 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-sm text-slate-400">
             본 서비스는 의료 진단이나 치료를 목적으로 하지 않습니다
           </p>
         </div>
