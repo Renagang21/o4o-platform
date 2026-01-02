@@ -5,15 +5,18 @@
  *
  * H2-0: metadata.channel 기반 주문 생성 로직
  * H3-0: Travel Order + TaxRefund Flag Implementation
+ * H3-1: Travel 주문 조회·필터링 기능
  *
  * ## 설계 원칙 (H1-2/H2-3 결정 준수)
  * - OrderType = RETAIL 고정
  * - 채널 분기 = metadata.channel ('local' | 'travel')
  * - Cosmetics Product = UUID 참조 + 스냅샷 (FK 없음)
  * - TaxRefund는 Order 단위, Amount 저장 금지 (H2-3)
+ * - Travel 전용 필터: guideId, tourSessionId, taxRefund (H3-1)
  *
  * @since H2-0 (2025-01-02)
  * @updated H3-0 (2025-01-02) - TaxRefund validation
+ * @updated H3-1 (2025-01-02) - Travel order filtering
  */
 
 import { Injectable, BadRequestException } from '@nestjs/common';
@@ -405,5 +408,155 @@ export class CosmeticsOrderService {
       orders: filteredOrders,
       total: filteredOrders.length,
     };
+  }
+
+  /**
+   * Travel 주문 조회 (H3-1)
+   *
+   * Travel 채널 전용 필터:
+   * - guideId: 가이드 ID
+   * - tourSessionId: 투어 세션 ID
+   * - taxRefundEligible: 환급 대상 여부
+   * - taxRefundStatus: 환급 상태
+   */
+  async findTravelOrders(
+    filters: {
+      sellerId?: string;
+      buyerId?: string;
+      guideId?: string;
+      tourSessionId?: string;
+      taxRefundEligible?: boolean;
+      taxRefundStatus?: 'pending' | 'requested' | 'completed' | 'rejected';
+      status?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{ orders: EcommerceOrder[]; total: number }> {
+    // RETAIL 타입 + Travel 채널 조회
+    const result = await this.orderService.findAll({
+      sellerId: filters.sellerId,
+      buyerId: filters.buyerId,
+      orderType: OrderType.RETAIL,
+      limit: filters.limit,
+      offset: filters.offset,
+    });
+
+    // Travel 채널 + 추가 필터 적용
+    const filteredOrders = result.orders.filter((order) => {
+      const metadata = order.metadata as CosmeticsOrderMetadata;
+
+      // Travel 채널만
+      if (metadata?.channel !== 'travel') {
+        return false;
+      }
+
+      // Order status 필터
+      if (filters.status && order.status !== filters.status) {
+        return false;
+      }
+
+      // Travel-specific filters
+      if (metadata.travel) {
+        // Guide ID 필터
+        if (filters.guideId && metadata.travel.guideId !== filters.guideId) {
+          return false;
+        }
+
+        // Tour Session ID 필터
+        if (filters.tourSessionId && metadata.travel.tourSessionId !== filters.tourSessionId) {
+          return false;
+        }
+
+        // Tax Refund Eligible 필터
+        if (filters.taxRefundEligible !== undefined) {
+          const isEligible = metadata.travel.taxRefund?.eligible === true;
+          if (filters.taxRefundEligible !== isEligible) {
+            return false;
+          }
+        }
+
+        // Tax Refund Status 필터
+        if (filters.taxRefundStatus) {
+          if (metadata.travel.taxRefund?.status !== filters.taxRefundStatus) {
+            return false;
+          }
+        }
+      } else {
+        // travel 메타데이터가 없는 경우 Travel 전용 필터가 있으면 제외
+        if (filters.guideId || filters.tourSessionId ||
+            filters.taxRefundEligible !== undefined || filters.taxRefundStatus) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return {
+      orders: filteredOrders,
+      total: filteredOrders.length,
+    };
+  }
+
+  /**
+   * 환급 대상 주문 조회 (H3-1)
+   *
+   * 간편 메서드: taxRefundEligible=true인 Travel 주문만 조회
+   */
+  async findTaxRefundEligibleOrders(
+    filters?: {
+      sellerId?: string;
+      buyerId?: string;
+      taxRefundStatus?: 'pending' | 'requested' | 'completed' | 'rejected';
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{ orders: EcommerceOrder[]; total: number }> {
+    return this.findTravelOrders({
+      ...filters,
+      taxRefundEligible: true,
+    });
+  }
+
+  /**
+   * 투어 세션별 주문 조회 (H3-1)
+   *
+   * 간편 메서드: 특정 투어 세션의 모든 주문 조회
+   */
+  async findOrdersByTourSession(
+    tourSessionId: string,
+    filters?: {
+      sellerId?: string;
+      buyerId?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{ orders: EcommerceOrder[]; total: number }> {
+    return this.findTravelOrders({
+      ...filters,
+      tourSessionId,
+    });
+  }
+
+  /**
+   * 가이드별 주문 조회 (H3-1)
+   *
+   * 간편 메서드: 특정 가이드의 모든 Travel 주문 조회
+   */
+  async findOrdersByGuide(
+    guideId: string,
+    filters?: {
+      sellerId?: string;
+      buyerId?: string;
+      taxRefundEligible?: boolean;
+      taxRefundStatus?: 'pending' | 'requested' | 'completed' | 'rejected';
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{ orders: EcommerceOrder[]; total: number }> {
+    return this.findTravelOrders({
+      ...filters,
+      guideId,
+    });
   }
 }

@@ -3,15 +3,18 @@
  *
  * H2-0: metadata.channel 기반 주문 생성 API
  * H3-0: Travel Order + TaxRefund Flag Implementation
+ * H3-1: Travel 주문 조회·필터링 API
  *
  * ## 설계 원칙
  * - OrderType = RETAIL 고정 (CosmeticsOrderService에서 처리)
  * - 채널 분기 = metadata.channel ('local' | 'travel')
  * - Cosmetics Product = UUID 참조 + 스냅샷
  * - TaxRefund는 Order 단위, Amount 저장 금지 (H2-3)
+ * - Travel 전용 필터 사용 시 자동으로 channel=travel 적용 (H3-1)
  *
  * @since H2-0 (2025-01-02)
  * @updated H3-0 (2025-01-02) - TaxRefund validation
+ * @updated H3-1 (2025-01-02) - Travel order filtering
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
@@ -134,7 +137,30 @@ const VALIDATION_ERRORS = {
   TAXREFUND_INVALID_SCHEME: 'metadata.travel.taxRefund.scheme must be "standard" or "instant"',
   TAXREFUND_INVALID_RATE: 'metadata.travel.taxRefund.estimatedRate must be between 0 and 1',
   TAXREFUND_INVALID_STATUS: 'metadata.travel.taxRefund.status must be one of: pending, requested, completed, rejected',
+  // H3-1: Query filter validation errors
+  INVALID_TAX_REFUND_STATUS_FILTER: 'taxRefundStatus must be one of: pending, requested, completed, rejected',
+  INVALID_TAX_REFUND_ELIGIBLE_FILTER: 'taxRefundEligible must be "true" or "false"',
 } as const;
+
+// H3-1: Valid tax refund statuses for filtering
+const VALID_TAX_REFUND_STATUSES = ['pending', 'requested', 'completed', 'rejected'] as const;
+type TaxRefundStatusFilter = typeof VALID_TAX_REFUND_STATUSES[number];
+
+/**
+ * Order query filters for Travel channel (H3-1)
+ */
+interface OrderQueryFilters {
+  channel?: OrderChannel;
+  status?: string;
+  // Travel-specific filters
+  guideId?: string;
+  tourSessionId?: string;
+  taxRefundEligible?: boolean;
+  taxRefundStatus?: TaxRefundStatusFilter;
+  // Pagination
+  page?: number;
+  limit?: number;
+}
 
 // ============================================================================
 // Controller Implementation
@@ -257,6 +283,144 @@ function validateChannelMetadata(
   }
 
   return { valid: true };
+}
+
+/**
+ * Parse and validate query filters for order listing (H3-1)
+ *
+ * Rules:
+ * - Travel-specific filters auto-apply channel=travel
+ * - Invalid values return error
+ */
+function parseOrderFilters(query: Record<string, any>): {
+  valid: boolean;
+  filters?: OrderQueryFilters;
+  error?: string;
+} {
+  const filters: OrderQueryFilters = {};
+
+  // Channel filter
+  if (query.channel) {
+    if (!['local', 'travel'].includes(query.channel)) {
+      return { valid: false, error: VALIDATION_ERRORS.INVALID_CHANNEL };
+    }
+    filters.channel = query.channel as OrderChannel;
+  }
+
+  // Order status filter
+  if (query.status) {
+    filters.status = query.status;
+  }
+
+  // Guide ID filter (Travel-specific)
+  if (query.guideId) {
+    filters.guideId = query.guideId;
+    // Auto-apply travel channel if not specified
+    if (!filters.channel) {
+      filters.channel = 'travel';
+    }
+  }
+
+  // Tour Session ID filter (Travel-specific)
+  if (query.tourSessionId) {
+    filters.tourSessionId = query.tourSessionId;
+    // Auto-apply travel channel if not specified
+    if (!filters.channel) {
+      filters.channel = 'travel';
+    }
+  }
+
+  // Tax Refund Eligible filter (Travel-specific)
+  if (query.taxRefundEligible !== undefined) {
+    const eligibleStr = String(query.taxRefundEligible).toLowerCase();
+    if (eligibleStr !== 'true' && eligibleStr !== 'false') {
+      return { valid: false, error: VALIDATION_ERRORS.INVALID_TAX_REFUND_ELIGIBLE_FILTER };
+    }
+    filters.taxRefundEligible = eligibleStr === 'true';
+    // Auto-apply travel channel if not specified
+    if (!filters.channel) {
+      filters.channel = 'travel';
+    }
+  }
+
+  // Tax Refund Status filter (Travel-specific)
+  if (query.taxRefundStatus) {
+    if (!VALID_TAX_REFUND_STATUSES.includes(query.taxRefundStatus)) {
+      return { valid: false, error: VALIDATION_ERRORS.INVALID_TAX_REFUND_STATUS_FILTER };
+    }
+    filters.taxRefundStatus = query.taxRefundStatus as TaxRefundStatusFilter;
+    // Auto-apply travel channel if not specified
+    if (!filters.channel) {
+      filters.channel = 'travel';
+    }
+  }
+
+  // Pagination
+  filters.page = query.page ? Number(query.page) : 1;
+  filters.limit = query.limit ? Number(query.limit) : 20;
+
+  return { valid: true, filters };
+}
+
+/**
+ * Apply filters to order data (H3-1)
+ *
+ * Note: This is an in-memory filter for mock data.
+ * In production, this should be a database query.
+ */
+function applyOrderFilters(
+  orders: any[],
+  filters: OrderQueryFilters
+): any[] {
+  return orders.filter((order) => {
+    const metadata = order.metadata as CosmeticsOrderMetadata;
+
+    // Channel filter
+    if (filters.channel && metadata?.channel !== filters.channel) {
+      return false;
+    }
+
+    // Order status filter
+    if (filters.status && order.status !== filters.status) {
+      return false;
+    }
+
+    // Travel-specific filters (only apply if channel is travel)
+    if (metadata?.channel === 'travel' && metadata.travel) {
+      // Guide ID filter
+      if (filters.guideId && metadata.travel.guideId !== filters.guideId) {
+        return false;
+      }
+
+      // Tour Session ID filter
+      if (filters.tourSessionId && metadata.travel.tourSessionId !== filters.tourSessionId) {
+        return false;
+      }
+
+      // Tax Refund Eligible filter
+      if (filters.taxRefundEligible !== undefined) {
+        const isEligible = metadata.travel.taxRefund?.eligible === true;
+        if (filters.taxRefundEligible !== isEligible) {
+          return false;
+        }
+      }
+
+      // Tax Refund Status filter
+      if (filters.taxRefundStatus) {
+        if (metadata.travel.taxRefund?.status !== filters.taxRefundStatus) {
+          return false;
+        }
+      }
+    } else if (filters.channel === 'travel') {
+      // If travel channel is requested but order has no travel metadata, exclude
+      if (filters.guideId || filters.tourSessionId ||
+          filters.taxRefundEligible !== undefined || filters.taxRefundStatus) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 }
 
 /**
@@ -406,13 +570,29 @@ export function createCosmeticsOrderController(
   /**
    * GET /cosmetics/orders
    * List orders for current user (buyer)
+   *
+   * H3-1: Travel 채널 전용 필터 추가
+   * - channel: 'local' | 'travel'
+   * - guideId: 가이드 ID (Travel 전용)
+   * - tourSessionId: 투어 세션 ID (Travel 전용)
+   * - taxRefundEligible: 환급 대상 여부 (Travel 전용)
+   * - taxRefundStatus: 환급 상태 (Travel 전용)
+   *
+   * Travel 전용 필터 사용 시 자동으로 channel=travel 적용
    */
   router.get(
     '/',
     requireAuth,
     [
+      // Basic filters
       query('channel').optional().isIn(['local', 'travel']),
       query('status').optional().isString(),
+      // H3-1: Travel-specific filters
+      query('guideId').optional().isString(),
+      query('tourSessionId').optional().isString(),
+      query('taxRefundEligible').optional().isString(),
+      query('taxRefundStatus').optional().isString(),
+      // Pagination
       query('page').optional().isInt({ min: 1 }).toInt(),
       query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
     ],
@@ -427,20 +607,56 @@ export function createCosmeticsOrderController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        // H2-0에서는 빈 배열 반환 (실제 DB 조회는 추후 구현)
+        // H3-1: Parse and validate filters
+        const filterResult = parseOrderFilters(req.query);
+        if (!filterResult.valid) {
+          return errorResponse(res, 400, 'FILTER_VALIDATION_ERROR', filterResult.error!);
+        }
+
+        const filters = filterResult.filters!;
+
+        // H3-1: Mock data for demonstration (실제 DB 조회는 추후 구현)
+        // In production, this should query the database with filters
+        const mockOrders: any[] = [];
+
+        // Apply filters to mock data
+        const filteredOrders = applyOrderFilters(mockOrders, filters);
+
+        // Calculate pagination
+        const total = filteredOrders.length;
+        const page = filters.page || 1;
+        const limit = filters.limit || 20;
+        const totalPages = Math.ceil(total / limit);
+        const startIndex = (page - 1) * limit;
+        const paginatedOrders = filteredOrders.slice(startIndex, startIndex + limit);
+
+        // Build response with applied filters info
+        const appliedFilters: Record<string, any> = {
+          buyerId,
+        };
+
+        if (filters.channel) appliedFilters.channel = filters.channel;
+        if (filters.status) appliedFilters.status = filters.status;
+        if (filters.guideId) appliedFilters.guideId = filters.guideId;
+        if (filters.tourSessionId) appliedFilters.tourSessionId = filters.tourSessionId;
+        if (filters.taxRefundEligible !== undefined) {
+          appliedFilters.taxRefundEligible = filters.taxRefundEligible;
+        }
+        if (filters.taxRefundStatus) {
+          appliedFilters.taxRefundStatus = filters.taxRefundStatus;
+        }
+
+        console.log('[Cosmetics Order] List orders with filters:', appliedFilters);
+
         res.json({
-          data: [],
+          data: paginatedOrders,
           pagination: {
-            page: Number(req.query.page) || 1,
-            limit: Number(req.query.limit) || 20,
-            total: 0,
-            totalPages: 0,
+            page,
+            limit,
+            total,
+            totalPages,
           },
-          filters: {
-            channel: req.query.channel,
-            status: req.query.status,
-            buyerId,
-          },
+          filters: appliedFilters,
         });
       } catch (error: any) {
         console.error('[Cosmetics Order] List orders error:', error);
