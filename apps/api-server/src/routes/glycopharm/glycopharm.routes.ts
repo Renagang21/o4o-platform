@@ -10,6 +10,8 @@ import { DataSource } from 'typeorm';
 import { createGlycopharmController } from './controllers/glycopharm.controller.js';
 import { createDisplayController } from './controllers/display.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
+import { createApplicationController } from './controllers/application.controller.js';
+import { createAdminController } from './controllers/admin.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 
 /**
@@ -73,6 +75,22 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requireGlycopharmScope
   );
   router.use('/forum-requests', forumRequestController);
+
+  // Application routes (pharmacy participation/service applications)
+  const applicationController = createApplicationController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope
+  );
+  router.use('/', applicationController);
+
+  // Admin routes (operator/admin application review)
+  const adminController = createAdminController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope
+  );
+  router.use('/', adminController);
 
   return router;
 }

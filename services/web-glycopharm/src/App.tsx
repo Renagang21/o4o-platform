@@ -36,6 +36,8 @@ import PartnerDashboard from '@/pages/partner/PartnerDashboard';
 // Operator Dashboard
 import OperatorDashboard from '@/pages/operator/OperatorDashboard';
 import ForumRequestsPage from '@/pages/operator/ForumRequestsPage';
+import ApplicationsPage from '@/pages/operator/ApplicationsPage';
+import ApplicationDetailPage from '@/pages/operator/ApplicationDetailPage';
 
 // Consumer Store
 import StoreFront from '@/pages/store/StoreFront';
@@ -52,6 +54,10 @@ import EducationPage from '@/pages/education/EducationPage';
 // Common Pages
 import MyPage from '@/pages/MyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+
+// Apply Pages (API 연동)
+import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
+import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
 
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -91,6 +97,8 @@ function AppRoutes() {
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="apply" element={<PharmacyApplyPage />} />
+        <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         <Route path="mypage" element={
           <ProtectedRoute>
             <MyPage />
@@ -154,6 +162,8 @@ function AppRoutes() {
       >
         <Route index element={<OperatorDashboard />} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
+        <Route path="applications" element={<ApplicationsPage />} />
+        <Route path="applications/:id" element={<ApplicationDetailPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}

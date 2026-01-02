@@ -243,7 +243,18 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20614208630 -R Renagang21/o4o-platform)",
       "Bash(pnpm -F @o4o/dropshipping-core build:*)",
       "Bash(\"C:\\\\\\\\Program Files\\\\\\\\GitHub CLI\\\\\\\\gh.exe\" run list:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(pnpm -F glycopharm-web build:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --workflow=deploy-web-services.yml --limit=5 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" workflow list -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --workflow=deploy-web-services.yml --limit=3 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20649307438 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20649511112 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --workflow=deploy-web-services.yml --limit=2 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20651085960 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(pnpm install:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" workflow run deploy-web-services.yml --ref main -f service=glycopharm -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20652560705 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }

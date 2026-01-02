@@ -13,6 +13,8 @@ import { createGlucoseViewController } from './controllers/glucoseview.controlle
 import { createCustomerController } from './controllers/customer.controller.js';
 import { createBranchController } from './controllers/branch.controller.js';
 import { createPharmacistController } from './controllers/pharmacist.controller.js';
+import { createGlucoseViewApplicationController } from './controllers/application.controller.js';
+import { createGlucoseViewPharmacyController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import { GlucoseViewPharmacist } from './entities/index.js';
 
@@ -134,11 +136,25 @@ export function createGlucoseViewRoutes(dataSource: DataSource): Router {
     requireGlucoseViewAdmin
   );
 
+  // Application controller (Phase C-4)
+  const applicationController = createGlucoseViewApplicationController(
+    dataSource,
+    coreRequireAuth as any
+  );
+
+  // Pharmacy controller (Phase C-4)
+  const pharmacyController = createGlucoseViewPharmacyController(
+    dataSource,
+    coreRequireAuth as any
+  );
+
   // Mount routes
   router.use('/', glucoseviewController);
   router.use('/customers', customerController);
   router.use('/', branchController); // /branches, /chapters
   router.use('/pharmacists', pharmacistController);
+  router.use('/applications', applicationController);
+  router.use('/pharmacies', pharmacyController);
 
   return router;
 }

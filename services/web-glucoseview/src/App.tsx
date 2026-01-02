@@ -10,6 +10,11 @@ import RegisterPage from './pages/RegisterPage';
 import PendingPage from './pages/PendingPage';
 import AdminPage from './pages/AdminPage';
 import MyPage from './pages/MyPage';
+import DashboardPage from './pages/DashboardPage';
+import ApplyPage from './pages/apply/ApplyPage';
+import MyApplicationsPage from './pages/apply/MyApplicationsPage';
+import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
+import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -62,6 +67,21 @@ function AppRoutes() {
 
       {/* 관리자 페이지 */}
       <Route path="/admin" element={<AdminPage />} />
+
+      {/* 서비스 신청 페이지 (Phase C-4) */}
+      <Route path="/apply" element={<ApplyPage />} />
+      <Route path="/apply/my-applications" element={<MyApplicationsPage />} />
+
+      {/* 대시보드 (Phase C-4) */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <DashboardPage />
+        </ProtectedRoute>
+      } />
+
+      {/* 운영자 페이지 (Phase C-4) */}
+      <Route path="/operator/glucoseview/applications" element={<OperatorApplicationsPage />} />
+      <Route path="/operator/glucoseview/applications/:id" element={<OperatorApplicationDetailPage />} />
 
       {/* 메인 레이아웃 (홈은 공개, 나머지는 보호) */}
       <Route path="/" element={<Layout />}>

@@ -14,6 +14,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { GlycopharmProduct } from './glycopharm-product.entity.js';
+import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
 
 export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
 
@@ -54,6 +55,9 @@ export class GlycopharmPharmacy {
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   created_by_user_name?: string;
+
+  @Column({ name: 'enabled_services', type: 'jsonb', default: '[]' })
+  enabled_services!: GlycopharmServiceType[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;

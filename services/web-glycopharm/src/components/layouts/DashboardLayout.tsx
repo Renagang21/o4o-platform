@@ -72,9 +72,9 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
     color: 'red',
     menuItems: [
       { path: '/operator', label: '대시보드', icon: LayoutDashboard },
+      { path: '/operator/applications', label: '신청 관리', icon: FileCheck },
+      { path: '/operator/forum-requests', label: '포럼 신청 관리', icon: MessageSquare },
       { path: '/operator/users', label: '회원 관리', icon: Users },
-      { path: '/operator/approvals', label: '승인 관리', icon: ShoppingCart },
-      { path: '/operator/forum-requests', label: '포럼 신청 관리', icon: FileCheck },
       { path: '/operator/settings', label: '사이트 설정', icon: Settings },
     ],
   },

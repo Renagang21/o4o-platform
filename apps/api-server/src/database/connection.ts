@@ -125,6 +125,7 @@ import {
   GlycopharmPharmacy,
   GlycopharmProduct,
   GlycopharmProductLog,
+  GlycopharmApplication,
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -138,6 +139,8 @@ import {
   GlucoseViewBranch,
   GlucoseViewChapter,
   GlucoseViewPharmacist,
+  GlucoseViewApplication,
+  GlucoseViewPharmacy,
 } from '../routes/glucoseview/entities/index.js';
 
 // ============================================================================
@@ -150,6 +153,14 @@ import {
   NetureOrder,
   NetureOrderItem,
 } from '../routes/neture/entities/index.js';
+
+// ============================================================================
+// K-SHOPPING ENTITIES (Phase E-1)
+// ============================================================================
+import {
+  KShoppingApplication,
+  KShoppingParticipant,
+} from '../routes/k-shopping/entities/index.js';
 
 // ============================================================================
 // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
@@ -351,6 +362,7 @@ export const AppDataSource = new DataSource({
     GlycopharmPharmacy,
     GlycopharmProduct,
     GlycopharmProductLog,
+    GlycopharmApplication,
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================
@@ -361,6 +373,8 @@ export const AppDataSource = new DataSource({
     GlucoseViewBranch,
     GlucoseViewChapter,
     GlucoseViewPharmacist,
+    GlucoseViewApplication,
+    GlucoseViewPharmacy,
     // ============================================================================
     // NETURE ENTITIES (Phase D-1, G-3: Neture API Implementation + Orders)
     // ============================================================================
@@ -369,6 +383,11 @@ export const AppDataSource = new DataSource({
     NetureProductLog,
     NetureOrder,
     NetureOrderItem,
+    // ============================================================================
+    // K-SHOPPING ENTITIES (Phase E-1: K-Shopping API Implementation)
+    // ============================================================================
+    KShoppingApplication,
+    KShoppingParticipant,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
     // ============================================================================

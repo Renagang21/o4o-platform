@@ -27,10 +27,10 @@ const partners = [
 
 // Mock stats
 const stats = [
-  { label: '가입 약국', value: '2,500+', icon: Building2 },
-  { label: '등록 상품', value: '15,000+', icon: Package },
-  { label: '월간 거래액', value: '50억+', icon: TrendingUp },
-  { label: '만족도', value: '98%', icon: Users },
+  { label: '가입 약국', value: '2,500+', icon: Building2, iconBg: 'bg-primary-100', iconColor: 'text-primary-600' },
+  { label: '등록 상품', value: '15,000+', icon: Package, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+  { label: '월간 거래액', value: '50억+', icon: TrendingUp, iconBg: 'bg-green-100', iconColor: 'text-green-600' },
+  { label: '만족도', value: '98%', icon: Users, iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
 ];
 
 const features = [
@@ -76,8 +76,8 @@ const categories = [
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-accent-700 py-20 md:py-28">
+      {/* Hero Section - Neutral 기반 + Primary 포인트 */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20 md:py-28">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
@@ -94,7 +94,7 @@ export default function HomePage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
                 혈당관리의 새로운
                 <br />
-                <span className="text-primary-200">기준을 만듭니다</span>
+                <span className="text-primary-400">기준을 만듭니다</span>
               </h1>
               <p className="text-lg text-white/80 mb-8 max-w-xl">
                 CGM, 혈당측정기, 건강기능식품까지.
@@ -103,7 +103,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <NavLink
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-primary-700 font-semibold rounded-xl hover:bg-primary-50 transition-all shadow-xl shadow-black/20"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/30"
                 >
                   무료로 시작하기
                   <ArrowRight className="w-5 h-5" />
@@ -131,8 +131,8 @@ export default function HomePage() {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
-                            <Icon className="w-6 h-6 text-primary-600" />
+                          <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center`}>
+                            <Icon className={`w-6 h-6 ${stat.iconColor}`} />
                           </div>
                           <div>
                             <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
@@ -205,8 +205,8 @@ export default function HomePage() {
                 className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all cursor-pointer"
               >
                 <div className="aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary-100 to-accent-100 flex items-center justify-center">
-                    <Activity className="w-10 h-10 text-primary-400" />
+                  <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+                    <Activity className="w-10 h-10 text-slate-400" />
                   </div>
                 </div>
                 <h3 className="font-medium text-slate-800 text-sm mb-1">{category.name}</h3>

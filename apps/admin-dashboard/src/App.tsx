@@ -178,6 +178,10 @@ const GlycopharmRouter = lazy(() => import('@/pages/glycopharm/GlycopharmRouter'
 // GlucoseView Pages (Phase C-3)
 const GlucoseViewRouter = lazy(() => import('@/pages/glucoseview/GlucoseViewRouter'));
 
+// Service Applications Admin Pages (Phase C-4)
+const ServiceApplicationsPage = lazy(() => import('@/pages/service-applications/ServiceApplicationsPage'));
+const ServiceApplicationDetailPage = lazy(() => import('@/pages/service-applications/ServiceApplicationDetailPage'));
+
 // Neture Pages (Phase D-3)
 const NetureRouter = lazy(() => import('@/pages/neture/NetureRouter'));
 
@@ -1388,6 +1392,22 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <GlucoseViewRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Service Applications Admin (Phase C-4) */}
+                    <Route path="/admin/service-applications/:service" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'operator']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ServiceApplicationsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/service-applications/:service/:id" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'operator']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ServiceApplicationDetailPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

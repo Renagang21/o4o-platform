@@ -394,6 +394,28 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
+  // Service Applications (서비스 신청 관리)
+  {
+    id: 'service-applications',
+    label: '서비스 신청 관리',
+    icon: <ClipboardList className="w-5 h-5" />,
+    roles: ['admin', 'super_admin', 'operator'],
+    children: [
+      {
+        id: 'service-applications-glycopharm',
+        label: 'GlycoPharm 신청',
+        icon: <Heart className="w-4 h-4" />,
+        path: '/admin/service-applications/glycopharm',
+      },
+      {
+        id: 'service-applications-glucoseview',
+        label: 'GlucoseView 신청',
+        icon: <Activity className="w-4 h-4" />,
+        path: '/admin/service-applications/glucoseview',
+      },
+    ],
+  },
+
   // Neture (B2C 대표 서비스)
   {
     id: 'neture',
