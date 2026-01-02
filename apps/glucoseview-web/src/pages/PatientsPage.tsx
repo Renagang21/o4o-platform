@@ -286,8 +286,7 @@ export default function PatientsPage() {
         <div className="max-w-5xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-900 mb-1">Patients</h1>
-              <p className="text-slate-500">환자별 CGM 데이터 관리</p>
+              <h1 className="text-2xl font-semibold text-slate-900">환자 관리</h1>
             </div>
             {/* Data Import Button */}
             <button
@@ -541,7 +540,7 @@ export default function PatientsPage() {
                   <div className="space-y-3 mb-6">
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">1</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">1</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">혈당 패턴 요약</p>
                           <p className="text-xs text-slate-500 mt-1">전반적으로 안정적인 패턴을 보이나, 식후 2시간 혈당 상승 경향이 관찰됩니다.</p>
@@ -551,7 +550,7 @@ export default function PatientsPage() {
 
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">2</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">2</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">주의 관찰 포인트</p>
                           <p className="text-xs text-slate-500 mt-1">야간(02:00-04:00) 저혈당 가능성 - 취침 전 간식 섭취 여부 확인 권장</p>
@@ -561,7 +560,7 @@ export default function PatientsPage() {
 
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">3</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">3</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">긍정적 변화</p>
                           <p className="text-xs text-slate-500 mt-1">지난 7일간 목표 범위(70-180) 내 시간 비율이 개선되었습니다.</p>
@@ -571,7 +570,7 @@ export default function PatientsPage() {
 
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">4</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">4</span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">상담 시 고려사항</p>
                           <p className="text-xs text-slate-500 mt-1">복용 중인 약물과 식사 시간의 연관성을 확인하고, 규칙적인 식사를 권장합니다.</p>
@@ -594,19 +593,16 @@ export default function PatientsPage() {
                         value={aiQuestion}
                         onChange={(e) => setAiQuestion(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleAskAI()}
-                        placeholder="예: 이 환자에게 추천할 생활습관은?"
+                        placeholder="질문 입력..."
                         className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <button
                         onClick={handleAskAI}
-                        className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         질문
                       </button>
                     </div>
-                    <p className="text-xs text-slate-400 mt-2">
-                      AI가 환자 데이터를 기반으로 추가 인사이트를 제공합니다
-                    </p>
                   </div>
                 </div>
 

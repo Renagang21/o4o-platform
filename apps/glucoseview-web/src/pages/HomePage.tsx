@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from '../components/LoginModal';
@@ -27,34 +27,16 @@ interface Partner {
   order: number;
 }
 
-// 샘플 슬라이드 배너 데이터 (나중에 관리자가 수정 가능)
+// 슬라이드 배너 데이터 - 단일 배너로 간소화 (전문 도구 UI)
 const sampleBanners: SlideBanner[] = [
   {
     id: '1',
     title: 'GlucoseView',
-    subtitle: '약국을 위한 CGM 데이터 정리 도구',
-    bgColor: 'bg-gradient-to-r from-blue-600 to-blue-400',
+    subtitle: '약국용 CGM 데이터 관리',
+    bgColor: 'bg-blue-600',
     textColor: 'text-white',
     isActive: true,
     order: 1,
-  },
-  {
-    id: '2',
-    title: '혈당 관리의 새로운 패러다임',
-    subtitle: '환자별 CGM 데이터를 한눈에 파악하세요',
-    bgColor: 'bg-gradient-to-r from-purple-600 to-pink-500',
-    textColor: 'text-white',
-    isActive: true,
-    order: 2,
-  },
-  {
-    id: '3',
-    title: '약사님의 상담을 도와드립니다',
-    subtitle: '데이터 기반의 전문 상담 지원',
-    bgColor: 'bg-gradient-to-r from-emerald-600 to-teal-500',
-    textColor: 'text-white',
-    isActive: true,
-    order: 3,
   },
 ];
 
@@ -143,16 +125,6 @@ export default function HomePage() {
   // 파트너 상태
   const [partners] = useState<Partner[]>(() => loadPartners().filter(p => p.isActive).sort((a, b) => a.order - b.order));
 
-  // 자동 슬라이드
-  useEffect(() => {
-    if (banners.length <= 1) return;
-
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % banners.length);
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [banners.length]);
 
   // 보호된 기능 클릭 핸들러
   const handleProtectedClick = (path: string) => {
@@ -261,12 +233,8 @@ export default function HomePage() {
       )}
 
       {/* Hero Section - CTA */}
-      <section className="py-12 px-6 bg-white border-b border-slate-100">
+      <section className="py-8 px-6 bg-white border-b border-slate-100">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-sm text-slate-400 mb-2">
-            glucoseview.co.kr
-          </p>
-
           {/* 로그인 상태에 따른 CTA */}
           {!isAuthenticated ? (
             <div className="flex items-center justify-center gap-3">
@@ -414,58 +382,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 사이트 폭에 맞춘 무한 스크롤 */}
+      {/* Partner Section - 정적 그리드 표시 */}
       {partners.length > 0 && (
         <section className="py-6 bg-slate-50 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-4 md:px-6 mb-4">
-            <h3 className="text-sm font-medium text-slate-500 text-center">파트너 & 관련 기관</h3>
+            <h3 className="text-sm font-medium text-slate-500 text-center">관련 기관</h3>
           </div>
 
-          {/* 무한 스크롤 마퀴 - 사이트 폭에 맞춤 */}
-          <div className="max-w-5xl mx-auto overflow-hidden">
-            <div className="flex animate-marquee">
-              {/* 첫 번째 세트 */}
+          {/* 정적 그리드 레이아웃 */}
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
+            <div className="flex flex-wrap justify-center gap-3">
               {partners.map((partner) => (
                 <a
                   key={partner.id}
                   href={partner.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 mx-3 flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
+                  className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
                     {partner.logoUrl ? (
-                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
+                      <img src={partner.logoUrl} alt={partner.name} className="w-5 h-5 object-contain" />
                     ) : (
-                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
+                      <span className="text-sm font-bold text-slate-400">{partner.name.charAt(0)}</span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
-                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
-                  </div>
-                </a>
-              ))}
-              {/* 두 번째 세트 (무한 스크롤 효과) */}
-              {partners.map((partner) => (
-                <a
-                  key={`${partner.id}-dup`}
-                  href={partner.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 mx-3 flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0">
-                    {partner.logoUrl ? (
-                      <img src={partner.logoUrl} alt={partner.name} className="w-6 h-6 object-contain" />
-                    ) : (
-                      <span className="text-lg font-bold text-slate-400">{partner.name.charAt(0)}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-700 whitespace-nowrap">{partner.name}</p>
-                    <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
-                  </div>
+                  <span className="text-sm font-medium text-slate-600">{partner.name}</span>
                 </a>
               ))}
             </div>
