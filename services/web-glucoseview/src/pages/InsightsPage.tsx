@@ -402,8 +402,7 @@ export default function InsightsPage() {
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-900 mb-1">Insights</h1>
-              <p className="text-slate-500">전체 고객의 경향과 흐름</p>
+              <h1 className="text-2xl font-semibold text-slate-900">분석 현황</h1>
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -434,8 +433,8 @@ export default function InsightsPage() {
           {/* 1. 전체 요약 */}
           <InsightCard
             id="summary"
-            icon={<svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>}
-            iconBg="bg-blue-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>}
+            iconBg="bg-slate-100"
             title="전체 요약"
             subtitle="고객 전체의 혈당 관리 현황"
             expanded={expandedSection === 'summary'}
@@ -497,8 +496,8 @@ export default function InsightsPage() {
           {/* 2. TIR 분석 (Time in Range) */}
           <InsightCard
             id="tir"
-            icon={<svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-            iconBg="bg-green-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+            iconBg="bg-slate-100"
             title="목표 범위 분석 (TIR)"
             subtitle="70-180 mg/dL 범위 내 시간 비율"
             badge={{ text: '핵심 지표', color: 'bg-green-100 text-green-700' }}
@@ -536,18 +535,8 @@ export default function InsightsPage() {
               </div>
 
               {/* 권장 목표 */}
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <div className="text-sm font-medium text-blue-800">국제 권장 기준</div>
-                    <div className="text-xs text-blue-600 mt-1">
-                      TIR 70% 이상 / 저혈당(&lt;70) 4% 미만 / 고혈당(&gt;180) 25% 미만
-                    </div>
-                  </div>
-                </div>
+              <div className="text-xs text-slate-500 text-center">
+                권장: TIR 70% 이상 / 저혈당 4% 미만 / 고혈당 25% 미만
               </div>
             </div>
           </InsightCard>
@@ -555,8 +544,8 @@ export default function InsightsPage() {
           {/* 3. 주간 경향 */}
           <InsightCard
             id="trend"
-            icon={<svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>}
-            iconBg="bg-purple-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>}
+            iconBg="bg-slate-100"
             title="주간 경향"
             subtitle="최근 7일간 평균 혈당 추이"
             expanded={expandedSection === 'trend'}
@@ -612,8 +601,8 @@ export default function InsightsPage() {
           {/* 4. 시간대별 패턴 */}
           <InsightCard
             id="timePattern"
-            icon={<svg className="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-            iconBg="bg-cyan-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+            iconBg="bg-slate-100"
             title="시간대별 패턴"
             subtitle="하루 중 혈당 변화 경향"
             expanded={expandedSection === 'timePattern'}
@@ -699,8 +688,8 @@ export default function InsightsPage() {
           {/* 5. GMI (혈당 관리 지표) */}
           <InsightCard
             id="gmi"
-            icon={<svg className="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>}
-            iconBg="bg-rose-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>}
+            iconBg="bg-slate-100"
             title="GMI (혈당 관리 지표)"
             subtitle="CGM 데이터 기반 추정 HbA1c"
             expanded={expandedSection === 'gmi'}
@@ -753,8 +742,8 @@ export default function InsightsPage() {
           {/* 6. 관찰 포인트 (알림) - 클릭 가능 */}
           <InsightCard
             id="alerts"
-            icon={<svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
-            iconBg="bg-amber-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
+            iconBg="bg-slate-100"
             title="관찰 포인트"
             subtitle="상담 시 참고할 주요 패턴"
             badge={{ text: '4건', color: 'bg-amber-100 text-amber-700' }}
@@ -823,8 +812,8 @@ export default function InsightsPage() {
           {/* 7. 혈당 변동성 (CV) - 클릭 가능 */}
           <InsightCard
             id="variability"
-            icon={<svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>}
-            iconBg="bg-indigo-50"
+            icon={<svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>}
+            iconBg="bg-slate-100"
             title="혈당 변동성 (CV)"
             subtitle="혈당 안정성 지표"
             expanded={expandedSection === 'variability'}
