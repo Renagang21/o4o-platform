@@ -5,6 +5,20 @@
  * - participantType: 'store' | 'guide' | 'partner'
  * - serviceTypes: 신청한 서비스 목록 (JSONB)
  * - 승인 시 KShoppingParticipant 생성
+ *
+ * 🔒 FROZEN (H1-0): 이 엔티티는 동결 상태입니다.
+ *
+ * ## 동결 사유
+ * Cosmetics Core 도메인으로의 향후 통합을 위해 현재 구조를 유지합니다.
+ * 통합 시 cosmetics_applications로 이전될 예정입니다.
+ *
+ * ## 확장 금지
+ * - 신규 컬럼 추가 ❌
+ * - participantType 값 추가 ❌ (store/guide/partner 고정)
+ * - serviceTypes 값 추가 ❌ (tax_refund/guide_sales/travel_package 고정)
+ * - Cosmetics 엔티티와 FK 관계 설정 ❌
+ *
+ * @frozen H1-0 (2025-01-02)
  */
 
 import {

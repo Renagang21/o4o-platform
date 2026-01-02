@@ -5,6 +5,24 @@
  * - Application 승인 시 자동 생성
  * - enabledServices: 활성화된 서비스 목록 (Source of Truth)
  * - participantType: 'store' | 'guide' | 'partner'
+ *
+ * 🔒 FROZEN (H1-0): 이 엔티티는 동결 상태입니다.
+ *
+ * ## 동결 사유
+ * Cosmetics Core 도메인으로의 향후 통합을 위해 현재 구조를 유지합니다.
+ * 통합 시 cosmetics_participants로 이전될 예정입니다.
+ *
+ * ## 확장 금지
+ * - 신규 컬럼 추가 ❌
+ * - status 값 추가 ❌ (active/inactive/suspended 고정)
+ * - Cosmetics 엔티티와 FK 관계 설정 ❌
+ *
+ * ## 데이터 관계 (참조만 허용)
+ * - userId → auth-core User (UUID 참조)
+ * - applicationId → KShoppingApplication (동일 도메인 내 참조)
+ * - Cosmetics 상품 ID 참조 시 → metadata JSONB에 저장 (FK 금지)
+ *
+ * @frozen H1-0 (2025-01-02)
  */
 
 import {
