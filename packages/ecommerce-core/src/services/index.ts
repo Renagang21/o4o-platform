@@ -22,3 +22,18 @@ export {
   type SellerStats,
   type OrderQueryFilters,
 } from './EcommerceOrderQueryService.js';
+
+// Cosmetics 도메인 전용 (H2-0)
+export {
+  CosmeticsOrderService,
+  type OrderChannel,
+  type FulfillmentType,
+  type TaxRefundMeta,
+  type TravelChannelMeta,
+  type LocalChannelMeta,
+  type CommissionMeta,
+  type CosmeticsOrderMetadata,
+  type ProductSnapshot,
+  type CreateCosmeticsOrderItemDto,
+  type CreateCosmeticsOrderDto,
+} from './CosmeticsOrderService.js';

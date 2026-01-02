@@ -2,12 +2,15 @@
  * Cosmetics Routes
  *
  * Phase 7-A-1: Cosmetics API Implementation
+ * H2-0: Order Routes 추가
+ *
  * Main entry point for cosmetics API routes
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { createCosmeticsController } from './controllers/cosmetics.controller.js';
+import { createCosmeticsOrderController } from './controllers/cosmetics-order.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 
@@ -54,8 +57,15 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     requireCosmeticsScope
   );
 
-  // Mount controller
+  // Create order controller (H2-0)
+  const orderController = createCosmeticsOrderController(
+    coreRequireAuth as any,
+    requireCosmeticsScope
+  );
+
+  // Mount controllers
   router.use('/', cosmeticsController);
+  router.use('/orders', orderController); // H2-0: 주문 엔드포인트
 
   return router;
 }
