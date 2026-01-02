@@ -2,13 +2,16 @@
  * Cosmetics Order Controller
  *
  * H2-0: metadata.channel 기반 주문 생성 API
+ * H3-0: Travel Order + TaxRefund Flag Implementation
  *
  * ## 설계 원칙
  * - OrderType = RETAIL 고정 (CosmeticsOrderService에서 처리)
  * - 채널 분기 = metadata.channel ('local' | 'travel')
  * - Cosmetics Product = UUID 참조 + 스냅샷
+ * - TaxRefund는 Order 단위, Amount 저장 금지 (H2-3)
  *
  * @since H2-0 (2025-01-02)
+ * @updated H3-0 (2025-01-02) - TaxRefund validation
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
@@ -22,11 +25,31 @@ import type { AuthRequest } from '../../../types/auth.js';
 type OrderChannel = 'local' | 'travel';
 type FulfillmentType = 'pickup' | 'delivery' | 'on-site';
 
+/**
+ * TaxRefund Metadata (H2-3 확정 스키마)
+ *
+ * 핵심 원칙:
+ * - amount 필드 없음 (정산 시 계산)
+ * - eligible은 필수
+ * - 외부 연동은 reference만
+ */
 interface TaxRefundMeta {
+  /** 환급 대상 여부 (필수) */
   eligible: boolean;
-  status?: 'pending' | 'applied' | 'completed' | 'rejected';
-  amount?: number;
-  applicationId?: string;
+  /** 환급 방식 */
+  scheme?: 'standard' | 'instant';
+  /** 예상 환급 비율 (0~1) */
+  estimatedRate?: number;
+  /** 환급 사업자 코드 (외부 연동 시) */
+  provider?: string;
+  /** 외부 시스템 참조 ID */
+  referenceId?: string;
+  /** 환급 상태 */
+  status?: 'pending' | 'requested' | 'completed' | 'rejected';
+  /** 신청 시점 */
+  requestedAt?: string;
+  /** 완료 시점 */
+  completedAt?: string;
 }
 
 interface TravelChannelMeta {
@@ -105,6 +128,12 @@ const VALIDATION_ERRORS = {
   TRAVEL_HAS_LOCAL_FIELDS: 'Travel channel order cannot have local-specific fields',
   ITEMS_REQUIRED: 'At least one order item is required',
   SELLER_ID_REQUIRED: 'sellerId is required',
+  // H3-0: TaxRefund validation errors
+  TAXREFUND_ELIGIBLE_REQUIRED: 'metadata.travel.taxRefund.eligible is required when taxRefund is provided',
+  TAXREFUND_AMOUNT_FORBIDDEN: 'metadata.travel.taxRefund.amount is not allowed (H2-3: Rate-based only)',
+  TAXREFUND_INVALID_SCHEME: 'metadata.travel.taxRefund.scheme must be "standard" or "instant"',
+  TAXREFUND_INVALID_RATE: 'metadata.travel.taxRefund.estimatedRate must be between 0 and 1',
+  TAXREFUND_INVALID_STATUS: 'metadata.travel.taxRefund.status must be one of: pending, requested, completed, rejected',
 } as const;
 
 // ============================================================================
@@ -141,6 +170,50 @@ function handleValidationErrors(req: Request, res: Response): boolean {
 }
 
 /**
+ * TaxRefund validation (H3-0)
+ *
+ * H2-3 결정 준수:
+ * - eligible 필수
+ * - amount 필드 금지
+ * - estimatedRate는 0~1 범위
+ */
+function validateTaxRefund(
+  taxRefund: TaxRefundMeta & { amount?: number }
+): { valid: boolean; error?: string } {
+  // eligible 필수
+  if (typeof taxRefund.eligible !== 'boolean') {
+    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_ELIGIBLE_REQUIRED };
+  }
+
+  // amount 필드 금지 (H2-3: Rate-based only)
+  if ('amount' in taxRefund && taxRefund.amount !== undefined) {
+    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_AMOUNT_FORBIDDEN };
+  }
+
+  // scheme 검증
+  if (taxRefund.scheme && !['standard', 'instant'].includes(taxRefund.scheme)) {
+    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_INVALID_SCHEME };
+  }
+
+  // estimatedRate 범위 검증
+  if (taxRefund.estimatedRate !== undefined) {
+    if (typeof taxRefund.estimatedRate !== 'number' ||
+        taxRefund.estimatedRate < 0 ||
+        taxRefund.estimatedRate > 1) {
+      return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_INVALID_RATE };
+    }
+  }
+
+  // status 검증
+  const validStatuses = ['pending', 'requested', 'completed', 'rejected'];
+  if (taxRefund.status && !validStatuses.includes(taxRefund.status)) {
+    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_INVALID_STATUS };
+  }
+
+  return { valid: true };
+}
+
+/**
  * Channel-specific validation
  */
 function validateChannelMetadata(
@@ -170,6 +243,16 @@ function validateChannelMetadata(
     }
     if (metadata.local) {
       return { valid: false, error: VALIDATION_ERRORS.TRAVEL_HAS_LOCAL_FIELDS };
+    }
+
+    // H3-0: TaxRefund 검증
+    if (metadata.travel.taxRefund) {
+      const taxRefundValidation = validateTaxRefund(
+        metadata.travel.taxRefund as TaxRefundMeta & { amount?: number }
+      );
+      if (!taxRefundValidation.valid) {
+        return taxRefundValidation;
+      }
     }
   }
 
@@ -284,14 +367,30 @@ export function createCosmeticsOrderController(
           createdAt: now.toISOString(),
         };
 
-        console.log(`[Cosmetics Order] Created ${dto.metadata.channel} channel order:`, {
+        // H3-0: Travel 주문 로깅 개선
+        const logData: Record<string, any> = {
           orderNumber,
           channel: dto.metadata.channel,
           buyerId,
           sellerId: dto.sellerId,
           totalAmount,
           itemCount: dto.items.length,
-        });
+        };
+
+        // Travel 채널인 경우 추가 정보 로깅
+        if (dto.metadata.channel === 'travel' && dto.metadata.travel) {
+          logData.guideId = dto.metadata.travel.guideId;
+          logData.tourSessionId = dto.metadata.travel.tourSessionId;
+          if (dto.metadata.travel.taxRefund) {
+            logData.taxRefund = {
+              eligible: dto.metadata.travel.taxRefund.eligible,
+              scheme: dto.metadata.travel.taxRefund.scheme,
+              estimatedRate: dto.metadata.travel.taxRefund.estimatedRate,
+            };
+          }
+        }
+
+        console.log(`[Cosmetics Order] Created ${dto.metadata.channel} channel order:`, logData);
 
         res.status(201).json({
           data: orderResponse,
