@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   TrendingUp,
@@ -9,7 +10,10 @@ import {
   ArrowRight,
   Eye,
   MoreHorizontal,
+  Building2,
+  CheckCircle,
 } from 'lucide-react';
+import { glycopharmApi, Pharmacy } from '@/api/glycopharm';
 
 // Mock data
 const stats = [
@@ -69,6 +73,25 @@ const statusColors: Record<string, { bg: string; text: string; label: string }> 
 };
 
 export default function PharmacyDashboard() {
+  const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null);
+  const [pharmacyLoading, setPharmacyLoading] = useState(true);
+
+  useEffect(() => {
+    loadPharmacyInfo();
+  }, []);
+
+  const loadPharmacyInfo = async () => {
+    try {
+      const response = await glycopharmApi.getMyPharmacy();
+      setPharmacy(response.pharmacy);
+    } catch {
+      // 약국 정보가 없는 경우 (아직 승인 전)
+      setPharmacy(null);
+    } finally {
+      setPharmacyLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -85,6 +108,47 @@ export default function PharmacyDashboard() {
           내 매장 보기
         </NavLink>
       </div>
+
+      {/* Pharmacy Info Card */}
+      {!pharmacyLoading && pharmacy && (
+        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-6 text-white shadow-lg">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                <Building2 className="w-7 h-7" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">{pharmacy.pharmacyName}</h2>
+                <p className="text-primary-100 text-sm">{pharmacy.address}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">활성화됨</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/20 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <p className="text-primary-200">사업자번호</p>
+              <p className="font-medium">{pharmacy.businessNumber || '-'}</p>
+            </div>
+            <div>
+              <p className="text-primary-200">연락처</p>
+              <p className="font-medium">{pharmacy.phone || '-'}</p>
+            </div>
+            <div>
+              <p className="text-primary-200">활성 서비스</p>
+              <p className="font-medium">{pharmacy.activeServices.length}개</p>
+            </div>
+            <div>
+              <p className="text-primary-200">승인일</p>
+              <p className="font-medium">
+                {new Date(pharmacy.approvedAt).toLocaleDateString('ko-KR')}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

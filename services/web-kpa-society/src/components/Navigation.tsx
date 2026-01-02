@@ -1,3 +1,5 @@
+import { Link, useLocation } from 'react-router-dom';
+
 interface NavItem {
   label: string;
   href: string;
@@ -5,29 +7,29 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: '홈', href: '/' },
-  { label: '서비스 소개', href: '/about' },
-  { label: '주요 기능', href: '/features' },
-  { label: '이용 안내', href: '/guide' },
+  { label: '조직', href: '/organizations' },
+  { label: '회원 신청', href: '/member/apply' },
+  { label: '내 신청', href: '/applications' },
 ];
 
 export function Navigation() {
-  // Phase 2-B: 현재 경로 하이라이트 (추후 React Router 연동)
-  const currentPath = window.location.pathname;
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   return (
     <nav style={styles.nav}>
       <ul style={styles.navList}>
         {navItems.map((item) => (
           <li key={item.href} style={styles.navItem}>
-            <a
-              href={item.href}
+            <Link
+              to={item.href}
               style={{
                 ...styles.navLink,
                 ...(currentPath === item.href ? styles.navLinkActive : {}),
               }}
             >
               {item.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

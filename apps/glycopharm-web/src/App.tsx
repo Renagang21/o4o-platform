@@ -42,6 +42,10 @@ import EducationPage from '@/pages/education/EducationPage';
 import MyPage from '@/pages/MyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
+// Pharmacy Application Pages
+import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
+import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
+
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
   const { isAuthenticated, user, isLoading } = useAuth();
@@ -80,6 +84,16 @@ function AppRoutes() {
         <Route path="mypage" element={
           <ProtectedRoute>
             <MyPage />
+          </ProtectedRoute>
+        } />
+        <Route path="apply" element={
+          <ProtectedRoute>
+            <PharmacyApplyPage />
+          </ProtectedRoute>
+        } />
+        <Route path="apply/status" element={
+          <ProtectedRoute>
+            <MyApplicationsPage />
           </ProtectedRoute>
         } />
       </Route>
