@@ -104,7 +104,9 @@ const io = new Server(httpServer, {
         "http://13.125.144.8:3000", "http://13.125.144.8:3001", "http://13.125.144.8", "https://13.125.144.8",
         "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr", "http://admin.neture.co.kr",
         "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
-        "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr", "http://api.neture.co.kr"
+        "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr", "http://api.neture.co.kr",
+        "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
+        "https://glucoseview.co.kr", "https://www.glucoseview.co.kr"
       ];
 
       if (!origin || allowedOrigins.includes(origin)) {
@@ -193,6 +195,8 @@ const corsOptions: CorsOptions = {
       "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
       "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
       "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
+      "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
+      "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
     ];
 
     const allowedOrigins = [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
