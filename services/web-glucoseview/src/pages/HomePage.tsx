@@ -386,7 +386,7 @@ export default function HomePage() {
       {partners.length > 0 && (
         <section className="py-6 bg-slate-50 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-4 md:px-6 mb-4">
-            <h3 className="text-sm font-medium text-slate-600 text-center">파트너 & 관련 기관</h3>
+            <h3 className="text-sm font-medium text-slate-600 text-center">파트너</h3>
           </div>
 
           {/* 정적 그리드 레이아웃 */}
