@@ -326,19 +326,40 @@ export default function HomePage() {
       </section>
 
       {/* Partners Marquee */}
-      <section className="py-16 bg-white border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-sm text-slate-400 mb-8">
+      <section className="py-16 bg-white border-t overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-8">
+          <p className="text-center text-sm text-slate-400">
             신뢰할 수 있는 파트너사와 함께합니다
           </p>
-          <div className="overflow-hidden">
-            <div className="flex animate-marquee">
-              {[...partners, ...partners].map((partner, index) => (
+        </div>
+
+        {/* 마퀴 컨테이너 */}
+        <div className="relative">
+          {/* 좌우 페이드 그라데이션 */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+          {/* 마퀴 애니메이션 */}
+          <div className="flex animate-marquee">
+            {/* 첫 번째 세트 */}
+            <div className="flex shrink-0">
+              {partners.map((partner) => (
                 <div
-                  key={`${partner.id}-${index}`}
-                  className="flex-shrink-0 w-32 h-16 mx-8 bg-slate-100 rounded-xl flex items-center justify-center"
+                  key={partner.id}
+                  className="shrink-0 w-36 h-20 mx-6 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-100 hover:border-slate-300 transition-colors"
                 >
-                  <span className="text-slate-400 font-medium">{partner.name}</span>
+                  <span className="text-slate-500 font-medium text-sm">{partner.name}</span>
+                </div>
+              ))}
+            </div>
+            {/* 두 번째 세트 (무한 루프용) */}
+            <div className="flex shrink-0">
+              {partners.map((partner) => (
+                <div
+                  key={`dup-${partner.id}`}
+                  className="shrink-0 w-36 h-20 mx-6 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-100 hover:border-slate-300 transition-colors"
+                >
+                  <span className="text-slate-500 font-medium text-sm">{partner.name}</span>
                 </div>
               ))}
             </div>
