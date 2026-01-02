@@ -1,19 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialEmail?: string;
+  initialPassword?: string;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, initialEmail, initialPassword }: LoginModalProps) {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // 초기값이 있으면 자동 설정
+  useEffect(() => {
+    if (isOpen && initialEmail && initialPassword) {
+      setEmail(initialEmail);
+      setPassword(initialPassword);
+    }
+  }, [isOpen, initialEmail, initialPassword]);
 
   if (!isOpen) return null;
 
@@ -124,29 +134,30 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           약사 회원가입
         </button>
 
-        {/* Test Account Info */}
+        {/* Test Account Buttons */}
         <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-amber-800 mb-2">테스트 계정</p>
-              <div className="space-y-2 text-xs text-amber-700">
-                <div className="p-2 bg-white/50 rounded">
-                  <p className="font-medium">약사 계정</p>
-                  <p>이메일: pharmacist@test.test</p>
-                  <p>비밀번호: testID1234</p>
-                </div>
-                <div className="p-2 bg-white/50 rounded">
-                  <p className="font-medium">관리자 계정</p>
-                  <p>이메일: admin@test.test</p>
-                  <p>비밀번호: adminID1234</p>
-                </div>
-              </div>
-            </div>
+          <p className="text-sm font-medium text-amber-800 mb-3">테스트 계정으로 로그인</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('pharmacist@test.test');
+                setPassword('testID1234');
+              }}
+              className="flex-1 px-3 py-2 text-xs font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+            >
+              약사 계정
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin@test.test');
+                setPassword('adminID1234');
+              }}
+              className="flex-1 px-3 py-2 text-xs font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+            >
+              관리자 계정
+            </button>
           </div>
         </div>
       </div>

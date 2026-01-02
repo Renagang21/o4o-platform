@@ -117,6 +117,7 @@ export default function HomePage() {
   const { isAuthenticated, isApproved, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [testAccount, setTestAccount] = useState<{ email: string; password: string } | null>(null);
 
   // 슬라이드 배너 상태
   const [banners] = useState<SlideBanner[]>(() => loadBanners().filter(b => b.isActive).sort((a, b) => a.order - b.order));
@@ -426,32 +427,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Test Account Info - 비로그인 시에만 표시 */}
+      {/* Test Account Buttons - 비로그인 시에만 표시 */}
       {!isAuthenticated && (
         <section className="pb-16 px-6">
           <div className="max-w-3xl mx-auto">
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-800 mb-2">테스트 계정 안내</p>
-                  <div className="grid grid-cols-2 gap-3 text-xs text-amber-700">
-                    <div className="p-2 bg-white/50 rounded">
-                      <p className="font-medium mb-1">약사 계정</p>
-                      <p>이메일: pharmacist@test.test</p>
-                      <p>비밀번호: testID1234</p>
-                    </div>
-                    <div className="p-2 bg-white/50 rounded">
-                      <p className="font-medium mb-1">관리자 계정</p>
-                      <p>이메일: admin@test.test</p>
-                      <p>비밀번호: adminID1234</p>
-                    </div>
-                  </div>
-                </div>
+              <p className="text-sm font-medium text-amber-800 mb-3 text-center">테스트 계정으로 로그인</p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => {
+                    setTestAccount({ email: 'pharmacist@test.test', password: 'testID1234' });
+                    setShowLoginModal(true);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+                >
+                  약사 계정
+                </button>
+                <button
+                  onClick={() => {
+                    setTestAccount({ email: 'admin@test.test', password: 'adminID1234' });
+                    setShowLoginModal(true);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+                >
+                  관리자 계정
+                </button>
               </div>
             </div>
           </div>
@@ -459,7 +459,15 @@ export default function HomePage() {
       )}
 
       {/* Login Modal */}
-      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => {
+          setShowLoginModal(false);
+          setTestAccount(null);
+        }}
+        initialEmail={testAccount?.email}
+        initialPassword={testAccount?.password}
+      />
     </div>
   );
 }
