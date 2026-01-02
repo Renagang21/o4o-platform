@@ -7,7 +7,7 @@ export default function ContactPage() {
       <section className="bg-white border-b border-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
           <h1 className="text-2xl font-bold text-slate-800 mb-3">문의하기</h1>
-          <p className="text-slate-500">
+          <p className="text-slate-500 text-base">
             GlycoPharm 서비스 및 제휴에 관한 문의를 받고 있습니다
           </p>
         </div>

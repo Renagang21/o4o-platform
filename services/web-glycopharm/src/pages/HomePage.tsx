@@ -153,10 +153,10 @@ export default function HomePage() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
+            <h2 className="text-3xl font-bold text-slate-800 mb-3">
               왜 GlycoPharm인가요?
             </h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">
+            <p className="text-slate-500 text-base leading-relaxed max-w-2xl mx-auto">
               약사 전용 플랫폼으로서 혈당관리 제품의 유통과 판매를 혁신합니다
             </p>
           </div>
@@ -173,7 +173,7 @@ export default function HomePage() {
                     <Icon className={`w-7 h-7 ${feature.iconColor}`} />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-800 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-slate-500">{feature.description}</p>
+                  <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
                 </div>
               );
             })}
@@ -187,7 +187,7 @@ export default function HomePage() {
           <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="text-3xl font-bold text-slate-800 mb-2">상품 카테고리</h2>
-              <p className="text-slate-500">다양한 혈당관리 제품을 만나보세요</p>
+              <p className="text-slate-500 text-base">다양한 혈당관리 제품을 만나보세요</p>
             </div>
             <NavLink
               to="/forum"
@@ -221,10 +221,10 @@ export default function HomePage() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
+            <h2 className="text-3xl font-bold text-slate-800 mb-3">
               함께 성장하세요
             </h2>
-            <p className="text-slate-500">각 역할에 맞는 맞춤형 서비스를 제공합니다</p>
+            <p className="text-slate-500 text-base">각 역할에 맞는 맞춤형 서비스를 제공합니다</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -233,7 +233,7 @@ export default function HomePage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
               <Building2 className="w-12 h-12 mb-4 opacity-80" />
               <h3 className="text-2xl font-bold mb-2">약국</h3>
-              <p className="text-white/80 text-sm mb-6">
+              <p className="text-white/80 text-sm leading-relaxed mb-6">
                 혈당관리 전문 약국으로 성장하세요. 다양한 제품과 고객 관리 도구를 제공합니다.
               </p>
               <NavLink
@@ -250,7 +250,7 @@ export default function HomePage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
               <Truck className="w-12 h-12 mb-4 opacity-80" />
               <h3 className="text-2xl font-bold mb-2">공급자</h3>
-              <p className="text-white/80 text-sm mb-6">
+              <p className="text-white/80 text-sm leading-relaxed mb-6">
                 전국 2,500개 이상의 약국에 제품을 공급하세요. 효율적인 주문 관리 시스템을 제공합니다.
               </p>
               <NavLink
@@ -267,7 +267,7 @@ export default function HomePage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
               <Handshake className="w-12 h-12 mb-4 opacity-80" />
               <h3 className="text-2xl font-bold mb-2">파트너</h3>
-              <p className="text-white/80 text-sm mb-6">
+              <p className="text-white/80 text-sm leading-relaxed mb-6">
                 디바이스, 컨텐츠, 마케팅 파트너로 함께 하세요. 새로운 비즈니스 기회를 발견하세요.
               </p>
               <NavLink
@@ -296,7 +296,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-slate-800 mb-2">포럼</h3>
-                <p className="text-slate-500 text-sm mb-3">
+                <p className="text-slate-500 text-sm leading-relaxed mb-3">
                   약사들의 노하우와 경험을 공유하세요. 혈당관리에 대한 다양한 정보를 나눌 수 있습니다.
                 </p>
                 <span className="text-primary-600 font-medium text-sm flex items-center gap-1">
@@ -316,7 +316,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-slate-800 mb-2">교육/자료</h3>
-                <p className="text-slate-500 text-sm mb-3">
+                <p className="text-slate-500 text-sm leading-relaxed mb-3">
                   혈당관리 최신 트렌드와 제품 교육 자료를 확인하세요. 전문성을 높이는 데 도움이 됩니다.
                 </p>
                 <span className="text-primary-600 font-medium text-sm flex items-center gap-1">
@@ -377,7 +377,7 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             지금 바로 시작하세요
           </h2>
-          <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
+          <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-2xl mx-auto">
             GlycoPharm과 함께 혈당관리 전문 약국으로 성장하세요.
             무료 가입으로 모든 기능을 체험해보실 수 있습니다.
           </p>
