@@ -79,27 +79,61 @@ const mockGroupbuys = [
 export function DashboardPage() {
   return (
     <div style={styles.container}>
-      {/* A. Hero Section */}
+      {/* A. Hero Section - 경기도약사회 스타일 */}
       <section style={styles.heroSection}>
+        <div style={styles.heroOverlay} />
+        <div style={styles.heroPattern} />
         <div style={styles.heroContent}>
+          <div style={styles.heroBadge}>청명광역약사회</div>
           <h1 style={styles.heroTitle}>
-            안녕하세요, <span style={styles.userName}>{mockUser.name}</span>님
+            약사회는 회원 여러분과<br />함께합니다
           </h1>
           <p style={styles.heroSubtitle}>
-            {mockUser.organization} {'>'} {mockUser.branch}
+            지역 약사회의 공식 업무 지원 플랫폼
           </p>
-          <div style={styles.heroStats}>
-            <div style={styles.heroStat}>
-              <span style={styles.heroStatValue}>{mockActivity.unreadNotices}</span>
-              <span style={styles.heroStatLabel}>미확인 공지</span>
+          <p style={styles.heroDescription}>
+            공지사항, 교육연수, 공동구매, 회원관리를 하나의 플랫폼에서
+          </p>
+          <div style={styles.heroButtons}>
+            <a href="/news/notice" style={styles.heroPrimaryButton}>
+              공지사항 확인
+            </a>
+            <a href="/organization" style={styles.heroSecondaryButton}>
+              약사회 소개
+            </a>
+          </div>
+        </div>
+        {/* 우측 장식 요소 */}
+        <div style={styles.heroDecoration}>
+          <div style={styles.decorCircle1} />
+          <div style={styles.decorCircle2} />
+          <div style={styles.decorCircle3} />
+        </div>
+      </section>
+
+      {/* 환영 메시지 카드 */}
+      <section style={styles.welcomeCard}>
+        <div style={styles.welcomeContent}>
+          <div style={styles.welcomeText}>
+            <span style={styles.welcomeGreeting}>
+              안녕하세요, <strong>{mockUser.name}</strong>님
+            </span>
+            <span style={styles.welcomeOrg}>
+              {mockUser.organization} &gt; {mockUser.branch}
+            </span>
+          </div>
+          <div style={styles.welcomeStats}>
+            <div style={styles.welcomeStat}>
+              <span style={styles.welcomeStatValue}>{mockActivity.unreadNotices}</span>
+              <span style={styles.welcomeStatLabel}>미확인 공지</span>
             </div>
-            <div style={styles.heroStat}>
-              <span style={styles.heroStatValue}>{mockActivity.ongoingCourses.length}</span>
-              <span style={styles.heroStatLabel}>진행중 교육</span>
+            <div style={styles.welcomeStat}>
+              <span style={styles.welcomeStatValue}>{mockActivity.ongoingCourses.length}</span>
+              <span style={styles.welcomeStatLabel}>진행중 교육</span>
             </div>
-            <div style={styles.heroStat}>
-              <span style={styles.heroStatValue}>{mockActivity.activeGroupbuys.length}</span>
-              <span style={styles.heroStatLabel}>참여 공동구매</span>
+            <div style={styles.welcomeStat}>
+              <span style={styles.welcomeStatValue}>{mockActivity.activeGroupbuys.length}</span>
+              <span style={styles.welcomeStatLabel}>참여 공동구매</span>
             </div>
           </div>
         </div>
@@ -304,50 +338,202 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '0 16px 48px',
   },
 
-  // Hero Section
+  // Hero Section - 경기도약사회 스타일 (크게)
   heroSection: {
+    position: 'relative',
     background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 100%)`,
-    borderRadius: borderRadius.lg,
-    padding: '32px',
-    marginTop: '24px',
-    marginBottom: '32px',
+    borderRadius: 0,
+    padding: '80px 40px',
+    marginTop: 0,
+    marginLeft: 'calc(-50vw + 50%)',
+    marginRight: 'calc(-50vw + 50%)',
+    width: '100vw',
+    marginBottom: '0',
     color: colors.white,
+    overflow: 'hidden',
+    minHeight: '400px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%)',
+    pointerEvents: 'none',
+  },
+  heroPattern: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 40%)`,
+    pointerEvents: 'none',
   },
   heroContent: {
-    maxWidth: '600px',
+    position: 'relative',
+    zIndex: 1,
+    maxWidth: '700px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: '20px',
+  },
+  heroBadge: {
+    display: 'inline-block',
+    padding: '8px 20px',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: '30px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    marginBottom: '24px',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255,255,255,0.3)',
   },
   heroTitle: {
-    fontSize: '1.75rem',
-    fontWeight: 600,
-    marginBottom: '8px',
-  },
-  userName: {
-    color: '#93C5FD',
+    fontSize: '2.75rem',
+    fontWeight: 700,
+    marginBottom: '16px',
+    lineHeight: 1.3,
+    textShadow: '0 2px 4px rgba(0,0,0,0.2)',
   },
   heroSubtitle: {
+    fontSize: '1.25rem',
+    opacity: 0.95,
+    marginBottom: '12px',
+    fontWeight: 500,
+  },
+  heroDescription: {
     fontSize: '1rem',
-    opacity: 0.9,
-    marginBottom: '24px',
+    opacity: 0.85,
+    marginBottom: '32px',
+    lineHeight: 1.6,
   },
-  heroStats: {
+  heroButtons: {
     display: 'flex',
-    gap: '24px',
+    gap: '16px',
+    flexWrap: 'wrap',
   },
-  heroStat: {
+  heroPrimaryButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '14px 32px',
+    backgroundColor: colors.white,
+    color: colors.primary,
+    borderRadius: '8px',
+    fontSize: '1rem',
+    fontWeight: 600,
+    textDecoration: 'none',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+  },
+  heroSecondaryButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '14px 32px',
+    backgroundColor: 'transparent',
+    color: colors.white,
+    borderRadius: '8px',
+    fontSize: '1rem',
+    fontWeight: 600,
+    textDecoration: 'none',
+    border: '2px solid rgba(255,255,255,0.5)',
+    transition: 'background-color 0.2s, border-color 0.2s',
+  },
+  heroDecoration: {
+    position: 'absolute',
+    right: '5%',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '400px',
+    height: '400px',
+    pointerEvents: 'none',
+  },
+  decorCircle1: {
+    position: 'absolute',
+    width: '300px',
+    height: '300px',
+    borderRadius: '50%',
+    border: '2px solid rgba(255,255,255,0.15)',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
+  decorCircle2: {
+    position: 'absolute',
+    width: '200px',
+    height: '200px',
+    borderRadius: '50%',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    top: '30%',
+    left: '60%',
+    transform: 'translate(-50%, -50%)',
+  },
+  decorCircle3: {
+    position: 'absolute',
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    top: '70%',
+    left: '40%',
+    transform: 'translate(-50%, -50%)',
+  },
+
+  // Welcome Card
+  welcomeCard: {
+    maxWidth: '1200px',
+    margin: '-40px auto 32px',
+    padding: '0 16px',
+    position: 'relative',
+    zIndex: 2,
+  },
+  welcomeContent: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '24px 32px',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.lg,
+    border: `1px solid ${colors.gray200}`,
+    flexWrap: 'wrap',
+    gap: '20px',
+  },
+  welcomeText: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  welcomeGreeting: {
+    fontSize: '1.125rem',
+    color: colors.neutral900,
+  },
+  welcomeOrg: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+  },
+  welcomeStats: {
+    display: 'flex',
+    gap: '32px',
+  },
+  welcomeStat: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '12px 20px',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: borderRadius.md,
+    padding: '8px 16px',
   },
-  heroStatValue: {
+  welcomeStatValue: {
     fontSize: '1.5rem',
     fontWeight: 700,
+    color: colors.primary,
   },
-  heroStatLabel: {
+  welcomeStatLabel: {
     fontSize: '0.75rem',
-    opacity: 0.9,
+    color: colors.neutral500,
   },
 
   // Section
