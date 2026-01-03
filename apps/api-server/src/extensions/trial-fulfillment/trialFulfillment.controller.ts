@@ -8,6 +8,7 @@
 
 import { Request, Response } from 'express';
 import { DataSource } from 'typeorm';
+import logger from '../../utils/logger.js';
 import {
     createFulfillment,
     getFulfillment,
@@ -432,10 +433,10 @@ export class TrialFulfillmentController {
             if (index !== -1) {
                 participations[index].rewardStatus = status;
                 participationsStore.set(trialId, participations);
-                console.log(`[TrialFulfillment] Updated rewardStatus to '${status}' for participation ${participationId}`);
+                logger.info(`[TrialFulfillment] Updated rewardStatus to '${status}' for participation ${participationId}`);
                 return;
             }
         }
-        console.warn(`[TrialFulfillment] Participation ${participationId} not found in Core store`);
+        logger.warn(`[TrialFulfillment] Participation ${participationId} not found in Core store`);
     }
 }

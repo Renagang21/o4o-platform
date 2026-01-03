@@ -20,6 +20,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, query, param, validationResult } from 'express-validator';
 import type { AuthRequest } from '../../../types/auth.js';
+import logger from '../../../utils/logger.js';
 
 // ============================================================================
 // Type Definitions (H1-2 확정 스키마와 동일)
@@ -554,14 +555,14 @@ export function createCosmeticsOrderController(
           }
         }
 
-        console.log(`[Cosmetics Order] Created ${dto.metadata.channel} channel order:`, logData);
+        logger.info(`[Cosmetics Order] Created ${dto.metadata.channel} channel order:`, logData);
 
         res.status(201).json({
           data: orderResponse,
           message: `${dto.metadata.channel.toUpperCase()} channel order created successfully`,
         });
       } catch (error: any) {
-        console.error('[Cosmetics Order] Create order error:', error);
+        logger.error('[Cosmetics Order] Create order error:', error);
         errorResponse(res, 500, 'ORDER_CREATE_ERROR', 'Failed to create order');
       }
     }
@@ -646,7 +647,7 @@ export function createCosmeticsOrderController(
           appliedFilters.taxRefundStatus = filters.taxRefundStatus;
         }
 
-        console.log('[Cosmetics Order] List orders with filters:', appliedFilters);
+        logger.info('[Cosmetics Order] List orders with filters:', appliedFilters);
 
         res.json({
           data: paginatedOrders,
@@ -659,7 +660,7 @@ export function createCosmeticsOrderController(
           filters: appliedFilters,
         });
       } catch (error: any) {
-        console.error('[Cosmetics Order] List orders error:', error);
+        logger.error('[Cosmetics Order] List orders error:', error);
         errorResponse(res, 500, 'ORDER_LIST_ERROR', 'Failed to list orders');
       }
     }
