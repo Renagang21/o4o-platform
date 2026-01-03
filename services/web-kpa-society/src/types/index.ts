@@ -49,8 +49,10 @@ export interface ForumPost {
   categoryId: string;
   categoryName: string;
   viewCount: number;
+  views: number; // alias for viewCount
   commentCount: number;
   likeCount: number;
+  likes: number; // alias for likeCount
   isPinned: boolean;
   createdAt: string;
   updatedAt: string;
@@ -65,6 +67,9 @@ export interface ForumComment {
   parentId?: string;
   createdAt: string;
 }
+
+// Alias for ForumComment
+export type Comment = ForumComment;
 
 export interface CreatePostRequest {
   title: string;
@@ -129,9 +134,12 @@ export interface Groupbuy {
   thumbnail?: string;
   originalPrice: number;
   groupPrice: number;
+  price?: number; // alias for groupPrice
   minParticipants: number;
   maxParticipants: number;
   currentParticipants: number;
+  currentQuantity: number; // alias for currentParticipants
+  targetQuantity: number; // alias for maxParticipants
   startDate: string;
   endDate: string;
   status: 'upcoming' | 'active' | 'ended' | 'cancelled';
@@ -159,9 +167,12 @@ export interface Notice {
   excerpt?: string;
   authorId: string;
   authorName: string;
+  author: string; // alias for authorName
   type: 'notice' | 'branch-news' | 'kpa-news' | 'press';
   isPinned: boolean;
+  isImportant: boolean; // alias for isPinned
   viewCount: number;
+  views: number; // alias for viewCount
   attachments?: Attachment[];
   createdAt: string;
 }
@@ -169,6 +180,7 @@ export interface Notice {
 export interface Attachment {
   id: string;
   filename: string;
+  name: string; // alias for filename
   url: string;
   size: number;
   mimeType: string;
@@ -179,8 +191,11 @@ export interface Resource {
   id: string;
   title: string;
   description?: string;
-  category: 'forms' | 'guidelines' | 'policies';
-  file: Attachment;
+  category: string;
+  file?: Attachment;
+  fileUrl?: string;
+  fileType?: string;
+  fileSize?: string;
   downloadCount: number;
   authorId: string;
   authorName: string;
@@ -211,6 +226,7 @@ export interface Officer {
   phone?: string;
   email?: string;
   photoUrl?: string;
+  pharmacy?: string;
   order: number;
 }
 

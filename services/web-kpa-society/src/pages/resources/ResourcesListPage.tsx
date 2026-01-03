@@ -74,7 +74,11 @@ export function ResourcesListPage() {
       const res = await resourcesApi.downloadResource(resource.id);
       window.open(res.data.downloadUrl, '_blank');
     } catch {
-      window.open(resource.file.url, '_blank');
+      if (resource.file?.url) {
+        window.open(resource.file.url, '_blank');
+      } else if (resource.fileUrl) {
+        window.open(resource.fileUrl, '_blank');
+      }
     }
   };
 
@@ -178,7 +182,7 @@ export function ResourcesListPage() {
               <Card key={resource.id} padding="medium">
                 <div style={styles.item}>
                   <span style={styles.fileIcon}>
-                    {getFileIcon(resource.file.mimeType)}
+                    {getFileIcon(resource.file?.mimeType || resource.fileType || '')}
                   </span>
                   <div style={styles.itemInfo}>
                     <h3 style={styles.itemTitle}>{resource.title}</h3>
@@ -187,13 +191,13 @@ export function ResourcesListPage() {
                     )}
                     <div style={styles.itemMeta}>
                       <span style={styles.categoryBadge}>
-                        {categoryLabels[resource.category]}
+                        {categoryLabels[resource.category as ResourceCategory] || resource.category}
                       </span>
-                      <span>{resource.file.filename}</span>
+                      <span>{resource.file?.filename || resource.title}</span>
                       <span>·</span>
-                      <span>{formatFileSize(resource.file.size)}</span>
+                      <span>{resource.file?.size ? formatFileSize(resource.file.size) : resource.fileSize || '-'}</span>
                       <span>·</span>
-                      <span>다운로드 {resource.downloadCount}회</span>
+                      <span>다운로드 {resource.downloadCount || 0}회</span>
                     </div>
                   </div>
                   <button

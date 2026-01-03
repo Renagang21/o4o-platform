@@ -24,6 +24,9 @@ import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, Co
 // MyPage pages
 import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage } from './pages/mypage';
 
+// Branch Routes (분회 서브디렉토리)
+import { BranchRoutes } from './routes/BranchRoutes';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -103,6 +106,11 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>
+
+        {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
+        <Routes>
+          <Route path="/branch/:branchId/*" element={<BranchRoutes />} />
+        </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
