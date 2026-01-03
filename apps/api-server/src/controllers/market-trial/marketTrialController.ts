@@ -46,7 +46,7 @@ interface TrialParticipation {
 
 // In-memory store for Phase L-1 MVP
 const trialsStore: Map<string, MarketTrial> = new Map();
-const participationsStore: Map<string, TrialParticipation[]> = new Map();
+export const participationsStore: Map<string, TrialParticipation[]> = new Map();
 
 // Initialize with sample data
 function initSampleTrials() {

@@ -126,6 +126,8 @@ import {
   GlycopharmProduct,
   GlycopharmProductLog,
   GlycopharmApplication,
+  GlycopharmOrder,
+  GlycopharmOrderItem,
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -366,12 +368,14 @@ export const AppDataSource = new DataSource({
     YaksaPost,
     YaksaPostLog,
     // ============================================================================
-    // GLYCOPHARM ENTITIES (Phase B-1: Glycopharm API Implementation)
+    // GLYCOPHARM ENTITIES (Phase B-1, H8-2: Glycopharm API + Orders)
     // ============================================================================
     GlycopharmPharmacy,
     GlycopharmProduct,
     GlycopharmProductLog,
     GlycopharmApplication,
+    GlycopharmOrder,
+    GlycopharmOrderItem,
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================

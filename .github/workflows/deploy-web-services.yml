@@ -1,7 +1,7 @@
 name: Deploy Web Services (Cloud Run)
 
 # Deploy web services to Cloud Run on push to main/develop
-# Phase 1: 5개 웹서버 자동 배포 (glucoseview 추가)
+# H9-0: Docker(Container) 배포 방식으로 전환
 # 변경된 웹서버만 배포됨
 
 concurrency:
@@ -30,7 +30,7 @@ on:
 env:
   PROJECT_ID: netureyoutube
   REGION: asia-northeast3
-  VITE_API_BASE_URL: https://o4o-core-api-117791934476.asia-northeast3.run.app
+  VITE_API_BASE_URL: https://api.neture.co.kr
 
 jobs:
   detect-changes:
@@ -127,14 +127,30 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Deploy neture-web
-        run: |
-          echo "🚀 Deploying neture-web..."
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
 
-          cd services/web-neture
+      - name: Build and push Docker image
+        run: |
+          echo "Building neture-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/neture-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/neture-web:latest \
+            services/web-neture
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/neture-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/neture-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying neture-web to Cloud Run..."
 
           gcloud run deploy neture-web \
-            --source . \
+            --image=gcr.io/${{ env.PROJECT_ID }}/neture-web:${{ github.sha }} \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --platform=managed \
@@ -143,10 +159,9 @@ jobs:
             --memory=256Mi \
             --cpu=1 \
             --min-instances=0 \
-            --max-instances=5 \
-            --set-env-vars="VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}"
+            --max-instances=5
 
-          echo "✅ neture-web deployed successfully!"
+          echo "neture-web deployed successfully!"
 
       - name: Verify deployment
         run: |
@@ -155,13 +170,12 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)")
 
-          echo "🌐 Service URL: ${SERVICE_URL}"
+          echo "Service URL: ${SERVICE_URL}"
 
-          # Simple health check
           if curl -sf "${SERVICE_URL}" > /dev/null; then
-            echo "✅ neture-web is accessible!"
+            echo "neture-web is accessible!"
           else
-            echo "⚠️ neture-web may need a moment to start"
+            echo "neture-web may need a moment to start"
           fi
 
   deploy-k-cosmetics:
@@ -185,14 +199,30 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Deploy k-cosmetics-web
-        run: |
-          echo "🚀 Deploying k-cosmetics-web..."
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
 
-          cd services/web-k-cosmetics
+      - name: Build and push Docker image
+        run: |
+          echo "Building k-cosmetics-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest \
+            services/web-k-cosmetics
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying k-cosmetics-web to Cloud Run..."
 
           gcloud run deploy k-cosmetics-web \
-            --source . \
+            --image=gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${{ github.sha }} \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --platform=managed \
@@ -201,10 +231,9 @@ jobs:
             --memory=256Mi \
             --cpu=1 \
             --min-instances=0 \
-            --max-instances=5 \
-            --set-env-vars="VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}"
+            --max-instances=5
 
-          echo "✅ k-cosmetics-web deployed successfully!"
+          echo "k-cosmetics-web deployed successfully!"
 
       - name: Verify deployment
         run: |
@@ -213,7 +242,7 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)")
 
-          echo "🌐 Service URL: ${SERVICE_URL}"
+          echo "Service URL: ${SERVICE_URL}"
 
   deploy-kpa-society:
     needs: detect-changes
@@ -236,14 +265,30 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Deploy kpa-society-web
-        run: |
-          echo "🚀 Deploying kpa-society-web..."
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
 
-          cd services/web-kpa-society
+      - name: Build and push Docker image
+        run: |
+          echo "Building kpa-society-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
+            services/web-kpa-society
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying kpa-society-web to Cloud Run..."
 
           gcloud run deploy kpa-society-web \
-            --source . \
+            --image=gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${{ github.sha }} \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --platform=managed \
@@ -252,10 +297,9 @@ jobs:
             --memory=256Mi \
             --cpu=1 \
             --min-instances=0 \
-            --max-instances=5 \
-            --set-env-vars="VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}"
+            --max-instances=5
 
-          echo "✅ kpa-society-web deployed successfully!"
+          echo "kpa-society-web deployed successfully!"
 
       - name: Verify deployment
         run: |
@@ -264,7 +308,7 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)")
 
-          echo "🌐 Service URL: ${SERVICE_URL}"
+          echo "Service URL: ${SERVICE_URL}"
 
   deploy-glycopharm:
     needs: detect-changes
@@ -287,14 +331,30 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Deploy glycopharm-web
-        run: |
-          echo "🚀 Deploying glycopharm-web..."
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
 
-          cd services/web-glycopharm
+      - name: Build and push Docker image
+        run: |
+          echo "Building glycopharm-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest \
+            services/web-glycopharm
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying glycopharm-web to Cloud Run..."
 
           gcloud run deploy glycopharm-web \
-            --source . \
+            --image=gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${{ github.sha }} \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --platform=managed \
@@ -303,10 +363,9 @@ jobs:
             --memory=256Mi \
             --cpu=1 \
             --min-instances=0 \
-            --max-instances=5 \
-            --set-env-vars="VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}"
+            --max-instances=5
 
-          echo "✅ glycopharm-web deployed successfully!"
+          echo "glycopharm-web deployed successfully!"
 
       - name: Verify deployment
         run: |
@@ -315,7 +374,7 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)")
 
-          echo "🌐 Service URL: ${SERVICE_URL}"
+          echo "Service URL: ${SERVICE_URL}"
 
   deploy-glucoseview:
     needs: detect-changes
@@ -338,14 +397,30 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Deploy glucoseview-web
-        run: |
-          echo "🚀 Deploying glucoseview-web..."
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
 
-          cd services/web-glucoseview
+      - name: Build and push Docker image
+        run: |
+          echo "Building glucoseview-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:latest \
+            services/web-glucoseview
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying glucoseview-web to Cloud Run..."
 
           gcloud run deploy glucoseview-web \
-            --source . \
+            --image=gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:${{ github.sha }} \
             --region=${{ env.REGION }} \
             --project=${{ env.PROJECT_ID }} \
             --platform=managed \
@@ -354,10 +429,9 @@ jobs:
             --memory=256Mi \
             --cpu=1 \
             --min-instances=0 \
-            --max-instances=5 \
-            --set-env-vars="VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}"
+            --max-instances=5
 
-          echo "✅ glucoseview-web deployed successfully!"
+          echo "glucoseview-web deployed successfully!"
 
       - name: Verify deployment
         run: |
@@ -366,13 +440,12 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --format="value(status.url)")
 
-          echo "🌐 Service URL: ${SERVICE_URL}"
+          echo "Service URL: ${SERVICE_URL}"
 
-          # Simple health check
           if curl -sf "${SERVICE_URL}" > /dev/null; then
-            echo "✅ glucoseview-web is accessible!"
+            echo "glucoseview-web is accessible!"
           else
-            echo "⚠️ glucoseview-web may need a moment to start"
+            echo "glucoseview-web may need a moment to start"
           fi
 
   summary:
@@ -383,7 +456,7 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "=========================================="
-          echo "📋 Web Services Deployment Summary"
+          echo "Web Services Deployment Summary"
           echo "=========================================="
           echo ""
           echo "Services deployed:"
@@ -393,6 +466,7 @@ jobs:
           echo "  - glycopharm-web: ${{ needs.detect-changes.outputs.glycopharm }}"
           echo "  - glucoseview-web: ${{ needs.detect-changes.outputs.glucoseview }}"
           echo ""
-          echo "📅 Time: $(date)"
-          echo "📝 Commit: ${{ github.sha }}"
+          echo "Time: $(date)"
+          echo "Commit: ${{ github.sha }}"
+          echo "Deployment: Docker (Container)"
           echo "=========================================="

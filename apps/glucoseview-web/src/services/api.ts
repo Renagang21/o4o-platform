@@ -1,7 +1,7 @@
 /**
  * GlucoseView API Service
  *
- * API client for GlucoseView backend
+ * H8-3: API client for GlucoseView backend with Core Auth integration
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
@@ -27,7 +27,42 @@ interface ApiError {
   };
 }
 
+// ============================================================================
+// Auth Types (Core Auth v2)
+// ============================================================================
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  status: string;
+  roleAssignments?: Array<{
+    role: string;
+    scope?: string;
+    isActive: boolean;
+    assignedAt: string;
+  }>;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  data: {
+    user: AuthUser;
+    accessToken?: string;
+    expiresIn?: number;
+  };
+  message?: string;
+}
+
+export interface MeResponse {
+  success: boolean;
+  data: AuthUser;
+}
+
+// ============================================================================
 // Customer types
+// ============================================================================
+
 export interface Customer {
   id: string;
   pharmacist_id: string;
@@ -74,13 +109,11 @@ export interface CustomerStats {
   synced: number;
 }
 
+// ============================================================================
+// API Service
+// ============================================================================
+
 class ApiService {
-  private token: string | null = null;
-
-  setToken(token: string | null) {
-    this.token = token;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -90,18 +123,17 @@ class ApiService {
       ...options.headers,
     };
 
-    if (this.token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
-    }
-
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers,
+      credentials: 'include', // httpOnly cookie for auth
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({})) as ApiError;
-      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+      const error = new Error(errorData.error?.message || `HTTP ${response.status}`) as Error & { status?: number };
+      error.status = response.status;
+      throw error;
     }
 
     // Handle 204 No Content
@@ -112,7 +144,31 @@ class ApiService {
     return response.json();
   }
 
-  // Customer endpoints
+  // ============================================================================
+  // Auth API (Core Auth v2)
+  // ============================================================================
+
+  async login(email: string, password: string): Promise<LoginResponse> {
+    return this.request<LoginResponse>('/api/v2/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  }
+
+  async logout(): Promise<{ success: boolean; message: string }> {
+    return this.request('/api/v2/auth/logout', {
+      method: 'POST',
+    });
+  }
+
+  async getMe(): Promise<MeResponse> {
+    return this.request<MeResponse>('/api/v2/auth/me');
+  }
+
+  // ============================================================================
+  // Customer API
+  // ============================================================================
+
   async listCustomers(params?: {
     search?: string;
     sort_by?: 'recent' | 'frequent' | 'name';
