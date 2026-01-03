@@ -7,6 +7,10 @@ import {
   OrganizationDetailPage,
   MemberApplyPage,
   MyApplicationsPage,
+  AboutPage,
+  NoticesPage,
+  ResourcesPage,
+  EventsPage,
 } from './pages';
 
 /**
@@ -27,6 +31,10 @@ function App() {
             <Route path="/organizations/:id" element={<OrganizationDetailPage />} />
             <Route path="/member/apply" element={<MemberApplyPage />} />
             <Route path="/applications" element={<MyApplicationsPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/notices" element={<NoticesPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/events" element={<EventsPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
