@@ -264,7 +264,8 @@
       "Bash(pnpm -F web-glycopharm build:*)",
       "Bash(pnpm -F web-glucoseview build:*)",
       "Bash(pnpm -F @o4o/web-neture build:*)",
-      "Bash(pnpm -F web-k-cosmetics build:*)"
+      "Bash(pnpm -F web-k-cosmetics build:*)",
+      "Bash(pnpm add:*)"
     ],
     "deny": []
   }
