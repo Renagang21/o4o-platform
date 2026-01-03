@@ -1,4 +1,11 @@
+/**
+ * GlucoseView Auth Context
+ *
+ * H8-3: Core Auth v2 integration (httpOnly cookie based)
+ */
+
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { api, type AuthUser } from '../services/api';
 
 // 사용자 역할
 export type UserRole = 'pharmacist' | 'admin';
@@ -32,110 +39,132 @@ interface AuthContextType {
   isAdmin: boolean;
   isPending: boolean;
   isRejected: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
 }
 
-// 테스트 사용자 데이터
-const testUsers = [
-  {
-    id: 'pharmacist-test-1',
-    name: '테스트 약사',
-    email: 'pharmacist@test.test',
-    password: 'testID1234',
-    role: 'pharmacist' as UserRole,
-    approvalStatus: 'approved' as ApprovalStatus,
-    pharmacyName: '테스트약국',
-    phone: '010-1234-5678',
-    licenseNumber: 'PH-12345',
-    displayName: '테스트약사',
-    chapterId: 'a1111111-1111-1111-1111-111111111111',
-    chapterName: '강남분회',
-    branchName: '서울지부',
-  },
-  {
-    id: 'admin-test-1',
-    name: '테스트 관리자',
-    email: 'admin@test.test',
-    password: 'adminID1234',
-    role: 'admin' as UserRole,
-    approvalStatus: 'approved' as ApprovalStatus,
-    pharmacyName: '관리약국',
-    phone: '010-9876-5432',
-    licenseNumber: 'PH-00001',
-    displayName: '관리자',
-    chapterId: 'a1111111-1111-1111-1111-111111111111',
-    chapterName: '강남분회',
-    branchName: '서울지부',
-  },
-  // 기존 테스트 계정 (하위 호환)
-  {
-    id: 'user-1',
-    name: 'Rena',
-    email: 'test@test.test',
-    password: 'testID1234',
-    role: 'pharmacist' as UserRole,
-    approvalStatus: 'approved' as ApprovalStatus,
-    pharmacyName: '',
-    phone: '',
-    licenseNumber: '',
-    displayName: 'Rena',
-  },
-];
-
 const AuthContext = createContext<AuthContextType | null>(null);
+
+/**
+ * AuthUser에서 역할 추출
+ */
+function extractUserRole(authUser: AuthUser): UserRole {
+  const roleMap: Record<string, UserRole> = {
+    pharmacist: 'pharmacist',
+    pharmacy: 'pharmacist',
+    admin: 'admin',
+    operator: 'admin',
+  };
+
+  if (authUser.roleAssignments) {
+    for (const assignment of authUser.roleAssignments) {
+      if (assignment.isActive && roleMap[assignment.role]) {
+        return roleMap[assignment.role];
+      }
+    }
+  }
+
+  return 'pharmacist'; // 기본값
+}
+
+/**
+ * AuthUser에서 승인 상태 추출
+ */
+function extractApprovalStatus(authUser: AuthUser): ApprovalStatus {
+  switch (authUser.status?.toLowerCase()) {
+    case 'approved':
+    case 'active':
+      return 'approved';
+    case 'rejected':
+    case 'banned':
+      return 'rejected';
+    case 'pending':
+    default:
+      return 'pending';
+  }
+}
+
+/**
+ * AuthUser를 User로 변환
+ */
+function convertAuthUser(authUser: AuthUser): User {
+  return {
+    id: authUser.id,
+    name: authUser.name,
+    email: authUser.email,
+    role: extractUserRole(authUser),
+    approvalStatus: extractApprovalStatus(authUser),
+    displayName: authUser.name,
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 페이지 로드 시 저장된 세션 확인
+  // 페이지 로드 시 세션 확인 (Core Auth v2 /me 호출)
   useEffect(() => {
-    const savedUser = localStorage.getItem('glucoseview_user');
-    if (savedUser) {
+    const checkSession = async () => {
       try {
-        setUser(JSON.parse(savedUser));
+        const response = await api.getMe();
+        if (response.success && response.data) {
+          setUser(convertAuthUser(response.data));
+        }
       } catch {
-        localStorage.removeItem('glucoseview_user');
+        // 세션 없음 - 정상 케이스
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    checkSession();
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
-    // 실제로는 API 호출
-    const foundUser = testUsers.find(
-      u => u.email === email && u.password === password
-    );
+    setIsLoading(true);
+    try {
+      const response = await api.login(email, password);
 
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem('glucoseview_user', JSON.stringify(userWithoutPassword));
+      if (response.success && response.data?.user) {
+        const convertedUser = convertAuthUser(response.data.user);
+        setUser(convertedUser);
 
-      // 승인 상태에 따른 메시지
-      if (foundUser.approvalStatus === 'pending') {
-        return { success: true, message: 'pending' };
+        // 승인 상태에 따른 메시지
+        if (convertedUser.approvalStatus === 'pending') {
+          return { success: true, message: 'pending' };
+        }
+        if (convertedUser.approvalStatus === 'rejected') {
+          return { success: true, message: 'rejected' };
+        }
+
+        return { success: true };
       }
-      if (foundUser.approvalStatus === 'rejected') {
-        return { success: true, message: 'rejected' };
-      }
 
-      return { success: true };
+      return { success: false, message: response.message || '로그인에 실패했습니다.' };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '로그인에 실패했습니다.';
+      return { success: false, message };
+    } finally {
+      setIsLoading(false);
     }
-    return { success: false, message: '이메일 또는 비밀번호가 올바르지 않습니다.' };
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('glucoseview_user');
-    // 사용자별 데이터는 유지 (다른 계정으로 로그인 시 사용)
+  const logout = async () => {
+    try {
+      await api.logout();
+    } catch {
+      // 로그아웃 API 실패해도 로컬 상태는 정리
+    } finally {
+      setUser(null);
+    }
   };
 
   const updateUser = (updates: Partial<User>) => {
     if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem('glucoseview_user', JSON.stringify(updatedUser));
+      setUser({ ...user, ...updates });
     }
   };
 
@@ -152,6 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin,
       isPending,
       isRejected,
+      isLoading,
       login,
       logout,
       updateUser,

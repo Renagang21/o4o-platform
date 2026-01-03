@@ -1,91 +1,34 @@
+/**
+ * GlucoseView Patients Page
+ *
+ * H8-3: localStorage → API 전환
+ * 고객 CRUD를 API 기반으로 전환
+ */
+
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PlaceholderChart from '../components/PlaceholderChart';
 import { useAuth } from '../contexts/AuthContext';
+import { api, type Customer, type CreateCustomerRequest, type UpdateCustomerRequest } from '../services/api';
 
-// 고객 타입 정의
-interface Customer {
-  id: number;
-  name: string;
-  lastVisit: Date;
-  visitCount: number;
-  lastSync: string;
-  birthYear?: number;
-  gender?: 'male' | 'female';
-  kakaoId?: string;
-  phone?: string;
-  email?: string;
+type SortType = 'recent' | 'frequent' | 'name';
+
+// API Customer를 로컬 표시용으로 변환
+interface DisplayCustomer extends Customer {
+  displayLastVisit: Date;
 }
-
-type SortType = 'recent' | 'frequent';
-
-// localStorage 키 생성 (사용자별 분리)
-const getStorageKey = (userId: string) => `glucoseview_customers_${userId}`;
-
-// localStorage에서 고객 데이터 로드
-const loadCustomers = (userId: string): Customer[] => {
-  try {
-    const data = localStorage.getItem(getStorageKey(userId));
-    if (data) {
-      const parsed = JSON.parse(data);
-      // Date 객체 복원
-      return parsed.map((c: Customer) => ({
-        ...c,
-        lastVisit: new Date(c.lastVisit),
-      }));
-    }
-  } catch {
-    console.error('Failed to load customers from localStorage');
-  }
-  return [];
-};
-
-// localStorage에 고객 데이터 저장
-const saveCustomers = (userId: string, customers: Customer[]) => {
-  try {
-    localStorage.setItem(getStorageKey(userId), JSON.stringify(customers));
-  } catch {
-    console.error('Failed to save customers to localStorage');
-  }
-};
 
 export default function PatientsPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
-  const [members, setMembers] = useState<Customer[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
+  const [customers, setCustomers] = useState<DisplayCustomer[]>([]);
 
-  // 사용자별 고객 데이터 로드
-  useEffect(() => {
-    if (user?.id) {
-      const loaded = loadCustomers(user.id);
-      setMembers(loaded);
-    }
-  }, [user?.id]);
+  // 로딩/에러 상태
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // 고객 데이터 변경 시 저장
-  const updateMembers = useCallback((updater: (prev: Customer[]) => Customer[]) => {
-    setMembers(prev => {
-      const updated = updater(prev);
-      if (user?.id) {
-        saveCustomers(user.id, updated);
-      }
-      return updated;
-    });
-  }, [user?.id]);
-
-  // URL에서 선택된 고객 ID 읽기
-  useEffect(() => {
-    const selectedId = searchParams.get('selected');
-    if (selectedId) {
-      const id = parseInt(selectedId, 10);
-      if (!isNaN(id) && members.some(m => m.id === id)) {
-        setSelectedPatient(id);
-        // URL에서 파라미터 제거 (깔끔한 URL 유지)
-        setSearchParams({});
-      }
-    }
-  }, [searchParams, setSearchParams, members]);
   const [aiQuestion, setAiQuestion] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -93,12 +36,14 @@ export default function PatientsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortType, setSortType] = useState<SortType>('recent');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 20;
 
   // 신규 고객 등록 폼 상태
   const [newCustomer, setNewCustomer] = useState({
     name: '',
-    birthYear: '',
+    age: '',
     gender: '' as '' | 'male' | 'female',
     kakaoId: '',
     phone: '',
@@ -107,110 +52,143 @@ export default function PatientsPage() {
 
   // 고객 수정 폼 상태
   const [editCustomer, setEditCustomer] = useState({
-    id: 0,
+    id: '',
     name: '',
-    birthYear: '',
+    age: '',
     gender: '' as '' | 'male' | 'female',
     kakaoId: '',
     phone: '',
     email: '',
   });
 
-  const handleRegisterCustomer = () => {
+  // API에서 고객 목록 로드
+  const loadCustomers = useCallback(async () => {
+    if (!user) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.listCustomers({
+        search: searchQuery || undefined,
+        sort_by: sortType,
+        page: currentPage,
+        limit: itemsPerPage,
+      });
+
+      const displayCustomers: DisplayCustomer[] = response.data.map((c) => ({
+        ...c,
+        displayLastVisit: c.last_visit ? new Date(c.last_visit) : new Date(c.created_at),
+      }));
+
+      setCustomers(displayCustomers);
+      setTotalPages(response.pagination.total_pages);
+      setTotalCount(response.pagination.total);
+    } catch (err) {
+      console.error('Failed to load customers:', err);
+      setError('고객 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, searchQuery, sortType, currentPage]);
+
+  // 초기 로드 및 검색/정렬/페이지 변경 시 재로드
+  useEffect(() => {
+    loadCustomers();
+  }, [loadCustomers]);
+
+  // URL에서 선택된 고객 ID 읽기
+  useEffect(() => {
+    const selectedId = searchParams.get('selected');
+    if (selectedId && customers.some((m) => m.id === selectedId)) {
+      setSelectedPatient(selectedId);
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, customers]);
+
+  // 신규 고객 등록
+  const handleRegisterCustomer = async () => {
     if (!newCustomer.name.trim()) {
       alert('이름을 입력해주세요.');
       return;
     }
 
-    // 새 고객 생성
-    const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
-    const newMember: Customer = {
-      id: newId,
-      name: newCustomer.name.trim(),
-      lastVisit: new Date(), // 오늘 날짜
-      visitCount: 1,
-      lastSync: '대기중',
-      birthYear: newCustomer.birthYear ? parseInt(newCustomer.birthYear, 10) : undefined,
-      gender: newCustomer.gender || undefined,
-      kakaoId: newCustomer.kakaoId || undefined,
-      phone: newCustomer.phone || undefined,
-      email: newCustomer.email || undefined,
-    };
+    setIsSaving(true);
 
-    // 목록에 추가 (사용자별 저장)
-    updateMembers(prev => [newMember, ...prev]);
+    try {
+      const createRequest: CreateCustomerRequest = {
+        name: newCustomer.name.trim(),
+        age: newCustomer.age ? parseInt(newCustomer.age, 10) : undefined,
+        gender: newCustomer.gender || undefined,
+        kakao_id: newCustomer.kakaoId || undefined,
+        phone: newCustomer.phone || undefined,
+        email: newCustomer.email || undefined,
+      };
 
-    // 새로 등록한 고객 선택
-    setSelectedPatient(newId);
+      const response = await api.createCustomer(createRequest);
 
-    // 폼 초기화 및 모달 닫기
-    setNewCustomer({ name: '', birthYear: '', gender: '', kakaoId: '', phone: '', email: '' });
-    setShowRegisterModal(false);
+      // 새로 등록한 고객 선택
+      setSelectedPatient(response.data.id);
 
-    // 첫 페이지로 이동 (새 고객이 맨 위에 있으므로)
-    setCurrentPage(1);
+      // 폼 초기화 및 모달 닫기
+      setNewCustomer({ name: '', age: '', gender: '', kakaoId: '', phone: '', email: '' });
+      setShowRegisterModal(false);
+
+      // 첫 페이지로 이동하여 새 고객 표시
+      setCurrentPage(1);
+      await loadCustomers();
+    } catch (err) {
+      console.error('Failed to create customer:', err);
+      alert('고객 등록에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // 고객 수정 모달 열기
-  const handleOpenEditModal = (member: Customer) => {
+  const handleOpenEditModal = (customer: DisplayCustomer) => {
     setEditCustomer({
-      id: member.id,
-      name: member.name,
-      birthYear: member.birthYear?.toString() || '',
-      gender: member.gender || '',
-      kakaoId: member.kakaoId || '',
-      phone: member.phone || '',
-      email: member.email || '',
+      id: customer.id,
+      name: customer.name,
+      age: customer.age?.toString() || '',
+      gender: customer.gender || '',
+      kakaoId: customer.kakao_id || '',
+      phone: customer.phone || '',
+      email: customer.email || '',
     });
     setShowEditModal(true);
   };
 
   // 고객 정보 수정 저장
-  const handleSaveEditCustomer = () => {
+  const handleSaveEditCustomer = async () => {
     if (!editCustomer.name.trim()) {
       alert('이름을 입력해주세요.');
       return;
     }
 
-    updateMembers(prev => prev.map(m => {
-      if (m.id === editCustomer.id) {
-        return {
-          ...m,
-          name: editCustomer.name.trim(),
-          birthYear: editCustomer.birthYear ? parseInt(editCustomer.birthYear, 10) : undefined,
-          gender: editCustomer.gender || undefined,
-          kakaoId: editCustomer.kakaoId || undefined,
-          phone: editCustomer.phone || undefined,
-          email: editCustomer.email || undefined,
-        };
-      }
-      return m;
-    }));
+    setIsSaving(true);
 
-    setShowEditModal(false);
-  };
+    try {
+      const updateRequest: UpdateCustomerRequest = {
+        name: editCustomer.name.trim(),
+        age: editCustomer.age ? parseInt(editCustomer.age, 10) : undefined,
+        gender: editCustomer.gender || undefined,
+        kakao_id: editCustomer.kakaoId || undefined,
+        phone: editCustomer.phone || undefined,
+        email: editCustomer.email || undefined,
+      };
 
-  // 검색 및 정렬된 목록
-  const filteredAndSortedMembers = useMemo(() => {
-    let result = members.filter(member =>
-      member.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+      await api.updateCustomer(editCustomer.id, updateRequest);
 
-    if (sortType === 'recent') {
-      result.sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
-    } else {
-      result.sort((a, b) => b.visitCount - a.visitCount);
+      setShowEditModal(false);
+      await loadCustomers();
+    } catch (err) {
+      console.error('Failed to update customer:', err);
+      alert('고객 정보 수정에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
     }
-
-    return result;
-  }, [members, searchQuery, sortType]);
-
-  // 페이지네이션
-  const totalPages = Math.ceil(filteredAndSortedMembers.length / itemsPerPage);
-  const paginatedMembers = filteredAndSortedMembers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  };
 
   // 날짜 포맷
   const formatDate = (date: Date) => {
@@ -224,6 +202,18 @@ export default function PatientsPage() {
     return `${Math.floor(days / 7)}주 전`;
   };
 
+  // 동기화 상태 표시
+  const getSyncStatus = (customer: DisplayCustomer) => {
+    switch (customer.sync_status) {
+      case 'synced':
+        return '동기화됨';
+      case 'error':
+        return '오류';
+      default:
+        return '대기중';
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -233,7 +223,6 @@ export default function PatientsPage() {
     const shareTitle = '혈당 관리 현황 리포트';
     const shareText = '약국에서 전달드리는 혈당 관리 현황 리포트입니다.';
 
-    // Web Share API 지원 여부 확인 (모바일에서 주로 지원)
     if (navigator.share) {
       try {
         await navigator.share({
@@ -242,19 +231,16 @@ export default function PatientsPage() {
           url: shareUrl,
         });
       } catch (err) {
-        // 사용자가 공유 취소한 경우 무시
         if ((err as Error).name !== 'AbortError') {
           console.error('공유 실패:', err);
         }
       }
     } else {
-      // Web Share API 미지원 시 클립보드 복사
       const fullText = `${shareTitle}\n\n${shareText}\n\n${shareUrl}`;
       try {
         await navigator.clipboard.writeText(fullText);
         alert('링크가 클립보드에 복사되었습니다.\n카카오톡이나 메시지 앱에 붙여넣기 하세요.');
       } catch {
-        // 클립보드도 안 되면 prompt로 보여주기
         prompt('아래 내용을 복사하세요:', fullText);
       }
     }
@@ -264,11 +250,11 @@ export default function PatientsPage() {
     const subject = encodeURIComponent('혈당 관리 현황 리포트');
     const body = encodeURIComponent(
       '안녕하세요.\n\n' +
-      '약국에서 전달드리는 혈당 관리 현황 리포트입니다.\n' +
-      '아래 링크를 통해 확인하실 수 있습니다.\n\n' +
-      `${window.location.href}\n\n` +
-      '궁금하신 점이 있으시면 약국으로 문의해 주세요.\n\n' +
-      '감사합니다.'
+        '약국에서 전달드리는 혈당 관리 현황 리포트입니다.\n' +
+        '아래 링크를 통해 확인하실 수 있습니다.\n\n' +
+        `${window.location.href}\n\n` +
+        '궁금하신 점이 있으시면 약국으로 문의해 주세요.\n\n' +
+        '감사합니다.'
     );
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
@@ -278,6 +264,11 @@ export default function PatientsPage() {
     alert(`AI 질문: "${aiQuestion}"\n\n(실제 연동 시 AI 응답이 표시됩니다)`);
     setAiQuestion('');
   };
+
+  // 선택된 고객 정보
+  const selectedCustomer = useMemo(() => {
+    return customers.find((c) => c.id === selectedPatient);
+  }, [customers, selectedPatient]);
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -294,7 +285,12 @@ export default function PatientsPage() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
               </svg>
               데이터 연동
             </button>
@@ -315,7 +311,12 @@ export default function PatientsPage() {
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                   신규 고객 등록
                 </button>
@@ -324,8 +325,18 @@ export default function PatientsPage() {
               {/* Search */}
               <div className="p-3 border-b border-slate-100">
                 <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                   <input
                     type="text"
@@ -343,7 +354,10 @@ export default function PatientsPage() {
               {/* Sort Tabs */}
               <div className="flex border-b border-slate-100">
                 <button
-                  onClick={() => { setSortType('recent'); setCurrentPage(1); }}
+                  onClick={() => {
+                    setSortType('recent');
+                    setCurrentPage(1);
+                  }}
                   className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
                     sortType === 'recent'
                       ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
@@ -353,7 +367,10 @@ export default function PatientsPage() {
                   최근 방문순
                 </button>
                 <button
-                  onClick={() => { setSortType('frequent'); setCurrentPage(1); }}
+                  onClick={() => {
+                    setSortType('frequent');
+                    setCurrentPage(1);
+                  }}
                   className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
                     sortType === 'frequent'
                       ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
@@ -368,23 +385,40 @@ export default function PatientsPage() {
               <div className="px-4 py-2 border-b border-slate-100 bg-slate-50">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-500">
-                    {filteredAndSortedMembers.length}명 중 {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, filteredAndSortedMembers.length)}
+                    {totalCount > 0
+                      ? `${totalCount}명 중 ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalCount)}`
+                      : '0명'}
                   </span>
                   <span className="text-xs text-slate-400">
-                    {currentPage}/{totalPages} 페이지
+                    {currentPage}/{totalPages || 1} 페이지
                   </span>
                 </div>
               </div>
 
               {/* List */}
               <div className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
-                {paginatedMembers.length > 0 ? (
-                  paginatedMembers.map((member) => (
+                {isLoading ? (
+                  <div className="px-4 py-8 text-center">
+                    <div className="inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <p className="text-sm text-slate-400">로딩 중...</p>
+                  </div>
+                ) : error ? (
+                  <div className="px-4 py-8 text-center">
+                    <p className="text-sm text-red-500 mb-2">{error}</p>
                     <button
-                      key={member.id}
-                      onClick={() => setSelectedPatient(member.id)}
+                      onClick={loadCustomers}
+                      className="text-sm text-blue-600 hover:text-blue-700"
+                    >
+                      다시 시도
+                    </button>
+                  </div>
+                ) : customers.length > 0 ? (
+                  customers.map((customer) => (
+                    <button
+                      key={customer.id}
+                      onClick={() => setSelectedPatient(customer.id)}
                       className={`w-full px-4 py-3 text-left transition-colors ${
-                        selectedPatient === member.id
+                        selectedPatient === customer.id
                           ? 'bg-blue-50 border-l-2 border-l-blue-500'
                           : 'hover:bg-slate-50'
                       }`}
@@ -392,24 +426,34 @@ export default function PatientsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-xs text-slate-500 font-medium">
-                            {member.name.slice(0, 2)}
+                            {customer.name.slice(0, 2)}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-slate-900 truncate">{member.name}</p>
-                            <span className={`text-xs px-1.5 py-0.5 rounded ${
-                              member.lastSync === '동기화됨'
-                                ? 'bg-green-50 text-green-600'
-                                : 'bg-slate-100 text-slate-500'
-                            }`}>
-                              {member.lastSync}
+                            <p className="text-sm font-medium text-slate-900 truncate">
+                              {customer.name}
+                            </p>
+                            <span
+                              className={`text-xs px-1.5 py-0.5 rounded ${
+                                customer.sync_status === 'synced'
+                                  ? 'bg-green-50 text-green-600'
+                                  : customer.sync_status === 'error'
+                                    ? 'bg-red-50 text-red-600'
+                                    : 'bg-slate-100 text-slate-500'
+                              }`}
+                            >
+                              {getSyncStatus(customer)}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-xs text-slate-400">{formatDate(member.lastVisit)}</span>
+                            <span className="text-xs text-slate-400">
+                              {formatDate(customer.displayLastVisit)}
+                            </span>
                             <span className="text-xs text-slate-300">•</span>
-                            <span className="text-xs text-slate-400">{member.visitCount}회 방문</span>
+                            <span className="text-xs text-slate-400">
+                              {customer.visit_count}회 방문
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -417,7 +461,9 @@ export default function PatientsPage() {
                   ))
                 ) : (
                   <div className="px-4 py-8 text-center">
-                    <p className="text-sm text-slate-400">검색 결과가 없습니다</p>
+                    <p className="text-sm text-slate-400">
+                      {searchQuery ? '검색 결과가 없습니다' : '등록된 고객이 없습니다'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -426,7 +472,7 @@ export default function PatientsPage() {
               {totalPages > 1 && (
                 <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
                   <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                     className="px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -460,7 +506,7 @@ export default function PatientsPage() {
                     })}
                   </div>
                   <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                     className="px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -473,50 +519,68 @@ export default function PatientsPage() {
 
           {/* Patient Detail */}
           <div className="md:col-span-2">
-            {selectedPatient ? (
+            {selectedCustomer ? (
               <div className="space-y-4">
                 {/* Member Header */}
                 <div className="bg-white rounded-xl border border-slate-200 p-5">
-                  {(() => {
-                    const member = members.find(m => m.id === selectedPatient);
-                    return member ? (
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-lg text-blue-600 font-semibold">{member.name.slice(0, 2)}</span>
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-lg font-semibold text-slate-900">{member.name}</h2>
-                          <div className="flex items-center gap-3 text-sm text-slate-500">
-                            <span>마지막 방문: {formatDate(member.lastVisit)}</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-lg text-blue-600 font-semibold">
+                        {selectedCustomer.name.slice(0, 2)}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-lg font-semibold text-slate-900">{selectedCustomer.name}</h2>
+                      <div className="flex items-center gap-3 text-sm text-slate-500">
+                        <span>마지막 방문: {formatDate(selectedCustomer.displayLastVisit)}</span>
+                        <span className="text-slate-300">•</span>
+                        <span>총 {selectedCustomer.visit_count}회 방문</span>
+                        {selectedCustomer.age && (
+                          <>
                             <span className="text-slate-300">•</span>
-                            <span>총 {member.visitCount}회 방문</span>
-                            {member.birthYear && (
-                              <>
-                                <span className="text-slate-300">•</span>
-                                <span>{member.birthYear}년생 {member.gender === 'male' ? '남' : member.gender === 'female' ? '여' : ''}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleOpenEditModal(member)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                          </svg>
-                          수정
-                        </button>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          member.lastSync === '동기화됨'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-slate-100 text-slate-600'
-                        }`}>
-                          {member.lastSync}
-                        </span>
+                            <span>
+                              {selectedCustomer.age}세{' '}
+                              {selectedCustomer.gender === 'male'
+                                ? '남'
+                                : selectedCustomer.gender === 'female'
+                                  ? '여'
+                                  : ''}
+                            </span>
+                          </>
+                        )}
                       </div>
-                    ) : null;
-                  })()}
+                    </div>
+                    <button
+                      onClick={() => handleOpenEditModal(selectedCustomer)}
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                    >
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                      수정
+                    </button>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        selectedCustomer.sync_status === 'synced'
+                          ? 'bg-green-100 text-green-700'
+                          : selectedCustomer.sync_status === 'error'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {getSyncStatus(selectedCustomer)}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Summary Stats */}
@@ -529,8 +593,18 @@ export default function PatientsPage() {
                 <div className="bg-white rounded-xl border border-slate-200 p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-4 h-4 text-emerald-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </div>
                     <h3 className="text-sm font-medium text-slate-700">약사 상담 참고사항</h3>
@@ -540,40 +614,56 @@ export default function PatientsPage() {
                   <div className="space-y-3 mb-6">
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">1</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                          1
+                        </span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">혈당 패턴 요약</p>
-                          <p className="text-xs text-slate-500 mt-1">전반적으로 안정적인 패턴을 보이나, 식후 2시간 혈당 상승 경향이 관찰됩니다.</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            전반적으로 안정적인 패턴을 보이나, 식후 2시간 혈당 상승 경향이 관찰됩니다.
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">2</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                          2
+                        </span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">주의 관찰 포인트</p>
-                          <p className="text-xs text-slate-500 mt-1">야간(02:00-04:00) 저혈당 가능성 - 취침 전 간식 섭취 여부 확인 권장</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            야간(02:00-04:00) 저혈당 가능성 - 취침 전 간식 섭취 여부 확인 권장
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">3</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                          3
+                        </span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">긍정적 변화</p>
-                          <p className="text-xs text-slate-500 mt-1">지난 7일간 목표 범위(70-180) 내 시간 비율이 개선되었습니다.</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            지난 7일간 목표 범위(70-180) 내 시간 비율이 개선되었습니다.
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-start gap-3">
-                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">4</span>
+                        <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                          4
+                        </span>
                         <div>
                           <p className="text-sm font-medium text-slate-700">상담 시 고려사항</p>
-                          <p className="text-xs text-slate-500 mt-1">복용 중인 약물과 식사 시간의 연관성을 확인하고, 규칙적인 식사를 권장합니다.</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            복용 중인 약물과 식사 시간의 연관성을 확인하고, 규칙적인 식사를 권장합니다.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -582,8 +672,18 @@ export default function PatientsPage() {
                   {/* AI Question Section */}
                   <div className="border-t border-slate-100 pt-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      <svg
+                        className="w-4 h-4 text-purple-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                        />
                       </svg>
                       <span className="text-sm font-medium text-slate-700">AI에게 추가 질문</span>
                     </div>
@@ -609,13 +709,23 @@ export default function PatientsPage() {
                 {/* Trend Chart */}
                 <PlaceholderChart type="trend" />
 
-                {/* Patient Report Section - 환자 전달용 */}
+                {/* Patient Report Section */}
                 <div className="bg-white rounded-xl border border-slate-200 p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-cyan-100 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <svg
+                          className="w-4 h-4 text-cyan-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
                         </svg>
                       </div>
                       <h3 className="text-sm font-medium text-slate-700">환자용 리포트</h3>
@@ -628,35 +738,62 @@ export default function PatientsPage() {
                   </p>
 
                   <div className="grid grid-cols-3 gap-2">
-                    {/* 공유 */}
                     <button
                       onClick={handleShare}
                       className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                        />
                       </svg>
                       공유
                     </button>
 
-                    {/* 인쇄 */}
                     <button
                       onClick={handlePrint}
                       className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                        />
                       </svg>
                       인쇄
                     </button>
 
-                    {/* 메일 */}
                     <button
                       onClick={handleEmail}
                       className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
                       </svg>
                       메일
                     </button>
@@ -671,9 +808,24 @@ export default function PatientsPage() {
             ) : (
               <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
                 <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <svg
+                    className="w-8 h-8 text-slate-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
                   </svg>
                 </div>
                 <p className="text-slate-500 mb-1">환자를 선택하세요</p>
@@ -695,13 +847,17 @@ export default function PatientsPage() {
                 className="p-1 text-slate-400 hover:text-slate-600"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             <div className="space-y-3">
-              {/* LibreView */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -714,7 +870,6 @@ export default function PatientsPage() {
                 </div>
               </button>
 
-              {/* Dexcom */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -727,12 +882,21 @@ export default function PatientsPage() {
                 </div>
               </button>
 
-              {/* File Upload */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <svg
+                      className="w-5 h-5 text-slate-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
                     </svg>
                   </div>
                   <div>
@@ -742,19 +906,30 @@ export default function PatientsPage() {
                 </div>
               </button>
 
-              {/* 고객 조제데이터 연동 */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    <svg
+                      className="w-5 h-5 text-purple-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                      />
                     </svg>
                   </div>
                   <div>
                     <p className="font-medium text-slate-900">고객 조제데이터 연동</p>
                     <p className="text-xs text-slate-500">고객 승인하에 조제 이력 연동</p>
                   </div>
-                  <span className="ml-auto px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">예정</span>
+                  <span className="ml-auto px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+                    예정
+                  </span>
                 </div>
               </button>
             </div>
@@ -780,13 +955,17 @@ export default function PatientsPage() {
                 className="p-1 text-slate-400 hover:text-slate-600"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             <div className="space-y-4">
-              {/* 이름 (필수) */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   이름 <span className="text-red-500">*</span>
@@ -800,17 +979,16 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 출생연도 & 성별 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">출생연도</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">나이</label>
                   <input
                     type="number"
-                    value={newCustomer.birthYear}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, birthYear: e.target.value })}
-                    placeholder="예: 1970"
-                    min="1900"
-                    max={new Date().getFullYear()}
+                    value={newCustomer.age}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, age: e.target.value })}
+                    placeholder="예: 55"
+                    min="1"
+                    max="150"
                     className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -843,12 +1021,15 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* 카카오톡 ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">카카오톡 ID</label>
                 <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FEE500]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.47 1.607 4.647 4.023 5.912-.125.455-.456 1.652-.522 1.91-.082.32.118.316.248.23.102-.068 1.629-1.073 2.29-1.51.635.097 1.29.148 1.961.148 5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/>
+                  <svg
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FEE500]"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.47 1.607 4.647 4.023 5.912-.125.455-.456 1.652-.522 1.91-.082.32.118.316.248.23.102-.068 1.629-1.073 2.29-1.51.635.097 1.29.148 1.961.148 5.523 0 10-3.477 10-7.5S17.523 3 12 3z" />
                   </svg>
                   <input
                     type="text"
@@ -860,7 +1041,6 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* 전화번호 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">전화번호</label>
                 <input
@@ -872,7 +1052,6 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 이메일 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
                 <input
@@ -884,14 +1063,24 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 조제 데이터 연동 안내 */}
               <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="flex items-start gap-2">
-                  <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <p className="text-xs text-slate-500">
-                    조제 데이터 연동은 추후 지원 예정입니다. 등록된 고객의 조제 이력을 연결하여 더 정확한 혈당 분석을 제공할 수 있습니다.
+                    조제 데이터 연동은 추후 지원 예정입니다. 등록된 고객의 조제 이력을 연결하여 더 정확한
+                    혈당 분석을 제공할 수 있습니다.
                   </p>
                 </div>
               </div>
@@ -900,15 +1089,17 @@ export default function PatientsPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowRegisterModal(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
               >
                 취소
               </button>
               <button
                 onClick={handleRegisterCustomer}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                등록하기
+                {isSaving ? '등록 중...' : '등록하기'}
               </button>
             </div>
           </div>
@@ -926,13 +1117,17 @@ export default function PatientsPage() {
                 className="p-1 text-slate-400 hover:text-slate-600"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             <div className="space-y-4">
-              {/* 이름 (필수) */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   이름 <span className="text-red-500">*</span>
@@ -946,17 +1141,16 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 출생연도 & 성별 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">출생연도</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">나이</label>
                   <input
                     type="number"
-                    value={editCustomer.birthYear}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, birthYear: e.target.value })}
-                    placeholder="예: 1970"
-                    min="1900"
-                    max={new Date().getFullYear()}
+                    value={editCustomer.age}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, age: e.target.value })}
+                    placeholder="예: 55"
+                    min="1"
+                    max="150"
                     className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -989,12 +1183,15 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* 카카오톡 ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">카카오톡 ID</label>
                 <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FEE500]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.47 1.607 4.647 4.023 5.912-.125.455-.456 1.652-.522 1.91-.082.32.118.316.248.23.102-.068 1.629-1.073 2.29-1.51.635.097 1.29.148 1.961.148 5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/>
+                  <svg
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FEE500]"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.47 1.607 4.647 4.023 5.912-.125.455-.456 1.652-.522 1.91-.082.32.118.316.248.23.102-.068 1.629-1.073 2.29-1.51.635.097 1.29.148 1.961.148 5.523 0 10-3.477 10-7.5S17.523 3 12 3z" />
                   </svg>
                   <input
                     type="text"
@@ -1006,7 +1203,6 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* 전화번호 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">전화번호</label>
                 <input
@@ -1018,7 +1214,6 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 이메일 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
                 <input
@@ -1034,15 +1229,17 @@ export default function PatientsPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
               >
                 취소
               </button>
               <button
                 onClick={handleSaveEditCustomer}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                저장하기
+                {isSaving ? '저장 중...' : '저장하기'}
               </button>
             </div>
           </div>

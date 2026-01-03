@@ -12,6 +12,7 @@ import { createDisplayController } from './controllers/display.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
+import { createOrderController } from './controllers/order.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 
 /**
@@ -91,6 +92,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requireGlycopharmScope
   );
   router.use('/', adminController);
+
+  // Order routes (H8-2)
+  const orderController = createOrderController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/orders', orderController);
 
   return router;
 }

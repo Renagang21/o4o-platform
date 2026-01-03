@@ -22,3 +22,7 @@ export { DisplaySchedule } from './display-schedule.entity.js';
 
 // Forum Category Request
 export { ForumCategoryRequest, type CategoryRequestStatus } from './forum-category-request.entity.js';
+
+// Orders
+export { GlycopharmOrder, type GlycopharmOrderStatus } from './glycopharm-order.entity.js';
+export { GlycopharmOrderItem } from './glycopharm-order-item.entity.js';

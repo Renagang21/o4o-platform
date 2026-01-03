@@ -103,6 +103,85 @@ export interface ApiError {
 }
 
 // ============================================================================
+// Order Types (H8-2)
+// ============================================================================
+
+export type OrderStatus = 'CREATED' | 'PAID' | 'FAILED';
+
+export interface OrderItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_sku?: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  pharmacy_id: string;
+  pharmacy_name?: string;
+  user_id: string;
+  status: OrderStatus;
+  total_amount: number;
+  customer_name?: string;
+  customer_phone?: string;
+  shipping_address?: string;
+  note?: string;
+  paid_at?: string;
+  payment_method?: string;
+  items: OrderItem[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderListItem {
+  id: string;
+  pharmacy_id: string;
+  pharmacy_name?: string;
+  status: OrderStatus;
+  total_amount: number;
+  item_count: number;
+  created_at: string;
+}
+
+export interface CreateOrderItemRequest {
+  product_id: string;
+  quantity: number;
+}
+
+export interface CreateOrderRequest {
+  pharmacy_id: string;
+  items: CreateOrderItemRequest[];
+  customer_name?: string;
+  customer_phone?: string;
+  shipping_address?: string;
+  note?: string;
+}
+
+export interface PayOrderRequest {
+  payment_method: string;
+  payment_id?: string;
+}
+
+export interface OrderResponse {
+  success: boolean;
+  data: Order;
+}
+
+export interface OrderListResponse {
+  success: boolean;
+  data: OrderListItem[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// ============================================================================
 // API Client
 // ============================================================================
 
@@ -194,6 +273,62 @@ class GlycopharmApiClient {
    */
   async getMyPharmacy(): Promise<PharmacyMeResponse> {
     return this.request('/glycopharm/pharmacies/me');
+  }
+
+  // ============================================================================
+  // Orders API (H8-2)
+  // ============================================================================
+
+  /**
+   * POST /glycopharm/orders
+   * 주문 생성
+   */
+  async createOrder(data: CreateOrderRequest): Promise<OrderResponse> {
+    return this.request('/glycopharm/orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * GET /glycopharm/orders/mine
+   * 내 주문 목록 조회
+   */
+  async getMyOrders(params?: {
+    page?: number;
+    limit?: number;
+    status?: OrderStatus;
+  }): Promise<OrderListResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', String(params.page));
+    if (params?.limit) searchParams.set('limit', String(params.limit));
+    if (params?.status) searchParams.set('status', params.status);
+
+    const queryString = searchParams.toString();
+    const endpoint = queryString
+      ? `/glycopharm/orders/mine?${queryString}`
+      : '/glycopharm/orders/mine';
+
+    return this.request(endpoint);
+  }
+
+  /**
+   * GET /glycopharm/orders/:id
+   * 주문 상세 조회
+   */
+  async getOrder(id: string): Promise<OrderResponse> {
+    return this.request(`/glycopharm/orders/${id}`);
+  }
+
+  /**
+   * POST /glycopharm/orders/:id/pay
+   * 주문 결제 처리
+   */
+  async payOrder(id: string, data: PayOrderRequest): Promise<OrderResponse> {
+    return this.request(`/glycopharm/orders/${id}/pay`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 }
 
