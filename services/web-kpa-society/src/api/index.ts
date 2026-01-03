@@ -1,0 +1,12 @@
+/**
+ * API 서비스 모듈 통합 export
+ */
+
+export { apiClient } from './client';
+export { forumApi } from './forum';
+export { lmsApi } from './lms';
+export { groupbuyApi } from './groupbuy';
+export { newsApi } from './news';
+export { resourcesApi } from './resources';
+export { organizationApi } from './organization';
+export { mypageApi } from './mypage';

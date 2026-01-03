@@ -43,7 +43,7 @@ export function HeroSection({
 const styles: Record<string, React.CSSProperties> = {
   hero: {
     position: 'relative',
-    background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 50%, ${colors.secondary} 100%)`,
+    background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 50%, ${colors.neutral900} 100%)`,
     minHeight: '400px',
     display: 'flex',
     alignItems: 'center',

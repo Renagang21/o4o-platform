@@ -14,41 +14,69 @@ interface MenuItem {
   children?: { label: string; href: string }[];
 }
 
+// IA 기준 메뉴 구조 (Design Package v1)
 const menuItems: MenuItem[] = [
   {
-    label: '약사회 소개',
-    href: '/about',
+    label: '공지',
+    href: '/news',
     children: [
-      { label: '인사말', href: '/about' },
-      { label: '연혁', href: '/about#history' },
-      { label: '조직도', href: '/about#organization' },
-      { label: '오시는 길', href: '/about#location' },
+      { label: '공지사항', href: '/news/notice' },
+      { label: '지부/분회 소식', href: '/news/branch-news' },
+      { label: '전체 약사회 소식', href: '/news/kpa-news' },
+      { label: '갤러리', href: '/news/gallery' },
+      { label: '보도자료', href: '/news/press' },
     ],
   },
   {
-    label: '공지/소식',
-    href: '/notices',
+    label: '포럼',
+    href: '/forum',
     children: [
-      { label: '공지사항', href: '/notices' },
-      { label: '행사/교육', href: '/events' },
-      { label: '자료실', href: '/resources' },
+      { label: '전체 글', href: '/forum' },
+      { label: '글쓰기', href: '/forum/write' },
     ],
   },
   {
-    label: '회원서비스',
-    href: '/organizations',
+    label: '교육',
+    href: '/lms',
     children: [
-      { label: '조직 현황', href: '/organizations' },
-      { label: '회원 가입 신청', href: '/member/apply' },
-      { label: '내 신청 현황', href: '/applications' },
+      { label: '교육 과정', href: '/lms/courses' },
+      { label: '수료증', href: '/lms/certificate' },
     ],
   },
   {
-    label: '커뮤니티',
-    href: '/community',
+    label: '공동구매',
+    href: '/groupbuy',
     children: [
-      { label: '회원 동정', href: '/community/news' },
-      { label: '자유게시판', href: '/community/board' },
+      { label: '진행중', href: '/groupbuy' },
+      { label: '참여 내역', href: '/groupbuy/history' },
+    ],
+  },
+  {
+    label: '자료실',
+    href: '/docs',
+    children: [
+      { label: '서식/양식', href: '/docs/forms' },
+      { label: '가이드라인', href: '/docs/guidelines' },
+      { label: '규정/정관', href: '/docs/policies' },
+    ],
+  },
+  {
+    label: '조직소개',
+    href: '/organization',
+    children: [
+      { label: '약사회 소개', href: '/organization' },
+      { label: '지부/분회', href: '/organization/branches' },
+      { label: '임원 안내', href: '/organization/officers' },
+      { label: '연락처', href: '/organization/contact' },
+    ],
+  },
+  {
+    label: '마이페이지',
+    href: '/mypage',
+    children: [
+      { label: '프로필', href: '/mypage/profile' },
+      { label: '설정', href: '/mypage/settings' },
+      { label: '수료증 관리', href: '/mypage/certificates' },
     ],
   },
 ];
