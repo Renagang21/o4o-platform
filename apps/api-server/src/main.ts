@@ -410,9 +410,6 @@ import { createNetureRoutes } from './routes/neture/neture.routes.js';
 // Dropshipping Admin Routes (DS-3)
 import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/dropshipping-admin.routes.js';
 
-// K-Shopping Routes (Phase E-1)
-import { createKShoppingRoutes } from './routes/k-shopping/kshopping.routes.js';
-
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -704,16 +701,7 @@ const startServer = async () => {
       logger.error('Failed to register Dropshipping Admin routes:', dropshippingError);
     }
 
-    // 31. Register K-Shopping routes (Phase E-1)
-    try {
-      const kshoppingRoutes = createKShoppingRoutes(AppDataSource);
-      app.use('/api/v1/k-shopping', kshoppingRoutes);
-      logger.info('✅ K-Shopping routes registered at /api/v1/k-shopping');
-    } catch (kshoppingError) {
-      logger.error('Failed to register K-Shopping routes:', kshoppingError);
-    }
-
-    // 32. Register KPA routes (Pharmacist Association SaaS)
+    // 31. Register KPA routes (Pharmacist Association SaaS)
     try {
       const kpaRoutes = createKpaRoutes(AppDataSource);
       app.use('/api/v1/kpa', kpaRoutes);

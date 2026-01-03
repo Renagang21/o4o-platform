@@ -1,8 +1,8 @@
 # Cosmetics Domain Boundary (H1-0)
 
 > **Status**: Core Catalog Domain
-> **Last Updated**: 2025-01-02
-> **Work Order**: H1-0
+> **Last Updated**: 2026-01-03
+> **Work Order**: H1-0, H8-6 (K-Shopping 통합 완료)
 
 ---
 
@@ -37,34 +37,22 @@ Cosmetics Core
 
 | 영역 | 담당 | 비고 |
 |------|------|------|
-| 여행자 신청 UX | K-Shopping (동결) | 향후 통합 가능 |
 | 가이드 판매 로직 | 외부 Sub-Domain | 미정의 |
 | 세금 환급 흐름 | 외부 Sub-Domain | 미정의 |
 | 채널별 주문 방식 | H1-1에서 설계 | 미구현 |
 
+> **Note**: K-Shopping은 H8-6에서 Cosmetics에 통합되어 더 이상 별도 Sub-Domain이 아닙니다.
+
 ---
 
-## 3. Sub-Domain 관계
+## 3. 외부 채널 관계
 
-### 3.1 K-Shopping (동결 상태)
+### 3.1 K-Shopping 통합 (H8-6 완료)
 
-```
-K-Shopping (FROZEN)
-├── Applications (신청)
-├── Participants (참여자)
-└── enabledServices (승인 서비스)
-     │
-     ▼ (UUID 참조만 허용)
-Cosmetics Core
-├── Products
-├── Brands
-└── Prices
-```
-
-**관계 원칙**:
-- K-Shopping → Cosmetics: UUID 참조만 허용
-- Cosmetics → K-Shopping: 참조 없음 (단방향)
-- FK 제약 설정 금지
+K-Shopping 기능은 Cosmetics 도메인에 통합되었습니다.
+- 기존 K-Shopping API/엔티티: **제거됨**
+- 여행자 서비스 기능: web-k-cosmetics에서 처리
+- 데이터베이스 테이블: 별도 migration으로 정리 예정
 
 ### 3.2 향후 채널 (미정의)
 
@@ -100,9 +88,9 @@ const product = await fetch(`/api/v1/cosmetics/products/${productId}`);
 @JoinColumn({ name: 'product_id' })
 product: CosmeticsProduct;
 
-// ❌ 직접 JOIN 쿼리
-SELECT * FROM kshopping_participants p
-JOIN cosmetics_products cp ON p.product_id = cp.id
+// ❌ 직접 JOIN 쿼리 (예시)
+SELECT * FROM external_service e
+JOIN cosmetics_products cp ON e.product_id = cp.id
 ```
 
 ---
@@ -113,9 +101,9 @@ JOIN cosmetics_products cp ON p.product_id = cp.id
 [외부 요청]
      │
      ▼
-[K-Shopping / Travel Channel]
+[web-k-cosmetics / 외부 채널]
      │
-     │ UUID 참조
+     │ API 호출
      ▼
 [Cosmetics API]
      │
@@ -135,12 +123,6 @@ JOIN cosmetics_products cp ON p.product_id = cp.id
 | 컬럼 삭제 | 없음 | 외부에서 UUID만 참조하므로 |
 | 테이블 삭제 | 외부 참조 깨짐 | 사전 협의 필요 |
 | ID 타입 변경 | 외부 참조 깨짐 | 금지 |
-
-### K-Shopping 스키마 변경 시
-
-| 변경 유형 | Cosmetics 영향 |
-|----------|---------------|
-| 모든 변경 | **없음** (Cosmetics는 K-Shopping을 참조하지 않음) |
 
 ---
 

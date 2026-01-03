@@ -17,21 +17,22 @@
  * ✅ 감사 로그 (Audit Logs) - 변경 이력
  *
  * ## 책임 외 영역 (NOT Responsible For)
- * ❌ 여행자 신청 UX - K-Shopping 또는 향후 채널이 담당
  * ❌ 가이드 판매 로직 - 외부 Sub-Domain이 담당
  * ❌ 세금 환급 흐름 - 외부 Sub-Domain이 담당
  * ❌ 채널별 주문 방식 - 향후 H1-1에서 설계
  *
- * ## 공유 가능 데이터 (Shareable with Sub-Domains)
+ * ## 공유 가능 데이터 (Shareable with External Channels)
  * - cosmetics_products (상품)
  * - cosmetics_brands (브랜드)
  * - cosmetics_lines (라인)
  * - cosmetics_price_policies (가격)
  *
- * ## Sub-Domain 연결 원칙
- * - K-Shopping, 향후 Travel Channel 등은 이 데이터를 **참조**할 수 있음
+ * ## 외부 채널 연결 원칙
+ * - web-k-cosmetics, 향후 Travel Channel 등은 이 데이터를 **참조**할 수 있음
  * - 직접 FK 설정 금지 (UUID 참조만 허용)
- * - Cosmetics 스키마 변경이 Sub-Domain에 영향 주지 않아야 함
+ * - Cosmetics 스키마 변경이 외부 채널에 영향 주지 않아야 함
+ *
+ * Note: K-Shopping은 H8-6에서 Cosmetics에 통합되었습니다.
  *
  * @see docs/plan/active/H0-k-cosmetics-investigation-report.md
  * @core H1-0 (2025-01-02)

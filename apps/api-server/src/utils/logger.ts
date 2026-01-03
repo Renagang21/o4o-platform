@@ -15,6 +15,10 @@ import fs from 'fs';
 const isCloudRun = !!process.env.K_SERVICE;
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Service identification for Cloud Run logging (H8-5: 운영 서비스 공통 안정화)
+const serviceName = process.env.K_SERVICE || process.env.SERVICE_NAME || 'o4o-api';
+const serviceRevision = process.env.K_REVISION || 'local';
+
 // Define log levels
 const levels = {
   error: 0,
@@ -41,10 +45,16 @@ const colors = {
 winston.addColors(colors);
 
 // Define log format for production (structured JSON for Cloud Logging)
+// Include service name and revision for log identification
 const productionFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.splat(),
+  winston.format((info) => {
+    info.service = serviceName;
+    info.revision = serviceRevision;
+    return info;
+  })(),
   winston.format.json()
 );
 
@@ -120,9 +130,11 @@ const logger = winston.createLogger({
 
 // Log environment info on startup (helps with debugging)
 if (isCloudRun) {
-  logger.info('Running in Cloud Run environment (console-only logging)');
+  logger.info(`Running in Cloud Run environment: ${serviceName} (${serviceRevision})`);
 } else if (isProduction) {
   logger.info('Running in production mode with file logging');
+} else {
+  logger.info(`Running in development mode: ${serviceName}`);
 }
 
 // Export logger

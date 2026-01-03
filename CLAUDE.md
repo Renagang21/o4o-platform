@@ -311,33 +311,39 @@ docs/app-guidelines/new-service-workorder-template.md
 
 ## 8. 인프라 정보
 
-> **GCP 단일 운영 체계** (Phase R5 확정)
-> 상세: `docs/_platform/infra-migration-gcp.md`
+> **GCP Cloud Run 단일 운영 체계** (H9-0 확정)
+> 모든 서비스는 Docker(Container) 배포 방식 사용
 
-### 8.1 서버 정보
+### 8.1 Cloud Run 서비스 목록
 
-| 서버 | 위치 | 역할 |
-|------|------|------|
-| **API 서버** | GCP Cloud Run (asia-northeast3) | o4o-core-api |
-| 웹서버 | 13.125.144.8 (`ssh o4o-web`) | Nginx 프록시 + Static |
+| 서비스 | 역할 | 배포 방식 |
+|--------|------|-----------|
+| `o4o-core-api` | API 서버 | Docker (Container) |
+| `neture-web` | 네처 메인 사이트 | Docker (Container) |
+| `glycopharm-web` | 글라이코팜 웹 | Docker (Container) |
+| `glucoseview-web` | 글루코스뷰 웹 | Docker (Container) |
+| `k-cosmetics-web` | K-화장품 웹 | Docker (Container) |
+| `kpa-society-web` | 약사회 SaaS 웹 | Docker (Container) |
 
-### 8.2 배포 경로
+### 8.2 배포 워크플로우
 
-| 앱 | 배포 대상 | 방식 |
-|----|-----------|------|
-| API | Cloud Run (o4o-core-api) | GitHub Actions 자동 |
-| Admin (개발) | `/var/www/dev-admin.neture.co.kr` | o4o-web |
-| Admin (프로덕션) | `/var/www/admin.neture.co.kr` | o4o-web |
-| Main Site | `/var/www/neture.co.kr` | o4o-web |
+| 워크플로우 | 트리거 | 대상 |
+|------------|--------|------|
+| `deploy-api.yml` | main push | o4o-core-api |
+| `deploy-web-services.yml` | main push (서비스별 변경 감지) | 5개 웹 서비스 |
+| `deploy-admin.yml` | main push | admin-dashboard |
 
 ### 8.3 배포 규칙
 
-* **API 서버**: `main` 브랜치 push 시 Cloud Run 자동 배포
-* **프론트엔드**: `apps/main-site/**` 또는 `apps/admin-dashboard/**` 변경 시 수동 배포
-* 스크립트: `./scripts/deploy-admin-manual.sh`, `./scripts/deploy-main-site-manual.sh`
+* **모든 배포**: Docker 이미지 빌드 → GCR 푸시 → Cloud Run 배포
+* **API 서버**: `main` 브랜치 push 시 자동 배포
+* **웹 서비스**: `services/web-*/**` 변경 시 해당 서비스만 자동 배포
+* **이미지 레지스트리**: `gcr.io/netureyoutube/{service}:{commit-sha}`
 
 ### 8.4 금지 사항
 
+* ❌ Source 배포 방식 사용 (`--source .` 옵션)
+* ❌ PM2/ecosystem.config 사용 (삭제됨)
 * ❌ AWS EC2로의 배포 시도
 * ❌ 신규 AWS 리소스 생성
 * ❌ `43.202.242.215` (구 API 서버) 참조

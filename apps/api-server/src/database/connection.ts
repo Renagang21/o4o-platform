@@ -157,14 +157,6 @@ import {
 } from '../routes/neture/entities/index.js';
 
 // ============================================================================
-// K-SHOPPING ENTITIES (Phase E-1)
-// ============================================================================
-import {
-  KShoppingApplication,
-  KShoppingParticipant,
-} from '../routes/k-shopping/entities/index.js';
-
-// ============================================================================
 // KPA ENTITIES (Pharmacist Association SaaS)
 // ============================================================================
 import {
@@ -396,11 +388,6 @@ export const AppDataSource = new DataSource({
     NetureProductLog,
     NetureOrder,
     NetureOrderItem,
-    // ============================================================================
-    // K-SHOPPING ENTITIES (Phase E-1: K-Shopping API Implementation)
-    // ============================================================================
-    KShoppingApplication,
-    KShoppingParticipant,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================

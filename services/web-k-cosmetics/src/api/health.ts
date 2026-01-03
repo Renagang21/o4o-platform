@@ -1,17 +1,21 @@
 /**
  * API Health Check
- * Phase 1: 최소 API 연결 확인용
+ * Phase H8-6: 운영 서비스 공통 안정화
+ *
+ * 표준 응답 형식:
+ * {
+ *   service: string,
+ *   status: "ok",
+ *   timestamp: ISO string
+ * }
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://o4o-core-api-3e3aws7zqa-du.a.run.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 export interface HealthResponse {
+  service: string;
   status: string;
-  timestamp?: string;
-  uptime?: number;
-  version?: string;
-  service?: string;
-  environment?: string;
+  timestamp: string;
 }
 
 export async function checkHealth(): Promise<HealthResponse> {

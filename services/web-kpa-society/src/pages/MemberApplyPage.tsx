@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { kpaApi, ApplyRoleRequest } from '../api/kpa';
+import { useAuth } from '../contexts';
 
 /**
  * Member Application Page
- * (B) 회원 신청 페이지
+ * Phase H8-4: Core Auth v2 Integration
+ * (B) 회원 신청 페이지 - 로그인 필수
  */
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export function MemberApplyPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [formData, setFormData] = useState<ApplyRoleRequest>({
     role: 'partner', // Default role for KPA member
     businessName: '',
@@ -47,6 +50,38 @@ export function MemberApplyPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // 인증 로딩 중
+  if (authLoading) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.loadingCard}>
+          <p>로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 미로그인 상태
+  if (!isAuthenticated) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.authRequiredCard}>
+          <div style={styles.authIcon}>🔒</div>
+          <h2 style={styles.authTitle}>로그인이 필요합니다</h2>
+          <p style={styles.authMessage}>
+            회원 신청을 하시려면 먼저 로그인해주세요.
+          </p>
+          <p style={styles.authHint}>
+            우측 상단의 로그인 버튼을 클릭하여 로그인하실 수 있습니다.
+          </p>
+          <Link to="/" style={styles.backButton}>
+            홈으로 돌아가기
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (status === 'success') {
     return (
@@ -312,5 +347,48 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     textDecoration: 'none',
     textAlign: 'center',
+  },
+  // Auth required styles
+  loadingCard: {
+    textAlign: 'center',
+    padding: 48,
+    color: '#666',
+  },
+  authRequiredCard: {
+    textAlign: 'center',
+    background: '#fff',
+    borderRadius: 12,
+    padding: 48,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+  },
+  authIcon: {
+    fontSize: 48,
+    marginBottom: 24,
+  },
+  authTitle: {
+    fontSize: 24,
+    fontWeight: 700,
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  authMessage: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
+  },
+  authHint: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 24,
+  },
+  backButton: {
+    display: 'inline-block',
+    padding: '12px 24px',
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#0066cc',
+    background: '#e3f2fd',
+    borderRadius: 8,
+    textDecoration: 'none',
   },
 };

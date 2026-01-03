@@ -1,25 +1,44 @@
-name: Deploy Neture Web (Cloud Run)
+name: "[DISABLED] Deploy Neture Web (Cloud Run)"
 
-# Deploy Neture B2C Web to Cloud Run
-# Phase G-1: neture.co.kr 배포
+# ============================================================================
+# STRATEGIC HOLD - DO NOT ENABLE
+# ============================================================================
+# 이 워크플로우는 비활성화되었습니다.
+#
+# 이유:
+# - apps/neture-web은 전략적 보류(Strategic Hold) 상태
+# - 현재 운영 중인 neture-web은 services/web-neture에서 빌드됨
+# - deploy-web-services.yml에서 관리
+#
+# 관련 문서:
+# - docs/plan/IR-20260103-neture-web-structure-investigation.md
+# - apps/neture-web/README.md
+#
+# 결정 Phase: H10-1 대기
+# 비활성화일: 2026-01-03
+# ============================================================================
 
 concurrency:
   group: deploy-neture-web-${{ github.ref }}
   cancel-in-progress: false
 
+# DISABLED: 트리거 비활성화
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'apps/neture-web/**'
-      - 'packages/**'
-      - '.github/workflows/deploy-neture-web.yml'
   workflow_dispatch:
     inputs:
       force_deploy:
-        description: 'Force deployment'
+        description: '[DISABLED] This workflow is disabled'
         required: false
         default: 'false'
+
+# 기존 트리거 (비활성화됨)
+# on:
+#   push:
+#     branches: [ main ]
+#     paths:
+#       - 'apps/neture-web/**'
+#       - 'packages/**'
+#       - '.github/workflows/deploy-neture-web.yml'
 
 env:
   PROJECT_ID: netureyoutube
