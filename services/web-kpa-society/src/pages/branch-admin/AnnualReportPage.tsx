@@ -29,12 +29,13 @@ export function AnnualReportPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [_selectedReport, _setSelectedReport] = useState<AnnualReport | null>(null);
 
+  // 샘플 데이터 (테스트용 최소 데이터)
   const [reports] = useState<AnnualReport[]>([
     {
       id: '1',
       memberId: 'm1',
-      memberName: '김약사',
-      pharmacyName: '행복약국',
+      memberName: '홍길동',
+      pharmacyName: '샘플약국',
       year: 2025,
       submittedAt: '2025-01-04 10:30',
       status: 'pending',
@@ -46,40 +47,15 @@ export function AnnualReportPage() {
     {
       id: '2',
       memberId: 'm2',
-      memberName: '이약사',
-      pharmacyName: '건강약국',
+      memberName: '김테스트',
+      pharmacyName: '테스트약국',
       year: 2025,
       submittedAt: '2025-01-03 15:20',
-      status: 'pending',
-      changes: [
-        { field: '근무약국', oldValue: '건강약국', newValue: '새건강약국' },
-      ],
-    },
-    {
-      id: '3',
-      memberId: 'm3',
-      memberName: '박약사',
-      pharmacyName: '사랑약국',
-      year: 2025,
-      submittedAt: '2025-01-02 09:15',
       status: 'approved',
       changes: [
         { field: '자택주소', oldValue: '서울시 서초구', newValue: '서울시 송파구' },
       ],
       reviewNote: '확인 완료',
-    },
-    {
-      id: '4',
-      memberId: 'm4',
-      memberName: '최약사',
-      pharmacyName: '희망약국',
-      year: 2025,
-      submittedAt: '2025-01-01 14:00',
-      status: 'revision_requested',
-      changes: [
-        { field: '면허번호', oldValue: '12345', newValue: '12346' },
-      ],
-      reviewNote: '면허번호 변경 증빙서류 첨부 필요',
     },
   ]);
 

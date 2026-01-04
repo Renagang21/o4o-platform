@@ -40,57 +40,17 @@ export function BranchManagementPage() {
       const res = await adminApi.getBranches();
       setBranches(res.data.items);
     } catch (err) {
-      // 데모용 샘플 데이터
+      // 데모용 샘플 데이터 (테스트용 분회 1개)
       setBranches([
         {
           id: 'branch-1',
-          code: 'GANGNAM',
-          name: '강남분회',
-          memberCount: 245,
-          officerCount: 8,
-          isActive: true,
-          createdAt: '2024-01-15',
-          metadata: { address: '서울시 강남구', phone: '02-1234-5678' },
-        },
-        {
-          id: 'branch-2',
-          code: 'GANGBUK',
-          name: '강북분회',
-          memberCount: 189,
-          officerCount: 6,
-          isActive: true,
-          createdAt: '2024-01-15',
-          metadata: { address: '서울시 강북구', phone: '02-2345-6789' },
-        },
-        {
-          id: 'branch-3',
-          code: 'JONGNO',
-          name: '종로분회',
-          memberCount: 156,
+          code: 'SAMPLE',
+          name: '샘플분회',
+          memberCount: 25,
           officerCount: 5,
           isActive: true,
-          createdAt: '2024-02-01',
-          metadata: { address: '서울시 종로구', phone: '02-3456-7890' },
-        },
-        {
-          id: 'branch-4',
-          code: 'MAPO',
-          name: '마포분회',
-          memberCount: 134,
-          officerCount: 5,
-          isActive: true,
-          createdAt: '2024-02-15',
-          metadata: { address: '서울시 마포구', phone: '02-4567-8901' },
-        },
-        {
-          id: 'branch-5',
-          code: 'YEONGDEUNGPO',
-          name: '영등포분회',
-          memberCount: 178,
-          officerCount: 7,
-          isActive: true,
-          createdAt: '2024-03-01',
-          metadata: { address: '서울시 영등포구', phone: '02-5678-9012' },
+          createdAt: '2024-01-15',
+          metadata: { address: '서울시 강남구 테헤란로 123', phone: '02-1234-5678', email: 'sample@kpa.or.kr' },
         },
       ]);
     } finally {

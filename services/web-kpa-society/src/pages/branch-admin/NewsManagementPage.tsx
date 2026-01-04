@@ -22,6 +22,7 @@ export function NewsManagementPage() {
   const { branchId } = useParams();
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
+  // 샘플 데이터 (테스트용 최소 데이터)
   const [notices] = useState<Notice[]>([
     {
       id: '1',
@@ -29,49 +30,19 @@ export function NewsManagementPage() {
       category: 'notice',
       author: '관리자',
       createdAt: '2025-01-04',
-      viewCount: 156,
+      viewCount: 45,
       isPinned: true,
       isPublished: true,
     },
     {
       id: '2',
-      title: '[긴급] 약국 운영 지침 변경 안내',
-      category: 'urgent',
-      author: '관리자',
-      createdAt: '2025-01-03',
-      viewCount: 342,
-      isPinned: true,
-      isPublished: true,
-    },
-    {
-      id: '3',
-      title: '신년 하례회 참석 안내',
-      category: 'event',
-      author: '관리자',
-      createdAt: '2025-01-02',
-      viewCount: 89,
-      isPinned: false,
-      isPublished: true,
-    },
-    {
-      id: '4',
-      title: '2025년 연회비 납부 안내',
+      title: '샘플 공지사항',
       category: 'notice',
       author: '관리자',
       createdAt: '2025-01-01',
-      viewCount: 234,
+      viewCount: 12,
       isPinned: false,
       isPublished: true,
-    },
-    {
-      id: '5',
-      title: '보수교육 일정 변경 (임시저장)',
-      category: 'notice',
-      author: '관리자',
-      createdAt: '2024-12-30',
-      viewCount: 0,
-      isPinned: false,
-      isPublished: false,
     },
   ]);
 

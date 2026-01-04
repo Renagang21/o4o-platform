@@ -27,12 +27,13 @@ export function MembershipFeePage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
 
+  // 샘플 데이터 (테스트용 최소 데이터)
   const [records] = useState<FeeRecord[]>([
     {
       id: '1',
       memberId: 'm1',
-      memberName: '김약사',
-      pharmacyName: '행복약국',
+      memberName: '홍길동',
+      pharmacyName: '샘플약국',
       year: 2025,
       amount: 200000,
       paidAmount: 200000,
@@ -44,42 +45,8 @@ export function MembershipFeePage() {
     {
       id: '2',
       memberId: 'm2',
-      memberName: '이약사',
-      pharmacyName: '건강약국',
-      year: 2025,
-      amount: 200000,
-      paidAmount: 0,
-      status: 'unpaid',
-    },
-    {
-      id: '3',
-      memberId: 'm3',
-      memberName: '박약사',
-      pharmacyName: '사랑약국',
-      year: 2025,
-      amount: 200000,
-      paidAmount: 100000,
-      paidAt: '2025-01-02',
-      status: 'partial',
-      paymentMethod: 'bank',
-    },
-    {
-      id: '4',
-      memberId: 'm4',
-      memberName: '최약사',
-      pharmacyName: '희망약국',
-      year: 2025,
-      amount: 200000,
-      paidAmount: 200000,
-      paidAt: '2025-01-04',
-      status: 'pending_confirm',
-      paymentMethod: 'bank',
-    },
-    {
-      id: '5',
-      memberId: 'm5',
-      memberName: '정약사',
-      pharmacyName: '미래약국',
+      memberName: '김테스트',
+      pharmacyName: '테스트약국',
       year: 2025,
       amount: 200000,
       paidAmount: 0,

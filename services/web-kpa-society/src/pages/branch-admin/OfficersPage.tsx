@@ -26,15 +26,16 @@ export function OfficersPage() {
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingOfficer, setEditingOfficer] = useState<Officer | null>(null);
 
+  // 샘플 데이터 (테스트용 최소 데이터 - 3명)
   const [officers] = useState<Officer[]>([
     {
       id: '1',
-      name: '김분회장',
+      name: '홍분회장',
       position: '분회장',
       role: 'president',
-      pharmacyName: '중앙약국',
+      pharmacyName: '샘플약국',
       phone: '010-1111-2222',
-      email: 'kim@pharmacy.com',
+      email: 'president@sample.com',
       termStart: '2024-01-01',
       termEnd: '2025-12-31',
       isActive: true,
@@ -42,12 +43,12 @@ export function OfficersPage() {
     },
     {
       id: '2',
-      name: '이부회장',
-      position: '부회장',
-      role: 'vice_president',
-      pharmacyName: '건강약국',
+      name: '김총무',
+      position: '총무',
+      role: 'secretary',
+      pharmacyName: '테스트약국',
       phone: '010-2222-3333',
-      email: 'lee@pharmacy.com',
+      email: 'secretary@sample.com',
       termStart: '2024-01-01',
       termEnd: '2025-12-31',
       isActive: true,
@@ -55,55 +56,16 @@ export function OfficersPage() {
     },
     {
       id: '3',
-      name: '박총무',
-      position: '총무',
-      role: 'secretary',
-      pharmacyName: '행복약국',
+      name: '박감사',
+      position: '감사',
+      role: 'auditor',
+      pharmacyName: '확인약국',
       phone: '010-3333-4444',
-      email: 'park@pharmacy.com',
+      email: 'auditor@sample.com',
       termStart: '2024-01-01',
       termEnd: '2025-12-31',
       isActive: true,
       order: 3,
-    },
-    {
-      id: '4',
-      name: '최재무',
-      position: '재무',
-      role: 'treasurer',
-      pharmacyName: '미래약국',
-      phone: '010-4444-5555',
-      email: 'choi@pharmacy.com',
-      termStart: '2024-01-01',
-      termEnd: '2025-12-31',
-      isActive: true,
-      order: 4,
-    },
-    {
-      id: '5',
-      name: '정이사',
-      position: '이사',
-      role: 'director',
-      pharmacyName: '희망약국',
-      phone: '010-5555-6666',
-      email: 'jung@pharmacy.com',
-      termStart: '2024-01-01',
-      termEnd: '2025-12-31',
-      isActive: true,
-      order: 5,
-    },
-    {
-      id: '6',
-      name: '강감사',
-      position: '감사',
-      role: 'auditor',
-      pharmacyName: '사랑약국',
-      phone: '010-6666-7777',
-      email: 'kang@pharmacy.com',
-      termStart: '2024-01-01',
-      termEnd: '2025-12-31',
-      isActive: true,
-      order: 6,
     },
   ]);
 
@@ -233,33 +195,18 @@ export function OfficersPage() {
             <div style={pageStyles.chartLevel}>
               <div style={pageStyles.chartBox}>
                 <strong>분회장</strong>
-                <span>김분회장</span>
+                <span>홍분회장</span>
               </div>
             </div>
-            <div style={pageStyles.chartConnector}>│</div>
-            <div style={pageStyles.chartLevel}>
-              <div style={pageStyles.chartBox}>
-                <strong>부회장</strong>
-                <span>이부회장</span>
-              </div>
-            </div>
-            <div style={pageStyles.chartConnector}>┬───────────┬</div>
+            <div style={pageStyles.chartConnector}>┬───────┬</div>
             <div style={pageStyles.chartLevel}>
               <div style={pageStyles.chartBox}>
                 <strong>총무</strong>
-                <span>박총무</span>
-              </div>
-              <div style={pageStyles.chartBox}>
-                <strong>재무</strong>
-                <span>최재무</span>
-              </div>
-              <div style={pageStyles.chartBox}>
-                <strong>이사</strong>
-                <span>정이사</span>
+                <span>김총무</span>
               </div>
               <div style={pageStyles.chartBox}>
                 <strong>감사</strong>
-                <span>강감사</span>
+                <span>박감사</span>
               </div>
             </div>
           </div>

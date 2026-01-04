@@ -26,21 +26,20 @@ interface RecentActivity {
 
 export function DashboardPage() {
   const { branchId } = useParams();
+  // 샘플 통계 데이터 (테스트용 최소 데이터)
   const [stats] = useState<DashboardStats>({
-    totalMembers: 245,
-    activeMembers: 232,
-    pendingAnnualReports: 3,
-    pendingMembershipFees: 5,
-    recentPosts: 12,
-    upcomingEvents: 2,
+    totalMembers: 25,
+    activeMembers: 23,
+    pendingAnnualReports: 1,
+    pendingMembershipFees: 2,
+    recentPosts: 3,
+    upcomingEvents: 1,
   });
 
+  // 샘플 활동 데이터 (테스트용)
   const [recentActivities] = useState<RecentActivity[]>([
-    { id: '1', type: 'annual_report', title: '김약사 - 2025년 신상신고서 제출', date: '2025-01-04', status: 'pending' },
-    { id: '2', type: 'membership_fee', title: '박약사 - 2025년 연회비 납부', date: '2025-01-03', status: 'pending' },
-    { id: '3', type: 'member_join', title: '이약사 - 신규 회원 가입 신청', date: '2025-01-03', status: 'pending' },
-    { id: '4', type: 'post', title: '2025년 정기총회 안내', date: '2025-01-02' },
-    { id: '5', type: 'annual_report', title: '최약사 - 2025년 신상신고서 제출', date: '2025-01-02', status: 'approved' },
+    { id: '1', type: 'annual_report', title: '홍길동 - 2025년 신상신고서 제출', date: '2025-01-04', status: 'pending' },
+    { id: '2', type: 'membership_fee', title: '김테스트 - 2025년 연회비 납부', date: '2025-01-03', status: 'pending' },
   ]);
 
   const basePath = `/branch/${branchId}/admin`;

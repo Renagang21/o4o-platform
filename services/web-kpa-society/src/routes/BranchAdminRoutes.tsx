@@ -1,10 +1,14 @@
 /**
  * BranchAdminRoutes - 분회 관리자 라우팅
  * 경로: /branch/:branchId/admin/*
+ *
+ * 권한 체크: BranchAdminAuthGuard가 분회 관리자 권한을 확인합니다.
+ * - 로그인 필수
+ * - 해당 분회의 관리자 권한 필요 (membership_branch_admin 또는 상위 권한)
  */
 
 import { Routes, Route } from 'react-router-dom';
-import { AdminLayout } from '../components/branch-admin';
+import { AdminLayout, BranchAdminAuthGuard } from '../components/branch-admin';
 import {
   DashboardPage,
   MembersPage,
@@ -19,8 +23,9 @@ import {
 
 export function BranchAdminRoutes() {
   return (
-    <Routes>
-      <Route element={<AdminLayout />}>
+    <BranchAdminAuthGuard>
+      <Routes>
+        <Route element={<AdminLayout />}>
         {/* 대시보드 */}
         <Route index element={<DashboardPage />} />
 
@@ -53,7 +58,8 @@ export function BranchAdminRoutes() {
 
         {/* 분회 설정 */}
         <Route path="settings" element={<SettingsPage />} />
-      </Route>
-    </Routes>
+        </Route>
+      </Routes>
+    </BranchAdminAuthGuard>
   );
 }
