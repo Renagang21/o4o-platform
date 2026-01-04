@@ -13,7 +13,6 @@ export function LmsCoursesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -27,7 +26,6 @@ export function LmsCoursesPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const res = await lmsApi.getCourses({
         category: currentCategory || undefined,
@@ -36,10 +34,13 @@ export function LmsCoursesPage() {
         limit: 12,
       });
 
-      setCourses(res.data);
-      setTotalPages(res.totalPages);
+      setCourses(res.data || []);
+      setTotalPages(res.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+      // API 오류 시 빈 목록 표시 (서비스 준비 중)
+      console.warn('LMS API not available:', err);
+      setCourses([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -75,19 +76,6 @@ export function LmsCoursesPage() {
 
   if (loading) {
     return <LoadingSpinner message="교육 과정을 불러오는 중..." />;
-  }
-
-  if (error) {
-    return (
-      <div style={styles.container}>
-        <EmptyState
-          icon="⚠️"
-          title="오류가 발생했습니다"
-          description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
-        />
-      </div>
-    );
   }
 
   return (

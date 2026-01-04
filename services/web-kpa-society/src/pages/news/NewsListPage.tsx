@@ -23,7 +23,6 @@ export function NewsListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
 
   // URL 경로에서 타입 추출
@@ -47,7 +46,6 @@ export function NewsListPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const res = await newsApi.getNotices({
         type: currentType,
@@ -56,10 +54,13 @@ export function NewsListPage() {
         search: searchQuery || undefined,
       });
 
-      setNotices(res.data);
-      setTotalPages(res.totalPages);
+      setNotices(res.data || []);
+      setTotalPages(res.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+      // API 오류 시 빈 목록 표시 (서비스 준비 중)
+      console.warn('News API not available:', err);
+      setNotices([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -78,18 +79,6 @@ export function NewsListPage() {
     return <LoadingSpinner message="게시글을 불러오는 중..." />;
   }
 
-  if (error) {
-    return (
-      <div style={styles.container}>
-        <EmptyState
-          icon="⚠️"
-          title="오류가 발생했습니다"
-          description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
-        />
-      </div>
-    );
-  }
 
   return (
     <div style={styles.container}>

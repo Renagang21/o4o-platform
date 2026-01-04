@@ -13,7 +13,6 @@ export function GroupbuyListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [groupbuys, setGroupbuys] = useState<Groupbuy[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -26,7 +25,6 @@ export function GroupbuyListPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const res = await groupbuyApi.getGroupbuys({
         status: currentStatus,
@@ -34,10 +32,13 @@ export function GroupbuyListPage() {
         limit: 12,
       });
 
-      setGroupbuys(res.data);
-      setTotalPages(res.totalPages);
+      setGroupbuys(res.data || []);
+      setTotalPages(res.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+      // API 오류 시 빈 목록 표시 (서비스 준비 중)
+      console.warn('Groupbuy API not available:', err);
+      setGroupbuys([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -82,19 +83,6 @@ export function GroupbuyListPage() {
 
   if (loading) {
     return <LoadingSpinner message="공동구매를 불러오는 중..." />;
-  }
-
-  if (error) {
-    return (
-      <div style={styles.container}>
-        <EmptyState
-          icon="⚠️"
-          title="오류가 발생했습니다"
-          description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
-        />
-      </div>
-    );
   }
 
   return (

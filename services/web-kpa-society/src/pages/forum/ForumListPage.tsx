@@ -14,7 +14,6 @@ export function ForumListPage() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -28,7 +27,6 @@ export function ForumListPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const [postsRes, categoriesRes] = await Promise.all([
         forumApi.getPosts({
@@ -40,11 +38,15 @@ export function ForumListPage() {
         forumApi.getCategories(),
       ]);
 
-      setPosts(postsRes.data);
-      setTotalPages(postsRes.totalPages);
-      setCategories(categoriesRes.data);
+      setPosts(postsRes.data || []);
+      setTotalPages(postsRes.totalPages || 1);
+      setCategories(categoriesRes.data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+      // API 오류 시 빈 목록 표시 (서비스 준비 중)
+      console.warn('Forum API not available:', err);
+      setPosts([]);
+      setCategories([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -71,19 +73,6 @@ export function ForumListPage() {
 
   if (loading) {
     return <LoadingSpinner message="게시글을 불러오는 중..." />;
-  }
-
-  if (error) {
-    return (
-      <div style={styles.container}>
-        <EmptyState
-          icon="⚠️"
-          title="오류가 발생했습니다"
-          description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
-        />
-      </div>
-    );
   }
 
   return (
