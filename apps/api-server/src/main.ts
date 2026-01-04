@@ -106,7 +106,9 @@ const io = new Server(httpServer, {
         "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
         "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr", "http://api.neture.co.kr",
         "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
-        "https://glucoseview.co.kr", "https://www.glucoseview.co.kr"
+        "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
+        "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
+        "https://k-cosmetics.site", "https://www.k-cosmetics.site"
       ];
 
       if (!origin || allowedOrigins.includes(origin)) {
@@ -197,6 +199,8 @@ const corsOptions: CorsOptions = {
       "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
       "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
       "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
+      "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
+      "https://k-cosmetics.site", "https://www.k-cosmetics.site",
     ];
 
     const allowedOrigins = [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
