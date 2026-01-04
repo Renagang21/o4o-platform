@@ -11,3 +11,4 @@ export { resourcesApi } from './resources';
 export { organizationApi } from './organization';
 export { mypageApi } from './mypage';
 export { branchApi } from './branch';
+export { adminApi } from './admin';

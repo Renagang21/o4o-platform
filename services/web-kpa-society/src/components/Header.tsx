@@ -81,6 +81,18 @@ const menuItems: MenuItem[] = [
   },
 ];
 
+// 관리자 메뉴 (로그인한 관리자에게만 표시)
+const adminMenu: MenuItem = {
+  label: '관리자',
+  href: '/admin',
+  children: [
+    { label: '대시보드', href: '/admin' },
+    { label: '분회 관리', href: '/admin/branches' },
+    { label: '회원 관리', href: '/admin/members' },
+    { label: '공지 관리', href: '/admin/news' },
+  ],
+};
+
 export function Header({ serviceName }: { serviceName: string }) {
   const { user, login, logout, isLoading } = useAuth();
   const location = useLocation();
@@ -90,6 +102,12 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 관리자 여부 확인 (데모: 로그인한 사용자는 관리자로 간주)
+  const isAdmin = !!user;
+
+  // 메뉴 구성 (관리자인 경우 관리자 메뉴 추가)
+  const displayMenuItems = isAdmin ? [...menuItems, adminMenu] : menuItems;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +141,7 @@ export function Header({ serviceName }: { serviceName: string }) {
           {/* Desktop Navigation */}
           <nav style={styles.nav}>
             <ul style={styles.navList}>
-              {menuItems.map((item) => (
+              {displayMenuItems.map((item) => (
                 <li
                   key={item.label}
                   style={styles.navItem}
@@ -195,7 +213,7 @@ export function Header({ serviceName }: { serviceName: string }) {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div style={styles.mobileMenu}>
-            {menuItems.map((item) => (
+            {displayMenuItems.map((item) => (
               <div key={item.label}>
                 <Link
                   to={item.href}

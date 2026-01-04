@@ -24,6 +24,9 @@ import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, Co
 // MyPage pages
 import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage } from './pages/mypage';
 
+// Admin pages (지부 관리자)
+import { AdminDashboardPage, BranchManagementPage, BranchFormPage } from './pages/admin';
+
 // Branch Routes (분회 서브디렉토리)
 import { BranchRoutes } from './routes/BranchRoutes';
 
@@ -96,6 +99,12 @@ function App() {
             <Route path="/mypage/profile" element={<MyProfilePage />} />
             <Route path="/mypage/settings" element={<MySettingsPage />} />
             <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
+
+            {/* Admin (지부 관리자) */}
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/branches" element={<BranchManagementPage />} />
+            <Route path="/admin/branches/new" element={<BranchFormPage />} />
+            <Route path="/admin/branches/:id/edit" element={<BranchFormPage />} />
 
             {/* Legacy routes (for backward compatibility) */}
             <Route path="/member/apply" element={<MemberApplyPage />} />
