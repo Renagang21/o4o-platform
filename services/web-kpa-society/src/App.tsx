@@ -30,6 +30,9 @@ import { AdminDashboardPage, BranchManagementPage, BranchFormPage } from './page
 // Branch Routes (분회 서브디렉토리)
 import { BranchRoutes } from './routes/BranchRoutes';
 
+// Branch Admin Routes (분회 관리자)
+import { BranchAdminRoutes } from './routes/BranchAdminRoutes';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -118,6 +121,7 @@ function App() {
 
         {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
         <Routes>
+          <Route path="/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
           <Route path="/branch/:branchId/*" element={<BranchRoutes />} />
         </Routes>
       </BrowserRouter>
