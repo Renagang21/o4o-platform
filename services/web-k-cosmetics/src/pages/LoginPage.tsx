@@ -1,18 +1,28 @@
 /**
  * LoginPage - K-Cosmetics 로그인 페이지
+ * 로그인 후 역할에 따라 대시보드로 이동, 복수 역할시 선택 화면
  */
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, UserRole } from '../contexts';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+const ROLE_ICONS: Record<UserRole, string> = {
+  admin: '🛡️',
+  supplier: '📦',
+  seller: '🏪',
+  partner: '🤝',
+};
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showRoleSelector, setShowRoleSelector] = useState(false);
+  const [pendingRoles, setPendingRoles] = useState<UserRole[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,28 +30,67 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await login(email, password);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || '로그인에 실패했습니다.');
+      if (!result.success) {
+        throw new Error(result.error || '로그인에 실패했습니다.');
       }
 
-      // 로그인 성공 - 홈으로 이동
-      navigate('/');
+      const savedUser = localStorage.getItem('kcosmetics_user');
+      if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        if (userData.roles.length > 1) {
+          setPendingRoles(userData.roles);
+          setShowRoleSelector(true);
+        } else {
+          navigate(ROLE_DASHBOARDS[userData.roles[0] as UserRole]);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleRoleSelect = (role: UserRole) => {
+    navigate(ROLE_DASHBOARDS[role]);
+  };
+
+  if (showRoleSelector && pendingRoles.length > 1) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.logo}>K-Cosmetics</div>
+          <h1 style={styles.title}>역할 선택</h1>
+          <p style={styles.subtitle}>사용할 역할을 선택하세요</p>
+
+          <div style={styles.roleGrid}>
+            {pendingRoles.map(role => (
+              <button
+                key={role}
+                style={styles.roleCard}
+                onClick={() => handleRoleSelect(role)}
+              >
+                <span style={styles.roleIcon}>{ROLE_ICONS[role]}</span>
+                <span style={styles.roleLabel}>{ROLE_LABELS[role]}</span>
+                <span style={styles.roleDescription}>
+                  {role === 'admin' && '플랫폼 전체 관리'}
+                  {role === 'supplier' && '상품 공급 및 배송'}
+                  {role === 'seller' && '매장 운영 관리'}
+                  {role === 'partner' && '파트너 연계 관리'}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <p style={styles.roleNote}>
+            로그인 후에도 상단 메뉴에서 역할을 전환할 수 있습니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
@@ -89,6 +138,16 @@ export function LoginPage() {
           </button>
         </form>
 
+        <div style={styles.testAccounts}>
+          <p style={styles.testTitle}>테스트 계정</p>
+          <ul style={styles.testList}>
+            <li>admin@test.com - 관리자 (모든 역할)</li>
+            <li>supplier@test.com - 공급자</li>
+            <li>seller@test.com - 매장</li>
+            <li>multi@test.com - 복수 역할</li>
+          </ul>
+        </div>
+
         <div style={styles.footer}>
           <a href="/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
           <span style={styles.divider}>|</span>
@@ -98,6 +157,8 @@ export function LoginPage() {
     </div>
   );
 }
+
+const PRIMARY_COLOR = '#FF6B9D';
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
@@ -113,13 +174,13 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '16px',
     padding: '48px',
     width: '100%',
-    maxWidth: '420px',
+    maxWidth: '480px',
     boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)',
   },
   logo: {
     fontSize: '28px',
     fontWeight: 700,
-    color: '#FF6B9D',
+    color: PRIMARY_COLOR,
     textAlign: 'center',
     marginBottom: '8px',
   },
@@ -168,7 +229,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   submitButton: {
     padding: '16px',
-    backgroundColor: '#FF6B9D',
+    backgroundColor: PRIMARY_COLOR,
     color: '#fff',
     border: 'none',
     borderRadius: '8px',
@@ -177,13 +238,71 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     marginTop: '8px',
   },
+  roleGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '16px',
+    marginBottom: '24px',
+  },
+  roleCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '24px 16px',
+    backgroundColor: '#fff',
+    border: '2px solid #e2e8f0',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  roleIcon: {
+    fontSize: '36px',
+    marginBottom: '12px',
+  },
+  roleLabel: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#0F172A',
+    marginBottom: '4px',
+  },
+  roleDescription: {
+    fontSize: '12px',
+    color: '#64748B',
+    textAlign: 'center',
+  },
+  roleNote: {
+    fontSize: '13px',
+    color: '#64748B',
+    textAlign: 'center',
+    margin: 0,
+  },
+  testAccounts: {
+    marginTop: '24px',
+    padding: '16px',
+    backgroundColor: '#FFF0F5',
+    borderRadius: '8px',
+  },
+  testTitle: {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#64748B',
+    margin: '0 0 8px 0',
+    textTransform: 'uppercase',
+  },
+  testList: {
+    fontSize: '12px',
+    color: '#64748B',
+    margin: 0,
+    paddingLeft: '16px',
+    lineHeight: 1.8,
+  },
   footer: {
     textAlign: 'center',
     marginTop: '24px',
     fontSize: '14px',
   },
   link: {
-    color: '#FF6B9D',
+    color: PRIMARY_COLOR,
     textDecoration: 'none',
   },
   divider: {

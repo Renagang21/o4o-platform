@@ -7,3 +7,4 @@ export { CoreValueSection } from './CoreValueSection';
 export { UsagePreviewSection } from './UsagePreviewSection';
 export { CTASection } from './CTASection';
 export { Footer } from './Footer';
+export { RoleSwitcher } from './RoleSwitcher';
