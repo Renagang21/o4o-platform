@@ -8,6 +8,7 @@
  * - /stores/:storeSlug : 개별 매장 (한국어 기본, 다국어)
  * - /tourists : 관광객 안내
  * - /partners : 파트너 안내
+ * - /suppliers : 공급사 참여 안내 (B2B)
  * - /about : 플랫폼 소개
  * - /contact : 문의
  */
@@ -20,6 +21,7 @@ import {
   StoreDetailPage,
   TouristsPage,
   PartnersPage,
+  SuppliersPage,
   AboutPage,
   ContactPage,
 } from './pages';
@@ -43,6 +45,9 @@ function App() {
 
           {/* 파트너 안내 */}
           <Route path="/partners" element={<PartnersPage />} />
+
+          {/* 공급사 참여 안내 (B2B) */}
+          <Route path="/suppliers" element={<SuppliersPage />} />
 
           {/* 플랫폼 소개 */}
           <Route path="/about" element={<AboutPage />} />
