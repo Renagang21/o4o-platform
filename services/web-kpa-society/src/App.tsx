@@ -24,14 +24,17 @@ import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, Co
 // MyPage pages
 import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage } from './pages/mypage';
 
-// Admin pages (지부 관리자)
-import { AdminDashboardPage, BranchManagementPage, BranchFormPage } from './pages/admin';
-
 // Branch Routes (분회 서브디렉토리)
 import { BranchRoutes } from './routes/BranchRoutes';
 
 // Branch Admin Routes (분회 관리자)
 import { BranchAdminRoutes } from './routes/BranchAdminRoutes';
+
+// Admin Routes (지부 관리자)
+import { AdminRoutes } from './routes/AdminRoutes';
+
+// Intranet Routes (인트라넷)
+import { IntranetRoutes } from './routes/IntranetRoutes';
 
 // Legacy pages (for backward compatibility)
 import {
@@ -103,11 +106,8 @@ function App() {
             <Route path="/mypage/settings" element={<MySettingsPage />} />
             <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
 
-            {/* Admin (지부 관리자) */}
-            <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="/admin/branches" element={<BranchManagementPage />} />
-            <Route path="/admin/branches/new" element={<BranchFormPage />} />
-            <Route path="/admin/branches/:id/edit" element={<BranchFormPage />} />
+            {/* Admin (지부 관리자) - 별도 레이아웃으로 처리 */}
+            {/* Note: Admin routes are handled below in separate Routes block */}
 
             {/* Legacy routes (for backward compatibility) */}
             <Route path="/member/apply" element={<MemberApplyPage />} />
@@ -118,6 +118,16 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>
+
+        {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
+        <Routes>
+          <Route path="/admin/*" element={<AdminRoutes />} />
+        </Routes>
+
+        {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
+        <Routes>
+          <Route path="/intranet/*" element={<IntranetRoutes />} />
+        </Routes>
 
         {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
         <Routes>

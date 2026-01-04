@@ -4,8 +4,9 @@
  */
 
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts';
+import { TestAccountType } from '../contexts/AuthContext';
 import { colors } from '../styles/theme';
 
 interface MenuItem {
@@ -94,8 +95,9 @@ const adminMenu: MenuItem = {
 };
 
 export function Header({ serviceName }: { serviceName: string }) {
-  const { user, login, logout, isLoading } = useAuth();
+  const { user, login, loginAsTestAccount, logout, isLoading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -126,6 +128,20 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  /**
+   * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정으로 즉시 로그인
+   */
+  const handleTestLogin = (accountType: TestAccountType) => {
+    loginAsTestAccount(accountType);
+    setShowLoginModal(false);
+    // 역할에 따라 적절한 페이지로 이동
+    if (accountType === 'district_admin') {
+      navigate('/admin');
+    } else {
+      navigate('/intranet');
+    }
   };
 
   return (
@@ -291,6 +307,34 @@ export function Header({ serviceName }: { serviceName: string }) {
                 {isSubmitting ? '로그인 중...' : '로그인'}
               </button>
             </form>
+
+            {/* WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 버튼 */}
+            <div style={styles.testAccountSection}>
+              <div style={styles.testAccountDivider}>
+                <span style={styles.testAccountDividerText}>테스트 환경</span>
+              </div>
+              <p style={styles.testAccountDesc}>
+                아래 버튼으로 테스트 계정에 즉시 로그인할 수 있습니다.
+              </p>
+              <div style={styles.testAccountButtons}>
+                <button
+                  type="button"
+                  style={styles.testAccountButton}
+                  onClick={() => handleTestLogin('district_admin')}
+                >
+                  <span style={styles.testAccountIcon}>🏛️</span>
+                  <span>지부 운영자 계정</span>
+                </button>
+                <button
+                  type="button"
+                  style={styles.testAccountButton}
+                  onClick={() => handleTestLogin('branch_admin')}
+                >
+                  <span style={styles.testAccountIcon}>🏢</span>
+                  <span>분회 운영자 계정</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -533,5 +577,50 @@ const styles: Record<string, React.CSSProperties> = {
   submitButtonDisabled: {
     backgroundColor: colors.gray400,
     cursor: 'not-allowed',
+  },
+  // WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 스타일
+  testAccountSection: {
+    marginTop: '24px',
+    paddingTop: '20px',
+    borderTop: `1px dashed ${colors.gray300}`,
+  },
+  testAccountDivider: {
+    textAlign: 'center',
+    marginBottom: '12px',
+  },
+  testAccountDividerText: {
+    fontSize: '12px',
+    color: colors.gray500,
+    backgroundColor: colors.white,
+    padding: '0 12px',
+  },
+  testAccountDesc: {
+    fontSize: '13px',
+    color: colors.gray600,
+    textAlign: 'center',
+    margin: '0 0 16px 0',
+  },
+  testAccountButtons: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  testAccountButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+    padding: '14px 16px',
+    backgroundColor: colors.gray100,
+    border: `1px solid ${colors.gray300}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: colors.gray700,
+    cursor: 'pointer',
+    transition: 'background-color 0.2s, border-color 0.2s',
+  },
+  testAccountIcon: {
+    fontSize: '18px',
   },
 };

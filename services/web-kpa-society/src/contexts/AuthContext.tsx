@@ -20,11 +20,34 @@ export interface User {
   role?: string;
 }
 
+/**
+ * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 정의
+ * - 지부 운영자: district_admin
+ * - 분회 운영자: branch_admin
+ */
+export type TestAccountType = 'district_admin' | 'branch_admin';
+
+export const TEST_ACCOUNTS: Record<TestAccountType, User> = {
+  district_admin: {
+    id: 'test-district-admin-001',
+    email: 'district-admin@kpa-test.kr',
+    name: '지부 운영자 (테스트)',
+    role: 'district_admin',
+  },
+  branch_admin: {
+    id: 'test-branch-admin-001',
+    email: 'branch-admin@kpa-test.kr',
+    name: '분회 운영자 (테스트)',
+    role: 'branch_admin',
+  },
+};
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -122,6 +145,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  /**
+   * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정으로 즉시 로그인
+   * - 실제 API 호출 없이 로컬 상태만 변경
+   * - 테스트 환경 전용
+   */
+  const loginAsTestAccount = (accountType: TestAccountType) => {
+    const testUser = TEST_ACCOUNTS[accountType];
+    setUser(testUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -129,6 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
+        loginAsTestAccount,
         logout,
         checkAuth,
       }}

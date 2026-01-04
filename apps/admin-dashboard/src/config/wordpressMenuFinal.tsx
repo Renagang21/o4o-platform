@@ -46,6 +46,7 @@ import {
   AlertTriangle,
   Brain,
   MessageSquare,
+  Layers,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -79,6 +80,15 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <LayoutDashboard className="w-5 h-5" />,
     path: '/admin',
     roles: ['admin', 'super_admin'],
+  },
+
+  // Service Content Manager (WO-ADMIN-CONTENT-SLOT-V1)
+  {
+    id: 'service-content-manager',
+    label: 'Service Content Manager',
+    icon: <Layers className="w-5 h-5" />,
+    path: '/admin/service-content-manager',
+    roles: ['admin', 'super_admin', 'platform_admin'],
   },
 
   // Yaksa Admin Hub (Phase 19-D)

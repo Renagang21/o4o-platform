@@ -185,6 +185,9 @@ const ServiceApplicationDetailPage = lazy(() => import('@/pages/service-applicat
 // Neture Pages (Phase D-3)
 const NetureRouter = lazy(() => import('@/pages/neture/NetureRouter'));
 
+// Service Content Manager (WO-ADMIN-CONTENT-SLOT-V1)
+const ServiceContentManagerPage = lazy(() => import('@/pages/service-content-manager/ServiceContentManagerPage'));
+
 // Storefront Pages (Phase 7-I)
 const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
 
@@ -510,6 +513,15 @@ function App() {
                       <Suspense fallback={<PageLoader />}>
                         <DashboardSimple />
                       </Suspense>
+                    } />
+
+                    {/* WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager */}
+                    <Route path="/admin/service-content-manager" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'platform_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ServiceContentManagerPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
                     } />
 
                     {/* P1 Phase C: Widget-based Admin Dashboard */}
