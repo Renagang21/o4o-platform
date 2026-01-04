@@ -54,88 +54,89 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Layout serviceName={SERVICE_NAME}>
-          <Routes>
-            {/* Home / Dashboard */}
-            <Route path="/" element={<DashboardPage />} />
-
-            {/* News (공지/소식) */}
-            <Route path="/news" element={<NewsListPage />} />
-            <Route path="/news/notice" element={<NewsListPage />} />
-            <Route path="/news/branch-news" element={<NewsListPage />} />
-            <Route path="/news/kpa-news" element={<NewsListPage />} />
-            <Route path="/news/gallery" element={<GalleryPage />} />
-            <Route path="/news/press" element={<NewsListPage />} />
-            <Route path="/news/:id" element={<NewsDetailPage />} />
-
-            {/* Forum (포럼) */}
-            <Route path="/forum" element={<ForumListPage />} />
-            <Route path="/forum/category/:id" element={<ForumListPage />} />
-            <Route path="/forum/post/:id" element={<ForumDetailPage />} />
-            <Route path="/forum/write" element={<ForumWritePage />} />
-            <Route path="/forum/edit/:id" element={<ForumWritePage />} />
-
-            {/* LMS (교육) */}
-            <Route path="/lms" element={<LmsCoursesPage />} />
-            <Route path="/lms/courses" element={<LmsCoursesPage />} />
-            <Route path="/lms/course/:id" element={<LmsCourseDetailPage />} />
-            <Route path="/lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
-            <Route path="/lms/certificate" element={<LmsCertificatesPage />} />
-
-            {/* Groupbuy (공동구매) */}
-            <Route path="/groupbuy" element={<GroupbuyListPage />} />
-            <Route path="/groupbuy/history" element={<GroupbuyHistoryPage />} />
-            <Route path="/groupbuy/:id" element={<GroupbuyDetailPage />} />
-
-            {/* Docs (자료실) */}
-            <Route path="/docs" element={<ResourcesListPage />} />
-            <Route path="/docs/forms" element={<ResourcesListPage />} />
-            <Route path="/docs/guidelines" element={<ResourcesListPage />} />
-            <Route path="/docs/policies" element={<ResourcesListPage />} />
-
-            {/* Organization (조직소개) */}
-            <Route path="/organization" element={<OrganizationAboutPage />} />
-            <Route path="/organization/branches" element={<BranchesPage />} />
-            <Route path="/organization/branches/:id" element={<BranchDetailPage />} />
-            <Route path="/organization/officers" element={<OfficersPage />} />
-            <Route path="/organization/contact" element={<ContactPage />} />
-
-            {/* MyPage (마이페이지) */}
-            <Route path="/mypage" element={<MyDashboardPage />} />
-            <Route path="/mypage/profile" element={<MyProfilePage />} />
-            <Route path="/mypage/settings" element={<MySettingsPage />} />
-            <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
-
-            {/* Admin (지부 관리자) - 별도 레이아웃으로 처리 */}
-            {/* Note: Admin routes are handled below in separate Routes block */}
-
-            {/* Legacy routes (for backward compatibility) */}
-            <Route path="/member/apply" element={<MemberApplyPage />} />
-            <Route path="/applications" element={<MyApplicationsPage />} />
-            <Route path="/events" element={<EventsPage />} />
-
-            {/* 404 */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Layout>
-
-        {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
         <Routes>
+          {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/admin/*" element={<AdminRoutes />} />
-        </Routes>
 
-        {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
-        <Routes>
+          {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/intranet/*" element={<IntranetRoutes />} />
-        </Routes>
 
-        {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
-        <Routes>
+          {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
           <Route path="/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
           <Route path="/branch/:branchId/*" element={<BranchRoutes />} />
+
+          {/* Main Layout Routes - 나머지 모든 경로 */}
+          <Route path="/*" element={<MainLayoutRoutes />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+  );
+}
+
+// Main Layout을 사용하는 라우트들
+function MainLayoutRoutes() {
+  return (
+    <Layout serviceName={SERVICE_NAME}>
+      <Routes>
+        {/* Home / Dashboard */}
+        <Route path="/" element={<DashboardPage />} />
+
+        {/* News (공지/소식) */}
+        <Route path="/news" element={<NewsListPage />} />
+        <Route path="/news/notice" element={<NewsListPage />} />
+        <Route path="/news/branch-news" element={<NewsListPage />} />
+        <Route path="/news/kpa-news" element={<NewsListPage />} />
+        <Route path="/news/gallery" element={<GalleryPage />} />
+        <Route path="/news/press" element={<NewsListPage />} />
+        <Route path="/news/:id" element={<NewsDetailPage />} />
+
+        {/* Forum (포럼) */}
+        <Route path="/forum" element={<ForumListPage />} />
+        <Route path="/forum/category/:id" element={<ForumListPage />} />
+        <Route path="/forum/post/:id" element={<ForumDetailPage />} />
+        <Route path="/forum/write" element={<ForumWritePage />} />
+        <Route path="/forum/edit/:id" element={<ForumWritePage />} />
+
+        {/* LMS (교육) */}
+        <Route path="/lms" element={<LmsCoursesPage />} />
+        <Route path="/lms/courses" element={<LmsCoursesPage />} />
+        <Route path="/lms/course/:id" element={<LmsCourseDetailPage />} />
+        <Route path="/lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
+        <Route path="/lms/certificate" element={<LmsCertificatesPage />} />
+
+        {/* Groupbuy (공동구매) */}
+        <Route path="/groupbuy" element={<GroupbuyListPage />} />
+        <Route path="/groupbuy/history" element={<GroupbuyHistoryPage />} />
+        <Route path="/groupbuy/:id" element={<GroupbuyDetailPage />} />
+
+        {/* Docs (자료실) */}
+        <Route path="/docs" element={<ResourcesListPage />} />
+        <Route path="/docs/forms" element={<ResourcesListPage />} />
+        <Route path="/docs/guidelines" element={<ResourcesListPage />} />
+        <Route path="/docs/policies" element={<ResourcesListPage />} />
+
+        {/* Organization (조직소개) */}
+        <Route path="/organization" element={<OrganizationAboutPage />} />
+        <Route path="/organization/branches" element={<BranchesPage />} />
+        <Route path="/organization/branches/:id" element={<BranchDetailPage />} />
+        <Route path="/organization/officers" element={<OfficersPage />} />
+        <Route path="/organization/contact" element={<ContactPage />} />
+
+        {/* MyPage (마이페이지) */}
+        <Route path="/mypage" element={<MyDashboardPage />} />
+        <Route path="/mypage/profile" element={<MyProfilePage />} />
+        <Route path="/mypage/settings" element={<MySettingsPage />} />
+        <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
+
+        {/* Legacy routes (for backward compatibility) */}
+        <Route path="/member/apply" element={<MemberApplyPage />} />
+        <Route path="/applications" element={<MyApplicationsPage />} />
+        <Route path="/events" element={<EventsPage />} />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Layout>
   );
 }
 
