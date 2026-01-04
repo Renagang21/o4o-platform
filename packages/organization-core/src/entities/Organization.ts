@@ -18,12 +18,12 @@ import {
  *
  * @example
  * ```typescript
- * // 약사회 조직 구조
- * 대한약사회 (본부, level=0, path="/national")
- *  ├─ 서울지부 (지부, level=1, path="/national/seoul")
- *  │   ├─ 강남분회 (분회, level=2, path="/national/seoul/gangnam")
- *  │   └─ 강서분회 (분회, level=2, path="/national/seoul/gangseo")
- *  └─ 부산지부 (지부, level=1, path="/national/busan")
+ * // 약사회 조직 구조 (지부 → 분회 2단 구조)
+ * 서울지부 (지부, level=0, path="/seoul")
+ *  ├─ 강남분회 (분회, level=1, path="/seoul/gangnam")
+ *  └─ 강서분회 (분회, level=1, path="/seoul/gangseo")
+ * 부산지부 (지부, level=0, path="/busan")
+ *  └─ 해운대분회 (분회, level=1, path="/busan/haeundae")
  * ```
  */
 @Entity('organizations')
@@ -54,16 +54,15 @@ export class Organization {
 
   /**
    * 조직 유형
-   * - national: 본부
-   * - division: 지부
-   * - branch: 분회
+   * - division: 지부 (최상위 조직)
+   * - branch: 분회 (하위 조직)
    */
   @Column({
     type: 'varchar',
     length: 50,
     default: 'branch',
   })
-  type!: 'national' | 'division' | 'branch';
+  type!: 'division' | 'branch';
 
   /**
    * 상위 조직 ID (null = 최상위 조직)
@@ -86,15 +85,14 @@ export class Organization {
 
   /**
    * 계층 레벨
-   * - 0: 본부
-   * - 1: 지부
-   * - 2: 분회
+   * - 0: 지부 (최상위 조직)
+   * - 1: 분회 (하위 조직)
    */
   @Column({ type: 'int', default: 0 })
   level!: number;
 
   /**
-   * 계층 경로 (예: "/national/seoul/gangnam")
+   * 계층 경로 (예: "/seoul/gangnam")
    *
    * 하위 조직 조회 시 LIKE 검색에 사용됩니다.
    */

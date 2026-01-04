@@ -8,15 +8,13 @@ import { useState, useRef, useEffect } from 'react';
 import { useOrganization, type Organization, type OrganizationMembership } from '@/context';
 
 // 조직 타입별 배지 색상
-const badgeColors = {
-  national: 'bg-purple-100 text-purple-800 border-purple-200',
+const badgeColors: Record<string, string> = {
   division: 'bg-blue-100 text-blue-800 border-blue-200',
   branch: 'bg-green-100 text-green-800 border-green-200',
 };
 
 // 조직 타입별 한글명
-const typeLabels = {
-  national: '본부',
+const typeLabels: Record<string, string> = {
   division: '지부',
   branch: '분회',
 };
@@ -137,9 +135,7 @@ export function OrganizationSelector({
           <>
             <span
               className={`w-2 h-2 rounded-full ${
-                organization.type === 'national'
-                  ? 'bg-purple-500'
-                  : organization.type === 'division'
+                organization.type === 'division'
                   ? 'bg-blue-500'
                   : 'bg-green-500'
               }`}
@@ -148,7 +144,7 @@ export function OrganizationSelector({
               {organization.name}
             </span>
             <span className="text-xs text-gray-500">
-              ({typeLabels[organization.type]})
+              ({typeLabels[organization.type] || organization.type})
             </span>
           </>
         ) : (
@@ -180,9 +176,7 @@ export function OrganizationSelector({
               >
                 <span
                   className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    membership.organization.type === 'national'
-                      ? 'bg-purple-500'
-                      : membership.organization.type === 'division'
+                    membership.organization.type === 'division'
                       ? 'bg-blue-500'
                       : 'bg-green-500'
                   }`}

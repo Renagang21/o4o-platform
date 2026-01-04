@@ -1,5 +1,4 @@
 import { InstallContext } from '../types/context.js';
-import { Organization } from '../entities/Organization.js';
 
 /**
  * Install Hook
@@ -29,10 +28,9 @@ export async function install(context: InstallContext): Promise<void> {
     // 4. RoleAssignment 확장 (scopeType/scopeId 컬럼 추가)
     await extendRoleAssignment(dataSource, logger);
 
-    // 5. 초기 조직 생성 (선택적)
-    if (options.seedDefaultData) {
-      await seedDefaultOrganization(dataSource, logger);
-    }
+    // Note: 초기 조직 생성은 제거됨
+    // 지부/분회 조직은 Admin 대시보드에서 수동 생성하거나
+    // 별도 시드 스크립트를 통해 생성합니다.
 
     logger.info(`[${manifest.appId}] Installation completed successfully.`);
   } catch (error) {
@@ -274,34 +272,6 @@ async function extendRoleAssignment(
   logger.info('RoleAssignment table extended successfully.');
 }
 
-/**
- * 초기 조직 생성
- *
- * 최상위 조직 (본부) 생성
- */
-async function seedDefaultOrganization(
-  dataSource: any,
-  logger: any
-): Promise<void> {
-  logger.info('Seeding default organization...');
-
-  const orgRepo = dataSource.getRepository(Organization);
-
-  const existing = await orgRepo.findOne({ where: { code: 'NATIONAL' } });
-  if (existing) {
-    logger.info('Default organization already exists.');
-    return;
-  }
-
-  const org = new Organization();
-  org.name = '본부';
-  org.code = 'NATIONAL';
-  org.type = 'national';
-  org.level = 0;
-  org.path = '/national';
-  org.isActive = true;
-  org.childrenCount = 0;
-
-  await orgRepo.save(org);
-  logger.info('Default organization created: 본부 (NATIONAL)');
-}
+// seedDefaultOrganization 함수 제거됨
+// 약사회 SaaS는 "지부 → 분회" 2단 구조를 사용하며
+// 초기 조직은 Admin 대시보드에서 수동 생성합니다.

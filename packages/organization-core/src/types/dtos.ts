@@ -20,11 +20,10 @@ export interface CreateOrganizationDto {
 
   /**
    * 조직 유형 (필수)
-   * - national: 본부
-   * - division: 지부
-   * - branch: 분회
+   * - division: 지부 (최상위 조직)
+   * - branch: 분회 (하위 조직)
    */
-  type: 'national' | 'division' | 'branch';
+  type: 'division' | 'branch';
 
   /**
    * 상위 조직 ID (선택적, null = 최상위)
@@ -68,7 +67,7 @@ export interface ListOrganizationDto {
   /**
    * 조직 유형 필터
    */
-  type?: 'national' | 'division' | 'branch';
+  type?: 'division' | 'branch';
 
   /**
    * 상위 조직 ID (하위 조직만 조회)

@@ -8,7 +8,7 @@ import { OfficialRole } from '../entities/Member.js';
  * Membership 앱 전용 역할
  */
 export type MembershipRole =
-  | 'membership_super_admin'   // 전체 관리자 (중앙회 레벨)
+  | 'membership_super_admin'   // 전체 운영자 (Global Operator)
   | 'membership_district_admin' // 지부 관리자
   | 'membership_branch_admin'   // 분회 관리자
   | 'membership_officer'        // 임원 (이사, 감사 등)
