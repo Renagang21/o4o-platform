@@ -1,4 +1,4 @@
-import { HeroSection, CoreValueSection, UsagePreviewSection, CTASection } from '../components';
+import { HeroSection, FeatureSection, CoreValueSection, UsagePreviewSection, CTASection } from '../components';
 
 /**
  * Neture Home 페이지
@@ -49,6 +49,7 @@ export function HomePage() {
         subHeadline={heroContent.subHeadline}
         supportText={heroContent.supportText}
       />
+      <FeatureSection />
       <CoreValueSection items={coreValues} />
       <UsagePreviewSection steps={usageSteps} />
       <CTASection

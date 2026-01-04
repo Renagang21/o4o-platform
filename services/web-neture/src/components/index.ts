@@ -2,6 +2,7 @@ export { Header } from './Header';
 export { Navigation } from './Navigation';
 export { Layout } from './Layout';
 export { HeroSection } from './HeroSection';
+export { FeatureSection } from './FeatureSection';
 export { CoreValueSection } from './CoreValueSection';
 export { UsagePreviewSection } from './UsagePreviewSection';
 export { CTASection } from './CTASection';

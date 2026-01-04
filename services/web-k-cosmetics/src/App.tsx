@@ -17,6 +17,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components';
 import {
   HomePage,
+  LoginPage,
   StoresPage,
   StoreDetailPage,
   TouristsPage,
@@ -35,6 +36,9 @@ function App() {
         <Routes>
           {/* 메인 홈 */}
           <Route path="/" element={<HomePage />} />
+
+          {/* 로그인 */}
+          <Route path="/login" element={<LoginPage />} />
 
           {/* 매장 디렉토리 */}
           <Route path="/stores" element={<StoresPage />} />

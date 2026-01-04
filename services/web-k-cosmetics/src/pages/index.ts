@@ -4,6 +4,7 @@
  */
 
 export { HomePage } from './HomePage';
+export { LoginPage } from './LoginPage';
 export { TouristsPage } from './TouristsPage';
 export { PartnersPage } from './PartnersPage';
 export { SuppliersPage } from './SuppliersPage';

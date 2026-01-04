@@ -2,10 +2,17 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Layout } from './components';
 import {
   HomePage,
+  LoginPage,
   TrialListPage,
   TrialDetailPage,
   ShippingAddressPage,
   FulfillmentStatusPage,
+  AdminDashboardPage,
+  SupplierDashboardPage,
+  SellerDashboardPage,
+  PartnerDashboardPage,
+  StoreHomePage,
+  StoreProductPage,
 } from './pages';
 
 /**
@@ -25,10 +32,21 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/trials" element={<TrialListPage />} />
           <Route path="/trial/:trialId" element={<TrialDetailPage />} />
           <Route path="/shipping/:participationId" element={<ShippingAddressPage />} />
           <Route path="/fulfillment/:participationId" element={<FulfillmentStatusPage />} />
+
+          {/* 대시보드 */}
+          <Route path="/admin/*" element={<AdminDashboardPage />} />
+          <Route path="/supplier/*" element={<SupplierDashboardPage />} />
+          <Route path="/seller/*" element={<SellerDashboardPage />} />
+          <Route path="/partner/*" element={<PartnerDashboardPage />} />
+
+          {/* 판매자 매장 */}
+          <Route path="/store/:storeId" element={<StoreHomePage />} />
+          <Route path="/store/:storeId/product/:productId" element={<StoreProductPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
