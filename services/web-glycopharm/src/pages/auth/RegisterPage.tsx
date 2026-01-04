@@ -9,8 +9,6 @@ import {
   Eye,
   EyeOff,
   Building2,
-  Truck,
-  Handshake,
   UserCircle,
   Check,
   ArrowRight,
@@ -18,24 +16,13 @@ import {
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 
+// 이 서비스에서 가입 가능한 역할 (공급자/파트너는 Neture에서 관리)
 const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2 }> = [
   {
     role: 'pharmacy',
     label: '약사',
     description: '약국을 운영하며 혈당관리 제품을 판매합니다',
     icon: Building2,
-  },
-  {
-    role: 'supplier',
-    label: '공급자',
-    description: '혈당관리 관련 제품을 공급합니다',
-    icon: Truck,
-  },
-  {
-    role: 'partner',
-    label: '파트너',
-    description: '디바이스, 컨텐츠 등 파트너 서비스를 제공합니다',
-    icon: Handshake,
   },
   {
     role: 'consumer',
@@ -282,20 +269,18 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Business Info (for pharmacy, supplier, partner) */}
-              {selectedRole && selectedRole !== 'consumer' && (
+              {/* Business Info (약사 전용) */}
+              {selectedRole === 'pharmacy' && (
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      {selectedRole === 'pharmacy' ? '약국명' : '회사명'}
-                    </label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">약국명</label>
                     <input
                       type="text"
                       name="businessName"
                       value={formData.businessName}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder={selectedRole === 'pharmacy' ? '건강약국' : '(주)회사명'}
+                      placeholder="건강약국"
                     />
                   </div>
                   <div className="col-span-2">

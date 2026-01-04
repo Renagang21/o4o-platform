@@ -27,11 +27,8 @@ import SchedulesPage from '@/pages/pharmacy/smart-display/SchedulesPage';
 import MediaLibraryPage from '@/pages/pharmacy/smart-display/MediaLibraryPage';
 import PlaylistForumPage from '@/pages/pharmacy/smart-display/PlaylistForumPage';
 
-// Supplier Dashboard
-import SupplierDashboard from '@/pages/supplier/SupplierDashboard';
-
-// Partner Dashboard
-import PartnerDashboard from '@/pages/partner/PartnerDashboard';
+// Role Not Available Page (공급자/파트너는 Neture에서 관리)
+import RoleNotAvailablePage from '@/pages/RoleNotAvailablePage';
 
 // Operator Dashboard
 import OperatorDashboard from '@/pages/operator/OperatorDashboard';
@@ -127,29 +124,25 @@ function AppRoutes() {
         <Route path="settings" element={<PharmacySettings />} />
       </Route>
 
-      {/* Supplier Dashboard */}
+      {/* Supplier Dashboard - Neture에서 관리 */}
       <Route
         path="supplier"
-        element={
-          <ProtectedRoute allowedRoles={['supplier']}>
-            <DashboardLayout role="supplier" />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<SupplierDashboard />} />
-      </Route>
+        element={<RoleNotAvailablePage role="supplier" />}
+      />
+      <Route
+        path="supplier/*"
+        element={<RoleNotAvailablePage role="supplier" />}
+      />
 
-      {/* Partner Dashboard */}
+      {/* Partner Dashboard - Neture에서 관리 */}
       <Route
         path="partner"
-        element={
-          <ProtectedRoute allowedRoles={['partner']}>
-            <DashboardLayout role="partner" />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<PartnerDashboard />} />
-      </Route>
+        element={<RoleNotAvailablePage role="partner" />}
+      />
+      <Route
+        path="partner/*"
+        element={<RoleNotAvailablePage role="partner" />}
+      />
 
       {/* Operator Dashboard */}
       <Route

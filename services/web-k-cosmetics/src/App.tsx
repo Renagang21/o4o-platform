@@ -29,10 +29,9 @@ import {
   AboutPage,
   ContactPage,
   AdminDashboardPage,
-  SupplierDashboardPage,
   SellerDashboardPage,
-  PartnerDashboardPage,
 } from './pages';
+import { RoleNotAvailablePage } from './pages/RoleNotAvailablePage';
 
 const SERVICE_NAME = 'K-Cosmetics';
 
@@ -88,9 +87,11 @@ function AppContent() {
 
         {/* 대시보드 */}
         <Route path="/admin/*" element={<AdminDashboardPage />} />
-        <Route path="/supplier/*" element={<SupplierDashboardPage />} />
         <Route path="/seller/*" element={<SellerDashboardPage />} />
-        <Route path="/partner/*" element={<PartnerDashboardPage />} />
+
+        {/* 공급자/파트너는 Neture에서 관리 */}
+        <Route path="/supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
+        <Route path="/partner/*" element={<RoleNotAvailablePage role="partner" />} />
 
         {/* 404 - 홈으로 리다이렉트 */}
         <Route path="*" element={<HomePage />} />

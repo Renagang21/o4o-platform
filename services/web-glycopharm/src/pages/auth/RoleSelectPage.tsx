@@ -2,14 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Building2,
-  Truck,
-  Handshake,
   Shield,
   UserCircle,
   ArrowRight,
+  ExternalLink,
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 
+// 이 서비스에서 사용 가능한 역할 (공급자/파트너는 Neture에서 관리)
 const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2; color: string }> = [
   {
     role: 'pharmacy',
@@ -17,20 +17,6 @@ const roleOptions: Array<{ role: UserRole; label: string; description: string; i
     description: '약국 운영, 상품 판매, 고객 관리',
     icon: Building2,
     color: 'primary',
-  },
-  {
-    role: 'supplier',
-    label: '공급자',
-    description: '제품 공급, 재고 관리, 주문 처리',
-    icon: Truck,
-    color: 'blue',
-  },
-  {
-    role: 'partner',
-    label: '파트너',
-    description: '디바이스, 컨텐츠, 서비스 제공',
-    icon: Handshake,
-    color: 'purple',
   },
   {
     role: 'operator',
@@ -97,6 +83,23 @@ export default function RoleSelectPage() {
               </button>
             );
           })}
+        </div>
+
+        {/* Neture 안내 */}
+        <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p className="text-sm text-slate-600 text-center">
+            공급자/파트너 역할은{' '}
+            <a
+              href="https://neture.co.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-primary-600 font-medium hover:underline"
+            >
+              Neture 플랫폼
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+            에서 관리됩니다.
+          </p>
         </div>
       </div>
     </div>

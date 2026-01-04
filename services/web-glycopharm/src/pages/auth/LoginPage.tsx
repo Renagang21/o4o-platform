@@ -23,11 +23,9 @@ export default function LoginPage() {
     }
   };
 
-  // Demo accounts for quick login
+  // Demo accounts for quick login (공급자/파트너는 Neture에서 관리)
   const demoAccounts = [
     { email: 'pharmacy@test.com', label: '약사', color: 'primary' },
-    { email: 'supplier@test.com', label: '공급자', color: 'blue' },
-    { email: 'partner@test.com', label: '파트너', color: 'purple' },
     { email: 'operator@test.com', label: '운영자', color: 'red' },
     { email: 'consumer@test.com', label: '소비자', color: 'green' },
   ];

@@ -14,6 +14,9 @@ const ROLE_ICONS: Record<UserRole, string> = {
   partner: '🤝',
 };
 
+// 이 서비스에서 사용 가능한 역할 (공급자/파트너는 Neture에서 관리)
+const AVAILABLE_ROLES: UserRole[] = ['admin', 'seller'];
+
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -58,6 +61,10 @@ export function LoginPage() {
   };
 
   if (showRoleSelector && pendingRoles.length > 1) {
+    // 이 서비스에서 사용 가능한 역할만 필터링
+    const availableHere = pendingRoles.filter(r => AVAILABLE_ROLES.includes(r));
+    const notAvailableHere = pendingRoles.filter(r => !AVAILABLE_ROLES.includes(r));
+
     return (
       <div style={styles.container}>
         <div style={styles.card}>
@@ -65,24 +72,40 @@ export function LoginPage() {
           <h1 style={styles.title}>역할 선택</h1>
           <p style={styles.subtitle}>사용할 역할을 선택하세요</p>
 
-          <div style={styles.roleGrid}>
-            {pendingRoles.map(role => (
-              <button
-                key={role}
-                style={styles.roleCard}
-                onClick={() => handleRoleSelect(role)}
-              >
-                <span style={styles.roleIcon}>{ROLE_ICONS[role]}</span>
-                <span style={styles.roleLabel}>{ROLE_LABELS[role]}</span>
-                <span style={styles.roleDescription}>
-                  {role === 'admin' && '플랫폼 전체 관리'}
-                  {role === 'supplier' && '상품 공급 및 배송'}
-                  {role === 'seller' && '매장 운영 관리'}
-                  {role === 'partner' && '파트너 연계 관리'}
-                </span>
-              </button>
-            ))}
-          </div>
+          {availableHere.length > 0 && (
+            <div style={styles.roleGrid}>
+              {availableHere.map(role => (
+                <button
+                  key={role}
+                  style={styles.roleCard}
+                  onClick={() => handleRoleSelect(role)}
+                >
+                  <span style={styles.roleIcon}>{ROLE_ICONS[role]}</span>
+                  <span style={styles.roleLabel}>{ROLE_LABELS[role]}</span>
+                  <span style={styles.roleDescription}>
+                    {role === 'admin' && '플랫폼 전체 관리'}
+                    {role === 'seller' && '매장 운영 관리'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {notAvailableHere.length > 0 && (
+            <div style={styles.netureNotice}>
+              <p style={styles.netureNoticeTitle}>Neture에서 관리되는 역할</p>
+              <div style={styles.netureRoles}>
+                {notAvailableHere.map(role => (
+                  <span key={role} style={styles.netureRole}>
+                    {ROLE_ICONS[role]} {ROLE_LABELS[role]}
+                  </span>
+                ))}
+              </div>
+              <p style={styles.netureNoticeText}>
+                공급자/파트너 업무는 <a href="https://neture.co.kr" target="_blank" rel="noopener noreferrer" style={styles.netureLink}>Neture 플랫폼</a>에서 관리됩니다.
+              </p>
+            </div>
+          )}
 
           <p style={styles.roleNote}>
             로그인 후에도 상단 메뉴에서 역할을 전환할 수 있습니다.
@@ -275,6 +298,42 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748B',
     textAlign: 'center',
     margin: 0,
+  },
+  netureNotice: {
+    backgroundColor: '#f0f9ff',
+    border: '1px solid #bae6fd',
+    borderRadius: '12px',
+    padding: '16px',
+    marginBottom: '24px',
+    textAlign: 'center',
+  },
+  netureNoticeTitle: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#0369a1',
+    margin: '0 0 12px 0',
+  },
+  netureRoles: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '16px',
+    marginBottom: '12px',
+  },
+  netureRole: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '14px',
+    color: '#334155',
+  },
+  netureNoticeText: {
+    fontSize: '12px',
+    color: '#64748B',
+    margin: 0,
+  },
+  netureLink: {
+    color: '#0369a1',
+    textDecoration: 'underline',
   },
   testAccounts: {
     marginTop: '24px',

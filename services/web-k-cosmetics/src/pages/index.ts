@@ -15,7 +15,5 @@ export { StoresPage, StoreDetailPage } from './stores';
 // Dashboards
 export {
   AdminDashboardPage,
-  SupplierDashboardPage,
   SellerDashboardPage,
-  PartnerDashboardPage,
 } from './dashboard';

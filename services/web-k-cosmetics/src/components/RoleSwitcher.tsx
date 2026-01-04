@@ -13,6 +13,9 @@ const ROLE_ICONS: Record<UserRole, string> = {
   partner: '🤝',
 };
 
+// 이 서비스에서 사용 가능한 역할
+const AVAILABLE_ROLES: UserRole[] = ['admin', 'seller'];
+
 export function RoleSwitcher() {
   const { user, hasMultipleRoles, switchRole } = useAuth();
   const navigate = useNavigate();
@@ -23,10 +26,20 @@ export function RoleSwitcher() {
   }
 
   const handleRoleChange = (role: UserRole) => {
+    if (!AVAILABLE_ROLES.includes(role)) {
+      // 공급자/파트너는 Neture로 안내
+      setIsOpen(false);
+      navigate(ROLE_DASHBOARDS[role]);
+      return;
+    }
     switchRole(role);
     setIsOpen(false);
     navigate(ROLE_DASHBOARDS[role]);
   };
+
+  // 사용 가능한 역할과 Neture 관리 역할 분리
+  const availableRoles = user.roles.filter(r => AVAILABLE_ROLES.includes(r));
+  const netureRoles = user.roles.filter(r => !AVAILABLE_ROLES.includes(r));
 
   return (
     <div style={styles.container}>
@@ -42,7 +55,7 @@ export function RoleSwitcher() {
           <div style={styles.overlay} onClick={() => setIsOpen(false)} />
           <div style={styles.dropdown}>
             <div style={styles.dropdownHeader}>역할 전환</div>
-            {user.roles.map(role => (
+            {availableRoles.map(role => (
               <button
                 key={role}
                 style={{
@@ -56,6 +69,22 @@ export function RoleSwitcher() {
                 {role === user.currentRole && <span style={styles.checkmark}>✓</span>}
               </button>
             ))}
+            {netureRoles.length > 0 && (
+              <>
+                <div style={styles.netureDivider}>Neture에서 관리</div>
+                {netureRoles.map(role => (
+                  <button
+                    key={role}
+                    style={styles.netureRoleOption}
+                    onClick={() => handleRoleChange(role)}
+                  >
+                    <span style={styles.roleIcon}>{ROLE_ICONS[role]}</span>
+                    <span style={styles.roleLabel}>{ROLE_LABELS[role]}</span>
+                    <span style={styles.externalIcon}>↗</span>
+                  </button>
+                ))}
+              </>
+            )}
           </div>
         </>
       )}
@@ -143,5 +172,29 @@ const styles: Record<string, React.CSSProperties> = {
   checkmark: {
     color: PRIMARY_COLOR,
     fontWeight: 600,
+  },
+  netureDivider: {
+    padding: '8px 16px',
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#94a3b8',
+    backgroundColor: '#f8fafc',
+    borderTop: '1px solid #f1f5f9',
+    textTransform: 'uppercase',
+  },
+  netureRoleOption: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    padding: '12px 16px',
+    backgroundColor: '#f8fafc',
+    border: 'none',
+    cursor: 'pointer',
+    textAlign: 'left',
+    fontSize: '14px',
+  },
+  externalIcon: {
+    fontSize: '12px',
+    color: '#94a3b8',
   },
 };
