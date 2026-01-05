@@ -146,11 +146,6 @@ export default function StoreApprovalsPage() {
 
   const hasFilters = !!statusFilter;
 
-  // 대기 중인 신청 수 계산 (submitted + reviewing + supplementing)
-  const pendingCount = applications.filter((a) =>
-    ['submitted', 'reviewing', 'supplementing'].includes(a.status)
-  ).length;
-
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}

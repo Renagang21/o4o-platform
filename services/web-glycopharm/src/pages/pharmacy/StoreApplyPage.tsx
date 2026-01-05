@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Store,
   CheckCircle,
@@ -54,7 +54,6 @@ const INITIAL_FORM: StoreApplicationForm = {
 };
 
 export default function StoreApplyPage() {
-  const navigate = useNavigate();
   const [step, setStep] = useState<Step>('intro');
   const [form, setForm] = useState<StoreApplicationForm>(INITIAL_FORM);
   const [existingApplication, setExistingApplication] = useState<StoreApplication | null>(null);

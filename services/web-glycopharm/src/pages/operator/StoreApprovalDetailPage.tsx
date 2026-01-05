@@ -809,7 +809,6 @@ function TimelineItem({
 
 function Modal({
   title,
-  onClose,
   children,
 }: {
   title: string;

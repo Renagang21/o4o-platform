@@ -4,7 +4,27 @@ export * from './categoryRequest';
 export * from './marketTrial';
 export * from './forum';
 export * from './b2bOrder';
-export * from './store';
+// Note: store.ts also exports CartItem, so we selectively re-export to avoid conflict
+export {
+  type PharmacyStoreStatus,
+  type PharmacyStore,
+  type OperatingHours,
+  type ShippingInfo,
+  type StoreCategory,
+  type StoreProduct,
+  type CartItem as StoreCartItem,
+  type StoreOrderStatus,
+  type OrderChannel,
+  type StoreOrder,
+  type StoreOrderItem,
+  type ShippingAddress,
+  type StoreApplicationForm,
+  type StoreApplicationStatus,
+  type StoreApplication,
+  type ReviewCheckpoint,
+  type StoreApiResponse,
+  type StorePaginatedResponse,
+} from './store';
 
 // User Roles
 export type UserRole = 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';

@@ -37,6 +37,10 @@ import {
   Eye,
   Loader2,
   Bell,
+  Globe,
+  Monitor,
+  Tablet,
+  Inbox,
 } from 'lucide-react';
 import {
   pharmacyApi,
@@ -122,10 +126,16 @@ export default function PharmacyDashboard() {
           storeStatus: 'pending',
           applicationStatus: 'none',
           legalInfoStatus: 'incomplete',
+          orderChannelStatus: {
+            web: true,
+            kiosk: 'none',
+            tablet: 'none',
+          },
         });
         setTodayActions({
           todayOrders: 0,
           pendingOrders: 0,
+          pendingReceiveOrders: 0,
           operatorNotices: 0,
           applicationAlerts: 0,
         });
@@ -232,6 +242,67 @@ export default function PharmacyDashboard() {
           </div>
         </div>
 
+        {/* 주문 채널 상태 */}
+        {pharmacyStatus?.orderChannelStatus && (
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm font-medium text-slate-600">주문 접수 채널</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Web 채널 (항상 ON) */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg">
+                <Globe className="w-4 h-4" />
+                <span className="text-sm font-medium">웹</span>
+                <span className="text-xs">ON</span>
+              </div>
+
+              {/* Kiosk 채널 */}
+              <NavLink
+                to="/pharmacy/settings?tab=devices"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
+                  pharmacyStatus.orderChannelStatus.kiosk === 'approved'
+                    ? 'bg-green-100 text-green-700'
+                    : pharmacyStatus.orderChannelStatus.kiosk === 'requested'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-slate-100 text-slate-500'
+                } hover:opacity-80 transition-opacity`}
+              >
+                <Monitor className="w-4 h-4" />
+                <span className="text-sm font-medium">키오스크</span>
+                <span className="text-xs">
+                  {pharmacyStatus.orderChannelStatus.kiosk === 'approved'
+                    ? 'ON'
+                    : pharmacyStatus.orderChannelStatus.kiosk === 'requested'
+                    ? '대기'
+                    : 'OFF'}
+                </span>
+              </NavLink>
+
+              {/* Tablet 채널 */}
+              <NavLink
+                to="/pharmacy/settings?tab=devices"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
+                  pharmacyStatus.orderChannelStatus.tablet === 'approved'
+                    ? 'bg-green-100 text-green-700'
+                    : pharmacyStatus.orderChannelStatus.tablet === 'requested'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-slate-100 text-slate-500'
+                } hover:opacity-80 transition-opacity`}
+              >
+                <Tablet className="w-4 h-4" />
+                <span className="text-sm font-medium">태블릿</span>
+                <span className="text-xs">
+                  {pharmacyStatus.orderChannelStatus.tablet === 'approved'
+                    ? 'ON'
+                    : pharmacyStatus.orderChannelStatus.tablet === 'requested'
+                    ? '대기'
+                    : 'OFF'}
+                </span>
+              </NavLink>
+            </div>
+          </div>
+        )}
+
         {/* 보완 필요 알림 */}
         {pharmacyStatus?.legalInfoIssues && pharmacyStatus.legalInfoIssues.length > 0 && (
           <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-xl">
@@ -255,7 +326,7 @@ export default function PharmacyDashboard() {
       {/* ========================================= */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">오늘의 운영</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {/* 오늘 주문 */}
           <NavLink
             to="/pharmacy/orders?filter=today"
@@ -273,9 +344,26 @@ export default function PharmacyDashboard() {
             <p className="text-sm text-slate-500">오늘 주문</p>
           </NavLink>
 
-          {/* 처리 대기 */}
+          {/* 접수 대기 (NEW - RECEIVED 처리 필요) */}
           <NavLink
             to="/pharmacy/orders?status=pending"
+            className="p-4 bg-cyan-50 rounded-xl hover:bg-cyan-100 transition-colors group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Inbox className="w-6 h-6 text-cyan-600" />
+              {(todayActions?.pendingReceiveOrders || 0) > 0 && (
+                <span className="w-6 h-6 bg-cyan-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {todayActions?.pendingReceiveOrders}
+                </span>
+              )}
+            </div>
+            <p className="text-2xl font-bold text-slate-800">{todayActions?.pendingReceiveOrders || 0}</p>
+            <p className="text-sm text-slate-500">접수 대기</p>
+          </NavLink>
+
+          {/* 처리 대기 */}
+          <NavLink
+            to="/pharmacy/orders?status=received"
             className="p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors group"
           >
             <div className="flex items-center justify-between mb-2">

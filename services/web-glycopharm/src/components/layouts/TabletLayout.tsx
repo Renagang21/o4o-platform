@@ -16,7 +16,6 @@ import {
   Search,
   Loader2,
   AlertCircle,
-  User,
   Settings,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';

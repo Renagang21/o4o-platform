@@ -3,8 +3,7 @@
  * 스토어 표시 모드 관리 (consumer | kiosk | tablet)
  */
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 
 // Store Mode Types
 export type StoreMode = 'consumer' | 'kiosk' | 'tablet';

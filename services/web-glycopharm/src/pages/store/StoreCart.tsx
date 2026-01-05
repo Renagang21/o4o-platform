@@ -13,7 +13,7 @@ import { useStoreMode } from '@/contexts/StoreModeContext';
 
 export default function StoreCart() {
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
-  const { mode, orderChannel, isKioskMode, isTabletMode, getStorePath, fontSize } = useStoreMode();
+  const { orderChannel, isKioskMode, isTabletMode, getStorePath, fontSize } = useStoreMode();
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);

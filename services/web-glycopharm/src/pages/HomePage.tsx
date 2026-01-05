@@ -25,7 +25,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { apiClient } from '@/services/api';
 import { LoadingState } from '@/components/common';
 
 // Types
@@ -71,20 +70,6 @@ interface Partner {
   logo: string;
 }
 
-interface HomePageData {
-  slides: HeroSlide[];
-  adSlot: AdSlot | null;
-  extensionCards: ExtensionCard[];
-  notices: Notice[];
-  partners: Partner[];
-}
-
-// Icon mapping
-const iconMap: Record<string, LucideIcon> = {
-  monitor: Monitor,
-  tag: Tag,
-  messageSquare: MessageSquare,
-};
 
 // Default extension cards (static fallback)
 const defaultExtensionCards: (ExtensionCard & { icon: LucideIcon })[] = [
@@ -127,11 +112,11 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
-  const [adSlot, setAdSlot] = useState<AdSlot | null>(null);
-  const [extensionCards, setExtensionCards] = useState<(ExtensionCard & { icon: LucideIcon })[]>(defaultExtensionCards);
-  const [notices, setNotices] = useState<Notice[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const [heroSlides] = useState<HeroSlide[]>([]);
+  const [adSlot] = useState<AdSlot | null>(null);
+  const [extensionCards] = useState<(ExtensionCard & { icon: LucideIcon })[]>(defaultExtensionCards);
+  const [notices] = useState<Notice[]>([]);
+  const [partners] = useState<Partner[]>([]);
 
   // 홈페이지 데이터 로드
   useEffect(() => {

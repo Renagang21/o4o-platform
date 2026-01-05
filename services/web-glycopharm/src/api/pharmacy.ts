@@ -4,8 +4,6 @@
  */
 
 import type {
-  StoreProduct,
-  StoreOrder,
   PharmacyStore,
   StoreApiResponse,
   StorePaginatedResponse,
@@ -25,6 +23,13 @@ export interface PharmacyStats {
   customersChange: number;
 }
 
+// Cockpit: 주문 채널 상태
+export interface OrderChannelStatus {
+  web: boolean;
+  kiosk: 'none' | 'requested' | 'approved' | 'rejected';
+  tablet: 'none' | 'requested' | 'approved' | 'rejected';
+}
+
 // Cockpit: 약국 상태 정보
 export interface PharmacyStatus {
   pharmacyName: string;
@@ -33,12 +38,14 @@ export interface PharmacyStatus {
   applicationStatus: 'none' | 'draft' | 'submitted' | 'reviewing' | 'supplementing' | 'approved' | 'rejected';
   legalInfoStatus: 'complete' | 'incomplete' | 'needs_update';
   legalInfoIssues?: string[];
+  orderChannelStatus?: OrderChannelStatus;
 }
 
 // Cockpit: 오늘의 운영 액션
 export interface TodayActions {
   todayOrders: number;
   pendingOrders: number;
+  pendingReceiveOrders: number; // 접수 대기 주문 (RECEIVED 처리 필요)
   operatorNotices: number;
   applicationAlerts: number;
 }
@@ -121,7 +128,7 @@ export interface PharmacyOrder {
   subtotal: number;
   shippingFee: number;
   totalAmount: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'received' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: {
     recipient: string;
     phone: string;

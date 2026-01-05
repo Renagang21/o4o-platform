@@ -10,6 +10,10 @@ import {
   Tablet,
   Copy,
   ExternalLink,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from 'lucide-react';
 
 export default function PharmacySettings() {
@@ -24,13 +28,21 @@ export default function PharmacySettings() {
     isStoreActive: true,
   });
 
+  // 채널 신청·승인 상태
+  // 'none' | 'requested' | 'approved' | 'rejected'
   const [deviceSettings, setDeviceSettings] = useState({
-    kioskEnabled: false,
-    tabletEnabled: false,
+    // 키오스크
+    kioskStatus: 'none' as 'none' | 'requested' | 'approved' | 'rejected',
+    kioskRequestedAt: null as string | null,
+    kioskApprovedAt: null as string | null,
     kioskPin: '',
+    kioskAutoReset: 180,
+    kioskProductLimit: 20,
+    // 태블릿
+    tabletStatus: 'none' as 'none' | 'requested' | 'approved' | 'rejected',
+    tabletRequestedAt: null as string | null,
+    tabletApprovedAt: null as string | null,
     tabletPin: '',
-    kioskAutoReset: 180, // seconds
-    kioskProductLimit: 20, // 키오스크에 표시할 상품 수 제한
   });
 
   const tabs = [
@@ -56,6 +68,63 @@ export default function PharmacySettings() {
   const handleSave = () => {
     // TODO: Implement save API
     alert('설정이 저장되었습니다.');
+  };
+
+  // 키오스크 신청
+  const handleKioskRequest = () => {
+    if (!confirm('키오스크 주문 채널 활성화를 신청하시겠습니까?\n\n운영자 승인 후 사용할 수 있습니다.')) return;
+    setDeviceSettings(prev => ({
+      ...prev,
+      kioskStatus: 'requested',
+      kioskRequestedAt: new Date().toISOString(),
+    }));
+    // TODO: API 호출
+    alert('키오스크 채널 신청이 완료되었습니다.\n운영자 승인을 기다려주세요.');
+  };
+
+  // 태블릿 신청
+  const handleTabletRequest = () => {
+    if (!confirm('태블릿 주문 채널 활성화를 신청하시겠습니까?\n\n운영자 승인 후 사용할 수 있습니다.')) return;
+    setDeviceSettings(prev => ({
+      ...prev,
+      tabletStatus: 'requested',
+      tabletRequestedAt: new Date().toISOString(),
+    }));
+    // TODO: API 호출
+    alert('태블릿 채널 신청이 완료되었습니다.\n운영자 승인을 기다려주세요.');
+  };
+
+  // 채널 상태 뱃지 렌더링
+  const renderChannelStatusBadge = (status: 'none' | 'requested' | 'approved' | 'rejected') => {
+    switch (status) {
+      case 'requested':
+        return (
+          <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
+            <Clock className="w-3 h-3" />
+            승인 대기
+          </span>
+        );
+      case 'approved':
+        return (
+          <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+            <CheckCircle className="w-3 h-3" />
+            승인됨
+          </span>
+        );
+      case 'rejected':
+        return (
+          <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">
+            <XCircle className="w-3 h-3" />
+            반려됨
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
+            미신청
+          </span>
+        );
+    }
   };
 
   return (
@@ -228,41 +297,66 @@ export default function PharmacySettings() {
             {activeTab === 'devices' && (
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold text-slate-800 border-b pb-4">
-                  키오스크 / 태블릿 설정
+                  주문 채널 관리
                 </h2>
+
+                {/* 안내 문구 */}
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="text-sm text-amber-800">
+                      <p className="font-semibold mb-1">주문 채널 활성화 안내</p>
+                      <p>키오스크/태블릿 채널은 <strong>웹 몰 판매 승인이 완료된 약국</strong>만 신청할 수 있습니다.</p>
+                      <p>신청 후 운영자 승인을 거쳐 활성화됩니다.</p>
+                    </div>
+                  </div>
+                </div>
 
                 {/* 키오스크 섹션 */}
                 <div className="p-5 bg-slate-50 rounded-xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <Monitor className="w-5 h-5 text-primary-600" />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        deviceSettings.kioskStatus === 'approved' ? 'bg-primary-100' : 'bg-slate-200'
+                      }`}>
+                        <Monitor className={`w-5 h-5 ${
+                          deviceSettings.kioskStatus === 'approved' ? 'text-primary-600' : 'text-slate-500'
+                        }`} />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-800">키오스크 모드</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-slate-800">키오스크 채널</p>
+                          {renderChannelStatusBadge(deviceSettings.kioskStatus)}
+                        </div>
                         <p className="text-sm text-slate-500">매장 내 고객 셀프 주문</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() =>
-                        setDeviceSettings((prev) => ({
-                          ...prev,
-                          kioskEnabled: !prev.kioskEnabled,
-                        }))
-                      }
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        deviceSettings.kioskEnabled ? 'bg-primary-600' : 'bg-slate-300'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          deviceSettings.kioskEnabled ? 'left-7' : 'left-1'
-                        }`}
-                      />
-                    </button>
+
+                    {/* 신청 버튼 (미신청 또는 반려 상태일 때) */}
+                    {(deviceSettings.kioskStatus === 'none' || deviceSettings.kioskStatus === 'rejected') && (
+                      <button
+                        onClick={handleKioskRequest}
+                        className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors"
+                      >
+                        활성화 신청
+                      </button>
+                    )}
                   </div>
 
-                  {deviceSettings.kioskEnabled && (
+                  {/* 승인 대기 상태 */}
+                  {deviceSettings.kioskStatus === 'requested' && (
+                    <div className="pt-4 border-t border-slate-200">
+                      <p className="text-sm text-slate-600">
+                        신청일: {deviceSettings.kioskRequestedAt ? new Date(deviceSettings.kioskRequestedAt).toLocaleDateString('ko-KR') : '-'}
+                      </p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        운영자가 신청을 검토 중입니다. 승인까지 1~2 영업일이 소요될 수 있습니다.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 승인 완료 상태 - 설정 표시 */}
+                  {deviceSettings.kioskStatus === 'approved' && (
                     <div className="space-y-4 pt-4 border-t border-slate-200">
                       {/* 키오스크 URL */}
                       <div>
@@ -313,9 +407,6 @@ export default function PharmacySettings() {
                           max={600}
                           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
-                        <p className="text-xs text-slate-500 mt-1">
-                          일정 시간 동안 활동이 없으면 화면이 초기화됩니다 (60~600초)
-                        </p>
                       </div>
 
                       {/* 상품 제한 */}
@@ -336,9 +427,6 @@ export default function PharmacySettings() {
                           max={50}
                           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
-                        <p className="text-xs text-slate-500 mt-1">
-                          키오스크에 표시할 인기 상품 수 (5~50개)
-                        </p>
                       </div>
 
                       {/* 접근 PIN */}
@@ -359,9 +447,6 @@ export default function PharmacySettings() {
                           maxLength={4}
                           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
-                        <p className="text-xs text-slate-500 mt-1">
-                          키오스크 설정 변경 시 필요한 PIN (비워두면 PIN 없이 접근 가능)
-                        </p>
                       </div>
                     </div>
                   )}
@@ -371,34 +456,47 @@ export default function PharmacySettings() {
                 <div className="p-5 bg-slate-50 rounded-xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                        <Tablet className="w-5 h-5 text-green-600" />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        deviceSettings.tabletStatus === 'approved' ? 'bg-green-100' : 'bg-slate-200'
+                      }`}>
+                        <Tablet className={`w-5 h-5 ${
+                          deviceSettings.tabletStatus === 'approved' ? 'text-green-600' : 'text-slate-500'
+                        }`} />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-800">태블릿 모드</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-slate-800">태블릿 채널</p>
+                          {renderChannelStatusBadge(deviceSettings.tabletStatus)}
+                        </div>
                         <p className="text-sm text-slate-500">직원 보조 주문</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() =>
-                        setDeviceSettings((prev) => ({
-                          ...prev,
-                          tabletEnabled: !prev.tabletEnabled,
-                        }))
-                      }
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        deviceSettings.tabletEnabled ? 'bg-green-600' : 'bg-slate-300'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                          deviceSettings.tabletEnabled ? 'left-7' : 'left-1'
-                        }`}
-                      />
-                    </button>
+
+                    {/* 신청 버튼 */}
+                    {(deviceSettings.tabletStatus === 'none' || deviceSettings.tabletStatus === 'rejected') && (
+                      <button
+                        onClick={handleTabletRequest}
+                        className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
+                      >
+                        활성화 신청
+                      </button>
+                    )}
                   </div>
 
-                  {deviceSettings.tabletEnabled && (
+                  {/* 승인 대기 상태 */}
+                  {deviceSettings.tabletStatus === 'requested' && (
+                    <div className="pt-4 border-t border-slate-200">
+                      <p className="text-sm text-slate-600">
+                        신청일: {deviceSettings.tabletRequestedAt ? new Date(deviceSettings.tabletRequestedAt).toLocaleDateString('ko-KR') : '-'}
+                      </p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        운영자가 신청을 검토 중입니다. 승인까지 1~2 영업일이 소요될 수 있습니다.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 승인 완료 상태 */}
+                  {deviceSettings.tabletStatus === 'approved' && (
                     <div className="space-y-4 pt-4 border-t border-slate-200">
                       {/* 태블릿 URL */}
                       <div>
@@ -449,29 +547,29 @@ export default function PharmacySettings() {
                           maxLength={4}
                           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
-                        <p className="text-xs text-slate-500 mt-1">
-                          태블릿 접근 시 필요한 PIN (비워두면 PIN 없이 접근 가능)
-                        </p>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* 안내 문구 */}
+                {/* 정책 안내 */}
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
                   <p className="text-sm text-blue-800">
-                    <strong>안내:</strong> 키오스크/태블릿 모드에서의 주문은 비회원 주문으로 처리되며,
-                    모든 주문 책임은 약국(판매자)에 있습니다. 주문 채널은 자동으로 기록됩니다.
+                    <strong>주문 책임 안내:</strong> 키오스크/태블릿 채널을 통한 주문은 비회원 주문으로 처리되며,
+                    해당 주문에 대한 모든 책임은 약국(판매자)에 있습니다. 주문 채널은 자동으로 기록됩니다.
                   </p>
                 </div>
 
-                <button
-                  onClick={handleSave}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
-                >
-                  <Save className="w-5 h-5" />
-                  설정 저장
-                </button>
+                {/* 저장 버튼 (승인된 채널이 있을 때만) */}
+                {(deviceSettings.kioskStatus === 'approved' || deviceSettings.tabletStatus === 'approved') && (
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
+                  >
+                    <Save className="w-5 h-5" />
+                    설정 저장
+                  </button>
+                )}
               </div>
             )}
 
