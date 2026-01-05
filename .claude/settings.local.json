@@ -271,7 +271,10 @@
       "Bash(pnpm -F kpa-society-web build:*)",
       "Bash(pnpm -F web-neture build:*)",
       "Bash(git merge-base:*)",
-      "Bash(git rev-parse:*)"
+      "Bash(git rev-parse:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20709014637 -R Renagang21/o4o-platform)",
+      "Bash(pnpm -F forum-yaksa run build)",
+      "Bash(pnpm -F forum-cosmetics run build:*)"
     ],
     "deny": []
   }
