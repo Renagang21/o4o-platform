@@ -13,7 +13,7 @@ export class SeedGlycopharmTestAccounts9980000000001 implements MigrationInterfa
   public async up(queryRunner: QueryRunner): Promise<void> {
     const testPassword = await bcrypt.hash('test123!@#', 10);
 
-    // 약국 테스트 계정
+    // 약국 테스트 계정 (유효한 UUID 사용)
     await queryRunner.query(`
       INSERT INTO users (
         id,
@@ -23,14 +23,14 @@ export class SeedGlycopharmTestAccounts9980000000001 implements MigrationInterfa
         status,
         "isActive",
         "isEmailVerified",
-        "createdAt",
-        "updatedAt"
+        created_at,
+        updated_at
       ) VALUES (
-        '00000000-0000-0000-0000-glycopharm01',
+        '00000000-0000-0000-0000-000000000101',
         'pharmacy@glycopharm.kr',
         '${testPassword}',
         '글리코팜 테스트 약국',
-        'ACTIVE',
+        'active',
         true,
         true,
         NOW(),
@@ -53,12 +53,12 @@ export class SeedGlycopharmTestAccounts9980000000001 implements MigrationInterfa
         updated_at
       ) VALUES (
         gen_random_uuid(),
-        '00000000-0000-0000-0000-glycopharm01',
+        '00000000-0000-0000-0000-000000000101',
         'pharmacy',
         true,
         NOW(),
         NOW(),
-        '00000000-0000-0000-0000-glycopharm01',
+        '00000000-0000-0000-0000-000000000101',
         NOW(),
         NOW()
       )
@@ -71,12 +71,12 @@ export class SeedGlycopharmTestAccounts9980000000001 implements MigrationInterfa
   public async down(queryRunner: QueryRunner): Promise<void> {
     // 역할 할당 삭제
     await queryRunner.query(`
-      DELETE FROM role_assignments WHERE user_id = '00000000-0000-0000-0000-glycopharm01'
+      DELETE FROM role_assignments WHERE user_id = '00000000-0000-0000-0000-000000000101'
     `);
 
     // 테스트 계정 삭제
     await queryRunner.query(`
-      DELETE FROM users WHERE id = '00000000-0000-0000-0000-glycopharm01'
+      DELETE FROM users WHERE id = '00000000-0000-0000-0000-000000000101'
     `);
 
     console.log('✅ Glycopharm test accounts removed');
