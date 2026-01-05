@@ -26,7 +26,6 @@ export default function LoginPage() {
   // 테스트 계정 (데이터베이스에 등록된 실제 계정)
   const testAccounts = [
     { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary' },
-    { email: 'admin@neture.co.kr', password: 'admin123!@#', label: '운영자', color: 'red' },
   ];
 
   // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)

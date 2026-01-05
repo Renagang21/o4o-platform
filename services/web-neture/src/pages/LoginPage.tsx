@@ -142,12 +142,11 @@ export function LoginPage() {
         </form>
 
         <div style={styles.testAccounts}>
-          <p style={styles.testTitle}>테스트 계정</p>
+          <p style={styles.testTitle}>테스트 계정 (비밀번호: test123!@#)</p>
           <ul style={styles.testList}>
-            <li>admin@test.com - 관리자 (모든 역할)</li>
-            <li>supplier@test.com - 공급자</li>
-            <li>partner@test.com - 파트너</li>
-            <li>multi@test.com - 복수 역할</li>
+            <li>test-supplier@neture.co.kr - 공급자</li>
+            <li>test-seller@neture.co.kr - 판매자</li>
+            <li>test-partner@neture.co.kr - 파트너</li>
           </ul>
         </div>
 

@@ -90,6 +90,20 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* 테스트 계정 */}
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <p className="text-xs text-slate-400 mb-3">테스트 계정</p>
+            <div className="space-y-2 text-xs text-slate-500">
+              <div className="flex justify-between">
+                <span>약사: pharmacist@test.test</span>
+                <span className="text-slate-400">/ testID1234</span>
+              </div>
+              <div className="flex justify-between">
+                <span>관리자: admin@test.test</span>
+                <span className="text-slate-400">/ adminID1234</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
