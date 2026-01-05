@@ -135,37 +135,9 @@ export default function HomePage() {
 
   // 홈페이지 데이터 로드
   useEffect(() => {
-    const fetchHomeData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await apiClient.get<HomePageData>('/api/v1/glycopharm/home');
-        if (response.data) {
-          if (response.data.slides?.length > 0) {
-            setHeroSlides(response.data.slides);
-          }
-          if (response.data.adSlot) {
-            setAdSlot(response.data.adSlot);
-          }
-          if (response.data.extensionCards?.length > 0) {
-            setExtensionCards(response.data.extensionCards.map((card) => ({
-              ...card,
-              icon: iconMap[card.iconType] || Monitor,
-            })));
-          }
-          if (response.data.notices) {
-            setNotices(response.data.notices);
-          }
-          if (response.data.partners) {
-            setPartners(response.data.partners);
-          }
-        }
-      } catch {
-        // API가 없거나 에러 시 기본 상태 유지
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchHomeData();
+    // TODO: /api/v1/glycopharm/home 엔드포인트 구현 시 API 호출 활성화
+    // 현재는 기본값 사용 (백엔드 엔드포인트 미구현)
+    setIsLoading(false);
   }, []);
 
   // Auto slide
@@ -199,9 +171,8 @@ export default function HomePage() {
             {heroSlides.map((slide, index) => (
               <div
                 key={slide.id}
-                className={`absolute inset-0 transition-opacity duration-500 ${
-                  index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                }`}
+                className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
               >
                 <div className={`h-full bg-gradient-to-br ${slide.bgColor}`}>
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center">
@@ -217,11 +188,10 @@ export default function HomePage() {
                           <NavLink
                             key={btnIdx}
                             to={btn.link}
-                            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
-                              btn.primary
+                            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${btn.primary
                                 ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
                                 : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
-                            }`}
+                              }`}
                           >
                             {btn.label}
                             <ArrowRight className="w-4 h-4" />
@@ -248,9 +218,8 @@ export default function HomePage() {
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentSlide ? 'bg-white w-8' : 'bg-white/40'
-                  }`}
+                  className={`w-3 h-3 rounded-full transition-all ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40'
+                    }`}
                 />
               ))}
             </div>

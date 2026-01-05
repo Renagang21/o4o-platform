@@ -4,6 +4,7 @@ export * from './categoryRequest';
 export * from './marketTrial';
 export * from './forum';
 export * from './b2bOrder';
+export * from './store';
 
 // User Roles
 export type UserRole = 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';

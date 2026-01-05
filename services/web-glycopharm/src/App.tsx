@@ -5,6 +5,8 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/layouts/MainLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import StoreLayout from '@/components/layouts/StoreLayout';
+import KioskLayout from '@/components/layouts/KioskLayout';
+import TabletLayout from '@/components/layouts/TabletLayout';
 
 // Public Pages
 import HomePage from '@/pages/HomePage';
@@ -49,6 +51,11 @@ import OperatorDashboard from '@/pages/operator/OperatorDashboard';
 import ForumRequestsPage from '@/pages/operator/ForumRequestsPage';
 import ApplicationsPage from '@/pages/operator/ApplicationsPage';
 import ApplicationDetailPage from '@/pages/operator/ApplicationDetailPage';
+import StoreApprovalsPage from '@/pages/operator/StoreApprovalsPage';
+import StoreApprovalDetailPage from '@/pages/operator/StoreApprovalDetailPage';
+
+// Pharmacy Store Apply
+import StoreApplyPage from '@/pages/pharmacy/StoreApplyPage';
 
 // Consumer Store
 import StoreFront from '@/pages/store/StoreFront';
@@ -146,6 +153,8 @@ function AppRoutes() {
         <Route path="market-trial" element={<MarketTrialListPage />} />
         {/* B2B Order */}
         <Route path="b2b-order" element={<B2BOrderPage />} />
+        {/* Store Apply */}
+        <Route path="store-apply" element={<StoreApplyPage />} />
         <Route path="settings" element={<PharmacySettings />} />
       </Route>
 
@@ -186,10 +195,29 @@ function AppRoutes() {
         <Route path="market-trial" element={<OperatorTrialSelectorPage />} />
         {/* Forum Extension */}
         <Route path="forum-management" element={<OperatorForumManagementPage />} />
+        {/* Store Approvals */}
+        <Route path="store-approvals" element={<StoreApprovalsPage />} />
+        <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
       <Route path="store/:pharmacyId" element={<StoreLayout />}>
+        <Route index element={<StoreFront />} />
+        <Route path="products" element={<StoreProducts />} />
+        <Route path="products/:productId" element={<StoreProductDetail />} />
+        <Route path="cart" element={<StoreCart />} />
+      </Route>
+
+      {/* Kiosk Store Mode - 매장 내 키오스크 */}
+      <Route path="store/:pharmacyId/kiosk" element={<KioskLayout />}>
+        <Route index element={<StoreFront />} />
+        <Route path="products" element={<StoreProducts />} />
+        <Route path="products/:productId" element={<StoreProductDetail />} />
+        <Route path="cart" element={<StoreCart />} />
+      </Route>
+
+      {/* Tablet Store Mode - 직원 보조 태블릿 */}
+      <Route path="store/:pharmacyId/tablet" element={<TabletLayout />}>
         <Route index element={<StoreFront />} />
         <Route path="products" element={<StoreProducts />} />
         <Route path="products/:productId" element={<StoreProductDetail />} />

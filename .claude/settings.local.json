@@ -284,7 +284,9 @@
       "Bash(gcloud compute url-maps add-path-matcher:*)",
       "Bash(gcloud compute url-maps list:*)",
       "Bash(gcloud compute url-maps add-host-rule:*)",
-      "Bash(gcloud compute network-endpoint-groups describe:*)"
+      "Bash(gcloud compute network-endpoint-groups describe:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth login --web)",
+      "Bash(printf:*)"
     ],
     "deny": []
   }

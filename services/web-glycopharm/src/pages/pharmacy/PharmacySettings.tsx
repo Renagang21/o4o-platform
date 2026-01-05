@@ -6,6 +6,10 @@ import {
   Truck,
   Shield,
   Save,
+  Monitor,
+  Tablet,
+  Copy,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function PharmacySettings() {
@@ -20,13 +24,34 @@ export default function PharmacySettings() {
     isStoreActive: true,
   });
 
+  const [deviceSettings, setDeviceSettings] = useState({
+    kioskEnabled: false,
+    tabletEnabled: false,
+    kioskPin: '',
+    tabletPin: '',
+    kioskAutoReset: 180, // seconds
+    kioskProductLimit: 20, // 키오스크에 표시할 상품 수 제한
+  });
+
   const tabs = [
     { id: 'store', label: '매장 정보', icon: Store },
+    { id: 'devices', label: '키오스크/태블릿', icon: Monitor },
     { id: 'notifications', label: '알림 설정', icon: Bell },
     { id: 'payment', label: '결제 설정', icon: CreditCard },
     { id: 'shipping', label: '배송 설정', icon: Truck },
     { id: 'security', label: '보안', icon: Shield },
   ];
+
+  // URL 복사 함수
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert('URL이 복사되었습니다.');
+  };
+
+  // 기본 URL
+  const baseUrl = window.location.origin;
+  const kioskUrl = `${baseUrl}/store/${storeSettings.storeSlug}/kiosk`;
+  const tabletUrl = `${baseUrl}/store/${storeSettings.storeSlug}/tablet`;
 
   const handleSave = () => {
     // TODO: Implement save API
@@ -196,6 +221,256 @@ export default function PharmacySettings() {
                 >
                   <Save className="w-5 h-5" />
                   저장하기
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'devices' && (
+              <div className="space-y-6">
+                <h2 className="text-lg font-semibold text-slate-800 border-b pb-4">
+                  키오스크 / 태블릿 설정
+                </h2>
+
+                {/* 키오스크 섹션 */}
+                <div className="p-5 bg-slate-50 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                        <Monitor className="w-5 h-5 text-primary-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-800">키오스크 모드</p>
+                        <p className="text-sm text-slate-500">매장 내 고객 셀프 주문</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setDeviceSettings((prev) => ({
+                          ...prev,
+                          kioskEnabled: !prev.kioskEnabled,
+                        }))
+                      }
+                      className={`relative w-12 h-6 rounded-full transition-colors ${
+                        deviceSettings.kioskEnabled ? 'bg-primary-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                          deviceSettings.kioskEnabled ? 'left-7' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {deviceSettings.kioskEnabled && (
+                    <div className="space-y-4 pt-4 border-t border-slate-200">
+                      {/* 키오스크 URL */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          키오스크 URL
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={kioskUrl}
+                            readOnly
+                            className="flex-1 px-4 py-2.5 bg-white rounded-xl border border-slate-200 text-sm text-slate-600"
+                          />
+                          <button
+                            onClick={() => copyToClipboard(kioskUrl)}
+                            className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                            title="URL 복사"
+                          >
+                            <Copy className="w-4 h-4 text-slate-600" />
+                          </button>
+                          <a
+                            href={kioskUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                            title="새 창에서 열기"
+                          >
+                            <ExternalLink className="w-4 h-4 text-slate-600" />
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* 자동 리셋 시간 */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          자동 리셋 시간 (초)
+                        </label>
+                        <input
+                          type="number"
+                          value={deviceSettings.kioskAutoReset}
+                          onChange={(e) =>
+                            setDeviceSettings((prev) => ({
+                              ...prev,
+                              kioskAutoReset: parseInt(e.target.value) || 180,
+                            }))
+                          }
+                          min={60}
+                          max={600}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          일정 시간 동안 활동이 없으면 화면이 초기화됩니다 (60~600초)
+                        </p>
+                      </div>
+
+                      {/* 상품 제한 */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          표시 상품 수 제한
+                        </label>
+                        <input
+                          type="number"
+                          value={deviceSettings.kioskProductLimit}
+                          onChange={(e) =>
+                            setDeviceSettings((prev) => ({
+                              ...prev,
+                              kioskProductLimit: parseInt(e.target.value) || 20,
+                            }))
+                          }
+                          min={5}
+                          max={50}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          키오스크에 표시할 인기 상품 수 (5~50개)
+                        </p>
+                      </div>
+
+                      {/* 접근 PIN */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          관리자 PIN (선택)
+                        </label>
+                        <input
+                          type="password"
+                          value={deviceSettings.kioskPin}
+                          onChange={(e) =>
+                            setDeviceSettings((prev) => ({
+                              ...prev,
+                              kioskPin: e.target.value,
+                            }))
+                          }
+                          placeholder="4자리 숫자"
+                          maxLength={4}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          키오스크 설정 변경 시 필요한 PIN (비워두면 PIN 없이 접근 가능)
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 태블릿 섹션 */}
+                <div className="p-5 bg-slate-50 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                        <Tablet className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-800">태블릿 모드</p>
+                        <p className="text-sm text-slate-500">직원 보조 주문</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setDeviceSettings((prev) => ({
+                          ...prev,
+                          tabletEnabled: !prev.tabletEnabled,
+                        }))
+                      }
+                      className={`relative w-12 h-6 rounded-full transition-colors ${
+                        deviceSettings.tabletEnabled ? 'bg-green-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                          deviceSettings.tabletEnabled ? 'left-7' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {deviceSettings.tabletEnabled && (
+                    <div className="space-y-4 pt-4 border-t border-slate-200">
+                      {/* 태블릿 URL */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          태블릿 URL
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={tabletUrl}
+                            readOnly
+                            className="flex-1 px-4 py-2.5 bg-white rounded-xl border border-slate-200 text-sm text-slate-600"
+                          />
+                          <button
+                            onClick={() => copyToClipboard(tabletUrl)}
+                            className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                            title="URL 복사"
+                          >
+                            <Copy className="w-4 h-4 text-slate-600" />
+                          </button>
+                          <a
+                            href={tabletUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                            title="새 창에서 열기"
+                          >
+                            <ExternalLink className="w-4 h-4 text-slate-600" />
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* 접근 PIN */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          직원 PIN (선택)
+                        </label>
+                        <input
+                          type="password"
+                          value={deviceSettings.tabletPin}
+                          onChange={(e) =>
+                            setDeviceSettings((prev) => ({
+                              ...prev,
+                              tabletPin: e.target.value,
+                            }))
+                          }
+                          placeholder="4자리 숫자"
+                          maxLength={4}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          태블릿 접근 시 필요한 PIN (비워두면 PIN 없이 접근 가능)
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 안내 문구 */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm text-blue-800">
+                    <strong>안내:</strong> 키오스크/태블릿 모드에서의 주문은 비회원 주문으로 처리되며,
+                    모든 주문 책임은 약국(판매자)에 있습니다. 주문 채널은 자동으로 기록됩니다.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleSave}
+                  className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
+                >
+                  <Save className="w-5 h-5" />
+                  설정 저장
                 </button>
               </div>
             )}

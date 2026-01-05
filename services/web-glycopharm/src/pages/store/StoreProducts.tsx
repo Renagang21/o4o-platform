@@ -1,64 +1,118 @@
-import { useState } from 'react';
+/**
+ * StoreProducts - 약국 몰 상품 목록 페이지
+ * Mock 데이터 제거, API 연동 구조
+ */
+
+import { useEffect, useState, useCallback } from 'react';
 import { NavLink, useParams, useSearchParams } from 'react-router-dom';
-import { Search, Package, Star } from 'lucide-react';
+import { Search, Package, Star, Loader2, AlertCircle } from 'lucide-react';
+import { storeApi } from '@/api/store';
+import type { StoreProduct, StoreCategory } from '@/types/store';
 
-// Mock products
-const allProducts = [
-  { id: '1', name: '프리스타일 리브레2 센서', category: '연속혈당측정기', price: 50000, discountPrice: 45000, rating: 4.8, reviews: 128, stock: 25 },
-  { id: '2', name: '덱스콤 G7 스타터킷', category: '연속혈당측정기', price: 120000, rating: 4.9, reviews: 86, stock: 15 },
-  { id: '3', name: '아큐첵 가이드 측정기', category: '혈당측정기', price: 35000, rating: 4.7, reviews: 204, stock: 40 },
-  { id: '4', name: '아큐첵 가이드 검사지 50매', category: '검사지', price: 25000, rating: 4.6, reviews: 312, stock: 100 },
-  { id: '5', name: '당뇨 영양바 (10개입)', category: '당뇨식품', price: 15000, rating: 4.5, reviews: 89, stock: 200 },
-  { id: '6', name: '당케어 혈당 보조제', category: '건강기능식품', price: 35000, discountPrice: 29000, rating: 4.4, reviews: 156, stock: 80 },
-  { id: '7', name: '란셋 (100개입)', category: '검사지', price: 12000, rating: 4.3, reviews: 78, stock: 150 },
-  { id: '8', name: '인슐린 보관 파우치', category: '기타', price: 18000, rating: 4.6, reviews: 45, stock: 30 },
-];
-
-const categories = ['전체', '연속혈당측정기', '혈당측정기', '검사지', '건강기능식품', '당뇨식품', '기타'];
-const sortOptions = [
+const SORT_OPTIONS = [
   { value: 'popular', label: '인기순' },
   { value: 'newest', label: '최신순' },
   { value: 'price_low', label: '가격 낮은순' },
   { value: 'price_high', label: '가격 높은순' },
   { value: 'rating', label: '평점순' },
-];
+] as const;
+
+type SortOption = typeof SORT_OPTIONS[number]['value'];
 
 export default function StoreProducts() {
-  const { pharmacyId } = useParams();
+  const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const [products, setProducts] = useState<StoreProduct[]>([]);
+  const [categories, setCategories] = useState<StoreCategory[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('popular');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const categoryParam = searchParams.get('category') || '전체';
+  const categoryId = searchParams.get('category') || '';
+  const sortBy = (searchParams.get('sort') as SortOption) || 'popular';
+  const page = parseInt(searchParams.get('page') || '1', 10);
 
-  const filteredProducts = allProducts.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryParam === '전체' || product.category === categoryParam;
-    return matchesSearch && matchesCategory;
-  });
+  // 검색어 디바운스
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'price_low':
-        return (a.discountPrice || a.price) - (b.discountPrice || b.price);
-      case 'price_high':
-        return (b.discountPrice || b.price) - (a.discountPrice || a.price);
-      case 'rating':
-        return b.rating - a.rating;
-      case 'newest':
-        return parseInt(b.id) - parseInt(a.id);
-      default:
-        return b.reviews - a.reviews;
+  // 카테고리 로드
+  useEffect(() => {
+    if (!storeSlug) return;
+
+    const loadCategories = async () => {
+      try {
+        const res = await storeApi.getStoreCategories(storeSlug);
+        if (res.success && res.data) {
+          setCategories(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
+    };
+
+    loadCategories();
+  }, [storeSlug]);
+
+  // 상품 로드
+  const loadProducts = useCallback(async () => {
+    if (!storeSlug) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await storeApi.getStoreProducts(storeSlug, {
+        categoryId: categoryId || undefined,
+        search: debouncedSearch || undefined,
+        sort: sortBy,
+        page,
+        pageSize: 12,
+      });
+
+      if (res.success && res.data) {
+        setProducts(res.data.items);
+        setTotalCount(res.data.total);
+      } else {
+        throw new Error('상품을 불러올 수 없습니다.');
+      }
+    } catch (err: any) {
+      console.error('Products load error:', err);
+      setError(err.message || '상품을 불러오는데 실패했습니다.');
+      setProducts([]);
+    } finally {
+      setLoading(false);
     }
-  });
+  }, [storeSlug, categoryId, debouncedSearch, sortBy, page]);
 
-  const handleCategoryChange = (category: string) => {
-    if (category === '전체') {
-      searchParams.delete('category');
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  const handleCategoryChange = (newCategoryId: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (newCategoryId) {
+      newParams.set('category', newCategoryId);
     } else {
-      searchParams.set('category', category);
+      newParams.delete('category');
     }
-    setSearchParams(searchParams);
+    newParams.delete('page'); // 카테고리 변경 시 페이지 초기화
+    setSearchParams(newParams);
+  };
+
+  const handleSortChange = (newSort: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('sort', newSort);
+    newParams.delete('page');
+    setSearchParams(newParams);
   };
 
   return (
@@ -66,7 +120,9 @@ export default function StoreProducts() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">전체 상품</h1>
-        <p className="text-slate-500 text-sm">{sortedProducts.length}개의 상품</p>
+        <p className="text-slate-500 text-sm">
+          {loading ? '불러오는 중...' : `${totalCount}개의 상품`}
+        </p>
       </div>
 
       {/* Filters */}
@@ -86,27 +142,37 @@ export default function StoreProducts() {
         {/* Category & Sort */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+            <button
+              onClick={() => handleCategoryChange('')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                !categoryId
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              전체
+            </button>
             {categories.map((category) => (
               <button
-                key={category}
-                onClick={() => handleCategoryChange(category)}
+                key={category.id}
+                onClick={() => handleCategoryChange(category.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  categoryParam === category
+                  categoryId === category.id
                     ? 'bg-primary-100 text-primary-700'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {category}
+                {category.name}
               </button>
             ))}
           </div>
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => handleSortChange(e.target.value)}
             className="px-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
-            {sortOptions.map((option) => (
+            {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -115,69 +181,99 @@ export default function StoreProducts() {
         </div>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {sortedProducts.map((product) => (
-          <NavLink
-            key={product.id}
-            to={`/store/${pharmacyId}/products/${product.id}`}
-            className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all group"
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+        </div>
+      )}
+
+      {/* Error */}
+      {!loading && error && (
+        <div className="text-center py-12 bg-white rounded-2xl">
+          <AlertCircle className="w-16 h-16 text-red-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-slate-800 mb-2">오류가 발생했습니다</h3>
+          <p className="text-slate-500 mb-4">{error}</p>
+          <button
+            onClick={loadProducts}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
-            <div className="relative aspect-square bg-slate-100 flex items-center justify-center">
-              <Package className="w-12 h-12 text-slate-300" />
-              {product.discountPrice && (
-                <span className="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-lg">
-                  {Math.round((1 - product.discountPrice / product.price) * 100)}% OFF
-                </span>
-              )}
-              {product.stock <= 10 && product.stock > 0 && (
-                <span className="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-white text-xs font-medium rounded-lg">
-                  품절 임박
-                </span>
-              )}
-              {product.stock === 0 && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="text-white font-bold">품절</span>
-                </div>
-              )}
-            </div>
-            <div className="p-4">
-              <span className="text-xs text-slate-400">{product.category}</span>
-              <h3 className="font-medium text-slate-800 text-sm line-clamp-2 mt-1 group-hover:text-primary-600 transition-colors">
-                {product.name}
-              </h3>
-              <div className="flex items-center gap-1 mt-2">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm text-slate-600">{product.rating}</span>
-                <span className="text-xs text-slate-400">({product.reviews})</span>
-              </div>
-              <div className="mt-2">
-                {product.discountPrice ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-red-600">
-                      {product.discountPrice.toLocaleString()}원
-                    </span>
-                    <span className="text-sm text-slate-400 line-through">
-                      {product.price.toLocaleString()}원
-                    </span>
-                  </div>
+            다시 시도
+          </button>
+        </div>
+      )}
+
+      {/* Products Grid */}
+      {!loading && !error && products.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {products.map((product) => (
+            <NavLink
+              key={product.id}
+              to={`/store/${storeSlug}/products/${product.id}`}
+              className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all group"
+            >
+              <div className="relative aspect-square bg-slate-100 flex items-center justify-center">
+                {product.thumbnailUrl ? (
+                  <img src={product.thumbnailUrl} alt={product.name} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-lg font-bold text-primary-600">
-                    {product.price.toLocaleString()}원
+                  <Package className="w-12 h-12 text-slate-300" />
+                )}
+                {product.salePrice && (
+                  <span className="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-lg">
+                    {Math.round((1 - product.salePrice / product.price) * 100)}% OFF
                   </span>
                 )}
+                {!product.isActive && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span className="text-white font-bold">품절</span>
+                  </div>
+                )}
               </div>
-            </div>
-          </NavLink>
-        ))}
-      </div>
+              <div className="p-4">
+                <span className="text-xs text-slate-400">{product.categoryName}</span>
+                <h3 className="font-medium text-slate-800 text-sm line-clamp-2 mt-1 group-hover:text-primary-600 transition-colors">
+                  {product.name}
+                </h3>
+                <div className="flex items-center gap-1 mt-2">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="text-sm text-slate-600">{product.rating.toFixed(1)}</span>
+                  <span className="text-xs text-slate-400">({product.reviewCount})</span>
+                </div>
+                <div className="mt-2">
+                  {product.salePrice ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold text-red-600">
+                        {product.salePrice.toLocaleString()}원
+                      </span>
+                      <span className="text-sm text-slate-400 line-through">
+                        {product.price.toLocaleString()}원
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-lg font-bold text-primary-600">
+                      {product.price.toLocaleString()}원
+                    </span>
+                  )}
+                </div>
+                {product.isDropshipping && (
+                  <p className="text-xs text-slate-400 mt-1">공급자 직배송</p>
+                )}
+              </div>
+            </NavLink>
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
-      {sortedProducts.length === 0 && (
+      {!loading && !error && products.length === 0 && (
         <div className="text-center py-12 bg-white rounded-2xl">
           <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">상품이 없습니다</h3>
-          <p className="text-slate-500">검색 조건에 맞는 상품이 없습니다.</p>
+          <p className="text-slate-500">
+            {debouncedSearch
+              ? '검색 조건에 맞는 상품이 없습니다.'
+              : '등록된 상품이 없습니다.'}
+          </p>
         </div>
       )}
     </div>

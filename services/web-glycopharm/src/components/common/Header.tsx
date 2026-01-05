@@ -57,10 +57,9 @@ export default function Header() {
               to="/"
               end
               className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`
               }
             >
@@ -69,10 +68,9 @@ export default function Header() {
             <NavLink
               to="/forum"
               className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`
               }
             >
@@ -81,10 +79,9 @@ export default function Header() {
             <NavLink
               to="/education"
               className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`
               }
             >
@@ -93,10 +90,9 @@ export default function Header() {
             <NavLink
               to="/apply"
               className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`
               }
             >
@@ -106,10 +102,9 @@ export default function Header() {
               <NavLink
                 to={roleNav.path}
                 className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-accent-100 text-accent-700'
-                      : 'text-accent-600 hover:bg-accent-50 hover:text-accent-700'
+                  `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                    ? 'bg-accent-100 text-accent-700'
+                    : 'text-accent-600 hover:bg-accent-50 hover:text-accent-700'
                   }`
                 }
               >
@@ -128,7 +123,7 @@ export default function Header() {
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      {user?.name.charAt(0)}
+                      {user?.name?.charAt(0) || '?'}
                     </span>
                   </div>
                   <span className="text-sm font-medium text-slate-700">{user?.name}</span>
@@ -214,8 +209,7 @@ export default function Header() {
                 to="/"
                 end
                 className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${
-                    isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
+                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}
@@ -225,8 +219,7 @@ export default function Header() {
               <NavLink
                 to="/forum"
                 className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${
-                    isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
+                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}
@@ -236,8 +229,7 @@ export default function Header() {
               <NavLink
                 to="/education"
                 className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${
-                    isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
+                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}
@@ -247,8 +239,7 @@ export default function Header() {
               <NavLink
                 to="/apply"
                 className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${
-                    isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
+                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
                   }`
                 }
                 onClick={() => setMobileMenuOpen(false)}
@@ -259,8 +250,7 @@ export default function Header() {
                 <NavLink
                   to={roleNav.path}
                   className={({ isActive }) =>
-                    `px-4 py-3 rounded-xl text-sm font-medium ${
-                      isActive ? 'bg-accent-100 text-accent-700' : 'text-accent-600'
+                    `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-accent-100 text-accent-700' : 'text-accent-600'
                     }`
                   }
                   onClick={() => setMobileMenuOpen(false)}

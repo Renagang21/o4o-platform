@@ -1,5 +1,5 @@
 import { Outlet, useParams, NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Store,
@@ -10,37 +10,82 @@ import {
   Search,
   Phone,
   MapPin,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
+import { storeApi } from '@/api/store';
+import type { PharmacyStore } from '@/types/store';
+import { StoreModeProvider } from '@/contexts/StoreModeContext';
 
-// Mock pharmacy data - in real app, fetch from API
-const mockPharmacies: Record<string, { name: string; address: string; phone: string; logo?: string }> = {
-  'pharmacy-1': {
-    name: '건강약국',
-    address: '서울시 강남구 테헤란로 123',
-    phone: '02-1234-5678',
-  },
-  'pharmacy-2': {
-    name: '행복약국',
-    address: '서울시 서초구 서초대로 456',
-    phone: '02-2345-6789',
-  },
-};
-
-export default function StoreLayout() {
-  const { pharmacyId } = useParams<{ pharmacyId: string }>();
+function StoreLayoutContent() {
+  const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
   const { user, isAuthenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartCount] = useState(0);
+  const [store, setStore] = useState<PharmacyStore | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const pharmacy = pharmacyId ? mockPharmacies[pharmacyId] : null;
+  // 스토어 정보 로드
+  useEffect(() => {
+    if (!storeSlug) return;
 
-  if (!pharmacy) {
+    const loadStore = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await storeApi.getStoreBySlug(storeSlug);
+        if (res.success && res.data) {
+          // 승인된 스토어만 표시
+          if (res.data.status !== 'approved') {
+            setError('현재 운영 중이 아닌 매장입니다.');
+            setStore(null);
+          } else {
+            setStore(res.data);
+          }
+        } else {
+          throw new Error('매장 정보를 불러올 수 없습니다.');
+        }
+      } catch (err: any) {
+        console.error('Store load error:', err);
+        setError(err.message || '매장을 찾을 수 없습니다.');
+        setStore(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStore();
+  }, [storeSlug]);
+
+  // 로딩 상태
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+      </div>
+    );
+  }
+
+  // 에러 상태 또는 스토어 없음
+  if (error || !store) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <Store className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-slate-800 mb-2">매장을 찾을 수 없습니다</h1>
-          <p className="text-slate-500">올바른 매장 링크를 확인해주세요.</p>
+          {error?.includes('운영 중이 아닌') ? (
+            <>
+              <AlertCircle className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+              <h1 className="text-xl font-bold text-slate-800 mb-2">매장 준비 중</h1>
+              <p className="text-slate-500">{error}</p>
+            </>
+          ) : (
+            <>
+              <Store className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <h1 className="text-xl font-bold text-slate-800 mb-2">매장을 찾을 수 없습니다</h1>
+              <p className="text-slate-500">{error || '올바른 매장 링크를 확인해주세요.'}</p>
+            </>
+          )}
         </div>
       </div>
     );
@@ -56,11 +101,11 @@ export default function StoreLayout() {
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <Phone className="w-3 h-3" />
-                {pharmacy.phone}
+                {store.phone}
               </span>
               <span className="hidden sm:flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
-                {pharmacy.address}
+                {store.address}
               </span>
             </div>
             <div>
@@ -79,12 +124,12 @@ export default function StoreLayout() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo & Store Name */}
-            <NavLink to={`/store/${pharmacyId}`} className="flex items-center gap-3">
+            <NavLink to={`/store/${storeSlug}`} className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
                 <Store className="w-6 h-6 text-primary-600" />
               </div>
               <div>
-                <h1 className="font-bold text-xl text-slate-800">{pharmacy.name}</h1>
+                <h1 className="font-bold text-xl text-slate-800">{store.name}</h1>
                 <p className="text-xs text-slate-500">혈당관리 전문</p>
               </div>
             </NavLink>
@@ -104,7 +149,7 @@ export default function StoreLayout() {
             {/* Actions */}
             <div className="flex items-center gap-3">
               <NavLink
-                to={`/store/${pharmacyId}/cart`}
+                to={`/store/${storeSlug}/cart`}
                 className="relative p-2 rounded-xl hover:bg-slate-100"
               >
                 <ShoppingCart className="w-6 h-6 text-slate-600" />
@@ -159,7 +204,7 @@ export default function StoreLayout() {
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-1 overflow-x-auto py-2">
               <NavLink
-                to={`/store/${pharmacyId}`}
+                to={`/store/${storeSlug}`}
                 end
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
@@ -172,7 +217,7 @@ export default function StoreLayout() {
                 홈
               </NavLink>
               <NavLink
-                to={`/store/${pharmacyId}/products`}
+                to={`/store/${storeSlug}/products`}
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     isActive
@@ -184,19 +229,19 @@ export default function StoreLayout() {
                 전체상품
               </NavLink>
               <NavLink
-                to={`/store/${pharmacyId}/products?category=cgm`}
+                to={`/store/${storeSlug}/products?category=cgm`}
                 className="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100"
               >
                 연속혈당측정기
               </NavLink>
               <NavLink
-                to={`/store/${pharmacyId}/products?category=supplement`}
+                to={`/store/${storeSlug}/products?category=supplement`}
                 className="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100"
               >
                 건강기능식품
               </NavLink>
               <NavLink
-                to={`/store/${pharmacyId}/products?category=food`}
+                to={`/store/${storeSlug}/products?category=food`}
                 className="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100"
               >
                 당뇨식품
@@ -216,9 +261,24 @@ export default function StoreLayout() {
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-start justify-between gap-6">
             <div>
-              <h3 className="font-bold text-lg text-slate-800 mb-2">{pharmacy.name}</h3>
-              <p className="text-sm text-slate-500">{pharmacy.address}</p>
-              <p className="text-sm text-slate-500">전화: {pharmacy.phone}</p>
+              <h3 className="font-bold text-lg text-slate-800 mb-2">{store.name}</h3>
+              <p className="text-sm text-slate-500">{store.address}</p>
+              <p className="text-sm text-slate-500">전화: {store.phone}</p>
+              {store.businessNumber && (
+                <p className="text-sm text-slate-400 mt-2">
+                  사업자등록번호: {store.businessNumber}
+                </p>
+              )}
+              {store.onlineSalesNumber && (
+                <p className="text-sm text-slate-400">
+                  통신판매업신고: {store.onlineSalesNumber}
+                </p>
+              )}
+              {store.pharmacistName && (
+                <p className="text-sm text-slate-400">
+                  관리약사: {store.pharmacistName}
+                </p>
+              )}
             </div>
             <div className="text-sm text-slate-500">
               <p>본 매장은 GlycoPharm 플랫폼에서 운영됩니다.</p>
@@ -228,5 +288,24 @@ export default function StoreLayout() {
         </div>
       </footer>
     </div>
+  );
+}
+
+// Provider로 감싸서 export
+export default function StoreLayout() {
+  const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
+
+  if (!storeSlug) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-slate-500">잘못된 접근입니다.</p>
+      </div>
+    );
+  }
+
+  return (
+    <StoreModeProvider mode="consumer" storeSlug={storeSlug}>
+      <StoreLayoutContent />
+    </StoreModeProvider>
   );
 }

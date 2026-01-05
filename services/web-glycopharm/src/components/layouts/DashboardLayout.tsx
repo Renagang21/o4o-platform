@@ -120,10 +120,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
               to="/"
               end
               className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100'
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100'
                 }`
               }
             >
@@ -133,10 +132,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
             <NavLink
               to="/forum"
               className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100'
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100'
                 }`
               }
             >
@@ -146,10 +144,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
             <NavLink
               to="/education"
               className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-slate-600 hover:bg-slate-100'
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100'
                 }`
               }
             >
@@ -181,9 +178,8 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-14 left-0 z-40 h-[calc(100vh-56px)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-14 left-0 z-40 h-[calc(100vh-56px)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
@@ -215,10 +211,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                   to={item.path}
                   end={item.path === `/${role}`}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                        ? `bg-${config.color}-50 text-${config.color}-700`
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                      ? `bg-${config.color}-50 text-${config.color}-700`
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`
                   }
                 >
@@ -283,7 +278,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      {user?.name.charAt(0)}
+                      {user?.name?.charAt(0) || '?'}
                     </span>
                   </div>
                   <span className="hidden md:block text-sm font-medium text-slate-700">

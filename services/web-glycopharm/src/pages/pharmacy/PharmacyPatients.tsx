@@ -1,4 +1,9 @@
-import { useState } from 'react';
+/**
+ * PharmacyPatients - 약국 고객 관리
+ * Mock 데이터 제거, API 연동 구조
+ */
+
+import { useState, useEffect, useCallback } from 'react';
 import {
   Search,
   Plus,
@@ -8,66 +13,10 @@ import {
   Calendar,
   Activity,
   MoreVertical,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
-
-// Mock customers
-const mockCustomers = [
-  {
-    id: '1',
-    name: '김철수',
-    phone: '010-1234-5678',
-    email: 'chulsoo@email.com',
-    diabetesType: 'type2',
-    lastVisit: '2024-01-15',
-    totalOrders: 12,
-    totalSpent: 1250000,
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: '이영희',
-    phone: '010-2345-6789',
-    email: 'younghee@email.com',
-    diabetesType: 'type1',
-    lastVisit: '2024-01-14',
-    totalOrders: 8,
-    totalSpent: 890000,
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: '박민수',
-    phone: '010-3456-7890',
-    email: 'minsu@email.com',
-    diabetesType: 'prediabetes',
-    lastVisit: '2024-01-10',
-    totalOrders: 3,
-    totalSpent: 180000,
-    status: 'inactive',
-  },
-  {
-    id: '4',
-    name: '정수진',
-    phone: '010-4567-8901',
-    email: 'sujin@email.com',
-    diabetesType: 'type2',
-    lastVisit: '2024-01-12',
-    totalOrders: 15,
-    totalSpent: 2100000,
-    status: 'active',
-  },
-  {
-    id: '5',
-    name: '최동현',
-    phone: '010-5678-9012',
-    email: 'donghyun@email.com',
-    diabetesType: 'gestational',
-    lastVisit: '2024-01-08',
-    totalOrders: 5,
-    totalSpent: 450000,
-    status: 'active',
-  },
-];
+import { pharmacyApi, type PharmacyCustomer } from '@/api/pharmacy';
 
 const diabetesLabels: Record<string, string> = {
   type1: '제1형 당뇨',
@@ -77,19 +26,60 @@ const diabetesLabels: Record<string, string> = {
 };
 
 export default function PharmacyPatients() {
+  const [customers, setCustomers] = useState<PharmacyCustomer[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<PharmacyCustomer | null>(null);
 
-  const filteredCustomers = mockCustomers.filter(
-    (customer) =>
-      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.phone.includes(searchQuery) ||
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // 검색어 디바운스
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const customer = selectedCustomer
-    ? mockCustomers.find((c) => c.id === selectedCustomer)
-    : null;
+  // 고객 로드
+  const loadCustomers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await pharmacyApi.getCustomers({
+        search: debouncedSearch || undefined,
+        pageSize: 50,
+      });
+
+      if (res.success && res.data) {
+        setCustomers(res.data.items);
+        setTotalCount(res.data.total);
+      } else {
+        throw new Error('고객 정보를 불러올 수 없습니다.');
+      }
+    } catch (err: any) {
+      console.error('Customers load error:', err);
+      setError(err.message || '고객 정보를 불러오는데 실패했습니다.');
+      setCustomers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    loadCustomers();
+  }, [loadCustomers]);
+
+  // 고객 선택 시 상세 정보 로드
+  const handleSelectCustomer = async (customerId: string) => {
+    const customer = customers.find((c) => c.id === customerId);
+    if (customer) {
+      setSelectedCustomer(customer);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -97,7 +87,9 @@ export default function PharmacyPatients() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">고객 관리</h1>
-          <p className="text-slate-500 text-sm">총 {mockCustomers.length}명의 고객</p>
+          <p className="text-slate-500 text-sm">
+            {loading ? '불러오는 중...' : `총 ${totalCount}명의 고객`}
+          </p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25">
           <Plus className="w-5 h-5" />
@@ -120,62 +112,89 @@ export default function PharmacyPatients() {
             />
           </div>
 
-          {/* Customers */}
-          <div className="space-y-3">
-            {filteredCustomers.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => setSelectedCustomer(c.id)}
-                className={`bg-white rounded-2xl p-4 cursor-pointer transition-all ${
-                  selectedCustomer === c.id
-                    ? 'ring-2 ring-primary-500 shadow-md'
-                    : 'hover:shadow-md'
-                }`}
+          {/* Loading */}
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+            </div>
+          )}
+
+          {/* Error */}
+          {!loading && error && (
+            <div className="text-center py-12 bg-white rounded-2xl">
+              <AlertCircle className="w-16 h-16 text-red-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-slate-800 mb-2">오류가 발생했습니다</h3>
+              <p className="text-slate-500 mb-4">{error}</p>
+              <button
+                onClick={loadCustomers}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-                      <span className="text-white font-semibold">{c.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-slate-800">{c.name}</h3>
-                        <span
-                          className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                            c.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-slate-100 text-slate-500'
-                          }`}
-                        >
-                          {c.status === 'active' ? '활성' : '비활성'}
-                        </span>
+                다시 시도
+              </button>
+            </div>
+          )}
+
+          {/* Customers */}
+          {!loading && !error && customers.length > 0 && (
+            <div className="space-y-3">
+              {customers.map((c) => (
+                <div
+                  key={c.id}
+                  onClick={() => handleSelectCustomer(c.id)}
+                  className={`bg-white rounded-2xl p-4 cursor-pointer transition-all ${selectedCustomer?.id === c.id
+                      ? 'ring-2 ring-primary-500 shadow-md'
+                      : 'hover:shadow-md'
+                    }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                        <span className="text-white font-semibold">{c.name?.charAt(0) || '?'}</span>
                       </div>
-                      <p className="text-sm text-slate-500">{c.phone}</p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-slate-800">{c.name}</h3>
+                          <span
+                            className={`px-2 py-0.5 text-xs font-medium rounded-full ${c.status === 'active'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-slate-100 text-slate-500'
+                              }`}
+                          >
+                            {c.status === 'active' ? '활성' : '비활성'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-500">{c.phone}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-slate-800">
-                      {c.totalSpent.toLocaleString()}원
-                    </p>
-                    <p className="text-xs text-slate-400">{c.totalOrders}회 구매</p>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-slate-800">
+                        {c.totalSpent.toLocaleString()}원
+                      </p>
+                      <p className="text-xs text-slate-400">{c.totalOrders}회 구매</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
-          {filteredCustomers.length === 0 && (
+          {/* Empty State */}
+          {!loading && !error && customers.length === 0 && (
             <div className="text-center py-12 bg-white rounded-2xl">
               <User className="w-16 h-16 text-slate-200 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-slate-800 mb-2">고객이 없습니다</h3>
-              <p className="text-slate-500">검색 조건에 맞는 고객이 없습니다.</p>
+              <p className="text-slate-500">
+                {debouncedSearch
+                  ? '검색 조건에 맞는 고객이 없습니다.'
+                  : '아직 등록된 고객이 없습니다.'}
+              </p>
             </div>
           )}
         </div>
 
         {/* Customer Detail */}
         <div className="lg:col-span-1">
-          {customer ? (
+          {selectedCustomer ? (
             <div className="bg-white rounded-2xl shadow-sm sticky top-6">
               <div className="p-5 border-b">
                 <div className="flex items-center justify-between">
@@ -191,44 +210,50 @@ export default function PharmacyPatients() {
                 <div className="text-center mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center mx-auto mb-3">
                     <span className="text-2xl font-bold text-white">
-                      {customer.name.charAt(0)}
+                      {selectedCustomer.name?.charAt(0) || '?'}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-800">{customer.name}</h3>
-                  <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full mt-2">
-                    {diabetesLabels[customer.diabetesType]}
-                  </span>
+                  <h3 className="text-lg font-bold text-slate-800">{selectedCustomer.name}</h3>
+                  {selectedCustomer.diabetesType && (
+                    <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full mt-2">
+                      {diabetesLabels[selectedCustomer.diabetesType] || selectedCustomer.diabetesType}
+                    </span>
+                  )}
                 </div>
 
                 {/* Contact Info */}
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                     <Phone className="w-5 h-5 text-slate-400" />
-                    <span className="text-sm text-slate-700">{customer.phone}</span>
+                    <span className="text-sm text-slate-700">{selectedCustomer.phone}</span>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <Mail className="w-5 h-5 text-slate-400" />
-                    <span className="text-sm text-slate-700">{customer.email}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <Calendar className="w-5 h-5 text-slate-400" />
-                    <span className="text-sm text-slate-700">
-                      마지막 방문: {customer.lastVisit}
-                    </span>
-                  </div>
+                  {selectedCustomer.email && (
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                      <Mail className="w-5 h-5 text-slate-400" />
+                      <span className="text-sm text-slate-700">{selectedCustomer.email}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.lastOrderAt && (
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                      <Calendar className="w-5 h-5 text-slate-400" />
+                      <span className="text-sm text-slate-700">
+                        마지막 주문: {new Date(selectedCustomer.lastOrderAt).toLocaleDateString('ko-KR')}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <div className="p-4 bg-primary-50 rounded-xl text-center">
                     <p className="text-2xl font-bold text-primary-700">
-                      {customer.totalOrders}
+                      {selectedCustomer.totalOrders}
                     </p>
                     <p className="text-xs text-primary-600">총 주문</p>
                   </div>
                   <div className="p-4 bg-green-50 rounded-xl text-center">
                     <p className="text-lg font-bold text-green-700">
-                      {(customer.totalSpent / 10000).toFixed(0)}만원
+                      {(selectedCustomer.totalSpent / 10000).toFixed(0)}만원
                     </p>
                     <p className="text-xs text-green-600">총 구매액</p>
                   </div>

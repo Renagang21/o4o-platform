@@ -64,7 +64,7 @@ export default function MyPage() {
                 <div className="w-24 h-24 rounded-2xl bg-white shadow-lg flex items-center justify-center overflow-hidden">
                   <div className="w-full h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
                     <span className="text-3xl font-bold text-white">
-                      {user.name.charAt(0)}
+                      {user?.name?.charAt(0) || '?'}
                     </span>
                   </div>
                 </div>
