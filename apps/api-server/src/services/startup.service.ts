@@ -143,13 +143,42 @@ export class StartupService {
       }
     }
 
-    // Run migrations (production only)
+    // Run migrations (production only) - with individual error handling
     if (env.isProduction() && AppDataSource.isInitialized) {
       try {
-        await AppDataSource.runMigrations();
-        logger.info('✅ Database migrations completed');
+        // Get pending migrations
+        const pendingMigrations = await AppDataSource.showMigrations();
+        if (pendingMigrations) {
+          logger.info('📋 Pending migrations detected, running...');
+        }
+
+        // Try to run all migrations first
+        const executedMigrations = await AppDataSource.runMigrations({ transaction: 'each' });
+        logger.info(`✅ Database migrations completed (${executedMigrations.length} executed)`);
       } catch (migrationError) {
-        logger.warn('Migration error (non-critical):', migrationError);
+        // Log the error but continue - migrations may have partially succeeded
+        logger.warn('⚠️ Migration error (continuing):', (migrationError as Error).message);
+
+        // Try to run Seed migrations individually (high priority)
+        try {
+          const seedMigrations = AppDataSource.migrations.filter(m =>
+            m.name?.includes('Seed') && parseInt(m.name?.match(/\d+/)?.[0] || '0') >= 9900000000000
+          );
+
+          for (const migration of seedMigrations) {
+            try {
+              const queryRunner = AppDataSource.createQueryRunner();
+              // MigrationInterface has up() method directly
+              await (migration as { up: (qr: typeof queryRunner) => Promise<void> }).up(queryRunner);
+              await queryRunner.release();
+              logger.info(`✅ Seed migration executed: ${migration.name}`);
+            } catch (seedError) {
+              logger.debug(`Seed migration skipped: ${migration.name} - ${(seedError as Error).message}`);
+            }
+          }
+        } catch {
+          logger.debug('Seed migration fallback skipped');
+        }
       }
     }
   }

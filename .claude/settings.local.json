@@ -269,7 +269,9 @@
       "Bash(pnpm -F organization-core build:*)",
       "Bash(pnpm:*)",
       "Bash(pnpm -F kpa-society-web build:*)",
-      "Bash(pnpm -F web-neture build:*)"
+      "Bash(pnpm -F web-neture build:*)",
+      "Bash(git merge-base:*)",
+      "Bash(git rev-parse:*)"
     ],
     "deny": []
   }

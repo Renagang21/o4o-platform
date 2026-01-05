@@ -4,9 +4,9 @@ export class CreateUsersTable1700000000000 implements MigrationInterface {
     name = 'CreateUsersTable1700000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create users table
+        // Create users table (skip if already exists)
         await queryRunner.query(`
-            CREATE TABLE "users" (
+            CREATE TABLE IF NOT EXISTS "users" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "email" varchar(255) NOT NULL,
                 "password" varchar(255) NOT NULL,
@@ -35,10 +35,10 @@ export class CreateUsersTable1700000000000 implements MigrationInterface {
                 CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")
             );
             
-            -- Create indexes
-            CREATE UNIQUE INDEX "IDX_97672ac88f789774dd47f7c8be" ON "users" ("email");
-            CREATE INDEX "IDX_ace513fa30d485cfd25c11a9e4" ON "users" ("role");
-            CREATE INDEX "IDX_050be899b13fa215727fa490ea" ON "users" ("isActive");
+            -- Create indexes (skip if already exists)
+            CREATE UNIQUE INDEX IF NOT EXISTS "IDX_97672ac88f789774dd47f7c8be" ON "users" ("email");
+            CREATE INDEX IF NOT EXISTS "IDX_ace513fa30d485cfd25c11a9e4" ON "users" ("role");
+            CREATE INDEX IF NOT EXISTS "IDX_050be899b13fa215727fa490ea" ON "users" ("isActive");
         `);
     }
 
