@@ -5,9 +5,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: '홈', href: '/' },
-  { label: '서비스 소개', href: '/about' },
-  { label: '주요 기능', href: '/features' },
-  { label: '이용 안내', href: '/guide' },
+  { label: 'Trials', href: '/trials' },
+  { label: 'B2B 조달', href: '/procurement' },
 ];
 
 export function Navigation() {

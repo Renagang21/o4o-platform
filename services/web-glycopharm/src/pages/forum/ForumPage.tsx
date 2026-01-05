@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Search,
@@ -11,66 +11,23 @@ import {
   MessageSquarePlus,
   FileText,
 } from 'lucide-react';
+import { apiClient } from '@/services/api';
+import { LoadingState, EmptyState } from '@/components/common';
 
-// Mock forum posts
-const mockPosts = [
-  {
-    id: '1',
-    title: 'CGM 센서 부착 위치에 대한 팁 공유',
-    content: '환자분들께 CGM 센서 부착 시 위치 선정에 대해 여러 가지 팁을 공유드립니다...',
-    author: '김약사',
-    authorRole: '약사',
-    category: 'CGM',
-    tags: ['CGM', '센서', '팁'],
-    views: 1250,
-    likes: 45,
-    comments: 23,
-    createdAt: '2024-01-15',
-    isHot: true,
-  },
-  {
-    id: '2',
-    title: '혈당 관리 상담 시 자주 받는 질문들',
-    content: '환자분들이 혈당 관리에 대해 자주 물어보시는 질문들을 정리해봤습니다...',
-    author: '이약사',
-    authorRole: '약사',
-    category: '상담',
-    tags: ['상담', 'FAQ'],
-    views: 890,
-    likes: 32,
-    comments: 18,
-    createdAt: '2024-01-14',
-    isHot: false,
-  },
-  {
-    id: '3',
-    title: '당뇨 환자 식단 가이드 - 실전편',
-    content: '당뇨 환자분들의 실제 식단 관리에 도움이 될 만한 내용들을 공유합니다...',
-    author: '박약사',
-    authorRole: '약사',
-    category: '영양',
-    tags: ['식단', '영양', '당뇨관리'],
-    views: 2100,
-    likes: 78,
-    comments: 45,
-    createdAt: '2024-01-13',
-    isHot: true,
-  },
-  {
-    id: '4',
-    title: '인슐린 보관 및 사용 시 주의사항',
-    content: '인슐린 보관과 사용에 있어서 주의해야 할 사항들을 정리했습니다...',
-    author: '최약사',
-    authorRole: '약사',
-    category: '의약품',
-    tags: ['인슐린', '보관', '주의사항'],
-    views: 560,
-    likes: 21,
-    comments: 8,
-    createdAt: '2024-01-12',
-    isHot: false,
-  },
-];
+interface ForumPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  authorRole: string;
+  category: string;
+  tags: string[];
+  views: number;
+  likes: number;
+  comments: number;
+  createdAt: string;
+  isHot: boolean;
+}
 
 const categories = ['전체', 'CGM', '혈당측정기', '상담', '영양', '의약품', '기타'];
 
@@ -80,13 +37,42 @@ export default function ForumPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('전체');
 
-  const filteredPosts = mockPosts.filter((post) => {
+  // API 상태
+  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 게시글 로드
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await apiClient.get<ForumPost[]>('/api/v1/glycopharm/forum/posts');
+        if (response.data) {
+          setPosts(response.data);
+        }
+      } catch {
+        // API가 없거나 에러 시 빈 배열 유지
+        setPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === '전체' || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const hotPosts = posts.filter((p) => p.isHot);
+
+  if (isLoading) {
+    return <LoadingState message="게시글을 불러오는 중..." />;
+  }
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4">
@@ -205,10 +191,12 @@ export default function ForumPage() {
           </div>
 
           {filteredPosts.length === 0 && (
-            <div className="text-center py-12 bg-white rounded-2xl">
-              <MessageSquare className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-800 mb-2">게시글이 없습니다</h3>
-              <p className="text-slate-500">첫 번째 글을 작성해보세요!</p>
+            <div className="bg-white rounded-2xl">
+              <EmptyState
+                icon={MessageSquare}
+                title="게시글이 없습니다"
+                description={searchQuery ? "검색 조건에 맞는 게시글이 없습니다." : "아직 작성된 게시글이 없습니다. 첫 번째 글을 작성해보세요!"}
+              />
             </div>
           )}
         </div>
@@ -240,24 +228,25 @@ export default function ForumPage() {
               인기글
             </h3>
             <div className="space-y-3">
-              {mockPosts
-                .filter((p) => p.isHot)
-                .map((post, index) => (
-                  <div
-                    key={post.id}
-                    className="flex items-start gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors"
-                  >
-                    <span className="text-lg font-bold text-primary-600">{index + 1}</span>
-                    <div>
-                      <p className="text-sm font-medium text-slate-800 line-clamp-2">
-                        {post.title}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        조회 {post.views} · 좋아요 {post.likes}
-                      </p>
-                    </div>
+              {hotPosts.length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-4">인기글이 없습니다</p>
+              )}
+              {hotPosts.map((post, index) => (
+                <div
+                  key={post.id}
+                  className="flex items-start gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors"
+                >
+                  <span className="text-lg font-bold text-primary-600">{index + 1}</span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-800 line-clamp-2">
+                      {post.title}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      조회 {post.views} · 좋아요 {post.likes}
+                    </p>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           </div>
 

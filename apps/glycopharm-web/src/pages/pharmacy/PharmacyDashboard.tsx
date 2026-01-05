@@ -13,7 +13,8 @@ import {
   Building2,
   CheckCircle,
 } from 'lucide-react';
-import { glycopharmApi, Pharmacy } from '@/api/glycopharm';
+import { glycopharmApi } from '@/api/glycopharm';
+import type { Pharmacy } from '@/api/glycopharm';
 
 // Mock data
 const stats = [

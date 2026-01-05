@@ -267,7 +267,9 @@
       "Bash(pnpm -F web-k-cosmetics build:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm -F organization-core build:*)",
-      "Bash(pnpm:*)"
+      "Bash(pnpm:*)",
+      "Bash(pnpm -F kpa-society-web build:*)",
+      "Bash(pnpm -F web-neture build:*)"
     ],
     "deny": []
   }

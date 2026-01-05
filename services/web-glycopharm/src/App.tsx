@@ -20,12 +20,26 @@ import PharmacyOrders from '@/pages/pharmacy/PharmacyOrders';
 import PharmacyPatients from '@/pages/pharmacy/PharmacyPatients';
 import PharmacySettings from '@/pages/pharmacy/PharmacySettings';
 
-// Smart Display
+// Smart Display (Legacy)
 import SmartDisplayPage from '@/pages/pharmacy/smart-display/SmartDisplayPage';
 import PlaylistsPage from '@/pages/pharmacy/smart-display/PlaylistsPage';
 import SchedulesPage from '@/pages/pharmacy/smart-display/SchedulesPage';
 import MediaLibraryPage from '@/pages/pharmacy/smart-display/MediaLibraryPage';
 import PlaylistForumPage from '@/pages/pharmacy/smart-display/PlaylistForumPage';
+
+// Signage Extension (New)
+import { ContentLibraryPage, MySignagePage, SignagePreviewPage } from '@/pages/pharmacy/signage';
+
+// Market Trial Extension
+import { MarketTrialListPage } from '@/pages/pharmacy/market-trial';
+import { OperatorTrialSelectorPage } from '@/pages/operator/market-trial';
+
+// B2B Order
+import { B2BOrderPage } from '@/pages/pharmacy/b2b-order';
+
+// Forum Extension
+import { ForumListPage, ForumFeedPage } from '@/pages/forum-ext';
+import { OperatorForumManagementPage } from '@/pages/operator/forum-management';
 
 // Role Not Available Page (공급자/파트너는 Neture에서 관리)
 import RoleNotAvailablePage from '@/pages/RoleNotAvailablePage';
@@ -92,6 +106,9 @@ function AppRoutes() {
         <Route path="forum" element={<ForumPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
+        {/* Forum Extension */}
+        <Route path="forum-ext" element={<ForumListPage />} />
+        <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
@@ -121,6 +138,14 @@ function AppRoutes() {
         <Route path="smart-display/schedules" element={<SchedulesPage />} />
         <Route path="smart-display/media" element={<MediaLibraryPage />} />
         <Route path="smart-display/forum" element={<PlaylistForumPage />} />
+        {/* Signage Extension (New) */}
+        <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/my" element={<MySignagePage />} />
+        <Route path="signage/preview" element={<SignagePreviewPage />} />
+        {/* Market Trial Extension */}
+        <Route path="market-trial" element={<MarketTrialListPage />} />
+        {/* B2B Order */}
+        <Route path="b2b-order" element={<B2BOrderPage />} />
         <Route path="settings" element={<PharmacySettings />} />
       </Route>
 
@@ -157,6 +182,10 @@ function AppRoutes() {
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
+        {/* Market Trial Extension */}
+        <Route path="market-trial" element={<OperatorTrialSelectorPage />} />
+        {/* Forum Extension */}
+        <Route path="forum-management" element={<OperatorForumManagementPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}

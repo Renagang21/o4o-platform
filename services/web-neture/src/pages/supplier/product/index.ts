@@ -1,0 +1,1 @@
+export { SupplierProductSettingsPage } from './SupplierProductSettingsPage';

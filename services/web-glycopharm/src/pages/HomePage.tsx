@@ -1,403 +1,430 @@
+/**
+ * HomePage - GlycoPharm 운영 허브
+ *
+ * 프랜차이즈 표준 화면 배치:
+ * 1. Hero: 운영 메시지 슬라이드 + CTA
+ * 2. 광고 슬롯
+ * 3. 핵심 3대 Extension 카드
+ * 4. 공지 요약
+ * 5. 협력업체 로고/링크
+ */
+
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  Activity,
   ArrowRight,
-  Building2,
-  Truck,
-  Handshake,
-  Users,
-  ShieldCheck,
-  TrendingUp,
-  Package,
-  BookOpen,
-  MessageSquare,
+  ChevronLeft,
   ChevronRight,
-  Sparkles,
+  Monitor,
+  Tag,
+  MessageSquare,
+  Pin,
+  ExternalLink,
+  Building2,
+  Megaphone,
+  type LucideIcon,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { apiClient } from '@/services/api';
+import { LoadingState } from '@/components/common';
 
-// Mock data for partners
-const partners = [
-  { id: 1, name: 'Abbott', logo: '/partners/abbott.png' },
-  { id: 2, name: 'Dexcom', logo: '/partners/dexcom.png' },
-  { id: 3, name: 'Medtronic', logo: '/partners/medtronic.png' },
-  { id: 4, name: 'Roche', logo: '/partners/roche.png' },
-  { id: 5, name: 'Bayer', logo: '/partners/bayer.png' },
-  { id: 6, name: 'LifeScan', logo: '/partners/lifescan.png' },
-];
+// Types
+interface HeroSlide {
+  id: string;
+  title: string;
+  description: string;
+  bgColor: string;
+  cta: { label: string; link: string; primary: boolean }[];
+}
 
-// Mock stats
-const stats = [
-  { label: '가입 약국', value: '2,500+', icon: Building2, iconBg: 'bg-primary-100', iconColor: 'text-primary-600' },
-  { label: '등록 상품', value: '15,000+', icon: Package, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
-  { label: '월간 거래액', value: '50억+', icon: TrendingUp, iconBg: 'bg-green-100', iconColor: 'text-green-600' },
-  { label: '만족도', value: '98%', icon: Users, iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-];
+interface AdSlot {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+  bgImage: string | null;
+  bgColor: string;
+}
 
-const features = [
+interface ExtensionCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  iconType: string;
+  link: string;
+  color: string;
+  stats: { label: string; value: string };
+}
+
+interface Notice {
+  id: string;
+  title: string;
+  date: string;
+  isPinned: boolean;
+  forumId: string;
+}
+
+interface Partner {
+  id: number;
+  name: string;
+  logo: string;
+}
+
+interface HomePageData {
+  slides: HeroSlide[];
+  adSlot: AdSlot | null;
+  extensionCards: ExtensionCard[];
+  notices: Notice[];
+  partners: Partner[];
+}
+
+// Icon mapping
+const iconMap: Record<string, LucideIcon> = {
+  monitor: Monitor,
+  tag: Tag,
+  messageSquare: MessageSquare,
+};
+
+// Default extension cards (static fallback)
+const defaultExtensionCards: (ExtensionCard & { icon: LucideIcon })[] = [
   {
-    icon: Building2,
-    title: '약국 전용 플랫폼',
-    description: '약사를 위한 맞춤형 B2B 플랫폼으로 효율적인 상품 관리와 판매가 가능합니다.',
-    iconBg: 'bg-primary-100',
-    iconColor: 'text-primary-600',
+    id: 'signage',
+    title: 'Signage',
+    subtitle: '콘텐츠 라이브러리',
+    description: '약국 TV에 노출할 교육 콘텐츠를 관리하세요',
+    iconType: 'monitor',
+    icon: Monitor,
+    link: '/pharmacy/signage/library',
+    color: 'bg-accent-500',
+    stats: { label: '등록 콘텐츠', value: '-' },
   },
   {
-    icon: Truck,
-    title: '신뢰할 수 있는 공급망',
-    description: '검증된 공급업체로부터 정품 혈당관리 제품을 안정적으로 공급받으세요.',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
+    id: 'trial',
+    title: 'Market Trial',
+    subtitle: '신제품 체험',
+    description: '공급사의 신제품 Trial 프로그램에 참여하세요',
+    iconType: 'tag',
+    icon: Tag,
+    link: '/pharmacy/market-trial',
+    color: 'bg-green-500',
+    stats: { label: '진행 중 Trial', value: '-' },
   },
   {
-    icon: ShieldCheck,
-    title: '안전한 거래',
-    description: '모든 거래는 안전하게 보호되며, 투명한 가격 정책을 운영합니다.',
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600',
+    id: 'forum',
+    title: 'Forum',
+    subtitle: '약사 커뮤니티',
+    description: '혈당관리 노하우와 경험을 공유하세요',
+    iconType: 'messageSquare',
+    icon: MessageSquare,
+    link: '/forum-ext',
+    color: 'bg-blue-500',
+    stats: { label: '활성 포럼', value: '-' },
   },
-  {
-    icon: Handshake,
-    title: '파트너 생태계',
-    description: '디바이스 제조사, 컨텐츠 제공자와 함께 성장하는 파트너십을 제공합니다.',
-    iconBg: 'bg-purple-100',
-    iconColor: 'text-purple-600',
-  },
-];
-
-const categories = [
-  { name: '연속혈당측정기', count: 45, image: '/categories/cgm.jpg' },
-  { name: '혈당측정기', count: 120, image: '/categories/meter.jpg' },
-  { name: '란셋/채혈침', count: 85, image: '/categories/lancet.jpg' },
-  { name: '검사지', count: 200, image: '/categories/strip.jpg' },
-  { name: '건강기능식품', count: 350, image: '/categories/supplement.jpg' },
-  { name: '당뇨식품', count: 280, image: '/categories/food.jpg' },
 ];
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuth();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
+  const [adSlot, setAdSlot] = useState<AdSlot | null>(null);
+  const [extensionCards, setExtensionCards] = useState<(ExtensionCard & { icon: LucideIcon })[]>(defaultExtensionCards);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+
+  // 홈페이지 데이터 로드
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await apiClient.get<HomePageData>('/api/v1/glycopharm/home');
+        if (response.data) {
+          if (response.data.slides?.length > 0) {
+            setHeroSlides(response.data.slides);
+          }
+          if (response.data.adSlot) {
+            setAdSlot(response.data.adSlot);
+          }
+          if (response.data.extensionCards?.length > 0) {
+            setExtensionCards(response.data.extensionCards.map((card) => ({
+              ...card,
+              icon: iconMap[card.iconType] || Monitor,
+            })));
+          }
+          if (response.data.notices) {
+            setNotices(response.data.notices);
+          }
+          if (response.data.partners) {
+            setPartners(response.data.partners);
+          }
+        }
+      } catch {
+        // API가 없거나 에러 시 기본 상태 유지
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchHomeData();
+  }, []);
+
+  // Auto slide
+  useEffect(() => {
+    if (heroSlides.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  if (isLoading) {
+    return <LoadingState message="페이지를 불러오는 중..." />;
+  }
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section - Neutral 기반 + Primary 포인트 */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20 md:py-28">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm mb-6">
-                <Sparkles className="w-4 h-4" />
-                약사를 위한 혈당관리 전문 플랫폼
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-                혈당관리의 새로운
-                <br />
-                <span className="text-primary-400">기준을 만듭니다</span>
-              </h1>
-              <p className="text-lg text-white/80 mb-8 max-w-xl">
-                CGM, 혈당측정기, 건강기능식품까지.
-                약국에서 필요한 모든 혈당관리 제품을 한 곳에서 만나보세요.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <NavLink
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/30"
-                >
-                  무료로 시작하기
-                  <ArrowRight className="w-5 h-5" />
-                </NavLink>
-                <NavLink
-                  to="/forum"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-all backdrop-blur-sm border border-white/20"
-                >
-                  둘러보기
-                </NavLink>
-              </div>
-            </div>
-
-            {/* Hero Visual */}
-            <div className="hidden lg:block relative">
-              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-                <div className="grid grid-cols-2 gap-4">
-                  {stats.map((stat, index) => {
-                    const Icon = stat.icon;
-                    return (
-                      <div
-                        key={stat.label}
-                        className={`bg-white rounded-2xl p-5 shadow-xl ${
-                          index === 0 ? 'col-span-2' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center`}>
-                            <Icon className={`w-6 h-6 ${stat.iconColor}`} />
-                          </div>
-                          <div>
-                            <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
-                            <p className="text-sm text-slate-500">{stat.label}</p>
-                          </div>
-                        </div>
+    <div className="min-h-screen bg-slate-50">
+      {/* Hero Section - 대형 슬라이드 */}
+      {heroSlides.length > 0 ? (
+        <section className="relative overflow-hidden">
+          {/* Slides */}
+          <div className="relative h-[400px] md:h-[480px]">
+            {heroSlides.map((slide, index) => (
+              <div
+                key={slide.id}
+                className={`absolute inset-0 transition-opacity duration-500 ${
+                  index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                }`}
+              >
+                <div className={`h-full bg-gradient-to-br ${slide.bgColor}`}>
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center">
+                    <div className="max-w-2xl">
+                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 whitespace-pre-line">
+                        {slide.title}
+                      </h1>
+                      <p className="text-lg text-white/80 mb-8">
+                        {slide.description}
+                      </p>
+                      <div className="flex flex-wrap gap-3">
+                        {slide.cta.map((btn, btnIdx) => (
+                          <NavLink
+                            key={btnIdx}
+                            to={btn.link}
+                            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                              btn.primary
+                                ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
+                                : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
+                            }`}
+                          >
+                            {btn.label}
+                            <ArrowRight className="w-4 h-4" />
+                          </NavLink>
+                        ))}
                       </div>
-                    );
-                  })}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-800 mb-3">
-              왜 GlycoPharm인가요?
-            </h2>
-            <p className="text-slate-500 text-base leading-relaxed max-w-2xl mx-auto">
-              약사 전용 플랫폼으로서 혈당관리 제품의 유통과 판매를 혁신합니다
+          {/* Slide Controls */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
+            <button
+              onClick={prevSlide}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="flex gap-2">
+              {heroSlides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    index === currentSlide ? 'bg-white w-8' : 'bg-white/40'
+                  }`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={nextSlide}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </section>
+      ) : (
+        <section className="bg-gradient-to-br from-primary-600 to-primary-800 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              GlycoPharm에 오신 것을 환영합니다
+            </h1>
+            <p className="text-lg text-white/80">
+              혈당관리 전문 약국을 위한 운영 플랫폼
             </p>
           </div>
+        </section>
+      )}
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="group p-6 bg-slate-50 rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-300"
-                >
-                  <div className={`w-14 h-14 rounded-xl ${feature.iconBg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon className={`w-7 h-7 ${feature.iconColor}`} />
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
+      {/* Ad Slot - 프로모션 배너 */}
+      {adSlot && (
+        <section className="py-6 px-4 sm:px-6 max-w-7xl mx-auto">
+          <NavLink
+            to={adSlot.link}
+            className={`block ${adSlot.bgColor} rounded-2xl p-6 md:p-8 hover:shadow-lg transition-shadow`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Megaphone className="w-6 h-6 text-white" />
                 </div>
-              );
-            })}
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold text-white">{adSlot.title}</h3>
+                  <p className="text-white/80 text-sm">{adSlot.description}</p>
+                </div>
+              </div>
+              <ExternalLink className="w-5 h-5 text-white/60 hidden md:block" />
+            </div>
+          </NavLink>
+        </section>
+      )}
+
+      {/* Extension Cards - 핵심 3대 운영 기능 */}
+      <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">운영 도구</h2>
+            <p className="text-sm text-slate-500">약국 운영에 필요한 핵심 기능</p>
           </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {extensionCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <NavLink
+                key={card.id}
+                to={card.link}
+                className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl ${card.color} flex items-center justify-center`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-slate-800">{card.stats.value}</p>
+                    <p className="text-xs text-slate-400">{card.stats.label}</p>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-slate-800 mb-1">{card.title}</h3>
+                <p className="text-sm text-primary-600 font-medium mb-2">{card.subtitle}</p>
+                <p className="text-sm text-slate-500">{card.description}</p>
+                <div className="mt-4 flex items-center gap-1 text-sm text-primary-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  바로가기
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </NavLink>
+            );
+          })}
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-800 mb-2">상품 카테고리</h2>
-              <p className="text-slate-500 text-base">다양한 혈당관리 제품을 만나보세요</p>
-            </div>
+      {/* Notice Summary - 공지 요약 */}
+      <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between p-5 border-b border-slate-100">
+            <h2 className="text-lg font-bold text-slate-800">공지사항</h2>
             <NavLink
-              to="/forum"
-              className="hidden md:flex items-center gap-1 text-primary-600 font-medium hover:text-primary-700"
+              to="/forum-ext"
+              className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
             >
               전체보기
               <ChevronRight className="w-4 h-4" />
             </NavLink>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((category) => (
-              <div
-                key={category.name}
-                className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all cursor-pointer"
-              >
-                <div className="aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                    <Activity className="w-10 h-10 text-slate-400" />
+          {notices.length > 0 ? (
+            <div className="divide-y divide-slate-100">
+              {notices.map((notice) => (
+                <NavLink
+                  key={notice.id}
+                  to={`/forum-ext/${notice.forumId}`}
+                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {notice.isPinned && (
+                      <Pin className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                    )}
+                    <span className={`text-sm ${notice.isPinned ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
+                      {notice.title}
+                    </span>
                   </div>
-                </div>
-                <h3 className="font-medium text-slate-800 text-sm mb-1">{category.name}</h3>
-                <p className="text-xs text-slate-400">{category.count}개 상품</p>
+                  <span className="text-xs text-slate-400 flex-shrink-0 ml-4">{notice.date}</span>
+                </NavLink>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center text-slate-500 text-sm">
+              등록된 공지사항이 없습니다.
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Quick Actions for Non-authenticated Users */}
+      {!isAuthenticated && (
+        <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 text-center">
+            <Building2 className="w-12 h-12 text-primary-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">GlycoPharm과 함께 성장하세요</h2>
+            <p className="text-slate-400 mb-6">
+              혈당관리 전문 약국으로 성장할 수 있는 모든 도구를 제공합니다
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <NavLink
+                to="/register"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
+              >
+                무료로 시작하기
+                <ArrowRight className="w-4 h-4" />
+              </NavLink>
+              <NavLink
+                to="/login"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-colors border border-white/20"
+              >
+                로그인
+              </NavLink>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Partners Section - 협력업체 */}
+      {partners.length > 0 && (
+        <section className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
+          <p className="text-center text-sm text-slate-400 mb-6">
+            신뢰할 수 있는 파트너사와 함께합니다
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            {partners.map((partner) => (
+              <div
+                key={partner.id}
+                className="w-28 h-16 bg-white border border-slate-200 rounded-xl flex items-center justify-center hover:border-slate-300 hover:shadow-sm transition-all"
+              >
+                <span className="text-slate-500 font-medium text-sm">{partner.name}</span>
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section - For Different Roles */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-800 mb-3">
-              함께 성장하세요
-            </h2>
-            <p className="text-slate-500 text-base">각 역할에 맞는 맞춤형 서비스를 제공합니다</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Pharmacy */}
-            <div className="relative group overflow-hidden rounded-3xl bg-gradient-to-br from-primary-500 to-primary-700 p-8 text-white">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
-              <Building2 className="w-12 h-12 mb-4 opacity-80" />
-              <h3 className="text-2xl font-bold mb-2">약국</h3>
-              <p className="text-white/80 text-sm leading-relaxed mb-6">
-                혈당관리 전문 약국으로 성장하세요. 다양한 제품과 고객 관리 도구를 제공합니다.
-              </p>
-              <NavLink
-                to="/register"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 font-medium rounded-xl hover:bg-primary-50 transition-colors"
-              >
-                입점 신청
-                <ArrowRight className="w-4 h-4" />
-              </NavLink>
-            </div>
-
-            {/* Supplier */}
-            <div className="relative group overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 to-blue-700 p-8 text-white">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
-              <Truck className="w-12 h-12 mb-4 opacity-80" />
-              <h3 className="text-2xl font-bold mb-2">공급자</h3>
-              <p className="text-white/80 text-sm leading-relaxed mb-6">
-                전국 2,500개 이상의 약국에 제품을 공급하세요. 효율적인 주문 관리 시스템을 제공합니다.
-              </p>
-              <NavLink
-                to="/register"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 font-medium rounded-xl hover:bg-blue-50 transition-colors"
-              >
-                공급자 등록
-                <ArrowRight className="w-4 h-4" />
-              </NavLink>
-            </div>
-
-            {/* Partner */}
-            <div className="relative group overflow-hidden rounded-3xl bg-gradient-to-br from-purple-500 to-purple-700 p-8 text-white">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
-              <Handshake className="w-12 h-12 mb-4 opacity-80" />
-              <h3 className="text-2xl font-bold mb-2">파트너</h3>
-              <p className="text-white/80 text-sm leading-relaxed mb-6">
-                디바이스, 컨텐츠, 마케팅 파트너로 함께 하세요. 새로운 비즈니스 기회를 발견하세요.
-              </p>
-              <NavLink
-                to="/register"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-purple-700 font-medium rounded-xl hover:bg-purple-50 transition-colors"
-              >
-                파트너 신청
-                <ArrowRight className="w-4 h-4" />
-              </NavLink>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Resources Section */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Forum */}
-            <NavLink
-              to="/forum"
-              className="group flex gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-accent-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                <MessageSquare className="w-8 h-8 text-accent-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">포럼</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-3">
-                  약사들의 노하우와 경험을 공유하세요. 혈당관리에 대한 다양한 정보를 나눌 수 있습니다.
-                </p>
-                <span className="text-primary-600 font-medium text-sm flex items-center gap-1">
-                  포럼 바로가기
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </div>
-            </NavLink>
-
-            {/* Education */}
-            <NavLink
-              to="/education"
-              className="group flex gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                <BookOpen className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">교육/자료</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-3">
-                  혈당관리 최신 트렌드와 제품 교육 자료를 확인하세요. 전문성을 높이는 데 도움이 됩니다.
-                </p>
-                <span className="text-primary-600 font-medium text-sm flex items-center gap-1">
-                  교육자료 바로가기
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </div>
-            </NavLink>
-          </div>
-        </div>
-      </section>
-
-      {/* Partners Marquee */}
-      <section className="py-12 bg-white border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-sm text-slate-400 mb-8">
-            신뢰할 수 있는 파트너사와 함께합니다
-          </p>
-
-          {/* 마퀴 컨테이너 - max-w 내에서만 동작 */}
-          <div className="relative overflow-hidden">
-            {/* 좌우 페이드 그라데이션 */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-
-            {/* 마퀴 애니메이션 */}
-            <div className="flex animate-marquee">
-              {/* 첫 번째 세트 */}
-              <div className="flex shrink-0">
-                {partners.map((partner) => (
-                  <div
-                    key={partner.id}
-                    className="shrink-0 w-36 h-20 mx-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-100 hover:border-slate-300 transition-colors"
-                  >
-                    <span className="text-slate-500 font-medium text-sm">{partner.name}</span>
-                  </div>
-                ))}
-              </div>
-              {/* 두 번째 세트 (무한 루프용) */}
-              <div className="flex shrink-0">
-                {partners.map((partner) => (
-                  <div
-                    key={`dup-${partner.id}`}
-                    className="shrink-0 w-36 h-20 mx-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-100 hover:border-slate-300 transition-colors"
-                  >
-                    <span className="text-slate-500 font-medium text-sm">{partner.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-24 bg-gradient-to-br from-slate-900 to-slate-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            지금 바로 시작하세요
-          </h2>
-          <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-2xl mx-auto">
-            GlycoPharm과 함께 혈당관리 전문 약국으로 성장하세요.
-            무료 가입으로 모든 기능을 체험해보실 수 있습니다.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <NavLink
-              to="/register"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-600/30"
-            >
-              무료로 시작하기
-              <ArrowRight className="w-5 h-5" />
-            </NavLink>
-            <NavLink
-              to="/forum"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-all backdrop-blur-sm border border-white/20"
-            >
-              더 알아보기
-            </NavLink>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

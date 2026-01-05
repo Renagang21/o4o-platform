@@ -1,6 +1,9 @@
 // Re-export from other type files
 export * from './signage';
 export * from './categoryRequest';
+export * from './marketTrial';
+export * from './forum';
+export * from './b2bOrder';
 
 // User Roles
 export type UserRole = 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';

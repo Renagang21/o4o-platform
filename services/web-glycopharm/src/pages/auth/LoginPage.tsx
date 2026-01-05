@@ -23,22 +23,17 @@ export default function LoginPage() {
     }
   };
 
-  // Demo accounts for quick login (공급자/파트너는 Neture에서 관리)
-  const demoAccounts = [
-    { email: 'pharmacy@test.com', label: '약사', color: 'primary' },
-    { email: 'operator@test.com', label: '운영자', color: 'red' },
-    { email: 'consumer@test.com', label: '소비자', color: 'green' },
+  // 테스트 계정 (데이터베이스에 등록된 실제 계정)
+  const testAccounts = [
+    { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary' },
+    { email: 'admin@neture.co.kr', password: 'admin123!@#', label: '운영자', color: 'red' },
   ];
 
-  const handleDemoLogin = async (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('demo123');
-    try {
-      await login(demoEmail, 'demo123');
-      navigate('/');
-    } catch {
-      setError('로그인에 실패했습니다.');
-    }
+  // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
+  const fillTestAccount = (account: { email: string; password: string }) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setError('');
   };
 
   return (
@@ -151,17 +146,28 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Demo Accounts */}
+          {/* 테스트 계정 */}
           <div className="mt-6 pt-6 border-t">
-            <p className="text-xs text-slate-400 text-center mb-3">테스트 계정으로 로그인</p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {demoAccounts.map((account) => (
+            <p className="text-xs text-slate-400 text-center mb-3">테스트 계정 (클릭 시 입력됨)</p>
+            <div className="space-y-2">
+              {testAccounts.map((account) => (
                 <button
                   key={account.email}
-                  onClick={() => handleDemoLogin(account.email)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors hover:bg-slate-50`}
+                  type="button"
+                  onClick={() => fillTestAccount(account)}
+                  className="w-full px-4 py-3 text-left rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
                 >
-                  {account.label}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-1 ${
+                        account.color === 'primary' ? 'bg-primary-100 text-primary-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                        {account.label}
+                      </span>
+                      <p className="text-sm text-slate-600">{account.email}</p>
+                    </div>
+                    <span className="text-xs text-slate-400">클릭하여 입력</span>
+                  </div>
                 </button>
               ))}
             </div>

@@ -4,7 +4,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type UserRole = 'admin' | 'supplier' | 'seller' | 'partner';
+export type UserRole = 'admin' | 'supplier' | 'partner';
 
 export interface User {
   id: string;
@@ -29,14 +29,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '관리자',
   supplier: '공급자',
-  seller: '판매자',
   partner: '파트너',
 };
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
   admin: '/admin',
   supplier: '/supplier',
-  seller: '/seller',
   partner: '/partner',
 };
 
@@ -73,20 +71,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // 테스트 계정별 역할 설정
-      let roles: UserRole[] = ['seller'];
+      let roles: UserRole[] = ['supplier'];
       let name = '사용자';
 
       if (email.includes('admin')) {
-        roles = ['admin', 'supplier', 'seller', 'partner'];
+        roles = ['admin', 'supplier', 'partner'];
         name = '관리자';
       } else if (email.includes('supplier')) {
         roles = ['supplier'];
         name = '공급자';
       } else if (email.includes('partner')) {
-        roles = ['partner', 'seller'];
+        roles = ['partner'];
         name = '파트너';
       } else if (email.includes('multi')) {
-        roles = ['supplier', 'seller'];
+        roles = ['supplier', 'partner'];
         name = '복수역할 사용자';
       }
 

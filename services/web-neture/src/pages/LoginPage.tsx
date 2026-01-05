@@ -10,7 +10,6 @@ import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, UserRole } from '../contexts';
 const ROLE_ICONS: Record<UserRole, string> = {
   admin: '🛡️',
   supplier: '📦',
-  seller: '🏪',
   partner: '🤝',
 };
 
@@ -81,7 +80,6 @@ export function LoginPage() {
                 <span style={styles.roleDescription}>
                   {role === 'admin' && '플랫폼 전체 관리'}
                   {role === 'supplier' && '상품 공급 및 배송'}
-                  {role === 'seller' && '상품 판매 및 채널 관리'}
                   {role === 'partner' && '협력사 연계 관리'}
                 </span>
               </button>
@@ -148,7 +146,7 @@ export function LoginPage() {
           <ul style={styles.testList}>
             <li>admin@test.com - 관리자 (모든 역할)</li>
             <li>supplier@test.com - 공급자</li>
-            <li>seller@test.com - 판매자</li>
+            <li>partner@test.com - 파트너</li>
             <li>multi@test.com - 복수 역할</li>
           </ul>
         </div>

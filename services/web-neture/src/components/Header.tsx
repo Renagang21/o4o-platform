@@ -40,9 +40,6 @@ export function Header({ serviceName }: HeaderProps) {
             </button>
             {dropdownOpen && (
               <div style={styles.dropdownMenu}>
-                <a href="/mypage" style={styles.dropdownItem}>
-                  마이페이지
-                </a>
                 <button
                   style={styles.dropdownItem}
                   onClick={handleLogout}

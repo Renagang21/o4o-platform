@@ -9,7 +9,15 @@ export function PartnerDashboardPage() {
     <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>파트너 대시보드</h1>
-        <p style={styles.subtitle}>협력 현황과 성과를 확인하세요</p>
+        <p style={styles.subtitle}>협력 현황을 관리하세요</p>
+        <div style={styles.roleGuide}>
+          <span style={styles.roleGuideText}>
+            이 화면은 파트너의 협업 관리를 위한 공간입니다.
+          </span>
+          <Link to="/partner/overview" style={styles.roleGuideLink}>
+            협업 현황 요약 보기 →
+          </Link>
+        </div>
       </div>
 
       {/* 통계 카드 */}
@@ -98,9 +106,9 @@ export function PartnerDashboardPage() {
             <span style={styles.menuIcon}>💰</span>
             <span style={styles.menuLabel}>커미션 내역</span>
           </Link>
-          <Link to="/partner/performance" style={styles.menuCard}>
+          <Link to="/partner/activity" style={styles.menuCard}>
             <span style={styles.menuIcon}>📊</span>
-            <span style={styles.menuLabel}>성과 분석</span>
+            <span style={styles.menuLabel}>활동 내역</span>
           </Link>
           <Link to="/partner/materials" style={styles.menuCard}>
             <span style={styles.menuIcon}>📁</span>
@@ -164,6 +172,28 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     color: '#64748B',
     margin: 0,
+  },
+  roleGuide: {
+    marginTop: '16px',
+    padding: '12px 16px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: '8px',
+  },
+  roleGuideText: {
+    fontSize: '13px',
+    color: '#64748b',
+  },
+  roleGuideLink: {
+    fontSize: '13px',
+    color: PRIMARY_COLOR,
+    textDecoration: 'none',
+    fontWeight: 500,
   },
   statsGrid: {
     display: 'grid',

@@ -90,69 +90,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Try real API first
-      try {
-        const response = await authApi.login(email, password);
+      const response = await authApi.login(email, password);
 
-        if (response.error) {
-          throw new Error(response.error.message || 'Login failed');
-        }
-
-        if (response.data) {
-          const { user: userData, accessToken } = response.data;
-          const typedUser = userData as User;
-          apiClient.setToken(accessToken);
-          setUser(typedUser);
-          setAvailableRoles([typedUser.role]);
-          localStorage.setItem('glycopharm_user', JSON.stringify(typedUser));
-          return;
-        }
-      } catch {
-        // Fall back to test mode
+      if (response.error) {
+        throw new Error(response.error.message || '로그인에 실패했습니다.');
       }
 
-      // Test mode login
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      let role: UserRole = 'consumer';
-      let roles: UserRole[] = ['consumer'];
-      let name = '사용자';
-
-      if (email.includes('operator') || email.includes('admin')) {
-        role = 'operator';
-        roles = ['operator', 'pharmacy', 'supplier', 'partner'];
-        name = '운영자';
-      } else if (email.includes('pharmacy')) {
-        role = 'pharmacy';
-        roles = ['pharmacy'];
-        name = '약국 담당자';
-      } else if (email.includes('supplier')) {
-        role = 'supplier';
-        roles = ['supplier'];
-        name = '공급자';
-      } else if (email.includes('partner')) {
-        role = 'partner';
-        roles = ['partner'];
-        name = '파트너';
-      } else if (email.includes('multi')) {
-        role = 'pharmacy';
-        roles = ['pharmacy', 'supplier'];
-        name = '복수역할 사용자';
+      if (response.data) {
+        const { user: userData, accessToken } = response.data;
+        const typedUser = userData as User;
+        apiClient.setToken(accessToken);
+        localStorage.setItem('glycopharm_token', accessToken);
+        setUser(typedUser);
+        setAvailableRoles([typedUser.role]);
+        localStorage.setItem('glycopharm_user', JSON.stringify(typedUser));
+        return;
       }
 
-      const testUser: User = {
-        id: `user_${Date.now()}`,
-        email,
-        name,
-        role,
-        status: 'approved',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      setUser(testUser);
-      setAvailableRoles(roles);
-      localStorage.setItem('glycopharm_user', JSON.stringify({ ...testUser, availableRoles: roles }));
+      throw new Error('로그인 응답이 올바르지 않습니다.');
     } finally {
       setIsLoading(false);
     }

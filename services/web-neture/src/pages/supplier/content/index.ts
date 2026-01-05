@@ -1,0 +1,1 @@
+export { SupplierContentDetailPage } from './SupplierContentDetailPage';

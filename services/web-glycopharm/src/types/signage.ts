@@ -1,7 +1,64 @@
 // Smart Display (Digital Signage) Types
+// Signage Extension - URL 기반 콘텐츠 관리
 
 /**
- * 미디어 소스 타입
+ * 콘텐츠 유형
+ */
+export type ContentType = 'video' | 'lms' | 'link';
+
+/**
+ * 콘텐츠 출처
+ */
+export type ContentSource = 'neture' | 'hq' | 'supplier' | 'pharmacy' | 'operator_ad';
+
+/**
+ * 콘텐츠 아이템 (Signage Extension 핵심 타입)
+ */
+export interface ContentItem {
+  id: string;
+  title: string;
+  type: ContentType;
+  url: string;
+  source: ContentSource;
+  sourceName?: string;        // 출처 상세 (예: 공급자명)
+  thumbnailUrl?: string;
+  description?: string;
+  duration?: number;          // 영상 길이 (초)
+  isForced: boolean;          // 운영자 광고 강제 노출 여부
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * My Signage 아이템 (약국별 편성)
+ */
+export interface MySignageItem {
+  id: string;
+  pharmacyId: string;
+  contentId: string;
+  content?: ContentItem;
+  channel: string;            // TV1, TV2 등
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * 채널 정보
+ */
+export interface SignageChannel {
+  id: string;
+  pharmacyId: string;
+  name: string;               // TV1, TV2 등
+  description?: string;
+  isDefault: boolean;
+  createdAt: string;
+}
+
+/**
+ * 미디어 소스 타입 (기존 호환)
  */
 export type MediaSourceType = 'youtube' | 'vimeo';
 

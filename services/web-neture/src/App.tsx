@@ -10,10 +10,12 @@ import {
   FulfillmentStatusPage,
   AdminDashboardPage,
   SupplierDashboardPage,
-  SellerDashboardPage,
   PartnerDashboardPage,
-  StoreHomePage,
-  StoreProductPage,
+  SupplierOverviewPage,
+  PartnerOverviewPage,
+  ProcurementHomePage,
+  CategoryListPage,
+  ProductDetailPage,
 } from './pages';
 
 /**
@@ -28,23 +30,18 @@ function AppContent() {
 
   return (
     <Layout serviceName={SERVICE_NAME}>
-      <nav style={navStyle}>
-        <div style={navLeftStyle}>
-          <Link to="/" style={linkStyle}>홈</Link>
-          <Link to="/trials" style={linkStyle}>Trial 목록</Link>
-        </div>
-        <div style={navRightStyle}>
-          {isAuthenticated ? (
-            <>
-              <RoleSwitcher />
-              <span style={userInfoStyle}>{user?.name}</span>
-              <button onClick={logout} style={logoutButtonStyle}>로그아웃</button>
-            </>
-          ) : (
-            <Link to="/login" style={linkStyle}>로그인</Link>
-          )}
-        </div>
-      </nav>
+      {/* 인증 상태 표시 - Layout의 Navigation과 별도로 역할 전환/로그인 기능 제공 */}
+      <div style={authBarStyle}>
+        {isAuthenticated ? (
+          <>
+            <RoleSwitcher />
+            <span style={userInfoStyle}>{user?.name}</span>
+            <button onClick={logout} style={logoutButtonStyle}>로그아웃</button>
+          </>
+        ) : (
+          <Link to="/login" style={linkStyle}>로그인</Link>
+        )}
+      </div>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -55,13 +52,21 @@ function AppContent() {
 
         {/* 대시보드 */}
         <Route path="/admin/*" element={<AdminDashboardPage />} />
+
+        {/* Supplier 라우트 - Overview가 첫 진입점 */}
+        <Route path="/supplier" element={<SupplierOverviewPage />} />
+        <Route path="/supplier/overview" element={<SupplierOverviewPage />} />
         <Route path="/supplier/*" element={<SupplierDashboardPage />} />
-        <Route path="/seller/*" element={<SellerDashboardPage />} />
+
+        {/* Partner 라우트 - Overview가 첫 진입점 */}
+        <Route path="/partner" element={<PartnerOverviewPage />} />
+        <Route path="/partner/overview" element={<PartnerOverviewPage />} />
         <Route path="/partner/*" element={<PartnerDashboardPage />} />
 
-        {/* 판매자 매장 */}
-        <Route path="/store/:storeId" element={<StoreHomePage />} />
-        <Route path="/store/:storeId/product/:productId" element={<StoreProductPage />} />
+        {/* B2B 조달 */}
+        <Route path="/procurement" element={<ProcurementHomePage />} />
+        <Route path="/procurement/category/:categoryId" element={<CategoryListPage />} />
+        <Route path="/procurement/product/:productId" element={<ProductDetailPage />} />
       </Routes>
     </Layout>
   );
@@ -77,25 +82,14 @@ function App() {
   );
 }
 
-const navStyle: React.CSSProperties = {
+const authBarStyle: React.CSSProperties = {
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '10px 20px',
-  borderBottom: '1px solid #ddd',
-  marginBottom: '20px',
-};
-
-const navLeftStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '15px',
-};
-
-const navRightStyle: React.CSSProperties = {
-  display: 'flex',
+  justifyContent: 'flex-end',
   alignItems: 'center',
   gap: '12px',
+  padding: '10px 20px',
+  borderBottom: '1px solid #e2e8f0',
+  backgroundColor: '#f8fafc',
 };
 
 const linkStyle: React.CSSProperties = {

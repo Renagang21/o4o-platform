@@ -10,6 +10,14 @@ export function SupplierDashboardPage() {
       <div style={styles.header}>
         <h1 style={styles.title}>공급자 대시보드</h1>
         <p style={styles.subtitle}>상품 등록 및 주문 현황을 관리하세요</p>
+        <div style={styles.roleGuide}>
+          <span style={styles.roleGuideText}>
+            이 화면은 공급자의 운영 관리를 위한 공간입니다.
+          </span>
+          <Link to="/supplier/overview" style={styles.roleGuideLink}>
+            콘텐츠 반응 및 인사이트 확인하기 →
+          </Link>
+        </div>
       </div>
 
       {/* 통계 카드 */}
@@ -119,6 +127,28 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     color: '#64748B',
     margin: 0,
+  },
+  roleGuide: {
+    marginTop: '16px',
+    padding: '12px 16px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: '8px',
+  },
+  roleGuideText: {
+    fontSize: '13px',
+    color: '#64748b',
+  },
+  roleGuideLink: {
+    fontSize: '13px',
+    color: PRIMARY_COLOR,
+    textDecoration: 'none',
+    fontWeight: 500,
   },
   statsGrid: {
     display: 'grid',

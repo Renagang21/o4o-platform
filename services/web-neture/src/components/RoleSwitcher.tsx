@@ -9,7 +9,6 @@ import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, UserRole } from '../contexts';
 const ROLE_ICONS: Record<UserRole, string> = {
   admin: '🛡️',
   supplier: '📦',
-  seller: '🏪',
   partner: '🤝',
 };
 

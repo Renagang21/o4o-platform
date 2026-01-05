@@ -24,6 +24,8 @@ import {
   BookOpen,
   Tv,
   FileCheck,
+  Monitor,
+  Tag,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -37,10 +39,13 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
     color: 'primary',
     menuItems: [
       { path: '/pharmacy', label: '대시보드', icon: LayoutDashboard },
+      { path: '/pharmacy/b2b-order', label: 'B2B 주문', icon: ShoppingCart },
       { path: '/pharmacy/products', label: '상품 관리', icon: Package },
-      { path: '/pharmacy/orders', label: '주문 관리', icon: ShoppingCart },
+      { path: '/pharmacy/orders', label: '주문 내역', icon: ShoppingCart },
       { path: '/pharmacy/patients', label: '고객 관리', icon: Users },
       { path: '/pharmacy/smart-display', label: '스마트 디스플레이', icon: Tv },
+      { path: '/pharmacy/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
+      { path: '/pharmacy/market-trial', label: 'Market Trial', icon: Tag },
       { path: '/pharmacy/settings', label: '설정', icon: Settings },
     ],
   },
@@ -74,6 +79,8 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/operator', label: '대시보드', icon: LayoutDashboard },
       { path: '/operator/applications', label: '신청 관리', icon: FileCheck },
       { path: '/operator/forum-requests', label: '포럼 신청 관리', icon: MessageSquare },
+      { path: '/operator/forum-management', label: '포럼 관리', icon: MessageSquare },
+      { path: '/operator/market-trial', label: 'Trial 관리', icon: Tag },
       { path: '/operator/users', label: '회원 관리', icon: Users },
       { path: '/operator/settings', label: '사이트 설정', icon: Settings },
     ],

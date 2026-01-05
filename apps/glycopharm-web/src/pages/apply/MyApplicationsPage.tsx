@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, CheckCircle, XCircle, Package, Building2, Monitor, RefreshCw } from 'lucide-react';
-import { glycopharmApi, PharmacyApplication, ServiceType, ApplicationStatus } from '@/api/glycopharm';
+import { glycopharmApi } from '@/api/glycopharm';
+import type { PharmacyApplication, ServiceType, ApplicationStatus } from '@/api/glycopharm';
 
 /**
  * My Applications Page
