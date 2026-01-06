@@ -20,6 +20,327 @@ export type ServiceContext = 'glycopharm' | 'yaksa';
 export const DEFAULT_SERVICE_CONTEXT: ServiceContext = 'glycopharm';
 
 // ============================================================================
+// Store Template (구조)
+// ============================================================================
+// Template은 구조만 담당 - 섹션 블록 조합
+// Theme와 절대 섞지 않음
+
+/**
+ * 스토어 템플릿 타입
+ * - franchise-standard: 프랜차이즈 표준 레이아웃
+ */
+export type StoreTemplate = 'franchise-standard';
+
+/** 기본 스토어 템플릿 */
+export const DEFAULT_STORE_TEMPLATE: StoreTemplate = 'franchise-standard';
+
+/**
+ * 템플릿 섹션 타입
+ * Franchise Standard 기준 고정 순서:
+ * 1. Hero Section
+ * 2. Featured Products
+ * 3. Category Grid
+ * 4. Event / Notice Slot
+ * 5. Legal / Footer
+ */
+export type TemplateSectionType =
+  | 'hero'
+  | 'featured-products'
+  | 'category-grid'
+  | 'event-notice'
+  | 'legal-footer';
+
+/**
+ * 콘텐츠 소유권 타입
+ * - operator: 운영자(본부) 관리
+ * - pharmacy: 약국 관리
+ */
+export type ContentOwner = 'operator' | 'pharmacy';
+
+/**
+ * 섹션 관리 권한 타입
+ * - operator: 운영자만 수정 가능
+ * - pharmacy: 약국이 수정 가능
+ * - readonly: 수정 불가 (시스템 고정)
+ */
+export type SectionManagedBy = 'operator' | 'pharmacy' | 'readonly';
+
+/**
+ * 템플릿 섹션 설정
+ * 섹션 단위 ON/OFF 허용
+ * 섹션 순서 변경 불가
+ */
+export interface TemplateSectionConfig {
+  /** 섹션 타입 */
+  type: TemplateSectionType;
+  /** 섹션 활성화 여부 */
+  enabled: boolean;
+  /** 섹션 관리 주체 */
+  managedBy: SectionManagedBy;
+  /** 섹션 설명 (PharmacySettings에서 표시) */
+  description: string;
+  /** 섹션별 추가 설정 (옵션) */
+  options?: Record<string, unknown>;
+}
+
+/**
+ * 스토어 템플릿 설정
+ */
+export interface StoreTemplateConfig {
+  template: StoreTemplate;
+  sections: TemplateSectionConfig[];
+}
+
+/** Franchise Standard 기본 섹션 설정 */
+export const DEFAULT_FRANCHISE_STANDARD_SECTIONS: TemplateSectionConfig[] = [
+  {
+    type: 'hero',
+    enabled: true,
+    managedBy: 'pharmacy',
+    description: '스토어 메인 배너 영역. 약국 브랜딩 및 주요 메시지를 표시합니다.',
+  },
+  {
+    type: 'featured-products',
+    enabled: true,
+    managedBy: 'operator',
+    description: '추천 상품 영역. 운영자 지정 상품이 우선 표시됩니다.',
+  },
+  {
+    type: 'category-grid',
+    enabled: true,
+    managedBy: 'pharmacy',
+    description: '카테고리 그리드. 상품 카테고리 바로가기를 제공합니다.',
+  },
+  {
+    type: 'event-notice',
+    enabled: true,
+    managedBy: 'operator',
+    description: '이벤트/공지 영역. 운영자 공지가 항상 우선 표시됩니다.',
+  },
+  {
+    type: 'legal-footer',
+    enabled: true,
+    managedBy: 'readonly',
+    description: '법정 고지 영역. 사업자 정보, 배송/환불 정책 등 필수 정보를 표시합니다.',
+  },
+];
+
+// ============================================================================
+// Hero Content
+// ============================================================================
+// Hero 콘텐츠 우선순위: 운영자 > 약국 > 기본
+
+/**
+ * Hero 콘텐츠 출처
+ * - operator: 운영자(본부) 등록
+ * - pharmacy: 약국 등록
+ * - default: 시스템 기본
+ */
+export type HeroContentSource = 'operator' | 'pharmacy' | 'default';
+
+/**
+ * Hero 콘텐츠
+ */
+export interface HeroContent {
+  id: string;
+  /** 콘텐츠 출처 */
+  source: HeroContentSource;
+  /** 제목 */
+  title: string;
+  /** 부제목/설명 */
+  subtitle?: string;
+  /** 배경 이미지 URL */
+  imageUrl?: string;
+  /** CTA 버튼 텍스트 */
+  ctaText?: string;
+  /** CTA 버튼 링크 */
+  ctaLink?: string;
+  /** 활성화 여부 */
+  isActive: boolean;
+  /** 우선순위 (낮을수록 먼저 표시) */
+  priority: number;
+  /** 시작일 */
+  startDate?: string;
+  /** 종료일 */
+  endDate?: string;
+}
+
+// ============================================================================
+// Event / Notice
+// ============================================================================
+// Event/Notice 콘텐츠 우선순위: 운영자 콘텐츠 항상 우선
+
+/**
+ * Event/Notice 콘텐츠 타입
+ */
+export type EventNoticeType = 'event' | 'notice';
+
+/**
+ * Event/Notice 콘텐츠
+ */
+export interface EventNoticeContent {
+  id: string;
+  /** 콘텐츠 타입 */
+  type: EventNoticeType;
+  /** 콘텐츠 소유자 (operator 항상 우선) */
+  owner: ContentOwner;
+  /** 제목 */
+  title: string;
+  /** 내용 요약 */
+  summary?: string;
+  /** 상세 링크 */
+  link?: string;
+  /** 이미지 URL */
+  imageUrl?: string;
+  /** 활성화 여부 */
+  isActive: boolean;
+  /** 고정 여부 (운영자 콘텐츠는 항상 고정) */
+  isPinned: boolean;
+  /** 시작일 */
+  startDate?: string;
+  /** 종료일 */
+  endDate?: string;
+  /** 생성일 */
+  createdAt: string;
+}
+
+// ============================================================================
+// Store Theme (스타일)
+// ============================================================================
+// Theme는 인상만 담당 - CSS Variable 기반
+// Template과 절대 섞지 않음
+
+/**
+ * 스토어 테마 타입
+ * - neutral: GlycoPharm 기본 (중립적, 상업적, 범용)
+ * - clean: 약사회 서비스 계열 (신뢰/공공/정보 중심)
+ * - modern: 디지털 친화 (키오스크/태블릿 최적화)
+ * - professional: 전문적/의료 이미지 (운영자 권장)
+ */
+export type StoreTheme = 'neutral' | 'clean' | 'modern' | 'professional';
+
+/** 기본 스토어 테마 */
+export const DEFAULT_STORE_THEME: StoreTheme = 'professional';
+
+/** 키오스크/태블릿 자동 적용 테마 */
+export const DEVICE_OPTIMIZED_THEME: StoreTheme = 'modern';
+
+/**
+ * 서비스별 기본 테마 매핑
+ * 운영자가 지정하지 않은 경우 서비스 컨텍스트에 따라 기본 테마 결정
+ */
+export const SERVICE_DEFAULT_THEMES: Record<ServiceContext, StoreTheme> = {
+  glycopharm: 'professional', // GlycoPharm: 전문적 의료 이미지
+  yaksa: 'clean',             // 약사회: 공공/신뢰 중심
+};
+
+/**
+ * 서비스별 기본 테마 조회
+ * @param serviceContext 서비스 컨텍스트
+ * @returns 해당 서비스의 기본 테마
+ */
+export function getServiceDefaultTheme(serviceContext: ServiceContext): StoreTheme {
+  return SERVICE_DEFAULT_THEMES[serviceContext] ?? DEFAULT_STORE_THEME;
+}
+
+/**
+ * 테마 메타 정보
+ */
+export interface ThemeMeta {
+  id: StoreTheme;
+  name: string;
+  description: string;
+  /** 키오스크/태블릿 자동 적용 대상 여부 */
+  isDeviceOptimized: boolean;
+  /** 운영자 권장 여부 */
+  isRecommended: boolean;
+  /** 미리보기 색상 스와치 (Primary, Accent, Background, Text) */
+  previewColors: [string, string, string, string];
+}
+
+/** 테마 메타 정보 목록 */
+export const THEME_METAS: ThemeMeta[] = [
+  {
+    id: 'professional',
+    name: '전문적',
+    description: '신뢰 / 전문 / 의료 이미지. GlycoPharm 기본 브랜드 톤.',
+    isDeviceOptimized: false,
+    isRecommended: true,
+    // Primary(Navy), Accent(Gray), Background(Off-white), Text(Slate)
+    previewColors: ['#1e40af', '#64748b', '#fafafa', '#1e293b'],
+  },
+  {
+    id: 'modern',
+    name: '모던',
+    description: '디지털 친화적. 키오스크/태블릿 가독성 최적화.',
+    isDeviceOptimized: true,
+    isRecommended: false,
+    // Primary(Indigo), Accent(Cyan), Background(Slate-50), Text(Slate-900)
+    previewColors: ['#4f46e5', '#06b6d4', '#f8fafc', '#0f172a'],
+  },
+  {
+    id: 'neutral',
+    name: '중립',
+    description: '범용적인 상업 스타일. 기존 기본 테마.',
+    isDeviceOptimized: false,
+    isRecommended: false,
+    // Primary(Blue), Accent(Amber), Background(Slate-50), Text(Slate-800)
+    previewColors: ['#3b82f6', '#f59e0b', '#f8fafc', '#1e293b'],
+  },
+  {
+    id: 'clean',
+    name: '클린',
+    description: '신뢰/공공/정보 중심. 약사회 서비스 계열.',
+    isDeviceOptimized: false,
+    isRecommended: false,
+    // Primary(Teal), Accent(Cyan), Background(Teal-50), Text(Teal-900)
+    previewColors: ['#0d9488', '#0891b2', '#f0fdfa', '#134e4a'],
+  },
+];
+
+/**
+ * 테마 색상 설정
+ */
+export interface ThemeColors {
+  primary: string;
+  primaryHover: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  surface: string;
+  text: string;
+  textMuted: string;
+  border: string;
+  success: string;
+  warning: string;
+  error: string;
+}
+
+/**
+ * 테마 폰트 설정
+ */
+export interface ThemeFonts {
+  heading: string;
+  body: string;
+  mono: string;
+}
+
+/**
+ * 테마 설정
+ */
+export interface StoreThemeConfig {
+  theme: StoreTheme;
+  colors: ThemeColors;
+  fonts: ThemeFonts;
+  /** 버튼 스타일 */
+  buttonRadius: 'none' | 'sm' | 'md' | 'lg' | 'full';
+  /** 카드 스타일 */
+  cardRadius: 'none' | 'sm' | 'md' | 'lg';
+  /** 그림자 강도 */
+  shadowIntensity: 'none' | 'subtle' | 'medium' | 'strong';
+}
+
+// ============================================================================
 // Store Status & Info
 // ============================================================================
 
@@ -125,6 +446,11 @@ export interface StoreProduct {
   serviceContext: ServiceContext;
   /** Market Trial 상품 여부 (serviceContext=glycopharm + isMarketTrial=true로 구분) */
   isMarketTrial?: boolean;
+  /**
+   * 운영자 지정 추천 상품 여부
+   * Featured Products 노출 우선순위: 운영자 지정 > Market Trial > 자동 추천
+   */
+  isFeaturedByOperator?: boolean;
 }
 
 // 장바구니 아이템

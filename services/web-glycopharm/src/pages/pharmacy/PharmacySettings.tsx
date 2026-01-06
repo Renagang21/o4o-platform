@@ -14,7 +14,11 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Palette,
+  Layout,
 } from 'lucide-react';
+import type { StoreTemplate, StoreTheme } from '@/types/store';
+import { DEFAULT_STORE_TEMPLATE, DEFAULT_STORE_THEME, THEME_METAS } from '@/types/store';
 
 export default function PharmacySettings() {
   const [activeTab, setActiveTab] = useState('store');
@@ -26,6 +30,9 @@ export default function PharmacySettings() {
     address: '서울시 강남구 테헤란로 123',
     businessNumber: '123-45-67890',
     isStoreActive: true,
+    // Template & Theme 설정
+    template: DEFAULT_STORE_TEMPLATE as StoreTemplate,
+    theme: DEFAULT_STORE_THEME as StoreTheme,
   });
 
   // 채널 신청·승인 상태
@@ -281,6 +288,123 @@ export default function PharmacySettings() {
                       }
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
+                  </div>
+
+                  {/* Template & Theme 설정 */}
+                  <div className="pt-4 border-t">
+                    <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                      <Palette className="w-5 h-5 text-primary-500" />
+                      스토어 디자인
+                    </h3>
+
+                    <div className="grid md:grid-cols-2 gap-5">
+                      {/* Template 선택 */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <Layout className="w-4 h-4 inline-block mr-1" />
+                          레이아웃 템플릿
+                        </label>
+                        <select
+                          value={storeSettings.template}
+                          onChange={(e) =>
+                            setStoreSettings((prev) => ({
+                              ...prev,
+                              template: e.target.value as StoreTemplate,
+                            }))
+                          }
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                        >
+                          <option value="franchise-standard">프랜차이즈 표준</option>
+                        </select>
+                        <p className="mt-1 text-xs text-slate-500">
+                          스토어 페이지의 구조와 섹션 배치를 결정합니다.
+                        </p>
+                      </div>
+
+                      {/* Theme 선택 */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <Palette className="w-4 h-4 inline-block mr-1" />
+                          색상 테마
+                        </label>
+                        <select
+                          value={storeSettings.theme}
+                          onChange={(e) =>
+                            setStoreSettings((prev) => ({
+                              ...prev,
+                              theme: e.target.value as StoreTheme,
+                            }))
+                          }
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                        >
+                          {THEME_METAS.map((themeMeta) => (
+                            <option key={themeMeta.id} value={themeMeta.id}>
+                              {themeMeta.name}
+                              {themeMeta.isRecommended ? ' (권장)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs text-slate-500">
+                          스토어의 색상과 스타일 인상을 결정합니다.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Theme Preview with Color Swatches */}
+                    {(() => {
+                      const selectedThemeMeta = THEME_METAS.find(
+                        (t) => t.id === storeSettings.theme
+                      );
+                      const swatchLabels = ['Primary', 'Accent', 'Background', 'Text'];
+                      return (
+                        <div className="mt-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="text-xs font-medium text-slate-500">미리보기</div>
+                            {selectedThemeMeta?.isDeviceOptimized && (
+                              <span className="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">
+                                키오스크/태블릿 최적화
+                              </span>
+                            )}
+                          </div>
+                          {/* Color Swatches */}
+                          <div className="flex items-center gap-2 mb-3">
+                            {selectedThemeMeta?.previewColors.map((color, idx) => (
+                              <div key={idx} className="flex flex-col items-center gap-1">
+                                <div
+                                  className="w-10 h-10 rounded-lg border border-slate-200 shadow-sm"
+                                  style={{ backgroundColor: color }}
+                                  title={`${swatchLabels[idx]}: ${color}`}
+                                />
+                                <span className="text-[10px] text-slate-400">{swatchLabels[idx]}</span>
+                              </div>
+                            ))}
+                          </div>
+                          {/* Theme Info */}
+                          <div className="text-sm">
+                            <span className="font-medium text-slate-700">
+                              {selectedThemeMeta?.name} 테마
+                              {selectedThemeMeta?.isRecommended && (
+                                <span className="ml-1 text-xs px-1.5 py-0.5 bg-primary-100 text-primary-700 rounded-full">
+                                  권장
+                                </span>
+                              )}
+                            </span>
+                            <p className="text-slate-500 mt-1 text-xs">
+                              {selectedThemeMeta?.description}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* 키오스크/태블릿 테마 안내 */}
+                    <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                      <p className="text-xs text-blue-800">
+                        <strong>참고:</strong> 키오스크 및 태블릿 모드에서는 가독성 최적화를 위해
+                        <strong> 모던 테마</strong>가 자동으로 적용됩니다.
+                        약국에서 선택한 테마는 일반 웹 스토어에만 적용됩니다.
+                      </p>
+                    </div>
                   </div>
                 </div>
 

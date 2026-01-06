@@ -1,15 +1,32 @@
 /**
  * StoreFront - 약국 몰 메인 페이지
  * Mock 데이터 제거, API 연동 구조
+ *
+ * Template Store v1 지원:
+ * - useTemplate=true로 FranchiseStandardTemplate 사용 가능
+ * - 기본값은 기존 UI 유지 (하위 호환)
  */
 
 import { useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ArrowRight, Star, Package, Truck, Shield, AlertCircle, Loader2 } from 'lucide-react';
 import { storeApi } from '@/api/store';
-import type { PharmacyStore, StoreProduct, StoreCategory } from '@/types/store';
+import type { PharmacyStore, StoreProduct, StoreCategory, StoreTemplate } from '@/types/store';
+import { DEFAULT_STORE_TEMPLATE } from '@/types/store';
+import { FranchiseStandardTemplate } from '@/components/store/template';
 
-export default function StoreFront() {
+interface StoreFrontProps {
+  /** Template 사용 여부 (기본값: false, 기존 UI 유지) */
+  useTemplate?: boolean;
+  /** 사용할 Template (기본값: franchise-standard) - 추후 다중 템플릿 지원 예약 */
+  template?: StoreTemplate;
+}
+
+export default function StoreFront({
+  useTemplate = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  template: _template = DEFAULT_STORE_TEMPLATE,
+}: StoreFrontProps = {}) {
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
 
   const [store, setStore] = useState<PharmacyStore | null>(null);
@@ -81,6 +98,19 @@ export default function StoreFront() {
     );
   }
 
+  // Template 사용 시 FranchiseStandardTemplate 렌더링
+  if (useTemplate && storeSlug) {
+    return (
+      <FranchiseStandardTemplate
+        store={store}
+        storeSlug={storeSlug}
+        products={featuredProducts}
+        categories={categories}
+      />
+    );
+  }
+
+  // 기존 UI (하위 호환)
   return (
     <div className="space-y-8">
       {/* Hero Banner */}

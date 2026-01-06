@@ -53,6 +53,7 @@ import ApplicationsPage from '@/pages/operator/ApplicationsPage';
 import ApplicationDetailPage from '@/pages/operator/ApplicationDetailPage';
 import StoreApprovalsPage from '@/pages/operator/StoreApprovalsPage';
 import StoreApprovalDetailPage from '@/pages/operator/StoreApprovalDetailPage';
+import { StoreTemplateManagerPage } from '@/pages/operator/store-template';
 
 // Pharmacy Store Apply
 import StoreApplyPage from '@/pages/pharmacy/StoreApplyPage';
@@ -72,6 +73,9 @@ import EducationPage from '@/pages/education/EducationPage';
 // Common Pages
 import MyPage from '@/pages/MyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+
+// Test Page
+import NavLinkTestPage from '@/pages/NavLinkTestPage';
 
 // Apply Pages (API 연동)
 import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
@@ -118,6 +122,7 @@ function AppRoutes() {
         <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="navlink-test" element={<NavLinkTestPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         <Route path="mypage" element={
@@ -198,6 +203,8 @@ function AppRoutes() {
         {/* Store Approvals */}
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
+        {/* Store Template Manager */}
+        <Route path="store-template" element={<StoreTemplateManagerPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}

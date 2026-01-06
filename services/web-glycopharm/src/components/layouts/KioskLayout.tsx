@@ -20,6 +20,7 @@ import {
 import { storeApi } from '@/api/store';
 import type { PharmacyStore } from '@/types/store';
 import { StoreModeProvider, useStoreMode } from '@/contexts/StoreModeContext';
+import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
 
 // 키오스크 헤더 컴포넌트
 function KioskHeader({ store }: { store: PharmacyStore }) {
@@ -221,6 +222,8 @@ function KioskLayoutContent() {
 }
 
 // Provider로 감싸서 export
+// Kiosk 모드에서는 StoreThemeProvider에 storeMode="kiosk"를 전달하여
+// modern 테마가 자동 적용됨
 export default function KioskLayout() {
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
 
@@ -233,8 +236,10 @@ export default function KioskLayout() {
   }
 
   return (
-    <StoreModeProvider mode="kiosk" storeSlug={storeSlug}>
-      <KioskLayoutContent />
-    </StoreModeProvider>
+    <StoreThemeProvider storeMode="kiosk">
+      <StoreModeProvider mode="kiosk" storeSlug={storeSlug}>
+        <KioskLayoutContent />
+      </StoreModeProvider>
+    </StoreThemeProvider>
   );
 }

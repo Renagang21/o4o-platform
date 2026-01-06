@@ -21,6 +21,7 @@ import {
 import { storeApi } from '@/api/store';
 import type { PharmacyStore } from '@/types/store';
 import { StoreModeProvider, useStoreMode } from '@/contexts/StoreModeContext';
+import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
 
 // 태블릿 헤더 컴포넌트
 function TabletHeader({ store }: { store: PharmacyStore }) {
@@ -242,6 +243,8 @@ function TabletLayoutContent() {
 }
 
 // Provider로 감싸서 export
+// Tablet 모드에서는 StoreThemeProvider에 storeMode="tablet"를 전달하여
+// modern 테마가 자동 적용됨
 export default function TabletLayout() {
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
 
@@ -254,8 +257,10 @@ export default function TabletLayout() {
   }
 
   return (
-    <StoreModeProvider mode="tablet" storeSlug={storeSlug}>
-      <TabletLayoutContent />
-    </StoreModeProvider>
+    <StoreThemeProvider storeMode="tablet">
+      <StoreModeProvider mode="tablet" storeSlug={storeSlug}>
+        <TabletLayoutContent />
+      </StoreModeProvider>
+    </StoreThemeProvider>
   );
 }

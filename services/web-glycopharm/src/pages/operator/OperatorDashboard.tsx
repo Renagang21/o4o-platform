@@ -1,169 +1,455 @@
+/**
+ * Operator Cockpit (WO-GP-OPERATOR-COCKPIT-V1)
+ *
+ * GlycoPharm 운영자 조종석
+ * - 통계가 아닌 "현재 상태"를 보여주는 관제 화면
+ * - 각 블록에서 바로 관리 UI로 점프 가능
+ * - 숫자 + 상태 아이콘 + 점프 링크
+ * - 그래프 없음, 상세 리스트 없음
+ */
+
+import { Link } from 'react-router-dom';
 import {
-  Users,
+  Activity,
   Building2,
-  Truck,
-  Handshake,
-  AlertCircle,
+  ShoppingBag,
+  Monitor,
+  Tablet,
+  Smartphone,
+  Image,
+  Star,
+  Bell,
+  Beaker,
+  MessageSquare,
+  AlertTriangle,
   CheckCircle,
   Clock,
-  ArrowRight,
-  TrendingUp,
+  AlertCircle,
+  ChevronRight,
+  FileText,
+  ArrowUpRight,
 } from 'lucide-react';
 
-const stats = [
-  { label: '총 회원', value: '4,521', change: '+156', icon: Users, color: 'primary' },
-  { label: '약국', value: '2,450', change: '+45', icon: Building2, color: 'green' },
-  { label: '공급자', value: '128', change: '+8', icon: Truck, color: 'blue' },
-  { label: '파트너', value: '56', change: '+3', icon: Handshake, color: 'purple' },
-];
+// ===== Mock Data =====
+// 실제로는 API에서 가져옴
 
-const pendingApprovals = [
-  { id: 1, name: '김약사', type: 'pharmacy', businessName: '건강플러스약국', date: '2024-01-15' },
-  { id: 2, name: '이공급', type: 'supplier', businessName: '(주)메디서플라이', date: '2024-01-15' },
-  { id: 3, name: '박파트너', type: 'partner', businessName: '덱스콤코리아', date: '2024-01-14' },
-  { id: 4, name: '최약사', type: 'pharmacy', businessName: '미래약국', date: '2024-01-14' },
-];
-
-const recentActivities = [
-  { action: '신규 약국 가입', user: '건강약국', time: '10분 전', type: 'join' },
-  { action: '주문 완료', user: '행복약국', time: '25분 전', type: 'order' },
-  { action: '상품 등록', user: '(주)메디서플라이', time: '1시간 전', type: 'product' },
-  { action: '콘텐츠 업로드', user: '덱스콤코리아', time: '2시간 전', type: 'content' },
-  { action: '회원 승인', user: '관리자', time: '3시간 전', type: 'approval' },
-];
-
-const typeLabels: Record<string, string> = {
-  pharmacy: '약국',
-  supplier: '공급자',
-  partner: '파트너',
+const SERVICE_STATUS = {
+  activePharmacies: 2450,
+  approvedStores: 187,
+  warnings: 3,
+  lastUpdated: '2024-01-15T14:30:00',
 };
 
+const STORE_STATUS = {
+  pendingApprovals: 4,
+  supplementRequests: 2,
+  activeStores: 187,
+  inactiveStores: 12,
+};
+
+const CHANNEL_STATUS = {
+  web: { active: 156, pending: 8, inactive: 23 },
+  kiosk: { active: 45, pending: 3, inactive: 12 },
+  tablet: { active: 89, pending: 5, inactive: 15 },
+};
+
+const CONTENT_STATUS = {
+  hero: { total: 8, active: 3 },
+  featured: { total: 24, operatorPicked: 6 },
+  eventNotice: { total: 15, active: 8 },
+};
+
+const TRIAL_STATUS = {
+  activeTrials: 5,
+  connectedPharmacies: 234,
+  pendingConnections: 12,
+};
+
+const FORUM_STATUS = {
+  open: 12,
+  readonly: 3,
+  closed: 5,
+  totalPosts: 1245,
+};
+
+// ===== Status Badge Component =====
+function StatusBadge({
+  status,
+  count,
+}: {
+  status: 'success' | 'warning' | 'error' | 'info' | 'neutral';
+  count?: number;
+}) {
+  const colors = {
+    success: 'bg-green-100 text-green-700',
+    warning: 'bg-amber-100 text-amber-700',
+    error: 'bg-red-100 text-red-700',
+    info: 'bg-blue-100 text-blue-700',
+    neutral: 'bg-slate-100 text-slate-600',
+  };
+
+  const icons = {
+    success: CheckCircle,
+    warning: AlertTriangle,
+    error: AlertCircle,
+    info: Clock,
+    neutral: Activity,
+  };
+
+  const Icon = icons[status];
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${colors[status]}`}
+    >
+      <Icon className="w-3 h-3" />
+      {count !== undefined && count}
+    </span>
+  );
+}
+
+// ===== Stat Item Component =====
+function StatItem({
+  label,
+  value,
+  subValue,
+  status,
+}: {
+  label: string;
+  value: number | string;
+  subValue?: string;
+  status?: 'success' | 'warning' | 'error' | 'info' | 'neutral';
+}) {
+  return (
+    <div className="flex items-center justify-between py-2">
+      <span className="text-sm text-slate-600">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="font-semibold text-slate-800">{value}</span>
+        {subValue && <span className="text-xs text-slate-400">{subValue}</span>}
+        {status && <StatusBadge status={status} />}
+      </div>
+    </div>
+  );
+}
+
+// ===== Cockpit Block Component =====
+function CockpitBlock({
+  title,
+  icon: Icon,
+  iconColor,
+  children,
+  jumpTo,
+  jumpLabel,
+  alert,
+}: {
+  title: string;
+  icon: React.ElementType;
+  iconColor: string;
+  children: React.ReactNode;
+  jumpTo?: string;
+  jumpLabel?: string;
+  alert?: { type: 'warning' | 'error'; message: string };
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl ${iconColor} flex items-center justify-center`}>
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="font-semibold text-slate-800">{title}</h2>
+        </div>
+        {jumpTo && (
+          <Link
+            to={jumpTo}
+            className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            {jumpLabel || '관리'}
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        )}
+      </div>
+
+      {/* Alert (if any) */}
+      {alert && (
+        <div
+          className={`px-4 py-2 text-sm flex items-center gap-2 ${
+            alert.type === 'error' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
+          }`}
+        >
+          <AlertTriangle className="w-4 h-4" />
+          {alert.message}
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="p-4">{children}</div>
+    </div>
+  );
+}
+
+// ===== Main Component =====
 export default function OperatorDashboard() {
+  const hasWarnings = SERVICE_STATUS.warnings > 0;
+  const hasPendingApprovals = STORE_STATUS.pendingApprovals > 0;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">운영자 대시보드</h1>
-        <p className="text-slate-500 text-sm">플랫폼 현황을 한눈에 확인하세요</p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">운영자 Cockpit</h1>
+          <p className="text-slate-500 text-sm">GlycoPharm 서비스 현황 관제</p>
+        </div>
+        <div className="text-xs text-slate-400">
+          마지막 업데이트: {new Date(SERVICE_STATUS.lastUpdated).toLocaleString('ko-KR')}
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div key={stat.label} className="bg-white rounded-2xl p-5 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div className={`w-12 h-12 rounded-xl bg-${stat.color}-100 flex items-center justify-center`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
-                </div>
-                <span className="text-sm text-green-600 flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4" />
-                  {stat.change}
+      {/* Block 1: Service Status Header */}
+      <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-6 text-white">
+        <div className="flex items-center gap-3 mb-4">
+          <Activity className="w-6 h-6" />
+          <h2 className="text-lg font-semibold">서비스 상태</h2>
+          {hasWarnings && (
+            <StatusBadge status="warning" count={SERVICE_STATUS.warnings} />
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-6">
+          <div>
+            <p className="text-3xl font-bold">{SERVICE_STATUS.activePharmacies.toLocaleString()}</p>
+            <p className="text-primary-200 text-sm">활성 약국</p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold">{SERVICE_STATUS.approvedStores}</p>
+            <p className="text-primary-200 text-sm">승인된 스토어</p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold flex items-center gap-2">
+              {SERVICE_STATUS.warnings}
+              {hasWarnings && <AlertTriangle className="w-5 h-5 text-amber-300" />}
+            </p>
+            <p className="text-primary-200 text-sm">주의 항목</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid: Blocks 2-6 */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Block 2: Store Status */}
+        <CockpitBlock
+          title="스토어 상태"
+          icon={ShoppingBag}
+          iconColor="bg-emerald-500"
+          jumpTo="/operator/store-approvals"
+          jumpLabel="승인 관리"
+          alert={
+            hasPendingApprovals
+              ? { type: 'warning', message: `승인 대기 ${STORE_STATUS.pendingApprovals}건` }
+              : undefined
+          }
+        >
+          <div className="space-y-1">
+            <StatItem label="승인 대기" value={STORE_STATUS.pendingApprovals} status={hasPendingApprovals ? 'warning' : 'success'} />
+            <StatItem label="보완 요청" value={STORE_STATUS.supplementRequests} status={STORE_STATUS.supplementRequests > 0 ? 'info' : 'neutral'} />
+            <StatItem label="운영 중" value={STORE_STATUS.activeStores} />
+            <StatItem label="비활성" value={STORE_STATUS.inactiveStores} />
+          </div>
+        </CockpitBlock>
+
+        {/* Block 3: Channel Status */}
+        <CockpitBlock
+          title="채널 상태"
+          icon={Monitor}
+          iconColor="bg-blue-500"
+        >
+          <div className="space-y-3">
+            {/* Web */}
+            <div className="flex items-center gap-3">
+              <Monitor className="w-4 h-4 text-slate-400" />
+              <span className="text-sm text-slate-600 w-12">Web</span>
+              <div className="flex-1 flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                  {CHANNEL_STATUS.web.active} 활성
+                </span>
+                <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+                  {CHANNEL_STATUS.web.pending} 대기
+                </span>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
+                  {CHANNEL_STATUS.web.inactive} 비활성
                 </span>
               </div>
-              <p className="text-2xl font-bold text-slate-800 mt-4">{stat.value}</p>
-              <p className="text-sm text-slate-500">{stat.label}</p>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Pending Approvals */}
-        <div className="bg-white rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between p-5 border-b">
-            <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-slate-800">승인 대기</h2>
-              <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full">
-                {pendingApprovals.length}
-              </span>
+            {/* Kiosk */}
+            <div className="flex items-center gap-3">
+              <Tablet className="w-4 h-4 text-slate-400" />
+              <span className="text-sm text-slate-600 w-12">Kiosk</span>
+              <div className="flex-1 flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                  {CHANNEL_STATUS.kiosk.active} 활성
+                </span>
+                <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+                  {CHANNEL_STATUS.kiosk.pending} 대기
+                </span>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
+                  {CHANNEL_STATUS.kiosk.inactive} 비활성
+                </span>
+              </div>
             </div>
-            <button className="text-sm text-red-600 flex items-center gap-1">
-              전체보기 <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="divide-y">
-            {pendingApprovals.map((item) => (
-              <div key={item.id} className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-slate-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-slate-800">{item.name}</p>
-                      <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
-                        {typeLabels[item.type]}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400">{item.businessName}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors">
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
-                    <AlertCircle className="w-4 h-4" />
-                  </button>
-                </div>
+            {/* Tablet */}
+            <div className="flex items-center gap-3">
+              <Smartphone className="w-4 h-4 text-slate-400" />
+              <span className="text-sm text-slate-600 w-12">Tablet</span>
+              <div className="flex-1 flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                  {CHANNEL_STATUS.tablet.active} 활성
+                </span>
+                <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+                  {CHANNEL_STATUS.tablet.pending} 대기
+                </span>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
+                  {CHANNEL_STATUS.tablet.inactive} 비활성
+                </span>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        </CockpitBlock>
 
-        {/* Recent Activities */}
-        <div className="bg-white rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between p-5 border-b">
-            <h2 className="font-semibold text-slate-800">최근 활동</h2>
-            <button className="text-sm text-primary-600 flex items-center gap-1">
-              전체보기 <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="divide-y">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="p-4 flex items-center gap-4">
-                <div className={`w-2 h-2 rounded-full ${
-                  activity.type === 'join' ? 'bg-green-500' :
-                  activity.type === 'order' ? 'bg-blue-500' :
-                  activity.type === 'product' ? 'bg-purple-500' :
-                  activity.type === 'content' ? 'bg-yellow-500' :
-                  'bg-slate-400'
-                }`} />
-                <div className="flex-1">
-                  <p className="text-sm text-slate-800">
-                    <span className="font-medium">{activity.user}</span>
-                    {' - '}{activity.action}
-                  </p>
-                  <p className="text-xs text-slate-400">{activity.time}</p>
-                </div>
+        {/* Block 4: Content Status */}
+        <CockpitBlock
+          title="콘텐츠 상태"
+          icon={FileText}
+          iconColor="bg-violet-500"
+          jumpTo="/operator/store-template"
+          jumpLabel="템플릿 관리"
+        >
+          <div className="space-y-3">
+            {/* Hero */}
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2">
+                <Image className="w-4 h-4 text-slate-400" />
+                <span className="text-sm text-slate-600">Hero</span>
               </div>
-            ))}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                  {CONTENT_STATUS.hero.active} 활성
+                </span>
+                <span className="text-slate-400">/ {CONTENT_STATUS.hero.total}</span>
+              </div>
+            </div>
+            {/* Featured */}
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-slate-400" />
+                <span className="text-sm text-slate-600">Featured</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">
+                  {CONTENT_STATUS.featured.operatorPicked} 운영자 지정
+                </span>
+                <span className="text-slate-400">/ {CONTENT_STATUS.featured.total}</span>
+              </div>
+            </div>
+            {/* Event/Notice */}
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-slate-400" />
+                <span className="text-sm text-slate-600">이벤트/공지</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                  {CONTENT_STATUS.eventNotice.active} 활성
+                </span>
+                <span className="text-slate-400">/ {CONTENT_STATUS.eventNotice.total}</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </CockpitBlock>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-2xl shadow-sm p-5">
-        <h2 className="font-semibold text-slate-800 mb-4">빠른 작업</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group">
-            <Users className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">회원 관리</span>
-          </button>
-          <button className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group">
-            <CheckCircle className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">승인 관리</span>
-          </button>
-          <button className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group">
-            <Building2 className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">사이트 설정</span>
-          </button>
-          <button className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group">
-            <AlertCircle className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">문의 관리</span>
-          </button>
-        </div>
+        {/* Block 5: Market Trial Status */}
+        <CockpitBlock
+          title="Market Trial"
+          icon={Beaker}
+          iconColor="bg-amber-500"
+          jumpTo="/operator/market-trial"
+          jumpLabel="Trial 관리"
+        >
+          <div className="space-y-1">
+            <StatItem label="진행 중 Trial" value={TRIAL_STATUS.activeTrials} />
+            <StatItem label="연결된 약국" value={TRIAL_STATUS.connectedPharmacies} />
+            <StatItem
+              label="연결 대기"
+              value={TRIAL_STATUS.pendingConnections}
+              status={TRIAL_STATUS.pendingConnections > 0 ? 'info' : 'neutral'}
+            />
+          </div>
+        </CockpitBlock>
+
+        {/* Block 6: Forum Status */}
+        <CockpitBlock
+          title="포럼 상태"
+          icon={MessageSquare}
+          iconColor="bg-rose-500"
+          jumpTo="/operator/forum-management"
+          jumpLabel="포럼 관리"
+        >
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <div className="text-center p-2 bg-green-50 rounded-lg">
+              <p className="text-lg font-bold text-green-700">{FORUM_STATUS.open}</p>
+              <p className="text-xs text-green-600">공개</p>
+            </div>
+            <div className="text-center p-2 bg-amber-50 rounded-lg">
+              <p className="text-lg font-bold text-amber-700">{FORUM_STATUS.readonly}</p>
+              <p className="text-xs text-amber-600">읽기전용</p>
+            </div>
+            <div className="text-center p-2 bg-slate-50 rounded-lg">
+              <p className="text-lg font-bold text-slate-600">{FORUM_STATUS.closed}</p>
+              <p className="text-xs text-slate-500">비공개</p>
+            </div>
+          </div>
+          <div className="text-center text-sm text-slate-500">
+            총 {FORUM_STATUS.totalPosts.toLocaleString()}개 게시물
+          </div>
+        </CockpitBlock>
+
+        {/* Quick Jump Block */}
+        <CockpitBlock
+          title="빠른 이동"
+          icon={ArrowUpRight}
+          iconColor="bg-slate-500"
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              to="/operator/applications"
+              className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
+            >
+              <Building2 className="w-4 h-4" />
+              신청서 관리
+            </Link>
+            <Link
+              to="/operator/forum-requests"
+              className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
+            >
+              <FileText className="w-4 h-4" />
+              포럼 요청
+            </Link>
+            <Link
+              to="/operator/store-template"
+              className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
+            >
+              <Image className="w-4 h-4" />
+              템플릿 관리
+            </Link>
+            <Link
+              to="/operator/store-approvals"
+              className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
+            >
+              <CheckCircle className="w-4 h-4" />
+              스토어 승인
+            </Link>
+          </div>
+        </CockpitBlock>
       </div>
     </div>
   );

@@ -6,8 +6,37 @@ export * from './forum';
 export * from './b2bOrder';
 // Note: store.ts also exports CartItem, so we selectively re-export to avoid conflict
 export {
+  // Service Context
   type ServiceContext,
   DEFAULT_SERVICE_CONTEXT,
+  // Template
+  type StoreTemplate,
+  DEFAULT_STORE_TEMPLATE,
+  type TemplateSectionType,
+  type TemplateSectionConfig,
+  type StoreTemplateConfig,
+  DEFAULT_FRANCHISE_STANDARD_SECTIONS,
+  // Template - Content Ownership
+  type ContentOwner,
+  type SectionManagedBy,
+  // Hero Content
+  type HeroContentSource,
+  type HeroContent,
+  // Event/Notice Content
+  type EventNoticeType,
+  type EventNoticeContent,
+  // Theme
+  type StoreTheme,
+  DEFAULT_STORE_THEME,
+  DEVICE_OPTIMIZED_THEME,
+  SERVICE_DEFAULT_THEMES,
+  getServiceDefaultTheme,
+  type ThemeMeta,
+  THEME_METAS,
+  type ThemeColors,
+  type ThemeFonts,
+  type StoreThemeConfig,
+  // Store
   type PharmacyStoreStatus,
   type PharmacyStore,
   type OperatingHours,
