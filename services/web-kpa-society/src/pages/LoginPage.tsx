@@ -10,20 +10,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, type TestAccountType } from '../contexts/AuthContext';
 
-// 테스트 계정 목록 (클릭 시 즉시 로그인)
+// 테스트 계정 목록 (클릭 시 입력됨)
 const TEST_ACCOUNT_LIST = [
   { type: 'district_admin' as TestAccountType, label: '지부 운영자', email: 'district-admin@kpa-test.kr', password: 'test123!@#' },
   { type: 'branch_admin' as TestAccountType, label: '분회 운영자', email: 'branch-admin@kpa-test.kr', password: 'test123!@#' },
   { type: 'pharmacist' as TestAccountType, label: '약사', email: 'pharmacist@kpa-test.kr', password: 'test123!@#' },
 ];
-
-// 역할별 대시보드 경로
-const ROLE_DASHBOARDS: Record<string, string> = {
-  'admin': '/admin',
-  'district_admin': '/admin',
-  'branch_admin': '/branch/1/admin',
-  'pharmacist': '/',
-};
 
 export function LoginPage() {
   const navigate = useNavigate();
