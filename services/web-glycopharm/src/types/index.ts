@@ -6,6 +6,8 @@ export * from './forum';
 export * from './b2bOrder';
 // Note: store.ts also exports CartItem, so we selectively re-export to avoid conflict
 export {
+  type ServiceContext,
+  DEFAULT_SERVICE_CONTEXT,
   type PharmacyStoreStatus,
   type PharmacyStore,
   type OperatingHours,

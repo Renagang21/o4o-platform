@@ -13,7 +13,9 @@ import type {
   StoreApplicationForm,
   StoreApiResponse,
   StorePaginatedResponse,
+  ServiceContext,
 } from '@/types/store';
+import { DEFAULT_SERVICE_CONTEXT } from '@/types/store';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -75,13 +77,20 @@ class StoreApiClient {
 
   /**
    * 약국 몰 카테고리 목록
+   * @param storeSlug 약국 slug
+   * @param serviceContext 서비스 컨텍스트 (기본값: glycopharm)
    */
-  async getStoreCategories(storeSlug: string): Promise<StoreApiResponse<StoreCategory[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/categories`);
+  async getStoreCategories(
+    storeSlug: string,
+    serviceContext: ServiceContext = DEFAULT_SERVICE_CONTEXT
+  ): Promise<StoreApiResponse<StoreCategory[]>> {
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/categories?serviceContext=${serviceContext}`);
   }
 
   /**
    * 약국 몰 상품 목록
+   * @param storeSlug 약국 slug
+   * @param params 검색/필터 파라미터 (serviceContext 기본값: glycopharm)
    */
   async getStoreProducts(
     storeSlug: string,
@@ -91,9 +100,12 @@ class StoreApiClient {
       sort?: 'popular' | 'newest' | 'price_low' | 'price_high' | 'rating';
       page?: number;
       pageSize?: number;
+      serviceContext?: ServiceContext;
     }
   ): Promise<StoreApiResponse<StorePaginatedResponse<StoreProduct>>> {
     const searchParams = new URLSearchParams();
+    // 서비스 컨텍스트 (기본값: glycopharm)
+    searchParams.set('serviceContext', params?.serviceContext || DEFAULT_SERVICE_CONTEXT);
     if (params?.categoryId) searchParams.set('categoryId', params.categoryId);
     if (params?.search) searchParams.set('search', params.search);
     if (params?.sort) searchParams.set('sort', params.sort);
@@ -101,14 +113,21 @@ class StoreApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products?${queryString}`);
   }
 
   /**
    * 약국 몰 인기 상품
+   * @param storeSlug 약국 slug
+   * @param limit 개수 제한
+   * @param serviceContext 서비스 컨텍스트 (기본값: glycopharm)
    */
-  async getFeaturedProducts(storeSlug: string, limit = 8): Promise<StoreApiResponse<StoreProduct[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products/featured?limit=${limit}`);
+  async getFeaturedProducts(
+    storeSlug: string,
+    limit = 8,
+    serviceContext: ServiceContext = DEFAULT_SERVICE_CONTEXT
+  ): Promise<StoreApiResponse<StoreProduct[]>> {
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products/featured?limit=${limit}&serviceContext=${serviceContext}`);
   }
 
   /**

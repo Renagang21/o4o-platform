@@ -3,6 +3,26 @@
  * 회원 약국 몰 관련 타입 정의
  */
 
+// ============================================================================
+// Service Context
+// ============================================================================
+// 하나의 스토어 엔진에서 여러 서비스를 병렬 운영하기 위한 컨텍스트
+// Store는 약국 단위로 1개, Service Context는 상품/카테고리에만 부여
+
+/**
+ * 서비스 컨텍스트 타입
+ * - glycopharm: 글리코팜 (기본값)
+ * - yaksa: 약사회 서비스
+ */
+export type ServiceContext = 'glycopharm' | 'yaksa';
+
+/** 기본 서비스 컨텍스트 */
+export const DEFAULT_SERVICE_CONTEXT: ServiceContext = 'glycopharm';
+
+// ============================================================================
+// Store Status & Info
+// ============================================================================
+
 // 약국 몰 상태
 export type PharmacyStoreStatus =
   | 'pending'      // 신청 대기
@@ -61,7 +81,13 @@ export interface ShippingInfo {
   deliveryNote: string;            // 배송 안내 문구
 }
 
+// ============================================================================
+// Category & Product
+// ============================================================================
+
 // 상품 카테고리
+// 카테고리는 반드시 Service Context 하위에 속한다
+// 서로 다른 서비스 간 카테고리 공유 불가
 export interface StoreCategory {
   id: string;
   name: string;
@@ -69,6 +95,8 @@ export interface StoreCategory {
   icon?: string;
   productCount: number;
   order: number;
+  /** 서비스 컨텍스트 (기본값: glycopharm) */
+  serviceContext: ServiceContext;
 }
 
 // 스토어 상품 (약국이 선택한 공급자 상품)
@@ -93,6 +121,10 @@ export interface StoreProduct {
   isActive: boolean;
   isFeatured: boolean;
   createdAt: string;
+  /** 서비스 컨텍스트 (기본값: glycopharm) */
+  serviceContext: ServiceContext;
+  /** Market Trial 상품 여부 (serviceContext=glycopharm + isMarketTrial=true로 구분) */
+  isMarketTrial?: boolean;
 }
 
 // 장바구니 아이템
