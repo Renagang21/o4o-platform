@@ -270,6 +270,7 @@ jobs:
           --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
           --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
+          --set-env-vars="JWT_REFRESH_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 
     - name: Verify deployment
