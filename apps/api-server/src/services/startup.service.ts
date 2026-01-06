@@ -30,6 +30,21 @@ import logger from '../utils/logger.js';
  * Usage:
  * - Cloud Run: GRACEFUL_STARTUP=true (default) - server always starts
  * - Production with DB: GRACEFUL_STARTUP=false - fail-fast if DB unavailable
+ *
+ * ============================================================================
+ * Phase 5-B: Auth ↔ Infra Separation
+ * ============================================================================
+ *
+ * StartupService는 Infra 계층의 책임을 담당한다:
+ * - DB 초기화 / 연결 상태 관리
+ * - Health Check를 통한 서비스 가용성 판단
+ *
+ * Auth 계층은 StartupService의 결과에 의존하지 않는다:
+ * - Auth는 503을 반환하지 않음
+ * - DB 실패 시 Auth는 자연스럽게 500 반환
+ * - 503 판단은 Health Check의 책임
+ *
+ * @see docs/architecture/auth-infra-separation.md
  * ============================================================================
  */
 export class StartupService {

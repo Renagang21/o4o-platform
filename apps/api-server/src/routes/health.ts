@@ -19,6 +19,21 @@ const router: Router = Router();
  *
  * IMPORTANT: /health MUST return 200 even if DB is not connected.
  * DB status is included as optional info in the response.
+ *
+ * ============================================================================
+ * Phase 5-B: Auth ↔ Infra Separation
+ * ============================================================================
+ *
+ * Health Check는 Infra 계층의 책임을 담당한다:
+ * - DB 연결 상태 판단 → 503 반환 가능
+ * - 시스템 리소스 상태 판단
+ * - Cloud Run / LB가 이 신호로 트래픽 제어
+ *
+ * Auth 계층은 503을 반환하지 않는다:
+ * - Auth는 오직 401/403/500만 반환
+ * - 서비스 가용성 판단은 Health Check의 책임
+ *
+ * @see docs/architecture/auth-infra-separation.md
  * ============================================================================
  */
 

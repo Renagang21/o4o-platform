@@ -1,4 +1,4 @@
-import { Router, Request } from 'express';
+import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -6,9 +6,11 @@ import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../modules/auth/entities/User.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../middleware/error-handler.js';
-import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error.js';
+// Phase 5-B: ServiceUnavailableError removed - Auth doesn't return 503
+import { UnauthorizedError, BadRequestError, ValidationError } from '../utils/api-error.js';
 import { env } from '../utils/env-validator.js';
 import { refreshTokenService } from '../modules/auth/services/refresh-token.service.js';
+import * as cookieUtils from '../utils/cookie.utils.js';
 
 const router: Router = Router();
 
@@ -24,11 +26,10 @@ router.post('/login',
     }
       const { email, password } = req.body;
 
-    // Check if database is initialized
-    if (!AppDataSource.isInitialized) {
-      throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
-    }
-      
+    // Phase 5-B: Auth ↔ Infra Separation
+    // Auth는 DB 상태를 검사하지 않음. DB 실패 시 자연스럽게 에러 반환.
+    // @see docs/architecture/auth-infra-separation.md
+
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { email },
@@ -83,12 +84,24 @@ router.post('/login',
       // Get active role information
       const activeRole = user.getActiveRole();
 
+      // Phase 6-7: Cookie Auth Primary
+      // Set httpOnly cookies as primary authentication method
+      // @see docs/architecture/auth-ssot-declaration.md (Phase 6-7)
+      cookieUtils.setAuthCookies(res, {
+        accessToken,
+        refreshToken,
+        expiresIn: 15 * 60 // 15 minutes
+      });
+
+      // Response: Cookie is primary, JSON tokens are optional for legacy support
+      // includeLegacyTokens defaults to false for new clients
+      const includeLegacyTokens = req.body.includeLegacyTokens === true;
+
       return res.json({
         success: true,
         message: 'Login successful',
-        accessToken,
-        refreshToken,
-        token: accessToken, // Legacy field for backward compatibility
+        // Phase 6-7: Tokens in body are optional, Cookie is primary
+        ...(includeLegacyTokens && { accessToken, refreshToken, token: accessToken }),
         user: {
           id: user.id,
           email: user.email,
@@ -127,10 +140,7 @@ const signupHandler = asyncHandler(async (req, res, next) => {
     throw new BadRequestError('Signup is currently disabled', 'SIGNUP_DISABLED');
   }
 
-  // Check if database is initialized
-  if (!AppDataSource.isInitialized) {
-    throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
-  }
+  // Phase 5-B: Auth ↔ Infra Separation - DB 상태 검사 제거
 
   // 비밀번호 확인 검증
   if (password !== passwordConfirm) {
@@ -178,6 +188,14 @@ const signupHandler = asyncHandler(async (req, res, next) => {
     req.ip
   );
 
+  // Phase 6-7: Cookie Auth Primary
+  // Set httpOnly cookies as primary authentication method
+  cookieUtils.setAuthCookies(res, {
+    accessToken,
+    refreshToken,
+    expiresIn: 15 * 60 // 15 minutes
+  });
+
   // 역할별 기본 리다이렉트 경로
   const getRedirectPath = (role: UserRole): string => {
     switch (role) {
@@ -195,12 +213,14 @@ const signupHandler = asyncHandler(async (req, res, next) => {
     }
   };
 
+  // Response: Cookie is primary, JSON tokens are optional for legacy support
+  const includeLegacyTokens = req.body.includeLegacyTokens === true;
+
   return res.status(201).json({
     success: true,
     message: 'Signup successful',
-    accessToken,
-    refreshToken,
-    token: accessToken, // Legacy field for backward compatibility
+    // Phase 6-7: Tokens in body are optional, Cookie is primary
+    ...(includeLegacyTokens && { accessToken, refreshToken, token: accessToken }),
     user: {
       id: user.id,
       email: user.email,
@@ -241,9 +261,12 @@ router.get('/verify', authenticate, asyncHandler(async (req: Request, res) => {
   });
 }));
 
-// 로그아웃 (클라이언트 측에서 토큰 삭제)
+// 로그아웃
+// Phase 6-7: Cookie Auth Primary - clear httpOnly cookies on logout
 router.post('/logout', authenticate, asyncHandler(async (req: Request, res) => {
-  // 서버 측에서는 특별히 할 일이 없음 (JWT는 stateless)
+  // Phase 6-7: Clear httpOnly cookies
+  cookieUtils.clearAuthCookies(res);
+
   // 향후 token blacklist 구현 시 여기서 처리
   return res.json({
     success: true,
@@ -257,10 +280,7 @@ router.get('/status', authenticate, asyncHandler(async (req: Request, res) => {
     throw new UnauthorizedError('Not authenticated', 'NOT_AUTHENTICATED');
   }
 
-  // Check if database is initialized
-  if (!AppDataSource.isInitialized) {
-    throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
-  }
+  // Phase 5-B: Auth ↔ Infra Separation - DB 상태 검사 제거
 
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
@@ -305,10 +325,14 @@ router.get('/status', authenticate, asyncHandler(async (req: Request, res) => {
 }));
 
 // 토큰 갱신 (Refresh Token)
+// Phase 6-7: Cookie Auth Primary - refresh token can come from cookie or body
 router.post('/refresh', asyncHandler(async (req: Request, res) => {
-  const { refreshToken } = req.body;
+  // Phase 6-7: Try cookie first, then body for legacy support
+  const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
 
   if (!refreshToken) {
+    // Clear any stale cookies
+    cookieUtils.clearAuthCookies(res);
     throw new UnauthorizedError('Refresh token not provided', 'NO_REFRESH_TOKEN');
   }
 
@@ -316,14 +340,31 @@ router.post('/refresh', asyncHandler(async (req: Request, res) => {
   const result = await refreshTokenService.refreshAccessToken(refreshToken);
 
   if (result.error || !result.accessToken) {
+    // Clear cookies on refresh failure
+    cookieUtils.clearAuthCookies(res);
     throw new UnauthorizedError(result.error || 'Invalid refresh token', 'INVALID_REFRESH_TOKEN');
   }
+
+  // Phase 6-7: Cookie Auth Primary
+  // Set new tokens in httpOnly cookies
+  cookieUtils.setAuthCookies(res, {
+    accessToken: result.accessToken,
+    refreshToken: refreshToken, // Keep same refresh token unless rotation
+    expiresIn: 15 * 60 // 15 minutes
+  });
+
+  // Response: Cookie is primary, JSON tokens are optional for legacy support
+  const includeLegacyTokens = req.body.includeLegacyTokens === true;
 
   return res.json({
     success: true,
     message: 'Token refreshed successfully',
-    accessToken: result.accessToken,
-    refreshToken // Return same refresh token (unless rotation is implemented)
+    // Phase 6-7: Tokens in body are optional, Cookie is primary
+    ...(includeLegacyTokens && {
+      accessToken: result.accessToken,
+      refreshToken
+    }),
+    expiresIn: 900 // 15 minutes
   });
 }));
 
@@ -348,10 +389,7 @@ router.post('/signup-complete',
       throw new BadRequestError('Terms of service and privacy policy must be accepted', 'TOS_NOT_ACCEPTED');
     }
 
-    // Check if database is initialized
-    if (!AppDataSource.isInitialized) {
-      throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
-    }
+    // Phase 5-B: Auth ↔ Infra Separation - DB 상태 검사 제거
 
     const userRepository = AppDataSource.getRepository(User);
 

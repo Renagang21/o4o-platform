@@ -11,6 +11,11 @@ import { LoginRequestDto, RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
 
+// Phase 5-B: Auth ↔ Infra Separation
+// Auth 계층은 DB 상태 검사를 수행하지 않음.
+// AppDataSource.isInitialized 체크는 Health Check에서만 수행.
+// @see docs/architecture/auth-infra-separation.md
+
 /**
  * Classify error for observability
  */
@@ -42,40 +47,21 @@ export class AuthController extends BaseController {
   /**
    * POST /api/v1/auth/login
    * Login with email/password
+   *
+   * Phase 6-7: Cookie Auth Primary
+   * - httpOnly cookies are the primary authentication method
+   * - JSON body tokens are optional (for legacy client support)
+   * - Pass includeLegacyTokens: true in request body to receive tokens in response
    */
   static async login(req: Request, res: Response): Promise<any> {
-    const { email, password, deviceId } = req.body as LoginRequestDto;
+    const { email, password, deviceId, includeLegacyTokens } = req.body as LoginRequestDto & { includeLegacyTokens?: boolean };
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
 
-    // P0 Fix: Check DB initialization before attempting login
-    if (!AppDataSource.isInitialized) {
-      logger.error('[AuthController.login] Database not initialized (GRACEFUL_STARTUP mode)', {
-        tag: 'db-not-initialized',
-        email,
-      });
-      return res.status(503).json({
-        success: false,
-        error: 'Service temporarily unavailable. Please try again later.',
-        code: 'SERVICE_UNAVAILABLE',
-        retryable: true,
-      });
-    }
-
-    // P0 Fix: Check JWT configuration before attempting login
-    if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-      logger.error('[AuthController.login] JWT configuration missing', {
-        tag: 'jwt-config-missing',
-        hasJwtSecret: !!process.env.JWT_SECRET,
-        hasJwtRefreshSecret: !!process.env.JWT_REFRESH_SECRET,
-      });
-      return res.status(503).json({
-        success: false,
-        error: 'Service configuration error. Please contact administrator.',
-        code: 'CONFIG_ERROR',
-        retryable: false,
-      });
-    }
+    // Phase 5-B: Auth ↔ Infra Separation
+    // Auth는 DB 상태를 검사하지 않음. DB 실패 시 자연스럽게 500 반환.
+    // 503은 Health Check의 책임. Auth는 인증 판단만 담당.
+    // @see docs/architecture/auth-infra-separation.md
 
     try {
       const result = await authenticationService.login({
@@ -85,14 +71,19 @@ export class AuthController extends BaseController {
         userAgent,
       });
 
-      // Set httpOnly cookies
+      // Phase 6-7: Cookie Auth Primary
+      // Set httpOnly cookies as primary authentication method
       authenticationService.setAuthCookies(res, result.tokens, result.sessionId);
 
+      // Response: Cookie is primary, JSON tokens are optional for legacy support
       return BaseController.ok(res, {
         message: 'Login successful',
         user: result.user,
-        accessToken: result.tokens.accessToken,
-        refreshToken: result.tokens.refreshToken,
+        // Phase 6-7: Tokens in body are optional, Cookie is primary
+        ...(includeLegacyTokens && {
+          accessToken: result.tokens.accessToken,
+          refreshToken: result.tokens.refreshToken,
+        }),
       });
     } catch (error: any) {
       // P1 Fix: Enhanced error logging with classification
@@ -117,16 +108,9 @@ export class AuthController extends BaseController {
         return BaseController.error(res, error.message, 429);
       }
 
-      // P0 Fix: Return more specific error for config issues (should not reach here after pre-checks)
-      if (errorTag === 'jwt-config-missing' || errorTag === 'db-connection-failed') {
-        return res.status(503).json({
-          success: false,
-          error: 'Service temporarily unavailable. Please try again later.',
-          code: 'SERVICE_UNAVAILABLE',
-          retryable: errorTag === 'db-connection-failed',
-        });
-      }
-
+      // Phase 5-B: Auth ↔ Infra Separation
+      // Auth는 503을 반환하지 않음. 인프라 문제는 500으로 처리.
+      // Cloud Run이 Health Check를 통해 인스턴스 상태를 관리.
       return BaseController.error(res, 'Login failed');
     }
   }
@@ -202,14 +186,21 @@ export class AuthController extends BaseController {
         userAgent,
       });
 
-      // Set httpOnly cookies
+      // Phase 6-7: Cookie Auth Primary
+      // Set httpOnly cookies as primary authentication method
       authenticationService.setAuthCookies(res, loginResult.tokens, loginResult.sessionId);
+
+      // Response: Cookie is primary, JSON tokens are optional for legacy support
+      const includeLegacyTokens = (data as any).includeLegacyTokens === true;
 
       return BaseController.created(res, {
         message: 'Registration successful',
         user: loginResult.user,
-        accessToken: loginResult.tokens.accessToken,
-        refreshToken: loginResult.tokens.refreshToken,
+        // Phase 6-7: Tokens in body are optional, Cookie is primary
+        ...(includeLegacyTokens && {
+          accessToken: loginResult.tokens.accessToken,
+          refreshToken: loginResult.tokens.refreshToken,
+        }),
       });
     } catch (error: any) {
       logger.error('[AuthController.register] Registration error', {
@@ -290,12 +281,20 @@ export class AuthController extends BaseController {
     try {
       const tokens = await authenticationService.refreshTokens(refreshToken);
 
+      // Phase 6-7: Cookie Auth Primary
+      // Set new tokens in httpOnly cookies
       authenticationService.setAuthCookies(res, tokens);
+
+      // Response: Cookie is primary, JSON tokens are optional for legacy support
+      const includeLegacyTokens = req.body.includeLegacyTokens === true;
 
       return BaseController.ok(res, {
         message: 'Token refreshed successfully',
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
+        // Phase 6-7: Tokens in body are optional, Cookie is primary
+        ...(includeLegacyTokens && {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        }),
         expiresIn: tokens.expiresIn || 900, // Default 15 minutes
       });
     } catch (error: any) {

@@ -29,12 +29,17 @@ export {
 
 /**
  * Auth Response from login/register endpoints
+ *
+ * Phase 6-7: Cookie Auth Primary
+ * - For cookie strategy: tokens are optional (set via httpOnly cookies)
+ * - For localStorage strategy: tokens are included when includeLegacyTokens=true
  */
 export interface AuthResponse {
   success: boolean;
   message?: string;
-  token?: string; // Optional for cookie-based auth
-  refreshToken?: string; // Optional for cookie-based auth
+  token?: string; // Legacy field for backward compatibility
+  accessToken?: string; // Phase 6-7: Optional, present when includeLegacyTokens=true
+  refreshToken?: string; // Phase 6-7: Optional, present when includeLegacyTokens=true
   user?: {
     id: string;
     email: string;

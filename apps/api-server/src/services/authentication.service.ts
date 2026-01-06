@@ -37,14 +37,27 @@ import { emailService } from './email.service.js';
 import logger from '../utils/logger.js';
 
 /**
- * Unified Authentication Service
+ * AuthenticationService - SSOT (Single Source of Truth) for Authentication
  *
- * This service consolidates all authentication logic from:
- * - AuthService (basic auth)
- * - AuthServiceV2 (cookie-based auth)
- * - UnifiedAuthService (email + OAuth)
+ * ============================================================================
+ * THIS IS THE ONLY AUTHORIZED AUTH SERVICE IN O4O PLATFORM
+ * ============================================================================
  *
- * It provides a single, consistent API for all authentication operations.
+ * This service is the single source of truth for all authentication operations:
+ * - Login (email + OAuth)
+ * - Token generation and validation
+ * - Session management
+ * - Password reset
+ *
+ * DO NOT use:
+ * - AuthService (DEPRECATED)
+ * - AuthServiceV2 (DEPRECATED)
+ * - Any direct JWT generation outside this service
+ *
+ * For user CRUD operations, use userService (modules/auth/services/user.service.ts)
+ *
+ * @see docs/architecture/auth-ssot-declaration.md
+ * @see CLAUDE.md Section 2.6
  */
 export class AuthenticationService {
   private userRepository: Repository<User>;

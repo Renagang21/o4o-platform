@@ -1,25 +1,46 @@
 import { FC, useState, ReactNode, useEffect  } from 'react';
 import { AuthContext } from './AuthContext';
-import { AuthClient } from '@o4o/auth-client';
+import { AuthClient, AuthStrategy } from '@o4o/auth-client';
 import type { User, SessionStatus } from './AuthContext';
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAllTokens,
+  setRefreshToken,
+} from './token-storage';
 
+/**
+ * Phase 6-7: Cookie Auth Primary
+ *
+ * Authentication strategy options:
+ * - 'cookie': Use httpOnly cookies (DEFAULT for B2C)
+ * - 'localStorage': Use localStorage tokens (legacy)
+ */
 interface AuthProviderProps {
   children: ReactNode;
   ssoClient?: AuthClient;
   autoRefresh?: boolean;
   onAuthError?: (error: string) => void;
   onSessionExpiring?: (remainingSeconds: number) => void;
+  /**
+   * Phase 6-7: Authentication strategy
+   * - 'cookie': Primary strategy, uses /auth/status API to check auth state
+   * - 'localStorage': Legacy strategy, uses localStorage tokens
+   * @default 'cookie'
+   */
+  strategy?: AuthStrategy;
 }
 
-export const AuthProvider: FC<AuthProviderProps> = ({ 
-  children, 
+export const AuthProvider: FC<AuthProviderProps> = ({
+  children,
   ssoClient,
-  onAuthError
+  onAuthError,
+  strategy = 'cookie' // Phase 6-7: Cookie Auth Primary
 }) => {
-  // 로컬 스토리지에서 초기 상태 읽기
-  const getInitialState = () => {
+  // Phase 6-7: localStorage fallback for localStorage strategy only
+  const getInitialStateFromStorage = () => {
     if (typeof window === 'undefined') return null;
-    
+
     const stored = localStorage.getItem('admin-auth-storage');
     if (stored) {
       try {
@@ -34,52 +55,84 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     return null;
   };
 
-  const [user, setUser] = useState<User | null>(getInitialState());
-  // 저장된 사용자 정보가 있으면 로딩을 false로, 없으면 true로 설정
+  // Phase 6-7: For cookie strategy, start with null and check via API
+  // For localStorage strategy, use stored state as initial value
+  const [user, setUser] = useState<User | null>(() => {
+    if (strategy === 'localStorage') {
+      return getInitialStateFromStorage();
+    }
+    return null; // Cookie strategy checks via API
+  });
+
+  // Phase 6-7: For cookie strategy, always start loading (need API check)
+  // For localStorage strategy, check if we have stored auth info
   const [isLoading, setIsLoading] = useState(() => {
-    const storedUser = getInitialState();
-    const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
-    // 저장된 인증 정보가 있으면 즉시 사용 가능하도록 false 반환
+    if (strategy === 'cookie') {
+      return true; // Cookie strategy needs API verification
+    }
+    const storedUser = getInitialStateFromStorage();
+    const storedToken = getAccessToken();
     return !(storedUser && storedToken);
   });
   const [error, setError] = useState<string | null>(null);
-  
+
+  // Phase 6-7: Create AuthClient with appropriate strategy
   const authClient = ssoClient || new AuthClient(
     typeof window !== 'undefined' ?
       'https://api.neture.co.kr/api' :
-      'https://api.neture.co.kr/api'
+      'https://api.neture.co.kr/api',
+    { strategy }
   );
 
-  // 초기 인증 상태 확인 - 마운트 시 한 번만 실행
+  // Phase 6-7: Initial auth check
+  // - Cookie strategy: Call /auth/status API to get auth state
+  // - localStorage strategy: Use stored tokens (legacy behavior)
   useEffect(() => {
     const checkInitialAuth = async () => {
       try {
-        const storedUser = getInitialState();
-        const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        
-        if (storedUser && storedToken) {
-          // 저장된 사용자 정보가 있으면 즉시 사용
-          // 이미 useState 초기값으로 설정되어 있으므로 setUser 호출 불필요
-          
-          // SSO 세션 확인은 백그라운드에서 수행 (옵션)
-          if (ssoClient && typeof window !== 'undefined') {
-            // SSO 체크는 비동기로 수행하되, 실패해도 로컬 세션 유지
-            authClient.checkSession().then(sessionData => {
-              if (!sessionData.isAuthenticated) {
-                // SSO 세션이 없어도 로컬 세션은 유지 (토큰이 유효한 경우)
-                // 콘솔 로그 제거 - 정상적인 동작임
-              }
-            }).catch(() => {
-              // SSO 체크 실패 시에도 기존 세션 유지
-              // 콘솔 로그 제거 - 정상적인 동작임
-            });
+        if (strategy === 'cookie') {
+          // Phase 6-7: Cookie strategy - check auth status via API
+          // Cookies are sent automatically with withCredentials: true
+          try {
+            const response = await authClient.api.get('/auth/status');
+            const statusData = response.data as any;
+
+            if (statusData.authenticated && statusData.user) {
+              const userWithDates = {
+                ...statusData.user,
+                createdAt: statusData.user.createdAt || new Date().toISOString(),
+                updatedAt: statusData.user.updatedAt || new Date().toISOString()
+              };
+              setUser(userWithDates);
+            } else {
+              setUser(null);
+            }
+          } catch (apiError) {
+            // API call failed (possibly 401) - user is not authenticated
+            setUser(null);
           }
-          
           setIsLoading(false);
         } else {
-          // 저장된 인증 정보가 없으면 null 설정
-          setUser(null);
-          setIsLoading(false);
+          // localStorage strategy - legacy behavior
+          const storedUser = getInitialStateFromStorage();
+          const storedToken = getAccessToken();
+
+          if (storedUser && storedToken) {
+            // SSO 세션 확인은 백그라운드에서 수행 (옵션)
+            if (ssoClient && typeof window !== 'undefined') {
+              authClient.checkSession().then(sessionData => {
+                if (!sessionData.isAuthenticated) {
+                  // SSO 세션이 없어도 로컬 세션은 유지 (토큰이 유효한 경우)
+                }
+              }).catch(() => {
+                // SSO 체크 실패 시에도 기존 세션 유지
+              });
+            }
+            setIsLoading(false);
+          } else {
+            setUser(null);
+            setIsLoading(false);
+          }
         }
       } catch (error) {
         console.error('Initial auth check failed:', error);
@@ -89,7 +142,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     };
 
     checkInitialAuth();
-  }, [authClient, ssoClient]);
+  }, [authClient, ssoClient, strategy]);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
@@ -99,26 +152,26 @@ export const AuthProvider: FC<AuthProviderProps> = ({
 
       // API 응답 구조: { success, data: { user, accessToken, refreshToken } }
       const loginData = (response as any).data || response;
-      const user = loginData.user;
+      const userData = loginData.user;
       const token = loginData.accessToken || loginData.token;
       const refreshToken = loginData.refreshToken;
 
       const userWithDates = {
-        ...user,
-        createdAt: user?.createdAt || new Date().toISOString(),
-        updatedAt: user?.updatedAt || new Date().toISOString()
+        ...userData,
+        createdAt: userData?.createdAt || new Date().toISOString(),
+        updatedAt: userData?.updatedAt || new Date().toISOString()
       };
       setUser(userWithDates as any);
 
-      // 토큰을 localStorage에 저장
-      if (token) {
-        // 여러 키로 저장 (다양한 API 클라이언트 호환성)
-        localStorage.setItem('accessToken', token);
-        localStorage.setItem('authToken', token); // postApi 호환성
-        localStorage.setItem('token', token); // 하위 호환성
+      // Phase 6-7: Token storage depends on strategy
+      // - Cookie strategy: Server sets httpOnly cookies, no localStorage needed
+      // - localStorage strategy: Store tokens in localStorage
+      if (strategy === 'localStorage' && token) {
+        // Use SSOT token storage - single key only
+        setAccessToken(token);
 
         if (refreshToken) {
-          localStorage.setItem('refreshToken', refreshToken);
+          setRefreshToken(refreshToken);
         }
 
         // admin-auth-storage 구조도 업데이트 (apiClient 호환성을 위해)
@@ -129,6 +182,17 @@ export const AuthProvider: FC<AuthProviderProps> = ({
             accessToken: token,
             refreshToken: refreshToken,
             isAuthenticated: true
+          }
+        };
+        localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
+      } else if (strategy === 'cookie') {
+        // Phase 6-7: Cookie strategy - only store user info for UI
+        // Tokens are in httpOnly cookies
+        const authStorage = {
+          state: {
+            user: userWithDates,
+            isAuthenticated: true
+            // No tokens stored in localStorage for cookie strategy
           }
         };
         localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
@@ -147,14 +211,15 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     authClient.logout();
     setUser(null);
     setError(null);
-    
-    // 모든 인증 관련 데이터 제거
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('token');
-    localStorage.removeItem('authToken');
+
+    // Phase 6-7: Clear localStorage for both strategies
+    // - Cookie strategy: Server clears httpOnly cookies, clear local user cache
+    // - localStorage strategy: Clear all tokens
+    if (strategy === 'localStorage') {
+      clearAllTokens();
+    }
+    // Clear user info cache
     localStorage.removeItem('admin-auth-storage');
-    localStorage.removeItem('user');
   };
 
   const clearError = () => {

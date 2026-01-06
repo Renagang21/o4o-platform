@@ -1,48 +1,69 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type { LoginCredentials, AuthResponse } from './types.js';
+import {
+  getAccessToken,
+  setAccessToken,
+  getRefreshToken,
+  setRefreshToken,
+  clearAllTokens,
+  updateAuthStorage,
+} from './token-storage.js';
+
+/**
+ * Auth Strategy
+ *
+ * Phase 6-7: Cookie Auth Primary
+ * - 'cookie': Use httpOnly cookies (DEFAULT, recommended for B2C)
+ * - 'localStorage': Use localStorage tokens (legacy, for specific use cases)
+ *
+ * @see docs/architecture/auth-ssot-declaration.md (Phase 6-7)
+ */
+export type AuthStrategy = 'cookie' | 'localStorage';
+
+export interface AuthClientOptions {
+  /**
+   * Authentication strategy
+   * - 'cookie': Use httpOnly cookies (DEFAULT)
+   * - 'localStorage': Use localStorage tokens (legacy)
+   *
+   * Phase 6-7: Cookie is the primary strategy for B2C launch
+   */
+  strategy?: AuthStrategy;
+}
 
 export class AuthClient {
   private baseURL: string;
   public api: AxiosInstance;
   private isRefreshing = false;
   private refreshSubscribers: Array<(token: string) => void> = [];
+  private strategy: AuthStrategy;
 
-  constructor(baseURL: string) {
+  constructor(baseURL: string, options?: AuthClientOptions) {
     this.baseURL = baseURL;
+    // Phase 6-7: Cookie Auth Primary - default strategy is 'cookie'
+    this.strategy = options?.strategy || 'cookie';
+
     this.api = axios.create({
       baseURL: this.baseURL,
       timeout: 120000, // 120 seconds for AI generation
       headers: {
         'Content-Type': 'application/json',
       },
+      // Phase 6-7: Cookie Auth Primary - include credentials for cookie-based auth
+      withCredentials: this.strategy === 'cookie',
     }) as any;
 
     // Add auth token to requests
+    // Phase 6-7: Only add Authorization header for localStorage strategy
+    // Cookie strategy relies on httpOnly cookies sent automatically
     this.api.interceptors.request.use((config: any) => {
-      // Check multiple possible token locations
-      // Priority: accessToken > token > authToken > admin-auth-storage
-      let token = localStorage.getItem('accessToken') || 
-                  localStorage.getItem('token') ||
-                  localStorage.getItem('authToken');
-      
-      // Also check admin-auth-storage for token
-      if (!token) {
-        const authStorage = localStorage.getItem('admin-auth-storage');
-        if (authStorage) {
-          try {
-            const parsed = JSON.parse(authStorage);
-            if (parsed.state?.accessToken || parsed.state?.token) {
-              token = parsed.state.accessToken || parsed.state.token;
-            }
-          } catch {
-            // Ignore parse errors
-          }
+      if (this.strategy === 'localStorage') {
+        const token = getAccessToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
       }
-      
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      // For cookie strategy, cookies are sent automatically with withCredentials: true
       return config;
     });
 
@@ -51,14 +72,16 @@ export class AuthClient {
       (response) => response,
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
-        
+
         // Check if error is 401 and not already retried
         if (error.response?.status === 401 && !originalRequest._retry) {
           if (this.isRefreshing) {
             // Wait for token refresh
             return new Promise((resolve) => {
               this.refreshSubscribers.push((token: string) => {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
+                if (this.strategy === 'localStorage') {
+                  originalRequest.headers.Authorization = `Bearer ${token}`;
+                }
                 resolve(this.api.request(originalRequest));
               });
             });
@@ -68,49 +91,40 @@ export class AuthClient {
           this.isRefreshing = true;
 
           try {
-            const refreshToken = localStorage.getItem('refreshToken');
+            // Phase 6-7: Cookie Auth Primary
+            // For cookie strategy, refresh token is sent via cookie automatically
+            // For localStorage strategy, send refresh token in body
+            const refreshPayload = this.strategy === 'localStorage'
+              ? { refreshToken: getRefreshToken(), includeLegacyTokens: true }
+              : {}; // Cookie strategy sends refresh token via cookie
 
-            if (refreshToken) {
-              // baseURL already includes /api/v1
-              const response = await this.api.post('/auth/refresh', { refreshToken });
-              const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken: string; refreshToken?: string };
-              
-              // Update tokens
-              localStorage.setItem('accessToken', accessToken);
+            const response = await this.api.post('/auth/refresh', refreshPayload);
+            const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken?: string; refreshToken?: string };
+
+            // Phase 6-7: Only update localStorage for localStorage strategy
+            if (this.strategy === 'localStorage' && accessToken) {
+              setAccessToken(accessToken);
               if (newRefreshToken) {
-                localStorage.setItem('refreshToken', newRefreshToken);
+                setRefreshToken(newRefreshToken);
               }
-              
-              // Update auth storage if exists
-              const authStorage = localStorage.getItem('admin-auth-storage');
-              if (authStorage) {
-                try {
-                  const parsed = JSON.parse(authStorage);
-                  if (parsed.state) {
-                    parsed.state.token = accessToken;
-                    parsed.state.accessToken = accessToken;
-                    if (newRefreshToken) {
-                      parsed.state.refreshToken = newRefreshToken;
-                    }
-                    localStorage.setItem('admin-auth-storage', JSON.stringify(parsed));
-                  }
-                } catch {
-                  // Ignore parse errors
-                }
-              }
-              
-              // Notify subscribers
-              this.refreshSubscribers.forEach(callback => callback(accessToken));
-              this.refreshSubscribers = [];
-              
-              // Retry original request
-              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-              return this.api.request(originalRequest);
+              updateAuthStorage(accessToken, newRefreshToken);
             }
+
+            // Notify subscribers
+            this.refreshSubscribers.forEach(callback => callback(accessToken || ''));
+            this.refreshSubscribers = [];
+
+            // Retry original request
+            if (this.strategy === 'localStorage' && accessToken) {
+              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            }
+            return this.api.request(originalRequest);
           } catch (refreshError) {
             // Refresh failed, clear tokens and redirect to login
-            this.clearAllTokens();
-            
+            if (this.strategy === 'localStorage') {
+              clearAllTokens();
+            }
+
             // Show user-friendly message before redirect
             if (typeof window !== 'undefined') {
               const errorData = (refreshError as any)?.response?.data;
@@ -119,56 +133,79 @@ export class AuthClient {
               } else {
                 console.warn('Authentication failed, redirecting to login');
               }
-              
+
               // Redirect to login page
               window.location.href = '/login';
             }
-            
+
             return Promise.reject(refreshError);
           } finally {
             this.isRefreshing = false;
           }
         }
-        
+
         return Promise.reject(error);
       }
     );
   }
 
+  /**
+   * Login with credentials
+   *
+   * Phase 6-7: Cookie Auth Primary
+   * - Cookie strategy: Server sets httpOnly cookies, no tokens in response
+   * - localStorage strategy: Server returns tokens in response body
+   */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // baseURL already includes /api/v1, so just add /auth/login
-    const response = await this.api.post('/auth/login', credentials);
-    return response.data as AuthResponse;
-  }
+    // Phase 6-7: For localStorage strategy, request tokens in body
+    const payload = this.strategy === 'localStorage'
+      ? { ...credentials, includeLegacyTokens: true }
+      : credentials;
 
-  // Clear all authentication tokens from all storage locations
-  private clearAllTokens(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('token');
-    localStorage.removeItem('admin-auth-storage');
-    
-    // Also clear any cookies if present
-    if (typeof document !== 'undefined') {
-      document.cookie = 'accessToken=; Max-Age=0; path=/';
-      document.cookie = 'refreshToken=; Max-Age=0; path=/';
+    const response = await this.api.post('/auth/login', payload);
+    const data = response.data as AuthResponse;
+
+    // Phase 6-7: Only store tokens locally for localStorage strategy
+    if (this.strategy === 'localStorage' && data.accessToken) {
+      setAccessToken(data.accessToken);
+      if (data.refreshToken) {
+        setRefreshToken(data.refreshToken);
+      }
+      updateAuthStorage(data.accessToken, data.refreshToken);
     }
+
+    return data;
   }
 
+  /**
+   * Logout
+   *
+   * Phase 6-7: Cookie Auth Primary
+   * - Cookie strategy: Server clears httpOnly cookies
+   * - localStorage strategy: Clear localStorage tokens
+   */
   async logout(): Promise<void> {
     try {
-      // baseURL already includes /api/v1
       await this.api.post('/auth/logout', {});
     } catch (error) {
       // Even if logout fails (e.g., token expired), continue with local cleanup
       // This is normal if token expired
     } finally {
-      // Always clear local tokens
-      this.clearAllTokens();
+      // Phase 6-7: Clear localStorage tokens for localStorage strategy
+      // For cookie strategy, server handles cookie clearing
+      if (this.strategy === 'localStorage') {
+        clearAllTokens();
+      }
     }
   }
 
+  /**
+   * Check session status
+   *
+   * Phase 6-7: Works with both strategies
+   * - Cookie strategy: Uses cookies sent automatically
+   * - localStorage strategy: Uses Authorization header
+   */
   async checkSession(): Promise<{ isAuthenticated: boolean; user?: any }> {
     try {
       const response = await this.api.get('/accounts/sso/check');
@@ -176,6 +213,13 @@ export class AuthClient {
     } catch (error) {
       return { isAuthenticated: false };
     }
+  }
+
+  /**
+   * Get current auth strategy
+   */
+  getStrategy(): AuthStrategy {
+    return this.strategy;
   }
 }
 

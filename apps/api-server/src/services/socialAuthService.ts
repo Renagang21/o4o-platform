@@ -1,10 +1,11 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
-import { getAuthService } from './AuthService.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { emailService } from './emailService.js';
 import { Response } from 'express';
 import logger from '../utils/logger.js';
+import * as tokenUtils from '../utils/token.utils.js';
+import * as cookieUtils from '../utils/cookie.utils.js';
 
 interface SocialProfile {
   provider: 'google' | 'kakao' | 'naver';
@@ -94,23 +95,23 @@ export class SocialAuthService {
 
   /**
    * Complete social login and set cookies
+   *
+   * Uses tokenUtils and cookieUtils directly instead of deprecated AuthService.
+   * AuthenticationService is the SSOT for authentication.
    */
   static async completeSocialLogin(user: User, res: Response): Promise<{
     user: User;
     sessionId: string;
   }> {
-    // Get authService instance
-    const authService = await getAuthService();
-
-    // Generate tokens
-    const tokens = await authService.generateTokens(user, 'neture.co.kr');
+    // Generate tokens using tokenUtils (SSOT for token generation)
+    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
 
     // Create SSO session
     const sessionId = SessionSyncService.generateSessionId();
     await SessionSyncService.createSession(user, sessionId);
 
-    // Set cookies
-    authService.setAuthCookies(res, tokens);
+    // Set cookies using cookieUtils (SSOT for cookie management)
+    cookieUtils.setAuthCookies(res, tokens);
 
     // Set session ID cookie for SSO
     res.cookie('sessionId', sessionId, {
