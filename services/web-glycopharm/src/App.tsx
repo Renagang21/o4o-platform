@@ -77,6 +77,9 @@ import NotFoundPage from '@/pages/NotFoundPage';
 // Test Page
 import NavLinkTestPage from '@/pages/NavLinkTestPage';
 
+// Debug Pages (/__debug__/*)
+import { LoginProbePage, NavigationProbePage, ApiProbePage } from '@/pages/__debug__';
+
 // Apply Pages (API 연동)
 import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
 import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
@@ -108,6 +111,13 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 function AppRoutes() {
   return (
     <Routes>
+      {/* Debug Routes - No layout, no auth (커뮤니티 검증 패턴) */}
+      <Route path="__debug__">
+        <Route path="login" element={<LoginProbePage />} />
+        <Route path="navigation" element={<NavigationProbePage />} />
+        <Route path="api" element={<ApiProbePage />} />
+      </Route>
+
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
