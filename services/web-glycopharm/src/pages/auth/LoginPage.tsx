@@ -24,8 +24,10 @@ export default function LoginPage() {
   };
 
   // 테스트 계정 (데이터베이스에 등록된 실제 계정)
+  // API 서버 역할: seller -> 약국(pharmacy), admin -> 운영자(operator)
   const testAccounts = [
-    { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary' },
+    { email: 'seller@test.com', password: 'test123!@#', label: '약국 (seller)', color: 'primary' },
+    { email: 'admin@test.com', password: 'test123!@#', label: '운영자 (admin)', color: 'red' },
   ];
 
   // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)

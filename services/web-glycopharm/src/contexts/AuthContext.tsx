@@ -16,6 +16,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// API 서버 역할을 glycopharm-web 역할로 매핑
+// API Server -> glycopharm-web
+// seller -> pharmacy
+// admin/super_admin -> operator
+// customer/user -> consumer
+// supplier -> supplier
+// partner -> partner
+function mapApiRoleToWebRole(apiRole: string): UserRole {
+  const roleMap: Record<string, UserRole> = {
+    'seller': 'pharmacy',
+    'admin': 'operator',
+    'super_admin': 'operator',
+    'customer': 'consumer',
+    'user': 'consumer',
+    'supplier': 'supplier',
+    'partner': 'partner',
+  };
+  return roleMap[apiRole] || 'consumer';
+}
+
 export const ROLE_LABELS: Record<UserRole, string> = {
   pharmacy: '약국',
   supplier: '공급자',
@@ -98,7 +118,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.data) {
         const { user: userData, accessToken } = response.data;
-        const typedUser = userData as User;
+        // API 역할을 웹 역할로 매핑
+        const apiUser = userData as { role: string; [key: string]: unknown };
+        const mappedRole = mapApiRoleToWebRole(apiUser.role);
+        const typedUser: User = {
+          ...apiUser,
+          role: mappedRole,
+          name: apiUser.fullName as string || apiUser.email as string,
+          status: (apiUser.status as string) || 'approved',
+          createdAt: apiUser.createdAt as string,
+          updatedAt: apiUser.updatedAt as string,
+        } as User;
+
         apiClient.setToken(accessToken);
         localStorage.setItem('glycopharm_token', accessToken);
         setUser(typedUser);
