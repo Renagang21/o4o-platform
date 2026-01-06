@@ -13,6 +13,13 @@ const ROLE_ICONS: Record<UserRole, string> = {
   partner: '🤝',
 };
 
+// 테스트 계정 목록
+const TEST_ACCOUNTS = [
+  { email: 'test-supplier@neture.co.kr', password: 'test123!@#', label: '공급자', role: 'supplier' as UserRole },
+  { email: 'test-partner@neture.co.kr', password: 'test123!@#', label: '파트너', role: 'partner' as UserRole },
+  { email: 'admin@neture.co.kr', password: 'Admin2024!', label: '관리자', role: 'admin' as UserRole },
+];
+
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -22,6 +29,13 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [pendingRoles, setPendingRoles] = useState<UserRole[]>([]);
+
+  // 테스트 계정 정보를 입력 필드에 채우기
+  const fillTestAccount = (account: { email: string; password: string }) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,12 +156,35 @@ export function LoginPage() {
         </form>
 
         <div style={styles.testAccounts}>
-          <p style={styles.testTitle}>테스트 계정 (비밀번호: test123!@#)</p>
-          <ul style={styles.testList}>
-            <li>test-supplier@neture.co.kr - 공급자</li>
-            <li>test-seller@neture.co.kr - 판매자</li>
-            <li>test-partner@neture.co.kr - 파트너</li>
-          </ul>
+          <p style={styles.testTitle}>테스트 계정 (클릭 시 입력됨)</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {TEST_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => fillTestAccount(account)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 12px',
+                  backgroundColor: '#fff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{ fontSize: '13px', fontWeight: 600, color: PRIMARY_COLOR, minWidth: '50px' }}>
+                  {account.label}
+                </span>
+                <span style={{ fontSize: '12px', color: '#64748B', flex: 1 }}>
+                  {account.email}
+                </span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>클릭하여 입력</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div style={styles.footer}>

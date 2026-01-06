@@ -36,6 +36,9 @@ import { AdminRoutes } from './routes/AdminRoutes';
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
 
+// Login page
+import { LoginPage } from './pages/LoginPage';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -55,6 +58,9 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Login Page (레이아웃 없음) */}
+          <Route path="/login" element={<LoginPage />} />
+
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/admin/*" element={<AdminRoutes />} />
 

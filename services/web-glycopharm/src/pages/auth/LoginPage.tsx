@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, ROLE_DASHBOARDS, type UserRole } from '@/contexts/AuthContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+
+// 테스트 계정 (데이터베이스에 등록된 실제 계정)
+const testAccounts = [
+  { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary', role: 'pharmacy' as UserRole },
+  { email: 'admin@neture.co.kr', password: 'Admin2024!', label: '운영자', color: 'red', role: 'operator' as UserRole },
+];
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -17,16 +23,15 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      navigate('/');
+      // 역할에 따른 대시보드로 이동
+      const account = testAccounts.find(a => a.email === email);
+      const role = account?.role || 'pharmacy';
+      const dashboard = ROLE_DASHBOARDS[role] || '/';
+      navigate(dashboard);
     } catch {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
     }
   };
-
-  // 테스트 계정 (데이터베이스에 등록된 실제 계정)
-  const testAccounts = [
-    { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary' },
-  ];
 
   // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
   const fillTestAccount = (account: { email: string; password: string }) => {

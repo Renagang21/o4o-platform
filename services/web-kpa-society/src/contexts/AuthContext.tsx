@@ -24,8 +24,9 @@ export interface User {
  * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 정의
  * - 지부 운영자: district_admin
  * - 분회 운영자: branch_admin
+ * - 약사: pharmacist
  */
-export type TestAccountType = 'district_admin' | 'branch_admin';
+export type TestAccountType = 'district_admin' | 'branch_admin' | 'pharmacist';
 
 export const TEST_ACCOUNTS: Record<TestAccountType, User> = {
   district_admin: {
@@ -39,6 +40,12 @@ export const TEST_ACCOUNTS: Record<TestAccountType, User> = {
     email: 'branch-admin@kpa-test.kr',
     name: '분회 운영자 (테스트)',
     role: 'branch_admin',
+  },
+  pharmacist: {
+    id: 'test-pharmacist-001',
+    email: 'pharmacist@kpa-test.kr',
+    name: '테스트 약사',
+    role: 'pharmacist',
   },
 };
 

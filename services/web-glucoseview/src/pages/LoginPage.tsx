@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+// 테스트 계정 목록
+const TEST_ACCOUNTS = [
+  { label: '약사', email: 'pharmacist@test.test', password: 'testID1234', role: 'pharmacist' },
+  { label: '관리자', email: 'admin@test.test', password: 'adminID1234', role: 'admin' },
+];
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,23 +16,38 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // 역할에 따른 대시보드 경로
+  const getDashboardPath = (role: string) => {
+    return role === 'admin' ? '/admin' : '/';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        navigate('/');
+      const result = await login(email, password);
+      if (result.success) {
+        // 로그인한 계정의 역할 확인
+        const account = TEST_ACCOUNTS.find(a => a.email === email);
+        const path = account ? getDashboardPath(account.role) : '/';
+        navigate(path);
       } else {
-        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+        setError(result.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch {
       setError('로그인 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 테스트 계정 정보를 입력 필드에 채우기
+  const fillTestAccount = (account: { email: string; password: string }) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setError('');
   };
 
   return (
@@ -92,16 +113,24 @@ export default function LoginPage() {
 
           {/* 테스트 계정 */}
           <div className="mt-6 pt-6 border-t border-slate-100">
-            <p className="text-xs text-slate-400 mb-3">테스트 계정</p>
-            <div className="space-y-2 text-xs text-slate-500">
-              <div className="flex justify-between">
-                <span>약사: pharmacist@test.test</span>
-                <span className="text-slate-400">/ testID1234</span>
-              </div>
-              <div className="flex justify-between">
-                <span>관리자: admin@test.test</span>
-                <span className="text-slate-400">/ adminID1234</span>
-              </div>
+            <p className="text-xs text-slate-400 mb-3">테스트 계정 (클릭 시 입력됨)</p>
+            <div className="space-y-2">
+              {TEST_ACCOUNTS.map((account) => (
+                <button
+                  key={account.email}
+                  type="button"
+                  onClick={() => fillTestAccount(account)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-700">
+                      {account.label}
+                    </span>
+                    <span className="text-sm text-slate-600">{account.email}</span>
+                  </div>
+                  <span className="text-xs text-slate-400">클릭하여 입력</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
