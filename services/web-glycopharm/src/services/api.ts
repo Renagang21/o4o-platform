@@ -110,7 +110,11 @@ export const apiClient = new ApiClient(API_BASE_URL);
 // Auth API
 export const authApi = {
   login: (email: string, password: string) =>
-    apiClient.post<{ user: unknown; accessToken: string; refreshToken: string }>('/api/v1/auth/login', { email, password }),
+    apiClient.post<{ user: unknown; accessToken: string; refreshToken: string }>('/api/v1/auth/login', {
+      provider: 'email',
+      email,
+      password
+    }),
 
   logout: () => apiClient.post('/api/v1/auth/logout'),
 
