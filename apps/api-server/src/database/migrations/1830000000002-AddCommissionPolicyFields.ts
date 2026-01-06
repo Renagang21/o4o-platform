@@ -8,8 +8,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * - Seller-level default commission rates
  * - Priority system: Product → Seller → Global Default (20%)
  */
-export class AddCommissionPolicyFields1830000000000 implements MigrationInterface {
-    name = 'AddCommissionPolicyFields1830000000000'
+export class AddCommissionPolicyFields1830000000002 implements MigrationInterface {
+    name = 'AddCommissionPolicyFields1830000000002'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Add commission policy fields to products table

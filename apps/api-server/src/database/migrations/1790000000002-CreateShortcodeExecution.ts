@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateShortcodeExecution1790000000000 implements MigrationInterface {
-  name = 'CreateShortcodeExecution1790000000000';
+export class CreateShortcodeExecution1790000000002 implements MigrationInterface {
+  name = 'CreateShortcodeExecution1790000000002';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create execution status enum

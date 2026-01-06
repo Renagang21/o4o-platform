@@ -6,7 +6,7 @@ import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
  * Purpose: Store user phone numbers collected during checkout
  * for auto-fill functionality in future orders
  */
-export class AddPhoneToUsers1830000000000 implements MigrationInterface {
+export class AddPhoneToUsers1830000000003 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Add phone column to users table
     await queryRunner.addColumn(

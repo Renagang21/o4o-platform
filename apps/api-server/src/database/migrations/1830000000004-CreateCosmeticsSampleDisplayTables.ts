@@ -9,7 +9,7 @@ import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
  * - cosmetics_sample_conversion: 샘플 → 구매 전환 추적
  * - cosmetics_display_layouts: 진열 레이아웃 관리
  */
-export class CreateCosmeticsSampleDisplayTables1830000000000 implements MigrationInterface {
+export class CreateCosmeticsSampleDisplayTables1830000000004 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1. cosmetics_sample_inventory
     await queryRunner.createTable(

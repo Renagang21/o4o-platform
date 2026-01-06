@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from 'typeorm';
 
-export class CreateKpaTables9990000000000 implements MigrationInterface {
-  name = 'CreateKpaTables9990000000000';
+export class CreateKpaTables9990000000002 implements MigrationInterface {
+  name = 'CreateKpaTables9990000000002';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1. KPA Organizations

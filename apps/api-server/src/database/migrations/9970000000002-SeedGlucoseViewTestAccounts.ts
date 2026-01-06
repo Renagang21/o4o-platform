@@ -39,12 +39,11 @@ export class SeedGlucoseViewTestAccounts9970000000002 implements MigrationInterf
 
     // Insert pharmacist user
     await queryRunner.query(`
-      INSERT INTO users (id, email, password_hash, name, display_name, is_active, created_at, updated_at)
+      INSERT INTO users (id, email, password, name, "isActive", "createdAt", "updatedAt")
       VALUES (
         '${pharmacistUserId}',
         'pharmacist@test.test',
         '${pharmacistPassword}',
-        '테스트약사',
         '테스트약사',
         true,
         CURRENT_TIMESTAMP,
@@ -54,12 +53,11 @@ export class SeedGlucoseViewTestAccounts9970000000002 implements MigrationInterf
 
     // Insert admin user
     await queryRunner.query(`
-      INSERT INTO users (id, email, password_hash, name, display_name, is_active, created_at, updated_at)
+      INSERT INTO users (id, email, password, name, "isActive", "createdAt", "updatedAt")
       VALUES (
         '${adminUserId}',
         'admin@test.test',
         '${adminPassword}',
-        '관리자',
         '관리자',
         true,
         CURRENT_TIMESTAMP,

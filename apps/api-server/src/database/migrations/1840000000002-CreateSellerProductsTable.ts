@@ -6,8 +6,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * Enables Seller workflow for importing supplier products into their catalog
  * with custom pricing, margins, and sync policies.
  */
-export class CreateSellerProductsTable1840000000000 implements MigrationInterface {
-    name = 'CreateSellerProductsTable1840000000000'
+export class CreateSellerProductsTable1840000000002 implements MigrationInterface {
+    name = 'CreateSellerProductsTable1840000000002'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Create seller_products table

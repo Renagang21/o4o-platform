@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, Index, ForeignKey } from 'typeorm';
 
-export class CreateOrderTables1790000000000 implements MigrationInterface {
+export class CreateOrderTables1790000000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create orders table
     await queryRunner.createTable(

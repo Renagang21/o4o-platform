@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey } from 'typeorm';
 
-export class CreateAppSystemTables1840000000000 implements MigrationInterface {
+export class CreateAppSystemTables1840000000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create apps table
     await queryRunner.createTable(

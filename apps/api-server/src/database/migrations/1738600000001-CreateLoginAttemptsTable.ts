@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateLoginAttemptsTable1738600000000 implements MigrationInterface {
+export class CreateLoginAttemptsTable1738600000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create login_attempts table
     await queryRunner.createTable(

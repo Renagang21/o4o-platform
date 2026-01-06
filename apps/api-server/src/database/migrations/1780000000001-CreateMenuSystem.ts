@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateMenuSystem1780000000000 implements MigrationInterface {
-  name = 'CreateMenuSystem1780000000000';
+export class CreateMenuSystem1780000000001 implements MigrationInterface {
+  name = 'CreateMenuSystem1780000000001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create menus table

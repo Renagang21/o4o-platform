@@ -6,8 +6,8 @@ import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey } f
  * Phase B-1: Glycopharm API Implementation
  * Table for pharmacy participation/service application workflow
  */
-export class CreateGlycopharmApplicationsTable9990000000000 implements MigrationInterface {
-  name = 'CreateGlycopharmApplicationsTable9990000000000';
+export class CreateGlycopharmApplicationsTable9990000000003 implements MigrationInterface {
+  name = 'CreateGlycopharmApplicationsTable9990000000003';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create glycopharm_applications table
