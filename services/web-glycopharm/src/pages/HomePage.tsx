@@ -1,12 +1,23 @@
 /**
- * HomePage - GlycoPharm 운영 허브
+ * HomePage - GlycoPharm 세미 프랜차이즈 쇼윈도
  *
- * 프랜차이즈 표준 화면 배치:
- * 1. Hero: 운영 메시지 슬라이드 + CTA
- * 2. 광고 슬롯
- * 3. 핵심 3대 Extension 카드
- * 4. 공지 요약
- * 5. 협력업체 로고/링크
+ * Work Order: WO-GP-HOME-RESTRUCTURE-V1
+ *
+ * 화면 구조 (상→하):
+ * 1. Hero / Campaign Slider - 플랫폼 정체성 + 캠페인
+ * 2. Quick Action - 운영 도구 상태 요약
+ * 3. Now Running - 신제품/Trial/이벤트
+ * 4. CGM / 연계 서비스 Zone
+ * 5. 운영 공지 / 가이드
+ * 6. 협력기관 / 파트너 신뢰 Zone
+ *
+ * 원칙:
+ * - 통계/차트 ❌
+ * - 매출 데이터 ❌
+ * - 환영 문구/기능 나열 ❌
+ * - 지금 진행 중인 것 ⭕
+ * - 참여 가능한 것 ⭕
+ * - 운영 주체의 존재감 ⭕
  */
 
 import { useState, useEffect } from 'react';
@@ -20,40 +31,46 @@ import {
   MessageSquare,
   Pin,
   ExternalLink,
+  Activity,
+  Sparkles,
+  Calendar,
+  Users,
   Building2,
-  Megaphone,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoadingState } from '@/components/common';
 
+// ========================================
 // Types
+// ========================================
+
 interface HeroSlide {
   id: string;
   title: string;
-  description: string;
-  bgColor: string;
-  cta: { label: string; link: string; primary: boolean }[];
+  subtitle: string;
+  bgGradient: string;
+  cta?: { label: string; link: string; variant: 'primary' | 'secondary' };
 }
 
-interface AdSlot {
-  id: string;
-  title: string;
-  description: string;
-  link: string;
-  bgImage: string | null;
-  bgColor: string;
-}
-
-interface ExtensionCard {
+interface QuickActionCard {
   id: string;
   title: string;
   subtitle: string;
   description: string;
-  iconType: string;
+  icon: LucideIcon;
   link: string;
   color: string;
-  stats: { label: string; value: string };
+  status: { label: string; value: string | number };
+}
+
+interface NowRunningItem {
+  id: string;
+  type: 'trial' | 'event' | 'campaign';
+  title: string;
+  supplier?: string;
+  deadline?: string;
+  participants?: number;
+  link: string;
 }
 
 interface Notice {
@@ -61,324 +78,528 @@ interface Notice {
   title: string;
   date: string;
   isPinned: boolean;
-  forumId: string;
+  link: string;
 }
 
 interface Partner {
-  id: number;
+  id: string;
   name: string;
-  logo: string;
+  logo?: string;
+  type: 'association' | 'supplier' | 'partner';
 }
 
+// ========================================
+// Static Data (운영자 관리 콘텐츠로 대체 예정)
+// ========================================
 
-// Default extension cards (static fallback)
-const defaultExtensionCards: (ExtensionCard & { icon: LucideIcon })[] = [
+const heroSlides: HeroSlide[] = [
+  {
+    id: 'main',
+    title: '혈당관리 약국을 위한\n운영 플랫폼',
+    subtitle: '제품·콘텐츠·실험·판매가 연결됩니다',
+    bgGradient: 'from-primary-600 via-primary-700 to-primary-800',
+    cta: { label: '시작하기', link: '/pharmacy', variant: 'primary' },
+  },
+  {
+    id: 'trial',
+    title: '신제품 Market Trial\n참여 약국 모집 중',
+    subtitle: '공급사의 신제품을 먼저 체험하고 피드백을 공유하세요',
+    bgGradient: 'from-green-600 via-green-700 to-emerald-800',
+    cta: { label: '자세히 보기', link: '/pharmacy/market-trial', variant: 'primary' },
+  },
+  {
+    id: 'cgm',
+    title: 'CGM 데이터 요약 기반\n설명·판매 지원',
+    subtitle: 'GlucoseView와 연계하여 환자 맞춤 제품 추천',
+    bgGradient: 'from-blue-600 via-blue-700 to-indigo-800',
+    cta: { label: 'CGM 서비스 보기', link: 'https://glucoseview.co.kr', variant: 'primary' },
+  },
+  {
+    id: 'trust',
+    title: '다수 약국·다수 기업이 함께하는\n세미 프랜차이즈 플랫폼',
+    subtitle: '한국당뇨협회, 협력 공급사와 함께 성장합니다',
+    bgGradient: 'from-slate-700 via-slate-800 to-slate-900',
+  },
+];
+
+const quickActionCards: QuickActionCard[] = [
   {
     id: 'signage',
     title: 'Signage',
     subtitle: '콘텐츠 라이브러리',
     description: '약국 TV에 노출할 교육 콘텐츠를 관리하세요',
-    iconType: 'monitor',
     icon: Monitor,
-    link: '/pharmacy/signage/library',
+    link: '/pharmacy/signage/my',
     color: 'bg-accent-500',
-    stats: { label: '등록 콘텐츠', value: '-' },
+    status: { label: '방영 중', value: 3 },
   },
   {
     id: 'trial',
     title: 'Market Trial',
     subtitle: '신제품 체험',
-    description: '공급사의 신제품 Trial 프로그램에 참여하세요',
-    iconType: 'tag',
+    description: '공급사의 신제품 Trial에 참여하세요',
     icon: Tag,
     link: '/pharmacy/market-trial',
     color: 'bg-green-500',
-    stats: { label: '진행 중 Trial', value: '-' },
+    status: { label: '진행 중', value: 2 },
   },
   {
     id: 'forum',
     title: 'Forum',
     subtitle: '약사 커뮤니티',
     description: '혈당관리 노하우와 경험을 공유하세요',
-    iconType: 'messageSquare',
     icon: MessageSquare,
     link: '/forum-ext',
     color: 'bg-blue-500',
-    stats: { label: '활성 포럼', value: '-' },
+    status: { label: '신규 글', value: 5 },
   },
 ];
 
-export default function HomePage() {
-  const { isAuthenticated } = useAuth();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [heroSlides] = useState<HeroSlide[]>([]);
-  const [adSlot] = useState<AdSlot | null>(null);
-  const [extensionCards] = useState<(ExtensionCard & { icon: LucideIcon })[]>(defaultExtensionCards);
-  const [notices] = useState<Notice[]>([]);
-  const [partners] = useState<Partner[]>([]);
+const nowRunningItems: NowRunningItem[] = [
+  {
+    id: '1',
+    type: 'trial',
+    title: '당뇨병 환자용 신규 영양제 Trial',
+    supplier: '글루코헬스',
+    deadline: '2026.01.31',
+    participants: 23,
+    link: '/pharmacy/market-trial',
+  },
+  {
+    id: '2',
+    type: 'event',
+    title: '혈당관리 앱 연동 이벤트',
+    supplier: 'GlucoseView',
+    deadline: '2026.02.15',
+    link: '/pharmacy/market-trial',
+  },
+  {
+    id: '3',
+    type: 'campaign',
+    title: '당뇨인의 날 캠페인',
+    deadline: '2026.03.14',
+    link: '/forum-ext',
+  },
+];
 
-  // 홈페이지 데이터 로드
-  useEffect(() => {
-    // TODO: /api/v1/glycopharm/home 엔드포인트 구현 시 API 호출 활성화
-    // 현재는 기본값 사용 (백엔드 엔드포인트 미구현)
-    setIsLoading(false);
-  }, []);
+const notices: Notice[] = [
+  {
+    id: '1',
+    title: '[공지] GlycoPharm 서비스 업데이트 안내 (v2.0)',
+    date: '2026.01.06',
+    isPinned: true,
+    link: '/forum-ext',
+  },
+  {
+    id: '2',
+    title: '[안내] Market Trial 참여 가이드',
+    date: '2026.01.05',
+    isPinned: true,
+    link: '/forum-ext',
+  },
+  {
+    id: '3',
+    title: '1월 Signage 콘텐츠 업데이트',
+    date: '2026.01.03',
+    isPinned: false,
+    link: '/forum-ext',
+  },
+  {
+    id: '4',
+    title: '협력 공급사 추가 안내',
+    date: '2026.01.02',
+    isPinned: false,
+    link: '/forum-ext',
+  },
+];
+
+const partners: Partner[] = [
+  { id: '1', name: '한국당뇨협회', type: 'association' },
+  { id: '2', name: '글루코헬스', type: 'supplier' },
+  { id: '3', name: '혈당케어', type: 'supplier' },
+  { id: '4', name: 'GlucoseView', type: 'partner' },
+  { id: '5', name: '바이오파마', type: 'supplier' },
+];
+
+// ========================================
+// Components
+// ========================================
+
+function HeroSection() {
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Auto slide
   useEffect(() => {
-    if (heroSlides.length === 0) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  }, []);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  if (isLoading) {
-    return <LoadingState message="페이지를 불러오는 중..." />;
-  }
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Hero Section - 대형 슬라이드 */}
-      {heroSlides.length > 0 ? (
-        <section className="relative overflow-hidden">
-          {/* Slides */}
-          <div className="relative h-[400px] md:h-[480px]">
-            {heroSlides.map((slide, index) => (
-              <div
-                key={slide.id}
-                className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-              >
-                <div className={`h-full bg-gradient-to-br ${slide.bgColor}`}>
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center">
-                    <div className="max-w-2xl">
-                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 whitespace-pre-line">
-                        {slide.title}
-                      </h1>
-                      <p className="text-lg text-white/80 mb-8">
-                        {slide.description}
-                      </p>
-                      <div className="flex flex-wrap gap-3">
-                        {slide.cta.map((btn, btnIdx) => (
-                          <NavLink
-                            key={btnIdx}
-                            to={btn.link}
-                            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${btn.primary
-                                ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
-                                : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
-                              }`}
-                          >
-                            {btn.label}
-                            <ArrowRight className="w-4 h-4" />
-                          </NavLink>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Slide Controls */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
-            <button
-              onClick={prevSlide}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div className="flex gap-2">
-              {heroSlides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40'
-                    }`}
-                />
-              ))}
-            </div>
-            <button
-              onClick={nextSlide}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </section>
-      ) : (
-        <section className="bg-gradient-to-br from-primary-600 to-primary-800 py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              GlycoPharm에 오신 것을 환영합니다
-            </h1>
-            <p className="text-lg text-white/80">
-              혈당관리 전문 약국을 위한 운영 플랫폼
-            </p>
-          </div>
-        </section>
-      )}
-
-      {/* Ad Slot - 프로모션 배너 */}
-      {adSlot && (
-        <section className="py-6 px-4 sm:px-6 max-w-7xl mx-auto">
-          <NavLink
-            to={adSlot.link}
-            className={`block ${adSlot.bgColor} rounded-2xl p-6 md:p-8 hover:shadow-lg transition-shadow`}
+    <section className="relative overflow-hidden">
+      <div className="relative h-[420px] md:h-[480px]">
+        {heroSlides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-700 ${
+              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Megaphone className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg md:text-xl font-bold text-white">{adSlot.title}</h3>
-                  <p className="text-white/80 text-sm">{adSlot.description}</p>
+            <div className={`h-full bg-gradient-to-br ${slide.bgGradient}`}>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center">
+                <div className="max-w-2xl">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 whitespace-pre-line">
+                    {slide.title}
+                  </h1>
+                  <p className="text-lg md:text-xl text-white/80 mb-8">
+                    {slide.subtitle}
+                  </p>
+                  {slide.cta && (
+                    <NavLink
+                      to={slide.cta.link}
+                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                        slide.cta.variant === 'primary'
+                          ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
+                          : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
+                      }`}
+                    >
+                      {slide.cta.label}
+                      <ArrowRight className="w-4 h-4" />
+                    </NavLink>
+                  )}
                 </div>
               </div>
-              <ExternalLink className="w-5 h-5 text-white/60 hidden md:block" />
             </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Slide Controls */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
+        <button
+          onClick={prevSlide}
+          className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+          aria-label="이전 슬라이드"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <div className="flex gap-2">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-2 rounded-full transition-all ${
+                index === currentSlide ? 'bg-white w-8' : 'bg-white/40 w-2'
+              }`}
+              aria-label={`슬라이드 ${index + 1}`}
+            />
+          ))}
+        </div>
+        <button
+          onClick={nextSlide}
+          className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+          aria-label="다음 슬라이드"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function QuickActionSection() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-800">운영 도구</h2>
+          <p className="text-sm text-slate-500">약국 운영에 필요한 핵심 기능</p>
+        </div>
+        {isAuthenticated && (
+          <NavLink
+            to="/pharmacy"
+            className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
+          >
+            대시보드
+            <ArrowRight className="w-4 h-4" />
           </NavLink>
-        </section>
-      )}
+        )}
+      </div>
 
-      {/* Extension Cards - 핵심 3대 운영 기능 */}
-      <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">운영 도구</h2>
-            <p className="text-sm text-slate-500">약국 운영에 필요한 핵심 기능</p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          {extensionCards.map((card) => {
-            const Icon = card.icon;
-            return (
-              <NavLink
-                key={card.id}
-                to={card.link}
-                className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl ${card.color} flex items-center justify-center`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-slate-800">{card.stats.value}</p>
-                    <p className="text-xs text-slate-400">{card.stats.label}</p>
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-slate-800 mb-1">{card.title}</h3>
-                <p className="text-sm text-primary-600 font-medium mb-2">{card.subtitle}</p>
-                <p className="text-sm text-slate-500">{card.description}</p>
-                <div className="mt-4 flex items-center gap-1 text-sm text-primary-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  바로가기
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </NavLink>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Notice Summary - 공지 요약 */}
-      <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between p-5 border-b border-slate-100">
-            <h2 className="text-lg font-bold text-slate-800">공지사항</h2>
+      <div className="grid md:grid-cols-3 gap-4">
+        {quickActionCards.map((card) => {
+          const Icon = card.icon;
+          return (
             <NavLink
-              to="/forum-ext"
-              className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
+              key={card.id}
+              to={card.link}
+              className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-slate-100"
             >
-              전체보기
-              <ChevronRight className="w-4 h-4" />
-            </NavLink>
-          </div>
-          {notices.length > 0 ? (
-            <div className="divide-y divide-slate-100">
-              {notices.map((notice) => (
-                <NavLink
-                  key={notice.id}
-                  to={`/forum-ext/${notice.forumId}`}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    {notice.isPinned && (
-                      <Pin className="w-4 h-4 text-primary-500 flex-shrink-0" />
-                    )}
-                    <span className={`text-sm ${notice.isPinned ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
-                      {notice.title}
-                    </span>
-                  </div>
-                  <span className="text-xs text-slate-400 flex-shrink-0 ml-4">{notice.date}</span>
-                </NavLink>
-              ))}
-            </div>
-          ) : (
-            <div className="py-8 text-center text-slate-500 text-sm">
-              등록된 공지사항이 없습니다.
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Quick Actions for Non-authenticated Users */}
-      {!isAuthenticated && (
-        <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 text-center">
-            <Building2 className="w-12 h-12 text-primary-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">GlycoPharm과 함께 성장하세요</h2>
-            <p className="text-slate-400 mb-6">
-              혈당관리 전문 약국으로 성장할 수 있는 모든 도구를 제공합니다
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <NavLink
-                to="/register"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
-              >
-                무료로 시작하기
-                <ArrowRight className="w-4 h-4" />
-              </NavLink>
-              <NavLink
-                to="/login"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-colors border border-white/20"
-              >
-                로그인
-              </NavLink>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Partners Section - 협력업체 */}
-      {partners.length > 0 && (
-        <section className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
-          <p className="text-center text-sm text-slate-400 mb-6">
-            신뢰할 수 있는 파트너사와 함께합니다
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {partners.map((partner) => (
-              <div
-                key={partner.id}
-                className="w-28 h-16 bg-white border border-slate-200 rounded-xl flex items-center justify-center hover:border-slate-300 hover:shadow-sm transition-all"
-              >
-                <span className="text-slate-500 font-medium text-sm">{partner.name}</span>
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl ${card.color} flex items-center justify-center`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-slate-800">{card.status.value}</p>
+                  <p className="text-xs text-slate-400">{card.status.label}</p>
+                </div>
               </div>
-            ))}
+              <h3 className="text-lg font-bold text-slate-800 mb-1">{card.title}</h3>
+              <p className="text-sm text-primary-600 font-medium mb-2">{card.subtitle}</p>
+              <p className="text-sm text-slate-500">{card.description}</p>
+              <div className="mt-4 flex items-center gap-1 text-sm text-primary-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                바로가기
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </NavLink>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function NowRunningSection() {
+  const getTypeConfig = (type: NowRunningItem['type']) => {
+    switch (type) {
+      case 'trial':
+        return { label: 'Trial', color: 'bg-green-100 text-green-700', icon: Tag };
+      case 'event':
+        return { label: '이벤트', color: 'bg-blue-100 text-blue-700', icon: Sparkles };
+      case 'campaign':
+        return { label: '캠페인', color: 'bg-purple-100 text-purple-700', icon: Calendar };
+    }
+  };
+
+  return (
+    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-800">Now Running</h2>
+          <p className="text-sm text-slate-500">지금 참여 가능한 프로그램</p>
+        </div>
+        <NavLink
+          to="/pharmacy/market-trial"
+          className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
+        >
+          전체보기
+          <ArrowRight className="w-4 h-4" />
+        </NavLink>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        {nowRunningItems.map((item) => {
+          const config = getTypeConfig(item.type);
+          const Icon = config.icon;
+          return (
+            <NavLink
+              key={item.id}
+              to={item.link}
+              className="group bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-slate-100"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                  <Icon className="w-3 h-3" />
+                  {config.label}
+                </span>
+                {item.deadline && (
+                  <span className="text-xs text-slate-400">~{item.deadline}</span>
+                )}
+              </div>
+              <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors">
+                {item.title}
+              </h3>
+              <div className="flex items-center justify-between text-sm">
+                {item.supplier && (
+                  <span className="text-slate-500">{item.supplier}</span>
+                )}
+                {item.participants && (
+                  <span className="flex items-center gap-1 text-slate-400">
+                    <Users className="w-3 h-3" />
+                    {item.participants}명 참여
+                  </span>
+                )}
+              </div>
+            </NavLink>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function CGMServiceSection() {
+  return (
+    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-slate-800">연계 서비스</h2>
+        <p className="text-sm text-slate-500">GlycoPharm과 연결된 전문 서비스</p>
+      </div>
+
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 md:p-8 border border-blue-100">
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
+          <div className="flex-shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+              <Activity className="w-8 h-8 text-white" />
+            </div>
           </div>
-        </section>
-      )}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-xl font-bold text-slate-800">GlucoseView</h3>
+              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                CGM 연계
+              </span>
+            </div>
+            <p className="text-slate-600 mb-4">
+              CGM 데이터 요약을 기반으로 환자에게 맞춤형 제품을 추천하세요.
+              <span className="block text-sm text-slate-500 mt-1">
+                ※ 환자 관리가 아닌, 판매·설명용 인사이트 제공 서비스
+              </span>
+            </p>
+            <a
+              href="https://glucoseview.co.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors border border-blue-200"
+            >
+              서비스 보기
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NoticeSection() {
+  return (
+    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
+        <div className="flex items-center justify-between p-5 border-b border-slate-100">
+          <h2 className="text-lg font-bold text-slate-800">운영 공지</h2>
+          <NavLink
+            to="/forum-ext"
+            className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
+          >
+            전체보기
+            <ChevronRight className="w-4 h-4" />
+          </NavLink>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {notices.map((notice) => (
+            <NavLink
+              key={notice.id}
+              to={notice.link}
+              className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                {notice.isPinned && (
+                  <Pin className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                )}
+                <span className={`text-sm ${notice.isPinned ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
+                  {notice.title}
+                </span>
+              </div>
+              <span className="text-xs text-slate-400 flex-shrink-0 ml-4">{notice.date}</span>
+            </NavLink>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PartnerTrustSection() {
+  return (
+    <section className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
+      <p className="text-center text-sm text-slate-500 mb-6">
+        신뢰할 수 있는 기관·기업과 함께합니다
+      </p>
+      <div className="flex flex-wrap justify-center gap-3">
+        {partners.map((partner) => (
+          <div
+            key={partner.id}
+            className={`px-5 py-3 rounded-xl flex items-center justify-center transition-all ${
+              partner.type === 'association'
+                ? 'bg-primary-50 border border-primary-200 text-primary-700'
+                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm'
+            }`}
+          >
+            <span className="font-medium text-sm">{partner.name}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CTASection() {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) return null;
+
+  return (
+    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 text-center">
+        <Building2 className="w-12 h-12 text-primary-400 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-white mb-2">GlycoPharm과 함께하세요</h2>
+        <p className="text-slate-400 mb-6 max-w-md mx-auto">
+          혈당관리 전문 약국으로 성장할 수 있는 모든 도구와 네트워크를 제공합니다
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <NavLink
+            to="/register"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
+          >
+            무료로 시작하기
+            <ArrowRight className="w-4 h-4" />
+          </NavLink>
+          <NavLink
+            to="/login"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-colors border border-white/20"
+          >
+            로그인
+          </NavLink>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ========================================
+// Main Component
+// ========================================
+
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* 1. Hero / Campaign Slider */}
+      <HeroSection />
+
+      {/* 2. Quick Action - 운영 도구 요약 */}
+      <QuickActionSection />
+
+      {/* 3. Now Running - 신제품/Trial/이벤트 */}
+      <NowRunningSection />
+
+      {/* 4. CGM / 연계 서비스 Zone */}
+      <CGMServiceSection />
+
+      {/* 5. 운영 공지 / 가이드 */}
+      <NoticeSection />
+
+      {/* CTA for Non-authenticated Users */}
+      <CTASection />
+
+      {/* 6. 협력기관 / 파트너 신뢰 Zone */}
+      <PartnerTrustSection />
     </div>
   );
 }
