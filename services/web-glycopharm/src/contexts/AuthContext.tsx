@@ -18,18 +18,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // API 서버 역할을 glycopharm-web 역할로 매핑
 // API Server -> glycopharm-web
-// seller -> pharmacy
+// seller/customer -> pharmacy (glycopharm은 약국 중심 서비스)
 // admin/super_admin -> operator
-// customer/user -> consumer
 // supplier -> supplier
 // partner -> partner
+// Note: customer는 glycopharm에서 약국(pharmacy) 역할로 간주됨
+// 일반 소비자(consumer)는 별도 역할 체계 필요시 추가 정의 예정
 function mapApiRoleToWebRole(apiRole: string): UserRole {
   const roleMap: Record<string, UserRole> = {
     'seller': 'pharmacy',
+    'customer': 'pharmacy', // glycopharm 약국 계정
+    'user': 'pharmacy',     // glycopharm 약국 계정
     'admin': 'operator',
     'super_admin': 'operator',
-    'customer': 'consumer',
-    'user': 'consumer',
     'supplier': 'supplier',
     'partner': 'partner',
   };
@@ -74,7 +75,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const response = await authApi.me();
           if (response.data) {
-            const userData = response.data.user as User;
+            // API 역할을 웹 역할로 매핑
+            const apiUser = response.data.user as { role: string; [key: string]: unknown };
+            const mappedRole = mapApiRoleToWebRole(apiUser.role);
+            const userData: User = {
+              ...apiUser,
+              role: mappedRole,
+              name: apiUser.fullName as string || apiUser.email as string,
+              status: (apiUser.status as string) || 'approved',
+              createdAt: apiUser.createdAt as string,
+              updatedAt: apiUser.updatedAt as string,
+            } as User;
             setUser(userData);
             localStorage.setItem('glycopharm_user', JSON.stringify(userData));
             setAvailableRoles([userData.role]);
