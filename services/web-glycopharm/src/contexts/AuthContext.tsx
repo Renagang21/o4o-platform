@@ -1,6 +1,17 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
+
+// Re-export UserRole for use by other components
+export type { UserRole } from '@/types';
 import { authApi, apiClient } from '@/services/api';
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAllAuthData,
+  getStoredUser,
+  setStoredUser,
+  clearStoredUser,
+} from '@/utils/token-storage';
 
 interface AuthContextType {
   user: User | null;
@@ -67,9 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
 
   useEffect(() => {
-    // Check for existing session
+    // Check for existing session - Uses SSOT token storage
     const checkSession = async () => {
-      const token = localStorage.getItem('glycopharm_token');
+      const token = getAccessToken();
       if (token) {
         apiClient.setToken(token);
         try {
@@ -87,28 +98,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               updatedAt: apiUser.updatedAt as string,
             } as User;
             setUser(userData);
-            localStorage.setItem('glycopharm_user', JSON.stringify(userData));
+            setStoredUser(userData);
             setAvailableRoles([userData.role]);
           } else {
-            localStorage.removeItem('glycopharm_token');
-            localStorage.removeItem('glycopharm_user');
+            clearAllAuthData();
             apiClient.setToken(null);
           }
         } catch {
-          localStorage.removeItem('glycopharm_token');
-          localStorage.removeItem('glycopharm_user');
+          clearAllAuthData();
           apiClient.setToken(null);
         }
       } else {
         // Check for saved user (test mode)
-        const savedUser = localStorage.getItem('glycopharm_user');
+        const savedUser = getStoredUser();
         if (savedUser) {
           try {
             const userData = JSON.parse(savedUser);
             setUser(userData);
             setAvailableRoles(userData.availableRoles || [userData.role]);
           } catch {
-            localStorage.removeItem('glycopharm_user');
+            clearStoredUser();
           }
         }
       }
@@ -142,10 +151,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } as User;
 
         apiClient.setToken(accessToken);
-        localStorage.setItem('glycopharm_token', accessToken);
+        setAccessToken(accessToken); // SSOT token storage
         setUser(typedUser);
         setAvailableRoles([typedUser.role]);
-        localStorage.setItem('glycopharm_user', JSON.stringify(typedUser));
+        setStoredUser(typedUser);
         return;
       }
 
@@ -159,8 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     authApi.logout();
     setUser(null);
     setAvailableRoles([]);
-    localStorage.removeItem('glycopharm_user');
-    localStorage.removeItem('glycopharm_token');
+    clearAllAuthData(); // SSOT token storage
     apiClient.setToken(null);
   };
 
@@ -168,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user && availableRoles.includes(role)) {
       const updatedUser = { ...user, role };
       setUser(updatedUser);
-      localStorage.setItem('glycopharm_user', JSON.stringify({ ...updatedUser, availableRoles }));
+      setStoredUser({ ...updatedUser, availableRoles });
     }
   };
 

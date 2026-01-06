@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, TEST_ACCOUNTS, type TestAccountType } from '../contexts/AuthContext';
+import { useAuth, type TestAccountType } from '../contexts/AuthContext';
 
 // 테스트 계정 목록 (클릭 시 즉시 로그인)
 const TEST_ACCOUNT_LIST = [
@@ -27,7 +27,7 @@ const ROLE_DASHBOARDS: Record<string, string> = {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login, loginAsTestAccount } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -52,18 +52,10 @@ export function LoginPage() {
   };
 
   // 테스트 계정 정보를 입력 필드에 채우기
-  const fillTestAccount = (account: { email: string; password: string }) => {
+  const fillTestAccount = (account: { email: string; password: string; type: TestAccountType }) => {
     setEmail(account.email);
     setPassword(account.password);
     setError(null);
-  };
-
-  // 테스트 계정으로 즉시 로그인 (로컬 상태만 변경)
-  const handleTestLogin = (accountType: TestAccountType) => {
-    loginAsTestAccount(accountType);
-    const testUser = TEST_ACCOUNTS[accountType];
-    const dashboard = ROLE_DASHBOARDS[testUser.role || ''] || '/';
-    navigate(dashboard);
   };
 
   return (
@@ -114,18 +106,18 @@ export function LoginPage() {
 
         {/* 테스트 계정 */}
         <div style={styles.testSection}>
-          <p style={styles.testTitle}>테스트 계정 (클릭 시 즉시 로그인)</p>
+          <p style={styles.testTitle}>테스트 계정 (클릭 시 입력됨)</p>
           <div style={styles.testAccounts}>
             {TEST_ACCOUNT_LIST.map((account) => (
               <button
                 key={account.email}
                 type="button"
-                onClick={() => handleTestLogin(account.type)}
+                onClick={() => fillTestAccount(account)}
                 style={styles.testAccountButton}
               >
                 <span style={styles.testAccountLabel}>{account.label}</span>
                 <span style={styles.testAccountEmail}>{account.email}</span>
-                <span style={styles.quickLoginBadge}>즉시 로그인</span>
+                <span style={styles.quickLoginBadge}>클릭하여 입력</span>
               </button>
             ))}
           </div>
