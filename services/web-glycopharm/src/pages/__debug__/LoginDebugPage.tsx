@@ -24,7 +24,6 @@ interface LoginProbeResult {
     url: string;
     method: string;
     payload: {
-      provider: string;
       email: string;
       password: string; // masked
     };
@@ -68,7 +67,6 @@ export default function LoginDebugPage() {
         url: `${API_BASE_URL}/api/v1/auth/login`,
         method: 'POST',
         payload: {
-          provider: 'email',
           email: email,
           password: '***MASKED***'
         }
@@ -112,7 +110,6 @@ export default function LoginDebugPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          provider: 'email',
           email: email,
           password: password
         })
