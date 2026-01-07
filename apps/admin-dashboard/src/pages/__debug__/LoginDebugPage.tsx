@@ -63,13 +63,10 @@ interface LoginProbeResult {
   };
 }
 
-// 실제 DB 테스트 계정 목록 (Migration에서 생성된 계정들)
+// 실제 Admin 로그인 페이지의 테스트 계정 (Login.tsx 참조)
 const TEST_ACCOUNTS = [
-  { label: 'Admin', email: 'admin@neture.co.kr', password: 'admin123!@#', description: '관리자' },
-  { label: 'Pharmacy', email: 'pharmacy@glycopharm.kr', password: 'test123!@#', description: '약국' },
-  { label: 'Supplier', email: 'test-supplier@neture.co.kr', password: 'test123!@#', description: '공급자' },
-  { label: 'Seller', email: 'test-seller@neture.co.kr', password: 'test123!@#', description: '판매자' },
-  { label: 'Partner', email: 'test-partner@neture.co.kr', password: 'test123!@#', description: '파트너' },
+  { label: 'Super Admin', email: 'admin@neture.co.kr', password: 'Admin2024!', description: '슈퍼 관리자' },
+  { label: 'Manager', email: 'manager@neture.co.kr', password: 'Manager2024!', description: '일반 관리자' },
 ];
 
 const LoginDebugPage: React.FC = () => {
