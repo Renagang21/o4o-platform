@@ -176,7 +176,7 @@ export function LoginPage() {
 
         <div style={styles.testAccounts}>
           <p style={styles.testTitle}>테스트 계정 (클릭 시 입력됨)</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {TEST_ACCOUNTS.map((account) => (
               <button
                 key={account.email}
@@ -185,26 +185,27 @@ export function LoginPage() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
-                  padding: '10px 12px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
+                  gap: 'var(--space-3)',
+                  padding: 'var(--space-3)',
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  border: '1px solid var(--color-border-default)',
+                  borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
                   textAlign: 'left',
+                  transition: 'var(--transition-fast)',
                 }}
               >
-                <span style={{ fontSize: '13px', fontWeight: 600, color: PRIMARY_COLOR, minWidth: '50px' }}>
+                <span style={{ fontSize: 'var(--text-body-md)', fontWeight: 600, color: 'var(--color-text-primary)', minWidth: '50px' }}>
                   {account.label}
                 </span>
-                <span style={{ fontSize: '12px', color: '#64748B', flex: 1 }}>
+                <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-text-tertiary)', flex: 1 }}>
                   {account.email}
                 </span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>클릭하여 입력</span>
+                <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-text-disabled)' }}>클릭하여 입력</span>
               </button>
             ))}
           </div>
-          <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '12px' }}>
+          <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-text-disabled)', marginTop: 'var(--space-3)' }}>
             공급자/파트너는 Neture에서 관리됩니다
           </p>
         </div>
@@ -219,191 +220,193 @@ export function LoginPage() {
   );
 }
 
-const PRIMARY_COLOR = '#FF6B9D';
-
+/**
+ * 스타일 정의 - Design Token CSS 변수 사용
+ * Primary 색상은 CTA 버튼과 로고에만 사용
+ * 나머지는 Neutral 계열 사용
+ */
 const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
+    backgroundColor: 'var(--color-bg-secondary)',
+    padding: 'var(--space-4)',
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    padding: '48px',
+    backgroundColor: 'var(--color-card-bg)',
+    borderRadius: 'var(--radius-xl)',
+    padding: 'var(--space-6)',
     width: '100%',
     maxWidth: '480px',
-    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)',
+    boxShadow: 'var(--shadow-lg)',
   },
   logo: {
-    fontSize: '28px',
+    fontSize: 'var(--text-title-lg)',
     fontWeight: 700,
-    color: PRIMARY_COLOR,
+    color: 'var(--color-primary)',  /* Primary 허용: 로고 */
     textAlign: 'center',
-    marginBottom: '8px',
+    marginBottom: 'var(--space-2)',
   },
   title: {
-    fontSize: '24px',
+    fontSize: 'var(--text-title-lg)',
     fontWeight: 600,
-    color: '#1a1a1a',
+    color: 'var(--color-text-primary)',
     textAlign: 'center',
-    margin: '0 0 8px 0',
+    margin: '0 0 var(--space-2) 0',
   },
   subtitle: {
-    fontSize: '14px',
-    color: '#666',
+    fontSize: 'var(--text-body-md)',
+    color: 'var(--color-text-secondary)',
     textAlign: 'center',
-    margin: '0 0 32px 0',
+    margin: '0 0 var(--space-5) 0',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: 'var(--space-4)',
   },
   error: {
     backgroundColor: '#FEE2E2',
-    color: '#DC2626',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
+    color: 'var(--color-error)',
+    padding: 'var(--space-3)',
+    borderRadius: 'var(--radius-md)',
+    fontSize: 'var(--text-body-md)',
   },
   inputGroup: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
+    gap: 'var(--space-1)',
   },
   label: {
-    fontSize: '14px',
+    fontSize: 'var(--text-body-md)',
     fontWeight: 500,
-    color: '#333',
+    color: 'var(--color-text-primary)',
   },
   input: {
-    padding: '14px 16px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    fontSize: '16px',
+    padding: 'var(--space-3)',
+    border: '1px solid var(--color-border-default)',
+    borderRadius: 'var(--radius-md)',
+    fontSize: 'var(--text-body-lg)',
     outline: 'none',
-    transition: 'border-color 0.2s',
+    transition: 'var(--transition-fast)',
   },
   submitButton: {
-    padding: '16px',
-    backgroundColor: PRIMARY_COLOR,
-    color: '#fff',
+    padding: 'var(--space-3)',
+    backgroundColor: 'var(--color-btn-primary-bg)',  /* Primary 허용: CTA 버튼 */
+    color: 'var(--color-btn-primary-text)',
     border: 'none',
-    borderRadius: '8px',
-    fontSize: '16px',
+    borderRadius: 'var(--radius-md)',
+    fontSize: 'var(--text-body-lg)',
     fontWeight: 600,
     cursor: 'pointer',
-    marginTop: '8px',
+    marginTop: 'var(--space-2)',
   },
   roleGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '16px',
-    marginBottom: '24px',
+    gap: 'var(--space-3)',
+    marginBottom: 'var(--space-4)',
   },
   roleCard: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '24px 16px',
-    backgroundColor: '#fff',
-    border: '2px solid #e2e8f0',
-    borderRadius: '12px',
+    padding: 'var(--space-4) var(--space-3)',
+    backgroundColor: 'var(--color-card-bg)',
+    border: '2px solid var(--color-border-default)',
+    borderRadius: 'var(--radius-lg)',
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: 'var(--transition-fast)',
   },
   roleIcon: {
-    fontSize: '36px',
-    marginBottom: '12px',
+    fontSize: 'var(--text-title-xl)',
+    marginBottom: 'var(--space-3)',
   },
   roleLabel: {
-    fontSize: '16px',
+    fontSize: 'var(--text-body-lg)',
     fontWeight: 600,
-    color: '#0F172A',
-    marginBottom: '4px',
+    color: 'var(--color-text-primary)',
+    marginBottom: 'var(--space-1)',
   },
   roleDescription: {
-    fontSize: '12px',
-    color: '#64748B',
+    fontSize: 'var(--text-body-sm)',
+    color: 'var(--color-text-tertiary)',
     textAlign: 'center',
   },
   roleNote: {
-    fontSize: '13px',
-    color: '#64748B',
+    fontSize: 'var(--text-body-md)',
+    color: 'var(--color-text-tertiary)',
     textAlign: 'center',
     margin: 0,
   },
   netureNotice: {
-    backgroundColor: '#f0f9ff',
-    border: '1px solid #bae6fd',
-    borderRadius: '12px',
-    padding: '16px',
-    marginBottom: '24px',
+    backgroundColor: 'var(--color-bg-tertiary)',
+    border: '1px solid var(--color-border-default)',
+    borderRadius: 'var(--radius-lg)',
+    padding: 'var(--space-3)',
+    marginBottom: 'var(--space-4)',
     textAlign: 'center',
   },
   netureNoticeTitle: {
-    fontSize: '13px',
+    fontSize: 'var(--text-body-md)',
     fontWeight: 600,
-    color: '#0369a1',
-    margin: '0 0 12px 0',
+    color: 'var(--color-text-secondary)',
+    margin: '0 0 var(--space-3) 0',
   },
   netureRoles: {
     display: 'flex',
     justifyContent: 'center',
-    gap: '16px',
-    marginBottom: '12px',
+    gap: 'var(--space-3)',
+    marginBottom: 'var(--space-3)',
   },
   netureRole: {
     display: 'flex',
     alignItems: 'center',
-    gap: '4px',
-    fontSize: '14px',
-    color: '#334155',
+    gap: 'var(--space-1)',
+    fontSize: 'var(--text-body-md)',
+    color: 'var(--color-text-primary)',
   },
   netureNoticeText: {
-    fontSize: '12px',
-    color: '#64748B',
+    fontSize: 'var(--text-body-sm)',
+    color: 'var(--color-text-tertiary)',
     margin: 0,
   },
   netureLink: {
-    color: '#0369a1',
+    color: 'var(--color-primary)',  /* Primary 허용: 핵심 링크 */
     textDecoration: 'underline',
   },
   testAccounts: {
-    marginTop: '24px',
-    padding: '16px',
-    backgroundColor: '#FFF0F5',
-    borderRadius: '8px',
+    marginTop: 'var(--space-4)',
+    paddingTop: 'var(--space-4)',
+    borderTop: '1px solid var(--color-border-default)',
   },
   testTitle: {
-    fontSize: '12px',
+    fontSize: 'var(--text-body-sm)',
     fontWeight: 600,
-    color: '#64748B',
-    margin: '0 0 8px 0',
+    color: 'var(--color-text-tertiary)',
+    margin: '0 0 var(--space-3) 0',
     textTransform: 'uppercase',
   },
   testList: {
-    fontSize: '12px',
-    color: '#64748B',
+    fontSize: 'var(--text-body-sm)',
+    color: 'var(--color-text-tertiary)',
     margin: 0,
-    paddingLeft: '16px',
+    paddingLeft: 'var(--space-3)',
     lineHeight: 1.8,
   },
   footer: {
     textAlign: 'center',
-    marginTop: '24px',
-    fontSize: '14px',
+    marginTop: 'var(--space-4)',
+    fontSize: 'var(--text-body-md)',
   },
   link: {
-    color: PRIMARY_COLOR,
+    color: 'var(--color-primary)',  /* Primary 허용: 핵심 링크 */
     textDecoration: 'none',
   },
   divider: {
-    color: '#ddd',
-    margin: '0 12px',
+    color: 'var(--color-border-default)',
+    margin: '0 var(--space-3)',
   },
 };
