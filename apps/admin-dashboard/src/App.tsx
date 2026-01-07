@@ -137,8 +137,8 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 
-// Site Builder (Step 24)
-const SiteBuilder = lazy(() => import('@/pages/site-builder/SiteBuilder'));
+// Site Builder - REMOVED (WO-ADMIN-LEGACY-CLEANUP-V2)
+// Moved to individual service responsibility per Goal State Definition
 
 // Forum Pages (from @o4o/forum-core package - source imports)
 const ForumBoardList = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumBoardList'));
@@ -296,7 +296,7 @@ const DropshippingUsersTest = lazy(() => import('@/pages/test/DropshippingUsersT
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
 const ApiResponseChecker = lazy(() => import('@/pages/test/ApiResponseChecker'));
 const MenuDebug = lazy(() => import('@/pages/test/MenuDebug'));
-const SiteBuilderTest = lazy(() => import('@/pages/test/SiteBuilderTest'));
+// SiteBuilderTest - REMOVED (WO-ADMIN-LEGACY-CLEANUP-V2)
 const CMSFieldsDebug = lazy(() => import('@/pages/test/CMSFieldsDebug'));
 const CMSViewCreateTest = lazy(() => import('@/pages/test/CMSViewCreateTest'));
 const CMSViewListDebug = lazy(() => import('@/pages/test/CMSViewListDebug'));
@@ -1185,14 +1185,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
-                    {/* Site Builder (Step 24) */}
-                    <Route path="/admin/site-builder" element={
-                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <SiteBuilder />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
+                    {/* Site Builder - REMOVED (WO-ADMIN-LEGACY-CLEANUP-V2) */}
 
                     {/* 포럼 - App-based routes with AppRouteGuard */}
                     <Route path="/forum/boards" element={
@@ -1675,12 +1668,7 @@ function App() {
                         <MenuDebug />
                       </Suspense>
                     } />
-                    {/* Test - Site Builder */}
-                    <Route path="/admin/test/site-builder" element={
-                      <Suspense fallback={<PageLoader />}>
-                        <SiteBuilderTest />
-                      </Suspense>
-                    } />
+                    {/* Test - Site Builder - REMOVED (WO-ADMIN-LEGACY-CLEANUP-V2) */}
                     {/* Test - CMS Fields Debug */}
                     <Route path="/admin/test/cms-fields" element={
                       <Suspense fallback={<PageLoader />}>

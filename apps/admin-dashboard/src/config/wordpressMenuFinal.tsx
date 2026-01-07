@@ -1,20 +1,14 @@
 /**
+ * Admin Menu Structure v2.0
+ *
+ * WO-ADMIN-ARCHITECTURE-RESTRUCTURE-V1
+ * Goal State Aligned: Core / Services / Insights
+ *
  * @deprecated Phase P0 Task A: This file is deprecated.
- *
- * MIGRATION GUIDE:
- * Navigation should be defined in app manifests using either:
- * 1. navigation.admin (flat structure with parentId)
- * 2. menus.admin (nested structure with children)
- *
- * These are automatically registered to NavigationRegistry during app activation.
- * useAdminMenu hook fetches navigation from /api/v1/navigation/admin API.
- *
+ * Navigation should be defined in app manifests.
  * This file is kept as a FALLBACK during the transition period.
- * It will be removed after all apps migrate their navigation to manifests.
  *
- * @see packages/cms-core/src/lifecycle/activate.ts
- * @see packages/cms-core/src/view-system/navigation-registry.ts
- * @see apps/api-server/src/routes/navigation.routes.ts
+ * @see docs/architecture/admin-goal-state-definition.md
  */
 
 import { ReactElement } from 'react';
@@ -22,11 +16,9 @@ import {
   LayoutDashboard,
   Database,
   Palette,
-  Globe,
   Package,
   Settings,
   Users,
-  Bell,
   FileText,
   UserCheck,
   BarChart2,
@@ -47,6 +39,9 @@ import {
   Brain,
   MessageSquare,
   Layers,
+  Shield,
+  TrendingUp,
+  Briefcase,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -60,75 +55,84 @@ export interface MenuItem {
 }
 
 /**
- * @deprecated This menu structure is deprecated.
- * Use manifest.navigation.admin or manifest.menus.admin instead.
+ * Admin Menu Structure v2.0 (Goal State Aligned)
  *
- * NextGen O4O Platform Menu Structure (Phase D-0)
- *
- * Clean, minimal menu focused on:
- * - CMS V2 (CPTs, Fields, Views, Pages)
- * - Visual Designer
- * - Multi-Site Builder
- * - AppStore
- * - System Management
+ * Structure:
+ * ├─ Overview (Dashboard)
+ * ├─ Core (플랫폼 핵심 기능)
+ * │  ├─ Users & Roles
+ * │  ├─ Membership
+ * │  ├─ CMS
+ * │  └─ AppStore
+ * ├─ Services (서비스별 관리)
+ * │  ├─ Yaksa (KPA Society)
+ * │  ├─ Glycopharm
+ * │  ├─ GlucoseView
+ * │  ├─ K-Cosmetics
+ * │  ├─ Neture
+ * │  └─ Digital Signage
+ * └─ Insights (의사결정 지원)
+ *    ├─ Service Health
+ *    └─ Reporting
  */
 export const wordpressMenuItems: MenuItem[] = [
-  // Dashboard
+  // ============================================
+  // OVERVIEW - 운영자 진입점
+  // ============================================
   {
     id: 'dashboard',
-    label: 'Dashboard',
+    label: 'Overview',
     icon: <LayoutDashboard className="w-5 h-5" />,
     path: '/admin',
     roles: ['admin', 'super_admin'],
   },
 
-  // Service Content Manager (WO-ADMIN-CONTENT-SLOT-V1)
+  // ============================================
+  // CORE - 플랫폼 핵심 기능
+  // ============================================
   {
-    id: 'service-content-manager',
-    label: 'Service Content Manager',
-    icon: <Layers className="w-5 h-5" />,
-    path: '/admin/service-content-manager',
-    roles: ['admin', 'super_admin', 'platform_admin'],
-  },
-
-  // Yaksa Admin Hub (Phase 19-D)
-  {
-    id: 'yaksa-hub',
-    label: 'Yaksa Hub',
-    icon: <Activity className="w-5 h-5" />,
-    path: '/admin/yaksa-hub',
+    id: 'core',
+    label: 'Core',
+    icon: <Shield className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
-  },
-
-  // Yaksa Tools (Forum Context → Tools)
-  {
-    id: 'yaksa-tools',
-    label: 'Yaksa Tools',
-    icon: <MessageSquare className="w-5 h-5" />,
-    roles: ['admin', 'super_admin', 'pharmacist'],
     children: [
+      // Users & Roles
       {
-        id: 'yaksa-forum',
-        label: 'Forum',
-        icon: <MessageSquare className="w-4 h-4" />,
-        path: '/forum/boards',
+        id: 'core-users',
+        label: 'Users & Roles',
+        icon: <Users className="w-4 h-4" />,
+        path: '/users',
+      },
+      // Membership (플랫폼 범용 Core로 통합)
+      {
+        id: 'core-membership',
+        label: 'Membership',
+        icon: <UserCheck className="w-4 h-4" />,
+        path: '/admin/membership/dashboard',
       },
       {
-        id: 'pharmacy-ai-insight',
-        label: 'AI Insight (Pharmacy)',
-        icon: <Brain className="w-4 h-4" />,
-        path: '/pharmacy-ai-insight',
+        id: 'core-membership-members',
+        label: 'Members',
+        icon: <Users className="w-4 h-4" />,
+        path: '/admin/membership/members',
       },
       {
-        id: 'cgm-pharmacist',
-        label: 'CGM 환자 관리',
-        icon: <Heart className="w-4 h-4" />,
-        path: '/cgm-pharmacist',
+        id: 'core-membership-verifications',
+        label: 'Verifications',
+        icon: <UserCheck className="w-4 h-4" />,
+        path: '/admin/membership/verifications',
+      },
+      // Platform Settings
+      {
+        id: 'core-settings',
+        label: 'Platform Settings',
+        icon: <Settings className="w-4 h-4" />,
+        path: '/settings',
       },
     ],
   },
 
-  // CMS V2
+  // CMS (플랫폼 콘텐츠 관리 - Core 하위)
   {
     id: 'cms',
     label: 'CMS',
@@ -137,70 +141,32 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       {
         id: 'cms-cpts',
-        label: 'Custom Post Types',
+        label: 'Post Types',
         icon: <FileText className="w-4 h-4" />,
         path: '/admin/cms/cpts',
       },
       {
         id: 'cms-fields',
-        label: 'Custom Fields',
+        label: 'Fields',
         icon: <FileText className="w-4 h-4" />,
         path: '/admin/cms/fields',
       },
       {
         id: 'cms-views',
-        label: 'View Templates',
-        icon: <FileText className="w-4 h-4" />,
+        label: 'Views',
+        icon: <Palette className="w-4 h-4" />,
         path: '/admin/cms/views',
       },
       {
         id: 'cms-pages',
-        label: 'CMS Pages',
+        label: 'Pages',
         icon: <FileText className="w-4 h-4" />,
         path: '/admin/cms/pages',
       },
     ],
   },
 
-  // Designer
-  {
-    id: 'designer',
-    label: 'Designer',
-    icon: <Palette className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'view-designer',
-        label: 'View Designer',
-        icon: <Palette className="w-4 h-4" />,
-        path: '/admin/cms/views',  // Navigate to views list, then select a view to edit with designer
-      },
-    ],
-  },
-
-  // Multi-Site Builder
-  {
-    id: 'site-builder',
-    label: 'Multi-Site Builder',
-    icon: <Globe className="w-5 h-5" />,
-    roles: ['super_admin', 'admin'],
-    children: [
-      {
-        id: 'site-builder-main',
-        label: 'Site Builder',
-        icon: <Globe className="w-4 h-4" />,
-        path: '/admin/site-builder',
-      },
-      {
-        id: 'site-instances',
-        label: 'Site Instances',
-        icon: <Globe className="w-4 h-4" />,
-        path: '/admin/instances',
-      },
-    ],
-  },
-
-  // AppStore
+  // AppStore (플랫폼 확장 관리 - Core 하위)
   {
     id: 'appstore',
     label: 'AppStore',
@@ -222,139 +188,52 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // Digital Signage
+  // ============================================
+  // SERVICES - 서비스별 관리
+  // ============================================
   {
-    id: 'digital-signage',
-    label: 'Digital Signage',
-    icon: <Monitor className="w-5 h-5" />,
+    id: 'services-separator',
+    label: 'Services',
+    icon: <Briefcase className="w-5 h-5" />,
+    separator: true,
+    roles: ['admin', 'super_admin'],
+  },
+
+  // Yaksa (KPA Society) - 서비스 관리 도구
+  {
+    id: 'yaksa',
+    label: 'Yaksa (KPA)',
+    icon: <Activity className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
     children: [
       {
-        id: 'digital-signage-operations',
-        label: 'Operations',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/admin/digital-signage/operations',
+        id: 'yaksa-hub',
+        label: 'Service Dashboard',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+        path: '/admin/yaksa-hub',
       },
       {
-        id: 'digital-signage-display-status',
-        label: 'Display Status',
-        icon: <Activity className="w-4 h-4" />,
-        path: '/admin/digital-signage/operations/display-status',
+        id: 'yaksa-forum',
+        label: 'Forum',
+        icon: <MessageSquare className="w-4 h-4" />,
+        path: '/forum/boards',
       },
       {
-        id: 'digital-signage-action-history',
-        label: 'Action History',
-        icon: <Clock className="w-4 h-4" />,
-        path: '/admin/digital-signage/operations/history',
+        id: 'yaksa-ai-insight',
+        label: 'AI Insight',
+        icon: <Brain className="w-4 h-4" />,
+        path: '/pharmacy-ai-insight',
       },
       {
-        id: 'digital-signage-problems',
-        label: 'Problems',
-        icon: <AlertTriangle className="w-4 h-4" />,
-        path: '/admin/digital-signage/operations/problems',
-      },
-      {
-        id: 'digital-signage-media-sources',
-        label: 'Media Sources',
-        icon: <Image className="w-4 h-4" />,
-        path: '/admin/digital-signage/media/sources',
-      },
-      {
-        id: 'digital-signage-media-lists',
-        label: 'Media Lists',
-        icon: <Image className="w-4 h-4" />,
-        path: '/admin/digital-signage/media/lists',
-      },
-      {
-        id: 'digital-signage-displays',
-        label: 'Displays',
-        icon: <Monitor className="w-4 h-4" />,
-        path: '/admin/digital-signage/displays',
-      },
-      {
-        id: 'digital-signage-display-slots',
-        label: 'Display Slots',
-        icon: <LayoutGrid className="w-4 h-4" />,
-        path: '/admin/digital-signage/display-slots',
-      },
-      {
-        id: 'digital-signage-schedules',
-        label: 'Schedules',
-        icon: <Calendar className="w-4 h-4" />,
-        path: '/admin/digital-signage/schedules',
-      },
-      {
-        id: 'digital-signage-actions',
-        label: 'Action Monitor',
-        icon: <PlayCircle className="w-4 h-4" />,
-        path: '/admin/digital-signage/actions',
+        id: 'yaksa-cgm',
+        label: 'CGM Patient Care',
+        icon: <Heart className="w-4 h-4" />,
+        path: '/cgm-pharmacist',
       },
     ],
   },
 
-  // Membership
-  {
-    id: 'membership',
-    label: 'Membership',
-    icon: <UserCheck className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'membership-dashboard',
-        label: 'Dashboard',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/admin/membership/dashboard',
-      },
-      {
-        id: 'membership-members',
-        label: 'Members',
-        icon: <Users className="w-4 h-4" />,
-        path: '/admin/membership/members',
-      },
-      {
-        id: 'membership-verifications',
-        label: 'Verifications',
-        icon: <UserCheck className="w-4 h-4" />,
-        path: '/admin/membership/verifications',
-      },
-      {
-        id: 'membership-categories',
-        label: 'Categories',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/membership/categories',
-      },
-    ],
-  },
-
-  // Reporting (신상신고)
-  {
-    id: 'reporting',
-    label: '신상신고',
-    icon: <ClipboardList className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'reporting-dashboard',
-        label: 'Dashboard',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/admin/reporting/dashboard',
-      },
-      {
-        id: 'reporting-reports',
-        label: '신고서 목록',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/reporting/reports',
-      },
-      {
-        id: 'reporting-templates',
-        label: '템플릿 관리',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/admin/reporting/templates',
-      },
-    ],
-  },
-
-  // Glycopharm (약국 혈당관리)
+  // Glycopharm
   {
     id: 'glycopharm',
     label: 'Glycopharm',
@@ -363,20 +242,26 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       {
         id: 'glycopharm-pharmacies',
-        label: '약국 관리',
+        label: 'Pharmacies',
         icon: <Heart className="w-4 h-4" />,
         path: '/glycopharm/pharmacies',
       },
       {
         id: 'glycopharm-products',
-        label: '제품 관리',
+        label: 'Products',
         icon: <Package className="w-4 h-4" />,
         path: '/glycopharm/products',
+      },
+      {
+        id: 'glycopharm-applications',
+        label: 'Applications',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/service-applications/glycopharm',
       },
     ],
   },
 
-  // GlucoseView (CGM 데이터 뷰)
+  // GlucoseView
   {
     id: 'glucoseview',
     label: 'GlucoseView',
@@ -385,48 +270,72 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       {
         id: 'glucoseview-vendors',
-        label: 'CGM 제조사',
+        label: 'CGM Vendors',
         icon: <Monitor className="w-4 h-4" />,
         path: '/glucoseview/vendors',
       },
       {
         id: 'glucoseview-profiles',
-        label: '표현 규칙',
+        label: 'View Profiles',
         icon: <LayoutGrid className="w-4 h-4" />,
         path: '/glucoseview/view-profiles',
       },
       {
         id: 'glucoseview-connections',
-        label: '연동 상태',
+        label: 'Connections',
         icon: <Link2 className="w-4 h-4" />,
         path: '/glucoseview/connections',
       },
-    ],
-  },
-
-  // Service Applications (서비스 신청 관리)
-  {
-    id: 'service-applications',
-    label: '서비스 신청 관리',
-    icon: <ClipboardList className="w-5 h-5" />,
-    roles: ['admin', 'super_admin', 'operator'],
-    children: [
       {
-        id: 'service-applications-glycopharm',
-        label: 'GlycoPharm 신청',
-        icon: <Heart className="w-4 h-4" />,
-        path: '/admin/service-applications/glycopharm',
-      },
-      {
-        id: 'service-applications-glucoseview',
-        label: 'GlucoseView 신청',
-        icon: <Activity className="w-4 h-4" />,
+        id: 'glucoseview-applications',
+        label: 'Applications',
+        icon: <ClipboardList className="w-4 h-4" />,
         path: '/admin/service-applications/glucoseview',
       },
     ],
   },
 
-  // Neture (B2C 대표 서비스)
+  // K-Cosmetics
+  {
+    id: 'k-cosmetics',
+    label: 'K-Cosmetics',
+    icon: <Heart className="w-5 h-5" />,
+    roles: ['admin', 'super_admin', 'partner'],
+    children: [
+      {
+        id: 'cosmetics-dashboard',
+        label: 'Dashboard',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/cosmetics-partner/dashboard',
+      },
+      {
+        id: 'cosmetics-links',
+        label: 'Partner Links',
+        icon: <Link2 className="w-4 h-4" />,
+        path: '/cosmetics-partner/links',
+      },
+      {
+        id: 'cosmetics-routines',
+        label: 'Routines',
+        icon: <Sparkles className="w-4 h-4" />,
+        path: '/cosmetics-partner/routines',
+      },
+      {
+        id: 'cosmetics-earnings',
+        label: 'Earnings',
+        icon: <DollarSign className="w-4 h-4" />,
+        path: '/cosmetics-partner/earnings',
+      },
+      {
+        id: 'cosmetics-commissions',
+        label: 'Commission Policies',
+        icon: <Percent className="w-4 h-4" />,
+        path: '/cosmetics-partner/commission-policies',
+      },
+    ],
+  },
+
+  // Neture
   {
     id: 'neture',
     label: 'Neture',
@@ -435,89 +344,97 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       {
         id: 'neture-products',
-        label: '상품 관리',
+        label: 'Products',
         icon: <Package className="w-4 h-4" />,
         path: '/neture/products',
       },
       {
         id: 'neture-partners',
-        label: '파트너 관리',
+        label: 'Partners',
         icon: <Users className="w-4 h-4" />,
         path: '/neture/partners',
       },
     ],
   },
 
-  // Cosmetics Partner (파트너/인플루언서)
+  // Digital Signage
   {
-    id: 'cosmetics-partner',
-    label: 'Cosmetics Partner',
-    icon: <Heart className="w-5 h-5" />,
-    roles: ['admin', 'super_admin', 'partner'],
+    id: 'digital-signage',
+    label: 'Digital Signage',
+    icon: <Monitor className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
     children: [
       {
-        id: 'cosmetics-partner-dashboard',
-        label: 'Dashboard',
+        id: 'signage-operations',
+        label: 'Operations',
         icon: <BarChart2 className="w-4 h-4" />,
-        path: '/cosmetics-partner/dashboard',
+        path: '/admin/digital-signage/operations',
       },
       {
-        id: 'cosmetics-partner-links',
-        label: 'Links',
-        icon: <Link2 className="w-4 h-4" />,
-        path: '/cosmetics-partner/links',
+        id: 'signage-displays',
+        label: 'Displays',
+        icon: <Monitor className="w-4 h-4" />,
+        path: '/admin/digital-signage/displays',
       },
       {
-        id: 'cosmetics-partner-routines',
-        label: 'Routines',
-        icon: <Sparkles className="w-4 h-4" />,
-        path: '/cosmetics-partner/routines',
+        id: 'signage-media',
+        label: 'Media Sources',
+        icon: <Image className="w-4 h-4" />,
+        path: '/admin/digital-signage/media/sources',
       },
       {
-        id: 'cosmetics-partner-earnings',
-        label: 'Earnings',
-        icon: <DollarSign className="w-4 h-4" />,
-        path: '/cosmetics-partner/earnings',
-      },
-      {
-        id: 'cosmetics-partner-commission-policies',
-        label: 'Commission Policies',
-        icon: <Percent className="w-4 h-4" />,
-        path: '/cosmetics-partner/commission-policies',
+        id: 'signage-schedules',
+        label: 'Schedules',
+        icon: <Calendar className="w-4 h-4" />,
+        path: '/admin/digital-signage/schedules',
       },
     ],
   },
 
-  // System
+  // ============================================
+  // INSIGHTS - 의사결정 지원
+  // ============================================
   {
-    id: 'system',
-    label: 'System',
-    icon: <Settings className="w-5 h-5" />,
+    id: 'insights-separator',
+    label: 'Insights',
+    icon: <TrendingUp className="w-5 h-5" />,
+    separator: true,
+    roles: ['admin', 'super_admin'],
+  },
+
+  // Service Content Manager (통합 콘텐츠 관리)
+  {
+    id: 'service-content-manager',
+    label: 'Content Manager',
+    icon: <Layers className="w-5 h-5" />,
+    path: '/admin/service-content-manager',
+    roles: ['admin', 'super_admin', 'platform_admin'],
+  },
+
+  // Reporting (의사결정 요약 도구)
+  {
+    id: 'reporting',
+    label: 'Reports',
+    icon: <ClipboardList className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
     children: [
       {
-        id: 'system-users',
-        label: 'Users',
-        icon: <Users className="w-4 h-4" />,
-        path: '/users',
+        id: 'reporting-overview',
+        label: 'Overview',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/admin/reporting/dashboard',
       },
       {
-        id: 'system-settings',
-        label: 'Settings',
-        icon: <Settings className="w-4 h-4" />,
-        path: '/settings',
-      },
-      {
-        id: 'system-notifications',
-        label: 'Notifications',
-        icon: <Bell className="w-4 h-4" />,
-        path: '/admin/notifications',
-      },
-      {
-        id: 'system-logs',
-        label: 'Logs',
+        id: 'reporting-submissions',
+        label: 'Submissions',
         icon: <FileText className="w-4 h-4" />,
-        path: '/admin/logs',
+        path: '/admin/reporting/reports',
+      },
+      {
+        id: 'reporting-templates',
+        label: 'Templates',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/reporting/templates',
       },
     ],
   },
