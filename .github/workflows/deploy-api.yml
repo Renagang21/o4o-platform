@@ -264,6 +264,7 @@ jobs:
           --set-env-vars="NODE_ENV=production" \
           --set-env-vars="GRACEFUL_STARTUP=false" \
           --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
+          --set-env-vars="COOKIE_DOMAIN=.neture.co.kr" \
           --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
           --set-env-vars="DB_PORT=5432" \
           --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
