@@ -13,6 +13,7 @@ import { createForumRequestController } from './controllers/forum-request.contro
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
 import { createOrderController } from './controllers/order.controller.js';
+import { createCockpitController } from './controllers/cockpit.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 
 /**
@@ -99,6 +100,14 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/orders', orderController);
+
+  // Cockpit routes (Pharmacy Dashboard 2.0)
+  const cockpitController = createCockpitController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope
+  );
+  router.use('/pharmacy/cockpit', cockpitController);
 
   return router;
 }
