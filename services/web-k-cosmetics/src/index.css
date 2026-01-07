@@ -1,0 +1,26 @@
+/**
+ * K-Cosmetics - Design Token 적용
+ */
+@import '../../../packages/design-tokens/design-tokens.css';
+
+/* K-Cosmetics 서비스 테마 (Rose/Pink) */
+:root {
+  --color-primary: #E11D48;        /* Rose 600 */
+  --color-primary-light: #F43F5E;
+  --color-primary-dark: #BE123C;
+  --color-primary-darker: #9F1239;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-neutral-50);
+  color: var(--color-neutral-900);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

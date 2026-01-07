@@ -1,0 +1,26 @@
+/**
+ * Neture - Design Token 적용
+ */
+@import '../../../packages/design-tokens/design-tokens.css';
+
+/* Neture 서비스 테마 (Indigo) */
+:root {
+  --color-primary: #4F46E5;        /* Indigo 600 */
+  --color-primary-light: #6366F1;
+  --color-primary-dark: #4338CA;
+  --color-primary-darker: #3730A3;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-neutral-50);
+  color: var(--color-neutral-900);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

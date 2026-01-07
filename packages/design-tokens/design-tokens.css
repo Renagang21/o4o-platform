@@ -1,0 +1,160 @@
+/**
+ * O4O Platform Design Tokens v1.0
+ *
+ * 모든 서비스에서 공통으로 사용하는 디자인 토큰
+ * CSS 변수 기반으로 정의하여 어떤 스타일링 방식(Tailwind/Inline)과도 호환
+ */
+
+:root {
+  /* ========================================
+   * SPACING (8px 그리드 기반)
+   * ======================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+
+  /* Section gaps */
+  --section-gap-sm: var(--space-4);
+  --section-gap-md: var(--space-5);
+  --section-gap-lg: var(--space-6);
+
+  /* ========================================
+   * TYPOGRAPHY (3단계 계층)
+   * ======================================== */
+  /* Font Family */
+  --font-primary: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Pretendard', 'Noto Sans KR', sans-serif;
+
+  /* Title Scale */
+  --text-title-xl: 1.875rem;  /* 30px - 페이지 제목 */
+  --text-title-lg: 1.5rem;    /* 24px - 섹션 제목 */
+  --text-title-md: 1.25rem;   /* 20px - 카드 제목 */
+  --text-title-sm: 1.125rem;  /* 18px - 서브 제목 */
+
+  /* Body Scale */
+  --text-body-lg: 1rem;       /* 16px - 본문 */
+  --text-body-md: 0.875rem;   /* 14px - 작은 본문 */
+  --text-body-sm: 0.75rem;    /* 12px - 캡션 */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* ========================================
+   * COLORS - Primary (서비스별 오버라이드 가능)
+   * ======================================== */
+  --color-primary: #2563EB;        /* Blue 600 - 기본 */
+  --color-primary-light: #3B82F6;  /* Blue 500 */
+  --color-primary-dark: #1D4ED8;   /* Blue 700 */
+  --color-primary-darker: #1E3A8A; /* Blue 800 */
+
+  /* ========================================
+   * COLORS - Neutral (공통 - 변경 금지)
+   * ======================================== */
+  --color-neutral-900: #0F172A;
+  --color-neutral-800: #1E293B;
+  --color-neutral-700: #334155;
+  --color-neutral-600: #475569;
+  --color-neutral-500: #64748B;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-50: #F8FAFC;
+  --color-white: #FFFFFF;
+
+  /* ========================================
+   * COLORS - Accent/Status (공통 - 변경 금지)
+   * ======================================== */
+  --color-success: #059669;  /* Green 600 */
+  --color-warning: #D97706;  /* Amber 600 */
+  --color-error: #DC2626;    /* Red 600 */
+  --color-info: #2563EB;     /* Blue 600 */
+
+  /* ========================================
+   * SHADOWS (2단계)
+   * ======================================== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* ========================================
+   * BORDER RADIUS
+   * ======================================== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ========================================
+   * TRANSITIONS
+   * ======================================== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ========================================
+   * Z-INDEX
+   * ======================================== */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+}
+
+/* ========================================
+ * SERVICE-SPECIFIC PRIMARY COLOR PRESETS
+ * 각 서비스에서 필요시 오버라이드
+ * ======================================== */
+
+/* GlycoPharm - Green 테마 */
+[data-theme="glycopharm"] {
+  --color-primary: #16A34A;        /* Green 600 */
+  --color-primary-light: #22C55E;  /* Green 500 */
+  --color-primary-dark: #15803D;   /* Green 700 */
+  --color-primary-darker: #166534; /* Green 800 */
+}
+
+/* KPA Society - Blue 테마 (기본값과 동일) */
+[data-theme="kpa-society"] {
+  --color-primary: #2563EB;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-darker: #1E3A8A;
+}
+
+/* K-Cosmetics - Rose/Pink 테마 */
+[data-theme="k-cosmetics"] {
+  --color-primary: #E11D48;        /* Rose 600 */
+  --color-primary-light: #F43F5E;  /* Rose 500 */
+  --color-primary-dark: #BE123C;   /* Rose 700 */
+  --color-primary-darker: #9F1239; /* Rose 800 */
+}
+
+/* GlucoseView - Teal 테마 */
+[data-theme="glucoseview"] {
+  --color-primary: #0D9488;        /* Teal 600 */
+  --color-primary-light: #14B8A6;  /* Teal 500 */
+  --color-primary-dark: #0F766E;   /* Teal 700 */
+  --color-primary-darker: #115E59; /* Teal 800 */
+}
+
+/* Neture - Indigo 테마 */
+[data-theme="neture"] {
+  --color-primary: #4F46E5;        /* Indigo 600 */
+  --color-primary-light: #6366F1;  /* Indigo 500 */
+  --color-primary-dark: #4338CA;   /* Indigo 700 */
+  --color-primary-darker: #3730A3; /* Indigo 800 */
+}

@@ -1,6 +1,16 @@
+@import '../../../packages/design-tokens/design-tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Apply service-specific theme */
+:root {
+  --color-primary: #16A34A;        /* Green 600 - GlycoPharm */
+  --color-primary-light: #22C55E;
+  --color-primary-dark: #15803D;
+  --color-primary-darker: #166534;
+}
 
 body {
   margin: 0;

@@ -1,6 +1,16 @@
+@import '../../../packages/design-tokens/design-tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Apply service-specific theme */
+:root {
+  --color-primary: #0D9488;        /* Teal 600 - GlucoseView */
+  --color-primary-light: #14B8A6;
+  --color-primary-dark: #0F766E;
+  --color-primary-darker: #115E59;
+}
 
 body {
   margin: 0;

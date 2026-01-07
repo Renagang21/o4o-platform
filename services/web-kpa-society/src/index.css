@@ -1,0 +1,26 @@
+/**
+ * KPA Society - Design Token 적용
+ */
+@import '../../../packages/design-tokens/design-tokens.css';
+
+/* KPA Society 서비스 테마 (Blue - 기본값 유지) */
+:root {
+  --color-primary: #2563EB;        /* Blue 600 */
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-darker: #1E3A8A;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-neutral-50);
+  color: var(--color-neutral-900);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

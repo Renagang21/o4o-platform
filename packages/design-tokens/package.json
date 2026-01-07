@@ -1,0 +1,15 @@
+{
+  "name": "@o4o/design-tokens",
+  "version": "1.0.0",
+  "description": "O4O Platform Design Tokens - 공통 디자인 변수",
+  "main": "design-tokens.css",
+  "files": [
+    "design-tokens.css"
+  ],
+  "keywords": [
+    "design-tokens",
+    "css-variables",
+    "o4o-platform"
+  ],
+  "license": "MIT"
+}
