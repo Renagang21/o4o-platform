@@ -301,6 +301,9 @@ const CMSFieldsDebug = lazy(() => import('@/pages/test/CMSFieldsDebug'));
 const CMSViewCreateTest = lazy(() => import('@/pages/test/CMSViewCreateTest'));
 const CMSViewListDebug = lazy(() => import('@/pages/test/CMSViewListDebug'));
 
+// Debug Pages (WO-DEBUG-ADMIN-LOGIN-MINIMAL-001)
+const LoginDebugPage = lazy(() => import('@/pages/__debug__/LoginDebugPage'));
+
 // Removed Apps Manager - using WordPress style menu
 
 // Appearance Pages (WordPress Style)
@@ -400,6 +403,13 @@ function App() {
             <Route path="/auth-inspector" element={
               <Suspense fallback={<PageLoader />}>
                 <AuthInspector />
+              </Suspense>
+            } />
+
+            {/* Login Debug Page - JSON probe for login flow (WO-DEBUG-ADMIN-LOGIN-MINIMAL-001) */}
+            <Route path="/__debug__/login" element={
+              <Suspense fallback={<PageLoader />}>
+                <LoginDebugPage />
               </Suspense>
             } />
 
