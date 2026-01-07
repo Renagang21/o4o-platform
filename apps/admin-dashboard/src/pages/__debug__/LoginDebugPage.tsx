@@ -63,13 +63,27 @@ interface LoginProbeResult {
   };
 }
 
+// 테스트 계정 목록
+const TEST_ACCOUNTS = [
+  { label: 'Admin', email: 'admin@example.com', password: 'admin123', description: '관리자' },
+  { label: 'Super Admin', email: 'superadmin@example.com', password: 'admin123', description: '슈퍼 관리자' },
+  { label: 'Pharmacist', email: 'pharmacist@example.com', password: 'test123', description: '약사' },
+  { label: 'Supplier', email: 'supplier@example.com', password: 'test123', description: '공급자' },
+  { label: 'Partner', email: 'partner@example.com', password: 'test123', description: '파트너' },
+];
+
 const LoginDebugPage: React.FC = () => {
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<LoginProbeResult | null>(null);
   const startTimeRef = useRef<number>(0);
   const timelineRef = useRef<TimelineEntry[]>([]);
+
+  const fillTestAccount = (account: typeof TEST_ACCOUNTS[0]) => {
+    setEmail(account.email);
+    setPassword(account.password);
+  };
 
   const addTimeline = (event: string, data?: any) => {
     const now = Date.now();
@@ -291,6 +305,36 @@ const LoginDebugPage: React.FC = () => {
         <h2 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>
           로그인 정보
         </h2>
+
+        {/* 테스트 계정 버튼 */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '8px', color: '#6b7280' }}>
+            테스트 계정 (클릭하면 자동 입력)
+          </label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {TEST_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => fillTestAccount(account)}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#f3f4f6',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span style={{ fontWeight: '600' }}>{account.label}</span>
+                <span style={{ color: '#9ca3af', fontSize: '11px' }}>{account.description}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           <div>
