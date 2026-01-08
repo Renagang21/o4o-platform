@@ -11,6 +11,7 @@ const ROLE_ICONS: Record<UserRole, string> = {
   admin: '🛡️',
   supplier: '📦',
   partner: '🤝',
+  user: '👤',
 };
 
 // 테스트 계정 목록

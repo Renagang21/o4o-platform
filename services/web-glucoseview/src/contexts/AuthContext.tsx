@@ -113,7 +113,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.user) {
         const apiUser = data.user;
         const mappedRole = mapApiRole(apiUser.role);
-        const approvalStatus: ApprovalStatus = apiUser.status === 'active' ? 'approved' : 'pending';
+        // API 상태를 ApprovalStatus로 매핑
+        let approvalStatus: ApprovalStatus = 'pending';
+        if (apiUser.status === 'active') {
+          approvalStatus = 'approved';
+        } else if (apiUser.status === 'rejected' || apiUser.status === 'inactive') {
+          approvalStatus = 'rejected';
+        }
 
         const userData: User = {
           id: apiUser.id,
