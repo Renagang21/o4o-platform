@@ -142,14 +142,17 @@ jobs:
         echo "🔨 Step 1: Building with tsc (includes migrations)..."
         pnpm run build
 
-        # Step 2: Backup migrations folder before tsup might clean dist
-        echo "📦 Step 2: Backing up migrations..."
-        if [ -d "dist/database/migrations" ]; then
-          cp -r dist/database/migrations /tmp/migrations-backup
-          echo "✅ Migrations backed up: $(ls /tmp/migrations-backup/*.js 2>/dev/null | wc -l) files"
-          ls -la /tmp/migrations-backup/
+        # Step 2: Backup database folder (migrations + run-migration.js) before tsup might clean dist
+        echo "📦 Step 2: Backing up database folder..."
+        if [ -d "dist/database" ]; then
+          cp -r dist/database /tmp/database-backup
+          echo "✅ Database folder backed up:"
+          ls -la /tmp/database-backup/
+          if [ -d "/tmp/database-backup/migrations" ]; then
+            echo "   Migrations: $(ls /tmp/database-backup/migrations/*.js 2>/dev/null | wc -l) files"
+          fi
         else
-          echo "⚠️ No migrations found to backup"
+          echo "⚠️ No database folder found to backup"
           ls -la dist/
         fi
 
@@ -157,18 +160,20 @@ jobs:
         echo "🔨 Step 3: Building API server with tsup (bundled build)..."
         pnpm run build:api
 
-        # Step 4: Restore migrations from backup
-        echo "📦 Step 4: Restoring migrations..."
-        if [ -d "/tmp/migrations-backup" ]; then
-          # Remove any existing migrations folder (may be empty from tsup)
-          rm -rf dist/database/migrations
-          mkdir -p dist/database
-          # Copy backup contents to migrations folder
-          cp -r /tmp/migrations-backup dist/database/migrations
-          echo "✅ Migrations restored: $(ls dist/database/migrations/*.js 2>/dev/null | wc -l) files"
-          ls -la dist/database/migrations/ | head -10
+        # Step 4: Restore database folder from backup
+        echo "📦 Step 4: Restoring database folder..."
+        if [ -d "/tmp/database-backup" ]; then
+          # Remove any existing database folder (may be empty from tsup)
+          rm -rf dist/database
+          # Copy backup contents to database folder
+          cp -r /tmp/database-backup dist/database
+          echo "✅ Database folder restored:"
+          ls -la dist/database/
+          if [ -d "dist/database/migrations" ]; then
+            echo "   Migrations: $(ls dist/database/migrations/*.js 2>/dev/null | wc -l) files"
+          fi
         else
-          echo "⚠️ No migrations backup found"
+          echo "⚠️ No database backup found"
         fi
 
         # Verify build output
@@ -183,6 +188,9 @@ jobs:
         # List generated files
         echo "📋 Generated files:"
         ls -la dist/
+        echo ""
+        echo "📋 Database folder:"
+        ls -la dist/database/ 2>/dev/null || echo "⚠️ No database directory"
         echo ""
         echo "📋 Migrations:"
         ls -la dist/database/migrations/ 2>/dev/null || echo "⚠️ No migrations directory"
