@@ -30,7 +30,13 @@ on:
 env:
   PROJECT_ID: netureyoutube
   REGION: asia-northeast3
+  # Default API URL (neture uses this)
   VITE_API_BASE_URL: https://api.neture.co.kr
+  # Service-specific API URLs (same-origin for cookie auth)
+  VITE_API_URL_GLYCOPHARM: https://api.glycopharm.co.kr
+  VITE_API_URL_KPA_SOCIETY: https://api.kpa-society.co.kr
+  VITE_API_URL_GLUCOSEVIEW: https://api.glucoseview.co.kr
+  VITE_API_URL_K_COSMETICS: https://api.k-cosmetics.site
 
 jobs:
   detect-changes:
@@ -207,9 +213,10 @@ jobs:
           echo "Building k-cosmetics-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
+          # Use service-specific API URL for same-origin cookie auth
           docker build \
             --platform linux/amd64 \
-            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_K_COSMETICS }} \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest \
             services/web-k-cosmetics
@@ -273,9 +280,10 @@ jobs:
           echo "Building kpa-society-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
+          # Use service-specific API URL for same-origin cookie auth
           docker build \
             --platform linux/amd64 \
-            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
             services/web-kpa-society
@@ -339,9 +347,10 @@ jobs:
           echo "Building glycopharm-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
+          # Use service-specific API URL for same-origin cookie auth
           docker build \
             --platform linux/amd64 \
-            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_GLYCOPHARM }} \
             -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest \
             services/web-glycopharm
@@ -405,9 +414,10 @@ jobs:
           echo "Building glucoseview-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
+          # Use service-specific API URL for same-origin cookie auth
           docker build \
             --platform linux/amd64 \
-            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_GLUCOSEVIEW }} \
             -t gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/glucoseview-web:latest \
             services/web-glucoseview
