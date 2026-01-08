@@ -142,38 +142,52 @@ jobs:
         echo "🔨 Step 1: Building with tsc (includes migrations)..."
         pnpm run build
 
-        # Step 2: Backup database folder (migrations + run-migration.js) before tsup might clean dist
-        echo "📦 Step 2: Backing up database folder..."
-        if [ -d "dist/database" ]; then
-          cp -r dist/database /tmp/database-backup
-          echo "✅ Database folder backed up:"
-          ls -la /tmp/database-backup/
-          if [ -d "/tmp/database-backup/migrations" ]; then
-            echo "   Migrations: $(ls /tmp/database-backup/migrations/*.js 2>/dev/null | wc -l) files"
+        # Step 2: Backup migrations folder before tsup cleans dist
+        # Note: Only backup migrations/*.js files (compiled by tsc)
+        # tsup will generate run-migration.js separately
+        echo "📦 Step 2: Backing up migrations folder..."
+        if [ -d "dist/database/migrations" ]; then
+          mkdir -p /tmp/migrations-backup
+          cp -r dist/database/migrations/* /tmp/migrations-backup/ 2>/dev/null || true
+          MIGRATION_COUNT=$(ls /tmp/migrations-backup/*.js 2>/dev/null | wc -l)
+          echo "✅ Migrations backed up: ${MIGRATION_COUNT} files"
+          if [ "$MIGRATION_COUNT" -eq 0 ]; then
+            echo "⚠️ WARNING: No migration .js files found in backup!"
+            ls -la dist/database/migrations/ | head -10
           fi
         else
-          echo "⚠️ No database folder found to backup"
-          ls -la dist/
+          echo "⚠️ No migrations folder found to backup"
+          ls -la dist/ | head -10
         fi
 
         # Step 3: Build with tsup (creates bundled main.js)
         echo "🔨 Step 3: Building API server with tsup (bundled build)..."
         pnpm run build:api
 
-        # Step 4: Restore database folder from backup
-        echo "📦 Step 4: Restoring database folder..."
-        if [ -d "/tmp/database-backup" ]; then
-          # Remove any existing database folder (may be empty from tsup)
-          rm -rf dist/database
-          # Copy backup contents to database folder
-          cp -r /tmp/database-backup dist/database
-          echo "✅ Database folder restored:"
-          ls -la dist/database/
-          if [ -d "dist/database/migrations" ]; then
-            echo "   Migrations: $(ls dist/database/migrations/*.js 2>/dev/null | wc -l) files"
+        # Step 4: Restore migrations folder into tsup's dist/database/
+        # tsup creates dist/database/run-migration.js, we add migrations/*.js
+        echo "📦 Step 4: Restoring migrations folder..."
+        if [ -d "/tmp/migrations-backup" ]; then
+          # Create migrations folder in tsup's dist/database/
+          mkdir -p dist/database/migrations
+          # Copy backed up migration files
+          cp -r /tmp/migrations-backup/* dist/database/migrations/ 2>/dev/null || true
+          RESTORED_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
+          echo "✅ Migrations restored: ${RESTORED_COUNT} files"
+
+          # Verify run-migration.js exists (from tsup)
+          if [ -f "dist/database/run-migration.js" ]; then
+            echo "✅ run-migration.js exists (from tsup)"
+          else
+            echo "❌ ERROR: run-migration.js missing!"
+            exit 1
           fi
+
+          # List database folder contents
+          echo "📋 dist/database/ contents:"
+          ls -la dist/database/
         else
-          echo "⚠️ No database backup found"
+          echo "⚠️ No migrations backup found"
         fi
 
         # Verify build output
@@ -185,15 +199,17 @@ jobs:
         echo "✅ API server build complete"
         echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
 
-        # List generated files
-        echo "📋 Generated files:"
-        ls -la dist/
-        echo ""
-        echo "📋 Database folder:"
-        ls -la dist/database/ 2>/dev/null || echo "⚠️ No database directory"
-        echo ""
-        echo "📋 Migrations:"
-        ls -la dist/database/migrations/ 2>/dev/null || echo "⚠️ No migrations directory"
+        # Final verification
+        echo "📋 Final verification:"
+        echo "  - main.js: $(du -h dist/main.js | cut -f1)"
+        echo "  - run-migration.js: $(du -h dist/database/run-migration.js | cut -f1)"
+        FINAL_MIGRATION_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
+        echo "  - migrations: ${FINAL_MIGRATION_COUNT} files"
+
+        if [ "$FINAL_MIGRATION_COUNT" -eq 0 ]; then
+          echo "❌ ERROR: No migration files in final build!"
+          exit 1
+        fi
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
