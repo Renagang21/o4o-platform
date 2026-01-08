@@ -14,7 +14,10 @@ import { createApplicationController } from './controllers/application.controlle
 import { createAdminController } from './controllers/admin.controller.js';
 import { createOrderController } from './controllers/order.controller.js';
 import { createCockpitController } from './controllers/cockpit.controller.js';
-import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
+import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
+
+// Domain controllers - Forum
+import { ForumController } from '../../controllers/forum/ForumController.js';
 
 /**
  * Scope verification middleware factory for Glycopharm
@@ -100,6 +103,42 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/orders', orderController);
+
+  // ============================================================================
+  // Forum Routes - /api/v1/glycopharm/forum/*
+  // ============================================================================
+  const forumRouter = Router();
+  const forumController = new ForumController();
+
+  // Health check
+  forumRouter.get('/health', forumController.health.bind(forumController));
+
+  // Statistics
+  forumRouter.get('/stats', optionalAuth, forumController.getStats.bind(forumController));
+
+  // Posts
+  forumRouter.get('/posts', optionalAuth, forumController.listPosts.bind(forumController));
+  forumRouter.get('/posts/:id', optionalAuth, forumController.getPost.bind(forumController));
+  forumRouter.post('/posts', authenticate, forumController.createPost.bind(forumController));
+  forumRouter.put('/posts/:id', authenticate, forumController.updatePost.bind(forumController));
+  forumRouter.delete('/posts/:id', authenticate, forumController.deletePost.bind(forumController));
+
+  // Comments
+  forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
+  forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
+
+  // Categories
+  forumRouter.get('/categories', forumController.listCategories.bind(forumController));
+  forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
+  forumRouter.post('/categories', authenticate, forumController.createCategory.bind(forumController));
+  forumRouter.put('/categories/:id', authenticate, forumController.updateCategory.bind(forumController));
+  forumRouter.delete('/categories/:id', authenticate, forumController.deleteCategory.bind(forumController));
+
+  // Moderation
+  forumRouter.get('/moderation', authenticate, forumController.getModerationQueue.bind(forumController));
+  forumRouter.post('/moderation/:type/:id', authenticate, forumController.moderateContent.bind(forumController));
+
+  router.use('/forum', forumRouter);
 
   // Cockpit routes (Pharmacy Dashboard 2.0)
   const cockpitController = createCockpitController(

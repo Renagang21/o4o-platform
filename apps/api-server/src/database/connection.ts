@@ -77,8 +77,8 @@ import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-// Forum App entities - REMOVED (Phase R1: Domain separation)
-// import { ForumPost, ForumCategory, ForumComment } from '@o4o/forum-core';
+// Forum App entities (Re-added for KPA/Glycopharm forum routes)
+import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o/forum-core';
 // Forum Notification entity (Phase 13)
 import { ForumNotification } from '../entities/ForumNotification.js';
 // Digital Signage entities
@@ -174,12 +174,24 @@ import {
 import { Organization, OrganizationMember } from '@o4o/organization-core';
 
 // ============================================================================
+// LMS-CORE ENTITIES (Re-added for KPA LMS routes)
+// ============================================================================
+import {
+  Course,
+  Lesson,
+  Enrollment,
+  Progress,
+  Certificate,
+  LMSEvent,
+  Attendance,
+} from '@o4o/lms-core';
+
+// ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
 // ============================================================================
 // The following domain package entities remain removed:
 // - @o4o/membership-yaksa (MemberCategory, Member, Affiliation, etc.)
 // - @o4o/dropshipping-cosmetics (CosmeticsFilter)
-// - @o4o/lms-core (Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance)
 // - @o4o/reporting-yaksa (AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment)
 // - @o4o/lms-yaksa (YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment)
 // - @o4o/annualfee-yaksa (FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog)
@@ -326,8 +338,11 @@ export const AppDataSource = new DataSource({
     RoleApplication,
     KycDocument,
     // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-    // Forum App entities - REMOVED (Phase R1)
-    // ForumPost, ForumCategory, ForumComment moved to domain service
+    // Forum App entities (Re-added for KPA/Glycopharm forum routes)
+    ForumPost,
+    ForumCategory,
+    ForumComment,
+    ForumTag,
     // Forum Notification entity (Phase 13) - local entity, kept
     ForumNotification,
     // Digital Signage entities
@@ -400,11 +415,20 @@ export const AppDataSource = new DataSource({
     Organization,
     OrganizationMember,
     // ============================================================================
+    // LMS-CORE ENTITIES (Re-added for KPA LMS routes)
+    // ============================================================================
+    Course,
+    Lesson,
+    Enrollment,
+    Progress,
+    Certificate,
+    LMSEvent,
+    Attendance,
+    // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
     // Membership-Yaksa: MemberCategory, Member, Affiliation, MembershipRoleAssignment, MembershipYear, Verification
     // Dropshipping-Cosmetics: CosmeticsFilter
-    // LMS-Core: Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance
     // Reporting-Yaksa: AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment
     // LMS-Yaksa: YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment
     // AnnualFee-Yaksa: FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog

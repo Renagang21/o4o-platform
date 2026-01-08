@@ -13,7 +13,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Store,
   ShoppingCart,
@@ -41,6 +41,8 @@ import {
   Monitor,
   Tablet,
   Inbox,
+  LogIn,
+  ArrowLeft,
 } from 'lucide-react';
 import {
   pharmacyApi,
@@ -86,12 +88,14 @@ const LEGAL_STATUS_CONFIG: Record<
 };
 
 export default function PharmacyDashboard() {
+  const navigate = useNavigate();
   const [pharmacyStatus, setPharmacyStatus] = useState<PharmacyStatus | null>(null);
   const [todayActions, setTodayActions] = useState<TodayActions | null>(null);
   const [franchiseServices, setFranchiseServices] = useState<FranchiseServices | null>(null);
   const [contentWorkspace, setContentWorkspace] = useState<ContentWorkspace | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [requiresLogin, setRequiresLogin] = useState(false);
 
   useEffect(() => {
     const loadCockpitData = async () => {
@@ -120,34 +124,12 @@ export default function PharmacyDashboard() {
         }
       } catch (err: any) {
         console.error('Cockpit load error:', err);
-        // API 미구현 시 기본값으로 표시
-        setPharmacyStatus({
-          pharmacyName: '내 약국',
-          storeStatus: 'pending',
-          applicationStatus: 'none',
-          legalInfoStatus: 'incomplete',
-          orderChannelStatus: {
-            web: true,
-            kiosk: 'none',
-            tablet: 'none',
-          },
-        });
-        setTodayActions({
-          todayOrders: 0,
-          pendingOrders: 0,
-          pendingReceiveOrders: 0,
-          operatorNotices: 0,
-          applicationAlerts: 0,
-        });
-        setFranchiseServices({
-          signage: { enabled: false, activeContents: 0 },
-          marketTrial: { enabled: false, activeTrials: 0 },
-          forum: { enabled: false, ownedForums: 0, joinedForums: 0 },
-        });
-        setContentWorkspace({
-          savedContents: 0,
-          recentContents: [],
-        });
+        // 401 에러 시 로그인 필요 상태로 설정
+        if (err.status === 401) {
+          setRequiresLogin(true);
+        } else {
+          setError(err.message || '데이터를 불러오는데 실패했습니다.');
+        }
       } finally {
         setLoading(false);
       }
@@ -160,6 +142,38 @@ export default function PharmacyDashboard() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (requiresLogin) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-2xl shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mx-auto mb-4">
+            <LogIn className="w-8 h-8 text-primary-600" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800 mb-2">로그인이 필요합니다</h2>
+          <p className="text-slate-500 mb-6">
+            약국 대시보드를 이용하시려면 먼저 로그인해 주세요.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              이전 화면으로
+            </button>
+            <NavLink
+              to="/login"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
+            >
+              <LogIn className="w-5 h-5" />
+              로그인하기
+            </NavLink>
+          </div>
+        </div>
       </div>
     );
   }
