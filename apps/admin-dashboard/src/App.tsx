@@ -235,6 +235,9 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 // Error Pages
 const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
+// Debug Pages
+const AuthBootstrapDebug = lazy(() => import('@/pages/__debug__/AuthBootstrapDebug'));
+
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 
@@ -400,6 +403,13 @@ function App() {
             <Route path="/auth-inspector" element={
               <Suspense fallback={<PageLoader />}>
                 <AuthInspector />
+              </Suspense>
+            } />
+
+            {/* Auth Bootstrap Debug - WO-DEBUG-ADMIN-AUTH-BOOTSTRAP-001 */}
+            <Route path="/__debug__/auth-bootstrap" element={
+              <Suspense fallback={<PageLoader />}>
+                <AuthBootstrapDebug />
               </Suspense>
             } />
 
