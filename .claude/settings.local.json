@@ -301,7 +301,17 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20768517036 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --limit=5 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --workflow=deploy-web-services.yml --limit=1 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20800640064 --log-failed -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20800640064 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(for app in admin-dashboard api-gateway api-server app-api-reference digital-signage-agent ecommerce forum-api forum-web funding glucoseview-web glycopharm-web healthcare main-site mobile-app neture-web page-generator vscode-extension web-server-reference)",
+      "Bash(do)",
+      "Bash(if [ -f \"c:/Users/home/coding/o4o-platform/apps/$app/package.json\" ])",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(else)",
+      "Bash(for svc in web-glucoseview web-glycopharm web-k-cosmetics web-kpa-society web-neture)",
+      "Bash(if [ -f \"c:/Users/home/coding/o4o-platform/services/$svc/Dockerfile\" ])",
+      "Bash(wc:*)",
+      "Bash(du -sh:*)"
     ],
     "deny": []
   }
