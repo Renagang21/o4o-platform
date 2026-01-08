@@ -2,7 +2,8 @@
  * API 클라이언트 - KPA Society
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+// VITE_API_BASE_URL is set via Docker build-arg in deploy workflow
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
