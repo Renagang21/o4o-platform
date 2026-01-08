@@ -7,7 +7,7 @@
  * JSON 타임라인으로 정확한 실패 지점 식별
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
@@ -271,12 +271,13 @@ const AuthBootstrapDebug: React.FC = () => {
     }
   };
 
-  // 콘솔에 출력 (디버그 전용)
-  const exportToConsole = () => {
+  // 새 탭에서 JSON 보기
+  const openInNewTab = () => {
     if (result) {
       const finalResult = { ...result, timeline };
-      // eslint-disable-next-line no-console
-      console.log('=== AUTH BOOTSTRAP DEBUG EXPORT ===\n' + JSON.stringify(finalResult, null, 2) + '\n=== END EXPORT ===');
+      const blob = new Blob([JSON.stringify(finalResult, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
     }
   };
 
@@ -382,10 +383,10 @@ const AuthBootstrapDebug: React.FC = () => {
                 Copy JSON
               </button>
               <button
-                onClick={exportToConsole}
+                onClick={openInNewTab}
                 style={{ padding: '6px 12px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
-                Export to Console
+                Open in New Tab
               </button>
             </div>
           </div>
