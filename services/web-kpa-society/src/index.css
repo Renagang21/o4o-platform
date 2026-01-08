@@ -1,14 +1,164 @@
 /**
- * KPA Society - Design Token 적용
+ * O4O Platform Design Tokens v1.0
+ * INLINED for Docker build (monorepo packages not available in Docker context)
+ * KPA Society - Blue Theme
  */
-@import '../../../packages/design-tokens/design-tokens.css';
 
-/* KPA Society 서비스 테마 (Blue - 기본값 유지) */
 :root {
-  --color-primary: #2563EB;        /* Blue 600 */
+  /* ========================================
+   * SPACING (8px 그리드 기반)
+   * ======================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+
+  /* Section gaps */
+  --section-gap-sm: var(--space-4);
+  --section-gap-md: var(--space-5);
+  --section-gap-lg: var(--space-6);
+
+  /* ========================================
+   * TYPOGRAPHY (3단계 계층)
+   * ======================================== */
+  --font-primary: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Pretendard', 'Noto Sans KR', sans-serif;
+
+  --text-title-xl: 1.875rem;
+  --text-title-lg: 1.5rem;
+  --text-title-md: 1.25rem;
+  --text-title-sm: 1.125rem;
+
+  --text-body-lg: 1rem;
+  --text-body-md: 0.875rem;
+  --text-body-sm: 0.75rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* ========================================
+   * COLORS - Primary (KPA Society Blue)
+   * ======================================== */
+  --color-primary: #2563EB;
   --color-primary-light: #3B82F6;
   --color-primary-dark: #1D4ED8;
   --color-primary-darker: #1E3A8A;
+
+  /* ========================================
+   * COLORS - Neutral
+   * ======================================== */
+  --color-neutral-900: #0F172A;
+  --color-neutral-800: #1E293B;
+  --color-neutral-700: #334155;
+  --color-neutral-600: #475569;
+  --color-neutral-500: #64748B;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-50: #F8FAFC;
+  --color-white: #FFFFFF;
+
+  /* ========================================
+   * COLORS - Accent/Status
+   * ======================================== */
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+  --color-info: #2563EB;
+
+  /* ========================================
+   * SHADOWS
+   * ======================================== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* ========================================
+   * BORDER RADIUS
+   * ======================================== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ========================================
+   * TRANSITIONS
+   * ======================================== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ========================================
+   * Z-INDEX
+   * ======================================== */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  /* ========================================
+   * SEMANTIC COLORS
+   * ======================================== */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-600);
+  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-400);
+  --color-text-inverse: var(--color-white);
+
+  --color-bg-primary: var(--color-white);
+  --color-bg-secondary: var(--color-neutral-50);
+  --color-bg-tertiary: var(--color-neutral-100);
+  --color-bg-hover: var(--color-neutral-100);
+  --color-bg-active: var(--color-neutral-200);
+
+  --color-border-default: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+  --color-border-focus: var(--color-primary);
+
+  /* ========================================
+   * ICON COLORS
+   * ======================================== */
+  --color-icon-default: var(--color-neutral-500);
+  --color-icon-secondary: var(--color-neutral-400);
+  --color-icon-hover: var(--color-neutral-700);
+  --color-icon-active: var(--color-primary);
+  --color-icon-success: var(--color-success);
+  --color-icon-warning: var(--color-warning);
+  --color-icon-error: var(--color-error);
+
+  /* ========================================
+   * BUTTON COLORS
+   * ======================================== */
+  --color-btn-primary-bg: var(--color-primary);
+  --color-btn-primary-text: var(--color-white);
+  --color-btn-primary-hover: var(--color-primary-dark);
+
+  --color-btn-secondary-bg: var(--color-white);
+  --color-btn-secondary-text: var(--color-neutral-700);
+  --color-btn-secondary-border: var(--color-neutral-300);
+  --color-btn-secondary-hover: var(--color-neutral-50);
+
+  --color-btn-ghost-bg: transparent;
+  --color-btn-ghost-text: var(--color-neutral-600);
+  --color-btn-ghost-hover: var(--color-neutral-100);
+
+  /* ========================================
+   * CARD COLORS
+   * ======================================== */
+  --color-card-bg: var(--color-white);
+  --color-card-border: var(--color-neutral-200);
+  --color-card-hover-border: var(--color-neutral-300);
 }
 
 body {
