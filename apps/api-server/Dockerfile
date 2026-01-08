@@ -53,11 +53,14 @@ ARG CACHEBUST=1
 COPY dist/main.js ./dist/main.js
 COPY dist/main.js.map ./dist/main.js.map
 
-# Copy migrations for TypeORM auto-migration on startup
-COPY dist/database/migrations ./dist/database/migrations
+# Copy database folder for migrations
+# - migration-config.js: Lightweight DataSource for TypeORM CLI (no entity imports)
+# - migrations/*.js: Compiled migration files
+COPY dist/database ./dist/database
 
-# Verify the bundle and migrations exist
+# Verify the bundle and migration files exist
 RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
+RUN ls -la /app/dist/database/migration-config.js || (echo "CRITICAL: migration-config.js not found!" && exit 1)
 RUN ls -la /app/dist/database/migrations/*.js | head -5 || echo "WARNING: No migrations found"
 
 # Set ownership
