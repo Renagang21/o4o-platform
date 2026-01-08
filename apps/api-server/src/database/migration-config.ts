@@ -51,7 +51,8 @@ const connectionConfig = isCloudSQLSocket
     };
 
 // Migration DataSource - NO entities, only migrations
-export const MigrationDataSource = new DataSource({
+// TypeORM CLI requires ONLY ONE export of DataSource instance
+export default new DataSource({
   ...connectionConfig,
 
   // NO entities - migrations execute raw SQL
@@ -72,6 +73,3 @@ export const MigrationDataSource = new DataSource({
   // No synchronize - we use migrations
   synchronize: false,
 });
-
-// CLI default export
-export default MigrationDataSource;
