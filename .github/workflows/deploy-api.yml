@@ -274,6 +274,54 @@ jobs:
           --set-env-vars="JWT_REFRESH_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 
+    - name: Run database migrations
+      run: |
+        echo "🔄 Running database migrations..."
+
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+        # Create or update the migration job
+        gcloud run jobs create o4o-api-migrations \
+          --image="${FULL_IMAGE}" \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --task-timeout=300 \
+          --max-retries=1 \
+          --set-env-vars="NODE_ENV=production" \
+          --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
+          --set-env-vars="DB_PORT=5432" \
+          --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
+          --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
+          --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
+          --command="node" \
+          --args="dist/database/run-migration.js" \
+          2>/dev/null || \
+        gcloud run jobs update o4o-api-migrations \
+          --image="${FULL_IMAGE}" \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --task-timeout=300 \
+          --max-retries=1 \
+          --set-env-vars="NODE_ENV=production" \
+          --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
+          --set-env-vars="DB_PORT=5432" \
+          --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
+          --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
+          --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
+          --command="node" \
+          --args="dist/database/run-migration.js"
+
+        # Execute the migration job
+        echo "🚀 Executing migration job..."
+        gcloud run jobs execute o4o-api-migrations \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --wait
+
+        echo "✅ Migrations completed successfully"
+
     - name: Verify deployment
       run: |
         echo "🔍 Verifying deployment..."
