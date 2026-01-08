@@ -128,7 +128,11 @@ export default function PharmacyDashboard() {
         if (err.status === 401) {
           setRequiresLogin(true);
         } else {
-          setError(err.message || '데이터를 불러오는데 실패했습니다.');
+          // err.message가 객체일 수 있으므로 문자열로 변환
+          const errorMessage = typeof err.message === 'string'
+            ? err.message
+            : (err.message?.message || '데이터를 불러오는데 실패했습니다.');
+          setError(errorMessage);
         }
       } finally {
         setLoading(false);
