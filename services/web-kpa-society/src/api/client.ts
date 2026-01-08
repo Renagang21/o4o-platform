@@ -1,9 +1,15 @@
 /**
  * API 클라이언트 - KPA Society
+ *
+ * API Base URL: https://api.neture.co.kr/api/v1/kpa
+ * All KPA Society API calls go through the /api/v1/kpa namespace
  */
 
 // VITE_API_BASE_URL is set via Docker build-arg in deploy workflow
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Default: /api/v1/kpa (relative path for local development)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/kpa`
+  : '/api/v1/kpa';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
