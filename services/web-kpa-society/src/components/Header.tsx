@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts';
 import { TestAccountType } from '../contexts/AuthContext';
 import { colors } from '../styles/theme';
@@ -97,7 +97,6 @@ const adminMenu: MenuItem = {
 export function Header({ serviceName }: { serviceName: string }) {
   const { user, login, logout, isLoading } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);

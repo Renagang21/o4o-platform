@@ -311,7 +311,18 @@
       "Bash(for svc in web-glucoseview web-glycopharm web-k-cosmetics web-kpa-society web-neture)",
       "Bash(if [ -f \"c:/Users/home/coding/o4o-platform/services/$svc/Dockerfile\" ])",
       "Bash(wc:*)",
-      "Bash(du -sh:*)"
+      "Bash(du -sh:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20801456567 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20801456567 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20801590241 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20801590241 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20801590241 --job=59747486475 --log -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20801590241 --job=59747486506 --log -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --limit=3 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20801690826 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20802217280 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20802624974 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20802624985 --log-failed -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }
