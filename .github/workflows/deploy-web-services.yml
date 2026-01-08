@@ -34,9 +34,9 @@ env:
   VITE_API_BASE_URL: https://api.neture.co.kr
   # Service-specific API URLs (same-origin for cookie auth)
   VITE_API_URL_GLYCOPHARM: https://api.glycopharm.co.kr
-  VITE_API_URL_KPA_SOCIETY: https://api.neture.co.kr
-  VITE_API_URL_GLUCOSEVIEW: https://api.neture.co.kr
-  VITE_API_URL_K_COSMETICS: https://api.neture.co.kr
+  VITE_API_URL_KPA_SOCIETY: https://api.kpa-society.co.kr
+  VITE_API_URL_GLUCOSEVIEW: https://api.glucoseview.co.kr
+  VITE_API_URL_K_COSMETICS: https://api.k-cosmetics.site
 
 jobs:
   detect-changes:
