@@ -50,7 +50,7 @@ const jsToTsPlugin: Plugin = {
  * - Output ESM format for Node.js 22+
  */
 export default defineConfig({
-  entry: ['src/main.ts'],
+  entry: ['src/main.ts', 'src/database/run-migration.ts'],
   format: ['esm'],
   target: 'node22',
   platform: 'node',
