@@ -3,15 +3,8 @@ import type { User, UserRole } from '@/types';
 
 // Re-export UserRole for use by other components
 export type { UserRole } from '@/types';
-import { authApi, apiClient } from '@/services/api';
-import {
-  getAccessToken,
-  setAccessToken,
-  clearAllAuthData,
-  getStoredUser,
-  setStoredUser,
-  clearStoredUser,
-} from '@/utils/token-storage';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 interface AuthContextType {
   user: User | null;
@@ -28,18 +21,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // API 서버 역할을 glycopharm-web 역할로 매핑
-// API Server -> glycopharm-web
-// seller/customer -> pharmacy (glycopharm은 약국 중심 서비스)
-// admin/super_admin -> operator
-// supplier -> supplier
-// partner -> partner
-// Note: customer는 glycopharm에서 약국(pharmacy) 역할로 간주됨
-// 일반 소비자(consumer)는 별도 역할 체계 필요시 추가 정의 예정
 function mapApiRoleToWebRole(apiRole: string): UserRole {
   const roleMap: Record<string, UserRole> = {
     'seller': 'pharmacy',
-    'customer': 'pharmacy', // glycopharm 약국 계정
-    'user': 'pharmacy',     // glycopharm 약국 계정
+    'customer': 'pharmacy',
+    'user': 'pharmacy',
     'admin': 'operator',
     'super_admin': 'operator',
     'supplier': 'supplier',
@@ -78,16 +64,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
 
   useEffect(() => {
-    // Check for existing session - Uses SSOT token storage
+    // httpOnly Cookie 기반 세션 확인
     const checkSession = async () => {
-      const token = getAccessToken();
-      if (token) {
-        apiClient.setToken(token);
-        try {
-          const response = await authApi.me();
-          if (response.data) {
-            // API 역할을 웹 역할로 매핑
-            const apiUser = response.data.user as { role: string; [key: string]: unknown };
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            const apiUser = data.user as { role: string; [key: string]: unknown };
             const mappedRole = mapApiRoleToWebRole(apiUser.role);
             const userData: User = {
               ...apiUser,
@@ -98,28 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               updatedAt: apiUser.updatedAt as string,
             } as User;
             setUser(userData);
-            setStoredUser(userData);
             setAvailableRoles([userData.role]);
-          } else {
-            clearAllAuthData();
-            apiClient.setToken(null);
-          }
-        } catch {
-          clearAllAuthData();
-          apiClient.setToken(null);
-        }
-      } else {
-        // Check for saved user (test mode)
-        const savedUser = getStoredUser();
-        if (savedUser) {
-          try {
-            const userData = JSON.parse(savedUser);
-            setUser(userData);
-            setAvailableRoles(userData.availableRoles || [userData.role]);
-          } catch {
-            clearStoredUser();
           }
         }
+      } catch {
+        // 세션 없음 - 정상
       }
       setIsLoading(false);
     };
@@ -130,16 +100,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await authApi.login(email, password);
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
 
-      if (response.error) {
-        throw new Error(response.error.message || '로그인에 실패했습니다.');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || '로그인에 실패했습니다.');
       }
 
-      if (response.data) {
-        const { user: userData, accessToken } = response.data;
-        // API 역할을 웹 역할로 매핑
-        const apiUser = userData as { role: string; [key: string]: unknown };
+      if (data.user) {
+        const apiUser = data.user as { role: string; [key: string]: unknown };
         const mappedRole = mapApiRoleToWebRole(apiUser.role);
         const typedUser: User = {
           ...apiUser,
@@ -150,11 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           updatedAt: apiUser.updatedAt as string,
         } as User;
 
-        apiClient.setToken(accessToken);
-        setAccessToken(accessToken); // SSOT token storage
         setUser(typedUser);
         setAvailableRoles([typedUser.role]);
-        setStoredUser(typedUser);
         return;
       }
 
@@ -164,19 +136,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    authApi.logout();
+  const logout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {
+      // 로그아웃 실패해도 로컬 상태 정리
+    }
     setUser(null);
     setAvailableRoles([]);
-    clearAllAuthData(); // SSOT token storage
-    apiClient.setToken(null);
   };
 
   const selectRole = (role: UserRole) => {
     if (user && availableRoles.includes(role)) {
-      const updatedUser = { ...user, role };
-      setUser(updatedUser);
-      setStoredUser({ ...updatedUser, availableRoles });
+      setUser({ ...user, role });
     }
   };
 

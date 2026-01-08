@@ -1,4 +1,11 @@
+/**
+ * AuthContext - GlucoseView 인증 및 역할 관리
+ * httpOnly Cookie 기반 인증
+ */
+
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // 사용자 역할
 export type UserRole = 'pharmacist' | 'admin';
@@ -37,105 +44,120 @@ interface AuthContextType {
   updateUser: (updates: Partial<User>) => void;
 }
 
-// 테스트 사용자 데이터
-const testUsers = [
-  {
-    id: 'pharmacist-test-1',
-    name: '테스트 약사',
-    email: 'pharmacist@test.test',
-    password: 'testID1234',
-    role: 'pharmacist' as UserRole,
-    approvalStatus: 'approved' as ApprovalStatus,
-    pharmacyName: '테스트약국',
-    phone: '010-1234-5678',
-    licenseNumber: 'PH-12345',
-    displayName: '테스트약사',
-    chapterId: 'a1111111-1111-1111-1111-111111111111',
-    chapterName: '강남분회',
-    branchName: '서울지부',
-  },
-  {
-    id: 'admin-test-1',
-    name: '테스트 관리자',
-    email: 'admin@test.test',
-    password: 'adminID1234',
-    role: 'admin' as UserRole,
-    approvalStatus: 'approved' as ApprovalStatus,
-    pharmacyName: '관리약국',
-    phone: '010-9876-5432',
-    licenseNumber: 'PH-00001',
-    displayName: '관리자',
-    chapterId: 'a1111111-1111-1111-1111-111111111111',
-    chapterName: '강남분회',
-    branchName: '서울지부',
-  },
-  // 기존 테스트 계정 (하위 호환)
-  {
-    id: 'user-1',
-    name: 'Rena',
-    email: 'test@test.test',
-    password: 'testID1234',
-    role: 'pharmacist' as UserRole,
-    approvalStatus: 'approved' as ApprovalStatus,
-    pharmacyName: '',
-    phone: '',
-    licenseNumber: '',
-    displayName: 'Rena',
-  },
-];
-
 const AuthContext = createContext<AuthContextType | null>(null);
+
+// API 역할을 web 역할로 매핑
+function mapApiRole(apiRole: string): UserRole {
+  const roleMap: Record<string, UserRole> = {
+    'admin': 'admin',
+    'super_admin': 'admin',
+    'pharmacist': 'pharmacist',
+    'seller': 'pharmacist',
+    'customer': 'pharmacist',
+    'user': 'pharmacist',
+  };
+  return roleMap[apiRole] || 'pharmacist';
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  // 페이지 로드 시 저장된 세션 확인
+  // httpOnly Cookie 기반 세션 확인
   useEffect(() => {
-    const savedUser = localStorage.getItem('glucoseview_user');
-    if (savedUser) {
+    const checkSession = async () => {
       try {
-        setUser(JSON.parse(savedUser));
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            const apiUser = data.user;
+            const mappedRole = mapApiRole(apiUser.role);
+            const userData: User = {
+              id: apiUser.id,
+              name: apiUser.fullName || apiUser.email,
+              email: apiUser.email,
+              role: mappedRole,
+              approvalStatus: apiUser.status === 'active' ? 'approved' : 'pending',
+              displayName: apiUser.fullName || apiUser.email,
+              phone: apiUser.phone,
+            };
+            setUser(userData);
+          }
+        }
       } catch {
-        localStorage.removeItem('glucoseview_user');
+        // 세션 없음 - 정상
       }
-    }
+    };
+
+    checkSession();
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
-    // 실제로는 API 호출
-    const foundUser = testUsers.find(
-      u => u.email === email && u.password === password
-    );
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
 
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem('glucoseview_user', JSON.stringify(userWithoutPassword));
+      const data = await response.json();
 
-      // 승인 상태에 따른 메시지
-      if (foundUser.approvalStatus === 'pending') {
-        return { success: true, message: 'pending' };
-      }
-      if (foundUser.approvalStatus === 'rejected') {
-        return { success: true, message: 'rejected' };
+      if (!response.ok) {
+        return { success: false, message: data.message || data.error || '이메일 또는 비밀번호가 올바르지 않습니다.' };
       }
 
-      return { success: true };
+      if (data.user) {
+        const apiUser = data.user;
+        const mappedRole = mapApiRole(apiUser.role);
+        const approvalStatus: ApprovalStatus = apiUser.status === 'active' ? 'approved' : 'pending';
+
+        const userData: User = {
+          id: apiUser.id,
+          name: apiUser.fullName || apiUser.email,
+          email: apiUser.email,
+          role: mappedRole,
+          approvalStatus,
+          displayName: apiUser.fullName || apiUser.email,
+          phone: apiUser.phone,
+        };
+        setUser(userData);
+
+        // 승인 상태에 따른 메시지
+        if (approvalStatus === 'pending') {
+          return { success: true, message: 'pending' };
+        }
+        if (approvalStatus === 'rejected') {
+          return { success: true, message: 'rejected' };
+        }
+
+        return { success: true };
+      }
+
+      return { success: false, message: '로그인 응답이 올바르지 않습니다.' };
+    } catch {
+      return { success: false, message: '로그인에 실패했습니다.' };
     }
-    return { success: false, message: '이메일 또는 비밀번호가 올바르지 않습니다.' };
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {
+      // 로그아웃 실패해도 로컬 상태 정리
+    }
     setUser(null);
-    localStorage.removeItem('glucoseview_user');
-    // 사용자별 데이터는 유지 (다른 계정으로 로그인 시 사용)
   };
 
   const updateUser = (updates: Partial<User>) => {
     if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem('glucoseview_user', JSON.stringify(updatedUser));
+      setUser({ ...user, ...updates });
     }
   };
 

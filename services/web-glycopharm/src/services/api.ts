@@ -20,24 +20,9 @@ interface ApiResponse<T> {
 
 class ApiClient {
   private baseUrl: string;
-  private token: string | null = null;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
-    this.token = localStorage.getItem('glycopharm_token');
-  }
-
-  setToken(token: string | null) {
-    this.token = token;
-    if (token) {
-      localStorage.setItem('glycopharm_token', token);
-    } else {
-      localStorage.removeItem('glycopharm_token');
-    }
-  }
-
-  getToken(): string | null {
-    return this.token;
   }
 
   private async request<T>(
@@ -51,15 +36,13 @@ class ApiClient {
       ...options?.headers,
     };
 
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
-    }
-
     try {
+      // httpOnly Cookie 기반 인증 (credentials: 'include')
       const response = await fetch(`${this.baseUrl}${path}`, {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
+        credentials: 'include',
       });
 
       const data = await response.json();

@@ -26,26 +26,18 @@ class StoreApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private getAuthToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    const token = this.getAuthToken();
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-    if (token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-    }
-
+    // httpOnly Cookie 기반 인증 (credentials: 'include')
     const response = await fetch(url, {
       ...options,
       headers,

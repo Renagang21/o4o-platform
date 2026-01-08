@@ -15,10 +15,6 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private getAuthToken(): string | null {
-    return localStorage.getItem('auth_token');
-  }
-
   private buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
     const url = new URL(`${this.baseUrl}${endpoint}`, window.location.origin);
     if (params) {
@@ -40,14 +36,11 @@ class ApiClient {
       ...options.headers,
     };
 
-    const token = this.getAuthToken();
-    if (token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-    }
-
+    // httpOnly Cookie 기반 인증 (credentials: 'include')
     const response = await fetch(url, {
       ...fetchOptions,
       headers,
+      credentials: 'include',
     });
 
     if (!response.ok) {
