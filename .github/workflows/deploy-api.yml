@@ -142,53 +142,61 @@ jobs:
         echo "🔨 Step 1: Building with tsc (includes migrations)..."
         pnpm run build
 
-        # Step 2: Backup migrations folder before tsup cleans dist
-        # Note: Only backup migrations/*.js files (compiled by tsc)
-        # tsup will generate run-migration.js separately
-        echo "📦 Step 2: Backing up migrations folder..."
-        if [ -d "dist/database/migrations" ]; then
-          mkdir -p /tmp/migrations-backup
-          cp -r dist/database/migrations/* /tmp/migrations-backup/ 2>/dev/null || true
-          MIGRATION_COUNT=$(ls /tmp/migrations-backup/*.js 2>/dev/null | wc -l)
-          echo "✅ Migrations backed up: ${MIGRATION_COUNT} files"
-          if [ "$MIGRATION_COUNT" -eq 0 ]; then
-            echo "⚠️ WARNING: No migration .js files found in backup!"
-            ls -la dist/database/migrations/ | head -10
-          fi
+        # Step 2: Backup database folder before tsup cleans dist
+        # Backup: migrations/*.js + migration-config.js (all compiled by tsc)
+        echo "📦 Step 2: Backing up database folder (migrations + migration-config)..."
+        mkdir -p /tmp/database-backup/migrations
+
+        # Backup migration-config.js (required for TypeORM CLI)
+        if [ -f "dist/database/migration-config.js" ]; then
+          cp dist/database/migration-config.js /tmp/database-backup/
+          cp dist/database/migration-config.js.map /tmp/database-backup/ 2>/dev/null || true
+          echo "✅ migration-config.js backed up"
         else
-          echo "⚠️ No migrations folder found to backup"
-          ls -la dist/ | head -10
+          echo "⚠️ WARNING: migration-config.js not found!"
+        fi
+
+        # Backup migration files
+        if [ -d "dist/database/migrations" ]; then
+          cp -r dist/database/migrations/* /tmp/database-backup/migrations/ 2>/dev/null || true
+          MIGRATION_COUNT=$(ls /tmp/database-backup/migrations/*.js 2>/dev/null | wc -l)
+          echo "✅ Migrations backed up: ${MIGRATION_COUNT} files"
+        else
+          echo "⚠️ No migrations folder found"
         fi
 
         # Step 3: Build with tsup (creates bundled main.js)
         echo "🔨 Step 3: Building API server with tsup (bundled build)..."
         pnpm run build:api
 
-        # Step 4: Restore migrations folder into tsup's dist/database/
-        # tsup creates dist/database/run-migration.js, we add migrations/*.js
-        echo "📦 Step 4: Restoring migrations folder..."
-        if [ -d "/tmp/migrations-backup" ]; then
-          # Create migrations folder in tsup's dist/database/
-          mkdir -p dist/database/migrations
-          # Copy backed up migration files
-          cp -r /tmp/migrations-backup/* dist/database/migrations/ 2>/dev/null || true
+        # Step 4: Restore database folder (migrations + migration-config)
+        echo "📦 Step 4: Restoring database folder..."
+
+        # Create database folder structure
+        mkdir -p dist/database/migrations
+
+        # Restore migration-config.js
+        if [ -f "/tmp/database-backup/migration-config.js" ]; then
+          cp /tmp/database-backup/migration-config.js dist/database/
+          cp /tmp/database-backup/migration-config.js.map dist/database/ 2>/dev/null || true
+          echo "✅ migration-config.js restored"
+        else
+          echo "❌ ERROR: migration-config.js not in backup!"
+          exit 1
+        fi
+
+        # Restore migration files
+        if [ -d "/tmp/database-backup/migrations" ]; then
+          cp -r /tmp/database-backup/migrations/* dist/database/migrations/ 2>/dev/null || true
           RESTORED_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
           echo "✅ Migrations restored: ${RESTORED_COUNT} files"
-
-          # Verify run-migration.js exists (from tsup)
-          if [ -f "dist/database/run-migration.js" ]; then
-            echo "✅ run-migration.js exists (from tsup)"
-          else
-            echo "❌ ERROR: run-migration.js missing!"
-            exit 1
-          fi
-
-          # List database folder contents
-          echo "📋 dist/database/ contents:"
-          ls -la dist/database/
-        else
-          echo "⚠️ No migrations backup found"
         fi
+
+        # List database folder contents
+        echo "📋 dist/database/ contents:"
+        ls -la dist/database/
+        echo "📋 dist/database/migrations/ (first 10):"
+        ls dist/database/migrations/*.js 2>/dev/null | head -10
 
         # Verify build output
         if [ ! -f "dist/main.js" ]; then
@@ -202,9 +210,15 @@ jobs:
         # Final verification
         echo "📋 Final verification:"
         echo "  - main.js: $(du -h dist/main.js | cut -f1)"
-        echo "  - run-migration.js: $(du -h dist/database/run-migration.js | cut -f1)"
+        echo "  - migration-config.js: $(du -h dist/database/migration-config.js | cut -f1)"
         FINAL_MIGRATION_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
         echo "  - migrations: ${FINAL_MIGRATION_COUNT} files"
+
+        # Verify all required files exist
+        if [ ! -f "dist/database/migration-config.js" ]; then
+          echo "❌ ERROR: migration-config.js missing!"
+          exit 1
+        fi
 
         if [ "$FINAL_MIGRATION_COUNT" -eq 0 ]; then
           echo "❌ ERROR: No migration files in final build!"
@@ -304,6 +318,10 @@ jobs:
 
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
+        # Use TypeORM CLI with migration-config.js (lightweight, no entities)
+        # Command: npx typeorm migration:run -d dist/database/migration-config.js
+        MIGRATION_CMD="npx typeorm migration:run -d dist/database/migration-config.js"
+
         # Create or update the migration job
         gcloud run jobs create o4o-api-migrations \
           --image="${FULL_IMAGE}" \
@@ -318,8 +336,8 @@ jobs:
           --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
           --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
-          --command="node" \
-          --args="dist/database/run-migration.js" \
+          --command="sh" \
+          --args="-c,${MIGRATION_CMD}" \
           2>/dev/null || \
         gcloud run jobs update o4o-api-migrations \
           --image="${FULL_IMAGE}" \
@@ -334,8 +352,8 @@ jobs:
           --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
           --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
-          --command="node" \
-          --args="dist/database/run-migration.js"
+          --command="sh" \
+          --args="-c,${MIGRATION_CMD}"
 
         # Execute the migration job
         echo "🚀 Executing migration job..."

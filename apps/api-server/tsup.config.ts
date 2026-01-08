@@ -50,7 +50,8 @@ const jsToTsPlugin: Plugin = {
  * - Output ESM format for Node.js 22+
  */
 export default defineConfig({
-  entry: ['src/main.ts', 'src/database/run-migration.ts'],
+  // Only bundle main.ts - migrations use tsc output with TypeORM CLI
+  entry: ['src/main.ts'],
   format: ['esm'],
   target: 'node22',
   platform: 'node',
