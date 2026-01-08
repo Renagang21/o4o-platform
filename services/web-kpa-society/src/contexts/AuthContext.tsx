@@ -59,16 +59,48 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
 }
 
+interface ApiUser {
+  id: string;
+  email: string;
+  name?: string;
+  fullName?: string;
+  role?: string;
+  roles?: string[];
+  [key: string]: unknown;
+}
+
 interface AuthResponse {
   success: boolean;
   data: {
-    user: User;
+    user: ApiUser;
   };
 }
 
 interface MeResponse {
   success: boolean;
-  data: User;
+  data: ApiUser;
+}
+
+/**
+ * API 서버 역할을 KPA Society 역할로 매핑
+ */
+function mapApiRoleToKpaRole(apiRole: string | undefined): string {
+  if (!apiRole) return 'pharmacist';
+
+  const roleMap: Record<string, string> = {
+    // KPA 전용 역할
+    'pharmacist': 'pharmacist',
+    'membership_district_admin': 'district_admin',
+    'membership_branch_admin': 'branch_admin',
+    'membership_super_admin': 'super_admin',
+    // 일반 역할 매핑
+    'admin': 'district_admin',
+    'super_admin': 'super_admin',
+    'customer': 'pharmacist',
+    'user': 'pharmacist',
+  };
+
+  return roleMap[apiRole] || 'pharmacist';
 }
 
 // ============================================================================
@@ -94,7 +126,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data: MeResponse = await response.json();
         if (data.success && data.data) {
-          setUser(data.data);
+          const apiUser = data.data;
+          const mappedRole = mapApiRoleToKpaRole(apiUser.role);
+          const userData: User = {
+            id: apiUser.id,
+            email: apiUser.email,
+            name: apiUser.fullName || apiUser.name || apiUser.email,
+            role: mappedRole,
+          };
+          setUser(userData);
         } else {
           setUser(null);
         }
@@ -130,7 +170,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data: AuthResponse = await response.json();
     if (data.success && data.data?.user) {
-      setUser(data.data.user);
+      const apiUser = data.data.user;
+      const mappedRole = mapApiRoleToKpaRole(apiUser.role);
+      const userData: User = {
+        id: apiUser.id,
+        email: apiUser.email,
+        name: apiUser.fullName || apiUser.name || apiUser.email,
+        role: mappedRole,
+      };
+      setUser(userData);
     } else {
       throw new Error('로그인 응답 형식이 올바르지 않습니다.');
     }

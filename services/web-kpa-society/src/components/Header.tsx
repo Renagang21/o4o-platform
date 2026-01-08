@@ -95,7 +95,7 @@ const adminMenu: MenuItem = {
 };
 
 export function Header({ serviceName }: { serviceName: string }) {
-  const { user, login, loginAsTestAccount, logout, isLoading } = useAuth();
+  const { user, login, logout, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -131,17 +131,18 @@ export function Header({ serviceName }: { serviceName: string }) {
   };
 
   /**
-   * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정으로 즉시 로그인
+   * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 정보를 입력 필드에 채우기
+   * (즉시 로그인이 아닌 입력만)
    */
-  const handleTestLogin = (accountType: TestAccountType) => {
-    loginAsTestAccount(accountType);
-    setShowLoginModal(false);
-    // 역할에 따라 적절한 페이지로 이동
-    if (accountType === 'district_admin') {
-      navigate('/admin');
-    } else {
-      navigate('/intranet');
-    }
+  const fillTestAccount = (accountType: TestAccountType) => {
+    const testCredentials: Record<TestAccountType, { email: string; password: string }> = {
+      pharmacist: { email: 'pharmacist@kpa-test.kr', password: 'test123!@#' },
+      district_admin: { email: 'district-admin@kpa-test.kr', password: 'test123!@#' },
+      branch_admin: { email: 'branch-admin@kpa-test.kr', password: 'test123!@#' },
+    };
+    const creds = testCredentials[accountType];
+    setLoginForm({ email: creds.email, password: creds.password });
+    setLoginError(null);
   };
 
   return (
@@ -314,13 +315,21 @@ export function Header({ serviceName }: { serviceName: string }) {
                 <span style={styles.testAccountDividerText}>테스트 환경</span>
               </div>
               <p style={styles.testAccountDesc}>
-                아래 버튼으로 테스트 계정에 즉시 로그인할 수 있습니다.
+                아래 버튼을 클릭하면 테스트 계정 정보가 입력됩니다.
               </p>
               <div style={styles.testAccountButtons}>
                 <button
                   type="button"
                   style={styles.testAccountButton}
-                  onClick={() => handleTestLogin('district_admin')}
+                  onClick={() => fillTestAccount('pharmacist')}
+                >
+                  <span style={styles.testAccountIcon}>💊</span>
+                  <span>약사 계정</span>
+                </button>
+                <button
+                  type="button"
+                  style={styles.testAccountButton}
+                  onClick={() => fillTestAccount('district_admin')}
                 >
                   <span style={styles.testAccountIcon}>🏛️</span>
                   <span>지부 운영자 계정</span>
@@ -328,7 +337,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                 <button
                   type="button"
                   style={styles.testAccountButton}
-                  onClick={() => handleTestLogin('branch_admin')}
+                  onClick={() => fillTestAccount('branch_admin')}
                 >
                   <span style={styles.testAccountIcon}>🏢</span>
                   <span>분회 운영자 계정</span>

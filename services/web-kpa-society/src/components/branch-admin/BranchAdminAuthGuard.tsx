@@ -121,14 +121,14 @@ function checkBranchAdminRole(user: User, _branchId: string): boolean {
     return true;
   }
 
-  // 지부 관리자는 소속 지부의 모든 분회 접근 가능
-  if (role === 'membership_district_admin') {
+  // 지부 관리자는 소속 지부의 모든 분회 접근 가능 (매핑된 역할 포함)
+  if (role === 'district_admin' || role === 'membership_district_admin') {
     // TODO: 지부-분회 관계 확인 로직 추가
     return true;
   }
 
-  // 분회 관리자 권한 확인
-  if (role === 'membership_branch_admin') {
+  // 분회 관리자 권한 확인 (매핑된 역할 포함)
+  if (role === 'branch_admin' || role === 'membership_branch_admin') {
     // TODO: 해당 분회에 대한 권한이 있는지 확인
     // 향후 API에서 user.managedBranches 등의 필드로 확인
     return true;
@@ -136,12 +136,6 @@ function checkBranchAdminRole(user: User, _branchId: string): boolean {
 
   // admin 역할도 허용
   if (role === 'admin') {
-    return true;
-  }
-
-  // 개발/테스트 환경에서는 임시로 허용 (TODO: 프로덕션에서 제거)
-  if (import.meta.env.DEV) {
-    console.warn('[DEV MODE] Branch admin access allowed for testing');
     return true;
   }
 
