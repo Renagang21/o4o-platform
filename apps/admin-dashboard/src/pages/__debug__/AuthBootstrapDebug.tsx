@@ -9,7 +9,9 @@
 
 import React, { useState, useCallback } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+// VITE_API_URL이 /api를 포함할 수 있으므로 순수 도메인만 추출
+const rawApiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+const API_BASE_URL = rawApiUrl.replace(/\/api\/?$/, '');
 
 interface TimelineEntry {
   timestamp: string;
