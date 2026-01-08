@@ -74,6 +74,9 @@ import EducationPage from '@/pages/education/EducationPage';
 import MyPage from '@/pages/MyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
+// Debug Pages
+import { LoginDebugPage } from '@/pages/__debug__';
+
 // Apply Pages (API 연동)
 import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
 import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
@@ -226,6 +229,9 @@ function AppRoutes() {
         <Route path="products/:productId" element={<StoreProductDetail />} />
         <Route path="cart" element={<StoreCart />} />
       </Route>
+
+      {/* Debug Routes */}
+      <Route path="__debug__/login" element={<LoginDebugPage />} />
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
