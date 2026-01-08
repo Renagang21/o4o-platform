@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { useAuth, ROLE_DASHBOARDS, type UserRole } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 // 테스트 계정 (데이터베이스에 등록된 실제 계정)
 const testAccounts = [
-  { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary', role: 'pharmacy' as UserRole },
-  { email: 'admin@neture.co.kr', password: 'Admin2024!', label: '운영자', color: 'red', role: 'operator' as UserRole },
+  { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary' },
+  { email: 'admin@neture.co.kr', password: 'Admin2024!', label: '운영자', color: 'red' },
 ];
 
 export default function LoginPage() {
@@ -23,11 +23,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      // 역할에 따른 대시보드로 이동
-      const account = testAccounts.find(a => a.email === email);
-      const role = account?.role || 'pharmacy';
-      const dashboard = ROLE_DASHBOARDS[role] || '/';
-      navigate(dashboard);
+      // 로그인 성공 시 홈으로 이동
+      navigate('/');
     } catch {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
     }
