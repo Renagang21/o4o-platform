@@ -13,7 +13,18 @@ export default {
         // ========================================
 
         // Primary 색상 (서비스별 테마 - CSS 변수로 관리)
+        // GlycoPharm Green 테마
         primary: {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',  // --color-primary-light
+          600: '#16a34a',  // --color-primary (기본값)
+          700: '#15803d',  // --color-primary-dark
+          800: '#166534',  // --color-primary-darker
+          900: '#14532d',
           DEFAULT: 'var(--color-primary)',
           light: 'var(--color-primary-light)',
           dark: 'var(--color-primary-dark)',

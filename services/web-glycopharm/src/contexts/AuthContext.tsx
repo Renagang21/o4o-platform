@@ -23,6 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // API 서버 역할을 glycopharm-web 역할로 매핑
 function mapApiRoleToWebRole(apiRole: string): UserRole {
   const roleMap: Record<string, UserRole> = {
+    'pharmacy': 'pharmacy',  // glycopharm 전용 역할
     'seller': 'pharmacy',
     'customer': 'pharmacy',
     'user': 'pharmacy',
