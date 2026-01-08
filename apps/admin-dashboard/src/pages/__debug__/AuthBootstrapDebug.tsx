@@ -271,13 +271,12 @@ const AuthBootstrapDebug: React.FC = () => {
     }
   };
 
-  // 콘솔에 출력
+  // 콘솔에 출력 (디버그 전용)
   const exportToConsole = () => {
     if (result) {
       const finalResult = { ...result, timeline };
-      console.log('=== AUTH BOOTSTRAP DEBUG EXPORT ===');
-      console.log(JSON.stringify(finalResult, null, 2));
-      console.log('=== END EXPORT ===');
+      // eslint-disable-next-line no-console
+      console.log('=== AUTH BOOTSTRAP DEBUG EXPORT ===\n' + JSON.stringify(finalResult, null, 2) + '\n=== END EXPORT ===');
     }
   };
 
