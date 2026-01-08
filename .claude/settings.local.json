@@ -322,7 +322,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20801690826 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20802217280 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20802624974 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20802624985 --log-failed -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20802624985 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20802823763 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }
