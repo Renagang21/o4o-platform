@@ -10,6 +10,13 @@ export class CreateSellerProductsTable1840000000002 implements MigrationInterfac
     name = 'CreateSellerProductsTable1840000000002'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        // This table requires products table to exist (FK constraint)
+        const hasProductsTable = await queryRunner.hasTable('products');
+        if (!hasProductsTable) {
+            console.log('Skipping CreateSellerProductsTable: products table does not exist');
+            return;
+        }
+
         // Create seller_products table
         await queryRunner.query(`
             CREATE TABLE "seller_products" (
@@ -80,6 +87,11 @@ export class CreateSellerProductsTable1840000000002 implements MigrationInterfac
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        const hasTable = await queryRunner.hasTable('seller_products');
+        if (!hasTable) {
+            return;
+        }
+
         // Drop indexes
         await queryRunner.query(`DROP INDEX IF EXISTS "IDX_seller_products_syncPolicy"`);
         await queryRunner.query(`DROP INDEX IF EXISTS "IDX_seller_products_productId"`);

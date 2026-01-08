@@ -17,6 +17,13 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
   name = 'OptimizeProductsWithJsonb1800000000003';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Skip if products table doesn't exist
+    const hasTable = await queryRunner.hasTable('products');
+    if (!hasTable) {
+      console.log('Skipping OptimizeProductsWithJsonb: products table does not exist');
+      return;
+    }
+
     // Step 1: Convert JSON columns to JSONB
 
     await queryRunner.query(`
@@ -204,6 +211,12 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Skip if products table doesn't exist
+    const hasTable = await queryRunner.hasTable('products');
+    if (!hasTable) {
+      return;
+    }
+
     // Drop materialized view and related objects
     await queryRunner.query(`DROP FUNCTION IF EXISTS refresh_product_listings();`);
     await queryRunner.query(`DROP MATERIALIZED VIEW IF EXISTS mv_product_listings;`);

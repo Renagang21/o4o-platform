@@ -3,6 +3,13 @@ import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 export class AddProductCommissionColumns1732422000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Add Phase PD-2 commission columns to products table
+    // Skip if products table doesn't exist (cosmetics domain uses separate DB)
+    const hasTable = await queryRunner.hasTable('products');
+    if (!hasTable) {
+      console.log('Skipping AddProductCommissionColumns: products table does not exist');
+      return;
+    }
+
     // Check if columns exist before adding to handle idempotency
     const table = await queryRunner.getTable('products');
 
@@ -59,6 +66,11 @@ export class AddProductCommissionColumns1732422000000 implements MigrationInterf
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    const hasTable = await queryRunner.hasTable('products');
+    if (!hasTable) {
+      return;
+    }
+
     await queryRunner.dropColumn('products', 'platformCommissionRate');
     await queryRunner.dropColumn('products', 'sellerCommissionRate');
     await queryRunner.dropColumn('products', 'commissionValue');
