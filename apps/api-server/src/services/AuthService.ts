@@ -343,13 +343,13 @@ class AuthService {
   }
 
   // Set auth cookies (Refactored to use cookie.utils)
-  setAuthCookies(res: Response, tokens: AuthTokens): void {
-    cookieUtils.setAuthCookies(res, tokens);
+  setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {
+    cookieUtils.setAuthCookies(req, res, tokens);
   }
 
   // Clear auth cookies (Refactored to use cookie.utils)
-  clearAuthCookies(res: Response): void {
-    cookieUtils.clearAuthCookies(res);
+  clearAuthCookies(req: Request, res: Response): void {
+    cookieUtils.clearAuthCookies(req, res);
   }
 
   // Revoke all user tokens

@@ -73,7 +73,8 @@ export class AuthController extends BaseController {
 
       // Phase 6-7: Cookie Auth Primary
       // Set httpOnly cookies as primary authentication method
-      authenticationService.setAuthCookies(res, result.tokens, result.sessionId);
+      // Uses request origin for multi-domain cookie support
+      authenticationService.setAuthCookies(req, res, result.tokens, result.sessionId);
 
       // Response: Cookie is primary, JSON tokens are optional for legacy support
       return BaseController.ok(res, {
@@ -188,7 +189,8 @@ export class AuthController extends BaseController {
 
       // Phase 6-7: Cookie Auth Primary
       // Set httpOnly cookies as primary authentication method
-      authenticationService.setAuthCookies(res, loginResult.tokens, loginResult.sessionId);
+      // Uses request origin for multi-domain cookie support
+      authenticationService.setAuthCookies(req, res, loginResult.tokens, loginResult.sessionId);
 
       // Response: Cookie is primary, JSON tokens are optional for legacy support
       const includeLegacyTokens = (data as any).includeLegacyTokens === true;
@@ -226,7 +228,7 @@ export class AuthController extends BaseController {
         await authenticationService.logout(userId, sessionId);
       }
 
-      authenticationService.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(req, res);
 
       return BaseController.ok(res, {
         message: 'Logout successful',
@@ -238,7 +240,7 @@ export class AuthController extends BaseController {
       });
 
       // Still clear cookies even if error occurs
-      authenticationService.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(req, res);
 
       return BaseController.ok(res, {
         message: 'Logout successful',
@@ -269,7 +271,7 @@ export class AuthController extends BaseController {
     const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
 
     if (!refreshToken) {
-      authenticationService.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(req, res);
       return res.status(401).json({
         success: false,
         error: 'Refresh token not provided',
@@ -283,7 +285,8 @@ export class AuthController extends BaseController {
 
       // Phase 6-7: Cookie Auth Primary
       // Set new tokens in httpOnly cookies
-      authenticationService.setAuthCookies(res, tokens);
+      // Uses request origin for multi-domain cookie support
+      authenticationService.setAuthCookies(req, res, tokens);
 
       // Response: Cookie is primary, JSON tokens are optional for legacy support
       const includeLegacyTokens = req.body.includeLegacyTokens === true;
@@ -304,7 +307,7 @@ export class AuthController extends BaseController {
       });
 
       // Phase 2.5: Always clear cookies on refresh failure
-      authenticationService.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(req, res);
 
       // Phase 2.5: Return specific error code for FE handling
       // All these errors are non-retryable - frontend should redirect to login
@@ -360,7 +363,7 @@ export class AuthController extends BaseController {
 
     try {
       await authenticationService.logoutAll(userId);
-      authenticationService.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(req, res);
 
       return BaseController.ok(res, {
         message: 'Logged out from all devices',
@@ -371,7 +374,7 @@ export class AuthController extends BaseController {
         userId,
       });
 
-      authenticationService.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(req, res);
 
       return BaseController.error(res, 'Failed to logout from all devices');
     }

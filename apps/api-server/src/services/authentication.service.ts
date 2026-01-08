@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
@@ -518,25 +518,27 @@ export class AuthenticationService {
   /**
    * Set authentication cookies
    *
+   * @param req - Express Request (for origin-based domain detection)
    * @param res - Express Response
    * @param tokens - Auth tokens
    * @param sessionId - Session ID (optional)
    */
-  setAuthCookies(res: Response, tokens: AuthTokens, sessionId?: string): void {
-    cookieUtils.setAuthCookies(res, tokens);
+  setAuthCookies(req: Request, res: Response, tokens: AuthTokens, sessionId?: string): void {
+    cookieUtils.setAuthCookies(req, res, tokens);
 
     if (sessionId) {
-      cookieUtils.setSessionCookie(res, sessionId);
+      cookieUtils.setSessionCookie(req, res, sessionId);
     }
   }
 
   /**
    * Clear authentication cookies
    *
+   * @param req - Express Request (for origin-based domain detection)
    * @param res - Express Response
    */
-  clearAuthCookies(res: Response): void {
-    cookieUtils.clearAuthCookies(res);
+  clearAuthCookies(req: Request, res: Response): void {
+    cookieUtils.clearAuthCookies(req, res);
   }
 
   /**

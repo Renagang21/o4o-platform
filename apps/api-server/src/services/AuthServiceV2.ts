@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { User } from '../modules/auth/entities/User.js';
 import {
   AccessTokenPayload,
@@ -253,15 +253,15 @@ export class AuthServiceV2 {
   /**
    * Set authentication cookies (Refactored to use cookie.utils)
    */
-  static setAuthCookies(res: Response, tokens: AuthTokens): void {
-    cookieUtils.setAuthCookies(res, tokens);
+  static setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {
+    cookieUtils.setAuthCookies(req, res, tokens);
   }
 
   /**
    * Clear authentication cookies (Refactored to use cookie.utils)
    */
-  static clearAuthCookies(res: Response): void {
-    cookieUtils.clearAuthCookies(res);
+  static clearAuthCookies(req: Request, res: Response): void {
+    cookieUtils.clearAuthCookies(req, res);
   }
 
   /**

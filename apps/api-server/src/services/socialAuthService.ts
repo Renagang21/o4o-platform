@@ -2,7 +2,7 @@ import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { emailService } from './emailService.js';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import logger from '../utils/logger.js';
 import * as tokenUtils from '../utils/token.utils.js';
 import * as cookieUtils from '../utils/cookie.utils.js';
@@ -99,7 +99,7 @@ export class SocialAuthService {
    * Uses tokenUtils and cookieUtils directly instead of deprecated AuthService.
    * AuthenticationService is the SSOT for authentication.
    */
-  static async completeSocialLogin(user: User, res: Response): Promise<{
+  static async completeSocialLogin(req: Request, user: User, res: Response): Promise<{
     user: User;
     sessionId: string;
   }> {
@@ -111,16 +111,9 @@ export class SocialAuthService {
     await SessionSyncService.createSession(user, sessionId);
 
     // Set cookies using cookieUtils (SSOT for cookie management)
-    cookieUtils.setAuthCookies(res, tokens);
-
-    // Set session ID cookie for SSO
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      domain: process.env.COOKIE_DOMAIN || undefined
-    });
+    // Uses request origin for multi-domain cookie support
+    cookieUtils.setAuthCookies(req, res, tokens);
+    cookieUtils.setSessionCookie(req, res, sessionId);
 
     return { user, sessionId };
   }

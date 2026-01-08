@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthTokens } from '../types/auth.js';
 
 /**
@@ -6,14 +6,60 @@ import { AuthTokens } from '../types/auth.js';
  *
  * Centralized cookie management for authentication tokens.
  * Ensures consistent cookie configuration across all auth services.
+ *
+ * Supports multiple service domains:
+ * - neture.co.kr (and subdomains)
+ * - glycopharm.co.kr
+ * - kpa-society.co.kr
+ * - glucoseview.co.kr
+ * - k-cosmetics.site
  */
 
 /**
- * Get cookie configuration based on environment
+ * Supported service domains for cookie setting
+ * Each domain gets its own cookie scope
  */
-function getCookieConfig() {
+const SERVICE_DOMAINS = [
+  '.neture.co.kr',
+  '.glycopharm.co.kr',
+  '.kpa-society.co.kr',
+  '.glucoseview.co.kr',
+  '.k-cosmetics.site',
+];
+
+/**
+ * Extract cookie domain from request origin
+ * Returns the appropriate cookie domain for the requesting origin
+ */
+function getCookieDomainFromOrigin(origin?: string): string | undefined {
+  if (!origin) return process.env.COOKIE_DOMAIN;
+
+  try {
+    const url = new URL(origin);
+    const hostname = url.hostname;
+
+    // Check each service domain
+    for (const domain of SERVICE_DOMAINS) {
+      const baseDomain = domain.substring(1); // Remove leading dot
+      if (hostname === baseDomain || hostname.endsWith(baseDomain)) {
+        return domain;
+      }
+    }
+
+    // Fallback to environment variable
+    return process.env.COOKIE_DOMAIN;
+  } catch {
+    return process.env.COOKIE_DOMAIN;
+  }
+}
+
+/**
+ * Get cookie configuration based on environment and request origin
+ */
+function getCookieConfig(req?: Request) {
   const isProduction = process.env.NODE_ENV === 'production';
-  const cookieDomain = process.env.COOKIE_DOMAIN; // e.g., '.neture.co.kr'
+  const origin = req?.get('origin');
+  const cookieDomain = getCookieDomainFromOrigin(origin);
 
   return {
     isProduction,
@@ -31,12 +77,14 @@ function getCookieConfig() {
  * Set authentication cookies
  *
  * Sets both access token and refresh token as httpOnly cookies.
+ * Cookie domain is determined from request origin for multi-domain support.
  *
+ * @param req - Express Request object (for origin-based domain detection)
  * @param res - Express Response object
  * @param tokens - AuthTokens object containing accessToken and refreshToken
  */
-export function setAuthCookies(res: Response, tokens: AuthTokens): void {
-  const { baseOptions } = getCookieConfig();
+export function setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {
+  const { baseOptions } = getCookieConfig(req);
 
   // Access token cookie (15 minutes)
   res.cookie('accessToken', tokens.accessToken, {
@@ -56,11 +104,12 @@ export function setAuthCookies(res: Response, tokens: AuthTokens): void {
  *
  * Used for SSO and session management across subdomains.
  *
+ * @param req - Express Request object (for origin-based domain detection)
  * @param res - Express Response object
  * @param sessionId - Session ID string
  */
-export function setSessionCookie(res: Response, sessionId: string): void {
-  const { baseOptions } = getCookieConfig();
+export function setSessionCookie(req: Request, res: Response, sessionId: string): void {
+  const { baseOptions } = getCookieConfig(req);
 
   res.cookie('sessionId', sessionId, {
     ...baseOptions,
@@ -73,10 +122,11 @@ export function setSessionCookie(res: Response, sessionId: string): void {
  *
  * Removes accessToken, refreshToken, and sessionId cookies.
  *
+ * @param req - Express Request object (for origin-based domain detection)
  * @param res - Express Response object
  */
-export function clearAuthCookies(res: Response): void {
-  const { cookieDomain } = getCookieConfig();
+export function clearAuthCookies(req: Request, res: Response): void {
+  const { cookieDomain } = getCookieConfig(req);
 
   const clearOptions = cookieDomain ? { domain: cookieDomain } : {};
 
@@ -90,10 +140,11 @@ export function clearAuthCookies(res: Response): void {
  *
  * Useful when refreshing tokens but keeping session active.
  *
+ * @param req - Express Request object (for origin-based domain detection)
  * @param res - Express Response object
  */
-export function clearAccessTokenCookie(res: Response): void {
-  const { cookieDomain } = getCookieConfig();
+export function clearAccessTokenCookie(req: Request, res: Response): void {
+  const { cookieDomain } = getCookieConfig(req);
 
   const clearOptions = cookieDomain ? { domain: cookieDomain } : {};
 
@@ -105,10 +156,11 @@ export function clearAccessTokenCookie(res: Response): void {
  *
  * Useful when revoking refresh token but allowing current session to finish.
  *
+ * @param req - Express Request object (for origin-based domain detection)
  * @param res - Express Response object
  */
-export function clearRefreshTokenCookie(res: Response): void {
-  const { cookieDomain } = getCookieConfig();
+export function clearRefreshTokenCookie(req: Request, res: Response): void {
+  const { cookieDomain } = getCookieConfig(req);
 
   const clearOptions = cookieDomain ? { domain: cookieDomain } : {};
 
@@ -120,13 +172,14 @@ export function clearRefreshTokenCookie(res: Response): void {
  *
  * Convenience method that sets both auth tokens and session ID.
  *
+ * @param req - Express Request object (for origin-based domain detection)
  * @param res - Express Response object
  * @param tokens - AuthTokens object
  * @param sessionId - Session ID string
  */
-export function setAuthSession(res: Response, tokens: AuthTokens, sessionId: string): void {
-  setAuthCookies(res, tokens);
-  setSessionCookie(res, sessionId);
+export function setAuthSession(req: Request, res: Response, tokens: AuthTokens, sessionId: string): void {
+  setAuthCookies(req, res, tokens);
+  setSessionCookie(req, res, sessionId);
 }
 
 /**
@@ -134,10 +187,11 @@ export function setAuthSession(res: Response, tokens: AuthTokens, sessionId: str
  *
  * Returns configuration info that can be sent to client for debugging.
  *
+ * @param req - Express Request object (optional, for origin-based domain detection)
  * @returns Cookie configuration object
  */
-export function getCookieConfigInfo() {
-  const { isProduction, cookieDomain } = getCookieConfig();
+export function getCookieConfigInfo(req?: Request) {
+  const { isProduction, cookieDomain } = getCookieConfig(req);
 
   return {
     isProduction,
