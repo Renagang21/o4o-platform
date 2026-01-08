@@ -3,6 +3,12 @@ name: Deploy API Server (Cloud Run)
 # Deploy API server to Cloud Run on push to main branch
 # Phase R5: Cloud Run 단일 배포 체계
 # Phase G1-2: Operational Mode (GRACEFUL_STARTUP=false, Cloud SQL 연결 필수)
+#
+# Migration Architecture:
+# - Uses TypeORM CLI with lightweight migration-config.js (NO entity imports)
+# - Avoids bundling 60+ entities that cause tsup compilation failures
+# - migration-config.ts → tsc → migration-config.js → TypeORM CLI
+# - See: apps/api-server/src/database/migration-config.ts
 
 concurrency:
   group: deploy-api-${{ github.ref }}

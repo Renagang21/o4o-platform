@@ -1,3 +1,17 @@
+/**
+ * @deprecated This file is no longer used in production deployments.
+ *
+ * Production migrations now use TypeORM CLI with migration-config.ts:
+ *   npx typeorm migration:run -d dist/database/migration-config.js
+ *
+ * Why deprecated?
+ * - This script imports connection.ts which imports 60+ entities
+ * - tsup bundling fails due to massive dependency chain
+ * - migration-config.ts is a lightweight DataSource without entity imports
+ *
+ * This file is kept for local development convenience only.
+ * For production, see: .github/workflows/deploy-api.yml
+ */
 import 'reflect-metadata';
 import { config } from 'dotenv';
 

@@ -329,7 +329,13 @@
       "Bash(gcloud sql connect:*)",
       "Bash(1 <<'EOF'\nUPDATE users SET role = 'pharmacy' WHERE email = 'pharmacy@glycopharm.kr';\nSELECT id, email, role, status FROM users WHERE email = 'pharmacy@glycopharm.kr';\nEOF)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20804107287 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20804263276 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20804263276 -R Renagang21/o4o-platform)",
+      "Bash(set NODE_OPTIONS=--max-old-space-size=4096)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=8192\" pnpm run build:*)",
+      "Bash(taskkill:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20804952821 -R Renagang21/o4o-platform)",
+      "Bash(docker pull:*)",
+      "Bash(docker run:*)"
     ],
     "deny": []
   }

@@ -1,3 +1,14 @@
+/**
+ * @deprecated This file is replaced by migration-config.ts for production.
+ *
+ * This CLI config imports entities which causes bundling issues with tsup.
+ * Use migration-config.ts instead - it's a lightweight DataSource without entity imports.
+ *
+ * Production command:
+ *   npx typeorm migration:run -d dist/database/migration-config.js
+ *
+ * This file is kept for backward compatibility with local development workflows.
+ */
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User.js';
 import { RefreshToken } from '../entities/RefreshToken.js';
