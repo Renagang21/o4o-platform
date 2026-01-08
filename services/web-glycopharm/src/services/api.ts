@@ -3,6 +3,8 @@
  * 실제 API 서버와 통신하는 클라이언트
  */
 
+import { getAccessToken } from '@/contexts/AuthContext';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 interface ApiResponse<T> {
@@ -31,13 +33,17 @@ class ApiClient {
     body?: unknown,
     options?: { headers?: Record<string, string> }
   ): Promise<ApiResponse<T>> {
+    // Cross-domain: Bearer Token 인증 (localStorage에서 토큰 가져옴)
+    const accessToken = getAccessToken();
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
       ...options?.headers,
     };
 
     try {
-      // httpOnly Cookie 기반 인증 (credentials: 'include')
+      // credentials: 'include'는 같은 도메인에서만 쿠키를 전송 (폴백)
       const response = await fetch(`${this.baseUrl}${path}`, {
         method,
         headers,

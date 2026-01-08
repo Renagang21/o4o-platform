@@ -16,6 +16,7 @@ import type {
   ServiceContext,
 } from '@/types/store';
 import { DEFAULT_SERVICE_CONTEXT } from '@/types/store';
+import { getAccessToken } from '@/contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -32,12 +33,16 @@ class StoreApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
+    // Cross-domain: Bearer Token 인증 (localStorage에서 토큰 가져옴)
+    const accessToken = getAccessToken();
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
       ...options.headers,
     };
 
-    // httpOnly Cookie 기반 인증 (credentials: 'include')
+    // credentials: 'include'는 같은 도메인에서만 쿠키를 전송 (폴백)
     const response = await fetch(url, {
       ...options,
       headers,

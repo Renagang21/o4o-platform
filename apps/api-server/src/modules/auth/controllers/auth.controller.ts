@@ -45,6 +45,26 @@ function classifyAuthError(error: Error): string {
  */
 export class AuthController extends BaseController {
   /**
+   * Check if request is cross-origin
+   * Cross-origin requests need tokens in response body since cookies won't work
+   */
+  private static isCrossOriginRequest(req: Request): boolean {
+    const origin = req.get('origin');
+    if (!origin) return false;
+
+    try {
+      const originHost = new URL(origin).hostname;
+      const apiHost = req.get('host')?.split(':')[0] || '';
+
+      // Different domain = cross-origin
+      // e.g., glycopharm.co.kr calling api.neture.co.kr
+      return originHost !== apiHost && !originHost.endsWith(`.${apiHost}`) && !apiHost.endsWith(`.${originHost}`);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * POST /api/v1/auth/login
    * Login with email/password
    *
@@ -52,11 +72,16 @@ export class AuthController extends BaseController {
    * - httpOnly cookies are the primary authentication method
    * - JSON body tokens are optional (for legacy client support)
    * - Pass includeLegacyTokens: true in request body to receive tokens in response
+   * - Cross-origin requests automatically receive tokens in response body
    */
   static async login(req: Request, res: Response): Promise<any> {
     const { email, password, deviceId, includeLegacyTokens } = req.body as LoginRequestDto & { includeLegacyTokens?: boolean };
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
+
+    // Cross-origin requests need tokens in response body since cookies won't work
+    const isCrossOrigin = AuthController.isCrossOriginRequest(req);
+    const includeTokensInBody = includeLegacyTokens || isCrossOrigin;
 
     // Phase 5-B: Auth ↔ Infra Separation
     // Auth는 DB 상태를 검사하지 않음. DB 실패 시 자연스럽게 500 반환.
@@ -76,14 +101,17 @@ export class AuthController extends BaseController {
       // Uses request origin for multi-domain cookie support
       authenticationService.setAuthCookies(req, res, result.tokens, result.sessionId);
 
-      // Response: Cookie is primary, JSON tokens are optional for legacy support
+      // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
       return BaseController.ok(res, {
         message: 'Login successful',
         user: result.user,
-        // Phase 6-7: Tokens in body are optional, Cookie is primary
-        ...(includeLegacyTokens && {
-          accessToken: result.tokens.accessToken,
-          refreshToken: result.tokens.refreshToken,
+        // Include tokens for cross-origin requests or when explicitly requested
+        ...(includeTokensInBody && {
+          tokens: {
+            accessToken: result.tokens.accessToken,
+            refreshToken: result.tokens.refreshToken,
+            expiresIn: result.tokens.expiresIn,
+          },
         }),
       });
     } catch (error: any) {
@@ -192,16 +220,20 @@ export class AuthController extends BaseController {
       // Uses request origin for multi-domain cookie support
       authenticationService.setAuthCookies(req, res, loginResult.tokens, loginResult.sessionId);
 
-      // Response: Cookie is primary, JSON tokens are optional for legacy support
-      const includeLegacyTokens = (data as any).includeLegacyTokens === true;
+      // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
+      const isCrossOrigin = AuthController.isCrossOriginRequest(req);
+      const includeTokensInBody = (data as any).includeLegacyTokens === true || isCrossOrigin;
 
       return BaseController.created(res, {
         message: 'Registration successful',
         user: loginResult.user,
-        // Phase 6-7: Tokens in body are optional, Cookie is primary
-        ...(includeLegacyTokens && {
-          accessToken: loginResult.tokens.accessToken,
-          refreshToken: loginResult.tokens.refreshToken,
+        // Include tokens for cross-origin requests or when explicitly requested
+        ...(includeTokensInBody && {
+          tokens: {
+            accessToken: loginResult.tokens.accessToken,
+            refreshToken: loginResult.tokens.refreshToken,
+            expiresIn: loginResult.tokens.expiresIn,
+          },
         }),
       });
     } catch (error: any) {
@@ -288,17 +320,21 @@ export class AuthController extends BaseController {
       // Uses request origin for multi-domain cookie support
       authenticationService.setAuthCookies(req, res, tokens);
 
-      // Response: Cookie is primary, JSON tokens are optional for legacy support
-      const includeLegacyTokens = req.body.includeLegacyTokens === true;
+      // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
+      const isCrossOrigin = AuthController.isCrossOriginRequest(req);
+      const includeTokensInBody = req.body.includeLegacyTokens === true || isCrossOrigin;
 
       return BaseController.ok(res, {
         message: 'Token refreshed successfully',
-        // Phase 6-7: Tokens in body are optional, Cookie is primary
-        ...(includeLegacyTokens && {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-        }),
         expiresIn: tokens.expiresIn || 900, // Default 15 minutes
+        // Include tokens for cross-origin requests or when explicitly requested
+        ...(includeTokensInBody && {
+          tokens: {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            expiresIn: tokens.expiresIn,
+          },
+        }),
       });
     } catch (error: any) {
       logger.error('[AuthController.refresh] Token refresh error', {
