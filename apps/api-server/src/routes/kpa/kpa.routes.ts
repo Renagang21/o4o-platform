@@ -9,17 +9,30 @@
  * - /api/v1/kpa/members - 회원 관리
  * - /api/v1/kpa/applications - 신청서 처리
  * - /api/v1/kpa/forum - 포럼/커뮤니티
+ * - /api/v1/kpa/lms - 학습관리시스템
+ * - /api/v1/kpa/news - 공지사항/뉴스
+ * - /api/v1/kpa/resources - 자료실
+ * - /api/v1/kpa/groupbuy - 공동구매
+ * - /api/v1/kpa/mypage - 마이페이지
+ * - /api/v1/kpa/organization - 조직정보 (공개)
  */
 
-import { Router, RequestHandler } from 'express';
+import { Router, RequestHandler, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
+import { asyncHandler } from '../../middleware/error-handler.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
+
+// LMS Controllers
+import { CourseController } from '../../modules/lms/controllers/CourseController.js';
+import { LessonController } from '../../modules/lms/controllers/LessonController.js';
+import { EnrollmentController } from '../../modules/lms/controllers/EnrollmentController.js';
+import { CertificateController } from '../../modules/lms/controllers/CertificateController.js';
 
 /**
  * Scope verification middleware factory for KPA
@@ -99,6 +112,237 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   forumRouter.post('/moderation/:type/:id', authenticate, forumController.moderateContent.bind(forumController));
 
   router.use('/forum', forumRouter);
+
+  // ============================================================================
+  // LMS Routes - /api/v1/kpa/lms/*
+  // ============================================================================
+  const lmsRouter = Router();
+
+  // Courses
+  lmsRouter.get('/courses', optionalAuth, asyncHandler(CourseController.listCourses));
+  lmsRouter.get('/courses/:id', optionalAuth, asyncHandler(CourseController.getCourse));
+  lmsRouter.get('/courses/:courseId/lessons', optionalAuth, asyncHandler(LessonController.listLessonsByCourse));
+
+  // Enrollments (authenticated)
+  lmsRouter.get('/enrollments', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
+  lmsRouter.get('/enrollments/:courseId', authenticate, asyncHandler(EnrollmentController.getEnrollment));
+  lmsRouter.post('/courses/:courseId/enroll', authenticate, asyncHandler(EnrollmentController.enrollCourse));
+
+  // Certificates
+  lmsRouter.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
+  lmsRouter.get('/certificates/:id', authenticate, asyncHandler(CertificateController.getCertificate));
+
+  router.use('/lms', lmsRouter);
+
+  // ============================================================================
+  // News Routes - /api/v1/kpa/news/*
+  // Placeholder: Returns mock data until CMS integration is complete
+  // ============================================================================
+  const newsRouter = Router();
+
+  newsRouter.get('/', optionalAuth, (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+      message: 'News API - Integration pending'
+    });
+  });
+
+  newsRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'News not found' } });
+  });
+
+  newsRouter.get('/gallery', optionalAuth, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+    });
+  });
+
+  router.use('/news', newsRouter);
+
+  // ============================================================================
+  // Resources Routes - /api/v1/kpa/resources/*
+  // Placeholder: Returns mock data until file management integration
+  // ============================================================================
+  const resourcesRouter = Router();
+
+  resourcesRouter.get('/', optionalAuth, (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+      message: 'Resources API - Integration pending'
+    });
+  });
+
+  resourcesRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'Resource not found' } });
+  });
+
+  resourcesRouter.post('/:id/download', authenticate, (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'Resource not found' } });
+  });
+
+  router.use('/resources', resourcesRouter);
+
+  // ============================================================================
+  // Groupbuy Routes - /api/v1/kpa/groupbuy/*
+  // Placeholder: Returns mock data until groupbuy module integration
+  // ============================================================================
+  const groupbuyRouter = Router();
+
+  groupbuyRouter.get('/', optionalAuth, (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+      message: 'Groupbuy API - Integration pending'
+    });
+  });
+
+  groupbuyRouter.get('/my-participations', authenticate, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+    });
+  });
+
+  groupbuyRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'Groupbuy not found' } });
+  });
+
+  groupbuyRouter.post('/:id/participate', authenticate, (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'Groupbuy not found' } });
+  });
+
+  router.use('/groupbuy', groupbuyRouter);
+
+  // ============================================================================
+  // MyPage Routes - /api/v1/kpa/mypage/*
+  // User profile, settings, and activity summary
+  // ============================================================================
+  const mypageRouter = Router();
+
+  mypageRouter.get('/profile', authenticate, (req: Request, res: Response) => {
+    const user = (req as any).user;
+    res.json({
+      success: true,
+      data: {
+        id: user?.id,
+        name: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+      }
+    });
+  });
+
+  mypageRouter.put('/profile', authenticate, (req: Request, res: Response) => {
+    res.json({ success: true, message: 'Profile update - Integration pending' });
+  });
+
+  mypageRouter.get('/settings', authenticate, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: {
+        emailNotifications: true,
+        smsNotifications: false,
+        marketingConsent: false
+      }
+    });
+  });
+
+  mypageRouter.put('/settings', authenticate, (req: Request, res: Response) => {
+    res.json({ success: true, message: 'Settings update - Integration pending' });
+  });
+
+  mypageRouter.get('/activities', authenticate, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+    });
+  });
+
+  mypageRouter.get('/summary', authenticate, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: {
+        enrolledCourses: 0,
+        completedCourses: 0,
+        certificates: 0,
+        forumPosts: 0,
+        groupbuyParticipations: 0
+      }
+    });
+  });
+
+  mypageRouter.get('/enrollments', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
+  mypageRouter.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
+  mypageRouter.get('/groupbuys', authenticate, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+    });
+  });
+
+  router.use('/mypage', mypageRouter);
+
+  // ============================================================================
+  // Organization Info Routes - /api/v1/kpa/organization (public)
+  // Public organization information (different from /organizations admin API)
+  // ============================================================================
+  const orgInfoRouter = Router();
+
+  orgInfoRouter.get('/', (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: {
+        name: '대한약사회',
+        description: '대한민국 약사들의 권익 보호 및 국민 건강 증진을 위한 전문직 단체',
+        established: '1953-04-25',
+        memberCount: 0,
+        branchCount: 0
+      }
+    });
+  });
+
+  orgInfoRouter.get('/branches', (req: Request, res: Response) => {
+    res.json({ success: true, data: [] });
+  });
+
+  orgInfoRouter.get('/branches/:id', (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'Branch not found' } });
+  });
+
+  orgInfoRouter.get('/officers', (req: Request, res: Response) => {
+    res.json({ success: true, data: [] });
+  });
+
+  orgInfoRouter.get('/contact', (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: {
+        address: '',
+        phone: '',
+        fax: '',
+        email: '',
+        workingHours: '평일 09:00 - 18:00'
+      }
+    });
+  });
+
+  router.use('/organization', orgInfoRouter);
 
   // Health check endpoint
   router.get('/health', (req, res) => {
