@@ -90,7 +90,8 @@ export const ROLE_ICONS: Record<UserRole, string> = {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // 토큰이 있으면 세션 확인 필요, 없으면 바로 로딩 완료
+  const [isLoading, setIsLoading] = useState(() => !!localStorage.getItem(ACCESS_TOKEN_KEY));
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
 
   // Token refresh function
@@ -174,49 +175,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include', // Still include for cookie-based fallback
-      });
+    // 로그인 API 호출 (isLoading은 버튼 상태용으로 LoginPage에서 별도 관리)
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include', // Still include for cookie-based fallback
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || data.error || '로그인에 실패했습니다.');
-      }
-
-      // Cross-domain 환경에서는 응답 body에서 토큰을 추출하여 localStorage에 저장
-      // API 응답 구조: { success: true, data: { message, user: {...}, tokens: {...} } }
-      const tokens = data.data?.tokens || data.tokens;
-      if (tokens?.accessToken && tokens?.refreshToken) {
-        storeTokens(tokens.accessToken, tokens.refreshToken);
-      }
-
-      const apiUser = data.data?.user || data.user;
-      if (apiUser && apiUser.id) {
-        const mappedRole = mapApiRoleToWebRole(apiUser.role);
-        const typedUser: User = {
-          ...apiUser,
-          role: mappedRole,
-          name: apiUser.fullName as string || apiUser.email as string,
-          status: (apiUser.status as string) || 'approved',
-          createdAt: apiUser.createdAt as string,
-          updatedAt: apiUser.updatedAt as string,
-        } as User;
-
-        setUser(typedUser);
-        setAvailableRoles([typedUser.role]);
-        return;
-      }
-
-      throw new Error('로그인 응답이 올바르지 않습니다.');
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      throw new Error(data.message || data.error || '로그인에 실패했습니다.');
     }
+
+    // Cross-domain 환경에서는 응답 body에서 토큰을 추출하여 localStorage에 저장
+    // API 응답 구조: { success: true, data: { message, user: {...}, tokens: {...} } }
+    const tokens = data.data?.tokens || data.tokens;
+    if (tokens?.accessToken && tokens?.refreshToken) {
+      storeTokens(tokens.accessToken, tokens.refreshToken);
+    }
+
+    const apiUser = data.data?.user || data.user;
+    if (apiUser && apiUser.id) {
+      const mappedRole = mapApiRoleToWebRole(apiUser.role);
+      const typedUser: User = {
+        ...apiUser,
+        role: mappedRole,
+        name: apiUser.fullName as string || apiUser.email as string,
+        status: (apiUser.status as string) || 'approved',
+        createdAt: apiUser.createdAt as string,
+        updatedAt: apiUser.updatedAt as string,
+      } as User;
+
+      setUser(typedUser);
+      setAvailableRoles([typedUser.role]);
+      return;
+    }
+
+    throw new Error('로그인 응답이 올바르지 않습니다.');
   };
 
   const logout = async () => {
