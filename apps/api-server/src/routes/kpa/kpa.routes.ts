@@ -22,6 +22,7 @@ import { DataSource } from 'typeorm';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
+import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
@@ -76,6 +77,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/members', createMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/applications', createApplicationController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Admin Dashboard routes (WO-KPA-SOCIETY-DASHBOARD-P1-A)
+  router.use('/admin', createAdminDashboardController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

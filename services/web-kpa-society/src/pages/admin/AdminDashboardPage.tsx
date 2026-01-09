@@ -32,13 +32,14 @@ export function AdminDashboardPage() {
       const res = await adminApi.getDashboardStats();
       setStats(res.data);
     } catch (err) {
-      // 데모용 기본값
+      // WO-KPA-SOCIETY-DASHBOARD-P1-A: Empty state on API failure (no mock data)
+      console.error('Failed to load dashboard stats:', err);
       setStats({
-        totalBranches: 5,
-        totalMembers: 1234,
-        pendingApprovals: 12,
-        activeGroupbuys: 3,
-        recentPosts: 28,
+        totalBranches: 0,
+        totalMembers: 0,
+        pendingApprovals: 0,
+        activeGroupbuys: 0,  // Entity 없음 - 항상 0
+        recentPosts: 0,      // Entity 없음 - 항상 0
       });
     } finally {
       setLoading(false);
