@@ -430,18 +430,26 @@ export class AccountLinkingService {
 
   /**
    * Get merged profile
+   * @param userId - User ID
+   * @param options - Profile merge options
+   * @param preloadedUser - Optional pre-loaded user to avoid duplicate DB query
    */
   static async getMergedProfile(
     userId: string,
-    options?: ProfileMergeOptions
+    options?: ProfileMergeOptions,
+    preloadedUser?: User
   ): Promise<MergedProfile | null> {
-    const userRepo = AppDataSource.getRepository(User);
-
     try {
-      const user = await userRepo.findOne({
-        where: { id: userId },
-        relations: ['linkedAccounts']
-      });
+      let user = preloadedUser;
+
+      // Only query DB if user not preloaded
+      if (!user) {
+        const userRepo = AppDataSource.getRepository(User);
+        user = await userRepo.findOne({
+          where: { id: userId },
+          relations: ['linkedAccounts']
+        });
+      }
 
       if (!user) {
         return null;

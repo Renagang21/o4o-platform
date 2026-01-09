@@ -176,52 +176,58 @@ export class AuthenticationService {
       throw new EmailNotVerifiedError();
     }
 
-    // Login successful
-    await this.handleSuccessfulLogin(user);
-    await this.logLoginAttempt(user.id, email, ipAddress, userAgent, true);
+    // Login successful - run non-critical tasks in parallel/background
+    // Fire-and-forget for logging (non-critical)
+    this.logLoginAttempt(user.id, email, ipAddress, userAgent, true).catch(err =>
+      logger.warn('Failed to log login attempt (non-critical):', err)
+    );
 
-    // Check concurrent sessions
-    try {
-      const sessionCheck = await SessionSyncService.checkConcurrentSessions(user.id);
-      if (!sessionCheck.allowed) {
-        await SessionSyncService.enforceSessionLimit(user.id);
-      }
-    } catch (sessionError) {
-      logger.warn('Failed to check/enforce session limits (non-critical):', sessionError);
-      // Continue login even if session check fails
-    }
-
-    // Generate session ID
+    // Generate session ID and tokens first (critical path)
     const sessionId = SessionSyncService.generateSessionId();
-
-    // Create session
-    try {
-      await SessionSyncService.createSession(user, sessionId, { userAgent, ipAddress });
-    } catch (sessionCreateError) {
-      logger.error('Failed to create session in Redis:', sessionCreateError);
-      // Depending on requirements, we might want to fail here or continue
-      // For now, we'll log it but allow the login to proceed (token-based auth still works)
-    }
-
-    // Generate tokens
     const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
 
-    // Update token family in user
+    // Prepare user updates
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+    user.loginAttempts = 0;
+    user.lockedUntil = null;
+    user.lastLoginAt = new Date();
     if (tokenFamily) {
       user.refreshTokenFamily = tokenFamily;
-      await this.userRepository.save(user);
     }
 
-    // Update last used for email linked account
+    // Prepare linked account update
     const emailAccount = user.linkedAccounts?.find(acc => acc.provider === 'email');
     if (emailAccount) {
       emailAccount.lastUsedAt = new Date();
-      await this.linkedAccountRepository.save(emailAccount);
     }
 
-    // Get merged profile
-    const mergedProfile = await AccountLinkingService.getMergedProfile(user.id);
+    // Run all DB saves and Redis operations in parallel
+    const parallelTasks: Promise<any>[] = [
+      this.userRepository.save(user),
+    ];
+
+    if (emailAccount) {
+      parallelTasks.push(this.linkedAccountRepository.save(emailAccount));
+    }
+
+    // Session operations (non-critical, don't block login)
+    SessionSyncService.checkConcurrentSessions(user.id).then(sessionCheck => {
+      if (!sessionCheck.allowed) {
+        SessionSyncService.enforceSessionLimit(user.id).catch(err =>
+          logger.warn('Failed to enforce session limit (non-critical):', err)
+        );
+      }
+    }).catch(err => logger.warn('Failed to check concurrent sessions (non-critical):', err));
+
+    SessionSyncService.createSession(user, sessionId, { userAgent, ipAddress }).catch(err =>
+      logger.warn('Failed to create session in Redis (non-critical):', err)
+    );
+
+    // Wait for critical DB saves
+    await Promise.all(parallelTasks);
+
+    // Get merged profile - pass preloaded user to avoid duplicate query
+    const mergedProfile = await AccountLinkingService.getMergedProfile(user.id, undefined, user);
 
     return {
       success: true,

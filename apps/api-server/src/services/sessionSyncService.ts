@@ -173,27 +173,41 @@ export class SessionSyncService {
 
   /**
    * Get all active sessions for a user with full data
+   * Optimized: Uses mget instead of N individual get calls
    */
   static async getUserSessions(userId: string): Promise<SessionData[]> {
     if (!this.isRedisAvailable()) return [];
 
     const sessionIds = await this.redis.smembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
+    if (sessionIds.length === 0) return [];
+
+    // Use mget to fetch all sessions in a single Redis call (N+1 → 1)
+    const sessionKeys = sessionIds.map(id => `${this.SESSION_PREFIX}${id}`);
+    const sessionDataArray = await this.redis.mget(...sessionKeys);
+
     const sessions: SessionData[] = [];
-    
-    for (const sessionId of sessionIds) {
-      const data = await this.redis.get(`${this.SESSION_PREFIX}${sessionId}`);
+    const expiredSessionIds: string[] = [];
+    const now = new Date();
+
+    for (let i = 0; i < sessionDataArray.length; i++) {
+      const data = sessionDataArray[i];
       if (data) {
         const sessionData = JSON.parse(data) as SessionData;
-        // Check if not expired
-        if (new Date(sessionData.expiresAt) > new Date()) {
+        if (new Date(sessionData.expiresAt) > now) {
           sessions.push(sessionData);
         } else {
-          // Clean up expired session
-          await this.removeSession(sessionId, userId);
+          expiredSessionIds.push(sessionIds[i]);
         }
       }
     }
-    
+
+    // Clean up expired sessions in background (non-blocking)
+    if (expiredSessionIds.length > 0) {
+      Promise.all(expiredSessionIds.map(id => this.removeSession(id, userId))).catch(err =>
+        console.warn('Failed to clean up expired sessions:', err)
+      );
+    }
+
     return sessions;
   }
 
