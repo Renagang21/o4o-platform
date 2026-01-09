@@ -45,10 +45,14 @@ export class MembershipRoleAssignment {
   /**
    * 역할
    *
-   * - membership_admin: 회원 관리 권한
-   * - membership_officer: 임원 권한
-   * - membership_verifier: 자격 검증 권한
+   * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+   * - membership_super_admin: 전체 운영자 (Global Operator)
+   * - membership_district_admin: 지부 관리자
+   * - membership_branch_admin: 분회 관리자
+   * - membership_verifier: 자격 검증 담당
    * - membership_member: 일반 회원
+   *
+   * Note: membership_officer는 REMOVED됨 (임원은 직책이며 권한이 아님)
    */
   @Column({ type: 'varchar', length: 100 })
   role!: string;

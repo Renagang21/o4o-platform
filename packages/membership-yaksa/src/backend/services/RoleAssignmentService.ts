@@ -6,34 +6,43 @@ import { OfficialRole } from '../entities/Member.js';
  * MembershipRole Types
  *
  * Membership 앱 전용 역할
+ *
+ * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+ * - membership_officer REMOVED (임원은 직책이며 권한이 아님)
+ * - 임원 표시는 Member.officialRole로만 처리 (상태 데이터)
+ * - 권한은 *_admin 계층만 가짐
  */
 export type MembershipRole =
-  | 'membership_super_admin'   // 전체 운영자 (Global Operator)
+  | 'membership_super_admin'    // 전체 운영자 (Global Operator)
   | 'membership_district_admin' // 지부 관리자
   | 'membership_branch_admin'   // 분회 관리자
-  | 'membership_officer'        // 임원 (이사, 감사 등)
   | 'membership_verifier'       // 자격 검증 담당
   | 'membership_member';        // 일반 회원
 
 /**
  * OfficialRole → MembershipRole 매핑
  *
- * Phase 2 규칙:
- * - president        → DISTRICT_ADMIN (지부장급)
- * - vice_president   → BRANCH_ADMIN (부회장급)
- * - general_manager  → OFFICER (총무)
- * - auditor          → OFFICER (감사)
- * - director         → OFFICER (이사)
- * - branch_head      → BRANCH_ADMIN (분회장)
- * - district_head    → DISTRICT_ADMIN (지부장)
+ * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+ * - 임원(general_manager, auditor, director)은 권한을 부여하지 않음
+ * - 임원은 직책(표시)이며 권한이 아님
+ * - 권한이 필요한 직책만 admin 계층에 매핑
+ *
+ * 권한 매핑 규칙:
+ * - president        → DISTRICT_ADMIN (지부장급 - 관리 권한 필요)
+ * - vice_president   → BRANCH_ADMIN (부회장급 - 관리 권한 필요)
+ * - branch_head      → BRANCH_ADMIN (분회장 - 관리 권한 필요)
+ * - district_head    → DISTRICT_ADMIN (지부장 - 관리 권한 필요)
+ * - general_manager  → MEMBER (총무 - 직책만, 권한 별도 부여)
+ * - auditor          → MEMBER (감사 - 직책만, 권한 별도 부여)
+ * - director         → MEMBER (이사 - 직책만, 권한 별도 부여)
  * - none             → MEMBER (일반 회원)
  */
 export const OFFICIAL_ROLE_TO_MEMBERSHIP_ROLE: Record<OfficialRole, MembershipRole> = {
   president: 'membership_district_admin',
   vice_president: 'membership_branch_admin',
-  general_manager: 'membership_officer',
-  auditor: 'membership_officer',
-  director: 'membership_officer',
+  general_manager: 'membership_member',  // 직책만, 권한 아님
+  auditor: 'membership_member',          // 직책만, 권한 아님
+  director: 'membership_member',         // 직책만, 권한 아님
   branch_head: 'membership_branch_admin',
   district_head: 'membership_district_admin',
   none: 'membership_member',
@@ -41,12 +50,14 @@ export const OFFICIAL_ROLE_TO_MEMBERSHIP_ROLE: Record<OfficialRole, MembershipRo
 
 /**
  * 역할 권한 레벨 (높을수록 상위 권한)
+ *
+ * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+ * - membership_officer REMOVED (임원은 권한이 아님)
  */
 export const ROLE_LEVELS: Record<MembershipRole, number> = {
   membership_super_admin: 100,
   membership_district_admin: 80,
   membership_branch_admin: 60,
-  membership_officer: 40,
   membership_verifier: 30,
   membership_member: 10,
 };
@@ -182,57 +193,45 @@ export class RoleAssignmentService {
 
   /**
    * ==========================================
-   * Phase 2 핵심: 직책 기반 자동 역할 동기화
+   * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1: DEPRECATED
    * ==========================================
    *
-   * officialRole 변경 시 호출되어 역할을 자동으로 재할당합니다.
+   * 이 함수는 더 이상 사용되지 않습니다.
    *
-   * @param memberId 회원 ID
-   * @param newOfficialRole 새로운 공식 직책
-   * @param organizationId 소속 조직 ID (스코프 적용)
-   * @param oldOfficialRole 이전 공식 직책 (있는 경우)
-   * @param assignedBy 변경자 ID
+   * 핵심 원칙:
+   * - 임원(officialRole)은 직책(표시 데이터)이며 권한이 아님
+   * - 직책 변경이 권한에 영향을 주지 않음
+   * - 권한 부여는 수동으로 관리자가 RoleAssignment를 직접 할당
+   *
+   * 관리자 직책(president, vice_president, branch_head, district_head)도
+   * 자동으로 권한을 부여하지 않습니다.
+   * 권한이 필요하면 관리자가 별도로 할당해야 합니다.
+   *
+   * @deprecated WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1에 의해 비활성화됨
    */
   async syncRoleFromOfficialRole(
-    memberId: string,
-    newOfficialRole: OfficialRole,
-    organizationId: string,
-    oldOfficialRole?: OfficialRole,
-    assignedBy?: string
+    _memberId: string,
+    _newOfficialRole: OfficialRole,
+    _organizationId: string,
+    _oldOfficialRole?: OfficialRole,
+    _assignedBy?: string
   ): Promise<{
     deactivated: number;
-    newAssignment: MembershipRoleAssignment;
+    newAssignment: MembershipRoleAssignment | null;
     previousRole?: MembershipRole;
     newRole: MembershipRole;
+    skipped: boolean;
+    reason: string;
   }> {
-    // 1. 새 역할 결정
-    const newRole = OFFICIAL_ROLE_TO_MEMBERSHIP_ROLE[newOfficialRole] || 'membership_member';
-    const previousRole = oldOfficialRole
-      ? OFFICIAL_ROLE_TO_MEMBERSHIP_ROLE[oldOfficialRole]
-      : undefined;
-
-    // 2. 이전 직책 기반 역할이 있으면 비활성화
-    let deactivated = 0;
-    if (previousRole && previousRole !== 'membership_member') {
-      deactivated = await this.deactivateRoleForMember(memberId, previousRole);
-    }
-
-    // 3. 새 역할 할당
-    const scopeType = newRole === 'membership_member' ? 'organization' : this.getScopeTypeForRole(newRole);
-
-    const newAssignment = await this.create({
-      memberId,
-      role: newRole,
-      scopeType,
-      scopeId: organizationId,
-      assignedBy,
-    });
-
+    // WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1: 자동 역할 동기화 비활성화
+    // 직책 변경은 권한에 영향을 주지 않음
     return {
-      deactivated,
-      newAssignment,
-      previousRole,
-      newRole,
+      deactivated: 0,
+      newAssignment: null,
+      previousRole: undefined,
+      newRole: 'membership_member',
+      skipped: true,
+      reason: 'WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1: 직책 변경은 권한에 영향 없음. 임원은 직책이며 권한이 아닙니다.',
     };
   }
 

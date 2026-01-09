@@ -1,14 +1,20 @@
 /**
  * OfficerManagePage
  *
- * Phase 1: 임원 관리 페이지
+ * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1: 직책 관리 페이지
+ *
+ * 핵심 원칙:
+ * - 임원은 "직책(표시 데이터)"이며 "권한"이 아님
+ * - 이 페이지는 직책을 조회하고 표시하는 용도
+ * - 권한 할당 UI가 아님
  *
  * 기능:
- * - 지부/분회 소속 회원 목록 조회
- * - 임원 역할 할당 / 해제
+ * - 지부/분회 소속 임원 목록 조회
+ * - 직책별 현황 조회 (회장, 부회장, 총무 등)
  *
  * 제한:
- * - 새로운 Role/Position 생성 ❌
+ * - 권한(Role) 할당 UI 없음
+ * - 새로운 직책 생성 ❌
  * - 조직 구조 변경 ❌
  */
 
@@ -18,36 +24,58 @@ import {
   ArrowLeft,
   Users,
   RefreshCw,
-  Shield,
-  AlertCircle,
+  Award,
+  Info,
 } from 'lucide-react';
 import {
   getOrganizationMembers,
-  updateMemberRole,
   type OrganizationMember,
 } from '@/lib/api/yaksaAdmin';
 
-const ROLE_LABELS: Record<string, string> = {
-  admin: '관리자',
-  manager: '임원',
-  member: '일반 회원',
-  moderator: '운영자',
+/**
+ * 직책 라벨 (표시용)
+ */
+const OFFICIAL_ROLE_LABELS: Record<string, string> = {
+  president: '회장',
+  vice_president: '부회장',
+  general_manager: '총무',
+  auditor: '감사',
+  director: '이사',
+  branch_head: '분회장',
+  district_head: '지부장',
+  none: '일반회원',
 };
 
-const ROLE_COLORS: Record<string, string> = {
-  admin: 'bg-purple-100 text-purple-700',
-  manager: 'bg-blue-100 text-blue-700',
-  member: 'bg-gray-100 text-gray-600',
-  moderator: 'bg-green-100 text-green-700',
+/**
+ * 직책 색상 (표시용)
+ */
+const OFFICIAL_ROLE_COLORS: Record<string, string> = {
+  president: 'bg-purple-100 text-purple-700',
+  vice_president: 'bg-blue-100 text-blue-700',
+  general_manager: 'bg-indigo-100 text-indigo-700',
+  auditor: 'bg-amber-100 text-amber-700',
+  director: 'bg-cyan-100 text-cyan-700',
+  branch_head: 'bg-green-100 text-green-700',
+  district_head: 'bg-teal-100 text-teal-700',
+  none: 'bg-gray-100 text-gray-600',
+};
+
+/**
+ * 임원 직책인지 확인 (표시용)
+ */
+const isExecutivePosition = (officialRole?: string): boolean => {
+  const executiveRoles = [
+    'president', 'vice_president', 'general_manager', 'auditor',
+    'director', 'branch_head', 'district_head',
+  ];
+  return officialRole ? executiveRoles.includes(officialRole) : false;
 };
 
 export function OfficerManagePage() {
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
-  const [showRoleModal, setShowRoleModal] = useState<OrganizationMember | null>(null);
-  const [selectedRole, setSelectedRole] = useState<string>('member');
+  const [filterExecutivesOnly, setFilterExecutivesOnly] = useState(true);
 
   // 임시: 로그인한 관리자의 조직 ID (실제로는 auth context에서 가져와야 함)
   const organizationId = 'org-sample-id';
@@ -70,28 +98,17 @@ export function OfficerManagePage() {
     loadMembers();
   }, []);
 
-  const handleRoleChange = async () => {
-    if (!showRoleModal) return;
+  // 필터링된 회원 목록
+  const filteredMembers = filterExecutivesOnly
+    ? members.filter((m) => isExecutivePosition(m.position))
+    : members;
 
-    setActionInProgress(showRoleModal.userId);
-    try {
-      await updateMemberRole(organizationId, showRoleModal.userId, {
-        role: selectedRole as 'admin' | 'manager' | 'member' | 'moderator',
-      });
-      setShowRoleModal(null);
-      await loadMembers();
-    } catch (err) {
-      setError('역할 변경 중 오류가 발생했습니다.');
-      console.error('Failed to update role:', err);
-    } finally {
-      setActionInProgress(null);
-    }
-  };
-
-  const openRoleModal = (member: OrganizationMember) => {
-    setShowRoleModal(member);
-    setSelectedRole(member.role);
-  };
+  // 직책별 통계
+  const positionStats = members.reduce((acc, m) => {
+    const pos = m.position || 'none';
+    acc[pos] = (acc[pos] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="p-6">
@@ -106,9 +123,9 @@ export function OfficerManagePage() {
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">임원 관리</h1>
+            <h1 className="text-2xl font-bold text-gray-900">임원 현황</h1>
             <p className="text-gray-500 mt-1">
-              지부/분회 소속 회원의 역할을 관리합니다.
+              지부/분회 임원진 현황을 조회합니다.
             </p>
           </div>
           <button
@@ -122,12 +139,50 @@ export function OfficerManagePage() {
         </div>
       </div>
 
-      {/* Info */}
-      <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-700">
-          <strong>주의:</strong> 임원 역할 변경은 해당 회원의 관리자 권한에 영향을 줍니다.
-          새로운 역할이나 직책을 생성할 수 없으며, 기존 역할만 할당할 수 있습니다.
-        </p>
+      {/* Info Banner - WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1 */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-700">
+            <p className="font-medium mb-1">직책과 권한은 분리되어 있습니다</p>
+            <p>
+              임원 직책은 조직 내 역할을 표시하는 것이며, 시스템 권한과는 무관합니다.
+              관리자 권한이 필요한 경우 별도로 권한 관리 메뉴에서 설정해야 합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Position Stats */}
+      <div className="mb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+        {Object.entries(OFFICIAL_ROLE_LABELS)
+          .filter(([key]) => key !== 'none')
+          .map(([key, label]) => (
+            <div
+              key={key}
+              className={`p-3 rounded-lg ${OFFICIAL_ROLE_COLORS[key]} border`}
+            >
+              <div className="text-2xl font-bold">{positionStats[key] || 0}</div>
+              <div className="text-xs font-medium">{label}</div>
+            </div>
+          ))}
+      </div>
+
+      {/* Filter Toggle */}
+      <div className="mb-4 flex items-center gap-4">
+        <label className="flex items-center gap-2 text-sm text-gray-600">
+          <input
+            type="checkbox"
+            checked={filterExecutivesOnly}
+            onChange={(e) => setFilterExecutivesOnly(e.target.checked)}
+            className="rounded border-gray-300"
+          />
+          임원만 표시
+        </label>
+        <span className="text-sm text-gray-500">
+          총 {filteredMembers.length}명
+          {filterExecutivesOnly && ` (전체 ${members.length}명 중 임원)`}
+        </span>
       </div>
 
       {/* Error */}
@@ -143,10 +198,12 @@ export function OfficerManagePage() {
           <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500">데이터를 불러오는 중...</p>
         </div>
-      ) : members.length === 0 ? (
+      ) : filteredMembers.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">소속 회원이 없습니다.</p>
+          <p className="text-gray-500">
+            {filterExecutivesOnly ? '임원이 없습니다.' : '소속 회원이 없습니다.'}
+          </p>
         </div>
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -157,26 +214,27 @@ export function OfficerManagePage() {
                   회원
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  현재 역할
+                  직책
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  직책
+                  소속
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   가입일
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  작업
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {members.map((member) => (
+              {filteredMembers.map((member) => (
                 <tr key={member.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-gray-500" />
+                        {isExecutivePosition(member.position) ? (
+                          <Award className="h-5 w-5 text-amber-500" />
+                        ) : (
+                          <Users className="h-5 w-5 text-gray-500" />
+                        )}
                       </div>
                       <div className="ml-3">
                         <div className="font-medium text-gray-900">
@@ -189,25 +247,22 @@ export function OfficerManagePage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${ROLE_COLORS[member.role] || 'bg-gray-100 text-gray-600'}`}>
-                      {ROLE_LABELS[member.role] || member.role}
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                        OFFICIAL_ROLE_COLORS[member.position || 'none'] ||
+                        'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {OFFICIAL_ROLE_LABELS[member.position || 'none'] ||
+                        member.position ||
+                        '일반회원'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {member.position || '-'}
+                    {member.organizationName || '-'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(member.joinedAt).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => openRoleModal(member)}
-                      disabled={actionInProgress === member.userId}
-                      className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      <Shield className="h-4 w-4 mr-1" />
-                      역할 변경
-                    </button>
                   </td>
                 </tr>
               ))}
@@ -216,49 +271,15 @@ export function OfficerManagePage() {
         </div>
       )}
 
-      {/* Role Change Modal */}
-      {showRoleModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              역할 변경
-            </h3>
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-4">
-                <strong>{showRoleModal.userName || showRoleModal.userId}</strong> 회원의 역할을 변경합니다.
-              </p>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                새 역할 선택
-              </label>
-              <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="member">일반 회원</option>
-                <option value="moderator">운영자</option>
-                <option value="manager">임원</option>
-                <option value="admin">관리자</option>
-              </select>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setShowRoleModal(null)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleRoleChange}
-                disabled={actionInProgress === showRoleModal.userId}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-              >
-                변경 저장
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Footer Note */}
+      <div className="mt-6 text-sm text-gray-500">
+        <p>
+          * 직책 변경은 회원 상세 페이지에서 가능합니다.
+        </p>
+        <p>
+          * 시스템 권한(관리자, 운영자 등)은 별도의 권한 관리 메뉴를 이용해 주세요.
+        </p>
+      </div>
     </div>
   );
 }

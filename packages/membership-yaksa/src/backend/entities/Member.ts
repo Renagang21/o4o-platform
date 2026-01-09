@@ -190,13 +190,52 @@ export class Member {
     )[0];
   }
 
-  // Phase 1: 임원 여부 확인
+  /**
+   * 임원 여부 확인 (표시용)
+   *
+   * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+   * - 이 함수는 "표시/상태 확인"용이며 권한 판정용이 아님
+   * - 임원이라고 해서 시스템 권한이 있는 것이 아님
+   * - 권한은 MembershipRoleAssignment를 통해 별도로 부여됨
+   */
   isExecutive(): boolean {
     const executiveRoles: OfficialRole[] = [
       'president', 'vice_president', 'general_manager', 'auditor',
       'director', 'branch_head', 'district_head',
     ];
     return this.officialRole ? executiveRoles.includes(this.officialRole) : false;
+  }
+
+  /**
+   * 관리자급 직책 여부 확인 (표시용)
+   *
+   * WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+   * - 이 함수는 "표시/상태 확인"용이며 권한 판정용이 아님
+   * - 관리자 직책이라고 해서 자동으로 admin 권한이 부여되지 않음
+   * - 권한은 관리자가 수동으로 MembershipRoleAssignment를 할당해야 함
+   */
+  isAdminPosition(): boolean {
+    const adminPositions: OfficialRole[] = [
+      'president', 'vice_president', 'branch_head', 'district_head',
+    ];
+    return this.officialRole ? adminPositions.includes(this.officialRole) : false;
+  }
+
+  /**
+   * 직책 표시 라벨 반환
+   */
+  getOfficialRoleLabel(): string {
+    const labels: Record<OfficialRole, string> = {
+      president: '회장',
+      vice_president: '부회장',
+      general_manager: '총무',
+      auditor: '감사',
+      director: '이사',
+      branch_head: '분회장',
+      district_head: '지부장',
+      none: '일반회원',
+    };
+    return this.officialRole ? labels[this.officialRole] : '일반회원';
   }
 
   // Phase 1: 현재 근무지 정보 반환

@@ -224,35 +224,19 @@ export class MemberService {
       }
     }
 
-    // Phase 2: officialRole 변경 감지
-    const oldOfficialRole = member.officialRole;
-    const newOfficialRole = dto.officialRole;
-    const officialRoleChanged =
-      newOfficialRole !== undefined && newOfficialRole !== oldOfficialRole;
+    // WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+    // officialRole 변경은 더 이상 권한에 영향을 주지 않음
+    // 임원은 직책(표시 데이터)이며 권한이 아님
 
     Object.assign(member, dto);
     const savedMember = await this.memberRepo.save(member);
 
-    // Phase 2: officialRole 변경 시 역할 자동 동기화
-    let roleSyncResult: RoleSyncResult | undefined;
-    if (officialRoleChanged && newOfficialRole) {
-      const syncResult = await this.roleAssignmentService.syncRoleFromOfficialRole(
-        member.id,
-        newOfficialRole,
-        member.organizationId,
-        oldOfficialRole,
-        updatedBy
-      );
+    // WO-KPA-AUTH-RBAC-EXECUTIVE-REFORM-V1:
+    // syncRoleFromOfficialRole 호출 제거
+    // 직책 변경이 권한에 영향을 주지 않음
+    // 권한 부여는 관리자가 RoleAssignment를 직접 할당해야 함
 
-      roleSyncResult = {
-        memberId: member.id,
-        previousRole: syncResult.previousRole,
-        newRole: syncResult.newRole,
-        deactivated: syncResult.deactivated,
-      };
-    }
-
-    return { member: savedMember, roleSyncResult };
+    return { member: savedMember, roleSyncResult: undefined };
   }
 
   /**
