@@ -14,6 +14,7 @@ import { createApplicationController } from './controllers/application.controlle
 import { createAdminController } from './controllers/admin.controller.js';
 import { createOrderController } from './controllers/order.controller.js';
 import { createCockpitController } from './controllers/cockpit.controller.js';
+import { createSignageController } from './controllers/signage.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 
 // Domain controllers - Forum
@@ -147,6 +148,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requireGlycopharmScope
   );
   router.use('/pharmacy/cockpit', cockpitController);
+
+  // Signage routes (채널, 내 사이니지 편성)
+  const signageController = createSignageController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/signage', signageController);
 
   return router;
 }
