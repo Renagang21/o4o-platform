@@ -99,33 +99,20 @@ const CosmeticsPartnerDashboardContent: React.FC = () => {
       }
     } catch (err: unknown) {
       console.error('Failed to fetch dashboard summary:', err);
-      // Demo data when API is not available
+      // API failure: set error state and empty summary
+      setError('대시보드 데이터를 불러오는데 실패했습니다.');
       setSummary({
-        totalClicks: period === 'today' ? 245 : period === '7d' ? 1840 : 12580,
-        totalConversions: period === 'today' ? 8 : period === '7d' ? 45 : 284,
-        conversionRate: 2.26,
-        totalEarnings: period === 'today' ? 85000 : period === '7d' ? 420000 : 1420000,
-        pendingEarnings: 180000,
-        availableEarnings: 1240000,
-        activeLinks: 18,
-        publishedRoutines: 7,
-        recentLinks: [
-          { id: '1', urlSlug: 'summer-skincare-2024', linkType: 'product', clicks: 245, conversions: 12, createdAt: '2024-12-10T10:00:00Z' },
-          { id: '2', urlSlug: 'anti-aging-routine', linkType: 'routine', clicks: 189, conversions: 8, createdAt: '2024-12-09T15:30:00Z' },
-          { id: '3', urlSlug: 'best-sunscreen-picks', linkType: 'product', clicks: 156, conversions: 5, createdAt: '2024-12-08T09:00:00Z' },
-        ],
-        recentEvents: [
-          { id: '1', type: 'SALE', linkSlug: 'summer-skincare-2024', amount: 45000, createdAt: '2024-12-12T14:30:00Z' },
-          { id: '2', type: 'CONVERSION', linkSlug: 'anti-aging-routine', createdAt: '2024-12-12T13:20:00Z' },
-          { id: '3', type: 'CLICK', linkSlug: 'best-sunscreen-picks', createdAt: '2024-12-12T12:45:00Z' },
-          { id: '4', type: 'SALE', linkSlug: 'summer-skincare-2024', amount: 32000, createdAt: '2024-12-12T11:30:00Z' },
-          { id: '5', type: 'CLICK', linkSlug: 'anti-aging-routine', createdAt: '2024-12-12T10:15:00Z' },
-        ],
-        comparison: {
-          clicksChange: 12.5,
-          conversionsChange: 8.3,
-          earningsChange: 15.2,
-        },
+        totalClicks: 0,
+        totalConversions: 0,
+        conversionRate: 0,
+        totalEarnings: 0,
+        pendingEarnings: 0,
+        availableEarnings: 0,
+        activeLinks: 0,
+        publishedRoutines: 0,
+        recentLinks: [],
+        recentEvents: [],
+        comparison: undefined,
       });
     } finally {
       setLoading(false);

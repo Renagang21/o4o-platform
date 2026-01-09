@@ -55,25 +55,28 @@ export interface UserChartData {
   activeUsers: number;
 }
 
+// System health status type (includes 'error' for API unavailable state)
+export type SystemHealthStatusType = 'healthy' | 'warning' | 'critical' | 'error';
+
 // System health types
 export interface SystemHealthStatus {
   api: {
-    status: 'healthy' | 'warning' | 'critical';
+    status: SystemHealthStatusType;
     responseTime: number;
     lastCheck: string;
   };
   database: {
-    status: 'healthy' | 'warning' | 'critical';
+    status: SystemHealthStatusType;
     connections: number;
     lastCheck: string;
   };
   storage: {
-    status: 'healthy' | 'warning' | 'critical';
+    status: SystemHealthStatusType;
     usage: number;
     total: number;
   };
   memory: {
-    status: 'healthy' | 'warning' | 'critical';
+    status: SystemHealthStatusType;
     usage: number;
     total: number;
   };

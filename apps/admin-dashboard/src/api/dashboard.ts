@@ -274,155 +274,56 @@ export const dashboardApi = {
     }
   },
 
-  // Default data generators (fallback)
+  // Empty state generators (API unavailable fallback)
+  // Returns empty arrays/objects to indicate "no data available"
+  // UI should display appropriate empty/error states
   getDefaultSalesData(): SalesDataItem[] {
-    const data: SalesDataItem[] = [];
-    const today = new Date();
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        amount: Math.floor(Math.random() * 500000) + 100000,
-        orders: Math.floor(Math.random() * 50) + 10
-      });
-    }
-    
-    return data;
+    // Empty state: API not available, no sales data to display
+    return [];
   },
 
   getDefaultOrdersData(): OrderStatusData[] {
-    return [
-      { status: '처리중', count: 45, color: '#3b82f6' },
-      { status: '배송중', count: 23, color: '#f59e0b' },
-      { status: '완료', count: 67, color: '#10b981' },
-      { status: '취소', count: 5, color: '#ef4444' }
-    ];
+    // Empty state: API not available, no order status data to display
+    return [];
   },
 
   getDefaultUsersData(): UserChartData[] {
-    const data: UserChartData[] = [];
-    const today = new Date();
-    
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        newUsers: Math.floor(Math.random() * 20) + 5,
-        activeUsers: Math.floor(Math.random() * 100) + 50
-      });
-    }
-    
-    return data;
+    // Empty state: API not available, no user chart data to display
+    return [];
   },
 
   getDefaultNotifications(): Notification[] {
-    return [
-      {
-        id: '1',
-        type: 'urgent' as const,
-        title: '재고 부족 경고',
-        message: '오메가3 제품의 재고가 5개 미만입니다.',
-        time: '2분 전',
-        read: false,
-        actionUrl: '/products/low-stock'
-      },
-      {
-        id: '2',
-        type: 'approval' as const,
-        title: '사업자 승인 대기',
-        message: '김사업자님의 사업자 등록 승인이 대기 중입니다.',
-        time: '15분 전',
-        read: false,
-        actionUrl: '/users/pending'
-      },
-      {
-        id: '3',
-        type: 'success' as const,
-        title: '매출 목표 달성',
-        message: '이번 주 매출 목표를 달성했습니다!',
-        time: '1시간 전',
-        read: true
-      },
-      {
-        id: '4',
-        type: 'info' as const,
-        title: '새로운 리뷰',
-        message: '프리미엄 비타민 상품에 새 리뷰가 등록되었습니다.',
-        time: '2시간 전',
-        read: true
-      }
-    ];
+    // Empty state: API not available, no notifications to display
+    return [];
   },
 
   getDefaultActivities(): Activity[] {
-    return [
-      {
-        id: '1',
-        type: 'user' as const,
-        message: '새로운 사업자 회원이 가입했습니다',
-        time: '2분 전',
-        user: '김사업자',
-        icon: '👤'
-      },
-      {
-        id: '2',
-        type: 'order' as const,
-        message: '새 주문이 접수되었습니다 (#ORD-2025-001)',
-        time: '15분 전',
-        user: '이고객',
-        icon: '🛒'
-      },
-      {
-        id: '3',
-        type: 'product' as const,
-        message: '오메가3 상품의 재고가 부족합니다',
-        time: '1시간 전',
-        icon: '📦'
-      },
-      {
-        id: '4',
-        type: 'content' as const,
-        message: '건강 가이드 페이지가 발행되었습니다',
-        time: '2시간 전',
-        user: '관리자',
-        icon: '📄'
-      },
-      {
-        id: '5',
-        type: 'order' as const,
-        message: '주문 #ORD-2024-156이 배송 완료되었습니다',
-        time: '3시간 전',
-        icon: '✅'
-      }
-    ];
+    // Empty state: API not available, no activities to display
+    return [];
   },
 
   getDefaultSystemHealth(): SystemHealthStatus {
+    // Error state: API not available, system status unknown
     return {
       api: {
-        status: 'healthy' as const,
-        responseTime: 120,
+        status: 'error' as const,
+        responseTime: 0,
         lastCheck: new Date().toISOString()
       },
       database: {
-        status: 'healthy' as const,
-        connections: 8,
+        status: 'error' as const,
+        connections: 0,
         lastCheck: new Date().toISOString()
       },
       storage: {
-        status: 'healthy' as const,
-        usage: 2.4,
-        total: 10
+        status: 'error' as const,
+        usage: 0,
+        total: 0
       },
       memory: {
-        status: 'warning' as const,
-        usage: 1.2,
-        total: 2
+        status: 'error' as const,
+        usage: 0,
+        total: 0
       }
     };
   }
