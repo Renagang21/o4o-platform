@@ -138,6 +138,8 @@ export function Header({ serviceName }: { serviceName: string }) {
       pharmacist: { email: 'pharmacist@kpa-test.kr', password: 'test123!@#' },
       district_admin: { email: 'district-admin@kpa-test.kr', password: 'test123!@#' },
       branch_admin: { email: 'branch-admin@kpa-test.kr', password: 'test123!@#' },
+      district_officer: { email: 'district-officer@kpa-test.kr', password: 'test123!@#' },
+      branch_officer: { email: 'branch-officer@kpa-test.kr', password: 'test123!@#' },
     };
     const creds = testCredentials[accountType];
     setLoginForm({ email: creds.email, password: creds.password });

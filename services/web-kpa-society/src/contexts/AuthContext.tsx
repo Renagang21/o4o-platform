@@ -22,13 +22,30 @@ export interface User {
 
 /**
  * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 정의
- * - 지부 운영자: district_admin
- * - 분회 운영자: branch_admin
- * - 약사: pharmacist
+ *
+ * 권한 계층 (Role):
+ * - 지부 운영자: district_admin (지부 관리 권한)
+ * - 분회 운영자: branch_admin (분회 관리 권한)
+ * - 약사: pharmacist (일반 회원 권한)
+ *
+ * 직책 (Position) - KPA-AUTH-ROLE-POSITION-PRINCIPLES:
+ * - 지부임원: district_officer (직책 표시용, 권한은 pharmacist와 동일)
+ * - 분회임원: branch_officer (직책 표시용, 권한은 pharmacist와 동일)
+ *
+ * Note: 임원은 직책이며 권한이 아님. 권한은 별도로 부여해야 함.
  */
-export type TestAccountType = 'district_admin' | 'branch_admin' | 'pharmacist';
+export type TestAccountType =
+  | 'district_admin'
+  | 'branch_admin'
+  | 'pharmacist'
+  | 'district_officer'
+  | 'branch_officer';
 
-export const TEST_ACCOUNTS: Record<TestAccountType, User> = {
+export interface TestUser extends User {
+  position?: string;  // 직책 (표시용)
+}
+
+export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
   district_admin: {
     id: 'test-district-admin-001',
     email: 'district-admin@kpa-test.kr',
@@ -40,6 +57,20 @@ export const TEST_ACCOUNTS: Record<TestAccountType, User> = {
     email: 'branch-admin@kpa-test.kr',
     name: '분회 운영자 (테스트)',
     role: 'branch_admin',
+  },
+  district_officer: {
+    id: 'test-district-officer-001',
+    email: 'district-officer@kpa-test.kr',
+    name: '지부 부회장 (테스트)',
+    role: 'pharmacist',  // 권한은 일반 회원
+    position: 'vice_president',  // 직책: 부회장
+  },
+  branch_officer: {
+    id: 'test-branch-officer-001',
+    email: 'branch-officer@kpa-test.kr',
+    name: '분회 이사 (테스트)',
+    role: 'pharmacist',  // 권한은 일반 회원
+    position: 'director',  // 직책: 이사
   },
   pharmacist: {
     id: 'test-pharmacist-001',
