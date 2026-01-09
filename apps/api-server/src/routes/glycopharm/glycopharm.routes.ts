@@ -172,6 +172,22 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/market-trials', marketTrialsController);
 
+  // Forums list endpoint (for pharmacy forum extension)
+  router.get('/forums', coreRequireAuth as any, async (_req, res) => {
+    try {
+      // Return empty array for now - feature to be implemented
+      res.json({
+        success: true,
+        data: [],
+      });
+    } catch (error: any) {
+      console.error('Failed to get forums:', error);
+      res.status(500).json({
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
   // Signage routes (채널, 내 사이니지 편성)
   const signageController = createSignageController(
     dataSource,

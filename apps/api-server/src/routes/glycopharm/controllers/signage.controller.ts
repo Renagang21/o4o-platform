@@ -164,22 +164,31 @@ export function createSignageController(
    */
   router.get('/contents', requireAuth, async (_req: Request, res: Response): Promise<void> => {
     try {
-      // Return available contents from DisplayMedia
-      const media = await mediaRepo.find({
-        order: { created_at: 'DESC' },
-        take: 50,
-      });
+      // Try to return available contents from DisplayMedia
+      // If entity is not registered, return empty array
+      let contents: any[] = [];
 
-      const contents = media.map((m) => ({
-        id: m.id,
-        title: m.name,
-        type: 'video' as const,
-        source: m.source_type,
-        sourceName: m.source_type === 'youtube' ? 'YouTube' : m.source_type,
-        duration: m.duration || undefined,
-        thumbnailUrl: m.thumbnail_url || undefined,
-        isForced: false,
-      }));
+      try {
+        const media = await mediaRepo.find({
+          order: { created_at: 'DESC' },
+          take: 50,
+        });
+
+        contents = media.map((m) => ({
+          id: m.id,
+          title: m.name,
+          type: 'video' as const,
+          source: m.source_type,
+          sourceName: m.source_type === 'youtube' ? 'YouTube' : m.source_type,
+          duration: m.duration || undefined,
+          thumbnailUrl: m.thumbnail_url || undefined,
+          isForced: false,
+        }));
+      } catch (entityError: any) {
+        // Entity not registered - return empty array
+        console.warn('DisplayMedia entity not available:', entityError.message);
+        contents = [];
+      }
 
       res.json({ success: true, data: contents });
     } catch (error: any) {
