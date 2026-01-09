@@ -1,11 +1,12 @@
 /**
  * Dashboard Statistics Hook
- * Integrates E-commerce API with dashboard statistics
+ * Integrates Admin Dashboard API with dashboard statistics
+ *
+ * WO-ADMIN-API-IMPLEMENT-P0: Uses real database queries
  */
 
 import { useQuery } from '@tanstack/react-query';
-// import { EcommerceApi } from '@/api/ecommerceApi';
-// import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+import { authClient } from '@o4o/auth-client';
 
 interface DashboardSummary {
   ecommerce: {
@@ -42,107 +43,79 @@ export const useDashboardStats = () => {
     queryKey: ['dashboard', 'stats', 'summary'],
     queryFn: async () => {
       try {
-        // Fetch dashboard stats
-        // const dashboardStats = await EcommerceApi.getDashboardStats();
+        // Fetch data from real Admin Dashboard APIs (WO-ADMIN-API-IMPLEMENT-P0)
+        const [salesResponse, orderStatusResponse, userGrowthResponse] = await Promise.all([
+          authClient.api.get('/admin/dashboard/sales-summary?period=30d'),
+          authClient.api.get('/admin/dashboard/order-status'),
+          authClient.api.get('/admin/dashboard/user-growth?period=30d')
+        ]);
 
-        // Fetch sales report for the month
-        // const salesReport = await EcommerceApi.getSalesReport(
-        //   'custom',
-        //   '/* date removed */',
-        //   '/* date removed */'
-        // );
+        const salesData = salesResponse.data?.data;
+        const orderStatusData = orderStatusResponse.data?.data || [];
+        const userGrowthData = userGrowthResponse.data?.data;
 
-        // Fetch recent orders for status distribution
-        // const ordersResponse = await EcommerceApi.getOrders(1, 100);
-        // const orders = ordersResponse.data || [];
-        const dashboardStats = { data: null };
-        const salesReport = { data: null };
-        const orders: any[] = [];
-
-        // Calculate order status distribution
-        const statusCounts: Record<string, number> = {
-          pending: 0,
-          processing: 0,
-          shipped: 0,
-          completed: 0,
-          cancelled: 0,
-          refunded: 0
-        };
-
-        orders.forEach((order: { status: string }) => {
-          if (statusCounts[order.status] !== undefined) {
-            statusCounts[order.status]++;
-          }
-        });
-
-        // Process sales data for chart (last 30 days)
-        const salesChartData = [];
+        // Generate sales chart data (empty until daily breakdown is implemented)
         const today = new Date();
-
+        const salesChartData = [];
         for (let i = 29; i >= 0; i--) {
           const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
-          const dayData = salesReport.data?.salesByDay?.find(
-            (d: { date: string; sales: number; orders: number }) => d.date === date.toISOString().split('T')[0]
-          );
-
           salesChartData.push({
             date: date.toISOString().split('T')[0],
-            amount: dayData?.sales || 0,
-            orders: dayData?.orders || 0
+            amount: 0,
+            orders: 0
           });
         }
 
-        // Order status chart data
-        const orderStatusData = [
-          { status: '대기중', count: statusCounts.pending, color: '#f59e0b' },
-          { status: '처리중', count: statusCounts.processing, color: '#3b82f6' },
-          { status: '배송중', count: statusCounts.shipped, color: '#8b5cf6' },
-          { status: '완료', count: statusCounts.completed, color: '#10b981' },
-          { status: '취소', count: statusCounts.cancelled, color: '#ef4444' },
-          { status: '환불', count: statusCounts.refunded, color: '#f97316' }
-        ].filter((item) => item.count > 0);
+        // Order status chart data from API
+        const orderChartData = orderStatusData.map((item: { status: string; label: string; count: number; color: string }) => ({
+          status: item.label,
+          count: item.count,
+          color: item.color
+        }));
 
-        // Generate user activity data (empty until API integration)
-        const userChartData = [];
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
-          userChartData.push({
-            date: date.toISOString().split('T')[0],
-            newUsers: 0,
-            activeUsers: 0
-          });
+        // User growth chart data from API
+        const userChartData = (userGrowthData?.growth || []).map((item: { date: string; newUsers: number }) => ({
+          date: item.date ? new Date(item.date).toISOString().split('T')[0] : '',
+          newUsers: item.newUsers,
+          activeUsers: 0 // Active users per day not yet implemented
+        }));
+
+        // Fill in missing days for user chart
+        if (userChartData.length < 7) {
+          for (let i = 6; i >= userChartData.length; i--) {
+            const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+            userChartData.unshift({
+              date: date.toISOString().split('T')[0],
+              newUsers: 0,
+              activeUsers: 0
+            });
+          }
         }
 
-        // Calculate monthly revenue
-        const monthlyRevenue = salesReport.data?.totalSales || 
-          (dashboardStats.data?.todaySales || 0) * 30;
-
-        // Calculate average order value
-        const avgOrderValue = dashboardStats.data?.todaySales && dashboardStats.data?.todayOrders
-          ? dashboardStats.data.todaySales / dashboardStats.data.todayOrders
-          : 0;
+        // Get pending order count from status data
+        const pendingCount = orderStatusData.find((s: { status: string }) =>
+          s.status === 'pending_payment' || s.status === 'created'
+        )?.count || 0;
 
         return {
           ecommerce: {
-            todaySales: dashboardStats.data?.todaySales || 0,
-            todayOrders: dashboardStats.data?.todayOrders || 0,
-            totalProducts: dashboardStats.data?.totalProducts || 0,
-            lowStockProducts: dashboardStats.data?.lowStockProducts || 0,
-            pendingOrders: dashboardStats.data?.pendingOrders || 0,
-            totalCustomers: dashboardStats.data?.totalCustomers || 0,
-            monthlyRevenue,
-            averageOrderValue: avgOrderValue
+            todaySales: 0, // Today's sales not yet implemented (requires daily breakdown)
+            todayOrders: 0, // Today's orders not yet implemented
+            totalProducts: 0, // Product count from cosmetics API
+            lowStockProducts: 0, // Low stock not yet implemented
+            pendingOrders: pendingCount,
+            totalCustomers: userGrowthData?.totalUsers || 0,
+            monthlyRevenue: salesData?.totalRevenue || 0,
+            averageOrderValue: salesData?.averageOrderValue || 0
           },
           chartData: {
             sales: salesChartData,
-            orders: orderStatusData,
-            users: userChartData
+            orders: orderChartData,
+            users: userChartData.slice(-7)
           }
         };
       } catch (error: unknown) {
-    // Error logging - use proper error handler
-        
-        // Return default data on error
+        // Return default data on error (empty state)
         return generateDefaultDashboardData();
       }
     },

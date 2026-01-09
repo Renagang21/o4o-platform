@@ -393,6 +393,9 @@ import checkoutRoutes from './routes/checkout.routes.js';
 // Admin Order Routes (Phase N-2)
 import adminOrderRoutes from './routes/admin-orders.routes.js';
 
+// Admin Dashboard Routes (WO-ADMIN-API-IMPLEMENT-P0)
+import adminDashboardRoutes from './routes/admin/dashboard.routes.js';
+
 // Cosmetics Routes (Phase 7-A-1)
 import { createCosmeticsRoutes } from './routes/cosmetics/cosmetics.routes.js';
 
@@ -650,6 +653,10 @@ const startServer = async () => {
     // 24. Register Admin Order routes (Phase N-2)
     app.use('/api/admin/orders', adminOrderRoutes);
     logger.info('✅ Admin Order routes registered at /api/admin/orders');
+
+    // 24-b. Register Admin Dashboard routes (WO-ADMIN-API-IMPLEMENT-P0)
+    app.use('/api/v1/admin', adminDashboardRoutes);
+    logger.info('✅ Admin Dashboard routes registered at /api/v1/admin');
 
     // 25. Register Cosmetics routes (Phase 7-A-1)
     try {
