@@ -87,7 +87,7 @@ export function createPharmacyController(
         const productRepo = dataSource.getRepository(GlycopharmProduct);
         const queryBuilder = productRepo
           .createQueryBuilder('product')
-          .where('product.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id });
+          .where('product.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id });
 
         // Apply filters
         if (categoryId) {
@@ -125,7 +125,7 @@ export function createPharmacyController(
           salePrice: p.sale_price ? Number(p.sale_price) : undefined,
           stock: p.stock_quantity || 0,
           status: p.status,
-          thumbnailUrl: p.image_url,
+          thumbnailUrl: undefined, // image_url not in entity
           isDropshipping: false,
           supplierId: '',
           supplierName: p.manufacturer || '',
@@ -226,16 +226,16 @@ export function createPharmacyController(
         const queryBuilder = orderRepo
           .createQueryBuilder('order')
           .leftJoinAndSelect('order.items', 'items')
-          .where('order.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id });
+          .where('order.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id });
 
         // Apply filters
         if (status) {
-          queryBuilder.andWhere('order.status = :status', { status });
+          queryBuilder.andWhere('order.status = :status', { status: status.toUpperCase() });
         }
 
         if (search) {
           queryBuilder.andWhere(
-            '(order.orderNumber ILIKE :search OR order.customerName ILIKE :search)',
+            '(order.id ILIKE :search OR order.customer_name ILIKE :search)',
             { search: `%${search}%` }
           );
         }
@@ -245,7 +245,7 @@ export function createPharmacyController(
 
         // Apply pagination
         const orders = await queryBuilder
-          .orderBy('order.createdAt', 'DESC')
+          .orderBy('order.created_at', 'DESC')
           .skip((page - 1) * pageSize)
           .take(pageSize)
           .getMany();
@@ -253,32 +253,37 @@ export function createPharmacyController(
         // Map to response format
         const items = orders.map((o) => ({
           id: o.id,
-          orderNumber: o.orderNumber,
-          customerId: o.userId || '',
-          customerName: o.customerName,
-          customerPhone: o.customerPhone || '',
+          orderNumber: o.id.substring(0, 8).toUpperCase(), // Generate order number from id
+          customerId: o.user_id || '',
+          customerName: o.customer_name || '',
+          customerPhone: o.customer_phone || '',
           items: o.items?.map((i) => ({
             id: i.id,
-            productId: i.productId,
-            productName: i.productName,
+            productId: i.product_id,
+            productName: i.product_name,
             productImage: undefined,
             quantity: i.quantity,
-            unitPrice: Number(i.unitPrice),
-            totalPrice: Number(i.totalPrice),
+            unitPrice: Number(i.unit_price),
+            totalPrice: Number(i.subtotal),
           })) || [],
-          subtotal: Number(o.totalAmount) - Number(o.shippingFee || 0),
-          shippingFee: Number(o.shippingFee || 0),
-          totalAmount: Number(o.totalAmount),
-          status: o.status,
-          shippingAddress: o.shippingAddress || {
-            recipient: o.customerName,
-            phone: o.customerPhone || '',
+          subtotal: Number(o.total_amount),
+          shippingFee: 0,
+          totalAmount: Number(o.total_amount),
+          status: o.status.toLowerCase(),
+          shippingAddress: o.shipping_address ? {
+            recipient: o.customer_name || '',
+            phone: o.customer_phone || '',
+            zipCode: '',
+            address1: o.shipping_address,
+          } : {
+            recipient: o.customer_name || '',
+            phone: o.customer_phone || '',
             zipCode: '',
             address1: '',
           },
-          trackingNumber: o.trackingNumber,
-          createdAt: o.createdAt.toISOString(),
-          updatedAt: o.updatedAt.toISOString(),
+          trackingNumber: undefined,
+          createdAt: o.created_at.toISOString(),
+          updatedAt: o.updated_at.toISOString(),
         }));
 
         res.json({
@@ -347,18 +352,18 @@ export function createPharmacyController(
         const orderRepo = dataSource.getRepository(GlycopharmOrder);
         const customersData = await orderRepo
           .createQueryBuilder('order')
-          .select('order.userId', 'userId')
-          .addSelect('order.customerName', 'name')
-          .addSelect('order.customerPhone', 'phone')
+          .select('order.user_id', 'userId')
+          .addSelect('order.customer_name', 'name')
+          .addSelect('order.customer_phone', 'phone')
           .addSelect('COUNT(order.id)', 'totalOrders')
-          .addSelect('SUM(order.totalAmount)', 'totalSpent')
-          .addSelect('MAX(order.createdAt)', 'lastOrderAt')
-          .where('order.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.userId IS NOT NULL')
-          .groupBy('order.userId')
-          .addGroupBy('order.customerName')
-          .addGroupBy('order.customerPhone')
-          .orderBy('MAX(order.createdAt)', 'DESC')
+          .addSelect('SUM(order.total_amount)', 'totalSpent')
+          .addSelect('MAX(order.created_at)', 'lastOrderAt')
+          .where('order.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id })
+          .andWhere('order.user_id IS NOT NULL')
+          .groupBy('order.user_id')
+          .addGroupBy('order.customer_name')
+          .addGroupBy('order.customer_phone')
+          .orderBy('MAX(order.created_at)', 'DESC')
           .offset((page - 1) * pageSize)
           .limit(pageSize)
           .getRawMany();
@@ -366,9 +371,9 @@ export function createPharmacyController(
         // Get total count
         const totalResult = await orderRepo
           .createQueryBuilder('order')
-          .select('COUNT(DISTINCT order.userId)', 'count')
-          .where('order.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.userId IS NOT NULL')
+          .select('COUNT(DISTINCT order.user_id)', 'count')
+          .where('order.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id })
+          .andWhere('order.user_id IS NOT NULL')
           .getRawOne();
 
         const total = parseInt(totalResult?.count || '0');
