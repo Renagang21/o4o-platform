@@ -174,6 +174,11 @@ import {
 import { Organization, OrganizationMember } from '@o4o/organization-core';
 
 // ============================================================================
+// CMS-CORE CONTENT ENTITIES (WO-P2-IMPLEMENT-CONTENT)
+// ============================================================================
+import { CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
+
+// ============================================================================
 // LMS-CORE ENTITIES (Re-added for KPA LMS routes)
 // ============================================================================
 import {
@@ -424,6 +429,11 @@ export const AppDataSource = new DataSource({
     Certificate,
     LMSEvent,
     Attendance,
+    // ============================================================================
+    // CMS-CORE CONTENT ENTITIES (WO-P2-IMPLEMENT-CONTENT)
+    // ============================================================================
+    CmsContent,
+    CmsContentSlot,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

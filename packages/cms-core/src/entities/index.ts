@@ -3,6 +3,10 @@ export * from './CmsTemplate.entity.js';
 export * from './CmsTemplatePart.entity.js';
 export * from './CmsView.entity.js';
 
+// Content system (WO-P2-IMPLEMENT-CONTENT)
+export * from './CmsContent.entity.js';
+export * from './CmsContentSlot.entity.js';
+
 // Custom Post Types
 export * from './CmsCptType.entity.js';
 export * from './CmsCptField.entity.js';

@@ -13,6 +13,7 @@ import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmOrder } from '../entities/glycopharm-order.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
+import { CmsContent } from '@o4o-apps/cms-core';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -157,11 +158,34 @@ export function createOperatorController(
           tablet: { active: 0, pending: 0, inactive: 0 },
         };
 
-        // === Content Status (Empty - no entity) ===
+        // === Content Status (WO-P2-IMPLEMENT-CONTENT: Real CMS data) ===
+        const contentRepo = dataSource.getRepository(CmsContent);
+        const serviceKey = 'glycopharm';
+
+        const [
+          heroTotal,
+          heroActive,
+          featuredTotal,
+          featuredOperatorPicked,
+          noticeTotal,
+          noticeActive,
+          eventTotal,
+          eventActive,
+        ] = await Promise.all([
+          contentRepo.count({ where: { serviceKey, type: 'hero' } }),
+          contentRepo.count({ where: { serviceKey, type: 'hero', status: 'published' } }),
+          contentRepo.count({ where: { serviceKey, type: 'featured' } }),
+          contentRepo.count({ where: { serviceKey, type: 'featured', isOperatorPicked: true } }),
+          contentRepo.count({ where: { serviceKey, type: 'notice' } }),
+          contentRepo.count({ where: { serviceKey, type: 'notice', status: 'published' } }),
+          contentRepo.count({ where: { serviceKey, type: 'event' } }),
+          contentRepo.count({ where: { serviceKey, type: 'event', status: 'published' } }),
+        ]);
+
         const contentStatus: ContentStatus = {
-          hero: { total: 0, active: 0 },
-          featured: { total: 0, operatorPicked: 0 },
-          eventNotice: { total: 0, active: 0 },
+          hero: { total: heroTotal, active: heroActive },
+          featured: { total: featuredTotal, operatorPicked: featuredOperatorPicked },
+          eventNotice: { total: noticeTotal + eventTotal, active: noticeActive + eventActive },
         };
 
         // === Trial Status (Empty - no entity) ===

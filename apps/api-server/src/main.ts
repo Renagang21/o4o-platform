@@ -417,6 +417,9 @@ import { createNetureRoutes } from './routes/neture/neture.routes.js';
 // Dropshipping Admin Routes (DS-3)
 import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/dropshipping-admin.routes.js';
 
+// CMS Content Routes (WO-P2-IMPLEMENT-CONTENT)
+import { createCmsContentRoutes } from './routes/cms-content/cms-content.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -719,6 +722,15 @@ const startServer = async () => {
       logger.info('✅ KPA routes registered at /api/v1/kpa');
     } catch (kpaError) {
       logger.error('Failed to register KPA routes:', kpaError);
+    }
+
+    // 32. Register CMS Content routes (WO-P2-IMPLEMENT-CONTENT)
+    try {
+      const cmsContentRoutes = createCmsContentRoutes(AppDataSource);
+      app.use('/api/v1/cms', cmsContentRoutes);
+      logger.info('✅ CMS Content routes registered at /api/v1/cms');
+    } catch (cmsContentError) {
+      logger.error('Failed to register CMS Content routes:', cmsContentError);
     }
 
     // 6. Core routes now registered via dynamic module loader

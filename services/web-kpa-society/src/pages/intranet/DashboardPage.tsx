@@ -10,7 +10,7 @@
  * - 공지/회의 목록
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { IntranetHeader } from '../../components/intranet';
 import {
@@ -29,6 +29,7 @@ import {
   canManageHero,
   canManagePartnerLinks,
 } from '../../types/mainpage';
+import { cmsApi } from '../../api/cms';
 
 interface Notice {
   id: string;
@@ -53,33 +54,50 @@ export function DashboardPage() {
   const userCanManageHero = canManageHero(orgType);
   const userCanManagePartnerLinks = canManagePartnerLinks(orgType);
 
-  // Hero 슬라이드 샘플 데이터
-  const [heroSlides] = useState<HeroSlide[]>([
-    {
-      id: 'hero-1',
-      title: '2025년 신년 인사',
-      subtitle: '새해 복 많이 받으세요. 약사회 회원 여러분의 건승을 기원합니다.',
-      backgroundColor: colors.primary,
-      linkUrl: '/intranet/notice/1',
-      linkText: '인사말 보기',
-      order: 1,
-      isActive: true,
-      createdAt: '2025-01-01',
-      updatedAt: '2025-01-01',
-    },
-    {
-      id: 'hero-2',
-      title: '1월 정기 이사회 개최',
-      subtitle: '2025년 1월 10일 오후 2시, 본회 회의실에서 진행됩니다.',
-      backgroundColor: '#2563eb',
-      linkUrl: '/intranet/meetings/1',
-      linkText: '회의 안내',
-      order: 2,
-      isActive: true,
-      createdAt: '2025-01-03',
-      updatedAt: '2025-01-03',
-    },
-  ]);
+  // WO-P2-IMPLEMENT-CONTENT: Hero 슬라이드 (CMS API 연동)
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
+  const [, setHeroLoading] = useState(true);
+
+  // Hero 슬라이드 로드
+  const loadHeroSlides = useCallback(async () => {
+    try {
+      setHeroLoading(true);
+      const response = await cmsApi.getSlots('intranet-hero', {
+        serviceKey: 'kpa',
+        organizationId: currentOrganization?.id,
+      });
+
+      if (response.success && response.data.length > 0) {
+        setHeroSlides(
+          response.data.map((slot) => ({
+            id: slot.id,
+            title: slot.content?.title || '',
+            subtitle: slot.content?.summary || '',
+            backgroundColor: slot.content?.metadata?.backgroundColor || colors.primary,
+            linkUrl: slot.content?.linkUrl || '',
+            linkText: slot.content?.linkText || '',
+            order: slot.sortOrder,
+            isActive: slot.isActive,
+            createdAt: slot.content?.metadata?.createdAt || '',
+            updatedAt: slot.content?.metadata?.updatedAt || '',
+          }))
+        );
+      } else {
+        // Empty state - no hero content in CMS
+        setHeroSlides([]);
+      }
+    } catch (error) {
+      console.error('Failed to load hero slides:', error);
+      // Empty state on error
+      setHeroSlides([]);
+    } finally {
+      setHeroLoading(false);
+    }
+  }, [currentOrganization?.id]);
+
+  useEffect(() => {
+    loadHeroSlides();
+  }, [loadHeroSlides]);
 
   // 협력업체 샘플 데이터 (지부 전용)
   const [partnerLinks] = useState<PartnerLink[]>([
@@ -181,12 +199,47 @@ export function DashboardPage() {
     loadNews();
   }, []);
 
-  // 샘플 데이터 - 최근 공지
-  const [notices] = useState<Notice[]>([
-    { id: '1', title: '2025년 신년 인사', createdAt: '2025-01-01', isPinned: true },
-    { id: '2', title: '1월 정기회의 안내', createdAt: '2025-01-03', isPinned: true },
-    { id: '3', title: '연회비 납부 안내', createdAt: '2025-01-02', isPinned: false },
-  ]);
+  // WO-P2-IMPLEMENT-CONTENT: 최근 공지 (CMS API 연동)
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [, setNoticesLoading] = useState(true);
+
+  // 공지사항 로드
+  const loadNotices = useCallback(async () => {
+    try {
+      setNoticesLoading(true);
+      const response = await cmsApi.getContents({
+        serviceKey: 'kpa',
+        organizationId: currentOrganization?.id,
+        type: 'notice',
+        status: 'published',
+        limit: 5,
+      });
+
+      if (response.success && response.data.length > 0) {
+        setNotices(
+          response.data.map((content) => ({
+            id: content.id,
+            title: content.title,
+            createdAt: content.createdAt.split('T')[0],
+            isPinned: content.isPinned,
+          }))
+        );
+      } else {
+        // Empty state - no notices in CMS
+        setNotices([]);
+      }
+    } catch (error) {
+      console.error('Failed to load notices:', error);
+      // Empty state on error
+      setNotices([]);
+    } finally {
+      setNoticesLoading(false);
+    }
+  }, [currentOrganization?.id]);
+
+  useEffect(() => {
+    loadNotices();
+  }, [loadNotices]);
 
   // 샘플 데이터 - 다가오는 회의
   const [meetings] = useState<Meeting[]>([
