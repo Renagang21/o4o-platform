@@ -16,6 +16,7 @@ import { createOrderController } from './controllers/order.controller.js';
 import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
+import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 
 // Domain controllers - Forum
@@ -149,6 +150,27 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requireGlycopharmScope
   );
   router.use('/pharmacy/cockpit', cockpitController);
+
+  // Pharmacy-specific routes (products, orders, customers, categories)
+  const pharmacyController = createPharmacyController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/pharmacy', pharmacyController);
+
+  // B2B products routes
+  const b2bController = createB2BController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/b2b', b2bController);
+
+  // Market trials routes
+  const marketTrialsController = createMarketTrialsController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/market-trials', marketTrialsController);
 
   // Signage routes (채널, 내 사이니지 편성)
   const signageController = createSignageController(

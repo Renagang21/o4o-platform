@@ -159,6 +159,38 @@ export function createSignageController(
   });
 
   /**
+   * GET /signage/contents
+   * 사이니지 콘텐츠 목록 조회
+   */
+  router.get('/contents', requireAuth, async (_req: Request, res: Response): Promise<void> => {
+    try {
+      // Return available contents from DisplayMedia
+      const media = await mediaRepo.find({
+        order: { created_at: 'DESC' },
+        take: 50,
+      });
+
+      const contents = media.map((m) => ({
+        id: m.id,
+        title: m.name,
+        type: 'video' as const,
+        source: m.source_type,
+        sourceName: m.source_type === 'youtube' ? 'YouTube' : m.source_type,
+        duration: m.duration || undefined,
+        thumbnailUrl: m.thumbnail_url || undefined,
+        isForced: false,
+      }));
+
+      res.json({ success: true, data: contents });
+    } catch (error: any) {
+      console.error('Failed to get signage contents:', error);
+      res.status(500).json({
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
    * PUT /signage/my-signage
    * 내 사이니지 편성 저장
    */
