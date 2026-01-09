@@ -7,6 +7,15 @@ export * from './CmsView.entity.js';
 export * from './CmsContent.entity.js';
 export * from './CmsContentSlot.entity.js';
 
+// Channel system (WO-P4-CHANNEL-IMPLEMENT-P0)
+export * from './Channel.entity.js';
+
+// Channel Playback Logging (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
+export * from './ChannelPlaybackLog.entity.js';
+
+// Channel Heartbeat (WO-P5-CHANNEL-HEARTBEAT-P1)
+export * from './ChannelHeartbeat.entity.js';
+
 // Custom Post Types
 export * from './CmsCptType.entity.js';
 export * from './CmsCptField.entity.js';

@@ -420,6 +420,21 @@ import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/drops
 // CMS Content Routes (WO-P2-IMPLEMENT-CONTENT)
 import { createCmsContentRoutes } from './routes/cms-content/cms-content.routes.js';
 
+// Channel Routes (WO-P4-CHANNEL-IMPLEMENT-P0)
+import { createChannelRoutes } from './routes/channels/channels.routes.js';
+
+// Admin Channel Playback Logs Routes (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
+import { createAdminPlaybackLogRoutes } from './routes/admin/channel-playback-logs.routes.js';
+
+// Admin Channel Heartbeat Routes (WO-P5-CHANNEL-HEARTBEAT-P1)
+import { createAdminHeartbeatRoutes } from './routes/admin/channel-heartbeat.routes.js';
+
+// Admin Channel Ops Routes (WO-P6-CHANNEL-OPS-DASHBOARD-P0)
+import { createAdminChannelOpsRoutes } from './routes/admin/channel-ops.routes.js';
+
+// Admin Ops Metrics Routes (WO-NEXT-OPS-METRICS-P0)
+import { createAdminOpsMetricsRoutes } from './routes/admin/ops-metrics.routes.js';
+
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
@@ -731,6 +746,51 @@ const startServer = async () => {
       logger.info('✅ CMS Content routes registered at /api/v1/cms');
     } catch (cmsContentError) {
       logger.error('Failed to register CMS Content routes:', cmsContentError);
+    }
+
+    // 33. Register Channel routes (WO-P4-CHANNEL-IMPLEMENT-P0)
+    try {
+      const channelRoutes = createChannelRoutes(AppDataSource);
+      app.use('/api/v1/channels', channelRoutes);
+      logger.info('✅ Channel routes registered at /api/v1/channels');
+    } catch (channelError) {
+      logger.error('Failed to register Channel routes:', channelError);
+    }
+
+    // 34. Register Admin Channel Playback Logs routes (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
+    try {
+      const adminPlaybackLogRoutes = createAdminPlaybackLogRoutes(AppDataSource);
+      app.use('/api/v1/admin/channel-playback-logs', adminPlaybackLogRoutes);
+      logger.info('✅ Admin Playback Log routes registered at /api/v1/admin/channel-playback-logs');
+    } catch (playbackLogError) {
+      logger.error('Failed to register Admin Playback Log routes:', playbackLogError);
+    }
+
+    // 35. Register Admin Channel Heartbeat routes (WO-P5-CHANNEL-HEARTBEAT-P1)
+    try {
+      const adminHeartbeatRoutes = createAdminHeartbeatRoutes(AppDataSource);
+      app.use('/api/v1/admin/channels/heartbeat', adminHeartbeatRoutes);
+      logger.info('✅ Admin Heartbeat routes registered at /api/v1/admin/channels/heartbeat');
+    } catch (heartbeatError) {
+      logger.error('Failed to register Admin Heartbeat routes:', heartbeatError);
+    }
+
+    // 36. Register Admin Channel Ops routes (WO-P6-CHANNEL-OPS-DASHBOARD-P0)
+    try {
+      const adminChannelOpsRoutes = createAdminChannelOpsRoutes(AppDataSource);
+      app.use('/api/v1/admin/channels/ops', adminChannelOpsRoutes);
+      logger.info('✅ Admin Channel Ops routes registered at /api/v1/admin/channels/ops');
+    } catch (channelOpsError) {
+      logger.error('Failed to register Admin Channel Ops routes:', channelOpsError);
+    }
+
+    // 37. Register Admin Ops Metrics routes (WO-NEXT-OPS-METRICS-P0)
+    try {
+      const adminOpsMetricsRoutes = createAdminOpsMetricsRoutes(AppDataSource);
+      app.use('/api/v1/admin/ops', adminOpsMetricsRoutes);
+      logger.info('✅ Admin Ops Metrics routes registered at /api/v1/admin/ops');
+    } catch (opsMetricsError) {
+      logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
     }
 
     // 6. Core routes now registered via dynamic module loader

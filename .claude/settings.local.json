@@ -335,7 +335,10 @@
       "Bash(taskkill:*)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20804952821 -R Renagang21/o4o-platform)",
       "Bash(docker pull:*)",
-      "Bash(docker run:*)"
+      "Bash(docker run:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20816178670 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20818659864 -R Renagang21/o4o-platform)",
+      "Bash(export NODE_OPTIONS=\"--max-old-space-size=8192\")"
     ],
     "deny": []
   }

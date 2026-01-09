@@ -4,6 +4,7 @@
  * WO-P2-IMPLEMENT-CONTENT: Read-only API endpoints for CMS content
  * WO-P3-CMS-ADMIN-CRUD-P0: CRUD endpoints for admin content management
  * WO-P3-CMS-SLOT-MANAGEMENT-P1: Slot CRUD and content assignment
+ * WO-P7-CMS-SLOT-LOCK-P1: Slot lock fields for edit restrictions
  *
  * Content Endpoints:
  * - GET /api/v1/cms/stats - Content statistics (for dashboards)
@@ -175,6 +176,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
           isActive: slot.isActive,
           startsAt: slot.startsAt,
           endsAt: slot.endsAt,
+          // Lock fields (WO-P7-CMS-SLOT-LOCK-P1)
+          isLocked: slot.isLocked,
+          lockedBy: slot.lockedBy,
+          lockedReason: slot.lockedReason,
+          lockedUntil: slot.lockedUntil,
           content: slot.content ? {
             id: slot.content.id,
             type: slot.content.type,
@@ -609,6 +615,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
           isActive: slot.isActive,
           startsAt: slot.startsAt,
           endsAt: slot.endsAt,
+          // Lock fields (WO-P7-CMS-SLOT-LOCK-P1)
+          isLocked: slot.isLocked,
+          lockedBy: slot.lockedBy,
+          lockedReason: slot.lockedReason,
+          lockedUntil: slot.lockedUntil,
           createdAt: slot.createdAt,
           updatedAt: slot.updatedAt,
         })),
@@ -700,6 +711,9 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
   /**
    * PUT /cms/slots/:id
    * Update a slot (admin only)
+   *
+   * WO-P7-CMS-SLOT-LOCK-P1: Locked slots cannot be edited
+   * Lock fields can only be modified by platform admins (future enhancement)
    */
   router.put('/slots/:id', requireAdmin, async (req: Request, res: Response): Promise<void> => {
     try {
@@ -712,6 +726,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         isActive,
         startsAt,
         endsAt,
+        // Lock fields - platform admin only
+        isLocked,
+        lockedBy,
+        lockedReason,
+        lockedUntil,
       } = req.body;
 
       const slotRepo = dataSource.getRepository(CmsContentSlot);
@@ -721,6 +740,28 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Slot not found' },
+        });
+        return;
+      }
+
+      // WO-P7-CMS-SLOT-LOCK-P1: Check if slot is locked
+      // If locked, only allow lock field modifications (platform admin override)
+      const isModifyingLockFields = isLocked !== undefined || lockedBy !== undefined ||
+                                     lockedReason !== undefined || lockedUntil !== undefined;
+      const isModifyingContentFields = slotKey !== undefined || serviceKey !== undefined ||
+                                        contentId !== undefined || sortOrder !== undefined ||
+                                        isActive !== undefined || startsAt !== undefined ||
+                                        endsAt !== undefined;
+
+      if (slot.isLocked && isModifyingContentFields && !isModifyingLockFields) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'SLOT_LOCKED',
+            message: slot.lockedReason || 'This slot is locked and cannot be edited',
+            lockedBy: slot.lockedBy,
+            lockedUntil: slot.lockedUntil,
+          },
         });
         return;
       }
@@ -747,6 +788,12 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       if (startsAt !== undefined) slot.startsAt = startsAt ? new Date(startsAt) : null;
       if (endsAt !== undefined) slot.endsAt = endsAt ? new Date(endsAt) : null;
 
+      // Lock fields (platform admin)
+      if (isLocked !== undefined) slot.isLocked = isLocked;
+      if (lockedBy !== undefined) slot.lockedBy = lockedBy;
+      if (lockedReason !== undefined) slot.lockedReason = lockedReason;
+      if (lockedUntil !== undefined) slot.lockedUntil = lockedUntil ? new Date(lockedUntil) : null;
+
       await slotRepo.save(slot);
 
       // Reload with content relation
@@ -771,6 +818,8 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
   /**
    * DELETE /cms/slots/:id
    * Delete a slot (admin only)
+   *
+   * WO-P7-CMS-SLOT-LOCK-P1: Locked slots cannot be deleted
    */
   router.delete('/slots/:id', requireAdmin, async (req: Request, res: Response): Promise<void> => {
     try {
@@ -782,6 +831,20 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Slot not found' },
+        });
+        return;
+      }
+
+      // WO-P7-CMS-SLOT-LOCK-P1: Check if slot is locked
+      if (slot.isLocked) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'SLOT_LOCKED',
+            message: slot.lockedReason || 'This slot is locked and cannot be deleted',
+            lockedBy: slot.lockedBy,
+            lockedUntil: slot.lockedUntil,
+          },
         });
         return;
       }

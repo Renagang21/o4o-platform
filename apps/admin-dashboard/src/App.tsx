@@ -268,6 +268,15 @@ const CMSContentList = lazy(() => import('@/pages/cms/contents/CMSContentList'))
 // CMS Slot Management (P3: WO-P3-CMS-SLOT-MANAGEMENT-P1)
 const CMSSlotList = lazy(() => import('@/pages/cms/slots/CMSSlotList'));
 
+// CMS Channel Management (P4: WO-P4-CHANNEL-IMPLEMENT-P0)
+const ChannelList = lazy(() => import('@/pages/cms/channels/ChannelList'));
+
+// Channel Operations Dashboard (P6: WO-P6-CHANNEL-OPS-DASHBOARD-P0)
+const ChannelOpsDashboard = lazy(() => import('@/pages/channels/ops/ChannelOpsDashboard'));
+
+// Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0)
+const OpsMetricsDashboard = lazy(() => import('@/pages/ops/OpsMetricsDashboard'));
+
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
@@ -939,6 +948,33 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <CMSSlotList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CMS Channel Routes (P4: WO-P4-CHANNEL-IMPLEMENT-P0) */}
+                    <Route path="/admin/cms/channels" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ChannelList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Channel Operations Dashboard (P6: WO-P6-CHANNEL-OPS-DASHBOARD-P0) */}
+                    <Route path="/admin/cms/channels/ops" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ChannelOpsDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0) */}
+                    <Route path="/admin/ops/metrics" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OpsMetricsDashboard />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

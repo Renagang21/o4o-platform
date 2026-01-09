@@ -2,12 +2,14 @@
  * CMS Slot List Page
  *
  * WO-P3-CMS-SLOT-MANAGEMENT-P1: Admin UI for managing content slots
+ * WO-P7-CMS-SLOT-LOCK-P1: Lock status display and edit restrictions
  *
  * Features:
  * - List all slots grouped by slotKey
  * - Filter by service and active status
  * - Create/Edit/Delete slots
  * - Assign contents to slots
+ * - Display lock status for contract-bound slots
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -23,6 +25,8 @@ import {
   ChevronDown,
   ChevronRight,
   Layers,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import cmsAPI, { CmsContentSlot } from '@/lib/cms';
 import toast from 'react-hot-toast';
@@ -131,6 +135,12 @@ export default function CMSSlotList() {
   };
 
   const handleDelete = async (slot: CmsContentSlot) => {
+    // WO-P7-CMS-SLOT-LOCK-P1: Check if slot is locked
+    if ((slot as any).isLocked) {
+      toast.error((slot as any).lockedReason || 'This slot is locked and cannot be deleted');
+      return;
+    }
+
     if (!confirm(`Delete this slot assignment? (Content will not be deleted)`)) {
       return;
     }
@@ -139,20 +149,36 @@ export default function CMSSlotList() {
       await cmsAPI.deleteSlot(slot.id);
       toast.success('Slot deleted successfully');
       loadSlots();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete slot:', error);
-      toast.error('Failed to delete slot');
+      // Handle SLOT_LOCKED error from API
+      if (error?.response?.data?.error?.code === 'SLOT_LOCKED') {
+        toast.error(error.response.data.error.message);
+      } else {
+        toast.error('Failed to delete slot');
+      }
     }
   };
 
   const handleToggleActive = async (slot: CmsContentSlot) => {
+    // WO-P7-CMS-SLOT-LOCK-P1: Check if slot is locked
+    if ((slot as any).isLocked) {
+      toast.error((slot as any).lockedReason || 'This slot is locked and cannot be modified');
+      return;
+    }
+
     try {
       await cmsAPI.updateSlot(slot.id, { isActive: !slot.isActive });
       toast.success(`Slot ${slot.isActive ? 'deactivated' : 'activated'}`);
       loadSlots();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to toggle slot:', error);
-      toast.error('Failed to update slot');
+      // Handle SLOT_LOCKED error from API
+      if (error?.response?.data?.error?.code === 'SLOT_LOCKED') {
+        toast.error(error.response.data.error.message);
+      } else {
+        toast.error('Failed to update slot');
+      }
     }
   };
 
@@ -314,11 +340,25 @@ export default function CMSSlotList() {
               {/* Group Contents */}
               {group.isExpanded && (
                 <ul className="divide-y divide-gray-200">
-                  {group.slots.map((slot) => (
-                    <li key={slot.id} className="px-4 py-3">
+                  {group.slots.map((slot) => {
+                    // WO-P7-CMS-SLOT-LOCK-P1: Check lock status
+                    const isLocked = (slot as any).isLocked;
+                    const lockedBy = (slot as any).lockedBy;
+                    const lockedReason = (slot as any).lockedReason;
+                    const lockedUntil = (slot as any).lockedUntil;
+
+                    return (
+                    <li key={slot.id} className={`px-4 py-3 ${isLocked ? 'bg-amber-50' : ''}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
+                            {/* Lock Icon (WO-P7-CMS-SLOT-LOCK-P1) */}
+                            {isLocked && (
+                              <Lock
+                                className="w-4 h-4 text-amber-600 flex-shrink-0"
+                                title={lockedReason || 'Locked slot'}
+                              />
+                            )}
                             <span className="text-sm font-medium text-gray-900 truncate">
                               {slot.content?.title || 'No content'}
                             </span>
@@ -332,23 +372,44 @@ export default function CMSSlotList() {
                                 {slot.serviceKey}
                               </span>
                             )}
+                            {/* Lock Badge */}
+                            {isLocked && (
+                              <span className="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-700">
+                                {lockedBy === 'contract' ? 'Contract' : 'Locked'}
+                              </span>
+                            )}
                           </div>
                           <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
                             <span>Order: {slot.sortOrder}</span>
                             {slot.startsAt && <span>Starts: {formatDate(slot.startsAt)}</span>}
                             {slot.endsAt && <span>Ends: {formatDate(slot.endsAt)}</span>}
+                            {/* Lock Until (WO-P7-CMS-SLOT-LOCK-P1) */}
+                            {isLocked && lockedUntil && (
+                              <span className="text-amber-600">
+                                Locked until: {formatDate(lockedUntil)}
+                              </span>
+                            )}
                           </div>
+                          {/* Lock Reason (WO-P7-CMS-SLOT-LOCK-P1) */}
+                          {isLocked && lockedReason && (
+                            <div className="mt-1 text-xs text-amber-700">
+                              {lockedReason}
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                           {/* Active Toggle */}
                           <button
                             onClick={() => handleToggleActive(slot)}
+                            disabled={isLocked}
                             className={`p-1.5 rounded ${
-                              slot.isActive
+                              isLocked
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : slot.isActive
                                 ? 'text-green-600 hover:bg-green-50'
                                 : 'text-gray-400 hover:bg-gray-50'
                             }`}
-                            title={slot.isActive ? 'Deactivate' : 'Activate'}
+                            title={isLocked ? 'Locked - cannot toggle' : slot.isActive ? 'Deactivate' : 'Activate'}
                           >
                             {slot.isActive ? (
                               <ToggleRight className="w-5 h-5" />
@@ -360,8 +421,13 @@ export default function CMSSlotList() {
                           {/* Edit */}
                           <button
                             onClick={() => handleEdit(slot)}
-                            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded"
-                            title="Edit"
+                            disabled={isLocked}
+                            className={`p-1.5 rounded ${
+                              isLocked
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                            }`}
+                            title={isLocked ? 'Locked - cannot edit' : 'Edit'}
                           >
                             <Edit className="w-4 h-4" />
                           </button>
@@ -369,15 +435,20 @@ export default function CMSSlotList() {
                           {/* Delete */}
                           <button
                             onClick={() => handleDelete(slot)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
-                            title="Delete"
+                            disabled={isLocked}
+                            className={`p-1.5 rounded ${
+                              isLocked
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                            }`}
+                            title={isLocked ? 'Locked - cannot delete' : 'Delete'}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
                     </li>
-                  ))}
+                  )})}
                 </ul>
               )}
             </div>

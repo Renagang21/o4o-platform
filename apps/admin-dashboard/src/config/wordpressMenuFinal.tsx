@@ -152,6 +152,18 @@ export const wordpressMenuItems: MenuItem[] = [
         path: '/admin/cms/slots',
       },
       {
+        id: 'cms-channels',
+        label: 'Channels',
+        icon: <Monitor className="w-4 h-4" />,
+        path: '/admin/cms/channels',
+      },
+      {
+        id: 'cms-channel-ops',
+        label: 'Channel Ops',
+        icon: <Activity className="w-4 h-4" />,
+        path: '/admin/cms/channels/ops',
+      },
+      {
         id: 'cms-cpts',
         label: 'Post Types',
         icon: <FileText className="w-4 h-4" />,
@@ -411,6 +423,15 @@ export const wordpressMenuItems: MenuItem[] = [
     label: 'Insights',
     icon: <TrendingUp className="w-5 h-5" />,
     separator: true,
+    roles: ['admin', 'super_admin'],
+  },
+
+  // Ops Metrics (WO-NEXT-OPS-METRICS-P0)
+  {
+    id: 'ops-metrics',
+    label: 'Ops Metrics',
+    icon: <Activity className="w-5 h-5" />,
+    path: '/admin/ops/metrics',
     roles: ['admin', 'super_admin'],
   },
 

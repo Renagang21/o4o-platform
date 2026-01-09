@@ -176,7 +176,7 @@ import { Organization, OrganizationMember } from '@o4o/organization-core';
 // ============================================================================
 // CMS-CORE CONTENT ENTITIES (WO-P2-IMPLEMENT-CONTENT)
 // ============================================================================
-import { CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
+import { CmsContent, CmsContentSlot, Channel, ChannelPlaybackLog, ChannelHeartbeat } from '@o4o-apps/cms-core';
 
 // ============================================================================
 // LMS-CORE ENTITIES (Re-added for KPA LMS routes)
@@ -434,6 +434,18 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CmsContent,
     CmsContentSlot,
+    // ============================================================================
+    // CHANNEL ENTITY (WO-P4-CHANNEL-IMPLEMENT-P0)
+    // ============================================================================
+    Channel,
+    // ============================================================================
+    // CHANNEL PLAYBACK LOG (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
+    // ============================================================================
+    ChannelPlaybackLog,
+    // ============================================================================
+    // CHANNEL HEARTBEAT (WO-P5-CHANNEL-HEARTBEAT-P1)
+    // ============================================================================
+    ChannelHeartbeat,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
