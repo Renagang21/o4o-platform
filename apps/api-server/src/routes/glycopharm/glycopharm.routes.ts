@@ -15,6 +15,7 @@ import { createAdminController } from './controllers/admin.controller.js';
 import { createOrderController } from './controllers/order.controller.js';
 import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createSignageController } from './controllers/signage.controller.js';
+import { createOperatorController } from './controllers/operator.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 
 // Domain controllers - Forum
@@ -155,6 +156,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/signage', signageController);
+
+  // Operator Dashboard routes (WO-GLYCOPHARM-DASHBOARD-P1-A)
+  const operatorController = createOperatorController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/operator', operatorController);
 
   return router;
 }

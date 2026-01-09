@@ -6,8 +6,11 @@
  * - 각 블록에서 바로 관리 UI로 점프 가능
  * - 숫자 + 상태 아이콘 + 점프 링크
  * - 그래프 없음, 상세 리스트 없음
+ *
+ * WO-GLYCOPHARM-DASHBOARD-P1-A: Real database queries
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Activity,
@@ -28,48 +31,56 @@ import {
   ChevronRight,
   FileText,
   ArrowUpRight,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
+import { glycopharmApi, type OperatorDashboardData } from '@/api/glycopharm';
 
-// ===== Mock Data =====
-// 실제로는 API에서 가져옴
-
-const SERVICE_STATUS = {
-  activePharmacies: 2450,
-  approvedStores: 187,
-  warnings: 3,
-  lastUpdated: '2024-01-15T14:30:00',
-};
-
-const STORE_STATUS = {
-  pendingApprovals: 4,
-  supplementRequests: 2,
-  activeStores: 187,
-  inactiveStores: 12,
-};
-
-const CHANNEL_STATUS = {
-  web: { active: 156, pending: 8, inactive: 23 },
-  kiosk: { active: 45, pending: 3, inactive: 12 },
-  tablet: { active: 89, pending: 5, inactive: 15 },
-};
-
-const CONTENT_STATUS = {
-  hero: { total: 8, active: 3 },
-  featured: { total: 24, operatorPicked: 6 },
-  eventNotice: { total: 15, active: 8 },
-};
-
-const TRIAL_STATUS = {
-  activeTrials: 5,
-  connectedPharmacies: 234,
-  pendingConnections: 12,
-};
-
-const FORUM_STATUS = {
-  open: 12,
-  readonly: 3,
-  closed: 5,
-  totalPosts: 1245,
+// Default empty data (no mock values)
+const EMPTY_DASHBOARD_DATA: OperatorDashboardData = {
+  serviceStatus: {
+    activePharmacies: 0,
+    approvedStores: 0,
+    warnings: 0,
+    lastUpdated: new Date().toISOString(),
+  },
+  storeStatus: {
+    pendingApprovals: 0,
+    supplementRequests: 0,
+    activeStores: 0,
+    inactiveStores: 0,
+  },
+  channelStatus: {
+    web: { active: 0, pending: 0, inactive: 0 },
+    kiosk: { active: 0, pending: 0, inactive: 0 },
+    tablet: { active: 0, pending: 0, inactive: 0 },
+  },
+  contentStatus: {
+    hero: { total: 0, active: 0 },
+    featured: { total: 0, operatorPicked: 0 },
+    eventNotice: { total: 0, active: 0 },
+  },
+  trialStatus: {
+    activeTrials: 0,
+    connectedPharmacies: 0,
+    pendingConnections: 0,
+  },
+  forumStatus: {
+    open: 0,
+    readonly: 0,
+    closed: 0,
+    totalPosts: 0,
+  },
+  productStats: {
+    total: 0,
+    active: 0,
+    draft: 0,
+  },
+  orderStats: {
+    totalOrders: 0,
+    paidOrders: 0,
+    totalRevenue: 0,
+  },
 };
 
 // ===== Status Badge Component =====
@@ -191,8 +202,58 @@ function CockpitBlock({
 
 // ===== Main Component =====
 export default function OperatorDashboard() {
-  const hasWarnings = SERVICE_STATUS.warnings > 0;
-  const hasPendingApprovals = STORE_STATUS.pendingApprovals > 0;
+  const [dashboardData, setDashboardData] = useState<OperatorDashboardData>(EMPTY_DASHBOARD_DATA);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDashboardData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await glycopharmApi.getOperatorDashboard();
+      if (response.success && response.data) {
+        setDashboardData(response.data);
+      } else {
+        setDashboardData(EMPTY_DASHBOARD_DATA);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch operator dashboard:', err);
+      // Show empty state on error (per WO-GLYCOPHARM-DASHBOARD-P1-A requirements)
+      setError(err?.message || '데이터를 불러올 수 없습니다');
+      setDashboardData(EMPTY_DASHBOARD_DATA);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  // Destructure dashboard data for easier access
+  const {
+    serviceStatus,
+    storeStatus,
+    channelStatus,
+    contentStatus,
+    trialStatus,
+    forumStatus,
+  } = dashboardData;
+
+  const hasWarnings = serviceStatus.warnings > 0;
+  const hasPendingApprovals = storeStatus.pendingApprovals > 0;
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+          <p className="text-slate-500 text-sm">대시보드 로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -202,10 +263,31 @@ export default function OperatorDashboard() {
           <h1 className="text-2xl font-bold text-slate-800">운영자 Cockpit</h1>
           <p className="text-slate-500 text-sm">GlycoPharm 서비스 현황 관제</p>
         </div>
-        <div className="text-xs text-slate-400">
-          마지막 업데이트: {new Date(SERVICE_STATUS.lastUpdated).toLocaleString('ko-KR')}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchDashboardData}
+            className="flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 transition-colors"
+            disabled={isLoading}
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            새로고침
+          </button>
+          <div className="text-xs text-slate-400">
+            마지막 업데이트: {new Date(serviceStatus.lastUpdated).toLocaleString('ko-KR')}
+          </div>
         </div>
       </div>
+
+      {/* Error Banner (if any) */}
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">{error}</p>
+            <p className="text-xs text-amber-600">빈 데이터로 표시됩니다.</p>
+          </div>
+        </div>
+      )}
 
       {/* Block 1: Service Status Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-6 text-white">
@@ -213,21 +295,21 @@ export default function OperatorDashboard() {
           <Activity className="w-6 h-6" />
           <h2 className="text-lg font-semibold">서비스 상태</h2>
           {hasWarnings && (
-            <StatusBadge status="warning" count={SERVICE_STATUS.warnings} />
+            <StatusBadge status="warning" count={serviceStatus.warnings} />
           )}
         </div>
         <div className="grid grid-cols-3 gap-6">
           <div>
-            <p className="text-3xl font-bold">{SERVICE_STATUS.activePharmacies.toLocaleString()}</p>
+            <p className="text-3xl font-bold">{serviceStatus.activePharmacies.toLocaleString()}</p>
             <p className="text-primary-200 text-sm">활성 약국</p>
           </div>
           <div>
-            <p className="text-3xl font-bold">{SERVICE_STATUS.approvedStores}</p>
+            <p className="text-3xl font-bold">{serviceStatus.approvedStores}</p>
             <p className="text-primary-200 text-sm">승인된 스토어</p>
           </div>
           <div>
             <p className="text-3xl font-bold flex items-center gap-2">
-              {SERVICE_STATUS.warnings}
+              {serviceStatus.warnings}
               {hasWarnings && <AlertTriangle className="w-5 h-5 text-amber-300" />}
             </p>
             <p className="text-primary-200 text-sm">주의 항목</p>
@@ -246,19 +328,19 @@ export default function OperatorDashboard() {
           jumpLabel="승인 관리"
           alert={
             hasPendingApprovals
-              ? { type: 'warning', message: `승인 대기 ${STORE_STATUS.pendingApprovals}건` }
+              ? { type: 'warning', message: `승인 대기 ${storeStatus.pendingApprovals}건` }
               : undefined
           }
         >
           <div className="space-y-1">
-            <StatItem label="승인 대기" value={STORE_STATUS.pendingApprovals} status={hasPendingApprovals ? 'warning' : 'success'} />
-            <StatItem label="보완 요청" value={STORE_STATUS.supplementRequests} status={STORE_STATUS.supplementRequests > 0 ? 'info' : 'neutral'} />
-            <StatItem label="운영 중" value={STORE_STATUS.activeStores} />
-            <StatItem label="비활성" value={STORE_STATUS.inactiveStores} />
+            <StatItem label="승인 대기" value={storeStatus.pendingApprovals} status={hasPendingApprovals ? 'warning' : 'success'} />
+            <StatItem label="보완 요청" value={storeStatus.supplementRequests} status={storeStatus.supplementRequests > 0 ? 'info' : 'neutral'} />
+            <StatItem label="운영 중" value={storeStatus.activeStores} />
+            <StatItem label="비활성" value={storeStatus.inactiveStores} />
           </div>
         </CockpitBlock>
 
-        {/* Block 3: Channel Status */}
+        {/* Block 3: Channel Status (Empty state - no channel entity) */}
         <CockpitBlock
           title="채널 상태"
           icon={Monitor}
@@ -271,13 +353,13 @@ export default function OperatorDashboard() {
               <span className="text-sm text-slate-600 w-12">Web</span>
               <div className="flex-1 flex items-center gap-2 text-xs">
                 <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
-                  {CHANNEL_STATUS.web.active} 활성
+                  {channelStatus.web.active} 활성
                 </span>
                 <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
-                  {CHANNEL_STATUS.web.pending} 대기
+                  {channelStatus.web.pending} 대기
                 </span>
                 <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
-                  {CHANNEL_STATUS.web.inactive} 비활성
+                  {channelStatus.web.inactive} 비활성
                 </span>
               </div>
             </div>
@@ -287,13 +369,13 @@ export default function OperatorDashboard() {
               <span className="text-sm text-slate-600 w-12">Kiosk</span>
               <div className="flex-1 flex items-center gap-2 text-xs">
                 <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
-                  {CHANNEL_STATUS.kiosk.active} 활성
+                  {channelStatus.kiosk.active} 활성
                 </span>
                 <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
-                  {CHANNEL_STATUS.kiosk.pending} 대기
+                  {channelStatus.kiosk.pending} 대기
                 </span>
                 <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
-                  {CHANNEL_STATUS.kiosk.inactive} 비활성
+                  {channelStatus.kiosk.inactive} 비활성
                 </span>
               </div>
             </div>
@@ -303,20 +385,20 @@ export default function OperatorDashboard() {
               <span className="text-sm text-slate-600 w-12">Tablet</span>
               <div className="flex-1 flex items-center gap-2 text-xs">
                 <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
-                  {CHANNEL_STATUS.tablet.active} 활성
+                  {channelStatus.tablet.active} 활성
                 </span>
                 <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
-                  {CHANNEL_STATUS.tablet.pending} 대기
+                  {channelStatus.tablet.pending} 대기
                 </span>
                 <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
-                  {CHANNEL_STATUS.tablet.inactive} 비활성
+                  {channelStatus.tablet.inactive} 비활성
                 </span>
               </div>
             </div>
           </div>
         </CockpitBlock>
 
-        {/* Block 4: Content Status */}
+        {/* Block 4: Content Status (Empty state - no content entity) */}
         <CockpitBlock
           title="콘텐츠 상태"
           icon={FileText}
@@ -333,9 +415,9 @@ export default function OperatorDashboard() {
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
-                  {CONTENT_STATUS.hero.active} 활성
+                  {contentStatus.hero.active} 활성
                 </span>
-                <span className="text-slate-400">/ {CONTENT_STATUS.hero.total}</span>
+                <span className="text-slate-400">/ {contentStatus.hero.total}</span>
               </div>
             </div>
             {/* Featured */}
@@ -346,9 +428,9 @@ export default function OperatorDashboard() {
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <span className="px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">
-                  {CONTENT_STATUS.featured.operatorPicked} 운영자 지정
+                  {contentStatus.featured.operatorPicked} 운영자 지정
                 </span>
-                <span className="text-slate-400">/ {CONTENT_STATUS.featured.total}</span>
+                <span className="text-slate-400">/ {contentStatus.featured.total}</span>
               </div>
             </div>
             {/* Event/Notice */}
@@ -359,15 +441,15 @@ export default function OperatorDashboard() {
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
-                  {CONTENT_STATUS.eventNotice.active} 활성
+                  {contentStatus.eventNotice.active} 활성
                 </span>
-                <span className="text-slate-400">/ {CONTENT_STATUS.eventNotice.total}</span>
+                <span className="text-slate-400">/ {contentStatus.eventNotice.total}</span>
               </div>
             </div>
           </div>
         </CockpitBlock>
 
-        {/* Block 5: Market Trial Status */}
+        {/* Block 5: Market Trial Status (Empty state - no trial entity) */}
         <CockpitBlock
           title="Market Trial"
           icon={Beaker}
@@ -376,17 +458,17 @@ export default function OperatorDashboard() {
           jumpLabel="Trial 관리"
         >
           <div className="space-y-1">
-            <StatItem label="진행 중 Trial" value={TRIAL_STATUS.activeTrials} />
-            <StatItem label="연결된 약국" value={TRIAL_STATUS.connectedPharmacies} />
+            <StatItem label="진행 중 Trial" value={trialStatus.activeTrials} />
+            <StatItem label="연결된 약국" value={trialStatus.connectedPharmacies} />
             <StatItem
               label="연결 대기"
-              value={TRIAL_STATUS.pendingConnections}
-              status={TRIAL_STATUS.pendingConnections > 0 ? 'info' : 'neutral'}
+              value={trialStatus.pendingConnections}
+              status={trialStatus.pendingConnections > 0 ? 'info' : 'neutral'}
             />
           </div>
         </CockpitBlock>
 
-        {/* Block 6: Forum Status */}
+        {/* Block 6: Forum Status (Empty state - no glycopharm-specific forum entity) */}
         <CockpitBlock
           title="포럼 상태"
           icon={MessageSquare}
@@ -396,20 +478,20 @@ export default function OperatorDashboard() {
         >
           <div className="grid grid-cols-3 gap-2 mb-3">
             <div className="text-center p-2 bg-green-50 rounded-lg">
-              <p className="text-lg font-bold text-green-700">{FORUM_STATUS.open}</p>
+              <p className="text-lg font-bold text-green-700">{forumStatus.open}</p>
               <p className="text-xs text-green-600">공개</p>
             </div>
             <div className="text-center p-2 bg-amber-50 rounded-lg">
-              <p className="text-lg font-bold text-amber-700">{FORUM_STATUS.readonly}</p>
+              <p className="text-lg font-bold text-amber-700">{forumStatus.readonly}</p>
               <p className="text-xs text-amber-600">읽기전용</p>
             </div>
             <div className="text-center p-2 bg-slate-50 rounded-lg">
-              <p className="text-lg font-bold text-slate-600">{FORUM_STATUS.closed}</p>
+              <p className="text-lg font-bold text-slate-600">{forumStatus.closed}</p>
               <p className="text-xs text-slate-500">비공개</p>
             </div>
           </div>
           <div className="text-center text-sm text-slate-500">
-            총 {FORUM_STATUS.totalPosts.toLocaleString()}개 게시물
+            총 {forumStatus.totalPosts.toLocaleString()}개 게시물
           </div>
         </CockpitBlock>
 

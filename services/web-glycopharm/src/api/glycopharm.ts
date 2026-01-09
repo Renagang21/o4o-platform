@@ -76,6 +76,61 @@ export interface ApiError {
 }
 
 // ============================================================================
+// Operator Dashboard Types (WO-GLYCOPHARM-DASHBOARD-P1-A)
+// ============================================================================
+
+export interface OperatorDashboardData {
+  serviceStatus: {
+    activePharmacies: number;
+    approvedStores: number;
+    warnings: number;
+    lastUpdated: string;
+  };
+  storeStatus: {
+    pendingApprovals: number;
+    supplementRequests: number;
+    activeStores: number;
+    inactiveStores: number;
+  };
+  channelStatus: {
+    web: { active: number; pending: number; inactive: number };
+    kiosk: { active: number; pending: number; inactive: number };
+    tablet: { active: number; pending: number; inactive: number };
+  };
+  contentStatus: {
+    hero: { total: number; active: number };
+    featured: { total: number; operatorPicked: number };
+    eventNotice: { total: number; active: number };
+  };
+  trialStatus: {
+    activeTrials: number;
+    connectedPharmacies: number;
+    pendingConnections: number;
+  };
+  forumStatus: {
+    open: number;
+    readonly: number;
+    closed: number;
+    totalPosts: number;
+  };
+  productStats: {
+    total: number;
+    active: number;
+    draft: number;
+  };
+  orderStats: {
+    totalOrders: number;
+    paidOrders: number;
+    totalRevenue: number;
+  };
+}
+
+export interface OperatorDashboardResponse {
+  success: boolean;
+  data: OperatorDashboardData;
+}
+
+// ============================================================================
 // Admin Types (운영 API)
 // ============================================================================
 
@@ -271,6 +326,17 @@ class GlycopharmApiClient {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
+  }
+
+  // ============================================================================
+  // Operator Dashboard API (WO-GLYCOPHARM-DASHBOARD-P1-A)
+  // ============================================================================
+
+  /**
+   * 운영자 대시보드 통계 조회
+   */
+  async getOperatorDashboard(): Promise<OperatorDashboardResponse> {
+    return this.request('/api/v1/glycopharm/operator/dashboard');
   }
 }
 
