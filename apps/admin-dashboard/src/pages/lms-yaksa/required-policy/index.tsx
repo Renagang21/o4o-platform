@@ -412,14 +412,8 @@ function PolicyFormDialog({
   const [isSaving, setIsSaving] = useState(false);
   const [memberTypeInput, setMemberTypeInput] = useState('');
 
-  // Mock courses for picker - In real app, fetch from LMS API
-  const mockCourses = [
-    { id: 'course-1', title: '약사 보수교육 기초', credits: 2, category: '기초' },
-    { id: 'course-2', title: '의약품 관리', credits: 3, category: '전문' },
-    { id: 'course-3', title: '환자 상담 기법', credits: 2, category: '실무' },
-    { id: 'course-4', title: '약물 상호작용', credits: 4, category: '전문' },
-    { id: 'course-5', title: '법규 및 윤리', credits: 2, category: '기초' },
-  ];
+  // Courses - empty until API integration
+  const courses: Array<{ id: string; title: string; credits: number; category: string }> = [];
 
   useEffect(() => {
     if (policy) {
@@ -512,7 +506,7 @@ function PolicyFormDialog({
           <div>
             <Label>필수 강좌</Label>
             <CoursePicker
-              courses={mockCourses}
+              courses={courses}
               selectedIds={formData.requiredCourseIds || []}
               onSelect={(courseId) =>
                 setFormData({

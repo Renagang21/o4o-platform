@@ -22,62 +22,20 @@ interface VendorReport {
   }[];
 }
 
-const mockReports: VendorReport[] = [
-  {
-    vendorId: '1',
-    vendorName: '김판매',
-    businessName: '프리미엄 건강식품',
-    period: '2024-03',
-    metrics: {
-      totalSales: 15000000,
-      orderCount: 320,
-      averageOrderValue: 46875,
-      productsSold: 45,
-      returnRate: 2.5,
-      customerSatisfaction: 4.8
-    },
-    topProducts: [
-      { id: '1', name: '프로바이오틱스 플러스', sales: 3500000, quantity: 140 },
-      { id: '2', name: '오메가3 프리미엄', sales: 2800000, quantity: 93 },
-      { id: '3', name: '멀티비타민 골드', sales: 2100000, quantity: 87 }
-    ]
-  },
-  {
-    vendorId: '2',
-    vendorName: '이공급',
-    businessName: '오가닉 라이프',
-    period: '2024-03',
-    metrics: {
-      totalSales: 8500000,
-      orderCount: 210,
-      averageOrderValue: 40476,
-      productsSold: 32,
-      returnRate: 1.8,
-      customerSatisfaction: 4.9
-    },
-    topProducts: [
-      { id: '4', name: '유기농 곡물 세트', sales: 2100000, quantity: 70 },
-      { id: '5', name: '천연 꿀 프리미엄', sales: 1800000, quantity: 60 },
-      { id: '6', name: '유기농 견과류 믹스', sales: 1500000, quantity: 50 }
-    ]
-  }
-];
+// Vendor reports - empty until API integration
+const vendorReports: VendorReport[] = [];
 
-
-const categoryPerformance = [
-  { category: '건강기능식품', sales: 8500000, percentage: 56.7 },
-  { category: '유기농 식품', sales: 4200000, percentage: 28 },
-  { category: '뷰티/케어', sales: 2300000, percentage: 15.3 }
-];
+// Category performance - empty until API integration
+const categoryPerformance: Array<{ category: string; sales: number; percentage: number }> = [];
 
 const VendorsReports = () => {
   const [selectedVendor, setSelectedVendor] = useState('all');
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [reportType, setReportType] = useState<'summary' | 'detailed'>('summary');
 
-  const currentReport = selectedVendor === 'all' 
-    ? null 
-    : mockReports.find((r: any) => r.vendorId === selectedVendor);
+  const currentReport = selectedVendor === 'all'
+    ? null
+    : vendorReports.find((r: any) => r.vendorId === selectedVendor);
 
   return (
     <div className="space-y-6">

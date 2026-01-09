@@ -77,18 +77,18 @@ export const useDashboardStats = () => {
 
         // Process sales data for chart (last 30 days)
         const salesChartData = [];
-        // const today = new Date();
-        
+        const today = new Date();
+
         for (let i = 29; i >= 0; i--) {
-          // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+          const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
           const dayData = salesReport.data?.salesByDay?.find(
-            (_d: { date: string; sales: number; orders: number }) => false // Fixed placeholder
+            (d: { date: string; sales: number; orders: number }) => d.date === date.toISOString().split('T')[0]
           );
-          
+
           salesChartData.push({
-            date: '/* date removed */',
-            amount: dayData?.sales || Math.floor(Math.random() * 5000000) + 1000000,
-            orders: dayData?.orders || Math.floor(Math.random() * 50) + 10
+            date: date.toISOString().split('T')[0],
+            amount: dayData?.sales || 0,
+            orders: dayData?.orders || 0
           });
         }
 
@@ -102,14 +102,14 @@ export const useDashboardStats = () => {
           { status: '환불', count: statusCounts.refunded, color: '#f97316' }
         ].filter((item) => item.count > 0);
 
-        // Generate user activity data (mock for now)
+        // Generate user activity data (empty until API integration)
         const userChartData = [];
         for (let i = 6; i >= 0; i--) {
-          // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+          const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
           userChartData.push({
-            date: '/* date removed */',
-            newUsers: Math.floor(Math.random() * 50) + 10,
-            activeUsers: Math.floor(Math.random() * 200) + 100
+            date: date.toISOString().split('T')[0],
+            newUsers: 0,
+            activeUsers: 0
           });
         }
 
@@ -120,7 +120,7 @@ export const useDashboardStats = () => {
         // Calculate average order value
         const avgOrderValue = dashboardStats.data?.todaySales && dashboardStats.data?.todayOrders
           ? dashboardStats.data.todaySales / dashboardStats.data.todayOrders
-          : 150000;
+          : 0;
 
         return {
           ecommerce: {
@@ -135,12 +135,7 @@ export const useDashboardStats = () => {
           },
           chartData: {
             sales: salesChartData,
-            orders: orderStatusData.length > 0 ? orderStatusData : [
-              { status: '처리중', count: 45, color: '#3b82f6' },
-              { status: '배송중', count: 23, color: '#f59e0b' },
-              { status: '완료', count: 67, color: '#10b981' },
-              { status: '취소', count: 5, color: '#ef4444' }
-            ],
+            orders: orderStatusData,
             users: userChartData
           }
         };
@@ -159,49 +154,44 @@ export const useDashboardStats = () => {
   });
 };
 
-// Generate default dashboard data
+// Generate default empty dashboard data (no mock values)
 function generateDefaultDashboardData(): DashboardSummary {
+  const today = new Date();
   const salesData = [];
-  // const today = new Date();
-  
+
   for (let i = 29; i >= 0; i--) {
-    // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
     salesData.push({
-      date: '/* date removed */',
-      amount: Math.floor(Math.random() * 5000000) + 1000000,
-      orders: Math.floor(Math.random() * 50) + 10
+      date: date.toISOString().split('T')[0],
+      amount: 0,
+      orders: 0
     });
   }
 
   const userData = [];
   for (let i = 6; i >= 0; i--) {
-    // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
     userData.push({
-      date: '/* date removed */',
-      newUsers: Math.floor(Math.random() * 50) + 10,
-      activeUsers: Math.floor(Math.random() * 200) + 100
+      date: date.toISOString().split('T')[0],
+      newUsers: 0,
+      activeUsers: 0
     });
   }
 
   return {
     ecommerce: {
-      todaySales: 3420000,
-      todayOrders: 47,
-      totalProducts: 1547,
-      lowStockProducts: 34,
-      pendingOrders: 23,
-      totalCustomers: 12847,
-      monthlyRevenue: 45600000,
-      averageOrderValue: 152400
+      todaySales: 0,
+      todayOrders: 0,
+      totalProducts: 0,
+      lowStockProducts: 0,
+      pendingOrders: 0,
+      totalCustomers: 0,
+      monthlyRevenue: 0,
+      averageOrderValue: 0
     },
     chartData: {
       sales: salesData,
-      orders: [
-        { status: '처리중', count: 45, color: '#3b82f6' },
-        { status: '배송중', count: 23, color: '#f59e0b' },
-        { status: '완료', count: 67, color: '#10b981' },
-        { status: '취소', count: 5, color: '#ef4444' }
-      ],
+      orders: [],
       users: userData
     }
   };

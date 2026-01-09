@@ -619,12 +619,8 @@ function CreateAssignmentDialog({
   });
   const [isCreating, setIsCreating] = useState(false);
 
-  // Mock courses for picker
-  const mockCourses = [
-    { id: 'course-1', title: '약사 보수교육 기초', credits: 2, category: '기초' },
-    { id: 'course-2', title: '의약품 관리', credits: 3, category: '전문' },
-    { id: 'course-3', title: '환자 상담 기법', credits: 2, category: '실무' },
-  ];
+  // Courses - empty until LMS API integration
+  const courses: Array<{ id: string; title: string; credits: number; category: string }> = [];
 
   const handleSubmit = async () => {
     if (!formData.userId || !formData.courseId) return;
@@ -670,7 +666,7 @@ function CreateAssignmentDialog({
           <div>
             <Label>강좌 선택 *</Label>
             <CoursePicker
-              courses={mockCourses}
+              courses={courses}
               selectedIds={formData.courseId ? [formData.courseId] : []}
               onSelect={(courseId) => setFormData({ ...formData, courseId })}
               placeholder="강좌를 선택하세요..."
@@ -754,11 +750,8 @@ function BulkAssignmentDialog({
   });
   const [isCreating, setIsCreating] = useState(false);
 
-  const mockCourses = [
-    { id: 'course-1', title: '약사 보수교육 기초', credits: 2, category: '기초' },
-    { id: 'course-2', title: '의약품 관리', credits: 3, category: '전문' },
-    { id: 'course-3', title: '환자 상담 기법', credits: 2, category: '실무' },
-  ];
+  // Courses - empty until LMS API integration
+  const bulkCourses: Array<{ id: string; title: string; credits: number; category: string }> = [];
 
   const parseUserIds = (text: string): string[] => {
     return text
@@ -823,7 +816,7 @@ function BulkAssignmentDialog({
           <div>
             <Label>강좌 선택 *</Label>
             <CoursePicker
-              courses={mockCourses}
+              courses={bulkCourses}
               selectedIds={formData.courseId ? [formData.courseId] : []}
               onSelect={(courseId) => setFormData({ ...formData, courseId })}
               placeholder="강좌를 선택하세요..."

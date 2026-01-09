@@ -23,33 +23,15 @@ import { DashboardHelp } from '@/components/help/DashboardHelp';
 const DashboardSimple: FC = () => {
   const { stats, isLoading } = useDashboardData();
 
-  // Mock recent activity - replace with real API
-  const recentActivity = [
-    {
-      id: '1',
-      type: 'post',
-      title: 'Welcome to WordPress!',
-      author: 'admin',
-      date: new Date(Date.now() - 1000 * 60 * 30),
-      icon: FileText
-    },
-    {
-      id: '2',
-      type: 'comment',
-      title: 'Great article on React development',
-      author: 'John Doe',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 2),
-      icon: MessageSquare
-    },
-    {
-      id: '3',
-      type: 'user',
-      title: 'New user registration',
-      author: 'jane.smith@example.com',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 5),
-      icon: Users
-    }
-  ];
+  // Recent activity - fetched from API (empty until API integration)
+  const recentActivity: Array<{
+    id: string;
+    type: 'post' | 'comment' | 'user';
+    title: string;
+    author: string;
+    date: Date;
+    icon: typeof FileText;
+  }> = [];
 
   if (isLoading) {
     return (
@@ -175,44 +157,48 @@ const DashboardSimple: FC = () => {
       <div className="dashboard-activity-section">
         <h2 className="section-title">Recent Activity</h2>
         <div className="activity-list">
-          {recentActivity.map((item: any) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.id} className="activity-item">
-                <div className="activity-icon">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="activity-content">
-                  <div className="activity-title">
+          {recentActivity.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No recent activity to display.</p>
+              <p className="text-sm mt-2">Activity will appear here once you start creating content.</p>
+            </div>
+          ) : (
+            recentActivity.map((item: any) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.id} className="activity-item">
+                  <div className="activity-icon">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-title">
+                      {item.type === 'post' && (
+                        <Link to={`/posts/${item.id}/edit`}>{item.title}</Link>
+                      )}
+                      {item.type === 'comment' && (
+                        <>Comment from <strong>{item.author}</strong> on <Link to={`/comments/${item.id}`}>{item.title}</Link></>
+                      )}
+                      {item.type === 'user' && (
+                        <>{item.title}: <strong>{item.author}</strong></>
+                      )}
+                    </div>
+                  </div>
+                  <div className="activity-actions">
                     {item.type === 'post' && (
-                      <Link to={`/posts/${item.id}/edit`}>{item.title}</Link>
+                      <Link to={`/posts/${item.id}/edit`} className="activity-action">
+                        <Edit3 className="w-4 h-4" />
+                      </Link>
                     )}
                     {item.type === 'comment' && (
-                      <>Comment from <strong>{item.author}</strong> on <Link to={`/comments/${item.id}`}>{item.title}</Link></>
-                    )}
-                    {item.type === 'user' && (
-                      <>{item.title}: <strong>{item.author}</strong></>
+                      <Link to={`/comments/${item.id}`} className="activity-action">
+                        <MessageSquare className="w-4 h-4" />
+                      </Link>
                     )}
                   </div>
-                  <div className="activity-time">
-                    {'/* date removed */'}
-                  </div>
                 </div>
-                <div className="activity-actions">
-                  {item.type === 'post' && (
-                    <Link to={`/posts/${item.id}/edit`} className="activity-action">
-                      <Edit3 className="w-4 h-4" />
-                    </Link>
-                  )}
-                  {item.type === 'comment' && (
-                    <Link to={`/comments/${item.id}`} className="activity-action">
-                      <MessageSquare className="w-4 h-4" />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
         <div className="activity-footer">
           <Link to="/activity" className="view-all-link">View All Activity →</Link>

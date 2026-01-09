@@ -71,37 +71,15 @@ const PartnerDashboard = () => {
           setChartData(chartData);
         }
       } else {
-        // Use mock data if no partner account exists
-        const mockStats = {
-          monthlyClicks: 245,
-          monthlySignups: 18,
-          monthlyOrders: 12,
-          monthlyRevenue: 1234000,
-          monthlyCommission: 61700,
-          totalSignups: 156,
-          totalRevenue: 8765000,
-          paidCommission: 350000,
-          pendingCommission: 125000,
-        };
-        setStats(mockStats);
-        setChartData(generateMockChartData());
+        // No partner account - show empty state
+        setStats(null);
+        setChartData([]);
       }
     } catch (error) {
       toast.error('데이터를 불러오는데 실패했습니다.');
-      // Use mock data as fallback
-      const mockStats = {
-        monthlyClicks: 245,
-        monthlySignups: 18,
-        monthlyOrders: 12,
-        monthlyRevenue: 1234000,
-        monthlyCommission: 61700,
-        totalSignups: 156,
-        totalRevenue: 8765000,
-        paidCommission: 350000,
-        pendingCommission: 125000,
-      };
-      setStats(mockStats);
-      setChartData(generateMockChartData());
+      // Show empty state on error
+      setStats(null);
+      setChartData([]);
     } finally {
       setLoading(false);
     }
@@ -122,29 +100,17 @@ const PartnerDashboard = () => {
     });
   };
 
-  const generateMockChartData = () => {
-    return [
-      { date: '3/25', clicks: 45, signups: 3, orders: 2, commission: 12000 },
-      { date: '3/26', clicks: 52, signups: 4, orders: 3, commission: 18000 },
-      { date: '3/27', clicks: 38, signups: 2, orders: 1, commission: 8000 },
-      { date: '3/28', clicks: 65, signups: 5, orders: 4, commission: 25000 },
-      { date: '3/29', clicks: 43, signups: 3, orders: 2, commission: 15000 },
-      { date: '3/30', clicks: 58, signups: 4, orders: 3, commission: 22000 },
-      { date: '3/31', clicks: 49, signups: 3, orders: 2, commission: 14000 },
-    ];
-  };
-  
-  const mockReferralCode = partnerUser?.referralCode || 'DEMO123';
-  const mockStats = stats || {
-    monthlyClicks: 245,
-    monthlySignups: 18,
-    monthlyOrders: 12,
-    monthlyRevenue: 1234000,
-    monthlyCommission: 61700,
-    totalSignups: 156,
-    totalRevenue: 8765000,
-    paidCommission: 350000,
-    pendingCommission: 125000,
+  const referralCode = partnerUser?.referralCode || '';
+  const currentStats = stats || {
+    monthlyClicks: 0,
+    monthlySignups: 0,
+    monthlyOrders: 0,
+    monthlyRevenue: 0,
+    monthlyCommission: 0,
+    totalSignups: 0,
+    totalRevenue: 0,
+    paidCommission: 0,
+    pendingCommission: 0,
   };
   
   if (loading) {
@@ -181,7 +147,7 @@ const PartnerDashboard = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">이번 달 클릭</p>
                 <p className="text-2xl font-bold text-modern-text-primary">
-                  {mockStats.monthlyClicks.toLocaleString()}
+                  {currentStats.monthlyClicks.toLocaleString()}
                 </p>
                 <p className="text-xs text-modern-success mt-1">+12.5%</p>
               </div>
@@ -196,10 +162,10 @@ const PartnerDashboard = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">이번 달 가입</p>
                 <p className="text-2xl font-bold text-modern-text-primary">
-                  {mockStats.monthlySignups}
+                  {currentStats.monthlySignups}
                 </p>
                 <p className="text-xs text-modern-text-secondary mt-1">
-                  전환율 {((mockStats.monthlySignups / mockStats.monthlyClicks) * 100).toFixed(1)}%
+                  전환율 {((currentStats.monthlySignups / currentStats.monthlyClicks) * 100).toFixed(1)}%
                 </p>
               </div>
               <Users className="w-8 h-8 text-modern-success opacity-20" />
@@ -213,10 +179,10 @@ const PartnerDashboard = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">이번 달 주문</p>
                 <p className="text-2xl font-bold text-modern-text-primary">
-                  {mockStats.monthlyOrders}
+                  {currentStats.monthlyOrders}
                 </p>
                 <p className="text-xs text-modern-text-secondary mt-1">
-                  구매율 {((mockStats.monthlyOrders / mockStats.monthlySignups) * 100).toFixed(1)}%
+                  구매율 {((currentStats.monthlyOrders / currentStats.monthlySignups) * 100).toFixed(1)}%
                 </p>
               </div>
               <TrendingUp className="w-8 h-8 text-modern-warning opacity-20" />
@@ -230,7 +196,7 @@ const PartnerDashboard = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">이번 달 수수료</p>
                 <p className="text-2xl font-bold text-modern-text-primary">
-                  ₩{mockStats.monthlyCommission.toLocaleString()}
+                  ₩{currentStats.monthlyCommission.toLocaleString()}
                 </p>
                 <p className="text-xs text-modern-text-secondary mt-1">
                   수수료율 5%
@@ -247,7 +213,7 @@ const PartnerDashboard = () => {
         {/* 추천 링크 생성기 (2열) */}
         <div className="lg:col-span-2">
           <ReferralLinkGenerator 
-            referralCode={mockReferralCode}
+            referralCode={referralCode}
             userName={user?.name || '회원'}
           />
         </div>
@@ -266,13 +232,13 @@ const PartnerDashboard = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-modern-text-secondary">총 수익</span>
                   <span className="font-medium">
-                    ₩{mockStats.totalRevenue.toLocaleString()}
+                    ₩{currentStats.totalRevenue.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-modern-text-secondary">지급 완료</span>
                   <span className="font-medium text-modern-success">
-                    ₩{mockStats.paidCommission.toLocaleString()}
+                    ₩{currentStats.paidCommission.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -518,21 +484,21 @@ const PartnerDashboard = () => {
             
             <TabsContent value="realtime" className="space-y-6">
               <RealTimeActivity 
-                referralCode={mockReferralCode}
+                referralCode={referralCode}
                 maxEvents={15}
               />
             </TabsContent>
             
             <TabsContent value="analytics" className="space-y-6">
               <ClickAnalytics 
-                referralCode={mockReferralCode}
+                referralCode={referralCode}
                 period="7d"
               />
             </TabsContent>
             
             <TabsContent value="notifications" className="space-y-6">
               <PartnerNotifications 
-                referralCode={mockReferralCode}
+                referralCode={referralCode}
                 onNotificationClick={() => {
                   // Handle notification click (e.g., navigate to relevant section)
                   // TODO: Implement navigation to relevant section based on notification type

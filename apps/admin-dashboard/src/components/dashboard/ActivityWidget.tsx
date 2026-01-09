@@ -27,32 +27,8 @@ const ActivityWidget: FC<ActivityDashboardWidgetProps> = ({
   showUsers = true,
   maxItems = 5
 }) => {
-  // Mock data - replace with real API
-  const recentActivity: ActivityItem[] = [
-    {
-      id: '1',
-      type: 'post',
-      title: 'Welcome to WordPress!',
-      author: 'admin',
-      date: new Date(Date.now() - 1000 * 60 * 30),
-      status: 'Published'
-    },
-    {
-      id: '2',
-      type: 'comment',
-      title: 'Great article on React development',
-      author: 'John Doe',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 2),
-      status: 'Approved'
-    },
-    {
-      id: '3',
-      type: 'user',
-      title: 'New user registration',
-      author: 'jane.smith@example.com',
-      date: new Date(Date.now() - 1000 * 60 * 60 * 5)
-    }
-  ];
+  // Activity data - empty until API integration
+  const recentActivity: ActivityItem[] = [];
 
   const getIcon = (type: string) => {
     switch (type) {

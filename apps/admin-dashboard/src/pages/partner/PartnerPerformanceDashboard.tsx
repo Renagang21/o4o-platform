@@ -30,91 +30,18 @@ const PartnerPerformanceDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      // 실제로는 API 호출
-      const mockPartner: PartnerUser = {
-        id: '1',
-        userId: user?.id?.toString() || '',
-        referralCode: 'KIM123ABC',
-        status: 'active',
-        joinedAt: new Date('2024-01-15'),
-        totalClicks: 3456,
-        totalSignups: 156,
-        totalOrders: 89,
-        totalRevenue: 15678000,
-        totalCommission: 783900,
-        paidCommission: 580000,
-        pendingCommission: 203900,
-        commissionRate: 5,
-        paymentMethod: 'bank',
-        bankAccount: {
-          bankName: '신한은행',
-          accountNumber: '***-***-123456',
-          accountHolder: '김철수'
-        },
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date()
-      };
+      // TODO: Implement actual API call
+      // const response = await partnerApi.getDashboard(user?.id, period);
+      // setPartnerData(response.partner);
+      // setDashboard(response.dashboard);
 
-      const mockDashboard: UserPartnerDashboard = {
-        referralCode: 'KIM123ABC',
-        status: 'active',
-        monthlyStats: {
-          clicks: 245,
-          signups: 18,
-          orders: 12,
-          revenue: 1234000,
-          commission: 61700
-        },
-        totalStats: {
-          signups: 156,
-          revenue: 15678000,
-          paidCommission: 580000,
-          pendingCommission: 203900
-        },
-        recentActivities: [
-          {
-            type: 'order',
-            description: '프리미엄 이어폰 구매 완료',
-            amount: 89000,
-            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
-          },
-          {
-            type: 'signup',
-            description: '새로운 회원 가입',
-            timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000)
-          },
-          {
-            type: 'click',
-            description: '추천 링크 클릭 (카카오톡)',
-            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
-          },
-          {
-            type: 'commission',
-            description: '커미션 승인됨',
-            amount: 125000,
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-          }
-        ],
-        referralLinks: [
-          {
-            type: 'main',
-            name: '메인 페이지',
-            url: 'https://o4o.com?ref=KIM123ABC',
-            clicks: 1234
-          },
-          {
-            type: 'product',
-            name: '베스트셀러 상품',
-            url: 'https://o4o.com/products/best?ref=KIM123ABC',
-            clicks: 567
-          }
-        ]
-      };
-
-      setPartnerData(mockPartner);
-      setDashboard(mockDashboard);
+      // Empty state until API integration
+      setPartnerData(null);
+      setDashboard(null);
     } catch (error: any) {
-    // Error logging - use proper error handler
+      // Error logging - use proper error handler
+      setPartnerData(null);
+      setDashboard(null);
     } finally {
       setLoading(false);
     }

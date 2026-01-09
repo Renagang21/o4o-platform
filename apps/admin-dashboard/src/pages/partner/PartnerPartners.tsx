@@ -20,79 +20,9 @@ interface PartnerPartner {
   paymentMethod: string;
 }
 
-const mockPartners: PartnerPartner[] = [
-  {
-    id: '1',
-    name: '김인플루언서',
-    email: 'influencer1@example.com',
-    website: 'https://youtube.com/influencer1',
-    type: 'influencer',
-    status: 'active',
-    joinedAt: '2024-01-15',
-    stats: {
-      clicks: 15420,
-      conversions: 462,
-      revenue: 13860000,
-      conversionRate: 3.0
-    },
-    commissionRate: 15,
-    paymentMethod: '계좌이체'
-  },
-  {
-    id: '2',
-    name: '건강 블로그',
-    email: 'healthblog@example.com',
-    website: 'https://healthblog.com',
-    type: 'blog',
-    status: 'active',
-    joinedAt: '2024-02-01',
-    stats: {
-      clicks: 8920,
-      conversions: 267,
-      revenue: 8010000,
-      conversionRate: 2.99
-    },
-    commissionRate: 12,
-    paymentMethod: '페이팔'
-  },
-  {
-    id: '3',
-    name: '뷰티 크리에이터',
-    email: 'beauty@example.com',
-    website: 'https://instagram.com/beautystar',
-    type: 'influencer',
-    status: 'pending',
-    joinedAt: '2024-03-20',
-    stats: {
-      clicks: 0,
-      conversions: 0,
-      revenue: 0,
-      conversionRate: 0
-    },
-    commissionRate: 10,
-    paymentMethod: '계좌이체'
-  },
-  {
-    id: '4',
-    name: '웰니스 샵',
-    email: 'wellness@example.com',
-    website: 'https://wellnessshop.kr',
-    type: 'business',
-    status: 'active',
-    joinedAt: '2023-12-10',
-    stats: {
-      clicks: 23580,
-      conversions: 589,
-      revenue: 17670000,
-      conversionRate: 2.5
-    },
-    commissionRate: 8,
-    paymentMethod: '세금계산서'
-  }
-];
-
 const PartnerPartners = () => {
-  const [partners] = useState(mockPartners);
+  // Partner data - empty until API integration
+  const [partners] = useState<PartnerPartner[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');

@@ -22,83 +22,9 @@ interface PartnerLink {
   status: 'active' | 'paused' | 'expired';
 }
 
-const mockLinks: PartnerLink[] = [
-  {
-    id: '1',
-    partnerId: '1',
-    partnerName: '김인플루언서',
-    url: 'https://neture.co.kr/products/probiotic-plus',
-    shortUrl: 'https://link.neture.co.kr/kim123',
-    campaign: '봄맞이 프로모션',
-    product: {
-      id: '1',
-      name: '프로바이오틱스 플러스',
-      image: '/placeholder.jpg'
-    },
-    stats: {
-      clicks: 3420,
-      conversions: 102,
-      revenue: 3060000
-    },
-    createdAt: '2024-03-01',
-    status: 'active'
-  },
-  {
-    id: '2',
-    partnerId: '2',
-    partnerName: '건강 블로그',
-    url: 'https://neture.co.kr/products/omega3-premium',
-    shortUrl: 'https://link.neture.co.kr/health456',
-    product: {
-      id: '2',
-      name: '오메가3 프리미엄',
-      image: '/placeholder.jpg'
-    },
-    stats: {
-      clicks: 1890,
-      conversions: 56,
-      revenue: 1680000
-    },
-    createdAt: '2024-03-05',
-    status: 'active'
-  },
-  {
-    id: '3',
-    partnerId: '1',
-    partnerName: '김인플루언서',
-    url: 'https://neture.co.kr/collections/spring-sale',
-    shortUrl: 'https://link.neture.co.kr/spring2024',
-    campaign: '봄 세일 특집',
-    stats: {
-      clicks: 5230,
-      conversions: 178,
-      revenue: 5340000
-    },
-    createdAt: '2024-02-20',
-    status: 'active'
-  },
-  {
-    id: '4',
-    partnerId: '4',
-    partnerName: '웰니스 샵',
-    url: 'https://neture.co.kr/products/multivitamin-gold',
-    shortUrl: 'https://link.neture.co.kr/wellness789',
-    product: {
-      id: '3',
-      name: '멀티비타민 골드'
-    },
-    stats: {
-      clicks: 980,
-      conversions: 29,
-      revenue: 870000
-    },
-    createdAt: '2024-01-15',
-    status: 'paused'
-  }
-];
-
 const PartnerLinks = () => {
-  const [links] = useState(mockLinks);
+  // Partner links - empty until API integration
+  const [links] = useState<PartnerLink[]>([]);
   const [selectedPartner, setSelectedPartner] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   // TODO: Implement create modal

@@ -5,13 +5,12 @@
 
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  EcommerceStatsResponse, 
-  ForumStatsResponse, 
+import {
+  EcommerceStatsResponse,
+  ForumStatsResponse,
   UserStatsResponse,
   DASHBOARD_API_ENDPOINTS,
-  DashboardApiUtils,
-  SAMPLE_ECOMMERCE_STATS
+  DashboardApiUtils
 } from '../../../../types/dashboard-api';
 import apiClient from '../../../../api/base';
 // import { EcommerceApi } from '../../../../api/ecommerceApi'; // Module not found - using mock data
@@ -66,7 +65,7 @@ const StatsOverview = memo<StatsOverviewProps>(({ className = '' }) => {
               activeProducts: dashboardStats.data?.totalProducts || 0,
               lowStockProducts: dashboardStats.data?.lowStockProducts || 0,
               outOfStockProducts: 0,
-              newProductsToday: 5
+              newProductsToday: 0
             },
             customers: {
               totalCustomers: dashboardStats.data?.totalCustomers || 0,
@@ -83,9 +82,8 @@ const StatsOverview = memo<StatsOverviewProps>(({ className = '' }) => {
           message: "E-commerce statistics retrieved successfully"
         } as EcommerceStatsResponse;
       } catch (error: any) {
-        // Return sample data on error - error handled in UI
-        // Return sample data on error
-        return SAMPLE_ECOMMERCE_STATS;
+        // Throw error to be handled by react-query
+        throw error;
       }
     },
     staleTime: 5 * 60 * 1000, // 5분

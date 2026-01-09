@@ -69,12 +69,8 @@ const QuickDraftWidget: FC = () => {
     }
   };
 
-  // Mock drafts data (will be replaced with real API call in future)
-  const recentDrafts = [
-    { id: '1', title: '기능 개발 중...', date: new Date(Date.now() - 86400000) },
-    { id: '2', title: '다음 스프린트 아이디어', date: new Date(Date.now() - 172800000) },
-    { id: '3', title: '고객 피드백 분석', date: new Date(Date.now() - 259200000) }
-  ];
+  // Recent drafts - empty until API integration
+  const recentDrafts: Array<{ id: string; title: string; date: Date }> = [];
 
   return (
     <div id="dashboard_quick_press" className="quick-draft-widget">
@@ -134,20 +130,24 @@ const QuickDraftWidget: FC = () => {
 
       <div className="drafts-list">
         <h3>Your Recent Drafts</h3>
-        <ul>
-          {recentDrafts.map((draft: any) => (
-            <li key={draft.id}>
-              <div className="draft-title">
-                <a href={`/posts/${draft.id}/edit`} className="draft-link">
-                  {draft.title}
-                </a>
-              </div>
-              <time dateTime={draft.date.toISOString()}>
-                {draft.date.toLocaleDateString()}
-              </time>
-            </li>
-          ))}
-        </ul>
+        {recentDrafts.length === 0 ? (
+          <p className="text-sm text-gray-500 py-4">No drafts yet. Start writing above!</p>
+        ) : (
+          <ul>
+            {recentDrafts.map((draft: any) => (
+              <li key={draft.id}>
+                <div className="draft-title">
+                  <a href={`/posts/${draft.id}/edit`} className="draft-link">
+                    {draft.title}
+                  </a>
+                </div>
+                <time dateTime={draft.date.toISOString()}>
+                  {draft.date.toLocaleDateString()}
+                </time>
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="view-all">
           <a href="/posts?post_status=draft">View all drafts</a>
         </div>

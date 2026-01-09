@@ -65,17 +65,14 @@ const CosmeticsPartnerStorefront: React.FC = () => {
   const [qrColor, setQrColor] = useState('#000000');
   const [generatedQR, setGeneratedQR] = useState<QRCodeResult | null>(null);
 
-  // Short Links State
+  // Short Links State - empty until API integration
   const [shortLinks, setShortLinks] = useState<Array<{
     id: string;
     slug: string;
     targetUrl: string;
     clicks: number;
     createdAt: string;
-  }>>([
-    { id: '1', slug: 'my-routine', targetUrl: 'https://neture.co.kr/routine/1', clicks: 156, createdAt: '2024-12-01' },
-    { id: '2', slug: 'best-serum', targetUrl: 'https://neture.co.kr/product/123', clicks: 89, createdAt: '2024-12-05' },
-  ]);
+  }>>([]);
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkSlug, setNewLinkSlug] = useState('');
 

@@ -17,66 +17,9 @@ interface CommissionEntry {
   invoice?: string;
 }
 
-const mockCommissions: CommissionEntry[] = [
-  {
-    id: '1',
-    partnerId: '1',
-    partnerName: '김인플루언서',
-    period: '2024-03',
-    sales: 13860000,
-    clicks: 15420,
-    conversions: 462,
-    commissionRate: 15,
-    commissionAmount: 2079000,
-    status: 'pending',
-    paymentMethod: '계좌이체'
-  },
-  {
-    id: '2',
-    partnerId: '2',
-    partnerName: '건강 블로그',
-    period: '2024-03',
-    sales: 8010000,
-    clicks: 8920,
-    conversions: 267,
-    commissionRate: 12,
-    commissionAmount: 961200,
-    status: 'processing',
-    paymentMethod: '페이팔'
-  },
-  {
-    id: '3',
-    partnerId: '4',
-    partnerName: '웰니스 샵',
-    period: '2024-03',
-    sales: 17670000,
-    clicks: 23580,
-    conversions: 589,
-    commissionRate: 8,
-    commissionAmount: 1413600,
-    status: 'paid',
-    paidDate: '2024-03-10',
-    paymentMethod: '세금계산서',
-    invoice: 'INV-2024-03-001'
-  },
-  {
-    id: '4',
-    partnerId: '1',
-    partnerName: '김인플루언서',
-    period: '2024-02',
-    sales: 11250000,
-    clicks: 12300,
-    conversions: 375,
-    commissionRate: 15,
-    commissionAmount: 1687500,
-    status: 'paid',
-    paidDate: '2024-02-10',
-    paymentMethod: '계좌이체'
-  }
-];
-
 const PartnerCommission = () => {
-  const [commissions] = useState(mockCommissions);
+  // Commission data - empty until API integration
+  const [commissions] = useState<CommissionEntry[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [selectedStatus, setSelectedStatus] = useState('all');
 
