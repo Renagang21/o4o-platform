@@ -1,59 +1,59 @@
-import { useState } from 'react';
+/**
+ * Header - Neture 통합 헤더
+ * 로고 + 네비게이션 + 로그인을 한 줄로 표시
+ */
 
 interface HeaderProps {
   serviceName: string;
 }
 
-interface User {
-  name: string;
+interface NavItem {
+  label: string;
+  href: string;
 }
 
+const navItems: NavItem[] = [
+  { label: '홈', href: '/' },
+  { label: 'Trials', href: '/trials' },
+  { label: 'B2B 조달', href: '/procurement' },
+];
+
 export function Header({ serviceName }: HeaderProps) {
-  // Phase 2-B: 로그인 상태는 Mock (추후 API 연동)
-  const [user, setUser] = useState<User | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const handleLogin = () => {
-    // Mock 로그인
-    setUser({ name: '홍길동' });
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setDropdownOpen(false);
-  };
+  const currentPath = window.location.pathname;
 
   return (
     <header style={styles.header}>
+      {/* 로고 */}
       <a href="/" style={styles.logo}>
         {serviceName}
       </a>
 
+      {/* 네비게이션 */}
+      <nav style={styles.nav}>
+        <ul style={styles.navList}>
+          {navItems.map((item) => (
+            <li key={item.href} style={styles.navItem}>
+              <a
+                href={item.href}
+                style={{
+                  ...styles.navLink,
+                  ...(currentPath === item.href || currentPath.startsWith(item.href + '/')
+                    ? styles.navLinkActive
+                    : {}),
+                }}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* 로그인 링크 */}
       <div style={styles.userArea}>
-        {user ? (
-          <div style={styles.dropdown}>
-            <button
-              style={styles.userButton}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              {user.name} ▾
-            </button>
-            {dropdownOpen && (
-              <div style={styles.dropdownMenu}>
-                <button
-                  style={styles.dropdownItem}
-                  onClick={handleLogout}
-                >
-                  로그아웃
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <button style={styles.loginButton} onClick={handleLogin}>
-            로그인
-          </button>
-        )}
+        <a href="/login" style={styles.loginLink}>
+          로그인
+        </a>
       </div>
     </header>
   );
@@ -64,9 +64,10 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 24px',
+    padding: '0 24px',
     borderBottom: '1px solid #e0e0e0',
     backgroundColor: '#ffffff',
+    height: '56px',
   },
   logo: {
     fontSize: '20px',
@@ -74,52 +75,43 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#333',
     textDecoration: 'none',
   },
-  userArea: {
-    position: 'relative' as const,
+  nav: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
+    marginLeft: '32px',
   },
-  loginButton: {
-    padding: '8px 16px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
+  navList: {
+    display: 'flex',
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+    gap: '4px',
   },
-  userButton: {
-    padding: '8px 16px',
-    backgroundColor: 'transparent',
-    color: '#333',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
+  navItem: {
+    margin: 0,
   },
-  dropdown: {
-    position: 'relative' as const,
-  },
-  dropdownMenu: {
-    position: 'absolute' as const,
-    top: '100%',
-    right: 0,
-    marginTop: '4px',
-    backgroundColor: '#fff',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    minWidth: '120px',
-    zIndex: 100,
-  },
-  dropdownItem: {
+  navLink: {
     display: 'block',
-    width: '100%',
-    padding: '10px 16px',
-    textAlign: 'left' as const,
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '14px',
-    color: '#333',
+    padding: '16px 16px',
+    color: '#666',
     textDecoration: 'none',
+    fontSize: '14px',
+    borderBottom: '2px solid transparent',
+    transition: 'color 0.2s, border-color 0.2s',
+  },
+  navLinkActive: {
+    color: '#007bff',
+    borderBottomColor: '#007bff',
+  },
+  userArea: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  loginLink: {
+    color: '#007bff',
+    textDecoration: 'none',
+    fontSize: '14px',
+    fontWeight: 500,
   },
 };

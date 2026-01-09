@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { Header } from './Header';
-import { Navigation } from './Navigation';
 import { Footer } from './Footer';
 
 interface LayoutProps {
@@ -12,7 +11,6 @@ export function Layout({ serviceName, children }: LayoutProps) {
   return (
     <div style={styles.container}>
       <Header serviceName={serviceName} />
-      <Navigation />
       <main style={styles.main}>{children}</main>
       <Footer />
     </div>
