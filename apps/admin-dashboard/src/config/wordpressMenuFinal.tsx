@@ -140,6 +140,18 @@ export const wordpressMenuItems: MenuItem[] = [
     roles: ['admin', 'super_admin'],
     children: [
       {
+        id: 'cms-contents',
+        label: 'Contents',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/admin/cms/contents',
+      },
+      {
+        id: 'cms-slots',
+        label: 'Slots',
+        icon: <Layers className="w-4 h-4" />,
+        path: '/admin/cms/slots',
+      },
+      {
         id: 'cms-cpts',
         label: 'Post Types',
         icon: <FileText className="w-4 h-4" />,

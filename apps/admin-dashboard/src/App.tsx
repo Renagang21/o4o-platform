@@ -262,6 +262,12 @@ const CMSPageForm = lazy(() => import('@/pages/cms/pages/PageForm'));
 // CMS V2 Visual Designer (Phase C-3)
 const ViewDesigner = lazy(() => import('@/pages/cms/designer/ViewDesigner'));
 
+// CMS Content Admin (P3: WO-P3-CMS-ADMIN-CRUD-P0)
+const CMSContentList = lazy(() => import('@/pages/cms/contents/CMSContentList'));
+
+// CMS Slot Management (P3: WO-P3-CMS-SLOT-MANAGEMENT-P1)
+const CMSSlotList = lazy(() => import('@/pages/cms/slots/CMSSlotList'));
+
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
@@ -915,6 +921,24 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <CMSPageForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CMS Content Routes (P3: WO-P3-CMS-ADMIN-CRUD-P0) */}
+                    <Route path="/admin/cms/contents" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CMSContentList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CMS Slot Routes (P3: WO-P3-CMS-SLOT-MANAGEMENT-P1) */}
+                    <Route path="/admin/cms/slots" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CMSSlotList />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

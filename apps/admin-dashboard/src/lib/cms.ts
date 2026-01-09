@@ -532,6 +532,207 @@ export const cmsAPI = {
     const response = await api.get('/cms/public/pages', { params });
     return response.data;
   },
+
+  // ========================================
+  // CMS CONTENT API (P3: Admin CRUD)
+  // ========================================
+
+  async listContents(params?: {
+    serviceKey?: string;
+    organizationId?: string;
+    type?: ContentType;
+    status?: ContentStatus;
+    isPinned?: boolean;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ data: CmsContent[]; pagination: { total: number; limit: number; offset: number } }> {
+    const response = await api.get('/cms/contents', { params });
+    return response.data;
+  },
+
+  async getContent(id: string): Promise<CmsContent> {
+    const response = await api.get(`/cms/contents/${id}`);
+    return response.data.data;
+  },
+
+  async createContent(data: {
+    serviceKey?: string;
+    organizationId?: string;
+    type: ContentType;
+    title: string;
+    summary?: string;
+    body?: string;
+    imageUrl?: string;
+    linkUrl?: string;
+    linkText?: string;
+    sortOrder?: number;
+    isPinned?: boolean;
+    isOperatorPicked?: boolean;
+    metadata?: Record<string, any>;
+  }): Promise<CmsContent> {
+    const response = await api.post('/cms/contents', data);
+    return response.data.data;
+  },
+
+  async updateContent(id: string, data: Partial<{
+    serviceKey: string;
+    type: ContentType;
+    title: string;
+    summary: string;
+    body: string;
+    imageUrl: string;
+    linkUrl: string;
+    linkText: string;
+    sortOrder: number;
+    isPinned: boolean;
+    isOperatorPicked: boolean;
+    metadata: Record<string, any>;
+  }>): Promise<CmsContent> {
+    const response = await api.put(`/cms/contents/${id}`, data);
+    return response.data.data;
+  },
+
+  async updateContentStatus(id: string, status: ContentStatus): Promise<CmsContent> {
+    const response = await api.patch(`/cms/contents/${id}/status`, { status });
+    return response.data.data;
+  },
+
+  async getContentStats(params?: {
+    serviceKey?: string;
+    organizationId?: string;
+  }): Promise<{
+    hero: { total: number; active: number };
+    notice: { total: number; active: number };
+    news: { total: number; active: number };
+    featured: { total: number; operatorPicked: number };
+    promo: { total: number; active: number };
+    event: { total: number; active: number };
+  }> {
+    const response = await api.get('/cms/stats', { params });
+    return response.data.data;
+  },
+
+  // ========================================
+  // CMS SLOT API (P3: WO-P3-CMS-SLOT-MANAGEMENT-P1)
+  // ========================================
+
+  async listSlots(params?: {
+    serviceKey?: string;
+    slotKey?: string;
+    isActive?: boolean;
+  }): Promise<{ data: CmsContentSlot[]; meta: { total: number; slotKeys: string[] } }> {
+    const response = await api.get('/cms/slots', { params });
+    return response.data;
+  },
+
+  async createSlot(data: {
+    slotKey: string;
+    serviceKey?: string;
+    organizationId?: string;
+    contentId: string;
+    sortOrder?: number;
+    isActive?: boolean;
+    startsAt?: string;
+    endsAt?: string;
+  }): Promise<CmsContentSlot> {
+    const response = await api.post('/cms/slots', data);
+    return response.data.data;
+  },
+
+  async updateSlot(id: string, data: Partial<{
+    slotKey: string;
+    serviceKey: string;
+    contentId: string;
+    sortOrder: number;
+    isActive: boolean;
+    startsAt: string | null;
+    endsAt: string | null;
+  }>): Promise<CmsContentSlot> {
+    const response = await api.put(`/cms/slots/${id}`, data);
+    return response.data.data;
+  },
+
+  async deleteSlot(id: string): Promise<void> {
+    await api.delete(`/cms/slots/${id}`);
+  },
+
+  async assignSlotContents(slotKey: string, data: {
+    serviceKey?: string;
+    organizationId?: string;
+    contents: Array<{
+      contentId: string;
+      sortOrder?: number;
+      isActive?: boolean;
+      startsAt?: string;
+      endsAt?: string;
+    }>;
+  }): Promise<{ data: CmsContentSlot[]; meta: { slotKey: string; serviceKey: string | null; total: number } }> {
+    const response = await api.put(`/cms/slots/${slotKey}/contents`, data);
+    return response.data;
+  },
+
+  async getSlotContents(slotKey: string, params?: {
+    serviceKey?: string;
+    organizationId?: string;
+    activeOnly?: boolean;
+  }): Promise<{ data: CmsContentSlot[]; meta: { slotKey: string; total: number } }> {
+    const response = await api.get(`/cms/slots/${slotKey}`, { params });
+    return response.data;
+  },
 };
+
+// ========================================
+// CMS CONTENT TYPES (P3)
+// ========================================
+
+export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event';
+export type ContentStatus = 'draft' | 'published' | 'archived';
+
+export interface CmsContent {
+  id: string;
+  serviceKey: string | null;
+  organizationId: string | null;
+  type: ContentType;
+  title: string;
+  summary: string | null;
+  body: string | null;
+  imageUrl: string | null;
+  linkUrl: string | null;
+  linkText: string | null;
+  status: ContentStatus;
+  publishedAt: string | null;
+  expiresAt: string | null;
+  sortOrder: number;
+  isPinned: boolean;
+  isOperatorPicked: boolean;
+  metadata: Record<string, any>;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ========================================
+// CMS SLOT TYPES (P3: WO-P3-CMS-SLOT-MANAGEMENT-P1)
+// ========================================
+
+export interface CmsContentSlot {
+  id: string;
+  slotKey: string;
+  serviceKey: string | null;
+  organizationId: string | null;
+  contentId: string;
+  content: {
+    id: string;
+    type: ContentType;
+    title: string;
+    status: ContentStatus;
+  } | null;
+  sortOrder: number;
+  isActive: boolean;
+  startsAt: string | null;
+  endsAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default cmsAPI;
