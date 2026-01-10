@@ -707,6 +707,9 @@ importers:
       '@o4o/lms-yaksa':
         specifier: workspace:*
         version: link:../../packages/lms-yaksa
+      '@o4o/market-trial':
+        specifier: workspace:*
+        version: link:../../packages/market-trial
       '@o4o/membership-yaksa':
         specifier: workspace:*
         version: link:../../packages/membership-yaksa

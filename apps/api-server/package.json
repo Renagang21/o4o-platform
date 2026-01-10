@@ -122,6 +122,7 @@
     "@o4o/annualfee-yaksa": "workspace:*",
     "@o4o/yaksa-scheduler": "workspace:*",
     "@o4o/groupbuy-yaksa": "workspace:*",
+    "@o4o/market-trial": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
