@@ -1,17 +1,18 @@
 /**
- * Unified Dashboard v1
+ * Unified Dashboard v1.1
  *
  * 목적: 역할별 대시보드를 단일 사용자 중심 대시보드로 통합
  * - 컨텍스트 기반 카드 시스템
  * - 우선순위 기반 정렬
  * - 조건부 카드 표시
+ * - v1.1: 임원 컨텍스트 카드 지원 (다중 가능)
  *
- * Status: Production (v1)
+ * Status: Production (v1.1)
  */
 
 import React, { useMemo } from 'react';
 import { useUserContext } from './useUserContext';
-import type { UnifiedCardConfig, CardSize } from './types';
+import type { UnifiedCardConfig, CardSize, ExecutiveContext } from './types';
 
 // Card Components
 import {
@@ -21,6 +22,7 @@ import {
   SupplierCard,
   PartnerCard,
   OperatorCard,
+  ExecutiveCard,
   KakaoConnectCard,
 } from './cards';
 
@@ -77,6 +79,7 @@ const CARD_REGISTRY: UnifiedCardConfig[] = [
     showCondition: ['operator', 'admin'],
     component: OperatorCard,
   },
+  // Note: ExecutiveCard는 동적으로 생성되므로 registry에 포함하지 않음
   {
     id: 'kakao-connect',
     title: '카카오톡 연결',
@@ -129,10 +132,47 @@ const CardWrapper: React.FC<{
 };
 
 /**
+ * v1.1: Executive Card Wrapper (임원 컨텍스트별)
+ */
+const ExecutiveCardWrapper: React.FC<{
+  executiveContext: ExecutiveContext;
+}> = ({ executiveContext }) => {
+  const orgTypeLabel =
+    executiveContext.type === 'executive_branch' ? '지부' : '분회';
+  const title = `${executiveContext.organizationName} (${orgTypeLabel})`;
+
+  return (
+    <div className="col-span-1 md:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Card Header */}
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <h3 className="text-base font-semibold text-gray-800">{title}</h3>
+        <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded">
+          임원
+        </span>
+      </div>
+      {/* Card Content */}
+      <div className="p-4">
+        <ExecutiveCard
+          executiveContext={executiveContext}
+          config={{
+            id: `executive-${executiveContext.id}`,
+            title,
+            size: 'medium',
+            priority: 'high',
+            showCondition: ['executive'],
+            component: ExecutiveCard as any,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+/**
  * Unified Dashboard Component
  */
 export const UnifiedDashboard: React.FC = () => {
-  const { contexts, shouldShowCard, isLoading } = useUserContext();
+  const { contexts, shouldShowCard, isLoading, executiveContexts } = useUserContext();
 
   // Filter and sort cards based on user context
   const visibleCards = useMemo(() => {
@@ -140,6 +180,13 @@ export const UnifiedDashboard: React.FC = () => {
       (a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
     );
   }, [shouldShowCard]);
+
+  // Separate cards into before/after executive cards (for proper ordering)
+  const { highPriorityCards, lowPriorityCards } = useMemo(() => {
+    const high = visibleCards.filter((c) => PRIORITY_ORDER[c.priority] <= 1);
+    const low = visibleCards.filter((c) => PRIORITY_ORDER[c.priority] > 1);
+    return { highPriorityCards: high, lowPriorityCards: low };
+  }, [visibleCards]);
 
   if (isLoading) {
     return (
@@ -173,7 +220,23 @@ export const UnifiedDashboard: React.FC = () => {
 
       {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visibleCards.map((cardConfig) => {
+        {/* High Priority Cards */}
+        {highPriorityCards.map((cardConfig) => {
+          const CardComponent = cardConfig.component;
+          return (
+            <CardWrapper key={cardConfig.id} config={cardConfig}>
+              <CardComponent config={cardConfig} />
+            </CardWrapper>
+          );
+        })}
+
+        {/* v1.1: Executive Cards (동적 생성) */}
+        {executiveContexts.map((execCtx) => (
+          <ExecutiveCardWrapper key={execCtx.id} executiveContext={execCtx} />
+        ))}
+
+        {/* Low Priority Cards */}
+        {lowPriorityCards.map((cardConfig) => {
           const CardComponent = cardConfig.component;
           return (
             <CardWrapper key={cardConfig.id} config={cardConfig}>
@@ -186,7 +249,7 @@ export const UnifiedDashboard: React.FC = () => {
       {/* Version Info */}
       <div className="mt-8 p-3 bg-gray-100 rounded-lg">
         <p className="text-xs text-gray-500 text-center">
-          통합 대시보드 v1 - Context-based Dashboard
+          통합 대시보드 v1.1 - Context-based Dashboard with Executive Support
         </p>
       </div>
     </div>
