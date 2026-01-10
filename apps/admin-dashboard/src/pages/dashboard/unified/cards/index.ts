@@ -8,4 +8,5 @@ export { MyAccountCard } from './MyAccountCard';
 export { SellerCard } from './SellerCard';
 export { SupplierCard } from './SupplierCard';
 export { PartnerCard } from './PartnerCard';
+export { OperatorCard } from './OperatorCard';
 export { KakaoConnectCard } from './KakaoConnectCard';

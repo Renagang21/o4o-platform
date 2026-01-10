@@ -71,6 +71,8 @@ const WordPressDashboard = lazy(() => import('@/pages/WordPressDashboard'));
 const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
 // P1 Phase C: Widget-based Dashboard
 const AdminDashboardPageWrapper = lazy(() => import('@/pages/dashboard/AdminDashboardPageWrapper'));
+// Unified Dashboard v1 - Context-based single dashboard
+const UnifiedDashboard = lazy(() => import('@/pages/dashboard/unified/UnifiedDashboard'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
@@ -534,7 +536,15 @@ function App() {
                       </Suspense>
                     } />
                     
+                    {/* Unified Dashboard v1 - Primary entry point */}
                     <Route path="/dashboard" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <UnifiedDashboard />
+                      </Suspense>
+                    } />
+
+                    {/* Legacy: Simple Dashboard (deprecated) */}
+                    <Route path="/dashboard/legacy" element={
                       <Suspense fallback={<PageLoader />}>
                         <DashboardSimple />
                       </Suspense>

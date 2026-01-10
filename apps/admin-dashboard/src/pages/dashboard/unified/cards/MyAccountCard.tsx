@@ -14,6 +14,7 @@ const CONTEXT_LABELS: Record<UserContextType, { label: string; color: string }> 
   seller: { label: '판매자', color: 'bg-blue-100 text-blue-700' },
   supplier: { label: '공급자', color: 'bg-green-100 text-green-700' },
   partner: { label: '파트너', color: 'bg-purple-100 text-purple-700' },
+  operator: { label: '운영자', color: 'bg-gray-100 text-gray-700' },
   executive: { label: '임원', color: 'bg-orange-100 text-orange-700' },
   admin: { label: '관리자', color: 'bg-red-100 text-red-700' },
 };

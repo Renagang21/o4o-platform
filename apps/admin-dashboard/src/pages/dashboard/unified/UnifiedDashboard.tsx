@@ -1,10 +1,12 @@
 /**
- * Unified Dashboard v1 - PoC
+ * Unified Dashboard v1
  *
  * 목적: 역할별 대시보드를 단일 사용자 중심 대시보드로 통합
  * - 컨텍스트 기반 카드 시스템
  * - 우선순위 기반 정렬
  * - 조건부 카드 표시
+ *
+ * Status: Production (v1)
  */
 
 import React, { useMemo } from 'react';
@@ -18,6 +20,7 @@ import {
   SellerCard,
   SupplierCard,
   PartnerCard,
+  OperatorCard,
   KakaoConnectCard,
 } from './cards';
 
@@ -65,6 +68,14 @@ const CARD_REGISTRY: UnifiedCardConfig[] = [
     priority: 'high',
     showCondition: ['partner'],
     component: PartnerCard,
+  },
+  {
+    id: 'operator',
+    title: '운영 현황',
+    size: 'medium',
+    priority: 'high',
+    showCondition: ['operator', 'admin'],
+    component: OperatorCard,
   },
   {
     id: 'kakao-connect',
@@ -172,11 +183,10 @@ export const UnifiedDashboard: React.FC = () => {
         })}
       </div>
 
-      {/* PoC Indicator */}
-      <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-800">
-          <strong>PoC 모드:</strong> 이 대시보드는 통합 대시보드 PoC입니다. 모든 데이터는
-          Mock 데이터이며, 실제 API 연동은 Phase 2에서 진행됩니다.
+      {/* Version Info */}
+      <div className="mt-8 p-3 bg-gray-100 rounded-lg">
+        <p className="text-xs text-gray-500 text-center">
+          통합 대시보드 v1 - Context-based Dashboard
         </p>
       </div>
     </div>

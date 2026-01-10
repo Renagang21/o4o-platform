@@ -10,6 +10,7 @@ export type UserContextType =
   | 'seller'      // 판매자 컨텍스트
   | 'supplier'    // 공급자 컨텍스트
   | 'partner'     // 파트너 컨텍스트
+  | 'operator'    // 운영자 컨텍스트 (membership/operator 흡수)
   | 'executive'   // 임원 컨텍스트 (향후 확장)
   | 'admin';      // 관리자 컨텍스트
 
@@ -48,6 +49,7 @@ export interface UserContextInfo {
   isSeller: boolean;
   isSupplier: boolean;
   isPartner: boolean;
+  isOperator: boolean;
   isAdmin: boolean;
   isExecutive: boolean;
 }

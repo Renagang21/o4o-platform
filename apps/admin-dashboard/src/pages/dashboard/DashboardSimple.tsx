@@ -1,14 +1,15 @@
 import { FC } from 'react';
-import { 
-  FileText, 
-  MessageSquare, 
-  Users, 
-  Package, 
-  Plus, 
+import {
+  FileText,
+  MessageSquare,
+  Users,
+  Package,
+  Plus,
   Eye,
   TrendingUp,
   Edit3,
-  Settings
+  Settings,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import { DashboardHelp } from '@/components/help/DashboardHelp';
 
 /**
  * Simple, mobile-friendly dashboard without complex widget system
+ * @deprecated Use UnifiedDashboard instead. This dashboard will be removed in a future version.
  */
 const DashboardSimple: FC = () => {
   const { stats, isLoading } = useDashboardData();
@@ -45,9 +47,25 @@ const DashboardSimple: FC = () => {
     <div className="wrap">
       <DashboardHelp />
       <ScreenMeta />
-      
-      <h1 className="wp-heading-inline">Dashboard</h1>
-      
+
+      {/* Deprecated Notice */}
+      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
+        <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-medium text-yellow-800">
+            이 대시보드는 더 이상 사용되지 않습니다 (Deprecated)
+          </p>
+          <p className="text-sm text-yellow-700 mt-1">
+            새로운 통합 대시보드가 출시되었습니다.{' '}
+            <Link to="/dashboard" className="underline font-medium hover:text-yellow-900">
+              통합 대시보드로 이동 →
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      <h1 className="wp-heading-inline">Dashboard (Legacy)</h1>
+
       {/* Quick Actions */}
       <div className="quick-actions-bar">
         <Link to="/posts/new">

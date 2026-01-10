@@ -15,6 +15,7 @@ export interface UseUserContextReturn {
   isSeller: boolean;
   isSupplier: boolean;
   isPartner: boolean;
+  isOperator: boolean;
   isAdmin: boolean;
   isExecutive: boolean;
   isLoading: boolean;
@@ -37,6 +38,7 @@ export function useUserContext(): UseUserContextReturn {
         isSeller: false,
         isSupplier: false,
         isPartner: false,
+        isOperator: false,
         isAdmin: false,
         isExecutive: false,
       };
@@ -62,6 +64,11 @@ export function useUserContext(): UseUserContextReturn {
       contexts.push('partner');
     }
 
+    // 운영자 컨텍스트 (membership/operator 흡수)
+    if (role === 'operator' || permissions.includes('membership.manage') || permissions.includes('operator.dashboard')) {
+      contexts.push('operator');
+    }
+
     // 임원 컨텍스트 (향후 확장)
     // 임원은 Role과 분리된 별도 구조
     if (permissions.includes('executive.dashboard') || permissions.includes('kpa.executive')) {
@@ -73,10 +80,11 @@ export function useUserContext(): UseUserContextReturn {
       contexts.push('seller');
     }
 
-    // Primary context 결정 (우선순위: admin > executive > supplier > partner > seller)
+    // Primary context 결정 (우선순위: admin > executive > operator > supplier > partner > seller)
     let primaryContext: UserContextType = 'seller';
     if (contexts.includes('admin')) primaryContext = 'admin';
     else if (contexts.includes('executive')) primaryContext = 'executive';
+    else if (contexts.includes('operator')) primaryContext = 'operator';
     else if (contexts.includes('supplier')) primaryContext = 'supplier';
     else if (contexts.includes('partner')) primaryContext = 'partner';
 
@@ -86,6 +94,7 @@ export function useUserContext(): UseUserContextReturn {
       isSeller: contexts.includes('seller'),
       isSupplier: contexts.includes('supplier'),
       isPartner: contexts.includes('partner'),
+      isOperator: contexts.includes('operator'),
       isAdmin: contexts.includes('admin'),
       isExecutive: contexts.includes('executive'),
     };
