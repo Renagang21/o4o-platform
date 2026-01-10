@@ -11,7 +11,21 @@ import { AuthRequest } from '../../types/auth.js';
 import { v4 as uuidv4 } from 'uuid';
 
 // Types - WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1 기준 통합
-import { TrialStatus } from '@o4o/market-trial';
+// Note: TrialStatus is defined locally to avoid full @o4o/market-trial import
+// which causes entity initialization issues in bundled runtime.
+// Keep in sync with packages/market-trial/src/entities/MarketTrial.entity.ts
+
+/** Trial 상태 - WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1 */
+enum TrialStatus {
+  DRAFT = 'draft',
+  SUBMITTED = 'submitted',
+  APPROVED = 'approved',
+  RECRUITING = 'recruiting',
+  DEVELOPMENT = 'development',
+  OUTCOME_CONFIRMING = 'outcome_confirming',
+  FULFILLED = 'fulfilled',
+  CLOSED = 'closed',
+}
 
 type TrialEligibleRole = 'partner' | 'seller';
 type RewardType = 'cash' | 'product';
