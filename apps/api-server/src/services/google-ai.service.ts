@@ -46,7 +46,7 @@ class GoogleAIService {
   ): Promise<GeminiResponse> {
     const {
       prompt,
-      model = 'gemini-2.5-flash',
+      model = 'gemini-3.0-flash',
       temperature = 0.7,
       maxOutputTokens = 2048
     } = options;
@@ -144,8 +144,8 @@ class GoogleAIService {
               },
               model: {
                 type: 'select',
-                options: ['gemini-2.5-pro', 'gemini-2.5-flash'],
-                default: 'gemini-2.5-flash',
+                options: ['gemini-3.0-flash', 'gemini-3.0-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+                default: 'gemini-3.0-flash',
                 description: 'Gemini model to use'
               },
               temperature: {

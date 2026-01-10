@@ -379,6 +379,9 @@ import serviceMonitorRoutes from './routes/service-monitor.routes.js';
 // Market Trial Routes (Phase L-1)
 import marketTrialRoutes from './routes/market-trial.routes.js';
 
+// AI Query Routes (Phase AI-1)
+import aiQueryRoutes from './routes/ai-query.routes.js';
+
 // Trial Extensions (H8-2, H8-3)
 import trialShippingRoutes from './extensions/trial-shipping/index.js';
 import trialFulfillmentRoutes from './extensions/trial-fulfillment/index.js';
@@ -653,6 +656,10 @@ const startServer = async () => {
     // 22. Register Market Trial routes (Phase L-1)
     app.use('/api/market-trial', marketTrialRoutes);
     logger.info('✅ Market Trial routes registered at /api/market-trial');
+
+    // 22-ai. Register AI Query routes (Phase AI-1)
+    app.use('/api/ai', aiQueryRoutes);
+    logger.info('✅ AI Query routes registered at /api/ai');
 
     // 22-a. Register Trial Shipping Extension (H8-2)
     app.use('/api/trial-shipping', trialShippingRoutes);

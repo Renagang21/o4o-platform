@@ -16,11 +16,12 @@ export const MODEL_WHITELIST = {
     'gpt-4o',
   ],
   gemini: [
-    'gemini-2.5-flash',
-    'gemini-2.5-pro',
+    'gemini-3.0-flash',
+    'gemini-3.0-pro',
     'gemini-2.0-flash',
-    'gemini-3-pro-preview', // Future model (준비용)
-    'gemini-3-flash-preview', // Future model (준비용)
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
   ],
   claude: [
     'claude-sonnet-4.5',
