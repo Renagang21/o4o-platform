@@ -118,6 +118,7 @@ jobs:
         pnpm --filter '@o4o/annualfee-yaksa' run build
         pnpm --filter '@o4o/groupbuy-yaksa' run build
         pnpm --filter '@o4o-apps/forum-yaksa' run build || true
+        pnpm --filter '@o4o/market-trial' run build
 
         # ============================================================
         # Layer 6: Cosmetics Extensions
