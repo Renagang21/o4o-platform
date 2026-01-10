@@ -12,7 +12,7 @@
 import { DataSource, Repository } from 'typeorm';
 import {
   MarketTrial,
-  MarketTrialStatus,
+  TrialStatus,
   MarketTrialForum,
   MarketTrialParticipant,
   ParticipantType,
@@ -127,8 +127,8 @@ export class MarketTrialForumService {
       return false;
     }
 
-    // FAILED trial is read-only
-    if (status === MarketTrialStatus.FAILED) {
+    // CLOSED trial is read-only
+    if (status === TrialStatus.CLOSED) {
       return false;
     }
 
@@ -182,7 +182,7 @@ export class MarketTrialForumService {
 
     if (role === ForumUserRole.GUEST) {
       accessMessage = '이 Forum에 접근하려면 Trial 참여자여야 합니다.';
-    } else if (trial.status === MarketTrialStatus.FAILED && !canWrite) {
+    } else if (trial.status === TrialStatus.CLOSED && !canWrite) {
       accessMessage = '이 Trial은 종료되어 읽기 전용입니다.';
     }
 

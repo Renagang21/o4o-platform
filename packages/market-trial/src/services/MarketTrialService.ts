@@ -13,7 +13,7 @@
 import { DataSource, Repository } from 'typeorm';
 import {
   MarketTrial,
-  MarketTrialStatus,
+  TrialStatus,
   MarketTrialParticipant,
   ParticipantType,
   MarketTrialForum,
@@ -38,7 +38,7 @@ export interface ParticipateDto {
 }
 
 export interface ListTrialsFilter {
-  status?: MarketTrialStatus;
+  status?: TrialStatus;
   supplierId?: string;
 }
 
@@ -71,7 +71,7 @@ export class MarketTrialService {
       fundingStartAt: dto.fundingStartAt,
       fundingEndAt: dto.fundingEndAt,
       trialPeriodDays: dto.trialPeriodDays,
-      status: MarketTrialStatus.OPEN,
+      status: TrialStatus.RECRUITING,
     });
 
     const savedTrial = await this.trialRepo.save(trial);
@@ -181,7 +181,7 @@ export class MarketTrialService {
     }
 
     // Check if trial is open for participation
-    if (trial.status !== MarketTrialStatus.OPEN) {
+    if (trial.status !== TrialStatus.RECRUITING) {
       throw new Error('Market Trial is not open for participation');
     }
 
@@ -218,7 +218,7 @@ export class MarketTrialService {
     // Check if funding target is reached
     if (newAmount >= Number(trial.targetAmount)) {
       await this.trialRepo.update(trialId, {
-        status: MarketTrialStatus.TRIAL_ACTIVE,
+        status: TrialStatus.DEVELOPMENT,
       });
     }
 
@@ -240,8 +240,8 @@ export class MarketTrialService {
    * Called on read operations to ensure status is current
    */
   async evaluateStatusIfNeeded(trial: MarketTrial): Promise<MarketTrial> {
-    // Only evaluate OPEN trials
-    if (trial.status !== MarketTrialStatus.OPEN) {
+    // Only evaluate RECRUITING trials
+    if (trial.status !== TrialStatus.RECRUITING) {
       return trial;
     }
 
@@ -254,11 +254,11 @@ export class MarketTrialService {
       const targetAmount = Number(trial.targetAmount);
 
       if (currentAmount >= targetAmount) {
-        // Funding successful
-        trial.status = MarketTrialStatus.TRIAL_ACTIVE;
+        // Funding successful - move to development
+        trial.status = TrialStatus.DEVELOPMENT;
       } else {
-        // Funding failed
-        trial.status = MarketTrialStatus.FAILED;
+        // Funding failed - close the trial
+        trial.status = TrialStatus.CLOSED;
       }
 
       // Update in database

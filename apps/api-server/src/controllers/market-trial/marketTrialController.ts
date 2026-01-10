@@ -10,13 +10,33 @@ import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
 import { v4 as uuidv4 } from 'uuid';
 
-// Types
+// Types - WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1 기준 통합
+import { TrialStatus } from '@o4o/market-trial';
+
 type TrialEligibleRole = 'partner' | 'seller';
 type RewardType = 'cash' | 'product';
-type TrialStatus = 'open' | 'closed';
 type RewardStatus = 'pending' | 'fulfilled';
 
-interface MarketTrial {
+/** Trial 참여 가능 상태 목록 */
+const JOINABLE_STATUSES: TrialStatus[] = [
+  TrialStatus.RECRUITING,
+];
+
+/** Trial 종료 상태 목록 */
+const CLOSED_STATUSES: TrialStatus[] = [
+  TrialStatus.FULFILLED,
+  TrialStatus.CLOSED,
+];
+
+/** Trial Outcome Snapshot - 결과 약속 정보 */
+interface TrialOutcomeSnapshot {
+  expectedType: 'product' | 'cash';
+  description: string;
+  quantity?: number;
+  note?: string;
+}
+
+interface MarketTrialDTO {
   id: string;
   title: string;
   description: string;
@@ -27,6 +47,7 @@ interface MarketTrial {
   cashRewardAmount?: number;
   productRewardDescription?: string;
   status: TrialStatus;
+  outcomeSnapshot?: TrialOutcomeSnapshot;
   maxParticipants?: number;
   currentParticipants: number;
   deadline?: string;
@@ -45,14 +66,14 @@ interface TrialParticipation {
 }
 
 // In-memory store for Phase L-1 MVP
-const trialsStore: Map<string, MarketTrial> = new Map();
-const participationsStore: Map<string, TrialParticipation[]> = new Map();
+const trialsStore: Map<string, MarketTrialDTO> = new Map();
+export const participationsStore: Map<string, TrialParticipation[]> = new Map();
 
 // Initialize with sample data
 function initSampleTrials() {
   if (trialsStore.size > 0) return;
 
-  const sampleTrials: MarketTrial[] = [
+  const sampleTrials: MarketTrialDTO[] = [
     {
       id: uuidv4(),
       title: '신제품 스킨케어 라인 체험단',
@@ -64,7 +85,11 @@ function initSampleTrials() {
       rewardOptions: ['cash', 'product'],
       cashRewardAmount: 50000,
       productRewardDescription: '정품 스킨케어 세트 (150,000원 상당)',
-      status: 'open',
+      status: TrialStatus.RECRUITING,
+      outcomeSnapshot: {
+        expectedType: 'product',
+        description: '정품 스킨케어 세트 (150,000원 상당)',
+      },
       maxParticipants: 50,
       currentParticipants: 23,
       deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
@@ -80,7 +105,11 @@ function initSampleTrials() {
       eligibleRoles: ['partner'],
       rewardOptions: ['cash'],
       cashRewardAmount: 30000,
-      status: 'open',
+      status: TrialStatus.RECRUITING,
+      outcomeSnapshot: {
+        expectedType: 'cash',
+        description: '30,000원 현금 보상',
+      },
       currentParticipants: 0,
       createdAt: new Date().toISOString(),
     },
@@ -94,7 +123,11 @@ function initSampleTrials() {
       eligibleRoles: ['seller'],
       rewardOptions: ['product'],
       productRewardDescription: '프리미엄 뷰티 디바이스 (500,000원 상당)',
-      status: 'open',
+      status: TrialStatus.RECRUITING,
+      outcomeSnapshot: {
+        expectedType: 'product',
+        description: '프리미엄 뷰티 디바이스 (500,000원 상당)',
+      },
       maxParticipants: 10,
       currentParticipants: 8,
       createdAt: new Date().toISOString(),
@@ -107,7 +140,7 @@ function initSampleTrials() {
       supplierName: '코스메틱 브랜드 A',
       eligibleRoles: ['partner', 'seller'],
       rewardOptions: ['cash', 'product'],
-      status: 'closed',
+      status: TrialStatus.CLOSED,
       currentParticipants: 30,
       createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     },
@@ -133,8 +166,12 @@ export class MarketTrialController {
 
       let trials = Array.from(trialsStore.values());
 
-      // Filter by status
-      if (status && (status === 'open' || status === 'closed')) {
+      // Filter by status - 새 enum 기반 필터링
+      if (status === 'open' || status === 'recruiting') {
+        trials = trials.filter((t) => JOINABLE_STATUSES.includes(t.status));
+      } else if (status === 'closed') {
+        trials = trials.filter((t) => CLOSED_STATUSES.includes(t.status));
+      } else if (status && Object.values(TrialStatus).includes(status as TrialStatus)) {
         trials = trials.filter((t) => t.status === status);
       }
 
@@ -255,11 +292,11 @@ export class MarketTrialController {
         });
       }
 
-      // Check if trial is open
-      if (trial.status !== 'open') {
+      // Check if trial is joinable (recruiting status)
+      if (!JOINABLE_STATUSES.includes(trial.status)) {
         return res.status(400).json({
           success: false,
-          message: 'Trial is closed',
+          message: 'Trial is not accepting participants',
         });
       }
 

@@ -15,14 +15,25 @@ import {
 } from 'typeorm';
 
 /**
- * Market Trial Status
- * Minimal status values as specified in Work Order.
+ * Trial Status (Unified Enum)
+ *
+ * WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1 기준 단일화된 상태 모델
+ * - Backend / API / Frontend 전부 이 enum 사용
+ * - 기존 open/closed, upcoming/active/ended 등 모두 폐기
  */
-export enum MarketTrialStatus {
-  OPEN = 'open',                 // Funding open for participation
-  TRIAL_ACTIVE = 'trial_active', // Funding complete, trial period active
-  FAILED = 'failed',             // Funding failed or trial failed
+export enum TrialStatus {
+  DRAFT = 'draft',                         // 초안 - 공급자가 작성 중
+  SUBMITTED = 'submitted',                 // 제출됨 - 운영자 심사 대기
+  APPROVED = 'approved',                   // 승인됨 - 모집 시작 전
+  RECRUITING = 'recruiting',               // 모집 중 - 참여자 모집 진행
+  DEVELOPMENT = 'development',             // 개발/준비 중 - 모집 완료 후 상품 준비
+  OUTCOME_CONFIRMING = 'outcome_confirming', // 결과 확정 중 - 참여자 Decision 수집
+  FULFILLED = 'fulfilled',                 // 이행 완료 - Trial 성공 종료
+  CLOSED = 'closed',                       // 종료 - 일반 종료 (실패/취소 포함)
 }
+
+/** @deprecated Use TrialStatus instead - 하위 호환용 alias */
+export const MarketTrialStatus = TrialStatus;
 
 @Entity('market_trials')
 export class MarketTrial {
@@ -38,12 +49,25 @@ export class MarketTrial {
   supplierId!: string;
 
   /**
-   * Product being trialed
+   * Product being trialed (Optional)
    * References dropshipping_product_masters.id
+   * @deprecated Trial-상품 FK 의존 제거 정책에 따라 optional로 변경
    */
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   @Index()
-  productId!: string;
+  productId?: string;
+
+  /**
+   * Outcome Snapshot - Trial 결과 약속 정보
+   * WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1: productId FK 대신 사용
+   */
+  @Column({ type: 'jsonb', nullable: true })
+  outcomeSnapshot?: {
+    expectedType: 'product' | 'cash';
+    description: string;
+    quantity?: number;
+    note?: string;
+  };
 
   /**
    * Trial campaign title
@@ -99,10 +123,10 @@ export class MarketTrial {
   @Column({
     type: 'varchar',
     length: 50,
-    default: MarketTrialStatus.OPEN,
+    default: TrialStatus.DRAFT,
   })
   @Index()
-  status!: string;
+  status!: TrialStatus;
 
   @CreateDateColumn()
   createdAt!: Date;
