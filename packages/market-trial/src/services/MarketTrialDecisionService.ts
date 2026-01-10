@@ -14,7 +14,7 @@ import {
   MarketTrialDecision,
   DecisionType,
   MarketTrial,
-  MarketTrialStatus,
+  TrialStatus,
   MarketTrialParticipant,
   ParticipantType,
 } from '../entities/index.js';
@@ -88,9 +88,9 @@ export class MarketTrialDecisionService {
       throw new Error('Market Trial not found');
     }
 
-    // Decisions can only be made when trial is TRIAL_ACTIVE (funding succeeded)
-    if (trial.status !== MarketTrialStatus.TRIAL_ACTIVE) {
-      throw new Error('Decisions can only be made when trial is active');
+    // Decisions can only be made when trial is in OUTCOME_CONFIRMING status
+    if (trial.status !== TrialStatus.OUTCOME_CONFIRMING) {
+      throw new Error('Decisions can only be made when trial is in outcome confirming phase');
     }
 
     return trial;

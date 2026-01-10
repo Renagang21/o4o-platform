@@ -24,7 +24,7 @@ import { DataSource } from 'typeorm';
 import { MarketTrialService } from '../services/MarketTrialService.js';
 import { MarketTrialDecisionService } from '../services/MarketTrialDecisionService.js';
 import { MarketTrialForumService } from '../services/MarketTrialForumService.js';
-import { MarketTrialStatus, ParticipantType, DecisionType } from '../entities/index.js';
+import { TrialStatus, ParticipantType, DecisionType } from '../entities/index.js';
 import {
   validateCreateRequest,
   validateParticipateRequest,
@@ -94,10 +94,10 @@ export function createMarketTrialController(dataSource: DataSource): Router {
     try {
       const { status, supplierId } = req.query;
 
-      const filter: { status?: MarketTrialStatus; supplierId?: string } = {};
+      const filter: { status?: TrialStatus; supplierId?: string } = {};
 
-      if (status && Object.values(MarketTrialStatus).includes(status as MarketTrialStatus)) {
-        filter.status = status as MarketTrialStatus;
+      if (status && Object.values(TrialStatus).includes(status as TrialStatus)) {
+        filter.status = status as TrialStatus;
       }
 
       if (supplierId) {
