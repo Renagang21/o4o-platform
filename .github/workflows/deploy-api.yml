@@ -99,6 +99,13 @@ jobs:
         pnpm --filter '@o4o/lms-core' run build
 
         # ============================================================
+        # Layer 3.5: Dropshipping Core (depends on organization-core)
+        # ============================================================
+        echo ""
+        echo "📦 Layer 3.5: Dropshipping Core..."
+        pnpm --filter '@o4o/dropshipping-core' run build
+
+        # ============================================================
         # Layer 4: Scheduler & Shared Services
         # ============================================================
         echo ""
