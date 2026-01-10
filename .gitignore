@@ -110,3 +110,7 @@ storybook-static
 .DS_Store
 Thumbs.db
 apps/admin-dashboard/.vite-cache/
+
+# Cloud SQL Proxy
+bin/cloud-sql-proxy.exe
+bin/cloud_sql_proxy
