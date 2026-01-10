@@ -1,8 +1,7 @@
-export { Header } from './Header';
-export { Navigation } from './Navigation';
-export { Layout } from './Layout';
-export { HeroSection } from './HeroSection';
-export { CoreValueSection } from './CoreValueSection';
-export { UsagePreviewSection } from './UsagePreviewSection';
-export { CTASection } from './CTASection';
-export { Footer } from './Footer';
+/**
+ * Components Index - K-Cosmetics
+ */
+
+export { Header, Footer } from './common';
+export { default as MainLayout } from './layouts/MainLayout';
+export { RoleSwitcher } from './RoleSwitcher';

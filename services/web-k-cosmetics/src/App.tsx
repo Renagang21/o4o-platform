@@ -1,154 +1,45 @@
 /**
  * App - K-Cosmetics
- * WO-KCOS-HOME-UI-V1
- *
- * 라우팅 설정:
- * - / : 홈 (한국어 고정)
- * - /stores : 매장 디렉토리 (영어 기본, 다국어)
- * - /stores/:storeSlug : 개별 매장 (한국어 기본, 다국어)
- * - /tourists : 관광객 안내
- * - /partners : 파트너 안내
- * - /suppliers : 공급사 참여 안내 (B2B)
- * - /about : 플랫폼 소개
- * - /contact : 문의
- * - /admin, /supplier, /seller, /partner : 역할별 대시보드
+ * Based on GlycoPharm App structure
  */
 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { Layout } from './components';
-import { RoleSwitcher } from './components/RoleSwitcher';
-import { AuthProvider, useAuth } from './contexts';
-import {
-  HomePage,
-  LoginPage,
-  StoresPage,
-  StoreDetailPage,
-  TouristsPage,
-  PartnersPage,
-  SuppliersPage,
-  AboutPage,
-  ContactPage,
-  AdminDashboardPage,
-  SellerDashboardPage,
-} from './pages';
-import { RoleNotAvailablePage } from './pages/RoleNotAvailablePage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
 
-const SERVICE_NAME = 'K-Cosmetics';
+// Layouts
+import MainLayout from '@/components/layouts/MainLayout';
 
-function AppContent() {
-  const { isAuthenticated, user, logout } = useAuth();
+// Public Pages
+import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage } from '@/pages';
+import LoginPage from '@/pages/auth/LoginPage';
 
+// App Routes
+function AppRoutes() {
   return (
-    <Layout serviceName={SERVICE_NAME}>
-      <nav style={navStyle}>
-        <div style={navLeftStyle}>
-          <Link to="/" style={linkStyle}>홈</Link>
-          <Link to="/stores" style={linkStyle}>매장</Link>
-          <Link to="/tourists" style={linkStyle}>관광객</Link>
-          <Link to="/about" style={linkStyle}>소개</Link>
-        </div>
-        <div style={navRightStyle}>
-          {isAuthenticated ? (
-            <>
-              <RoleSwitcher />
-              <span style={userInfoStyle}>{user?.name}</span>
-              <button onClick={logout} style={logoutButtonStyle}>로그아웃</button>
-            </>
-          ) : (
-            <Link to="/login" style={linkStyle}>로그인</Link>
-          )}
-        </div>
-      </nav>
-      <Routes>
-        {/* 메인 홈 */}
-        <Route path="/" element={<HomePage />} />
+    <Routes>
+      {/* Public Routes with MainLayout */}
+      <Route element={<MainLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="contact" element={<ContactPage />} />
 
-        {/* 로그인 */}
-        <Route path="/login" element={<LoginPage />} />
+        {/* Role Not Available */}
+        <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
+        <Route path="partner/*" element={<RoleNotAvailablePage role="partner" />} />
+      </Route>
 
-        {/* 매장 디렉토리 */}
-        <Route path="/stores" element={<StoresPage />} />
-        <Route path="/stores/:storeSlug" element={<StoreDetailPage />} />
-
-        {/* 관광객 안내 */}
-        <Route path="/tourists" element={<TouristsPage />} />
-
-        {/* 파트너 안내 */}
-        <Route path="/partners" element={<PartnersPage />} />
-
-        {/* 공급사 참여 안내 (B2B) */}
-        <Route path="/suppliers" element={<SuppliersPage />} />
-
-        {/* 플랫폼 소개 */}
-        <Route path="/about" element={<AboutPage />} />
-
-        {/* 문의 */}
-        <Route path="/contact" element={<ContactPage />} />
-
-        {/* 대시보드 */}
-        <Route path="/admin/*" element={<AdminDashboardPage />} />
-        <Route path="/seller/*" element={<SellerDashboardPage />} />
-
-        {/* 공급자/파트너는 Neture에서 관리 */}
-        <Route path="/supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
-        <Route path="/partner/*" element={<RoleNotAvailablePage role="partner" />} />
-
-        {/* 404 - 홈으로 리다이렉트 */}
-        <Route path="*" element={<HomePage />} />
-      </Routes>
-    </Layout>
+      {/* 404 */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
-
-const navStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '10px 20px',
-  borderBottom: '1px solid #fce4ec',
-  marginBottom: '20px',
-};
-
-const navLeftStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '15px',
-};
-
-const navRightStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '12px',
-};
-
-const linkStyle: React.CSSProperties = {
-  color: '#FF6B9D',
-  textDecoration: 'none',
-};
-
-const userInfoStyle: React.CSSProperties = {
-  fontSize: '14px',
-  color: '#333',
-};
-
-const logoutButtonStyle: React.CSSProperties = {
-  padding: '6px 12px',
-  backgroundColor: '#FFF0F5',
-  border: '1px solid #fce4ec',
-  borderRadius: '6px',
-  fontSize: '13px',
-  color: '#FF6B9D',
-  cursor: 'pointer',
-};
-
-export default App;
