@@ -7,6 +7,7 @@ import { useAuth } from '@o4o/auth-context'
 import { WordPressRouter } from '@/components/routing/WordPressRouter'
 import { useLocation } from 'react-router-dom'
 import { useAdminFullscreen } from '@/hooks/useAdminFullscreen'
+import FloatingAiButton from '@/components/ai/FloatingAiButton'
 
 interface AdminLayoutProps {
   children: ReactNode
@@ -92,11 +93,14 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       
       {/* Mobile sidebar backdrop */}
       {!isFullscreenMode && (
-        <div 
+        <div
           className={`admin-sidebar-backdrop ${sidebarOpen ? 'show' : ''}`}
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Floating AI Button - Phase AI-1 */}
+      {!isFullscreenMode && <FloatingAiButton />}
     </div>
   )
 }
