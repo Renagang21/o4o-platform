@@ -108,6 +108,41 @@ router.put(
 );
 
 // ============================================================================
+// EXTERNAL CONTACT ROUTES (UserController)
+// WO-NETURE-EXTERNAL-CONTACT-V1
+// ============================================================================
+
+/**
+ * GET /api/v1/users/me/contact
+ * Get current user's external contact settings
+ */
+router.get(
+  '/me/contact',
+  requireAuth,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    return UserController.getContactSettings(req, res);
+  })
+);
+
+/**
+ * PATCH /api/v1/users/me/contact
+ * Update current user's external contact settings
+ */
+router.patch(
+  '/me/contact',
+  requireAuth,
+  [
+    body('contactEnabled').optional().isBoolean().withMessage('contactEnabled must be a boolean'),
+    body('kakaoOpenChatUrl').optional({ nullable: true }).isString().withMessage('kakaoOpenChatUrl must be a string'),
+    body('kakaoChannelUrl').optional({ nullable: true }).isString().withMessage('kakaoChannelUrl must be a string'),
+  ],
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!validateRequest(req, res)) return;
+    return UserController.updateContactSettings(req, res);
+  })
+);
+
+// ============================================================================
 // SESSION MANAGEMENT ROUTES (UserController)
 // ============================================================================
 

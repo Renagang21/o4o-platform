@@ -20,3 +20,6 @@ export {
   CategoryListPage,
   ProductDetailPage,
 } from './procurement';
+
+// Forum (WO-NETURE-HOME-HUB-FORUM-V0.1)
+export { ForumPage, ForumPostPage, ForumWritePage } from './forum';

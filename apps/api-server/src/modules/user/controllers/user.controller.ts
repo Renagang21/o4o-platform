@@ -247,6 +247,106 @@ export class UserController extends BaseController {
   }
 
   /**
+   * GET /api/v1/users/me/contact
+   * Get current user's external contact settings
+   * WO-NETURE-EXTERNAL-CONTACT-V1
+   */
+  static async getContactSettings(req: AuthRequest, res: Response): Promise<any> {
+    if (!req.user) {
+      return BaseController.unauthorized(res, 'Not authenticated');
+    }
+
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { id: req.user.id },
+        select: ['id', 'contactEnabled', 'kakaoOpenChatUrl', 'kakaoChannelUrl'],
+      });
+
+      if (!user) {
+        return BaseController.notFound(res, 'User not found');
+      }
+
+      return BaseController.ok(res, {
+        contactEnabled: user.contactEnabled,
+        kakaoOpenChatUrl: user.kakaoOpenChatUrl || null,
+        kakaoChannelUrl: user.kakaoChannelUrl || null,
+      });
+    } catch (error: any) {
+      logger.error('[UserController.getContactSettings] Error', {
+        error: error.message,
+        userId: req.user.id,
+      });
+      return BaseController.error(res, 'Failed to get contact settings');
+    }
+  }
+
+  /**
+   * PATCH /api/v1/users/me/contact
+   * Update current user's external contact settings
+   * WO-NETURE-EXTERNAL-CONTACT-V1
+   */
+  static async updateContactSettings(req: AuthRequest, res: Response): Promise<any> {
+    if (!req.user) {
+      return BaseController.unauthorized(res, 'Not authenticated');
+    }
+
+    const { contactEnabled, kakaoOpenChatUrl, kakaoChannelUrl } = req.body;
+
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { id: req.user.id },
+      });
+
+      if (!user) {
+        return BaseController.notFound(res, 'User not found');
+      }
+
+      // Validate KakaoTalk URLs if provided
+      if (kakaoOpenChatUrl !== undefined) {
+        if (kakaoOpenChatUrl !== null && kakaoOpenChatUrl !== '') {
+          // Basic URL validation for Kakao open chat
+          if (!kakaoOpenChatUrl.startsWith('https://open.kakao.com/')) {
+            return BaseController.error(res, 'Invalid Kakao Open Chat URL format', 400);
+          }
+        }
+        user.kakaoOpenChatUrl = kakaoOpenChatUrl || undefined;
+      }
+
+      if (kakaoChannelUrl !== undefined) {
+        if (kakaoChannelUrl !== null && kakaoChannelUrl !== '') {
+          // Basic URL validation for Kakao channel
+          if (!kakaoChannelUrl.startsWith('https://pf.kakao.com/')) {
+            return BaseController.error(res, 'Invalid Kakao Channel URL format', 400);
+          }
+        }
+        user.kakaoChannelUrl = kakaoChannelUrl || undefined;
+      }
+
+      if (typeof contactEnabled === 'boolean') {
+        user.contactEnabled = contactEnabled;
+      }
+
+      user.updatedAt = new Date();
+      await userRepository.save(user);
+
+      return BaseController.ok(res, {
+        message: 'Contact settings updated successfully',
+        contactEnabled: user.contactEnabled,
+        kakaoOpenChatUrl: user.kakaoOpenChatUrl || null,
+        kakaoChannelUrl: user.kakaoChannelUrl || null,
+      });
+    } catch (error: any) {
+      logger.error('[UserController.updateContactSettings] Error', {
+        error: error.message,
+        userId: req.user.id,
+      });
+      return BaseController.error(res, 'Failed to update contact settings');
+    }
+  }
+
+  /**
    * GET /api/v1/users/profile/completeness
    * Get profile completeness percentage
    */

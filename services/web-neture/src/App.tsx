@@ -16,7 +16,11 @@ import {
   ProcurementHomePage,
   CategoryListPage,
   ProductDetailPage,
+  ForumPage,
+  ForumPostPage,
+  ForumWritePage,
 } from './pages';
+import { ContactSettingsPage } from './pages/profile/ContactSettingsPage';
 
 /**
  * Neture - 전자상거래 판매자 지원 서비스
@@ -67,6 +71,14 @@ function AppContent() {
         <Route path="/procurement" element={<ProcurementHomePage />} />
         <Route path="/procurement/category/:categoryId" element={<CategoryListPage />} />
         <Route path="/procurement/product/:productId" element={<ProductDetailPage />} />
+
+        {/* 포럼 (WO-NETURE-HOME-HUB-FORUM-V0.1) */}
+        <Route path="/forum" element={<ForumPage />} />
+        <Route path="/forum/write" element={<ForumWritePage />} />
+        <Route path="/forum/post/:slug" element={<ForumPostPage />} />
+
+        {/* 프로필/설정 (WO-NETURE-EXTERNAL-CONTACT-V1) */}
+        <Route path="/profile/contact" element={<ContactSettingsPage />} />
       </Routes>
     </Layout>
   );

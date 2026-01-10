@@ -74,6 +74,10 @@ export class ForumPost {
   @Column({ type: 'boolean', default: true })
   allowComments!: boolean;
 
+  // WO-NETURE-EXTERNAL-CONTACT-V1: Show author's contact info on this post
+  @Column({ name: 'show_contact_on_post', type: 'boolean', default: false })
+  showContactOnPost!: boolean;
+
   @Column({ type: 'int', default: 0 })
   viewCount!: number;
 

@@ -40,6 +40,17 @@ export class User {
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone?: string;
 
+  // WO-NETURE-EXTERNAL-CONTACT-V1: External contact settings
+  // 사용자가 외부 연락 수단(카카오톡)을 선택적으로 등록
+  @Column({ type: 'boolean', default: false, name: 'contact_enabled' })
+  contactEnabled!: boolean;
+
+  @Column({ type: 'varchar', length: 500, nullable: true, name: 'kakao_open_chat_url' })
+  kakaoOpenChatUrl?: string;
+
+  @Column({ type: 'varchar', length: 500, nullable: true, name: 'kakao_channel_url' })
+  kakaoChannelUrl?: string;
+
   @Column({
     type: 'enum',
     enum: UserStatus,
@@ -442,6 +453,10 @@ export class User {
       lastName: this.lastName,
       fullName: this.fullName,
       phone: this.phone, // Phase 3-3: Include phone for checkout auto-fill
+      // WO-NETURE-EXTERNAL-CONTACT-V1: External contact settings
+      contactEnabled: this.contactEnabled,
+      kakaoOpenChatUrl: this.kakaoOpenChatUrl,
+      kakaoChannelUrl: this.kakaoChannelUrl,
       // Note: role/roles/dbRoles are deprecated - use RoleAssignment data
       role: this.role,
       roles: this.getRoleNames(), // Return role names as string array

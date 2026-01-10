@@ -17,4 +17,10 @@ export {
   HomePartnerSection,
   HomeB2BIntroSection,
   HomeFooterSummary,
+  HomeForumSection,
+  // v2 components (WO-NETURE-HOME-HUB-FORUM-V0.1)
+  HomeHeroSection_v2,
+  HomeCoreValueSection_v2,
+  HomeNetureRoleSection,
+  HomeB2BIntroSection_v2,
 } from './home';
