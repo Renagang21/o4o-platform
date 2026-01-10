@@ -569,17 +569,19 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   },
 
   // ============================================
-  // Market Trial App
+  // Market Trial App (Experimental)
   // Supplier product trial funding
+  // WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1: Experimental 선언
   // ============================================
   {
     appId: 'market-trial',
     name: 'Market Trial',
     version: '1.0.0',
-    description: '공급자 상품 시범판매 펀딩 - 판매자/파트너 참여형 시장 테스트',
+    description: '공급자 상품 시범판매 펀딩 - 판매자/파트너 참여형 시장 테스트 (운영 실험 목적, 자동화 기능 미포함, 정책 변경 가능성 있음)',
     category: 'commerce',
-    tags: ['market-trial', '시범판매', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner'],
+    tags: ['market-trial', '시범판매', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner', 'experimental'],
     type: 'extension',
+    status: 'experimental',
     dependencies: { 'dropshipping-core': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'supplierops', 'sellerops'],
