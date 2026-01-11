@@ -39,6 +39,9 @@ import { OperatorTrialSelectorPage } from '@/pages/operator/market-trial';
 // B2B Order
 import { B2BOrderPage } from '@/pages/pharmacy/b2b-order';
 
+// B2B Supply
+import { SupplyPage } from '@/pages/b2b';
+
 // Forum Extension
 import { ForumListPage, ForumFeedPage } from '@/pages/forum-ext';
 import { OperatorForumManagementPage } from '@/pages/operator/forum-management';
@@ -121,6 +124,8 @@ function AppRoutes() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
+        {/* B2B Supply */}
+        <Route path="b2b/supply" element={<SupplyPage />} />
         <Route path="mypage" element={
           <ProtectedRoute>
             <MyPage />
