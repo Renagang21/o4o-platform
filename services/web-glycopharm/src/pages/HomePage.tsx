@@ -5,11 +5,10 @@
  *
  * 화면 구조 (상→하):
  * 1. Hero / Campaign Slider - 플랫폼 정체성 + 캠페인
- * 2. Quick Action - 운영 도구 상태 요약
+ * 2. Quick Action - 운영 도구 상태 요약 (Signage, Supply, Market Trial, CGM Hub)
  * 3. Now Running - 신제품/Trial/이벤트
- * 4. CGM / 연계 서비스 Zone
- * 5. 운영 공지 / 가이드
- * 6. 협력기관 / 파트너 신뢰 Zone
+ * 4. 운영 공지 / 가이드
+ * 5. 협력기관 / 파트너 신뢰 Zone
  *
  * 원칙:
  * - 통계/차트 ❌
@@ -28,9 +27,7 @@ import {
   ChevronRight,
   Monitor,
   Tag,
-  MessageSquare,
   Pin,
-  ExternalLink,
   Activity,
   Sparkles,
   Calendar,
@@ -109,10 +106,10 @@ const heroSlides: HeroSlide[] = [
   },
   {
     id: 'cgm',
-    title: 'CGM 데이터 요약 기반\n설명·판매 지원',
-    subtitle: 'GlucoseView와 연계하여 환자 맞춤 제품 추천',
+    title: '지금 8개 약국\n· CGM 데이터 연결 중',
+    subtitle: 'CGM Hub를 통해 실시간 연결됩니다',
     bgGradient: 'from-blue-600 via-blue-700 to-indigo-800',
-    cta: { label: 'CGM 서비스 보기', link: 'https://glucoseview.co.kr', variant: 'primary' },
+    cta: { label: 'CGM Hub 보기', link: 'https://glucoseview.co.kr', variant: 'primary' },
   },
   {
     id: 'trust',
@@ -134,6 +131,16 @@ const quickActionCards: QuickActionCard[] = [
     status: { label: '방영 중', value: 3 },
   },
   {
+    id: 'supply',
+    title: 'Supply',
+    subtitle: 'B2B 공급',
+    description: '검증된 공급자의 제품을 조달합니다',
+    icon: Building2,
+    link: '/b2b/supply',
+    color: 'bg-blue-600',
+    status: { label: '공급', value: '사용 중' },
+  },
+  {
     id: 'trial',
     title: 'Market Trial',
     subtitle: '신제품 체험',
@@ -144,14 +151,14 @@ const quickActionCards: QuickActionCard[] = [
     status: { label: '진행 중', value: 2 },
   },
   {
-    id: 'forum',
-    title: 'Forum',
-    subtitle: '약사 커뮤니티',
-    description: '혈당관리 노하우와 경험을 공유하세요',
-    icon: MessageSquare,
-    link: '/forum-ext',
-    color: 'bg-blue-500',
-    status: { label: '신규 글', value: 5 },
+    id: 'cgm-hub',
+    title: 'CGM Hub',
+    subtitle: 'CGM 데이터 허브',
+    description: '약국·환자·CGM 데이터를 연결합니다',
+    icon: Activity,
+    link: 'https://glucoseview.co.kr',
+    color: 'bg-indigo-500',
+    status: { label: '연결 중', value: '환자' },
   },
 ];
 
@@ -434,50 +441,6 @@ function NowRunningSection() {
   );
 }
 
-function CGMServiceSection() {
-  return (
-    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-800">연계 서비스</h2>
-        <p className="text-sm text-slate-500">GlycoPharm과 연결된 전문 서비스</p>
-      </div>
-
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 md:p-8 border border-blue-100">
-        <div className="flex flex-col md:flex-row md:items-center gap-6">
-          <div className="flex-shrink-0">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-              <Activity className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-xl font-bold text-slate-800">GlucoseView</h3>
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                CGM 연계
-              </span>
-            </div>
-            <p className="text-slate-600 mb-4">
-              CGM 데이터 요약을 기반으로 환자에게 맞춤형 제품을 추천하세요.
-              <span className="block text-sm text-slate-500 mt-1">
-                ※ 환자 관리가 아닌, 판매·설명용 인사이트 제공 서비스
-              </span>
-            </p>
-            <a
-              href="https://glucoseview.co.kr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors border border-blue-200"
-            >
-              서비스 보기
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function NoticeSection() {
   return (
     <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
@@ -589,16 +552,14 @@ export default function HomePage() {
       {/* 3. Now Running - 신제품/Trial/이벤트 */}
       <NowRunningSection />
 
-      {/* 4. CGM / 연계 서비스 Zone */}
-      <CGMServiceSection />
 
-      {/* 5. 운영 공지 / 가이드 */}
+      {/* 4. 운영 공지 / 가이드 */}
       <NoticeSection />
 
       {/* CTA for Non-authenticated Users */}
       <CTASection />
 
-      {/* 6. 협력기관 / 파트너 신뢰 Zone */}
+      {/* 5. 협력기관 / 파트너 신뢰 Zone */}
       <PartnerTrustSection />
     </div>
   );

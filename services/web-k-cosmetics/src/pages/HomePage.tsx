@@ -6,11 +6,10 @@
  *
  * 화면 구조 (상→하):
  * 1. Hero / Campaign Slider - 플랫폼 정체성 + 캠페인
- * 2. Quick Action - 운영 도구 상태 요약
+ * 2. Quick Action - 운영 도구 상태 요약 (Products, Supply, Market Trial, Tourist Hub)
  * 3. Now Running - 신상품/Trial/이벤트
- * 4. Tourist Service Zone - 관광객 연계 서비스
- * 5. 운영 공지 / 가이드
- * 6. 협력기관 / 파트너 신뢰 Zone
+ * 4. 운영 공지 / 가이드
+ * 5. 협력기관 / 파트너 신뢰 Zone
  *
  * 원칙:
  * - 통계/차트 ❌
@@ -94,10 +93,10 @@ const heroSlides: HeroSlide[] = [
   },
   {
     id: 'tourist',
-    title: '외국인 관광객을 위한\n검증된 매장 네트워크',
-    subtitle: '개인 관광객부터 단체 관광까지 연결',
+    title: '지금 12개 매장\n· 관광객 연결 중',
+    subtitle: 'Tourist Hub를 통해 실시간 연결됩니다',
     bgGradient: 'linear-gradient(135deg, #2196f3 0%, #1976d2 50%, #1565c0 100%)',
-    cta: { label: '관광객 서비스 보기', link: '/services/tourists', variant: 'primary' },
+    cta: { label: 'Tourist Hub 보기', link: '/services/tourists', variant: 'primary' },
   },
   {
     id: 'trust',
@@ -119,6 +118,16 @@ const quickActionCards: QuickActionCard[] = [
     status: { label: '노출 중', value: 24 },
   },
   {
+    id: 'supply',
+    title: 'Supply',
+    subtitle: 'B2B 공급',
+    description: '검증된 공급자의 상품을 조달합니다',
+    icon: '📋',
+    link: '/b2b/supply',
+    color: '#2196f3',
+    status: { label: '공급', value: '사용 중' },
+  },
+  {
     id: 'trial',
     title: 'Market Trial',
     subtitle: '신상품 체험',
@@ -129,14 +138,14 @@ const quickActionCards: QuickActionCard[] = [
     status: { label: '진행 중', value: 3 },
   },
   {
-    id: 'orders',
-    title: 'Orders',
-    subtitle: 'B2B 주문',
-    description: '브랜드에서 직접 상품을 주문하세요',
-    icon: '📋',
-    link: '/orders',
-    color: '#2196f3',
-    status: { label: '진행 중', value: 2 },
+    id: 'tourist-hub',
+    title: 'Tourist Hub',
+    subtitle: '관광객 허브',
+    description: '관광객·콘텐츠·매장을 연결합니다',
+    icon: '🌏',
+    link: '/services/tourists',
+    color: '#ff9800',
+    status: { label: '연결 중', value: '매장' },
   },
 ];
 
@@ -534,80 +543,6 @@ function NowRunningSection() {
   );
 }
 
-function TouristServiceSection() {
-  return (
-    <section style={{ padding: '48px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>연계 서비스</h2>
-        <p style={{ fontSize: '14px', color: '#666' }}>K-Cosmetics와 연결된 전문 서비스</p>
-      </div>
-
-      <div style={{
-        background: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)',
-        borderRadius: '16px',
-        padding: '32px',
-        border: '1px solid #f48fb1',
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '16px',
-              background: 'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(233, 30, 99, 0.3)',
-              fontSize: '28px',
-            }}>
-              🌏
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a' }}>Tourist Service</h3>
-                <span style={{
-                  padding: '2px 8px',
-                  backgroundColor: '#fce4ec',
-                  color: '#c2185b',
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  borderRadius: '20px',
-                }}>
-                  관광객 연결
-                </span>
-              </div>
-              <p style={{ color: '#666' }}>
-                외국인 관광객을 매장으로 연결해드립니다.
-              </p>
-            </div>
-          </div>
-          <p style={{ fontSize: '14px', color: '#888' }}>
-            ※ 개인 관광객·단체 관광 모두 지원. 검증된 매장만 노출됩니다.
-          </p>
-          <Link
-            to="/services/tourists"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 20px',
-              backgroundColor: '#fff',
-              color: '#e91e63',
-              fontWeight: 500,
-              borderRadius: '10px',
-              textDecoration: 'none',
-              border: '1px solid #f48fb1',
-              alignSelf: 'flex-start',
-            }}
-          >
-            서비스 보기 →
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function NoticeSection() {
   return (
@@ -787,16 +722,13 @@ export function HomePage() {
       {/* 3. Now Running - 신상품/Trial/이벤트 */}
       <NowRunningSection />
 
-      {/* 4. Tourist Service Zone */}
-      <TouristServiceSection />
-
-      {/* 5. 운영 공지 / 가이드 */}
+      {/* 4. 운영 공지 / 가이드 */}
       <NoticeSection />
 
       {/* CTA for Non-authenticated Users */}
       <CTASection />
 
-      {/* 6. 협력 브랜드 신뢰 Zone */}
+      {/* 5. 협력 브랜드 신뢰 Zone */}
       <PartnerTrustSection />
     </div>
   );
