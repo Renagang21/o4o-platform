@@ -1,22 +1,8 @@
 /**
  * Glycopharm Product Log Entity
  *
- * ============================================================================
- * ⚠️ ACTIVE TABLE - GlycoPharm Domain (Phase 9-A Reviewed)
- * ============================================================================
- *
- * This table remains ACTIVE for product audit logging.
- * Unlike glycopharm_orders, this is NOT deprecated.
- *
- * The product log entity tracks:
- * - Product creation/updates
- * - Status changes
- * - Price modifications
- *
- * @see CLAUDE.md §7 for E-commerce Core rules
- * ============================================================================
- *
- * Original: Phase B-1 Glycopharm API Implementation
+ * Phase B-1: Glycopharm API Implementation
+ * Audit log for product changes
  */
 
 import {
@@ -27,7 +13,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { GlycopharmProduct } from './glycopharm-product.entity.js';
+import { GlycopharmProduct } from './glycopharm-product.entity.js';
 
 export type GlycopharmProductLogAction = 'create' | 'update' | 'status_change' | 'delete';
 
@@ -60,8 +46,7 @@ export class GlycopharmProductLog {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  // Relations (using type-only imports to avoid circular dependency in ESM)
-  @ManyToOne('GlycopharmProduct', 'logs')
+  @ManyToOne(() => GlycopharmProduct, (product) => product.logs)
   @JoinColumn({ name: 'product_id' })
   product?: GlycopharmProduct;
 }

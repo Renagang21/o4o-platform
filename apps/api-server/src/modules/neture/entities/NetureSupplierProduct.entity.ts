@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { NetureSupplier } from './NetureSupplier.entity.js';
+import { NetureSupplier } from './NetureSupplier.entity';
 
 @Entity('neture_supplier_products')
 export class NetureSupplierProduct {
@@ -28,7 +28,7 @@ export class NetureSupplierProduct {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne('NetureSupplier', 'products', {
+  @ManyToOne(() => NetureSupplier, (supplier) => supplier.products, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'supplier_id' })

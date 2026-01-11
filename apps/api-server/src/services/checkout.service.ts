@@ -2,17 +2,8 @@
  * Checkout Service
  *
  * Phase N-2: 운영 안정화
- * Phase 5-D: Order Guardrails 적용
  *
  * 주문/결제 DB 영속화 서비스
- *
- * ## Phase 5-D Guardrails
- * - 모든 주문은 이 서비스를 통해서만 생성 가능
- * - OrderType 필수 검증 (Hard Fail)
- * - 차단된 OrderType 거부
- *
- * @see CLAUDE.md §7 - E-commerce Core 절대 규칙
- * @see CLAUDE.md §21 - Order Guardrails (Phase 5-D)
  */
 
 import { Repository } from 'typeorm';
@@ -23,7 +14,6 @@ import {
   CheckoutOrderStatus,
   CheckoutPaymentStatus,
   ShippingAddress,
-  OrderType,
 } from '../entities/checkout/CheckoutOrder.entity.js';
 import {
   CheckoutPayment,
@@ -31,12 +21,6 @@ import {
 } from '../entities/checkout/CheckoutPayment.entity.js';
 import { OrderLog, OrderAction } from '../entities/checkout/OrderLog.entity.js';
 import logger from '../utils/logger.js';
-import {
-  assertOrderCreationAllowed,
-  validateOrderType,
-  InvalidOrderTypeError,
-  BLOCKED_ORDER_TYPES,
-} from '../guards/order-creation.guard.js';
 
 /**
  * 주문 아이템
@@ -51,14 +35,8 @@ export interface OrderItem {
 
 /**
  * 주문 생성 DTO
- *
- * Phase 5-A′: orderType 필수화
- * - 모든 주문은 서비스 유형을 명시해야 함
- * - orderType 미지정 시 GENERIC으로 기본 설정
  */
 export interface CreateOrderDto {
-  /** 주문 유형 (서비스 식별) - Phase 5-A′ 추가 */
-  orderType?: OrderType;
   buyerId: string;
   sellerId: string;
   supplierId: string;
@@ -134,42 +112,9 @@ class CheckoutService {
 
   /**
    * 주문 생성
-   *
-   * Phase 5-A′: E-commerce Core 주문 표준화
-   * Phase 5-D: Order Guardrails 적용
-   *
-   * - 모든 주문은 이 메서드를 통해서만 생성
-   * - orderType으로 서비스 유형 식별
-   * - Guardrail: OrderType 필수, 차단된 타입 거부
-   *
-   * @param dto 주문 생성 정보
-   * @returns 생성된 주문
-   * @throws InvalidOrderTypeError OrderType 누락 또는 유효하지 않은 경우
    */
   async createOrder(dto: CreateOrderDto): Promise<CheckoutOrder> {
     await this.ensureInitialized();
-
-    // ================================================================
-    // Phase 5-D: Order Guardrails
-    // - OrderType 필수 검증 (Hard Fail)
-    // - 차단된 OrderType 거부
-    // ================================================================
-    const orderType = dto.orderType || OrderType.GENERIC;
-
-    // Guardrail 검증
-    assertOrderCreationAllowed(orderType, {
-      viaCheckoutService: true,
-      callerService: 'checkoutService',
-      timestamp: new Date(),
-    });
-
-    // 추가 경고: GENERIC 사용 시 로깅
-    if (orderType === OrderType.GENERIC) {
-      logger.warn('[CheckoutService] Order created with GENERIC type. Consider specifying a service-specific OrderType.', {
-        buyerId: dto.buyerId,
-        sellerId: dto.sellerId,
-      });
-    }
 
     const subtotal = dto.items.reduce((sum, item) => sum + item.subtotal, 0);
     const shippingFee = 0;
@@ -178,7 +123,6 @@ class CheckoutService {
 
     const order = this.orderRepository!.create({
       orderNumber: this.generateOrderNumber(),
-      orderType, // Phase 5-A′: 주문 유형 추가
       buyerId: dto.buyerId,
       sellerId: dto.sellerId,
       supplierId: dto.supplierId,
@@ -203,13 +147,12 @@ class CheckoutService {
       newStatus: CheckoutOrderStatus.CREATED,
       performedBy: dto.buyerId,
       performerType: 'consumer',
-      message: `주문 생성: ${savedOrder.orderNumber} (${orderType})`,
+      message: `주문 생성: ${savedOrder.orderNumber}`,
     });
 
     logger.info('Order created:', {
       orderId: savedOrder.id,
       orderNumber: savedOrder.orderNumber,
-      orderType,
       totalAmount,
     });
 
@@ -447,17 +390,12 @@ class CheckoutService {
 
   /**
    * 모든 주문 조회 (Admin)
-   *
-   * Phase 7-A: orderType 필터 추가
-   * - Admin이 서비스별 주문을 분리 조회 가능
-   * - 정산/리포트에서 OrderType별 집계 가능
    */
   async findAll(filters?: {
     status?: CheckoutOrderStatus;
     paymentStatus?: CheckoutPaymentStatus;
     supplierId?: string;
     partnerId?: string;
-    orderType?: OrderType; // Phase 7-A: 서비스별 필터링
     limit?: number;
     offset?: number;
   }): Promise<{ orders: CheckoutOrder[]; total: number }> {
@@ -481,12 +419,6 @@ class CheckoutService {
     if (filters?.partnerId) {
       query.andWhere('order.partnerId = :partnerId', {
         partnerId: filters.partnerId,
-      });
-    }
-    // Phase 7-A: OrderType 필터
-    if (filters?.orderType) {
-      query.andWhere('order.orderType = :orderType', {
-        orderType: filters.orderType,
       });
     }
 
@@ -550,160 +482,6 @@ class CheckoutService {
    */
   isInitialized(): boolean {
     return this.initialized;
-  }
-
-  // ============================================================================
-  // Phase 7-B: 정산 연동 메서드
-  // ============================================================================
-
-  /**
-   * 정산 대상 주문 조회
-   *
-   * Phase 7-B: checkout_orders 기반 정산 대상 조회
-   *
-   * 정산 대상 기준:
-   * - paymentStatus = 'paid' (결제 완료)
-   * - status != 'cancelled' (취소되지 않음)
-   * - 기간 내 결제 완료된 주문
-   *
-   * @param params 조회 조건
-   * @returns 정산 대상 주문 목록
-   */
-  async findSettlementTargetOrders(params: {
-    periodStart: Date;
-    periodEnd: Date;
-    orderType?: OrderType;
-    supplierId?: string;
-    partnerId?: string;
-  }): Promise<CheckoutOrder[]> {
-    await this.ensureInitialized();
-
-    const query = this.orderRepository!.createQueryBuilder('order')
-      .where('order.paymentStatus = :paymentStatus', {
-        paymentStatus: CheckoutPaymentStatus.PAID,
-      })
-      .andWhere('order.status != :cancelledStatus', {
-        cancelledStatus: CheckoutOrderStatus.CANCELLED,
-      })
-      .andWhere('order.paidAt >= :periodStart', { periodStart: params.periodStart })
-      .andWhere('order.paidAt <= :periodEnd', { periodEnd: params.periodEnd });
-
-    if (params.orderType) {
-      query.andWhere('order.orderType = :orderType', {
-        orderType: params.orderType,
-      });
-    }
-
-    if (params.supplierId) {
-      query.andWhere('order.supplierId = :supplierId', {
-        supplierId: params.supplierId,
-      });
-    }
-
-    if (params.partnerId) {
-      query.andWhere('order.partnerId = :partnerId', {
-        partnerId: params.partnerId,
-      });
-    }
-
-    query.orderBy('order.paidAt', 'ASC');
-
-    return await query.getMany();
-  }
-
-  /**
-   * 정산 집계 조회
-   *
-   * Phase 7-B: 기간별/서비스별 정산 금액 집계
-   *
-   * @param params 집계 조건
-   * @returns 집계 결과
-   */
-  async getSettlementSummary(params: {
-    periodStart: Date;
-    periodEnd: Date;
-    orderType?: OrderType;
-    groupBy?: 'orderType' | 'supplierId' | 'partnerId';
-  }): Promise<{
-    totalOrders: number;
-    totalRevenue: number;
-    byGroup?: Array<{
-      groupKey: string;
-      orderCount: number;
-      revenue: number;
-    }>;
-  }> {
-    await this.ensureInitialized();
-
-    // 기본 집계
-    const baseQuery = this.orderRepository!.createQueryBuilder('order')
-      .where('order.paymentStatus = :paymentStatus', {
-        paymentStatus: CheckoutPaymentStatus.PAID,
-      })
-      .andWhere('order.status != :cancelledStatus', {
-        cancelledStatus: CheckoutOrderStatus.CANCELLED,
-      })
-      .andWhere('order.paidAt >= :periodStart', { periodStart: params.periodStart })
-      .andWhere('order.paidAt <= :periodEnd', { periodEnd: params.periodEnd });
-
-    if (params.orderType) {
-      baseQuery.andWhere('order.orderType = :orderType', {
-        orderType: params.orderType,
-      });
-    }
-
-    // 총 건수 및 매출
-    const totalResult = await baseQuery
-      .select('COUNT(*)', 'orderCount')
-      .addSelect('COALESCE(SUM(order.totalAmount), 0)', 'totalRevenue')
-      .getRawOne();
-
-    const result: {
-      totalOrders: number;
-      totalRevenue: number;
-      byGroup?: Array<{
-        groupKey: string;
-        orderCount: number;
-        revenue: number;
-      }>;
-    } = {
-      totalOrders: parseInt(totalResult?.orderCount || '0', 10),
-      totalRevenue: parseFloat(totalResult?.totalRevenue || '0'),
-    };
-
-    // 그룹별 집계
-    if (params.groupBy) {
-      const groupField = `order.${params.groupBy}`;
-      const groupQuery = this.orderRepository!.createQueryBuilder('order')
-        .select(groupField, 'groupKey')
-        .addSelect('COUNT(*)', 'orderCount')
-        .addSelect('COALESCE(SUM(order.totalAmount), 0)', 'revenue')
-        .where('order.paymentStatus = :paymentStatus', {
-          paymentStatus: CheckoutPaymentStatus.PAID,
-        })
-        .andWhere('order.status != :cancelledStatus', {
-          cancelledStatus: CheckoutOrderStatus.CANCELLED,
-        })
-        .andWhere('order.paidAt >= :periodStart', { periodStart: params.periodStart })
-        .andWhere('order.paidAt <= :periodEnd', { periodEnd: params.periodEnd })
-        .groupBy(groupField);
-
-      if (params.orderType) {
-        groupQuery.andWhere('order.orderType = :orderType', {
-          orderType: params.orderType,
-        });
-      }
-
-      const groupResults = await groupQuery.getRawMany();
-
-      result.byGroup = groupResults.map((row) => ({
-        groupKey: row.groupKey || 'UNKNOWN',
-        orderCount: parseInt(row.orderCount || '0', 10),
-        revenue: parseFloat(row.revenue || '0'),
-      }));
-    }
-
-    return result;
   }
 }
 

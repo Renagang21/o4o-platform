@@ -8,18 +8,19 @@
  *
  * Entities used:
  * - User (users table) - user growth
+ * - NetureOrder (neture.neture_orders) - order/sales data
  * - GlycopharmOrder (glycopharm_orders) - order/sales data
+ * - NeturePartner (neture.neture_partners) - partner data
  * - CosmeticsProduct - cosmetics metrics
- *
- * NOTE: Neture Order/Partner references removed after Step 1 investigation
- *       confirmed Neture as Read-Only Information Hub (no commerce features)
  */
 
 import { Response } from 'express';
 import { AppDataSource, checkDatabaseHealth } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../types/auth.js';
+import { NetureOrder } from '../../routes/neture/entities/neture-order.entity.js';
 import { GlycopharmOrder } from '../../routes/glycopharm/entities/glycopharm-order.entity.js';
+import { NeturePartner } from '../../routes/neture/entities/neture-partner.entity.js';
 import { CosmeticsProduct, CosmeticsBrand, CosmeticsProductStatus } from '../../routes/cosmetics/entities/index.js';
 
 export class AdminDashboardController {
@@ -59,6 +60,16 @@ export class AdminDashboardController {
           startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       }
 
+      // Query Neture orders (only PAID status)
+      const netureRepo = AppDataSource.getRepository(NetureOrder);
+      const netureResult = await netureRepo
+        .createQueryBuilder('order')
+        .select('COALESCE(SUM(order.finalAmount), 0)', 'totalAmount')
+        .addSelect('COUNT(order.id)', 'orderCount')
+        .where('order.status = :status', { status: 'paid' })
+        .andWhere('order.createdAt >= :startDate', { startDate })
+        .getRawOne();
+
       // Query Glycopharm orders (only PAID status)
       const glycopharmRepo = AppDataSource.getRepository(GlycopharmOrder);
       const glycopharmResult = await glycopharmRepo
@@ -69,9 +80,9 @@ export class AdminDashboardController {
         .andWhere('order.created_at >= :startDate', { startDate })
         .getRawOne();
 
-      // Combine results (Neture removed - Read-Only Hub)
-      const totalRevenue = Number(glycopharmResult?.totalAmount || 0);
-      const totalOrders = Number(glycopharmResult?.orderCount || 0);
+      // Combine results
+      const totalRevenue = Number(netureResult?.totalAmount || 0) + Number(glycopharmResult?.totalAmount || 0);
+      const totalOrders = Number(netureResult?.orderCount || 0) + Number(glycopharmResult?.orderCount || 0);
       const averageOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
 
       res.json({
@@ -82,6 +93,10 @@ export class AdminDashboardController {
           totalOrders,
           averageOrderValue,
           breakdown: {
+            neture: {
+              revenue: Number(netureResult?.totalAmount || 0),
+              orders: Number(netureResult?.orderCount || 0)
+            },
             glycopharm: {
               revenue: Number(glycopharmResult?.totalAmount || 0),
               orders: Number(glycopharmResult?.orderCount || 0)
@@ -114,7 +129,16 @@ export class AdminDashboardController {
         });
       }
 
-      // Query Glycopharm order status distribution (Neture removed)
+      // Query Neture order status distribution
+      const netureRepo = AppDataSource.getRepository(NetureOrder);
+      const netureStatusCounts = await netureRepo
+        .createQueryBuilder('order')
+        .select('order.status', 'status')
+        .addSelect('COUNT(order.id)', 'count')
+        .groupBy('order.status')
+        .getRawMany();
+
+      // Query Glycopharm order status distribution
       const glycopharmRepo = AppDataSource.getRepository(GlycopharmOrder);
       const glycopharmStatusCounts = await glycopharmRepo
         .createQueryBuilder('order')
@@ -138,8 +162,13 @@ export class AdminDashboardController {
         'FAILED': { label: '실패', color: '#ef4444' }
       };
 
-      // Aggregate counts (Neture removed)
+      // Aggregate counts
       const aggregatedCounts: Record<string, number> = {};
+
+      netureStatusCounts.forEach((row: any) => {
+        const status = row.status;
+        aggregatedCounts[status] = (aggregatedCounts[status] || 0) + Number(row.count);
+      });
 
       glycopharmStatusCounts.forEach((row: any) => {
         const status = row.status;
@@ -323,9 +352,113 @@ export class AdminDashboardController {
     }
   }
 
-  // NOTE: Partner-related methods (getPartners, getPartnerSummary) removed
-  //       after Step 1 investigation confirmed Neture as Read-Only Hub.
-  //       Partner features belong to a separate commerce service or Neture P2.
+  /**
+   * GET /api/v1/admin/partners
+   *
+   * Returns partner list from NeturePartner
+   */
+  async getPartners(req: AuthRequest, res: Response) {
+    try {
+      // Check admin permission
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Admin access required'
+        });
+      }
+
+      const { page = 1, limit = 20 } = req.query;
+      const skip = (Number(page) - 1) * Number(limit);
+
+      const partnerRepo = AppDataSource.getRepository(NeturePartner);
+
+      const [partners, total] = await partnerRepo.findAndCount({
+        take: Number(limit),
+        skip,
+        order: { createdAt: 'DESC' }
+      });
+
+      res.json({
+        success: true,
+        data: partners,
+        pagination: {
+          page: Number(page),
+          limit: Number(limit),
+          total,
+          totalPages: Math.ceil(total / Number(limit))
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching partners:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch partners',
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/admin/partners/:id/summary
+   *
+   * Returns partner performance summary
+   */
+  async getPartnerSummary(req: AuthRequest, res: Response) {
+    try {
+      // Check admin permission
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Admin access required'
+        });
+      }
+
+      const { id } = req.params;
+
+      // Get partner info
+      const partnerRepo = AppDataSource.getRepository(NeturePartner);
+      const partner = await partnerRepo.findOne({ where: { id } });
+
+      if (!partner) {
+        return res.status(404).json({
+          success: false,
+          message: 'Partner not found'
+        });
+      }
+
+      // Partner sales summary would require order attribution
+      // For now, return partner info with placeholder for metrics
+      // (Real implementation requires partner_id on orders)
+
+      res.json({
+        success: true,
+        data: {
+          partner: {
+            id: partner.id,
+            name: partner.name,
+            type: partner.type,
+            userId: partner.userId,
+            status: partner.status,
+            createdAt: partner.createdAt
+          },
+          metrics: {
+            // Empty until order attribution is implemented
+            totalOrders: 0,
+            totalRevenue: 0,
+            totalCommission: 0,
+            message: 'Partner attribution not yet implemented on orders'
+          }
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching partner summary:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch partner summary',
+        error: error.message
+      });
+    }
+  }
 
   /**
    * GET /api/v1/admin/cosmetics/partner-metrics

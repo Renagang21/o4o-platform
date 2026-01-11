@@ -17,7 +17,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { User } from '../../../modules/auth/entities/User.js';
+import { User } from '../../../modules/auth/entities/User.js';
 
 export type GlucoseViewApplicationStatus = 'submitted' | 'approved' | 'rejected';
 export type GlucoseViewServiceType = 'cgm_view';
@@ -30,7 +30,7 @@ export class GlucoseViewApplication {
   @Column({ name: 'user_id', type: 'uuid' })
   userId!: string;
 
-  @ManyToOne('User', { eager: false })
+  @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'user_id' })
   user?: User;
 

@@ -1,127 +1,90 @@
-/**
- * Admin Stats Controller
- *
- * Phase 7-C: checkout_orders 기반 실데이터 리포트
- *
- * ## 변경 사항 (Phase 7-C)
- * - Mock 데이터 제거
- * - checkout_orders 기반 실제 집계
- * - OrderType별 리포트 지원
- * - paidAt 기준 기간 필터 통일
- *
- * ## 데이터 기준
- * - 매출: paymentStatus='paid' AND status!='cancelled'
- * - 기간: paidAt 기준
- * - 그룹핑: orderType, supplierId, partnerId
- *
- * @see CLAUDE.md §7 - E-commerce Core 절대 규칙
- * @since Phase 7-C (2026-01-11)
- */
-
 import { Request, Response } from 'express';
-import { checkoutService } from '../../services/checkout.service.js';
-import { OrderType } from '../../entities/checkout/CheckoutOrder.entity.js';
+import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
-
-/**
- * Admin 권한 체크
- */
-function isAdmin(req: Request): boolean {
-  const user = (req as any).user;
-  return user && (
-    user.role === 'admin' ||
-    user.role === 'administrator' ||
-    user.role === 'operator' ||
-    user.roles?.includes('admin') ||
-    user.roles?.includes('administrator')
-  );
-}
 
 export class AdminStatsController {
   /**
    * Get platform statistics
    * GET /api/v1/admin/platform-stats
-   *
-   * Phase 7-C: checkout_orders 기반 실데이터
-   *
-   * @query period - 기간 (7d, 30d, 90d, 365d, all) default: 30d
-   * @query order_type - OrderType 필터
    */
   async getPlatformStats(req: Request, res: Response) {
     try {
-      if (!isAdmin(req)) {
+      // Check admin permission
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
         });
       }
 
-      const { period = '30d', order_type } = req.query;
-
-      // 기간 계산
-      const { periodStart, periodEnd } = this.calculatePeriod(period as string);
-
-      // OrderType 검증
-      let orderType: OrderType | undefined;
-      if (order_type) {
-        const orderTypeStr = (order_type as string).toUpperCase();
-        if (Object.values(OrderType).includes(orderTypeStr as OrderType)) {
-          orderType = orderTypeStr as OrderType;
-        }
-      }
-
-      // Phase 7-C: checkout_orders 기반 실제 집계
-      const summary = await checkoutService.getSettlementSummary({
-        periodStart,
-        periodEnd,
-        orderType,
-        groupBy: 'orderType',
-      });
-
-      // 일별 데이터 조회
-      const dailyData = await this.getDailyRevenue(periodStart, periodEnd, orderType);
-
-      // 주문 상태별 건수
-      const statusCounts = await this.getStatusCounts(periodStart, periodEnd, orderType);
-
+      // Generate mock data for now - replace with actual database queries
       const stats = {
-        success: true,
-        data: {
-          period: {
-            type: period,
-            start: periodStart.toISOString(),
-            end: periodEnd.toISOString(),
-          },
-          filter: {
-            orderType: orderType || 'ALL',
-          },
-          overview: {
-            totalRevenue: summary.totalRevenue,
-            totalOrders: summary.totalOrders,
-            averageOrderValue: summary.totalOrders > 0
-              ? Math.round(summary.totalRevenue / summary.totalOrders)
-              : 0,
-            currency: 'KRW',
-          },
-          byOrderType: summary.byGroup?.map(g => ({
-            orderType: g.groupKey,
-            orderCount: g.orderCount,
-            revenue: g.revenue,
-          })) || [],
-          byStatus: statusCounts,
-          dailyRevenue: dailyData,
+        overview: {
+          totalRevenue: 158750000,
+          netProfit: 15875000, // 10% of revenue
+          pendingSettlement: 8250000,
+          totalOrders: 1234,
+          activeUsers: 5678,
+          totalProducts: 342,
+          conversionRate: 3.45,
+          averageOrderValue: 128700
         },
-        // Phase 7-C: 데이터 출처 명시
-        _meta: {
-          source: 'checkout_orders',
-          generatedAt: new Date().toISOString(),
-          note: 'Phase 7-C: Real data from checkout_orders (paidAt basis)',
+        revenue: {
+          daily: this.generateDailyRevenue(),
+          monthly: this.generateMonthlyRevenue(),
+          commissions: {
+            partner: 4725000,
+            vendor: 6300000,
+            platform: 4850000,
+            total: 15875000
+          }
         },
+        approvals: {
+          pending: 7,
+          approved: 42,
+          rejected: 5,
+          avgProcessTime: '2.3 시간'
+        },
+        users: {
+          suppliers: 28,
+          partners: 156,
+          sellers: 89,
+          customers: 5305,
+          growth: 12.5
+        },
+        settlements: {
+          pending: [
+            {
+              id: 'stl_001',
+              type: '파트너 수수료',
+              amount: 2850000,
+              recipient: '김철수',
+              dueDate: '2025-01-30'
+            },
+            {
+              id: 'stl_002',
+              type: '공급자 정산',
+              amount: 3200000,
+              recipient: '삼성전자',
+              dueDate: '2025-01-31'
+            },
+            {
+              id: 'stl_003',
+              type: '판매자 정산',
+              amount: 2200000,
+              recipient: 'LG전자',
+              dueDate: '2025-02-01'
+            }
+          ],
+          completed: 127,
+          upcoming: 3
+        },
+        alerts: this.generateAlerts()
       };
 
       res.json(stats);
     } catch (error) {
-      logger.error('Error fetching platform stats:', error);
+      console.error('Error fetching platform stats:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch platform statistics'
@@ -132,88 +95,43 @@ export class AdminStatsController {
   /**
    * Get revenue summary
    * GET /api/v1/admin/revenue-summary
-   *
-   * Phase 7-C: checkout_orders 기반 실데이터
-   *
-   * @query period - 기간 (7d, 30d, 90d, 365d, all) default: 30d
-   * @query order_type - OrderType 필터
-   * @query group_by - 그룹 기준 (orderType, supplierId, partnerId)
    */
   async getRevenueSummary(req: Request, res: Response) {
     try {
-      if (!isAdmin(req)) {
+      // Check admin permission
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
         });
       }
 
-      const { period = '30d', order_type, group_by } = req.query;
+      const { period = '30d' } = req.query;
 
-      // 기간 계산
-      const { periodStart, periodEnd } = this.calculatePeriod(period as string);
-
-      // OrderType 검증
-      let orderType: OrderType | undefined;
-      if (order_type) {
-        const orderTypeStr = (order_type as string).toUpperCase();
-        if (Object.values(OrderType).includes(orderTypeStr as OrderType)) {
-          orderType = orderTypeStr as OrderType;
-        }
-      }
-
-      // groupBy 검증
-      let groupBy: 'orderType' | 'supplierId' | 'partnerId' | undefined;
-      if (group_by) {
-        const validGroupBy = ['orderType', 'supplierId', 'partnerId'];
-        if (validGroupBy.includes(group_by as string)) {
-          groupBy = group_by as 'orderType' | 'supplierId' | 'partnerId';
-        }
-      }
-
-      // Phase 7-C: checkout_orders 기반 실제 집계
-      const summary = await checkoutService.getSettlementSummary({
-        periodStart,
-        periodEnd,
-        orderType,
-        groupBy,
-      });
-
-      // 일 평균 계산
-      const daysDiff = Math.max(1, Math.ceil((periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)));
-      const averageDaily = Math.round(summary.totalRevenue / daysDiff);
+      // Calculate revenue summary based on period
+      const summary = {
+        period,
+        totalRevenue: 158750000,
+        totalProfit: 15875000,
+        averageDaily: 5291667,
+        topProducts: [
+          { name: '갤럭시 S24 Ultra', revenue: 25000000 },
+          { name: 'LG 그램 17인치', revenue: 18000000 },
+          { name: '에어팟 프로 2세대', revenue: 12000000 }
+        ],
+        topPartners: [
+          { name: '김철수', commission: 2850000 },
+          { name: '이영희', commission: 2100000 },
+          { name: '박민수', commission: 1950000 }
+        ]
+      };
 
       res.json({
         success: true,
-        data: {
-          period: {
-            type: period,
-            start: periodStart.toISOString(),
-            end: periodEnd.toISOString(),
-            days: daysDiff,
-          },
-          filter: {
-            orderType: orderType || 'ALL',
-            groupBy: groupBy || 'none',
-          },
-          summary: {
-            totalRevenue: summary.totalRevenue,
-            totalOrders: summary.totalOrders,
-            averageDaily,
-            averageOrderValue: summary.totalOrders > 0
-              ? Math.round(summary.totalRevenue / summary.totalOrders)
-              : 0,
-            currency: 'KRW',
-          },
-          byGroup: summary.byGroup || [],
-        },
-        _meta: {
-          source: 'checkout_orders',
-          generatedAt: new Date().toISOString(),
-        },
+        data: summary
       });
     } catch (error) {
-      logger.error('Error fetching revenue summary:', error);
+      console.error('Error fetching revenue summary:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch revenue summary'
@@ -222,60 +140,63 @@ export class AdminStatsController {
   }
 
   /**
-   * Get pending settlements summary
+   * Get pending settlements
    * GET /api/v1/admin/pending-settlements
-   *
-   * Phase 7-C: checkout_orders 기반 정산 예정 데이터
-   * - 결제 완료되었으나 아직 정산되지 않은 주문 기준
    */
   async getPendingSettlements(req: Request, res: Response) {
     try {
-      if (!isAdmin(req)) {
+      // Check admin permission
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
         });
       }
 
-      // 이번 달 기준 정산 대상 조회
-      const now = new Date();
-      const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-
-      // Phase 7-C: checkout_orders 기반 정산 대상 집계
-      const summary = await checkoutService.getSettlementSummary({
-        periodStart,
-        periodEnd,
-        groupBy: 'orderType',
-      });
+      const settlements = [
+        {
+          id: 'SET001',
+          type: 'partner_commission',
+          userId: 'user_123',
+          userName: '김철수',
+          amount: 2850000,
+          period: '2025-01',
+          status: 'pending',
+          dueDate: '2025-01-30',
+          bankAccount: '****-****-1234'
+        },
+        {
+          id: 'SET002',
+          type: 'supplier_payment',
+          userId: 'supplier_001',
+          userName: '삼성전자',
+          amount: 45000000,
+          period: '2025-01',
+          status: 'pending',
+          dueDate: '2025-01-31',
+          bankAccount: '****-****-5678'
+        },
+        {
+          id: 'SET003',
+          type: 'seller_revenue',
+          userId: 'seller_001',
+          userName: 'LG전자',
+          amount: 12500000,
+          period: '2025-01',
+          status: 'pending',
+          dueDate: '2025-02-01',
+          bankAccount: '****-****-9012'
+        }
+      ];
 
       res.json({
         success: true,
-        data: {
-          period: {
-            start: periodStart.toISOString(),
-            end: periodEnd.toISOString(),
-            label: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
-          },
-          summary: {
-            totalOrders: summary.totalOrders,
-            totalAmount: summary.totalRevenue,
-            currency: 'KRW',
-          },
-          byOrderType: summary.byGroup?.map(g => ({
-            orderType: g.groupKey,
-            orderCount: g.orderCount,
-            amount: g.revenue,
-          })) || [],
-        },
-        _meta: {
-          source: 'checkout_orders',
-          generatedAt: new Date().toISOString(),
-          note: 'Phase 7-C: Settlement candidates from checkout_orders',
-        },
+        data: settlements,
+        total: settlements.length,
+        totalAmount: settlements.reduce((sum, s) => sum + s.amount, 0)
       });
     } catch (error) {
-      logger.error('Error fetching pending settlements:', error);
+      console.error('Error fetching pending settlements:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch pending settlements'
@@ -284,15 +205,16 @@ export class AdminStatsController {
   }
 
   /**
-   * Process settlement (placeholder)
+   * Process settlement
    * POST /api/v1/admin/process-settlement/:id
    */
   async processSettlement(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { action } = req.body;
+      const { action } = req.body; // 'approve' or 'defer'
 
-      if (!isAdmin(req)) {
+      // Check admin permission
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
@@ -306,24 +228,21 @@ export class AdminStatsController {
         });
       }
 
-      // Phase 7-C Note: 실제 정산 처리는 Settlement Entity 구현 후 활성화
+      // Process the settlement (mock implementation)
       logger.info(`Processing settlement ${id} with action: ${action}`);
 
       res.json({
         success: true,
-        message: `Settlement ${action === 'approve' ? '승인' : '보류'} 요청됨`,
+        message: `Settlement ${action === 'approve' ? '승인' : '보류'} 완료`,
         data: {
           settlementId: id,
           action,
-          processedBy: (req as any).user?.id,
+          processedBy: req.user?.id,
           processedAt: new Date().toISOString()
-        },
-        _meta: {
-          note: 'Phase 7-C: Settlement Entity implementation required for actual processing',
-        },
+        }
       });
     } catch (error) {
-      logger.error('Error processing settlement:', error);
+      console.error('Error processing settlement:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to process settlement'
@@ -331,144 +250,63 @@ export class AdminStatsController {
     }
   }
 
-  // ============================================================================
-  // Helper Methods (Phase 7-C)
-  // ============================================================================
-
-  /**
-   * 기간 문자열을 Date 범위로 변환
-   */
-  private calculatePeriod(period: string): { periodStart: Date; periodEnd: Date } {
-    const now = new Date();
-    const periodEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-    let periodStart: Date;
-
-    switch (period) {
-      case '7d':
-        periodStart = new Date(now);
-        periodStart.setDate(periodStart.getDate() - 7);
-        break;
-      case '30d':
-        periodStart = new Date(now);
-        periodStart.setDate(periodStart.getDate() - 30);
-        break;
-      case '90d':
-        periodStart = new Date(now);
-        periodStart.setDate(periodStart.getDate() - 90);
-        break;
-      case '365d':
-        periodStart = new Date(now);
-        periodStart.setFullYear(periodStart.getFullYear() - 1);
-        break;
-      case 'all':
-        periodStart = new Date(2020, 0, 1); // 플랫폼 시작일
-        break;
-      default:
-        periodStart = new Date(now);
-        periodStart.setDate(periodStart.getDate() - 30);
+  // Helper methods for generating mock data
+  private generateDailyRevenue() {
+    const data = [];
+    const today = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      data.push({
+        date: date.toISOString().split('T')[0],
+        revenue: Math.floor(Math.random() * 3000000) + 3000000,
+        orders: Math.floor(Math.random() * 50) + 30
+      });
     }
-
-    periodStart.setHours(0, 0, 0, 0);
-
-    return { periodStart, periodEnd };
+    
+    return data;
   }
 
-  /**
-   * 일별 매출 데이터 조회
-   *
-   * Phase 7-C: checkout_orders 기반 실제 일별 집계
-   */
-  private async getDailyRevenue(
-    periodStart: Date,
-    periodEnd: Date,
-    orderType?: OrderType
-  ): Promise<Array<{ date: string; revenue: number; orders: number }>> {
-    try {
-      // 정산 대상 주문 조회
-      const orders = await checkoutService.findSettlementTargetOrders({
-        periodStart,
-        periodEnd,
-        orderType,
+  private generateMonthlyRevenue() {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const data = [];
+    
+    for (let i = 0; i < 12; i++) {
+      const revenue = Math.floor(Math.random() * 50000000) + 100000000;
+      data.push({
+        month: months[i],
+        revenue: revenue,
+        profit: Math.floor(revenue * 0.1)
       });
-
-      // 일별 집계
-      const dailyMap = new Map<string, { revenue: number; orders: number }>();
-
-      for (const order of orders) {
-        if (order.paidAt) {
-          const dateKey = order.paidAt.toISOString().split('T')[0];
-          const existing = dailyMap.get(dateKey) || { revenue: 0, orders: 0 };
-          dailyMap.set(dateKey, {
-            revenue: existing.revenue + Number(order.totalAmount),
-            orders: existing.orders + 1,
-          });
-        }
-      }
-
-      // 날짜 순 정렬
-      const result = Array.from(dailyMap.entries())
-        .map(([date, data]) => ({
-          date,
-          revenue: data.revenue,
-          orders: data.orders,
-        }))
-        .sort((a, b) => a.date.localeCompare(b.date));
-
-      return result;
-    } catch (error) {
-      logger.error('Error getting daily revenue:', error);
-      return [];
     }
+    
+    return data;
   }
 
-  /**
-   * 주문 상태별 건수 조회
-   */
-  private async getStatusCounts(
-    periodStart: Date,
-    periodEnd: Date,
-    orderType?: OrderType
-  ): Promise<{
-    paid: number;
-    pending: number;
-    refunded: number;
-    cancelled: number;
-  }> {
-    try {
-      // 결제 완료
-      const paidResult = await checkoutService.findAll({
-        paymentStatus: 'paid' as any,
-        orderType,
+  private generateAlerts() {
+    const alerts = [];
+    
+    if (Math.random() > 0.5) {
+      alerts.push({
+        id: 'alert_001',
+        type: 'warning' as const,
+        message: '승인 대기 요청이 7건 있습니다',
+        timestamp: new Date().toISOString()
       });
-
-      // 결제 대기
-      const pendingResult = await checkoutService.findAll({
-        paymentStatus: 'pending' as any,
-        orderType,
-      });
-
-      // 환불
-      const refundedResult = await checkoutService.findAll({
-        paymentStatus: 'refunded' as any,
-        orderType,
-      });
-
-      // 취소
-      const cancelledResult = await checkoutService.findAll({
-        status: 'cancelled' as any,
-        orderType,
-      });
-
-      return {
-        paid: paidResult.total,
-        pending: pendingResult.total,
-        refunded: refundedResult.total,
-        cancelled: cancelledResult.total,
-      };
-    } catch (error) {
-      logger.error('Error getting status counts:', error);
-      return { paid: 0, pending: 0, refunded: 0, cancelled: 0 };
     }
+    
+    if (Math.random() > 0.7) {
+      alerts.push({
+        id: 'alert_002',
+        type: 'info' as const,
+        message: '정산 예정액이 800만원을 초과했습니다',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    return alerts;
   }
 }
 

@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { NeturePartnershipRequest } from './NeturePartnershipRequest.entity.js';
+import { NeturePartnershipRequest } from './NeturePartnershipRequest.entity';
 
 @Entity('neture_partnership_products')
 export class NeturePartnershipProduct {
@@ -21,7 +21,7 @@ export class NeturePartnershipProduct {
   @Column({ nullable: true })
   category: string;
 
-  @ManyToOne('NeturePartnershipRequest', 'products', {
+  @ManyToOne(() => NeturePartnershipRequest, (request) => request.products, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'partnership_request_id' })

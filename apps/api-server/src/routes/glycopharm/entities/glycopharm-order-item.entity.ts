@@ -1,23 +1,8 @@
 /**
  * Glycopharm Order Item Entity
  *
- * ============================================================================
- * ⚠️ LEGACY TABLE (READ-ONLY) - Phase 9-A Frozen
- * ============================================================================
- *
- * This table is part of the GlycoPharm legacy order structure.
- * New order items are created in checkout_order_items via E-commerce Core.
- *
- * DO NOT:
- * - Create new records in this table
- * - Add new references to this entity
- *
- * @see docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md
- * @see GlycopharmOrder for full context
- * @deprecated Phase 5-A - Use E-commerce Core instead
- * ============================================================================
- *
- * Original: H8-2 주문/결제 API v1 Implementation
+ * H8-2: 주문/결제 API v1 Implementation
+ * Order line items for blood glucose product orders
  */
 
 import {
@@ -28,8 +13,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { GlycopharmOrder } from './glycopharm-order.entity.js';
-import type { GlycopharmProduct } from './glycopharm-product.entity.js';
+import { GlycopharmOrder } from './glycopharm-order.entity.js';
+import { GlycopharmProduct } from './glycopharm-product.entity.js';
 
 @Entity({ name: 'glycopharm_order_items', schema: 'public' })
 export class GlycopharmOrderItem {
@@ -60,12 +45,11 @@ export class GlycopharmOrderItem {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  // Relations (using type-only imports to avoid circular dependency in ESM)
-  @ManyToOne('GlycopharmOrder', 'items', { onDelete: 'CASCADE' })
+  @ManyToOne(() => GlycopharmOrder, (order) => order.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'order_id' })
   order?: GlycopharmOrder;
 
-  @ManyToOne('GlycopharmProduct')
+  @ManyToOne(() => GlycopharmProduct)
   @JoinColumn({ name: 'product_id' })
   product?: GlycopharmProduct;
 }

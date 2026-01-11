@@ -13,7 +13,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { YaksaPost } from './yaksa-post.entity.js';
+import { YaksaPost } from './yaksa-post.entity.js';
 
 export type YaksaPostLogAction = 'create' | 'update' | 'status_change' | 'delete';
 
@@ -46,8 +46,7 @@ export class YaksaPostLog {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  // Relations (using type-only imports to avoid circular dependency in ESM)
-  @ManyToOne('YaksaPost', 'logs')
+  @ManyToOne(() => YaksaPost, (post) => post.logs)
   @JoinColumn({ name: 'post_id' })
   post?: YaksaPost;
 }

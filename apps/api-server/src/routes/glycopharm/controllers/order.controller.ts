@@ -42,33 +42,60 @@ export function createOrderController(
 
   /**
    * POST /orders - Create new order
-   *
-   * ⚠️ DISABLED (Phase 5-A: E-commerce Core Integration)
-   *
-   * This endpoint is disabled per CLAUDE.md §7 (E-commerce Core 절대 규칙).
-   * All orders must be created through E-commerce Core.
-   *
-   * GlycoPharm orders should be created via:
-   * - POST /api/v1/ecommerce/orders with orderType: 'GLYCOPHARM'
-   *
-   * Reference: WO-O4O-STRUCTURE-REFORM-PHASE5-V01
-   * Disabled: 2026-01-11
    */
   router.post(
     '/',
     requireAuth,
-    async (_req: AuthRequest, res: Response): Promise<void> => {
-      res.status(410).json({
-        error: {
-          code: 'ENDPOINT_GONE',
-          message: 'Direct order creation is no longer supported. Please use E-commerce Core API.',
-          migration: {
-            newEndpoint: '/api/v1/ecommerce/orders',
-            orderType: 'GLYCOPHARM',
-            documentation: 'See CLAUDE.md §7 for E-commerce Core integration requirements',
-          },
-        },
-      });
+    [
+      body('pharmacy_id').isUUID().withMessage('Valid pharmacy_id is required'),
+      body('items').isArray({ min: 1 }).withMessage('At least one item is required'),
+      body('items.*.product_id').isUUID().withMessage('Valid product_id is required'),
+      body('items.*.quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+      body('customer_name').optional().isString(),
+      body('customer_phone').optional().isString(),
+      body('shipping_address').optional().isString(),
+      body('note').optional().isString(),
+      handleValidationErrors,
+    ],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        if (!req.user?.id) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'User not authenticated' },
+          });
+          return;
+        }
+
+        const order = await service.createOrder(req.body, req.user.id);
+        res.status(201).json({ success: true, data: order });
+      } catch (error: any) {
+        console.error('Failed to create order:', error);
+
+        if (error.message.includes('not found')) {
+          res.status(404).json({
+            error: { code: 'NOT_FOUND', message: error.message },
+          });
+          return;
+        }
+
+        if (error.message.includes('not active') || error.message.includes('not available')) {
+          res.status(400).json({
+            error: { code: 'BAD_REQUEST', message: error.message },
+          });
+          return;
+        }
+
+        if (error.message.includes('Insufficient stock')) {
+          res.status(409).json({
+            error: { code: 'CONFLICT', message: error.message },
+          });
+          return;
+        }
+
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
     }
   );
 
@@ -144,30 +171,53 @@ export function createOrderController(
   );
 
   /**
-   * POST /orders/:id/pay - Pay for order
-   *
-   * ⚠️ DISABLED (Phase 5-A: E-commerce Core Integration)
-   *
-   * Payment processing is disabled per CLAUDE.md §7 (E-commerce Core 절대 규칙).
-   * All payments must be processed through E-commerce Core.
-   *
-   * Reference: WO-O4O-STRUCTURE-REFORM-PHASE5-V01
-   * Disabled: 2026-01-11
+   * POST /orders/:id/pay - Pay for order (v1 Stub)
    */
   router.post(
     '/:id/pay',
     requireAuth,
-    async (_req: AuthRequest, res: Response): Promise<void> => {
-      res.status(410).json({
-        error: {
-          code: 'ENDPOINT_GONE',
-          message: 'Direct payment processing is no longer supported. Please use E-commerce Core API.',
-          migration: {
-            newEndpoint: '/api/v1/ecommerce/orders/:id/pay',
-            documentation: 'See CLAUDE.md §7 for E-commerce Core integration requirements',
-          },
-        },
-      });
+    [
+      param('id').isUUID(),
+      body('payment_method').isString().notEmpty().withMessage('Payment method is required'),
+      body('payment_id').optional().isString(),
+      handleValidationErrors,
+    ],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        if (!req.user?.id) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'User not authenticated' },
+          });
+          return;
+        }
+
+        const order = await service.payOrder(req.params.id, req.user.id, {
+          payment_method: req.body.payment_method,
+          payment_id: req.body.payment_id,
+        });
+
+        res.json({ success: true, data: order });
+      } catch (error: any) {
+        console.error('Failed to pay order:', error);
+
+        if (error.message === 'Order not found') {
+          res.status(404).json({
+            error: { code: 'NOT_FOUND', message: error.message },
+          });
+          return;
+        }
+
+        if (error.message.includes('Cannot pay order')) {
+          res.status(400).json({
+            error: { code: 'BAD_REQUEST', message: error.message },
+          });
+          return;
+        }
+
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
     }
   );
 

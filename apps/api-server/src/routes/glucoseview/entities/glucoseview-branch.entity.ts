@@ -12,7 +12,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import type { GlucoseViewChapter } from './glucoseview-chapter.entity.js';
+import { GlucoseViewChapter } from './glucoseview-chapter.entity.js';
 
 @Entity({ name: 'glucoseview_branches', schema: 'public' })
 export class GlucoseViewBranch {
@@ -43,7 +43,7 @@ export class GlucoseViewBranch {
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
 
-  @OneToMany('GlucoseViewChapter', 'branch')
+  @OneToMany(() => GlucoseViewChapter, (chapter) => chapter.branch)
   chapters!: GlucoseViewChapter[];
 
   @CreateDateColumn({ type: 'timestamp' })

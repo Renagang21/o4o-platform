@@ -15,8 +15,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import type { YaksaCategory } from './yaksa-category.entity.js';
-import type { YaksaPostLog } from './yaksa-post-log.entity.js';
+import { YaksaCategory } from './yaksa-category.entity.js';
+import { YaksaPostLog } from './yaksa-post-log.entity.js';
 
 export type YaksaPostStatus = 'draft' | 'published' | 'hidden' | 'deleted';
 
@@ -67,11 +67,10 @@ export class YaksaPost {
   @Column({ type: 'timestamp', nullable: true })
   published_at?: Date;
 
-  // Relations (using type-only imports to avoid circular dependency in ESM)
-  @ManyToOne('YaksaCategory', 'posts')
+  @ManyToOne(() => YaksaCategory, (category) => category.posts)
   @JoinColumn({ name: 'category_id' })
   category?: YaksaCategory;
 
-  @OneToMany('YaksaPostLog', 'post')
+  @OneToMany(() => YaksaPostLog, (log) => log.post)
   logs?: YaksaPostLog[];
 }
