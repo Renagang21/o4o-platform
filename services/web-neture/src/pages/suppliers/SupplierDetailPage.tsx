@@ -1,15 +1,50 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Mail, Phone, Globe, MessageCircle, ArrowLeft } from 'lucide-react';
-import { mockSuppliers } from '../../data/mockData';
+import { netureApi, type SupplierDetail } from '../../lib/api';
 
 export default function SupplierDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const supplier = mockSuppliers.find(s => s.slug === slug);
+  const [supplier, setSupplier] = useState<SupplierDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!supplier) {
+  useEffect(() => {
+    const fetchSupplier = async () => {
+      if (!slug) {
+        setError('Supplier slug is required');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data = await netureApi.getSupplierBySlug(slug);
+        setSupplier(data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSupplier();
+  }, [slug]);
+
+  if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">공급자를 찾을 수 없습니다</h1>
+        <p className="text-gray-600">Loading supplier...</p>
+      </div>
+    );
+  }
+
+  if (error || !supplier) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          {error ? `Error: ${error}` : '공급자를 찾을 수 없습니다'}
+        </h1>
         <Link to="/suppliers" className="text-primary-600 hover:text-primary-700 mt-4 inline-block">
           목록으로 돌아가기
         </Link>
@@ -35,7 +70,7 @@ export default function SupplierDetailPage() {
             </span>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{supplier.name}</h1>
             <p className="text-lg text-gray-600 mb-6">{supplier.shortDescription}</p>
-            
+
             {/* Contact Buttons */}
             <div className="flex flex-wrap gap-3">
               <a href={`mailto:${supplier.contact.email}`} className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">

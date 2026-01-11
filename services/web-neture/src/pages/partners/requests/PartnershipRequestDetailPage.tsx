@@ -1,15 +1,50 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Mail, Phone, MessageCircle, ExternalLink } from 'lucide-react';
-import { mockPartnershipRequests } from '../../../data/mockData';
+import { netureApi, type PartnershipRequestDetail } from '../../../lib/api';
 
 export default function PartnershipRequestDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const request = mockPartnershipRequests.find(r => r.id === id);
+  const [request, setRequest] = useState<PartnershipRequestDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!request) {
+  useEffect(() => {
+    const fetchRequest = async () => {
+      if (!id) {
+        setError('Request ID is required');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data = await netureApi.getPartnershipRequestById(id);
+        setRequest(data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequest();
+  }, [id]);
+
+  if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">제휴 요청을 찾을 수 없습니다</h1>
+        <p className="text-gray-600">Loading partnership request...</p>
+      </div>
+    );
+  }
+
+  if (error || !request) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          {error ? `Error: ${error}` : '제휴 요청을 찾을 수 없습니다'}
+        </h1>
         <Link to="/partners/requests" className="text-primary-600 hover:text-primary-700 mt-4 inline-block">
           목록으로 돌아가기
         </Link>
@@ -37,9 +72,11 @@ export default function PartnershipRequestDetailPage() {
           <span className={`px-4 py-2 text-sm font-medium rounded-full ${
             request.status === 'OPEN'
               ? 'bg-green-100 text-green-700'
-              : 'bg-blue-100 text-blue-700'
+              : request.status === 'MATCHED'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-gray-100 text-gray-700'
           }`}>
-            {request.status === 'OPEN' ? '모집 중' : '매칭 완료'}
+            {request.status === 'OPEN' ? '모집 중' : request.status === 'MATCHED' ? '매칭 완료' : '종료'}
           </span>
         </div>
 
@@ -99,60 +136,46 @@ export default function PartnershipRequestDetailPage() {
 
       {/* Promotion Scope */}
       <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">홍보 범위</h2>
-        <div className="space-y-3">
-          {request.promotionScope.sns && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
-              <span className="text-gray-700">SNS 홍보</span>
-            </div>
-          )}
-          {request.promotionScope.content && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
-              <span className="text-gray-700">콘텐츠 홍보</span>
-            </div>
-          )}
-          {request.promotionScope.banner && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
-              <span className="text-gray-700">배너/링크 홍보</span>
-            </div>
-          )}
-          {request.promotionScope.other && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
-              <span className="text-gray-700">기타: {request.promotionScope.other}</span>
-            </div>
-          )}
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">홍보 범위</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <div className={`p-4 border rounded-lg text-center ${request.promotionScope.sns ? 'border-primary-300 bg-primary-50' : 'border-gray-200'}`}>
+            <p className="font-medium text-gray-900">SNS</p>
+            <p className="text-sm text-gray-600 mt-1">{request.promotionScope.sns ? '포함' : '제외'}</p>
+          </div>
+          <div className={`p-4 border rounded-lg text-center ${request.promotionScope.content ? 'border-primary-300 bg-primary-50' : 'border-gray-200'}`}>
+            <p className="font-medium text-gray-900">콘텐츠</p>
+            <p className="text-sm text-gray-600 mt-1">{request.promotionScope.content ? '포함' : '제외'}</p>
+          </div>
+          <div className={`p-4 border rounded-lg text-center ${request.promotionScope.banner ? 'border-primary-300 bg-primary-50' : 'border-gray-200'}`}>
+            <p className="font-medium text-gray-900">배너</p>
+            <p className="text-sm text-gray-600 mt-1">{request.promotionScope.banner ? '포함' : '제외'}</p>
+          </div>
+          <div className={`p-4 border rounded-lg text-center ${request.promotionScope.other ? 'border-primary-300 bg-primary-50' : 'border-gray-200'}`}>
+            <p className="font-medium text-gray-900">기타</p>
+            <p className="text-sm text-gray-600 mt-1">{request.promotionScope.other || '없음'}</p>
+          </div>
         </div>
+        {request.promotionScope.other && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p className="text-sm text-gray-700">{request.promotionScope.other}</p>
+          </div>
+        )}
       </div>
 
-      {/* Contact */}
+      {/* Contact Information */}
       <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">협의 방법</h2>
-        <div className="flex flex-wrap gap-4">
-          <a
-            href={`mailto:${request.contact.email}`}
-            className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-          >
-            <Mail className="w-5 h-5 mr-2" />
-            이메일로 연락
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">연락처</h2>
+        <div className="flex flex-wrap gap-3">
+          <a href={`mailto:${request.contact.email}`} className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+            <Mail className="w-4 h-4 mr-2" />
+            이메일
           </a>
-          <a
-            href={`tel:${request.contact.phone}`}
-            className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <Phone className="w-5 h-5 mr-2" />
-            전화로 연락
+          <a href={`tel:${request.contact.phone}`} className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+            <Phone className="w-4 h-4 mr-2" />
+            전화
           </a>
-          <a
-            href={request.contact.kakao}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <MessageCircle className="w-5 h-5 mr-2" />
+          <a href={request.contact.kakao} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+            <MessageCircle className="w-4 h-4 mr-2" />
             카카오톡
           </a>
         </div>
@@ -160,12 +183,20 @@ export default function PartnershipRequestDetailPage() {
 
       {/* Match Status Info */}
       {request.status === 'MATCHED' && request.matchedAt && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-          <p className="text-blue-900 font-medium">
-            이 제휴는 {new Date(request.matchedAt).toLocaleDateString('ko-KR')}에 매칭이 완료되었습니다
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">매칭 완료</h3>
+          <p className="text-sm text-blue-800">
+            매칭 일자: {new Date(request.matchedAt).toLocaleDateString('ko-KR')}
           </p>
         </div>
       )}
+
+      {/* Bottom Notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+        <p className="text-blue-900 font-medium">
+          제휴를 원하시면 위 연락처로 직접 문의하세요
+        </p>
+      </div>
     </div>
   );
 }

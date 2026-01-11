@@ -1,7 +1,44 @@
 import { Link } from 'react-router-dom';
-import { mockSuppliers } from '../../data/mockData';
+import { useState, useEffect } from 'react';
+import { netureApi, type Supplier } from '../../lib/api';
 
 export default function SupplierListPage() {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        setLoading(true);
+        const data = await netureApi.getSuppliers();
+        setSuppliers(data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSuppliers();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <p className="text-gray-600">Loading suppliers...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <p className="text-red-600">Error loading suppliers: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
@@ -12,7 +49,7 @@ export default function SupplierListPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockSuppliers.map((supplier) => (
+        {suppliers.map((supplier) => (
           <Link
             key={supplier.id}
             to={`/suppliers/${supplier.slug}`}
@@ -34,7 +71,7 @@ export default function SupplierListPage() {
                 {supplier.shortDescription}
               </p>
               <p className="text-xs text-gray-500">
-                제품 {supplier.products.length}개
+                제품 {supplier.productCount}개
               </p>
             </div>
           </Link>

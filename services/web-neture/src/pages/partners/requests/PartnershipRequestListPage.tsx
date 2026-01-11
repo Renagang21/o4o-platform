@@ -1,15 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { mockPartnershipRequests } from '../../../data/mockData';
+import { netureApi, type PartnershipRequest } from '../../../lib/api';
 
 export default function PartnershipRequestListPage() {
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'OPEN' | 'MATCHED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'OPEN' | 'MATCHED' | 'CLOSED'>('ALL');
+  const [requests, setRequests] = useState<PartnershipRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredRequests = mockPartnershipRequests.filter(req => {
-    if (statusFilter === 'ALL') return true;
-    return req.status === statusFilter;
-  });
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        setLoading(true);
+        const data = statusFilter === 'ALL'
+          ? await netureApi.getPartnershipRequests()
+          : await netureApi.getPartnershipRequests(statusFilter);
+        setRequests(data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, [statusFilter]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <p className="text-gray-600">Loading partnership requests...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <p className="text-red-600">Error loading requests: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -27,24 +59,25 @@ export default function PartnershipRequestListPage() {
           <label className="block text-sm font-medium text-gray-700 mb-2">상태</label>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'OPEN' | 'MATCHED')}
+            onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'OPEN' | 'MATCHED' | 'CLOSED')}
             className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="ALL">전체</option>
             <option value="OPEN">모집 중</option>
             <option value="MATCHED">매칭 완료</option>
+            <option value="CLOSED">종료</option>
           </select>
         </div>
       </div>
 
       {/* Request Cards */}
-      {filteredRequests.length === 0 ? (
+      {requests.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-gray-600">해당하는 제휴 요청이 없습니다</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredRequests.map((request) => (
+          {requests.map((request) => (
             <Link
               key={request.id}
               to={`/partners/requests/${request.id}`}
@@ -58,9 +91,11 @@ export default function PartnershipRequestListPage() {
                 <span className={`px-3 py-1 text-xs rounded-full ${
                   request.status === 'OPEN'
                     ? 'bg-green-100 text-green-700'
-                    : 'bg-blue-100 text-blue-700'
+                    : request.status === 'MATCHED'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700'
                 }`}>
-                  {request.status === 'OPEN' ? '모집 중' : '매칭 완료'}
+                  {request.status === 'OPEN' ? '모집 중' : request.status === 'MATCHED' ? '매칭 완료' : '종료'}
                 </span>
               </div>
 
@@ -82,7 +117,7 @@ export default function PartnershipRequestListPage() {
               </div>
 
               {/* Revenue Structure */}
-              <div className="pt-4 border-t border-gray-100 mb-4">
+              <div className="pt-4 border-t border-gray-100">
                 <p className="text-sm text-gray-700 font-medium mb-2">수익 구조</p>
                 <p className="text-sm text-gray-600">{request.revenueStructure}</p>
               </div>
