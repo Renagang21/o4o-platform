@@ -9,9 +9,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Building2, Users, Calendar, Bell, ChevronRight, Loader2 } from 'lucide-react';
+import { Building2, Users, Calendar, Bell, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ExecutiveCardProps, ExecutiveContextType } from '../types';
+import { useNotifications } from '../useNotifications';
 
 // 조직 타입 라벨
 const ORG_TYPE_LABELS: Record<ExecutiveContextType, { label: string; color: string }> = {
@@ -30,6 +31,13 @@ interface ExecutiveSummary {
 export const ExecutiveCard: React.FC<ExecutiveCardProps> = ({ executiveContext }) => {
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // executive 컨텍스트 알림 연계
+  const { getNotificationsByContext, isLoading: isLoadingNotifications } = useNotifications({
+    contextFilter: 'executive',
+  });
+
+  const executiveNotifications = getNotificationsByContext('executive');
 
   useEffect(() => {
     loadExecutiveSummary();
@@ -56,13 +64,15 @@ export const ExecutiveCard: React.FC<ExecutiveCardProps> = ({ executiveContext }
   const orgTypeInfo = ORG_TYPE_LABELS[executiveContext.type];
   const isActive = executiveContext.status === 'active';
 
-  if (isLoading) {
+  if (isLoading || isLoadingNotifications) {
     return (
       <div className="flex items-center justify-center h-40">
         <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
       </div>
     );
   }
+
+  const unreadCount = executiveNotifications?.unreadCount || 0;
 
   return (
     <div className="space-y-4">
@@ -103,6 +113,23 @@ export const ExecutiveCard: React.FC<ExecutiveCardProps> = ({ executiveContext }
               <> ~ {new Date(executiveContext.term.endAt).toLocaleDateString('ko-KR')}</>
             )}
           </span>
+        </div>
+      )}
+
+      {/* Executive Notifications */}
+      {unreadCount > 0 && (
+        <div className="p-2 bg-indigo-50 rounded-lg border border-indigo-200">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-indigo-600" />
+            <p className="text-sm text-indigo-700">
+              <strong>{unreadCount}</strong>건의 새 알림
+            </p>
+          </div>
+          {executiveNotifications?.notifications?.slice(0, 1).map((notif) => (
+            <p key={notif.id} className="text-xs text-indigo-600 mt-1 truncate">
+              {notif.title}
+            </p>
+          ))}
         </div>
       )}
 

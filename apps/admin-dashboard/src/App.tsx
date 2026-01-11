@@ -68,9 +68,8 @@ const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const WordPressDashboard = lazy(() => import('@/pages/WordPressDashboard'));
-const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
-// P1 Phase C: Widget-based Dashboard
-const AdminDashboardPageWrapper = lazy(() => import('@/pages/dashboard/AdminDashboardPageWrapper'));
+// Legacy DashboardSimple removed - use UnifiedDashboard
+// Legacy Widget-based Dashboard removed - use UnifiedDashboard
 // Unified Dashboard v1 - Context-based single dashboard
 const UnifiedDashboard = lazy(() => import('@/pages/dashboard/unified/UnifiedDashboard'));
 const UsersPage = lazy(() => import('@/pages/users'));
@@ -543,12 +542,6 @@ function App() {
                       </Suspense>
                     } />
 
-                    {/* Legacy: Simple Dashboard (deprecated) */}
-                    <Route path="/dashboard/legacy" element={
-                      <Suspense fallback={<PageLoader />}>
-                        <DashboardSimple />
-                      </Suspense>
-                    } />
 
                     {/* WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager */}
                     <Route path="/admin/service-content-manager" element={
@@ -559,14 +552,6 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
-                    {/* P1 Phase C: Widget-based Admin Dashboard */}
-                    <Route path="/admin/dashboard/widgets" element={
-                      <AdminProtectedRoute requiredRoles={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AdminDashboardPageWrapper />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
 
                     {/* PD-3: Seller Dashboard Routes */}
                     <Route path="/dashboard/seller/catalog" element={

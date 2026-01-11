@@ -1,24 +1,38 @@
 /**
- * Overview Card with AI Summary
- * PoC: 오늘의 요약 + AI 요약
+ * Overview Card with AI Summary + Notification Integration
+ * v1.1: 통합 알림 시스템 연계
  */
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, TrendingUp, AlertCircle, Clock, Loader2 } from 'lucide-react';
+import { Sparkles, Bell, AlertTriangle, Clock, Loader2, CheckCircle2 } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import type { UnifiedCardProps } from '../types';
+import { useNotifications } from '../useNotifications';
 
 interface OverviewData {
   todayOrders: number;
   pendingTasks: number;
-  notifications: number;
 }
+
+// 우선순위별 색상
+const PRIORITY_COLORS = {
+  critical: 'bg-red-100 text-red-700 border-red-200',
+  high: 'bg-orange-100 text-orange-700 border-orange-200',
+  medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  low: 'bg-gray-100 text-gray-700 border-gray-200',
+};
 
 export const OverviewCard: React.FC<UnifiedCardProps> = ({ config, userContexts }) => {
   const [data, setData] = useState<OverviewData | null>(null);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 알림 시스템 연계
+  const { summary, aiContext, isLoading: isLoadingNotifications } = useNotifications({
+    refreshInterval: 60000,
+    maxNotifications: 20,
+  });
 
   useEffect(() => {
     loadOverviewData();
@@ -28,11 +42,10 @@ export const OverviewCard: React.FC<UnifiedCardProps> = ({ config, userContexts 
     setIsLoading(true);
     try {
       // Mock data for PoC
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 300));
       setData({
         todayOrders: Math.floor(Math.random() * 50) + 10,
         pendingTasks: Math.floor(Math.random() * 10) + 1,
-        notifications: Math.floor(Math.random() * 5),
       });
     } catch (err) {
       console.error('Error loading overview:', err);
@@ -52,6 +65,8 @@ export const OverviewCard: React.FC<UnifiedCardProps> = ({ config, userContexts 
         contextData: {
           overview: data,
           userContexts,
+          // AI 요약에 알림 컨텍스트 포함
+          notifications: aiContext,
         },
       });
 
@@ -60,22 +75,32 @@ export const OverviewCard: React.FC<UnifiedCardProps> = ({ config, userContexts 
       }
     } catch (err) {
       console.error('AI summary error:', err);
-      // Fallback summary for PoC
+      // Fallback summary with notification context
+      const criticalCount = summary?.byPriority?.critical || 0;
+      const actionCount = aiContext?.actionRequired?.length || 0;
+
       setAiSummary(
-        `오늘 ${data?.todayOrders || 0}건의 주문이 있습니다. ${data?.pendingTasks || 0}건의 처리 대기 작업이 있으며, ${data?.notifications || 0}개의 새 알림이 있습니다.`
+        `오늘 ${data?.todayOrders || 0}건의 주문이 있습니다. ${data?.pendingTasks || 0}건의 처리 대기 작업이 있습니다.` +
+        (criticalCount > 0 ? ` 중요 알림 ${criticalCount}건이 있습니다.` : '') +
+        (actionCount > 0 ? ` ${actionCount}건의 처리가 필요한 알림이 있습니다.` : '')
       );
     } finally {
       setIsLoadingAI(false);
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingNotifications) {
     return (
       <div className="flex items-center justify-center h-48">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     );
   }
+
+  const unreadCount = summary?.unreadCount || 0;
+  const criticalCount = summary?.byPriority?.critical || 0;
+  const highCount = summary?.byPriority?.high || 0;
+  const actionRequiredCount = aiContext?.actionRequired?.length || 0;
 
   return (
     <div className="space-y-4">
@@ -89,11 +114,50 @@ export const OverviewCard: React.FC<UnifiedCardProps> = ({ config, userContexts 
           <p className="text-2xl font-bold text-orange-600">{data?.pendingTasks || 0}</p>
           <p className="text-sm text-gray-600">대기 작업</p>
         </div>
-        <div className="text-center p-3 bg-green-50 rounded-lg">
-          <p className="text-2xl font-bold text-green-600">{data?.notifications || 0}</p>
+        <div className="text-center p-3 bg-green-50 rounded-lg relative">
+          <p className="text-2xl font-bold text-green-600">{unreadCount}</p>
           <p className="text-sm text-gray-600">새 알림</p>
+          {criticalCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+              !
+            </span>
+          )}
         </div>
       </div>
+
+      {/* Critical/High Priority Alerts */}
+      {(criticalCount > 0 || highCount > 0) && (
+        <div className="space-y-2">
+          {aiContext?.recentHighPriority?.slice(0, 2).map((notification) => (
+            <div
+              key={notification.id}
+              className={`p-2 rounded-lg border flex items-start gap-2 ${PRIORITY_COLORS[notification.priority]}`}
+            >
+              {notification.priority === 'critical' ? (
+                <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              ) : (
+                <Bell className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{notification.title}</p>
+                <p className="text-xs opacity-75 truncate">{notification.message}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Action Required Summary */}
+      {actionRequiredCount > 0 && (
+        <div className="p-2 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-amber-600" />
+            <p className="text-sm text-amber-700">
+              <strong>{actionRequiredCount}</strong>건의 처리가 필요합니다
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* AI Summary Section */}
       <div className="border-t pt-4">

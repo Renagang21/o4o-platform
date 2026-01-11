@@ -93,3 +93,86 @@ export interface UnifiedDashboardState {
   aiSummary?: AISummaryData;
   isLoading: boolean;
 }
+
+// ============================================
+// Unified Notification v1
+// ============================================
+
+// 알림 타입
+export type NotificationType =
+  | 'system'        // 시스템 알림 (필독)
+  | 'business'      // 비즈니스 알림 (주문, 정산 등)
+  | 'organization'  // 조직 알림 (지부/분회)
+  | 'information';  // 정보성 알림
+
+// 알림 우선순위
+export type NotificationPriority = 'critical' | 'high' | 'medium' | 'low';
+
+// 알림 컨텍스트 태그 (어떤 역할/컨텍스트 관련인지)
+export type NotificationContextTag = UserContextType | 'global';
+
+// 단일 알림 항목
+export interface Notification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  priority: NotificationPriority;
+  contextTag: NotificationContextTag;
+
+  // 알림 내용
+  title: string;
+  message: string;
+
+  // 참조 정보 (중복 제거용)
+  referenceType?: string;   // 예: 'order', 'settlement', 'notice'
+  referenceId?: string;     // 예: 주문 ID, 공지 ID
+
+  // 메타데이터
+  timestamp: Date;
+  isRead: boolean;
+  readAt?: Date;
+
+  // 액션 링크
+  actionUrl?: string;
+  actionLabel?: string;
+}
+
+// 알림 그룹 (카드별 집계)
+export interface NotificationGroup {
+  contextTag: NotificationContextTag;
+  type: NotificationType;
+  count: number;
+  unreadCount: number;
+  highestPriority: NotificationPriority;
+  latestTimestamp: Date;
+  notifications: Notification[];
+}
+
+// 사용자 알림 집계 결과
+export interface UserNotificationSummary {
+  userId: string;
+  totalCount: number;
+  unreadCount: number;
+
+  // 타입별 집계
+  byType: Record<NotificationType, number>;
+
+  // 컨텍스트별 집계 (카드 연계용)
+  byContext: Record<NotificationContextTag, NotificationGroup>;
+
+  // 우선순위별 집계
+  byPriority: Record<NotificationPriority, number>;
+
+  // 최근 중요 알림 (AI 요약용)
+  criticalNotifications: Notification[];
+
+  // 마지막 갱신
+  lastUpdated: Date;
+}
+
+// AI 요약용 알림 컨텍스트
+export interface NotificationAIContext {
+  summary: UserNotificationSummary;
+  recentHighPriority: Notification[];
+  actionRequired: Notification[];
+}

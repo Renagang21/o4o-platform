@@ -1,12 +1,13 @@
 /**
- * Seller Context Card
- * PoC: 판매자 대시보드 대체 카드
+ * Seller Context Card v1.1
+ * 판매자 대시보드 카드 + 알림 연계
  */
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Package, TrendingUp, ArrowRight, Loader2 } from 'lucide-react';
+import { ShoppingCart, Package, TrendingUp, ArrowRight, Loader2, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { UnifiedCardProps } from '../types';
+import { useNotifications } from '../useNotifications';
 
 interface SellerStats {
   todayOrders: number;
@@ -18,6 +19,13 @@ interface SellerStats {
 export const SellerCard: React.FC<UnifiedCardProps> = ({ config }) => {
   const [stats, setStats] = useState<SellerStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // seller 컨텍스트 알림만 필터링
+  const { getNotificationsByContext, isLoading: isLoadingNotifications } = useNotifications({
+    contextFilter: 'seller',
+  });
+
+  const sellerNotifications = getNotificationsByContext('seller');
 
   useEffect(() => {
     loadSellerStats();
@@ -41,7 +49,7 @@ export const SellerCard: React.FC<UnifiedCardProps> = ({ config }) => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingNotifications) {
     return (
       <div className="flex items-center justify-center h-40">
         <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
@@ -49,8 +57,27 @@ export const SellerCard: React.FC<UnifiedCardProps> = ({ config }) => {
     );
   }
 
+  const unreadCount = sellerNotifications?.unreadCount || 0;
+
   return (
     <div className="space-y-4">
+      {/* Seller Notifications Alert */}
+      {unreadCount > 0 && (
+        <div className="p-2 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-blue-600" />
+            <p className="text-sm text-blue-700">
+              <strong>{unreadCount}</strong>건의 새 알림이 있습니다
+            </p>
+          </div>
+          {sellerNotifications?.notifications?.slice(0, 1).map((notif) => (
+            <p key={notif.id} className="text-xs text-blue-600 mt-1 truncate">
+              {notif.title}
+            </p>
+          ))}
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
         <div className="p-3 bg-blue-50 rounded-lg">
