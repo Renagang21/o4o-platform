@@ -142,12 +142,9 @@ import {
   TourismPackageItem,
 } from '../routes/tourism/entities/index.js';
 
-// Checkout (E-commerce Core)
-import {
-  CheckoutOrder,
-  CheckoutPayment,
-  OrderLog,
-} from '../entities/checkout/index.js';
+// NOTE: Checkout entities (CheckoutOrder, CheckoutPayment, OrderLog) are NOT registered yet.
+// These tables don't exist in the database. Migration needed before registration.
+// See: apps/api-server/src/entities/checkout/
 
 // Organization core
 import { Organization, OrganizationMember } from '@o4o/organization-core';
@@ -347,10 +344,7 @@ export const AppDataSource = new DataSource({
     TourismDestination,
     TourismPackage,
     TourismPackageItem,
-    // Checkout (E-commerce Core)
-    CheckoutOrder,
-    CheckoutPayment,
-    OrderLog,
+    // NOTE: Checkout entities not registered - tables don't exist yet
   ],
 
   migrations: NODE_ENV === 'production'
