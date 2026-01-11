@@ -57,19 +57,20 @@ router.get(
  * Partner APIs
  */
 
+// NOTE: Partner routes removed - dependent on legacy Neture Partner Entity
 // GET /api/v1/admin/partners
 // Returns partner list
-router.get(
-  '/partners',
-  (req, res: Response) => adminDashboardController.getPartners(req as AuthRequest, res)
-);
+// router.get(
+//   '/partners',
+//   (req, res: Response) => adminDashboardController.getPartners(req as AuthRequest, res)
+// );
 
 // GET /api/v1/admin/partners/:id/summary
 // Returns partner performance summary
-router.get(
-  '/partners/:id/summary',
-  (req, res: Response) => adminDashboardController.getPartnerSummary(req as AuthRequest, res)
-);
+// router.get(
+//   '/partners/:id/summary',
+//   (req, res: Response) => adminDashboardController.getPartnerSummary(req as AuthRequest, res)
+// );
 
 /**
  * Cosmetics APIs
