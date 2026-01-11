@@ -135,15 +135,12 @@ import {
   KpaApplication,
 } from '../routes/kpa/entities/index.js';
 
-// Tourism entities (Phase 5-C)
-import {
-  TourismDestination,
-  TourismPackage,
-  TourismPackageItem,
-} from '../routes/tourism/entities/index.js';
+// NOTE: Tourism entities (TourismDestination, TourismPackage, TourismPackageItem) NOT registered.
+// No migration exists for tourism tables. Migration needed before registration.
+// See: apps/api-server/src/routes/tourism/entities/
 
-// NOTE: Checkout entities (CheckoutOrder, CheckoutPayment, OrderLog) are NOT registered yet.
-// These tables don't exist in the database. Migration needed before registration.
+// NOTE: Checkout entities (CheckoutOrder, CheckoutPayment, OrderLog) NOT registered.
+// No migration exists for checkout tables. Migration needed before registration.
 // See: apps/api-server/src/entities/checkout/
 
 // Organization core
@@ -340,11 +337,7 @@ export const AppDataSource = new DataSource({
     Channel,
     ChannelPlaybackLog,
     ChannelHeartbeat,
-    // Tourism (Phase 5-C)
-    TourismDestination,
-    TourismPackage,
-    TourismPackageItem,
-    // NOTE: Checkout entities not registered - tables don't exist yet
+    // NOTE: Tourism & Checkout entities not registered - no migrations exist yet
   ],
 
   migrations: NODE_ENV === 'production'
