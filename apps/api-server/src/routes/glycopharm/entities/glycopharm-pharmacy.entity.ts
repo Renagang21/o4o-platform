@@ -1,8 +1,26 @@
 /**
  * Glycopharm Pharmacy Entity
  *
- * Phase B-1: Glycopharm API Implementation
- * Pharmacy/Store management for blood glucose product sales
+ * ============================================================================
+ * ⚠️ ACTIVE TABLE - GlycoPharm Domain (Phase 9-A Reviewed)
+ * ============================================================================
+ *
+ * This table remains ACTIVE for pharmacy/store management.
+ * Unlike glycopharm_orders, this is NOT deprecated.
+ *
+ * The pharmacy entity is used for:
+ * - Store registration and management
+ * - Product catalog organization
+ * - GlucoseView integration
+ *
+ * Orders for pharmacies now go through E-commerce Core with:
+ * - OrderType.GLYCOPHARM
+ * - metadata.pharmacyId reference
+ *
+ * @see CLAUDE.md §7 for E-commerce Core rules
+ * ============================================================================
+ *
+ * Original: Phase B-1 Glycopharm API Implementation
  */
 
 import {
@@ -13,7 +31,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { GlycopharmProduct } from './glycopharm-product.entity.js';
+import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
 
 export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
@@ -65,6 +83,7 @@ export class GlycopharmPharmacy {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @OneToMany(() => GlycopharmProduct, (product) => product.pharmacy)
+  // Relations (using type-only imports to avoid circular dependency in ESM)
+  @OneToMany('GlycopharmProduct', 'pharmacy')
   products?: GlycopharmProduct[];
 }

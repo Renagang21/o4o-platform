@@ -1,0 +1,149 @@
+{
+  "$schema": "../../schemas/theme-config.schema.json",
+  "templateId": "beauty-experience",
+  "templateName": "Beauty Experience Store",
+  "version": "1.0.0",
+
+  "colors": {
+    "primary": "#BE185D",
+    "primaryHover": "#9D174D",
+    "secondary": "#78716C",
+    "accent": "#D4AF37",
+    "background": "#FFFFFF",
+    "backgroundAlt": "#FDF2F8",
+    "surface": "#FFFFFF",
+    "text": "#1C1917",
+    "textMuted": "#78716C",
+    "border": "#E7E5E4",
+    "success": "#059669",
+    "warning": "#D97706",
+    "error": "#DC2626",
+    "rose": "#FB7185",
+    "gold": "#D4AF37",
+    "cream": "#FFFBEB"
+  },
+
+  "typography": {
+    "fontFamily": {
+      "heading": "'Playfair Display', 'Noto Serif KR', Georgia, serif",
+      "body": "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
+      "accent": "'Cormorant Garamond', 'Noto Serif KR', serif",
+      "mono": "'JetBrains Mono', monospace"
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "2rem",
+      "4xl": "2.5rem",
+      "5xl": "3rem",
+      "6xl": "3.75rem"
+    },
+    "fontWeight": {
+      "light": 300,
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "letterSpacing": {
+      "tight": "-0.02em",
+      "normal": "0",
+      "wide": "0.05em",
+      "wider": "0.1em"
+    }
+  },
+
+  "spacing": {
+    "containerMaxWidth": "1440px",
+    "sectionPadding": "6rem",
+    "cardPadding": "2rem",
+    "gridGap": "2rem"
+  },
+
+  "borderRadius": {
+    "none": "0",
+    "sm": "0.125rem",
+    "md": "0.25rem",
+    "lg": "0.5rem",
+    "xl": "1rem",
+    "full": "9999px"
+  },
+
+  "shadows": {
+    "sm": "0 1px 2px 0 rgb(0 0 0 / 0.03)",
+    "md": "0 4px 6px -1px rgb(0 0 0 / 0.05)",
+    "lg": "0 10px 15px -3px rgb(0 0 0 / 0.08)",
+    "xl": "0 25px 50px -12px rgb(0 0 0 / 0.15)",
+    "glow": "0 0 40px rgba(190, 24, 93, 0.15)"
+  },
+
+  "components": {
+    "button": {
+      "primary": {
+        "borderRadius": "none",
+        "paddingX": "2rem",
+        "paddingY": "1rem",
+        "fontSize": "sm",
+        "fontWeight": "medium",
+        "letterSpacing": "wider",
+        "textTransform": "uppercase"
+      },
+      "secondary": {
+        "borderRadius": "none",
+        "border": true,
+        "borderWidth": "1px"
+      }
+    },
+    "card": {
+      "borderRadius": "none",
+      "shadow": "none",
+      "hoverShadow": "lg",
+      "padding": "0",
+      "imageAspect": "3:4"
+    },
+    "input": {
+      "borderRadius": "none",
+      "borderColor": "border",
+      "focusBorderColor": "primary",
+      "paddingX": "1rem",
+      "paddingY": "0.875rem"
+    }
+  },
+
+  "animations": {
+    "transition": {
+      "fast": "150ms ease",
+      "normal": "300ms ease",
+      "slow": "500ms ease"
+    },
+    "hover": {
+      "scale": "1.02",
+      "opacity": "0.9"
+    },
+    "scroll": {
+      "fadeIn": true,
+      "parallax": true
+    }
+  },
+
+  "specialElements": {
+    "hero": {
+      "overlayGradient": "linear-gradient(to right, rgba(0,0,0,0.3), transparent)",
+      "textColor": "white",
+      "minHeight": "100vh"
+    },
+    "productCard": {
+      "hoverEffect": "zoom",
+      "quickView": true,
+      "wishlist": true
+    },
+    "sectionDivider": {
+      "type": "elegant-line",
+      "color": "gold"
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "../../../schemas/products.schema.json",
+  "products": [
+    {
+      "id": "prod-001",
+      "name": "Sample Product 1",
+      "slug": "sample-product-1",
+      "description": "This is a sample product description. Replace with your actual product details.",
+      "shortDescription": "Sample product for template",
+      "sku": "SKU-001",
+      "price": {
+        "base": 35000,
+        "sale": null,
+        "currency": "KRW"
+      },
+      "images": [
+        {
+          "url": "/assets/products/product-1.jpg",
+          "alt": "Sample Product 1",
+          "isPrimary": true
+        }
+      ],
+      "categories": ["cat-001", "cat-005"],
+      "tags": ["featured", "new"],
+      "stock": {
+        "quantity": 100,
+        "lowStockThreshold": 10,
+        "status": "in_stock"
+      },
+      "isActive": true,
+      "isFeatured": true,
+      "metadata": {
+        "weight": "200g",
+        "dimensions": "10 x 5 x 3 cm"
+      }
+    },
+    {
+      "id": "prod-002",
+      "name": "Sample Product 2",
+      "slug": "sample-product-2",
+      "description": "Another sample product. Customize as needed.",
+      "shortDescription": "Sample product for template",
+      "sku": "SKU-002",
+      "price": {
+        "base": 45000,
+        "sale": 38000,
+        "currency": "KRW"
+      },
+      "images": [
+        {
+          "url": "/assets/products/product-2.jpg",
+          "alt": "Sample Product 2",
+          "isPrimary": true
+        }
+      ],
+      "categories": ["cat-002", "cat-004"],
+      "tags": ["new", "sale"],
+      "stock": {
+        "quantity": 50,
+        "lowStockThreshold": 5,
+        "status": "in_stock"
+      },
+      "isActive": true,
+      "isFeatured": false,
+      "metadata": {}
+    },
+    {
+      "id": "prod-003",
+      "name": "Sample Product 3",
+      "slug": "sample-product-3",
+      "description": "Best seller sample product.",
+      "shortDescription": "Top rated product",
+      "sku": "SKU-003",
+      "price": {
+        "base": 28000,
+        "sale": null,
+        "currency": "KRW"
+      },
+      "images": [
+        {
+          "url": "/assets/products/product-3.jpg",
+          "alt": "Sample Product 3",
+          "isPrimary": true
+        }
+      ],
+      "categories": ["cat-003", "cat-006"],
+      "tags": ["bestseller"],
+      "stock": {
+        "quantity": 200,
+        "lowStockThreshold": 20,
+        "status": "in_stock"
+      },
+      "isActive": true,
+      "isFeatured": true,
+      "metadata": {}
+    }
+  ]
+}

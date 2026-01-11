@@ -2,17 +2,20 @@
  * Admin Order Controller
  *
  * Phase N-2: 운영 안정화
+ * Phase 7-A: orderType 필터 추가
  *
  * 운영자용 주문 관리 API
  * - 주문 목록/상세 조회
  * - 환불 처리
  * - 상태/로그 조회
+ * - 서비스별(OrderType) 필터링
  */
 
 import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
 import { checkoutService } from '../../services/checkout.service.js';
 import { tossPaymentsService } from '../../services/toss-payments.service.js';
+import { OrderType } from '../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -27,6 +30,12 @@ export class AdminOrderController {
    * GET /api/admin/orders
    *
    * 주문 목록 조회 (Admin)
+   *
+   * Phase 7-A: orderType 쿼리 파라미터 추가
+   * - ?orderType=COSMETICS → Cosmetics 주문만
+   * - ?orderType=TOURISM → Tourism 주문만
+   * - ?orderType=DROPSHIPPING → Dropshipping 주문만
+   * - 미지정 시 전체 주문 조회
    */
   static async getOrders(req: AuthRequest, res: Response) {
     try {
@@ -39,14 +48,29 @@ export class AdminOrderController {
         });
       }
 
-      const { status, paymentStatus, supplierId, partnerId, limit, offset } =
+      const { status, paymentStatus, supplierId, partnerId, orderType, limit, offset } =
         req.query;
+
+      // Phase 7-A: orderType 유효성 검증
+      let validatedOrderType: OrderType | undefined;
+      if (orderType) {
+        const orderTypeStr = (orderType as string).toUpperCase();
+        if (Object.values(OrderType).includes(orderTypeStr as OrderType)) {
+          validatedOrderType = orderTypeStr as OrderType;
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid orderType: ${orderType}. Valid values: ${Object.values(OrderType).join(', ')}`,
+          });
+        }
+      }
 
       const { orders, total } = await checkoutService.findAll({
         status: status as any,
         paymentStatus: paymentStatus as any,
         supplierId: supplierId as string,
         partnerId: partnerId as string,
+        orderType: validatedOrderType, // Phase 7-A
         limit: limit ? parseInt(limit as string, 10) : 50,
         offset: offset ? parseInt(offset as string, 10) : 0,
       });
@@ -59,6 +83,10 @@ export class AdminOrderController {
             total,
             limit: limit ? parseInt(limit as string, 10) : 50,
             offset: offset ? parseInt(offset as string, 10) : 0,
+          },
+          // Phase 7-A: 현재 적용된 필터 정보
+          filters: {
+            orderType: validatedOrderType || 'ALL',
           },
         },
       });

@@ -216,6 +216,88 @@ packages/<app>/
 
 ---
 
+## 4.1 TypeORM Entity – ESM Mandatory Rules (FROZEN)
+
+> **이 규칙은 플랫폼 전체에 적용되는 필수 패턴이다.**
+> **위반 시 API 서버 기동 실패 및 즉시 롤백 대상이다.**
+
+모든 TypeORM 엔티티의 관계(relationship) 정의는 반드시 아래 규칙을 따른다.
+
+### Rule 1: Type-Only Imports for Related Entities
+
+관계가 있는 엔티티는 반드시 `type` 키워드와 함께 import한다.
+
+```typescript
+// ❌ FORBIDDEN (절대 금지)
+import { RelatedEntity } from './related.entity.js';
+
+// ✅ REQUIRED (필수)
+import type { RelatedEntity } from './related.entity.js';
+```
+
+### Rule 2: String-Based Relationship Decorators
+
+관계 데코레이터는 반드시 문자열 기반 문법을 사용한다.
+
+```typescript
+// ❌ FORBIDDEN (절대 금지)
+@ManyToOne(() => RelatedEntity, (e) => e.property)
+@OneToMany(() => RelatedEntity, (e) => e.property)
+@OneToOne(() => RelatedEntity, (e) => e.property)
+
+// ✅ REQUIRED (필수)
+@ManyToOne('RelatedEntity', 'property')
+@OneToMany('RelatedEntity', 'property')
+@OneToOne('RelatedEntity', 'property')
+```
+
+### Reason (이유)
+
+ESM 환경에서 `emitDecoratorMetadata: true` 설정과 클래스 참조 기반 데코레이터를 함께 사용하면 **런타임 순환 의존성 에러**가 발생한다.
+
+**에러 패턴**:
+```
+ReferenceError: Cannot access 'EntityName' before initialization
+```
+
+**해결 원리**:
+- `import type`은 런타임에서 제거되어 순환 참조를 차단
+- 문자열 기반 데코레이터는 TypeORM이 지연 해석하여 초기화 순서 문제 회피
+
+### Violation Consequences (위반 시)
+
+| 결과 | 설명 |
+|------|------|
+| ❌ API 서버 기동 실패 | AppDataSource 초기화 실패 |
+| ❌ CI 빌드 실패 | TypeORM entity loading 단계 실패 |
+| ❌ 즉시 롤백 필수 | 프로덕션 배포 불가 |
+
+### Enforcement (적용 규칙)
+
+* **모든 신규 엔티티**: 반드시 이 패턴 사용
+* **기존 엔티티 수정 시**: 이 패턴으로 변경
+* **코드 리뷰**: 패턴 준수 여부 필수 검증
+* **자동화 권장**: ESLint rule로 검증 (선택)
+
+### References (참조 문서)
+
+* 근본 원인 분석: `docs/reports/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md`
+* 수정 작업 기록: `docs/reports/STEP3-EXECUTION-RESULTS-V01.md`
+* 검증 결과: `docs/reports/DOMAIN-INTEGRATION-VERIFICATION-RESULTS-V01.md`
+
+### Affected Files (적용 완료 파일)
+
+**Phase 2 (2026-01-11)**: 22개 엔티티 파일 수정 완료
+- Cosmetics: 4 files
+- Yaksa: 3 files
+- Glycopharm: 5 files
+- GlucoseView: 6 files
+- Neture: 4 files
+
+**Status**: ✅ All platform entities now compliant
+
+---
+
 ## 5. View / CMS 규칙 (CMS 2.0)
 
 * CPT/ACF 기반 데이터 구조
@@ -306,6 +388,27 @@ docs/app-guidelines/new-service-workorder-template.md
 * 주문/결제 개념이 없는 순수 컨텐츠/커뮤니티 서비스
 * 인프라/UI 전용 패키지
 * **단, 미적용 시 반드시 문서화 필수**
+
+### 7.4 OrderType 정의 (Phase 5-A′ 확정)
+
+```typescript
+enum OrderType {
+  GENERIC = 'GENERIC',         // 일반 주문 (기본값)
+  DROPSHIPPING = 'DROPSHIPPING', // 드롭쉬핑 주문
+  GLYCOPHARM = 'GLYCOPHARM',   // GlycoPharm 약국 주문
+  COSMETICS = 'COSMETICS',     // Cosmetics 화장품 주문
+  TOURISM = 'TOURISM',         // Tourism 관광 주문
+}
+```
+
+| 서비스 | OrderType | 상태 |
+|--------|-----------|------|
+| Dropshipping | DROPSHIPPING | ✅ 표준 |
+| GlycoPharm | GLYCOPHARM | ✅ 표준 (Phase 5-A 차단 완료) |
+| Cosmetics | COSMETICS | ✅ 표준 (Phase 5-B 판정 완료) |
+| Tourism | TOURISM | ⏳ 향후 구현 |
+
+> 📄 상세 계약: `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md`
 
 ---
 
@@ -432,6 +535,20 @@ cosmetics DB에 아래 데이터 저장 금지:
 * Core 마이그레이션과 **동시 실행 금지**
 * cosmetics 스키마 변경은 Core 배포와 **독립적**이어야 함
 
+### 11.6 주문 처리 원칙 (Phase 5-B 확정)
+
+| 원칙 | 설명 |
+|------|------|
+| 주문 생성 | **E-commerce Core** 통해 처리 |
+| OrderType | `COSMETICS` |
+| 주문 원장 | `checkout_orders` (Core 소유) |
+| Cosmetics 책임 | 상품/브랜드/가격 관리만 |
+
+> Cosmetics는 **상품 데이터**에 대해 독립 스키마를 유지하되,
+> **주문/결제**는 E-commerce Core를 통해 처리한다.
+> 이는 플랫폼 표준 매장으로서의 지위를 명확히 한다.
+
+> 📄 판정 문서: `docs/_platform/COSMETICS-ORDER-POSITIONING.md`
 > 📄 상세 규정: `docs/architecture/cosmetics-db-schema.md`
 
 ---
@@ -842,6 +959,7 @@ mkdir -p apps/{business}-web
 cosmetics:read, cosmetics:write, cosmetics:admin
 yaksa:read, yaksa:write, yaksa:admin
 dropshipping:read, dropshipping:write, dropshipping:admin
+tourism:read, tourism:write, tourism:admin
 ```
 
 ### 17.5 개발 환경 포트 할당
@@ -852,6 +970,7 @@ dropshipping:read, dropshipping:write, dropshipping:admin
 | cosmetics | 4001 | 4002 |
 | yaksa | 4011 | 4012 |
 | dropshipping | 4021 | 4022 |
+| tourism | 4031 | 4032 |
 
 ### 17.6 위반 시 조치
 
@@ -921,13 +1040,327 @@ node test-{feature}.mjs
 
 ---
 
-## 19. 최종 원칙
+## 19. Tourism Domain Rules (Mandatory) - Phase 5-C
+
+> Tourism 도메인은 **O4O 표준 매장 패턴**을 따르며,
+> 모든 주문은 E-commerce Core를 통해 처리한다.
+
+### 19.1 Tourism 정체성 (확정)
+
+| 질문 | 답변 |
+|------|------|
+| O4O 표준 매장인가? | **예** |
+| 독립 Commerce인가? | **아니오** |
+| E-commerce Core 사용? | **예** |
+| OrderType | `TOURISM` |
+
+> Tourism은 Cosmetics와 함께 **표준 매장 참조 구현(reference implementation)**입니다.
+
+### 19.2 소유권 원칙
+
+| 테이블 | 소유자 | 비고 |
+|--------|--------|------|
+| tourism_destinations | Tourism | 관광지/테마 정보 |
+| tourism_packages | Tourism | 관광 패키지 |
+| tourism_package_items | Tourism | 패키지 구성 아이템 |
+| checkout_orders (orderType: TOURISM) | E-commerce Core | 주문 원장 |
+
+### 19.3 주문 처리 원칙 (절대 규칙)
+
+| 원칙 | 설명 |
+|------|------|
+| 주문 생성 | E-commerce Core 통해 처리 (`checkoutService.createOrder()`) |
+| OrderType | `TOURISM` |
+| 주문 원장 | `checkout_orders` (Core 소유) |
+| Tourism 책임 | 관광지/패키지/콘텐츠 관리만 |
+
+```typescript
+// 허용 (Phase 5-C 표준)
+const order = await checkoutService.createOrder({
+  orderType: OrderType.TOURISM,
+  buyerId,
+  items,
+  metadata: { packageId, tourDate, ... }
+});
+
+// 금지 (절대)
+const order = tourismOrderRepository.save({ ... }); // ❌
+```
+
+### 19.4 금지 사항 (즉시 차단)
+
+| 금지 | 사유 |
+|------|------|
+| tourism_orders 테이블 생성 | E-commerce Core 우회 |
+| Tourism 결제 API | Core 책임 |
+| checkoutService 미사용 | 주문 원장 무결성 훼손 |
+| Dropshipping 상품 직접 저장 | 상품은 참조만 |
+
+### 19.5 Dropshipping 연계 규칙
+
+Tourism은 **상품을 소유하지 않습니다**.
+
+| 역할 | 책임 |
+|------|------|
+| Tourism | 상품을 설명하는 서비스 (콘텐츠) |
+| Dropshipping | 상품을 공급하는 엔진 |
+| E-commerce Core | 주문 원장 |
+
+```typescript
+// tourism_package_items
+@Column({ type: 'uuid', nullable: true })
+dropshippingProductId?: string;  // Soft FK (참조만, FK 제약 없음)
+```
+
+### 19.6 위반 시 조치
+
+| 위반 유형 | 조치 |
+|-----------|------|
+| tourism_orders 테이블 생성 | 즉시 삭제 |
+| checkoutService 미사용 주문 | 즉시 수정 |
+| orderType 누락 | 빌드 실패 |
+
+> 📄 도메인 경계: `apps/api-server/src/routes/tourism/DOMAIN-BOUNDARY.md`
+> 📄 주문 표준 계약: `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md`
+
+---
+
+## 20. Order Guardrails (Phase 5-D) - 절대 규칙
+
+> **"어떤 서비스도 E-commerce Core를 우회해 주문을 만들 수 없게 한다."**
+
+### 20.1 3중 방어 체계
+
+| 레이어 | 방어 수단 | 설명 |
+|--------|----------|------|
+| 런타임 | OrderCreationGuard | checkoutService 외 주문 생성 즉시 차단 |
+| 계약 | OrderType 강제 | 누락/무효 시 Hard Fail |
+| 스키마 | 금지 테이블 검사 | `*_orders`, `*_payments` 생성 차단 |
+
+### 20.2 Guardrail 1: 런타임 차단 (Service Layer)
+
+모든 주문은 `checkoutService.createOrder()`를 통해서만 생성 가능합니다.
+
+```typescript
+// 허용
+const order = await checkoutService.createOrder({
+  orderType: OrderType.COSMETICS,
+  buyerId,
+  items,
+  ...
+});
+
+// 금지 (런타임 에러 발생)
+const order = await someOtherService.createOrder({ ... });  // ❌
+const order = await orderRepository.save({ ... });          // ❌
+```
+
+**구현 파일**: `apps/api-server/src/guards/order-creation.guard.ts`
+
+### 20.3 Guardrail 2: OrderType 강제 (Contract Layer)
+
+| 규칙 | 동작 |
+|------|------|
+| OrderType 누락 | **Hard Fail** (400 Bad Request) |
+| 무효한 OrderType | **Hard Fail** (400 Bad Request) |
+| 차단된 OrderType | **Hard Fail** (GLYCOPHARM 등) |
+
+```typescript
+// 허용된 OrderType
+enum OrderType {
+  GENERIC,      // 기본값 (경고 로깅)
+  DROPSHIPPING,
+  COSMETICS,
+  TOURISM,
+  GLYCOPHARM,   // 차단됨 (조회만 가능)
+}
+
+// 차단된 OrderType
+const BLOCKED_ORDER_TYPES = [
+  OrderType.GLYCOPHARM,  // Phase 5-A에서 차단
+];
+```
+
+### 20.4 Guardrail 3: 스키마 정책 (DB Layer)
+
+**금지된 테이블 패턴**:
+
+| 패턴 | 예시 | 이유 |
+|------|------|------|
+| `*_orders` | cosmetics_orders, tourism_orders | 주문 원장 분산 |
+| `*_payments` | cosmetics_payments | 결제 원장 분산 |
+
+**허용된 테이블**:
+
+| 테이블 | 소유자 |
+|--------|--------|
+| checkout_orders | E-commerce Core |
+| checkout_payments | E-commerce Core |
+
+**검사 스크립트**: `scripts/check-forbidden-tables.mjs`
+
+```bash
+# CI에서 실행
+node scripts/check-forbidden-tables.mjs
+```
+
+### 20.5 금지 패턴 목록
+
+다음 패턴은 **발견 즉시 제거 대상**입니다:
+
+| 금지 패턴 | 이유 |
+|-----------|------|
+| `tourism_orders` | Tourism은 Core 위임 |
+| `cosmetics_orders` | Cosmetics는 Core 위임 |
+| `glycopharm_orders` | Phase 5-A에서 폐기 |
+| `yaksa_orders` | Yaksa는 주문 기능 없음 |
+| `neture_orders` | Neture는 Read-only Hub |
+| Service 내 `createOrder()` | 책임 침범 |
+| 서비스별 결제 API | Core 책임 |
+
+### 20.6 위반 시 조치
+
+| 위반 유형 | 조치 |
+|-----------|------|
+| 금지 테이블 생성 시도 | CI 실패, PR 차단 |
+| checkoutService 우회 | 런타임 에러, 즉시 수정 |
+| OrderType 누락/무효 | 400 Bad Request |
+| 차단된 OrderType 사용 | 400 Bad Request |
+
+### 20.7 레거시 예외 (향후 제거)
+
+다음 파일은 Phase 5 이전 레거시로, 검사에서 제외됩니다:
+
+```
+packages/ecommerce-core/src/entities/EcommerceOrder.entity.ts
+packages/ecommerce-core/src/entities/EcommercePayment.entity.ts
+packages/pharmaceutical-core/src/entities/PharmaOrder.entity.ts
+```
+
+> ⚠️ 이 파일들은 향후 Phase에서 제거 또는 마이그레이션 예정
+
+### 20.8 GlycoPharm Legacy (Phase 9-A Frozen)
+
+GlycoPharm은 독립 주문 구조로 인해 **영구 차단**된 서비스입니다.
+
+| 상태 | 설명 |
+|------|------|
+| `glycopharm_orders` | READ-ONLY (역사 데이터 보존) |
+| `glycopharm_order_items` | READ-ONLY (역사 데이터 보존) |
+| `OrderType.GLYCOPHARM` | **BLOCKED** (신규 주문 차단) |
+
+**교훈**: 독립 주문 구조가 왜 플랫폼 전체에 문제가 되는지 기록됨
+
+> 📄 상세 분석: `docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
+
+> 📄 가드 구현: `apps/api-server/src/guards/order-creation.guard.ts`
+> 📄 검사 스크립트: `scripts/check-forbidden-tables.mjs`
+> 📄 주문 계약: `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md`
+
+---
+
+## 21. O4O Store Template Rules (Phase 8) - 필수
+
+> **모든 매장형 O4O 서비스는 O4O Store Template를 기반으로 생성한다.**
+> 템플릿 없이 임의로 매장을 생성하는 것은 금지된다.
+
+### 21.1 O4O 표준 매장 정의
+
+| 항목 | 표준 |
+|------|------|
+| 주문 생성 | **E-commerce Core 전용** (`checkoutService.createOrder()`) |
+| 주문 원장 | `checkout_orders` |
+| 구분 키 | `OrderType` enum |
+| 매장 책임 | 상품/콘텐츠/가격/패키지 관리 |
+| 결제/정산 | Core 책임 |
+| 독립 주문 테이블 | **금지** |
+
+### 21.2 Reference Implementation
+
+| 매장 | OrderType | 상태 |
+|------|-----------|------|
+| Cosmetics | `COSMETICS` | Active (참조 구현) |
+| Tourism | `TOURISM` | Active (참조 구현) |
+
+### 21.3 새 매장 생성 시 필수 절차
+
+```bash
+# 1. 템플릿 복사
+cp -r docs/templates/o4o-store-template/* docs/services/{new-store}/
+
+# 2. OrderType enum 추가
+# apps/api-server/src/entities/checkout/CheckoutOrder.entity.ts
+export enum OrderType {
+  ...
+  {NEW_STORE} = '{NEW_STORE}',
+}
+
+# 3. Order Controller 생성 (템플릿 패턴 필수)
+# apps/api-server/src/routes/{new-store}/controllers/{new-store}-order.controller.ts
+```
+
+### 21.4 Order Controller 필수 패턴
+
+모든 매장은 아래 패턴으로만 주문을 생성할 수 있다.
+
+```typescript
+import { checkoutService } from '../../../services/checkout.service.js';
+import { OrderType } from '../../../entities/checkout/CheckoutOrder.entity.js';
+
+// 유일하게 허용되는 주문 생성 패턴
+const order = await checkoutService.createOrder({
+  orderType: OrderType.{STORE_TYPE},   // 필수: 매장 타입
+  buyerId,                              // 필수: 구매자 ID
+  sellerId,                             // 필수: 판매자 ID
+  supplierId,                           // 필수: 공급자 ID
+  items,                                // 필수: 주문 아이템
+  metadata: { ... },                    // 선택: 매장별 메타데이터
+});
+```
+
+### 21.5 금지 사항 (즉시 차단)
+
+| 금지 | 이유 |
+|------|------|
+| `{store}_orders` 테이블 생성 | E-commerce Core 원칙 위반 |
+| 직접 INSERT/UPDATE 주문 | 판매 원장 무결성 훼손 |
+| `checkoutService` 미사용 | 통합 조회/정산 불가 |
+| OrderType 없이 주문 생성 | 서비스 식별 불가 |
+| 템플릿 미사용 | 표준화 위반 |
+
+### 21.6 매장 생성 체크리스트
+
+새 매장 생성 시 반드시 확인:
+
+- [ ] OrderType enum에 추가됨
+- [ ] `checkoutService.createOrder()`만 사용
+- [ ] 자체 주문 테이블 없음
+- [ ] ESM 호환 Entity 패턴 준수 (§4.1)
+- [ ] CLAUDE.md §7 규칙 준수
+- [ ] 템플릿 문서 생성 (DOMAIN-BOUNDARY.md)
+
+### 21.7 위반 시 조치
+
+| 위반 유형 | 조치 |
+|-----------|------|
+| 템플릿 미사용 | 개발 중단, 템플릿에서 재시작 |
+| 금지 테이블 생성 | 마이그레이션 롤백, 테이블 삭제 |
+| checkoutService 우회 | 코드 즉시 제거 |
+| OrderType 누락 | 빌드 실패 |
+
+> 📄 템플릿 디렉터리: `docs/templates/o4o-store-template/`
+> 📄 주문 위임 패턴: `docs/templates/o4o-store-template/ORDER-DELEGATION.md`
+> 📄 도메인 경계: `docs/templates/o4o-store-template/DOMAIN-BOUNDARY.md`
+
+---
+
+## 22. 최종 원칙
 
 > **새 앱을 만들기 전에,
 > "이게 위 기준을 모두 만족하는가?"를 먼저 확인하라.**
 
 ---
 
-*Updated: 2026-01-06*
-*Version: 2.9*
+*Updated: 2026-01-11*
+*Version: 3.3*
 *Status: Active Constitution*

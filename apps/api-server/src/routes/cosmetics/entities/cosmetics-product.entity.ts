@@ -16,9 +16,9 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { CosmeticsBrand } from './cosmetics-brand.entity.js';
-import { CosmeticsLine } from './cosmetics-line.entity.js';
-import { CosmeticsPricePolicy } from './cosmetics-price-policy.entity.js';
+import type { CosmeticsBrand } from './cosmetics-brand.entity.js';
+import type { CosmeticsLine } from './cosmetics-line.entity.js';
+import type { CosmeticsPricePolicy } from './cosmetics-price-policy.entity.js';
 
 /**
  * Product Status Enum
@@ -124,15 +124,15 @@ export class CosmeticsProduct {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  // Relations (no FK constraints)
-  @ManyToOne(() => CosmeticsBrand, (brand) => brand.products)
+  // Relations (using type-only imports to avoid circular dependency in ESM)
+  @ManyToOne('CosmeticsBrand', 'products')
   @JoinColumn({ name: 'brand_id' })
   brand?: CosmeticsBrand;
 
-  @ManyToOne(() => CosmeticsLine, (line) => line.products)
+  @ManyToOne('CosmeticsLine', 'products')
   @JoinColumn({ name: 'line_id' })
   line?: CosmeticsLine;
 
-  @OneToOne(() => CosmeticsPricePolicy, (policy) => policy.product)
+  @OneToOne('CosmeticsPricePolicy', 'product')
   pricePolicy?: CosmeticsPricePolicy;
 }

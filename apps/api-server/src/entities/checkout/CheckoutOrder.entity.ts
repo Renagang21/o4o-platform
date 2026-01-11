@@ -2,10 +2,14 @@
  * CheckoutOrder Entity
  *
  * Phase N-2: 운영 안정화
+ * Phase 5-A′: E-commerce Core 주문 표준화
  *
  * 실거래 MVP용 주문 엔티티
  * - Phase N-1 In-memory 구조의 DB 영속화 버전
- * - 향후 EcommerceOrder와 통합 가능
+ * - Phase 5-A′: 모든 서비스의 주문은 이 엔티티를 통해서만 생성
+ *
+ * @see CLAUDE.md §7 - E-commerce Core 절대 규칙
+ * @see docs/_platform/E-COMMERCE-ORDER-CONTRACT.md
  */
 
 import {
@@ -17,6 +21,27 @@ import {
   Index,
   OneToMany,
 } from 'typeorm';
+
+/**
+ * 주문 유형 (서비스 식별)
+ *
+ * Phase 5-A′: 모든 주문은 반드시 orderType을 가져야 함
+ *
+ * @rule orderType 없는 주문 생성 불가
+ * @rule orderType은 생성 후 변경 불가 (immutable)
+ */
+export enum OrderType {
+  /** 일반 주문 (기본값) */
+  GENERIC = 'GENERIC',
+  /** 드롭쉬핑 주문 */
+  DROPSHIPPING = 'DROPSHIPPING',
+  /** GlycoPharm 약국 주문 */
+  GLYCOPHARM = 'GLYCOPHARM',
+  /** Cosmetics 화장품 주문 */
+  COSMETICS = 'COSMETICS',
+  /** Tourism 관광 주문 */
+  TOURISM = 'TOURISM',
+}
 
 /**
  * 주문 상태
@@ -62,6 +87,26 @@ export class CheckoutOrder {
   @Index({ unique: true })
   @Column({ type: 'varchar', length: 50 })
   orderNumber!: string;
+
+  /**
+   * 주문 유형 (서비스 식별)
+   *
+   * Phase 5-A′: 모든 주문은 반드시 orderType을 가져야 함
+   * - GENERIC: 일반 주문 (기본값, 하위 호환성)
+   * - DROPSHIPPING: 드롭쉬핑 주문
+   * - GLYCOPHARM: GlycoPharm 약국 주문
+   * - COSMETICS: Cosmetics 화장품 주문
+   * - TOURISM: Tourism 관광 주문
+   *
+   * @immutable 생성 후 변경 불가
+   */
+  @Index()
+  @Column({
+    type: 'enum',
+    enum: OrderType,
+    default: OrderType.GENERIC,
+  })
+  orderType!: OrderType;
 
   /**
    * 구매자 ID

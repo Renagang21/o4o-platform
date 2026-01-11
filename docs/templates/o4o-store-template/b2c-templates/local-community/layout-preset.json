@@ -1,0 +1,247 @@
+{
+  "$schema": "../../schemas/layout-preset.schema.json",
+  "templateId": "local-community",
+  "version": "1.0.0",
+
+  "pages": {
+    "home": {
+      "title": "Home",
+      "path": "/",
+      "sections": [
+        {
+          "id": "store-intro",
+          "type": "store-greeting",
+          "enabled": true,
+          "config": {
+            "layout": "centered",
+            "showOwnerPhoto": true,
+            "showStoreName": true,
+            "showGreeting": true,
+            "greetingText": "안녕하세요! {{STORE_NAME}}입니다",
+            "showBusinessHours": true
+          }
+        },
+        {
+          "id": "quick-actions",
+          "type": "action-buttons",
+          "enabled": true,
+          "config": {
+            "layout": "horizontal",
+            "buttons": [
+              { "icon": "phone", "label": "전화하기", "action": "tel" },
+              { "icon": "map", "label": "오시는 길", "action": "scroll-to-map" },
+              { "icon": "kakao", "label": "카카오톡", "action": "kakao" }
+            ]
+          }
+        },
+        {
+          "id": "todays-pick",
+          "type": "owner-recommendation",
+          "enabled": true,
+          "config": {
+            "title": "오늘의 추천",
+            "showOwnerNote": true,
+            "maxItems": 4,
+            "layout": "horizontal-scroll"
+          }
+        },
+        {
+          "id": "popular-items",
+          "type": "product-simple-grid",
+          "enabled": true,
+          "config": {
+            "title": "자주 찾는 제품",
+            "columns": 2,
+            "maxItems": 6,
+            "showQuickAdd": true,
+            "compactCard": true
+          }
+        },
+        {
+          "id": "notice",
+          "type": "notice-board",
+          "enabled": true,
+          "config": {
+            "title": "공지사항",
+            "maxItems": 3,
+            "showDate": true,
+            "showPin": true
+          }
+        },
+        {
+          "id": "store-photos",
+          "type": "photo-gallery",
+          "enabled": true,
+          "config": {
+            "title": "매장 소개",
+            "layout": "carousel",
+            "showCaption": true,
+            "autoplay": true
+          }
+        },
+        {
+          "id": "location",
+          "type": "store-location",
+          "enabled": true,
+          "config": {
+            "title": "오시는 길",
+            "showMap": true,
+            "mapProvider": "kakao",
+            "showAddress": true,
+            "showParkingInfo": true,
+            "showNearbyLandmarks": true
+          }
+        },
+        {
+          "id": "business-hours",
+          "type": "hours-table",
+          "enabled": true,
+          "config": {
+            "title": "영업시간",
+            "showToday": true,
+            "highlightToday": true,
+            "showHolidays": true
+          }
+        }
+      ]
+    },
+
+    "productList": {
+      "title": "Products",
+      "path": "/products",
+      "sections": [
+        {
+          "id": "category-tabs",
+          "type": "category-tabs",
+          "enabled": true,
+          "config": {
+            "position": "top",
+            "sticky": true,
+            "showAll": true,
+            "scrollable": true
+          }
+        },
+        {
+          "id": "product-grid",
+          "type": "product-simple-grid",
+          "enabled": true,
+          "config": {
+            "columns": 2,
+            "columnsMobile": 2,
+            "pagination": true,
+            "itemsPerPage": 20,
+            "showQuickAdd": true,
+            "compactCard": true
+          }
+        }
+      ]
+    },
+
+    "productDetail": {
+      "title": "Product Detail",
+      "path": "/products/:id",
+      "sections": [
+        {
+          "id": "product-main",
+          "type": "product-detail-simple",
+          "enabled": true,
+          "config": {
+            "imagePosition": "top",
+            "imageAspect": "1:1",
+            "showStock": true,
+            "showOwnerNote": true,
+            "stickyAddToCart": true
+          }
+        },
+        {
+          "id": "product-info",
+          "type": "collapsible-sections",
+          "enabled": true,
+          "config": {
+            "sections": [
+              "description",
+              "usage",
+              "precautions"
+            ],
+            "defaultOpen": "description"
+          }
+        },
+        {
+          "id": "related-products",
+          "type": "product-simple-grid",
+          "enabled": true,
+          "config": {
+            "title": "함께 많이 구매하는 제품",
+            "columns": 2,
+            "maxItems": 4,
+            "filter": "frequently-bought"
+          }
+        }
+      ]
+    },
+
+    "contact": {
+      "title": "Contact",
+      "path": "/contact",
+      "sections": [
+        {
+          "id": "contact-info",
+          "type": "contact-card",
+          "enabled": true,
+          "config": {
+            "showPhone": true,
+            "showKakao": true,
+            "showEmail": true,
+            "showAddress": true
+          }
+        },
+        {
+          "id": "inquiry-form",
+          "type": "simple-form",
+          "enabled": true,
+          "config": {
+            "fields": ["name", "phone", "message"],
+            "submitText": "문의하기"
+          }
+        }
+      ]
+    }
+  },
+
+  "layout": {
+    "header": {
+      "type": "simple",
+      "sticky": true,
+      "showLogo": true,
+      "showSearch": true,
+      "showCart": true,
+      "showUser": false,
+      "compact": true
+    },
+    "footer": {
+      "type": "simple",
+      "showStoreInfo": true,
+      "showBusinessNumber": true,
+      "showSocial": true,
+      "compact": true
+    },
+    "bottomNav": {
+      "enabled": true,
+      "items": [
+        { "icon": "home", "label": "홈", "path": "/" },
+        { "icon": "products", "label": "제품", "path": "/products" },
+        { "icon": "phone", "label": "문의", "action": "tel" },
+        { "icon": "cart", "label": "장바구니", "path": "/cart" }
+      ]
+    }
+  },
+
+  "floatingActions": {
+    "enabled": true,
+    "position": "bottom-right",
+    "items": [
+      { "icon": "phone", "label": "전화", "action": "tel", "primary": true },
+      { "icon": "kakao", "label": "카카오톡", "action": "kakao" }
+    ]
+  }
+}

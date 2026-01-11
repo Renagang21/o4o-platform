@@ -1,8 +1,25 @@
 /**
  * Glycopharm Product Entity
  *
- * Phase B-1: Glycopharm API Implementation
- * Blood glucose related products (CGM devices, test strips, etc.)
+ * ============================================================================
+ * ⚠️ ACTIVE TABLE - GlycoPharm Domain (Phase 9-A Reviewed)
+ * ============================================================================
+ *
+ * This table remains ACTIVE for product catalog management.
+ * Unlike glycopharm_orders, this is NOT deprecated.
+ *
+ * The product entity is used for:
+ * - Blood glucose product catalog (CGM devices, test strips, etc.)
+ * - Pricing and inventory management
+ * - Product display in pharmacy storefronts
+ *
+ * When orders are created, product info is copied to:
+ * - checkout_order_items.metadata.productDetails
+ *
+ * @see CLAUDE.md §7 for E-commerce Core rules
+ * ============================================================================
+ *
+ * Original: Phase B-1 Glycopharm API Implementation
  */
 
 import {
@@ -15,8 +32,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
-import { GlycopharmProductLog } from './glycopharm-product-log.entity.js';
+import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { GlycopharmProductLog } from './glycopharm-product-log.entity.js';
 
 export type GlycopharmProductStatus = 'draft' | 'active' | 'inactive' | 'discontinued';
 export type GlycopharmProductCategory = 'cgm_device' | 'test_strip' | 'lancet' | 'meter' | 'accessory' | 'other';
@@ -80,10 +97,11 @@ export class GlycopharmProduct {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @ManyToOne(() => GlycopharmPharmacy, (pharmacy) => pharmacy.products)
+  // Relations (using type-only imports to avoid circular dependency in ESM)
+  @ManyToOne('GlycopharmPharmacy', 'products')
   @JoinColumn({ name: 'pharmacy_id' })
   pharmacy?: GlycopharmPharmacy;
 
-  @OneToMany(() => GlycopharmProductLog, (log) => log.product)
+  @OneToMany('GlycopharmProductLog', 'product')
   logs?: GlycopharmProductLog[];
 }

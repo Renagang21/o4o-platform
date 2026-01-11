@@ -1,0 +1,140 @@
+{
+  "$schema": "../../schemas/theme-config.schema.json",
+  "templateId": "local-community",
+  "templateName": "Local Community Store",
+  "version": "1.0.0",
+
+  "colors": {
+    "primary": "#EA580C",
+    "primaryHover": "#C2410C",
+    "secondary": "#65A30D",
+    "accent": "#0891B2",
+    "background": "#FFFBEB",
+    "backgroundAlt": "#FEF3C7",
+    "surface": "#FFFFFF",
+    "text": "#292524",
+    "textMuted": "#78716C",
+    "border": "#D6D3D1",
+    "success": "#16A34A",
+    "warning": "#CA8A04",
+    "error": "#DC2626",
+    "warm": "#F97316",
+    "nature": "#84CC16"
+  },
+
+  "typography": {
+    "fontFamily": {
+      "heading": "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
+      "body": "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
+      "mono": "'JetBrains Mono', monospace"
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem"
+    },
+    "fontWeight": {
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeight": {
+      "tight": 1.25,
+      "normal": 1.6,
+      "relaxed": 1.75
+    }
+  },
+
+  "spacing": {
+    "containerMaxWidth": "1024px",
+    "sectionPadding": "3rem",
+    "cardPadding": "1.25rem",
+    "gridGap": "1rem"
+  },
+
+  "borderRadius": {
+    "sm": "0.5rem",
+    "md": "0.75rem",
+    "lg": "1rem",
+    "xl": "1.5rem",
+    "full": "9999px"
+  },
+
+  "shadows": {
+    "sm": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    "md": "0 4px 6px -1px rgb(0 0 0 / 0.08)",
+    "lg": "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+    "xl": "0 20px 25px -5px rgb(0 0 0 / 0.1)",
+    "warm": "0 4px 14px -3px rgba(234, 88, 12, 0.2)"
+  },
+
+  "components": {
+    "button": {
+      "borderRadius": "lg",
+      "paddingX": "1.5rem",
+      "paddingY": "0.875rem",
+      "fontSize": "base",
+      "fontWeight": "semibold"
+    },
+    "card": {
+      "borderRadius": "xl",
+      "shadow": "md",
+      "hoverShadow": "lg",
+      "padding": "1.25rem",
+      "border": false
+    },
+    "input": {
+      "borderRadius": "lg",
+      "borderColor": "border",
+      "focusBorderColor": "primary",
+      "paddingX": "1rem",
+      "paddingY": "0.875rem"
+    },
+    "badge": {
+      "borderRadius": "full",
+      "paddingX": "0.75rem",
+      "paddingY": "0.375rem",
+      "fontSize": "sm",
+      "fontWeight": "medium"
+    }
+  },
+
+  "specialElements": {
+    "ownerGreeting": {
+      "backgroundColor": "backgroundAlt",
+      "borderRadius": "xl",
+      "padding": "1.5rem",
+      "showPhoto": true
+    },
+    "todaysPick": {
+      "borderColor": "primary",
+      "borderWidth": "2px",
+      "ribbon": true
+    },
+    "storeInfo": {
+      "backgroundColor": "surface",
+      "shadow": "md",
+      "showMap": true,
+      "showHours": true
+    },
+    "quickContact": {
+      "position": "fixed",
+      "bottom": "1rem",
+      "showPhone": true,
+      "showKakao": true
+    }
+  },
+
+  "mobileOptimizations": {
+    "touchTargetSize": "48px",
+    "bottomNav": true,
+    "swipeEnabled": true,
+    "reducedMotion": true
+  }
+}

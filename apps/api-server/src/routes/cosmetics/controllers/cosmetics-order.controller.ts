@@ -21,6 +21,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, query, param, validationResult } from 'express-validator';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { checkoutService, type OrderItem } from '../../../services/checkout.service.js';
+import { OrderType } from '../../../entities/checkout/CheckoutOrder.entity.js';
 
 // ============================================================================
 // Type Definitions (H1-2 확정 스키마와 동일)
@@ -486,38 +488,61 @@ export function createCosmeticsOrderController(
           return errorResponse(res, 400, 'CHANNEL_VALIDATION_ERROR', channelValidation.error!);
         }
 
-        // 금액 계산
-        const subtotal = dto.items.reduce((sum, item) => {
-          return sum + item.quantity * item.unitPrice - (item.discount || 0);
-        }, 0);
-        const shippingFee = dto.shippingFee || 0;
-        const discount = dto.discount || 0;
-        const totalAmount = subtotal + shippingFee - discount;
+        // ================================================================
+        // Phase 5-B′: E-commerce Core 주문 위임
+        // - 기존 Mock 응답 → checkoutService.createOrder() 호출
+        // - OrderType.COSMETICS 사용
+        // - 모든 주문은 checkout_orders 테이블에 저장
+        // ================================================================
 
-        // 주문 번호 생성
-        const now = new Date();
-        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        const orderNumber = `COS-${dateStr}-${random}`;
+        // E-commerce Core CreateOrderDto 형식으로 변환
+        const orderItems: OrderItem[] = dto.items.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          subtotal: item.quantity * item.unitPrice - (item.discount || 0),
+        }));
 
-        // 주문 응답 생성 (실제 DB 저장은 EcommerceOrderService 통해 처리)
-        // H2-0에서는 API 레이어 검증만 구현
-        const orderResponse = {
-          id: `order-${Date.now()}`, // 임시 ID (실제 구현 시 DB에서 생성)
-          orderNumber,
-          orderType: 'retail', // Cosmetics = RETAIL 고정
+        // E-commerce Core를 통해 주문 생성
+        const order = await checkoutService.createOrder({
+          orderType: OrderType.COSMETICS,
           buyerId,
           sellerId: dto.sellerId,
-          status: 'created',
-          paymentStatus: 'pending',
-          subtotal,
-          shippingFee,
-          discount,
-          totalAmount,
+          supplierId: dto.sellerId, // Cosmetics에서는 sellerId = supplierId
+          items: orderItems,
+          shippingAddress: dto.shippingAddress ? {
+            recipientName: dto.shippingAddress.recipientName,
+            phone: dto.shippingAddress.phone,
+            zipCode: dto.shippingAddress.zipCode,
+            address1: dto.shippingAddress.address1,
+            address2: dto.shippingAddress.address2,
+            memo: dto.shippingAddress.memo,
+          } : undefined,
+          metadata: {
+            ...dto.metadata,
+            // Cosmetics 원본 아이템 정보 보존 (productSnapshot 포함)
+            originalItems: dto.items,
+          },
+        });
+
+        // 응답 형식 변환 (기존 Cosmetics API 호환성 유지)
+        const orderResponse = {
+          id: order.id,
+          orderNumber: order.orderNumber,
+          orderType: 'COSMETICS',
+          buyerId: order.buyerId,
+          sellerId: order.sellerId,
+          status: order.status,
+          paymentStatus: order.paymentStatus,
+          subtotal: order.subtotal,
+          shippingFee: order.shippingFee,
+          discount: order.discount,
+          totalAmount: order.totalAmount,
           currency: 'KRW',
           metadata: dto.metadata,
           items: dto.items.map((item, index) => ({
-            id: `item-${Date.now()}-${index}`,
+            id: `${order.id}-item-${index}`,
             productId: item.productId,
             productName: item.productName,
             quantity: item.quantity,
@@ -529,16 +554,17 @@ export function createCosmeticsOrderController(
               : undefined,
           })),
           shippingAddress: dto.shippingAddress,
-          createdAt: now.toISOString(),
+          createdAt: order.createdAt,
         };
 
         // H3-0: Travel 주문 로깅 개선
         const logData: Record<string, any> = {
-          orderNumber,
+          orderId: order.id,
+          orderNumber: order.orderNumber,
           channel: dto.metadata.channel,
           buyerId,
           sellerId: dto.sellerId,
-          totalAmount,
+          totalAmount: order.totalAmount,
           itemCount: dto.items.length,
         };
 

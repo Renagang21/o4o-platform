@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { NeturePartnershipProduct } from './NeturePartnershipProduct.entity';
+import type { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
 
 export enum PartnershipStatus {
   OPEN = 'OPEN',
@@ -79,6 +79,6 @@ export class NeturePartnershipRequest {
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
 
-  @OneToMany(() => NeturePartnershipProduct, (product) => product.partnershipRequest)
+  @OneToMany('NeturePartnershipProduct', 'partnershipRequest')
   products: NeturePartnershipProduct[];
 }

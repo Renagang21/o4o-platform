@@ -1,0 +1,234 @@
+{
+  "$schema": "../../schemas/layout-preset.schema.json",
+  "templateId": "beauty-experience",
+  "version": "1.0.0",
+
+  "pages": {
+    "home": {
+      "title": "Home",
+      "path": "/",
+      "sections": [
+        {
+          "id": "hero",
+          "type": "hero-fullscreen",
+          "enabled": true,
+          "config": {
+            "layout": "fullscreen",
+            "height": "100vh",
+            "mediaType": "video",
+            "fallbackImage": true,
+            "overlay": true,
+            "textPosition": "center",
+            "ctaStyle": "minimal",
+            "scrollIndicator": true
+          }
+        },
+        {
+          "id": "brand-intro",
+          "type": "brand-story",
+          "enabled": true,
+          "config": {
+            "layout": "split-image",
+            "imagePosition": "right",
+            "textAlign": "left",
+            "showTagline": true,
+            "animation": "fade-in"
+          }
+        },
+        {
+          "id": "bestsellers",
+          "type": "product-showcase",
+          "enabled": true,
+          "config": {
+            "title": "Best Sellers",
+            "titleStyle": "elegant",
+            "layout": "masonry",
+            "columns": 3,
+            "maxItems": 6,
+            "showQuickView": true,
+            "hoverEffect": "zoom"
+          }
+        },
+        {
+          "id": "collection-banner",
+          "type": "banner-fullwidth",
+          "enabled": true,
+          "config": {
+            "height": "60vh",
+            "parallax": true,
+            "textOverlay": true,
+            "ctaButton": true
+          }
+        },
+        {
+          "id": "new-arrivals",
+          "type": "product-carousel",
+          "enabled": true,
+          "config": {
+            "title": "New Arrivals",
+            "titleStyle": "elegant",
+            "itemsPerView": 4,
+            "showArrows": true,
+            "autoplay": true,
+            "autoplaySpeed": 5000,
+            "filter": "new"
+          }
+        },
+        {
+          "id": "ingredients",
+          "type": "ingredients-showcase",
+          "enabled": true,
+          "config": {
+            "title": "Our Ingredients",
+            "layout": "horizontal-scroll",
+            "showDetails": true,
+            "animation": "slide-in"
+          }
+        },
+        {
+          "id": "instagram-feed",
+          "type": "social-feed",
+          "enabled": true,
+          "config": {
+            "platform": "instagram",
+            "layout": "grid",
+            "columns": 6,
+            "maxItems": 12,
+            "showLikes": false,
+            "linkToPost": true
+          }
+        },
+        {
+          "id": "newsletter",
+          "type": "newsletter-elegant",
+          "enabled": true,
+          "config": {
+            "title": "Join Our Beauty Community",
+            "subtitle": "Get exclusive offers and beauty tips",
+            "backgroundImage": true,
+            "inputStyle": "minimal"
+          }
+        }
+      ]
+    },
+
+    "productList": {
+      "title": "Shop",
+      "path": "/shop",
+      "sections": [
+        {
+          "id": "collection-header",
+          "type": "collection-hero",
+          "enabled": true,
+          "config": {
+            "height": "40vh",
+            "showDescription": true,
+            "parallax": true
+          }
+        },
+        {
+          "id": "product-filter",
+          "type": "filter-horizontal",
+          "enabled": true,
+          "config": {
+            "position": "top",
+            "showCategory": true,
+            "showSkinType": true,
+            "showConcern": true,
+            "style": "minimal"
+          }
+        },
+        {
+          "id": "product-grid",
+          "type": "product-grid",
+          "enabled": true,
+          "config": {
+            "columns": 4,
+            "columnsMobile": 2,
+            "pagination": "infinite-scroll",
+            "itemsPerPage": 24,
+            "showQuickView": true,
+            "cardStyle": "minimal",
+            "imageAspect": "3:4"
+          }
+        }
+      ]
+    },
+
+    "productDetail": {
+      "title": "Product Detail",
+      "path": "/products/:id",
+      "sections": [
+        {
+          "id": "product-main",
+          "type": "product-detail-beauty",
+          "enabled": true,
+          "config": {
+            "imagePosition": "left",
+            "imageGallery": "vertical-thumbnails",
+            "zoomOnHover": true,
+            "showShades": true,
+            "showSize": true,
+            "stickyAddToCart": true
+          }
+        },
+        {
+          "id": "product-story",
+          "type": "product-story",
+          "enabled": true,
+          "config": {
+            "layout": "fullwidth-sections",
+            "showIngredients": true,
+            "showHowToUse": true,
+            "showResults": true
+          }
+        },
+        {
+          "id": "reviews",
+          "type": "reviews-beauty",
+          "enabled": true,
+          "config": {
+            "showPhotos": true,
+            "showSkinType": true,
+            "filterBySkinType": true,
+            "sortOptions": ["helpful", "recent", "rating"]
+          }
+        },
+        {
+          "id": "complete-look",
+          "type": "product-bundle",
+          "enabled": true,
+          "config": {
+            "title": "Complete Your Routine",
+            "maxItems": 4,
+            "showBundle": true
+          }
+        }
+      ]
+    }
+  },
+
+  "layout": {
+    "header": {
+      "type": "minimal",
+      "sticky": true,
+      "transparent": true,
+      "transparentOnHero": true,
+      "showLogo": true,
+      "logoPosition": "center",
+      "showSearch": true,
+      "searchStyle": "icon",
+      "showCart": true,
+      "showWishlist": true,
+      "navPosition": "sides"
+    },
+    "footer": {
+      "type": "elegant",
+      "columns": 4,
+      "showNewsletter": true,
+      "showSocial": true,
+      "socialStyle": "icons-only",
+      "backgroundColor": "backgroundAlt"
+    }
+  }
+}

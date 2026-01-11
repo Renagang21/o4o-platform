@@ -1,0 +1,104 @@
+{
+  "$schema": "../../../schemas/store-info.schema.json",
+  "storeId": "{{STORE_ID}}",
+  "storeName": "{{STORE_NAME}}",
+  "storeSlug": "{{STORE_SLUG}}",
+
+  "owner": {
+    "name": "{{OWNER_NAME}}",
+    "title": "대표",
+    "photo": "/assets/owner.jpg",
+    "greeting": "안녕하세요! {{STORE_NAME}}입니다. 언제나 정성껏 모시겠습니다.",
+    "experience": "20년"
+  },
+
+  "branding": {
+    "logo": {
+      "url": "/assets/logo.svg",
+      "alt": "{{STORE_NAME}}"
+    },
+    "favicon": "/assets/favicon.ico",
+    "tagline": "우리 동네 믿을 수 있는 {{STORE_TYPE}}"
+  },
+
+  "contact": {
+    "phone": "{{PHONE_NUMBER}}",
+    "kakaoChannel": "{{KAKAO_CHANNEL}}",
+    "email": "{{EMAIL}}",
+    "address": {
+      "street": "{{STREET_ADDRESS}}",
+      "detail": "{{ADDRESS_DETAIL}}",
+      "city": "{{CITY}}",
+      "province": "{{PROVINCE}}",
+      "postalCode": "{{POSTAL_CODE}}",
+      "country": "South Korea"
+    },
+    "coordinates": {
+      "latitude": "{{LATITUDE}}",
+      "longitude": "{{LONGITUDE}}"
+    }
+  },
+
+  "businessHours": {
+    "timezone": "Asia/Seoul",
+    "hours": [
+      { "day": "monday", "open": "09:00", "close": "21:00" },
+      { "day": "tuesday", "open": "09:00", "close": "21:00" },
+      { "day": "wednesday", "open": "09:00", "close": "21:00" },
+      { "day": "thursday", "open": "09:00", "close": "21:00" },
+      { "day": "friday", "open": "09:00", "close": "21:00" },
+      { "day": "saturday", "open": "09:00", "close": "18:00" },
+      { "day": "sunday", "closed": true }
+    ],
+    "holidays": [
+      { "date": "2026-01-01", "name": "신정" },
+      { "date": "2026-02-28", "name": "설날 연휴" }
+    ],
+    "note": "공휴일 영업시간은 별도 공지"
+  },
+
+  "location": {
+    "parkingInfo": "건물 지하주차장 이용가능 (2시간 무료)",
+    "nearbyLandmarks": [
+      "{{LANDMARK_1}} 옆",
+      "{{LANDMARK_2}}에서 도보 3분"
+    ],
+    "publicTransport": [
+      "지하철 {{LINE}}호선 {{STATION}}역 {{EXIT}}번 출구",
+      "버스 {{BUS_NUMBERS}}"
+    ]
+  },
+
+  "social": {
+    "instagram": null,
+    "facebook": null,
+    "kakao": "{{KAKAO_CHANNEL_URL}}",
+    "naver": null
+  },
+
+  "policies": {
+    "shipping": {
+      "localDelivery": true,
+      "localDeliveryFee": 0,
+      "localDeliveryArea": "{{LOCAL_AREA}}",
+      "standardShippingFee": 3000,
+      "freeShippingThreshold": 30000
+    },
+    "returns": {
+      "returnPeriod": 7,
+      "conditions": "미개봉 제품에 한함"
+    }
+  },
+
+  "business": {
+    "registrationNumber": "{{BUSINESS_NUMBER}}",
+    "representativeName": "{{OWNER_NAME}}",
+    "mailOrderNumber": "{{MAIL_ORDER_NUMBER}}"
+  },
+
+  "seo": {
+    "title": "{{STORE_NAME}} - {{CITY}} {{STORE_TYPE}}",
+    "description": "{{CITY}} {{DISTRICT}}의 믿을 수 있는 {{STORE_TYPE}}. {{SPECIALTY}}.",
+    "keywords": ["{{CITY}}", "{{DISTRICT}}", "{{STORE_TYPE}}", "{{SPECIALTY}}"]
+  }
+}

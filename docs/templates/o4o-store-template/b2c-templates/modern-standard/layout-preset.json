@@ -1,0 +1,185 @@
+{
+  "$schema": "../../schemas/layout-preset.schema.json",
+  "templateId": "modern-standard",
+  "version": "1.0.0",
+
+  "pages": {
+    "home": {
+      "title": "Home",
+      "path": "/",
+      "sections": [
+        {
+          "id": "hero",
+          "type": "hero-simple",
+          "enabled": true,
+          "config": {
+            "layout": "center",
+            "height": "medium",
+            "backgroundType": "gradient",
+            "showCta": true,
+            "ctaText": "Shop Now",
+            "ctaLink": "/products"
+          }
+        },
+        {
+          "id": "featured-products",
+          "type": "product-grid",
+          "enabled": true,
+          "config": {
+            "title": "Featured Products",
+            "columns": 4,
+            "maxItems": 8,
+            "showPrice": true,
+            "showRating": true,
+            "filter": "featured"
+          }
+        },
+        {
+          "id": "categories",
+          "type": "category-grid",
+          "enabled": true,
+          "config": {
+            "title": "Shop by Category",
+            "columns": 3,
+            "maxItems": 6,
+            "showImage": true,
+            "imageAspect": "square"
+          }
+        },
+        {
+          "id": "promotion",
+          "type": "banner-single",
+          "enabled": true,
+          "config": {
+            "layout": "full-width",
+            "height": "small",
+            "showCountdown": false
+          }
+        },
+        {
+          "id": "new-arrivals",
+          "type": "product-carousel",
+          "enabled": true,
+          "config": {
+            "title": "New Arrivals",
+            "itemsPerView": 4,
+            "showArrows": true,
+            "autoplay": false,
+            "filter": "new"
+          }
+        },
+        {
+          "id": "trust-signals",
+          "type": "trust-badges",
+          "enabled": true,
+          "config": {
+            "layout": "horizontal",
+            "items": [
+              { "icon": "shipping", "text": "Free Shipping over 50,000 KRW" },
+              { "icon": "secure", "text": "Secure Payment" },
+              { "icon": "return", "text": "Easy Returns" },
+              { "icon": "support", "text": "24/7 Support" }
+            ]
+          }
+        }
+      ]
+    },
+
+    "productList": {
+      "title": "Products",
+      "path": "/products",
+      "sections": [
+        {
+          "id": "product-header",
+          "type": "page-header",
+          "enabled": true,
+          "config": {
+            "showBreadcrumb": true,
+            "showTitle": true,
+            "showDescription": false
+          }
+        },
+        {
+          "id": "product-filter",
+          "type": "filter-sidebar",
+          "enabled": true,
+          "config": {
+            "position": "left",
+            "showCategory": true,
+            "showPrice": true,
+            "showBrand": true,
+            "collapsible": true
+          }
+        },
+        {
+          "id": "product-grid",
+          "type": "product-grid",
+          "enabled": true,
+          "config": {
+            "columns": 4,
+            "pagination": true,
+            "itemsPerPage": 20,
+            "showSort": true,
+            "showViewToggle": true
+          }
+        }
+      ]
+    },
+
+    "productDetail": {
+      "title": "Product Detail",
+      "path": "/products/:id",
+      "sections": [
+        {
+          "id": "product-main",
+          "type": "product-detail",
+          "enabled": true,
+          "config": {
+            "imagePosition": "left",
+            "imageGallery": true,
+            "showSku": true,
+            "showStock": true,
+            "showShare": true
+          }
+        },
+        {
+          "id": "product-tabs",
+          "type": "tabs",
+          "enabled": true,
+          "config": {
+            "tabs": ["description", "specifications", "reviews"]
+          }
+        },
+        {
+          "id": "related-products",
+          "type": "product-carousel",
+          "enabled": true,
+          "config": {
+            "title": "You May Also Like",
+            "itemsPerView": 4,
+            "filter": "related"
+          }
+        }
+      ]
+    }
+  },
+
+  "layout": {
+    "header": {
+      "type": "standard",
+      "sticky": true,
+      "showLogo": true,
+      "showSearch": true,
+      "showCart": true,
+      "showUser": true,
+      "navPosition": "center"
+    },
+    "footer": {
+      "type": "multi-column",
+      "columns": 4,
+      "showNewsletter": true,
+      "showSocial": true,
+      "showPaymentIcons": true
+    }
+  }
+}

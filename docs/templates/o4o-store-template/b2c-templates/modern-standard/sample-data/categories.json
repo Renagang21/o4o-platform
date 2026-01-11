@@ -1,0 +1,65 @@
+{
+  "$schema": "../../../schemas/categories.schema.json",
+  "categories": [
+    {
+      "id": "cat-001",
+      "name": "Featured",
+      "slug": "featured",
+      "description": "Our top picks for you",
+      "image": "/assets/categories/featured.jpg",
+      "sortOrder": 1,
+      "isActive": true,
+      "parentId": null
+    },
+    {
+      "id": "cat-002",
+      "name": "New Arrivals",
+      "slug": "new-arrivals",
+      "description": "Fresh from our collection",
+      "image": "/assets/categories/new.jpg",
+      "sortOrder": 2,
+      "isActive": true,
+      "parentId": null
+    },
+    {
+      "id": "cat-003",
+      "name": "Best Sellers",
+      "slug": "best-sellers",
+      "description": "Customer favorites",
+      "image": "/assets/categories/bestsellers.jpg",
+      "sortOrder": 3,
+      "isActive": true,
+      "parentId": null
+    },
+    {
+      "id": "cat-004",
+      "name": "Sale",
+      "slug": "sale",
+      "description": "Special offers and discounts",
+      "image": "/assets/categories/sale.jpg",
+      "sortOrder": 4,
+      "isActive": true,
+      "parentId": null
+    },
+    {
+      "id": "cat-005",
+      "name": "Category A",
+      "slug": "category-a",
+      "description": "Primary product category",
+      "image": "/assets/categories/category-a.jpg",
+      "sortOrder": 5,
+      "isActive": true,
+      "parentId": null
+    },
+    {
+      "id": "cat-006",
+      "name": "Category B",
+      "slug": "category-b",
+      "description": "Secondary product category",
+      "image": "/assets/categories/category-b.jpg",
+      "sortOrder": 6,
+      "isActive": true,
+      "parentId": null
+    }
+  ]
+}

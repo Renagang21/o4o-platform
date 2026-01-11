@@ -16,8 +16,8 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { CosmeticsBrand } from './cosmetics-brand.entity.js';
-import { CosmeticsProduct } from './cosmetics-product.entity.js';
+import type { CosmeticsBrand } from './cosmetics-brand.entity.js';
+import type { CosmeticsProduct } from './cosmetics-product.entity.js';
 
 @Entity({ name: 'cosmetics_lines', schema: 'cosmetics' })
 export class CosmeticsLine {
@@ -50,11 +50,11 @@ export class CosmeticsLine {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  // Relations
-  @ManyToOne(() => CosmeticsBrand, (brand) => brand.lines)
+  // Relations (using type-only imports to avoid circular dependency in ESM)
+  @ManyToOne('CosmeticsBrand', 'lines')
   @JoinColumn({ name: 'brand_id' })
   brand?: CosmeticsBrand;
 
-  @OneToMany(() => CosmeticsProduct, (product) => product.line)
+  @OneToMany('CosmeticsProduct', 'line')
   products?: CosmeticsProduct[];
 }

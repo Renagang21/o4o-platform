@@ -1,8 +1,33 @@
 /**
  * Glycopharm Order Entity
  *
- * H8-2: 주문/결제 API v1 Implementation
- * Order management for blood glucose product sales
+ * ============================================================================
+ * ⚠️ LEGACY TABLE (READ-ONLY) - Phase 9-A Frozen
+ * ============================================================================
+ *
+ * This table is intentionally kept for historical data preservation.
+ * Order creation via GlycoPharm is PERMANENTLY DISABLED (Phase 5-A).
+ *
+ * DO NOT:
+ * - Create new records in this table
+ * - Add new references to this entity
+ * - Reuse this structure for new services
+ * - Remove this table (historical data must be preserved)
+ *
+ * WHY THIS FAILED:
+ * - Independent order structure bypassed E-commerce Core
+ * - Caused reporting/settlement inconsistencies
+ * - Made platform-wide order management impossible
+ *
+ * CORRECT PATTERN:
+ * All new services must use checkoutService.createOrder() with OrderType.
+ * See: CLAUDE.md §7, §20, §21
+ *
+ * @see docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md
+ * @deprecated Phase 5-A - Use E-commerce Core instead
+ * ============================================================================
+ *
+ * Original: H8-2 주문/결제 API v1 Implementation
  */
 
 import {
@@ -15,8 +40,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
-import { GlycopharmOrderItem } from './glycopharm-order-item.entity.js';
+import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { GlycopharmOrderItem } from './glycopharm-order-item.entity.js';
 
 export type GlycopharmOrderStatus = 'CREATED' | 'PAID' | 'FAILED';
 
@@ -67,10 +92,11 @@ export class GlycopharmOrder {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @ManyToOne(() => GlycopharmPharmacy)
+  // Relations (using type-only imports to avoid circular dependency in ESM)
+  @ManyToOne('GlycopharmPharmacy')
   @JoinColumn({ name: 'pharmacy_id' })
   pharmacy?: GlycopharmPharmacy;
 
-  @OneToMany(() => GlycopharmOrderItem, (item) => item.order, { cascade: true })
+  @OneToMany('GlycopharmOrderItem', 'order', { cascade: true })
   items?: GlycopharmOrderItem[];
 }

@@ -1,0 +1,71 @@
+{
+  "$schema": "../../../schemas/store-info.schema.json",
+  "storeId": "{{STORE_ID}}",
+  "storeName": "{{STORE_NAME}}",
+  "storeSlug": "{{STORE_SLUG}}",
+
+  "branding": {
+    "logo": {
+      "url": "/assets/logo.svg",
+      "alt": "{{STORE_NAME}}"
+    },
+    "favicon": "/assets/favicon.ico",
+    "tagline": "Your trusted shopping destination"
+  },
+
+  "contact": {
+    "email": "contact@{{STORE_SLUG}}.com",
+    "phone": "+82-2-1234-5678",
+    "address": {
+      "street": "123 Commerce Street",
+      "city": "Seoul",
+      "province": "Seoul",
+      "postalCode": "06000",
+      "country": "South Korea"
+    }
+  },
+
+  "businessHours": {
+    "timezone": "Asia/Seoul",
+    "hours": [
+      { "day": "monday", "open": "09:00", "close": "18:00" },
+      { "day": "tuesday", "open": "09:00", "close": "18:00" },
+      { "day": "wednesday", "open": "09:00", "close": "18:00" },
+      { "day": "thursday", "open": "09:00", "close": "18:00" },
+      { "day": "friday", "open": "09:00", "close": "18:00" },
+      { "day": "saturday", "open": "10:00", "close": "15:00" },
+      { "day": "sunday", "closed": true }
+    ]
+  },
+
+  "social": {
+    "instagram": "https://instagram.com/{{STORE_SLUG}}",
+    "facebook": "https://facebook.com/{{STORE_SLUG}}",
+    "youtube": null,
+    "kakao": "https://pf.kakao.com/{{STORE_SLUG}}"
+  },
+
+  "policies": {
+    "shipping": {
+      "freeShippingThreshold": 50000,
+      "standardShippingFee": 3000,
+      "estimatedDelivery": "2-3 business days"
+    },
+    "returns": {
+      "returnPeriod": 14,
+      "exchangePeriod": 14,
+      "conditions": "Unused items with original packaging"
+    }
+  },
+
+  "seo": {
+    "title": "{{STORE_NAME}} - Quality Products",
+    "description": "Discover quality products at {{STORE_NAME}}. Fast shipping and easy returns.",
+    "keywords": ["shopping", "products", "quality", "{{STORE_NAME}}"]
+  },
+
+  "analytics": {
+    "googleAnalyticsId": null,
+    "facebookPixelId": null
+  }
+}

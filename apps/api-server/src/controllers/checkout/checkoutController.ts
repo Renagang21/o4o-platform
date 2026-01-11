@@ -2,18 +2,31 @@
  * Checkout Controller
  *
  * Phase N-2: 운영 안정화
+ * Phase 5-A′: E-commerce Core 주문 표준화
+ * Phase 5-D: Order Guardrails 적용
  *
  * 결제 흐름 (DB 영속화 버전):
  * 1. initiate - 주문 생성 + 결제 준비 정보 반환
  * 2. confirm - Toss 결제 성공 후 서버 승인
  * 3. refund - 환불 처리 (운영자만)
+ *
+ * Phase 5-A′: 모든 서비스의 주문은 이 컨트롤러를 통해서만 생성
+ * Phase 5-D: Guardrail 검증 강화 - OrderType 필수, 차단된 타입 거부
+ *
+ * @see CLAUDE.md §7 - E-commerce Core 절대 규칙
+ * @see CLAUDE.md §21 - Order Guardrails (Phase 5-D)
  */
 
 import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
 import { tossPaymentsService } from '../../services/toss-payments.service.js';
 import { checkoutService } from '../../services/checkout.service.js';
+import { OrderType } from '../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../utils/logger.js';
+import {
+  validateOrderType,
+  BLOCKED_ORDER_TYPES,
+} from '../../guards/order-creation.guard.js';
 
 // Phase N-1 고정 설정
 const PHASE_N1_CONFIG = {
@@ -47,7 +60,7 @@ export class CheckoutController {
         });
       }
 
-      const { items, shippingAddress, partnerId, successUrl, failUrl } =
+      const { items, shippingAddress, partnerId, successUrl, failUrl, orderType } =
         req.body;
 
       // Validation
@@ -95,8 +108,36 @@ export class CheckoutController {
         });
       }
 
+      // ================================================================
+      // Phase 5-D: OrderType Guardrail 검증 강화
+      // - OrderType 유효성 검증
+      // - 차단된 OrderType 거부
+      // ================================================================
+      let validatedOrderType: OrderType = OrderType.GENERIC;
+      if (orderType) {
+        // Guardrail 검증
+        const validation = validateOrderType(orderType as OrderType);
+        if (!validation.valid) {
+          logger.warn('[Checkout] OrderType validation failed:', {
+            orderType,
+            error: validation.error,
+            code: validation.code,
+          });
+          return res.status(400).json({
+            success: false,
+            message: validation.error,
+            code: validation.code,
+          });
+        }
+        validatedOrderType = orderType as OrderType;
+      } else {
+        // Phase 5-D: GENERIC 사용 시 경고 로깅
+        logger.warn('[Checkout] No orderType specified, using GENERIC. Consider specifying a service-specific OrderType.');
+      }
+
       // DB에 주문 생성
       const order = await checkoutService.createOrder({
+        orderType: validatedOrderType, // Phase 5-A′: 주문 유형 추가
         buyerId: userId,
         sellerId: PHASE_N1_CONFIG.PLATFORM_SELLER_ID,
         supplierId: PHASE_N1_CONFIG.SUPPLIER_ID,
@@ -126,6 +167,7 @@ export class CheckoutController {
       logger.info('Checkout initiated:', {
         orderId: order.id,
         orderNumber: order.orderNumber,
+        orderType: order.orderType, // Phase 5-A′
         totalAmount: order.totalAmount,
         partnerId,
       });
@@ -135,6 +177,7 @@ export class CheckoutController {
         data: {
           orderId: order.id,
           orderNumber: order.orderNumber,
+          orderType: order.orderType, // Phase 5-A′: 응답에 주문 유형 포함
           totalAmount: order.totalAmount,
           payment: {
             ...paymentInfo,

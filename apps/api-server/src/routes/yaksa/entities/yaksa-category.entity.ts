@@ -13,7 +13,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { YaksaPost } from './yaksa-post.entity.js';
+import type { YaksaPost } from './yaksa-post.entity.js';
 
 export type YaksaCategoryStatus = 'active' | 'inactive';
 
@@ -46,6 +46,7 @@ export class YaksaCategory {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @OneToMany(() => YaksaPost, (post) => post.category)
+  // Relations (using type-only imports to avoid circular dependency in ESM)
+  @OneToMany('YaksaPost', 'category')
   posts?: YaksaPost[];
 }

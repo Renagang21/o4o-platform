@@ -83,6 +83,20 @@ export interface PayOrderDto {
 // Service
 // ============================================================================
 
+/**
+ * ⚠️ PHASE 5-A: READ-ONLY MODE
+ *
+ * This service is now in READ-ONLY mode per CLAUDE.md §7.
+ * All write operations (create, update, delete) are disabled.
+ *
+ * New orders must be created via E-commerce Core:
+ * - POST /api/v1/ecommerce/orders with orderType: 'GLYCOPHARM'
+ *
+ * Reference: WO-O4O-STRUCTURE-REFORM-PHASE5-V01
+ * Effective: 2026-01-11
+ */
+const GLYCOPHARM_ORDER_READONLY = true;
+
 export class GlycopharmOrderService {
   private orderRepo: Repository<GlycopharmOrder>;
   private orderItemRepo: Repository<GlycopharmOrderItem>;
@@ -100,7 +114,21 @@ export class GlycopharmOrderService {
   // Order Methods
   // ============================================================================
 
-  async createOrder(dto: CreateOrderDto, userId: string): Promise<OrderResponseDto> {
+  /**
+   * @deprecated DISABLED - Use E-commerce Core instead
+   * @throws Error Always throws - direct order creation is no longer supported
+   */
+  async createOrder(_dto: CreateOrderDto, _userId: string): Promise<OrderResponseDto> {
+    if (GLYCOPHARM_ORDER_READONLY) {
+      throw new Error(
+        'GLYCOPHARM_ORDER_READONLY: Direct order creation is disabled. ' +
+        'Use E-commerce Core API: POST /api/v1/ecommerce/orders with orderType: GLYCOPHARM. ' +
+        'See CLAUDE.md §7 for details.'
+      );
+    }
+    // Legacy code below - unreachable when GLYCOPHARM_ORDER_READONLY is true
+    const dto = _dto;
+    const userId = _userId;
     // 1. Validate pharmacy
     const pharmacy = await this.pharmacyRepo.findOneBy({ id: dto.pharmacy_id });
     if (!pharmacy) {
@@ -248,7 +276,22 @@ export class GlycopharmOrderService {
   // Payment Methods (v1 Stub)
   // ============================================================================
 
-  async payOrder(orderId: string, userId: string, dto: PayOrderDto): Promise<OrderResponseDto> {
+  /**
+   * @deprecated DISABLED - Use E-commerce Core instead
+   * @throws Error Always throws - direct payment is no longer supported
+   */
+  async payOrder(_orderId: string, _userId: string, _dto: PayOrderDto): Promise<OrderResponseDto> {
+    if (GLYCOPHARM_ORDER_READONLY) {
+      throw new Error(
+        'GLYCOPHARM_ORDER_READONLY: Direct payment processing is disabled. ' +
+        'Use E-commerce Core API for payment processing. ' +
+        'See CLAUDE.md §7 for details.'
+      );
+    }
+    // Legacy code below - unreachable when GLYCOPHARM_ORDER_READONLY is true
+    const orderId = _orderId;
+    const userId = _userId;
+    const dto = _dto;
     const order = await this.orderRepo.findOne({
       where: { id: orderId, user_id: userId },
       relations: ['items', 'pharmacy'],
@@ -273,7 +316,21 @@ export class GlycopharmOrderService {
     return this.toOrderResponse(savedOrder, order.items || [], order.pharmacy?.name);
   }
 
-  async failOrder(orderId: string, reason: string): Promise<OrderResponseDto> {
+  /**
+   * @deprecated DISABLED - Use E-commerce Core instead
+   * @throws Error Always throws - direct order status change is no longer supported
+   */
+  async failOrder(_orderId: string, _reason: string): Promise<OrderResponseDto> {
+    if (GLYCOPHARM_ORDER_READONLY) {
+      throw new Error(
+        'GLYCOPHARM_ORDER_READONLY: Direct order status change is disabled. ' +
+        'Use E-commerce Core API for order management. ' +
+        'See CLAUDE.md §7 for details.'
+      );
+    }
+    // Legacy code below - unreachable when GLYCOPHARM_ORDER_READONLY is true
+    const orderId = _orderId;
+    const reason = _reason;
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
       relations: ['items', 'pharmacy'],
