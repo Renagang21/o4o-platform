@@ -407,4 +407,42 @@ Tourism       → 제휴 프로그램 연계
 
 ---
 
+## L. Decision Log (Post-Investigation Actions)
+
+### L-1. Legacy Code Removal (2026-01-11)
+
+**Decision**: Remove all legacy Neture commerce code (routes/neture/entities, trial-* extensions)
+
+**Commit**: 24e7f2132 - "refactor(neture): remove legacy commerce code conflicting with Read-Only Hub identity"
+
+**Removed Components:**
+```
+routes/neture/entities/ (5 files)
+routes/neture/controllers/payment.controller.ts
+routes/neture/services/
+routes/neture/repositories/
+routes/neture/dto/
+extensions/trial-fulfillment/
+extensions/trial-shipping/
+adminDashboardController: Neture Order/Partner methods
+```
+
+**Rationale:**
+1. Conflicts with confirmed P1 identity (Read-Only Information Hub)
+2. HARD RULES violation (POST/payments in legacy code)
+3. Code duplication (modules vs routes)
+4. Test environment clarity
+
+**Impact:**
+- Build: ✅ PASS (0 TypeScript errors)
+- Code reduction: -3,160 lines
+- P1 implementation preserved intact (modules/neture)
+
+**Future Path:**
+Commerce features (if needed) belong to:
+- Separate commerce service, OR
+- Neture P2 module (after explicit approval)
+
+---
+
 *End of Report*
