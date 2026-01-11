@@ -481,23 +481,39 @@ function NoticeSection() {
 
 function PartnerTrustSection() {
   return (
-    <section className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
-      <p className="text-center text-sm text-slate-500 mb-6">
-        신뢰할 수 있는 기관·기업과 함께합니다
-      </p>
-      <div className="flex flex-wrap justify-center gap-3">
-        {partners.map((partner) => (
-          <div
-            key={partner.id}
-            className={`px-5 py-3 rounded-xl flex items-center justify-center transition-all ${
-              partner.type === 'association'
-                ? 'bg-primary-50 border border-primary-200 text-primary-700'
-                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm'
-            }`}
-          >
-            <span className="font-medium text-sm">{partner.name}</span>
+    <section className="py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <p className="text-center text-sm text-slate-500 mb-6">
+          신뢰할 수 있는 기관·기업과 함께합니다
+        </p>
+        <div className="overflow-hidden">
+          <div className="flex gap-3 animate-marquee">
+            {partners.map((partner) => (
+              <div
+                key={partner.id}
+                className={`px-5 py-3 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                  partner.type === 'association'
+                    ? 'bg-primary-50 border border-primary-200 text-primary-700'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm'
+                }`}
+              >
+                <span className="font-medium text-sm">{partner.name}</span>
+              </div>
+            ))}
+            {partners.map((partner) => (
+              <div
+                key={`${partner.id}-duplicate`}
+                className={`px-5 py-3 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
+                  partner.type === 'association'
+                    ? 'bg-primary-50 border border-primary-200 text-primary-700'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm'
+                }`}
+              >
+                <span className="font-medium text-sm">{partner.name}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );
