@@ -146,15 +146,14 @@ import {
 } from '../routes/glucoseview/entities/index.js';
 
 // ============================================================================
-// NETURE ENTITIES (Phase D-1, G-3)
+// NETURE ENTITIES (Phase P1: Read-Only Information Platform)
 // ============================================================================
 import {
-  NetureProduct,
-  NeturePartner,
-  NetureProductLog,
-  NetureOrder,
-  NetureOrderItem,
-} from '../routes/neture/entities/index.js';
+  NetureSupplier,
+  NetureSupplierProduct,
+  NeturePartnershipRequest,
+  NeturePartnershipProduct,
+} from '../modules/neture/entities/index.js';
 
 // ============================================================================
 // KPA ENTITIES (Pharmacist Association SaaS)
@@ -401,13 +400,12 @@ export const AppDataSource = new DataSource({
     GlucoseViewApplication,
     GlucoseViewPharmacy,
     // ============================================================================
-    // NETURE ENTITIES (Phase D-1, G-3: Neture API Implementation + Orders)
+    // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================
-    NetureProduct,
-    NeturePartner,
-    NetureProductLog,
-    NetureOrder,
-    NetureOrderItem,
+    NetureSupplier,
+    NetureSupplierProduct,
+    NeturePartnershipRequest,
+    NeturePartnershipProduct,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================

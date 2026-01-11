@@ -1,70 +1,37 @@
 /**
- * Neture Routes
+ * Neture Routes - P1 Implementation
  *
- * Phase D-1: Neture API Server 골격 구축
- * Phase G-3: 주문/결제 플로우 구현
- * Main entry point for Neture API routes
+ * Work Order: WO-NETURE-CORE-P1
+ * Phase: P1 (Backend Integration)
+ *
+ * HARD RULES:
+ * - GET endpoints ONLY
+ * - NO authentication required (public information)
+ * - NO payment/order endpoints
+ * - Read-only information platform
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { DataSource } from 'typeorm';
 import { createNetureController } from './controllers/neture.controller.js';
-import { createPaymentController } from './controllers/payment.controller.js';
-import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
-import type { AuthRequest } from '../../types/auth.js';
 
 /**
- * Neture scope verification middleware
- * Checks if user has required scope in their JWT
- */
-function requireNetureScope(requiredScope: string) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const authReq = req as AuthRequest;
-
-    // Get scopes from user object (set by auth middleware)
-    const userScopes = authReq.user?.scopes || [];
-
-    // Check if user has the required scope or admin scope
-    if (
-      userScopes.includes(requiredScope) ||
-      userScopes.includes('neture:admin') ||
-      userScopes.includes('admin') ||
-      authReq.user?.roles?.includes('admin')
-    ) {
-      return next();
-    }
-
-    return res.status(403).json({
-      error: {
-        code: 'NETURE_403',
-        message: `Permission denied. Required scope: ${requiredScope}`,
-      },
-    });
-  };
-}
-
-/**
- * Create Neture routes
+ * Create Neture routes (P1 - Read-Only)
  */
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
 
-  // Create controller with auth middleware
-  const netureController = createNetureController(
-    dataSource,
-    coreRequireAuth as any,
-    requireNetureScope
-  );
-
-  // Create payment controller
-  const paymentController = createPaymentController(
-    dataSource,
-    coreRequireAuth as any
-  );
-
-  // Mount controllers
+  // Mount GET-only controller (no auth required)
+  const netureController = createNetureController(dataSource);
   router.use('/', netureController);
-  router.use('/payments', paymentController);
+
+  // ============================================================================
+  // HARD RULES ENFORCEMENT
+  // ============================================================================
+  // ❌ NO /payments endpoint (violates read-only principle)
+  // ❌ NO /orders endpoint (violates read-only principle)
+  // ❌ NO authentication middleware (public information platform)
+  // ============================================================================
 
   return router;
 }

@@ -1,0 +1,81 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { NetureSupplierProduct } from './NetureSupplierProduct.entity';
+
+export enum SupplierStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
+@Entity('neture_suppliers')
+export class NetureSupplier {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true })
+  slug: string;
+
+  @Column()
+  name: string;
+
+  @Column({ name: 'logo_url', nullable: true })
+  logoUrl: string;
+
+  @Column({ nullable: true })
+  category: string;
+
+  @Column({ name: 'short_description', type: 'text', nullable: true })
+  shortDescription: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ name: 'pricing_policy', type: 'text', nullable: true })
+  pricingPolicy: string;
+
+  @Column({ nullable: true })
+  moq: string;
+
+  @Column({ name: 'shipping_standard', type: 'text', nullable: true })
+  shippingStandard: string;
+
+  @Column({ name: 'shipping_island', type: 'text', nullable: true })
+  shippingIsland: string;
+
+  @Column({ name: 'shipping_mountain', type: 'text', nullable: true })
+  shippingMountain: string;
+
+  @Column({ name: 'contact_email', nullable: true })
+  contactEmail: string;
+
+  @Column({ name: 'contact_phone', nullable: true })
+  contactPhone: string;
+
+  @Column({ name: 'contact_website', type: 'text', nullable: true })
+  contactWebsite: string;
+
+  @Column({ name: 'contact_kakao', type: 'text', nullable: true })
+  contactKakao: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @Column({
+    type: 'enum',
+    enum: SupplierStatus,
+    default: SupplierStatus.ACTIVE,
+  })
+  status: SupplierStatus;
+
+  @OneToMany(() => NetureSupplierProduct, (product) => product.supplier)
+  products: NetureSupplierProduct[];
+}
