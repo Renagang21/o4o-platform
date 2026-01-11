@@ -128,8 +128,6 @@ export class CreateNetureTables1736611200000 implements MigrationInterface {
     await queryRunner.query(`
       CREATE INDEX "idx_neture_partnership_products_request" ON "neture_partnership_products" ("partnership_request_id")
     `);
-
-    console.log('✅ Neture tables created successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -138,7 +136,5 @@ export class CreateNetureTables1736611200000 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE IF EXISTS "neture_partnership_requests" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "neture_supplier_products" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "neture_suppliers" CASCADE`);
-
-    console.log('✅ Neture tables dropped successfully');
   }
 }

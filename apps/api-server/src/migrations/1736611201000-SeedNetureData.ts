@@ -283,8 +283,6 @@ export class SeedNetureData1736611201000 implements MigrationInterface {
       ('${beautyId[0].id}', '콜라겐 크림', '화장품'),
       ('${beautyId[0].id}', '선크림', '화장품')
     `);
-
-    console.log('✅ Neture sample data seeded successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -293,7 +291,5 @@ export class SeedNetureData1736611201000 implements MigrationInterface {
     await queryRunner.query(`DELETE FROM neture_partnership_requests`);
     await queryRunner.query(`DELETE FROM neture_supplier_products`);
     await queryRunner.query(`DELETE FROM neture_suppliers`);
-
-    console.log('✅ Neture sample data removed successfully');
   }
 }
