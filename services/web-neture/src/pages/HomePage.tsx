@@ -1,18 +1,19 @@
 /**
  * HomePage - Neture 유통 정보 플랫폼
  *
- * Work Order: WO-NETURE-CORE-V1
- * Phase: P0 Prototype
+ * Work Order: WO-NETURE-CORE-P1
+ * Phase: P1 (Real API Integration)
  *
  * 화면 구조:
  * 1. Hero - 플랫폼 정체성
- * 2. 공급자 미리보기
- * 3. 제휴 요청 미리보기
+ * 2. 공급자 미리보기 (Real API)
+ * 3. 제휴 요청 미리보기 (Real API)
  */
 
 import { Link } from 'react-router-dom';
 import { ArrowRight, Building2, Handshake } from 'lucide-react';
-import { mockSuppliers, mockPartnershipRequests } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import { netureApi, type Supplier, type PartnershipRequest } from '../lib/api';
 
 export default function HomePage() {
   return (
@@ -61,7 +62,45 @@ function HeroSection() {
 }
 
 function SuppliersPreviewSection() {
-  const featuredSuppliers = mockSuppliers.slice(0, 4);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        setLoading(true);
+        const data = await netureApi.getSuppliers();
+        setSuppliers(data.slice(0, 4)); // Show first 4 for preview
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSuppliers();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-gray-600">Loading suppliers...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-red-600">Error loading suppliers: {error}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-white">
@@ -75,7 +114,7 @@ function SuppliersPreviewSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredSuppliers.map((supplier) => (
+          {suppliers.map((supplier) => (
             <Link
               key={supplier.id}
               to={`/suppliers/${supplier.slug}`}
@@ -116,7 +155,45 @@ function SuppliersPreviewSection() {
 }
 
 function PartnershipRequestsPreviewSection() {
-  const featuredRequests = mockPartnershipRequests.filter(req => req.status === 'OPEN').slice(0, 3);
+  const [requests, setRequests] = useState<PartnershipRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        setLoading(true);
+        const data = await netureApi.getPartnershipRequests('OPEN');
+        setRequests(data.slice(0, 3)); // Show first 3 for preview
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-gray-600">Loading partnership requests...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-red-600">Error loading requests: {error}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gray-50">
@@ -130,7 +207,7 @@ function PartnershipRequestsPreviewSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredRequests.map((request) => (
+          {requests.map((request) => (
             <Link
               key={request.id}
               to={`/partners/requests/${request.id}`}

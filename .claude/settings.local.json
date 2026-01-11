@@ -359,7 +359,8 @@
       "Bash(./pnpm.cmd:*)",
       "Bash(\"C:/Program Files/nodejs/node.exe\" \"C:/Users/sohae/AppData/Roaming/npm/node_modules/pnpm/bin/pnpm.cjs\" --version)",
       "Bash(\"C:/Users/sohae/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd\" auth application-default login --no-launch-browser)",
-      "Bash(\"C:/Program Files/nodejs/node.exe\" \"C:/Users/sohae/AppData/Roaming/npm/node_modules/pnpm/bin/pnpm.cjs\" run build)"
+      "Bash(\"C:/Program Files/nodejs/node.exe\" \"C:/Users/sohae/AppData/Roaming/npm/node_modules/pnpm/bin/pnpm.cjs\" run build)",
+      "Bash(timeout 30 pnpm dev:*)"
     ],
     "deny": []
   }
