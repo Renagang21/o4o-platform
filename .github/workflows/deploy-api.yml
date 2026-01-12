@@ -349,18 +349,15 @@ jobs:
         # ============================================================
 
         # Create or update the migration job with node migrate.js command
+        # Use ^::^ delimiter syntax to avoid issues with special characters in passwords
+        # This is more reliable than multiple --set-env-vars flags
         gcloud run jobs create o4o-api-migrations \
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
           --task-timeout=300 \
           --max-retries=1 \
-          --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
-          --set-env-vars="DB_PORT=5432" \
-          --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
-          --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
-          --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
           --command="node" \
           --args="dist/migrate.js" \
@@ -371,12 +368,7 @@ jobs:
           --project=${{ env.PROJECT_ID }} \
           --task-timeout=300 \
           --max-retries=1 \
-          --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
-          --set-env-vars="DB_PORT=5432" \
-          --set-env-vars="DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}" \
-          --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
-          --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
           --command="node" \
           --args="dist/migrate.js"
