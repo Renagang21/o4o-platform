@@ -53,6 +53,7 @@ jobs:
           --exclude="cli.ts" \
           --exclude="main.tsx" \
           --exclude="main.ts" \
+          --exclude="migrate.ts" \
           | grep -v "//.*console\.log" \
           | grep -v "^\s*//" \
           | grep -v "\*.*console\.log" \
