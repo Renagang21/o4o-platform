@@ -13,8 +13,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { GlycopharmOrder } from './glycopharm-order.entity.js';
-import { GlycopharmProduct } from './glycopharm-product.entity.js';
+import type { GlycopharmOrder } from './glycopharm-order.entity.js';
+import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 
 @Entity({ name: 'glycopharm_order_items', schema: 'public' })
 export class GlycopharmOrderItem {
@@ -45,11 +45,11 @@ export class GlycopharmOrderItem {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  @ManyToOne(() => GlycopharmOrder, (order) => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne('GlycopharmOrder', 'items', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'order_id' })
   order?: GlycopharmOrder;
 
-  @ManyToOne(() => GlycopharmProduct)
+  @ManyToOne('GlycopharmProduct')
   @JoinColumn({ name: 'product_id' })
   product?: GlycopharmProduct;
 }

@@ -15,8 +15,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { YaksaCategory } from './yaksa-category.entity.js';
-import { YaksaPostLog } from './yaksa-post-log.entity.js';
+import type { YaksaCategory } from './yaksa-category.entity.js';
+import type { YaksaPostLog } from './yaksa-post-log.entity.js';
 
 export type YaksaPostStatus = 'draft' | 'published' | 'hidden' | 'deleted';
 
@@ -67,10 +67,10 @@ export class YaksaPost {
   @Column({ type: 'timestamp', nullable: true })
   published_at?: Date;
 
-  @ManyToOne(() => YaksaCategory, (category) => category.posts)
+  @ManyToOne('YaksaCategory', 'posts')
   @JoinColumn({ name: 'category_id' })
   category?: YaksaCategory;
 
-  @OneToMany(() => YaksaPostLog, (log) => log.post)
+  @OneToMany('YaksaPostLog', 'post')
   logs?: YaksaPostLog[];
 }

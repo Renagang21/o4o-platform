@@ -13,7 +13,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
 
 export type PlaylistStatus = 'draft' | 'active' | 'archived';
 
@@ -25,7 +25,7 @@ export class DisplayPlaylist {
   @Column({ type: 'uuid', nullable: true })
   pharmacy_id?: string;
 
-  @ManyToOne(() => GlycopharmPharmacy, { nullable: true })
+  @ManyToOne('GlycopharmPharmacy', { nullable: true })
   @JoinColumn({ name: 'pharmacy_id' })
   pharmacy?: GlycopharmPharmacy;
 

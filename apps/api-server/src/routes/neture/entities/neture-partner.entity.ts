@@ -16,7 +16,7 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import { NetureProduct } from './neture-product.entity.js';
+import type { NetureProduct } from './neture-product.entity.js';
 
 /**
  * Partner Type Enum
@@ -126,6 +126,6 @@ export class NeturePartner {
   updatedAt!: Date;
 
   // Relations
-  @OneToMany(() => NetureProduct, (product) => product.partner)
+  @OneToMany('NetureProduct', 'partner')
   products?: NetureProduct[];
 }

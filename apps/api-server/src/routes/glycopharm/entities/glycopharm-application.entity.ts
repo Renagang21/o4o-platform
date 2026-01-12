@@ -17,7 +17,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../../../modules/auth/entities/User.js';
+import type { User } from '../../../modules/auth/entities/User.js';
 
 export type GlycopharmApplicationStatus = 'submitted' | 'approved' | 'rejected';
 export type GlycopharmServiceType = 'dropshipping' | 'sample_sales' | 'digital_signage';
@@ -31,7 +31,7 @@ export class GlycopharmApplication {
   @Column({ name: 'user_id', type: 'uuid' })
   userId!: string;
 
-  @ManyToOne(() => User, { eager: false })
+  @ManyToOne('User', { eager: false })
   @JoinColumn({ name: 'user_id' })
   user?: User;
 

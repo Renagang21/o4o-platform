@@ -11,8 +11,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { DisplayPlaylist } from './display-playlist.entity.js';
-import { DisplayMedia } from './display-media.entity.js';
+import type { DisplayPlaylist } from './display-playlist.entity.js';
+import type { DisplayMedia } from './display-media.entity.js';
 
 export type TransitionType = 'fade' | 'slide' | 'none';
 
@@ -24,14 +24,14 @@ export class DisplayPlaylistItem {
   @Column({ type: 'uuid' })
   playlist_id!: string;
 
-  @ManyToOne(() => DisplayPlaylist, { onDelete: 'CASCADE' })
+  @ManyToOne('DisplayPlaylist', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'playlist_id' })
   playlist!: DisplayPlaylist;
 
   @Column({ type: 'uuid' })
   media_id!: string;
 
-  @ManyToOne(() => DisplayMedia, { onDelete: 'CASCADE' })
+  @ManyToOne('DisplayMedia', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'media_id' })
   media!: DisplayMedia;
 

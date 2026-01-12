@@ -14,8 +14,9 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { NetureOrder } from './neture-order.entity.js';
-import { NetureProduct, NetureProductImage } from './neture-product.entity.js';
+import type { NetureOrder } from './neture-order.entity.js';
+import type { NetureProduct } from './neture-product.entity.js';
+import { type NetureProductImage } from './neture-product.entity.js';
 
 @Entity({ name: 'neture_order_items', schema: 'neture' })
 export class NetureOrderItem {
@@ -52,11 +53,11 @@ export class NetureOrderItem {
   createdAt!: Date;
 
   // Relations
-  @ManyToOne(() => NetureOrder, (order) => order.items)
+  @ManyToOne('NetureOrder', 'items')
   @JoinColumn({ name: 'order_id' })
   order?: NetureOrder;
 
-  @ManyToOne(() => NetureProduct)
+  @ManyToOne('NetureProduct')
   @JoinColumn({ name: 'product_id' })
   product?: NetureProduct;
 }

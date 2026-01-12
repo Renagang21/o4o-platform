@@ -1,5 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
+// Forward declare for type-only references
+type SignagePlaylistType = SignagePlaylist;
+
 /**
  * SignagePlaylist Entity
  * Represents a collection of slides that play in sequence
@@ -21,7 +24,7 @@ export class SignagePlaylist {
   @Column({ type: 'boolean', default: false })
   loop!: boolean; // Loop playlist continuously
 
-  @OneToMany(() => SignagePlaylistItem, item => item.playlist, { cascade: true })
+  @OneToMany('SignagePlaylistItem', 'playlist', { cascade: true })
   items!: SignagePlaylistItem[];
 
   @CreateDateColumn()
@@ -52,7 +55,7 @@ export class SignagePlaylistItem {
   @Column({ type: 'integer', nullable: true })
   duration?: number; // Override slide default duration
 
-  @ManyToOne(() => SignagePlaylist, playlist => playlist.items, { onDelete: 'CASCADE' })
+  @ManyToOne('SignagePlaylist', 'items', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'playlistId' })
   playlist!: SignagePlaylist;
 

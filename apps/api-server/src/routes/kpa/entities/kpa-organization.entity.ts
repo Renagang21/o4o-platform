@@ -49,10 +49,10 @@ export class KpaOrganization {
   updated_at: Date;
 
   // Self-referencing relation for hierarchy
-  @ManyToOne(() => KpaOrganization, { nullable: true })
+  @ManyToOne('KpaOrganization', { nullable: true })
   @JoinColumn({ name: 'parent_id' })
   parent: KpaOrganization | null;
 
-  @OneToMany(() => KpaOrganization, (org) => org.parent)
+  @OneToMany('KpaOrganization', 'parent')
   children: KpaOrganization[];
 }

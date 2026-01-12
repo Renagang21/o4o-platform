@@ -12,8 +12,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
-import { DisplayPlaylist } from './display-playlist.entity.js';
+import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { DisplayPlaylist } from './display-playlist.entity.js';
 
 @Entity('glycopharm_display_schedules')
 export class DisplaySchedule {
@@ -23,7 +23,7 @@ export class DisplaySchedule {
   @Column({ type: 'uuid' })
   pharmacy_id!: string;
 
-  @ManyToOne(() => GlycopharmPharmacy, { onDelete: 'CASCADE' })
+  @ManyToOne('GlycopharmPharmacy', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'pharmacy_id' })
   pharmacy!: GlycopharmPharmacy;
 
@@ -33,7 +33,7 @@ export class DisplaySchedule {
   @Column({ type: 'uuid' })
   playlist_id!: string;
 
-  @ManyToOne(() => DisplayPlaylist, { onDelete: 'CASCADE' })
+  @ManyToOne('DisplayPlaylist', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'playlist_id' })
   playlist!: DisplayPlaylist;
 

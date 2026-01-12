@@ -14,7 +14,7 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import { NetureOrderItem } from './neture-order-item.entity.js';
+import type { NetureOrderItem } from './neture-order-item.entity.js';
 import { NetureCurrency } from './neture-product.entity.js';
 
 /**
@@ -133,6 +133,6 @@ export class NetureOrder {
   updatedAt!: Date;
 
   // Relations
-  @OneToMany(() => NetureOrderItem, (item) => item.order)
+  @OneToMany('NetureOrderItem', 'order')
   items?: NetureOrderItem[];
 }

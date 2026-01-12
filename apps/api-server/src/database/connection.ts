@@ -77,8 +77,13 @@ import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-// Forum App entities (Re-added for KPA/Glycopharm forum routes)
-import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o/forum-core';
+// ============================================================================
+// EXTERNAL PACKAGE IMPORTS REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+// ============================================================================
+// Forum App entities - REMOVED to fix startup crash
+// Original: import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o/forum-core';
+// Reason: Package index.ts loads services/controllers causing side-effect failures
+// ============================================================================
 // Forum Notification entity (Phase 13)
 import { ForumNotification } from '../entities/ForumNotification.js';
 // Digital Signage entities
@@ -165,30 +170,27 @@ import {
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
-// ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
+// ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
 // ============================================================================
-// Organization and OrganizationMember are absorbed into Core API as the
-// foundational structure for all organization-based services.
+// Original: import { Organization, OrganizationMember } from '@o4o/organization-core';
+// Reason: Package index.ts loads services/controllers/lifecycle causing side-effect failures
 // ============================================================================
-import { Organization, OrganizationMember } from '@o4o/organization-core';
 
 // ============================================================================
-// CMS-CORE CONTENT ENTITIES (WO-P2-IMPLEMENT-CONTENT)
+// CMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
 // ============================================================================
-import { CmsContent, CmsContentSlot, Channel, ChannelPlaybackLog, ChannelHeartbeat } from '@o4o-apps/cms-core';
+// Original: import { CmsContent, CmsContentSlot, Channel, ChannelPlaybackLog, ChannelHeartbeat } from '@o4o-apps/cms-core';
+// Reason: Package index.ts re-exports all entities causing potential circular dependencies
+// These entities will be lazy-loaded when Admin/Ops routes are accessed
+// ============================================================================
 
 // ============================================================================
-// LMS-CORE ENTITIES (Re-added for KPA LMS routes)
+// LMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
 // ============================================================================
-import {
-  Course,
-  Lesson,
-  Enrollment,
-  Progress,
-  Certificate,
-  LMSEvent,
-  Attendance,
-} from '@o4o/lms-core';
+// Original: import { Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance } from '@o4o/lms-core';
+// Reason: Package index.ts loads ContentBundleService causing initialization failures
+// These entities will be lazy-loaded when LMS routes are accessed
+// ============================================================================
 
 // ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
@@ -342,11 +344,11 @@ export const AppDataSource = new DataSource({
     RoleApplication,
     KycDocument,
     // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
-    // Forum App entities (Re-added for KPA/Glycopharm forum routes)
-    ForumPost,
-    ForumCategory,
-    ForumComment,
-    ForumTag,
+    // ============================================================================
+    // FORUM ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+    // ============================================================================
+    // ForumPost, ForumCategory, ForumComment, ForumTag - from @o4o/forum-core
+    // Removed to prevent package side-effect loading
     // Forum Notification entity (Phase 13) - local entity, kept
     ForumNotification,
     // Digital Signage entities
@@ -413,37 +415,21 @@ export const AppDataSource = new DataSource({
     KpaMember,
     KpaApplication,
     // ============================================================================
-    // ORGANIZATION-CORE ENTITIES (Phase R3.5: Organization Core Absorption)
+    // ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
     // ============================================================================
-    Organization,
-    OrganizationMember,
+    // Organization, OrganizationMember - from @o4o/organization-core
+    // Removed to prevent package side-effect loading
     // ============================================================================
-    // LMS-CORE ENTITIES (Re-added for KPA LMS routes)
+    // LMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
     // ============================================================================
-    Course,
-    Lesson,
-    Enrollment,
-    Progress,
-    Certificate,
-    LMSEvent,
-    Attendance,
+    // Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance
+    // Removed to prevent package side-effect loading
     // ============================================================================
-    // CMS-CORE CONTENT ENTITIES (WO-P2-IMPLEMENT-CONTENT)
+    // CMS-CORE & CHANNEL ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
     // ============================================================================
-    CmsContent,
-    CmsContentSlot,
-    // ============================================================================
-    // CHANNEL ENTITY (WO-P4-CHANNEL-IMPLEMENT-P0)
-    // ============================================================================
-    Channel,
-    // ============================================================================
-    // CHANNEL PLAYBACK LOG (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
-    // ============================================================================
-    ChannelPlaybackLog,
-    // ============================================================================
-    // CHANNEL HEARTBEAT (WO-P5-CHANNEL-HEARTBEAT-P1)
-    // ============================================================================
-    ChannelHeartbeat,
+    // CmsContent, CmsContentSlot, Channel, ChannelPlaybackLog, ChannelHeartbeat
+    // Removed to prevent package side-effect loading from @o4o-apps/cms-core
+    // These Admin/Ops entities will be lazy-loaded when routes are accessed
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

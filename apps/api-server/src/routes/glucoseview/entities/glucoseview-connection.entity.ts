@@ -14,7 +14,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { GlucoseViewVendor } from './glucoseview-vendor.entity.js';
+import type { GlucoseViewVendor } from './glucoseview-vendor.entity.js';
 
 export type ConnectionStatus = 'pending' | 'active' | 'suspended' | 'disconnected';
 
@@ -41,7 +41,7 @@ export class GlucoseViewConnection {
   @Column({ type: 'uuid' })
   vendor_id!: string;
 
-  @ManyToOne(() => GlucoseViewVendor, (vendor) => vendor.connections)
+  @ManyToOne('GlucoseViewVendor', 'connections')
   @JoinColumn({ name: 'vendor_id' })
   vendor?: GlucoseViewVendor;
 

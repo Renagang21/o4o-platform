@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { User } from '../modules/auth/entities/User.js';
+import type { User } from '../modules/auth/entities/User.js';
 
 /**
  * KYC 문서 (Know Your Customer Documents)
@@ -38,7 +38,7 @@ export class KycDocument {
   @Column({ name: 'user_id', type: 'uuid' })
   userId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
@@ -100,7 +100,7 @@ export class KycDocument {
   @Column({ name: 'verified_by', type: 'uuid', nullable: true })
   verifiedBy?: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'verified_by' })
   verifier?: User;
 

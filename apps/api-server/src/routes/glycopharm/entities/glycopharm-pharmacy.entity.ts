@@ -13,7 +13,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { GlycopharmProduct } from './glycopharm-product.entity.js';
+import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
 
 export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
@@ -65,6 +65,6 @@ export class GlycopharmPharmacy {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @OneToMany(() => GlycopharmProduct, (product) => product.pharmacy)
+  @OneToMany('GlycopharmProduct', 'pharmacy')
   products?: GlycopharmProduct[];
 }

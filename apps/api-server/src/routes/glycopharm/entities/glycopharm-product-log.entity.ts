@@ -13,7 +13,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { GlycopharmProduct } from './glycopharm-product.entity.js';
+import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 
 export type GlycopharmProductLogAction = 'create' | 'update' | 'status_change' | 'delete';
 
@@ -46,7 +46,7 @@ export class GlycopharmProductLog {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  @ManyToOne(() => GlycopharmProduct, (product) => product.logs)
+  @ManyToOne('GlycopharmProduct', 'logs')
   @JoinColumn({ name: 'product_id' })
   product?: GlycopharmProduct;
 }

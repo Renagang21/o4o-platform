@@ -15,7 +15,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { NeturePartner } from './neture-partner.entity.js';
+import type { NeturePartner } from './neture-partner.entity.js';
 
 /**
  * Product Status Enum
@@ -142,7 +142,7 @@ export class NetureProduct {
   updatedAt!: Date;
 
   // Relations (no FK constraints to other schemas)
-  @ManyToOne(() => NeturePartner, (partner) => partner.products)
+  @ManyToOne('NeturePartner', 'products')
   @JoinColumn({ name: 'partner_id' })
   partner?: NeturePartner;
 }

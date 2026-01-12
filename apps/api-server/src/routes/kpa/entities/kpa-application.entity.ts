@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { KpaOrganization } from './kpa-organization.entity.js';
+import type { KpaOrganization } from './kpa-organization.entity.js';
 
 export type KpaApplicationType = 'membership' | 'service' | 'other';
 export type KpaApplicationStatus = 'submitted' | 'approved' | 'rejected' | 'cancelled';
@@ -56,7 +56,7 @@ export class KpaApplication {
   updated_at: Date;
 
   // Relations
-  @ManyToOne(() => KpaOrganization)
+  @ManyToOne('KpaOrganization')
   @JoinColumn({ name: 'organization_id' })
   organization: KpaOrganization;
 }

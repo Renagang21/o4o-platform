@@ -16,7 +16,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../modules/auth/entities/User.js';
+import type { User } from '../modules/auth/entities/User.js';
 
 export enum RoleApplicationStatus {
   PENDING = 'pending',
@@ -32,7 +32,7 @@ export class RoleApplication {
   @Column({ name: 'user_id', type: 'uuid' })
   userId!: string;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne('User', { eager: true })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 

@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { CustomPostType } from './CustomPostType.js';
+import type { CustomPostType } from './CustomPostType.js';
 import type { FormPresetConfig } from '@o4o/types';
 
 @Entity('form_presets')
@@ -49,7 +49,7 @@ export class FormPreset {
   @Column('uuid', { nullable: true, name: 'created_by' })
   createdBy?: string;
 
-  @ManyToOne(() => CustomPostType, { onDelete: 'CASCADE' })
+  @ManyToOne('CustomPostType', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cpt_slug', referencedColumnName: 'slug' })
   cpt!: CustomPostType;
 

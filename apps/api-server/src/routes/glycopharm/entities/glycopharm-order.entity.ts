@@ -15,8 +15,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
-import { GlycopharmOrderItem } from './glycopharm-order-item.entity.js';
+import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { GlycopharmOrderItem } from './glycopharm-order-item.entity.js';
 
 export type GlycopharmOrderStatus = 'CREATED' | 'PAID' | 'FAILED';
 
@@ -67,10 +67,10 @@ export class GlycopharmOrder {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @ManyToOne(() => GlycopharmPharmacy)
+  @ManyToOne('GlycopharmPharmacy')
   @JoinColumn({ name: 'pharmacy_id' })
   pharmacy?: GlycopharmPharmacy;
 
-  @OneToMany(() => GlycopharmOrderItem, (item) => item.order, { cascade: true })
+  @OneToMany('GlycopharmOrderItem', 'order', { cascade: true })
   items?: GlycopharmOrderItem[];
 }

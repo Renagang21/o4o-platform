@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   Index
 } from 'typeorm';
-import { User } from '../modules/auth/entities/User.js';
+import type { User } from '../modules/auth/entities/User.js';
 
 /**
  * Interface for tracking changes in audit logs
@@ -63,7 +63,7 @@ export class AuditLog {
   /**
    * User who performed the action
    */
-  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne('User', { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'userId' })
   user?: User;
 

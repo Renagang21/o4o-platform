@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { NetureSupplierProduct } from './NetureSupplierProduct.entity';
+import type { NetureSupplierProduct } from './NetureSupplierProduct.entity.js';
 
 export enum SupplierStatus {
   ACTIVE = 'ACTIVE',
@@ -76,6 +76,6 @@ export class NetureSupplier {
   })
   status: SupplierStatus;
 
-  @OneToMany(() => NetureSupplierProduct, (product) => product.supplier)
+  @OneToMany('NetureSupplierProduct', 'supplier')
   products: NetureSupplierProduct[];
 }

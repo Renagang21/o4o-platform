@@ -9,7 +9,7 @@ import {
   Index,
   Unique,
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 /**
  * 역할 할당 (Assignment)
@@ -39,7 +39,7 @@ export class RoleAssignment {
   @Column({ name: 'user_id', type: 'uuid' })
   userId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
@@ -88,7 +88,7 @@ export class RoleAssignment {
   @Column({ name: 'assigned_by', type: 'uuid', nullable: true })
   assignedBy?: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'assigned_by' })
   assigner?: User;
 

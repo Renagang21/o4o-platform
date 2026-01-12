@@ -15,7 +15,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { GlucoseViewChapter } from './glucoseview-chapter.entity.js';
+import type { GlucoseViewChapter } from './glucoseview-chapter.entity.js';
 
 export type PharmacistApprovalStatus = 'pending' | 'approved' | 'rejected';
 export type PharmacistRole = 'pharmacist' | 'admin';
@@ -114,7 +114,7 @@ export class GlucoseViewPharmacist {
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
 
-  @ManyToOne(() => GlucoseViewChapter)
+  @ManyToOne('GlucoseViewChapter')
   @JoinColumn({ name: 'chapter_id' })
   chapter!: GlucoseViewChapter;
 

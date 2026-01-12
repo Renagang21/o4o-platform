@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { CustomPostType } from './CustomPostType.js';
+import type { CustomPostType } from './CustomPostType.js';
 import type { ViewPresetConfig } from '@o4o/types';
 
 @Entity('view_presets')
@@ -49,7 +49,7 @@ export class ViewPreset {
   @Column('uuid', { nullable: true, name: 'created_by' })
   createdBy?: string;
 
-  @ManyToOne(() => CustomPostType, { onDelete: 'CASCADE' })
+  @ManyToOne('CustomPostType', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cpt_slug', referencedColumnName: 'slug' })
   cpt!: CustomPostType;
 

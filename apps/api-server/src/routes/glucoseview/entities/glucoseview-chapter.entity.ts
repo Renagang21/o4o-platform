@@ -14,7 +14,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { GlucoseViewBranch } from './glucoseview-branch.entity.js';
+import type { GlucoseViewBranch } from './glucoseview-branch.entity.js';
 
 @Entity({ name: 'glucoseview_chapters', schema: 'public' })
 @Index(['branch_id', 'name'], { unique: true })
@@ -53,7 +53,7 @@ export class GlucoseViewChapter {
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
 
-  @ManyToOne(() => GlucoseViewBranch, (branch) => branch.chapters)
+  @ManyToOne('GlucoseViewBranch', 'chapters')
   @JoinColumn({ name: 'branch_id' })
   branch!: GlucoseViewBranch;
 
