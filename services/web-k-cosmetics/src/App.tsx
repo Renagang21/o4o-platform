@@ -12,6 +12,7 @@ import MainLayout from '@/components/layouts/MainLayout';
 // Public Pages
 import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
+import PartnerInfoPage from '@/pages/PartnerInfoPage';
 
 // App Routes
 function AppRoutes() {
@@ -22,6 +23,7 @@ function AppRoutes() {
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="partners" element={<PartnerInfoPage />} />
 
         {/* Role Not Available */}
         <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />

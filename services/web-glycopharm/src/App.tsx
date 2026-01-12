@@ -48,6 +48,7 @@ import { OperatorForumManagementPage } from '@/pages/operator/forum-management';
 
 // Role Not Available Page (공급자/파트너는 Neture에서 관리)
 import RoleNotAvailablePage from '@/pages/RoleNotAvailablePage';
+import PartnerInfoPage from '@/pages/PartnerInfoPage';
 
 // Operator Dashboard
 import OperatorDashboard from '@/pages/operator/OperatorDashboard';
@@ -122,6 +123,7 @@ function AppRoutes() {
         <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}

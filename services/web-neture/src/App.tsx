@@ -18,6 +18,7 @@ import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
+import PartnerInfoPage from './pages/PartnerInfoPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
           <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
           <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
+          <Route path="/partners/info" element={<PartnerInfoPage />} />
           <Route path="/content" element={<div className="max-w-7xl mx-auto px-4 py-16"><h1 className="text-3xl font-bold">콘텐츠 (준비 중)</h1></div>} />
         </Route>
       </Routes>
