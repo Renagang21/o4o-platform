@@ -218,12 +218,17 @@ jobs:
           exit 1
         fi
 
+        if [ ! -f "dist/migrate.js" ]; then
+          echo "❌ Build failed: dist/migrate.js not found"
+          exit 1
+        fi
+
         echo "✅ API server build complete"
-        echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
 
         # Final verification
         echo "📋 Final verification:"
-        echo "  - main.js: $(du -h dist/main.js | cut -f1)"
+        echo "  - main.js (Service entry): $(du -h dist/main.js | cut -f1)"
+        echo "  - migrate.js (Job entry): $(du -h dist/migrate.js | cut -f1)"
         echo "  - migration-config.js: $(du -h dist/database/migration-config.js | cut -f1)"
         FINAL_MIGRATION_COUNT=$(ls dist/database/migrations/*.js 2>/dev/null | wc -l)
         echo "  - migrations: ${FINAL_MIGRATION_COUNT} files"
@@ -257,10 +262,12 @@ jobs:
       run: |
         cd apps/api-server
 
-        # Verify tsup bundle exists
+        # Verify tsup bundles exist (main.js for Service, migrate.js for Job)
         echo "📂 Checking bundled output:"
-        ls -la dist/main.js dist/main.js.map || (echo "❌ Bundle not found!" && exit 1)
-        echo "📦 Bundle size: $(du -h dist/main.js | cut -f1)"
+        ls -la dist/main.js dist/main.js.map || (echo "❌ main.js bundle not found!" && exit 1)
+        ls -la dist/migrate.js dist/migrate.js.map || (echo "❌ migrate.js bundle not found!" && exit 1)
+        echo "📦 main.js (Service): $(du -h dist/main.js | cut -f1)"
+        echo "📦 migrate.js (Job): $(du -h dist/migrate.js | cut -f1)"
 
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
@@ -332,11 +339,16 @@ jobs:
 
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
-        # Use TypeORM CLI with migration-config.js (lightweight, no entities)
-        # Command: npx typeorm migration:run -d dist/database/migration-config.js
-        MIGRATION_CMD="npx typeorm migration:run -d dist/database/migration-config.js"
+        # ============================================================
+        # Migration Strategy: Use dedicated migrate.js entry point
+        # ============================================================
+        # - migrate.js is a standalone CLI that runs migrations and exits
+        # - NO Express server, NO health endpoints, NO PORT listening
+        # - Exit 0 on success, Exit 1 on failure
+        # - This ensures Cloud Run Job terminates properly
+        # ============================================================
 
-        # Create or update the migration job
+        # Create or update the migration job with node migrate.js command
         gcloud run jobs create o4o-api-migrations \
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
@@ -350,8 +362,8 @@ jobs:
           --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
           --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
-          --command="sh" \
-          --args="-c,${MIGRATION_CMD}" \
+          --command="node" \
+          --args="dist/migrate.js" \
           2>/dev/null || \
         gcloud run jobs update o4o-api-migrations \
           --image="${FULL_IMAGE}" \
@@ -366,8 +378,8 @@ jobs:
           --set-env-vars="DB_PASSWORD=${{ secrets.GCP_DB_PASSWORD }}" \
           --set-env-vars="DB_NAME=${{ secrets.GCP_DB_NAME }}" \
           --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
-          --command="sh" \
-          --args="-c,${MIGRATION_CMD}"
+          --command="node" \
+          --args="dist/migrate.js"
 
         # Execute the migration job
         echo "🚀 Executing migration job..."

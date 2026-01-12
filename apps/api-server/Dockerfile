@@ -49,18 +49,22 @@ COPY --from=deps /app/node_modules ./node_modules
 # Cache bust argument - pass --build-arg CACHEBUST=$(date +%s) to invalidate cache
 ARG CACHEBUST=1
 
-# Copy the bundled application (tsup creates a single bundled main.js)
+# Copy the bundled application (tsup creates bundled entry points)
+# - main.js: API Server entry (Cloud Run Service)
+# - migrate.js: Migration CLI entry (Cloud Run Job)
 COPY dist/main.js ./dist/main.js
 COPY dist/main.js.map ./dist/main.js.map
+COPY dist/migrate.js ./dist/migrate.js
+COPY dist/migrate.js.map ./dist/migrate.js.map
 
 # Copy database folder for migrations
-# - migration-config.js: Lightweight DataSource for TypeORM CLI (no entity imports)
+# - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)
 # - migrations/*.js: Compiled migration files
 COPY dist/database ./dist/database
 
 # Verify the bundle and migration files exist
 RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
-RUN ls -la /app/dist/database/migration-config.js || (echo "CRITICAL: migration-config.js not found!" && exit 1)
+RUN ls -la /app/dist/migrate.js || (echo "CRITICAL: dist/migrate.js not found!" && exit 1)
 RUN ls -la /app/dist/database/migrations/*.js | head -5 || echo "WARNING: No migrations found"
 
 # Set ownership
