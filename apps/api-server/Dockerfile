@@ -48,6 +48,8 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Cache bust argument - pass --build-arg CACHEBUST=$(date +%s) to invalidate cache
 ARG CACHEBUST=1
+# Force cache invalidation for COPY steps below
+RUN echo "Cache bust: ${CACHEBUST}"
 
 # Copy the bundled application (tsup creates bundled entry points)
 # - main.js: API Server entry (Cloud Run Service)
