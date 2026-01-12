@@ -89,7 +89,12 @@ const app: Application = express();
 app.set('trust proxy', true);
 
 const httpServer = createServer(app);
-const port = env.getNumber('PORT', 4000);
+
+// CLOUD RUN PORT CONFIGURATION
+// Cloud Run injects PORT=8080 - read directly from process.env for reliability
+// Do NOT use env wrapper which may have timing/proxy issues
+const port = Number(process.env.PORT) || 8080;
+logger.info(`[STARTUP] PORT configuration: process.env.PORT=${process.env.PORT}, resolved port=${port}`);
 
 // ============================================================================
 // SOCKET.IO CONFIGURATION
@@ -140,6 +145,33 @@ io.on('connection', (socket) => {
     // Handle disconnect
   });
 });
+
+// ============================================================================
+// IMMEDIATE HEALTH ENDPOINT - CLOUD RUN STARTUP PROBE
+// ============================================================================
+// This endpoint MUST respond immediately without any DB or heavy dependencies
+// Cloud Run requires container to listen on PORT within startup timeout
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'alive',
+    timestamp: new Date().toISOString(),
+    port: port,
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    version: process.env.npm_package_version || '0.5.0'
+  });
+});
+
+// Alias for /health - also required by some load balancers
+app.get('/', (req, res, next) => {
+  // Allow root path health check for Cloud Run startup probe
+  if (req.headers['user-agent']?.includes('GoogleHC') || req.query.health === 'true') {
+    return res.status(200).json({ status: 'alive', port: port });
+  }
+  next();
+});
+
+logger.info(`[STARTUP] Immediate health endpoint registered on port ${port}`);
 
 // ============================================================================
 // MIDDLEWARE SETUP
@@ -471,6 +503,24 @@ try {
 // ============================================================================
 const startServer = async () => {
   logger.info('Starting server...');
+
+  // ============================================================================
+  // CLOUD RUN CRITICAL: START LISTENING IMMEDIATELY
+  // ============================================================================
+  // Cloud Run requires the container to listen on PORT within startup timeout.
+  // We MUST start the HTTP server BEFORE any heavy initialization (DB, modules, etc.)
+  // The /health endpoint is already registered above, so it will respond immediately.
+  // ============================================================================
+  const host = process.env.HOST || '0.0.0.0';
+  await new Promise<void>((resolve) => {
+    httpServer.listen(port as number, host as string, () => {
+      logger.info(`🚀 API Server listening on ${host}:${port} (Cloud Run ready)`);
+      resolve();
+    });
+  });
+
+  // Now do heavy initialization in background
+  // Server is already accepting health check requests
 
   // Validate payment configuration (Phase PG-1)
   try {
@@ -854,11 +904,8 @@ const startServer = async () => {
     logger.info('Redis disabled, skipping Redis initialization');
   }
 
-  // Start server
-  const host = env.getString('HOST', '0.0.0.0');
-  httpServer.listen(port as number, host as string, () => {
-    logger.info(`🚀 API Server running on ${host}:${port}`);
-  });
+  // Server is already listening (started at the beginning of startServer)
+  logger.info('✅ Background initialization complete');
 };
 
 startServer().catch((error) => {

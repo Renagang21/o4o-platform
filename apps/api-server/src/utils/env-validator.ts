@@ -98,7 +98,7 @@ class EnvironmentValidator {
     logger.info('🔧 Environment Configuration:');
     logger.info(`  - Environment: ${this.env.NODE_ENV || 'development'}`);
     logger.info(`  - Database: ${this.env.DB_NAME}@${this.env.DB_HOST}:${this.env.DB_PORT}`);
-    logger.info(`  - Server Port: ${this.env.PORT || '3001'}`);
+    logger.info(`  - Server Port: ${this.env.PORT || '8080'}`);
     
     // Optional services
     if (this.env.REDIS_HOST) {
