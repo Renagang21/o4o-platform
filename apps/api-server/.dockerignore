@@ -9,8 +9,12 @@
 *
 
 # Allow bundled output from tsup
+# - main.js: API Server entry (Cloud Run Service)
+# - migrate.js: Migration CLI entry (Cloud Run Job)
 !dist/main.js
 !dist/main.js.map
+!dist/migrate.js
+!dist/migrate.js.map
 
 # Allow migrations for TypeORM auto-migration on startup
 !dist/database
