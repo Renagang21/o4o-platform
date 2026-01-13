@@ -170,12 +170,11 @@ import {
 
 // ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
+// Import entities directly to avoid NestJS dependency from main package
 // ============================================================================
-import {
-  EcommerceOrder,
-  EcommerceOrderItem,
-  EcommercePayment,
-} from '@o4o/ecommerce-core';
+import { EcommerceOrder } from '@o4o/ecommerce-core/dist/entities/EcommerceOrder.entity.js';
+import { EcommerceOrderItem } from '@o4o/ecommerce-core/dist/entities/EcommerceOrderItem.entity.js';
+import { EcommercePayment } from '@o4o/ecommerce-core/dist/entities/EcommercePayment.entity.js';
 
 // ============================================================================
 // ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
