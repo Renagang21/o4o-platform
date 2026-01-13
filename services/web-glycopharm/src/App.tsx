@@ -82,6 +82,14 @@ import NotFoundPage from '@/pages/NotFoundPage';
 import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
 import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
 
+// Test Guide Pages
+import {
+  TestGuidePage,
+  PharmacyManualPage,
+  ConsumerManualPage,
+  OperatorManualPage,
+} from '@/pages/test-guide';
+
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
   const { isAuthenticated, user, isLoading } = useAuth();
@@ -125,6 +133,12 @@ function AppRoutes() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
+
+        {/* Test Guide */}
+        <Route path="test-guide" element={<TestGuidePage />} />
+        <Route path="test-guide/manual/pharmacy" element={<PharmacyManualPage />} />
+        <Route path="test-guide/manual/consumer" element={<ConsumerManualPage />} />
+        <Route path="test-guide/manual/operator" element={<OperatorManualPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}
         <Route path="b2b/supply" element={<SupplyPage />} />

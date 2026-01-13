@@ -15,6 +15,7 @@ import ApplyPage from './pages/apply/ApplyPage';
 import MyApplicationsPage from './pages/apply/MyApplicationsPage';
 import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
+import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -82,6 +83,11 @@ function AppRoutes() {
       {/* 운영자 페이지 (Phase C-4) */}
       <Route path="/operator/glucoseview/applications" element={<OperatorApplicationsPage />} />
       <Route path="/operator/glucoseview/applications/:id" element={<OperatorApplicationDetailPage />} />
+
+      {/* Test Guide */}
+      <Route path="/test-guide" element={<TestGuidePage />} />
+      <Route path="/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
+      <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
 
       {/* 메인 레이아웃 (홈은 공개, 나머지는 보호) */}
       <Route path="/" element={<Layout />}>

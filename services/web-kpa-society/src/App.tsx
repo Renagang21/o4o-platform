@@ -39,6 +39,9 @@ import { IntranetRoutes } from './routes/IntranetRoutes';
 // Login page
 import { LoginPage } from './pages/LoginPage';
 
+// Test Guide Pages
+import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchOfficerManualPage, AdminManualPage } from './pages/test-guide';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -60,6 +63,13 @@ function App() {
         <Routes>
           {/* Login Page (레이아웃 없음) */}
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Test Guide (레이아웃 없음) */}
+          <Route path="/test-guide" element={<TestGuidePage />} />
+          <Route path="/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
+          <Route path="/test-guide/manual/district_officer" element={<DistrictOfficerManualPage />} />
+          <Route path="/test-guide/manual/branch_officer" element={<BranchOfficerManualPage />} />
+          <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
 
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/admin/*" element={<AdminRoutes />} />

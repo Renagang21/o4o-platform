@@ -3,10 +3,11 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
-// 테스트 계정 (데이터베이스에 등록된 실제 계정)
+// 테스트 계정 (비밀번호 통일: TestPassword)
+const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'pharmacy@glycopharm.kr', password: 'test123!@#', label: '약국', color: 'primary' },
-  { email: 'admin@neture.co.kr', password: 'Admin2024!', label: '운영자', color: 'red' },
+  { email: 'pharmacy@glycopharm.kr', password: TEST_PASSWORD, label: '약국', color: 'primary' },
+  { email: 'admin@neture.co.kr', password: TEST_PASSWORD, label: '운영자', color: 'red' },
 ];
 
 export default function LoginPage() {
@@ -145,6 +146,10 @@ export default function LoginPage() {
 
           <div className="mt-6 pt-6 border-t">
             <p className="text-center text-sm text-slate-500 mb-4">
+              <NavLink to="/test-guide" className="text-amber-600 font-semibold hover:text-amber-700">
+                테스트 가이드 보기
+              </NavLink>
+              <span className="mx-2 text-slate-300">|</span>
               계정이 없으신가요?{' '}
               <NavLink to="/register" className="text-primary-600 font-medium hover:text-primary-700">
                 회원가입

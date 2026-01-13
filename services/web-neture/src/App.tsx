@@ -20,6 +20,14 @@ import PartnershipRequestListPage from './pages/partners/requests/PartnershipReq
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
 
+// Test Guide Pages
+import {
+  TestGuidePage,
+  SupplierManualPage,
+  PartnerManualPage,
+  AdminManualPage,
+} from './pages/test-guide';
+
 function App() {
   return (
     <BrowserRouter>
@@ -32,6 +40,12 @@ function App() {
           <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
           <Route path="/partners/info" element={<PartnerInfoPage />} />
           <Route path="/content" element={<div className="max-w-7xl mx-auto px-4 py-16"><h1 className="text-3xl font-bold">콘텐츠 (준비 중)</h1></div>} />
+
+          {/* Test Guide */}
+          <Route path="/test-guide" element={<TestGuidePage />} />
+          <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
+          <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
+          <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

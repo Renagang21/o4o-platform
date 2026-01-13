@@ -14,11 +14,12 @@ const ROLE_ICONS: Record<UserRole, string> = {
   user: '👤',
 };
 
-// 테스트 계정 목록
+// 테스트 계정 목록 (비밀번호 통일: TestPassword)
+const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNTS = [
-  { email: 'test-supplier@neture.co.kr', password: 'test123!@#', label: '공급자', role: 'supplier' as UserRole },
-  { email: 'test-partner@neture.co.kr', password: 'test123!@#', label: '파트너', role: 'partner' as UserRole },
-  { email: 'admin@neture.co.kr', password: 'Admin2024!', label: '관리자', role: 'admin' as UserRole },
+  { email: 'supplier@neture.test', password: TEST_PASSWORD, label: '공급자', role: 'supplier' as UserRole },
+  { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너', role: 'partner' as UserRole },
+  { email: 'admin@neture.test', password: TEST_PASSWORD, label: '운영자', role: 'admin' as UserRole },
 ];
 
 export function LoginPage() {
@@ -190,6 +191,8 @@ export function LoginPage() {
         </div>
 
         <div style={styles.footer}>
+          <a href="/test-guide" style={styles.testGuideLink}>테스트 가이드 보기</a>
+          <span style={styles.divider}>|</span>
           <a href="/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
           <span style={styles.divider}>|</span>
           <a href="/register" style={styles.link}>회원가입</a>
@@ -343,6 +346,11 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     marginTop: 'var(--space-4)',
     fontSize: 'var(--text-body-md)',
+  },
+  testGuideLink: {
+    color: '#f59e0b',
+    textDecoration: 'none',
+    fontWeight: 600,
   },
   link: {
     color: 'var(--color-primary)',  /* Primary 허용: 핵심 링크 */

@@ -14,6 +14,15 @@ import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage } from '@/pag
 import LoginPage from '@/pages/auth/LoginPage';
 import PartnerInfoPage from '@/pages/PartnerInfoPage';
 
+// Test Guide Pages
+import {
+  TestGuidePage,
+  ConsumerManualPage,
+  SellerManualPage,
+  SupplierManualPage,
+  AdminManualPage,
+} from '@/pages/test-guide';
+
 // App Routes
 function AppRoutes() {
   return (
@@ -24,6 +33,13 @@ function AppRoutes() {
         <Route path="login" element={<LoginPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
+
+        {/* Test Guide */}
+        <Route path="test-guide" element={<TestGuidePage />} />
+        <Route path="test-guide/manual/consumer" element={<ConsumerManualPage />} />
+        <Route path="test-guide/manual/seller" element={<SellerManualPage />} />
+        <Route path="test-guide/manual/supplier" element={<SupplierManualPage />} />
+        <Route path="test-guide/manual/admin" element={<AdminManualPage />} />
 
         {/* Role Not Available */}
         <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />

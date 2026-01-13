@@ -18,17 +18,19 @@ import { useAuth, type TestAccountType } from '../contexts/AuthContext';
  * - 임원: 직책만 표시, 권한은 일반 회원과 동일 (district_officer, branch_officer)
  * - 약사: 일반 회원
  *
+ * 비밀번호 통일: TestPassword
  * @see docs/app-guidelines/kpa-auth-role-position-principles.md
  */
+const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNT_LIST = [
   // 권한 보유 계정 (Role)
-  { type: 'district_admin' as TestAccountType, label: '지부 운영자', email: 'district-admin@kpa-test.kr', password: 'test123!@#', category: 'admin' },
-  { type: 'branch_admin' as TestAccountType, label: '분회 운영자', email: 'branch-admin@kpa-test.kr', password: 'test123!@#', category: 'admin' },
+  { type: 'district_admin' as TestAccountType, label: '지부 운영자', email: 'district-admin@kpa-test.kr', password: TEST_PASSWORD, category: 'admin' },
+  { type: 'branch_admin' as TestAccountType, label: '분회 운영자', email: 'branch-admin@kpa-test.kr', password: TEST_PASSWORD, category: 'admin' },
   // 직책만 보유 계정 (Position) - 권한 없음
-  { type: 'district_officer' as TestAccountType, label: '지부 임원', email: 'district-officer@kpa-test.kr', password: 'test123!@#', category: 'officer' },
-  { type: 'branch_officer' as TestAccountType, label: '분회 임원', email: 'branch-officer@kpa-test.kr', password: 'test123!@#', category: 'officer' },
+  { type: 'district_officer' as TestAccountType, label: '지부 임원', email: 'district-officer@kpa-test.kr', password: TEST_PASSWORD, category: 'officer' },
+  { type: 'branch_officer' as TestAccountType, label: '분회 임원', email: 'branch-officer@kpa-test.kr', password: TEST_PASSWORD, category: 'officer' },
   // 일반 회원
-  { type: 'pharmacist' as TestAccountType, label: '약사', email: 'pharmacist@kpa-test.kr', password: 'test123!@#', category: 'member' },
+  { type: 'pharmacist' as TestAccountType, label: '약사', email: 'pharmacist@kpa-test.kr', password: TEST_PASSWORD, category: 'member' },
 ];
 
 export function LoginPage() {
@@ -167,6 +169,8 @@ export function LoginPage() {
         </div>
 
         <div style={styles.footer}>
+          <a href="/test-guide" style={styles.testGuideLink}>테스트 가이드 보기</a>
+          <span style={styles.divider}>|</span>
           <a href="/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
           <span style={styles.divider}>|</span>
           <a href="/member/apply" style={styles.link}>회원가입</a>

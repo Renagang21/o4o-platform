@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-// 테스트 계정 목록
+// 테스트 계정 목록 (비밀번호 통일: TestPassword)
+const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNTS = [
-  { label: '약사', email: 'pharmacist@test.test', password: 'testID1234', role: 'pharmacist' },
-  { label: '관리자', email: 'admin@test.test', password: 'adminID1234', role: 'admin' },
+  { label: '약사', email: 'pharmacist@test.test', password: TEST_PASSWORD, role: 'pharmacist' },
+  { label: '관리자', email: 'admin@test.test', password: TEST_PASSWORD, role: 'admin' },
 ];
 
 export default function LoginPage() {
@@ -111,8 +112,15 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* 테스트 가이드 링크 */}
+          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+            <a href="/test-guide" className="text-amber-600 font-semibold text-sm hover:text-amber-700">
+              테스트 가이드 보기
+            </a>
+          </div>
+
           {/* 테스트 계정 */}
-          <div className="mt-6 pt-6 border-t border-slate-100">
+          <div className="mt-4 pt-4 border-t border-slate-100">
             <p className="text-xs text-slate-400 mb-3">테스트 계정 (클릭 시 입력됨)</p>
             <div className="space-y-2">
               {TEST_ACCOUNTS.map((account) => (

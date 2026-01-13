@@ -15,13 +15,40 @@
 
 import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../styles/theme';
+import { useAuth, TestUser } from '../contexts/AuthContext';
 
-// Mock user data
+// Mock user data (fallback when not logged in)
 const mockUser = {
   name: '홍길동',
   organization: '서울지부',
   branch: '강남분회',
   role: '일반회원',
+};
+
+// 직책 한글명 매핑
+const positionLabels: Record<string, string> = {
+  vice_president: '지부 부회장',
+  director: '분회 이사',
+  president: '회장',
+  secretary: '총무',
+};
+
+// 임원 전용 Mock 데이터
+const mockOfficerData = {
+  upcomingMeetings: [
+    { id: 1, title: '12월 정기 임원회의', date: '2024-12-20', time: '14:00', location: '약사회관 3층' },
+    { id: 2, title: '신년 사업계획 논의', date: '2025-01-05', time: '10:00', location: '온라인(Zoom)' },
+  ],
+  officerNotices: [
+    { id: 1, title: '2025년 임원 업무분장 안내', date: '2024-12-18', isNew: true },
+    { id: 2, title: '회비 징수 현황 보고', date: '2024-12-15' },
+    { id: 3, title: '지부장 연석회의 결과 공유', date: '2024-12-10' },
+  ],
+  taskSummary: {
+    pendingApprovals: 0,  // 임원은 승인 권한 없음
+    myReports: 2,
+    upcomingEvents: 3,
+  },
 };
 
 // Quick Menu items
@@ -77,6 +104,24 @@ const mockGroupbuys = [
 ];
 
 export function DashboardPage() {
+  const { user } = useAuth();
+
+  // 테스트 계정 타입 감지
+  const testUser = user as TestUser | null;
+
+  // 임원 여부 확인 (position 필드가 있으면 임원)
+  const isOfficer = testUser?.position !== undefined;
+  const officerPosition = testUser?.position;
+  const positionLabel = officerPosition ? positionLabels[officerPosition] || officerPosition : '';
+
+  // 표시용 사용자 정보
+  const displayUser = user ? {
+    name: user.name,
+    organization: isOfficer && officerPosition === 'vice_president' ? '서울지부' : '서울지부',
+    branch: isOfficer && officerPosition === 'director' ? '강남분회' : '강남분회',
+    role: isOfficer ? positionLabel : '일반회원',
+  } : mockUser;
+
   return (
     <div style={styles.container}>
       {/* A. Hero Section - 경기도약사회 스타일 */}
@@ -116,10 +161,11 @@ export function DashboardPage() {
         <div style={styles.welcomeContent}>
           <div style={styles.welcomeText}>
             <span style={styles.welcomeGreeting}>
-              안녕하세요, <strong>{mockUser.name}</strong>님
+              안녕하세요, <strong>{displayUser.name}</strong>님
+              {isOfficer && <span style={styles.officerBadge}>{positionLabel}</span>}
             </span>
             <span style={styles.welcomeOrg}>
-              {mockUser.organization} &gt; {mockUser.branch}
+              {displayUser.organization} &gt; {displayUser.branch}
             </span>
           </div>
           <div style={styles.welcomeStats}>
@@ -138,6 +184,79 @@ export function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* 임원 전용 섹션 - 임원으로 로그인한 경우에만 표시 */}
+      {isOfficer && (
+        <section style={styles.officerSection}>
+          <div style={styles.officerSectionHeader}>
+            <h2 style={styles.officerSectionTitle}>
+              <span style={styles.officerIcon}>👔</span>
+              {positionLabel} 업무 현황
+            </h2>
+            <span style={styles.officerNote}>임원 전용 정보</span>
+          </div>
+
+          <div style={styles.officerGrid}>
+            {/* 임원 회의 일정 */}
+            <div style={styles.officerCard}>
+              <div style={styles.officerCardHeader}>
+                <span style={styles.officerCardIcon}>📅</span>
+                <span style={styles.officerCardTitle}>임원 회의 일정</span>
+              </div>
+              <div style={styles.officerCardContent}>
+                {mockOfficerData.upcomingMeetings.map((meeting) => (
+                  <div key={meeting.id} style={styles.meetingItem}>
+                    <div style={styles.meetingTitle}>{meeting.title}</div>
+                    <div style={styles.meetingMeta}>
+                      {meeting.date} {meeting.time} · {meeting.location}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 임원 전용 공지 */}
+            <div style={styles.officerCard}>
+              <div style={styles.officerCardHeader}>
+                <span style={styles.officerCardIcon}>📋</span>
+                <span style={styles.officerCardTitle}>임원 전용 공지</span>
+              </div>
+              <div style={styles.officerCardContent}>
+                {mockOfficerData.officerNotices.map((notice) => (
+                  <div key={notice.id} style={styles.noticeItem}>
+                    <div style={styles.noticeTitleRow}>
+                      {notice.isNew && <span style={styles.newBadge}>NEW</span>}
+                      <span style={styles.noticeTitle}>{notice.title}</span>
+                    </div>
+                    <div style={styles.noticeDate}>{notice.date}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 임원 업무 요약 */}
+            <div style={styles.officerCard}>
+              <div style={styles.officerCardHeader}>
+                <span style={styles.officerCardIcon}>📊</span>
+                <span style={styles.officerCardTitle}>업무 요약</span>
+              </div>
+              <div style={styles.taskSummaryGrid}>
+                <div style={styles.taskSummaryItem}>
+                  <span style={styles.taskSummaryValue}>{mockOfficerData.taskSummary.myReports}</span>
+                  <span style={styles.taskSummaryLabel}>작성 보고서</span>
+                </div>
+                <div style={styles.taskSummaryItem}>
+                  <span style={styles.taskSummaryValue}>{mockOfficerData.taskSummary.upcomingEvents}</span>
+                  <span style={styles.taskSummaryLabel}>예정 행사</span>
+                </div>
+              </div>
+              <div style={styles.officerNotice}>
+                <strong>참고:</strong> 임원은 직책이며, 관리 권한은 별도로 부여됩니다.
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* B. Quick Menu */}
       <section style={styles.section}>
@@ -838,5 +957,157 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     fontWeight: 500,
     color: colors.neutral700,
+  },
+
+  // Officer Badge (in welcome)
+  officerBadge: {
+    display: 'inline-block',
+    marginLeft: '8px',
+    padding: '4px 10px',
+    backgroundColor: '#f59e0b',
+    color: '#fff',
+    borderRadius: '12px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  },
+
+  // Officer Section
+  officerSection: {
+    backgroundColor: '#fffbeb',
+    border: '2px solid #f59e0b',
+    borderRadius: borderRadius.lg,
+    padding: '24px',
+    marginBottom: '32px',
+  },
+  officerSectionHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  officerSectionTitle: {
+    fontSize: '1.25rem',
+    fontWeight: 600,
+    color: '#92400e',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    margin: 0,
+  },
+  officerIcon: {
+    fontSize: '1.25rem',
+  },
+  officerNote: {
+    fontSize: '0.75rem',
+    color: '#b45309',
+    backgroundColor: '#fef3c7',
+    padding: '4px 8px',
+    borderRadius: '4px',
+  },
+  officerGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '16px',
+  },
+  officerCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    padding: '20px',
+    boxShadow: shadows.sm,
+    border: '1px solid #fcd34d',
+  },
+  officerCardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '16px',
+    paddingBottom: '12px',
+    borderBottom: '1px solid #fef3c7',
+  },
+  officerCardIcon: {
+    fontSize: '20px',
+  },
+  officerCardTitle: {
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    color: colors.neutral900,
+  },
+  officerCardContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  meetingItem: {
+    padding: '8px 0',
+    borderBottom: `1px solid ${colors.gray200}`,
+  },
+  meetingTitle: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral900,
+    marginBottom: '4px',
+  },
+  meetingMeta: {
+    fontSize: '0.75rem',
+    color: colors.neutral500,
+  },
+  noticeItem: {
+    padding: '8px 0',
+    borderBottom: `1px solid ${colors.gray200}`,
+  },
+  noticeTitleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '4px',
+  },
+  newBadge: {
+    padding: '2px 6px',
+    backgroundColor: '#ef4444',
+    color: '#fff',
+    borderRadius: '4px',
+    fontSize: '0.625rem',
+    fontWeight: 600,
+  },
+  noticeTitle: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral900,
+  },
+  noticeDate: {
+    fontSize: '0.75rem',
+    color: colors.neutral500,
+  },
+  taskSummaryGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '12px',
+    marginBottom: '16px',
+  },
+  taskSummaryItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '16px',
+    backgroundColor: '#fef3c7',
+    borderRadius: borderRadius.md,
+  },
+  taskSummaryValue: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    color: '#b45309',
+  },
+  taskSummaryLabel: {
+    fontSize: '0.75rem',
+    color: '#92400e',
+    marginTop: '4px',
+  },
+  officerNotice: {
+    padding: '12px',
+    backgroundColor: '#fef3c7',
+    borderRadius: borderRadius.md,
+    fontSize: '0.75rem',
+    color: '#92400e',
+    lineHeight: 1.5,
   },
 };
