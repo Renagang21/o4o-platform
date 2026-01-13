@@ -77,13 +77,18 @@ import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
+
 // ============================================================================
-// EXTERNAL PACKAGE IMPORTS REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+// FORUM-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
+// Use /entities subpath to avoid side-effect loading
 // ============================================================================
-// Forum App entities - REMOVED to fix startup crash
-// Original: import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o/forum-core';
-// Reason: Package index.ts loads services/controllers causing side-effect failures
-// ============================================================================
+import {
+  ForumPost,
+  ForumCategory,
+  ForumComment,
+  ForumTag,
+} from '@o4o/forum-core/entities';
+
 // Forum Notification entity (Phase 13)
 import { ForumNotification } from '../entities/ForumNotification.js';
 // Digital Signage entities
@@ -175,11 +180,13 @@ import {
 import { EcommerceOrder, EcommerceOrderItem, EcommercePayment } from '@o4o/ecommerce-core/entities';
 
 // ============================================================================
-// ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+// ORGANIZATION-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
+// Use /entities subpath to avoid side-effect loading
 // ============================================================================
-// Original: import { Organization, OrganizationMember } from '@o4o/organization-core';
-// Reason: Package index.ts loads services/controllers/lifecycle causing side-effect failures
-// ============================================================================
+import {
+  Organization,
+  OrganizationMember,
+} from '@o4o/organization-core/entities';
 
 // ============================================================================
 // CMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
@@ -190,12 +197,19 @@ import { EcommerceOrder, EcommerceOrderItem, EcommercePayment } from '@o4o/ecomm
 // ============================================================================
 
 // ============================================================================
-// LMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+// LMS-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
+// Use /entities subpath to avoid side-effect loading
 // ============================================================================
-// Original: import { Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance } from '@o4o/lms-core';
-// Reason: Package index.ts loads ContentBundleService causing initialization failures
-// These entities will be lazy-loaded when LMS routes are accessed
-// ============================================================================
+import {
+  Course,
+  Lesson,
+  Enrollment,
+  Progress,
+  Certificate,
+  LMSEvent,
+  Attendance,
+  ContentBundle,
+} from '@o4o/lms-core/entities';
 
 // ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
@@ -350,11 +364,13 @@ export const AppDataSource = new DataSource({
     KycDocument,
     // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
     // ============================================================================
-    // FORUM ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+    // FORUM-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
     // ============================================================================
-    // ForumPost, ForumCategory, ForumComment, ForumTag - from @o4o/forum-core
-    // Removed to prevent package side-effect loading
-    // Forum Notification entity (Phase 13) - local entity, kept
+    ForumPost,
+    ForumCategory,
+    ForumComment,
+    ForumTag,
+    // Forum Notification entity (Phase 13) - local entity
     ForumNotification,
     // Digital Signage entities
     SignageDevice,
@@ -425,15 +441,21 @@ export const AppDataSource = new DataSource({
     EcommerceOrderItem,
     EcommercePayment,
     // ============================================================================
-    // ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+    // ORGANIZATION-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
     // ============================================================================
-    // Organization, OrganizationMember - from @o4o/organization-core
-    // Removed to prevent package side-effect loading
+    Organization,
+    OrganizationMember,
     // ============================================================================
-    // LMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+    // LMS-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
     // ============================================================================
-    // Course, Lesson, Enrollment, Progress, Certificate, LMSEvent, Attendance
-    // Removed to prevent package side-effect loading
+    Course,
+    Lesson,
+    Enrollment,
+    Progress,
+    Certificate,
+    LMSEvent,
+    Attendance,
+    ContentBundle,
     // ============================================================================
     // CMS-CORE & CHANNEL ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
     // ============================================================================
