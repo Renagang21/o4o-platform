@@ -7,7 +7,7 @@
  * Simple fetch-based API client for Neture backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
 interface Supplier {
   id: string;

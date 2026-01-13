@@ -10,7 +10,7 @@
  * }
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.glucoseview.co.kr';
 
 export interface HealthResponse {
   service: string;

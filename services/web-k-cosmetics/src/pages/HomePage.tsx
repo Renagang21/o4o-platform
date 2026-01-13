@@ -114,7 +114,7 @@ const quickActionCards: QuickActionCard[] = [
     description: '매장에 노출할 상품을 관리하세요',
     icon: '📦',
     link: '/platform/stores/products',
-    color: '#e91e63',
+    color: '#e2e8f0',
     status: { label: '노출 중', value: 24 },
   },
   {
@@ -124,7 +124,7 @@ const quickActionCards: QuickActionCard[] = [
     description: '검증된 공급자의 상품을 조달합니다',
     icon: '📋',
     link: '/b2b/supply',
-    color: '#2196f3',
+    color: '#e2e8f0',
     status: { label: '공급', value: '사용 중' },
   },
   {
@@ -134,7 +134,7 @@ const quickActionCards: QuickActionCard[] = [
     description: '브랜드의 신상품 Trial에 참여하세요',
     icon: '🎯',
     link: '/platform/stores',
-    color: '#4caf50',
+    color: '#e2e8f0',
     status: { label: '진행 중', value: 3 },
   },
   {
@@ -144,7 +144,7 @@ const quickActionCards: QuickActionCard[] = [
     description: '관광객·콘텐츠·매장을 연결합니다',
     icon: '🌏',
     link: '/services/tourists',
-    color: '#ff9800',
+    color: '#e2e8f0',
     status: { label: '연결 중', value: '매장' },
   },
 ];
@@ -386,7 +386,7 @@ function QuickActionSection() {
             to="/platform/stores"
             style={{
               fontSize: '14px',
-              color: '#e91e63',
+              color: '#64748b',
               fontWeight: 500,
               textDecoration: 'none',
               display: 'flex',
@@ -437,7 +437,7 @@ function QuickActionSection() {
               </div>
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>{card.title}</h3>
-            <p style={{ fontSize: '14px', color: '#e91e63', fontWeight: 500, marginBottom: '8px' }}>{card.subtitle}</p>
+            <p style={{ fontSize: '14px', color: '#64748b', fontWeight: 500, marginBottom: '8px' }}>{card.subtitle}</p>
             <p style={{ fontSize: '14px', color: '#666' }}>{card.description}</p>
           </Link>
         ))}
@@ -450,13 +450,13 @@ function NowRunningSection() {
   const getTypeConfig = (type: NowRunningItem['type']) => {
     switch (type) {
       case 'trial':
-        return { label: 'Trial', color: '#e8f5e9', textColor: '#2e7d32', icon: '🎯' };
+        return { label: 'Trial', color: '#f1f5f9', textColor: '#475569', icon: '🎯' };
       case 'product':
-        return { label: '신상품', color: '#fff3e0', textColor: '#e65100', icon: '✨' };
+        return { label: '신상품', color: '#f1f5f9', textColor: '#475569', icon: '✨' };
       case 'event':
-        return { label: '이벤트', color: '#e3f2fd', textColor: '#1565c0', icon: '🎉' };
+        return { label: '이벤트', color: '#f1f5f9', textColor: '#475569', icon: '🎉' };
       case 'campaign':
-        return { label: '캠페인', color: '#f3e5f5', textColor: '#7b1fa2', icon: '📢' };
+        return { label: '캠페인', color: '#f1f5f9', textColor: '#475569', icon: '📢' };
     }
   };
 
@@ -471,7 +471,7 @@ function NowRunningSection() {
           to="/products"
           style={{
             fontSize: '14px',
-            color: '#e91e63',
+            color: '#64748b',
             fontWeight: 500,
             textDecoration: 'none',
             display: 'flex',
@@ -566,7 +566,7 @@ function NoticeSection() {
             to="/about"
             style={{
               fontSize: '14px',
-              color: '#e91e63',
+              color: '#64748b',
               fontWeight: 500,
               textDecoration: 'none',
               display: 'flex',

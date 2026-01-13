@@ -10,7 +10,7 @@
 
 // Feature flag for API switching
 const USE_REAL_API = import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
 // ============================================================================
 // Types (matching forum-core and API responses)

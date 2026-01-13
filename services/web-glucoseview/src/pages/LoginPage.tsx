@@ -87,6 +87,7 @@ export default function LoginPage() {
               </label>
               <input
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력하세요"
@@ -131,7 +132,7 @@ export default function LoginPage() {
                   className="w-full flex items-center justify-between px-3 py-2.5 text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-700">
+                    <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-700">
                       {account.label}
                     </span>
                     <span className="text-sm text-slate-600">{account.email}</span>

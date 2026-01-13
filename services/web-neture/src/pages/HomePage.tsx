@@ -43,14 +43,14 @@ function HeroSection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/suppliers"
-            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-slate-500 bg-white hover:bg-primary-50 transition-colors"
           >
             공급자 보기
             <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
           <Link
             to="/partners/requests"
-            className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-primary-600 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-slate-500 transition-colors"
           >
             제휴 요청 보기
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -106,7 +106,7 @@ function SuppliersPreviewSection() {
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <Building2 className="w-12 h-12 text-primary-600 mx-auto mb-4" />
+          <Building2 className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-900 mb-4">공급자 둘러보기</h2>
           <p className="text-lg text-gray-600">
             검증된 공급자의 정보를 확인하세요
@@ -129,7 +129,7 @@ function SuppliersPreviewSection() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {supplier.name}
                 </h3>
-                <span className="inline-block px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-full mb-3">
+                <span className="inline-block px-3 py-1 text-sm bg-slate-100 text-slate-700 rounded-full mb-3">
                   {supplier.category}
                 </span>
                 <p className="text-sm text-gray-600">
@@ -143,7 +143,7 @@ function SuppliersPreviewSection() {
         <div className="text-center mt-10">
           <Link
             to="/suppliers"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
+            className="inline-flex items-center text-slate-500 hover:text-primary-700 font-medium"
           >
             공급자 전체 보기
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -199,7 +199,7 @@ function PartnershipRequestsPreviewSection() {
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <Handshake className="w-12 h-12 text-primary-600 mx-auto mb-4" />
+          <Handshake className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-900 mb-4">제휴 파트너를 찾는 판매자</h2>
           <p className="text-lg text-gray-600">
             진행 중인 제휴 기회를 확인하세요
@@ -217,7 +217,7 @@ function PartnershipRequestsPreviewSection() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {request.seller.name}
                 </h3>
-                <span className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                <span className="px-3 py-1 text-xs bg-slate-100 text-slate-700 rounded-full">
                   {request.status}
                 </span>
               </div>
@@ -237,7 +237,7 @@ function PartnershipRequestsPreviewSection() {
                 <p className="text-sm text-gray-600">{request.revenueStructure}</p>
               </div>
               <div className="mt-4">
-                <span className="inline-flex items-center text-primary-600 hover:text-primary-700 text-sm font-medium">
+                <span className="inline-flex items-center text-slate-500 hover:text-primary-700 text-sm font-medium">
                   제휴 조건 보기
                   <ArrowRight className="ml-1 w-4 h-4" />
                 </span>
@@ -249,7 +249,7 @@ function PartnershipRequestsPreviewSection() {
         <div className="text-center mt-10">
           <Link
             to="/partners/requests"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
+            className="inline-flex items-center text-slate-500 hover:text-primary-700 font-medium"
           >
             제휴 요청 전체 보기
             <ArrowRight className="ml-2 w-5 h-5" />

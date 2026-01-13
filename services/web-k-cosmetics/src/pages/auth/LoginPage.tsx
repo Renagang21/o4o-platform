@@ -12,10 +12,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 // 테스트 계정 목록 (비밀번호 통일: TestPassword)
 const TEST_ACCOUNTS = [
-  { role: 'consumer', label: '소비자', email: 'consumer@k-cosmetics.test', color: '#10b981' },
-  { role: 'seller', label: '판매자', email: 'seller@k-cosmetics.test', color: '#3b82f6' },
-  { role: 'supplier', label: '공급자', email: 'supplier@k-cosmetics.test', color: '#8b5cf6' },
-  { role: 'admin', label: '운영자', email: 'admin@k-cosmetics.test', color: '#ef4444' },
+  { role: 'consumer', label: '소비자', email: 'consumer@k-cosmetics.test', color: '#64748b' },
+  { role: 'seller', label: '판매자', email: 'seller@k-cosmetics.test', color: '#64748b' },
+  { role: 'supplier', label: '공급자', email: 'supplier@k-cosmetics.test', color: '#64748b' },
+  { role: 'admin', label: '운영자', email: 'admin@k-cosmetics.test', color: '#64748b' },
 ];
 
 const TEST_PASSWORD = 'TestPassword';
@@ -79,6 +79,7 @@ export default function LoginPage() {
             <label style={styles.label}>비밀번호</label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="비밀번호를 입력하세요"

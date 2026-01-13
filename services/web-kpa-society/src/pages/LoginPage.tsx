@@ -92,6 +92,7 @@ export function LoginPage() {
             <label style={styles.label}>비밀번호</label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="비밀번호를 입력하세요"
