@@ -344,16 +344,17 @@ export default function PharmacyDashboard() {
       {/* ========================================= */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">오늘의 운영</h2>
+        {/* UX Trust Rules v1: 카드 배경 white, 아이콘 gray-500, border로 구분 */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {/* 오늘 주문 */}
           <NavLink
             to="/pharmacy/orders?filter=today"
-            className="p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <ShoppingCart className="w-6 h-6 text-blue-600" />
+              <ShoppingCart className="w-6 h-6 text-slate-500" />
               {(todayActions?.todayOrders || 0) > 0 && (
-                <span className="w-6 h-6 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="w-6 h-6 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {todayActions?.todayOrders}
                 </span>
               )}
@@ -365,12 +366,12 @@ export default function PharmacyDashboard() {
           {/* 접수 대기 (NEW - RECEIVED 처리 필요) */}
           <NavLink
             to="/pharmacy/orders?status=pending"
-            className="p-4 bg-cyan-50 rounded-xl hover:bg-cyan-100 transition-colors group"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <Inbox className="w-6 h-6 text-cyan-600" />
+              <Inbox className="w-6 h-6 text-slate-500" />
               {(todayActions?.pendingReceiveOrders || 0) > 0 && (
-                <span className="w-6 h-6 bg-cyan-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="w-6 h-6 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {todayActions?.pendingReceiveOrders}
                 </span>
               )}
@@ -382,12 +383,12 @@ export default function PharmacyDashboard() {
           {/* 처리 대기 */}
           <NavLink
             to="/pharmacy/orders?status=received"
-            className="p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors group"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <Clock className="w-6 h-6 text-amber-600" />
+              <Clock className="w-6 h-6 text-slate-500" />
               {(todayActions?.pendingOrders || 0) > 0 && (
-                <span className="w-6 h-6 bg-amber-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="w-6 h-6 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {todayActions?.pendingOrders}
                 </span>
               )}
@@ -399,12 +400,12 @@ export default function PharmacyDashboard() {
           {/* 운영자 공지 */}
           <NavLink
             to="/pharmacy/notices"
-            className="p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors group"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <Bell className="w-6 h-6 text-purple-600" />
+              <Bell className="w-6 h-6 text-slate-500" />
               {(todayActions?.operatorNotices || 0) > 0 && (
-                <span className="w-6 h-6 bg-purple-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="w-6 h-6 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {todayActions?.operatorNotices}
                 </span>
               )}
@@ -416,12 +417,12 @@ export default function PharmacyDashboard() {
           {/* 신청 알림 */}
           <NavLink
             to="/pharmacy/store-apply"
-            className="p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <FileText className="w-6 h-6 text-green-600" />
+              <FileText className="w-6 h-6 text-slate-500" />
               {(todayActions?.applicationAlerts || 0) > 0 && (
-                <span className="w-6 h-6 bg-green-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="w-6 h-6 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {todayActions?.applicationAlerts}
                 </span>
               )}
@@ -437,18 +438,19 @@ export default function PharmacyDashboard() {
       {/* ========================================= */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">프랜차이즈 서비스</h2>
+        {/* UX Trust Rules v1: 아이콘 gray-500, 상태 뱃지 neutral */}
         <div className="grid md:grid-cols-3 gap-4">
           {/* 디지털 사이니지 */}
           <NavLink
             to="/pharmacy/signage/my"
-            className="p-5 border border-slate-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all group"
+            className="p-5 border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all group"
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                <Tv className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                <Tv className="w-6 h-6 text-slate-500" />
               </div>
               {franchiseServices?.signage.enabled ? (
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                <span className="px-2 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full">
                   사용 중
                 </span>
               ) : (
@@ -473,14 +475,14 @@ export default function PharmacyDashboard() {
           {/* Market Trial */}
           <NavLink
             to="/pharmacy/market-trial"
-            className="p-5 border border-slate-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all group"
+            className="p-5 border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all group"
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-                <FlaskConical className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                <FlaskConical className="w-6 h-6 text-slate-500" />
               </div>
               {franchiseServices?.marketTrial.enabled ? (
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                <span className="px-2 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full">
                   참여 중
                 </span>
               ) : (
@@ -505,14 +507,14 @@ export default function PharmacyDashboard() {
           {/* 포럼 */}
           <NavLink
             to="/forum-ext"
-            className="p-5 border border-slate-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all group"
+            className="p-5 border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all group"
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                <MessageSquare className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-slate-500" />
               </div>
               {franchiseServices?.forum.enabled ? (
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                <span className="px-2 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full">
                   활동 중
                 </span>
               ) : (
@@ -550,6 +552,7 @@ export default function PharmacyDashboard() {
           </NavLink>
         </div>
 
+        {/* UX Trust Rules v1: 콘텐츠 타입 아이콘 gray-500 */}
         {contentWorkspace && contentWorkspace.recentContents.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
             {contentWorkspace.recentContents.slice(0, 4).map((content) => (
@@ -558,9 +561,9 @@ export default function PharmacyDashboard() {
                 className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  {content.type === 'video' && <Video className="w-5 h-5 text-red-500" />}
-                  {content.type === 'document' && <File className="w-5 h-5 text-blue-500" />}
-                  {content.type === 'link' && <LinkIcon className="w-5 h-5 text-green-500" />}
+                  {content.type === 'video' && <Video className="w-5 h-5 text-slate-500" />}
+                  {content.type === 'document' && <File className="w-5 h-5 text-slate-500" />}
+                  {content.type === 'link' && <LinkIcon className="w-5 h-5 text-slate-500" />}
                   <span className="text-xs text-slate-400">{content.source}</span>
                 </div>
                 <p className="text-sm font-medium text-slate-800 line-clamp-2">{content.title}</p>
@@ -580,18 +583,18 @@ export default function PharmacyDashboard() {
           </div>
         )}
 
-        {/* 콘텐츠 활용 버튼 */}
+        {/* 콘텐츠 활용 버튼 - UX Trust Rules v1: 중립 색상 */}
         {contentWorkspace && contentWorkspace.savedContents > 0 && (
           <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
             <NavLink
               to="/pharmacy/signage/my"
-              className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors"
+              className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors"
             >
               사이니지로 보내기
             </NavLink>
             <NavLink
               to="/forum-ext"
-              className="px-4 py-2 bg-green-50 text-green-700 text-sm font-medium rounded-lg hover:bg-green-100 transition-colors"
+              className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors"
             >
               포럼에 공유하기
             </NavLink>

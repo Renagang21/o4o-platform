@@ -61,7 +61,6 @@ interface QuickActionCard {
   description: string;
   icon: LucideIcon;
   link: string;
-  color: string;
   status: { label: string; value: string | number };
 }
 
@@ -80,6 +79,7 @@ interface Partner {
 // heroSlides는 config/heroConfig.ts에서 import
 // ========================================
 
+// UX Trust Rules v1: 아이콘 색상 통일 (gray-500)
 const quickActionCards: QuickActionCard[] = [
   {
     id: 'signage',
@@ -88,7 +88,6 @@ const quickActionCards: QuickActionCard[] = [
     description: '매장에서 바로 쓰는 콘텐츠로 신뢰를 형성합니다',
     icon: Monitor,
     link: '/pharmacy/signage/my',
-    color: 'bg-accent-500',
     status: { label: '방영 중', value: 3 },
   },
   {
@@ -98,7 +97,6 @@ const quickActionCards: QuickActionCard[] = [
     description: '검증된 공급망으로 안정적인 운영을 지원합니다',
     icon: Building2,
     link: '/b2b/supply',
-    color: 'bg-blue-600',
     status: { label: '공급', value: '사용 중' },
   },
   {
@@ -108,7 +106,6 @@ const quickActionCards: QuickActionCard[] = [
     description: '새로운 수익 기회와 환자 가치를 동시에 얻으세요',
     icon: Tag,
     link: '/pharmacy/market-trial',
-    color: 'bg-green-500',
     status: { label: '진행 중', value: 2 },
   },
   {
@@ -118,7 +115,6 @@ const quickActionCards: QuickActionCard[] = [
     description: '데이터가 만드는 전문 약국의 차이를 경험하세요',
     icon: Activity,
     link: 'https://glucoseview.co.kr',
-    color: 'bg-indigo-500',
     status: { label: '연결 중', value: '환자' },
   },
 ];
@@ -277,6 +273,7 @@ function QuickActionSection() {
         )}
       </div>
 
+      {/* UX Trust Rules v1: 아이콘 gray-500, 배경 slate-100 */}
       <div className="grid md:grid-cols-3 gap-4">
         {quickActionCards.map((card) => {
           const Icon = card.icon;
@@ -284,11 +281,11 @@ function QuickActionSection() {
             <NavLink
               key={card.id}
               to={card.link}
-              className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-slate-100"
+              className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-slate-200"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl ${card.color} flex items-center justify-center`}>
-                  <Icon className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-slate-500" />
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-slate-800">{card.status.value}</p>
@@ -296,7 +293,7 @@ function QuickActionSection() {
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-800 mb-1">{card.title}</h3>
-              <p className="text-sm text-primary-600 font-medium mb-2">{card.subtitle}</p>
+              <p className="text-sm text-slate-600 font-medium mb-2">{card.subtitle}</p>
               <p className="text-sm text-slate-500">{card.description}</p>
               <div className="mt-4 flex items-center gap-1 text-sm text-primary-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                 바로가기
@@ -316,14 +313,15 @@ interface NowRunningSectionProps {
 }
 
 function NowRunningSection({ items, loading }: NowRunningSectionProps) {
+  // UX Trust Rules v1: 뱃지 색상 neutral (gray 계열)
   const getTypeConfig = (type: ApiNowRunningItem['type']) => {
     switch (type) {
       case 'trial':
-        return { label: 'Trial', color: 'bg-green-100 text-green-700', icon: Tag };
+        return { label: 'Trial', color: 'bg-slate-100 text-slate-700', icon: Tag };
       case 'event':
-        return { label: '이벤트', color: 'bg-blue-100 text-blue-700', icon: Sparkles };
+        return { label: '이벤트', color: 'bg-slate-100 text-slate-700', icon: Sparkles };
       case 'campaign':
-        return { label: '캠페인', color: 'bg-purple-100 text-purple-700', icon: Calendar };
+        return { label: '캠페인', color: 'bg-slate-100 text-slate-700', icon: Calendar };
     }
   };
 
@@ -463,17 +461,13 @@ function PartnerTrustSection() {
           </p>
         </div>
 
-        {/* Partner Marquee */}
+        {/* Partner Marquee - UX Trust Rules v1: 색상 통일 */}
         <div className="overflow-hidden mb-8">
           <div className="flex gap-3 animate-marquee">
             {partners.map((partner) => (
               <div
                 key={partner.id}
-                className={`px-5 py-3 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
-                  partner.type === 'association'
-                    ? 'bg-primary-50 border border-primary-200 text-primary-700'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm'
-                }`}
+                className="px-5 py-3 rounded-xl flex items-center justify-center transition-all flex-shrink-0 bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm"
               >
                 <span className="font-medium text-sm">{partner.name}</span>
               </div>
@@ -481,11 +475,7 @@ function PartnerTrustSection() {
             {partners.map((partner) => (
               <div
                 key={`${partner.id}-duplicate`}
-                className={`px-5 py-3 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${
-                  partner.type === 'association'
-                    ? 'bg-primary-50 border border-primary-200 text-primary-700'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm'
-                }`}
+                className="px-5 py-3 rounded-xl flex items-center justify-center transition-all flex-shrink-0 bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm"
               >
                 <span className="font-medium text-sm">{partner.name}</span>
               </div>

@@ -4,10 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
+// UX Trust Rules v1: 뱃지 색상 neutral (gray 계열)
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'pharmacy@glycopharm.kr', password: TEST_PASSWORD, label: '약국', color: 'primary' },
-  { email: 'admin@neture.co.kr', password: TEST_PASSWORD, label: '운영자', color: 'red' },
+  { email: 'pharmacy@glycopharm.kr', password: TEST_PASSWORD, label: '약국' },
+  { email: 'admin@neture.co.kr', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export default function LoginPage() {
@@ -170,9 +171,7 @@ export default function LoginPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-1 ${
-                        account.color === 'primary' ? 'bg-primary-100 text-primary-700' : 'bg-red-100 text-red-700'
-                      }`}>
+                      <span className="inline-block px-2 py-0.5 rounded text-xs font-medium mb-1 bg-slate-100 text-slate-700">
                         {account.label}
                       </span>
                       <p className="text-sm text-slate-600">{account.email}</p>

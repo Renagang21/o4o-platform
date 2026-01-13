@@ -141,20 +141,20 @@ export default function StoreFront({
         </div>
       </div>
 
-      {/* Trust Badges */}
+      {/* Trust Badges - UX Trust Rules v1: 아이콘 gray-500 통일 */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-            <Package className="w-5 h-5 text-primary-600" />
+        <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+            <Package className="w-5 h-5 text-slate-500" />
           </div>
           <div>
             <p className="font-medium text-slate-800 text-sm">정품 보장</p>
             <p className="text-xs text-slate-500">공식 유통 제품</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-            <Truck className="w-5 h-5 text-green-600" />
+        <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+            <Truck className="w-5 h-5 text-slate-500" />
           </div>
           <div>
             <p className="font-medium text-slate-800 text-sm">빠른 배송</p>
@@ -163,9 +163,9 @@ export default function StoreFront({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-blue-600" />
+        <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
+          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-slate-500" />
           </div>
           <div>
             <p className="font-medium text-slate-800 text-sm">약사 상담</p>

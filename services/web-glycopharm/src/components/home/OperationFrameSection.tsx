@@ -19,42 +19,33 @@ import {
 interface FrameCard {
   id: string;
   icon: React.ElementType;
-  iconColor: string;
-  iconBg: string;
   title: string;
   description: string;
 }
 
+// UX Trust Rules v1: 아이콘 색상 gray-500 통일
 const frameCards: FrameCard[] = [
   {
     id: 'data-consulting',
     icon: BarChart3,
-    iconColor: 'text-blue-600',
-    iconBg: 'bg-blue-100',
     title: '데이터 기반 상담',
     description: 'CGM 리포트로 환자 맞춤 상담을 제공합니다',
   },
   {
     id: 'patient-experience',
     icon: HeartPulse,
-    iconColor: 'text-rose-600',
-    iconBg: 'bg-rose-100',
     title: '환자 체감 중심 관리',
     description: '혈당 변화를 눈으로 확인하며 동기를 부여합니다',
   },
   {
     id: 'pharmacist-role',
     icon: Stethoscope,
-    iconColor: 'text-emerald-600',
-    iconBg: 'bg-emerald-100',
     title: '약사 역할 확장',
     description: '처방을 넘어 관리 파트너로 자리매김합니다',
   },
   {
     id: 'trust-revisit',
     icon: RefreshCcw,
-    iconColor: 'text-amber-600',
-    iconBg: 'bg-amber-100',
     title: '신뢰 기반 재방문',
     description: '데이터가 만드는 단골, 지속되는 관계를 형성합니다',
   },
@@ -82,11 +73,9 @@ export default function OperationFrameSection() {
               key={card.id}
               className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-all group"
             >
-              {/* Icon */}
-              <div
-                className={`w-12 h-12 rounded-xl ${card.iconBg} flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}
-              >
-                <Icon className={`w-6 h-6 ${card.iconColor}`} />
+              {/* Icon - UX Trust Rules v1: gray-500 통일 */}
+              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                <Icon className="w-6 h-6 text-slate-500" />
               </div>
 
               {/* Content */}
