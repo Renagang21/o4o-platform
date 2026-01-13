@@ -170,7 +170,7 @@ import {
 
 // ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
-// Import entities directly to avoid NestJS dependency from main package
+// Direct import from dist to avoid NestJS dependency (services use NestJS)
 // ============================================================================
 import { EcommerceOrder } from '@o4o/ecommerce-core/dist/entities/EcommerceOrder.entity.js';
 import { EcommerceOrderItem } from '@o4o/ecommerce-core/dist/entities/EcommerceOrderItem.entity.js';

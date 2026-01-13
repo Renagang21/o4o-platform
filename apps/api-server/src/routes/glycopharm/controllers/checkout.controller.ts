@@ -19,7 +19,7 @@ import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
-// Import entities directly to avoid NestJS dependency from main package
+// Direct import from dist to avoid NestJS dependency (services use NestJS)
 import {
   EcommerceOrder,
   OrderType,
