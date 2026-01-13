@@ -1,5 +1,15 @@
 import { DefaultNamingStrategy, NamingStrategyInterface } from 'typeorm';
-import { snakeCase } from 'typeorm/util/StringUtils';
+
+/**
+ * Convert string to snake_case
+ * Replaces typeorm/util/StringUtils.snakeCase for moduleResolution: bundler compatibility
+ */
+function snakeCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/[\s-]+/g, '_')
+    .toLowerCase();
+}
 
 export class SnakeNamingStrategy extends DefaultNamingStrategy implements NamingStrategyInterface {
   tableName(targetName: string, userSpecifiedName: string | undefined): string {
