@@ -3,12 +3,14 @@
  *
  * Work Order: WO-GP-HOME-RESTRUCTURE-V1
  *
- * 화면 구조 (상→하):
- * 1. Hero / Campaign Slider - 플랫폼 정체성 + 캠페인
- * 2. Quick Action - 운영 도구 상태 요약 (Signage, Supply, Market Trial, CGM Hub)
- * 3. Now Running - 신제품/Trial/이벤트
- * 4. 운영 공지 / 가이드
- * 5. 협력기관 / 파트너 신뢰 Zone
+ * 화면 구조 (상→하) - 개편:
+ * 0. Hero - 플랫폼 정체성 선언 (heroConfig 분리)
+ * 1. Now Running - 지금 진행 중인 것 (Trial/Event/Campaign)
+ * 2. Operation Frame - 혈당관리 약국 운영 프레임 설명 [신규]
+ * 3. Quick Action - 운영 도구 바로가기 (운영 가치 중심 메시지)
+ * 4. Notice - 운영 공지
+ * 5. Partner Trust - 협력 네트워크 / 신뢰 요소
+ * 6. CTA - 비로그인 사용자용
  *
  * 원칙:
  * - 통계/차트 ❌
@@ -17,6 +19,7 @@
  * - 지금 진행 중인 것 ⭕
  * - 참여 가능한 것 ⭕
  * - 운영 주체의 존재감 ⭕
+ * - 왜 이 서비스가 필요한가 ⭕
  */
 
 import { useState, useEffect } from 'react';
@@ -33,21 +36,23 @@ import {
   Calendar,
   Users,
   Building2,
+  ExternalLink,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { heroSlides, heroSettings, type HeroSlide } from '@/config/heroConfig';
+import OperationFrameSection from '@/components/home/OperationFrameSection';
+import {
+  publicApi,
+  fallbackNowRunning,
+  fallbackNotices,
+  type NowRunningItem as ApiNowRunningItem,
+  type Notice as ApiNotice,
+} from '@/api/public';
 
 // ========================================
 // Types
 // ========================================
-
-interface HeroSlide {
-  id: string;
-  title: string;
-  subtitle: string;
-  bgGradient: string;
-  cta?: { label: string; link: string; variant: 'primary' | 'secondary' };
-}
 
 interface QuickActionCard {
   id: string;
@@ -60,23 +65,8 @@ interface QuickActionCard {
   status: { label: string; value: string | number };
 }
 
-interface NowRunningItem {
-  id: string;
-  type: 'trial' | 'event' | 'campaign';
-  title: string;
-  supplier?: string;
-  deadline?: string;
-  participants?: number;
-  link: string;
-}
-
-interface Notice {
-  id: string;
-  title: string;
-  date: string;
-  isPinned: boolean;
-  link: string;
-}
+// NowRunningItem, Notice 타입은 @/api/public에서 import
+// ApiNowRunningItem, ApiNotice로 사용
 
 interface Partner {
   id: string;
@@ -87,44 +77,15 @@ interface Partner {
 
 // ========================================
 // Static Data (운영자 관리 콘텐츠로 대체 예정)
+// heroSlides는 config/heroConfig.ts에서 import
 // ========================================
-
-const heroSlides: HeroSlide[] = [
-  {
-    id: 'main',
-    title: '혈당관리 약국을 위한\n운영 플랫폼',
-    subtitle: '제품·콘텐츠·실험·판매가 연결됩니다',
-    bgGradient: 'from-primary-600 via-primary-700 to-primary-800',
-    cta: { label: '시작하기', link: '/pharmacy', variant: 'primary' },
-  },
-  {
-    id: 'trial',
-    title: '신제품 Market Trial\n참여 약국 모집 중',
-    subtitle: '공급사의 신제품을 먼저 체험하고 피드백을 공유하세요',
-    bgGradient: 'from-green-600 via-green-700 to-emerald-800',
-    cta: { label: '자세히 보기', link: '/pharmacy/market-trial', variant: 'primary' },
-  },
-  {
-    id: 'cgm',
-    title: '지금 8개 약국\n· CGM 데이터 연결 중',
-    subtitle: 'CGM Hub를 통해 실시간 연결됩니다',
-    bgGradient: 'from-blue-600 via-blue-700 to-indigo-800',
-    cta: { label: 'CGM Hub 보기', link: 'https://glucoseview.co.kr', variant: 'primary' },
-  },
-  {
-    id: 'trust',
-    title: '다수 약국·다수 기업이 함께하는\n세미 프랜차이즈 플랫폼',
-    subtitle: '한국당뇨협회, 협력 공급사와 함께 성장합니다',
-    bgGradient: 'from-slate-700 via-slate-800 to-slate-900',
-  },
-];
 
 const quickActionCards: QuickActionCard[] = [
   {
     id: 'signage',
     title: 'Signage',
-    subtitle: '콘텐츠 라이브러리',
-    description: '약국 TV에 노출할 교육 콘텐츠를 관리하세요',
+    subtitle: '매장 콘텐츠',
+    description: '매장에서 바로 쓰는 콘텐츠로 신뢰를 형성합니다',
     icon: Monitor,
     link: '/pharmacy/signage/my',
     color: 'bg-accent-500',
@@ -134,7 +95,7 @@ const quickActionCards: QuickActionCard[] = [
     id: 'supply',
     title: 'Supply',
     subtitle: 'B2B 공급',
-    description: '검증된 공급자의 제품을 조달합니다',
+    description: '검증된 공급망으로 안정적인 운영을 지원합니다',
     icon: Building2,
     link: '/b2b/supply',
     color: 'bg-blue-600',
@@ -144,7 +105,7 @@ const quickActionCards: QuickActionCard[] = [
     id: 'trial',
     title: 'Market Trial',
     subtitle: '신제품 체험',
-    description: '공급사의 신제품 Trial에 참여하세요',
+    description: '새로운 수익 기회와 환자 가치를 동시에 얻으세요',
     icon: Tag,
     link: '/pharmacy/market-trial',
     color: 'bg-green-500',
@@ -153,8 +114,8 @@ const quickActionCards: QuickActionCard[] = [
   {
     id: 'cgm-hub',
     title: 'CGM Hub',
-    subtitle: 'CGM 데이터 허브',
-    description: '약국·환자·CGM 데이터를 연결합니다',
+    subtitle: '데이터 연결',
+    description: '데이터가 만드는 전문 약국의 차이를 경험하세요',
     icon: Activity,
     link: 'https://glucoseview.co.kr',
     color: 'bg-indigo-500',
@@ -162,63 +123,8 @@ const quickActionCards: QuickActionCard[] = [
   },
 ];
 
-const nowRunningItems: NowRunningItem[] = [
-  {
-    id: '1',
-    type: 'trial',
-    title: '당뇨병 환자용 신규 영양제 Trial',
-    supplier: '글루코헬스',
-    deadline: '2026.01.31',
-    participants: 23,
-    link: '/pharmacy/market-trial',
-  },
-  {
-    id: '2',
-    type: 'event',
-    title: '혈당관리 앱 연동 이벤트',
-    supplier: 'GlucoseView',
-    deadline: '2026.02.15',
-    link: '/pharmacy/market-trial',
-  },
-  {
-    id: '3',
-    type: 'campaign',
-    title: '당뇨인의 날 캠페인',
-    deadline: '2026.03.14',
-    link: '/forum-ext',
-  },
-];
-
-const notices: Notice[] = [
-  {
-    id: '1',
-    title: '[공지] GlycoPharm 서비스 업데이트 안내 (v2.0)',
-    date: '2026.01.06',
-    isPinned: true,
-    link: '/forum-ext',
-  },
-  {
-    id: '2',
-    title: '[안내] Market Trial 참여 가이드',
-    date: '2026.01.05',
-    isPinned: true,
-    link: '/forum-ext',
-  },
-  {
-    id: '3',
-    title: '1월 Signage 콘텐츠 업데이트',
-    date: '2026.01.03',
-    isPinned: false,
-    link: '/forum-ext',
-  },
-  {
-    id: '4',
-    title: '협력 공급사 추가 안내',
-    date: '2026.01.02',
-    isPinned: false,
-    link: '/forum-ext',
-  },
-];
+// nowRunningItems와 notices는 API에서 로딩
+// fallback 데이터는 @/api/public에서 import
 
 const partners: Partner[] = [
   { id: '1', name: '한국당뇨협회', type: 'association' },
@@ -235,16 +141,60 @@ const partners: Partner[] = [
 function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Auto slide
+  // Auto slide (using heroSettings)
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 6000);
+    }, heroSettings.autoPlayInterval);
     return () => clearInterval(timer);
   }, []);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+
+  // CTA 버튼 렌더링 (내부/외부 링크 처리)
+  const renderCta = (slide: HeroSlide) => {
+    if (!slide.cta) return null;
+
+    const buttonClass = `inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+      slide.cta.variant === 'primary'
+        ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
+        : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
+    }`;
+
+    // 외부 링크 처리
+    if (slide.cta.external) {
+      return (
+        <a
+          href={slide.cta.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClass}
+        >
+          {slide.cta.label}
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      );
+    }
+
+    // 앵커 링크 처리 (#으로 시작)
+    if (slide.cta.link.startsWith('#')) {
+      return (
+        <a href={slide.cta.link} className={buttonClass}>
+          {slide.cta.label}
+          <ArrowRight className="w-4 h-4" />
+        </a>
+      );
+    }
+
+    // 내부 라우터 링크
+    return (
+      <NavLink to={slide.cta.link} className={buttonClass}>
+        {slide.cta.label}
+        <ArrowRight className="w-4 h-4" />
+      </NavLink>
+    );
+  };
 
   return (
     <section className="relative overflow-hidden">
@@ -265,19 +215,7 @@ function HeroSection() {
                   <p className="text-lg md:text-xl text-white/80 mb-8">
                     {slide.subtitle}
                   </p>
-                  {slide.cta && (
-                    <NavLink
-                      to={slide.cta.link}
-                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
-                        slide.cta.variant === 'primary'
-                          ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
-                          : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
-                      }`}
-                    >
-                      {slide.cta.label}
-                      <ArrowRight className="w-4 h-4" />
-                    </NavLink>
-                  )}
+                  {renderCta(slide)}
                 </div>
               </div>
             </div>
@@ -372,8 +310,13 @@ function QuickActionSection() {
   );
 }
 
-function NowRunningSection() {
-  const getTypeConfig = (type: NowRunningItem['type']) => {
+interface NowRunningSectionProps {
+  items: ApiNowRunningItem[];
+  loading?: boolean;
+}
+
+function NowRunningSection({ items, loading }: NowRunningSectionProps) {
+  const getTypeConfig = (type: ApiNowRunningItem['type']) => {
     switch (type) {
       case 'trial':
         return { label: 'Trial', color: 'bg-green-100 text-green-700', icon: Tag };
@@ -400,48 +343,65 @@ function NowRunningSection() {
         </NavLink>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        {nowRunningItems.map((item) => {
-          const config = getTypeConfig(item.type);
-          const Icon = config.icon;
-          return (
-            <NavLink
-              key={item.id}
-              to={item.link}
-              className="group bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-slate-100"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-                  <Icon className="w-3 h-3" />
-                  {config.label}
-                </span>
-                {item.deadline && (
-                  <span className="text-xs text-slate-400">~{item.deadline}</span>
-                )}
-              </div>
-              <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors">
-                {item.title}
-              </h3>
-              <div className="flex items-center justify-between text-sm">
-                {item.supplier && (
-                  <span className="text-slate-500">{item.supplier}</span>
-                )}
-                {item.participants && (
-                  <span className="flex items-center gap-1 text-slate-400">
-                    <Users className="w-3 h-3" />
-                    {item.participants}명 참여
+      {loading ? (
+        <div className="grid md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 animate-pulse">
+              <div className="h-6 bg-slate-200 rounded w-20 mb-3" />
+              <div className="h-5 bg-slate-200 rounded w-full mb-2" />
+              <div className="h-4 bg-slate-200 rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-4">
+          {items.map((item) => {
+            const config = getTypeConfig(item.type);
+            const Icon = config.icon;
+            return (
+              <NavLink
+                key={item.id}
+                to={item.link}
+                className="group bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-slate-100"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                    <Icon className="w-3 h-3" />
+                    {config.label}
                   </span>
-                )}
-              </div>
-            </NavLink>
-          );
-        })}
-      </div>
+                  {item.deadline && (
+                    <span className="text-xs text-slate-400">~{item.deadline}</span>
+                  )}
+                </div>
+                <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors">
+                  {item.title}
+                </h3>
+                <div className="flex items-center justify-between text-sm">
+                  {item.supplier && (
+                    <span className="text-slate-500">{item.supplier}</span>
+                  )}
+                  {item.participants && (
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Users className="w-3 h-3" />
+                      {item.participants}명 참여
+                    </span>
+                  )}
+                </div>
+              </NavLink>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
 
-function NoticeSection() {
+interface NoticeSectionProps {
+  items: ApiNotice[];
+  loading?: boolean;
+}
+
+function NoticeSection({ items, loading }: NoticeSectionProps) {
   return (
     <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
@@ -455,25 +415,35 @@ function NoticeSection() {
             <ChevronRight className="w-4 h-4" />
           </NavLink>
         </div>
-        <div className="divide-y divide-slate-100">
-          {notices.map((notice) => (
-            <NavLink
-              key={notice.id}
-              to={notice.link}
-              className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                {notice.isPinned && (
-                  <Pin className="w-4 h-4 text-primary-500 flex-shrink-0" />
-                )}
-                <span className={`text-sm ${notice.isPinned ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
-                  {notice.title}
-                </span>
+        {loading ? (
+          <div className="divide-y divide-slate-100">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="px-5 py-4 animate-pulse">
+                <div className="h-4 bg-slate-200 rounded w-3/4" />
               </div>
-              <span className="text-xs text-slate-400 flex-shrink-0 ml-4">{notice.date}</span>
-            </NavLink>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {items.map((notice) => (
+              <NavLink
+                key={notice.id}
+                to={notice.link}
+                className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {notice.isPinned && (
+                    <Pin className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                  )}
+                  <span className={`text-sm ${notice.isPinned ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
+                    {notice.title}
+                  </span>
+                </div>
+                <span className="text-xs text-slate-400 flex-shrink-0 ml-4">{notice.date}</span>
+              </NavLink>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -481,12 +451,20 @@ function NoticeSection() {
 
 function PartnerTrustSection() {
   return (
-    <section className="py-12">
+    <section id="partners" className="py-12 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <p className="text-center text-sm text-slate-500 mb-6">
-          신뢰할 수 있는 기관·기업과 함께합니다
-        </p>
-        <div className="overflow-hidden">
+        {/* Section Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-lg font-bold text-slate-800 mb-2">
+            협력 네트워크
+          </h2>
+          <p className="text-sm text-slate-500">
+            신뢰할 수 있는 기관·기업과 함께합니다
+          </p>
+        </div>
+
+        {/* Partner Marquee */}
+        <div className="overflow-hidden mb-8">
           <div className="flex gap-3 animate-marquee">
             {partners.map((partner) => (
               <div
@@ -513,6 +491,16 @@ function PartnerTrustSection() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Trust Message */}
+        <div className="text-center space-y-2">
+          <p className="text-xs text-slate-500">
+            전북 당뇨 약국 시범사업 기반 · 혈당관리 전문 약국 네트워크
+          </p>
+          <p className="text-xs text-slate-400">
+            프랜차이즈가 아닌 <span className="font-medium text-slate-600">자율 참여 플랫폼</span>입니다
+          </p>
         </div>
       </div>
     </section>
@@ -557,26 +545,56 @@ function CTASection() {
 // ========================================
 
 export default function HomePage() {
+  const [nowRunning, setNowRunning] = useState<ApiNowRunningItem[]>(fallbackNowRunning);
+  const [notices, setNotices] = useState<ApiNotice[]>(fallbackNotices);
+  const [loading, setLoading] = useState(true);
+
+  // API 데이터 로딩
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        const [nowRunningData, noticesData] = await Promise.all([
+          publicApi.getNowRunning(),
+          publicApi.getNotices(),
+        ]);
+        setNowRunning(nowRunningData);
+        setNotices(noticesData);
+      } catch (error) {
+        console.warn('Failed to load home data, using fallback:', error);
+        // fallback 데이터는 이미 기본값으로 설정됨
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* 1. Hero / Campaign Slider */}
+      {/* Block 0: Hero - 플랫폼 정체성 선언 */}
       <HeroSection />
 
-      {/* 2. Quick Action - 운영 도구 요약 */}
+      {/* Block 1: Now Running - 지금 진행 중인 것 */}
+      <NowRunningSection items={nowRunning} loading={loading} />
+
+      {/* Block 2: Operation Frame - 혈당관리 약국 운영 프레임 [신규] */}
+      <div id="operation-frame">
+        <OperationFrameSection />
+      </div>
+
+      {/* Block 3: Quick Action - 운영 도구 바로가기 */}
       <QuickActionSection />
 
-      {/* 3. Now Running - 신제품/Trial/이벤트 */}
-      <NowRunningSection />
+      {/* Block 4: Notice - 운영 공지 */}
+      <NoticeSection items={notices} loading={loading} />
 
-
-      {/* 4. 운영 공지 / 가이드 */}
-      <NoticeSection />
-
-      {/* CTA for Non-authenticated Users */}
-      <CTASection />
-
-      {/* 5. 협력기관 / 파트너 신뢰 Zone */}
+      {/* Block 5: Partner Trust - 협력 네트워크 */}
       <PartnerTrustSection />
+
+      {/* Block 6: CTA - 비로그인 사용자용 */}
+      <CTASection />
     </div>
   );
 }

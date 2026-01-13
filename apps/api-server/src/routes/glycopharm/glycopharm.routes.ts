@@ -16,6 +16,7 @@ import { createOrderController } from './controllers/order.controller.js';
 import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
+import { createPublicController } from './controllers/public.controller.js';
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 
@@ -201,6 +202,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/operator', operatorController);
+
+  // ============================================================================
+  // Public Routes (인증 불필요, 공개 페이지용)
+  // WO-GP-HOME-RESTRUCTURE-V1 (Phase 6)
+  // ============================================================================
+  const publicController = createPublicController(dataSource);
+  router.use('/public', publicController);
 
   return router;
 }
