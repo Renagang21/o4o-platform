@@ -169,6 +169,15 @@ import {
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
+// E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
+// ============================================================================
+import {
+  EcommerceOrder,
+  EcommerceOrderItem,
+  EcommercePayment,
+} from '@o4o/ecommerce-core';
+
+// ============================================================================
 // ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
 // ============================================================================
 // Original: import { Organization, OrganizationMember } from '@o4o/organization-core';
@@ -412,6 +421,12 @@ export const AppDataSource = new DataSource({
     KpaOrganization,
     KpaMember,
     KpaApplication,
+    // ============================================================================
+    // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
+    // ============================================================================
+    EcommerceOrder,
+    EcommerceOrderItem,
+    EcommercePayment,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
     // ============================================================================
