@@ -94,12 +94,18 @@ export const netureApi = {
    * GET /api/v1/neture/suppliers
    */
   async getSuppliers(): Promise<Supplier[]> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/suppliers`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch suppliers');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/suppliers`);
+      if (!response.ok) {
+        console.warn('[Neture API] Suppliers API not available, returning empty array');
+        return [];
+      }
+      const data = await response.json();
+      return data.suppliers || [];
+    } catch (error) {
+      console.warn('[Neture API] Failed to fetch suppliers:', error);
+      return [];
     }
-    const data = await response.json();
-    return data.suppliers;
   },
 
   /**
@@ -117,16 +123,22 @@ export const netureApi = {
    * GET /api/v1/neture/partnership/requests
    */
   async getPartnershipRequests(status?: 'OPEN' | 'MATCHED' | 'CLOSED'): Promise<PartnershipRequest[]> {
-    const url = status
-      ? `${API_BASE_URL}/api/v1/neture/partnership/requests?status=${status}`
-      : `${API_BASE_URL}/api/v1/neture/partnership/requests`;
+    try {
+      const url = status
+        ? `${API_BASE_URL}/api/v1/neture/partnership/requests?status=${status}`
+        : `${API_BASE_URL}/api/v1/neture/partnership/requests`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch partnership requests');
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.warn('[Neture API] Partnership requests API not available, returning empty array');
+        return [];
+      }
+      const data = await response.json();
+      return data.requests || [];
+    } catch (error) {
+      console.warn('[Neture API] Failed to fetch partnership requests:', error);
+      return [];
     }
-    const data = await response.json();
-    return data.requests;
   },
 
   /**
