@@ -2,7 +2,7 @@
  * Card - 기본 카드 컴포넌트
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 
 interface CardProps {

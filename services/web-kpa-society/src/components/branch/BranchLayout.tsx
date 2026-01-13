@@ -3,7 +3,7 @@
  * 지부 사이트의 서브디렉토리(/branch/:branchId)로 운영
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { BranchHeader } from './BranchHeader';
 import { BranchFooter } from './BranchFooter';
 

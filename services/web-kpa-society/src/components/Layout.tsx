@@ -3,7 +3,7 @@
  * Header (nav 포함) + Content + Footer
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 

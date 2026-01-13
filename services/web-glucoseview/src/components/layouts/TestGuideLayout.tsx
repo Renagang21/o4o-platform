@@ -3,7 +3,7 @@
  * WO-TEST-GUIDE-UI-LAYOUT-V1 기준
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface TestGuideLayoutProps {
