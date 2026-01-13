@@ -12,7 +12,7 @@ import { createDisplayController } from './controllers/display.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
-import { createOrderController } from './controllers/order.controller.js';
+// import { createOrderController } from './controllers/order.controller.js'; // REMOVED (Phase 4-A)
 import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
@@ -101,12 +101,10 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/', adminController);
 
-  // Order routes (H8-2)
-  const orderController = createOrderController(
-    dataSource,
-    coreRequireAuth as any
-  );
-  router.use('/orders', orderController);
+  // Order routes - REMOVED (Phase 4-A: Legacy Order System Deprecation)
+  // GlycoPharm orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
+  // const orderController = createOrderController(dataSource, coreRequireAuth as any);
+  // router.use('/orders', orderController);
 
   // ============================================================================
   // Forum Routes - /api/v1/glycopharm/forum/*

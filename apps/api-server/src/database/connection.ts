@@ -131,8 +131,7 @@ import {
   GlycopharmProduct,
   GlycopharmProductLog,
   GlycopharmApplication,
-  GlycopharmOrder,
-  GlycopharmOrderItem,
+  // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -381,14 +380,13 @@ export const AppDataSource = new DataSource({
     YaksaPost,
     YaksaPostLog,
     // ============================================================================
-    // GLYCOPHARM ENTITIES (Phase B-1, H8-2: Glycopharm API + Orders)
+    // GLYCOPHARM ENTITIES (Phase B-1)
+    // Note: GlycopharmOrder, GlycopharmOrderItem REMOVED (Phase 4-A Legacy Deprecation)
     // ============================================================================
     GlycopharmPharmacy,
     GlycopharmProduct,
     GlycopharmProductLog,
     GlycopharmApplication,
-    GlycopharmOrder,
-    GlycopharmOrderItem,
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================

@@ -11,7 +11,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
-import { GlycopharmOrder } from '../entities/glycopharm-order.entity.js';
+// GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import type { AuthRequest } from '../../../types/auth.js';
@@ -118,7 +118,7 @@ export function createOperatorController(
         // Get repositories
         const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
-        const orderRepo = dataSource.getRepository(GlycopharmOrder);
+        // orderRepo - REMOVED (Phase 4-A: Legacy Order System Deprecation)
         const productRepo = dataSource.getRepository(GlycopharmProduct);
 
         // === Service Status ===
@@ -211,17 +211,11 @@ export function createOperatorController(
         ]);
 
         // === Order Stats ===
-        const [totalOrders, paidOrders] = await Promise.all([
-          orderRepo.count(),
-          orderRepo.count({ where: { status: 'PAID' } }),
-        ]);
-
-        // Get total revenue from paid orders
-        const revenueResult = await orderRepo
-          .createQueryBuilder('order')
-          .select('COALESCE(SUM(order.total_amount), 0)', 'totalRevenue')
-          .where('order.status = :status', { status: 'PAID' })
-          .getRawOne();
+        // Phase 4-A: Legacy Order System removed
+        // Order stats will be available via E-commerce Core after integration
+        const totalOrders = 0;
+        const paidOrders = 0;
+        const totalRevenue = 0;
 
         const response: OperatorDashboardResponse = {
           serviceStatus,
@@ -238,7 +232,7 @@ export function createOperatorController(
           orderStats: {
             totalOrders,
             paidOrders,
-            totalRevenue: Number(revenueResult?.totalRevenue || 0),
+            totalRevenue,
           },
         };
 
@@ -255,6 +249,9 @@ export function createOperatorController(
   /**
    * GET /operator/recent-orders
    * Get recent orders for operator dashboard
+   *
+   * NOTE: Phase 4-A - Legacy Order System Deprecated
+   * Returns empty array until E-commerce Core integration is complete.
    */
   router.get(
     '/recent-orders',
@@ -271,26 +268,12 @@ export function createOperatorController(
           return;
         }
 
-        const limit = parseInt(req.query.limit as string) || 10;
-        const orderRepo = dataSource.getRepository(GlycopharmOrder);
-
-        const recentOrders = await orderRepo.find({
-          order: { created_at: 'DESC' },
-          take: limit,
-          relations: ['pharmacy'],
-        });
-
+        // Phase 4-A: Legacy Order System removed
+        // Return empty array until E-commerce Core integration
         res.json({
           success: true,
-          data: recentOrders.map((order) => ({
-            id: order.id,
-            pharmacyId: order.pharmacy_id,
-            pharmacyName: order.pharmacy?.name || 'Unknown',
-            status: order.status,
-            totalAmount: order.total_amount,
-            customerName: order.customer_name,
-            createdAt: order.created_at,
-          })),
+          data: [],
+          _notice: 'Order system migration in progress. Orders will be available via E-commerce Core.',
         });
       } catch (error: any) {
         console.error('Failed to get recent orders:', error);

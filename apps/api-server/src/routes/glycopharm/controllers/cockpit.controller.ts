@@ -9,7 +9,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
-import { GlycopharmOrder } from '../entities/glycopharm-order.entity.js';
+// GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -204,36 +204,11 @@ export function createCockpitController(
           return;
         }
 
-        // Get today's date range
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        // Count orders
-        const orderRepo = dataSource.getRepository(GlycopharmOrder);
-
-        // Today's orders
-        const todayOrders = await orderRepo
-          .createQueryBuilder('order')
-          .where('order.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.createdAt >= :today', { today })
-          .andWhere('order.createdAt < :tomorrow', { tomorrow })
-          .getCount();
-
-        // Pending orders (not yet confirmed)
-        const pendingOrders = await orderRepo
-          .createQueryBuilder('order')
-          .where('order.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.status IN (:...statuses)', { statuses: ['pending', 'received'] })
-          .getCount();
-
-        // Orders pending receive (new orders that need acknowledgment)
-        const pendingReceiveOrders = await orderRepo
-          .createQueryBuilder('order')
-          .where('order.pharmacyId = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.status = :status', { status: 'pending' })
-          .getCount();
+        // Phase 4-A: Legacy Order System removed
+        // Order counts will be available via E-commerce Core after integration
+        const todayOrders = 0;
+        const pendingOrders = 0;
+        const pendingReceiveOrders = 0;
 
         // Check for application alerts
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);

@@ -15,7 +15,8 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GlycopharmOrder } from '../entities/glycopharm-order.entity.js';
+// GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
+// Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -179,122 +180,31 @@ export function createPharmacyController(
   /**
    * GET /pharmacy/orders
    * Get orders for the authenticated user's pharmacy
+   *
+   * NOTE: Phase 4-A - Legacy Order System Deprecated
+   * This endpoint returns empty data until E-commerce Core integration is complete.
+   * Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
    */
   router.get(
     '/orders',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-
-        if (!userId) {
-          res.status(401).json({
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
-
-        // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
-        const pharmacy = await pharmacyRepo.findOne({
-          where: { created_by_user_id: userId },
-        });
-
-        if (!pharmacy) {
-          res.json({
-            success: true,
-            data: {
-              items: [],
-              total: 0,
-              page: 1,
-              pageSize: 20,
-              totalPages: 0,
-            },
-          });
-          return;
-        }
-
-        // Get query params
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 20;
-        const status = req.query.status as string;
-        const search = req.query.search as string;
 
-        // Build query
-        const orderRepo = dataSource.getRepository(GlycopharmOrder);
-        const queryBuilder = orderRepo
-          .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
-          .where('order.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id });
-
-        // Apply filters
-        if (status) {
-          queryBuilder.andWhere('order.status = :status', { status: status.toUpperCase() });
-        }
-
-        if (search) {
-          queryBuilder.andWhere(
-            '(order.id ILIKE :search OR order.customer_name ILIKE :search)',
-            { search: `%${search}%` }
-          );
-        }
-
-        // Get total count
-        const total = await queryBuilder.getCount();
-
-        // Apply pagination
-        const orders = await queryBuilder
-          .orderBy('order.created_at', 'DESC')
-          .skip((page - 1) * pageSize)
-          .take(pageSize)
-          .getMany();
-
-        // Map to response format
-        const items = orders.map((o) => ({
-          id: o.id,
-          orderNumber: o.id.substring(0, 8).toUpperCase(), // Generate order number from id
-          customerId: o.user_id || '',
-          customerName: o.customer_name || '',
-          customerPhone: o.customer_phone || '',
-          items: o.items?.map((i) => ({
-            id: i.id,
-            productId: i.product_id,
-            productName: i.product_name,
-            productImage: undefined,
-            quantity: i.quantity,
-            unitPrice: Number(i.unit_price),
-            totalPrice: Number(i.subtotal),
-          })) || [],
-          subtotal: Number(o.total_amount),
-          shippingFee: 0,
-          totalAmount: Number(o.total_amount),
-          status: o.status.toLowerCase(),
-          shippingAddress: o.shipping_address ? {
-            recipient: o.customer_name || '',
-            phone: o.customer_phone || '',
-            zipCode: '',
-            address1: o.shipping_address,
-          } : {
-            recipient: o.customer_name || '',
-            phone: o.customer_phone || '',
-            zipCode: '',
-            address1: '',
-          },
-          trackingNumber: undefined,
-          createdAt: o.created_at.toISOString(),
-          updatedAt: o.updated_at.toISOString(),
-        }));
-
+        // Phase 4-A: Legacy Order System removed
+        // Return empty data until E-commerce Core integration
         res.json({
           success: true,
           data: {
-            items,
-            total,
+            items: [],
+            total: 0,
             page,
             pageSize,
-            totalPages: Math.ceil(total / pageSize),
+            totalPages: 0,
           },
+          _notice: 'Order system migration in progress. Orders will be available via E-commerce Core.',
         });
       } catch (error: any) {
         console.error('Failed to get pharmacy orders:', error);
@@ -308,98 +218,30 @@ export function createPharmacyController(
   /**
    * GET /pharmacy/customers
    * Get customers for the authenticated user's pharmacy
+   *
+   * NOTE: Phase 4-A - Legacy Order System Deprecated
+   * Customer data was derived from orders. Returns empty until E-commerce Core integration.
    */
   router.get(
     '/customers',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-
-        if (!userId) {
-          res.status(401).json({
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
-
-        // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
-        const pharmacy = await pharmacyRepo.findOne({
-          where: { created_by_user_id: userId },
-        });
-
-        if (!pharmacy) {
-          res.json({
-            success: true,
-            data: {
-              items: [],
-              total: 0,
-              page: 1,
-              pageSize: 50,
-              totalPages: 0,
-            },
-          });
-          return;
-        }
-
-        // Get query params
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 50;
 
-        // Get unique customers from orders
-        const orderRepo = dataSource.getRepository(GlycopharmOrder);
-        const customersData = await orderRepo
-          .createQueryBuilder('order')
-          .select('order.user_id', 'userId')
-          .addSelect('order.customer_name', 'name')
-          .addSelect('order.customer_phone', 'phone')
-          .addSelect('COUNT(order.id)', 'totalOrders')
-          .addSelect('SUM(order.total_amount)', 'totalSpent')
-          .addSelect('MAX(order.created_at)', 'lastOrderAt')
-          .where('order.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.user_id IS NOT NULL')
-          .groupBy('order.user_id')
-          .addGroupBy('order.customer_name')
-          .addGroupBy('order.customer_phone')
-          .orderBy('MAX(order.created_at)', 'DESC')
-          .offset((page - 1) * pageSize)
-          .limit(pageSize)
-          .getRawMany();
-
-        // Get total count
-        const totalResult = await orderRepo
-          .createQueryBuilder('order')
-          .select('COUNT(DISTINCT order.user_id)', 'count')
-          .where('order.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id })
-          .andWhere('order.user_id IS NOT NULL')
-          .getRawOne();
-
-        const total = parseInt(totalResult?.count || '0');
-
-        const items = customersData.map((c) => ({
-          id: c.userId || c.name,
-          name: c.name || '알 수 없음',
-          phone: c.phone || '',
-          email: undefined,
-          diabetesType: undefined,
-          lastOrderAt: c.lastOrderAt,
-          totalOrders: parseInt(c.totalOrders || '0'),
-          totalSpent: parseFloat(c.totalSpent || '0'),
-          status: 'active' as const,
-          createdAt: c.lastOrderAt,
-        }));
-
+        // Phase 4-A: Legacy Order System removed
+        // Customer data was derived from orders - return empty until E-commerce Core integration
         res.json({
           success: true,
           data: {
-            items,
-            total,
+            items: [],
+            total: 0,
             page,
             pageSize,
-            totalPages: Math.ceil(total / pageSize),
+            totalPages: 0,
           },
+          _notice: 'Customer data migration in progress. Data will be available via E-commerce Core.',
         });
       } catch (error: any) {
         console.error('Failed to get pharmacy customers:', error);

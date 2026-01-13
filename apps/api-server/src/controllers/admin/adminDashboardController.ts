@@ -9,7 +9,7 @@
  * Entities used:
  * - User (users table) - user growth
  * - NetureOrder (neture.neture_orders) - order/sales data
- * - GlycopharmOrder (glycopharm_orders) - order/sales data
+ * - GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
  * - NeturePartner (neture.neture_partners) - partner data
  * - CosmeticsProduct - cosmetics metrics
  */
@@ -19,7 +19,7 @@ import { AppDataSource, checkDatabaseHealth } from '../../database/connection.js
 import { User } from '../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { NetureOrder } from '../../routes/neture/entities/neture-order.entity.js';
-import { GlycopharmOrder } from '../../routes/glycopharm/entities/glycopharm-order.entity.js';
+// GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import { NeturePartner } from '../../routes/neture/entities/neture-partner.entity.js';
 import { CosmeticsProduct, CosmeticsBrand, CosmeticsProductStatus } from '../../routes/cosmetics/entities/index.js';
 
@@ -70,15 +70,8 @@ export class AdminDashboardController {
         .andWhere('order.createdAt >= :startDate', { startDate })
         .getRawOne();
 
-      // Query Glycopharm orders (only PAID status)
-      const glycopharmRepo = AppDataSource.getRepository(GlycopharmOrder);
-      const glycopharmResult = await glycopharmRepo
-        .createQueryBuilder('order')
-        .select('COALESCE(SUM(order.total_amount), 0)', 'totalAmount')
-        .addSelect('COUNT(order.id)', 'orderCount')
-        .where('order.status = :status', { status: 'PAID' })
-        .andWhere('order.created_at >= :startDate', { startDate })
-        .getRawOne();
+      // Phase 4-A: GlycopharmOrder removed - returns 0 until E-commerce Core integration
+      const glycopharmResult = { totalAmount: 0, orderCount: 0 };
 
       // Combine results
       const totalRevenue = Number(netureResult?.totalAmount || 0) + Number(glycopharmResult?.totalAmount || 0);
@@ -138,14 +131,8 @@ export class AdminDashboardController {
         .groupBy('order.status')
         .getRawMany();
 
-      // Query Glycopharm order status distribution
-      const glycopharmRepo = AppDataSource.getRepository(GlycopharmOrder);
-      const glycopharmStatusCounts = await glycopharmRepo
-        .createQueryBuilder('order')
-        .select('order.status', 'status')
-        .addSelect('COUNT(order.id)', 'count')
-        .groupBy('order.status')
-        .getRawMany();
+      // Phase 4-A: GlycopharmOrder removed - returns empty array until E-commerce Core integration
+      const glycopharmStatusCounts: any[] = [];
 
       // Map status to display names
       const statusMap: Record<string, { label: string; color: string }> = {
