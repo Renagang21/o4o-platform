@@ -8,13 +8,13 @@ const router: ExpressRouter = Router();
 const netureService = new NetureService();
 
 // Extended Request type with user info
-interface AuthenticatedRequest extends Request {
+type AuthenticatedRequest = Request & {
   user?: {
     id: string;
     role: string;
     supplierId?: string;
   };
-}
+};
 
 /**
  * GET /api/v1/neture/suppliers

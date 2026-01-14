@@ -775,10 +775,18 @@ export class NetureService {
         },
       };
 
+      // 기본 설정 (타입 안전성을 위해)
+      const defaultConfig = {
+        url: '',
+        ordersPath: '',
+        supportEmail: '',
+        features: [] as string[],
+      };
+
       // 각 서비스에 대해 최근 이벤트 조회
       const serviceDetails = await Promise.all(
         approvedByService.map(async (svc) => {
-          const config = serviceConfig[svc.serviceId] || {};
+          const config = serviceConfig[svc.serviceId] || defaultConfig;
 
           // 최근 승인/거절 이벤트 (최신 5건)
           const recentEvents = await this.requestEventRepo
