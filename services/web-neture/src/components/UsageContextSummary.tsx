@@ -66,10 +66,11 @@ const MOCK_USAGE_CONTEXTS: UsageContext[] = [
 ];
 
 export function UsageContextSummary({
-  productId,
+  productId: _productId,
   productName,
   usageContexts,
 }: Props) {
+  void _productId; // Reserved for future use
   // 실제 데이터가 없으면 Mock 사용 (데모용)
   const contexts = usageContexts || MOCK_USAGE_CONTEXTS;
 

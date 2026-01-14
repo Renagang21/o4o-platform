@@ -494,7 +494,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20983191819 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list --limit=4 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20986480721 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20986480721 --log-failed -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20986480721 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20986662720 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }
