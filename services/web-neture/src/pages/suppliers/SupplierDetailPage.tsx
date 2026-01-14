@@ -21,6 +21,7 @@ import { netureApi, type SupplierDetail } from '../../lib/api';
 import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
 import { ProductPurposeBadge } from '../../components/ProductPurposeBadge';
 import { ActiveUsageList } from '../../components/ActiveUsageList';
+import { UsageContextSummary } from '../../components/UsageContextSummary';
 
 export default function SupplierDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -146,6 +147,22 @@ export default function SupplierDetailPage() {
             .map((product) => (
               <div key={product.id} className="mb-4">
                 <ActiveUsageList
+                  productId={product.id}
+                  productName={product.name}
+                />
+              </div>
+            ))}
+        </div>
+      )}
+
+      {/* 사용 맥락 요약 (WO-NETURE-EXTENSION-P5) - ACTIVE_SALES 제품만 */}
+      {supplier.products.some((p) => p.purpose === 'ACTIVE_SALES') && (
+        <div className="mb-8">
+          {supplier.products
+            .filter((p) => p.purpose === 'ACTIVE_SALES')
+            .map((product) => (
+              <div key={product.id} className="mb-4">
+                <UsageContextSummary
                   productId={product.id}
                   productName={product.name}
                 />
