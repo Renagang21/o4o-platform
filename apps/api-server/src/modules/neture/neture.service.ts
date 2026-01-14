@@ -19,22 +19,62 @@ import {
 import logger from '../../utils/logger.js';
 
 export class NetureService {
-  private supplierRepo: Repository<NetureSupplier>;
-  private productRepo: Repository<NetureSupplierProduct>;
-  private partnershipRepo: Repository<NeturePartnershipRequest>;
-  private partnershipProductRepo: Repository<NeturePartnershipProduct>;
-  private supplierRequestRepo: Repository<NetureSupplierRequest>;
-  private contentRepo: Repository<NetureSupplierContent>;
-  private requestEventRepo: Repository<NetureSupplierRequestEvent>;
+  // Lazy initialization: repositories are created on first access
+  private _supplierRepo?: Repository<NetureSupplier>;
+  private _productRepo?: Repository<NetureSupplierProduct>;
+  private _partnershipRepo?: Repository<NeturePartnershipRequest>;
+  private _partnershipProductRepo?: Repository<NeturePartnershipProduct>;
+  private _supplierRequestRepo?: Repository<NetureSupplierRequest>;
+  private _contentRepo?: Repository<NetureSupplierContent>;
+  private _requestEventRepo?: Repository<NetureSupplierRequestEvent>;
 
-  constructor() {
-    this.supplierRepo = AppDataSource.getRepository(NetureSupplier);
-    this.productRepo = AppDataSource.getRepository(NetureSupplierProduct);
-    this.partnershipRepo = AppDataSource.getRepository(NeturePartnershipRequest);
-    this.partnershipProductRepo = AppDataSource.getRepository(NeturePartnershipProduct);
-    this.supplierRequestRepo = AppDataSource.getRepository(NetureSupplierRequest);
-    this.contentRepo = AppDataSource.getRepository(NetureSupplierContent);
-    this.requestEventRepo = AppDataSource.getRepository(NetureSupplierRequestEvent);
+  private get supplierRepo(): Repository<NetureSupplier> {
+    if (!this._supplierRepo) {
+      this._supplierRepo = AppDataSource.getRepository(NetureSupplier);
+    }
+    return this._supplierRepo;
+  }
+
+  private get productRepo(): Repository<NetureSupplierProduct> {
+    if (!this._productRepo) {
+      this._productRepo = AppDataSource.getRepository(NetureSupplierProduct);
+    }
+    return this._productRepo;
+  }
+
+  private get partnershipRepo(): Repository<NeturePartnershipRequest> {
+    if (!this._partnershipRepo) {
+      this._partnershipRepo = AppDataSource.getRepository(NeturePartnershipRequest);
+    }
+    return this._partnershipRepo;
+  }
+
+  private get partnershipProductRepo(): Repository<NeturePartnershipProduct> {
+    if (!this._partnershipProductRepo) {
+      this._partnershipProductRepo = AppDataSource.getRepository(NeturePartnershipProduct);
+    }
+    return this._partnershipProductRepo;
+  }
+
+  private get supplierRequestRepo(): Repository<NetureSupplierRequest> {
+    if (!this._supplierRequestRepo) {
+      this._supplierRequestRepo = AppDataSource.getRepository(NetureSupplierRequest);
+    }
+    return this._supplierRequestRepo;
+  }
+
+  private get contentRepo(): Repository<NetureSupplierContent> {
+    if (!this._contentRepo) {
+      this._contentRepo = AppDataSource.getRepository(NetureSupplierContent);
+    }
+    return this._contentRepo;
+  }
+
+  private get requestEventRepo(): Repository<NetureSupplierRequestEvent> {
+    if (!this._requestEventRepo) {
+      this._requestEventRepo = AppDataSource.getRepository(NetureSupplierRequestEvent);
+    }
+    return this._requestEventRepo;
   }
 
   // ==================== Suppliers ====================
