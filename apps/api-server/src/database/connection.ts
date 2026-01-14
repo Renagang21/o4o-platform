@@ -8,8 +8,11 @@ const __dirname = dirname(__filename);
 
 // Note: Environment variables are loaded by main.ts at startup
 // In Cloud Run, env vars are injected via workflow (no .env files needed)
-// AUTH Module entities (migrated to src/modules/auth/entities/)
-import { User } from '../modules/auth/entities/User.js';
+// AUTH Module entities
+// IMPORTANT: Use entities/User.js re-export to ensure class identity matches
+// other files that import from entities/User.js (e.g., authentication.service.ts)
+// This prevents "No metadata for User was found" TypeORM errors.
+import { User } from '../entities/User.js';
 import { Role } from '../modules/auth/entities/Role.js';
 import { Permission } from '../modules/auth/entities/Permission.js';
 import { RefreshToken } from '../modules/auth/entities/RefreshToken.js';
