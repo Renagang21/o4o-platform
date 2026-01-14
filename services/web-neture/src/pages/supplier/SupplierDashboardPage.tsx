@@ -2,6 +2,7 @@
  * SupplierDashboardPage - 공급자 대시보드 메인
  *
  * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0
+ * API: WO-NETURE-SUPPLIER-REQUEST-API-V1
  *
  * 표시 기능:
  * - 대기 중 신청 수
@@ -16,90 +17,37 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileCheck, Clock, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supplierApi, type SupplierRequest } from '../../lib/api';
 
-// 신청 상태 타입
-type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-
-// 판매자 신청 타입 (여러 서비스 통합)
-interface SellerRequest {
-  id: string;
-  sellerName: string;
-  sellerEmail: string;
-  serviceName: string;
-  serviceIcon: string;
-  productName: string;
-  status: RequestStatus;
-  createdAt: string;
-}
-
-// Mock 데이터 (API 연동 전)
-const MOCK_REQUESTS: SellerRequest[] = [
-  {
-    id: 'req-1',
-    sellerName: '강남약국',
-    sellerEmail: 'gangnam@pharmacy.kr',
-    serviceName: 'GlycoPharm',
-    serviceIcon: '🏥',
-    productName: '혈당관리 건강기능식품 A',
-    status: 'PENDING',
-    createdAt: '2026-01-14T09:30:00Z',
-  },
-  {
-    id: 'req-2',
-    sellerName: '뷰티플러스 명동점',
-    sellerEmail: 'myeongdong@beauty.kr',
-    serviceName: 'K-Cosmetics',
-    serviceIcon: '💄',
-    productName: '프리미엄 스킨케어 세트',
-    status: 'PENDING',
-    createdAt: '2026-01-14T08:15:00Z',
-  },
-  {
-    id: 'req-3',
-    sellerName: '서초중앙약국',
-    sellerEmail: 'seocho@pharmacy.kr',
-    serviceName: 'GlycoPharm',
-    serviceIcon: '🏥',
-    productName: '혈당관리 건강기능식품 B',
-    status: 'APPROVED',
-    createdAt: '2026-01-13T14:00:00Z',
-  },
-  {
-    id: 'req-4',
-    sellerName: '한국약사회 직영',
-    sellerEmail: 'kpa@society.kr',
-    serviceName: 'GlucoseView',
-    serviceIcon: '📊',
-    productName: '당뇨 관리 키트',
-    status: 'REJECTED',
-    createdAt: '2026-01-12T11:30:00Z',
-  },
-];
+// 서비스 아이콘 맵핑
+const SERVICE_ICONS: Record<string, string> = {
+  glycopharm: '🏥',
+  'k-cosmetics': '💄',
+  glucoseview: '📊',
+};
 
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
-  const [requests, setRequests] = useState<SellerRequest[]>([]);
+  const [requests, setRequests] = useState<SupplierRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock API call
     const fetchRequests = async () => {
       setLoading(true);
-      // 실제 API 연동 시 교체
-      await new Promise((r) => setTimeout(r, 500));
-      setRequests(MOCK_REQUESTS);
+      const data = await supplierApi.getRequests();
+      setRequests(data);
       setLoading(false);
     };
     fetchRequests();
   }, []);
 
   const stats = {
-    pending: requests.filter((r) => r.status === 'PENDING').length,
-    approved: requests.filter((r) => r.status === 'APPROVED').length,
-    rejected: requests.filter((r) => r.status === 'REJECTED').length,
+    pending: requests.filter((r) => r.status === 'pending').length,
+    approved: requests.filter((r) => r.status === 'approved').length,
+    rejected: requests.filter((r) => r.status === 'rejected').length,
   };
 
-  const pendingRequests = requests.filter((r) => r.status === 'PENDING').slice(0, 3);
+  const pendingRequests = requests.filter((r) => r.status === 'pending').slice(0, 3);
 
   return (
     <div>
@@ -164,7 +112,7 @@ export default function SupplierDashboardPage() {
                 style={styles.requestCard}
               >
                 <div style={styles.requestHeader}>
-                  <span style={styles.serviceIcon}>{req.serviceIcon}</span>
+                  <span style={styles.serviceIcon}>{SERVICE_ICONS[req.serviceId] || '📦'}</span>
                   <span style={styles.serviceName}>{req.serviceName}</span>
                   <span style={styles.pendingBadge}>대기 중</span>
                 </div>
@@ -174,7 +122,7 @@ export default function SupplierDashboardPage() {
                 </div>
                 <div style={styles.requestFooter}>
                   <span style={styles.timestamp}>
-                    {new Date(req.createdAt).toLocaleDateString('ko-KR')}
+                    {new Date(req.requestedAt).toLocaleDateString('ko-KR')}
                   </span>
                   <ArrowRight size={16} style={{ color: '#94a3b8' }} />
                 </div>

@@ -246,10 +246,145 @@ interface CmsContent {
   createdAt: string;
 }
 
+// ==================== Supplier Request API (WO-NETURE-SUPPLIER-REQUEST-API-V1) ====================
+
+export type SupplierRequestStatus = 'pending' | 'approved' | 'rejected';
+
+interface SupplierRequest {
+  id: string;
+  status: SupplierRequestStatus;
+  sellerName: string;
+  sellerEmail: string;
+  serviceName: string;
+  serviceId: string;
+  productName: string;
+  productId: string;
+  productPurpose: string;
+  requestedAt: string;
+}
+
+interface SupplierRequestDetail {
+  id: string;
+  status: SupplierRequestStatus;
+  seller: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    storeUrl: string;
+  };
+  service: {
+    id: string;
+    name: string;
+  };
+  product: {
+    id: string;
+    name: string;
+    category: string;
+    purpose: string;
+  };
+  decidedBy: string | null;
+  decidedAt: string | null;
+  rejectReason: string | null;
+  createdAt: string;
+}
+
+export const supplierApi = {
+  /**
+   * GET /api/v1/neture/supplier/requests
+   * 공급자에게 들어온 신청 목록 조회
+   */
+  async getRequests(filters?: { status?: SupplierRequestStatus; serviceId?: string }): Promise<SupplierRequest[]> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.status) params.append('status', filters.status);
+      if (filters?.serviceId) params.append('serviceId', filters.serviceId);
+
+      const url = `${API_BASE_URL}/api/v1/neture/supplier/requests${params.toString() ? `?${params}` : ''}`;
+
+      const response = await fetch(url, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.warn('[Supplier API] Requests API not available');
+        return [];
+      }
+
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch requests:', error);
+      return [];
+    }
+  },
+
+  /**
+   * GET /api/v1/neture/supplier/requests/:id
+   * 신청 상세 조회
+   */
+  async getRequestById(id: string): Promise<SupplierRequestDetail | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch request detail:', error);
+      return null;
+    }
+  },
+
+  /**
+   * POST /api/v1/neture/supplier/requests/:id/approve
+   * 신청 승인
+   */
+  async approveRequest(id: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * POST /api/v1/neture/supplier/requests/:id/reject
+   * 신청 거절
+   */
+  async rejectRequest(id: string, reason?: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ reason }),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+};
+
 export type {
   Supplier,
   SupplierDetail,
   PartnershipRequest,
   PartnershipRequestDetail,
   CmsContent,
+  SupplierRequest,
+  SupplierRequestDetail,
 };

@@ -2,26 +2,16 @@
  * SellerRequestDetailPage - 판매자 신청 상세 + 승인/거절
  *
  * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0
+ * API: WO-NETURE-SUPPLIER-REQUEST-API-V1
  *
  * 핵심 기능:
  * - 신청 상세 정보 조회
  * - 승인/거절 실행 (공급자 주체)
  * - P5 사용 맥락 요약 재사용
- *
- * 표시 항목:
- * - 판매자 정보
- * - 신청 제품 정보
- * - 제품 목적 (CATALOG / APPLICATION / ACTIVE_SALES)
- * - 기존 ACTIVE_SALES 여부
- * - 서비스 맥락 요약
- *
- * 금지사항:
- * - 자동 승인 ❌
- * - 관리자 승인 ❌
  */
 
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
   User,
@@ -32,83 +22,15 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  AlertTriangle,
   Sparkles,
 } from 'lucide-react';
+import { supplierApi, type SupplierRequestDetail } from '../../lib/api';
 
-// 신청 상태 타입
-type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-
-// 상세 신청 정보
-interface SellerRequestDetail {
-  id: string;
-  // 판매자 정보
-  seller: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    storeUrl: string;
-    serviceType: string;
-  };
-  // 서비스 정보
-  service: {
-    id: string;
-    name: string;
-    icon: string;
-  };
-  // 제품 정보
-  product: {
-    id: string;
-    name: string;
-    category: string;
-    purpose: 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
-    description: string;
-  };
-  // 신청 상태
-  status: RequestStatus;
-  createdAt: string;
-  processedAt: string | null;
-  processedBy: string | null;
-  rejectReason: string | null;
-  // 기존 ACTIVE_SALES 정보
-  existingActiveSales: Array<{
-    serviceName: string;
-    storeName: string;
-  }>;
-}
-
-// Mock 데이터
-const MOCK_REQUEST_DETAIL: SellerRequestDetail = {
-  id: 'req-1',
-  seller: {
-    id: 'seller-1',
-    name: '강남약국',
-    email: 'gangnam@pharmacy.kr',
-    phone: '02-1234-5678',
-    storeUrl: 'https://glycopharm.kr/store/gangnam',
-    serviceType: '약국',
-  },
-  service: {
-    id: 'glycopharm',
-    name: 'GlycoPharm',
-    icon: '🏥',
-  },
-  product: {
-    id: 'prod-1',
-    name: '혈당관리 건강기능식품 A',
-    category: '건강기능식품',
-    purpose: 'APPLICATION',
-    description: '혈당 관리에 도움을 주는 건강기능식품입니다. 식후 혈당 상승 억제에 효과적입니다.',
-  },
-  status: 'PENDING',
-  createdAt: '2026-01-14T09:30:00Z',
-  processedAt: null,
-  processedBy: null,
-  rejectReason: null,
-  existingActiveSales: [
-    { serviceName: 'K-Cosmetics', storeName: '뷰티플러스 명동점' },
-  ],
+// 서비스 아이콘 맵핑
+const SERVICE_ICONS: Record<string, string> = {
+  glycopharm: '🏥',
+  'k-cosmetics': '💄',
+  glucoseview: '📊',
 };
 
 // 사용 맥락 정보 (P5 재사용)
@@ -130,7 +52,7 @@ const USAGE_CONTEXTS: Record<string, { description: string; audience: string; pu
   },
 };
 
-const PURPOSE_CONFIG = {
+const PURPOSE_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
   CATALOG: { label: '정보 제공용', color: '#475569', bgColor: '#f1f5f9' },
   APPLICATION: { label: '신청 가능', color: '#1d4ed8', bgColor: '#eff6ff' },
   ACTIVE_SALES: { label: '판매 중', color: '#15803d', bgColor: '#f0fdf4' },
@@ -138,8 +60,7 @@ const PURPOSE_CONFIG = {
 
 export default function SellerRequestDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [request, setRequest] = useState<SellerRequestDetail | null>(null);
+  const [request, setRequest] = useState<SupplierRequestDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -148,11 +69,15 @@ export default function SellerRequestDetailPage() {
 
   useEffect(() => {
     const fetchRequest = async () => {
+      if (!id) return;
       setLoading(true);
       try {
-        // 실제 API 연동 시 교체
-        await new Promise((r) => setTimeout(r, 500));
-        setRequest(MOCK_REQUEST_DETAIL);
+        const data = await supplierApi.getRequestById(id);
+        if (data) {
+          setRequest(data);
+        } else {
+          setError('신청을 찾을 수 없습니다.');
+        }
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -163,17 +88,20 @@ export default function SellerRequestDetailPage() {
   }, [id]);
 
   const handleApprove = async () => {
-    if (!request) return;
+    if (!request || !id) return;
     setProcessing(true);
     try {
-      // 실제 API: POST /api/v1/neture/supplier/requests/:id/approve
-      await new Promise((r) => setTimeout(r, 1000));
-      setRequest({
-        ...request,
-        status: 'APPROVED',
-        processedAt: new Date().toISOString(),
-      });
-      alert('신청이 승인되었습니다.');
+      const result = await supplierApi.approveRequest(id);
+      if (result.success) {
+        setRequest({
+          ...request,
+          status: 'approved',
+          decidedAt: new Date().toISOString(),
+        });
+        alert('신청이 승인되었습니다.');
+      } else {
+        alert(result.error || '승인 처리 중 오류가 발생했습니다.');
+      }
     } catch (err) {
       alert('승인 처리 중 오류가 발생했습니다.');
     } finally {
@@ -182,19 +110,22 @@ export default function SellerRequestDetailPage() {
   };
 
   const handleReject = async () => {
-    if (!request || !rejectReason.trim()) return;
+    if (!request || !id || !rejectReason.trim()) return;
     setProcessing(true);
     try {
-      // 실제 API: POST /api/v1/neture/supplier/requests/:id/reject
-      await new Promise((r) => setTimeout(r, 1000));
-      setRequest({
-        ...request,
-        status: 'REJECTED',
-        processedAt: new Date().toISOString(),
-        rejectReason: rejectReason,
-      });
-      setShowRejectModal(false);
-      alert('신청이 거절되었습니다.');
+      const result = await supplierApi.rejectRequest(id, rejectReason);
+      if (result.success) {
+        setRequest({
+          ...request,
+          status: 'rejected',
+          decidedAt: new Date().toISOString(),
+          rejectReason: rejectReason,
+        });
+        setShowRejectModal(false);
+        alert('신청이 거절되었습니다.');
+      } else {
+        alert(result.error || '거절 처리 중 오류가 발생했습니다.');
+      }
     } catch (err) {
       alert('거절 처리 중 오류가 발생했습니다.');
     } finally {
@@ -215,9 +146,10 @@ export default function SellerRequestDetailPage() {
     );
   }
 
-  const purposeConfig = PURPOSE_CONFIG[request.product.purpose];
+  const purposeConfig = PURPOSE_CONFIG[request.product.purpose] || PURPOSE_CONFIG.CATALOG;
   const usageContext = USAGE_CONTEXTS[request.service.id];
-  const isPending = request.status === 'PENDING';
+  const serviceIcon = SERVICE_ICONS[request.service.id] || '📦';
+  const isPending = request.status === 'pending';
 
   return (
     <div>
@@ -229,7 +161,7 @@ export default function SellerRequestDetailPage() {
 
       <div style={styles.header}>
         <div style={styles.headerLeft}>
-          <span style={styles.serviceIcon}>{request.service.icon}</span>
+          <span style={styles.headerServiceIcon}>{serviceIcon}</span>
           <div>
             <h1 style={styles.title}>판매자 신청 상세</h1>
             <p style={styles.subtitle}>
@@ -240,17 +172,17 @@ export default function SellerRequestDetailPage() {
         <div
           style={{
             ...styles.statusBadge,
-            backgroundColor: request.status === 'PENDING' ? '#fef3c7' :
-              request.status === 'APPROVED' ? '#dcfce7' : '#fee2e2',
-            color: request.status === 'PENDING' ? '#b45309' :
-              request.status === 'APPROVED' ? '#15803d' : '#dc2626',
+            backgroundColor: request.status === 'pending' ? '#fef3c7' :
+              request.status === 'approved' ? '#dcfce7' : '#fee2e2',
+            color: request.status === 'pending' ? '#b45309' :
+              request.status === 'approved' ? '#15803d' : '#dc2626',
           }}
         >
-          {request.status === 'PENDING' && <Clock size={14} />}
-          {request.status === 'APPROVED' && <CheckCircle size={14} />}
-          {request.status === 'REJECTED' && <XCircle size={14} />}
-          {request.status === 'PENDING' ? '승인 대기' :
-            request.status === 'APPROVED' ? '승인됨' : '거절됨'}
+          {request.status === 'pending' && <Clock size={14} />}
+          {request.status === 'approved' && <CheckCircle size={14} />}
+          {request.status === 'rejected' && <XCircle size={14} />}
+          {request.status === 'pending' ? '승인 대기' :
+            request.status === 'approved' ? '승인됨' : '거절됨'}
         </div>
       </div>
 
@@ -283,7 +215,7 @@ export default function SellerRequestDetailPage() {
                 <Phone size={16} style={styles.infoIcon} />
                 <div>
                   <p style={styles.infoLabel}>연락처</p>
-                  <p style={styles.infoValue}>{request.seller.phone}</p>
+                  <p style={styles.infoValue}>{request.seller.phone || '-'}</p>
                 </div>
               </div>
             </div>
@@ -308,28 +240,7 @@ export default function SellerRequestDetailPage() {
               </span>
             </div>
             <p style={styles.productCategory}>{request.product.category}</p>
-            <p style={styles.productDescription}>{request.product.description}</p>
           </div>
-
-          {/* Existing Active Sales */}
-          {request.existingActiveSales.length > 0 && (
-            <div style={styles.warningCard}>
-              <div style={styles.warningHeader}>
-                <AlertTriangle size={18} style={{ color: '#d97706' }} />
-                <h3 style={styles.warningTitle}>기존 판매 현황</h3>
-              </div>
-              <p style={styles.warningText}>
-                이 제품은 현재 다른 서비스에서 판매 중입니다.
-              </p>
-              <ul style={styles.activeSalesList}>
-                {request.existingActiveSales.map((sale, idx) => (
-                  <li key={idx}>
-                    {sale.serviceName} - {sale.storeName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
 
         {/* Right Column */}
@@ -386,8 +297,8 @@ export default function SellerRequestDetailPage() {
             <div style={styles.processedCard}>
               <h2 style={styles.processedTitle}>처리 정보</h2>
               <p>
-                처리 일시: {request.processedAt
-                  ? new Date(request.processedAt).toLocaleString('ko-KR')
+                처리 일시: {request.decidedAt
+                  ? new Date(request.decidedAt).toLocaleString('ko-KR')
                   : '-'}
               </p>
               {request.rejectReason && (
@@ -485,7 +396,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '16px',
   },
-  serviceIcon: {
+  headerServiceIcon: {
     fontSize: '40px',
   },
   title: {
@@ -583,42 +494,7 @@ const styles: Record<string, React.CSSProperties> = {
   productCategory: {
     fontSize: '13px',
     color: '#64748b',
-    margin: '0 0 12px 0',
-  },
-  productDescription: {
-    fontSize: '14px',
-    color: '#475569',
-    lineHeight: 1.6,
     margin: 0,
-  },
-  warningCard: {
-    backgroundColor: '#fffbeb',
-    borderRadius: '12px',
-    border: '1px solid #fde68a',
-    padding: '20px',
-  },
-  warningHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '12px',
-  },
-  warningTitle: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: '#92400e',
-    margin: 0,
-  },
-  warningText: {
-    fontSize: '13px',
-    color: '#92400e',
-    margin: '0 0 12px 0',
-  },
-  activeSalesList: {
-    margin: 0,
-    paddingLeft: '20px',
-    fontSize: '13px',
-    color: '#b45309',
   },
   contextCard: {
     backgroundColor: '#faf5ff',
