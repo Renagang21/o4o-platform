@@ -23,6 +23,9 @@ import {
   AdminManualPage,
 } from '@/pages/test-guide';
 
+// Forum Pages
+import { ForumPage, PostDetailPage } from '@/pages/forum';
+
 // App Routes
 function AppRoutes() {
   return (
@@ -40,6 +43,10 @@ function AppRoutes() {
         <Route path="test-guide/manual/seller" element={<SellerManualPage />} />
         <Route path="test-guide/manual/supplier" element={<SupplierManualPage />} />
         <Route path="test-guide/manual/admin" element={<AdminManualPage />} />
+
+        {/* Forum */}
+        <Route path="forum" element={<ForumPage />} />
+        <Route path="forum/post/:postId" element={<PostDetailPage />} />
 
         {/* Role Not Available */}
         <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
