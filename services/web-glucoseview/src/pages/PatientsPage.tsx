@@ -528,8 +528,8 @@ export default function PatientsPage() {
                 {/* Pharmacist Advice Section */}
                 <div className="bg-white rounded-xl border border-slate-200 p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
@@ -582,7 +582,7 @@ export default function PatientsPage() {
                   {/* AI Question Section */}
                   <div className="border-t border-slate-100 pt-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
                       <span className="text-sm font-medium text-slate-700">AI에게 추가 질문</span>
@@ -616,8 +616,8 @@ export default function PatientsPage() {
                 <div className="bg-white rounded-xl border border-slate-200 p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-cyan-100 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
@@ -634,7 +634,7 @@ export default function PatientsPage() {
                     {/* 공유 */}
                     <button
                       onClick={handleShare}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -705,10 +705,10 @@ export default function PatientsPage() {
 
             <div className="space-y-3">
               {/* LibreView */}
-              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
+              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-orange-600 font-bold text-sm">LV</span>
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <span className="text-slate-600 font-bold text-sm">LV</span>
                   </div>
                   <div>
                     <p className="font-medium text-slate-900">LibreView 연동</p>
@@ -718,10 +718,10 @@ export default function PatientsPage() {
               </button>
 
               {/* Dexcom */}
-              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
+              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <span className="text-green-600 font-bold text-sm">DX</span>
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <span className="text-slate-600 font-bold text-sm">DX</span>
                   </div>
                   <div>
                     <p className="font-medium text-slate-900">Dexcom 연동</p>
@@ -731,7 +731,7 @@ export default function PatientsPage() {
               </button>
 
               {/* File Upload */}
-              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
+              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -746,10 +746,10 @@ export default function PatientsPage() {
               </button>
 
               {/* 고객 조제데이터 연동 */}
-              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
+              <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                     </svg>
                   </div>
@@ -757,7 +757,7 @@ export default function PatientsPage() {
                     <p className="font-medium text-slate-900">고객 조제데이터 연동</p>
                     <p className="text-xs text-slate-500">고객 승인하에 조제 이력 연동</p>
                   </div>
-                  <span className="ml-auto px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">예정</span>
+                  <span className="ml-auto px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 rounded">예정</span>
                 </div>
               </button>
             </div>
@@ -836,7 +836,7 @@ export default function PatientsPage() {
                       onClick={() => setNewCustomer({ ...newCustomer, gender: 'female' })}
                       className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
                         newCustomer.gender === 'female'
-                          ? 'bg-pink-50 border-pink-300 text-pink-700'
+                          ? 'bg-blue-50 border-blue-300 text-blue-700'
                           : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                       }`}
                     >
@@ -982,7 +982,7 @@ export default function PatientsPage() {
                       onClick={() => setEditCustomer({ ...editCustomer, gender: 'female' })}
                       className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
                         editCustomer.gender === 'female'
-                          ? 'bg-pink-50 border-pink-300 text-pink-700'
+                          ? 'bg-blue-50 border-blue-300 text-blue-700'
                           : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                       }`}
                     >

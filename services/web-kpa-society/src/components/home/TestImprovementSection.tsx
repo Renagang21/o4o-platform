@@ -109,7 +109,7 @@ export function TestImprovementSection({ config = {} }: Props) {
           {guideCards.map((card, index) => (
             <div key={index} style={styles.card}>
               <div style={styles.cardHeader}>
-                <span style={{ ...styles.cardIcon, backgroundColor: `${mergedConfig.primaryColor}15` }}>
+                <span style={styles.cardIcon}>
                   {card.icon}
                 </span>
                 <h3 style={styles.cardTitle}>{card.title}</h3>
@@ -208,7 +208,7 @@ export function TestImprovementSection({ config = {} }: Props) {
 
 const styles: Record<string, React.CSSProperties> = {
   section: {
-    padding: '60px 20px',
+    padding: '48px 20px',
     backgroundColor: colors.gray100,
     borderTop: `1px solid ${colors.gray200}`,
   },
@@ -221,10 +221,10 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '40px',
   },
   title: {
-    fontSize: '24px',
-    fontWeight: 700,
+    fontSize: '20px',
+    fontWeight: 600,
     color: colors.gray900,
-    marginBottom: '12px',
+    marginBottom: '10px',
   },
   subtitle: {
     fontSize: '16px',
@@ -252,13 +252,14 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '12px',
   },
   cardIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    backgroundColor: colors.gray100,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '20px',
+    fontSize: '18px',
   },
   cardTitle: {
     fontSize: '16px',
@@ -306,9 +307,9 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
   },
   writeLink: {
-    fontSize: '14px',
+    fontSize: '13px',
     fontWeight: 500,
-    color: colors.primary,
+    color: colors.gray600,
     textDecoration: 'none',
   },
   boardContent: {

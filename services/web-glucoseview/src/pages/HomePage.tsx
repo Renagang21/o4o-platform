@@ -33,7 +33,7 @@ const sampleBanners: SlideBanner[] = [
     id: '1',
     title: 'GlucoseView',
     subtitle: '약국용 CGM 데이터 관리',
-    bgColor: 'bg-blue-600',
+    bgColor: 'bg-slate-800',
     textColor: 'text-white',
     isActive: true,
     order: 1,
@@ -42,7 +42,7 @@ const sampleBanners: SlideBanner[] = [
     id: '2',
     title: '혈당 데이터 분석',
     subtitle: '연속혈당 데이터를 시각화하여 상담에 활용',
-    bgColor: 'bg-indigo-600',
+    bgColor: 'bg-slate-700',
     textColor: 'text-white',
     isActive: true,
     order: 2,
@@ -51,7 +51,7 @@ const sampleBanners: SlideBanner[] = [
     id: '3',
     title: '약사 전용 서비스',
     subtitle: '대한약사회 인증 회원 전용',
-    bgColor: 'bg-slate-700',
+    bgColor: 'bg-slate-600',
     textColor: 'text-white',
     isActive: true,
     order: 3,
@@ -188,7 +188,7 @@ export default function HomePage() {
         <section className="bg-white">
           <div className="max-w-6xl mx-auto px-4 md:px-6 pt-8 pb-6">
             <div
-              className="relative overflow-hidden rounded-2xl h-44 sm:h-56 md:h-64 shadow-lg"
+              className="relative overflow-hidden rounded-xl h-44 sm:h-52 md:h-56"
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
             >
@@ -400,69 +400,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partner Section - 마퀴 애니메이션 */}
+      {/* Partner Section - 정적 그리드 */}
       {partners.length > 0 && (
-        <section className="py-12 bg-white border-t border-slate-100 overflow-hidden">
-          <div className="max-w-6xl mx-auto px-4 md:px-6">
-            <h3 className="text-sm font-semibold text-slate-500 text-center mb-8 uppercase tracking-wider">파트너</h3>
-          </div>
-
-          {/* 마퀴 컨테이너 */}
-          <div className="relative">
-            {/* 좌우 페이드 그라데이션 */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-
-            {/* 마퀴 애니메이션 */}
-            <div className="flex animate-marquee">
-              {/* 첫 번째 세트 */}
-              <div className="flex gap-4 px-4 shrink-0">
-                {partners.map((partner) => (
-                  <a
-                    key={partner.id}
-                    href={partner.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 px-5 py-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
-                      {partner.logoUrl ? (
-                        <img src={partner.logoUrl} alt={partner.name} className="w-7 h-7 object-contain" />
-                      ) : (
-                        <span className="text-xl font-bold text-slate-400">{partner.name.charAt(0)}</span>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-700 whitespace-nowrap">{partner.name}</p>
-                      <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
-                    </div>
-                  </a>
-                ))}
-              </div>
-              {/* 두 번째 세트 (무한 루프용) */}
-              <div className="flex gap-4 px-4 shrink-0">
-                {partners.map((partner) => (
-                  <a
-                    key={`dup-${partner.id}`}
-                    href={partner.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 px-5 py-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 hover:border-slate-300"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
-                      {partner.logoUrl ? (
-                        <img src={partner.logoUrl} alt={partner.name} className="w-7 h-7 object-contain" />
-                      ) : (
-                        <span className="text-xl font-bold text-slate-400">{partner.name.charAt(0)}</span>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-700 whitespace-nowrap">{partner.name}</p>
-                      <p className="text-xs text-slate-500 whitespace-nowrap">{partner.description}</p>
-                    </div>
-                  </a>
-                ))}
-              </div>
+        <section className="py-12 bg-white border-t border-slate-100">
+          <div className="max-w-4xl mx-auto px-4 md:px-6">
+            <h3 className="text-sm font-medium text-slate-400 text-center mb-6">파트너</h3>
+            <div className="flex flex-wrap justify-center gap-3">
+              {partners.map((partner) => (
+                <a
+                  key={partner.id}
+                  href={partner.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {partner.logoUrl ? (
+                      <img src={partner.logoUrl} alt={partner.name} className="w-5 h-5 object-contain" />
+                    ) : (
+                      <span className="text-sm font-medium text-slate-400">{partner.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  <span className="text-sm text-slate-600">{partner.name}</span>
+                </a>
+              ))}
             </div>
           </div>
         </section>
