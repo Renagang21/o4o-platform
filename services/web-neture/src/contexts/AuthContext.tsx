@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // httpOnly Cookie 기반 세션 확인
     const checkSession = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
           credentials: 'include',
         });
 
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
