@@ -8,7 +8,7 @@
  * - 인증 없이 접근 가능한 공개 콘텐츠
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.glycopharm.co.kr';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // ============================================================================
 // Types

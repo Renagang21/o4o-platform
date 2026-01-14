@@ -18,7 +18,7 @@ import type {
 import { DEFAULT_SERVICE_CONTEXT } from '@/types/store';
 import { getAccessToken } from '@/contexts/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.glycopharm.co.kr';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 class StoreApiClient {
   private baseUrl: string;

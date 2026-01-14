@@ -4,9 +4,8 @@ import type { User, UserRole } from '@/types';
 // Re-export UserRole for use by other components
 export type { UserRole } from '@/types';
 
-// API Base URL: 각 서비스 도메인에서 자체 API 서브도메인 사용 (same-origin cookie auth)
-// e.g., glycopharm.co.kr → api.glycopharm.co.kr
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.glycopharm.co.kr';
+// API Base URL: 공용 API 서버 사용 (glycopharm.co.kr -> api.neture.co.kr)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'glycopharm_access_token';
