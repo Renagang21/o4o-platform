@@ -1,20 +1,23 @@
 /**
- * Neture P0 - 유통 정보 플랫폼 Prototype
+ * Neture - 유통 정보 플랫폼
  *
- * Work Order: WO-NETURE-EXTENSION-P1
- * Phase: P0 (Read-Only Information Platform)
+ * Work Orders:
+ * - WO-NETURE-EXTENSION-P1~P5: 표현 계층 (Read-Only Information)
+ * - WO-NETURE-SUPPLIER-DASHBOARD-P0: 실행 계층 (Supplier Actions)
+ *
+ * Phase: P0 (Read-Only + Supplier Execution)
  *
  * HARD RULES:
- * - NO 주문/결제/정산
- * - NO 관리 콘솔
+ * - NO 주문/결제/정산 (P1 이후)
+ * - NO 관리자 승인 (공급자만 승인 주체)
  * - NO 내부 메시지
- * - NO 신청 폼 (각 서비스에서 직접 처리)
- * - 읽기 전용 정보 플랫폼만
+ * - 일반 사용자/판매자: 읽기 전용 정보 플랫폼
+ * - 공급자: 신청 승인/거절 실행 가능
  *
  * Neture 책임 선언:
- * - Neture는 중앙 신청 시스템이 아님
- * - 신청/승인은 각 서비스(Glycopharm, Cosmetics 등)에서 처리
- * - 여기서는 정보 조회 + 외부 링크만 제공
+ * - Neture는 공급자 통합 운영 대시보드
+ * - 신청 생성은 각 서비스에서 처리
+ * - 신청 승인/거절은 공급자가 Neture에서 처리
  */
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -31,6 +34,14 @@ import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
+
+// Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0)
+import {
+  SupplierDashboardLayout,
+  SupplierDashboardPage,
+  SellerRequestsPage,
+  SellerRequestDetailPage,
+} from './pages/supplier';
 
 // Test Guide Pages
 import {
@@ -72,6 +83,13 @@ function App() {
             {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
             <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
             <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
+          </Route>
+
+          {/* Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0) */}
+          <Route element={<SupplierDashboardLayout />}>
+            <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
+            <Route path="/supplier/requests" element={<SellerRequestsPage />} />
+            <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
