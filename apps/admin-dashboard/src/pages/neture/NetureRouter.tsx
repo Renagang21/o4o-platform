@@ -12,6 +12,8 @@ const ProductListPage = React.lazy(() => import('./ProductListPage'));
 const ProductDetailPage = React.lazy(() => import('./ProductDetailPage'));
 const PartnerListPage = React.lazy(() => import('./PartnerListPage'));
 const PartnerDetailPage = React.lazy(() => import('./PartnerDetailPage'));
+const PartnershipRequestListPage = React.lazy(() => import('./PartnershipRequestListPage'));
+const PartnershipRequestDetailPage = React.lazy(() => import('./PartnershipRequestDetailPage'));
 
 const NetureRouter: React.FC = () => {
   return (
@@ -30,6 +32,10 @@ const NetureRouter: React.FC = () => {
         {/* Partners */}
         <Route path="partners" element={<PartnerListPage />} />
         <Route path="partners/:partnerId" element={<PartnerDetailPage />} />
+
+        {/* Partnership Requests */}
+        <Route path="partnership-requests" element={<PartnershipRequestListPage />} />
+        <Route path="partnership-requests/:id" element={<PartnershipRequestDetailPage />} />
 
         {/* Default redirect */}
         <Route index element={<Navigate to="/neture/products" replace />} />

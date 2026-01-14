@@ -71,8 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (response.ok) {
           const data = await response.json();
-          if (data.user) {
-            const apiUser = data.user;
+          // API 응답 구조: { success: true, data: { user: {...} } }
+          const userData = data.data?.user || data.user;
+          if (userData) {
+            const apiUser = userData;
             const mappedRole = mapApiRole(apiUser.role);
             const newUser: User = {
               id: apiUser.id,
@@ -110,8 +112,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: data.message || data.error || '로그인에 실패했습니다.' };
       }
 
-      if (data.user) {
-        const apiUser = data.user;
+      // API 응답 구조: { success: true, data: { user: {...} } }
+      const userData = data.data?.user || data.user;
+      if (userData) {
+        const apiUser = userData;
         const mappedRole = mapApiRole(apiUser.role);
         const newUser: User = {
           id: apiUser.id,

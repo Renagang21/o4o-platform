@@ -47,7 +47,7 @@ function App() {
             <Route path="/suppliers" element={<SupplierListPage />} />
             <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
             <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
-            <Route path="/partners/requests/new" element={<PartnershipRequestCreatePage />} />
+            <Route path="/partners/requests/create" element={<PartnershipRequestCreatePage />} />
             <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
             <Route path="/partners/apply" element={<PartnersApplyPage />} />
             <Route path="/partners/info" element={<PartnerInfoPage />} />

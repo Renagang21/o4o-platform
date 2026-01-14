@@ -281,4 +281,36 @@ export class NetureService {
       throw error;
     }
   }
+
+  /**
+   * PATCH /partnership/requests/:id - Update partnership request status
+   */
+  async updatePartnershipRequestStatus(id: string, status: PartnershipStatus) {
+    try {
+      const request = await this.partnershipRepo.findOne({ where: { id } });
+
+      if (!request) {
+        return null;
+      }
+
+      request.status = status;
+
+      // Set matchedAt timestamp when status changes to MATCHED
+      if (status === PartnershipStatus.MATCHED && !request.matchedAt) {
+        request.matchedAt = new Date();
+      }
+
+      const updatedRequest = await this.partnershipRepo.save(request);
+
+      logger.info(`[NetureService] Updated partnership request ${id} status to ${status}`);
+
+      return {
+        id: updatedRequest.id,
+        status: updatedRequest.status,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error updating partnership request status:', error);
+      throw error;
+    }
+  }
 }

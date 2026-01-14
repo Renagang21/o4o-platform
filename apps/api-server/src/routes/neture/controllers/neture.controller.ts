@@ -229,6 +229,68 @@ export function createNetureController(dataSource: DataSource): Router {
     }
   });
 
+  /**
+   * PATCH /partnership/requests/:id
+   * Update partnership request status (admin only)
+   */
+  router.patch('/partnership/requests/:id', optionalAuth, async (req: Request, res: Response) => {
+    try {
+      // Check if user is logged in and is admin
+      const user = (req as any).user;
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+          code: 'AUTH_REQUIRED',
+        });
+      }
+
+      // Check if user is admin
+      if (user.role !== 'admin' && user.role !== 'super_admin') {
+        return res.status(403).json({
+          success: false,
+          error: 'Admin access required',
+          code: 'FORBIDDEN',
+        });
+      }
+
+      const { id } = req.params;
+      const { status } = req.body;
+
+      // Validate status
+      const validStatuses = ['pending', 'approved', 'rejected'];
+      if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid status. Must be one of: pending, approved, rejected',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await service.updatePartnershipRequestStatus(id, status as PartnershipStatus);
+
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          error: 'Partnership request not found',
+          code: 'NOT_FOUND',
+        });
+      }
+
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      logger.error('[Neture API] Error updating partnership request status:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update partnership request status',
+        details: (error as Error).message,
+      });
+    }
+  });
+
   return router;
 }
 

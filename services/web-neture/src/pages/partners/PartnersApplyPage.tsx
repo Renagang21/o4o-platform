@@ -36,6 +36,9 @@ export default function PartnersApplyPage() {
               <li>주문 처리 지원</li>
               <li>정산 시스템 연동</li>
             </ul>
+            <Link to="/partners/requests/create" style={styles.applyButton}>
+              참여 신청하기 →
+            </Link>
           </div>
 
           {/* 파트너 */}
@@ -51,6 +54,9 @@ export default function PartnersApplyPage() {
               <li>공동 마케팅</li>
               <li>협력 네트워크</li>
             </ul>
+            <Link to="/partners/requests/create" style={styles.applyButton}>
+              참여 신청하기 →
+            </Link>
           </div>
         </div>
 
@@ -60,7 +66,7 @@ export default function PartnersApplyPage() {
           <div style={styles.processSteps}>
             <div style={styles.step}>
               <div style={styles.stepNumber}>1</div>
-              <div style={styles.stepText}>문의 접수</div>
+              <div style={styles.stepText}>온라인 신청</div>
             </div>
             <div style={styles.stepArrow}>→</div>
             <div style={styles.step}>
@@ -76,24 +82,6 @@ export default function PartnersApplyPage() {
             <div style={styles.step}>
               <div style={styles.stepNumber}>4</div>
               <div style={styles.stepText}>서비스 이용</div>
-            </div>
-          </div>
-        </div>
-
-        {/* 문의 안내 */}
-        <div style={styles.contactSection}>
-          <h3 style={styles.sectionTitle}>문의하기</h3>
-          <p style={styles.contactText}>
-            참여를 희망하시면 아래로 문의해 주세요.
-          </p>
-          <div style={styles.contactInfo}>
-            <div style={styles.contactItem}>
-              <span style={styles.contactLabel}>이메일</span>
-              <span style={styles.contactValue}>partner@neture.co.kr</span>
-            </div>
-            <div style={styles.contactItem}>
-              <span style={styles.contactLabel}>전화</span>
-              <span style={styles.contactValue}>02-1234-5678</span>
             </div>
           </div>
         </div>
@@ -179,6 +167,21 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#475569',
     fontSize: '14px',
     lineHeight: 1.8,
+    marginBottom: '20px',
+  },
+  applyButton: {
+    display: 'inline-block',
+    width: '100%',
+    padding: '12px 24px',
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    textDecoration: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 600,
+    textAlign: 'center' as const,
+    transition: 'background-color 0.2s',
+    cursor: 'pointer',
   },
   processSection: {
     backgroundColor: '#ffffff',
