@@ -108,7 +108,7 @@ export function TestImprovementSection({ config = {} }: Props) {
           {guideCards.map((card, index) => (
             <div key={index} style={styles.card}>
               <div style={styles.cardHeader}>
-                <span style={{ ...styles.cardIcon, backgroundColor: `${mergedConfig.primaryColor}15` }}>
+                <span style={styles.cardIcon}>
                   {card.icon}
                 </span>
                 <h3 style={styles.cardTitle}>{card.title}</h3>
@@ -207,7 +207,7 @@ export function TestImprovementSection({ config = {} }: Props) {
 
 const styles: Record<string, React.CSSProperties> = {
   section: {
-    padding: '64px 24px',
+    padding: '48px 24px',
     backgroundColor: '#f8fafc',
     borderTop: '1px solid #e2e8f0',
   },
@@ -217,13 +217,13 @@ const styles: Record<string, React.CSSProperties> = {
   },
   header: {
     textAlign: 'center',
-    marginBottom: '48px',
+    marginBottom: '32px',
   },
   title: {
-    fontSize: '24px',
-    fontWeight: 700,
+    fontSize: '20px',
+    fontWeight: 600,
     color: '#1e293b',
-    marginBottom: '12px',
+    marginBottom: '10px',
   },
   subtitle: {
     fontSize: '16px',
@@ -236,12 +236,12 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
     gap: '16px',
-    marginBottom: '48px',
+    marginBottom: '32px',
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: '12px',
-    padding: '20px',
+    borderRadius: '8px',
+    padding: '16px',
     border: '1px solid #e2e8f0',
   },
   cardHeader: {
@@ -251,13 +251,14 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '12px',
   },
   cardIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '10px',
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    backgroundColor: '#f1f5f9',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '20px',
+    fontSize: '18px',
   },
   cardTitle: {
     fontSize: '16px',
@@ -278,7 +279,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   board: {
     backgroundColor: '#fff',
-    borderRadius: '16px',
+    borderRadius: '8px',
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
   },

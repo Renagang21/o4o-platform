@@ -82,28 +82,28 @@ const heroSlides: HeroSlide[] = [
     id: 'main',
     title: 'K-Beauty Store를 위한\n운영 플랫폼',
     subtitle: '브랜드·매장·관광객이 연결됩니다',
-    bgGradient: 'linear-gradient(135deg, #e91e63 0%, #c2185b 50%, #ad1457 100%)',
+    bgGradient: '#1e293b',
     cta: { label: '시작하기', link: '/platform/stores', variant: 'primary' },
   },
   {
     id: 'trial',
     title: '신상품 Market Trial\n참여 매장 모집 중',
     subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
-    bgGradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 50%, #2e7d32 100%)',
+    bgGradient: '#334155',
     cta: { label: '자세히 보기', link: '/platform/stores', variant: 'primary' },
   },
   {
     id: 'tourist',
-    title: '지금 12개 매장\n· 관광객 연결 중',
+    title: '지금 12개 매장\n관광객 연결 중',
     subtitle: 'Tourist Hub를 통해 실시간 연결됩니다',
-    bgGradient: 'linear-gradient(135deg, #2196f3 0%, #1976d2 50%, #1565c0 100%)',
+    bgGradient: '#475569',
     cta: { label: 'Tourist Hub 보기', link: '/services/tourists', variant: 'primary' },
   },
   {
     id: 'trust',
     title: '다수 매장·다수 브랜드가 함께하는\nK-Beauty 플랫폼',
     subtitle: '검증된 정품 매장만 연결합니다',
-    bgGradient: 'linear-gradient(135deg, #455a64 0%, #37474f 50%, #263238 100%)',
+    bgGradient: '#0f172a',
   },
 ];
 
@@ -236,7 +236,7 @@ function HeroSection() {
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'relative', height: '420px' }}>
+      <div style={{ position: 'relative', height: '320px' }}>
         {heroSlides.map((slide, index) => (
           <div
             key={slide.id}
@@ -262,19 +262,19 @@ function HeroSection() {
               }}>
                 <div style={{ maxWidth: '600px' }}>
                   <h1 style={{
-                    fontSize: '40px',
-                    fontWeight: 700,
+                    fontSize: '32px',
+                    fontWeight: 600,
                     color: '#fff',
-                    lineHeight: 1.3,
-                    marginBottom: '16px',
+                    lineHeight: 1.4,
+                    marginBottom: '12px',
                     whiteSpace: 'pre-line',
                   }}>
                     {slide.title}
                   </h1>
                   <p style={{
-                    fontSize: '18px',
-                    color: 'rgba(255,255,255,0.8)',
-                    marginBottom: '32px',
+                    fontSize: '16px',
+                    color: 'rgba(255,255,255,0.7)',
+                    marginBottom: '24px',
                   }}>
                     {slide.subtitle}
                   </p>
@@ -284,16 +284,14 @@ function HeroSection() {
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '14px 28px',
-                        borderRadius: '12px',
+                        gap: '6px',
+                        padding: '12px 24px',
+                        borderRadius: '6px',
                         fontWeight: 500,
-                        fontSize: '15px',
+                        fontSize: '14px',
                         textDecoration: 'none',
-                        transition: 'all 0.2s',
-                        backgroundColor: slide.cta.variant === 'primary' ? '#fff' : 'rgba(255,255,255,0.2)',
-                        color: slide.cta.variant === 'primary' ? '#1a1a1a' : '#fff',
-                        boxShadow: slide.cta.variant === 'primary' ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+                        backgroundColor: '#fff',
+                        color: '#1e293b',
                       }}
                     >
                       {slide.cta.label}
@@ -376,11 +374,11 @@ function QuickActionSection() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section style={{ padding: '48px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>운영 도구</h2>
-          <p style={{ fontSize: '14px', color: '#666' }}>매장 운영에 필요한 핵심 기능</p>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>운영 도구</h2>
+          <p style={{ fontSize: '13px', color: '#64748b' }}>매장 운영에 필요한 핵심 기능</p>
         </div>
         {isAuthenticated && (
           <Link
@@ -411,35 +409,33 @@ function QuickActionSection() {
             to={card.link}
             style={{
               backgroundColor: '#fff',
-              borderRadius: '16px',
-              padding: '24px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-              border: '1px solid #f0f0f0',
+              borderRadius: '8px',
+              padding: '20px',
+              border: '1px solid #e2e8f0',
               textDecoration: 'none',
-              transition: 'all 0.2s',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                backgroundColor: card.color,
+                width: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                backgroundColor: '#f1f5f9',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '24px',
+                fontSize: '20px',
               }}>
                 {card.icon}
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '24px', fontWeight: 700, color: '#1a1a1a' }}>{card.status.value}</p>
-                <p style={{ fontSize: '12px', color: '#999' }}>{card.status.label}</p>
+                <p style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b' }}>{card.status.value}</p>
+                <p style={{ fontSize: '11px', color: '#94a3b8' }}>{card.status.label}</p>
               </div>
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>{card.title}</h3>
-            <p style={{ fontSize: '14px', color: '#64748b', fontWeight: 500, marginBottom: '8px' }}>{card.subtitle}</p>
-            <p style={{ fontSize: '14px', color: '#666' }}>{card.description}</p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>{card.title}</h3>
+            <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, marginBottom: '6px' }}>{card.subtitle}</p>
+            <p style={{ fontSize: '13px', color: '#94a3b8' }}>{card.description}</p>
           </Link>
         ))}
       </div>
@@ -448,36 +444,29 @@ function QuickActionSection() {
 }
 
 function NowRunningSection() {
-  const getTypeConfig = (type: NowRunningItem['type']) => {
+  const getTypeLabel = (type: NowRunningItem['type']) => {
     switch (type) {
-      case 'trial':
-        return { label: 'Trial', color: '#f1f5f9', textColor: '#475569', icon: '🎯' };
-      case 'product':
-        return { label: '신상품', color: '#f1f5f9', textColor: '#475569', icon: '✨' };
-      case 'event':
-        return { label: '이벤트', color: '#f1f5f9', textColor: '#475569', icon: '🎉' };
-      case 'campaign':
-        return { label: '캠페인', color: '#f1f5f9', textColor: '#475569', icon: '📢' };
+      case 'trial': return 'Trial';
+      case 'product': return '신상품';
+      case 'event': return '이벤트';
+      case 'campaign': return '캠페인';
     }
   };
 
   return (
-    <section style={{ padding: '48px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>Now Running</h2>
-          <p style={{ fontSize: '14px', color: '#666' }}>지금 참여 가능한 프로그램</p>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>Now Running</h2>
+          <p style={{ fontSize: '13px', color: '#64748b' }}>지금 참여 가능한 프로그램</p>
         </div>
         <Link
           to="/products"
           style={{
-            fontSize: '14px',
+            fontSize: '13px',
             color: '#64748b',
             fontWeight: 500,
             textDecoration: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
           }}
         >
           전체보기 →
@@ -489,56 +478,48 @@ function NowRunningSection() {
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: '16px',
       }}>
-        {nowRunningItems.map((item) => {
-          const config = getTypeConfig(item.type);
-          return (
-            <Link
-              key={item.id}
-              to={item.link}
-              style={{
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                padding: '20px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                border: '1px solid #f0f0f0',
-                textDecoration: 'none',
-                transition: 'all 0.2s',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '4px 8px',
-                  borderRadius: '20px',
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  backgroundColor: config.color,
-                  color: config.textColor,
-                }}>
-                  {config.icon} {config.label}
+        {nowRunningItems.map((item) => (
+          <Link
+            key={item.id}
+            to={item.link}
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '8px',
+              padding: '16px',
+              border: '1px solid #e2e8f0',
+              textDecoration: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <span style={{
+                padding: '3px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 500,
+                backgroundColor: '#f1f5f9',
+                color: '#475569',
+              }}>
+                {getTypeLabel(item.type)}
+              </span>
+              {item.deadline && (
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>~{item.deadline}</span>
+              )}
+            </div>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1e293b', marginBottom: '6px' }}>
+              {item.title}
+            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              {item.supplier && (
+                <span style={{ color: '#64748b' }}>{item.supplier}</span>
+              )}
+              {item.participants && (
+                <span style={{ color: '#94a3b8' }}>
+                  {item.participants}개 매장 참여
                 </span>
-                {item.deadline && (
-                  <span style={{ fontSize: '12px', color: '#999' }}>~{item.deadline}</span>
-                )}
-              </div>
-              <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1a1a1a', marginBottom: '8px' }}>
-                {item.title}
-              </h3>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                {item.supplier && (
-                  <span style={{ color: '#666' }}>{item.supplier}</span>
-                )}
-                {item.participants && (
-                  <span style={{ color: '#999' }}>
-                    👥 {item.participants}개 매장 참여
-                  </span>
-                )}
-              </div>
-            </Link>
-          );
-        })}
+              )}
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
@@ -547,32 +528,28 @@ function NowRunningSection() {
 
 function NoticeSection() {
   return (
-    <section style={{ padding: '48px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{
         backgroundColor: '#fff',
-        borderRadius: '16px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-        border: '1px solid #f0f0f0',
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
         overflow: 'hidden',
       }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '20px',
-          borderBottom: '1px solid #f0f0f0',
+          padding: '16px 20px',
+          borderBottom: '1px solid #e2e8f0',
         }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a1a' }}>운영 공지</h2>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b' }}>운영 공지</h2>
           <Link
             to="/about"
             style={{
-              fontSize: '14px',
+              fontSize: '13px',
               color: '#64748b',
               fontWeight: 500,
               textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
             }}
           >
             전체보기 ›
@@ -618,26 +595,25 @@ function NoticeSection() {
 
 function PartnerTrustSection() {
   return (
-    <section style={{ padding: '48px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <p style={{ textAlign: 'center', fontSize: '14px', color: '#666', marginBottom: '24px' }}>
+    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <p style={{ textAlign: 'center', fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
         신뢰할 수 있는 브랜드와 함께합니다
       </p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
         {partners.map((partner) => (
           <div
             key={partner.id}
             style={{
-              padding: '12px 20px',
-              borderRadius: '12px',
+              padding: '10px 16px',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: partner.type === 'association' ? '#fce4ec' : '#fff',
-              border: partner.type === 'association' ? '1px solid #f48fb1' : '1px solid #e0e0e0',
-              color: partner.type === 'association' ? '#c2185b' : '#666',
+              backgroundColor: '#f8fafc',
+              border: '1px solid #e2e8f0',
             }}
           >
-            <span style={{ fontWeight: 500, fontSize: '14px' }}>{partner.name}</span>
+            <span style={{ fontWeight: 500, fontSize: '13px', color: '#475569' }}>{partner.name}</span>
           </div>
         ))}
       </div>
@@ -651,18 +627,17 @@ function CTASection() {
   if (isAuthenticated) return null;
 
   return (
-    <section style={{ padding: '48px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{
-        background: 'linear-gradient(135deg, #37474f 0%, #263238 100%)',
-        borderRadius: '16px',
-        padding: '48px',
+        backgroundColor: '#1e293b',
+        borderRadius: '8px',
+        padding: '40px',
         textAlign: 'center',
       }}>
-        <div style={{ fontSize: '40px', marginBottom: '16px' }}>💄</div>
-        <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
           K-Cosmetics와 함께하세요
         </h2>
-        <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '32px', maxWidth: '400px', margin: '0 auto 32px' }}>
+        <p style={{ color: '#94a3b8', marginBottom: '24px', fontSize: '14px' }}>
           K-Beauty 매장으로 성장할 수 있는 모든 도구와 네트워크를 제공합니다
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
@@ -671,14 +646,14 @@ function CTASection() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '14px 28px',
-              backgroundColor: '#e91e63',
-              color: '#fff',
+              gap: '6px',
+              padding: '12px 24px',
+              backgroundColor: '#fff',
+              color: '#1e293b',
               fontWeight: 500,
-              borderRadius: '12px',
+              borderRadius: '6px',
               textDecoration: 'none',
+              fontSize: '14px',
             }}
           >
             매장 시작하기 →
@@ -688,15 +663,15 @@ function CTASection() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '14px 28px',
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              color: '#fff',
+              gap: '6px',
+              padding: '12px 24px',
+              backgroundColor: 'transparent',
+              color: '#94a3b8',
               fontWeight: 500,
-              borderRadius: '12px',
+              borderRadius: '6px',
               textDecoration: 'none',
-              border: '1px solid rgba(255,255,255,0.2)',
+              fontSize: '14px',
+              border: '1px solid #475569',
             }}
           >
             로그인
@@ -713,7 +688,7 @@ function CTASection() {
 
 export function HomePage() {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#fafafa' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       {/* 1. Hero / Campaign Slider */}
       <HeroSection />
 
