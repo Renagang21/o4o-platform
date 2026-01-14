@@ -6,10 +6,15 @@ import {
   NeturePartnershipRequest,
   NeturePartnershipProduct,
   NetureSupplierRequest,
+  NetureSupplierContent,
+  NetureSupplierRequestEvent,
   SupplierStatus,
   PartnershipStatus,
   SupplierRequestStatus,
   ProductPurpose,
+  ContentType,
+  ContentStatus,
+  RequestEventType,
 } from './entities/index.js';
 import logger from '../../utils/logger.js';
 
@@ -19,6 +24,8 @@ export class NetureService {
   private partnershipRepo: Repository<NeturePartnershipRequest>;
   private partnershipProductRepo: Repository<NeturePartnershipProduct>;
   private supplierRequestRepo: Repository<NetureSupplierRequest>;
+  private contentRepo: Repository<NetureSupplierContent>;
+  private requestEventRepo: Repository<NetureSupplierRequestEvent>;
 
   constructor() {
     this.supplierRepo = AppDataSource.getRepository(NetureSupplier);
@@ -26,6 +33,8 @@ export class NetureService {
     this.partnershipRepo = AppDataSource.getRepository(NeturePartnershipRequest);
     this.partnershipProductRepo = AppDataSource.getRepository(NeturePartnershipProduct);
     this.supplierRequestRepo = AppDataSource.getRepository(NetureSupplierRequest);
+    this.contentRepo = AppDataSource.getRepository(NetureSupplierContent);
+    this.requestEventRepo = AppDataSource.getRepository(NetureSupplierRequestEvent);
   }
 
   // ==================== Suppliers ====================
@@ -412,8 +421,9 @@ export class NetureService {
    * POST /supplier/requests/:id/approve - 신청 승인
    *
    * 상태 전이: pending → approved
+   * 이벤트 로그 기록 (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2)
    */
-  async approveSupplierRequest(id: string, supplierId: string) {
+  async approveSupplierRequest(id: string, supplierId: string, actorName?: string) {
     try {
       const request = await this.supplierRequestRepo.findOne({
         where: { id, supplierId },
@@ -432,6 +442,8 @@ export class NetureService {
         };
       }
 
+      const fromStatus = request.status;
+
       // 승인 처리
       request.status = SupplierRequestStatus.APPROVED;
       request.decidedBy = supplierId;
@@ -439,7 +451,24 @@ export class NetureService {
 
       const updatedRequest = await this.supplierRequestRepo.save(request);
 
-      logger.info(`[NetureService] Approved supplier request ${id} by ${supplierId}`);
+      // 이벤트 로그 기록
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.APPROVED,
+        actorId: supplierId,
+        actorName: actorName || '',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.APPROVED,
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Approved supplier request ${id} by ${supplierId} (event: ${event.id})`);
 
       return {
         success: true,
@@ -448,6 +477,7 @@ export class NetureService {
           status: updatedRequest.status,
           decidedBy: updatedRequest.decidedBy,
           decidedAt: updatedRequest.decidedAt,
+          eventId: event.id,
         },
       };
     } catch (error) {
@@ -460,8 +490,9 @@ export class NetureService {
    * POST /supplier/requests/:id/reject - 신청 거절
    *
    * 상태 전이: pending → rejected
+   * 이벤트 로그 기록 (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2)
    */
-  async rejectSupplierRequest(id: string, supplierId: string, reason?: string) {
+  async rejectSupplierRequest(id: string, supplierId: string, reason?: string, actorName?: string) {
     try {
       const request = await this.supplierRequestRepo.findOne({
         where: { id, supplierId },
@@ -480,6 +511,8 @@ export class NetureService {
         };
       }
 
+      const fromStatus = request.status;
+
       // 거절 처리
       request.status = SupplierRequestStatus.REJECTED;
       request.decidedBy = supplierId;
@@ -488,7 +521,25 @@ export class NetureService {
 
       const updatedRequest = await this.supplierRequestRepo.save(request);
 
-      logger.info(`[NetureService] Rejected supplier request ${id} by ${supplierId}`);
+      // 이벤트 로그 기록
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.REJECTED,
+        actorId: supplierId,
+        actorName: actorName || '',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.REJECTED,
+        reason: reason || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Rejected supplier request ${id} by ${supplierId} (event: ${event.id})`);
 
       return {
         success: true,
@@ -498,6 +549,7 @@ export class NetureService {
           decidedBy: updatedRequest.decidedBy,
           decidedAt: updatedRequest.decidedAt,
           rejectReason: updatedRequest.rejectReason,
+          eventId: event.id,
         },
       };
     } catch (error) {
@@ -668,13 +720,18 @@ export class NetureService {
     }
   }
 
-  // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4) ====================
+  // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4, P1 §3.3) ====================
 
   /**
    * GET /supplier/orders/summary - 서비스별 주문 요약
    *
    * Neture는 주문을 직접 처리하지 않음.
    * 서비스별 요약 정보만 제공하고 해당 서비스로 이동 링크 제공.
+   *
+   * P1 §3.3 정밀화:
+   * - 최근 승인 발생 시점
+   * - 각 서비스 상태 정보
+   * - 서비스별 담당자 연락처
    */
   async getSupplierOrdersSummary(supplierId: string) {
     try {
@@ -684,28 +741,413 @@ export class NetureService {
         .select('request.serviceId', 'serviceId')
         .addSelect('request.serviceName', 'serviceName')
         .addSelect('COUNT(*)', 'approvedCount')
+        .addSelect('MAX(request.decidedAt)', 'lastApprovedAt')
         .where('request.supplierId = :supplierId', { supplierId })
         .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
         .groupBy('request.serviceId')
         .addGroupBy('request.serviceName')
         .getRawMany();
 
-      // 서비스 URL 맵핑 (실제로는 설정에서 가져와야 함)
-      const serviceUrls: Record<string, string> = {
-        glycopharm: 'https://glycopharm.neture.co.kr',
-        'k-cosmetics': 'https://k-cosmetics.neture.co.kr',
-        glucoseview: 'https://glucoseview.neture.co.kr',
+      // 서비스 설정 (실제로는 DB나 설정에서 가져와야 함)
+      const serviceConfig: Record<string, {
+        url: string;
+        ordersPath: string;
+        supportEmail?: string;
+        features: string[];
+      }> = {
+        glycopharm: {
+          url: 'https://glycopharm.neture.co.kr',
+          ordersPath: '/supplier/orders',
+          supportEmail: 'support@glycopharm.kr',
+          features: ['주문관리', '배송조회', '반품처리'],
+        },
+        'k-cosmetics': {
+          url: 'https://k-cosmetics.neture.co.kr',
+          ordersPath: '/supplier/orders',
+          supportEmail: 'support@k-cosmetics.kr',
+          features: ['주문관리', '배송조회'],
+        },
+        glucoseview: {
+          url: 'https://glucoseview.neture.co.kr',
+          ordersPath: '/supplier/orders',
+          supportEmail: 'support@glucoseview.kr',
+          features: ['주문관리', '구독관리'],
+        },
       };
 
-      return approvedByService.map((svc) => ({
-        serviceId: svc.serviceId,
-        serviceName: svc.serviceName,
-        approvedSellerCount: parseInt(svc.approvedCount, 10),
-        serviceUrl: serviceUrls[svc.serviceId] || null,
-        message: '주문 현황은 해당 서비스에서 확인하세요.',
-      }));
+      // 각 서비스에 대해 최근 이벤트 조회
+      const serviceDetails = await Promise.all(
+        approvedByService.map(async (svc) => {
+          const config = serviceConfig[svc.serviceId] || {};
+
+          // 최근 승인/거절 이벤트 (최신 5건)
+          const recentEvents = await this.requestEventRepo
+            .createQueryBuilder('event')
+            .where('event.actorId = :supplierId', { supplierId })
+            .andWhere('event.serviceId = :serviceId', { serviceId: svc.serviceId })
+            .orderBy('event.createdAt', 'DESC')
+            .limit(5)
+            .getMany();
+
+          const pendingCount = await this.supplierRequestRepo.count({
+            where: {
+              supplierId,
+              serviceId: svc.serviceId,
+              status: SupplierRequestStatus.PENDING,
+            },
+          });
+
+          return {
+            serviceId: svc.serviceId,
+            serviceName: svc.serviceName,
+            summary: {
+              approvedSellerCount: parseInt(svc.approvedCount, 10),
+              pendingRequestCount: pendingCount,
+              lastApprovedAt: svc.lastApprovedAt || null,
+            },
+            navigation: {
+              serviceUrl: config.url || null,
+              ordersUrl: config.url ? `${config.url}${config.ordersPath}` : null,
+              supportEmail: config.supportEmail || null,
+            },
+            features: config.features || [],
+            recentActivity: recentEvents.map((e) => ({
+              eventType: e.eventType,
+              sellerName: e.sellerName,
+              productName: e.productName,
+              createdAt: e.createdAt,
+            })),
+            notice: 'Neture에서는 주문을 직접 처리하지 않습니다. 해당 서비스에서 주문을 관리하세요.',
+          };
+        })
+      );
+
+      return {
+        services: serviceDetails,
+        totalApprovedSellers: serviceDetails.reduce((sum, s) => sum + s.summary.approvedSellerCount, 0),
+        totalPendingRequests: serviceDetails.reduce((sum, s) => sum + s.summary.pendingRequestCount, 0),
+      };
     } catch (error) {
       logger.error('[NetureService] Error fetching order summary:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Supplier Contents (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.1) ====================
+
+  /**
+   * GET /supplier/contents - 공급자 콘텐츠 목록
+   */
+  async getSupplierContents(
+    supplierId: string,
+    filters?: { type?: ContentType; status?: ContentStatus }
+  ) {
+    try {
+      const query = this.contentRepo
+        .createQueryBuilder('content')
+        .where('content.supplierId = :supplierId', { supplierId });
+
+      if (filters?.type) {
+        query.andWhere('content.type = :type', { type: filters.type });
+      }
+
+      if (filters?.status) {
+        query.andWhere('content.status = :status', { status: filters.status });
+      }
+
+      query.orderBy('content.updatedAt', 'DESC');
+
+      const contents = await query.getMany();
+
+      return contents.map((c) => ({
+        id: c.id,
+        type: c.type,
+        title: c.title,
+        description: c.description,
+        status: c.status,
+        availableServices: c.availableServices || [],
+        availableAreas: c.availableAreas || [],
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+        publishedAt: c.publishedAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching supplier contents:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /supplier/contents/:id - 콘텐츠 상세 조회
+   */
+  async getSupplierContentById(id: string, supplierId: string) {
+    try {
+      const content = await this.contentRepo.findOne({
+        where: { id, supplierId },
+      });
+
+      if (!content) {
+        return null;
+      }
+
+      return {
+        id: content.id,
+        type: content.type,
+        title: content.title,
+        description: content.description,
+        body: content.body,
+        imageUrl: content.imageUrl,
+        status: content.status,
+        availableServices: content.availableServices || [],
+        availableAreas: content.availableAreas || [],
+        createdAt: content.createdAt,
+        updatedAt: content.updatedAt,
+        publishedAt: content.publishedAt,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching supplier content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /supplier/contents - 콘텐츠 생성
+   */
+  async createSupplierContent(
+    supplierId: string,
+    data: {
+      type: ContentType;
+      title: string;
+      description?: string;
+      body?: string;
+      imageUrl?: string;
+      availableServices?: string[];
+      availableAreas?: string[];
+    }
+  ) {
+    try {
+      const content = this.contentRepo.create({
+        supplierId,
+        type: data.type,
+        title: data.title,
+        description: data.description || '',
+        body: data.body || '',
+        imageUrl: data.imageUrl || '',
+        status: ContentStatus.DRAFT,
+        availableServices: data.availableServices || [],
+        availableAreas: data.availableAreas || [],
+      });
+
+      const savedContent = await this.contentRepo.save(content);
+
+      logger.info(`[NetureService] Created content ${savedContent.id} for supplier ${supplierId}`);
+
+      return {
+        id: savedContent.id,
+        type: savedContent.type,
+        title: savedContent.title,
+        status: savedContent.status,
+        createdAt: savedContent.createdAt,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error creating supplier content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * PATCH /supplier/contents/:id - 콘텐츠 수정
+   */
+  async updateSupplierContent(
+    id: string,
+    supplierId: string,
+    updates: {
+      title?: string;
+      description?: string;
+      body?: string;
+      imageUrl?: string;
+      status?: ContentStatus;
+      availableServices?: string[];
+      availableAreas?: string[];
+    }
+  ) {
+    try {
+      const content = await this.contentRepo.findOne({
+        where: { id, supplierId },
+      });
+
+      if (!content) {
+        return { success: false, error: 'CONTENT_NOT_FOUND' };
+      }
+
+      // 필드 업데이트
+      if (updates.title !== undefined) content.title = updates.title;
+      if (updates.description !== undefined) content.description = updates.description;
+      if (updates.body !== undefined) content.body = updates.body;
+      if (updates.imageUrl !== undefined) content.imageUrl = updates.imageUrl;
+      if (updates.availableServices !== undefined) content.availableServices = updates.availableServices;
+      if (updates.availableAreas !== undefined) content.availableAreas = updates.availableAreas;
+
+      // 상태 전환 처리
+      if (updates.status !== undefined) {
+        const oldStatus = content.status;
+        content.status = updates.status;
+
+        // draft → published 전환 시 publishedAt 설정
+        if (oldStatus === ContentStatus.DRAFT && updates.status === ContentStatus.PUBLISHED) {
+          content.publishedAt = new Date();
+        }
+      }
+
+      const savedContent = await this.contentRepo.save(content);
+
+      logger.info(`[NetureService] Updated content ${id} by supplier ${supplierId}`);
+
+      return {
+        success: true,
+        data: {
+          id: savedContent.id,
+          title: savedContent.title,
+          status: savedContent.status,
+          updatedAt: savedContent.updatedAt,
+          publishedAt: savedContent.publishedAt,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error updating supplier content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * DELETE /supplier/contents/:id - 콘텐츠 삭제
+   */
+  async deleteSupplierContent(id: string, supplierId: string) {
+    try {
+      const content = await this.contentRepo.findOne({
+        where: { id, supplierId },
+      });
+
+      if (!content) {
+        return { success: false, error: 'CONTENT_NOT_FOUND' };
+      }
+
+      await this.contentRepo.remove(content);
+
+      logger.info(`[NetureService] Deleted content ${id} by supplier ${supplierId}`);
+
+      return { success: true };
+    } catch (error) {
+      logger.error('[NetureService] Error deleting supplier content:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Request Events (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2) ====================
+
+  /**
+   * GET /supplier/requests/:id/events - 신청에 대한 이벤트 로그 조회
+   */
+  async getRequestEvents(requestId: string, supplierId: string) {
+    try {
+      // 먼저 해당 신청이 이 공급자 소유인지 확인
+      const request = await this.supplierRequestRepo.findOne({
+        where: { id: requestId, supplierId },
+      });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      const events = await this.requestEventRepo.find({
+        where: { requestId },
+        order: { createdAt: 'DESC' },
+      });
+
+      return {
+        success: true,
+        data: events.map((e) => ({
+          id: e.id,
+          eventType: e.eventType,
+          actor: {
+            id: e.actorId,
+            name: e.actorName,
+          },
+          seller: {
+            id: e.sellerId,
+            name: e.sellerName,
+          },
+          product: {
+            id: e.productId,
+            name: e.productName,
+          },
+          service: {
+            id: e.serviceId,
+            name: e.serviceName,
+          },
+          fromStatus: e.fromStatus,
+          toStatus: e.toStatus,
+          reason: e.reason,
+          createdAt: e.createdAt,
+        })),
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching request events:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /supplier/events - 공급자의 모든 이벤트 로그 조회
+   *
+   * 필터 옵션:
+   * - eventType: 이벤트 유형 (approved, rejected)
+   * - limit: 최대 개수
+   */
+  async getSupplierEvents(
+    supplierId: string,
+    filters?: { eventType?: RequestEventType; limit?: number }
+  ) {
+    try {
+      const query = this.requestEventRepo
+        .createQueryBuilder('event')
+        .where('event.actorId = :supplierId', { supplierId });
+
+      if (filters?.eventType) {
+        query.andWhere('event.eventType = :eventType', { eventType: filters.eventType });
+      }
+
+      query.orderBy('event.createdAt', 'DESC');
+
+      if (filters?.limit) {
+        query.limit(filters.limit);
+      }
+
+      const events = await query.getMany();
+
+      return events.map((e) => ({
+        id: e.id,
+        eventType: e.eventType,
+        requestId: e.requestId,
+        seller: {
+          id: e.sellerId,
+          name: e.sellerName,
+        },
+        product: {
+          id: e.productId,
+          name: e.productName,
+        },
+        service: {
+          id: e.serviceId,
+          name: e.serviceName,
+        },
+        fromStatus: e.fromStatus,
+        toStatus: e.toStatus,
+        reason: e.reason,
+        createdAt: e.createdAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching supplier events:', error);
       throw error;
     }
   }

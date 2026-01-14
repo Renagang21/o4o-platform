@@ -454,4 +454,289 @@ router.get('/supplier/orders/summary', async (req: AuthenticatedRequest, res: Re
   }
 });
 
+// ==================== Supplier Contents (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.1) ====================
+
+/**
+ * GET /api/v1/neture/supplier/contents
+ * Get contents for authenticated supplier
+ */
+router.get('/supplier/contents', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { type, status } = req.query;
+
+    const filters: { type?: string; status?: string } = {};
+    if (type && typeof type === 'string') filters.type = type;
+    if (status && typeof status === 'string') filters.status = status;
+
+    const contents = await netureService.getSupplierContents(supplierId, filters as any);
+
+    res.json({
+      success: true,
+      data: contents,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier contents:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch supplier contents',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/contents/:id
+ * Get content detail
+ */
+router.get('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+
+    const content = await netureService.getSupplierContentById(id, supplierId);
+
+    if (!content) {
+      return res.status(404).json({
+        success: false,
+        error: 'NOT_FOUND',
+        message: 'Content not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: content,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch supplier content',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/supplier/contents
+ * Create new content
+ */
+router.post('/supplier/contents', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { type, title, description, body, imageUrl, availableServices, availableAreas } = req.body;
+
+    if (!type || !title) {
+      return res.status(400).json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'type and title are required',
+      });
+    }
+
+    const result = await netureService.createSupplierContent(supplierId, {
+      type,
+      title,
+      description,
+      body,
+      imageUrl,
+      availableServices,
+      availableAreas,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error creating supplier content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to create supplier content',
+    });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/supplier/contents/:id
+ * Update content
+ */
+router.patch('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+    const updates = req.body;
+
+    const result = await netureService.updateSupplierContent(id, supplierId, updates);
+
+    if (!result.success) {
+      const statusCode = result.error === 'CONTENT_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error updating supplier content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to update supplier content',
+    });
+  }
+});
+
+/**
+ * DELETE /api/v1/neture/supplier/contents/:id
+ * Delete content
+ */
+router.delete('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+
+    const result = await netureService.deleteSupplierContent(id, supplierId);
+
+    if (!result.success) {
+      const statusCode = result.error === 'CONTENT_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error deleting supplier content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to delete supplier content',
+    });
+  }
+});
+
+// ==================== Request Events (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2) ====================
+
+/**
+ * GET /api/v1/neture/supplier/requests/:id/events
+ * Get event logs for a specific request
+ */
+router.get('/supplier/requests/:id/events', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+
+    const result = await netureService.getRequestEvents(id, supplierId);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error fetching request events:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch request events',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/events
+ * Get all events for the supplier
+ *
+ * Query Parameters:
+ * - eventType (optional): Filter by event type ('approved', 'rejected')
+ * - limit (optional): Limit number of results
+ */
+router.get('/supplier/events', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { eventType, limit } = req.query;
+
+    const filters: { eventType?: string; limit?: number } = {};
+    if (eventType && typeof eventType === 'string') filters.eventType = eventType as any;
+    if (limit && typeof limit === 'string') filters.limit = parseInt(limit, 10);
+
+    const events = await netureService.getSupplierEvents(supplierId, filters as any);
+
+    res.json({
+      success: true,
+      data: events,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier events:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch supplier events',
+    });
+  }
+});
+
 export default router;

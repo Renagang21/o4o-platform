@@ -3,3 +3,5 @@ export { NetureSupplierProduct, ProductPurpose } from './NetureSupplierProduct.e
 export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
 export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
 export { NetureSupplierRequest, SupplierRequestStatus } from './NetureSupplierRequest.entity.js';
+export { NetureSupplierContent, ContentType, ContentStatus } from './NetureSupplierContent.entity.js';
+export { NetureSupplierRequestEvent, RequestEventType } from './NetureSupplierRequestEvent.entity.js';
