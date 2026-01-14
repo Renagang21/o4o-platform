@@ -449,6 +449,9 @@ import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes
 // Neture Routes (Phase D-1)
 import { createNetureRoutes } from './routes/neture/neture.routes.js';
 
+// Neture Supplier Routes (modules/neture - supplier dashboard APIs)
+import netureSupplierRoutes from './modules/neture/neture.routes.js';
+
 // Dropshipping Admin Routes (DS-3)
 import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/dropshipping-admin.routes.js';
 
@@ -776,6 +779,14 @@ const startServer = async () => {
       logger.info('✅ Neture routes registered at /api/v1/neture');
     } catch (netureError) {
       logger.error('Failed to register Neture routes:', netureError);
+    }
+
+    // 29b. Register Neture Supplier routes (modules/neture - supplier dashboard)
+    try {
+      app.use('/api/v1/neture', netureSupplierRoutes);
+      logger.info('✅ Neture Supplier routes registered at /api/v1/neture/supplier/*');
+    } catch (netureSupplierError) {
+      logger.error('Failed to register Neture Supplier routes:', netureSupplierError);
     }
 
     // 30. Register Dropshipping Admin routes (DS-3)
