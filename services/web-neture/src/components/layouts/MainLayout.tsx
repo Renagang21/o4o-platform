@@ -13,7 +13,7 @@ export default function MainLayout() {
             </Link>
 
             {/* Navigation */}
-            <nav className="flex space-x-8">
+            <nav className="flex items-center space-x-6">
               <Link
                 to="/"
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
@@ -33,10 +33,17 @@ export default function MainLayout() {
                 제휴 요청
               </Link>
               <Link
-                to="/content"
+                to="/partners/apply"
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
               >
-                콘텐츠
+                참여 신청
+              </Link>
+              <span className="text-gray-300">|</span>
+              <Link
+                to="/login"
+                className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+              >
+                로그인
               </Link>
             </nav>
           </div>

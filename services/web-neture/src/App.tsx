@@ -12,12 +12,15 @@
  */
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts';
 import MainLayout from './components/layouts/MainLayout';
 import HomePage from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
 import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
+import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
 
 // Test Guide Pages
@@ -30,25 +33,31 @@ import {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/suppliers" element={<SupplierListPage />} />
-          <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
-          <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
-          <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
-          <Route path="/partners/info" element={<PartnerInfoPage />} />
-          <Route path="/content" element={<div className="max-w-7xl mx-auto px-4 py-16"><h1 className="text-3xl font-bold">콘텐츠 (준비 중)</h1></div>} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Login - outside MainLayout */}
+          <Route path="/login" element={<LoginPage />} />
 
-          {/* Test Guide */}
-          <Route path="/test-guide" element={<TestGuidePage />} />
-          <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
-          <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
-          <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/suppliers" element={<SupplierListPage />} />
+            <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
+            <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
+            <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
+            <Route path="/partners/apply" element={<PartnersApplyPage />} />
+            <Route path="/partners/info" element={<PartnerInfoPage />} />
+            <Route path="/content" element={<div className="max-w-7xl mx-auto px-4 py-16"><h1 className="text-3xl font-bold">콘텐츠 (준비 중)</h1></div>} />
+
+            {/* Test Guide */}
+            <Route path="/test-guide" element={<TestGuidePage />} />
+            <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
+            <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
+            <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
