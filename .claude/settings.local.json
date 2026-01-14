@@ -456,7 +456,11 @@
       "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api AND timestamp>=\"\"2026-01-14T00:58:00Z\"\"\" --limit=30 --format=json --project=netureyoutube)",
       "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api AND jsonPayload.message:pharmacist\" --limit=5 --format=\"table\\(timestamp, jsonPayload.message\\)\" --project=netureyoutube)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20978578541 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20978822314 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20978822314 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" workflow run deploy-web-services.yml --ref main -f service=neture -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20979476938 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20979476938 --log-failed -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_job AND resource.labels.job_name=o4o-api-migrations AND timestamp>=\"\"2026-01-14T02:00:00Z\"\"\" --limit=30 --format=\"table\\(timestamp, textPayload\\)\" --project=netureyoutube)"
     ],
     "deny": []
   }

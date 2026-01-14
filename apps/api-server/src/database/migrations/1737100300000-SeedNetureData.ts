@@ -206,14 +206,14 @@ export class SeedNetureData1737100300000 implements MigrationInterface {
     // ========================================
 
     const existingContents = await queryRunner.query(
-      `SELECT COUNT(*) as count FROM cms_contents WHERE service_key = 'neture'`
+      `SELECT COUNT(*) as count FROM cms_contents WHERE "serviceKey" = 'neture'`
     );
 
     if (parseInt(existingContents[0].count) === 0) {
       await queryRunner.query(
         `INSERT INTO cms_contents (
-          id, service_key, type, title, summary, body, status,
-          is_pinned, sort_order, created_at, updated_at, published_at
+          id, "serviceKey", type, title, summary, body, status,
+          "isPinned", "sortOrder", "createdAt", "updatedAt", "publishedAt"
         ) VALUES
         (
           gen_random_uuid(), 'neture', 'notice',
@@ -252,7 +252,7 @@ export class SeedNetureData1737100300000 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Remove CMS contents
-    await queryRunner.query(`DELETE FROM cms_contents WHERE service_key = 'neture'`);
+    await queryRunner.query(`DELETE FROM cms_contents WHERE "serviceKey" = 'neture'`);
 
     // Remove partnership products and requests
     await queryRunner.query(`DELETE FROM neture_partnership_products`);
