@@ -6,6 +6,7 @@
 import { Link } from 'react-router-dom';
 import { HeroSection } from '../components';
 import { colors } from '../styles/theme';
+import { TestImprovementSection } from '../components/home/TestImprovementSection';
 
 // 메인 서비스 카드
 const serviceCards = [
@@ -163,6 +164,15 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 서비스 테스트 & 개선 참여 (WO-TEST-HOMEPAGE-SECTION-V1) */}
+      <TestImprovementSection
+        config={{
+          serviceName: '청명광역약사회',
+          serviceDescription: '지부·분회 회원 관리, 교육 신청, 공동구매 등 약사회 운영을 지원하는 SaaS 플랫폼',
+          primaryColor: colors.primary,
+        }}
+      />
     </div>
   );
 }

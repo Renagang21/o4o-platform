@@ -23,6 +23,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts';
+import { TestImprovementSection } from '../components/home/TestImprovementSection';
 
 // ========================================
 // Types
@@ -730,6 +731,15 @@ export function HomePage() {
 
       {/* 5. 협력 브랜드 신뢰 Zone */}
       <PartnerTrustSection />
+
+      {/* 서비스 테스트 & 개선 참여 (WO-TEST-HOMEPAGE-SECTION-V1) */}
+      <TestImprovementSection
+        config={{
+          serviceName: 'K-Cosmetics',
+          serviceDescription: '국내 화장품 브랜드를 한 곳에서 탐색하고 구매할 수 있는 뷰티 커머스 플랫폼',
+          primaryColor: '#e91e63',
+        }}
+      />
     </div>
   );
 }

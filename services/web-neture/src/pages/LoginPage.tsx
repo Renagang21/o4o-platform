@@ -14,14 +14,6 @@ const ROLE_ICONS: Record<UserRole, string> = {
   user: '👤',
 };
 
-// 테스트 계정 목록 (비밀번호 통일: TestPassword)
-const TEST_PASSWORD = 'TestPassword';
-const TEST_ACCOUNTS = [
-  { email: 'supplier@neture.test', password: TEST_PASSWORD, label: '공급자', role: 'supplier' as UserRole },
-  { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너', role: 'partner' as UserRole },
-  { email: 'admin@neture.test', password: TEST_PASSWORD, label: '운영자', role: 'admin' as UserRole },
-];
-
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -31,13 +23,6 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [pendingRoles, setPendingRoles] = useState<UserRole[]>([]);
-
-  // 테스트 계정 정보를 입력 필드에 채우기
-  const fillTestAccount = (account: { email: string; password: string }) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setError(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,42 +143,7 @@ export function LoginPage() {
           </button>
         </form>
 
-        <div style={styles.testAccounts}>
-          <p style={styles.testTitle}>테스트 계정 (클릭 시 입력됨)</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            {TEST_ACCOUNTS.map((account) => (
-              <button
-                key={account.email}
-                type="button"
-                onClick={() => fillTestAccount(account)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-3)',
-                  padding: 'var(--space-3)',
-                  backgroundColor: 'var(--color-bg-secondary)',
-                  border: '1px solid var(--color-border-default)',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'var(--transition-fast)',
-                }}
-              >
-                <span style={{ fontSize: 'var(--text-body-md)', fontWeight: 600, color: 'var(--color-text-primary)', minWidth: '50px' }}>
-                  {account.label}
-                </span>
-                <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-text-tertiary)', flex: 1 }}>
-                  {account.email}
-                </span>
-                <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--color-text-disabled)' }}>클릭하여 입력</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div style={styles.footer}>
-          <a href="/test-guide" style={styles.testGuideLink}>테스트 가이드 보기</a>
-          <span style={styles.divider}>|</span>
           <a href="/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
           <span style={styles.divider}>|</span>
           <a href="/register" style={styles.link}>회원가입</a>
@@ -324,34 +274,10 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     margin: 0,
   },
-  testAccounts: {
-    marginTop: 'var(--space-4)',
-    paddingTop: 'var(--space-4)',
-    borderTop: '1px solid var(--color-border-default)',
-  },
-  testTitle: {
-    fontSize: 'var(--text-body-sm)',
-    fontWeight: 600,
-    color: 'var(--color-text-tertiary)',
-    margin: '0 0 var(--space-3) 0',
-    textTransform: 'uppercase',
-  },
-  testList: {
-    fontSize: 'var(--text-body-sm)',
-    color: 'var(--color-text-tertiary)',
-    margin: 0,
-    paddingLeft: 'var(--space-3)',
-    lineHeight: 1.8,
-  },
   footer: {
     textAlign: 'center',
     marginTop: 'var(--space-4)',
     fontSize: 'var(--text-body-md)',
-  },
-  testGuideLink: {
-    color: '#f59e0b',
-    textDecoration: 'none',
-    fontWeight: 600,
   },
   link: {
     color: 'var(--color-primary)',  /* Primary 허용: 핵심 링크 */
