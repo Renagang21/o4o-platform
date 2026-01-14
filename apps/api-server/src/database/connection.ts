@@ -192,12 +192,13 @@ import {
 } from '@o4o/organization-core/entities';
 
 // ============================================================================
-// CMS-CORE ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+// CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
+// Use /entities subpath to avoid side-effect loading
 // ============================================================================
-// Original: import { CmsContent, CmsContentSlot, Channel, ChannelPlaybackLog, ChannelHeartbeat } from '@o4o-apps/cms-core';
-// Reason: Package index.ts re-exports all entities causing potential circular dependencies
-// These entities will be lazy-loaded when Admin/Ops routes are accessed
-// ============================================================================
+import {
+  CmsContent,
+  CmsContentSlot,
+} from '@o4o-apps/cms-core/entities';
 
 // ============================================================================
 // LMS-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
@@ -460,11 +461,10 @@ export const AppDataSource = new DataSource({
     Attendance,
     ContentBundle,
     // ============================================================================
-    // CMS-CORE & CHANNEL ENTITIES - REMOVED (WO-PLATFORM-BOOTSTRAP-STABILIZATION-P0)
+    // CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
     // ============================================================================
-    // CmsContent, CmsContentSlot, Channel, ChannelPlaybackLog, ChannelHeartbeat
-    // Removed to prevent package side-effect loading from @o4o-apps/cms-core
-    // These Admin/Ops entities will be lazy-loaded when routes are accessed
+    CmsContent,
+    CmsContentSlot,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
