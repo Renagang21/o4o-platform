@@ -377,7 +377,101 @@ export const supplierApi = {
       return { success: false, error: 'NETWORK_ERROR' };
     }
   },
+
+  /**
+   * GET /api/v1/neture/supplier/products
+   * 공급자 제품 목록
+   */
+  async getProducts(): Promise<SupplierProduct[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.warn('[Supplier API] Products API not available');
+        return [];
+      }
+
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch products:', error);
+      return [];
+    }
+  },
+
+  /**
+   * PATCH /api/v1/neture/supplier/products/:id
+   * 제품 상태 업데이트
+   */
+  async updateProduct(
+    id: string,
+    updates: { isActive?: boolean; acceptsApplications?: boolean }
+  ): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * GET /api/v1/neture/supplier/orders/summary
+   * 서비스별 주문 요약
+   */
+  async getOrdersSummary(): Promise<OrderSummary[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/summary`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.warn('[Supplier API] Orders summary API not available');
+        return [];
+      }
+
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch orders summary:', error);
+      return [];
+    }
+  },
 };
+
+// ==================== Additional Types ====================
+
+export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
+
+interface SupplierProduct {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  purpose: SupplierProductPurpose;
+  isActive: boolean;
+  acceptsApplications: boolean;
+  pendingRequestCount: number;
+  activeServiceCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface OrderSummary {
+  serviceId: string;
+  serviceName: string;
+  approvedSellerCount: number;
+  serviceUrl: string | null;
+  message: string;
+}
 
 export type {
   Supplier,
@@ -387,4 +481,6 @@ export type {
   CmsContent,
   SupplierRequest,
   SupplierRequestDetail,
+  SupplierProduct,
+  OrderSummary,
 };

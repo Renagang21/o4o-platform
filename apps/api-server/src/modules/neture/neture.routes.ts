@@ -342,4 +342,116 @@ router.post('/supplier/requests', async (req: Request, res: Response) => {
   }
 });
 
+// ==================== Supplier Products (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2) ====================
+
+/**
+ * GET /api/v1/neture/supplier/products
+ * Get products for authenticated supplier
+ */
+router.get('/supplier/products', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const products = await netureService.getSupplierProducts(supplierId);
+
+    res.json({
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier products:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch supplier products',
+    });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/supplier/products/:id
+ * Update product status (activation, applications toggle)
+ */
+router.patch('/supplier/products/:id', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+    const { isActive, acceptsApplications } = req.body;
+
+    const result = await netureService.updateSupplierProduct(id, supplierId, {
+      isActive,
+      acceptsApplications,
+    });
+
+    if (!result.success) {
+      const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error updating supplier product:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to update supplier product',
+    });
+  }
+});
+
+// ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4) ====================
+
+/**
+ * GET /api/v1/neture/supplier/orders/summary
+ * Get service-wise order summary for supplier
+ *
+ * NOTE: Neture does NOT process orders.
+ * This endpoint provides summary and links to navigate to each service.
+ */
+router.get('/supplier/orders/summary', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = req.user?.supplierId || req.user?.id;
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const summary = await netureService.getSupplierOrdersSummary(supplierId);
+
+    res.json({
+      success: true,
+      data: summary,
+      notice: 'Neture는 주문을 직접 처리하지 않습니다. 각 서비스에서 주문을 관리하세요.',
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching order summary:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch order summary',
+    });
+  }
+});
+
 export default router;

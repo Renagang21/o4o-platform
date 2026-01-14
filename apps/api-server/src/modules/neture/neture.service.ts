@@ -9,6 +9,7 @@ import {
   SupplierStatus,
   PartnershipStatus,
   SupplierRequestStatus,
+  ProductPurpose,
 } from './entities/index.js';
 import logger from '../../utils/logger.js';
 
@@ -552,6 +553,159 @@ export class NetureService {
       };
     } catch (error) {
       logger.error('[NetureService] Error creating supplier request:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Supplier Products (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2) ====================
+
+  /**
+   * GET /supplier/products - 공급자의 제품 목록
+   */
+  async getSupplierProducts(supplierId: string) {
+    try {
+      const products = await this.productRepo.find({
+        where: { supplierId },
+        order: { createdAt: 'DESC' },
+      });
+
+      // 각 제품별 신청 대기 건수 조회
+      const pendingCounts = await Promise.all(
+        products.map(async (product) => {
+          const count = await this.supplierRequestRepo.count({
+            where: {
+              supplierId,
+              productId: product.id,
+              status: SupplierRequestStatus.PENDING,
+            },
+          });
+          return { productId: product.id, count };
+        })
+      );
+
+      const pendingMap = new Map(pendingCounts.map((p) => [p.productId, p.count]));
+
+      // 각 제품별 사용 서비스 수 (approved 상태 기준)
+      const serviceCounts = await Promise.all(
+        products.map(async (product) => {
+          const count = await this.supplierRequestRepo
+            .createQueryBuilder('request')
+            .where('request.supplierId = :supplierId', { supplierId })
+            .andWhere('request.productId = :productId', { productId: product.id })
+            .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
+            .select('COUNT(DISTINCT request.serviceId)', 'count')
+            .getRawOne();
+          return { productId: product.id, count: parseInt(count?.count || '0', 10) };
+        })
+      );
+
+      const serviceMap = new Map(serviceCounts.map((s) => [s.productId, s.count]));
+
+      return products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        description: product.description,
+        purpose: product.purpose,
+        isActive: product.isActive,
+        acceptsApplications: product.acceptsApplications,
+        pendingRequestCount: pendingMap.get(product.id) || 0,
+        activeServiceCount: serviceMap.get(product.id) || 0,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching supplier products:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * PATCH /supplier/products/:id - 제품 상태 업데이트
+   *
+   * 허용 액션:
+   * - isActive 토글 (활성/비활성)
+   * - acceptsApplications 토글 (신청 가능/불가)
+   */
+  async updateSupplierProduct(
+    productId: string,
+    supplierId: string,
+    updates: { isActive?: boolean; acceptsApplications?: boolean }
+  ) {
+    try {
+      const product = await this.productRepo.findOne({
+        where: { id: productId, supplierId },
+      });
+
+      if (!product) {
+        return { success: false, error: 'PRODUCT_NOT_FOUND' };
+      }
+
+      if (updates.isActive !== undefined) {
+        product.isActive = updates.isActive;
+      }
+
+      if (updates.acceptsApplications !== undefined) {
+        product.acceptsApplications = updates.acceptsApplications;
+      }
+
+      const savedProduct = await this.productRepo.save(product);
+
+      logger.info(`[NetureService] Updated product ${productId} by supplier ${supplierId}`);
+
+      return {
+        success: true,
+        data: {
+          id: savedProduct.id,
+          isActive: savedProduct.isActive,
+          acceptsApplications: savedProduct.acceptsApplications,
+          updatedAt: savedProduct.updatedAt,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error updating supplier product:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4) ====================
+
+  /**
+   * GET /supplier/orders/summary - 서비스별 주문 요약
+   *
+   * Neture는 주문을 직접 처리하지 않음.
+   * 서비스별 요약 정보만 제공하고 해당 서비스로 이동 링크 제공.
+   */
+  async getSupplierOrdersSummary(supplierId: string) {
+    try {
+      // 서비스별 승인된 신청 수 집계
+      const approvedByService = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .select('request.serviceId', 'serviceId')
+        .addSelect('request.serviceName', 'serviceName')
+        .addSelect('COUNT(*)', 'approvedCount')
+        .where('request.supplierId = :supplierId', { supplierId })
+        .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
+        .groupBy('request.serviceId')
+        .addGroupBy('request.serviceName')
+        .getRawMany();
+
+      // 서비스 URL 맵핑 (실제로는 설정에서 가져와야 함)
+      const serviceUrls: Record<string, string> = {
+        glycopharm: 'https://glycopharm.neture.co.kr',
+        'k-cosmetics': 'https://k-cosmetics.neture.co.kr',
+        glucoseview: 'https://glucoseview.neture.co.kr',
+      };
+
+      return approvedByService.map((svc) => ({
+        serviceId: svc.serviceId,
+        serviceName: svc.serviceName,
+        approvedSellerCount: parseInt(svc.approvedCount, 10),
+        serviceUrl: serviceUrls[svc.serviceId] || null,
+        message: '주문 현황은 해당 서비스에서 확인하세요.',
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching order summary:', error);
       throw error;
     }
   }

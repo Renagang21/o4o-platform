@@ -41,6 +41,9 @@ import {
   SupplierDashboardPage,
   SellerRequestsPage,
   SellerRequestDetailPage,
+  SupplierProductsPage,
+  SupplierOrdersPage,
+  SupplierContentsPage,
 } from './pages/supplier';
 
 // Test Guide Pages
@@ -90,6 +93,9 @@ function App() {
             <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
             <Route path="/supplier/requests" element={<SellerRequestsPage />} />
             <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
+            <Route path="/supplier/products" element={<SupplierProductsPage />} />
+            <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
+            <Route path="/supplier/contents" element={<SupplierContentsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
