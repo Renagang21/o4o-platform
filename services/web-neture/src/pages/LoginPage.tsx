@@ -5,14 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, UserRole } from '../contexts';
-
-const ROLE_ICONS: Record<UserRole, string> = {
-  admin: '🛡️',
-  supplier: '📦',
-  partner: '🤝',
-  user: '👤',
-};
+import { useAuth } from '../contexts';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
 const TEST_PASSWORD = 'TestPassword';
@@ -29,8 +22,6 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showRoleSelector, setShowRoleSelector] = useState(false);
-  const [pendingRoles, setPendingRoles] = useState<UserRole[]>([]);
 
   // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
   const fillTestAccount = (account: { email: string; password: string }) => {
@@ -51,64 +42,14 @@ export function LoginPage() {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
 
-      // 로그인 성공 - 역할 확인
-      const savedUser = localStorage.getItem('neture_user');
-      if (savedUser) {
-        const userData = JSON.parse(savedUser);
-        if (userData.roles.length > 1) {
-          // 복수 역할 - 선택 화면 표시
-          setPendingRoles(userData.roles);
-          setShowRoleSelector(true);
-        } else {
-          // 단일 역할 - 바로 대시보드로 이동
-          navigate(ROLE_DASHBOARDS[userData.roles[0] as UserRole]);
-        }
-      }
+      // 로그인 성공 - 홈으로 이동 (AuthContext에서 user 상태 관리)
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
-
-  const handleRoleSelect = (role: UserRole) => {
-    navigate(ROLE_DASHBOARDS[role]);
-  };
-
-  // 역할 선택 화면
-  if (showRoleSelector && pendingRoles.length > 1) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <div style={styles.logo}>🌿</div>
-          <h1 style={styles.title}>역할 선택</h1>
-          <p style={styles.subtitle}>사용할 역할을 선택하세요</p>
-
-          <div style={styles.roleGrid}>
-            {pendingRoles.map(role => (
-              <button
-                key={role}
-                style={styles.roleCard}
-                onClick={() => handleRoleSelect(role)}
-              >
-                <span style={styles.roleIcon}>{ROLE_ICONS[role]}</span>
-                <span style={styles.roleLabel}>{ROLE_LABELS[role]}</span>
-                <span style={styles.roleDescription}>
-                  {role === 'admin' && '플랫폼 전체 관리'}
-                  {role === 'supplier' && '상품 공급 및 배송'}
-                  {role === 'partner' && '협력사 연계 관리'}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <p style={styles.roleNote}>
-            로그인 후에도 상단 메뉴에서 역할을 전환할 수 있습니다.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   // 로그인 폼
   return (
@@ -266,44 +207,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     marginTop: '8px',
   },
-  roleGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-    marginBottom: '16px',
-  },
-  roleCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '16px 12px',
-    backgroundColor: '#fff',
-    border: '2px solid #e2e8f0',
-    borderRadius: '12px',
-    cursor: 'pointer',
-    transition: 'border-color 0.2s, background-color 0.2s',
-  },
-  roleIcon: {
-    fontSize: '32px',
-    marginBottom: '12px',
-  },
-  roleLabel: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: '4px',
-  },
-  roleDescription: {
-    fontSize: '12px',
-    color: '#94a3b8',
-    textAlign: 'center',
-  },
-  roleNote: {
-    fontSize: '14px',
-    color: '#94a3b8',
-    textAlign: 'center',
-    margin: 0,
-  },
   footer: {
     marginTop: '24px',
     paddingTop: '24px',
@@ -315,10 +218,6 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     fontSize: '14px',
     fontWeight: 500,
-  },
-  divider: {
-    color: '#e2e8f0',
-    margin: '0 12px',
   },
   testSection: {
     marginTop: '24px',
