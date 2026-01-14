@@ -42,6 +42,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { heroSlides, heroSettings, type HeroSlide } from '@/config/heroConfig';
 import OperationFrameSection from '@/components/home/OperationFrameSection';
+import TestImprovementSection from '@/components/home/TestImprovementSection';
 import {
   publicApi,
   fallbackNowRunning,
@@ -152,11 +153,10 @@ function HeroSection() {
   const renderCta = (slide: HeroSlide) => {
     if (!slide.cta) return null;
 
-    const buttonClass = `inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
-      slide.cta.variant === 'primary'
-        ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
-        : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
-    }`;
+    const buttonClass = `inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${slide.cta.variant === 'primary'
+      ? 'bg-white text-slate-800 hover:bg-slate-100 shadow-lg'
+      : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
+      }`;
 
     // 외부 링크 처리
     if (slide.cta.external) {
@@ -198,9 +198,8 @@ function HeroSection() {
         {heroSlides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-700 ${
-              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-700 ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
           >
             <div className={`h-full bg-gradient-to-br ${slide.bgGradient}`}>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center">
@@ -233,9 +232,8 @@ function HeroSection() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === currentSlide ? 'bg-white w-8' : 'bg-white/40 w-2'
-              }`}
+              className={`h-2 rounded-full transition-all ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 w-2'
+                }`}
               aria-label={`슬라이드 ${index + 1}`}
             />
           ))}
@@ -583,7 +581,10 @@ export default function HomePage() {
       {/* Block 5: Partner Trust - 협력 네트워크 */}
       <PartnerTrustSection />
 
-      {/* Block 6: CTA - 비로그인 사용자용 */}
+      {/* Block 6: Test Improvement - 서비스 테스트 & 개선 참여 [신규] */}
+      <TestImprovementSection />
+
+      {/* Block 7: CTA - 비로그인 사용자용 */}
       <CTASection />
     </div>
   );

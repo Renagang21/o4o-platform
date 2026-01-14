@@ -113,13 +113,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* 테스트 가이드 링크 */}
-          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-            <a href="/test-guide" className="text-amber-600 font-semibold text-sm hover:text-amber-700">
-              테스트 가이드 보기
-            </a>
-          </div>
-
           {/* 테스트 계정 */}
           <div className="mt-4 pt-4 border-t border-slate-100">
             <p className="text-xs text-slate-400 mb-3">테스트 계정 (클릭 시 입력됨)</p>

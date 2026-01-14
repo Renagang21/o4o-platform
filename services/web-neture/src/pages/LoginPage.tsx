@@ -14,6 +14,13 @@ const ROLE_ICONS: Record<UserRole, string> = {
   user: '👤',
 };
 
+// 테스트 계정 (비밀번호 통일: TestPassword)
+const TEST_PASSWORD = 'TestPassword';
+const testAccounts = [
+  { email: 'supplier@neture.test', password: TEST_PASSWORD, label: '공급자' },
+  { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너' },
+];
+
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -23,6 +30,13 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [pendingRoles, setPendingRoles] = useState<UserRole[]>([]);
+
+  // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
+  const fillTestAccount = (account: { email: string; password: string }) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +161,27 @@ export function LoginPage() {
           <a href="/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
           <span style={styles.divider}>|</span>
           <a href="/register" style={styles.link}>회원가입</a>
+        </div>
+
+        {/* 테스트 계정 */}
+        <div style={styles.testSection}>
+          <p style={styles.testLabel}>테스트 계정 (클릭 시 입력됨)</p>
+          <div style={styles.testAccounts}>
+            {testAccounts.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => fillTestAccount(account)}
+                style={styles.testAccountButton}
+              >
+                <div style={styles.testAccountInfo}>
+                  <span style={styles.testAccountBadge}>{account.label}</span>
+                  <p style={styles.testAccountEmail}>{account.email}</p>
+                </div>
+                <span style={styles.testAccountClick}>클릭하여 입력</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -286,5 +321,57 @@ const styles: Record<string, React.CSSProperties> = {
   divider: {
     color: 'var(--color-border-default)',
     margin: '0 var(--space-3)',
+  },
+  testSection: {
+    marginTop: 'var(--space-5)',
+    paddingTop: 'var(--space-5)',
+    borderTop: '1px solid var(--color-border-default)',
+  },
+  testLabel: {
+    fontSize: 'var(--text-body-sm)',
+    color: 'var(--color-text-tertiary)',
+    textAlign: 'center',
+    marginBottom: 'var(--space-3)',
+  },
+  testAccounts: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--space-2)',
+  },
+  testAccountButton: {
+    width: '100%',
+    padding: 'var(--space-3) var(--space-4)',
+    textAlign: 'left',
+    borderRadius: 'var(--radius-lg)',
+    border: '1px solid var(--color-border-default)',
+    backgroundColor: 'var(--color-card-bg)',
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    transition: 'var(--transition-fast)',
+  },
+  testAccountInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--space-1)',
+  },
+  testAccountBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: 'var(--radius-sm)',
+    fontSize: 'var(--text-body-sm)',
+    fontWeight: 500,
+    backgroundColor: 'var(--color-bg-secondary)',
+    color: 'var(--color-text-secondary)',
+  },
+  testAccountEmail: {
+    fontSize: 'var(--text-body-md)',
+    color: 'var(--color-text-secondary)',
+    margin: 0,
+  },
+  testAccountClick: {
+    fontSize: 'var(--text-body-sm)',
+    color: 'var(--color-text-tertiary)',
   },
 };

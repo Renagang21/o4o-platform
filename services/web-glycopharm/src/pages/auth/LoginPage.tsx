@@ -147,10 +147,6 @@ export default function LoginPage() {
 
           <div className="mt-6 pt-6 border-t">
             <p className="text-center text-sm text-slate-500 mb-4">
-              <NavLink to="/test-guide" className="text-amber-600 font-semibold hover:text-amber-700">
-                테스트 가이드 보기
-              </NavLink>
-              <span className="mx-2 text-slate-300">|</span>
               계정이 없으신가요?{' '}
               <NavLink to="/register" className="text-primary-600 font-medium hover:text-primary-700">
                 회원가입
