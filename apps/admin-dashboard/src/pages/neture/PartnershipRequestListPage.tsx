@@ -1,7 +1,11 @@
 /**
- * PartnershipRequestListPage - 파트너십 신청 목록 (Admin)
+ * PartnershipRequestListPage - 파트너십 신청 목록 조회 (Admin)
  *
- * 관리자가 모든 파트너십 신청을 확인하고 관리하는 페이지
+ * Work Order: WO-NETURE-EXTENSION-P1
+ *
+ * Neture 책임 선언에 따라 조회 전용 페이지입니다.
+ * - 신청 목록 조회만 제공
+ * - 승인/거절은 각 서비스에서 직접 처리
  */
 
 import { useState, useEffect } from 'react';
@@ -96,8 +100,11 @@ export default function PartnershipRequestListPage() {
         <div className="p-6">
             {/* Header */}
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">파트너십 신청 관리</h1>
-                <p className="text-gray-600">공급자 및 파트너 참여 신청을 검토하고 관리합니다</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">파트너십 신청 현황</h1>
+                <p className="text-gray-600">
+                    공급자 및 파트너 참여 신청 현황을 조회합니다.
+                    <span className="text-slate-500 ml-1">(조회 전용 - 승인/거절은 각 서비스에서 처리)</span>
+                </p>
             </div>
 
             {/* Filters */}

@@ -14,7 +14,9 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Building2, Handshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { netureApi, type Supplier, type PartnershipRequest } from '../lib/api';
-import { TestImprovementSection } from '../components/home/TestImprovementSection';
+import { HomeTestIntroSection } from '../components/home/HomeTestIntroSection';
+import { HomeTestFeedbackSection } from '../components/home/HomeTestFeedbackSection';
+import { HomeServiceUpdateSection } from '../components/home/HomeServiceUpdateSection';
 
 export default function HomePage() {
   return (
@@ -28,14 +30,10 @@ export default function HomePage() {
       {/* Partnership Requests Preview */}
       <PartnershipRequestsPreviewSection />
 
-      {/* 서비스 테스트 & 개선 참여 (WO-TEST-HOMEPAGE-SECTION-V1) */}
-      <TestImprovementSection
-        config={{
-          serviceName: 'Neture',
-          serviceDescription: '공급자를 찾고, 제휴를 연결하는 B2B 유통 정보 플랫폼',
-          primaryColor: '#4f46e5',
-        }}
-      />
+      {/* 서비스 테스트 & 개선 참여 (WO-NETURE-TEST-SECTIONS-V1) */}
+      <HomeTestIntroSection />
+      <HomeTestFeedbackSection />
+      <HomeServiceUpdateSection />
     </div>
   );
 }

@@ -1,7 +1,26 @@
+/**
+ * SupplierDetailPage - 공급자 상세 페이지
+ *
+ * Work Order: WO-NETURE-EXTENSION-P4
+ *
+ * 표현 기능:
+ * - P2: 콘텐츠 활용 안내 (Content Utilization Visibility)
+ * - P3: 제품 목적 표시 (Product Purpose Visibility)
+ * - P4: 판매 중 매장 표시 (Active Usage Visibility)
+ *
+ * 금지사항:
+ * - 신청/승인 버튼 없음
+ * - 상태 변경 없음
+ * - Read-Only 유지
+ */
+
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Mail, Phone, Globe, MessageCircle, ArrowLeft } from 'lucide-react';
 import { netureApi, type SupplierDetail } from '../../lib/api';
+import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
+import { ProductPurposeBadge } from '../../components/ProductPurposeBadge';
+import { ActiveUsageList } from '../../components/ActiveUsageList';
 
 export default function SupplierDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -100,13 +119,16 @@ export default function SupplierDetailPage() {
         <p className="text-gray-700 leading-relaxed">{supplier.description}</p>
       </div>
 
-      {/* Products */}
+      {/* Products (WO-NETURE-EXTENSION-P3: 목적 라벨 추가) */}
       <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">취급 제품</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {supplier.products.map((product) => (
             <div key={product.id} className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                <ProductPurposeBadge purpose={product.purpose} size="small" />
+              </div>
               <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded mb-2">
                 {product.category}
               </span>
@@ -114,6 +136,30 @@ export default function SupplierDetailPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* 판매 중 매장 표시 (WO-NETURE-EXTENSION-P4) - ACTIVE_SALES 제품만 */}
+      {supplier.products.some((p) => p.purpose === 'ACTIVE_SALES') && (
+        <div className="mb-8">
+          {supplier.products
+            .filter((p) => p.purpose === 'ACTIVE_SALES')
+            .map((product) => (
+              <div key={product.id} className="mb-4">
+                <ActiveUsageList
+                  productId={product.id}
+                  productName={product.name}
+                />
+              </div>
+            ))}
+        </div>
+      )}
+
+      {/* 콘텐츠 활용 안내 (WO-NETURE-EXTENSION-P2) */}
+      <div className="mb-8">
+        <ContentUtilizationGuide
+          contentType="product"
+          usageNote={`${supplier.name}의 제품 콘텐츠(이미지, 설명 등)는 제휴된 서비스에서 활용할 수 있습니다.`}
+        />
       </div>
 
       {/* Distribution Terms */}

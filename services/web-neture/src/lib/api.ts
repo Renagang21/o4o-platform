@@ -1,11 +1,19 @@
 /**
  * Neture API Client
  *
- * Work Order: WO-NETURE-CORE-P1
- * Phase: P1 (Frontend Integration)
+ * Work Order: WO-NETURE-EXTENSION-P3
+ * Phase: P3 (Product Purpose Visibility)
  *
  * Simple fetch-based API client for Neture backend
+ *
+ * ProductPurpose 타입 추가:
+ * - CATALOG: 정보 제공용
+ * - APPLICATION: 신청 가능
+ * - ACTIVE_SALES: 판매 중
  */
+
+// 제품 목적 타입 (WO-NETURE-EXTENSION-P3)
+export type ProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
@@ -32,6 +40,7 @@ interface SupplierDetail {
     name: string;
     category: string;
     description: string;
+    purpose?: ProductPurpose; // WO-NETURE-EXTENSION-P3: 제품 목적 (기본값: CATALOG)
   }>;
   pricingPolicy: string;
   moq: string;

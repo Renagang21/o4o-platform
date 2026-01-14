@@ -1,13 +1,18 @@
 /**
  * ContentDetailPage - 콘텐츠 상세 페이지
  *
- * WO-NETURE-SMOKE-STABILIZATION-V1
+ * WO-NETURE-EXTENSION-P2
+ *
+ * 콘텐츠 활용 안내 (Content Utilization Visibility):
+ * - 콘텐츠가 어디서 활용 가능한지 표시
+ * - 외부 서비스 링크만 제공
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Bell, FileText, Calendar } from 'lucide-react';
 import { cmsApi, type CmsContent } from '../../lib/api';
+import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
 
 export default function ContentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -175,6 +180,14 @@ export default function ContentDetailPage() {
           )}
         </div>
       </article>
+
+      {/* 콘텐츠 활용 안내 (WO-NETURE-EXTENSION-P2) */}
+      <div className="mt-8">
+        <ContentUtilizationGuide
+          contentType="content"
+          usageNote="이 콘텐츠는 Neture 플랫폼에서 관리되며, 제휴된 서비스에서 활용할 수 있습니다."
+        />
+      </div>
 
       {/* Navigation */}
       <div className="mt-8 text-center">

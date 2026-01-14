@@ -1,7 +1,12 @@
 /**
  * Neture Admin Router
  *
+ * Work Order: WO-NETURE-EXTENSION-P1
  * Phase D-3: Admin Dashboard에 Neture 서비스 등록
+ *
+ * 조회 전용 (Read-Only):
+ * - Partnership Requests: 조회만 가능 (승인/거절은 각 서비스에서 처리)
+ * - Neture는 중앙 신청 시스템이 아님
  */
 
 import React from 'react';

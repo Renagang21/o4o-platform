@@ -121,7 +121,7 @@ function PostItem({ post, onClick }: { post: DisplayPost; onClick: () => void })
   );
 }
 
-export function ForumPage() {
+export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const navigate = useNavigate();
   const [pinnedPosts, setPinnedPosts] = useState<DisplayPost[]>([]);
   const [posts, setPosts] = useState<DisplayPost[]>([]);
@@ -136,6 +136,7 @@ export function ForumPage() {
 
       try {
         // Fetch pinned and regular posts in parallel
+        // TODO: Add categorySlug filter when API supports it
         const [pinnedResponse, postsResponse] = await Promise.all([
           fetchPinnedPosts(2),
           fetchForumPosts({ page: 1, limit: 20 }),
@@ -160,7 +161,7 @@ export function ForumPage() {
     }
 
     loadPosts();
-  }, []);
+  }, [boardSlug]);
 
   const handlePostClick = (post: DisplayPost) => {
     navigate(`/forum/post/${post.slug}`);

@@ -1,11 +1,19 @@
+/**
+ * PartnershipRequestListPage - 제휴 요청 목록 조회
+ *
+ * Work Order: WO-NETURE-EXTENSION-P1
+ *
+ * 조회 전용 페이지:
+ * - 제휴 요청 목록만 표시
+ * - 신청은 각 서비스에서 직접 처리
+ */
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Plus } from 'lucide-react';
+import { ArrowRight, Info } from 'lucide-react';
 import { netureApi, type PartnershipRequest } from '../../../lib/api';
-import { useAuth } from '../../../contexts';
 
 export default function PartnershipRequestListPage() {
-  const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'OPEN' | 'MATCHED' | 'CLOSED'>('ALL');
   const [requests, setRequests] = useState<PartnershipRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,29 +56,26 @@ export default function PartnershipRequestListPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">제휴 파트너를 찾는 판매자</h1>
-          <p className="text-lg text-gray-600">
-            단일 판매자와 기간 제휴 형태로 진행됩니다
-          </p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">제휴 파트너를 찾는 판매자</h1>
+        <p className="text-lg text-gray-600 mb-4">
+          단일 판매자와 기간 제휴 형태로 진행됩니다
+        </p>
+        {/* 안내 메시지 */}
+        <div className="flex items-start gap-3 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+          <Info className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-slate-700">
+              <strong>조회 전용:</strong> 제휴 신청은 각 서비스에서 직접 진행해 주세요.
+            </p>
+            <Link
+              to="/partners/apply"
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium mt-1 inline-block"
+            >
+              참여 안내 페이지 →
+            </Link>
+          </div>
         </div>
-        {user ? (
-          <Link
-            to="/partners/requests/new"
-            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            제휴 요청하기
-          </Link>
-        ) : (
-          <Link
-            to="/login"
-            className="inline-flex items-center px-4 py-2 border border-primary-600 text-primary-600 rounded-md hover:bg-primary-50 transition-colors"
-          >
-            로그인 후 요청하기
-          </Link>
-        )}
       </div>
 
       {/* Filters */}

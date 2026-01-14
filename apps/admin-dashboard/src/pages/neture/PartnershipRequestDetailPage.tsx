@@ -1,12 +1,17 @@
 /**
- * PartnershipRequestDetailPage - 파트너십 신청 상세 (Admin)
+ * PartnershipRequestDetailPage - 파트너십 신청 상세 조회 (Admin)
  *
- * 개별 파트너십 신청의 상세 정보를 확인하고 상태를 업데이트하는 페이지
+ * Work Order: WO-NETURE-EXTENSION-P1
+ *
+ * Neture 책임 선언에 따라 조회 전용 페이지입니다.
+ * - 승인/거절 기능 없음 (Neture는 중앙 신청 시스템이 아님)
+ * - 신청 정보는 각 서비스에서 직접 관리
+ * - 여기서는 조회만 제공
  */
 
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
 
 interface Product {
     name: string;
@@ -38,11 +43,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co
 
 export default function PartnershipRequestDetailPage() {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const [request, setRequest] = useState<PartnershipRequest | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -67,34 +70,6 @@ export default function PartnershipRequestDetailPage() {
             setError((err as Error).message);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const updateStatus = async (newStatus: 'approved' | 'rejected') => {
-        if (!id) return;
-
-        try {
-            setUpdating(true);
-            const response = await fetch(`${API_BASE_URL}/api/v1/neture/partnership/requests/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({ status: newStatus }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update status');
-            }
-
-            // Refresh the data
-            await fetchRequestDetail();
-            alert(`신청이 ${newStatus === 'approved' ? '승인' : '거절'}되었습니다.`);
-        } catch (err) {
-            alert(`상태 업데이트 실패: ${(err as Error).message}`);
-        } finally {
-            setUpdating(false);
         }
     };
 
@@ -154,30 +129,24 @@ export default function PartnershipRequestDetailPage() {
                 {getStatusBadge(request.status)}
             </div>
 
-            {/* Status Actions */}
-            {request.status === 'pending' && (
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-gray-700 mb-3">이 신청을 검토하고 승인 또는 거절하세요:</p>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => updateStatus('approved')}
-                            disabled={updating}
-                            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            승인
-                        </button>
-                        <button
-                            onClick={() => updateStatus('rejected')}
-                            disabled={updating}
-                            className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <XCircle className="w-4 h-4 mr-2" />
-                            거절
-                        </button>
-                    </div>
-                </div>
-            )}
+            {/* 안내 메시지 */}
+            <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                <p className="text-sm text-slate-700">
+                    <strong>조회 전용:</strong> Neture는 신청 정보를 표시만 합니다.
+                    승인/거절은 각 서비스(예: Glycopharm, Cosmetics)에서 직접 처리합니다.
+                </p>
+                {request.sellerStoreUrl && (
+                    <a
+                        href={request.sellerStoreUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center mt-2 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        해당 서비스에서 관리하기
+                    </a>
+                )}
+            </div>
 
             {/* Details */}
             <div className="space-y-6">
