@@ -11,7 +11,6 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Bell, Target, Users, Lightbulb, CheckCircle } from 'lucide-react';
 
 // Types
 interface ForumPost {
@@ -26,8 +25,6 @@ interface ForumPost {
 interface ServiceConfig {
   serviceName: string;
   serviceDescription: string;
-  forumCategorySlug: string;
-  updatesCategorySlug: string;
   primaryColor: string;
 }
 
@@ -35,30 +32,28 @@ interface ServiceConfig {
 const defaultConfig: ServiceConfig = {
   serviceName: 'Neture',
   serviceDescription: '공급자를 찾고, 제휴를 연결하는 B2B 유통 정보 플랫폼',
-  forumCategorySlug: 'neture-feedback',
-  updatesCategorySlug: 'neture-updates',
   primaryColor: '#4f46e5',
 };
 
 // 테스트 안내 카드 콘텐츠
 const guideCards = [
   {
-    icon: Target,
+    icon: '🎯',
     title: '이 서비스의 목적',
     description: '실제 사용자가 편리하게 이용할 수 있는 서비스를 만들기 위해 여러분의 피드백을 수집합니다.',
   },
   {
-    icon: Users,
+    icon: '👥',
     title: '참여 방법',
     description: '서비스를 자유롭게 사용해보시고, 불편한 점이나 개선 아이디어가 있으면 의견을 남겨주세요.',
   },
   {
-    icon: Lightbulb,
+    icon: '💡',
     title: '의견 남기기',
     description: '아래 테스트 의견 게시판에서 직접 글을 작성하거나, 기존 의견에 댓글로 의견을 더할 수 있습니다.',
   },
   {
-    icon: CheckCircle,
+    icon: '✅',
     title: '의견 반영 방식',
     description: '작성해주신 의견은 검토 후 서비스 업데이트에 반영되며, 처리 결과는 댓글로 안내드립니다.',
   },
@@ -89,164 +84,119 @@ export function TestImprovementSection({ config = {} }: Props) {
 
   useEffect(() => {
     // TODO: 실제 포럼 API 연동
-    // const fetchPosts = async () => {
-    //   const feedback = await forumApi.getPosts({ category: mergedConfig.forumCategorySlug, limit: 3 });
-    //   const updates = await forumApi.getPosts({ category: mergedConfig.updatesCategorySlug, limit: 3 });
-    //   setFeedbackPosts(feedback);
-    //   setUpdatePosts(updates);
-    // };
-    // fetchPosts();
-
-    // 현재는 Mock 데이터 사용
     setTimeout(() => {
       setFeedbackPosts(mockFeedbackPosts);
       setUpdatePosts(mockUpdatePosts);
       setLoading(false);
     }, 300);
-  }, [mergedConfig.forumCategorySlug, mergedConfig.updatesCategorySlug]);
+  }, []);
 
   return (
-    <section className="py-16 bg-gray-50 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section style={styles.section}>
+      <div style={styles.container}>
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            서비스 테스트 &amp; 개선 참여
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+        <div style={styles.header}>
+          <h2 style={styles.title}>서비스 테스트 &amp; 개선 참여</h2>
+          <p style={styles.subtitle}>
             {mergedConfig.serviceDescription}에 대한 여러분의 의견을 들려주세요.
             함께 더 나은 서비스를 만들어갑니다.
           </p>
         </div>
 
         {/* Guide Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        <div style={styles.cardsGrid}>
           {guideCards.map((card, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg p-5 border border-gray-200 hover:border-gray-300 transition-colors"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: `${mergedConfig.primaryColor}15` }}
-                >
-                  <card.icon
-                    className="w-5 h-5"
-                    style={{ color: mergedConfig.primaryColor }}
-                  />
-                </div>
-                <h3 className="font-semibold text-gray-900">{card.title}</h3>
+            <div key={index} style={styles.card}>
+              <div style={styles.cardHeader}>
+                <span style={styles.cardIcon}>
+                  {card.icon}
+                </span>
+                <h3 style={styles.cardTitle}>{card.title}</h3>
               </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {card.description}
-              </p>
+              <p style={styles.cardDescription}>{card.description}</p>
             </div>
           ))}
         </div>
 
         {/* Forum Boards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div style={styles.boardsGrid}>
           {/* Feedback Board */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-gray-600" />
-                <h3 className="font-semibold text-gray-900">테스트 의견</h3>
+          <div style={styles.board}>
+            <div style={styles.boardHeader}>
+              <div style={styles.boardTitleWrap}>
+                <span style={styles.boardIcon}>💬</span>
+                <h3 style={styles.boardTitle}>테스트 의견</h3>
               </div>
-              <Link
-                to="/forum/feedback"
-                className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                글쓰기 &rarr;
+              <Link to="/forum/test-feedback" style={styles.writeLink}>
+                글쓰기 →
               </Link>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div style={styles.boardContent}>
               {loading ? (
-                <div className="px-5 py-8 text-center text-gray-500">
-                  로딩 중...
-                </div>
+                <p style={styles.emptyMessage}>로딩 중...</p>
               ) : feedbackPosts.length === 0 ? (
-                <div className="px-5 py-8 text-center text-gray-500">
+                <p style={styles.emptyMessage}>
                   아직 등록된 의견이 없습니다. 첫 번째 의견을 남겨주세요!
-                </div>
+                </p>
               ) : (
-                feedbackPosts.map((post) => (
+                feedbackPosts.map((post, index) => (
                   <Link
                     key={post.id}
                     to={`/forum/post/${post.id}`}
-                    className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors"
+                    style={{
+                      ...styles.postItem,
+                      borderBottom: index < feedbackPosts.length - 1 ? '1px solid #f1f5f9' : 'none',
+                    }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {post.title}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {post.author} · {post.createdAt}
-                      </p>
+                    <div style={styles.postInfo}>
+                      <p style={styles.postTitle}>{post.title}</p>
+                      <p style={styles.postMeta}>{post.author} · {post.createdAt}</p>
                     </div>
                     {post.commentCount > 0 && (
-                      <span className="ml-3 px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded">
-                        댓글 {post.commentCount}
-                      </span>
+                      <span style={styles.commentBadge}>댓글 {post.commentCount}</span>
                     )}
                   </Link>
                 ))
               )}
             </div>
-            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
-              <Link
-                to="/forum/feedback"
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                전체 보기 &rarr;
-              </Link>
+            <div style={styles.boardFooter}>
+              <Link to="/forum/test-feedback" style={styles.viewAllLink}>전체 보기 →</Link>
             </div>
           </div>
 
           {/* Updates Board */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50">
-              <div className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <h3 className="font-semibold text-gray-900">서비스 업데이트</h3>
+          <div style={styles.board}>
+            <div style={styles.boardHeader}>
+              <div style={styles.boardTitleWrap}>
+                <span style={styles.boardIcon}>🔔</span>
+                <h3 style={styles.boardTitle}>서비스 업데이트</h3>
               </div>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div style={styles.boardContent}>
               {loading ? (
-                <div className="px-5 py-8 text-center text-gray-500">
-                  로딩 중...
-                </div>
+                <p style={styles.emptyMessage}>로딩 중...</p>
               ) : updatePosts.length === 0 ? (
-                <div className="px-5 py-8 text-center text-gray-500">
-                  아직 등록된 업데이트가 없습니다.
-                </div>
+                <p style={styles.emptyMessage}>아직 등록된 업데이트가 없습니다.</p>
               ) : (
-                updatePosts.map((post) => (
+                updatePosts.map((post, index) => (
                   <Link
                     key={post.id}
                     to={`/forum/post/${post.id}`}
-                    className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors"
+                    style={{
+                      ...styles.postItem,
+                      borderBottom: index < updatePosts.length - 1 ? '1px solid #f1f5f9' : 'none',
+                    }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {post.title}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {post.author} · {post.createdAt}
-                      </p>
+                    <div style={styles.postInfo}>
+                      <p style={styles.postTitle}>{post.title}</p>
+                      <p style={styles.postMeta}>{post.author} · {post.createdAt}</p>
                     </div>
                   </Link>
                 ))
               )}
             </div>
-            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
-              <Link
-                to="/forum/updates"
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                전체 보기 &rarr;
-              </Link>
+            <div style={styles.boardFooter}>
+              <Link to="/forum/service-update" style={styles.viewAllLink}>전체 보기 →</Link>
             </div>
           </div>
         </div>
@@ -254,5 +204,167 @@ export function TestImprovementSection({ config = {} }: Props) {
     </section>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  section: {
+    padding: '48px 24px',
+    backgroundColor: '#f8fafc',
+    borderTop: '1px solid #e2e8f0',
+  },
+  container: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+  },
+  header: {
+    textAlign: 'center',
+    marginBottom: '32px',
+  },
+  title: {
+    fontSize: '20px',
+    fontWeight: 600,
+    color: '#1e293b',
+    marginBottom: '10px',
+  },
+  subtitle: {
+    fontSize: '16px',
+    color: '#64748b',
+    maxWidth: '600px',
+    margin: '0 auto',
+    lineHeight: 1.6,
+  },
+  cardsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '16px',
+    marginBottom: '32px',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '16px',
+    border: '1px solid #e2e8f0',
+  },
+  cardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '12px',
+  },
+  cardIcon: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    backgroundColor: '#f1f5f9',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '18px',
+  },
+  cardTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: 0,
+  },
+  cardDescription: {
+    fontSize: '14px',
+    color: '#64748b',
+    lineHeight: 1.6,
+    margin: 0,
+  },
+  boardsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+    gap: '24px',
+  },
+  board: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    overflow: 'hidden',
+  },
+  boardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '16px 20px',
+    backgroundColor: '#f8fafc',
+    borderBottom: '1px solid #f1f5f9',
+  },
+  boardTitleWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  boardIcon: {
+    fontSize: '18px',
+  },
+  boardTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: 0,
+  },
+  writeLink: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#64748b',
+    textDecoration: 'none',
+  },
+  boardContent: {
+    minHeight: '180px',
+  },
+  emptyMessage: {
+    padding: '40px 20px',
+    textAlign: 'center',
+    color: '#94a3b8',
+    fontSize: '14px',
+  },
+  postItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 20px',
+    textDecoration: 'none',
+  },
+  postInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  postTitle: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#1e293b',
+    margin: '0 0 4px 0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  postMeta: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  commentBadge: {
+    marginLeft: '12px',
+    padding: '2px 8px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#64748b',
+    backgroundColor: '#f1f5f9',
+    borderRadius: '4px',
+    flexShrink: 0,
+  },
+  boardFooter: {
+    padding: '12px 20px',
+    borderTop: '1px solid #f1f5f9',
+    backgroundColor: '#f8fafc',
+  },
+  viewAllLink: {
+    fontSize: '14px',
+    color: '#64748b',
+    textDecoration: 'none',
+  },
+};
 
 export default TestImprovementSection;
