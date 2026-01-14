@@ -19,6 +19,7 @@ const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'supplier@neture.test', password: TEST_PASSWORD, label: '공급자' },
   { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너' },
+  { email: 'admin@neture.test', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export function LoginPage() {
