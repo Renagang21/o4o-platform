@@ -27,18 +27,30 @@ export default function MainLayout() {
                 공급자
               </Link>
               <Link
+                to="/partners/info"
+                className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                파트너
+              </Link>
+              <Link
                 to="/partners/requests"
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
               >
                 제휴 요청
               </Link>
               <Link
+                to="/content"
+                className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                콘텐츠
+              </Link>
+              <span className="text-gray-300">|</span>
+              <Link
                 to="/partners/apply"
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
               >
                 참여 신청
               </Link>
-              <span className="text-gray-300">|</span>
               <Link
                 to="/login"
                 className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Plus } from 'lucide-react';
 import { netureApi, type PartnershipRequest } from '../../../lib/api';
+import { useAuth } from '../../../contexts';
 
 export default function PartnershipRequestListPage() {
+  const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'OPEN' | 'MATCHED' | 'CLOSED'>('ALL');
   const [requests, setRequests] = useState<PartnershipRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,11 +48,29 @@ export default function PartnershipRequestListPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">제휴 파트너를 찾는 판매자</h1>
-        <p className="text-lg text-gray-600">
-          단일 판매자와 기간 제휴 형태로 진행됩니다
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">제휴 파트너를 찾는 판매자</h1>
+          <p className="text-lg text-gray-600">
+            단일 판매자와 기간 제휴 형태로 진행됩니다
+          </p>
+        </div>
+        {user ? (
+          <Link
+            to="/partners/requests/new"
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            제휴 요청하기
+          </Link>
+        ) : (
+          <Link
+            to="/login"
+            className="inline-flex items-center px-4 py-2 border border-primary-600 text-primary-600 rounded-md hover:bg-primary-50 transition-colors"
+          >
+            로그인 후 요청하기
+          </Link>
+        )}
       </div>
 
       {/* Filters */}

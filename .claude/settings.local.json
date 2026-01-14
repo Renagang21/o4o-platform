@@ -439,7 +439,24 @@
       "Bash(git show:*)",
       "WebSearch",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20948557825 -R Renagang21/o4o-platform)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20977564520 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api AND jsonPayload.message:login\" --limit=5 --format=json --project=netureyoutube)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" run jobs describe o4o-api-migrations --region=asia-northeast3 --project=netureyoutube --format=\"yaml\\(spec.template.spec.containers[0].command,spec.template.spec.containers[0].args\\)\")",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" run jobs list --region=asia-northeast3 --project=netureyoutube)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" run jobs executions list --job=o4o-api-migrations --region=asia-northeast3 --project=netureyoutube --limit=3)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_job AND resource.labels.job_name=o4o-api-migrations AND timestamp>=\"\"2026-01-14T00:28:00Z\"\"\" --limit=30 --format=\"table\\(timestamp,textPayload\\)\" --project=netureyoutube)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_job AND resource.labels.job_name=o4o-api-migrations AND textPayload:\"\"test account\"\"\" --limit=20 --format=\"table\\(timestamp,textPayload\\)\" --project=netureyoutube)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20977860932 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20977860932 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api AND textPayload:login\" --limit=10 --format=json --project=netureyoutube)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_job AND resource.labels.job_name=o4o-api-migrations AND timestamp>=\"\"2026-01-14T00:41:00Z\"\"\" --limit=30 --format=\"table\\(timestamp, textPayload\\)\" --project=netureyoutube)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20978242934 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_job AND resource.labels.job_name=o4o-api-migrations AND timestamp>=\"\"2026-01-14T00:57:00Z\"\"\" --limit=20 --format=\"table\\(timestamp, textPayload\\)\" --project=netureyoutube)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api AND timestamp>=\"\"2026-01-14T00:58:00Z\"\"\" --limit=30 --format=json --project=netureyoutube)",
+      "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api AND jsonPayload.message:pharmacist\" --limit=5 --format=\"table\\(timestamp, jsonPayload.message\\)\" --project=netureyoutube)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20978578541 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20978822314 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }

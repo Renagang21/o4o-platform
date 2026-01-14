@@ -211,4 +211,74 @@ export class NetureService {
       throw error;
     }
   }
+
+  // ==================== P2: CREATE Operations ====================
+
+  /**
+   * POST /partnership/requests - Create a new partnership request
+   */
+  async createPartnershipRequest(data: {
+    sellerId: string;
+    sellerName: string;
+    sellerServiceType?: string;
+    sellerStoreUrl?: string;
+    periodStart?: string;
+    periodEnd?: string;
+    revenueStructure?: string;
+    promotionSns?: boolean;
+    promotionContent?: boolean;
+    promotionBanner?: boolean;
+    promotionOther?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    contactKakao?: string;
+    products?: Array<{ name: string; category?: string }>;
+  }) {
+    try {
+      // Create partnership request
+      const request = this.partnershipRepo.create({
+        sellerId: data.sellerId,
+        sellerName: data.sellerName,
+        sellerServiceType: data.sellerServiceType || '',
+        sellerStoreUrl: data.sellerStoreUrl || '',
+        productCount: data.products?.length || 0,
+        periodStart: data.periodStart ? new Date(data.periodStart) : undefined,
+        periodEnd: data.periodEnd ? new Date(data.periodEnd) : undefined,
+        revenueStructure: data.revenueStructure || '',
+        status: PartnershipStatus.OPEN,
+        promotionSns: data.promotionSns || false,
+        promotionContent: data.promotionContent || false,
+        promotionBanner: data.promotionBanner || false,
+        promotionOther: data.promotionOther || '',
+        contactEmail: data.contactEmail || '',
+        contactPhone: data.contactPhone || '',
+        contactKakao: data.contactKakao || '',
+      });
+
+      const savedRequest = await this.partnershipRepo.save(request);
+
+      // Create products if provided
+      if (data.products && data.products.length > 0) {
+        for (const product of data.products) {
+          const partnershipProduct = this.partnershipProductRepo.create({
+            partnershipRequestId: savedRequest.id,
+            name: product.name,
+            category: product.category || '',
+          });
+          await this.partnershipProductRepo.save(partnershipProduct);
+        }
+      }
+
+      logger.info(`[NetureService] Created partnership request: ${savedRequest.id}`);
+
+      return {
+        id: savedRequest.id,
+        status: savedRequest.status,
+        createdAt: savedRequest.createdAt,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error creating partnership request:', error);
+      throw error;
+    }
+  }
 }

@@ -1,20 +1,24 @@
 /**
- * Neture Controller - P1 Implementation
+ * Neture Controller - P2 Implementation
  *
- * Work Order: WO-NETURE-CORE-P1
- * Phase: P1 (Backend Integration)
+ * Work Order: WO-NETURE-SMOKE-STABILIZATION-V1
+ * Phase: P2 (CRUD Operations)
  *
- * HARD RULES:
- * - GET endpoints ONLY
- * - NO POST/PUT/DELETE operations
- * - Read-only information platform
- * - No authentication required (public information)
+ * Public endpoints (no auth):
+ * - GET /suppliers
+ * - GET /suppliers/:slug
+ * - GET /partnership/requests
+ * - GET /partnership/requests/:id
+ *
+ * Authenticated endpoints:
+ * - POST /partnership/requests (create)
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
+import { optionalAuth } from '../../../middleware/auth.middleware.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -148,17 +152,82 @@ export function createNetureController(dataSource: DataSource): Router {
   });
 
   // ============================================================================
-  // HARD RULES ENFORCEMENT - NO OTHER METHODS ALLOWED
+  // P2: AUTHENTICATED ENDPOINTS
   // ============================================================================
-  // ❌ NO POST /suppliers
-  // ❌ NO PUT /suppliers/:id
-  // ❌ NO DELETE /suppliers/:id
-  // ❌ NO POST /partnership/requests
-  // ❌ NO PUT /partnership/requests/:id
-  // ❌ NO DELETE /partnership/requests/:id
-  // ❌ NO PATCH (status changes)
-  // ❌ NO orders/payments/dashboard endpoints
-  // ============================================================================
+
+  /**
+   * POST /partnership/requests
+   * Create a new partnership request (requires login)
+   */
+  router.post('/partnership/requests', optionalAuth, async (req: Request, res: Response) => {
+    try {
+      // Check if user is logged in
+      const user = (req as any).user;
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+          code: 'AUTH_REQUIRED',
+        });
+      }
+
+      const {
+        sellerName,
+        sellerServiceType,
+        sellerStoreUrl,
+        periodStart,
+        periodEnd,
+        revenueStructure,
+        promotionSns,
+        promotionContent,
+        promotionBanner,
+        promotionOther,
+        contactEmail,
+        contactPhone,
+        contactKakao,
+        products,
+      } = req.body;
+
+      // Validate required fields
+      if (!sellerName) {
+        return res.status(400).json({
+          success: false,
+          error: 'sellerName is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await service.createPartnershipRequest({
+        sellerId: user.id,
+        sellerName,
+        sellerServiceType,
+        sellerStoreUrl,
+        periodStart,
+        periodEnd,
+        revenueStructure,
+        promotionSns,
+        promotionContent,
+        promotionBanner,
+        promotionOther,
+        contactEmail: contactEmail || user.email,
+        contactPhone,
+        contactKakao,
+        products,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      logger.error('[Neture API] Error creating partnership request:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create partnership request',
+        details: (error as Error).message,
+      });
+    }
+  });
 
   return router;
 }

@@ -20,8 +20,11 @@ import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
+import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
 import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
+import ContentListPage from './pages/content/ContentListPage';
+import ContentDetailPage from './pages/content/ContentDetailPage';
 
 // Test Guide Pages
 import {
@@ -44,10 +47,12 @@ function App() {
             <Route path="/suppliers" element={<SupplierListPage />} />
             <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
             <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
+            <Route path="/partners/requests/new" element={<PartnershipRequestCreatePage />} />
             <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
             <Route path="/partners/apply" element={<PartnersApplyPage />} />
             <Route path="/partners/info" element={<PartnerInfoPage />} />
-            <Route path="/content" element={<div className="max-w-7xl mx-auto px-4 py-16"><h1 className="text-3xl font-bold">콘텐츠 (준비 중)</h1></div>} />
+            <Route path="/content" element={<ContentListPage />} />
+            <Route path="/content/:id" element={<ContentDetailPage />} />
 
             {/* Test Guide */}
             <Route path="/test-guide" element={<TestGuidePage />} />

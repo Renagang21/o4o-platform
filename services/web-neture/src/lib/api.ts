@@ -151,11 +151,96 @@ export const netureApi = {
     }
     return response.json();
   },
+
+  /**
+   * POST /api/v1/neture/partnership/requests
+   * Create a new partnership request (requires auth)
+   */
+  async createPartnershipRequest(data: {
+    sellerName: string;
+    sellerServiceType?: string;
+    sellerStoreUrl?: string;
+    periodStart?: string;
+    periodEnd?: string;
+    revenueStructure?: string;
+    promotionSns?: boolean;
+    promotionContent?: boolean;
+    promotionBanner?: boolean;
+    promotionOther?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    contactKakao?: string;
+    products?: Array<{ name: string; category?: string }>;
+  }): Promise<{ success: boolean; data?: { id: string; status: string; createdAt: string }; error?: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partnership/requests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    return result;
+  },
 };
+
+// CMS Content API
+export const cmsApi = {
+  /**
+   * GET /api/v1/cms/contents?serviceKey=neture
+   */
+  async getContents(): Promise<CmsContent[]> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/cms/contents?serviceKey=neture&status=published`
+      );
+      if (!response.ok) {
+        console.warn('[CMS API] Contents API not available, returning empty array');
+        return [];
+      }
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[CMS API] Failed to fetch contents:', error);
+      return [];
+    }
+  },
+
+  /**
+   * GET /api/v1/cms/contents/:id
+   */
+  async getContentById(id: string): Promise<CmsContent> {
+    const response = await fetch(`${API_BASE_URL}/api/v1/cms/contents/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch content detail');
+    }
+    const result = await response.json();
+    return result.data;
+  },
+};
+
+interface CmsContent {
+  id: string;
+  type: string;
+  title: string;
+  summary: string | null;
+  body: string | null;
+  imageUrl: string | null;
+  linkUrl: string | null;
+  linkText: string | null;
+  status: string;
+  publishedAt: string | null;
+  isPinned: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
 
 export type {
   Supplier,
   SupplierDetail,
   PartnershipRequest,
   PartnershipRequestDetail,
+  CmsContent,
 };
