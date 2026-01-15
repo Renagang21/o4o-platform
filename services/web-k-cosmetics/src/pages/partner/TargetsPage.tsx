@@ -1,43 +1,48 @@
 /**
  * PartnerTargetsPage - 홍보 대상 페이지
  * Reference: GlycoPharm (복제)
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  */
 
-import { MapPin, Building2, Info } from 'lucide-react';
-
-interface PromotionTarget {
-  id: string;
-  name: string;
-  type: 'store' | 'region';
-  description: string;
-  address?: string;
-}
-
-const mockTargets: PromotionTarget[] = [
-  {
-    id: '1',
-    name: 'K-Beauty 강남점',
-    type: 'store',
-    description: '서울 강남구 신사동 일대',
-    address: '서울 강남구 압구정로 123',
-  },
-  {
-    id: '2',
-    name: 'K-Beauty 홍대점',
-    type: 'store',
-    description: '서울 마포구 홍익대학교 일대',
-    address: '서울 마포구 와우산로 45',
-  },
-  {
-    id: '3',
-    name: '서울 전체',
-    type: 'region',
-    description: '서울특별시 전체 서비스 영역',
-  },
-];
+import { useState, useEffect } from 'react';
+import { MapPin, Building2, Info, Loader2 } from 'lucide-react';
+import { partnerApi, type PartnerTarget } from '../../services/partnerApi';
 
 export default function PartnerTargetsPage() {
-  const targets = mockTargets;
+  const [targets, setTargets] = useState<PartnerTarget[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTargets = async () => {
+      setIsLoading(true);
+      setError(null);
+      const response = await partnerApi.getTargets();
+      if (response.error) {
+        setError(response.error.message);
+      } else if (response.data) {
+        setTargets(response.data);
+      }
+      setIsLoading(false);
+    };
+    fetchTargets();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -71,9 +76,9 @@ export default function PartnerTargetsPage() {
               <li key={target.id} className="px-6 py-4">
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    target.type === 'store' ? 'bg-pink-100' : 'bg-blue-100'
+                    target.type === 'pharmacy' ? 'bg-pink-100' : 'bg-blue-100'
                   }`}>
-                    {target.type === 'store' ? (
+                    {target.type === 'pharmacy' ? (
                       <Building2 className="w-5 h-5 text-pink-600" />
                     ) : (
                       <MapPin className="w-5 h-5 text-blue-600" />
@@ -83,14 +88,14 @@ export default function PartnerTargetsPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-slate-800">{target.name}</h3>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        target.type === 'store'
+                        target.type === 'pharmacy'
                           ? 'bg-pink-100 text-pink-700'
                           : 'bg-blue-100 text-blue-700'
                       }`}>
-                        {target.type === 'store' ? '매장' : '지역'}
+                        {target.type === 'pharmacy' ? '매장' : '지역'}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 mt-1">{target.description}</p>
+                    <p className="text-sm text-slate-500 mt-1">{target.serviceArea || target.description}</p>
                     {target.address && (
                       <p className="text-xs text-slate-400 mt-1">{target.address}</p>
                     )}

@@ -209,3 +209,85 @@ export const forumRequestApi = {
   review: (id: string, data: { status: 'approved' | 'rejected'; review_comment?: string }) =>
     apiClient.patch<unknown>(`/api/v1/glycopharm/forum-requests/${id}/review`, data),
 };
+
+// Partner Dashboard API (WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1)
+const PARTNER_SERVICE_ID = 'glycopharm';
+
+// Partner API Types
+export interface PartnerOverviewData {
+  activeContentCount: number;
+  activeEventCount: number;
+  status: 'active' | 'inactive';
+}
+
+export interface PartnerTarget {
+  id: string;
+  name: string;
+  type: 'pharmacy' | 'region';
+  serviceArea?: string;
+  address?: string;
+  description?: string;
+}
+
+export interface PartnerContent {
+  id: string;
+  type: 'text' | 'image' | 'link';
+  title: string;
+  body?: string;
+  url?: string;
+  isActive: boolean;
+  status: 'active' | 'inactive';
+  createdAt: string;
+}
+
+export interface PartnerEvent {
+  id: string;
+  name: string;
+  period: {
+    start: Date;
+    end: Date;
+  };
+  region?: string;
+  targetScope?: string;
+  isActive: boolean;
+  status: 'active' | 'scheduled' | 'ended';
+}
+
+export interface PartnerStatusData {
+  contents: Array<{ id: string; name: string; status: 'active' | 'inactive' }>;
+  events: Array<{ id: string; name: string; status: 'active' | 'ongoing' | 'ended' }>;
+}
+
+export const partnerApi = {
+  // Overview
+  getOverview: () =>
+    apiClient.get<PartnerOverviewData>(`/api/v1/partner/overview?serviceId=${PARTNER_SERVICE_ID}`),
+
+  // Targets (Read Only)
+  getTargets: () =>
+    apiClient.get<PartnerTarget[]>(`/api/v1/partner/targets?serviceId=${PARTNER_SERVICE_ID}`),
+
+  // Contents CRUD
+  getContents: () =>
+    apiClient.get<PartnerContent[]>(`/api/v1/partner/content?serviceId=${PARTNER_SERVICE_ID}`),
+
+  createContent: (data: { type: 'text' | 'image' | 'link'; title: string; body?: string; url?: string }) =>
+    apiClient.post<PartnerContent>(`/api/v1/partner/content?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  updateContent: (id: string, data: { title?: string; body?: string; url?: string; isActive?: boolean }) =>
+    apiClient.patch<PartnerContent>(`/api/v1/partner/content/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  // Events CRUD
+  getEvents: () =>
+    apiClient.get<PartnerEvent[]>(`/api/v1/partner/events?serviceId=${PARTNER_SERVICE_ID}`),
+
+  createEvent: (data: { name: string; startDate: string; endDate: string; region?: string; targetScope?: string }) =>
+    apiClient.post<PartnerEvent>(`/api/v1/partner/events?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  updateEvent: (id: string, data: { name?: string; startDate?: string; endDate?: string; region?: string; targetScope?: string; isActive?: boolean }) =>
+    apiClient.patch<PartnerEvent>(`/api/v1/partner/events/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  // Status
+  getStatus: () =>
+    apiClient.get<PartnerStatusData>(`/api/v1/partner/status?serviceId=${PARTNER_SERVICE_ID}`),
+};

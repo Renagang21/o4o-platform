@@ -1,9 +1,10 @@
 /**
  * PartnerEventsPage - 이벤트 조건 설정 페이지
  * Reference: GlycoPharm (복제)
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Calendar,
   MapPin,
@@ -11,29 +12,10 @@ import {
   Plus,
   MoreVertical,
   Edit2,
-  Trash2,
   Clock,
+  Loader2,
 } from 'lucide-react';
-
-interface EventCondition {
-  id: string;
-  name: string;
-  period: { start: string; end: string };
-  region: string;
-  targetScope: string;
-  status: 'active' | 'scheduled' | 'ended';
-}
-
-const mockEvents: EventCondition[] = [
-  {
-    id: '1',
-    name: '1월 건강 관리 이벤트',
-    period: { start: '2026-01-01', end: '2026-01-31' },
-    region: '서울 전체',
-    targetScope: '모든 센터',
-    status: 'active',
-  },
-];
+import { partnerApi, type PartnerEvent } from '../../services/api';
 
 const statusConfig = {
   active: { label: '진행 중', color: 'green' },
@@ -42,9 +24,68 @@ const statusConfig = {
 };
 
 export default function PartnerEventsPage() {
-  const [events] = useState<EventCondition[]>(mockEvents);
+  const [events, setEvents] = useState<PartnerEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    name: '',
+    startDate: '',
+    endDate: '',
+    region: '서울 전체',
+    targetScope: '모든 센터',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchEvents = async () => {
+    setIsLoading(true);
+    setError(null);
+    const response = await partnerApi.getEvents();
+    if (response.error) {
+      setError(response.error.message);
+    } else if (response.data) {
+      setEvents(response.data);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleCreateEvent = async () => {
+    if (!newEvent.name.trim() || !newEvent.startDate || !newEvent.endDate) return;
+    setIsSubmitting(true);
+    const response = await partnerApi.createEvent(newEvent);
+    if (!response.error) {
+      setShowCreateModal(false);
+      setNewEvent({ name: '', startDate: '', endDate: '', region: '서울 전체', targetScope: '모든 센터' });
+      fetchEvents();
+    }
+    setIsSubmitting(false);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toISOString().split('T')[0];
+  };
 
   return (
     <div>
@@ -111,16 +152,20 @@ export default function PartnerEventsPage() {
                       <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500">
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          <span>{event.period.start} ~ {event.period.end}</span>
+                          <span>{formatDate(event.period.start)} ~ {formatDate(event.period.end)}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          <span>{event.region}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          <span>{event.targetScope}</span>
-                        </div>
+                        {event.region && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            <span>{event.region}</span>
+                          </div>
+                        )}
+                        {event.targetScope && (
+                          <div className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            <span>{event.targetScope}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="relative">
@@ -137,10 +182,6 @@ export default function PartnerEventsPage() {
                             <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
                               <Edit2 className="w-4 h-4" />
                               수정
-                            </button>
-                            <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                              <Trash2 className="w-4 h-4" />
-                              삭제
                             </button>
                           </div>
                         </>
@@ -162,36 +203,73 @@ export default function PartnerEventsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">이벤트 이름</label>
-                <input type="text" className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="이벤트 이름" />
+                <input
+                  type="text"
+                  value={newEvent.name}
+                  onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="이벤트 이름"
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">시작일</label>
-                  <input type="date" className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    type="date"
+                    value={newEvent.startDate}
+                    onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">종료일</label>
-                  <input type="date" className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    type="date"
+                    value={newEvent.endDate}
+                    onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">지역</label>
-                <select className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={newEvent.region}
+                  onChange={(e) => setNewEvent({ ...newEvent, region: e.target.value })}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                   <option>서울 전체</option>
                   <option>서울 강남구</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">대상 범위</label>
-                <select className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={newEvent.targetScope}
+                  onChange={(e) => setNewEvent({ ...newEvent, targetScope: e.target.value })}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                   <option>모든 센터</option>
                   <option>특정 센터만</option>
                 </select>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowCreateModal(false)} className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50">취소</button>
-              <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">추가</button>
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateEvent}
+                disabled={isSubmitting || !newEvent.name.trim() || !newEvent.startDate || !newEvent.endDate}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isSubmitting ? '추가 중...' : '추가'}
+              </button>
             </div>
           </div>
         </div>

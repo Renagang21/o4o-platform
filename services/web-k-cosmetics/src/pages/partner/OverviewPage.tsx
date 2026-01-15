@@ -1,18 +1,56 @@
 /**
  * PartnerOverviewPage - 파트너 요약 페이지
  * Reference: GlycoPharm (복제)
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  */
 
-import { FileText, Calendar, Activity, CheckCircle } from 'lucide-react';
-
-const mockData = {
-  activeContents: 2,
-  ongoingEvents: 1,
-  overallStatus: 'active' as const,
-};
+import { useState, useEffect } from 'react';
+import { FileText, Calendar, Activity, CheckCircle, Loader2 } from 'lucide-react';
+import { partnerApi, type PartnerOverviewData } from '../../services/partnerApi';
 
 export default function PartnerOverviewPage() {
-  const data = mockData;
+  const [data, setData] = useState<PartnerOverviewData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOverview = async () => {
+      setIsLoading(true);
+      setError(null);
+      const response = await partnerApi.getOverview();
+      if (response.error) {
+        setError(response.error.message);
+      } else if (response.data) {
+        setData(response.data);
+      }
+      setIsLoading(false);
+    };
+    fetchOverview();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
+        <p className="text-slate-500">데이터를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -31,7 +69,7 @@ export default function PartnerOverviewPage() {
             </div>
             <div>
               <p className="text-sm text-slate-500">활성 콘텐츠</p>
-              <p className="text-2xl font-bold text-slate-800">{data.activeContents}개</p>
+              <p className="text-2xl font-bold text-slate-800">{data.activeContentCount}개</p>
             </div>
           </div>
         </div>
@@ -43,7 +81,7 @@ export default function PartnerOverviewPage() {
             </div>
             <div>
               <p className="text-sm text-slate-500">진행 중 이벤트</p>
-              <p className="text-2xl font-bold text-slate-800">{data.ongoingEvents}개</p>
+              <p className="text-2xl font-bold text-slate-800">{data.activeEventCount}개</p>
             </div>
           </div>
         </div>
@@ -51,9 +89,9 @@ export default function PartnerOverviewPage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
           <div className="flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-              data.overallStatus === 'active' ? 'bg-green-100' : 'bg-slate-100'
+              data.status === 'active' ? 'bg-green-100' : 'bg-slate-100'
             }`}>
-              {data.overallStatus === 'active' ? (
+              {data.status === 'active' ? (
                 <CheckCircle className="w-6 h-6 text-green-600" />
               ) : (
                 <Activity className="w-6 h-6 text-slate-400" />
@@ -62,9 +100,9 @@ export default function PartnerOverviewPage() {
             <div>
               <p className="text-sm text-slate-500">전체 상태</p>
               <p className={`text-lg font-semibold ${
-                data.overallStatus === 'active' ? 'text-green-600' : 'text-slate-500'
+                data.status === 'active' ? 'text-green-600' : 'text-slate-500'
               }`}>
-                {data.overallStatus === 'active' ? '활성' : '비활성'}
+                {data.status === 'active' ? '활성' : '비활성'}
               </p>
             </div>
           </div>

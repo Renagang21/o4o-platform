@@ -2,6 +2,7 @@
  * PartnerTargetsPage - 홍보 대상 페이지
  *
  * Work Order: WO-GLYCOPHARM-PARTNER-DASHBOARD-IMPLEMENTATION-V1
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  *
  * 포함 요소:
  * - 읽기 전용 리스트 (약국/매장명, 서비스 영역 설명)
@@ -16,42 +17,45 @@
  * - 대상 우선순위 조정
  */
 
-import { MapPin, Building2, Info } from 'lucide-react';
-
-// Mock 데이터 (API 연동 구조 유지)
-interface PromotionTarget {
-  id: string;
-  name: string;
-  type: 'pharmacy' | 'region';
-  description: string;
-  address?: string;
-}
-
-const mockTargets: PromotionTarget[] = [
-  {
-    id: '1',
-    name: '글라이코팜 강남점',
-    type: 'pharmacy',
-    description: '서울 강남구 테헤란로 일대',
-    address: '서울 강남구 테헤란로 123',
-  },
-  {
-    id: '2',
-    name: '글라이코팜 홍대점',
-    type: 'pharmacy',
-    description: '서울 마포구 홍익대학교 일대',
-    address: '서울 마포구 와우산로 45',
-  },
-  {
-    id: '3',
-    name: '서울 전체',
-    type: 'region',
-    description: '서울특별시 전체 서비스 영역',
-  },
-];
+import { useState, useEffect } from 'react';
+import { MapPin, Building2, Info, Loader2 } from 'lucide-react';
+import { partnerApi, type PartnerTarget } from '@/services/api';
 
 export default function PartnerTargetsPage() {
-  const targets = mockTargets;
+  const [targets, setTargets] = useState<PartnerTarget[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTargets = async () => {
+      setIsLoading(true);
+      setError(null);
+      const response = await partnerApi.getTargets();
+      if (response.error) {
+        setError(response.error.message);
+      } else if (response.data) {
+        setTargets(response.data);
+      }
+      setIsLoading(false);
+    };
+    fetchTargets();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -107,7 +111,7 @@ export default function PartnerTargetsPage() {
                         {target.type === 'pharmacy' ? '매장' : '지역'}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 mt-1">{target.description}</p>
+                    <p className="text-sm text-slate-500 mt-1">{target.serviceArea || target.description}</p>
                     {target.address && (
                       <p className="text-xs text-slate-400 mt-1">{target.address}</p>
                     )}

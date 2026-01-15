@@ -1,23 +1,12 @@
 /**
  * PartnerStatusPage - 상태 확인 페이지
  * Reference: GlycoPharm (복제)
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  */
 
-import { FileText, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
-
-interface StatusItem {
-  id: string;
-  name: string;
-  type: 'content' | 'event';
-  status: 'active' | 'inactive' | 'ongoing' | 'ended';
-  updatedAt: string;
-}
-
-const mockStatusItems: StatusItem[] = [
-  { id: '1', name: '신제품 스킨케어 안내', type: 'content', status: 'active', updatedAt: '2026-01-15' },
-  { id: '2', name: '1월 뷰티 프로모션 배너', type: 'content', status: 'active', updatedAt: '2026-01-14' },
-  { id: '3', name: '1월 신년 뷰티 이벤트', type: 'event', status: 'ongoing', updatedAt: '2026-01-01' },
-];
+import { useState, useEffect } from 'react';
+import { FileText, Calendar, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
+import { partnerApi, type PartnerStatusData } from '../../services/partnerApi';
 
 const statusConfig = {
   active: { label: '활성', icon: CheckCircle, color: 'green' },
@@ -27,9 +16,51 @@ const statusConfig = {
 };
 
 export default function PartnerStatusPage() {
-  const items = mockStatusItems;
-  const contentItems = items.filter((item) => item.type === 'content');
-  const eventItems = items.filter((item) => item.type === 'event');
+  const [data, setData] = useState<PartnerStatusData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      setIsLoading(true);
+      setError(null);
+      const response = await partnerApi.getStatus();
+      if (response.error) {
+        setError(response.error.message);
+      } else if (response.data) {
+        setData(response.data);
+      }
+      setIsLoading(false);
+    };
+    fetchStatus();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
+        <p className="text-slate-500">데이터를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
+
+  const contentItems = data.contents;
+  const eventItems = data.events;
 
   const renderStatusBadge = (status: keyof typeof statusConfig) => {
     const config = statusConfig[status];
@@ -66,7 +97,7 @@ export default function PartnerStatusPage() {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
           <p className="text-2xl font-bold text-blue-600">
-            {eventItems.filter((i) => i.status === 'ongoing').length}
+            {eventItems.filter((i) => i.status === 'ongoing' || i.status === 'active').length}
           </p>
           <p className="text-sm text-slate-500">진행 중 이벤트</p>
         </div>
@@ -91,7 +122,6 @@ export default function PartnerStatusPage() {
               <li key={item.id} className="px-6 py-3 flex items-center justify-between">
                 <div>
                   <p className="font-medium text-slate-800">{item.name}</p>
-                  <p className="text-xs text-slate-400">업데이트: {item.updatedAt}</p>
                 </div>
                 {renderStatusBadge(item.status as 'active' | 'inactive')}
               </li>
@@ -113,9 +143,8 @@ export default function PartnerStatusPage() {
               <li key={item.id} className="px-6 py-3 flex items-center justify-between">
                 <div>
                   <p className="font-medium text-slate-800">{item.name}</p>
-                  <p className="text-xs text-slate-400">업데이트: {item.updatedAt}</p>
                 </div>
-                {renderStatusBadge(item.status as 'ongoing' | 'ended')}
+                {renderStatusBadge(item.status === 'active' ? 'ongoing' : item.status as 'ongoing' | 'ended')}
               </li>
             ))}
           </ul>

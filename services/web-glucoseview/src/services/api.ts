@@ -344,3 +344,129 @@ class ApiService {
 }
 
 export const api = new ApiService();
+
+// ============================================================================
+// Partner Dashboard API (WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1)
+// ============================================================================
+
+const PARTNER_SERVICE_ID = 'glucoseview';
+
+export interface PartnerOverviewData {
+  activeContentCount: number;
+  activeEventCount: number;
+  status: 'active' | 'inactive';
+}
+
+export interface PartnerTarget {
+  id: string;
+  name: string;
+  type: 'pharmacy' | 'region';
+  serviceArea?: string;
+  address?: string;
+  description?: string;
+}
+
+export interface PartnerContent {
+  id: string;
+  type: 'text' | 'image' | 'link';
+  title: string;
+  body?: string;
+  url?: string;
+  isActive: boolean;
+  status: 'active' | 'inactive';
+  createdAt: string;
+}
+
+export interface PartnerEvent {
+  id: string;
+  name: string;
+  period: {
+    start: Date;
+    end: Date;
+  };
+  region?: string;
+  targetScope?: string;
+  isActive: boolean;
+  status: 'active' | 'scheduled' | 'ended';
+}
+
+export interface PartnerStatusData {
+  contents: Array<{ id: string; name: string; status: 'active' | 'inactive' }>;
+  events: Array<{ id: string; name: string; status: 'active' | 'ongoing' | 'ended' }>;
+}
+
+interface PartnerApiResponse<T> {
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+async function partnerApiRequest<T>(
+  method: string,
+  path: string,
+  body?: unknown
+): Promise<PartnerApiResponse<T>> {
+  const token = localStorage.getItem('glucoseview_access_token');
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: 'include',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        error: data.error || {
+          code: 'API_ERROR',
+          message: data.message || 'API request failed',
+        },
+      };
+    }
+
+    return data;
+  } catch (error) {
+    return {
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network request failed',
+      },
+    };
+  }
+}
+
+export const partnerApi = {
+  getOverview: () =>
+    partnerApiRequest<PartnerOverviewData>('GET', `/api/v1/partner/overview?serviceId=${PARTNER_SERVICE_ID}`),
+
+  getTargets: () =>
+    partnerApiRequest<PartnerTarget[]>('GET', `/api/v1/partner/targets?serviceId=${PARTNER_SERVICE_ID}`),
+
+  getContents: () =>
+    partnerApiRequest<PartnerContent[]>('GET', `/api/v1/partner/content?serviceId=${PARTNER_SERVICE_ID}`),
+
+  createContent: (data: { type: 'text' | 'image' | 'link'; title: string; body?: string; url?: string }) =>
+    partnerApiRequest<PartnerContent>('POST', `/api/v1/partner/content?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  updateContent: (id: string, data: { title?: string; body?: string; url?: string; isActive?: boolean }) =>
+    partnerApiRequest<PartnerContent>('PATCH', `/api/v1/partner/content/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  getEvents: () =>
+    partnerApiRequest<PartnerEvent[]>('GET', `/api/v1/partner/events?serviceId=${PARTNER_SERVICE_ID}`),
+
+  createEvent: (data: { name: string; startDate: string; endDate: string; region?: string; targetScope?: string }) =>
+    partnerApiRequest<PartnerEvent>('POST', `/api/v1/partner/events?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  updateEvent: (id: string, data: { name?: string; startDate?: string; endDate?: string; region?: string; targetScope?: string; isActive?: boolean }) =>
+    partnerApiRequest<PartnerEvent>('PATCH', `/api/v1/partner/events/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
+
+  getStatus: () =>
+    partnerApiRequest<PartnerStatusData>('GET', `/api/v1/partner/status?serviceId=${PARTNER_SERVICE_ID}`),
+};

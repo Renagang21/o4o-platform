@@ -2,6 +2,7 @@
  * PartnerContentPage - 콘텐츠 관리 페이지
  *
  * Work Order: WO-GLYCOPHARM-PARTNER-DASHBOARD-IMPLEMENTATION-V1
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  *
  * 포함 요소:
  * - 콘텐츠 CRUD UI (생성, 수정, 비활성)
@@ -13,7 +14,7 @@
  * - 노출 위치 선택 UI 금지
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FileText,
   Image,
@@ -22,45 +23,9 @@ import {
   MoreVertical,
   Edit2,
   Power,
-  Trash2,
+  Loader2,
 } from 'lucide-react';
-
-// Mock 데이터 타입 (API 연동 구조 유지)
-interface PartnerContent {
-  id: string;
-  type: 'text' | 'image' | 'link';
-  title: string;
-  description: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-}
-
-const mockContents: PartnerContent[] = [
-  {
-    id: '1',
-    type: 'text',
-    title: '신규 건강기능식품 안내',
-    description: '혈당 관리에 도움이 되는 새로운 제품을 소개합니다.',
-    status: 'active',
-    createdAt: '2026-01-10',
-  },
-  {
-    id: '2',
-    type: 'image',
-    title: '1월 프로모션 배너',
-    description: '겨울철 건강관리 캠페인 이미지',
-    status: 'active',
-    createdAt: '2026-01-08',
-  },
-  {
-    id: '3',
-    type: 'link',
-    title: '당뇨 관리 가이드',
-    description: '공식 블로그 건강 정보 페이지 링크',
-    status: 'inactive',
-    createdAt: '2026-01-05',
-  },
-];
+import { partnerApi, type PartnerContent } from '@/services/api';
 
 const typeConfig = {
   text: { icon: FileText, label: '텍스트', color: 'blue' },
@@ -69,13 +34,75 @@ const typeConfig = {
 };
 
 export default function PartnerContentPage() {
-  const [contents] = useState<PartnerContent[]>(mockContents);
+  const [contents, setContents] = useState<PartnerContent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newContent, setNewContent] = useState<{ type: 'text' | 'image' | 'link'; title: string; body: string }>({
+    type: 'text',
+    title: '',
+    body: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchContents = async () => {
+    setIsLoading(true);
+    setError(null);
+    const response = await partnerApi.getContents();
+    if (response.error) {
+      setError(response.error.message);
+    } else if (response.data) {
+      setContents(response.data);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchContents();
+  }, []);
 
   const handleToggleMenu = (id: string) => {
     setActiveMenu(activeMenu === id ? null : id);
   };
+
+  const handleCreateContent = async () => {
+    if (!newContent.title.trim()) return;
+    setIsSubmitting(true);
+    const response = await partnerApi.createContent({
+      type: newContent.type,
+      title: newContent.title,
+      body: newContent.body,
+    });
+    if (!response.error) {
+      setShowCreateModal(false);
+      setNewContent({ type: 'text', title: '', body: '' });
+      fetchContents();
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleToggleStatus = async (content: PartnerContent) => {
+    setActiveMenu(null);
+    await partnerApi.updateContent(content.id, { isActive: !content.isActive });
+    fetchContents();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -138,15 +165,15 @@ export default function PartnerContentPage() {
                           {content.title}
                         </h3>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          content.status === 'active'
+                          content.isActive
                             ? 'bg-green-100 text-green-700'
                             : 'bg-slate-100 text-slate-500'
                         }`}>
-                          {content.status === 'active' ? '활성' : '비활성'}
+                          {content.isActive ? '활성' : '비활성'}
                         </span>
                       </div>
                       <p className="text-sm text-slate-500 mt-1 truncate">
-                        {content.description}
+                        {content.body}
                       </p>
                       <p className="text-xs text-slate-400 mt-1">
                         {config.label} · {content.createdAt}
@@ -170,13 +197,12 @@ export default function PartnerContentPage() {
                               <Edit2 className="w-4 h-4" />
                               수정
                             </button>
-                            <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                            <button
+                              onClick={() => handleToggleStatus(content)}
+                              className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                            >
                               <Power className="w-4 h-4" />
-                              {content.status === 'active' ? '비활성화' : '활성화'}
-                            </button>
-                            <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                              <Trash2 className="w-4 h-4" />
-                              삭제
+                              {content.isActive ? '비활성화' : '활성화'}
                             </button>
                           </div>
                         </>
@@ -211,7 +237,13 @@ export default function PartnerContentPage() {
                     return (
                       <button
                         key={type}
-                        className={`p-3 border rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-colors`}
+                        type="button"
+                        onClick={() => setNewContent({ ...newContent, type: type as 'text' | 'image' | 'link' })}
+                        className={`p-3 border rounded-xl transition-colors ${
+                          newContent.type === type
+                            ? 'border-purple-500 bg-purple-50'
+                            : 'hover:border-purple-300 hover:bg-purple-50'
+                        }`}
                       >
                         <Icon className="w-5 h-5 mx-auto text-slate-600 mb-1" />
                         <span className="text-xs text-slate-600">{config.label}</span>
@@ -227,6 +259,8 @@ export default function PartnerContentPage() {
                 </label>
                 <input
                   type="text"
+                  value={newContent.title}
+                  onChange={(e) => setNewContent({ ...newContent, title: e.target.value })}
                   className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="콘텐츠 제목을 입력하세요"
                 />
@@ -237,6 +271,8 @@ export default function PartnerContentPage() {
                   설명
                 </label>
                 <textarea
+                  value={newContent.body}
+                  onChange={(e) => setNewContent({ ...newContent, body: e.target.value })}
                   className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   rows={3}
                   placeholder="콘텐츠 설명을 입력하세요"
@@ -246,13 +282,19 @@ export default function PartnerContentPage() {
 
             <div className="flex gap-3 mt-6">
               <button
+                type="button"
                 onClick={() => setShowCreateModal(false)}
                 className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50"
               >
                 취소
               </button>
-              <button className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700">
-                추가
+              <button
+                type="button"
+                onClick={handleCreateContent}
+                disabled={isSubmitting || !newContent.title.trim()}
+                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50"
+              >
+                {isSubmitting ? '추가 중...' : '추가'}
               </button>
             </div>
           </div>

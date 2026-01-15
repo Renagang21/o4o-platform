@@ -1,11 +1,57 @@
 /**
  * PartnerOverviewPage - 파트너 현황 페이지
  * Reference: GlycoPharm (복제)
+ * API Integration: WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
  */
 
-import { FileText, Calendar, Activity } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Calendar, Activity, CheckCircle, Loader2 } from 'lucide-react';
+import { partnerApi, type PartnerOverviewData } from '../../services/api';
 
 export default function PartnerOverviewPage() {
+  const [data, setData] = useState<PartnerOverviewData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOverview = async () => {
+      setIsLoading(true);
+      setError(null);
+      const response = await partnerApi.getOverview();
+      if (response.error) {
+        setError(response.error.message);
+      } else if (response.data) {
+        setData(response.data);
+      }
+      setIsLoading(false);
+    };
+    fetchOverview();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
+        <p className="text-slate-500">데이터를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -22,7 +68,7 @@ export default function PartnerOverviewPage() {
               <FileText className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">2</p>
+              <p className="text-2xl font-bold text-slate-800">{data.activeContentCount}</p>
               <p className="text-sm text-slate-500">활성 콘텐츠</p>
             </div>
           </div>
@@ -34,7 +80,7 @@ export default function PartnerOverviewPage() {
               <Calendar className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">1</p>
+              <p className="text-2xl font-bold text-slate-800">{data.activeEventCount}</p>
               <p className="text-sm text-slate-500">진행 중 이벤트</p>
             </div>
           </div>
@@ -42,36 +88,30 @@ export default function PartnerOverviewPage() {
 
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <Activity className="w-6 h-6 text-amber-600" />
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+              data.status === 'active' ? 'bg-green-100' : 'bg-slate-100'
+            }`}>
+              {data.status === 'active' ? (
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              ) : (
+                <Activity className="w-6 h-6 text-slate-400" />
+              )}
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">정상</p>
+              <p className="text-2xl font-bold text-slate-800">{data.status === 'active' ? '정상' : '비활성'}</p>
               <p className="text-sm text-slate-500">전체 상태</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 p-6">
-        <h2 className="font-semibold text-slate-800 mb-4">최근 활동</h2>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 text-sm">
-            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-            <span className="text-slate-600">신규 혈당 관리 콘텐츠가 등록되었습니다.</span>
-            <span className="text-slate-400 ml-auto">1일 전</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span className="text-slate-600">1월 건강 이벤트가 시작되었습니다.</span>
-            <span className="text-slate-400 ml-auto">3일 전</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-            <span className="text-slate-600">홍보 대상이 업데이트되었습니다.</span>
-            <span className="text-slate-400 ml-auto">1주 전</span>
-          </div>
-        </div>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+        <h3 className="font-semibold text-blue-800 mb-2">파트너 센터 안내</h3>
+        <ul className="text-sm text-blue-700 space-y-1">
+          <li>이 페이지는 현재 활동 현황을 요약합니다.</li>
+          <li>콘텐츠, 이벤트 조건 설정은 각 메뉴에서 진행해 주세요.</li>
+          <li>홍보 대상은 GlucoseView 서비스에서 지정됩니다.</li>
+        </ul>
       </div>
     </div>
   );
