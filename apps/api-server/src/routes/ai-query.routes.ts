@@ -11,6 +11,8 @@
  * - GET /api/ai/policy - 정책 조회
  * - PUT /api/ai/policy - 정책 수정
  * - GET /api/ai/card-report - 카드 노출 리포트 (WO-AI-CARD-EXPOSURE-REPORT-V1.1)
+ * - GET /api/ai/operations - 운영 상태 대시보드 (WO-AI-OPERATIONS-GUARDRAILS-V1)
+ * - POST /api/ai/operations/acknowledge-alert - 경고 확인 처리
  */
 
 import { Router, Response } from 'express';
@@ -18,6 +20,7 @@ import { authenticate } from '../middleware/auth.middleware.js';
 import { requireAdmin } from '../middleware/permission.middleware.js';
 import { aiQueryController } from '../controllers/ai/AiQueryController.js';
 import { aiCardExposureService } from '../services/ai-card-exposure.service.js';
+import { aiOperationsService } from '../services/ai-operations.service.js';
 import type { AuthRequest } from '../types/auth.js';
 
 const router: Router = Router();
@@ -103,6 +106,70 @@ router.get('/card-report', authenticate, requireAdmin, (req, res: Response) => {
     return res.status(500).json({
       success: false,
       error: '리포트 조회 중 오류가 발생했습니다.',
+    });
+  }
+});
+
+// ===========================================
+// Operations routes (WO-AI-OPERATIONS-GUARDRAILS-V1)
+// ===========================================
+
+// GET /api/ai/operations - 운영 상태 대시보드 데이터
+router.get('/operations', authenticate, requireAdmin, (req, res: Response) => {
+  try {
+    const dashboardData = aiOperationsService.getDashboardData();
+
+    return res.json({
+      success: true,
+      data: dashboardData,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: '운영 상태 조회 중 오류가 발생했습니다.',
+    });
+  }
+});
+
+// GET /api/ai/operations/summary - 오늘 요약만
+router.get('/operations/summary', authenticate, requireAdmin, (req, res: Response) => {
+  try {
+    const summary = aiOperationsService.getTodaySummary();
+
+    return res.json({
+      success: true,
+      data: summary,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: '요약 조회 중 오류가 발생했습니다.',
+    });
+  }
+});
+
+// POST /api/ai/operations/acknowledge-alert - 경고 확인 처리
+router.post('/operations/acknowledge-alert', authenticate, requireAdmin, (req, res: Response) => {
+  try {
+    const { alertId } = req.body;
+
+    if (!alertId) {
+      return res.status(400).json({
+        success: false,
+        error: 'alertId가 필요합니다.',
+      });
+    }
+
+    const acknowledged = aiOperationsService.acknowledgeAlert(alertId);
+
+    return res.json({
+      success: acknowledged,
+      message: acknowledged ? '경고가 확인 처리되었습니다.' : '경고를 찾을 수 없습니다.',
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: '경고 확인 처리 중 오류가 발생했습니다.',
     });
   }
 });

@@ -17,6 +17,7 @@ import type { AiQueryContextType } from '../entities/AiQueryLog.js';
 import { AiSettings } from '../entities/AiSettings.js';
 import { googleAI } from './google-ai.service.js';
 import { aiCardExposureService } from './ai-card-exposure.service.js';
+import { aiOperationsService } from './ai-operations.service.js';
 import type { AiCard, CardExposureContext, AiCardData } from '@o4o/ai-core';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../utils/logger.js';
@@ -37,6 +38,9 @@ export interface AiQueryRequest {
   productId?: string;
   categoryId?: string;
   pageType?: 'home' | 'store' | 'product' | 'category' | 'content';
+  // Operations tracking (WO-AI-OPERATIONS-GUARDRAILS-V1)
+  sessionId?: string;
+  pageUrl?: string;
 }
 
 // Phase 2: 맥락 정보 UI 데이터 구조
@@ -425,6 +429,22 @@ class AiQueryService {
     const startTime = Date.now();
     const today = this.getTodayDate();
 
+    // 0. Operations: Record request and check circuit breaker
+    aiOperationsService.recordRequest({
+      userId: request.userId,
+      sessionId: request.sessionId,
+      pageUrl: request.pageUrl,
+    });
+
+    const circuitCheck = aiOperationsService.shouldAllowRequest();
+    if (!circuitCheck.allowed) {
+      return {
+        success: false,
+        error: circuitCheck.message || 'AI 서비스가 일시적으로 지연되고 있습니다.',
+        errorCode: 'AI_ERROR'
+      };
+    }
+
     // 1. Check if query is allowed
     const canQueryResult = await this.canQuery(request.userId, request.isPaidUser);
     if (!canQueryResult.allowed) {
@@ -467,6 +487,9 @@ class AiQueryService {
       const answer = response.data.text;
       const durationMs = Date.now() - startTime;
 
+      // Operations: Record success
+      aiOperationsService.recordResult('success');
+
       // 5. Save log
       const log = this.logRepo.create({
         userId: request.userId,
@@ -504,6 +527,15 @@ class AiQueryService {
     } catch (error: any) {
       const durationMs = Date.now() - startTime;
 
+      // Operations: Record error type
+      if (error.name === 'AbortError' || error.message?.includes('시간이 초과')) {
+        aiOperationsService.recordResult('timeout');
+      } else if (error.message?.includes('API')) {
+        aiOperationsService.recordResult('api_error');
+      } else {
+        aiOperationsService.recordResult('other_error');
+      }
+
       // Save error log
       const log = this.logRepo.create({
         userId: request.userId,
@@ -523,7 +555,7 @@ class AiQueryService {
 
       return {
         success: false,
-        error: 'AI 응답 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        error: error.message || 'AI 응답 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         errorCode: 'AI_ERROR'
       };
     }

@@ -106,7 +106,17 @@ export default function AdminDashboardPage() {
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900">AI 관리</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6">
+            <Link
+              to="/admin/ai-operations"
+              className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
+            >
+              <span className="text-2xl">🔍</span>
+              <div>
+                <div className="font-medium text-gray-900">운영 상태</div>
+                <div className="text-sm text-gray-500">실시간 모니터링</div>
+              </div>
+            </Link>
             <Link
               to="/admin/ai-business-pack"
               className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
