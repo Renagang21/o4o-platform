@@ -53,6 +53,7 @@ import { PartnerOverviewPage } from './pages/partner/PartnerOverviewPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AiCardExplainPage from './pages/admin/AiCardExplainPage';
 import AiCardReportPage from './pages/admin/AiCardReportPage';
+import AiBusinessPackPage from './pages/admin/AiBusinessPackPage';
 
 // Test Guide Pages
 import {
@@ -120,6 +121,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
           <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
+          <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
