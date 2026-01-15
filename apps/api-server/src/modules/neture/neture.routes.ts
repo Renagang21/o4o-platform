@@ -3,6 +3,7 @@ import type { Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
 import { SupplierStatus, PartnershipStatus, SupplierRequestStatus } from './entities/index.js';
 import logger from '../../utils/logger.js';
+import { requireAuth } from '../../middleware/auth.middleware.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -145,7 +146,7 @@ router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
  * - status (optional): Filter by status ('pending', 'approved', 'rejected')
  * - serviceId (optional): Filter by service
  */
-router.get('/supplier/requests', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     // 인증 확인 (실제로는 미들웨어에서 처리)
     const supplierId = req.user?.supplierId || req.user?.id;
@@ -190,7 +191,7 @@ router.get('/supplier/requests', async (req: AuthenticatedRequest, res: Response
  * GET /api/v1/neture/supplier/requests/:id
  * Get supplier request detail
  */
-router.get('/supplier/requests/:id', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -234,7 +235,7 @@ router.get('/supplier/requests/:id', async (req: AuthenticatedRequest, res: Resp
  *
  * State transition: pending → approved
  */
-router.post('/supplier/requests/:id/approve', async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/requests/:id/approve', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -275,7 +276,7 @@ router.post('/supplier/requests/:id/approve', async (req: AuthenticatedRequest, 
  * Body:
  * - reason (optional): Rejection reason
  */
-router.post('/supplier/requests/:id/reject', async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/requests/:id/reject', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -348,7 +349,7 @@ router.post('/supplier/requests', async (req: Request, res: Response) => {
  * GET /api/v1/neture/supplier/products
  * Get products for authenticated supplier
  */
-router.get('/supplier/products', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -380,7 +381,7 @@ router.get('/supplier/products', async (req: AuthenticatedRequest, res: Response
  * PATCH /api/v1/neture/supplier/products/:id
  * Update product status (activation, applications toggle)
  */
-router.patch('/supplier/products/:id', async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/supplier/products/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -425,7 +426,7 @@ router.patch('/supplier/products/:id', async (req: AuthenticatedRequest, res: Re
  * NOTE: Neture does NOT process orders.
  * This endpoint provides summary and links to navigate to each service.
  */
-router.get('/supplier/orders/summary', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/orders/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -460,7 +461,7 @@ router.get('/supplier/orders/summary', async (req: AuthenticatedRequest, res: Re
  * GET /api/v1/neture/supplier/contents
  * Get contents for authenticated supplier
  */
-router.get('/supplier/contents', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -498,7 +499,7 @@ router.get('/supplier/contents', async (req: AuthenticatedRequest, res: Response
  * GET /api/v1/neture/supplier/contents/:id
  * Get content detail
  */
-router.get('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -540,7 +541,7 @@ router.get('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Resp
  * POST /api/v1/neture/supplier/contents
  * Create new content
  */
-router.post('/supplier/contents', async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -590,7 +591,7 @@ router.post('/supplier/contents', async (req: AuthenticatedRequest, res: Respons
  * PATCH /api/v1/neture/supplier/contents/:id
  * Update content
  */
-router.patch('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -627,7 +628,7 @@ router.patch('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Re
  * DELETE /api/v1/neture/supplier/contents/:id
  * Delete content
  */
-router.delete('/supplier/contents/:id', async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -665,7 +666,7 @@ router.delete('/supplier/contents/:id', async (req: AuthenticatedRequest, res: R
  * GET /api/v1/neture/supplier/requests/:id/events
  * Get event logs for a specific request
  */
-router.get('/supplier/requests/:id/events', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/requests/:id/events', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
@@ -705,7 +706,7 @@ router.get('/supplier/requests/:id/events', async (req: AuthenticatedRequest, re
  * - eventType (optional): Filter by event type ('approved', 'rejected')
  * - limit (optional): Limit number of results
  */
-router.get('/supplier/events', async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/events', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = req.user?.supplierId || req.user?.id;
 
