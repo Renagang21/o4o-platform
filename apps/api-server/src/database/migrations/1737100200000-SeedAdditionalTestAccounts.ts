@@ -75,7 +75,7 @@ const TEST_ACCOUNTS = [
   {
     email: 'partner@neture.test',
     name: 'Test Partner',
-    role: 'user',
+    role: 'partner',
     domain: 'neture.co.kr',
     description: 'Neture 파트너 테스트 계정',
   },
