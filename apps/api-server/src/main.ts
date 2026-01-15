@@ -414,6 +414,9 @@ import marketTrialRoutes from './routes/market-trial.routes.js';
 // AI Query Routes (Phase AI-1)
 import aiQueryRoutes from './routes/ai-query.routes.js';
 
+// AI Admin Routes (WO-AI-ADMIN-CONTROL-PLANE-V1)
+import aiAdminRoutes from './routes/ai-admin.routes.js';
+
 // Trial Extensions (H8-2, H8-3)
 import trialShippingRoutes from './extensions/trial-shipping/index.js';
 import trialFulfillmentRoutes from './extensions/trial-fulfillment/index.js';
@@ -724,6 +727,10 @@ const startServer = async () => {
     // 22-ai. Register AI Query routes (Phase AI-1)
     app.use('/api/ai', aiQueryRoutes);
     logger.info('✅ AI Query routes registered at /api/ai');
+
+    // 22-ai-admin. Register AI Admin routes (WO-AI-ADMIN-CONTROL-PLANE-V1)
+    app.use('/api/ai/admin', aiAdminRoutes);
+    logger.info('✅ AI Admin routes registered at /api/ai/admin');
 
     // 22-a. Register Trial Shipping Extension (H8-2)
     app.use('/api/trial-shipping', trialShippingRoutes);

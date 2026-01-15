@@ -1,6 +1,7 @@
 /**
  * AI Query Policy Entity
  * Phase 1 - AI 일 사용량 정책 관리
+ * WO-AI-ADMIN-CONTROL-PLANE-V1 - 관리자 제어 기능 추가
  *
  * 원칙:
  * - Gemini Flash 단일 모델
@@ -33,6 +34,18 @@ export class AiQueryPolicy {
   /** 시스템 프롬프트 - 서비스 맥락 유도 */
   @Column({ name: 'system_prompt', type: 'text', nullable: true })
   systemPrompt!: string | null;
+
+  /** 경고 임계치 (%) - WO-AI-ADMIN-CONTROL-PLANE-V1 */
+  @Column({ name: 'warning_threshold', type: 'int', default: 80 })
+  warningThreshold!: number;
+
+  /** 전체 일 최대 질문 수 (모든 사용자 합산) - WO-AI-ADMIN-CONTROL-PLANE-V1 */
+  @Column({ name: 'global_daily_limit', type: 'int', default: 1000 })
+  globalDailyLimit!: number;
+
+  /** 현재 활성 엔진 ID - WO-AI-ADMIN-CONTROL-PLANE-V1 */
+  @Column({ name: 'active_engine_id', type: 'int', nullable: true })
+  activeEngineId!: number | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

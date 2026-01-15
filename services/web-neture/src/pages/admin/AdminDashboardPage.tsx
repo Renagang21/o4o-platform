@@ -103,10 +103,23 @@ export default function AdminDashboardPage() {
 
         {/* AI Management */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
-          <div className="px-6 py-4 border-b border-gray-100">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
             <h2 className="font-semibold text-gray-900">AI 관리</h2>
+            <Link to="/admin/ai" className="text-sm text-primary-600 hover:text-primary-700">
+              AI 제어판 바로가기 &rarr;
+            </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 p-6">
+            <Link
+              to="/admin/ai"
+              className="flex items-center gap-4 p-4 rounded-lg border-2 border-primary-200 bg-primary-50 hover:border-primary-400 transition-colors"
+            >
+              <span className="text-2xl">🎛️</span>
+              <div>
+                <div className="font-medium text-gray-900">AI 제어판</div>
+                <div className="text-sm text-primary-600">엔진 & 정책 설정</div>
+              </div>
+            </Link>
             <Link
               to="/admin/ai-operations"
               className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
@@ -118,23 +131,23 @@ export default function AdminDashboardPage() {
               </div>
             </Link>
             <Link
-              to="/admin/ai-business-pack"
-              className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
-            >
-              <span className="text-2xl">📋</span>
-              <div>
-                <div className="font-medium text-gray-900">AI 정보 노출 안내</div>
-                <div className="text-sm text-gray-500">사업자용 설명</div>
-              </div>
-            </Link>
-            <Link
               to="/admin/ai-card-report"
               className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
             >
               <span className="text-2xl">📊</span>
               <div>
-                <div className="font-medium text-gray-900">카드 노출 리포트</div>
-                <div className="text-sm text-gray-500">운영 현황</div>
+                <div className="font-medium text-gray-900">카드 리포트</div>
+                <div className="text-sm text-gray-500">노출 현황</div>
+              </div>
+            </Link>
+            <Link
+              to="/admin/ai-business-pack"
+              className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
+            >
+              <span className="text-2xl">📋</span>
+              <div>
+                <div className="font-medium text-gray-900">사업자 안내</div>
+                <div className="text-sm text-gray-500">파트너용</div>
               </div>
             </Link>
             <Link

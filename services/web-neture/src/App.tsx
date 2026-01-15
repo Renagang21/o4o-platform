@@ -56,6 +56,9 @@ import AiCardReportPage from './pages/admin/AiCardReportPage';
 import AiBusinessPackPage from './pages/admin/AiBusinessPackPage';
 import AiOperationsPage from './pages/admin/AiOperationsPage';
 
+// AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1)
+import { AiAdminDashboardPage, AiEnginesPage, AiPolicyPage } from './pages/admin/ai';
+
 // Test Guide Pages
 import {
   TestGuidePage,
@@ -124,6 +127,11 @@ function App() {
           <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
           <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
           <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
+
+          {/* AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1) */}
+          <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
+          <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
+          <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
