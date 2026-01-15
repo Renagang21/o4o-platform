@@ -3,6 +3,7 @@
  * Based on GlycoPharm App structure
  */
 
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -38,11 +39,19 @@ import PartnerContentPage from '@/pages/partner/ContentPage';
 import PartnerEventsPage from '@/pages/partner/EventsPage';
 import PartnerStatusPage from '@/pages/partner/StatusPage';
 
-// Protected Route Component
+// Protected Route Component - triggers auth check only when entering
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading, isSessionChecked, checkSession } = useAuth();
 
-  if (isLoading) {
+  // Trigger session check when entering protected route
+  React.useEffect(() => {
+    if (!isSessionChecked) {
+      checkSession();
+    }
+  }, [isSessionChecked, checkSession]);
+
+  // Wait for session check to complete
+  if (!isSessionChecked || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
