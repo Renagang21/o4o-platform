@@ -546,7 +546,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@19.2.0)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: file:packages/utils
@@ -604,7 +604,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/compression':
         specifier: ^1.7.5
         version: 1.8.1
@@ -959,7 +959,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/bcryptjs':
         specifier: 2.4.6
         version: 2.4.6
@@ -1483,7 +1483,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.9.6(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
@@ -2062,7 +2062,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0
-        version: 6.30.2(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
+        version: 6.30.2(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
@@ -2118,7 +2118,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.9.6(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -2313,7 +2313,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.9.6(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
@@ -2356,7 +2356,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.9.6(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
@@ -2947,7 +2947,7 @@ importers:
         version: 18.3.1
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
+        version: 7.9.6(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
@@ -3062,6 +3062,9 @@ importers:
 
   services/web-glucoseview:
     dependencies:
+      lucide-react:
+        specifier: ^0.468.0
+        version: 0.468.0(react@19.2.0)
       react:
         specifier: ^19.2.0
         version: 19.2.0
@@ -3181,6 +3184,9 @@ importers:
 
   services/web-k-cosmetics:
     dependencies:
+      lucide-react:
+        specifier: ^0.468.0
+        version: 0.468.0(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -5042,12 +5048,6 @@ packages:
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
-
-  '@o4o/types@file:packages/types':
-    resolution: {directory: packages/types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-    peerDependencies:
-      react: 18.2.0
 
   '@o4o/utils@file:packages/utils':
     resolution: {directory: packages/utils, type: directory}
@@ -15979,10 +15979,6 @@ snapshots:
     transitivePeerDependencies:
       - embla-carousel
 
-  '@o4o/types@file:packages/types(react@19.2.0)':
-    dependencies:
-      react: 19.2.0
-
   '@o4o/utils@file:packages/utils':
     dependencies:
       '@o4o/auth-client': link:packages/auth-client
@@ -18099,12 +18095,12 @@ snapshots:
       '@types/react': 18.3.27
       '@types/react-dom': 18.3.7(@types/react@18.3.27)
 
-  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@testing-library/dom': 10.4.1
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     optionalDependencies:
       '@types/react': 19.2.7
       '@types/react-dom': 19.2.3(@types/react@19.2.7)
@@ -24909,11 +24905,6 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-dom@19.2.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      scheduler: 0.27.0
-
   react-dom@19.2.0(react@19.2.0):
     dependencies:
       react: 19.2.0
@@ -25034,13 +25025,6 @@ snapshots:
       react-dom: 18.2.0(react@18.3.1)
       react-router: 6.30.2(react@18.3.1)
 
-  react-router-dom@6.30.2(react-dom@19.2.0(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@remix-run/router': 1.23.1
-      react: 18.3.1
-      react-dom: 19.2.0(react@18.3.1)
-      react-router: 6.30.2(react@18.3.1)
-
   react-router-dom@7.9.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       react: 18.2.0
@@ -25052,12 +25036,6 @@ snapshots:
       react: 18.3.1
       react-dom: 18.2.0(react@18.3.1)
       react-router: 7.9.6(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
-
-  react-router-dom@7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      react-dom: 19.2.0(react@18.3.1)
-      react-router: 7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1)
 
   react-router-dom@7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
@@ -25085,14 +25063,6 @@ snapshots:
       set-cookie-parser: 2.7.2
     optionalDependencies:
       react-dom: 18.2.0(react@18.3.1)
-
-  react-router@7.9.6(react-dom@19.2.0(react@18.3.1))(react@18.3.1):
-    dependencies:
-      cookie: 1.1.1
-      react: 18.3.1
-      set-cookie-parser: 2.7.2
-    optionalDependencies:
-      react-dom: 19.2.0(react@18.3.1)
 
   react-router@7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
