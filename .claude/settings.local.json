@@ -440,7 +440,12 @@
       "WebSearch",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 20948557825 -R Renagang21/o4o-platform)",
       "Bash(npx vite build)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list:*)",
+      "Bash(\"C:/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api\" --limit=30 --format=\"table\\(timestamp, textPayload\\)\" --project=netureyoutube)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" workflow run deploy-web-services.yml --ref main -f service=neture -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21015088354 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21015878863 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }

@@ -58,6 +58,8 @@ import ApplicationDetailPage from '@/pages/operator/ApplicationDetailPage';
 import StoreApprovalsPage from '@/pages/operator/StoreApprovalsPage';
 import StoreApprovalDetailPage from '@/pages/operator/StoreApprovalDetailPage';
 import { StoreTemplateManagerPage } from '@/pages/operator/store-template';
+import UsersPage from '@/pages/operator/UsersPage';
+import SettingsPage from '@/pages/operator/SettingsPage';
 
 // Pharmacy Store Apply
 import StoreApplyPage from '@/pages/pharmacy/StoreApplyPage';
@@ -222,6 +224,9 @@ function AppRoutes() {
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         {/* Store Template Manager */}
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
+        {/* Users & Settings (Stub) */}
+        <Route path="users" element={<UsersPage />} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
