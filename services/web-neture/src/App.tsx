@@ -46,6 +46,12 @@ import {
   SupplierContentsPage,
 } from './pages/supplier';
 
+// Partner Dashboard
+import { PartnerOverviewPage } from './pages/partner/PartnerOverviewPage';
+
+// Admin Dashboard
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+
 // Test Guide Pages
 import {
   TestGuidePage,
@@ -104,6 +110,12 @@ function App() {
             <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
             <Route path="/supplier/contents" element={<SupplierContentsPage />} />
           </Route>
+
+          {/* Partner Dashboard */}
+          <Route path="/partner" element={<PartnerOverviewPage />} />
+
+          {/* Admin Dashboard */}
+          <Route path="/admin" element={<AdminDashboardPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
