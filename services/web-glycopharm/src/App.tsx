@@ -81,6 +81,9 @@ import EducationPage from '@/pages/education/EducationPage';
 import MyPage from '@/pages/MyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
+// Partner Application (WO-PARTNER-APPLICATION-V1)
+import PartnerApplyPage from '@/pages/partners/ApplyPage';
+
 // Apply Pages (API 연동)
 import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
 import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
@@ -143,6 +146,7 @@ function AppRoutes() {
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
+        <Route path="partners/apply" element={<PartnerApplyPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
 
         {/* Test Guide */}

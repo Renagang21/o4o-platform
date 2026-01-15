@@ -15,6 +15,9 @@ import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage } from '@/pag
 import LoginPage from '@/pages/auth/LoginPage';
 import PartnerInfoPage from '@/pages/PartnerInfoPage';
 
+// Partner Application (WO-PARTNER-APPLICATION-V1)
+import PartnerApplyPage from '@/pages/partners/ApplyPage';
+
 // Test Guide Pages
 import {
   TestGuidePage,
@@ -68,6 +71,7 @@ function AppRoutes() {
         <Route path="login" element={<LoginPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
+        <Route path="partners/apply" element={<PartnerApplyPage />} />
 
         {/* Test Guide */}
         <Route path="test-guide" element={<TestGuidePage />} />

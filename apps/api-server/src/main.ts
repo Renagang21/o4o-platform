@@ -423,7 +423,7 @@ import { TrialFulfillmentController } from './extensions/trial-fulfillment/trial
 import partnerRoutes from './routes/partner.routes.js';
 
 // Partner Dashboard Routes (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
-import { partnerDashboardRoutes } from './modules/partner/index.js';
+import { partnerDashboardRoutes, partnerApplicationRoutes } from './modules/partner/index.js';
 
 // Checkout Routes (Phase N-1)
 import checkoutRoutes from './routes/checkout.routes.js';
@@ -712,6 +712,10 @@ const startServer = async () => {
     // 21-a. Register Partner Dashboard API v1 (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     app.use('/api/v1/partner', partnerDashboardRoutes);
     logger.info('✅ Partner Dashboard API v1 registered at /api/v1/partner');
+
+    // 21-b. Register Partner Application API (WO-PARTNER-APPLICATION-V1) - PUBLIC ENDPOINT
+    app.use('/api/v1/partner/applications', partnerApplicationRoutes);
+    logger.info('✅ Partner Application API registered at /api/v1/partner/applications');
 
     // 22. Register Market Trial routes (Phase L-1)
     app.use('/api/market-trial', marketTrialRoutes);

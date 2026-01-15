@@ -26,6 +26,9 @@ import PartnerContentPage from './pages/partner/ContentPage';
 import PartnerEventsPage from './pages/partner/EventsPage';
 import PartnerStatusPage from './pages/partner/StatusPage';
 
+// Partner Application (WO-PARTNER-APPLICATION-V1)
+import PartnerApplyPage from './pages/partners/ApplyPage';
+
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -121,6 +124,9 @@ function AppRoutes() {
       <Route path="/test-guide" element={<TestGuidePage />} />
       <Route path="/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
       <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
+
+      {/* Partner Application (WO-PARTNER-APPLICATION-V1) */}
+      <Route path="/partners/apply" element={<PartnerApplyPage />} />
 
       {/* Partner Dashboard */}
       <Route
