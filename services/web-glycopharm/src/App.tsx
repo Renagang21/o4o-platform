@@ -7,6 +7,7 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
+import PartnerLayout from '@/components/layouts/PartnerLayout';
 
 // Public Pages
 import HomePage from '@/pages/HomePage';
@@ -91,6 +92,14 @@ import {
   ConsumerManualPage,
   OperatorManualPage,
 } from '@/pages/test-guide';
+
+// Partner Dashboard Pages
+import PartnerIndex from '@/pages/partner/index';
+import PartnerOverviewPage from '@/pages/partner/OverviewPage';
+import PartnerTargetsPage from '@/pages/partner/TargetsPage';
+import PartnerContentPage from '@/pages/partner/ContentPage';
+import PartnerEventsPage from '@/pages/partner/EventsPage';
+import PartnerStatusPage from '@/pages/partner/StatusPage';
 
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -192,15 +201,22 @@ function AppRoutes() {
         element={<RoleNotAvailablePage role="supplier" />}
       />
 
-      {/* Partner Dashboard - Neture에서 관리 */}
+      {/* Partner Dashboard */}
       <Route
         path="partner"
-        element={<RoleNotAvailablePage role="partner" />}
-      />
-      <Route
-        path="partner/*"
-        element={<RoleNotAvailablePage role="partner" />}
-      />
+        element={
+          <ProtectedRoute allowedRoles={['partner']}>
+            <PartnerLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<PartnerIndex />} />
+        <Route path="overview" element={<PartnerOverviewPage />} />
+        <Route path="targets" element={<PartnerTargetsPage />} />
+        <Route path="content" element={<PartnerContentPage />} />
+        <Route path="events" element={<PartnerEventsPage />} />
+        <Route path="status" element={<PartnerStatusPage />} />
+      </Route>
 
       {/* Operator Dashboard */}
       <Route
