@@ -25,34 +25,34 @@ export class CreateAiEnginesAndAdminColumns1737100700000 implements MigrationInt
     `);
 
     // ============================================================
-    // 2. Add new columns to ai_query_policies (if they don't exist)
+    // 2. Add new columns to ai_query_policy (if they don't exist)
     // ============================================================
 
     // Check if columns exist before adding
     const tableInfo = await queryRunner.query(`
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name = 'ai_query_policies'
+      WHERE table_name = 'ai_query_policy'
     `);
     const existingColumns = tableInfo.map((row: any) => row.column_name);
 
     if (!existingColumns.includes('warning_threshold')) {
       await queryRunner.query(`
-        ALTER TABLE ai_query_policies
+        ALTER TABLE ai_query_policy
         ADD COLUMN warning_threshold INTEGER DEFAULT 80
       `);
     }
 
     if (!existingColumns.includes('global_daily_limit')) {
       await queryRunner.query(`
-        ALTER TABLE ai_query_policies
+        ALTER TABLE ai_query_policy
         ADD COLUMN global_daily_limit INTEGER DEFAULT 1000
       `);
     }
 
     if (!existingColumns.includes('active_engine_id')) {
       await queryRunner.query(`
-        ALTER TABLE ai_query_policies
+        ALTER TABLE ai_query_policy
         ADD COLUMN active_engine_id INTEGER
       `);
     }
@@ -75,17 +75,17 @@ export class CreateAiEnginesAndAdminColumns1737100700000 implements MigrationInt
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Remove columns from ai_query_policies
+    // Remove columns from ai_query_policy
     await queryRunner.query(`
-      ALTER TABLE ai_query_policies
+      ALTER TABLE ai_query_policy
       DROP COLUMN IF EXISTS warning_threshold
     `);
     await queryRunner.query(`
-      ALTER TABLE ai_query_policies
+      ALTER TABLE ai_query_policy
       DROP COLUMN IF EXISTS global_daily_limit
     `);
     await queryRunner.query(`
-      ALTER TABLE ai_query_policies
+      ALTER TABLE ai_query_policy
       DROP COLUMN IF EXISTS active_engine_id
     `);
 
