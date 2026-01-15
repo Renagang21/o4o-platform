@@ -16,6 +16,9 @@ import { AiQueryLog } from '../entities/AiQueryLog.js';
 import type { AiQueryContextType } from '../entities/AiQueryLog.js';
 import { AiSettings } from '../entities/AiSettings.js';
 import { googleAI } from './google-ai.service.js';
+import { aiCardExposureService } from './ai-card-exposure.service.js';
+import type { AiCard, CardExposureContext, AiCardData } from '@o4o/ai-core';
+import { v4 as uuidv4 } from 'uuid';
 import logger from '../utils/logger.js';
 
 // Re-export type for consumers
@@ -71,6 +74,8 @@ export interface AiQueryResponse {
   errorCode?: 'LIMIT_EXCEEDED' | 'AI_DISABLED' | 'AI_ERROR' | 'NO_API_KEY';
   // Phase 2: 맥락 정보 UI 데이터
   contextPanel?: ContextInfoPanel;
+  // Phase 3: AI 카드 (최대 3개, 설명 가능성 포함)
+  cards?: AiCard[];
 }
 
 export interface DailyUsageInfo {
@@ -334,6 +339,84 @@ class AiQueryService {
   }
 
   /**
+   * Phase 3: Build card exposure context and select cards
+   * 카드 노출 컨텍스트 생성 및 카드 선택
+   */
+  private buildCardsForResponse(request: AiQueryRequest, requestId: string): AiCard[] {
+    // 1. 카드 노출 컨텍스트 생성
+    const context: CardExposureContext = {
+      serviceId: request.serviceId || 'default',
+      storeId: request.storeId,
+      productId: request.productId,
+      categoryId: request.categoryId,
+    };
+
+    // 2. 사용 가능한 카드 데이터 수집
+    const availableData: {
+      storeProducts?: AiCardData[];
+      relatedProducts?: AiCardData[];
+      categoryProducts?: AiCardData[];
+      serviceDefaults?: AiCardData[];
+    } = {};
+
+    // contextData에서 카드 데이터 추출
+    if (request.contextData) {
+      // 매장 상품
+      if (request.storeId && request.contextData.storeProducts) {
+        availableData.storeProducts = this.extractCardData(request.contextData.storeProducts);
+      }
+
+      // 관련 상품
+      if (request.productId && request.contextData.relatedProducts) {
+        availableData.relatedProducts = this.extractCardData(request.contextData.relatedProducts);
+      }
+
+      // 카테고리 상품
+      if (request.categoryId && request.contextData.categoryProducts) {
+        availableData.categoryProducts = this.extractCardData(request.contextData.categoryProducts);
+      }
+
+      // 서비스 기본 카드
+      if (request.contextData.serviceDefaults) {
+        availableData.serviceDefaults = this.extractCardData(request.contextData.serviceDefaults);
+      }
+
+      // contextPanel의 products도 활용
+      if (request.contextData.products && !availableData.storeProducts) {
+        availableData.storeProducts = this.extractCardData(request.contextData.products);
+      }
+    }
+
+    // 3. 카드 선택
+    const cards = aiCardExposureService.selectCards(context, availableData);
+
+    // 4. 카드 노출 로그 기록
+    if (cards.length > 0) {
+      aiCardExposureService.logCardExposure(requestId, cards, context);
+    }
+
+    return cards;
+  }
+
+  /**
+   * 다양한 형식의 데이터를 AiCardData로 변환
+   */
+  private extractCardData(data: any[]): AiCardData[] {
+    if (!Array.isArray(data)) return [];
+
+    return data.map(item => ({
+      title: item.name || item.title || '',
+      description: item.description,
+      imageUrl: item.imageUrl || item.image,
+      linkUrl: item.url || item.linkUrl,
+      price: item.price,
+      meta: {
+        id: item.id,
+      },
+    })).filter(card => card.title); // 제목이 있는 것만
+  }
+
+  /**
    * Process AI query
    */
   async query(request: AiQueryRequest): Promise<AiQueryResponse> {
@@ -405,12 +488,17 @@ class AiQueryService {
       // 7. Phase 2: Build context panel for UI
       const contextPanel = this.buildContextPanel(request);
 
+      // 8. Phase 3: Build cards with explainability
+      const requestId = uuidv4();
+      const cards = this.buildCardsForResponse(request, requestId);
+
       return {
         success: true,
         answer,
         attachedInfo: request.contextData || undefined,
         remainingQueries: usage.remaining,
-        contextPanel: Object.keys(contextPanel).length > 0 ? contextPanel : undefined
+        contextPanel: Object.keys(contextPanel).length > 0 ? contextPanel : undefined,
+        cards: cards.length > 0 ? cards : undefined
       };
 
     } catch (error: any) {
