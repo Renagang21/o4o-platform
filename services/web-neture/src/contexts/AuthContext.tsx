@@ -38,7 +38,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
   admin: '/admin',
-  supplier: '/supplier',
+  supplier: '/supplier/dashboard',
   partner: '/partner',
   user: '/',
 };
