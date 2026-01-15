@@ -1,14 +1,7 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts';
+import { Link, Outlet } from 'react-router-dom';
+import AccountMenu from '../AccountMenu';
 
 export default function MainLayout() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -59,27 +52,8 @@ export default function MainLayout() {
               >
                 참여 신청
               </Link>
-              {isAuthenticated && user ? (
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm text-gray-600">
-                    <span className="font-medium text-gray-800">{user.name}</span>
-                    <span className="ml-1 text-xs text-gray-400">({user.currentRole})</span>
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-                  >
-                    로그아웃
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  to="/login"
-                  className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-                >
-                  로그인
-                </Link>
-              )}
+              {/* Account Menu (WO-NETURE-UI-ACCOUNT-MENU-V1) */}
+              <AccountMenu />
             </nav>
           </div>
         </div>
