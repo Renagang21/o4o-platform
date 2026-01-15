@@ -6,7 +6,7 @@
 import { Link } from 'react-router-dom';
 
 interface RoleNotAvailablePageProps {
-  role: 'supplier' | 'partner';
+  role: 'supplier' | 'partner' | 'admin' | 'seller';
 }
 
 const ROLE_INFO = {
@@ -19,6 +19,16 @@ const ROLE_INFO = {
     label: '파트너',
     icon: '🤝',
     description: '파트너십 및 연계 서비스 관리',
+  },
+  admin: {
+    label: '관리자',
+    icon: '🔧',
+    description: '플랫폼 운영 및 관리',
+  },
+  seller: {
+    label: '판매자',
+    icon: '🛒',
+    description: '상품 판매 및 매장 관리',
   },
 };
 

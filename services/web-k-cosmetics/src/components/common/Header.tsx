@@ -3,15 +3,40 @@
  * Based on GlycoPharm Header structure
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setUserMenuOpen(false);
+    };
+    if (userMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [userMenuOpen]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [userMenuOpen]);
 
   const handleLogout = () => {
     logout();
@@ -19,6 +44,9 @@ export default function Header() {
     setUserMenuOpen(false);
     setMobileMenuOpen(false);
   };
+
+  const dashboardPath = user?.currentRole ? ROLE_DASHBOARDS[user.currentRole] : '/';
+  const roleLabel = user?.currentRole ? ROLE_LABELS[user.currentRole] : '';
 
   return (
     <header style={styles.header}>
@@ -45,44 +73,37 @@ export default function Header() {
           {/* Desktop User Actions */}
           <div style={styles.actions}>
             {isAuthenticated ? (
-              <div style={styles.userMenu}>
+              <div style={styles.userMenu} ref={dropdownRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   style={styles.userButton}
+                  aria-label="사용자 메뉴"
                 >
                   <div style={styles.avatar}>
                     {user?.name?.charAt(0) || '?'}
                   </div>
-                  <span style={styles.userName}>{user?.name}</span>
-                  <span style={styles.chevron}>▾</span>
                 </button>
 
                 {userMenuOpen && (
-                  <>
-                    <div
-                      style={styles.overlay}
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div style={styles.dropdown}>
-                      <div style={styles.dropdownHeader}>
-                        <p style={styles.dropdownName}>{user?.name}</p>
-                        <p style={styles.dropdownEmail}>{user?.email}</p>
-                      </div>
-                      <Link
-                        to="/mypage"
-                        style={styles.dropdownItem}
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        마이페이지
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        style={styles.dropdownLogout}
-                      >
-                        로그아웃
-                      </button>
+                  <div style={styles.dropdown}>
+                    <div style={styles.dropdownHeader}>
+                      <p style={styles.dropdownEmail}>{user?.email}</p>
+                      <p style={styles.dropdownRole}>{roleLabel}</p>
                     </div>
-                  </>
+                    <Link
+                      to={dashboardPath}
+                      style={styles.dropdownItem}
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      대시보드
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      style={styles.dropdownLogout}
+                    >
+                      로그아웃
+                    </button>
+                  </div>
                 )}
               </div>
             ) : (
@@ -216,38 +237,26 @@ const styles: Record<string, React.CSSProperties> = {
   userButton: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '6px 12px',
-    borderRadius: '12px',
+    justifyContent: 'center',
+    padding: '4px',
+    borderRadius: '50%',
     border: 'none',
     background: 'transparent',
     cursor: 'pointer',
+    transition: 'background-color 0.2s',
   },
   avatar: {
-    width: '32px',
-    height: '32px',
+    width: '36px',
+    height: '36px',
     borderRadius: '50%',
     background: 'linear-gradient(135deg, #f48fb1, #e91e63)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     color: '#fff',
-    fontSize: '14px',
-    fontWeight: 500,
-  },
-  userName: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#334155',
-  },
-  chevron: {
-    fontSize: '10px',
-    color: '#94a3b8',
-  },
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    zIndex: 40,
+    fontSize: '15px',
+    fontWeight: 600,
+    boxShadow: '0 2px 8px rgba(233, 30, 99, 0.3)',
   },
   dropdown: {
     position: 'absolute',
@@ -266,16 +275,17 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '12px 16px',
     borderBottom: '1px solid #e2e8f0',
   },
-  dropdownName: {
-    fontSize: '14px',
+  dropdownEmail: {
+    fontSize: '13px',
     fontWeight: 500,
     color: '#1e293b',
     margin: 0,
   },
-  dropdownEmail: {
-    fontSize: '12px',
-    color: '#64748b',
-    margin: 0,
+  dropdownRole: {
+    fontSize: '11px',
+    color: '#e91e63',
+    margin: '2px 0 0 0',
+    fontWeight: 500,
   },
   dropdownItem: {
     display: 'flex',

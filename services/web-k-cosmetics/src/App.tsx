@@ -15,6 +15,7 @@ import PartnerLayout from '@/components/layouts/PartnerLayout';
 import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
 import PartnerInfoPage from '@/pages/PartnerInfoPage';
+import MyPage from '@/pages/MyPage';
 
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 import PartnerApplyPage from '@/pages/partners/ApplyPage';
@@ -93,8 +94,20 @@ function AppRoutes() {
         <Route path="forum" element={<ForumPage />} />
         <Route path="forum/post/:postId" element={<PostDetailPage />} />
 
-        {/* Role Not Available */}
+        {/* MyPage (Protected) */}
+        <Route
+          path="mypage"
+          element={
+            <ProtectedRoute>
+              <MyPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Role Not Available - these roles use Neture platform */}
         <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
+        <Route path="admin/*" element={<RoleNotAvailablePage role="admin" />} />
+        <Route path="seller/*" element={<RoleNotAvailablePage role="seller" />} />
       </Route>
 
       {/* Partner Dashboard */}
