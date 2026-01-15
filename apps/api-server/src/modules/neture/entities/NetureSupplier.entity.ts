@@ -76,6 +76,13 @@ export class NetureSupplier {
   })
   status: SupplierStatus;
 
+  /**
+   * User ID linking this supplier to a user account
+   * Used for authentication - when user logs in, find their supplier by user_id
+   */
+  @Column({ name: 'user_id', type: 'uuid', nullable: true })
+  userId: string;
+
   @OneToMany('NetureSupplierProduct', 'supplier')
   products: NetureSupplierProduct[];
 }

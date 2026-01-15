@@ -14,9 +14,10 @@
  * - 자동 승인 로직 (정책 미확정)
  */
 
-import { Navigate, Outlet, NavLink } from 'react-router-dom';
+import { Navigate, Outlet, NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, FileCheck, Package, ShoppingBag, FileText, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileCheck, Package, ShoppingBag, FileText, Settings, LogOut, Home } from 'lucide-react';
+import AccountMenu from '../../components/AccountMenu';
 
 export default function SupplierDashboardLayout() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -56,9 +57,39 @@ export default function SupplierDashboardLayout() {
   ];
 
   return (
-    <div style={styles.container}>
-      {/* Sidebar */}
-      <aside style={styles.sidebar}>
+    <div style={styles.wrapper}>
+      {/* Top Header */}
+      <header style={styles.topHeader}>
+        <div style={styles.topHeaderContent}>
+          {/* Logo */}
+          <Link to="/" style={styles.topLogo}>
+            Neture
+          </Link>
+
+          {/* Navigation */}
+          <nav style={styles.topNav}>
+            <Link to="/" style={styles.topNavLink}>
+              <Home size={16} />
+              홈으로
+            </Link>
+            <Link to="/suppliers" style={styles.topNavLink}>
+              공급자
+            </Link>
+            <Link to="/partners/requests" style={styles.topNavLink}>
+              제휴 요청
+            </Link>
+            <Link to="/content" style={styles.topNavLink}>
+              콘텐츠
+            </Link>
+            <span style={styles.topNavDivider}>|</span>
+            <AccountMenu />
+          </nav>
+        </div>
+      </header>
+
+      <div style={styles.container}>
+        {/* Sidebar */}
+        <aside style={styles.sidebar}>
         <div style={styles.sidebarHeader}>
           <h2 style={styles.sidebarTitle}>Neture</h2>
           <span style={styles.roleTag}>공급자</span>
@@ -99,11 +130,59 @@ export default function SupplierDashboardLayout() {
       <main style={styles.main}>
         <Outlet />
       </main>
+      </div>
     </div>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  wrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+  },
+  topHeader: {
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e2e8f0',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+  },
+  topHeaderContent: {
+    maxWidth: '100%',
+    margin: '0 auto',
+    padding: '0 24px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '56px',
+  },
+  topLogo: {
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#16a34a',
+    textDecoration: 'none',
+  },
+  topNav: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+  topNavLink: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    color: '#64748b',
+    textDecoration: 'none',
+    fontSize: '14px',
+    fontWeight: 500,
+    padding: '8px 12px',
+    borderRadius: '6px',
+    transition: 'all 0.15s',
+  },
+  topNavDivider: {
+    color: '#e2e8f0',
+  },
   loadingContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -128,7 +207,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   container: {
     display: 'flex',
-    minHeight: '100vh',
+    flex: 1,
     backgroundColor: '#f8fafc',
   },
   sidebar: {

@@ -139,6 +139,23 @@ router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
 // ==================== Supplier Request API (WO-NETURE-SUPPLIER-REQUEST-API-V1) ====================
 
 /**
+ * Helper: Get supplier ID from authenticated user
+ * First checks userId -> supplier mapping, then falls back to user.id
+ */
+async function getSupplierIdFromUser(req: AuthenticatedRequest): Promise<string | null> {
+  if (!req.user?.id) return null;
+
+  // First try to find supplier linked to this user
+  const linkedSupplierId = await netureService.getSupplierIdByUserId(req.user.id);
+  if (linkedSupplierId) {
+    return linkedSupplierId;
+  }
+
+  // Fallback: use user ID directly (for backwards compatibility)
+  return req.user.id;
+}
+
+/**
  * GET /api/v1/neture/supplier/requests
  * Get supplier requests for authenticated supplier
  *
@@ -148,8 +165,8 @@ router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
  */
 router.get('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // 인증 확인 (실제로는 미들웨어에서 처리)
-    const supplierId = req.user?.supplierId || req.user?.id;
+    // 인증 확인 및 supplierId 조회
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -193,7 +210,7 @@ router.get('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, 
  */
 router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -237,7 +254,7 @@ router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedReque
  */
 router.post('/supplier/requests/:id/approve', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -278,7 +295,7 @@ router.post('/supplier/requests/:id/approve', requireAuth, async (req: Authentic
  */
 router.post('/supplier/requests/:id/reject', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -351,7 +368,7 @@ router.post('/supplier/requests', async (req: Request, res: Response) => {
  */
 router.get('/supplier/products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -383,7 +400,7 @@ router.get('/supplier/products', requireAuth, async (req: AuthenticatedRequest, 
  */
 router.patch('/supplier/products/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -428,7 +445,7 @@ router.patch('/supplier/products/:id', requireAuth, async (req: AuthenticatedReq
  */
 router.get('/supplier/orders/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -463,7 +480,7 @@ router.get('/supplier/orders/summary', requireAuth, async (req: AuthenticatedReq
  */
 router.get('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -501,7 +518,7 @@ router.get('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, 
  */
 router.get('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -543,7 +560,7 @@ router.get('/supplier/contents/:id', requireAuth, async (req: AuthenticatedReque
  */
 router.post('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -593,7 +610,7 @@ router.post('/supplier/contents', requireAuth, async (req: AuthenticatedRequest,
  */
 router.patch('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -630,7 +647,7 @@ router.patch('/supplier/contents/:id', requireAuth, async (req: AuthenticatedReq
  */
 router.delete('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -668,7 +685,7 @@ router.delete('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRe
  */
 router.get('/supplier/requests/:id/events', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({
@@ -708,7 +725,7 @@ router.get('/supplier/requests/:id/events', requireAuth, async (req: Authenticat
  */
 router.get('/supplier/events', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = req.user?.supplierId || req.user?.id;
+    const supplierId = await getSupplierIdFromUser(req);
 
     if (!supplierId) {
       return res.status(401).json({

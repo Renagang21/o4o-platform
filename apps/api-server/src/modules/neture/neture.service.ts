@@ -77,6 +77,40 @@ export class NetureService {
     return this._requestEventRepo;
   }
 
+  // ==================== User-Supplier Linking ====================
+
+  /**
+   * Get supplier ID by user ID
+   * Used to link authenticated user to their supplier account
+   */
+  async getSupplierIdByUserId(userId: string): Promise<string | null> {
+    try {
+      const supplier = await this.supplierRepo.findOne({
+        where: { userId },
+        select: ['id'],
+      });
+      return supplier?.id || null;
+    } catch (error) {
+      logger.error('[NetureService] Error finding supplier by user ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get supplier by user ID
+   */
+  async getSupplierByUserId(userId: string): Promise<NetureSupplier | null> {
+    try {
+      return await this.supplierRepo.findOne({
+        where: { userId },
+        relations: ['products'],
+      });
+    } catch (error) {
+      logger.error('[NetureService] Error finding supplier by user ID:', error);
+      return null;
+    }
+  }
+
   // ==================== Suppliers ====================
 
   /**
