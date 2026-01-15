@@ -14,10 +14,9 @@
  * - 상세 분석/처리는 각 서비스에서
  */
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, Sparkles } from 'lucide-react';
-import { AiPreviewModal } from '../../components/ai/AiPreviewModal';
+import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight } from 'lucide-react';
+import { AiSummaryButton } from '../../components/ai';
 
 // Mock 데이터: 연결된 서비스/공급자 목록
 const connectedServices = [
@@ -50,7 +49,6 @@ const notifications = [
 ];
 
 export function PartnerOverviewPage() {
-  const [showAiModal, setShowAiModal] = useState(false);
   const totalSuppliers = connectedServices.reduce((sum, s) => sum + s.supplierCount, 0);
   const totalCampaigns = connectedServices.reduce((sum, s) => sum + s.activeCampaigns, 0);
 
@@ -69,14 +67,7 @@ export function PartnerOverviewPage() {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setShowAiModal(true)}
-          style={styles.aiButton}
-          aria-label="AI 요약"
-        >
-          <Sparkles size={16} />
-          AI 요약
-        </button>
+        <AiSummaryButton contextLabel="파트너 운영 현황" />
       </div>
 
       {/* Hub Concept Info */}
@@ -229,7 +220,6 @@ export function PartnerOverviewPage() {
         </div>
       </div>
 
-      <AiPreviewModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
     </div>
   );
 }
@@ -270,20 +260,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#64748b',
     margin: 0,
-  },
-  aiButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '10px 16px',
-    backgroundColor: '#eff6ff',
-    color: '#2563eb',
-    border: '1px solid #bfdbfe',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
   },
   infoCard: {
     display: 'flex',

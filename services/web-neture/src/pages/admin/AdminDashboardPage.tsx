@@ -1,23 +1,19 @@
 /**
  * AdminDashboardPage - 운영자 대시보드
  *
- * Work Order: WO-AI-DASHBOARD-PREVIEW-V1
+ * Work Order: WO-AI-PREVIEW-SUMMARY-V1
  *
  * Neture 플랫폼 전체 운영 현황
  * - 서비스 상태 모니터링
  * - 주요 지표 요약
  * - 승인 대기 항목
- * - AI 요약 버튼 (WO-AI-DASHBOARD-PREVIEW-V1)
+ * - AI 요약 버튼 (WO-AI-PREVIEW-SUMMARY-V1)
  */
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
-import { AiPreviewModal } from '../../components/ai/AiPreviewModal';
+import { AiSummaryButton } from '../../components/ai';
 
 export default function AdminDashboardPage() {
-  const [showAiModal, setShowAiModal] = useState(false);
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -45,13 +41,7 @@ export default function AdminDashboardPage() {
             <h1 className="text-2xl font-bold text-gray-900">운영자 대시보드</h1>
             <p className="text-gray-500 mt-1">플랫폼 전체 운영 현황을 확인합니다.</p>
           </div>
-          <button
-            onClick={() => setShowAiModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
-          >
-            <Sparkles size={16} />
-            AI 요약
-          </button>
+          <AiSummaryButton contextLabel="플랫폼 운영 요약" />
         </div>
 
         {/* Stats Grid */}
@@ -153,8 +143,6 @@ export default function AdminDashboardPage() {
           상세 관리 기능은 순차적으로 추가됩니다.
         </div>
       </main>
-
-      <AiPreviewModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
     </div>
   );
 }
