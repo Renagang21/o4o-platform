@@ -56,6 +56,8 @@ import {
 
 // Forum Pages (WO-NETURE-TEST-SECTIONS-V1)
 import { ForumPage } from './pages/forum/ForumPage';
+import { ForumWritePage } from './pages/forum/ForumWritePage';
+import { ForumPostPage } from './pages/forum/ForumPostPage';
 
 function App() {
   return (
@@ -85,7 +87,12 @@ function App() {
 
             {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
             <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
+            <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
+            <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />
             <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
+            <Route path="/forum/service-update/new" element={<ForumWritePage />} />
+            <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
+            <Route path="/forum/write" element={<ForumWritePage />} />
           </Route>
 
           {/* Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0) */}
