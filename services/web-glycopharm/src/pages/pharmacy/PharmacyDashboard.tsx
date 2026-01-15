@@ -44,6 +44,7 @@ import {
   LogIn,
   ArrowLeft,
 } from 'lucide-react';
+import { AiSummaryButton } from '@/components/ai';
 import {
   pharmacyApi,
   type PharmacyStatus,
@@ -226,6 +227,9 @@ export default function PharmacyDashboard() {
                   <ExternalLink className="w-3 h-3" />
                 </a>
               )}
+            </div>
+            <div className="ml-4">
+              <AiSummaryButton contextLabel="약국 운영 현황" />
             </div>
           </div>
 

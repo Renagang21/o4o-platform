@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import type { GlucoseViewPharmacy } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { AiSummaryButton } from '../components/ai';
 
 export default function DashboardPage() {
   const { isAuthenticated } = useAuth();
@@ -132,7 +133,8 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold text-gray-800">{pharmacy.name}</h1>
               <p className="text-gray-500">GlucoseView 대시보드</p>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-3">
+              <AiSummaryButton contextLabel="혈당 모니터링 현황" />
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 pharmacy.status === 'active'
                   ? 'bg-slate-100 text-slate-700'

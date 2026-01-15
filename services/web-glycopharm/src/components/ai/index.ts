@@ -5,5 +5,3 @@
 
 export { AiPreviewModal } from './AiPreviewModal';
 export { AiSummaryButton } from './AiSummaryButton';
-export { default as AIChatButton } from './AIChatButton';
-export { default as AIChatWidget } from './AIChatWidget';

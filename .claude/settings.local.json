@@ -477,7 +477,10 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021625992 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021865260 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022169650 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022367262 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022367262 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022494828 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022696387 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022861960 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }

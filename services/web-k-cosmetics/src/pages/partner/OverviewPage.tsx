@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Calendar, Activity, CheckCircle, Loader2 } from 'lucide-react';
 import { partnerApi, type PartnerOverviewData } from '../../services/partnerApi';
+import { AiSummaryButton } from '../../components/ai';
 
 export default function PartnerOverviewPage() {
   const [data, setData] = useState<PartnerOverviewData | null>(null);
@@ -54,11 +55,14 @@ export default function PartnerOverviewPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">요약</h1>
-        <p className="text-slate-500 mt-1">
-          현재 파트너 활동 현황을 한눈에 확인하세요.
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">요약</h1>
+          <p className="text-slate-500 mt-1">
+            현재 파트너 활동 현황을 한눈에 확인하세요.
+          </p>
+        </div>
+        <AiSummaryButton contextLabel="파트너 활동 현황" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

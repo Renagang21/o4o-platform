@@ -16,6 +16,7 @@
 import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../styles/theme';
 import { useAuth, TestUser } from '../contexts/AuthContext';
+import { AiSummaryButton } from '../components/ai';
 
 // Mock user data (fallback when not logged in)
 const mockUser = {
@@ -169,6 +170,7 @@ export function DashboardPage() {
             </span>
           </div>
           <div style={styles.welcomeStats}>
+            <AiSummaryButton contextLabel="약사회 활동 현황" />
             <div style={styles.welcomeStat}>
               <span style={styles.welcomeStatValue}>{mockActivity.unreadNotices}</span>
               <span style={styles.welcomeStatLabel}>미확인 공지</span>
