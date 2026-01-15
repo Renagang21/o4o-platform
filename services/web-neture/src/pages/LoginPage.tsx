@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts';
+import { useAuth, ROLE_DASHBOARDS } from '../contexts';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
 const TEST_PASSWORD = 'TestPassword';
@@ -42,8 +42,9 @@ export function LoginPage() {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
 
-      // 로그인 성공 - 홈으로 이동 (AuthContext에서 user 상태 관리)
-      navigate('/');
+      // 로그인 성공 - 역할별 대시보드로 이동
+      const dashboardPath = result.role ? ROLE_DASHBOARDS[result.role] : '/';
+      navigate(dashboardPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
