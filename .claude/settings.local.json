@@ -474,7 +474,8 @@
       "Bash(\"/c/Users/home/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin/gcloud\" logging read \"resource.type=cloud_run_revision AND resource.labels.service_name=o4o-core-api\" --limit=20 --format=\"json\" --project=netureyoutube)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021199208 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021339780 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021625992 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021625992 -R Renagang21/o4o-platform)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21021865260 -R Renagang21/o4o-platform)"
     ],
     "deny": []
   }

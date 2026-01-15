@@ -1,19 +1,16 @@
 /**
- * SupplierOrdersPage - 주문/배송 작업 진입점
+ * SupplierOrdersPage - 공급자 운영 허브
  *
- * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4, P1 §3.3
+ * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0, P1, P2-REORDER
  *
- * 중요: Neture가 주문을 처리하지는 않지만,
- * 공급자가 "어디서 주문이 왔는지"를 확인하는 곳은 필요하다.
- *
- * P1 §3.3 정밀화:
- * - 최근 승인 발생 시점
- * - 서비스별 상세 정보
- * - 최근 활동 내역
+ * 핵심 개념: Neture는 주문 처리가 아닌 "운영 허브"
+ * - 서비스별 주문 현황을 한눈에 확인
+ * - 필요한 서비스로 바로 이동
+ * - 주문 처리는 각 서비스에서 수행
  */
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, ExternalLink, AlertTriangle, Users, Clock, Mail, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass } from 'lucide-react';
 import { supplierApi, type OrderSummaryResponse, type ServiceSummary } from '../../lib/api';
 
 const SERVICE_ICONS: Record<string, string> = {
@@ -76,20 +73,25 @@ export default function SupplierOrdersPage() {
     <div>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>주문/배송 현황</h1>
-        <p style={styles.subtitle}>
-          각 서비스에서 발생하는 주문 현황을 확인하고, 해당 서비스로 이동합니다.
-        </p>
+        <div style={styles.headerIcon}>
+          <Compass size={28} style={{ color: '#3b82f6' }} />
+        </div>
+        <div>
+          <h1 style={styles.title}>공급자 운영 허브</h1>
+          <p style={styles.subtitle}>
+            서비스별 주문 현황을 확인하고, 필요한 서비스로 바로 이동합니다
+          </p>
+        </div>
       </div>
 
-      {/* Important Notice */}
-      <div style={styles.warningBox}>
-        <AlertTriangle size={20} style={{ color: '#b45309', flexShrink: 0 }} />
+      {/* Hub Concept Info */}
+      <div style={styles.infoCard}>
+        <Info size={20} style={{ color: '#3b82f6', flexShrink: 0 }} />
         <div>
-          <p style={styles.warningTitle}>Neture는 주문을 직접 처리하지 않습니다</p>
-          <p style={styles.warningText}>
-            주문 확인, 송장 입력, 배송 처리, 반품 승인 등 모든 주문 관련 작업은
-            각 서비스(GlycoPharm, K-Cosmetics 등)에서 직접 수행합니다.
+          <p style={styles.infoCardText}>
+            <strong>Neture는 공급자의 운영 허브입니다.</strong><br />
+            주문은 각 서비스에서 발생하며, 이곳에서는 서비스별 주문 현황을 한눈에 확인하고
+            필요한 서비스로 바로 이동할 수 있습니다.
           </p>
         </div>
       </div>
@@ -124,33 +126,43 @@ export default function SupplierOrdersPage() {
         <div style={styles.loading}>로딩 중...</div>
       ) : data.services.length === 0 ? (
         <div style={styles.emptyState}>
-          <ShoppingBag size={48} style={{ color: '#94a3b8', marginBottom: '16px' }} />
-          <p>연결된 서비스가 없습니다.</p>
-          <p style={{ fontSize: '13px', marginTop: '8px' }}>
-            판매자 신청을 승인하면 해당 서비스가 여기에 표시됩니다.
+          <div style={styles.emptyStateIcon}>
+            <Compass size={40} style={{ color: '#94a3b8' }} />
+          </div>
+          <h3 style={styles.emptyStateTitle}>아직 연결된 서비스가 없습니다</h3>
+          <p style={styles.emptyStateText}>
+            판매자 신청이 승인되면,<br />
+            해당 서비스가 이곳에 자동으로 표시됩니다.
+          </p>
+          <p style={styles.emptyStateHint}>
+            판매자 신청 현황은 "신청 관리" 메뉴에서 확인하세요
           </p>
         </div>
       ) : (
-        <div style={styles.serviceList}>
-          {data.services.map((svc) => (
-            <ServiceCard
-              key={svc.serviceId}
-              service={svc}
-              expanded={expandedService === svc.serviceId}
-              onToggle={() => toggleExpand(svc.serviceId)}
-            />
-          ))}
+        <div>
+          <h2 style={styles.sectionTitle}>서비스별 운영 현황</h2>
+          <div style={styles.serviceList}>
+            {data.services.map((svc) => (
+              <ServiceCard
+                key={svc.serviceId}
+                service={svc}
+                expanded={expandedService === svc.serviceId}
+                onToggle={() => toggleExpand(svc.serviceId)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Info Box */}
-      <div style={styles.infoBox}>
-        <h3 style={styles.infoTitle}>주문 관리 안내</h3>
-        <ul style={styles.infoList}>
-          <li>각 서비스에서 주문이 발생하면, 해당 서비스 관리자 페이지에서 처리합니다.</li>
-          <li>Neture는 공급자-판매자 매칭과 승인만 담당합니다.</li>
-          <li>최근 활동 내역은 승인/거절 이벤트를 보여줍니다.</li>
-        </ul>
+      {/* Role Separation Notice */}
+      <div style={styles.roleNotice}>
+        <div style={styles.roleNoticeContent}>
+          <span style={styles.roleNoticeBadge}>책임 분리</span>
+          <p style={styles.roleNoticeText}>
+            <strong>Neture</strong>: 판매자 승인 및 운영 현황 확인 &nbsp;|&nbsp;
+            <strong>각 서비스</strong>: 주문 처리, 배송, 반품 관리
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -205,11 +217,11 @@ function ServiceCard({
                 rel="noopener noreferrer"
                 style={styles.serviceLink}
               >
-                주문 관리
+                {service.serviceName} 관리 페이지로 이동
                 <ExternalLink size={14} />
               </a>
             ) : (
-              <span style={styles.serviceLinkDisabled}>URL 미설정</span>
+              <span style={styles.serviceLinkDisabled}>관리 페이지 URL 미설정</span>
             )}
             <button onClick={onToggle} style={styles.expandButton}>
               {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -279,40 +291,52 @@ function ServiceCard({
 
 const styles: Record<string, React.CSSProperties> = {
   header: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
     marginBottom: '24px',
+  },
+  headerIcon: {
+    width: '56px',
+    height: '56px',
+    borderRadius: '14px',
+    backgroundColor: '#eff6ff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: '24px',
     fontWeight: 700,
     color: '#1e293b',
-    margin: '0 0 8px 0',
+    margin: '0 0 4px 0',
   },
   subtitle: {
     fontSize: '14px',
     color: '#64748b',
     margin: 0,
   },
-  warningBox: {
+  infoCard: {
     display: 'flex',
     alignItems: 'flex-start',
     gap: '14px',
-    backgroundColor: '#fffbeb',
-    border: '1px solid #fcd34d',
-    borderRadius: '10px',
-    padding: '16px 20px',
+    backgroundColor: '#eff6ff',
+    border: '1px solid #bfdbfe',
+    borderRadius: '12px',
+    padding: '18px 22px',
     marginBottom: '24px',
   },
-  warningTitle: {
+  infoCardText: {
     fontSize: '14px',
-    fontWeight: 600,
-    color: '#92400e',
-    margin: '0 0 4px 0',
-  },
-  warningText: {
-    fontSize: '13px',
-    color: '#a16207',
+    color: '#1e40af',
     margin: 0,
-    lineHeight: 1.5,
+    lineHeight: 1.6,
+  },
+  sectionTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#475569',
+    margin: '0 0 16px 0',
   },
   statsRow: {
     display: 'grid',
@@ -348,11 +372,37 @@ const styles: Record<string, React.CSSProperties> = {
   },
   emptyState: {
     textAlign: 'center',
-    padding: '60px',
-    color: '#94a3b8',
+    padding: '60px 40px',
     backgroundColor: '#fff',
-    borderRadius: '12px',
+    borderRadius: '16px',
     border: '1px solid #e2e8f0',
+  },
+  emptyStateIcon: {
+    width: '80px',
+    height: '80px',
+    borderRadius: '50%',
+    backgroundColor: '#f1f5f9',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 20px',
+  },
+  emptyStateTitle: {
+    fontSize: '18px',
+    fontWeight: 600,
+    color: '#475569',
+    margin: '0 0 12px 0',
+  },
+  emptyStateText: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: '0 0 16px 0',
+    lineHeight: 1.6,
+  },
+  emptyStateHint: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: 0,
   },
   serviceList: {
     display: 'flex',
@@ -523,23 +573,30 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
     fontStyle: 'italic',
   },
-  infoBox: {
+  roleNotice: {
+    marginTop: '24px',
     backgroundColor: '#f8fafc',
-    borderRadius: '12px',
+    borderRadius: '10px',
     border: '1px solid #e2e8f0',
-    padding: '20px',
+    padding: '16px 20px',
   },
-  infoTitle: {
-    fontSize: '14px',
+  roleNoticeContent: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  roleNoticeBadge: {
+    fontSize: '11px',
     fontWeight: 600,
     color: '#475569',
-    margin: '0 0 12px 0',
+    backgroundColor: '#e2e8f0',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    whiteSpace: 'nowrap',
   },
-  infoList: {
-    margin: 0,
-    paddingLeft: '20px',
+  roleNoticeText: {
     fontSize: '13px',
     color: '#64748b',
-    lineHeight: 1.8,
+    margin: 0,
   },
 };
