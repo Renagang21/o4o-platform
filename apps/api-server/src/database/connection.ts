@@ -177,6 +177,15 @@ import {
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
+// PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
+// ============================================================================
+import {
+  PartnerContent,
+  PartnerEvent,
+  PartnerTarget,
+} from '../modules/partner/entities/index.js';
+
+// ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
@@ -438,6 +447,12 @@ export const AppDataSource = new DataSource({
     KpaOrganization,
     KpaMember,
     KpaApplication,
+    // ============================================================================
+    // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
+    // ============================================================================
+    PartnerContent,
+    PartnerEvent,
+    PartnerTarget,
     // ============================================================================
     // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
     // ============================================================================
