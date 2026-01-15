@@ -1,0 +1,42 @@
+{
+  "name": "@o4o/ai-core",
+  "version": "0.1.0",
+  "description": "AI Core - Policy, Contract, and Log standards for AI features",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./contracts": {
+      "import": "./dist/contracts/index.js",
+      "types": "./dist/contracts/index.d.ts"
+    },
+    "./policies": {
+      "import": "./dist/policies/index.js",
+      "types": "./dist/policies/index.d.ts"
+    },
+    "./ai-logs": {
+      "import": "./dist/ai-logs/index.js",
+      "types": "./dist/ai-logs/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "keywords": [
+    "ai",
+    "core",
+    "policy",
+    "contract",
+    "o4o-platform"
+  ],
+  "license": "UNLICENSED"
+}
