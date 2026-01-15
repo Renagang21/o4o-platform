@@ -52,6 +52,7 @@ import { PartnerOverviewPage } from './pages/partner/PartnerOverviewPage';
 // Admin Dashboard
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AiCardExplainPage from './pages/admin/AiCardExplainPage';
+import AiCardReportPage from './pages/admin/AiCardReportPage';
 
 // Test Guide Pages
 import {
@@ -118,6 +119,7 @@ function App() {
           {/* Admin Dashboard */}
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
+          <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

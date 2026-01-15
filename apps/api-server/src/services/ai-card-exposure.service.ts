@@ -227,7 +227,7 @@ class AiCardExposureService {
   }
 
   /**
-   * 카드 노출 통계 (관리자용)
+   * 카드 노출 통계 (관리자용 - 기본)
    */
   getExposureStats(): {
     total: number;
@@ -260,6 +260,175 @@ class AiCardExposureService {
       avgCardsPerRequest: Math.round(avgCardsPerRequest * 100) / 100,
     };
   }
+
+  /**
+   * 운영 리포트용 통계 (WO-AI-CARD-EXPOSURE-REPORT-V1.1)
+   * 기간별 필터링 지원
+   */
+  getReportStats(options: {
+    startDate?: Date;
+    endDate?: Date;
+  } = {}): CardExposureReportStats {
+    const now = new Date();
+    const startDate = options.startDate || new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 기본 7일
+    const endDate = options.endDate || now;
+
+    // 기간 내 로그 필터링
+    const filteredLogs = cardExposureLogs.filter(log => {
+      const logTime = log.timestamp.getTime();
+      return logTime >= startDate.getTime() && logTime <= endDate.getTime();
+    });
+
+    // 요청별 그룹핑
+    const requestMap = new Map<string, CardExposureLogEntry[]>();
+    filteredLogs.forEach(log => {
+      const existing = requestMap.get(log.requestId) || [];
+      existing.push(log);
+      requestMap.set(log.requestId, existing);
+    });
+
+    // KPI 계산
+    const totalRequests = requestMap.size;
+    const totalCards = filteredLogs.length;
+    const requestsWithCards = Array.from(requestMap.values()).filter(logs => logs.length > 0).length;
+    const cardExposureRate = totalRequests > 0 ? (requestsWithCards / totalRequests) * 100 : 0;
+    const avgCardsPerRequest = totalRequests > 0 ? totalCards / totalRequests : 0;
+
+    // 카드 개수 분포
+    const cardCountDistribution: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+    requestMap.forEach(logs => {
+      const count = Math.min(logs.length, 3);
+      cardCountDistribution[count] = (cardCountDistribution[count] || 0) + 1;
+    });
+
+    // reason 분포
+    const reasonDistribution: Record<CardExposureReason, number> = {
+      same_store: 0,
+      same_product: 0,
+      same_category: 0,
+      service_fallback: 0,
+    };
+    filteredLogs.forEach(log => {
+      reasonDistribution[log.reason]++;
+    });
+
+    // 일자별 추이
+    const dailyTrend = this.calculateDailyTrend(filteredLogs, startDate, endDate);
+
+    return {
+      period: {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+      },
+      kpi: {
+        totalRequests,
+        requestsWithCards,
+        totalCards,
+        cardExposureRate: Math.round(cardExposureRate * 100) / 100,
+        avgCardsPerRequest: Math.round(avgCardsPerRequest * 100) / 100,
+      },
+      cardCountDistribution,
+      reasonDistribution,
+      dailyTrend,
+    };
+  }
+
+  /**
+   * 일자별 추이 계산
+   */
+  private calculateDailyTrend(
+    logs: CardExposureLogEntry[],
+    startDate: Date,
+    endDate: Date
+  ): DailyTrendEntry[] {
+    const trend: DailyTrendEntry[] = [];
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    // 날짜별 그룹핑
+    const dailyMap = new Map<string, { requests: Set<string>; cards: number }>();
+
+    logs.forEach(log => {
+      const dateKey = log.timestamp.toISOString().split('T')[0];
+      const existing = dailyMap.get(dateKey) || { requests: new Set(), cards: 0 };
+      existing.requests.add(log.requestId);
+      existing.cards++;
+      dailyMap.set(dateKey, existing);
+    });
+
+    // 기간 내 모든 날짜에 대해 데이터 생성
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const dateKey = currentDate.toISOString().split('T')[0];
+      const dayData = dailyMap.get(dateKey);
+
+      const requests = dayData?.requests.size || 0;
+      const cards = dayData?.cards || 0;
+
+      trend.push({
+        date: dateKey,
+        requests,
+        cards,
+        avgCards: requests > 0 ? Math.round((cards / requests) * 100) / 100 : 0,
+        exposureRate: requests > 0 ? Math.round((cards > 0 ? 100 : 0) * 100) / 100 : 0,
+      });
+
+      currentDate = new Date(currentDate.getTime() + dayMs);
+    }
+
+    return trend;
+  }
+
+  /**
+   * reason 설명 반환 (UI용)
+   */
+  getReasonDescriptions(): Record<CardExposureReason, { label: string; description: string }> {
+    return {
+      same_store: {
+        label: '같은 매장',
+        description: '현재 보고 있는 매장의 다른 상품/정보',
+      },
+      same_product: {
+        label: '같은 상품',
+        description: '현재 보고 있는 상품과 관련된 정보',
+      },
+      same_category: {
+        label: '같은 카테고리',
+        description: '같은 카테고리에 속한 다른 상품',
+      },
+      service_fallback: {
+        label: '서비스 대표',
+        description: '특정 맥락이 없을 때 표시되는 서비스 대표 정보',
+      },
+    };
+  }
+}
+
+/**
+ * 리포트 통계 타입 (WO-AI-CARD-EXPOSURE-REPORT-V1.1)
+ */
+export interface CardExposureReportStats {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  kpi: {
+    totalRequests: number;
+    requestsWithCards: number;
+    totalCards: number;
+    cardExposureRate: number;
+    avgCardsPerRequest: number;
+  };
+  cardCountDistribution: Record<number, number>;
+  reasonDistribution: Record<CardExposureReason, number>;
+  dailyTrend: DailyTrendEntry[];
+}
+
+export interface DailyTrendEntry {
+  date: string;
+  requests: number;
+  cards: number;
+  avgCards: number;
+  exposureRate: number;
 }
 
 export const aiCardExposureService = AiCardExposureService.getInstance();
