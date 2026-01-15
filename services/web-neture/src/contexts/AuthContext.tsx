@@ -37,9 +37,9 @@ const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  admin: '/admin',
+  admin: '/',           // Admin dashboard not yet implemented in Neture
   supplier: '/supplier/dashboard',
-  partner: '/partner',
+  partner: '/',         // Partner dashboard not yet implemented in Neture
   user: '/',
 };
 
