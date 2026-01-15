@@ -8,7 +8,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // 사용자 역할
-export type UserRole = 'pharmacist' | 'admin';
+export type UserRole = 'pharmacist' | 'admin' | 'partner';
 
 // 승인 상태
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
@@ -35,6 +35,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   isApproved: boolean;
   isAdmin: boolean;
   isPending: boolean;
@@ -55,12 +56,14 @@ function mapApiRole(apiRole: string): UserRole {
     'seller': 'pharmacist',
     'customer': 'pharmacist',
     'user': 'pharmacist',
+    'partner': 'partner',
   };
   return roleMap[apiRole] || 'pharmacist';
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // httpOnly Cookie 기반 세션 확인
   useEffect(() => {
@@ -89,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch {
         // 세션 없음 - 정상
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -176,6 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       user,
       isAuthenticated: !!user,
+      isLoading,
       isApproved,
       isAdmin,
       isPending,

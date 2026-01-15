@@ -16,6 +16,16 @@ import MyApplicationsPage from './pages/apply/MyApplicationsPage';
 import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
+
+// Partner Dashboard
+import PartnerLayout from './components/layouts/PartnerLayout';
+import PartnerIndex from './pages/partner/index';
+import PartnerOverviewPage from './pages/partner/OverviewPage';
+import PartnerTargetsPage from './pages/partner/TargetsPage';
+import PartnerContentPage from './pages/partner/ContentPage';
+import PartnerEventsPage from './pages/partner/EventsPage';
+import PartnerStatusPage from './pages/partner/StatusPage';
+
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -43,6 +53,29 @@ function PendingRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!isPending && !isRejected) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// 역할 기반 보호 라우트
+function RoleProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles: string[] }) {
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 
@@ -88,6 +121,23 @@ function AppRoutes() {
       <Route path="/test-guide" element={<TestGuidePage />} />
       <Route path="/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
       <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
+
+      {/* Partner Dashboard */}
+      <Route
+        path="/partner"
+        element={
+          <RoleProtectedRoute allowedRoles={['partner']}>
+            <PartnerLayout />
+          </RoleProtectedRoute>
+        }
+      >
+        <Route index element={<PartnerIndex />} />
+        <Route path="overview" element={<PartnerOverviewPage />} />
+        <Route path="targets" element={<PartnerTargetsPage />} />
+        <Route path="content" element={<PartnerContentPage />} />
+        <Route path="events" element={<PartnerEventsPage />} />
+        <Route path="status" element={<PartnerStatusPage />} />
+      </Route>
 
       {/* 메인 레이아웃 (홈은 공개, 나머지는 보호) */}
       <Route path="/" element={<Layout />}>
