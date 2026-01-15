@@ -1,7 +1,7 @@
 /**
  * SupplierSummaryCards - 운영 요약 카드
  *
- * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P2
+ * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P2, WO-AI-DASHBOARD-PREVIEW-V1
  *
  * 표시 항목:
  * - ACTIVE_SALES 제품 수
@@ -11,11 +11,16 @@
  * - 게시 중 콘텐츠 수
  * - 연결된 서비스 수
  *
+ * AI 요약 버튼 (WO-AI-DASHBOARD-PREVIEW-V1):
+ * - 헤더에 AI 요약 버튼 표시
+ * - 클릭 시 AiPreviewModal 표시
+ *
  * 금지:
  * - 증감/비교/퍼센트 표시
- * - 클릭 이벤트
+ * - 클릭 이벤트 (AI 버튼 제외)
  */
 
+import { useState } from 'react';
 import {
   Package,
   Clock,
@@ -23,7 +28,9 @@ import {
   ShoppingCart,
   FileText,
   Link2,
+  Sparkles,
 } from 'lucide-react';
+import { AiPreviewModal } from '../ai/AiPreviewModal';
 
 export interface SummaryData {
   activeProducts: number;
@@ -40,6 +47,8 @@ interface Props {
 }
 
 export function SupplierSummaryCards({ data, loading }: Props) {
+  const [showAiModal, setShowAiModal] = useState(false);
+
   const cards = [
     {
       icon: Package,
@@ -103,8 +112,20 @@ export function SupplierSummaryCards({ data, loading }: Props) {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.sectionTitle}>운영 요약</h2>
-      <p style={styles.sectionSubtitle}>현재 상황을 한눈에 확인하세요</p>
+      <div style={styles.sectionHeader}>
+        <div>
+          <h2 style={styles.sectionTitle}>운영 요약</h2>
+          <p style={styles.sectionSubtitle}>현재 상황을 한눈에 확인하세요</p>
+        </div>
+        <button
+          onClick={() => setShowAiModal(true)}
+          style={styles.aiButton}
+          aria-label="AI 요약"
+        >
+          <Sparkles size={16} />
+          AI 요약
+        </button>
+      </div>
       <div style={styles.grid}>
         {cards.map((card) => {
           const Icon = card.icon;
@@ -126,6 +147,8 @@ export function SupplierSummaryCards({ data, loading }: Props) {
           );
         })}
       </div>
+
+      <AiPreviewModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
     </div>
   );
 }
@@ -133,6 +156,12 @@ export function SupplierSummaryCards({ data, loading }: Props) {
 const styles: Record<string, React.CSSProperties> = {
   container: {
     marginBottom: '32px',
+  },
+  sectionHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '16px',
   },
   sectionTitle: {
     fontSize: '18px',
@@ -143,7 +172,21 @@ const styles: Record<string, React.CSSProperties> = {
   sectionSubtitle: {
     fontSize: '14px',
     color: '#64748b',
-    margin: '0 0 16px 0',
+    margin: 0,
+  },
+  aiButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    backgroundColor: '#eff6ff',
+    color: '#2563eb',
+    border: '1px solid #bfdbfe',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
   },
   grid: {
     display: 'grid',

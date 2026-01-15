@@ -14,8 +14,10 @@
  * - 상세 분석/처리는 각 서비스에서
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight } from 'lucide-react';
+import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, Sparkles } from 'lucide-react';
+import { AiPreviewModal } from '../../components/ai/AiPreviewModal';
 
 // Mock 데이터: 연결된 서비스/공급자 목록
 const connectedServices = [
@@ -48,6 +50,7 @@ const notifications = [
 ];
 
 export function PartnerOverviewPage() {
+  const [showAiModal, setShowAiModal] = useState(false);
   const totalSuppliers = connectedServices.reduce((sum, s) => sum + s.supplierCount, 0);
   const totalCampaigns = connectedServices.reduce((sum, s) => sum + s.activeCampaigns, 0);
 
@@ -55,15 +58,25 @@ export function PartnerOverviewPage() {
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <div style={styles.headerIcon}>
-          <Compass size={28} style={{ color: '#2563eb' }} />
+        <div style={styles.headerLeft}>
+          <div style={styles.headerIcon}>
+            <Compass size={28} style={{ color: '#2563eb' }} />
+          </div>
+          <div>
+            <h1 style={styles.title}>파트너 운영 허브</h1>
+            <p style={styles.subtitle}>
+              연결된 서비스 현황을 확인하고, 필요한 서비스로 바로 이동합니다
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 style={styles.title}>파트너 운영 허브</h1>
-          <p style={styles.subtitle}>
-            연결된 서비스 현황을 확인하고, 필요한 서비스로 바로 이동합니다
-          </p>
-        </div>
+        <button
+          onClick={() => setShowAiModal(true)}
+          style={styles.aiButton}
+          aria-label="AI 요약"
+        >
+          <Sparkles size={16} />
+          AI 요약
+        </button>
       </div>
 
       {/* Hub Concept Info */}
@@ -215,6 +228,8 @@ export function PartnerOverviewPage() {
           </p>
         </div>
       </div>
+
+      <AiPreviewModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
     </div>
   );
 }
@@ -227,9 +242,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   header: {
     display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '24px',
+  },
+  headerLeft: {
+    display: 'flex',
     alignItems: 'center',
     gap: '16px',
-    marginBottom: '24px',
   },
   headerIcon: {
     width: '56px',
@@ -250,6 +270,20 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#64748b',
     margin: 0,
+  },
+  aiButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 16px',
+    backgroundColor: '#eff6ff',
+    color: '#2563eb',
+    border: '1px solid #bfdbfe',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
   },
   infoCard: {
     display: 'flex',
