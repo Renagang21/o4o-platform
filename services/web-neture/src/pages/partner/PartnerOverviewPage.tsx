@@ -191,17 +191,17 @@ export function PartnerOverviewPage() {
       <div style={styles.quickSection}>
         <h2 style={styles.sectionTitle}>빠른 액션</h2>
         <div style={styles.quickGrid}>
-          <Link to="#" style={styles.quickCard}>
+          <Link to="/partner/collaboration" style={styles.quickCard}>
             <span style={styles.quickIcon}>🤝</span>
             <span style={styles.quickLabel}>협업 관리</span>
             <span style={styles.quickDesc}>공급자 연결 및 계약</span>
           </Link>
-          <Link to="#" style={styles.quickCard}>
+          <Link to="/partner/promotions" style={styles.quickCard}>
             <span style={styles.quickIcon}>📢</span>
             <span style={styles.quickLabel}>프로모션</span>
             <span style={styles.quickDesc}>캠페인 현황 확인</span>
           </Link>
-          <Link to="#" style={styles.quickCard}>
+          <Link to="/partner/settlements" style={styles.quickCard}>
             <span style={styles.quickIcon}>💳</span>
             <span style={styles.quickLabel}>정산 내역</span>
             <span style={styles.quickDesc}>커미션 및 정산</span>

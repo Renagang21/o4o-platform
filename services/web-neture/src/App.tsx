@@ -51,6 +51,9 @@ import ContentEditorPage from './pages/supplier/content/ContentEditorPage';
 
 // Partner Dashboard
 import { PartnerOverviewPage } from './pages/partner/PartnerOverviewPage';
+import { CollaborationPage } from './pages/partner/CollaborationPage';
+import { PromotionsPage } from './pages/partner/PromotionsPage';
+import { SettlementsPage } from './pages/partner/SettlementsPage';
 
 // Admin Dashboard
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -139,6 +142,9 @@ function App() {
 
           {/* Partner Dashboard */}
           <Route path="/partner" element={<PartnerOverviewPage />} />
+          <Route path="/partner/collaboration" element={<CollaborationPage />} />
+          <Route path="/partner/promotions" element={<PromotionsPage />} />
+          <Route path="/partner/settlements" element={<SettlementsPage />} />
 
           {/* Admin Dashboard */}
           <Route path="/admin" element={<AdminDashboardPage />} />
