@@ -240,7 +240,7 @@ const Login: FC = () => {
               type="button"
               onClick={() => {
                 setEmail('admin@neture.co.kr');
-                setPassword('Admin2024!');
+                setPassword('TestPassword');
               }}
               className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors border border-white/10"
             >
@@ -249,17 +249,17 @@ const Login: FC = () => {
             <button
               type="button"
               onClick={() => {
-                setEmail('manager@neture.co.kr');
-                setPassword('Manager2024!');
+                setEmail('admin@neture.test');
+                setPassword('TestPassword');
               }}
               className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors border border-white/10"
             >
-              일반 관리자
+              테스트 관리자
             </button>
           </div>
           <div className="mt-3 text-xs text-blue-200/60 space-y-1">
-            <div>📧 admin@neture.co.kr / Admin2024!</div>
-            <div>📧 manager@neture.co.kr / Manager2024!</div>
+            <div>📧 admin@neture.co.kr / TestPassword</div>
+            <div>📧 admin@neture.test / TestPassword</div>
           </div>
         </div>
 
