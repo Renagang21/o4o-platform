@@ -9,6 +9,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { adminAppsApi, AppRegistryEntry } from '@/api/admin-apps';
+import { useAuth } from '@o4o/auth-context';
 
 export interface UseAppStatusReturn {
   /** Loading state */
@@ -31,12 +32,15 @@ export interface UseAppStatusReturn {
  * @returns App status utilities
  */
 export function useAppStatus(): UseAppStatusReturn {
+  const { isAuthenticated } = useAuth();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['installedApps'],
     queryFn: adminAppsApi.getInstalledApps,
     staleTime: 30 * 1000, // 30 seconds
     gcTime: 5 * 60 * 1000, // 5 minutes (cacheTime renamed to gcTime in v5)
     refetchOnWindowFocus: false,
+    enabled: isAuthenticated, // Only fetch when authenticated
   });
 
   const apps = data ?? [];
