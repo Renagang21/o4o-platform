@@ -64,7 +64,14 @@ import AiOperationsPage from './pages/admin/AiOperationsPage';
 
 // AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1)
 // AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1)
-import { AiAdminDashboardPage, AiEnginesPage, AiPolicyPage, AssetQualityPage } from './pages/admin/ai';
+// AI Cost Tooling (WO-AI-COST-TOOLING-V1)
+import {
+  AiAdminDashboardPage,
+  AiEnginesPage,
+  AiPolicyPage,
+  AssetQualityPage,
+  AiCostPage,
+} from './pages/admin/ai';
 
 // Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1)
 import { OperatorDashboard, OperatorAiReportPage } from './pages/operator';
@@ -159,10 +166,12 @@ function App() {
 
           {/* AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1) */}
           {/* AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1) */}
+          {/* AI Cost Tooling (WO-AI-COST-TOOLING-V1) */}
           <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
           <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
           <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
           <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
+          <Route path="/admin/ai/cost" element={<AiCostPage />} />
 
           {/* Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
           <Route path="/operator" element={<OperatorDashboard />} />

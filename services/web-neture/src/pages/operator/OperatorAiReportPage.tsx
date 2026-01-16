@@ -891,6 +891,56 @@ export default function OperatorAiReportPage() {
         </div>
       </div>
 
+      {/* ===== 비용 현황 요약 (WO-AI-COST-TOOLING-V1) ===== */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
+        <div className="p-6 border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">비용 현황</h2>
+                <p className="text-sm text-slate-500">
+                  AI 사용에 따른 상대적 비용 지표
+                </p>
+              </div>
+            </div>
+            <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+              보통
+            </span>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="text-sm text-slate-500 mb-1">AI 요청 수</div>
+              <div className="text-2xl font-bold text-slate-800">1,247</div>
+              <div className="text-xs text-slate-400">최근 7일</div>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="text-sm text-slate-500 mb-1">비용 수준</div>
+              <div className="text-2xl font-bold text-emerald-600">보통</div>
+              <div className="text-xs text-slate-400">평균 대비 정상 범위</div>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="text-sm text-slate-500 mb-1">패키지 준수율</div>
+              <div className="text-2xl font-bold text-slate-800">100%</div>
+              <div className="text-xs text-slate-400">권장 Asset 충족</div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-blue-50 rounded-xl flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-800">
+              <strong>비용 레벨 안내</strong>: 비용 지표는 전체 서비스 평균 대비 상대적 수준을 나타냅니다.
+              실제 과금액이 아닌 내부 기준입니다. 패키지 준수율이 높을수록 AI 응답 품질이 향상됩니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ===== 품질 인사이트 섹션 (WO-AI-ASSET-QUALITY-LOOP-V1) ===== */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
         <div className="p-6 border-b border-slate-100">
