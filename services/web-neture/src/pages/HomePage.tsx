@@ -121,32 +121,39 @@ function SuppliersPreviewSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {suppliers.map((supplier) => (
-            <Link
-              key={supplier.id}
-              to={`/suppliers/${supplier.slug}`}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
-            >
-              <div className="flex flex-col items-center text-center">
-                <img
-                  src={supplier.logo}
-                  alt={supplier.name}
-                  className="w-20 h-20 rounded-full mb-4"
-                />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {supplier.name}
-                </h3>
-                <span className="inline-block px-3 py-1 text-sm bg-slate-100 text-slate-700 rounded-full mb-3">
-                  {supplier.category}
-                </span>
-                <p className="text-sm text-gray-600">
-                  {supplier.shortDescription}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {suppliers.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+            <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500">등록된 공급자가 없습니다</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {suppliers.map((supplier) => (
+              <Link
+                key={supplier.id}
+                to={`/suppliers/${supplier.slug}`}
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src={supplier.logo}
+                    alt={supplier.name}
+                    className="w-20 h-20 rounded-full mb-4"
+                  />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {supplier.name}
+                  </h3>
+                  <span className="inline-block px-3 py-1 text-sm bg-slate-100 text-slate-700 rounded-full mb-3">
+                    {supplier.category}
+                  </span>
+                  <p className="text-sm text-gray-600">
+                    {supplier.shortDescription}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="text-center mt-10">
           <Link
@@ -214,45 +221,52 @@ function PartnershipRequestsPreviewSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {requests.map((request) => (
-            <Link
-              key={request.id}
-              to={`/partners/requests/${request.id}`}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {request.seller.name}
-                </h3>
-                <span className="px-3 py-1 text-xs bg-slate-100 text-slate-700 rounded-full">
-                  {request.status}
-                </span>
-              </div>
-              <div className="space-y-2 mb-4">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">서비스:</span> {request.seller.serviceType}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">제품 수:</span> {request.productCount}개
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">기간:</span> {request.period.start} ~ {request.period.end}
-                </p>
-              </div>
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-700 font-medium mb-2">수익 구조</p>
-                <p className="text-sm text-gray-600">{request.revenueStructure}</p>
-              </div>
-              <div className="mt-4">
-                <span className="inline-flex items-center text-slate-500 hover:text-primary-700 text-sm font-medium">
-                  제휴 조건 보기
-                  <ArrowRight className="ml-1 w-4 h-4" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {requests.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <Handshake className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500">진행 중인 제휴 요청이 없습니다</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {requests.map((request) => (
+              <Link
+                key={request.id}
+                to={`/partners/requests/${request.id}`}
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {request.seller.name}
+                  </h3>
+                  <span className="px-3 py-1 text-xs bg-slate-100 text-slate-700 rounded-full">
+                    {request.status}
+                  </span>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">서비스:</span> {request.seller.serviceType}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">제품 수:</span> {request.productCount}개
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">기간:</span> {request.period.start} ~ {request.period.end}
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-gray-100">
+                  <p className="text-sm text-gray-700 font-medium mb-2">수익 구조</p>
+                  <p className="text-sm text-gray-600">{request.revenueStructure}</p>
+                </div>
+                <div className="mt-4">
+                  <span className="inline-flex items-center text-slate-500 hover:text-primary-700 text-sm font-medium">
+                    제휴 조건 보기
+                    <ArrowRight className="ml-1 w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="text-center mt-10">
           <Link

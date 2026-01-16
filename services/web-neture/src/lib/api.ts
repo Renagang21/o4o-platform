@@ -17,6 +17,20 @@ export type ProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
+// 빠른 timeout을 위한 fetch wrapper (3초)
+const fetchWithTimeout = async (url: string, options?: RequestInit, timeout = 3000): Promise<Response> => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+};
+
 interface Supplier {
   id: string;
   slug: string;
@@ -104,7 +118,7 @@ export const netureApi = {
    */
   async getSuppliers(): Promise<Supplier[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/suppliers`);
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/suppliers`);
       if (!response.ok) {
         console.warn('[Neture API] Suppliers API not available, returning empty array');
         return [];
@@ -137,7 +151,7 @@ export const netureApi = {
         ? `${API_BASE_URL}/api/v1/neture/partnership/requests?status=${status}`
         : `${API_BASE_URL}/api/v1/neture/partnership/requests`;
 
-      const response = await fetch(url);
+      const response = await fetchWithTimeout(url);
       if (!response.ok) {
         console.warn('[Neture API] Partnership requests API not available, returning empty array');
         return [];
