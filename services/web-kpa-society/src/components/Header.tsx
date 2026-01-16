@@ -134,12 +134,13 @@ export function Header({ serviceName }: { serviceName: string }) {
    * (즉시 로그인이 아닌 입력만)
    */
   const fillTestAccount = (accountType: TestAccountType) => {
+    // Note: Password must match API server seed (TestPassword)
     const testCredentials: Record<TestAccountType, { email: string; password: string }> = {
-      pharmacist: { email: 'pharmacist@kpa-test.kr', password: 'test123!@#' },
-      district_admin: { email: 'district-admin@kpa-test.kr', password: 'test123!@#' },
-      branch_admin: { email: 'branch-admin@kpa-test.kr', password: 'test123!@#' },
-      district_officer: { email: 'district-officer@kpa-test.kr', password: 'test123!@#' },
-      branch_officer: { email: 'branch-officer@kpa-test.kr', password: 'test123!@#' },
+      pharmacist: { email: 'pharmacist@kpa-test.kr', password: 'TestPassword' },
+      district_admin: { email: 'district-admin@kpa-test.kr', password: 'TestPassword' },
+      branch_admin: { email: 'branch-admin@kpa-test.kr', password: 'TestPassword' },
+      district_officer: { email: 'district-officer@kpa-test.kr', password: 'TestPassword' },
+      branch_officer: { email: 'branch-officer@kpa-test.kr', password: 'TestPassword' },
     };
     const creds = testCredentials[accountType];
     setLoginForm({ email: creds.email, password: creds.password });
@@ -342,6 +343,22 @@ export function Header({ serviceName }: { serviceName: string }) {
                 >
                   <span style={styles.testAccountIcon}>🏢</span>
                   <span>분회 운영자 계정</span>
+                </button>
+                <button
+                  type="button"
+                  style={styles.testAccountButton}
+                  onClick={() => fillTestAccount('district_officer')}
+                >
+                  <span style={styles.testAccountIcon}>👔</span>
+                  <span>지부 임원 계정</span>
+                </button>
+                <button
+                  type="button"
+                  style={styles.testAccountButton}
+                  onClick={() => fillTestAccount('branch_officer')}
+                >
+                  <span style={styles.testAccountIcon}>👤</span>
+                  <span>분회 임원 계정</span>
                 </button>
               </div>
             </div>
