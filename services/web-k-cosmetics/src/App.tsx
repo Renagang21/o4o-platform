@@ -12,7 +12,7 @@ import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
 
 // Public Pages
-import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage } from '@/pages';
+import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage, StoresPage, ProductsPage, SupplyPage, TouristHubPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
 import PartnerInfoPage from '@/pages/PartnerInfoPage';
 import MyPage from '@/pages/MyPage';
@@ -108,6 +108,16 @@ function AppRoutes() {
         <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
         <Route path="admin/*" element={<RoleNotAvailablePage role="admin" />} />
         <Route path="seller/*" element={<RoleNotAvailablePage role="seller" />} />
+
+        {/* Platform Routes */}
+        <Route path="platform/stores" element={<StoresPage />} />
+        <Route path="platform/stores/products" element={<ProductsPage />} />
+
+        {/* B2B Routes */}
+        <Route path="b2b/supply" element={<SupplyPage />} />
+
+        {/* Services Routes */}
+        <Route path="services/tourists" element={<TouristHubPage />} />
       </Route>
 
       {/* Partner Dashboard */}

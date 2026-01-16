@@ -941,30 +941,64 @@ startServer().catch((error) => {
   logger.error('Failed to start server:', error);
   // GRACEFUL_STARTUP Policy: Only exit if explicitly disabled
   // This allows the server to attempt recovery or at least respond to health checks
-  if (process.env.GRACEFUL_STARTUP === 'false') {
+  const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+  if (!gracefulStartup) {
+    logger.error('💀 GRACEFUL_STARTUP=false: Exiting process due to startup failure');
     process.exit(1);
   }
-  logger.warn('🔄 Server startup failed but GRACEFUL_STARTUP=true: Process will continue');
+  logger.warn('🔄 Server startup failed but GRACEFUL_STARTUP enabled: Process will continue');
+  logger.warn('   Note: Some features may not work. Check logs for details.');
 });
 
 // ============================================================================
 // GRACEFUL SHUTDOWN
 // ============================================================================
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM signal received: closing HTTP server');
-  await startupService.shutdown();
-  httpServer.close(() => {
-    logger.info('HTTP server closed');
-  });
+const SHUTDOWN_TIMEOUT_MS = 10000; // 10 seconds for graceful shutdown
+
+const gracefulShutdown = async (signal: string) => {
+  logger.info(`${signal} signal received: initiating graceful shutdown`);
+
+  // Set a timeout to force exit if shutdown takes too long
+  const forceExitTimeout = setTimeout(() => {
+    logger.error(`💀 Shutdown timeout (${SHUTDOWN_TIMEOUT_MS}ms) exceeded, forcing exit`);
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS);
+
+  try {
+    // Stop accepting new connections
+    httpServer.close(() => {
+      logger.info('✅ HTTP server closed');
+    });
+
+    // Shutdown services (DB connections, etc.)
+    await startupService.shutdown();
+    logger.info('✅ Services shutdown complete');
+
+    clearTimeout(forceExitTimeout);
+    logger.info('✅ Graceful shutdown complete');
+    process.exit(0);
+  } catch (error) {
+    logger.error('Error during shutdown:', error);
+    clearTimeout(forceExitTimeout);
+    process.exit(1);
+  }
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught exceptions and unhandled rejections
+process.on('uncaughtException', (error) => {
+  logger.error('💀 Uncaught Exception:', error);
+  gracefulShutdown('uncaughtException');
 });
 
-process.on('SIGINT', async () => {
-  logger.info('SIGINT signal received: closing HTTP server');
-  await startupService.shutdown();
-  httpServer.close(() => {
-    logger.info('HTTP server closed');
-    process.exit(0);
-  });
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('💀 Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit for unhandled rejections in dev mode, but log them
+  if (process.env.NODE_ENV === 'production') {
+    gracefulShutdown('unhandledRejection');
+  }
 });
 
 // Export services for other modules

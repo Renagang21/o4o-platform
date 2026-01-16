@@ -22,9 +22,11 @@ class EnvironmentValidator {
   ];
 
   // Computed required vars based on GRACEFUL_STARTUP
+  // Policy: GRACEFUL_STARTUP is enabled by default (unless explicitly set to 'false')
   private get requiredVars(): string[] {
-    // If GRACEFUL_STARTUP is enabled, skip DB vars
-    if (process.env.GRACEFUL_STARTUP === 'true') {
+    // If GRACEFUL_STARTUP is enabled (default), skip DB vars
+    const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+    if (gracefulStartup) {
       return this.baseRequiredVars;
     }
     return [...this.baseRequiredVars, ...this.dbRequiredVars];
