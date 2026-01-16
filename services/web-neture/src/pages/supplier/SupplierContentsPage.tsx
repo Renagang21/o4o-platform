@@ -4,10 +4,10 @@
  * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.1
  *
  * 기능:
- * - 콘텐츠 생성(Create)
- * - 수정(Update)
- * - 삭제(Delete)
+ * - 콘텐츠 목록 조회
+ * - 콘텐츠 생성/수정: 전용 편집 페이지로 이동
  * - 상태 관리: draft / published
+ * - 삭제
  *
  * 금지:
  * - 자동 배포
@@ -20,6 +20,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   Image,
@@ -31,8 +32,6 @@ import {
   EyeOff,
   Edit2,
   Trash2,
-  X,
-  Save,
 } from 'lucide-react';
 import {
   supplierApi,
@@ -48,44 +47,10 @@ const CONTENT_TYPE_CONFIG: Record<ContentType, { label: string; icon: typeof Fil
   guide: { label: '가이드', icon: BookOpen, color: '#10b981' },
 };
 
-const AVAILABLE_SERVICES = [
-  { id: 'glycopharm', name: 'GlycoPharm' },
-  { id: 'k-cosmetics', name: 'K-Cosmetics' },
-  { id: 'glucoseview', name: 'GlucoseView' },
-];
-
-const AVAILABLE_AREAS = [
-  { id: 'product', name: '상품 상세' },
-  { id: 'banner', name: '배너' },
-  { id: 'description', name: '설명' },
-  { id: 'guide', name: '가이드' },
-];
-
-interface FormData {
-  type: ContentType;
-  title: string;
-  description: string;
-  body: string;
-  availableServices: string[];
-  availableAreas: string[];
-}
-
-const initialFormData: FormData = {
-  type: 'description',
-  title: '',
-  description: '',
-  body: '',
-  availableServices: [],
-  availableAreas: [],
-};
-
 export default function SupplierContentsPage() {
+  const navigate = useNavigate();
   const [contents, setContents] = useState<SupplierContentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [submitting, setSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const fetchContents = async () => {
@@ -98,64 +63,6 @@ export default function SupplierContentsPage() {
   useEffect(() => {
     fetchContents();
   }, []);
-
-  const handleCreate = async () => {
-    if (!formData.title.trim()) return;
-
-    setSubmitting(true);
-    const result = await supplierApi.createContent({
-      type: formData.type,
-      title: formData.title,
-      description: formData.description,
-      body: formData.body,
-      availableServices: formData.availableServices,
-      availableAreas: formData.availableAreas,
-    });
-
-    if (result.success) {
-      setShowCreateModal(false);
-      setFormData(initialFormData);
-      fetchContents();
-    }
-    setSubmitting(false);
-  };
-
-  const handleEdit = async (id: string) => {
-    const content = await supplierApi.getContentById(id);
-    if (content) {
-      setFormData({
-        type: content.type,
-        title: content.title,
-        description: content.description,
-        body: content.body,
-        availableServices: content.availableServices,
-        availableAreas: content.availableAreas,
-      });
-      setEditingId(id);
-      setShowCreateModal(true);
-    }
-  };
-
-  const handleUpdate = async () => {
-    if (!editingId || !formData.title.trim()) return;
-
-    setSubmitting(true);
-    const result = await supplierApi.updateContent(editingId, {
-      title: formData.title,
-      description: formData.description,
-      body: formData.body,
-      availableServices: formData.availableServices,
-      availableAreas: formData.availableAreas,
-    });
-
-    if (result.success) {
-      setShowCreateModal(false);
-      setEditingId(null);
-      setFormData(initialFormData);
-      fetchContents();
-    }
-    setSubmitting(false);
-  };
 
   const handleDelete = async (id: string) => {
     const result = await supplierApi.deleteContent(id);
@@ -171,12 +78,6 @@ export default function SupplierContentsPage() {
     if (result.success) {
       fetchContents();
     }
-  };
-
-  const closeModal = () => {
-    setShowCreateModal(false);
-    setEditingId(null);
-    setFormData(initialFormData);
   };
 
   const stats = {
@@ -195,7 +96,7 @@ export default function SupplierContentsPage() {
             판매자/파트너가 참고할 수 있는 제품 자료를 관리합니다.
           </p>
         </div>
-        <button style={styles.createButton} onClick={() => setShowCreateModal(true)}>
+        <button style={styles.createButton} onClick={() => navigate('/supplier/contents/new')}>
           <Plus size={18} />
           콘텐츠 추가
         </button>
@@ -245,6 +146,13 @@ export default function SupplierContentsPage() {
           <p style={styles.emptySubtext}>
             제품 설명, 이미지, 배너, 가이드 등 판매자가 활용할 수 있는 자료를 등록하세요.
           </p>
+          <button
+            style={{ ...styles.createButton, marginTop: '16px' }}
+            onClick={() => navigate('/supplier/contents/new')}
+          >
+            <Plus size={18} />
+            첫 콘텐츠 만들기
+          </button>
         </div>
       ) : (
         <div style={styles.contentList}>
@@ -289,7 +197,10 @@ export default function SupplierContentsPage() {
                     {content.status === 'published' ? <Eye size={14} /> : <EyeOff size={14} />}
                     {content.status === 'published' ? '공개' : '임시저장'}
                   </button>
-                  <button onClick={() => handleEdit(content.id)} style={styles.iconButton}>
+                  <button
+                    onClick={() => navigate(`/supplier/contents/${content.id}/edit`)}
+                    style={styles.iconButton}
+                  >
                     <Edit2 size={16} />
                   </button>
                   <button
@@ -302,159 +213,6 @@ export default function SupplierContentsPage() {
               </div>
             );
           })}
-        </div>
-      )}
-
-      {/* Create/Edit Modal */}
-      {showCreateModal && (
-        <div style={styles.modalOverlay} onClick={closeModal}>
-          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>{editingId ? '콘텐츠 수정' : '콘텐츠 추가'}</h2>
-              <button onClick={closeModal} style={styles.closeButton}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={styles.modalBody}>
-              {/* Type */}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>유형</label>
-                <div style={styles.typeGrid}>
-                  {(Object.entries(CONTENT_TYPE_CONFIG) as [ContentType, typeof CONTENT_TYPE_CONFIG[ContentType]][]).map(
-                    ([type, config]) => {
-                      const Icon = config.icon;
-                      return (
-                        <button
-                          key={type}
-                          onClick={() => setFormData({ ...formData, type })}
-                          style={{
-                            ...styles.typeOption,
-                            borderColor: formData.type === type ? config.color : '#e2e8f0',
-                            backgroundColor: formData.type === type ? `${config.color}10` : '#fff',
-                          }}
-                        >
-                          <Icon size={18} style={{ color: config.color }} />
-                          <span>{config.label}</span>
-                        </button>
-                      );
-                    }
-                  )}
-                </div>
-              </div>
-
-              {/* Title */}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>제목 *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="콘텐츠 제목"
-                  style={styles.input}
-                />
-              </div>
-
-              {/* Description */}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>설명</label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="간단한 설명"
-                  style={styles.input}
-                />
-              </div>
-
-              {/* Body */}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>본문</label>
-                <textarea
-                  value={formData.body}
-                  onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-                  placeholder="콘텐츠 본문"
-                  rows={4}
-                  style={styles.textarea}
-                />
-              </div>
-
-              {/* Available Services */}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>사용 가능 서비스</label>
-                <div style={styles.checkboxGroup}>
-                  {AVAILABLE_SERVICES.map((svc) => (
-                    <label key={svc.id} style={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={formData.availableServices.includes(svc.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData({
-                              ...formData,
-                              availableServices: [...formData.availableServices, svc.id],
-                            });
-                          } else {
-                            setFormData({
-                              ...formData,
-                              availableServices: formData.availableServices.filter((s) => s !== svc.id),
-                            });
-                          }
-                        }}
-                      />
-                      {svc.name}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Available Areas */}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>사용 가능 영역</label>
-                <div style={styles.checkboxGroup}>
-                  {AVAILABLE_AREAS.map((area) => (
-                    <label key={area.id} style={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={formData.availableAreas.includes(area.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData({
-                              ...formData,
-                              availableAreas: [...formData.availableAreas, area.id],
-                            });
-                          } else {
-                            setFormData({
-                              ...formData,
-                              availableAreas: formData.availableAreas.filter((a) => a !== area.id),
-                            });
-                          }
-                        }}
-                      />
-                      {area.name}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={styles.modalFooter}>
-              <button onClick={closeModal} style={styles.cancelButton}>
-                취소
-              </button>
-              <button
-                onClick={editingId ? handleUpdate : handleCreate}
-                disabled={submitting || !formData.title.trim()}
-                style={{
-                  ...styles.submitButton,
-                  opacity: submitting || !formData.title.trim() ? 0.5 : 1,
-                }}
-              >
-                <Save size={16} />
-                {editingId ? '수정' : '저장'}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
@@ -681,128 +439,6 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     zIndex: 1000,
   },
-  modal: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    width: '100%',
-    maxWidth: '560px',
-    maxHeight: '90vh',
-    overflow: 'auto',
-  },
-  modalHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '20px 24px',
-    borderBottom: '1px solid #e2e8f0',
-  },
-  modalTitle: {
-    fontSize: '18px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: 0,
-  },
-  closeButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '32px',
-    height: '32px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: '#64748b',
-    cursor: 'pointer',
-  },
-  modalBody: {
-    padding: '24px',
-  },
-  formGroup: {
-    marginBottom: '20px',
-  },
-  label: {
-    display: 'block',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: '#475569',
-    marginBottom: '8px',
-  },
-  input: {
-    width: '100%',
-    padding: '10px 12px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '14px',
-    outline: 'none',
-  },
-  textarea: {
-    width: '100%',
-    padding: '10px 12px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '14px',
-    outline: 'none',
-    resize: 'vertical',
-  },
-  typeGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '8px',
-  },
-  typeOption: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '12px',
-    border: '2px solid #e2e8f0',
-    borderRadius: '8px',
-    backgroundColor: '#fff',
-    cursor: 'pointer',
-    fontSize: '12px',
-    color: '#475569',
-  },
-  checkboxGroup: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '12px',
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '13px',
-    color: '#475569',
-    cursor: 'pointer',
-  },
-  modalFooter: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '12px',
-    padding: '16px 24px',
-    borderTop: '1px solid #e2e8f0',
-  },
-  cancelButton: {
-    padding: '10px 16px',
-    backgroundColor: '#fff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '14px',
-    color: '#64748b',
-    cursor: 'pointer',
-  },
-  submitButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '10px 16px',
-    backgroundColor: '#3b82f6',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#fff',
-    cursor: 'pointer',
-  },
   confirmModal: {
     backgroundColor: '#fff',
     borderRadius: '12px',
@@ -825,6 +461,15 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'center',
     gap: '12px',
+  },
+  cancelButton: {
+    padding: '10px 16px',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: '#64748b',
+    cursor: 'pointer',
   },
   deleteButton: {
     padding: '10px 16px',

@@ -46,6 +46,9 @@ import {
   SupplierContentsPage,
 } from './pages/supplier';
 
+// Content Editor (WO-CONTENT-EDITOR-V1)
+import ContentEditorPage from './pages/supplier/content/ContentEditorPage';
+
 // Partner Dashboard
 import { PartnerOverviewPage } from './pages/partner/PartnerOverviewPage';
 
@@ -116,6 +119,8 @@ function App() {
             <Route path="/supplier/products" element={<SupplierProductsPage />} />
             <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
             <Route path="/supplier/contents" element={<SupplierContentsPage />} />
+            <Route path="/supplier/contents/new" element={<ContentEditorPage />} />
+            <Route path="/supplier/contents/:id/edit" element={<ContentEditorPage />} />
           </Route>
 
           {/* Partner Dashboard */}
