@@ -35,6 +35,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { glycopharmApi, type OperatorDashboardData } from '@/api/glycopharm';
+import { AiSummaryButton } from '@/components/ai';
 
 // Default empty data (no mock values)
 const EMPTY_DASHBOARD_DATA: OperatorDashboardData = {
@@ -264,6 +265,7 @@ export default function OperatorDashboard() {
           <p className="text-slate-500 text-sm">GlycoPharm 서비스 현황 관제</p>
         </div>
         <div className="flex items-center gap-3">
+          <AiSummaryButton contextLabel="운영자 Cockpit 현황" serviceId="glycopharm" />
           <button
             onClick={fetchDashboardData}
             className="flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 transition-colors"

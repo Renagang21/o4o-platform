@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
+import { AiSummaryButton } from '../../components/ai';
 import { useAuth } from '../../contexts';
 import { adminApi } from '../../api/admin';
 import { colors } from '../../styles/theme';
@@ -52,14 +53,17 @@ export function AdminDashboardPage() {
 
   return (
     <div style={styles.container}>
-      <PageHeader
-        title="지부 관리자"
-        description={`${user?.name || '관리자'}님, 환영합니다.`}
-        breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '관리자' },
-        ]}
-      />
+      <div style={styles.headerRow}>
+        <PageHeader
+          title="지부 관리자"
+          description={`${user?.name || '관리자'}님, 환영합니다.`}
+          breadcrumb={[
+            { label: '홈', href: '/' },
+            { label: '관리자' },
+          ]}
+        />
+        <AiSummaryButton contextLabel="지부 관리 현황" serviceId="kpa-society" />
+      </div>
 
       {/* 통계 카드 */}
       <div style={styles.statsGrid}>
@@ -169,6 +173,12 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '0 20px 40px',
+  },
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '24px',
   },
   statsGrid: {
     display: 'grid',

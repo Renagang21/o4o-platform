@@ -30,6 +30,7 @@ import {
   canManagePartnerLinks,
 } from '../../types/mainpage';
 import { cmsApi } from '../../api/cms';
+import { AiSummaryButton } from '../../components/ai';
 
 interface Notice {
   id: string;
@@ -260,10 +261,13 @@ export function DashboardPage() {
 
   return (
     <div>
-      <IntranetHeader
-        title="홈"
-        subtitle={currentOrganization?.name || '조직 홈'}
-      />
+      <div style={styles.headerRow}>
+        <IntranetHeader
+          title="홈"
+          subtitle={currentOrganization?.name || '조직 홈'}
+        />
+        <AiSummaryButton contextLabel="인트라넷 현황" serviceId="kpa-society" />
+      </div>
 
       <div style={styles.content}>
         {/* Hero 영역 */}
@@ -371,6 +375,12 @@ export function DashboardPage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0 32px',
+  },
   content: {
     padding: '24px 32px',
   },

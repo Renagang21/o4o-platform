@@ -3,13 +3,19 @@
  */
 
 import { Link } from 'react-router-dom';
+import { AiSummaryButton } from '../../components/ai';
 
 export function SupplierDashboardPage() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>공급자 대시보드</h1>
-        <p style={styles.subtitle}>상품 등록 및 주문 현황을 관리하세요</p>
+        <div style={styles.headerTop}>
+          <div>
+            <h1 style={styles.title}>공급자 대시보드</h1>
+            <p style={styles.subtitle}>상품 등록 및 주문 현황을 관리하세요</p>
+          </div>
+          <AiSummaryButton contextLabel="공급자 운영 현황" serviceId="neture" />
+        </div>
         <div style={styles.roleGuide}>
           <span style={styles.roleGuideText}>
             이 화면은 공급자의 운영 관리를 위한 공간입니다.
@@ -116,6 +122,11 @@ const styles: Record<string, React.CSSProperties> = {
   },
   header: {
     marginBottom: '40px',
+  },
+  headerTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: '32px',

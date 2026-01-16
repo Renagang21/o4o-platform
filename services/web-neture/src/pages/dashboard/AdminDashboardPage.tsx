@@ -3,13 +3,19 @@
  */
 
 import { Link } from 'react-router-dom';
+import { AiSummaryButton } from '../../components/ai';
 
 export function AdminDashboardPage() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>관리자 대시보드</h1>
-        <p style={styles.subtitle}>플랫폼 전체 현황을 한눈에 확인하세요</p>
+        <div style={styles.headerTop}>
+          <div>
+            <h1 style={styles.title}>관리자 대시보드</h1>
+            <p style={styles.subtitle}>플랫폼 전체 현황을 한눈에 확인하세요</p>
+          </div>
+          <AiSummaryButton contextLabel="관리자 대시보드 현황" serviceId="neture" />
+        </div>
       </div>
 
       {/* 통계 카드 */}
@@ -107,6 +113,11 @@ const styles: Record<string, React.CSSProperties> = {
   },
   header: {
     marginBottom: '40px',
+  },
+  headerTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: '32px',

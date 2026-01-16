@@ -1,12 +1,11 @@
 /**
  * AiSummaryButton - AI 요약 버튼 공통 컴포넌트
  *
- * Work Order: WO-AI-PREVIEW-SUMMARY-V1
+ * Work Order: WO-AI-SUMMARY-INTEGRATION-V1
  *
  * 목적:
  * - AI 요약 버튼을 일관된 UX로 제공
- * - 클릭 시 공통 AiPreviewModal 호출
- * - 실제 AI API와 연결하지 않음
+ * - 클릭 시 실제 AI API 호출하여 요약 제공
  *
  * 사용:
  * - 대시보드 카드 헤더
@@ -16,7 +15,7 @@
 
 import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { AiPreviewModal } from './AiPreviewModal';
+import { AiSummaryModal } from './AiSummaryModal';
 
 interface AiSummaryButtonProps {
   /** 버튼 라벨 (기본: "AI 요약") */
@@ -29,6 +28,10 @@ interface AiSummaryButtonProps {
   variant?: 'default' | 'outline';
   /** 추가 className (Tailwind용) */
   className?: string;
+  /** 요약할 데이터 컨텍스트 */
+  contextData?: Record<string, unknown>;
+  /** 서비스 ID */
+  serviceId?: string;
 }
 
 export function AiSummaryButton({
@@ -36,6 +39,8 @@ export function AiSummaryButton({
   contextLabel,
   size = 'md',
   variant = 'default',
+  contextData,
+  serviceId,
 }: AiSummaryButtonProps) {
   const [showModal, setShowModal] = useState(false);
 
@@ -57,10 +62,12 @@ export function AiSummaryButton({
         {label}
       </button>
 
-      <AiPreviewModal
+      <AiSummaryModal
         open={showModal}
         onClose={() => setShowModal(false)}
         contextLabel={contextLabel}
+        contextData={contextData}
+        serviceId={serviceId}
       />
     </>
   );
