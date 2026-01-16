@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { FileText, Calendar, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
+import { FileText, Calendar, CheckCircle, XCircle, Clock, Loader2 } from '@/components/icons';
 import { partnerApi, type PartnerStatusData } from '../../services/partnerApi';
 
 const statusConfig = {

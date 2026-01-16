@@ -21,7 +21,7 @@ import {
   ArrowRight,
   Loader2,
   CheckCircle
-} from 'lucide-react';
+} from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 

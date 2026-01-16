@@ -20,7 +20,7 @@ import {
   ChevronDown,
   Handshake,
   Home,
-} from 'lucide-react';
+} from '@/components/icons';
 
 const menuItems = [
   { path: '/partner/overview', label: '요약', icon: LayoutDashboard },

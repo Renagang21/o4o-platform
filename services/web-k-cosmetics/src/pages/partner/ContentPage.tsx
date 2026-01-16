@@ -14,7 +14,7 @@ import {
   Edit2,
   Power,
   Loader2,
-} from 'lucide-react';
+} from '@/components/icons';
 import { partnerApi, type PartnerContent } from '../../services/partnerApi';
 
 const typeConfig = {

@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { Building2, Mail, Phone, User, FileText, CheckCircle, Send } from 'lucide-react';
+import { Building2, Mail, Phone, User, FileText, CheckCircle, Send } from '@/components/icons';
 
 type ServiceInterest = 'DIGITAL_SIGNAGE' | 'PHARMACY_SUPPLY' | 'ADVERTISEMENT';
 

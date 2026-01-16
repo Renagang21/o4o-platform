@@ -20,7 +20,7 @@ import {
   ArrowRight,
   Loader2,
   Building2
-} from 'lucide-react';
+} from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 

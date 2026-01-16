@@ -14,7 +14,7 @@ import {
   Edit2,
   Clock,
   Loader2,
-} from 'lucide-react';
+} from '@/components/icons';
 import { partnerApi, type PartnerEvent } from '../../services/partnerApi';
 
 const statusConfig = {

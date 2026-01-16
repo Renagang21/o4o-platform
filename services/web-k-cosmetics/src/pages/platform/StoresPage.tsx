@@ -21,7 +21,7 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2
-} from 'lucide-react';
+} from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 

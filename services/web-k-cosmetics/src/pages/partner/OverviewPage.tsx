@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { FileText, Calendar, Activity, CheckCircle, Loader2 } from 'lucide-react';
+import { FileText, Calendar, Activity, CheckCircle, Loader2 } from '@/components/icons';
 import { partnerApi, type PartnerOverviewData } from '../../services/partnerApi';
 import { AiSummaryButton } from '../../components/ai';
 

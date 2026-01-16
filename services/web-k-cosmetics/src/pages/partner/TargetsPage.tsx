@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { MapPin, Building2, Info, Loader2 } from 'lucide-react';
+import { MapPin, Building2, Info, Loader2 } from '@/components/icons';
 import { partnerApi, type PartnerTarget } from '../../services/partnerApi';
 
 export default function PartnerTargetsPage() {
