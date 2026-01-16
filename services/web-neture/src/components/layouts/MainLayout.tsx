@@ -52,6 +52,12 @@ export default function MainLayout() {
               >
                 참여 신청
               </Link>
+              <Link
+                to="/test-guide"
+                className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                테스트 가이드
+              </Link>
               {/* Account Menu (WO-NETURE-UI-ACCOUNT-MENU-V1) */}
               <AccountMenu />
             </nav>

@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Layers, Package, Building2, FileText, Users, AlertCircle } from 'lucide-react';
+import { Layers, Package, Building2, FileText, Users, AlertCircle, Sparkles, MessageSquare, DollarSign } from 'lucide-react';
 import ManualLayout, { type ManualSection } from '../../../../components/layouts/ManualLayout';
 
 const SECTIONS: ManualSection[] = [
@@ -14,6 +14,7 @@ const SECTIONS: ManualSection[] = [
   { id: 'supplier-flow', title: '공급자 흐름' },
   { id: 'partner-flow', title: '파트너 흐름' },
   { id: 'content', title: '콘텐츠 활용' },
+  { id: 'ai-system', title: 'AI 시스템' },
   { id: 'faq', title: '자주 묻는 질문' },
 ];
 
@@ -32,6 +33,8 @@ export default function NetureServiceManualPage() {
         return <PartnerFlowSection />;
       case 'content':
         return <ContentSection />;
+      case 'ai-system':
+        return <AiSystemSection />;
       case 'faq':
         return <FaqSection />;
       default:
@@ -292,6 +295,114 @@ function ContentSection() {
   );
 }
 
+function AiSystemSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>AI 시스템</h2>
+      <p style={styles.text}>
+        Neture 플랫폼의 AI 기능은 <strong>사용자에게 자연스러운 정보 제공</strong>을 목표로 합니다.
+        관리자는 AI 응답의 구성 규칙과 Context Asset을 관리합니다.
+      </p>
+
+      <div style={styles.infoCard}>
+        <Sparkles size={24} style={{ color: '#8b5cf6' }} />
+        <div>
+          <strong>Perplexity형 UX 원칙</strong>
+          <p style={styles.infoText}>
+            AI 응답이 항상 주인공이며, Context Asset은 보조 정보입니다.
+            <strong>광고처럼 보이면 실패, 정보처럼 느껴지면 성공</strong>입니다.
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>AI 관리 메뉴 (관리자용)</h3>
+        <ul style={styles.list}>
+          <li><strong>/admin/ai</strong>: AI 운영 대시보드</li>
+          <li><strong>/admin/ai/engines</strong>: AI 엔진 설정 (Gemini, GPT, Claude)</li>
+          <li><strong>/admin/ai/policy</strong>: 사용 기준 설정 (한도, 임계치)</li>
+          <li><strong>/admin/ai/asset-quality</strong>: 품질 관리 (서비스별 품질 신호)</li>
+          <li><strong>/admin/ai/cost</strong>: 비용 현황 (엔진별·서비스별 비용)</li>
+          <li><strong>/admin/ai/context-assets</strong>: Context Asset 관리</li>
+          <li><strong>/admin/ai/composition-rules</strong>: 응답 구성 규칙</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>Context Asset이란?</h3>
+        <p style={{ ...styles.tipText, color: '#475569', marginBottom: '12px' }}>
+          AI 응답에 노출되는 광고/정보/콘텐츠입니다. 관리자가 등록한 자산만 AI가 노출할 수 있습니다.
+        </p>
+        <ul style={styles.list}>
+          <li><strong>브랜드</strong>: 브랜드/공급자 소개</li>
+          <li><strong>상품</strong>: 판매 상품 정보</li>
+          <li><strong>비상품</strong>: 출시 예정, 테스트 제품</li>
+          <li><strong>콘텐츠</strong>: 가이드, 캠페인, 정보성 콘텐츠</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>응답 구성 규칙 (V1)</h3>
+        <p style={{ ...styles.tipText, color: '#475569', marginBottom: '12px' }}>
+          AI 응답과 Context Asset의 배치·톤·비율을 규정합니다.
+        </p>
+
+        <div style={{ marginBottom: '16px' }}>
+          <strong style={{ fontSize: '13px', color: '#334155' }}>질문 유형별 규칙</strong>
+          <ul style={{ ...styles.list, marginTop: '8px' }}>
+            <li><strong>범용 질문</strong>: information 태그만 허용, 하단 배치</li>
+            <li><strong>전문/업무 질문</strong>: information + branding 허용</li>
+            <li><strong>탐색/비교 질문</strong>: 모든 태그 허용, 병렬 카드</li>
+          </ul>
+        </div>
+
+        <div style={{ marginBottom: '16px' }}>
+          <strong style={{ fontSize: '13px', color: '#334155' }}>금지 표현</strong>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+            <span style={styles.forbiddenTag}>"지금 구매하세요"</span>
+            <span style={styles.forbiddenTag}>"특가"</span>
+            <span style={styles.forbiddenTag}>"추천드립니다"</span>
+            <span style={styles.forbiddenTag}>"최고의 선택"</span>
+          </div>
+        </div>
+
+        <div>
+          <strong style={{ fontSize: '13px', color: '#334155' }}>허용 표현</strong>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+            <span style={styles.allowedTag}>"관련 자료"</span>
+            <span style={styles.allowedTag}>"참고할 수 있는 정보"</span>
+            <span style={styles.allowedTag}>"도움이 될 수 있는 내용"</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={styles.featureGrid}>
+        <div style={styles.featureCard}>
+          <MessageSquare size={20} style={{ color: '#8b5cf6' }} />
+          <h4 style={styles.featureTitle}>응답 중간 삽입 금지</h4>
+          <p style={styles.featureDesc}>
+            Context Asset은 응답 하단 또는 병렬 카드로만 배치
+          </p>
+        </div>
+        <div style={styles.featureCard}>
+          <DollarSign size={20} style={{ color: '#10b981' }} />
+          <h4 style={styles.featureTitle}>최대 카드 3개</h4>
+          <p style={styles.featureDesc}>
+            응답당 Context Asset 카드는 최대 3개까지만 노출
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.tipBox}>
+        <AlertCircle size={16} style={{ color: '#2563eb', flexShrink: 0 }} />
+        <p style={styles.tipText}>
+          AI 응답 규칙은 실험을 통해 변경할 수 없습니다. 규칙은 실험 위에 고정됩니다.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function FaqSection() {
   return (
     <div>
@@ -486,5 +597,21 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     fontSize: '14px',
     fontWeight: 500,
+  },
+  forbiddenTag: {
+    padding: '4px 10px',
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: '16px',
+    fontSize: '12px',
+    color: '#dc2626',
+  },
+  allowedTag: {
+    padding: '4px 10px',
+    backgroundColor: '#f0fdf4',
+    border: '1px solid #bbf7d0',
+    borderRadius: '16px',
+    fontSize: '12px',
+    color: '#16a34a',
   },
 };

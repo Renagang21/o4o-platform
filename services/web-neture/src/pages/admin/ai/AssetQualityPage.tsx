@@ -560,6 +560,18 @@ export default function AssetQualityPage() {
             >
               비용 현황
             </Link>
+            <Link
+              to="/admin/ai/context-assets"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+            >
+              Context Asset
+            </Link>
+            <Link
+              to="/admin/ai/composition-rules"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+            >
+              응답 규칙
+            </Link>
           </nav>
         </div>
       </div>

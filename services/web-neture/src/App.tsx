@@ -65,12 +65,17 @@ import AiOperationsPage from './pages/admin/AiOperationsPage';
 // AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1)
 // AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1)
 // AI Cost Tooling (WO-AI-COST-TOOLING-V1)
+// AI Context Asset Manager (WO-AI-CONTEXT-ASSET-MANAGER-V1)
+// AI Answer Composition Rules (WO-AI-ANSWER-COMPOSITION-RULES-V1)
 import {
   AiAdminDashboardPage,
   AiEnginesPage,
   AiPolicyPage,
   AssetQualityPage,
   AiCostPage,
+  ContextAssetListPage,
+  ContextAssetFormPage,
+  AnswerCompositionRulesPage,
 } from './pages/admin/ai';
 
 // Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1)
@@ -167,11 +172,17 @@ function App() {
           {/* AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1) */}
           {/* AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1) */}
           {/* AI Cost Tooling (WO-AI-COST-TOOLING-V1) */}
+          {/* AI Context Asset Manager (WO-AI-CONTEXT-ASSET-MANAGER-V1) */}
+          {/* AI Answer Composition Rules (WO-AI-ANSWER-COMPOSITION-RULES-V1) */}
           <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
           <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
           <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
           <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
           <Route path="/admin/ai/cost" element={<AiCostPage />} />
+          <Route path="/admin/ai/context-assets" element={<ContextAssetListPage />} />
+          <Route path="/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
+          <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
+          <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
 
           {/* Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
           <Route path="/operator" element={<OperatorDashboard />} />
