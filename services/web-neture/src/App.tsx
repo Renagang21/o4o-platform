@@ -68,6 +68,13 @@ import {
   SupplierManualPage,
   PartnerManualPage,
   AdminManualPage,
+  ContentEditorManualPage,
+  // Service Manuals
+  NetureServiceManualPage,
+  KCosmeticsServiceManualPage,
+  GlycoPharmServiceManualPage,
+  GlucoseViewServiceManualPage,
+  KpaSocietyServiceManualPage,
 } from './pages/test-guide';
 
 // Forum Pages (WO-NETURE-TEST-SECTIONS-V1)
@@ -100,6 +107,13 @@ function App() {
             <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
             <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
             <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
+            <Route path="/test-guide/manual/content-editor" element={<ContentEditorManualPage />} />
+            {/* Service Manuals */}
+            <Route path="/test-guide/service/neture" element={<NetureServiceManualPage />} />
+            <Route path="/test-guide/service/k-cosmetics" element={<KCosmeticsServiceManualPage />} />
+            <Route path="/test-guide/service/glycopharm" element={<GlycoPharmServiceManualPage />} />
+            <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
+            <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
 
             {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
             <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
