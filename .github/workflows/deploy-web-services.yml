@@ -141,12 +141,14 @@ jobs:
           echo "Building neture-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
+          # Build from repo root with Dockerfile path (for workspace packages)
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            -f services/web-neture/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/neture-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/neture-web:latest \
-            services/web-neture
+            .
 
           docker push gcr.io/${{ env.PROJECT_ID }}/neture-web:${IMAGE_TAG}
           docker push gcr.io/${{ env.PROJECT_ID }}/neture-web:latest
