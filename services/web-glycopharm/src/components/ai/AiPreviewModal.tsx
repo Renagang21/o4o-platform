@@ -14,7 +14,7 @@
  * - 푸터: 닫기 버튼
  */
 
-import { Sparkles, X, CheckCircle2 } from 'lucide-react';
+import { SparklesIcon, CloseIcon, CheckIcon } from './icons';
 
 interface AiPreviewModalProps {
   /** 모달 표시 여부 */
@@ -54,7 +54,7 @@ export function AiPreviewModal({
         <div style={styles.header}>
           <div style={styles.headerLeft}>
             <div style={styles.headerIcon}>
-              <Sparkles size={22} style={{ color: '#2563eb' }} />
+              <SparklesIcon size={22} style={{ color: '#2563eb' }} />
             </div>
             <div>
               <h2 style={styles.title}>{title}</h2>
@@ -62,7 +62,7 @@ export function AiPreviewModal({
             </div>
           </div>
           <button onClick={onClose} style={styles.closeButton} aria-label="닫기">
-            <X size={20} />
+            <CloseIcon size={20} />
           </button>
         </div>
 
@@ -88,7 +88,7 @@ export function AiPreviewModal({
             <ul style={styles.featuresList}>
               {upcomingFeatures.map((feature) => (
                 <li key={feature} style={styles.featureItem}>
-                  <CheckCircle2 size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
+                  <CheckIcon size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
                   <span>{feature}</span>
                 </li>
               ))}

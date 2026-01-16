@@ -62,6 +62,16 @@ import { StoreTemplateManagerPage } from '@/pages/operator/store-template';
 import UsersPage from '@/pages/operator/UsersPage';
 import SettingsPage from '@/pages/operator/SettingsPage';
 
+// Operator Semi-Franchise Pages
+import PharmaciesPage from '@/pages/operator/PharmaciesPage';
+import ProductsPage from '@/pages/operator/ProductsPage';
+import OrdersPage from '@/pages/operator/OrdersPage';
+import InventoryPage from '@/pages/operator/InventoryPage';
+import SettlementsPage from '@/pages/operator/SettlementsPage';
+import AnalyticsPage from '@/pages/operator/AnalyticsPage';
+import MarketingPage from '@/pages/operator/MarketingPage';
+import SupportPage from '@/pages/operator/SupportPage';
+
 // Pharmacy Store Apply
 import StoreApplyPage from '@/pages/pharmacy/StoreApplyPage';
 
@@ -232,20 +242,29 @@ function AppRoutes() {
         }
       >
         <Route index element={<OperatorDashboard />} />
-        <Route path="forum-requests" element={<ForumRequestsPage />} />
+        {/* Semi-Franchise Management */}
+        <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="orders" element={<OrdersPage />} />
+        <Route path="inventory" element={<InventoryPage />} />
+        <Route path="settlements" element={<SettlementsPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="marketing" element={<MarketingPage />} />
+        {/* Forum */}
+        <Route path="forum-requests" element={<ForumRequestsPage />} />
+        <Route path="forum-management" element={<OperatorForumManagementPage />} />
         {/* Market Trial Extension */}
         <Route path="market-trial" element={<OperatorTrialSelectorPage />} />
-        {/* Forum Extension */}
-        <Route path="forum-management" element={<OperatorForumManagementPage />} />
         {/* Store Approvals */}
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         {/* Store Template Manager */}
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
-        {/* Users & Settings (Stub) */}
+        {/* Users & Support & Settings */}
         <Route path="users" element={<UsersPage />} />
+        <Route path="support" element={<SupportPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 

@@ -11,10 +11,11 @@ const ROLE_ICONS: Record<UserRole, string> = {
   supplier: '📦',
   seller: '🏪',
   partner: '🤝',
+  operator: '⚙️',
 };
 
 // 이 서비스에서 사용 가능한 역할
-const AVAILABLE_ROLES: UserRole[] = ['admin', 'seller'];
+const AVAILABLE_ROLES: UserRole[] = ['admin', 'seller', 'operator'];
 
 export function RoleSwitcher() {
   const { user, hasMultipleRoles, switchRole } = useAuth();

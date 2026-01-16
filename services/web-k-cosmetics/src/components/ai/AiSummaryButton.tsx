@@ -14,7 +14,7 @@
  */
 
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { SparklesIcon } from './icons';
 import { AiSummaryModal } from './AiSummaryModal';
 
 interface AiSummaryButtonProps {
@@ -58,7 +58,7 @@ export function AiSummaryButton({
         aria-label={label}
         title="AI가 이 영역의 데이터를 요약해 드립니다"
       >
-        <Sparkles size={size === 'sm' ? 14 : 16} />
+        <SparklesIcon size={size === 'sm' ? 14 : 16} />
         {label}
       </button>
 

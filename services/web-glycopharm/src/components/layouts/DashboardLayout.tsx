@@ -26,6 +26,13 @@ import {
   FileCheck,
   Monitor,
   Tag,
+  Store,
+  BarChart3,
+  Boxes,
+  CreditCard,
+  Megaphone,
+  HelpCircle,
+  FileText,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -77,12 +84,20 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
     color: 'red',
     menuItems: [
       { path: '/operator', label: '대시보드', icon: LayoutDashboard },
+      { path: '/operator/pharmacies', label: '약국 네트워크', icon: Store },
       { path: '/operator/applications', label: '신청 관리', icon: FileCheck },
-      { path: '/operator/forum-requests', label: '포럼 신청 관리', icon: MessageSquare },
-      { path: '/operator/forum-management', label: '포럼 관리', icon: MessageSquare },
+      { path: '/operator/products', label: '상품 관리', icon: Package },
+      { path: '/operator/orders', label: '주문 관리', icon: ShoppingCart },
+      { path: '/operator/inventory', label: '재고/공급', icon: Boxes },
+      { path: '/operator/settlements', label: '정산 관리', icon: CreditCard },
+      { path: '/operator/analytics', label: '분석/리포트', icon: BarChart3 },
+      { path: '/operator/marketing', label: '마케팅', icon: Megaphone },
+      { path: '/operator/forum-requests', label: '포럼 신청', icon: MessageSquare },
+      { path: '/operator/forum-management', label: '포럼 관리', icon: FileText },
       { path: '/operator/market-trial', label: 'Trial 관리', icon: Tag },
       { path: '/operator/users', label: '회원 관리', icon: Users },
-      { path: '/operator/settings', label: '사이트 설정', icon: Settings },
+      { path: '/operator/support', label: '고객지원', icon: HelpCircle },
+      { path: '/operator/settings', label: '설정', icon: Settings },
     ],
   },
 };

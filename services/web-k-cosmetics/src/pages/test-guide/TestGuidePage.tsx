@@ -19,7 +19,8 @@ const SERVICE_CONFIG = {
     { key: 'consumer', label: '소비자', description: '상품 탐색 및 구매' },
     { key: 'seller', label: '판매자', description: '상품 등록 및 판매 관리' },
     { key: 'supplier', label: '공급자', description: '상품 공급 및 재고 관리' },
-    { key: 'admin', label: '운영자', description: '플랫폼 전체 관리', internal: true },
+    { key: 'admin', label: '관리자', description: '플랫폼 전체 관리', internal: true },
+    { key: 'operator', label: '운영자', description: '매장 네트워크 및 주문 운영', internal: true },
   ],
 };
 

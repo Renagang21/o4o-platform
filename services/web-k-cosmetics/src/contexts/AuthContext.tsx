@@ -7,7 +7,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
-export type UserRole = 'admin' | 'supplier' | 'seller' | 'partner';
+export type UserRole = 'admin' | 'supplier' | 'seller' | 'partner' | 'operator';
 
 export interface User {
   id: string;
@@ -36,6 +36,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
   supplier: '공급자',
   seller: '판매자',
   partner: '파트너',
+  operator: '운영자',
 };
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
@@ -43,6 +44,7 @@ const ROLE_DASHBOARDS: Record<UserRole, string> = {
   supplier: '/supplier',
   seller: '/seller',
   partner: '/partner',
+  operator: '/operator',
 };
 
 // API 역할을 web 역할로 매핑
@@ -50,6 +52,7 @@ function mapApiRole(apiRole: string): UserRole {
   const roleMap: Record<string, UserRole> = {
     'admin': 'admin',
     'super_admin': 'admin',
+    'operator': 'operator',
     'supplier': 'supplier',
     'seller': 'seller',
     'partner': 'partner',

@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 // Layouts
 import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
 
 // Public Pages
 import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage, StoresPage, ProductsPage, SupplyPage, TouristHubPage } from '@/pages';
@@ -27,6 +28,7 @@ import {
   SellerManualPage,
   SupplierManualPage,
   AdminManualPage,
+  OperatorManualPage,
 } from '@/pages/test-guide';
 
 // Forum Pages
@@ -39,6 +41,20 @@ import PartnerTargetsPage from '@/pages/partner/TargetsPage';
 import PartnerContentPage from '@/pages/partner/ContentPage';
 import PartnerEventsPage from '@/pages/partner/EventsPage';
 import PartnerStatusPage from '@/pages/partner/StatusPage';
+
+// Operator Dashboard Pages
+import OperatorIndex from '@/pages/operator/index';
+import OperatorStoresPage from '@/pages/operator/StoresPage';
+import OperatorApplicationsPage from '@/pages/operator/ApplicationsPage';
+import OperatorProductsPage from '@/pages/operator/ProductsPage';
+import OperatorOrdersPage from '@/pages/operator/OrdersPage';
+import OperatorInventoryPage from '@/pages/operator/InventoryPage';
+import OperatorSettlementsPage from '@/pages/operator/SettlementsPage';
+import OperatorAnalyticsPage from '@/pages/operator/AnalyticsPage';
+import OperatorMarketingPage from '@/pages/operator/MarketingPage';
+import OperatorUsersPage from '@/pages/operator/UsersPage';
+import OperatorSupportPage from '@/pages/operator/SupportPage';
+import OperatorSettingsPage from '@/pages/operator/SettingsPage';
 
 // Protected Route Component - triggers auth check only when entering
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -89,6 +105,7 @@ function AppRoutes() {
         <Route path="test-guide/manual/seller" element={<SellerManualPage />} />
         <Route path="test-guide/manual/supplier" element={<SupplierManualPage />} />
         <Route path="test-guide/manual/admin" element={<AdminManualPage />} />
+        <Route path="test-guide/manual/operator" element={<OperatorManualPage />} />
 
         {/* Forum */}
         <Route path="forum" element={<ForumPage />} />
@@ -135,6 +152,29 @@ function AppRoutes() {
         <Route path="content" element={<PartnerContentPage />} />
         <Route path="events" element={<PartnerEventsPage />} />
         <Route path="status" element={<PartnerStatusPage />} />
+      </Route>
+
+      {/* Operator Dashboard */}
+      <Route
+        path="operator"
+        element={
+          <ProtectedRoute allowedRoles={['operator']}>
+            <DashboardLayout role="operator" />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<OperatorIndex />} />
+        <Route path="stores" element={<OperatorStoresPage />} />
+        <Route path="applications" element={<OperatorApplicationsPage />} />
+        <Route path="products" element={<OperatorProductsPage />} />
+        <Route path="orders" element={<OperatorOrdersPage />} />
+        <Route path="inventory" element={<OperatorInventoryPage />} />
+        <Route path="settlements" element={<OperatorSettlementsPage />} />
+        <Route path="analytics" element={<OperatorAnalyticsPage />} />
+        <Route path="marketing" element={<OperatorMarketingPage />} />
+        <Route path="users" element={<OperatorUsersPage />} />
+        <Route path="support" element={<OperatorSupportPage />} />
+        <Route path="settings" element={<OperatorSettingsPage />} />
       </Route>
 
       {/* 404 */}

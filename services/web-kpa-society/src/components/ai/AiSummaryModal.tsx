@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Sparkles, X, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { SparklesIcon, CloseIcon, LoaderIcon, AlertIcon, RefreshIcon } from './icons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -110,7 +110,7 @@ export function AiSummaryModal({
         <div style={styles.header}>
           <div style={styles.headerLeft}>
             <div style={styles.headerIcon}>
-              <Sparkles size={22} style={{ color: '#2563eb' }} />
+              <SparklesIcon size={22} style={{ color: '#2563eb' }} />
             </div>
             <div>
               <h2 style={styles.title}>AI 요약</h2>
@@ -120,7 +120,7 @@ export function AiSummaryModal({
             </div>
           </div>
           <button onClick={onClose} style={styles.closeButton} aria-label="닫기">
-            <X size={20} />
+            <CloseIcon size={20} />
           </button>
         </div>
 
@@ -128,17 +128,17 @@ export function AiSummaryModal({
         <div style={styles.body}>
           {state === 'loading' && (
             <div style={styles.loadingContainer}>
-              <Loader2 size={32} style={{ color: '#2563eb', animation: 'spin 1s linear infinite' }} />
+              <LoaderIcon size={32} style={{ color: '#2563eb', animation: 'spin 1s linear infinite' }} />
               <p style={styles.loadingText}>AI가 데이터를 분석하고 있습니다...</p>
             </div>
           )}
 
           {state === 'error' && (
             <div style={styles.errorContainer}>
-              <AlertCircle size={32} style={{ color: '#dc2626' }} />
+              <AlertIcon size={32} style={{ color: '#dc2626' }} />
               <p style={styles.errorText}>{error}</p>
               <button onClick={fetchSummary} style={styles.retryButton}>
-                <RefreshCw size={16} />
+                <RefreshIcon size={16} />
                 다시 시도
               </button>
             </div>
@@ -161,7 +161,7 @@ export function AiSummaryModal({
         <div style={styles.footer}>
           {state === 'success' && (
             <button onClick={fetchSummary} style={styles.refreshButton}>
-              <RefreshCw size={14} />
+              <RefreshIcon size={14} />
               새로고침
             </button>
           )}
