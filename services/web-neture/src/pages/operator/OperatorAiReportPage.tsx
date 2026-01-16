@@ -26,12 +26,10 @@ import {
   Users,
   ShoppingBag,
   Building2,
-  ExternalLink,
   AlertTriangle,
   CheckCircle,
   XCircle,
   Send,
-  MessageSquare,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 
@@ -76,14 +74,6 @@ interface QualitySignal {
   metric: string;
   suggestion: string;
   relatedAssets?: string[];
-}
-
-interface ImprovementRequest {
-  id: string;
-  signalId: string;
-  status: 'pending' | 'acknowledged' | 'resolved';
-  memo: string;
-  createdAt: string;
 }
 
 // ===== Mock 데이터 =====

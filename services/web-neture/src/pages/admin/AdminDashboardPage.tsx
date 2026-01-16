@@ -200,6 +200,23 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
+        {/* Platform Settings */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mt-8">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-900">플랫폼 설정</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
+            <Link
+              to="/admin/settings/email"
+              className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <span className="text-2xl mb-2">📧</span>
+              <span className="text-sm font-medium text-gray-700">이메일 설정</span>
+              <span className="text-xs text-gray-400 mt-1">SMTP 구성</span>
+            </Link>
+          </div>
+        </div>
+
         {/* Notice */}
         <div className="mt-8 text-center text-sm text-gray-400">
           상세 관리 기능은 순차적으로 추가됩니다.

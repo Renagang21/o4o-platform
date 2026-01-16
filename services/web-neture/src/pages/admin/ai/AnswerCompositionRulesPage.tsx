@@ -37,9 +37,7 @@ import {
   CARD_UI_RULES,
   EXPERIMENT_COMPOSITION_RULES,
   VIOLATION_CONDITIONS,
-  COMPOSITION_PRINCIPLES,
   PROHIBITED_ACTIONS,
-  type QuestionType,
 } from './answerCompositionRules';
 
 // ===== 섹션 헤더 컴포넌트 =====

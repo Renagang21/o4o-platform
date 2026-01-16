@@ -13,7 +13,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Plus,
   Search,
-  Filter,
   Package,
   Eye,
   Edit,
@@ -23,7 +22,6 @@ import {
   FileText,
   ShoppingBag,
   Megaphone,
-  ExternalLink,
   CheckCircle,
   XCircle,
 } from 'lucide-react';
@@ -32,12 +30,10 @@ import {
   type AssetType,
   type AssetStatus,
   type ServiceScope,
-  type PurposeTag,
   type ContextAssetFilter,
   ASSET_TYPE_OPTIONS,
   ASSET_STATUS_OPTIONS,
   SERVICE_SCOPE_OPTIONS,
-  PURPOSE_TAG_OPTIONS,
   getAssetTypeLabel,
   getAssetStatusInfo,
   getPurposeTagInfo,

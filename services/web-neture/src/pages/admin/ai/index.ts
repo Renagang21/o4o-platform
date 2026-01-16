@@ -24,7 +24,26 @@ export * from './aiAssetPackageStandards';
 export * from './aiCostConfig';
 
 // Context Asset Types (WO-AI-CONTEXT-ASSET-MANAGER-V1)
-export * from './contextAssetTypes';
+// Note: AssetType and getAssetTypeLabel are exported from aiAssetPackageStandards
+export {
+  ASSET_TYPE_OPTIONS,
+  type ServiceScope,
+  SERVICE_SCOPE_OPTIONS,
+  type PageType,
+  PAGE_TYPE_OPTIONS,
+  type PurposeTag,
+  PURPOSE_TAG_OPTIONS,
+  getPurposeTagInfo,
+  type ExperimentTag,
+  EXPERIMENT_TAG_OPTIONS,
+  type AssetStatus,
+  ASSET_STATUS_OPTIONS,
+  getAssetStatusInfo,
+  type ContextAsset,
+  type ContextAssetFormData,
+  DEFAULT_FORM_DATA,
+  type ContextAssetFilter,
+} from './contextAssetTypes';
 
 // Answer Composition Rules (WO-AI-ANSWER-COMPOSITION-RULES-V1)
 export * from './answerCompositionRules';

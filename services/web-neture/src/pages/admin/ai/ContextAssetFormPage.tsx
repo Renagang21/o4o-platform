@@ -22,11 +22,7 @@ import {
 } from 'lucide-react';
 import {
   type ContextAssetFormData,
-  type AssetType,
   type AssetStatus,
-  type ServiceScope,
-  type PageType,
-  type PurposeTag,
   type ExperimentTag,
   ASSET_TYPE_OPTIONS,
   ASSET_STATUS_OPTIONS,

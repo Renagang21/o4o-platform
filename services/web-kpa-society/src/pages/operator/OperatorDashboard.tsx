@@ -10,17 +10,13 @@
 
 import { Link } from 'react-router-dom';
 import {
-  Activity,
   Users,
   GraduationCap,
   ShoppingCart,
-  MessageSquare,
   Clock,
-  CheckCircle,
   TrendingUp,
   ChevronRight,
   ArrowUpRight,
-  FileText,
   Building2,
   Calendar,
 } from 'lucide-react';

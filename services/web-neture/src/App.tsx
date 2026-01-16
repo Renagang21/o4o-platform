@@ -25,6 +25,8 @@ import { AuthProvider } from './contexts';
 import MainLayout from './components/layouts/MainLayout';
 import HomePage from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { RegisterPendingPage } from './pages/RegisterPendingPage';
 import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
@@ -78,6 +80,13 @@ import {
   AnswerCompositionRulesPage,
 } from './pages/admin/ai';
 
+// Admin Settings
+import { EmailSettingsPage } from './pages/admin/settings';
+
+// Operator Settings & Registration Management
+import { EmailNotificationSettingsPage } from './pages/operator/settings';
+import { RegistrationRequestsPage } from './pages/operator/registrations';
+
 // Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1)
 import { OperatorDashboard, OperatorAiReportPage } from './pages/operator';
 
@@ -106,8 +115,10 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Login - outside MainLayout */}
+          {/* Login & Register - outside MainLayout */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register/pending" element={<RegisterPendingPage />} />
 
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
@@ -184,9 +195,14 @@ function App() {
           <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
           <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
 
+          {/* Admin Settings */}
+          <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
+
           {/* Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
           <Route path="/operator" element={<OperatorDashboard />} />
           <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
+          <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+          <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

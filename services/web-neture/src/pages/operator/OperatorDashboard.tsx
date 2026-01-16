@@ -16,12 +16,11 @@ import {
   FileText,
   TrendingUp,
   Clock,
-  CheckCircle,
-  AlertTriangle,
   ChevronRight,
   ArrowUpRight,
-  Package,
-  Megaphone,
+  UserPlus,
+  Bell,
+  Settings,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 
@@ -142,7 +141,7 @@ export default function OperatorDashboard() {
                 </div>
                 <h2 className="text-lg font-semibold text-slate-800">최근 신청</h2>
               </div>
-              <Link to="/operator/applications" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <Link to="/operator/registrations" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
                 전체보기 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -216,6 +215,38 @@ export default function OperatorDashboard() {
               <span className="font-medium text-slate-700">{action.label}</span>
             </Link>
           ))}
+        </div>
+      </div>
+
+      {/* Registration & Settings */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+            <Settings className="w-5 h-5 text-green-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-800">가입 관리 및 설정</h2>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <Link
+            to="/operator/registrations"
+            className="flex items-center gap-3 p-4 rounded-xl border-2 border-amber-200 bg-amber-50 hover:border-amber-400 transition-colors"
+          >
+            <UserPlus className="w-5 h-5 text-amber-600" />
+            <div>
+              <span className="font-medium text-slate-700">가입 신청 관리</span>
+              <p className="text-xs text-slate-500">승인/거부 처리</p>
+            </div>
+          </Link>
+          <Link
+            to="/operator/settings/notifications"
+            className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+          >
+            <Bell className="w-5 h-5 text-blue-600" />
+            <div>
+              <span className="font-medium text-slate-700">알림 설정</span>
+              <p className="text-xs text-slate-500">이메일 알림 관리</p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>

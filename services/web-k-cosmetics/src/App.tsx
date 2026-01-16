@@ -15,6 +15,7 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 // Public Pages
 import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage, StoresPage, ProductsPage, SupplyPage, TouristHubPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
+import RegisterPage from '@/pages/auth/RegisterPage';
 import PartnerInfoPage from '@/pages/PartnerInfoPage';
 import MyPage from '@/pages/MyPage';
 
@@ -96,6 +97,7 @@ function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />

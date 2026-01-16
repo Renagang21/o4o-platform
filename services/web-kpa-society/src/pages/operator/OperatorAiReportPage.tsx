@@ -19,7 +19,6 @@ import {
   Package,
   Users,
   GraduationCap,
-  Building2,
   AlertTriangle,
   CheckCircle,
   XCircle,

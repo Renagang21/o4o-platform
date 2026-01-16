@@ -39,8 +39,10 @@ import { OperatorRoutes } from './routes/OperatorRoutes';
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
 
-// Login page
+// Login & Register pages
 import { LoginPage } from './pages/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 
 // Test Guide Pages
 import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchOfficerManualPage, AdminManualPage } from './pages/test-guide';
@@ -64,8 +66,10 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Login Page (레이아웃 없음) */}
+          {/* Login & Register Pages (레이아웃 없음) */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register/pending" element={<RegisterPendingPage />} />
 
           {/* Test Guide (레이아웃 없음) */}
           <Route path="/test-guide" element={<TestGuidePage />} />
