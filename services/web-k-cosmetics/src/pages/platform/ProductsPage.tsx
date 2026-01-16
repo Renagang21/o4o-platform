@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Package,
   Plus,
@@ -15,10 +15,13 @@ import {
   Edit,
   Trash2,
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 interface Product {
   id: string;
@@ -30,55 +33,6 @@ interface Product {
   imageUrl?: string;
   category: string;
 }
-
-// Mock data - will be replaced with API call
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Advanced Snail 96 Mucin Power Essence',
-    brand: 'COSRX',
-    price: 25000,
-    stock: 50,
-    status: 'active',
-    category: '스킨케어',
-  },
-  {
-    id: '2',
-    name: 'Green Tea Seed Serum',
-    brand: 'Innisfree',
-    price: 32000,
-    stock: 30,
-    status: 'active',
-    category: '스킨케어',
-  },
-  {
-    id: '3',
-    name: 'Water Sleeping Mask',
-    brand: 'Laneige',
-    price: 38000,
-    stock: 25,
-    status: 'active',
-    category: '마스크',
-  },
-  {
-    id: '4',
-    name: 'First Care Activating Serum',
-    brand: 'Sulwhasoo',
-    price: 120000,
-    stock: 10,
-    status: 'pending',
-    category: '스킨케어',
-  },
-  {
-    id: '5',
-    name: 'Play Color Eyes',
-    brand: 'Etude',
-    price: 28000,
-    stock: 0,
-    status: 'inactive',
-    category: '메이크업',
-  },
-];
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(price);
@@ -97,18 +51,32 @@ function getStatusBadge(status: Product['status']) {
 
 export default function ProductsPage() {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | Product['status']>('all');
 
   useEffect(() => {
-    // Simulate API call
     const fetchProducts = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setProducts(mockProducts);
-      setIsLoading(false);
+      setError(null);
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/products`, {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('상품 목록을 불러오는데 실패했습니다');
+        }
+        const data = await response.json();
+        setProducts(data.data || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '오류가 발생했습니다');
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchProducts();
   }, []);
@@ -119,6 +87,10 @@ export default function ProductsPage() {
     const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  const handleProductClick = (productId: string) => {
+    navigate(`/platform/stores/products/${productId}/edit`);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -213,10 +185,15 @@ export default function ProductsPage() {
             <div className="flex items-center justify-center h-64">
               <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
             </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center h-64">
+              <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+              <p className="text-red-600">{error}</p>
+            </div>
           ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64">
               <Package className="w-12 h-12 text-slate-300 mb-4" />
-              <p className="text-slate-500">등록된 상품이 없습니다</p>
+              <p className="text-slate-500">자료가 없습니다</p>
               <Link
                 to="/platform/stores/products/new"
                 className="mt-4 text-pink-600 font-medium hover:underline"
@@ -251,7 +228,11 @@ export default function ProductsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filteredProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-slate-50">
+                    <tr
+                      key={product.id}
+                      className="hover:bg-slate-50 cursor-pointer"
+                      onClick={() => handleProductClick(product.id)}
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -272,11 +253,15 @@ export default function ProductsPage() {
                       </td>
                       <td className="px-6 py-4">{getStatusBadge(product.status)}</td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button className="p-1 text-slate-400 hover:text-slate-600" title="수정">
+                        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="p-1 text-slate-400 hover:text-slate-600"
+                            title="수정"
+                            onClick={() => handleProductClick(product.id)}
+                          >
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="p-1 text-slate-400 hover:text-slate-600" title="삭제">
+                          <button className="p-1 text-slate-400 hover:text-red-600" title="삭제">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -290,14 +275,16 @@ export default function ProductsPage() {
         </div>
 
         {/* Summary */}
-        <div className="mt-6 flex items-center justify-between text-sm text-slate-500">
-          <p>총 {filteredProducts.length}개 상품</p>
-          <p>
-            노출 중: {products.filter(p => p.status === 'active').length} |
-            검수 중: {products.filter(p => p.status === 'pending').length} |
-            비활성: {products.filter(p => p.status === 'inactive').length}
-          </p>
-        </div>
+        {!isLoading && !error && products.length > 0 && (
+          <div className="mt-6 flex items-center justify-between text-sm text-slate-500">
+            <p>총 {filteredProducts.length}개 상품</p>
+            <p>
+              노출 중: {products.filter(p => p.status === 'active').length} |
+              검수 중: {products.filter(p => p.status === 'pending').length} |
+              비활성: {products.filter(p => p.status === 'inactive').length}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

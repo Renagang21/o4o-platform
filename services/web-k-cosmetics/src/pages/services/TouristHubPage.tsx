@@ -25,6 +25,8 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+
 interface ConnectedStore {
   id: string;
   name: string;
@@ -42,59 +44,6 @@ interface TouristStats {
   topCountries: { country: string; percentage: number }[];
 }
 
-// Mock data
-const mockStores: ConnectedStore[] = [
-  {
-    id: '1',
-    name: 'K-Beauty Flagship Store',
-    location: '명동',
-    rating: 4.8,
-    visitorCount: 1250,
-    contentCount: 45,
-    isActive: true,
-  },
-  {
-    id: '2',
-    name: 'Cosmetics Gallery',
-    location: '강남',
-    rating: 4.6,
-    visitorCount: 890,
-    contentCount: 32,
-    isActive: true,
-  },
-  {
-    id: '3',
-    name: 'Beauty Hub Hongdae',
-    location: '홍대',
-    rating: 4.5,
-    visitorCount: 720,
-    contentCount: 28,
-    isActive: true,
-  },
-  {
-    id: '4',
-    name: 'Skin Care Center',
-    location: '이태원',
-    rating: 4.3,
-    visitorCount: 450,
-    contentCount: 15,
-    isActive: false,
-  },
-];
-
-const mockStats: TouristStats = {
-  totalVisitors: 15420,
-  todayVisitors: 245,
-  weeklyGrowth: 12.5,
-  topCountries: [
-    { country: '일본', percentage: 35 },
-    { country: '중국', percentage: 28 },
-    { country: '미국', percentage: 15 },
-    { country: '태국', percentage: 12 },
-    { country: '기타', percentage: 10 },
-  ],
-};
-
 export default function TouristHubPage() {
   const { isAuthenticated } = useAuth();
   const [stores, setStores] = useState<ConnectedStore[]>([]);
@@ -104,10 +53,35 @@ export default function TouristHubPage() {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setStores(mockStores);
-      setStats(mockStats);
-      setIsLoading(false);
+      try {
+        const [storesResponse, statsResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/v1/cosmetics/tourist-hub/stores`, {
+            credentials: 'include',
+          }),
+          fetch(`${API_BASE_URL}/api/v1/cosmetics/tourist-hub/stats`, {
+            credentials: 'include',
+          }),
+        ]);
+
+        if (storesResponse.ok) {
+          const storesData = await storesResponse.json();
+          setStores(storesData.data || []);
+        } else {
+          setStores([]);
+        }
+
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          setStats(statsData.data || null);
+        } else {
+          setStats(null);
+        }
+      } catch {
+        setStores([]);
+        setStats(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -151,7 +125,7 @@ export default function TouristHubPage() {
                   <span className="text-sm text-slate-500">총 방문자</span>
                 </div>
                 <p className="text-2xl font-bold text-slate-800">
-                  {stats?.totalVisitors.toLocaleString()}
+                  {stats?.totalVisitors?.toLocaleString() || '-'}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">누적 관광객</p>
               </div>
@@ -164,12 +138,14 @@ export default function TouristHubPage() {
                   <span className="text-sm text-slate-500">오늘 방문</span>
                 </div>
                 <p className="text-2xl font-bold text-slate-800">
-                  {stats?.todayVisitors}
+                  {stats?.todayVisitors ?? '-'}
                 </p>
-                <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  +{stats?.weeklyGrowth}% 주간
-                </p>
+                {stats?.weeklyGrowth !== undefined && (
+                  <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    +{stats.weeklyGrowth}% 주간
+                  </p>
+                )}
               </div>
 
               <div className="bg-white rounded-xl border border-slate-200 p-5">
@@ -180,7 +156,7 @@ export default function TouristHubPage() {
                   <span className="text-sm text-slate-500">연결 매장</span>
                 </div>
                 <p className="text-2xl font-bold text-slate-800">
-                  {stores.filter(s => s.isActive).length}
+                  {stores.length > 0 ? stores.filter(s => s.isActive).length : '-'}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">활성 매장</p>
               </div>
@@ -193,7 +169,7 @@ export default function TouristHubPage() {
                   <span className="text-sm text-slate-500">콘텐츠</span>
                 </div>
                 <p className="text-2xl font-bold text-slate-800">
-                  {stores.reduce((sum, s) => sum + s.contentCount, 0)}
+                  {stores.length > 0 ? stores.reduce((sum, s) => sum + s.contentCount, 0) : '-'}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">연동 콘텐츠</p>
               </div>
@@ -202,20 +178,24 @@ export default function TouristHubPage() {
             {/* Top Countries */}
             <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8">
               <h2 className="font-semibold text-slate-800 mb-4">방문자 국가 분포</h2>
-              <div className="space-y-3">
-                {stats?.topCountries.map((item) => (
-                  <div key={item.country} className="flex items-center gap-4">
-                    <span className="w-16 text-sm text-slate-600">{item.country}</span>
-                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-pink-500 rounded-full"
-                        style={{ width: `${item.percentage}%` }}
-                      />
+              {stats?.topCountries && stats.topCountries.length > 0 ? (
+                <div className="space-y-3">
+                  {stats.topCountries.map((item) => (
+                    <div key={item.country} className="flex items-center gap-4">
+                      <span className="w-16 text-sm text-slate-600">{item.country}</span>
+                      <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-pink-500 rounded-full"
+                          style={{ width: `${item.percentage}%` }}
+                        />
+                      </div>
+                      <span className="w-12 text-sm text-slate-500 text-right">{item.percentage}%</span>
                     </div>
-                    <span className="w-12 text-sm text-slate-500 text-right">{item.percentage}%</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-center py-4">자료가 없습니다</p>
+              )}
             </div>
 
             {/* Connected Stores */}
@@ -232,49 +212,56 @@ export default function TouristHubPage() {
                   </Link>
                 )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {stores.map((store) => (
-                  <div
-                    key={store.id}
-                    className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                          <Store className="w-5 h-5 text-slate-500" />
+              {stores.length === 0 ? (
+                <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+                  <Store className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500">자료가 없습니다</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {stores.map((store) => (
+                    <div
+                      key={store.id}
+                      className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                            <Store className="w-5 h-5 text-slate-500" />
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-slate-800">{store.name}</h3>
+                            <p className="text-sm text-slate-500 flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {store.location}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-medium text-slate-800">{store.name}</h3>
-                          <p className="text-sm text-slate-500 flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {store.location}
-                          </p>
-                        </div>
+                        {store.isActive ? (
+                          <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                            <CheckCircle className="w-3 h-3" />
+                            활성
+                          </span>
+                        ) : (
+                          <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                            비활성
+                          </span>
+                        )}
                       </div>
-                      {store.isActive ? (
-                        <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                          <CheckCircle className="w-3 h-3" />
-                          활성
+                      <div className="flex items-center gap-6 text-sm text-slate-600">
+                        <span className="flex items-center gap-1">
+                          <Users className="w-4 h-4 text-slate-400" />
+                          방문 {store.visitorCount.toLocaleString()}
                         </span>
-                      ) : (
-                        <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
-                          비활성
+                        <span className="flex items-center gap-1">
+                          <Camera className="w-4 h-4 text-slate-400" />
+                          콘텐츠 {store.contentCount}
                         </span>
-                      )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-6 text-sm text-slate-600">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4 text-slate-400" />
-                        방문 {store.visitorCount.toLocaleString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Camera className="w-4 h-4 text-slate-400" />
-                        콘텐츠 {store.contentCount}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* CTA Section */}

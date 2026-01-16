@@ -9,7 +9,7 @@
  * - 매출 분석
  */
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Package,
@@ -19,10 +19,20 @@ import {
   Plus,
   TrendingUp,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+
+interface DashboardStats {
+  todaySales: number;
+  newOrders: number;
+  activeProducts: number;
+  storeStatus: 'active' | 'inactive';
+}
 
 interface DashboardCard {
   id: string;
@@ -30,7 +40,8 @@ interface DashboardCard {
   description: string;
   icon: React.ReactNode;
   link: string;
-  stats?: { label: string; value: string | number };
+  statsKey?: keyof DashboardStats;
+  statsLabel?: string;
   color: string;
 }
 
@@ -41,7 +52,8 @@ const dashboardCards: DashboardCard[] = [
     description: '매장에 노출할 상품을 등록하고 관리합니다',
     icon: <Package className="w-6 h-6" />,
     link: '/platform/stores/products',
-    stats: { label: '등록 상품', value: 24 },
+    statsKey: 'activeProducts',
+    statsLabel: '등록 상품',
     color: 'blue',
   },
   {
@@ -50,7 +62,8 @@ const dashboardCards: DashboardCard[] = [
     description: '최근 주문 및 배송 상태를 확인합니다',
     icon: <ShoppingCart className="w-6 h-6" />,
     link: '/platform/stores/orders',
-    stats: { label: '신규 주문', value: 5 },
+    statsKey: 'newOrders',
+    statsLabel: '신규 주문',
     color: 'green',
   },
   {
@@ -59,7 +72,6 @@ const dashboardCards: DashboardCard[] = [
     description: '매출 통계 및 트렌드를 분석합니다',
     icon: <BarChart3 className="w-6 h-6" />,
     link: '/platform/stores/analytics',
-    stats: { label: '이번 달', value: '₩2.4M' },
     color: 'purple',
   },
   {
@@ -83,8 +95,40 @@ function getColorClasses(color: string) {
   return colors[color] || colors.slate;
 }
 
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
+}
+
 export default function StoresPage() {
   const { user, isAuthenticated } = useAuth();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/stores/dashboard`, {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data.data || null);
+        } else {
+          setStats(null);
+        }
+      } catch {
+        setStats(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (isAuthenticated) {
+      fetchDashboardStats();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
@@ -143,7 +187,13 @@ export default function StoresPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-500">오늘 매출</p>
-                <p className="text-lg font-bold text-slate-800">₩124,500</p>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                ) : (
+                  <p className="text-lg font-bold text-slate-800">
+                    {stats?.todaySales ? formatCurrency(stats.todaySales) : '-'}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -154,7 +204,13 @@ export default function StoresPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-500">신규 주문</p>
-                <p className="text-lg font-bold text-slate-800">5건</p>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                ) : (
+                  <p className="text-lg font-bold text-slate-800">
+                    {stats?.newOrders !== undefined ? `${stats.newOrders}건` : '-'}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -165,7 +221,13 @@ export default function StoresPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-500">노출 상품</p>
-                <p className="text-lg font-bold text-slate-800">24개</p>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                ) : (
+                  <p className="text-lg font-bold text-slate-800">
+                    {stats?.activeProducts !== undefined ? `${stats.activeProducts}개` : '-'}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -176,7 +238,13 @@ export default function StoresPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-500">매장 상태</p>
-                <p className="text-lg font-bold text-green-600">운영 중</p>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                ) : (
+                  <p className={`text-lg font-bold ${stats?.storeStatus === 'active' ? 'text-green-600' : 'text-slate-500'}`}>
+                    {stats?.storeStatus === 'active' ? '운영 중' : '-'}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -186,6 +254,7 @@ export default function StoresPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {dashboardCards.map((card) => {
             const colorClasses = getColorClasses(card.color);
+            const statsValue = card.statsKey && stats ? stats[card.statsKey] : undefined;
             return (
               <Link
                 key={card.id}
@@ -196,10 +265,12 @@ export default function StoresPage() {
                   <div className={`w-12 h-12 rounded-xl ${colorClasses.bg} flex items-center justify-center ${colorClasses.icon}`}>
                     {card.icon}
                   </div>
-                  {card.stats && (
+                  {card.statsLabel && (
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-slate-800">{card.stats.value}</p>
-                      <p className="text-sm text-slate-500">{card.stats.label}</p>
+                      <p className="text-2xl font-bold text-slate-800">
+                        {isLoading ? '-' : (statsValue !== undefined ? statsValue : '-')}
+                      </p>
+                      <p className="text-sm text-slate-500">{card.statsLabel}</p>
                     </div>
                   )}
                 </div>

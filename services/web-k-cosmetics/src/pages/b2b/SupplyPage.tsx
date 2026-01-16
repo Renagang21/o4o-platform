@@ -24,6 +24,8 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+
 interface Supplier {
   id: string;
   name: string;
@@ -46,73 +48,6 @@ interface SupplyProduct {
   inStock: boolean;
 }
 
-// Mock data
-const mockSuppliers: Supplier[] = [
-  {
-    id: '1',
-    name: 'K-Beauty Distribution',
-    category: '스킨케어 / 메이크업',
-    rating: 4.8,
-    productCount: 150,
-    verified: true,
-    leadTime: '2-3일',
-    minOrder: '₩500,000',
-  },
-  {
-    id: '2',
-    name: 'Cosmetics Korea Co.',
-    category: '스킨케어',
-    rating: 4.6,
-    productCount: 80,
-    verified: true,
-    leadTime: '3-5일',
-    minOrder: '₩300,000',
-  },
-  {
-    id: '3',
-    name: 'Beauty Plus Trading',
-    category: '메이크업 / 헤어케어',
-    rating: 4.5,
-    productCount: 200,
-    verified: false,
-    leadTime: '5-7일',
-    minOrder: '₩200,000',
-  },
-];
-
-const mockProducts: SupplyProduct[] = [
-  {
-    id: '1',
-    name: 'Advanced Snail 96 Mucin Power Essence',
-    brand: 'COSRX',
-    supplier: 'K-Beauty Distribution',
-    wholesalePrice: 15000,
-    retailPrice: 25000,
-    moq: 10,
-    inStock: true,
-  },
-  {
-    id: '2',
-    name: 'Green Tea Seed Serum',
-    brand: 'Innisfree',
-    supplier: 'Cosmetics Korea Co.',
-    wholesalePrice: 20000,
-    retailPrice: 32000,
-    moq: 20,
-    inStock: true,
-  },
-  {
-    id: '3',
-    name: 'Water Sleeping Mask',
-    brand: 'Laneige',
-    supplier: 'K-Beauty Distribution',
-    wholesalePrice: 25000,
-    retailPrice: 38000,
-    moq: 15,
-    inStock: false,
-  },
-];
-
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(price);
 }
@@ -128,13 +63,47 @@ export default function SupplyPage() {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setSuppliers(mockSuppliers);
-      setProducts(mockProducts);
-      setIsLoading(false);
+      try {
+        if (activeTab === 'suppliers') {
+          const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/suppliers`, {
+            credentials: 'include',
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setSuppliers(data.data || []);
+          } else {
+            setSuppliers([]);
+          }
+        } else {
+          const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/supply/products`, {
+            credentials: 'include',
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setProducts(data.data || []);
+          } else {
+            setProducts([]);
+          }
+        }
+      } catch {
+        setSuppliers([]);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
-  }, []);
+  }, [activeTab]);
+
+  const filteredSuppliers = suppliers.filter(s =>
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.brand.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (!isAuthenticated) {
     return (
@@ -219,118 +188,132 @@ export default function SupplyPage() {
           </div>
         ) : activeTab === 'suppliers' ? (
           /* Suppliers List */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {suppliers.map((supplier) => (
-              <div
-                key={supplier.id}
-                className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-slate-500" />
+          filteredSuppliers.length === 0 ? (
+            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+              <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500">자료가 없습니다</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredSuppliers.map((supplier) => (
+                <div
+                  key={supplier.id}
+                  className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                      <Building2 className="w-6 h-6 text-slate-500" />
+                    </div>
+                    {supplier.verified && (
+                      <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        <CheckCircle className="w-3 h-3" />
+                        인증됨
+                      </span>
+                    )}
                   </div>
-                  {supplier.verified && (
-                    <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                      <CheckCircle className="w-3 h-3" />
-                      인증됨
+                  <h3 className="font-semibold text-slate-800 mb-1">{supplier.name}</h3>
+                  <p className="text-sm text-slate-500 mb-3">{supplier.category}</p>
+
+                  <div className="flex items-center gap-4 text-sm text-slate-600 mb-4">
+                    <span className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                      {supplier.rating}
                     </span>
-                  )}
-                </div>
-                <h3 className="font-semibold text-slate-800 mb-1">{supplier.name}</h3>
-                <p className="text-sm text-slate-500 mb-3">{supplier.category}</p>
+                    <span className="flex items-center gap-1">
+                      <Package className="w-4 h-4 text-slate-400" />
+                      {supplier.productCount}개
+                    </span>
+                  </div>
 
-                <div className="flex items-center gap-4 text-sm text-slate-600 mb-4">
-                  <span className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                    {supplier.rating}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Package className="w-4 h-4 text-slate-400" />
-                    {supplier.productCount}개
-                  </span>
-                </div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      리드타임: {supplier.leadTime}
+                    </span>
+                    <span>최소주문: {supplier.minOrder}</span>
+                  </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    리드타임: {supplier.leadTime}
-                  </span>
-                  <span>최소주문: {supplier.minOrder}</span>
+                  <button className="w-full mt-4 flex items-center justify-center gap-2 py-2 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+                    상품 보기
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-
-                <button className="w-full mt-4 flex items-center justify-center gap-2 py-2 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition-colors">
-                  상품 보기
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )
         ) : (
           /* Products Catalog */
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    상품
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    공급자
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    도매가
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    소비자가
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    MOQ
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    재고
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    작업
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="font-medium text-slate-800">{product.name}</p>
-                        <p className="text-sm text-slate-500">{product.brand}</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 text-sm">{product.supplier}</td>
-                    <td className="px-6 py-4 text-slate-800 font-medium">{formatPrice(product.wholesalePrice)}</td>
-                    <td className="px-6 py-4 text-slate-500">{formatPrice(product.retailPrice)}</td>
-                    <td className="px-6 py-4 text-slate-600">{product.moq}개</td>
-                    <td className="px-6 py-4">
-                      {product.inStock ? (
-                        <span className="text-green-600 font-medium">재고있음</span>
-                      ) : (
-                        <span className="text-red-500">품절</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        disabled={!product.inStock}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                          product.inStock
-                            ? 'bg-pink-600 text-white hover:bg-pink-700'
-                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        }`}
-                      >
-                        발주하기
-                      </button>
-                    </td>
+          filteredProducts.length === 0 ? (
+            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+              <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500">자료가 없습니다</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      상품
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      공급자
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      도매가
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      소비자가
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      MOQ
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      재고
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      작업
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-medium text-slate-800">{product.name}</p>
+                          <p className="text-sm text-slate-500">{product.brand}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 text-sm">{product.supplier}</td>
+                      <td className="px-6 py-4 text-slate-800 font-medium">{formatPrice(product.wholesalePrice)}</td>
+                      <td className="px-6 py-4 text-slate-500">{formatPrice(product.retailPrice)}</td>
+                      <td className="px-6 py-4 text-slate-600">{product.moq}개</td>
+                      <td className="px-6 py-4">
+                        {product.inStock ? (
+                          <span className="text-green-600 font-medium">재고있음</span>
+                        ) : (
+                          <span className="text-red-500">품절</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          disabled={!product.inStock}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                            product.inStock
+                              ? 'bg-pink-600 text-white hover:bg-pink-700'
+                              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                          }`}
+                        >
+                          발주하기
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         )}
 
         {/* Notice */}
