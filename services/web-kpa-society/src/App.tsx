@@ -33,6 +33,9 @@ import { BranchAdminRoutes } from './routes/BranchAdminRoutes';
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
 
+// Operator Routes (서비스 운영자)
+import { OperatorRoutes } from './routes/OperatorRoutes';
+
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
 
@@ -73,6 +76,9 @@ function App() {
 
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/admin/*" element={<AdminRoutes />} />
+
+          {/* Operator Routes (서비스 운영자 - 별도 레이아웃) */}
+          <Route path="/operator/*" element={<OperatorRoutes />} />
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/intranet/*" element={<IntranetRoutes />} />

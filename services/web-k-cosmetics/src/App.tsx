@@ -55,6 +55,7 @@ import OperatorMarketingPage from '@/pages/operator/MarketingPage';
 import OperatorUsersPage from '@/pages/operator/UsersPage';
 import OperatorSupportPage from '@/pages/operator/SupportPage';
 import OperatorSettingsPage from '@/pages/operator/SettingsPage';
+import OperatorAiReportPage from '@/pages/operator/AiReportPage';
 
 // Protected Route Component - triggers auth check only when entering
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -175,6 +176,8 @@ function AppRoutes() {
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="support" element={<OperatorSupportPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
+        {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
+        <Route path="ai-report" element={<OperatorAiReportPage />} />
       </Route>
 
       {/* 404 */}

@@ -63,7 +63,11 @@ import AiBusinessPackPage from './pages/admin/AiBusinessPackPage';
 import AiOperationsPage from './pages/admin/AiOperationsPage';
 
 // AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1)
-import { AiAdminDashboardPage, AiEnginesPage, AiPolicyPage } from './pages/admin/ai';
+// AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1)
+import { AiAdminDashboardPage, AiEnginesPage, AiPolicyPage, AssetQualityPage } from './pages/admin/ai';
+
+// Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1)
+import { OperatorDashboard, OperatorAiReportPage } from './pages/operator';
 
 // Test Guide Pages
 import {
@@ -154,9 +158,15 @@ function App() {
           <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
 
           {/* AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1) */}
+          {/* AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1) */}
           <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
           <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
           <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
+          <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
+
+          {/* Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
+          <Route path="/operator" element={<OperatorDashboard />} />
+          <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

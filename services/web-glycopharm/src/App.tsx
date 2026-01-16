@@ -61,6 +61,7 @@ import StoreApprovalDetailPage from '@/pages/operator/StoreApprovalDetailPage';
 import { StoreTemplateManagerPage } from '@/pages/operator/store-template';
 import UsersPage from '@/pages/operator/UsersPage';
 import SettingsPage from '@/pages/operator/SettingsPage';
+import AiReportPage from '@/pages/operator/AiReportPage';
 
 // Operator Semi-Franchise Pages
 import PharmaciesPage from '@/pages/operator/PharmaciesPage';
@@ -266,6 +267,8 @@ function AppRoutes() {
         <Route path="users" element={<UsersPage />} />
         <Route path="support" element={<SupportPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
+        <Route path="ai-report" element={<AiReportPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}

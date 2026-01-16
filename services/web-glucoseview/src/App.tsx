@@ -15,6 +15,7 @@ import ApplyPage from './pages/apply/ApplyPage';
 import MyApplicationsPage from './pages/apply/MyApplicationsPage';
 import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
+import OperatorAiReportPage from './pages/operator/AiReportPage';
 import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
 
 // Partner Dashboard
@@ -119,6 +120,8 @@ function AppRoutes() {
       {/* 운영자 페이지 (Phase C-4) */}
       <Route path="/operator/glucoseview/applications" element={<OperatorApplicationsPage />} />
       <Route path="/operator/glucoseview/applications/:id" element={<OperatorApplicationDetailPage />} />
+      {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
+      <Route path="/operator/glucoseview/ai-report" element={<OperatorAiReportPage />} />
 
       {/* Test Guide */}
       <Route path="/test-guide" element={<TestGuidePage />} />
