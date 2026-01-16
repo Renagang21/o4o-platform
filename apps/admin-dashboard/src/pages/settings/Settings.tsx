@@ -1,50 +1,12 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Mail, BookOpen, Key, MessageSquare, Shield, Link as LinkIcon, Edit, Package, Lock, Code, Bot } from 'lucide-react'
-import GeneralSettings from './GeneralSettings'
-import ReadingSettings from './ReadingSettings'
+import { Key, Package, Bot } from 'lucide-react'
 import OAuthSettings from './OAuthSettings'
-import AuthSettings from './AuthSettings'
-import EmailSettings from './EmailSettings'
-import PermalinkSettings from './PermalinkSettings'
-import WritingSettings from './WritingSettings'
-import PrivacySettings from './PrivacySettings'
 import AppServices from './AppServices'
-import CustomCSSSettings from './CustomCSSSettings'
 import AiQuerySettings from './AiQuerySettings'
 
-const UserSettings: FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-wp-text-secondary">
-        <p>사용자 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
-
-
-const IntegrationSettings: FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-wp-text-secondary">
-        <p>연동 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
-
 const settingsTabs = [
-  { id: 'general', label: '일반', icon: <SettingsIcon className="w-4 h-4" />, path: '/settings' },
-  { id: 'writing', label: '쓰기', icon: <Edit className="w-4 h-4" />, path: '/settings/writing' },
-  { id: 'reading', label: '읽기', icon: <BookOpen className="w-4 h-4" />, path: '/settings/reading' },
-  { id: 'permalink', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: '/settings/permalink' },
-  { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: '/settings/discussion' },
-  { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: '/settings/privacy' },
-  { id: 'auth', label: '인증', icon: <Lock className="w-4 h-4" />, path: '/settings/auth' },
-  { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
-  { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
-  { id: 'custom-css', label: 'Custom CSS', icon: <Code className="w-4 h-4" />, path: '/settings/custom-css' },
+  { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings' },
   { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' },
   { id: 'ai-query', label: 'AI Query', icon: <Bot className="w-4 h-4" />, path: '/settings/ai-query' }
 ]
@@ -86,19 +48,9 @@ const Settings: FC = () => {
 
       {/* Settings Content */}
       <Routes>
-        <Route index element={<GeneralSettings />} />
-        <Route path="writing" element={<WritingSettings />} />
-        <Route path="reading" element={<ReadingSettings />} />
-        <Route path="permalink" element={<PermalinkSettings />} />
-        <Route path="privacy" element={<PrivacySettings />} />
-        <Route path="auth" element={<AuthSettings />} />
-        <Route path="oauth" element={<OAuthSettings />} />
-        <Route path="users" element={<UserSettings />} />
-        <Route path="email" element={<EmailSettings />} />
-        <Route path="custom-css" element={<CustomCSSSettings />} />
+        <Route index element={<OAuthSettings />} />
         <Route path="app-services" element={<AppServices />} />
         <Route path="ai-query" element={<AiQuerySettings />} />
-        <Route path="integrations" element={<IntegrationSettings />} />
         <Route path="*" element={<Navigate to="" replace />} />
       </Routes>
     </div>
