@@ -9,6 +9,10 @@ import { AttendanceController } from '../controllers/AttendanceController.js';
 // Phase 1 Refoundation: Quiz/Survey Core
 import { QuizController } from '../controllers/QuizController.js';
 import { SurveyController } from '../controllers/SurveyController.js';
+// Phase 2 Refoundation: Marketing Campaign Controllers
+import { ProductContentController } from '../controllers/ProductContentController.js';
+import { QuizCampaignController } from '../controllers/QuizCampaignController.js';
+import { SurveyCampaignController } from '../controllers/SurveyCampaignController.js';
 import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
@@ -325,5 +329,119 @@ router.get('/surveys/bundle/:bundleId', requireAuth, asyncHandler(SurveyControll
 
 // GET /api/v1/lms/surveys/:id/responses/check - Check if User Responded (Frontend Compatibility)
 router.get('/surveys/:id/responses/check', requireAuth, asyncHandler(SurveyController.checkUserResponse));
+
+// ========================================
+// MARKETING: PRODUCT CONTENT ROUTES (Phase 2 Refoundation)
+// ========================================
+
+// POST /api/v1/lms/marketing/products - Create ProductContent
+router.post('/marketing/products', requireAuth, asyncHandler(ProductContentController.createProductContent));
+
+// GET /api/v1/lms/marketing/products - List ProductContents
+router.get('/marketing/products', requireAuth, asyncHandler(ProductContentController.listProductContents));
+
+// GET /api/v1/lms/marketing/products/published - Get Published ProductContents
+router.get('/marketing/products/published', requireAuth, asyncHandler(ProductContentController.findPublished));
+
+// GET /api/v1/lms/marketing/products/supplier/:supplierId - Get ProductContents by Supplier
+router.get('/marketing/products/supplier/:supplierId', requireAuth, asyncHandler(ProductContentController.findBySupplier));
+
+// GET /api/v1/lms/marketing/products/:id - Get ProductContent by ID
+router.get('/marketing/products/:id', requireAuth, asyncHandler(ProductContentController.getProductContent));
+
+// PATCH /api/v1/lms/marketing/products/:id - Update ProductContent
+router.patch('/marketing/products/:id', requireAuth, asyncHandler(ProductContentController.updateProductContent));
+
+// DELETE /api/v1/lms/marketing/products/:id - Delete ProductContent
+router.delete('/marketing/products/:id', requireAuth, asyncHandler(ProductContentController.deleteProductContent));
+
+// POST /api/v1/lms/marketing/products/:id/publish - Publish ProductContent
+router.post('/marketing/products/:id/publish', requireAuth, asyncHandler(ProductContentController.publishProductContent));
+
+// POST /api/v1/lms/marketing/products/:id/pause - Pause ProductContent
+router.post('/marketing/products/:id/pause', requireAuth, asyncHandler(ProductContentController.pauseProductContent));
+
+// POST /api/v1/lms/marketing/products/:id/archive - Archive ProductContent
+router.post('/marketing/products/:id/archive', requireAuth, asyncHandler(ProductContentController.archiveProductContent));
+
+// ========================================
+// MARKETING: QUIZ CAMPAIGN ROUTES (Phase 2 Refoundation)
+// ========================================
+
+// POST /api/v1/lms/marketing/quiz-campaigns - Create QuizCampaign
+router.post('/marketing/quiz-campaigns', requireAuth, asyncHandler(QuizCampaignController.createCampaign));
+
+// GET /api/v1/lms/marketing/quiz-campaigns - List QuizCampaigns
+router.get('/marketing/quiz-campaigns', requireAuth, asyncHandler(QuizCampaignController.listCampaigns));
+
+// GET /api/v1/lms/marketing/quiz-campaigns/active - Get Active QuizCampaigns
+router.get('/marketing/quiz-campaigns/active', requireAuth, asyncHandler(QuizCampaignController.findActiveCampaigns));
+
+// GET /api/v1/lms/marketing/quiz-campaigns/:id - Get QuizCampaign by ID
+router.get('/marketing/quiz-campaigns/:id', requireAuth, asyncHandler(QuizCampaignController.getCampaign));
+
+// PATCH /api/v1/lms/marketing/quiz-campaigns/:id - Update QuizCampaign
+router.patch('/marketing/quiz-campaigns/:id', requireAuth, asyncHandler(QuizCampaignController.updateCampaign));
+
+// DELETE /api/v1/lms/marketing/quiz-campaigns/:id - Delete QuizCampaign
+router.delete('/marketing/quiz-campaigns/:id', requireAuth, asyncHandler(QuizCampaignController.deleteCampaign));
+
+// POST /api/v1/lms/marketing/quiz-campaigns/:id/activate - Activate QuizCampaign
+router.post('/marketing/quiz-campaigns/:id/activate', requireAuth, asyncHandler(QuizCampaignController.activateCampaign));
+
+// POST /api/v1/lms/marketing/quiz-campaigns/:id/pause - Pause QuizCampaign
+router.post('/marketing/quiz-campaigns/:id/pause', requireAuth, asyncHandler(QuizCampaignController.pauseCampaign));
+
+// POST /api/v1/lms/marketing/quiz-campaigns/:id/complete - Complete QuizCampaign
+router.post('/marketing/quiz-campaigns/:id/complete', requireAuth, asyncHandler(QuizCampaignController.completeCampaign));
+
+// POST /api/v1/lms/marketing/quiz-campaigns/:id/archive - Archive QuizCampaign
+router.post('/marketing/quiz-campaigns/:id/archive', requireAuth, asyncHandler(QuizCampaignController.archiveCampaign));
+
+// POST /api/v1/lms/marketing/quiz-campaigns/:id/participation - Record Participation
+router.post('/marketing/quiz-campaigns/:id/participation', requireAuth, asyncHandler(QuizCampaignController.recordParticipation));
+
+// POST /api/v1/lms/marketing/quiz-campaigns/:id/completion - Record Completion
+router.post('/marketing/quiz-campaigns/:id/completion', requireAuth, asyncHandler(QuizCampaignController.recordCompletion));
+
+// ========================================
+// MARKETING: SURVEY CAMPAIGN ROUTES (Phase 2 Refoundation)
+// ========================================
+
+// POST /api/v1/lms/marketing/survey-campaigns - Create SurveyCampaign
+router.post('/marketing/survey-campaigns', requireAuth, asyncHandler(SurveyCampaignController.createCampaign));
+
+// GET /api/v1/lms/marketing/survey-campaigns - List SurveyCampaigns
+router.get('/marketing/survey-campaigns', requireAuth, asyncHandler(SurveyCampaignController.listCampaigns));
+
+// GET /api/v1/lms/marketing/survey-campaigns/active - Get Active SurveyCampaigns
+router.get('/marketing/survey-campaigns/active', requireAuth, asyncHandler(SurveyCampaignController.findActiveCampaigns));
+
+// GET /api/v1/lms/marketing/survey-campaigns/:id - Get SurveyCampaign by ID
+router.get('/marketing/survey-campaigns/:id', requireAuth, asyncHandler(SurveyCampaignController.getCampaign));
+
+// PATCH /api/v1/lms/marketing/survey-campaigns/:id - Update SurveyCampaign
+router.patch('/marketing/survey-campaigns/:id', requireAuth, asyncHandler(SurveyCampaignController.updateCampaign));
+
+// DELETE /api/v1/lms/marketing/survey-campaigns/:id - Delete SurveyCampaign
+router.delete('/marketing/survey-campaigns/:id', requireAuth, asyncHandler(SurveyCampaignController.deleteCampaign));
+
+// POST /api/v1/lms/marketing/survey-campaigns/:id/activate - Activate SurveyCampaign
+router.post('/marketing/survey-campaigns/:id/activate', requireAuth, asyncHandler(SurveyCampaignController.activateCampaign));
+
+// POST /api/v1/lms/marketing/survey-campaigns/:id/pause - Pause SurveyCampaign
+router.post('/marketing/survey-campaigns/:id/pause', requireAuth, asyncHandler(SurveyCampaignController.pauseCampaign));
+
+// POST /api/v1/lms/marketing/survey-campaigns/:id/complete - Complete SurveyCampaign
+router.post('/marketing/survey-campaigns/:id/complete', requireAuth, asyncHandler(SurveyCampaignController.completeCampaign));
+
+// POST /api/v1/lms/marketing/survey-campaigns/:id/archive - Archive SurveyCampaign
+router.post('/marketing/survey-campaigns/:id/archive', requireAuth, asyncHandler(SurveyCampaignController.archiveCampaign));
+
+// POST /api/v1/lms/marketing/survey-campaigns/:id/response - Record Response
+router.post('/marketing/survey-campaigns/:id/response', requireAuth, asyncHandler(SurveyCampaignController.recordResponse));
+
+// POST /api/v1/lms/marketing/survey-campaigns/:id/completed - Record Completed
+router.post('/marketing/survey-campaigns/:id/completed', requireAuth, asyncHandler(SurveyCampaignController.recordCompleted));
 
 export default router;
