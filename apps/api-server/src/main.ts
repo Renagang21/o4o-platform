@@ -464,6 +464,9 @@ import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/drops
 // CMS Content Routes (WO-P2-IMPLEMENT-CONTENT)
 import { createCmsContentRoutes } from './routes/cms-content/cms-content.routes.js';
 
+// Signage Routes (Phase 2 Production Build - Sprint 2-2)
+import { createSignageRoutes } from './routes/signage/index.js';
+
 // Channel Routes (WO-P4-CHANNEL-IMPLEMENT-P0)
 import { createChannelRoutes } from './routes/channels/channels.routes.js';
 
@@ -841,6 +844,15 @@ const startServer = async () => {
       logger.info('✅ Channel routes registered at /api/v1/channels');
     } catch (channelError) {
       logger.error('Failed to register Channel routes:', channelError);
+    }
+
+    // 33-b. Register Signage routes (Phase 2 Production Build - Sprint 2-2)
+    try {
+      const signageRoutes = createSignageRoutes(AppDataSource);
+      app.use('/api/signage/:serviceKey', signageRoutes);
+      logger.info('✅ Signage routes registered at /api/signage/:serviceKey');
+    } catch (signageError) {
+      logger.error('Failed to register Signage routes:', signageError);
     }
 
     // 34. Register Admin Channel Playback Logs routes (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
