@@ -659,6 +659,9 @@ importers:
       '@o4o-apps/cms-core':
         specifier: workspace:*
         version: link:../../packages/cms-core
+      '@o4o-apps/digital-signage-core':
+        specifier: workspace:*
+        version: link:../../packages/digital-signage-core
       '@o4o-apps/forum-yaksa':
         specifier: workspace:*
         version: link:../../packages/forum-yaksa

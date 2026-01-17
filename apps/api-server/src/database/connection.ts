@@ -213,6 +213,14 @@ import {
 } from '@o4o-apps/cms-core/entities';
 
 // ============================================================================
+// DIGITAL-SIGNAGE-CORE ENTITIES (Phase 2: Production Build)
+// Use /entities subpath for TypeORM entity imports
+// ============================================================================
+import {
+  SignageCoreEntities,
+} from '@o4o-apps/digital-signage-core/entities';
+
+// ============================================================================
 // LMS-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
 // Use /entities subpath to avoid side-effect loading
 // ============================================================================
@@ -486,6 +494,10 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CmsContent,
     CmsContentSlot,
+    // ============================================================================
+    // DIGITAL-SIGNAGE-CORE ENTITIES (Phase 2: Production Build)
+    // ============================================================================
+    ...SignageCoreEntities,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
