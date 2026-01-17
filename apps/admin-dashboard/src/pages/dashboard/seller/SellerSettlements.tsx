@@ -78,11 +78,12 @@ export default function SellerSettlements() {
       const response = await authClient.api.get<SettlementsResponse>(
         `/v1/seller/settlements?${params.toString()}`
       );
+      const responseData = response.data;
 
-      if (response.success && response.settlements) {
-        setSettlements(response.settlements);
-        setTotalPages(response.totalPages);
-        setTotal(response.total);
+      if (responseData.success && responseData.settlements) {
+        setSettlements(responseData.settlements);
+        setTotalPages(responseData.totalPages);
+        setTotal(responseData.total);
       }
     } catch (error) {
       console.error('Failed to fetch settlements:', error);
@@ -110,12 +111,13 @@ export default function SellerSettlements() {
         periodEnd: periodEnd.toISOString(),
       });
 
-      const response = await authClient.api.get<{ success: boolean; preview: SettlementPreview }>(
+      const previewResponse = await authClient.api.get<{ success: boolean; preview: SettlementPreview }>(
         `/v1/seller/settlements/preview?${params.toString()}`
       );
+      const previewData = previewResponse.data;
 
-      if (response.success && response.preview) {
-        setPreview(response.preview);
+      if (previewData.success && previewData.preview) {
+        setPreview(previewData.preview);
       }
     } catch (error) {
       console.error('Failed to fetch settlement preview:', error);

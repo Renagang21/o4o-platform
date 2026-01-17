@@ -1,19 +1,23 @@
 /**
- * Digital Signage Router
+ * Digital Signage Admin Router
  *
- * Admin Dashboard router for Digital Signage Core management UI
+ * Admin Dashboard router for Digital Signage system management
  *
- * Route Structure (R-1 Refinement):
- * - / (root): System Dashboard (Admin)
- * - /operations/*: Operations monitoring (Admin)
- * - /templates/*: Global template management (Admin)
- * - /layout-presets/*: Layout preset management (Admin)
- * - /content-blocks/*: Content block library (Admin)
- * - /settings/*: System settings (Admin)
- * - /analytics/*: Analytics dashboard (Admin)
+ * Route Structure (Role Reform V1):
+ * - / (root): System Dashboard
+ * - /settings: System settings
+ * - /extensions: Extension app management
+ * - /suppliers: Supplier management
+ * - /analytics: System-wide analytics
+ * - /monitoring: System monitoring
+ * - /operations/*: Operations legacy (Phase 12)
  *
- * Note: Store and HQ Operator routes are in Service Frontend
- * See: SIGNAGE-ROUTING-MAP-V2.md for full route structure
+ * IMPORTANT: This router is for ADMIN ONLY.
+ * - HQ Operator routes are in Service Frontend (/signage/hq/*)
+ * - Store routes are in Service Frontend (/signage/store/*)
+ *
+ * See: ROLE-STRUCTURE-V3.md for role definitions
+ * See: SIGNAGE-ROUTING-MAP-V3.md for full route structure
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -21,7 +25,45 @@ import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AppGuard } from '@/components/common/AppGuard';
 
-// ========== Legacy Pages (Phase 6/12) ==========
+// ========== Admin System Pages ==========
+// System Dashboard / Monitoring
+const SystemDashboard = lazy(() => import('./v2/MonitoringDashboard'));
+
+// System Settings (placeholder - to be implemented)
+const SystemSettings = lazy(() =>
+  import('./admin/SystemSettings').catch(() => ({
+    default: () => <div className="p-6">System Settings - Coming Soon</div>,
+  }))
+);
+
+// Extension Management (placeholder - to be implemented)
+const ExtensionList = lazy(() =>
+  import('./admin/ExtensionList').catch(() => ({
+    default: () => <div className="p-6">Extension Management - Coming Soon</div>,
+  }))
+);
+
+// Supplier Management (placeholder - to be implemented)
+const SupplierList = lazy(() =>
+  import('./admin/SupplierList').catch(() => ({
+    default: () => <div className="p-6">Supplier Management - Coming Soon</div>,
+  }))
+);
+
+// System Analytics (placeholder - to be implemented)
+const SystemAnalytics = lazy(() =>
+  import('./admin/SystemAnalytics').catch(() => ({
+    default: () => <div className="p-6">System Analytics - Coming Soon</div>,
+  }))
+);
+
+// ========== Operations Pages (Phase 12 Legacy) ==========
+const OperationsDashboard = lazy(() => import('./operations/OperationsDashboard'));
+const ActionHistory = lazy(() => import('./operations/ActionHistory'));
+const DisplayStatusMap = lazy(() => import('./operations/DisplayStatusMap'));
+const ProblemTracking = lazy(() => import('./operations/ProblemTracking'));
+
+// ========== Legacy Phase 6 Pages (for backward compatibility) ==========
 // Media pages
 const MediaSourceList = lazy(() => import('./media/MediaSourceList'));
 const MediaSourceDetail = lazy(() => import('./media/MediaSourceDetail'));
@@ -41,44 +83,27 @@ const ScheduleDetail = lazy(() => import('./schedule/ScheduleDetail'));
 const ActionExecutionList = lazy(() => import('./action/ActionExecutionList'));
 const ActionExecutionDetail = lazy(() => import('./action/ActionExecutionDetail'));
 
-// Operations pages (Phase 12)
-const OperationsDashboard = lazy(() => import('./operations/OperationsDashboard'));
-const ActionHistory = lazy(() => import('./operations/ActionHistory'));
-const DisplayStatusMap = lazy(() => import('./operations/DisplayStatusMap'));
-const ProblemTracking = lazy(() => import('./operations/ProblemTracking'));
-
-// ========== Admin Pages (R-1: Admin-only) ==========
-// System Dashboard / Monitoring
-const V2MonitoringDashboard = lazy(() => import('./v2/MonitoringDashboard'));
-
-// Template Management (Admin)
-const V2TemplateList = lazy(() => import('./v2/TemplateList'));
-const V2TemplateBuilder = lazy(() => import('./v2/TemplateBuilder'));
-
-// Layout Preset Management (Admin)
-const V2LayoutPresetList = lazy(() => import('./v2/LayoutPresetList'));
-
-// Content Block Library (Admin)
-const V2ContentBlockLibrary = lazy(() => import('./v2/ContentBlockLibrary'));
-
-// ========== Store/HQ Preview Pages (for Admin reference) ==========
-// These are kept for admin to preview Store/HQ functionality
-// In production, these will be in Service Frontend
-const V2ChannelList = lazy(() => import('./v2/ChannelList'));
-const V2ChannelEditor = lazy(() => import('./v2/ChannelEditor'));
-const V2PlaylistList = lazy(() => import('./v2/PlaylistList'));
-const V2PlaylistEditor = lazy(() => import('./v2/PlaylistEditor'));
-const V2ScheduleCalendar = lazy(() => import('./v2/ScheduleCalendar'));
-const V2MediaLibrary = lazy(() => import('./v2/MediaLibrary'));
-
-// Sprint 2-6: Global Content Pages (Store/HQ Preview)
-const StoreSignageDashboard = lazy(() => import('./v2/store/StoreSignageDashboard'));
-const HQContentManager = lazy(() => import('./v2/hq/HQContentManager'));
-
 const PageLoader = () => (
   <div className="p-6 space-y-4">
     <Skeleton className="h-8 w-64" />
     <Skeleton className="h-64 w-full" />
+  </div>
+);
+
+/**
+ * Redirect component for removed routes
+ * Shows a message and redirects to the appropriate location
+ */
+const RemovedRouteRedirect = ({ message }: { message: string }) => (
+  <div className="p-6 space-y-4">
+    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <h3 className="font-medium text-yellow-800">Route Relocated</h3>
+      <p className="text-yellow-700 mt-1">{message}</p>
+      <p className="text-sm text-yellow-600 mt-2">
+        This route has been moved as part of Role Reform.
+        Please access it from the appropriate service frontend.
+      </p>
+    </div>
   </div>
 );
 
@@ -88,66 +113,23 @@ export default function DigitalSignageRouter() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* ========== Admin Dashboard Root ========== */}
-          {/* Default redirect to System Dashboard (Monitoring) */}
-          <Route path="/" element={<Navigate to="v2/monitoring" replace />} />
+          <Route path="/" element={<Navigate to="monitoring" replace />} />
 
-          {/* ========== Admin: System Dashboard ========== */}
-          <Route path="v2" element={<Navigate to="v2/monitoring" replace />} />
-          <Route path="v2/monitoring" element={<V2MonitoringDashboard />} />
+          {/* ========== Admin: System Management ========== */}
+          <Route path="monitoring" element={<SystemDashboard />} />
+          <Route path="settings" element={<SystemSettings />} />
+          <Route path="extensions" element={<ExtensionList />} />
+          <Route path="suppliers" element={<SupplierList />} />
+          <Route path="analytics" element={<SystemAnalytics />} />
 
-          {/* ========== Admin: Template Management ========== */}
-          <Route path="templates" element={<V2TemplateList />} />
-          <Route path="templates/new" element={<V2TemplateBuilder />} />
-          <Route path="templates/:templateId" element={<V2TemplateBuilder />} />
-          {/* Legacy v2 path redirect */}
-          <Route path="v2/templates" element={<Navigate to="/digital-signage/templates" replace />} />
-          <Route path="v2/templates/*" element={<Navigate to="/digital-signage/templates" replace />} />
-
-          {/* ========== Admin: Layout Preset Management ========== */}
-          <Route path="layout-presets" element={<V2LayoutPresetList />} />
-          {/* Legacy v2 path redirect */}
-          <Route path="v2/layout-presets" element={<Navigate to="/digital-signage/layout-presets" replace />} />
-
-          {/* ========== Admin: Content Block Library ========== */}
-          <Route path="content-blocks" element={<V2ContentBlockLibrary />} />
-          {/* Legacy v2 path redirect */}
-          <Route path="v2/content-blocks" element={<Navigate to="/digital-signage/content-blocks" replace />} />
-
-          {/* ========== Admin: Operations (Phase 12 Legacy) ========== */}
+          {/* ========== Admin: Operations (Phase 12) ========== */}
           <Route path="operations" element={<OperationsDashboard />} />
           <Route path="operations/history" element={<ActionHistory />} />
           <Route path="operations/display-status" element={<DisplayStatusMap />} />
           <Route path="operations/problems" element={<ProblemTracking />} />
 
-          {/* ========== Store/HQ Preview (Admin Reference Only) ========== */}
-          {/* These routes allow admins to preview Store/HQ functionality */}
-          {/* In production, these will be served from Service Frontend */}
-
-          {/* Store Preview */}
-          <Route path="preview/store" element={<StoreSignageDashboard />} />
-          <Route path="preview/store/playlists" element={<V2PlaylistList />} />
-          <Route path="preview/store/playlists/new" element={<V2PlaylistEditor />} />
-          <Route path="preview/store/playlists/:playlistId" element={<V2PlaylistEditor />} />
-          <Route path="preview/store/schedules" element={<V2ScheduleCalendar />} />
-          <Route path="preview/store/media" element={<V2MediaLibrary />} />
-          <Route path="preview/store/channels" element={<V2ChannelList />} />
-          <Route path="preview/store/channels/new" element={<V2ChannelEditor />} />
-          <Route path="preview/store/channels/:channelId" element={<V2ChannelEditor />} />
-
-          {/* HQ Operator Preview */}
-          <Route path="preview/hq" element={<HQContentManager />} />
-
-          {/* ========== Legacy V2 Redirects (for backward compatibility) ========== */}
-          <Route path="v2/store" element={<Navigate to="/digital-signage/preview/store" replace />} />
-          <Route path="v2/hq" element={<Navigate to="/digital-signage/preview/hq" replace />} />
-          <Route path="v2/channels" element={<Navigate to="/digital-signage/preview/store/channels" replace />} />
-          <Route path="v2/channels/*" element={<Navigate to="/digital-signage/preview/store/channels" replace />} />
-          <Route path="v2/playlists" element={<Navigate to="/digital-signage/preview/store/playlists" replace />} />
-          <Route path="v2/playlists/*" element={<Navigate to="/digital-signage/preview/store/playlists" replace />} />
-          <Route path="v2/schedules" element={<Navigate to="/digital-signage/preview/store/schedules" replace />} />
-          <Route path="v2/media" element={<Navigate to="/digital-signage/preview/store/media" replace />} />
-
           {/* ========== Legacy Phase 6 Routes ========== */}
+          {/* These routes are kept for backward compatibility */}
           {/* Media routes */}
           <Route path="media/sources" element={<MediaSourceList />} />
           <Route path="media/sources/:id" element={<MediaSourceDetail />} />
@@ -159,13 +141,83 @@ export default function DigitalSignageRouter() {
           <Route path="displays/:id" element={<DisplayDetail />} />
           <Route path="display-slots" element={<DisplaySlotList />} />
 
-          {/* Schedule routes */}
+          {/* Schedule routes (legacy) */}
           <Route path="schedules" element={<ScheduleList />} />
           <Route path="schedules/:id" element={<ScheduleDetail />} />
 
           {/* Action routes */}
           <Route path="actions" element={<ActionExecutionList />} />
           <Route path="actions/:id" element={<ActionExecutionDetail />} />
+
+          {/* ========== Removed Routes (Role Reform) ========== */}
+          {/* These routes have been moved to Service Frontend */}
+
+          {/* HQ routes → Service Frontend /signage/hq/* */}
+          <Route
+            path="preview/hq"
+            element={
+              <RemovedRouteRedirect message="HQ Content Manager has been moved to Service Frontend at /signage/hq" />
+            }
+          />
+          <Route
+            path="v2/hq"
+            element={
+              <RemovedRouteRedirect message="HQ Content Manager has been moved to Service Frontend at /signage/hq" />
+            }
+          />
+
+          {/* Store routes → Service Frontend /signage/store/* */}
+          <Route
+            path="preview/store/*"
+            element={
+              <RemovedRouteRedirect message="Store Dashboard has been moved to Service Frontend at /signage/store" />
+            }
+          />
+          <Route
+            path="v2/store"
+            element={
+              <RemovedRouteRedirect message="Store Dashboard has been moved to Service Frontend at /signage/store" />
+            }
+          />
+
+          {/* Template routes → Operator or Extension */}
+          <Route
+            path="templates/*"
+            element={
+              <RemovedRouteRedirect message="Templates are now managed by HQ Operators at /signage/hq/templates" />
+            }
+          />
+          <Route
+            path="v2/templates/*"
+            element={
+              <RemovedRouteRedirect message="Templates are now managed by HQ Operators at /signage/hq/templates" />
+            }
+          />
+
+          {/* Content blocks → Operator or Extension */}
+          <Route
+            path="content-blocks"
+            element={
+              <RemovedRouteRedirect message="Content Blocks are now managed by HQ Operators" />
+            }
+          />
+          <Route
+            path="layout-presets"
+            element={
+              <RemovedRouteRedirect message="Layout Presets are now managed by HQ Operators" />
+            }
+          />
+
+          {/* Legacy V2 redirects → Removed */}
+          <Route
+            path="v2/*"
+            element={
+              <RemovedRouteRedirect message="V2 routes have been reorganized. Please use the new navigation." />
+            }
+          />
+
+          {/* Catch-all for unknown routes */}
+          <Route path="*" element={<Navigate to="monitoring" replace />} />
         </Routes>
       </Suspense>
     </AppGuard>

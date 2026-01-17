@@ -68,11 +68,12 @@ export default function SellerCatalog() {
       const response = await authClient.api.get<CatalogResponse>(
         `/v2/seller/catalog?${params.toString()}`
       );
+      const responseData = response.data;
 
-      if (response.success && response.items) {
-        setProducts(response.items);
-        setTotalPages(response.totalPages);
-        setTotal(response.total);
+      if (responseData.success && responseData.items) {
+        setProducts(responseData.items);
+        setTotalPages(responseData.totalPages);
+        setTotal(responseData.total);
       }
     } catch (error) {
       console.error('Failed to fetch catalog:', error);
@@ -94,7 +95,7 @@ export default function SellerCatalog() {
     try {
       setImportingIds((prev) => new Set(prev).add(product.id));
 
-      const response = await authClient.api.post<{ success: boolean; data: any }>(
+      const importResponse = await authClient.api.post<{ success: boolean; data: any }>(
         '/v2/seller/catalog/import',
         {
           productId: product.id,
@@ -104,7 +105,7 @@ export default function SellerCatalog() {
         }
       );
 
-      if (response.success) {
+      if (importResponse.data.success) {
         toast({
           title: '성공',
           description: `${product.name}을(를) 성공적으로 가져왔습니다.`,

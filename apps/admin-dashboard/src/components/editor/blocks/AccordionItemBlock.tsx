@@ -67,6 +67,7 @@ const AccordionItemBlock: React.FC<AccordionItemBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="accordion-item"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

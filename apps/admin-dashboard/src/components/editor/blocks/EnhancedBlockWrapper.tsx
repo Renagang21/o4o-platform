@@ -62,6 +62,9 @@ interface EnhancedBlockWrapperProps {
 
   // Slate.js editor support
   slateEditor?: BaseEditor & ReactEditor; // Pass Slate editor for proper focus handling
+
+  // Optional label for display purposes (used by some blocks for Inspector)
+  label?: string;
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({

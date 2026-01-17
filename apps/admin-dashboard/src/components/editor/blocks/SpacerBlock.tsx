@@ -52,6 +52,7 @@ const SpacerBlock: React.FC<SpacerBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="spacer"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

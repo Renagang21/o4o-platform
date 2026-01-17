@@ -136,6 +136,7 @@ const IconFeatureListBlock: React.FC<IconFeatureListBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="icon-feature-list"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

@@ -55,11 +55,12 @@ export default function ChannelOpsDashboard() {
 
       const url = `/api/v1/admin/channels/ops${params.toString() ? `?${params}` : ''}`;
       const response = await authClient.api.get<ChannelOpsResponse>(url);
+      const responseData = response.data;
 
-      if (response.success) {
-        setData(response.data);
-        setSummary(response.summary);
-        setLastUpdated(new Date(response.checkedAt));
+      if (responseData.success) {
+        setData(responseData.data);
+        setSummary(responseData.summary);
+        setLastUpdated(new Date(responseData.checkedAt));
       } else {
         throw new Error('Failed to fetch channel operations data');
       }

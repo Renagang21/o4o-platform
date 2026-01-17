@@ -480,7 +480,15 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022367262 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022494828 -R Renagang21/o4o-platform)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022696387 -R Renagang21/o4o-platform)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022861960 -R Renagang21/o4o-platform)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run watch 21022861960 -R Renagang21/o4o-platform)",
+      "Bash(docker info:*)",
+      "Bash(start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
+      "Bash(start \"\" \"$LOCALAPPDATA\\\\Docker\\\\Docker Desktop.exe\")",
+      "Bash(docker build:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list -R Renagang21/o4o-platform --limit 5)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 21030945539 -R Renagang21/o4o-platform --log-failed)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list -R Renagang21/o4o-platform --limit 3)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 21031078868 -R Renagang21/o4o-platform --log-failed)"
     ],
     "deny": []
   }

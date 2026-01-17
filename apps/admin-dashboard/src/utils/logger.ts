@@ -19,3 +19,12 @@ export const devWarn = (...args: any[]) => {
 
 // console.error is allowed even in production for critical errors
 export const devError = console.error;
+
+// Default export for convenience
+const logger = {
+  log: devLog,
+  warn: devWarn,
+  error: devError,
+};
+
+export default logger;

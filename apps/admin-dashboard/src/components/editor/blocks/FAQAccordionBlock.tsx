@@ -119,6 +119,7 @@ const FAQAccordionBlock: React.FC<FAQAccordionBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="faq-accordion"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

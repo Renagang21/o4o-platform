@@ -119,6 +119,7 @@ const FeatureCardBlock: React.FC<FeatureCardBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="feature-card"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

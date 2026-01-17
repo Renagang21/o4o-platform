@@ -72,6 +72,7 @@ const RoleCardBlock: React.FC<RoleCardBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="role-card"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

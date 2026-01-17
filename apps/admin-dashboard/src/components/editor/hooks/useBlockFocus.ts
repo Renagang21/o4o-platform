@@ -9,8 +9,10 @@
 
 import { useEffect, RefObject } from 'react';
 import { ReactEditor } from 'slate-react';
-import { Transforms, Editor as SlateEditor } from 'slate';
-import type { BaseEditor } from 'slate';
+import { Transforms, Editor as SlateEditor, BaseEditor } from 'slate';
+
+// Extended editor type that includes ReactEditor capabilities
+type SlateReactEditor = BaseEditor & ReactEditor;
 
 export interface UseBlockFocusOptions {
   /** Block element reference */
@@ -18,7 +20,7 @@ export interface UseBlockFocusOptions {
   /** Whether block is selected */
   isSelected: boolean;
   /** Optional Slate editor instance (for Slate-based blocks) */
-  slateEditor?: BaseEditor & ReactEditor;
+  slateEditor?: SlateReactEditor;
 }
 
 /**
@@ -61,7 +63,8 @@ export function useBlockFocus({
 
           // Only move selection when the editor has no selection yet
           if (!slateEditor.selection) {
-            Transforms.select(slateEditor, SlateEditor.end(slateEditor, []));
+            // Cast to any to avoid strict type checking on editor internals
+            Transforms.select(slateEditor as any, SlateEditor.end(slateEditor as any, []));
           }
         } catch (error) {
           console.debug('Slate focus error (non-critical):', error);

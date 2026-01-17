@@ -78,11 +78,12 @@ export default function SellerOrders() {
       const response = await authClient.api.get<OrdersResponse>(
         `/v2/seller/orders?${params.toString()}`
       );
+      const responseData = response.data;
 
-      if (response.success && response.orders) {
-        setOrders(response.orders);
-        setTotalPages(response.totalPages);
-        setTotal(response.total);
+      if (responseData.success && responseData.orders) {
+        setOrders(responseData.orders);
+        setTotalPages(responseData.totalPages);
+        setTotal(responseData.total);
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);

@@ -148,9 +148,22 @@ const ForumPostDetail = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/Fo
 const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostForm'));
 
 // Yaksa Community Pages (from @o4o/forum-core-yaksa package - source imports)
-const YaksaCommunityList = lazy(() => import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityList'));
-const YaksaCommunityDetail = lazy(() => import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
-const YaksaCommunityFeed = lazy(() => import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
+// Note: Package not yet implemented, using fallback placeholders
+const YaksaCommunityList = lazy(() =>
+  import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityList').catch(() => ({
+    default: () => <div className="p-6">Yaksa Community List - Coming Soon</div>,
+  }))
+);
+const YaksaCommunityDetail = lazy(() =>
+  import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityDetail').catch(() => ({
+    default: () => <div className="p-6">Yaksa Community Detail - Coming Soon</div>,
+  }))
+);
+const YaksaCommunityFeed = lazy(() =>
+  import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityFeed').catch(() => ({
+    default: () => <div className="p-6">Yaksa Community Feed - Coming Soon</div>,
+  }))
+);
 
 // Groupbuy Pages
 const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
@@ -196,10 +209,27 @@ const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
 // CGM Pharmacist App (Phase 1 - Development)
-const CGMPatientListPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.PatientListPage })));
-const CGMPatientDetailPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.PatientDetailPage })));
-const CGMCoachingPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.CoachingPage })));
-const CGMAlertsPage = lazy(() => import('@o4o/cgm-pharmacist-app').then(m => ({ default: m.AlertsPage })));
+// Note: Package not yet implemented, using fallback placeholders
+const CGMPatientListPage = lazy(() =>
+  import('@o4o/cgm-pharmacist-app')
+    .then(m => ({ default: m.PatientListPage }))
+    .catch(() => ({ default: () => <div className="p-6">CGM Patient List - Coming Soon</div> }))
+);
+const CGMPatientDetailPage = lazy(() =>
+  import('@o4o/cgm-pharmacist-app')
+    .then(m => ({ default: m.PatientDetailPage }))
+    .catch(() => ({ default: () => <div className="p-6">CGM Patient Detail - Coming Soon</div> }))
+);
+const CGMCoachingPage = lazy(() =>
+  import('@o4o/cgm-pharmacist-app')
+    .then(m => ({ default: m.CoachingPage }))
+    .catch(() => ({ default: () => <div className="p-6">CGM Coaching - Coming Soon</div> }))
+);
+const CGMAlertsPage = lazy(() =>
+  import('@o4o/cgm-pharmacist-app')
+    .then(m => ({ default: m.AlertsPage }))
+    .catch(() => ({ default: () => <div className="p-6">CGM Alerts - Coming Soon</div> }))
+);
 
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));

@@ -11,7 +11,7 @@ export interface Column<T> {
   align?: 'left' | 'center' | 'right';
 }
 
-interface DataTableProps<T> {
+export interface DataTableProps<T> {
   columns: Column<T>[];
   dataSource: T[];
   rowKey: keyof T | ((record: T) => string);
@@ -26,6 +26,8 @@ interface DataTableProps<T> {
     onClick?: () => void;
     className?: string;
   };
+  /** Shorthand for onRow click handler */
+  onRowClick?: (record: T) => void | Promise<void>;
   rowSelection?: {
     selectedRowKeys: string[];
     onChange: (selectedRowKeys: string[]) => void;
@@ -47,6 +49,7 @@ export function DataTable<T extends Record<string, any>>({
   loading = false,
   pagination,
   onRow,
+  onRowClick,
   rowSelection,
   expandable,
   emptyText = '데이터가 없습니다',
@@ -221,12 +224,14 @@ export function DataTable<T extends Record<string, any>>({
                 const rowProps = onRow?.(record) || {};
                 const key = getRowKey(record, index);
                 const expanded = isExpanded(record, index);
+                // Support both onRow and onRowClick
+                const handleClick = rowProps.onClick || (onRowClick ? () => onRowClick(record) : undefined);
 
                 return (
                   <React.Fragment key={key}>
                     <tr
-                      onClick={rowProps.onClick}
-                      className={`hover:bg-gray-50 ${rowProps.onClick ? 'cursor-pointer' : ''} ${rowProps.className || ''
+                      onClick={handleClick}
+                      className={`hover:bg-gray-50 ${handleClick ? 'cursor-pointer' : ''} ${rowProps.className || ''
                         }`}
                     >
                       {rowSelection && (

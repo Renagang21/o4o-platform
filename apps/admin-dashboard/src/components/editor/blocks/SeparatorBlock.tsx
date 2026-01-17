@@ -74,6 +74,7 @@ const SeparatorBlock: React.FC<SeparatorBlockProps> = ({
   return (
     <EnhancedBlockWrapper
       id={id}
+      type="separator"
       onDelete={onDelete}
       onDuplicate={onDuplicate}
       onMoveUp={onMoveUp}

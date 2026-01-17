@@ -86,11 +86,12 @@ export default function SellerProducts() {
       const response = await authClient.api.get<ProductsResponse>(
         `/v2/seller/products?${params.toString()}`
       );
+      const responseData = response.data;
 
-      if (response.success && response.items) {
-        setProducts(response.items);
-        setTotalPages(response.totalPages);
-        setTotal(response.total);
+      if (responseData.success && responseData.items) {
+        setProducts(responseData.items);
+        setTotalPages(responseData.totalPages);
+        setTotal(responseData.total);
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
@@ -132,7 +133,7 @@ export default function SellerProducts() {
         }
       );
 
-      if (response.success) {
+      if (response.data.success) {
         toast({
           title: '성공',
           description: '상품 정보가 업데이트되었습니다.',
@@ -158,11 +159,11 @@ export default function SellerProducts() {
 
     try {
       setDeleting(productId);
-      const response = await authClient.api.delete<{ success: boolean }>(
+      const deleteResponse = await authClient.api.delete<{ success: boolean }>(
         `/v2/seller/products/${productId}`
       );
 
-      if (response.success) {
+      if (deleteResponse.data.success) {
         toast({
           title: '성공',
           description: '상품이 삭제되었습니다.',
