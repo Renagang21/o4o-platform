@@ -6,6 +6,9 @@ import { ProgressController } from '../controllers/ProgressController.js';
 import { CertificateController } from '../controllers/CertificateController.js';
 import { EventController } from '../controllers/EventController.js';
 import { AttendanceController } from '../controllers/AttendanceController.js';
+// Phase 1 Refoundation: Quiz/Survey Core
+import { QuizController } from '../controllers/QuizController.js';
+import { SurveyController } from '../controllers/SurveyController.js';
 import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
@@ -194,5 +197,133 @@ router.get('/attendance/:id', requireAuth, asyncHandler(AttendanceController.get
 
 // PATCH /api/v1/lms/attendance/:id - Update Attendance
 router.patch('/attendance/:id', requireAuth, asyncHandler(AttendanceController.updateAttendance));
+
+// ========================================
+// QUIZ ROUTES (Phase 1 Refoundation)
+// ========================================
+
+// POST /api/v1/lms/quizzes - Create Quiz
+router.post('/quizzes', requireAuth, asyncHandler(QuizController.createQuiz));
+
+// GET /api/v1/lms/quizzes - List Quizzes
+router.get('/quizzes', requireAuth, asyncHandler(QuizController.listQuizzes));
+
+// GET /api/v1/lms/quizzes/:id - Get Quiz by ID
+router.get('/quizzes/:id', requireAuth, asyncHandler(QuizController.getQuiz));
+
+// PATCH /api/v1/lms/quizzes/:id - Update Quiz
+router.patch('/quizzes/:id', requireAuth, asyncHandler(QuizController.updateQuiz));
+
+// DELETE /api/v1/lms/quizzes/:id - Delete Quiz
+router.delete('/quizzes/:id', requireAuth, asyncHandler(QuizController.deleteQuiz));
+
+// POST /api/v1/lms/quizzes/:id/publish - Publish Quiz
+router.post('/quizzes/:id/publish', requireAuth, asyncHandler(QuizController.publishQuiz));
+
+// POST /api/v1/lms/quizzes/:id/unpublish - Unpublish Quiz
+router.post('/quizzes/:id/unpublish', requireAuth, asyncHandler(QuizController.unpublishQuiz));
+
+// POST /api/v1/lms/quizzes/:id/questions - Add Question
+router.post('/quizzes/:id/questions', requireAuth, asyncHandler(QuizController.addQuestion));
+
+// DELETE /api/v1/lms/quizzes/:id/questions/:questionId - Remove Question
+router.delete('/quizzes/:id/questions/:questionId', requireAuth, asyncHandler(QuizController.removeQuestion));
+
+// POST /api/v1/lms/quizzes/:id/questions/reorder - Reorder Questions
+router.post('/quizzes/:id/questions/reorder', requireAuth, asyncHandler(QuizController.reorderQuestions));
+
+// POST /api/v1/lms/quizzes/:id/attempts - Start Attempt
+router.post('/quizzes/:id/attempts', requireAuth, asyncHandler(QuizController.startAttempt));
+
+// GET /api/v1/lms/quizzes/:id/attempts - Get User Attempts
+router.get('/quizzes/:id/attempts', requireAuth, asyncHandler(QuizController.getUserAttempts));
+
+// GET /api/v1/lms/quizzes/attempts/:attemptId - Get Attempt by ID
+router.get('/quizzes/attempts/:attemptId', requireAuth, asyncHandler(QuizController.getAttempt));
+
+// POST /api/v1/lms/quizzes/attempts/:attemptId/answers - Submit Answer
+router.post('/quizzes/attempts/:attemptId/answers', requireAuth, asyncHandler(QuizController.submitAnswer));
+
+// POST /api/v1/lms/quizzes/attempts/:attemptId/complete - Complete Attempt
+router.post('/quizzes/attempts/:attemptId/complete', requireAuth, asyncHandler(QuizController.completeAttempt));
+
+// GET /api/v1/lms/quizzes/:id/stats - Get Quiz Stats
+router.get('/quizzes/:id/stats', requireAuth, asyncHandler(QuizController.getQuizStats));
+
+// GET /api/v1/lms/quizzes/bundle/:bundleId - Get Quizzes by Bundle (Frontend Compatibility)
+router.get('/quizzes/bundle/:bundleId', requireAuth, asyncHandler(QuizController.getQuizzesByBundle));
+
+// GET /api/v1/lms/quizzes/:id/attempts/me - Get My Attempts (Frontend Compatibility)
+router.get('/quizzes/:id/attempts/me', requireAuth, asyncHandler(QuizController.getMyAttempts));
+
+// ========================================
+// SURVEY ROUTES (Phase 1 Refoundation)
+// ========================================
+
+// POST /api/v1/lms/surveys - Create Survey
+router.post('/surveys', requireAuth, asyncHandler(SurveyController.createSurvey));
+
+// GET /api/v1/lms/surveys - List Surveys
+router.get('/surveys', requireAuth, asyncHandler(SurveyController.listSurveys));
+
+// GET /api/v1/lms/surveys/:id - Get Survey by ID
+router.get('/surveys/:id', requireAuth, asyncHandler(SurveyController.getSurvey));
+
+// PATCH /api/v1/lms/surveys/:id - Update Survey
+router.patch('/surveys/:id', requireAuth, asyncHandler(SurveyController.updateSurvey));
+
+// DELETE /api/v1/lms/surveys/:id - Delete Survey
+router.delete('/surveys/:id', requireAuth, asyncHandler(SurveyController.deleteSurvey));
+
+// POST /api/v1/lms/surveys/:id/publish - Publish Survey
+router.post('/surveys/:id/publish', requireAuth, asyncHandler(SurveyController.publishSurvey));
+
+// POST /api/v1/lms/surveys/:id/close - Close Survey
+router.post('/surveys/:id/close', requireAuth, asyncHandler(SurveyController.closeSurvey));
+
+// POST /api/v1/lms/surveys/:id/archive - Archive Survey
+router.post('/surveys/:id/archive', requireAuth, asyncHandler(SurveyController.archiveSurvey));
+
+// GET /api/v1/lms/surveys/:id/questions - Get Questions
+router.get('/surveys/:id/questions', requireAuth, asyncHandler(SurveyController.getQuestions));
+
+// POST /api/v1/lms/surveys/:id/questions - Add Question
+router.post('/surveys/:id/questions', requireAuth, asyncHandler(SurveyController.addQuestion));
+
+// PATCH /api/v1/lms/surveys/questions/:questionId - Update Question
+router.patch('/surveys/questions/:questionId', requireAuth, asyncHandler(SurveyController.updateQuestion));
+
+// DELETE /api/v1/lms/surveys/questions/:questionId - Delete Question
+router.delete('/surveys/questions/:questionId', requireAuth, asyncHandler(SurveyController.deleteQuestion));
+
+// POST /api/v1/lms/surveys/:id/questions/reorder - Reorder Questions
+router.post('/surveys/:id/questions/reorder', requireAuth, asyncHandler(SurveyController.reorderQuestions));
+
+// POST /api/v1/lms/surveys/:id/responses - Start Response
+router.post('/surveys/:id/responses', requireAuth, asyncHandler(SurveyController.startResponse));
+
+// GET /api/v1/lms/surveys/:id/responses - Get Survey Responses
+router.get('/surveys/:id/responses', requireAuth, asyncHandler(SurveyController.getSurveyResponses));
+
+// GET /api/v1/lms/surveys/responses/:responseId - Get Response by ID
+router.get('/surveys/responses/:responseId', requireAuth, asyncHandler(SurveyController.getResponse));
+
+// POST /api/v1/lms/surveys/responses/:responseId/answers - Submit Answer
+router.post('/surveys/responses/:responseId/answers', requireAuth, asyncHandler(SurveyController.submitAnswer));
+
+// POST /api/v1/lms/surveys/responses/:responseId/complete - Complete Response
+router.post('/surveys/responses/:responseId/complete', requireAuth, asyncHandler(SurveyController.completeResponse));
+
+// GET /api/v1/lms/surveys/:id/stats - Get Survey Stats
+router.get('/surveys/:id/stats', requireAuth, asyncHandler(SurveyController.getSurveyStats));
+
+// GET /api/v1/lms/surveys/:id/question-stats - Get Question Stats
+router.get('/surveys/:id/question-stats', requireAuth, asyncHandler(SurveyController.getQuestionStats));
+
+// GET /api/v1/lms/surveys/bundle/:bundleId - Get Surveys by Bundle (Frontend Compatibility)
+router.get('/surveys/bundle/:bundleId', requireAuth, asyncHandler(SurveyController.getSurveysByBundle));
+
+// GET /api/v1/lms/surveys/:id/responses/check - Check if User Responded (Frontend Compatibility)
+router.get('/surveys/:id/responses/check', requireAuth, asyncHandler(SurveyController.checkUserResponse));
 
 export default router;

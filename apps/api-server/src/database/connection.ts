@@ -233,6 +233,13 @@ import {
   LMSEvent,
   Attendance,
   ContentBundle,
+  // Quiz Core Entities (Phase 1 Refoundation)
+  Quiz,
+  QuizAttempt,
+  // Survey Core Entities (Phase 1 Refoundation)
+  Survey,
+  SurveyQuestion,
+  SurveyResponse,
 } from '@o4o/lms-core/entities';
 
 // ============================================================================
@@ -489,6 +496,13 @@ export const AppDataSource = new DataSource({
     LMSEvent,
     Attendance,
     ContentBundle,
+    // Quiz Core Entities (Phase 1 Refoundation)
+    Quiz,
+    QuizAttempt,
+    // Survey Core Entities (Phase 1 Refoundation)
+    Survey,
+    SurveyQuestion,
+    SurveyResponse,
     // ============================================================================
     // CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
     // ============================================================================
