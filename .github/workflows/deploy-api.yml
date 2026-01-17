@@ -121,6 +121,7 @@ jobs:
         pnpm --filter '@o4o-apps/digital-signage-core' run build
         pnpm --filter '@o4o-apps/signage' run build
         pnpm --filter '@o4o-extensions/organization-forum' run build
+        pnpm --filter '@o4o/lms-marketing' run build
         pnpm --filter '@o4o/lms-yaksa' run build
         pnpm --filter '@o4o/membership-yaksa' run build
         pnpm --filter '@o4o/reporting-yaksa' run build
