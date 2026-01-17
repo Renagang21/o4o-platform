@@ -3263,6 +3263,9 @@ importers:
 
   services/web-k-cosmetics:
     dependencies:
+      lucide-react:
+        specifier: ^0.344.0
+        version: 0.344.0(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -3303,6 +3306,9 @@ importers:
 
   services/web-kpa-society:
     dependencies:
+      lucide-react:
+        specifier: ^0.344.0
+        version: 0.344.0(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -11124,6 +11130,11 @@ packages:
 
   lucide-react@0.294.0:
     resolution: {integrity: sha512-V7o0/VECSGbLHn3/1O67FUgBwWB+hmzshrgDVRJQhMh8uj5D3HBuIvhuAmQTtlupILSplwIZg5FTc4tTKMA2SA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+
+  lucide-react@0.344.0:
+    resolution: {integrity: sha512-6YyBnn91GB45VuVT96bYCOKElbJzUHqp65vX8cDcu55MQL9T969v4dhGClpljamuI/+KMO9P6w9Acq1CVQGvIQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
 
@@ -24395,6 +24406,10 @@ snapshots:
     optional: true
 
   lucide-react@0.294.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  lucide-react@0.344.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
