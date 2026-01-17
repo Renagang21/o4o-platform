@@ -243,6 +243,16 @@ import {
 } from '@o4o/lms-core/entities';
 
 // ============================================================================
+// LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
+// Core ID reference pattern - NOT entity duplication
+// ============================================================================
+import {
+  ProductContent,
+  QuizCampaign,
+  SurveyCampaign,
+} from '@o4o/lms-marketing/entities';
+
+// ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
 // ============================================================================
 // The following domain package entities remain removed:
@@ -503,6 +513,13 @@ export const AppDataSource = new DataSource({
     Survey,
     SurveyQuestion,
     SurveyResponse,
+    // ============================================================================
+    // LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
+    // Core ID reference pattern - NOT entity duplication
+    // ============================================================================
+    ProductContent,
+    QuizCampaign,
+    SurveyCampaign,
     // ============================================================================
     // CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
     // ============================================================================

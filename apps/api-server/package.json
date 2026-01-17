@@ -112,6 +112,7 @@
     "@o4o/block-renderer": "workspace:*",
     "@o4o/cpt-registry": "workspace:*",
     "@o4o/lms-core": "workspace:*",
+    "@o4o/lms-marketing": "workspace:*",
     "@o4o/lms-yaksa": "workspace:*",
     "@o4o/organization-core": "workspace:*",
     "@o4o/membership-yaksa": "workspace:*",
