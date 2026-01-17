@@ -649,3 +649,101 @@ export interface ScheduleCalendarResponseDto {
   startDate: string;
   endDate: string;
 }
+
+// ========== Sprint 2-6: Global Content DTOs ==========
+
+/**
+ * Content source types
+ * - hq: HQ operator (본부 운영자)
+ * - supplier: Supplier (공급자)
+ * - community: Community shared (커뮤니티 공유)
+ * - store: Store (개별 매장)
+ */
+export type ContentSource = 'hq' | 'supplier' | 'community' | 'store';
+
+/**
+ * Content scope types
+ * - global: Available to all stores in the service
+ * - store: Store-specific content
+ */
+export type ContentScope = 'global' | 'store';
+
+export interface GlobalContentQueryDto {
+  page?: number;
+  limit?: number;
+  source?: ContentSource;
+  mediaType?: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';
+  category?: string;
+  tags?: string[];
+  search?: string;
+  sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'likeCount' | 'downloadCount';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface GlobalPlaylistResponseDto extends PlaylistResponseDto {
+  source: ContentSource;
+  scope: ContentScope;
+  parentPlaylistId: string | null;
+}
+
+export interface GlobalMediaResponseDto extends MediaResponseDto {
+  source: ContentSource;
+  scope: ContentScope;
+  parentMediaId: string | null;
+}
+
+// ========== Clone DTOs ==========
+
+export interface ClonePlaylistDto {
+  /** New name for the cloned playlist (optional, defaults to "Copy of {originalName}") */
+  name?: string;
+  /** Target organization ID for the clone */
+  targetOrganizationId?: string;
+  /** Include items in the clone */
+  includeItems?: boolean;
+  /** Clone media as well (creates copies of media, not references) */
+  cloneMedia?: boolean;
+}
+
+export interface ClonePlaylistResponseDto {
+  /** The cloned playlist */
+  playlist: GlobalPlaylistResponseDto;
+  /** Number of items cloned */
+  itemsCloned: number;
+  /** Number of media cloned (if cloneMedia was true) */
+  mediaCloned: number;
+}
+
+export interface CloneMediaDto {
+  /** New name for the cloned media (optional, defaults to "Copy of {originalName}") */
+  name?: string;
+  /** Target organization ID for the clone */
+  targetOrganizationId?: string;
+}
+
+export interface CloneMediaResponseDto {
+  /** The cloned media */
+  media: GlobalMediaResponseDto;
+}
+
+// ========== HQ Content Creation DTOs ==========
+
+export interface CreateGlobalPlaylistDto extends CreatePlaylistDto {
+  source: ContentSource;
+  scope: ContentScope;
+}
+
+export interface CreateGlobalMediaDto extends CreateMediaDto {
+  source: ContentSource;
+  scope: ContentScope;
+}
+
+export interface UpdateGlobalPlaylistDto extends UpdatePlaylistDto {
+  source?: ContentSource;
+  scope?: ContentScope;
+}
+
+export interface UpdateGlobalMediaDto extends UpdateMediaDto {
+  source?: ContentSource;
+  scope?: ContentScope;
+}

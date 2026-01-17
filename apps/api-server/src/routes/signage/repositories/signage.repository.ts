@@ -18,6 +18,7 @@ import type {
   ContentBlockQueryDto,
   LayoutPresetQueryDto,
   ScopeFilter,
+  GlobalContentQueryDto,
 } from '../dto/index.js';
 
 /**
@@ -854,5 +855,180 @@ export class SignageRepository {
     }
 
     return { platform, organization };
+  }
+
+  // ========== Sprint 2-6: Global Content Methods ==========
+
+  /**
+   * Find global playlists (scope: 'global')
+   */
+  async findGlobalPlaylists(
+    query: GlobalContentQueryDto,
+    scope: ScopeFilter,
+  ): Promise<{ data: SignagePlaylist[]; total: number }> {
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const qb = this.playlistRepo.createQueryBuilder('playlist');
+
+    // Filter by serviceKey
+    qb.where('playlist.serviceKey = :serviceKey', { serviceKey: scope.serviceKey });
+
+    // Only global scope content
+    qb.andWhere("playlist.scope = 'global'");
+
+    // Soft delete filter
+    qb.andWhere('playlist.deletedAt IS NULL');
+
+    // Source filter (hq, supplier, community)
+    if (query.source) {
+      qb.andWhere('playlist.source = :source', { source: query.source });
+    } else {
+      // Default: exclude store content from global listing
+      qb.andWhere("playlist.source IN ('hq', 'supplier', 'community')");
+    }
+
+    // Search
+    if (query.search) {
+      qb.andWhere('(playlist.name ILIKE :search OR playlist.description ILIKE :search)', {
+        search: `%${query.search}%`,
+      });
+    }
+
+    // Category filter
+    if (query.category) {
+      qb.andWhere("playlist.metadata->>'category' = :category", { category: query.category });
+    }
+
+    // Sorting
+    const sortBy = query.sortBy || 'createdAt';
+    const sortOrder = query.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    if (sortBy === 'likeCount' || sortBy === 'downloadCount') {
+      qb.orderBy(`playlist.${sortBy}`, sortOrder);
+    } else {
+      qb.orderBy(`playlist.${sortBy}`, sortOrder);
+    }
+
+    qb.skip(skip).take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total };
+  }
+
+  /**
+   * Find global media (scope: 'global')
+   */
+  async findGlobalMedia(
+    query: GlobalContentQueryDto,
+    scope: ScopeFilter,
+  ): Promise<{ data: SignageMedia[]; total: number }> {
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const qb = this.mediaRepo.createQueryBuilder('media');
+
+    // Filter by serviceKey
+    qb.where('media.serviceKey = :serviceKey', { serviceKey: scope.serviceKey });
+
+    // Only global scope content
+    qb.andWhere("media.scope = 'global'");
+
+    // Soft delete filter
+    qb.andWhere('media.deletedAt IS NULL');
+
+    // Active status only
+    qb.andWhere('media.status = :status', { status: 'active' });
+
+    // Source filter
+    if (query.source) {
+      qb.andWhere('media.source = :source', { source: query.source });
+    } else {
+      // Default: exclude store content from global listing
+      qb.andWhere("media.source IN ('hq', 'supplier', 'community')");
+    }
+
+    // Media type filter
+    if (query.mediaType) {
+      qb.andWhere('media.mediaType = :mediaType', { mediaType: query.mediaType });
+    }
+
+    // Category filter
+    if (query.category) {
+      qb.andWhere('media.category = :category', { category: query.category });
+    }
+
+    // Tags filter
+    if (query.tags && query.tags.length > 0) {
+      qb.andWhere('media.tags && :tags', { tags: query.tags });
+    }
+
+    // Search
+    if (query.search) {
+      qb.andWhere('(media.name ILIKE :search OR media.description ILIKE :search)', {
+        search: `%${query.search}%`,
+      });
+    }
+
+    // Sorting
+    const sortBy = query.sortBy || 'createdAt';
+    const sortOrder = query.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    qb.orderBy(`media.${sortBy}`, sortOrder);
+
+    qb.skip(skip).take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total };
+  }
+
+  /**
+   * Find playlist by ID without organization scope (for global content)
+   */
+  async findPlaylistByIdGlobal(id: string, serviceKey: string): Promise<SignagePlaylist | null> {
+    return this.playlistRepo.findOne({
+      where: {
+        id,
+        serviceKey,
+      },
+      relations: ['items', 'items.media'],
+    });
+  }
+
+  /**
+   * Find media by ID without organization scope (for global content)
+   */
+  async findMediaByIdGlobal(id: string, serviceKey: string): Promise<SignageMedia | null> {
+    return this.mediaRepo.findOne({
+      where: {
+        id,
+        serviceKey,
+      },
+    });
+  }
+
+  /**
+   * Increment download count for a playlist
+   */
+  async incrementPlaylistDownloadCount(playlistId: string): Promise<void> {
+    await this.playlistRepo
+      .createQueryBuilder()
+      .update(SignagePlaylist)
+      .set({ downloadCount: () => '"downloadCount" + 1' })
+      .where('id = :id', { id: playlistId })
+      .execute();
+  }
+
+  /**
+   * Increment like count for a playlist
+   */
+  async incrementPlaylistLikeCount(playlistId: string): Promise<void> {
+    await this.playlistRepo
+      .createQueryBuilder()
+      .update(SignagePlaylist)
+      .set({ likeCount: () => '"likeCount" + 1' })
+      .where('id = :id', { id: playlistId })
+      .execute();
   }
 }

@@ -77,6 +77,43 @@ export class SignagePlaylist {
   @Column({ type: 'int', default: 0 })
   itemCount!: number;
 
+  // ========== Global Content (Sprint 2-6) ==========
+  /**
+   * Content source - who created this playlist
+   * - hq: HQ operator (본부 운영자)
+   * - supplier: Supplier (공급자)
+   * - community: Community shared (커뮤니티 공유)
+   * - store: Store (개별 매장)
+   */
+  @Column({
+    type: 'varchar',
+    length: 20,
+    default: 'store',
+  })
+  @Index()
+  source!: 'hq' | 'supplier' | 'community' | 'store';
+
+  /**
+   * Content scope - visibility/distribution level
+   * - global: Available to all stores in the service
+   * - store: Store-specific content
+   */
+  @Column({
+    type: 'varchar',
+    length: 20,
+    default: 'store',
+  })
+  @Index()
+  scope!: 'global' | 'store';
+
+  /**
+   * Parent playlist ID - for cloned content tracking
+   * Links to the original playlist when cloned from global content
+   */
+  @Column({ type: 'uuid', nullable: true })
+  @Index()
+  parentPlaylistId!: string | null;
+
   // ========== Social Features ==========
   @Column({ type: 'boolean', default: false })
   isPublic!: boolean;

@@ -59,6 +59,20 @@ import type {
   TemplatePreviewResponseDto,
   PresignedUploadRequestDto,
   PresignedUploadResponseDto,
+  // Sprint 2-6 DTOs
+  GlobalContentQueryDto,
+  GlobalPlaylistResponseDto,
+  GlobalMediaResponseDto,
+  CreateGlobalPlaylistDto,
+  CreateGlobalMediaDto,
+  UpdateGlobalPlaylistDto,
+  UpdateGlobalMediaDto,
+  ClonePlaylistDto,
+  ClonePlaylistResponseDto,
+  CloneMediaDto,
+  CloneMediaResponseDto,
+  ContentSource,
+  ContentScope,
 } from '../dto/index.js';
 
 /**
@@ -1100,6 +1114,326 @@ export class SignageService {
       sortOrder: preset.sortOrder,
       createdAt: preset.createdAt?.toISOString(),
       updatedAt: preset.updatedAt?.toISOString(),
+    };
+  }
+
+  // ========== Sprint 2-6: Global Content Methods ==========
+
+  /**
+   * Get global playlists (HQ, Supplier, Community)
+   * Only returns playlists with scope: 'global'
+   */
+  async getGlobalPlaylists(
+    query: GlobalContentQueryDto,
+    scope: ScopeFilter,
+  ): Promise<PaginatedResponse<GlobalPlaylistResponseDto>> {
+    const { data, total } = await this.repository.findGlobalPlaylists(query, scope);
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: data.map(p => this.toGlobalPlaylistResponse(p)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  /**
+   * Get global media
+   */
+  async getGlobalMedia(
+    query: GlobalContentQueryDto,
+    scope: ScopeFilter,
+  ): Promise<PaginatedResponse<GlobalMediaResponseDto>> {
+    const { data, total } = await this.repository.findGlobalMedia(query, scope);
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: data.map(m => this.toGlobalMediaResponse(m)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  /**
+   * Create global playlist (HQ content)
+   */
+  async createGlobalPlaylist(
+    dto: CreateGlobalPlaylistDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<GlobalPlaylistResponseDto> {
+    const playlist = await this.repository.createPlaylist({
+      ...dto,
+      serviceKey: scope.serviceKey,
+      organizationId: null, // Global content has no organization
+      createdByUserId: userId || null,
+      itemCount: 0,
+      totalDuration: 0,
+      likeCount: 0,
+      downloadCount: 0,
+      source: dto.source,
+      scope: dto.scope,
+      parentPlaylistId: null,
+    });
+    return this.toGlobalPlaylistResponse(playlist);
+  }
+
+  /**
+   * Create global media (HQ content)
+   */
+  async createGlobalMedia(
+    dto: CreateGlobalMediaDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<GlobalMediaResponseDto> {
+    const media = await this.repository.createMedia({
+      ...dto,
+      serviceKey: scope.serviceKey,
+      organizationId: null, // Global content has no organization
+      createdByUserId: userId || null,
+      status: 'active',
+      source: dto.source,
+      scope: dto.scope,
+      parentMediaId: null,
+    });
+    return this.toGlobalMediaResponse(media);
+  }
+
+  /**
+   * Update global playlist
+   */
+  async updateGlobalPlaylist(
+    id: string,
+    dto: UpdateGlobalPlaylistDto,
+    scope: ScopeFilter,
+  ): Promise<GlobalPlaylistResponseDto | null> {
+    // For global content, we don't filter by organizationId
+    const globalScope: ScopeFilter = {
+      serviceKey: scope.serviceKey,
+      organizationId: undefined,
+    };
+
+    const playlist = await this.repository.updatePlaylist(id, dto, globalScope);
+    if (!playlist) return null;
+    return this.toGlobalPlaylistResponse(playlist);
+  }
+
+  /**
+   * Update global media
+   */
+  async updateGlobalMedia(
+    id: string,
+    dto: UpdateGlobalMediaDto,
+    scope: ScopeFilter,
+  ): Promise<GlobalMediaResponseDto | null> {
+    // For global content, we don't filter by organizationId
+    const globalScope: ScopeFilter = {
+      serviceKey: scope.serviceKey,
+      organizationId: undefined,
+    };
+
+    const media = await this.repository.updateMedia(id, dto, globalScope);
+    if (!media) return null;
+    return this.toGlobalMediaResponse(media);
+  }
+
+  // ========== Clone Methods ==========
+
+  /**
+   * Clone a playlist to the store
+   * Creates a copy with source: 'store' and links to parent
+   */
+  async clonePlaylist(
+    sourceId: string,
+    dto: ClonePlaylistDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<ClonePlaylistResponseDto> {
+    // Find source playlist (can be global or from same org)
+    const sourcePlaylist = await this.repository.findPlaylistByIdGlobal(sourceId, scope.serviceKey);
+    if (!sourcePlaylist) {
+      throw new Error('Playlist not found');
+    }
+
+    // Create cloned playlist
+    const clonedPlaylist = await this.repository.createPlaylist({
+      name: dto.name || `Copy of ${sourcePlaylist.name}`,
+      description: sourcePlaylist.description,
+      status: 'draft',
+      loopEnabled: sourcePlaylist.loopEnabled,
+      defaultItemDuration: sourcePlaylist.defaultItemDuration,
+      transitionType: sourcePlaylist.transitionType,
+      transitionDuration: sourcePlaylist.transitionDuration,
+      isPublic: false,
+      metadata: sourcePlaylist.metadata,
+      serviceKey: scope.serviceKey,
+      organizationId: dto.targetOrganizationId || scope.organizationId || null,
+      createdByUserId: userId || null,
+      itemCount: 0,
+      totalDuration: 0,
+      likeCount: 0,
+      downloadCount: 0,
+      source: 'store' as ContentSource,
+      scope: 'store' as ContentScope,
+      parentPlaylistId: sourceId,
+    });
+
+    let itemsCloned = 0;
+    let mediaCloned = 0;
+
+    // Clone items if requested
+    if (dto.includeItems !== false) {
+      const sourceItems = await this.repository.findPlaylistItems(sourceId);
+      const mediaIdMap = new Map<string, string>();
+
+      // Clone media if requested
+      if (dto.cloneMedia) {
+        for (const item of sourceItems) {
+          if (item.media && !mediaIdMap.has(item.mediaId)) {
+            const clonedMedia = await this.repository.createMedia({
+              name: item.media.name,
+              description: item.media.description,
+              mediaType: item.media.mediaType,
+              sourceType: item.media.sourceType,
+              sourceUrl: item.media.sourceUrl,
+              embedId: item.media.embedId,
+              thumbnailUrl: item.media.thumbnailUrl,
+              duration: item.media.duration,
+              resolution: item.media.resolution,
+              fileSize: item.media.fileSize,
+              mimeType: item.media.mimeType,
+              content: item.media.content,
+              tags: item.media.tags,
+              category: item.media.category,
+              metadata: item.media.metadata,
+              serviceKey: scope.serviceKey,
+              organizationId: dto.targetOrganizationId || scope.organizationId || null,
+              createdByUserId: userId || null,
+              status: 'active',
+              source: 'store' as ContentSource,
+              scope: 'store' as ContentScope,
+              parentMediaId: item.mediaId,
+            });
+            mediaIdMap.set(item.mediaId, clonedMedia.id);
+            mediaCloned++;
+          }
+        }
+      }
+
+      // Clone playlist items
+      const itemsToCreate = sourceItems.map(item => ({
+        playlistId: clonedPlaylist.id,
+        mediaId: dto.cloneMedia ? (mediaIdMap.get(item.mediaId) || item.mediaId) : item.mediaId,
+        sortOrder: item.sortOrder,
+        duration: item.duration,
+        transitionType: item.transitionType,
+        isActive: item.isActive,
+        isForced: false, // Cloned items are not forced
+        sourceType: 'store' as const,
+        metadata: item.metadata,
+      }));
+
+      if (itemsToCreate.length > 0) {
+        await this.repository.createPlaylistItemsBulk(itemsToCreate);
+        itemsCloned = itemsToCreate.length;
+      }
+
+      // Update playlist stats
+      await this.repository.updatePlaylistStats(clonedPlaylist.id);
+    }
+
+    // Increment download count on source
+    await this.repository.incrementPlaylistDownloadCount(sourceId);
+
+    // Fetch updated playlist with stats
+    const updatedPlaylist = await this.repository.findPlaylistById(clonedPlaylist.id, scope);
+
+    return {
+      playlist: this.toGlobalPlaylistResponse(updatedPlaylist || clonedPlaylist),
+      itemsCloned,
+      mediaCloned,
+    };
+  }
+
+  /**
+   * Clone media to the store
+   */
+  async cloneMedia(
+    sourceId: string,
+    dto: CloneMediaDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<CloneMediaResponseDto> {
+    // Find source media
+    const sourceMedia = await this.repository.findMediaByIdGlobal(sourceId, scope.serviceKey);
+    if (!sourceMedia) {
+      throw new Error('Media not found');
+    }
+
+    // Create cloned media
+    const clonedMedia = await this.repository.createMedia({
+      name: dto.name || `Copy of ${sourceMedia.name}`,
+      description: sourceMedia.description,
+      mediaType: sourceMedia.mediaType,
+      sourceType: sourceMedia.sourceType,
+      sourceUrl: sourceMedia.sourceUrl,
+      embedId: sourceMedia.embedId,
+      thumbnailUrl: sourceMedia.thumbnailUrl,
+      duration: sourceMedia.duration,
+      resolution: sourceMedia.resolution,
+      fileSize: sourceMedia.fileSize,
+      mimeType: sourceMedia.mimeType,
+      content: sourceMedia.content,
+      tags: sourceMedia.tags,
+      category: sourceMedia.category,
+      metadata: sourceMedia.metadata,
+      serviceKey: scope.serviceKey,
+      organizationId: dto.targetOrganizationId || scope.organizationId || null,
+      createdByUserId: userId || null,
+      status: 'active',
+      source: 'store' as ContentSource,
+      scope: 'store' as ContentScope,
+      parentMediaId: sourceId,
+    });
+
+    return {
+      media: this.toGlobalMediaResponse(clonedMedia),
+    };
+  }
+
+  // ========== Sprint 2-6: Response Transformers ==========
+
+  private toGlobalPlaylistResponse(playlist: SignagePlaylist): GlobalPlaylistResponseDto {
+    return {
+      ...this.toPlaylistResponse(playlist),
+      source: (playlist as any).source || 'store',
+      scope: (playlist as any).scope || 'store',
+      parentPlaylistId: (playlist as any).parentPlaylistId || null,
+    };
+  }
+
+  private toGlobalMediaResponse(media: SignageMedia): GlobalMediaResponseDto {
+    return {
+      ...this.toMediaResponse(media),
+      source: (media as any).source || 'store',
+      scope: (media as any).scope || 'store',
+      parentMediaId: (media as any).parentMediaId || null,
     };
   }
 }

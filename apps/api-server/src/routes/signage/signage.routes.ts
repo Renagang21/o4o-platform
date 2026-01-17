@@ -165,5 +165,41 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // POST /api/signage/:serviceKey/ai/generate - Generate content with AI
   router.post('/ai/generate', controller.generateWithAi);
 
+  // ========== Sprint 2-6: Global Content Routes ==========
+
+  // GET /api/signage/:serviceKey/global/playlists - List global playlists (HQ, Supplier, Community)
+  router.get('/global/playlists', controller.getGlobalPlaylists);
+
+  // GET /api/signage/:serviceKey/global/playlists/:source - List playlists by source
+  router.get('/global/playlists/:source', controller.getGlobalPlaylistsBySource);
+
+  // GET /api/signage/:serviceKey/global/media - List global media
+  router.get('/global/media', controller.getGlobalMedia);
+
+  // GET /api/signage/:serviceKey/global/media/:source - List media by source
+  router.get('/global/media/:source', controller.getGlobalMediaBySource);
+
+  // ========== HQ Content Management Routes ==========
+
+  // POST /api/signage/:serviceKey/hq/playlists - Create HQ playlist (scope: global)
+  router.post('/hq/playlists', controller.createHqPlaylist);
+
+  // POST /api/signage/:serviceKey/hq/media - Create HQ media (scope: global)
+  router.post('/hq/media', controller.createHqMedia);
+
+  // PATCH /api/signage/:serviceKey/hq/playlists/:id - Update HQ playlist
+  router.patch('/hq/playlists/:id', controller.updateHqPlaylist);
+
+  // PATCH /api/signage/:serviceKey/hq/media/:id - Update HQ media
+  router.patch('/hq/media/:id', controller.updateHqMedia);
+
+  // ========== Clone Routes ==========
+
+  // POST /api/signage/:serviceKey/playlists/:id/clone - Clone a playlist to store
+  router.post('/playlists/:id/clone', controller.clonePlaylist);
+
+  // POST /api/signage/:serviceKey/media/:id/clone - Clone media to store
+  router.post('/media/:id/clone', controller.cloneMedia);
+
   return router;
 }

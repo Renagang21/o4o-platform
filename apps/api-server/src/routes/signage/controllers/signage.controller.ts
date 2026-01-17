@@ -32,6 +32,15 @@ import type {
   AiGenerateRequestDto,
   TemplatePreviewDto,
   PresignedUploadRequestDto,
+  // Sprint 2-6 DTOs
+  GlobalContentQueryDto,
+  ContentSource,
+  CreateGlobalPlaylistDto,
+  CreateGlobalMediaDto,
+  UpdateGlobalPlaylistDto,
+  UpdateGlobalMediaDto,
+  ClonePlaylistDto,
+  CloneMediaDto,
 } from '../dto/index.js';
 
 /**
@@ -893,6 +902,245 @@ export class SignageController {
       const result = await this.service.generateWithAi(dto, scope, userId);
       res.status(201).json({ data: result });
     } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Sprint 2-6: Global Content Endpoints ==========
+
+  /**
+   * Get all global playlists (HQ, Supplier, Community)
+   */
+  getGlobalPlaylists = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const query: GlobalContentQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        source: req.query.source as ContentSource,
+        category: req.query.category as string,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getGlobalPlaylists(query, scope);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Get global playlists by source (hq, supplier, community)
+   */
+  getGlobalPlaylistsBySource = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const source = req.params.source as ContentSource;
+
+      if (!['hq', 'supplier', 'community'].includes(source)) {
+        res.status(400).json({ error: 'Invalid source. Must be: hq, supplier, or community' });
+        return;
+      }
+
+      const query: GlobalContentQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        source,
+        category: req.query.category as string,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getGlobalPlaylists(query, scope);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Get all global media
+   */
+  getGlobalMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const query: GlobalContentQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        source: req.query.source as ContentSource,
+        mediaType: req.query.mediaType as any,
+        category: req.query.category as string,
+        tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getGlobalMedia(query, scope);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Get global media by source
+   */
+  getGlobalMediaBySource = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const source = req.params.source as ContentSource;
+
+      if (!['hq', 'supplier', 'community'].includes(source)) {
+        res.status(400).json({ error: 'Invalid source. Must be: hq, supplier, or community' });
+        return;
+      }
+
+      const query: GlobalContentQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        source,
+        mediaType: req.query.mediaType as any,
+        category: req.query.category as string,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getGlobalMedia(query, scope);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== HQ Content Management Endpoints ==========
+
+  /**
+   * Create HQ playlist (global scope)
+   */
+  createHqPlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const dto: CreateGlobalPlaylistDto = {
+        ...req.body,
+        source: 'hq',
+        scope: 'global',
+      };
+
+      const playlist = await this.service.createGlobalPlaylist(dto, scope, userId);
+      res.status(201).json({ data: playlist });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Create HQ media (global scope)
+   */
+  createHqMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const dto: CreateGlobalMediaDto = {
+        ...req.body,
+        source: 'hq',
+        scope: 'global',
+      };
+
+      const media = await this.service.createGlobalMedia(dto, scope, userId);
+      res.status(201).json({ data: media });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Update HQ playlist
+   */
+  updateHqPlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+      const dto: UpdateGlobalPlaylistDto = req.body;
+
+      const playlist = await this.service.updateGlobalPlaylist(id, dto, scope);
+      if (!playlist) {
+        res.status(404).json({ error: 'Playlist not found' });
+        return;
+      }
+
+      res.json({ data: playlist });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Update HQ media
+   */
+  updateHqMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+      const dto: UpdateGlobalMediaDto = req.body;
+
+      const media = await this.service.updateGlobalMedia(id, dto, scope);
+      if (!media) {
+        res.status(404).json({ error: 'Media not found' });
+        return;
+      }
+
+      res.json({ data: media });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Clone Endpoints ==========
+
+  /**
+   * Clone a playlist to the store
+   */
+  clonePlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const { id } = req.params;
+      const dto: ClonePlaylistDto = req.body;
+
+      const result = await this.service.clonePlaylist(id, dto, scope, userId);
+      res.status(201).json({ data: result });
+    } catch (error) {
+      if ((error as Error).message === 'Playlist not found') {
+        res.status(404).json({ error: 'Playlist not found' });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  /**
+   * Clone media to the store
+   */
+  cloneMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const { id } = req.params;
+      const dto: CloneMediaDto = req.body;
+
+      const result = await this.service.cloneMedia(id, dto, scope, userId);
+      res.status(201).json({ data: result });
+    } catch (error) {
+      if ((error as Error).message === 'Media not found') {
+        res.status(404).json({ error: 'Media not found' });
+        return;
+      }
       next(error);
     }
   };

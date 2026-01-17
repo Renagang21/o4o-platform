@@ -50,6 +50,10 @@ const V2ContentBlockLibrary = lazy(() => import('./v2/ContentBlockLibrary'));
 const V2LayoutPresetList = lazy(() => import('./v2/LayoutPresetList'));
 const V2MonitoringDashboard = lazy(() => import('./v2/MonitoringDashboard'));
 
+// Sprint 2-6: Global Content Pages
+const StoreSignageDashboard = lazy(() => import('./v2/store/StoreSignageDashboard'));
+const HQContentManager = lazy(() => import('./v2/hq/HQContentManager'));
+
 const PageLoader = () => (
   <div className="p-6 space-y-4">
     <Skeleton className="h-8 w-64" />
@@ -106,6 +110,10 @@ export default function DigitalSignageRouter() {
         <Route path="v2/templates/:templateId" element={<V2TemplateBuilder />} />
         <Route path="v2/content-blocks" element={<V2ContentBlockLibrary />} />
         <Route path="v2/layout-presets" element={<V2LayoutPresetList />} />
+
+        {/* Sprint 2-6: Global Content Routes */}
+        <Route path="v2/store" element={<StoreSignageDashboard />} />
+        <Route path="v2/hq" element={<HQContentManager />} />
         </Routes>
       </Suspense>
     </AppGuard>
