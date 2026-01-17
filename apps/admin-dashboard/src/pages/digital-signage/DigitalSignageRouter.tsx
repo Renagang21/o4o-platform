@@ -29,33 +29,17 @@ import { AppGuard } from '@/components/common/AppGuard';
 // System Dashboard / Monitoring
 const SystemDashboard = lazy(() => import('./v2/MonitoringDashboard'));
 
-// System Settings (placeholder - to be implemented)
-const SystemSettings = lazy(() =>
-  import('./admin/SystemSettings').catch(() => ({
-    default: () => <div className="p-6">System Settings - Coming Soon</div>,
-  }))
-);
+// System Settings
+const SystemSettings = lazy(() => import('./admin/SystemSettings'));
 
-// Extension Management (placeholder - to be implemented)
-const ExtensionList = lazy(() =>
-  import('./admin/ExtensionList').catch(() => ({
-    default: () => <div className="p-6">Extension Management - Coming Soon</div>,
-  }))
-);
+// Extension Management
+const ExtensionList = lazy(() => import('./admin/ExtensionList'));
 
-// Supplier Management (placeholder - to be implemented)
-const SupplierList = lazy(() =>
-  import('./admin/SupplierList').catch(() => ({
-    default: () => <div className="p-6">Supplier Management - Coming Soon</div>,
-  }))
-);
+// Supplier Management
+const SupplierList = lazy(() => import('./admin/SupplierList'));
 
-// System Analytics (placeholder - to be implemented)
-const SystemAnalytics = lazy(() =>
-  import('./admin/SystemAnalytics').catch(() => ({
-    default: () => <div className="p-6">System Analytics - Coming Soon</div>,
-  }))
-);
+// System Analytics
+const SystemAnalytics = lazy(() => import('./admin/SystemAnalytics'));
 
 // ========== Operations Pages (Phase 12 Legacy) ==========
 const OperationsDashboard = lazy(() => import('./operations/OperationsDashboard'));

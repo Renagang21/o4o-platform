@@ -1,0 +1,15 @@
+/**
+ * Supplier List Page (Placeholder)
+ *
+ * Admin-only supplier management for Digital Signage
+ * To be implemented in future sprints
+ */
+
+export default function SupplierList() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Supplier Management</h1>
+      <p className="text-gray-600">Coming Soon</p>
+    </div>
+  );
+}

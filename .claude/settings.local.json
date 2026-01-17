@@ -488,7 +488,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list -R Renagang21/o4o-platform --limit 5)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 21030945539 -R Renagang21/o4o-platform --log-failed)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list -R Renagang21/o4o-platform --limit 3)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 21031078868 -R Renagang21/o4o-platform --log-failed)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 21031078868 -R Renagang21/o4o-platform --log-failed)",
+      "Bash(git merge-base:*)"
     ],
     "deny": []
   }
