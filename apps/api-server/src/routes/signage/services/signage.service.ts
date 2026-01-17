@@ -4,6 +4,10 @@ import type {
   SignagePlaylistItem,
   SignageMedia,
   SignageSchedule,
+  SignageTemplate,
+  SignageTemplateZone,
+  SignageContentBlock,
+  SignageLayoutPreset,
 } from '@o4o-apps/digital-signage-core/entities';
 import { SignageRepository } from '../repositories/signage.repository.js';
 import type {
@@ -28,6 +32,33 @@ import type {
   ScopeFilter,
   PaginatedResponse,
   ActiveContentResponseDto,
+  // Sprint 2-3 DTOs
+  CreateTemplateDto,
+  UpdateTemplateDto,
+  TemplateQueryDto,
+  TemplateResponseDto,
+  TemplateDetailResponseDto,
+  CreateTemplateZoneDto,
+  UpdateTemplateZoneDto,
+  TemplateZoneResponseDto,
+  CreateContentBlockDto,
+  UpdateContentBlockDto,
+  ContentBlockQueryDto,
+  ContentBlockResponseDto,
+  CreateLayoutPresetDto,
+  UpdateLayoutPresetDto,
+  LayoutPresetQueryDto,
+  LayoutPresetResponseDto,
+  MediaLibraryResponseDto,
+  ScheduleCalendarQueryDto,
+  ScheduleCalendarResponseDto,
+  ScheduleCalendarEventDto,
+  AiGenerateRequestDto,
+  AiGenerateResponseDto,
+  TemplatePreviewDto,
+  TemplatePreviewResponseDto,
+  PresignedUploadRequestDto,
+  PresignedUploadResponseDto,
 } from '../dto/index.js';
 
 /**
@@ -528,6 +559,547 @@ export class SignageService {
       createdAt: schedule.createdAt?.toISOString(),
       updatedAt: schedule.updatedAt?.toISOString(),
       playlist: schedule.playlist ? this.toPlaylistResponse(schedule.playlist) : undefined,
+    };
+  }
+
+  // ========== Sprint 2-3: Template Methods ==========
+
+  async getTemplate(id: string, scope: ScopeFilter): Promise<TemplateDetailResponseDto | null> {
+    const template = await this.repository.findTemplateById(id, scope);
+    if (!template) return null;
+    return this.toTemplateDetailResponse(template);
+  }
+
+  async getTemplates(
+    query: TemplateQueryDto,
+    scope: ScopeFilter,
+  ): Promise<PaginatedResponse<TemplateResponseDto>> {
+    const { data, total } = await this.repository.findTemplates(query, scope);
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: data.map(t => this.toTemplateResponse(t)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async createTemplate(
+    dto: CreateTemplateDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<TemplateResponseDto> {
+    const template = await this.repository.createTemplate({
+      ...dto,
+      serviceKey: scope.serviceKey,
+      organizationId: scope.organizationId || null,
+      createdByUserId: userId || null,
+    });
+    return this.toTemplateResponse(template);
+  }
+
+  async updateTemplate(
+    id: string,
+    dto: UpdateTemplateDto,
+    scope: ScopeFilter,
+  ): Promise<TemplateResponseDto | null> {
+    const template = await this.repository.updateTemplate(id, dto, scope);
+    if (!template) return null;
+    return this.toTemplateResponse(template);
+  }
+
+  async deleteTemplate(id: string, scope: ScopeFilter): Promise<boolean> {
+    return this.repository.softDeleteTemplate(id, scope);
+  }
+
+  // ========== Template Zone Methods ==========
+
+  async getTemplateZones(
+    templateId: string,
+    scope: ScopeFilter,
+  ): Promise<TemplateZoneResponseDto[]> {
+    const template = await this.repository.findTemplateById(templateId, scope);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+    const zones = await this.repository.findTemplateZones(templateId);
+    return zones.map(z => this.toTemplateZoneResponse(z));
+  }
+
+  async addTemplateZone(
+    templateId: string,
+    dto: CreateTemplateZoneDto,
+    scope: ScopeFilter,
+  ): Promise<TemplateZoneResponseDto> {
+    const template = await this.repository.findTemplateById(templateId, scope);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    let sortOrder = dto.sortOrder;
+    if (sortOrder === undefined) {
+      const maxOrder = await this.repository.getMaxZoneSortOrder(templateId);
+      sortOrder = maxOrder + 1;
+    }
+
+    const zone = await this.repository.createTemplateZone({
+      templateId,
+      ...dto,
+      sortOrder,
+      zIndex: dto.zIndex ?? 0,
+      isActive: dto.isActive ?? true,
+    });
+    return this.toTemplateZoneResponse(zone);
+  }
+
+  async updateTemplateZone(
+    templateId: string,
+    zoneId: string,
+    dto: UpdateTemplateZoneDto,
+    scope: ScopeFilter,
+  ): Promise<TemplateZoneResponseDto | null> {
+    const template = await this.repository.findTemplateById(templateId, scope);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    const existingZone = await this.repository.findTemplateZoneById(zoneId);
+    if (!existingZone || existingZone.templateId !== templateId) {
+      return null;
+    }
+
+    const zone = await this.repository.updateTemplateZone(zoneId, dto);
+    if (!zone) return null;
+    return this.toTemplateZoneResponse(zone);
+  }
+
+  async deleteTemplateZone(
+    templateId: string,
+    zoneId: string,
+    scope: ScopeFilter,
+  ): Promise<boolean> {
+    const template = await this.repository.findTemplateById(templateId, scope);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+    return this.repository.deleteTemplateZone(zoneId);
+  }
+
+  // ========== Content Block Methods ==========
+
+  async getContentBlock(id: string, scope: ScopeFilter): Promise<ContentBlockResponseDto | null> {
+    const block = await this.repository.findContentBlockById(id, scope);
+    if (!block) return null;
+    return this.toContentBlockResponse(block);
+  }
+
+  async getContentBlocks(
+    query: ContentBlockQueryDto,
+    scope: ScopeFilter,
+  ): Promise<PaginatedResponse<ContentBlockResponseDto>> {
+    const { data, total } = await this.repository.findContentBlocks(query, scope);
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: data.map(b => this.toContentBlockResponse(b)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async createContentBlock(
+    dto: CreateContentBlockDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<ContentBlockResponseDto> {
+    const block = await this.repository.createContentBlock({
+      ...dto,
+      serviceKey: scope.serviceKey,
+      organizationId: scope.organizationId || null,
+      createdByUserId: userId || null,
+    });
+    return this.toContentBlockResponse(block);
+  }
+
+  async updateContentBlock(
+    id: string,
+    dto: UpdateContentBlockDto,
+    scope: ScopeFilter,
+  ): Promise<ContentBlockResponseDto | null> {
+    const block = await this.repository.updateContentBlock(id, dto, scope);
+    if (!block) return null;
+    return this.toContentBlockResponse(block);
+  }
+
+  async deleteContentBlock(id: string, scope: ScopeFilter): Promise<boolean> {
+    return this.repository.softDeleteContentBlock(id, scope);
+  }
+
+  // ========== Layout Preset Methods ==========
+
+  async getLayoutPreset(id: string, serviceKey?: string): Promise<LayoutPresetResponseDto | null> {
+    const preset = await this.repository.findLayoutPresetById(id, serviceKey);
+    if (!preset) return null;
+    return this.toLayoutPresetResponse(preset);
+  }
+
+  async getLayoutPresets(
+    query: LayoutPresetQueryDto,
+    serviceKey?: string,
+  ): Promise<PaginatedResponse<LayoutPresetResponseDto>> {
+    const { data, total } = await this.repository.findLayoutPresets(query, serviceKey);
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: data.map(p => this.toLayoutPresetResponse(p)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  async createLayoutPreset(
+    dto: CreateLayoutPresetDto,
+    serviceKey?: string,
+  ): Promise<LayoutPresetResponseDto> {
+    const preset = await this.repository.createLayoutPreset({
+      ...dto,
+      serviceKey: serviceKey || null,
+    });
+    return this.toLayoutPresetResponse(preset);
+  }
+
+  async updateLayoutPreset(
+    id: string,
+    dto: UpdateLayoutPresetDto,
+  ): Promise<LayoutPresetResponseDto | null> {
+    const preset = await this.repository.updateLayoutPreset(id, dto);
+    if (!preset) return null;
+    return this.toLayoutPresetResponse(preset);
+  }
+
+  async deleteLayoutPreset(id: string): Promise<boolean> {
+    return this.repository.softDeleteLayoutPreset(id);
+  }
+
+  // ========== Media Library ==========
+
+  async getMediaLibrary(
+    scope: ScopeFilter,
+    mediaType?: string,
+    category?: string,
+    search?: string,
+  ): Promise<MediaLibraryResponseDto> {
+    const { platform, organization } = await this.repository.findMediaLibrary(
+      scope,
+      mediaType,
+      category,
+      search,
+    );
+
+    return {
+      platform: platform.map(m => this.toMediaResponse(m)),
+      organization: organization.map(m => this.toMediaResponse(m)),
+      supplier: [], // Will be implemented with supplier integration
+      meta: {
+        page: 1,
+        limit: 50,
+        total: platform.length + organization.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    };
+  }
+
+  // ========== Schedule Calendar ==========
+
+  async getScheduleCalendar(
+    query: ScheduleCalendarQueryDto,
+    scope: ScopeFilter,
+  ): Promise<ScheduleCalendarResponseDto> {
+    const startDate = new Date(query.startDate);
+    const endDate = new Date(query.endDate);
+
+    const schedules = await this.repository.findSchedulesForCalendar(
+      scope,
+      startDate,
+      endDate,
+      query.channelId,
+    );
+
+    // Generate calendar events from schedules
+    const events: ScheduleCalendarEventDto[] = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const dayOfWeek = currentDate.getDay();
+      const dateStr = currentDate.toISOString().slice(0, 10);
+
+      for (const schedule of schedules) {
+        if (schedule.daysOfWeek.includes(dayOfWeek)) {
+          events.push({
+            scheduleId: schedule.id,
+            scheduleName: schedule.name,
+            playlistId: schedule.playlistId,
+            playlistName: schedule.playlist?.name || 'Unknown',
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+            daysOfWeek: schedule.daysOfWeek,
+            priority: schedule.priority,
+            date: dateStr,
+          });
+        }
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return {
+      events,
+      startDate: query.startDate,
+      endDate: query.endDate,
+    };
+  }
+
+  // ========== Presigned Upload (Stub) ==========
+
+  async getPresignedUploadUrl(
+    dto: PresignedUploadRequestDto,
+    scope: ScopeFilter,
+  ): Promise<PresignedUploadResponseDto> {
+    // In production, this would integrate with GCS or S3
+    // For now, return a placeholder response
+    const timestamp = Date.now();
+    const expiresAt = new Date(timestamp + 3600000); // 1 hour from now
+
+    return {
+      uploadUrl: `https://storage.example.com/upload/${scope.serviceKey}/${timestamp}/${dto.fileName}`,
+      downloadUrl: `https://storage.example.com/media/${scope.serviceKey}/${timestamp}/${dto.fileName}`,
+      fields: {
+        'Content-Type': dto.mimeType,
+      },
+      expiresAt: expiresAt.toISOString(),
+    };
+  }
+
+  // ========== AI Generation (Stub) ==========
+
+  async generateWithAi(
+    dto: AiGenerateRequestDto,
+    scope: ScopeFilter,
+    userId?: string,
+  ): Promise<AiGenerateResponseDto> {
+    // In production, this would call AI service (OpenAI, Claude, etc.)
+    // For now, return a placeholder response and log the request
+
+    const generatedContent = `<div class="ai-generated ${dto.style || 'modern'}">
+      <h2>${dto.prompt.slice(0, 50)}</h2>
+      <p>AI-generated content placeholder</p>
+    </div>`;
+
+    // Create content block for generated content
+    const block = await this.repository.createContentBlock({
+      serviceKey: scope.serviceKey,
+      organizationId: scope.organizationId || null,
+      createdByUserId: userId || null,
+      name: `AI Generated: ${dto.templateType}`,
+      blockType: 'html',
+      content: generatedContent,
+      status: 'active',
+      metadata: {
+        aiGenerated: true,
+        prompt: dto.prompt,
+        templateType: dto.templateType,
+        style: dto.style,
+      },
+    });
+
+    // Log the generation
+    await this.repository.createAiGenerationLog({
+      serviceKey: scope.serviceKey,
+      organizationId: scope.organizationId || null,
+      userId: userId || null,
+      generationType: dto.templateType as 'banner' | 'custom',
+      request: {
+        prompt: dto.prompt,
+        parameters: {
+          style: dto.style,
+          width: dto.width,
+          height: dto.height,
+        },
+      },
+      outputData: {
+        contentBlockId: block.id,
+        resultType: 'content_block',
+      },
+      modelName: 'placeholder',
+      tokensUsed: 0,
+      status: 'completed',
+    });
+
+    return {
+      contentBlockId: block.id,
+      generatedContent,
+      thumbnailUrl: null,
+      generationLog: {
+        prompt: dto.prompt,
+        model: 'placeholder',
+        tokensUsed: 0,
+        generatedAt: new Date().toISOString(),
+      },
+    };
+  }
+
+  // ========== Template Preview (Stub) ==========
+
+  async generateTemplatePreview(
+    dto: TemplatePreviewDto,
+    scope: ScopeFilter,
+  ): Promise<TemplatePreviewResponseDto> {
+    const template = await this.repository.findTemplateById(dto.templateId, scope);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    // In production, this would compile the template with variables
+    // For now, return a placeholder
+    const previewHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; background: ${template.layoutConfig.backgroundColor || '#000'}; }
+    .zone { position: absolute; border: 1px dashed #fff; }
+  </style>
+</head>
+<body style="width: ${template.layoutConfig.width}px; height: ${template.layoutConfig.height}px;">
+  ${(template.zones || []).map(zone => `
+    <div class="zone" style="
+      left: ${zone.position.x}${zone.position.unit};
+      top: ${zone.position.y}${zone.position.unit};
+      width: ${zone.position.width}${zone.position.unit};
+      height: ${zone.position.height}${zone.position.unit};
+    ">
+      ${zone.name}
+    </div>
+  `).join('')}
+</body>
+</html>`;
+
+    return {
+      previewHtml,
+      previewUrl: null,
+      compiledAt: new Date().toISOString(),
+    };
+  }
+
+  // ========== Sprint 2-3: Response Transformers ==========
+
+  private toTemplateResponse(template: SignageTemplate): TemplateResponseDto {
+    return {
+      id: template.id,
+      serviceKey: template.serviceKey,
+      organizationId: template.organizationId,
+      name: template.name,
+      description: template.description || null,
+      layoutConfig: template.layoutConfig,
+      category: template.category || null,
+      tags: template.tags || [],
+      thumbnailUrl: template.thumbnailUrl || null,
+      status: template.status,
+      isPublic: template.isPublic,
+      isSystem: template.isSystem,
+      createdByUserId: template.createdByUserId,
+      createdAt: template.createdAt?.toISOString(),
+      updatedAt: template.updatedAt?.toISOString(),
+    };
+  }
+
+  private toTemplateDetailResponse(template: SignageTemplate): TemplateDetailResponseDto {
+    return {
+      ...this.toTemplateResponse(template),
+      zones: (template.zones || []).map(z => this.toTemplateZoneResponse(z)),
+    };
+  }
+
+  private toTemplateZoneResponse(zone: SignageTemplateZone): TemplateZoneResponseDto {
+    return {
+      id: zone.id,
+      templateId: zone.templateId,
+      name: zone.name,
+      zoneKey: zone.zoneKey || null,
+      zoneType: zone.zoneType,
+      position: zone.position,
+      zIndex: zone.zIndex,
+      sortOrder: zone.sortOrder,
+      style: zone.style || {},
+      defaultPlaylistId: zone.defaultPlaylistId || null,
+      defaultMediaId: zone.defaultMediaId || null,
+      settings: zone.settings || {},
+      isActive: zone.isActive,
+      createdAt: zone.createdAt?.toISOString(),
+      updatedAt: zone.updatedAt?.toISOString(),
+    };
+  }
+
+  private toContentBlockResponse(block: SignageContentBlock): ContentBlockResponseDto {
+    return {
+      id: block.id,
+      serviceKey: block.serviceKey,
+      organizationId: block.organizationId,
+      name: block.name,
+      description: block.description || null,
+      blockType: block.blockType,
+      content: block.content || null,
+      mediaId: block.mediaId || null,
+      settings: block.settings || {},
+      status: block.status,
+      category: block.category || null,
+      tags: block.tags || [],
+      createdByUserId: block.createdByUserId,
+      createdAt: block.createdAt?.toISOString(),
+      updatedAt: block.updatedAt?.toISOString(),
+    };
+  }
+
+  private toLayoutPresetResponse(preset: SignageLayoutPreset): LayoutPresetResponseDto {
+    return {
+      id: preset.id,
+      serviceKey: preset.serviceKey || null,
+      name: preset.name,
+      description: preset.description || null,
+      presetData: preset.presetData,
+      category: preset.category || null,
+      tags: preset.tags || [],
+      thumbnailUrl: preset.thumbnailUrl || null,
+      isSystem: preset.isSystem,
+      isActive: preset.isActive,
+      sortOrder: preset.sortOrder,
+      createdAt: preset.createdAt?.toISOString(),
+      updatedAt: preset.updatedAt?.toISOString(),
     };
   }
 }

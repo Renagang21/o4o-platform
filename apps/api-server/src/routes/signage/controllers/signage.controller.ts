@@ -16,6 +16,22 @@ import type {
   UpdateScheduleDto,
   ScheduleQueryDto,
   ScopeFilter,
+  // Sprint 2-3 DTOs
+  CreateTemplateDto,
+  UpdateTemplateDto,
+  TemplateQueryDto,
+  CreateTemplateZoneDto,
+  UpdateTemplateZoneDto,
+  CreateContentBlockDto,
+  UpdateContentBlockDto,
+  ContentBlockQueryDto,
+  CreateLayoutPresetDto,
+  UpdateLayoutPresetDto,
+  LayoutPresetQueryDto,
+  ScheduleCalendarQueryDto,
+  AiGenerateRequestDto,
+  TemplatePreviewDto,
+  PresignedUploadRequestDto,
 } from '../dto/index.js';
 
 /**
@@ -450,6 +466,432 @@ export class SignageController {
 
       const content = await this.service.resolveActiveContent(channelId, scope, currentTime);
       res.json({ data: content });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Sprint 2-3: Template Endpoints ==========
+
+  getTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+
+      const template = await this.service.getTemplate(id, scope);
+      if (!template) {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+
+      res.json({ data: template });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getTemplates = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const query: TemplateQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        status: req.query.status as any,
+        isPublic: req.query.isPublic === 'true' ? true : req.query.isPublic === 'false' ? false : undefined,
+        isSystem: req.query.isSystem === 'true' ? true : req.query.isSystem === 'false' ? false : undefined,
+        category: req.query.category as string,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getTemplates(query, scope);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const dto: CreateTemplateDto = req.body;
+
+      const template = await this.service.createTemplate(dto, scope, userId);
+      res.status(201).json({ data: template });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+      const dto: UpdateTemplateDto = req.body;
+
+      const template = await this.service.updateTemplate(id, dto, scope);
+      if (!template) {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+
+      res.json({ data: template });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+
+      const success = await this.service.deleteTemplate(id, scope);
+      if (!success) {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Template Zone Endpoints ==========
+
+  getTemplateZones = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { templateId } = req.params;
+
+      const zones = await this.service.getTemplateZones(templateId, scope);
+      res.json({ data: zones });
+    } catch (error) {
+      if ((error as Error).message === 'Template not found') {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  addTemplateZone = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { templateId } = req.params;
+      const dto: CreateTemplateZoneDto = req.body;
+
+      const zone = await this.service.addTemplateZone(templateId, dto, scope);
+      res.status(201).json({ data: zone });
+    } catch (error) {
+      if ((error as Error).message === 'Template not found') {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  updateTemplateZone = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { templateId, zoneId } = req.params;
+      const dto: UpdateTemplateZoneDto = req.body;
+
+      const zone = await this.service.updateTemplateZone(templateId, zoneId, dto, scope);
+      if (!zone) {
+        res.status(404).json({ error: 'Template zone not found' });
+        return;
+      }
+
+      res.json({ data: zone });
+    } catch (error) {
+      if ((error as Error).message === 'Template not found') {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  deleteTemplateZone = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { templateId, zoneId } = req.params;
+
+      const success = await this.service.deleteTemplateZone(templateId, zoneId, scope);
+      if (!success) {
+        res.status(404).json({ error: 'Template zone not found' });
+        return;
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      if ((error as Error).message === 'Template not found') {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  // ========== Template Preview ==========
+
+  previewTemplate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const dto: TemplatePreviewDto = req.body;
+
+      const preview = await this.service.generateTemplatePreview(dto, scope);
+      res.json({ data: preview });
+    } catch (error) {
+      if ((error as Error).message === 'Template not found') {
+        res.status(404).json({ error: 'Template not found' });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  // ========== Content Block Endpoints ==========
+
+  getContentBlock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+
+      const block = await this.service.getContentBlock(id, scope);
+      if (!block) {
+        res.status(404).json({ error: 'Content block not found' });
+        return;
+      }
+
+      res.json({ data: block });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getContentBlocks = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const query: ContentBlockQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        blockType: req.query.blockType as string,
+        status: req.query.status as any,
+        category: req.query.category as string,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getContentBlocks(query, scope);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createContentBlock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const dto: CreateContentBlockDto = req.body;
+
+      const block = await this.service.createContentBlock(dto, scope, userId);
+      res.status(201).json({ data: block });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateContentBlock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+      const dto: UpdateContentBlockDto = req.body;
+
+      const block = await this.service.updateContentBlock(id, dto, scope);
+      if (!block) {
+        res.status(404).json({ error: 'Content block not found' });
+        return;
+      }
+
+      res.json({ data: block });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteContentBlock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+
+      const success = await this.service.deleteContentBlock(id, scope);
+      if (!success) {
+        res.status(404).json({ error: 'Content block not found' });
+        return;
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Layout Preset Endpoints ==========
+
+  getLayoutPreset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const serviceKey = req.params.serviceKey;
+      const { id } = req.params;
+
+      const preset = await this.service.getLayoutPreset(id, serviceKey);
+      if (!preset) {
+        res.status(404).json({ error: 'Layout preset not found' });
+        return;
+      }
+
+      res.json({ data: preset });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getLayoutPresets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const serviceKey = req.params.serviceKey;
+      const query: LayoutPresetQueryDto = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+        category: req.query.category as string,
+        isSystem: req.query.isSystem === 'true' ? true : req.query.isSystem === 'false' ? false : undefined,
+        isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
+        search: req.query.search as string,
+        sortBy: req.query.sortBy as any,
+        sortOrder: req.query.sortOrder as any,
+      };
+
+      const result = await this.service.getLayoutPresets(query, serviceKey);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createLayoutPreset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const serviceKey = req.params.serviceKey;
+      const dto: CreateLayoutPresetDto = req.body;
+
+      const preset = await this.service.createLayoutPreset(dto, serviceKey);
+      res.status(201).json({ data: preset });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateLayoutPreset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const dto: UpdateLayoutPresetDto = req.body;
+
+      const preset = await this.service.updateLayoutPreset(id, dto);
+      if (!preset) {
+        res.status(404).json({ error: 'Layout preset not found' });
+        return;
+      }
+
+      res.json({ data: preset });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteLayoutPreset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      const success = await this.service.deleteLayoutPreset(id);
+      if (!success) {
+        res.status(404).json({ error: 'Layout preset not found' });
+        return;
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Media Library ==========
+
+  getMediaLibrary = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const mediaType = req.query.mediaType as string;
+      const category = req.query.category as string;
+      const search = req.query.search as string;
+
+      const library = await this.service.getMediaLibrary(scope, mediaType, category, search);
+      res.json({ data: library });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Schedule Calendar ==========
+
+  getScheduleCalendar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const query: ScheduleCalendarQueryDto = {
+        channelId: req.query.channelId as string,
+        startDate: req.query.startDate as string,
+        endDate: req.query.endDate as string,
+      };
+
+      if (!query.startDate || !query.endDate) {
+        res.status(400).json({ error: 'startDate and endDate are required' });
+        return;
+      }
+
+      const calendar = await this.service.getScheduleCalendar(query, scope);
+      res.json({ data: calendar });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== Presigned Upload ==========
+
+  getPresignedUploadUrl = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const dto: PresignedUploadRequestDto = req.body;
+
+      const result = await this.service.getPresignedUploadUrl(dto, scope);
+      res.json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ========== AI Generation ==========
+
+  generateWithAi = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+      const dto: AiGenerateRequestDto = req.body;
+
+      const result = await this.service.generateWithAi(dto, scope, userId);
+      res.status(201).json({ data: result });
     } catch (error) {
       next(error);
     }

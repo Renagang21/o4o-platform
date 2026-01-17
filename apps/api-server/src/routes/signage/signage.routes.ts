@@ -85,5 +85,85 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // GET /api/signage/:serviceKey/active-content - Resolve active content for channel
   router.get('/active-content', controller.resolveActiveContent);
 
+  // ========== Sprint 2-3: Template Routes ==========
+  // GET /api/signage/:serviceKey/templates - List templates
+  router.get('/templates', controller.getTemplates);
+
+  // POST /api/signage/:serviceKey/templates - Create template
+  router.post('/templates', controller.createTemplate);
+
+  // GET /api/signage/:serviceKey/templates/:id - Get template by ID
+  router.get('/templates/:id', controller.getTemplate);
+
+  // PATCH /api/signage/:serviceKey/templates/:id - Update template
+  router.patch('/templates/:id', controller.updateTemplate);
+
+  // DELETE /api/signage/:serviceKey/templates/:id - Delete template (soft delete)
+  router.delete('/templates/:id', controller.deleteTemplate);
+
+  // POST /api/signage/:serviceKey/templates/preview - Generate template preview
+  router.post('/templates/preview', controller.previewTemplate);
+
+  // ========== Template Zone Routes ==========
+  // GET /api/signage/:serviceKey/templates/:templateId/zones - List template zones
+  router.get('/templates/:templateId/zones', controller.getTemplateZones);
+
+  // POST /api/signage/:serviceKey/templates/:templateId/zones - Add zone to template
+  router.post('/templates/:templateId/zones', controller.addTemplateZone);
+
+  // PATCH /api/signage/:serviceKey/templates/:templateId/zones/:zoneId - Update zone
+  router.patch('/templates/:templateId/zones/:zoneId', controller.updateTemplateZone);
+
+  // DELETE /api/signage/:serviceKey/templates/:templateId/zones/:zoneId - Delete zone
+  router.delete('/templates/:templateId/zones/:zoneId', controller.deleteTemplateZone);
+
+  // ========== Content Block Routes ==========
+  // GET /api/signage/:serviceKey/content-blocks - List content blocks
+  router.get('/content-blocks', controller.getContentBlocks);
+
+  // POST /api/signage/:serviceKey/content-blocks - Create content block
+  router.post('/content-blocks', controller.createContentBlock);
+
+  // GET /api/signage/:serviceKey/content-blocks/:id - Get content block by ID
+  router.get('/content-blocks/:id', controller.getContentBlock);
+
+  // PATCH /api/signage/:serviceKey/content-blocks/:id - Update content block
+  router.patch('/content-blocks/:id', controller.updateContentBlock);
+
+  // DELETE /api/signage/:serviceKey/content-blocks/:id - Delete content block (soft delete)
+  router.delete('/content-blocks/:id', controller.deleteContentBlock);
+
+  // ========== Layout Preset Routes ==========
+  // GET /api/signage/:serviceKey/layout-presets - List layout presets
+  router.get('/layout-presets', controller.getLayoutPresets);
+
+  // POST /api/signage/:serviceKey/layout-presets - Create layout preset
+  router.post('/layout-presets', controller.createLayoutPreset);
+
+  // GET /api/signage/:serviceKey/layout-presets/:id - Get layout preset by ID
+  router.get('/layout-presets/:id', controller.getLayoutPreset);
+
+  // PATCH /api/signage/:serviceKey/layout-presets/:id - Update layout preset
+  router.patch('/layout-presets/:id', controller.updateLayoutPreset);
+
+  // DELETE /api/signage/:serviceKey/layout-presets/:id - Delete layout preset (soft delete)
+  router.delete('/layout-presets/:id', controller.deleteLayoutPreset);
+
+  // ========== Media Library Routes ==========
+  // GET /api/signage/:serviceKey/media/library - Get media library (platform + org + supplier)
+  router.get('/media/library', controller.getMediaLibrary);
+
+  // ========== Schedule Calendar Routes ==========
+  // GET /api/signage/:serviceKey/schedules/calendar - Get schedule calendar view
+  router.get('/schedules/calendar', controller.getScheduleCalendar);
+
+  // ========== Upload Routes ==========
+  // POST /api/signage/:serviceKey/upload/presigned - Get presigned upload URL
+  router.post('/upload/presigned', controller.getPresignedUploadUrl);
+
+  // ========== AI Generation Routes ==========
+  // POST /api/signage/:serviceKey/ai/generate - Generate content with AI
+  router.post('/ai/generate', controller.generateWithAi);
+
   return router;
 }
