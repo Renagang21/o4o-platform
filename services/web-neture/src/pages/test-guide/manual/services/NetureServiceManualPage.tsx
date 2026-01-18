@@ -1,19 +1,22 @@
 /**
  * NetureServiceManualPage - Neture 서비스 매뉴얼
  * 공급자-파트너 연결 유통 정보 플랫폼
+ *
+ * WO-NETURE-SERVICE-MANUAL-UPDATE-V2: 디지털사이니지, 포럼, 채널/판매 구조 추가
  */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Layers, Package, Building2, FileText, Users, AlertCircle, Sparkles, MessageSquare, DollarSign } from 'lucide-react';
+import { Layers, Package, Users, AlertCircle, Sparkles, MessageSquare, DollarSign, Tv, QrCode } from 'lucide-react';
 import ManualLayout, { type ManualSection } from '../../../../components/layouts/ManualLayout';
 
 const SECTIONS: ManualSection[] = [
   { id: 'intro', title: '서비스 소개' },
   { id: 'features', title: '주요 기능' },
+  { id: 'channel', title: '채널/판매 구조' },
+  { id: 'signage', title: '디지털사이니지' },
+  { id: 'forum', title: '포럼/게시판' },
   { id: 'supplier-flow', title: '공급자 흐름' },
-  { id: 'partner-flow', title: '파트너 흐름' },
-  { id: 'content', title: '콘텐츠 활용' },
   { id: 'ai-system', title: 'AI 시스템' },
   { id: 'faq', title: '자주 묻는 질문' },
 ];
@@ -27,12 +30,14 @@ export default function NetureServiceManualPage() {
         return <IntroSection />;
       case 'features':
         return <FeaturesSection />;
+      case 'channel':
+        return <ChannelSection />;
+      case 'signage':
+        return <SignageSection />;
+      case 'forum':
+        return <ForumSection />;
       case 'supplier-flow':
         return <SupplierFlowSection />;
-      case 'partner-flow':
-        return <PartnerFlowSection />;
-      case 'content':
-        return <ContentSection />;
       case 'ai-system':
         return <AiSystemSection />;
       case 'faq':
@@ -80,9 +85,9 @@ function IntroSection() {
         <h3 style={styles.highlightTitle}>Neture의 특징</h3>
         <ul style={styles.list}>
           <li><strong>정보 플랫폼</strong>: 직접 거래가 아닌 연결 중심</li>
-          <li><strong>콘텐츠 공유</strong>: 공급자가 제공하는 자료를 파트너가 참고</li>
+          <li><strong>무재고 판매</strong>: 매장은 재고 없이 취급과 노출만 선택</li>
+          <li><strong>채널 주도권</strong>: 매장이 디지털 채널을 소유</li>
           <li><strong>자율적 제휴</strong>: 공급자가 직접 요청을 승인/거절</li>
-          <li><strong>투명한 정보</strong>: 공급 조건과 상품 정보 공개</li>
         </ul>
       </div>
 
@@ -111,28 +116,42 @@ function FeaturesSection() {
           <Package size={20} style={{ color: '#8b5cf6' }} />
           <h4 style={styles.featureTitle}>공급자 대시보드</h4>
           <p style={styles.featureDesc}>
-            상품 등록, 제휴 요청 관리, 콘텐츠 관리를 한 곳에서
+            상품 등록, 제휴 요청 관리, 콘텐츠 관리
           </p>
         </div>
         <div style={styles.featureCard}>
-          <Building2 size={20} style={{ color: '#0ea5e9' }} />
-          <h4 style={styles.featureTitle}>파트너 탐색</h4>
+          <Tv size={20} style={{ color: '#0ea5e9' }} />
+          <h4 style={styles.featureTitle}>디지털사이니지</h4>
           <p style={styles.featureDesc}>
-            공급자 검색, 상품 정보 확인, 제휴 요청
+            플레이리스트, 스케줄, 템플릿 관리
           </p>
         </div>
         <div style={styles.featureCard}>
-          <FileText size={20} style={{ color: '#10b981' }} />
-          <h4 style={styles.featureTitle}>콘텐츠 관리</h4>
+          <MessageSquare size={20} style={{ color: '#10b981' }} />
+          <h4 style={styles.featureTitle}>포럼/게시판</h4>
           <p style={styles.featureDesc}>
-            제품 설명, 가이드, 이미지, 동영상 제공
+            테스트 피드백, 서비스 업데이트
           </p>
         </div>
         <div style={styles.featureCard}>
-          <Users size={20} style={{ color: '#f59e0b' }} />
+          <QrCode size={20} style={{ color: '#f59e0b' }} />
+          <h4 style={styles.featureTitle}>QR 채널</h4>
+          <p style={styles.featureDesc}>
+            매장별 QR 코드 생성 및 다운로드
+          </p>
+        </div>
+        <div style={styles.featureCard}>
+          <Users size={20} style={{ color: '#ec4899' }} />
           <h4 style={styles.featureTitle}>제휴 관리</h4>
           <p style={styles.featureDesc}>
-            요청 검토, 승인/거절, 파트너 관계 유지
+            요청 검토, 승인/거절, 파트너 관계
+          </p>
+        </div>
+        <div style={styles.featureCard}>
+          <Sparkles size={20} style={{ color: '#6366f1' }} />
+          <h4 style={styles.featureTitle}>AI 시스템</h4>
+          <p style={styles.featureDesc}>
+            Context Asset, 응답 규칙 관리
           </p>
         </div>
       </div>
@@ -142,6 +161,151 @@ function FeaturesSection() {
         <p style={styles.tipText}>
           현재 테스트 버전에서는 주문/결제/정산 기능이 제외되어 있습니다.
         </p>
+      </div>
+    </div>
+  );
+}
+
+function ChannelSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>채널/판매 구조</h2>
+      <p style={styles.text}>
+        o4o 플랫폼의 핵심 개념인 <strong>채널 주도권</strong>과 <strong>무재고 판매</strong> 구조입니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>채널 주도권</h3>
+        <ul style={styles.list}>
+          <li>매장이 디지털 채널(QR 코드)을 소유합니다</li>
+          <li>플랫폼은 도구만 제공하고, 채널 운영은 매장이 결정합니다</li>
+          <li>콘텐츠 선택과 노출도 매장의 권한입니다</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>무재고 판매 (B2C)</h3>
+        <ul style={styles.list}>
+          <li><strong>재고 부담 없음</strong>: 창고, 보관, 재고 관리 불필요</li>
+          <li><strong>배송 부담 없음</strong>: 포장, 배송은 공급사가 처리</li>
+          <li><strong>취급만 선택</strong>: 어떤 상품을 노출할지만 결정</li>
+        </ul>
+      </div>
+
+      <div style={styles.infoCard}>
+        <QrCode size={24} style={{ color: '#f59e0b' }} />
+        <div>
+          <strong>QR 코드의 역할</strong>
+          <p style={styles.infoText}>
+            QR 코드는 매장의 디지털 채널 입구입니다.
+            고객이 스캔하면 매장이 선택한 콘텐츠와 상품이 노출됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>B2B + B2C 동시 구조</h3>
+        <ul style={styles.list}>
+          <li><strong>B2B</strong>: 공급사 → 매장 (도매 가격, 대량 주문)</li>
+          <li><strong>B2C</strong>: 매장 → 소비자 (무재고, 드롭쉬핑)</li>
+          <li>하나의 시스템에서 두 가지 흐름을 동시에 지원</li>
+        </ul>
+      </div>
+
+      <div style={styles.footer}>
+        <Link to="/channel/structure" style={styles.forumButton}>
+          채널·판매 구조 상세 보기 →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function SignageSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>디지털사이니지</h2>
+      <p style={styles.text}>
+        매장 내 TV/디스플레이에 콘텐츠를 송출하는 시스템입니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>주요 기능</h3>
+        <ul style={styles.list}>
+          <li><strong>플레이리스트</strong>: 미디어 항목의 재생 목록</li>
+          <li><strong>미디어 라이브러리</strong>: 이미지, 동영상, HTML 콘텐츠</li>
+          <li><strong>스케줄</strong>: 요일/시간별 자동 재생</li>
+          <li><strong>템플릿</strong>: 레이아웃 및 영역 설정</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>콘텐츠 흐름 (Global Content)</h3>
+        <ul style={styles.list}>
+          <li><strong>HQ</strong>: 본사에서 제작한 글로벌 콘텐츠</li>
+          <li><strong>Supplier</strong>: 공급사가 제공하는 콘텐츠</li>
+          <li><strong>Community</strong>: 커뮤니티 공유 콘텐츠</li>
+          <li><strong>Store</strong>: 매장 자체 콘텐츠</li>
+        </ul>
+      </div>
+
+      <div style={styles.infoCard}>
+        <Tv size={24} style={{ color: '#0ea5e9' }} />
+        <div>
+          <strong>Clone & Customize</strong>
+          <p style={styles.infoText}>
+            매장은 글로벌 콘텐츠를 복제(Clone)하여 자체적으로 수정할 수 있습니다.
+            원본은 유지되고, 매장 전용 버전이 생성됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>역할별 기능</h3>
+        <ul style={styles.list}>
+          <li><strong>HQ 운영자</strong>: 글로벌 플레이리스트/미디어, 템플릿 관리</li>
+          <li><strong>매장</strong>: 자체 플레이리스트, 스케줄, 디스플레이 관리</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function ForumSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>포럼/게시판</h2>
+      <p style={styles.text}>
+        서비스 사용자들이 소통하는 커뮤니티 게시판입니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>게시판 종류</h3>
+        <ul style={styles.list}>
+          <li><strong>테스트 피드백</strong>: 테스트 중 발견한 문제, 개선 의견</li>
+          <li><strong>서비스 업데이트</strong>: 새 기능, 변경 사항 공지</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>주요 기능</h3>
+        <ul style={styles.list}>
+          <li>게시글 작성/수정/삭제</li>
+          <li>댓글 및 답글</li>
+          <li>AI 요약 및 자동 태깅</li>
+          <li>실시간 알림 (SSE)</li>
+          <li>게시글 추천</li>
+        </ul>
+      </div>
+
+      <div style={styles.infoCard}>
+        <MessageSquare size={24} style={{ color: '#10b981' }} />
+        <div>
+          <strong>외부 연락처 표시</strong>
+          <p style={styles.infoText}>
+            게시글 작성 시 카카오톡 등 외부 연락처 공개를 선택할 수 있습니다.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -198,97 +362,6 @@ function SupplierFlowSection() {
               승인된 파트너와의 관계를 유지하고 발주를 처리합니다.
             </p>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PartnerFlowSection() {
-  return (
-    <div>
-      <h2 style={styles.sectionTitle}>파트너 흐름</h2>
-      <p style={styles.text}>
-        파트너로서 Neture를 사용하는 전체 흐름입니다.
-      </p>
-
-      <div style={styles.stepList}>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>1</span>
-          <div>
-            <strong>공급자 탐색</strong>
-            <p style={styles.stepText}>
-              공급자 목록에서 관심 있는 공급자를 찾습니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>2</span>
-          <div>
-            <strong>상품 정보 확인</strong>
-            <p style={styles.stepText}>
-              공급자의 상품, 공급 조건, 콘텐츠를 확인합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>3</span>
-          <div>
-            <strong>제휴 요청</strong>
-            <p style={styles.stepText}>
-              관심 있는 공급자에게 제휴를 요청합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>4</span>
-          <div>
-            <strong>승인 대기</strong>
-            <p style={styles.stepText}>
-              공급자의 승인을 기다립니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>5</span>
-          <div>
-            <strong>발주 진행</strong>
-            <p style={styles.stepText}>
-              승인 후 필요한 상품을 발주합니다.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ContentSection() {
-  return (
-    <div>
-      <h2 style={styles.sectionTitle}>콘텐츠 활용</h2>
-      <p style={styles.text}>
-        Neture에서 콘텐츠가 어떻게 활용되는지 안내합니다.
-      </p>
-
-      <div style={styles.highlightBox}>
-        <h3 style={styles.highlightTitle}>콘텐츠 유형</h3>
-        <ul style={styles.list}>
-          <li><strong>제품 설명</strong>: 상세한 제품 소개 텍스트</li>
-          <li><strong>이미지</strong>: 제품 사진, 배너 이미지</li>
-          <li><strong>가이드</strong>: 사용 방법, FAQ</li>
-          <li><strong>동영상</strong>: YouTube, Vimeo 링크</li>
-        </ul>
-      </div>
-
-      <div style={styles.infoCard}>
-        <FileText size={24} style={{ color: '#10b981' }} />
-        <div>
-          <strong>콘텐츠 활용 원칙</strong>
-          <p style={styles.infoText}>
-            공급자가 등록한 콘텐츠는 파트너가 <strong>참고 자료로 활용</strong>합니다.
-            자동 적용되거나 강제 배포되지 않습니다.
-          </p>
         </div>
       </div>
     </div>

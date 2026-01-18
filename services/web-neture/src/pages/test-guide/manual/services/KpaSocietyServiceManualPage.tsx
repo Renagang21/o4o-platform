@@ -1,19 +1,23 @@
 /**
  * KpaSocietyServiceManualPage - KPA Society 서비스 매뉴얼
  * 약사회 SaaS 운영 플랫폼
+ *
+ * WO-KPA-SERVICE-MANUAL-UPDATE-V2: LMS, 포럼, 공동구매, 관리자 대시보드 기능 추가
  */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building, Users, Calendar, FileText, Settings, AlertCircle } from 'lucide-react';
+import { Building, Users, FileText, AlertCircle, BookOpen, MessageSquare, ShoppingCart, LayoutDashboard } from 'lucide-react';
 import ManualLayout, { type ManualSection } from '../../../../components/layouts/ManualLayout';
 
 const SECTIONS: ManualSection[] = [
   { id: 'intro', title: '서비스 소개' },
   { id: 'features', title: '주요 기능' },
+  { id: 'roles', title: '역할별 대시보드' },
+  { id: 'lms', title: 'LMS (교육)' },
+  { id: 'forum', title: '포럼/게시판' },
+  { id: 'groupbuy', title: '공동구매' },
   { id: 'members', title: '회원 관리' },
-  { id: 'events', title: '행사/교육 관리' },
-  { id: 'documents', title: '문서 관리' },
   { id: 'faq', title: '자주 묻는 질문' },
 ];
 
@@ -26,12 +30,16 @@ export default function KpaSocietyServiceManualPage() {
         return <IntroSection />;
       case 'features':
         return <FeaturesSection />;
+      case 'roles':
+        return <RolesSection />;
+      case 'lms':
+        return <LmsSection />;
+      case 'forum':
+        return <ForumSection />;
+      case 'groupbuy':
+        return <GroupbuySection />;
       case 'members':
         return <MembersSection />;
-      case 'events':
-        return <EventsSection />;
-      case 'documents':
-        return <DocumentsSection />;
       case 'faq':
         return <FaqSection />;
       default:
@@ -84,11 +92,21 @@ function IntroSection() {
       </div>
 
       <div style={styles.highlightBox}>
-        <h3 style={styles.highlightTitle}>사용자 역할</h3>
+        <h3 style={styles.highlightTitle}>사용자 역할 (계층 구조)</h3>
         <ul style={styles.list}>
-          <li><strong>관리자</strong>: 단체 전체 운영 및 설정</li>
-          <li><strong>운영진</strong>: 행사/교육 관리</li>
-          <li><strong>일반 회원</strong>: 정보 조회 및 행사 참여</li>
+          <li><strong>서비스 운영자</strong>: 전체 플랫폼 운영 및 AI 리포트</li>
+          <li><strong>지부 관리자</strong>: 지부 전체 운영 (분회 관리, 회원 승인)</li>
+          <li><strong>분회 관리자</strong>: 분회 수준 운영 (뉴스, 자료, 회원)</li>
+          <li><strong>일반 회원</strong>: 정보 조회, 포럼 참여, 교육 수강</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>조직 계층</h3>
+        <ul style={styles.list}>
+          <li><strong>본회</strong>: 대한약사회 (최상위)</li>
+          <li><strong>지부</strong>: 각 시/도 약사회</li>
+          <li><strong>분회</strong>: 구/군 단위 약사회</li>
         </ul>
       </div>
     </div>
@@ -108,28 +126,42 @@ function FeaturesSection() {
           <Users size={20} style={{ color: '#6366f1' }} />
           <h4 style={styles.featureTitle}>회원 관리</h4>
           <p style={styles.featureDesc}>
-            회원 정보, 회비, 자격 관리
+            회원 정보, 회비, 자격/면허 관리
           </p>
         </div>
         <div style={styles.featureCard}>
-          <Calendar size={20} style={{ color: '#0ea5e9' }} />
-          <h4 style={styles.featureTitle}>행사 관리</h4>
+          <BookOpen size={20} style={{ color: '#0ea5e9' }} />
+          <h4 style={styles.featureTitle}>LMS (교육)</h4>
           <p style={styles.featureDesc}>
-            행사 등록, 참가 신청, 출석 관리
+            강좌, 퀴즈, 수료증, 평점 관리
           </p>
         </div>
         <div style={styles.featureCard}>
-          <FileText size={20} style={{ color: '#10b981' }} />
-          <h4 style={styles.featureTitle}>문서 관리</h4>
+          <MessageSquare size={20} style={{ color: '#10b981' }} />
+          <h4 style={styles.featureTitle}>포럼/게시판</h4>
           <p style={styles.featureDesc}>
-            공문, 회의록, 자료 아카이브
+            복약지도, 부작용 공유, 교육자료
           </p>
         </div>
         <div style={styles.featureCard}>
-          <Settings size={20} style={{ color: '#f59e0b' }} />
-          <h4 style={styles.featureTitle}>설정</h4>
+          <ShoppingCart size={20} style={{ color: '#f59e0b' }} />
+          <h4 style={styles.featureTitle}>공동구매</h4>
           <p style={styles.featureDesc}>
-            단체 정보, 권한, 알림 설정
+            회원 전용 상품, 공급자 연계
+          </p>
+        </div>
+        <div style={styles.featureCard}>
+          <LayoutDashboard size={20} style={{ color: '#8b5cf6' }} />
+          <h4 style={styles.featureTitle}>관리자 대시보드</h4>
+          <p style={styles.featureDesc}>
+            통계, 승인 대기, 퀵 메뉴
+          </p>
+        </div>
+        <div style={styles.featureCard}>
+          <FileText size={20} style={{ color: '#ec4899' }} />
+          <h4 style={styles.featureTitle}>뉴스/자료실</h4>
+          <p style={styles.featureDesc}>
+            공지사항, 자료 아카이브
           </p>
         </div>
       </div>
@@ -144,6 +176,203 @@ function FeaturesSection() {
   );
 }
 
+function RolesSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>역할별 대시보드</h2>
+      <p style={styles.text}>
+        각 역할에 맞는 전용 대시보드와 기능을 제공합니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>서비스 운영자 (/operator)</h3>
+        <ul style={styles.list}>
+          <li>전체 플랫폼 현황 대시보드</li>
+          <li>AI 리포트 (운영 인사이트)</li>
+          <li>공동구매 상품 관리 및 통계</li>
+          <li>공급자 연계 상태 모니터링</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>지부 관리자 (/admin)</h3>
+        <ul style={styles.list}>
+          <li>분회 관리 (생성, 수정, 삭제)</li>
+          <li>회원 목록 및 승인</li>
+          <li>임원 관리</li>
+          <li>연회비 관리</li>
+          <li>신상신고 처리</li>
+          <li>공지/소식 작성</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>분회 관리자 (/branch/:id/admin)</h3>
+        <ul style={styles.list}>
+          <li>분회 수준 회원 관리</li>
+          <li>분회 임원 관리</li>
+          <li>뉴스/자료 관리</li>
+          <li>게시판 중재</li>
+        </ul>
+      </div>
+
+      <div style={styles.infoCard}>
+        <LayoutDashboard size={24} style={{ color: '#6366f1' }} />
+        <div>
+          <strong>대시보드 통계 항목</strong>
+          <p style={styles.infoText}>
+            등록 분회 수, 전체 회원 수, 승인 대기, 진행중 공동구매
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LmsSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>LMS (교육 관리)</h2>
+      <p style={styles.text}>
+        약사 보수교육과 필수교육을 관리하는 학습관리시스템입니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>주요 기능</h3>
+        <ul style={styles.list}>
+          <li><strong>강좌 관리</strong>: 온라인/오프라인 강좌 등록</li>
+          <li><strong>퀴즈/설문</strong>: 학습 평가 및 만족도 조사</li>
+          <li><strong>수료증</strong>: 자동 발급 및 검증 코드</li>
+          <li><strong>평점 관리</strong>: 보수교육 평점 누적 및 추적</li>
+          <li><strong>필수교육 정책</strong>: 부서별 의무교육 설정</li>
+        </ul>
+      </div>
+
+      <div style={styles.stepList}>
+        <div style={styles.stepItem}>
+          <span style={styles.stepNumber}>1</span>
+          <div>
+            <strong>강좌 등록</strong>
+            <p style={styles.stepText}>관리자가 강좌 정보, 강의 목록, 평점을 등록합니다.</p>
+          </div>
+        </div>
+        <div style={styles.stepItem}>
+          <span style={styles.stepNumber}>2</span>
+          <div>
+            <strong>수강 신청</strong>
+            <p style={styles.stepText}>회원이 강좌를 검색하고 수강 신청합니다.</p>
+          </div>
+        </div>
+        <div style={styles.stepItem}>
+          <span style={styles.stepNumber}>3</span>
+          <div>
+            <strong>학습 진행</strong>
+            <p style={styles.stepText}>레슨 시청, 퀴즈 응시, 진도 추적이 자동으로 관리됩니다.</p>
+          </div>
+        </div>
+        <div style={styles.stepItem}>
+          <span style={styles.stepNumber}>4</span>
+          <div>
+            <strong>수료 및 평점</strong>
+            <p style={styles.stepText}>수료 시 수료증 발급 및 보수교육 평점이 자동 기록됩니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style={styles.infoCard}>
+        <BookOpen size={24} style={{ color: '#0ea5e9' }} />
+        <div>
+          <strong>면허 프로필 연동</strong>
+          <p style={styles.infoText}>
+            약사 면허번호와 연동하여 보수교육 이수 현황을 자동 관리합니다.
+            갱신 필요 여부, 당년도 평점 등을 실시간 확인할 수 있습니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ForumSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>포럼/게시판</h2>
+      <p style={styles.text}>
+        약사 회원 전용 커뮤니티 게시판입니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>게시판 카테고리</h3>
+        <ul style={styles.list}>
+          <li><strong>지부 공지</strong>: 공식 공지사항</li>
+          <li><strong>복약지도</strong>: 복약지도 노하우 공유</li>
+          <li><strong>부작용 공유</strong>: 약물 부작용 정보 공유</li>
+          <li><strong>교육자료</strong>: 학습 자료 공유</li>
+        </ul>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>주요 기능</h3>
+        <ul style={styles.list}>
+          <li>게시글 작성/수정/삭제</li>
+          <li>댓글 및 답글 기능</li>
+          <li>AI 요약 및 자동 태깅</li>
+          <li>게시글 추천 엔진</li>
+          <li>실시간 알림 (SSE)</li>
+          <li>콘텐츠 중재 기능</li>
+        </ul>
+      </div>
+
+      <div style={styles.tipBox}>
+        <MessageSquare size={16} style={{ color: '#6366f1', flexShrink: 0 }} />
+        <p style={styles.tipText}>
+          약사 포럼은 승인제로 운영됩니다. 게시글은 관리자 승인 후 공개됩니다.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function GroupbuySection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>공동구매</h2>
+      <p style={styles.text}>
+        회원 전용 공동구매 서비스입니다.
+      </p>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>운영자 기능</h3>
+        <ul style={styles.list}>
+          <li><strong>상품 관리</strong>: 추가, 삭제, 노출/비노출 설정</li>
+          <li><strong>순서 관리</strong>: 상품 정렬 순서 변경</li>
+          <li><strong>통계 조회</strong>: 주문 현황, 참여자 통계</li>
+          <li><strong>공급자 연계</strong>: 공급자 시스템 연동 상태</li>
+        </ul>
+      </div>
+
+      <div style={styles.infoCard}>
+        <ShoppingCart size={24} style={{ color: '#f59e0b' }} />
+        <div>
+          <strong>무재고 판매 구조</strong>
+          <p style={styles.infoText}>
+            매장은 재고를 보유하지 않습니다.
+            공급자가 직접 배송하는 드롭쉬핑 방식으로 운영됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.tipBox}>
+        <AlertCircle size={16} style={{ color: '#6366f1', flexShrink: 0 }} />
+        <p style={styles.tipText}>
+          현재 테스트 환경에서는 공급자 연계가 Mock 모드로 동작합니다.
+          실제 주문은 처리되지 않습니다.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function MembersSection() {
   return (
     <div>
@@ -152,40 +381,41 @@ function MembersSection() {
         회원 정보를 등록하고 관리하는 방법입니다.
       </p>
 
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>회원 정보 필드</h3>
+        <ul style={styles.list}>
+          <li><strong>기본 정보</strong>: 이름, 연락처, 이메일</li>
+          <li><strong>면허 정보</strong>: 약사 면허번호, 발급일, 만료일</li>
+          <li><strong>소속 정보</strong>: 약국명, 약국 주소</li>
+          <li><strong>가입 정보</strong>: 가입일, 상태, 역할</li>
+        </ul>
+      </div>
+
       <div style={styles.stepList}>
         <div style={styles.stepItem}>
           <span style={styles.stepNumber}>1</span>
           <div>
-            <strong>회원 목록 조회</strong>
+            <strong>회원 가입 신청</strong>
             <p style={styles.stepText}>
-              회원 관리 메뉴에서 전체 회원을 조회합니다.
+              사용자가 회원 가입을 신청하면 관리자에게 알림이 전송됩니다.
             </p>
           </div>
         </div>
         <div style={styles.stepItem}>
           <span style={styles.stepNumber}>2</span>
           <div>
-            <strong>회원 검색/필터</strong>
+            <strong>승인/거절 처리</strong>
             <p style={styles.stepText}>
-              이름, 소속, 회비 납부 상태 등으로 필터링합니다.
+              관리자가 승인 대기 목록에서 가입 요청을 검토합니다.
             </p>
           </div>
         </div>
         <div style={styles.stepItem}>
           <span style={styles.stepNumber}>3</span>
           <div>
-            <strong>회원 정보 수정</strong>
+            <strong>회원 정보 관리</strong>
             <p style={styles.stepText}>
-              회원 상세에서 연락처, 소속, 자격 정보를 수정합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>4</span>
-          <div>
-            <strong>회비 관리</strong>
-            <p style={styles.stepText}>
-              회비 납부 현황을 확인하고 독촉 알림을 발송합니다.
+              승인된 회원의 정보를 조회하고 수정합니다.
             </p>
           </div>
         </div>
@@ -194,139 +424,22 @@ function MembersSection() {
       <div style={styles.highlightBox}>
         <h3 style={styles.highlightTitle}>회원 상태</h3>
         <ul style={styles.list}>
-          <li><strong>정회원</strong>: 회비 납부 완료, 모든 권한</li>
-          <li><strong>준회원</strong>: 일부 권한 제한</li>
-          <li><strong>휴면</strong>: 회비 미납 또는 활동 중단</li>
-          <li><strong>탈퇴</strong>: 회원 자격 상실</li>
+          <li><strong>pending</strong>: 승인 대기</li>
+          <li><strong>active</strong>: 활성 (정상)</li>
+          <li><strong>suspended</strong>: 정지</li>
+          <li><strong>withdrawn</strong>: 탈퇴</li>
         </ul>
-      </div>
-    </div>
-  );
-}
-
-function EventsSection() {
-  return (
-    <div>
-      <h2 style={styles.sectionTitle}>행사/교육 관리</h2>
-      <p style={styles.text}>
-        단체 행사와 교육 프로그램을 관리하는 방법입니다.
-      </p>
-
-      <div style={styles.stepList}>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>1</span>
-          <div>
-            <strong>행사 등록</strong>
-            <p style={styles.stepText}>
-              새 행사를 등록하고 일시, 장소, 내용을 입력합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>2</span>
-          <div>
-            <strong>참가 신청 관리</strong>
-            <p style={styles.stepText}>
-              회원의 참가 신청을 접수하고 관리합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>3</span>
-          <div>
-            <strong>알림 발송</strong>
-            <p style={styles.stepText}>
-              참가자에게 행사 안내 및 리마인더를 발송합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>4</span>
-          <div>
-            <strong>출석 관리</strong>
-            <p style={styles.stepText}>
-              QR 코드 또는 수동으로 출석을 체크합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>5</span>
-          <div>
-            <strong>교육 이수 기록</strong>
-            <p style={styles.stepText}>
-              교육 참석 시 보수교육 이수 시간을 자동 기록합니다.
-            </p>
-          </div>
-        </div>
       </div>
 
       <div style={styles.infoCard}>
-        <Calendar size={24} style={{ color: '#0ea5e9' }} />
+        <Users size={24} style={{ color: '#6366f1' }} />
         <div>
-          <strong>행사 유형</strong>
+          <strong>권한과 직책의 분리</strong>
           <p style={styles.infoText}>
-            정기총회, 학술대회, 보수교육, 친목행사 등
-            다양한 행사 유형을 지원합니다.
+            임원은 직책(Position)이며, 권한은 Role로만 부여됩니다.
+            예: 회장이라는 직책과 admin 권한은 별개입니다.
           </p>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function DocumentsSection() {
-  return (
-    <div>
-      <h2 style={styles.sectionTitle}>문서 관리</h2>
-      <p style={styles.text}>
-        단체 문서를 저장하고 관리하는 방법입니다.
-      </p>
-
-      <div style={styles.highlightBox}>
-        <h3 style={styles.highlightTitle}>문서 유형</h3>
-        <ul style={styles.list}>
-          <li><strong>공문</strong>: 발송/수신 공문 관리</li>
-          <li><strong>회의록</strong>: 이사회, 총회 등 회의 기록</li>
-          <li><strong>규정</strong>: 정관, 운영규정, 세칙</li>
-          <li><strong>자료실</strong>: 각종 참고 자료 보관</li>
-        </ul>
-      </div>
-
-      <div style={styles.stepList}>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>1</span>
-          <div>
-            <strong>문서 업로드</strong>
-            <p style={styles.stepText}>
-              PDF, Word, Excel 등 문서 파일을 업로드합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>2</span>
-          <div>
-            <strong>분류 및 태그</strong>
-            <p style={styles.stepText}>
-              문서를 분류하고 검색용 태그를 추가합니다.
-            </p>
-          </div>
-        </div>
-        <div style={styles.stepItem}>
-          <span style={styles.stepNumber}>3</span>
-          <div>
-            <strong>공개 범위 설정</strong>
-            <p style={styles.stepText}>
-              전체 공개, 회원 전용, 운영진 전용 등 설정합니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div style={styles.tipBox}>
-        <FileText size={16} style={{ color: '#6366f1', flexShrink: 0 }} />
-        <p style={styles.tipText}>
-          중요 문서는 버전 관리 기능을 활용하여 변경 이력을 추적할 수 있습니다.
-        </p>
       </div>
     </div>
   );

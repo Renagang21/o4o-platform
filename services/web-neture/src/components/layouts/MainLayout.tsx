@@ -27,11 +27,12 @@ export default function MainLayout() {
               >
                 공급자
               </Link>
+              {/* WO-NETURE-HOME-HERO-AND-NAV-O4O-ALIGNMENT-V1: 파트너 → 참여 안내 */}
               <Link
                 to="/partners/info"
                 className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
               >
-                파트너
+                참여 안내
               </Link>
               <Link
                 to="/partners/requests"

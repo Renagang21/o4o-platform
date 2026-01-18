@@ -4,9 +4,12 @@
  * 네뚜레(Neture)는 유통 정보 플랫폼입니다.
  * 이 페이지는 공급자·파트너·협력사가 네뚜레에 등록하기 위한 안내를 제공합니다.
  *
+ * WO-NETURE-PARTNER-INFO-PAGE-V2: 채널·판매 구조 안내 추가
+ *
  * 책임:
  * - 각 역할의 정의와 관계 설명
  * - 참여 절차 안내
+ * - 채널·판매 구조 연결
  */
 
 import { Link } from 'react-router-dom';
@@ -25,7 +28,7 @@ const ROLE_CARDS: RoleCard[] = [
     id: 'supplier',
     icon: '📦',
     title: '공급자',
-    description: '상품을 공급하고 O4O 유통망에 참여합니다. 공급자 등록을 통해 다양한 서비스에 상품을 노출할 수 있습니다.',
+    description: '상품을 공급하고 유통망에 참여합니다. 공급자 등록을 통해 다양한 서비스에 상품을 노출할 수 있습니다.',
     linkTo: '/suppliers',
     linkText: '등록된 공급자 보기',
   },
@@ -50,15 +53,22 @@ const ROLE_CARDS: RoleCard[] = [
 export function PartnerInfoPage() {
   return (
     <div style={styles.container}>
+      {/* o4o 소개 유도 배너 (WO-NETURE-PARTNERS-INFO-O4O-REALIGNMENT-V1) */}
+      <div style={styles.o4oBanner}>
+        <p style={styles.o4oBannerText}>
+          o4o 플랫폼의 구조와 철학을 먼저 확인해 보세요.
+        </p>
+        <Link to="/o4o" style={styles.o4oBannerLink}>
+          o4o 플랫폼 소개 보기 →
+        </Link>
+      </div>
+
       {/* 상단 설명 영역 */}
       <header style={styles.header}>
         <h1 style={styles.title}>참여 안내</h1>
         <div style={styles.notice}>
           <p style={styles.noticeText}>
-            <strong>네뚜레(Neture)는 O4O 유통 정보 플랫폼입니다.</strong>
-          </p>
-          <p style={styles.noticeText}>
-            공급자, 파트너, 협력사로 참여하여 O4O 생태계에 합류하세요.
+            공급자, 파트너, 협력사로 네뚜레에 참여할 수 있습니다.
           </p>
           <p style={styles.noticeText}>
             등록된 정보는 K-Cosmetics, GlycoPharm 등 연결된 서비스에 노출됩니다.
@@ -106,6 +116,24 @@ export function PartnerInfoPage() {
         </div>
       </section>
 
+      {/* 채널·판매 구조 안내 (WO-NETURE-PARTNER-INFO-PAGE-V2) */}
+      <section style={styles.channelSection}>
+        <h2 style={styles.channelSectionTitle}>채널·판매 구조 이해하기</h2>
+        <p style={styles.channelSectionText}>
+          o4o 플랫폼의 <strong>무재고 판매 구조</strong>와 <strong>채널 주도권</strong> 개념을 이해하면
+          <br />
+          파트너로서 어떤 역할을 수행하게 되는지 명확해집니다.
+        </p>
+        <div style={styles.channelLinks}>
+          <Link to="/channel/structure" style={styles.channelLinkPrimary}>
+            채널·판매 구조 상세 보기 →
+          </Link>
+          <Link to="/seller/overview" style={styles.channelLinkSecondary}>
+            매장(판매자) 안내 보기 →
+          </Link>
+        </div>
+      </section>
+
       {/* 하단 */}
       <footer style={styles.footer}>
         <Link to="/" style={styles.backLink}>
@@ -123,6 +151,33 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '900px',
     margin: '0 auto',
     padding: '48px 24px',
+  },
+  // o4o 유도 배너 (WO-NETURE-PARTNERS-INFO-O4O-REALIGNMENT-V1)
+  o4oBanner: {
+    backgroundColor: '#0f172a',
+    borderRadius: '12px',
+    padding: '20px 24px',
+    marginBottom: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: '16px',
+  },
+  o4oBannerText: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: '15px',
+    margin: 0,
+  },
+  o4oBannerLink: {
+    display: 'inline-block',
+    padding: '10px 20px',
+    backgroundColor: PRIMARY_COLOR,
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    borderRadius: '6px',
+    textDecoration: 'none',
   },
   header: {
     textAlign: 'center',
@@ -229,6 +284,53 @@ const styles: Record<string, React.CSSProperties> = {
   stepArrow: {
     fontSize: '20px',
     color: '#ccc',
+  },
+  // Channel Section (WO-NETURE-PARTNER-INFO-PAGE-V2)
+  channelSection: {
+    backgroundColor: '#f0f9ff',
+    borderRadius: '16px',
+    padding: '32px',
+    marginBottom: '32px',
+    textAlign: 'center',
+  },
+  channelSectionTitle: {
+    fontSize: '20px',
+    fontWeight: 600,
+    color: '#0369a1',
+    marginBottom: '16px',
+  },
+  channelSectionText: {
+    fontSize: '15px',
+    color: '#334155',
+    lineHeight: 1.7,
+    marginBottom: '20px',
+  },
+  channelLinks: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '16px',
+    flexWrap: 'wrap',
+  },
+  channelLinkPrimary: {
+    display: 'inline-block',
+    padding: '12px 24px',
+    backgroundColor: PRIMARY_COLOR,
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    borderRadius: '8px',
+    textDecoration: 'none',
+  },
+  channelLinkSecondary: {
+    display: 'inline-block',
+    padding: '12px 24px',
+    backgroundColor: '#fff',
+    color: PRIMARY_COLOR,
+    fontSize: '14px',
+    fontWeight: 600,
+    borderRadius: '8px',
+    textDecoration: 'none',
+    border: `1px solid ${PRIMARY_COLOR}`,
   },
   footer: {
     textAlign: 'center',

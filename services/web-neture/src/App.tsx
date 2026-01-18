@@ -18,12 +18,20 @@
  * - Neture는 공급자 통합 운영 대시보드
  * - 신청 생성은 각 서비스에서 처리
  * - 신청 승인/거절은 공급자가 Neture에서 처리
+ *
+ * Code Splitting:
+ * - Heavy pages (Admin, Supplier, Operator) are lazy loaded
+ * - Content Editor (TipTap) is lazy loaded
  */
 
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts';
 import MainLayout from './components/layouts/MainLayout';
+
+// Core pages (always loaded)
 import HomePage from './pages/HomePage';
+import O4OIntroPage from './pages/O4OIntroPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
@@ -31,73 +39,33 @@ import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
-// PartnershipRequestCreatePage 제거됨 (WO-NETURE-EXTENSION-P1: 신청은 각 서비스에서 직접 처리)
 import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
+import SellerOverviewPage from './pages/SellerOverviewPage';
+import SellerQRGuidePage from './pages/SellerQRGuidePage';
+import {
+  SellerOverviewPharmacy,
+  SellerOverviewBeauty,
+  SellerOverviewMarket,
+} from './pages/seller';
+import PartnerOverviewInfoPage from './pages/PartnerOverviewInfoPage';
+import {
+  DentalChannelExplanationPage,
+  PharmacyChannelExplanationPage,
+  OpticalChannelExplanationPage,
+  MedicalChannelExplanationPage,
+  ChannelSalesStructurePage,
+} from './pages/channel';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
 
-// Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0)
-import {
-  SupplierDashboardLayout,
-  SupplierDashboardPage,
-  SellerRequestsPage,
-  SellerRequestDetailPage,
-  SupplierProductsPage,
-  SupplierOrdersPage,
-  SupplierContentsPage,
-} from './pages/supplier';
-
-// Content Editor (WO-CONTENT-EDITOR-V1)
-import ContentEditorPage from './pages/supplier/content/ContentEditorPage';
-
-// Partner Dashboard
-import { PartnerOverviewPage } from './pages/partner/PartnerOverviewPage';
-import { CollaborationPage } from './pages/partner/CollaborationPage';
-import { PromotionsPage } from './pages/partner/PromotionsPage';
-import { SettlementsPage } from './pages/partner/SettlementsPage';
-
-// Admin Dashboard
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import AiCardExplainPage from './pages/admin/AiCardExplainPage';
-import AiCardReportPage from './pages/admin/AiCardReportPage';
-import AiBusinessPackPage from './pages/admin/AiBusinessPackPage';
-import AiOperationsPage from './pages/admin/AiOperationsPage';
-
-// AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1)
-// AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1)
-// AI Cost Tooling (WO-AI-COST-TOOLING-V1)
-// AI Context Asset Manager (WO-AI-CONTEXT-ASSET-MANAGER-V1)
-// AI Answer Composition Rules (WO-AI-ANSWER-COMPOSITION-RULES-V1)
-import {
-  AiAdminDashboardPage,
-  AiEnginesPage,
-  AiPolicyPage,
-  AssetQualityPage,
-  AiCostPage,
-  ContextAssetListPage,
-  ContextAssetFormPage,
-  AnswerCompositionRulesPage,
-} from './pages/admin/ai';
-
-// Admin Settings
-import { EmailSettingsPage } from './pages/admin/settings';
-
-// Operator Settings & Registration Management
-import { EmailNotificationSettingsPage } from './pages/operator/settings';
-import { RegistrationRequestsPage } from './pages/operator/registrations';
-
-// Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1)
-import { OperatorDashboard, OperatorAiReportPage } from './pages/operator';
-
-// Test Guide Pages
+// Test Guide Pages (always loaded - lightweight)
 import {
   TestGuidePage,
   SupplierManualPage,
   PartnerManualPage,
   AdminManualPage,
   ContentEditorManualPage,
-  // Service Manuals
   NetureServiceManualPage,
   KCosmeticsServiceManualPage,
   GlycoPharmServiceManualPage,
@@ -105,105 +73,224 @@ import {
   KpaSocietyServiceManualPage,
 } from './pages/test-guide';
 
-// Forum Pages (WO-NETURE-TEST-SECTIONS-V1)
+// Forum Pages (always loaded)
 import { ForumPage } from './pages/forum/ForumPage';
 import { ForumWritePage } from './pages/forum/ForumWritePage';
 import { ForumPostPage } from './pages/forum/ForumPostPage';
+
+// ============================================================================
+// Lazy loaded pages (heavy / rarely accessed)
+// ============================================================================
+
+// Supplier Dashboard
+const SupplierDashboardLayout = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardLayout }))
+);
+const SupplierDashboardPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardPage }))
+);
+const SellerRequestsPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SellerRequestsPage }))
+);
+const SellerRequestDetailPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SellerRequestDetailPage }))
+);
+const SupplierProductsPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierProductsPage }))
+);
+const SupplierOrdersPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierOrdersPage }))
+);
+const SupplierContentsPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierContentsPage }))
+);
+
+// Content Editor (TipTap - heavy)
+const ContentEditorPage = lazy(() => import('./pages/supplier/content/ContentEditorPage'));
+
+// Partner Dashboard
+const PartnerOverviewPage = lazy(() =>
+  import('./pages/partner/PartnerOverviewPage').then((m) => ({ default: m.PartnerOverviewPage }))
+);
+const CollaborationPage = lazy(() =>
+  import('./pages/partner/CollaborationPage').then((m) => ({ default: m.CollaborationPage }))
+);
+const PromotionsPage = lazy(() =>
+  import('./pages/partner/PromotionsPage').then((m) => ({ default: m.PromotionsPage }))
+);
+const SettlementsPage = lazy(() =>
+  import('./pages/partner/SettlementsPage').then((m) => ({ default: m.SettlementsPage }))
+);
+
+// Admin Dashboard
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AiCardExplainPage = lazy(() => import('./pages/admin/AiCardExplainPage'));
+const AiCardReportPage = lazy(() => import('./pages/admin/AiCardReportPage'));
+const AiBusinessPackPage = lazy(() => import('./pages/admin/AiBusinessPackPage'));
+const AiOperationsPage = lazy(() => import('./pages/admin/AiOperationsPage'));
+
+// AI Admin Control Plane
+const AiAdminDashboardPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.AiAdminDashboardPage }))
+);
+const AiEnginesPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.AiEnginesPage }))
+);
+const AiPolicyPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.AiPolicyPage }))
+);
+const AssetQualityPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.AssetQualityPage }))
+);
+const AiCostPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.AiCostPage }))
+);
+const ContextAssetListPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.ContextAssetListPage }))
+);
+const ContextAssetFormPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.ContextAssetFormPage }))
+);
+const AnswerCompositionRulesPage = lazy(() =>
+  import('./pages/admin/ai').then((m) => ({ default: m.AnswerCompositionRulesPage }))
+);
+
+// Admin Settings
+const EmailSettingsPage = lazy(() =>
+  import('./pages/admin/settings').then((m) => ({ default: m.EmailSettingsPage }))
+);
+
+// Operator Dashboard
+const OperatorDashboard = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.OperatorDashboard }))
+);
+const OperatorAiReportPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.OperatorAiReportPage }))
+);
+const EmailNotificationSettingsPage = lazy(() =>
+  import('./pages/operator/settings').then((m) => ({ default: m.EmailNotificationSettingsPage }))
+);
+const RegistrationRequestsPage = lazy(() =>
+  import('./pages/operator/registrations').then((m) => ({ default: m.RegistrationRequestsPage }))
+);
+
+// Loading fallback
+function PageLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-gray-500">Loading...</div>
+    </div>
+  );
+}
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          {/* Login & Register - outside MainLayout */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/register/pending" element={<RegisterPendingPage />} />
+        <Suspense fallback={<PageLoading />}>
+          <Routes>
+            {/* Login & Register - outside MainLayout */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/register/pending" element={<RegisterPendingPage />} />
 
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/suppliers" element={<SupplierListPage />} />
-            <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
-            <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
-            {/* /partners/requests/create 제거됨 - 신청은 각 서비스에서 직접 */}
-            <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
-            <Route path="/partners/apply" element={<PartnersApplyPage />} />
-            <Route path="/partners/info" element={<PartnerInfoPage />} />
-            <Route path="/content" element={<ContentListPage />} />
-            <Route path="/content/:id" element={<ContentDetailPage />} />
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<HomePage />} />
+              {/* O4O Platform Introduction (WO-NETURE-O4O-INTRO-PAGE-IMPLEMENTATION-V1) */}
+              <Route path="/o4o" element={<O4OIntroPage />} />
+              <Route path="/suppliers" element={<SupplierListPage />} />
+              <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
+              <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
+              <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
+              <Route path="/partners/apply" element={<PartnersApplyPage />} />
+              <Route path="/partners/info" element={<PartnerInfoPage />} />
+              {/* Seller Overview (WO-NETURE-SELLER-OVERVIEW-PAGE-V1) */}
+              <Route path="/seller/overview" element={<SellerOverviewPage />} />
+              {/* Seller QR Guide (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track A) */}
+              <Route path="/seller/qr-guide" element={<SellerQRGuidePage />} />
+              {/* Seller Overview by Industry (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track B) */}
+              <Route path="/seller/overview/pharmacy" element={<SellerOverviewPharmacy />} />
+              <Route path="/seller/overview/beauty" element={<SellerOverviewBeauty />} />
+              <Route path="/seller/overview/market" element={<SellerOverviewMarket />} />
+              {/* Partner Overview Info (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track C) */}
+              <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
+              {/* Channel Explanation Pages */}
+              <Route path="/channel/structure" element={<ChannelSalesStructurePage />} />
+              <Route path="/channel/dental" element={<DentalChannelExplanationPage />} />
+              <Route path="/channel/pharmacy" element={<PharmacyChannelExplanationPage />} />
+              <Route path="/channel/optical" element={<OpticalChannelExplanationPage />} />
+              <Route path="/channel/medical" element={<MedicalChannelExplanationPage />} />
+              <Route path="/content" element={<ContentListPage />} />
+              <Route path="/content/:id" element={<ContentDetailPage />} />
 
-            {/* Test Guide */}
-            <Route path="/test-guide" element={<TestGuidePage />} />
-            <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
-            <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
-            <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
-            <Route path="/test-guide/manual/content-editor" element={<ContentEditorManualPage />} />
-            {/* Service Manuals */}
-            <Route path="/test-guide/service/neture" element={<NetureServiceManualPage />} />
-            <Route path="/test-guide/service/k-cosmetics" element={<KCosmeticsServiceManualPage />} />
-            <Route path="/test-guide/service/glycopharm" element={<GlycoPharmServiceManualPage />} />
-            <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
-            <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
+              {/* Test Guide */}
+              <Route path="/test-guide" element={<TestGuidePage />} />
+              <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
+              <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
+              <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
+              <Route path="/test-guide/manual/content-editor" element={<ContentEditorManualPage />} />
+              <Route path="/test-guide/service/neture" element={<NetureServiceManualPage />} />
+              <Route path="/test-guide/service/k-cosmetics" element={<KCosmeticsServiceManualPage />} />
+              <Route path="/test-guide/service/glycopharm" element={<GlycoPharmServiceManualPage />} />
+              <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
+              <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
 
-            {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
-            <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
-            <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
-            <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />
-            <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
-            <Route path="/forum/service-update/new" element={<ForumWritePage />} />
-            <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
-            <Route path="/forum/write" element={<ForumWritePage />} />
-          </Route>
+              {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
+              <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
+              <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
+              <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />
+              <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
+              <Route path="/forum/service-update/new" element={<ForumWritePage />} />
+              <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
+              <Route path="/forum/write" element={<ForumWritePage />} />
+            </Route>
 
-          {/* Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0) */}
-          <Route element={<SupplierDashboardLayout />}>
-            <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
-            <Route path="/supplier/requests" element={<SellerRequestsPage />} />
-            <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
-            <Route path="/supplier/products" element={<SupplierProductsPage />} />
-            <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
-            <Route path="/supplier/contents" element={<SupplierContentsPage />} />
-            <Route path="/supplier/contents/new" element={<ContentEditorPage />} />
-            <Route path="/supplier/contents/:id/edit" element={<ContentEditorPage />} />
-          </Route>
+            {/* Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0) - Lazy */}
+            <Route element={<SupplierDashboardLayout />}>
+              <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
+              <Route path="/supplier/requests" element={<SellerRequestsPage />} />
+              <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
+              <Route path="/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
+              <Route path="/supplier/contents" element={<SupplierContentsPage />} />
+              <Route path="/supplier/contents/new" element={<ContentEditorPage />} />
+              <Route path="/supplier/contents/:id/edit" element={<ContentEditorPage />} />
+            </Route>
 
-          {/* Partner Dashboard */}
-          <Route path="/partner" element={<PartnerOverviewPage />} />
-          <Route path="/partner/collaboration" element={<CollaborationPage />} />
-          <Route path="/partner/promotions" element={<PromotionsPage />} />
-          <Route path="/partner/settlements" element={<SettlementsPage />} />
+            {/* Partner Dashboard - Lazy */}
+            <Route path="/partner" element={<PartnerOverviewPage />} />
+            <Route path="/partner/collaboration" element={<CollaborationPage />} />
+            <Route path="/partner/promotions" element={<PromotionsPage />} />
+            <Route path="/partner/settlements" element={<SettlementsPage />} />
 
-          {/* Admin Dashboard */}
-          <Route path="/admin" element={<AdminDashboardPage />} />
-          <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
-          <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
-          <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-          <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
+            {/* Admin Dashboard - Lazy */}
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
+            <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
+            <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
+            <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
 
-          {/* AI Admin Control Plane (WO-AI-ADMIN-CONTROL-PLANE-V1) */}
-          {/* AI Asset Quality (WO-AI-ASSET-QUALITY-LOOP-V1) */}
-          {/* AI Cost Tooling (WO-AI-COST-TOOLING-V1) */}
-          {/* AI Context Asset Manager (WO-AI-CONTEXT-ASSET-MANAGER-V1) */}
-          {/* AI Answer Composition Rules (WO-AI-ANSWER-COMPOSITION-RULES-V1) */}
-          <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
-          <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
-          <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
-          <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
-          <Route path="/admin/ai/cost" element={<AiCostPage />} />
-          <Route path="/admin/ai/context-assets" element={<ContextAssetListPage />} />
-          <Route path="/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
-          <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
-          <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
+            {/* AI Admin Control Plane - Lazy */}
+            <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
+            <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
+            <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
+            <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
+            <Route path="/admin/ai/cost" element={<AiCostPage />} />
+            <Route path="/admin/ai/context-assets" element={<ContextAssetListPage />} />
+            <Route path="/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
+            <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
+            <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
 
-          {/* Admin Settings */}
-          <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
+            {/* Admin Settings - Lazy */}
+            <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
 
-          {/* Operator Dashboard (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
-          <Route path="/operator" element={<OperatorDashboard />} />
-          <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
-          <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-          <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
-        </Routes>
+            {/* Operator Dashboard - Lazy */}
+            <Route path="/operator" element={<OperatorDashboard />} />
+            <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
+            <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+            <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </AuthProvider>
   );

@@ -1,11 +1,12 @@
 /**
- * HomePage - Neture 유통 정보 플랫폼
+ * HomePage - Neture 유통 정보 서비스
  *
  * Work Order: WO-NETURE-CORE-P1
  * Phase: P1 (Real API Integration)
+ * WO-NETURE-HOME-HERO-AND-NAV-O4O-ALIGNMENT-V1: Hero 문안 정합성 조정
  *
  * 화면 구조:
- * 1. Hero - 플랫폼 정체성
+ * 1. Hero - o4o 플랫폼 기반 서비스 정체성
  * 2. 공급자 미리보기 (Real API)
  * 3. 제휴 요청 미리보기 (Real API)
  */
@@ -42,11 +43,17 @@ function HeroSection() {
   return (
     <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* WO-NETURE-HOME-HERO-AND-NAV-O4O-ALIGNMENT-V1: o4o ↔ Neture 관계 명확화 */}
+        <p className="text-primary-200 text-sm mb-4">
+          o4o 플랫폼 기반 서비스
+        </p>
         <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-          공급자를 찾고, 제휴를 연결하는 유통 정보 플랫폼
+          유통 정보 서비스, Neture
         </h1>
         <p className="text-xl text-primary-100 mb-10">
-          주문·결제 없이 조건과 기회를 투명하게 확인하세요
+          공급자를 찾고, 제휴를 연결합니다.
+          <br />
+          주문·결제 없이 조건과 기회를 투명하게 확인하세요.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
@@ -62,6 +69,15 @@ function HeroSection() {
           >
             제휴 요청 보기
             <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+        {/* o4o 플랫폼 소개 링크 */}
+        <div className="mt-6">
+          <Link
+            to="/o4o"
+            className="text-primary-100 hover:text-white text-sm underline underline-offset-2 transition-colors"
+          >
+            o4o 플랫폼 소개 보기
           </Link>
         </div>
       </div>
