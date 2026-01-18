@@ -6,7 +6,7 @@
 
 import { authClient } from '@o4o/auth-client';
 
-const API_BASE = '/api/v1/lms-marketing/product';
+const API_BASE = '/api/v1/lms/marketing/products';
 
 /**
  * Target audience type
