@@ -111,14 +111,16 @@ function transformActivityEvents(summary: SupplierDashboardSummary | null): Acti
     return [];
   }
 
-  return summary.recentActivity.map((activity) => ({
-    id: activity.id,
-    type: activity.type === 'approved' ? 'request_approved' : activity.type === 'rejected' ? 'request_rejected' : 'request_created',
-    title: activity.type === 'approved' ? '신청 승인' : activity.type === 'rejected' ? '신청 거절' : '신청 생성',
-    description: `${activity.sellerName}님의 ${activity.productName} 신청`,
-    serviceName: activity.serviceName,
-    timestamp: activity.timestamp,
-  }));
+  return summary.recentActivity
+    .filter((activity) => activity.type === 'approved' || activity.type === 'rejected')
+    .map((activity) => ({
+      id: activity.id,
+      type: activity.type === 'approved' ? 'request_approved' as const : 'request_rejected' as const,
+      title: activity.type === 'approved' ? '신청 승인' : '신청 거절',
+      description: `${activity.sellerName}님의 ${activity.productName} 신청`,
+      serviceName: activity.serviceName,
+      timestamp: activity.timestamp,
+    }));
 }
 
 function transformBasicStats(summary: SupplierDashboardSummary | null): BasicStatsData {

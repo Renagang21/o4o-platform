@@ -71,7 +71,6 @@ export default function OperatorDashboard() {
     fetchData();
   }, [fetchData]);
 
-  const hasData = summary !== null;
   const stats = summary?.stats || {
     activeSuppliers: 0,
     totalRequests: 0,

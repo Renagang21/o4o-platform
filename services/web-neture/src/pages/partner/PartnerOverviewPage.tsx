@@ -63,7 +63,6 @@ export function PartnerOverviewPage() {
     fetchData();
   }, [fetchData]);
 
-  const hasData = summary !== null;
   const hasConnectedServices = summary?.connectedServices && summary.connectedServices.length > 0;
   const hasNotifications = summary?.notifications && summary.notifications.length > 0;
 
