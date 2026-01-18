@@ -212,6 +212,34 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
+  // Forum (플랫폼 포럼 관리 - Core 하위)
+  {
+    id: 'forum',
+    label: 'Forum',
+    icon: <MessageSquare className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'forum-dashboard',
+        label: 'Dashboard',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+        path: '/forum',
+      },
+      {
+        id: 'forum-boards',
+        label: 'Boards',
+        icon: <MessageSquare className="w-4 h-4" />,
+        path: '/forum/boards',
+      },
+      {
+        id: 'forum-categories',
+        label: 'Categories',
+        icon: <Layers className="w-4 h-4" />,
+        path: '/forum/categories',
+      },
+    ],
+  },
+
   // ============================================
   // SERVICES - 서비스별 관리
   // ============================================
@@ -240,7 +268,7 @@ export const wordpressMenuItems: MenuItem[] = [
         id: 'yaksa-forum',
         label: 'Forum',
         icon: <MessageSquare className="w-4 h-4" />,
-        path: '/forum/boards',
+        path: '/forum',
       },
       {
         id: 'yaksa-ai-insight',
