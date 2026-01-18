@@ -142,6 +142,7 @@ const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 // Moved to individual service responsibility per Goal State Definition
 
 // Forum Pages (from @o4o/forum-core package - source imports)
+const ForumDashboard = lazy(() => import('@/pages/forum'));
 const ForumBoardList = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumBoardList'));
 const ForumCategories = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumCategories'));
 const ForumPostDetail = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostDetail'));
@@ -1287,6 +1288,15 @@ function App() {
                     {/* Site Builder - REMOVED (WO-ADMIN-LEGACY-CLEANUP-V2) */}
 
                     {/* 포럼 - App-based routes with AppRouteGuard */}
+                    <Route path="/forum" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumDashboard />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
                     <Route path="/forum/boards" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
                         <AppRouteGuard appId="forum">
