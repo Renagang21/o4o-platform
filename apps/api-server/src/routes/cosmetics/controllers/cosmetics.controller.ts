@@ -514,5 +514,24 @@ export function createCosmeticsController(
     }
   );
 
+  /**
+   * GET /cosmetics/admin/dashboard/summary
+   * Get operator dashboard summary
+   */
+  router.get(
+    '/admin/dashboard/summary',
+    requireAuth,
+    requireScope('cosmetics:admin'),
+    async (_req: Request, res: Response) => {
+      try {
+        const result = await service.getOperatorDashboardSummary();
+        res.json({ success: true, data: result });
+      } catch (error: any) {
+        console.error('[Cosmetics] Get dashboard summary error:', error);
+        errorResponse(res, 500, 'COSMETICS_500', 'Internal server error');
+      }
+    }
+  );
+
   return router;
 }

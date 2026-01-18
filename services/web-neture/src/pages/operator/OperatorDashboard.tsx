@@ -8,6 +8,7 @@
  * - 신청 현황
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Activity,
@@ -21,48 +22,67 @@ import {
   UserPlus,
   Bell,
   Settings,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
+import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
 
-// 통계 데이터 (Mock)
-const stats = [
-  { label: '활성 공급자', value: '12', change: '+2', trend: 'up', color: 'blue' },
-  { label: '활성 파트너', value: '48', change: '+8', trend: 'up', color: 'green' },
-  { label: '콘텐츠', value: '156', change: '+23', trend: 'up', color: 'purple' },
-  { label: '대기 신청', value: '5', change: '-2', trend: 'down', color: 'amber' },
-];
+// 빈 데이터 상태 컴포넌트
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="text-center py-10">
+      <AlertCircle size={40} className="mx-auto mb-4 text-slate-400" />
+      <p className="text-slate-500 text-sm">{message}</p>
+    </div>
+  );
+}
 
-// 최근 신청 데이터 (Mock)
-const recentApplications = [
-  { name: '(주)헬스케어코리아', type: '공급자 신청', date: '2024-01-15', status: '검토중' },
-  { name: '뷰티스타 강남점', type: '파트너 신청', date: '2024-01-14', status: '승인대기' },
-  { name: '코스메틱랩', type: '공급자 신청', date: '2024-01-13', status: '서류심사' },
-];
+// 상대적 시간 포맷팅
+function formatRelativeTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
 
-// 최근 활동 데이터 (Mock)
-const recentActivities = [
-  { icon: '📦', text: 'GlycoPharm 상품 50개 등록', time: '30분 전' },
-  { icon: '🤝', text: '파트너십 계약 3건 체결', time: '2시간 전' },
-  { icon: '📄', text: '콘텐츠 15개 승인 완료', time: '4시간 전' },
-  { icon: '📊', text: '월간 리포트 생성 완료', time: '1일 전' },
-];
-
-const statusStyles: Record<string, string> = {
-  '검토중': 'bg-gray-100 text-gray-700',
-  '승인대기': 'bg-amber-100 text-amber-700',
-  '서류심사': 'bg-purple-100 text-purple-700',
-  '완료': 'bg-green-100 text-green-700',
-};
-
-// 서비스 현황 데이터 (Mock)
-const serviceStatus = [
-  { name: 'GlycoPharm', suppliers: 3, partners: 15, status: 'active' },
-  { name: 'K-Cosmetics', suppliers: 5, partners: 23, status: 'active' },
-  { name: 'GlucoseView', suppliers: 2, partners: 8, status: 'active' },
-  { name: 'KPA Society', suppliers: 2, partners: 2, status: 'pending' },
-];
+  if (minutes < 60) return `${minutes}분 전`;
+  if (hours < 24) return `${hours}시간 전`;
+  return `${days}일 전`;
+}
 
 export default function OperatorDashboard() {
+  const [summary, setSummary] = useState<AdminDashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await dashboardApi.getAdminDashboardSummary();
+      setSummary(data);
+    } catch (error) {
+      console.error('Failed to fetch operator dashboard data:', error);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const hasData = summary !== null;
+  const stats = summary?.stats || {
+    activeSuppliers: 0,
+    totalRequests: 0,
+    pendingRequests: 0,
+    publishedContents: 0,
+  };
+
+  const hasServiceStatus = summary?.serviceStatus && summary.serviceStatus.length > 0;
+  const hasRecentApplications = summary?.recentApplications && summary.recentApplications.length > 0;
+  const hasRecentActivities = summary?.recentActivities && summary.recentActivities.length > 0;
+
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
       {/* Page Header */}
@@ -71,24 +91,66 @@ export default function OperatorDashboard() {
           <h1 className="text-2xl font-bold text-slate-800">운영자 대시보드</h1>
           <p className="text-slate-500 mt-1">Neture 유통 정보 플랫폼 운영 현황</p>
         </div>
-        <AiSummaryButton
-          contextLabel="운영자 대시보드 요약"
-        />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchData}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            새로고침
+          </button>
+          <AiSummaryButton contextLabel="운영자 대시보드 요약" />
+        </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-500">{stat.label}</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {stat.change}
-              </span>
+        {loading ? (
+          [1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 opacity-50">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">로딩 중...</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">-</p>
             </div>
-            <p className="text-3xl font-bold text-slate-800 mt-2">{stat.value}</p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">활성 공급자</span>
+                {stats.activeSuppliers > 0 && (
+                  <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">활성</span>
+                )}
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.activeSuppliers}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">총 요청 수</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.totalRequests}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">콘텐츠</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.publishedContents}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">대기 신청</span>
+                {stats.pendingRequests > 0 && (
+                  <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+                    {stats.pendingRequests}건
+                  </span>
+                )}
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.pendingRequests}</p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Service Status */}
@@ -103,30 +165,42 @@ export default function OperatorDashboard() {
             </div>
           </div>
         </div>
-        <div className="divide-y divide-slate-100">
-          {serviceStatus.map((service) => (
-            <div key={service.name} className="p-4 hover:bg-slate-50 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="font-medium text-slate-800 w-28">{service.name}</span>
-                  <div className="flex items-center gap-4 text-sm text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Building2 className="w-4 h-4" />
-                      {service.suppliers} 공급자
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {service.partners} 파트너
-                    </span>
+        {loading ? (
+          <div className="p-6 text-center text-slate-500">로딩 중...</div>
+        ) : !hasServiceStatus ? (
+          <EmptyState message="자료가 없습니다. 아직 서비스 데이터가 없습니다." />
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {summary!.serviceStatus.map((service) => (
+              <div key={service.serviceId} className="p-4 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="font-medium text-slate-800 w-28">{service.serviceName}</span>
+                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <Building2 className="w-4 h-4" />
+                        {service.suppliers} 공급자
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        {service.partners} 파트너
+                      </span>
+                    </div>
                   </div>
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full ${
+                      service.status === 'active'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-amber-100 text-amber-700'
+                    }`}
+                  >
+                    {service.status === 'active' ? '운영중' : '대기중'}
+                  </span>
                 </div>
-                <span className={`text-xs px-3 py-1 rounded-full ${service.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                  {service.status === 'active' ? '운영중' : '대기중'}
-                </span>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Two Column Layout */}
@@ -141,26 +215,37 @@ export default function OperatorDashboard() {
                 </div>
                 <h2 className="text-lg font-semibold text-slate-800">최근 신청</h2>
               </div>
-              <Link to="/operator/registrations" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <Link
+                to="/operator/registrations"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+              >
                 전체보기 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
-          <div className="divide-y divide-slate-100">
-            {recentApplications.map((app, idx) => (
-              <div key={idx} className="p-4 hover:bg-slate-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-slate-800">{app.name}</p>
-                    <p className="text-sm text-slate-500">{app.type} · {app.date}</p>
+          {loading ? (
+            <div className="p-6 text-center text-slate-500">로딩 중...</div>
+          ) : !hasRecentApplications ? (
+            <EmptyState message="자료가 없습니다. 최근 신청 내역이 없습니다." />
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {summary!.recentApplications.map((app) => (
+                <div key={app.id} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-slate-800">{app.name}</p>
+                      <p className="text-sm text-slate-500">
+                        {app.type} · {new Date(app.date).toLocaleDateString('ko-KR')}
+                      </p>
+                    </div>
+                    <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+                      {app.status}
+                    </span>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full ${statusStyles[app.status]}`}>
-                    {app.status}
-                  </span>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Recent Activities */}
@@ -175,19 +260,27 @@ export default function OperatorDashboard() {
               </div>
             </div>
           </div>
-          <div className="divide-y divide-slate-100">
-            {recentActivities.map((activity, idx) => (
-              <div key={idx} className="p-4 hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{activity.icon}</span>
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-700">{activity.text}</p>
+          {loading ? (
+            <div className="p-6 text-center text-slate-500">로딩 중...</div>
+          ) : !hasRecentActivities ? (
+            <EmptyState message="자료가 없습니다. 최근 활동 내역이 없습니다." />
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {summary!.recentActivities.map((activity) => (
+                <div key={activity.id} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">
+                      {activity.type === 'approved' ? '✅' : activity.type === 'rejected' ? '❌' : '📦'}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm text-slate-700">{activity.text}</p>
+                    </div>
+                    <span className="text-xs text-slate-400">{formatRelativeTime(activity.time)}</span>
                   </div>
-                  <span className="text-xs text-slate-400">{activity.time}</span>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

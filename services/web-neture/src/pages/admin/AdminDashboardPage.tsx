@@ -10,10 +10,51 @@
  * - AI 요약 버튼 (WO-AI-PREVIEW-SUMMARY-V1)
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
+import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
+
+// 빈 데이터 상태 컴포넌트
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="text-center py-8">
+      <AlertCircle size={36} className="mx-auto mb-3 text-gray-400" />
+      <p className="text-gray-500 text-sm">{message}</p>
+    </div>
+  );
+}
 
 export default function AdminDashboardPage() {
+  const [summary, setSummary] = useState<AdminDashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await dashboardApi.getAdminDashboardSummary();
+      setSummary(data);
+    } catch (error) {
+      console.error('Failed to fetch admin dashboard data:', error);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const stats = summary?.stats || {
+    totalSuppliers: 0,
+    activeSuppliers: 0,
+    totalPartnershipRequests: 0,
+    openPartnershipRequests: 0,
+    pendingRequests: 0,
+  };
+
+  const hasRecentApplications = summary?.recentApplications && summary.recentApplications.length > 0;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -41,31 +82,53 @@ export default function AdminDashboardPage() {
             <h1 className="text-2xl font-bold text-gray-900">운영자 대시보드</h1>
             <p className="text-gray-500 mt-1">플랫폼 전체 운영 현황을 확인합니다.</p>
           </div>
-          <AiSummaryButton contextLabel="플랫폼 운영 요약" />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={fetchData}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+              새로고침
+            </button>
+            <AiSummaryButton contextLabel="플랫폼 운영 요약" />
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="text-3xl mb-2">🏪</div>
-            <div className="text-2xl font-bold text-gray-900">5</div>
-            <div className="text-sm text-gray-500">활성 서비스</div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="text-3xl mb-2">📦</div>
-            <div className="text-2xl font-bold text-gray-900">3</div>
-            <div className="text-sm text-gray-500">등록 공급자</div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="text-3xl mb-2">🤝</div>
-            <div className="text-2xl font-bold text-gray-900">2</div>
-            <div className="text-sm text-gray-500">활성 파트너</div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="text-3xl mb-2">📝</div>
-            <div className="text-2xl font-bold text-primary-600">4</div>
-            <div className="text-sm text-gray-500">승인 대기</div>
-          </div>
+          {loading ? (
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 opacity-50">
+                <div className="text-3xl mb-2">...</div>
+                <div className="text-2xl font-bold text-gray-900">-</div>
+                <div className="text-sm text-gray-500">로딩 중</div>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">🏪</div>
+                <div className="text-2xl font-bold text-gray-900">{stats.activeSuppliers}</div>
+                <div className="text-sm text-gray-500">활성 공급자</div>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">📦</div>
+                <div className="text-2xl font-bold text-gray-900">{stats.totalSuppliers}</div>
+                <div className="text-sm text-gray-500">등록 공급자</div>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">🤝</div>
+                <div className="text-2xl font-bold text-gray-900">{stats.totalPartnershipRequests}</div>
+                <div className="text-sm text-gray-500">파트너십 요청</div>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">📝</div>
+                <div className="text-2xl font-bold text-primary-600">{stats.pendingRequests}</div>
+                <div className="text-sm text-gray-500">승인 대기</div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Pending Items */}
@@ -73,32 +136,28 @@ export default function AdminDashboardPage() {
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900">승인 대기 항목</h2>
           </div>
-          <div className="divide-y divide-gray-100">
-            <div className="px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">📦</span>
-                <div>
-                  <div className="font-medium text-gray-900">공급자 신청</div>
-                  <div className="text-sm text-gray-500">팜프레시코리아 외 2건</div>
+          {loading ? (
+            <div className="px-6 py-8 text-center text-gray-500">로딩 중...</div>
+          ) : !hasRecentApplications ? (
+            <EmptyState message="자료가 없습니다. 현재 승인 대기 항목이 없습니다." />
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {summary!.recentApplications.map((app) => (
+                <div key={app.id} className="px-6 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">📦</span>
+                    <div>
+                      <div className="font-medium text-gray-900">{app.type}</div>
+                      <div className="text-sm text-gray-500">{app.name}</div>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                    {app.status}
+                  </span>
                 </div>
-              </div>
-              <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
-                3건 대기
-              </span>
+              ))}
             </div>
-            <div className="px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">🤝</span>
-                <div>
-                  <div className="font-medium text-gray-900">파트너 신청</div>
-                  <div className="text-sm text-gray-500">뷰티랩 코스메틱</div>
-                </div>
-              </div>
-              <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
-                1건 대기
-              </span>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* AI Management */}

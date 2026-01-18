@@ -503,6 +503,49 @@ export class CosmeticsService {
   }
 
   // ============================================================================
+  // Dashboard Summary Methods
+  // ============================================================================
+
+  async getOperatorDashboardSummary(): Promise<{
+    stats: {
+      totalStores: number;
+      activeOrders: number;
+      monthlyRevenue: string;
+      newSignups: number;
+    };
+    recentOrders: Array<{
+      id: string;
+      store: string;
+      amount: string;
+      status: string;
+      time: string;
+    }>;
+    recentApplications: Array<{
+      name: string;
+      type: string;
+      date: string;
+      status: string;
+    }>;
+  }> {
+    // Query database for statistics
+    const totalProducts = await this.repository.countAllProducts();
+    const visibleProducts = await this.repository.countProductsByStatus(CosmeticsProductStatus.VISIBLE);
+    const brands = await this.repository.findAllBrands({});
+
+    // Return empty state data - actual store/order data would come from O4O Store
+    return {
+      stats: {
+        totalStores: brands.length,
+        activeOrders: 0,
+        monthlyRevenue: '₩0',
+        newSignups: 0,
+      },
+      recentOrders: [],
+      recentApplications: [],
+    };
+  }
+
+  // ============================================================================
   // Private Helper Methods
   // ============================================================================
 

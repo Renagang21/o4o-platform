@@ -677,6 +677,94 @@ router.delete('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRe
   }
 });
 
+// ==================== Dashboard Summary API ====================
+
+/**
+ * GET /api/v1/neture/supplier/dashboard/summary
+ * Get dashboard summary for authenticated supplier
+ */
+router.get('/supplier/dashboard/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const summary = await netureService.getSupplierDashboardSummary(supplierId);
+
+    res.json({
+      success: true,
+      data: summary,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier dashboard summary:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch dashboard summary',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/dashboard/summary
+ * Get admin/operator dashboard summary (requires admin role)
+ */
+router.get('/admin/dashboard/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const summary = await netureService.getAdminDashboardSummary();
+
+    res.json({
+      success: true,
+      data: summary,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin dashboard summary:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch admin dashboard summary',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/dashboard/summary
+ * Get partner dashboard summary
+ */
+router.get('/partner/dashboard/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const summary = await netureService.getPartnerDashboardSummary(userId);
+
+    res.json({
+      success: true,
+      data: summary,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner dashboard summary:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch partner dashboard summary',
+    });
+  }
+});
+
 // ==================== Request Events (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2) ====================
 
 /**

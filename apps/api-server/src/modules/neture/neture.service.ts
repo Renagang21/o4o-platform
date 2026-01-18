@@ -1125,6 +1125,330 @@ export class NetureService {
     }
   }
 
+  // ==================== Dashboard Summary API ====================
+
+  /**
+   * GET /supplier/dashboard/summary - 공급자 대시보드 통계 요약
+   */
+  async getSupplierDashboardSummary(supplierId: string) {
+    try {
+      // 요청 통계
+      const totalRequests = await this.supplierRequestRepo.count({
+        where: { supplierId },
+      });
+
+      const pendingRequests = await this.supplierRequestRepo.count({
+        where: { supplierId, status: SupplierRequestStatus.PENDING },
+      });
+
+      const approvedRequests = await this.supplierRequestRepo.count({
+        where: { supplierId, status: SupplierRequestStatus.APPROVED },
+      });
+
+      const rejectedRequests = await this.supplierRequestRepo.count({
+        where: { supplierId, status: SupplierRequestStatus.REJECTED },
+      });
+
+      // 최근 7일 승인
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const recentApprovals = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .where('request.supplierId = :supplierId', { supplierId })
+        .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
+        .andWhere('request.decidedAt >= :sevenDaysAgo', { sevenDaysAgo })
+        .getCount();
+
+      // 제품 통계
+      const products = await this.productRepo.find({
+        where: { supplierId },
+      });
+
+      const activeProducts = products.filter((p) => p.isActive).length;
+      const totalProducts = products.length;
+
+      // 콘텐츠 통계
+      const totalContents = await this.contentRepo.count({
+        where: { supplierId },
+      });
+
+      const publishedContents = await this.contentRepo.count({
+        where: { supplierId, status: ContentStatus.PUBLISHED },
+      });
+
+      // 연결된 서비스 수 (승인된 요청 기준)
+      const connectedServices = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .select('COUNT(DISTINCT request.serviceId)', 'count')
+        .where('request.supplierId = :supplierId', { supplierId })
+        .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
+        .getRawOne();
+
+      // 서비스별 통계
+      const serviceStats = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .select('request.serviceId', 'serviceId')
+        .addSelect('request.serviceName', 'serviceName')
+        .addSelect('SUM(CASE WHEN request.status = :pending THEN 1 ELSE 0 END)', 'pending')
+        .addSelect('SUM(CASE WHEN request.status = :approved THEN 1 ELSE 0 END)', 'approved')
+        .addSelect('SUM(CASE WHEN request.status = :rejected THEN 1 ELSE 0 END)', 'rejected')
+        .where('request.supplierId = :supplierId', { supplierId })
+        .setParameter('pending', SupplierRequestStatus.PENDING)
+        .setParameter('approved', SupplierRequestStatus.APPROVED)
+        .setParameter('rejected', SupplierRequestStatus.REJECTED)
+        .groupBy('request.serviceId')
+        .addGroupBy('request.serviceName')
+        .getRawMany();
+
+      // 최근 활동 (이벤트)
+      const recentEvents = await this.requestEventRepo
+        .createQueryBuilder('event')
+        .where('event.actorId = :supplierId', { supplierId })
+        .orderBy('event.createdAt', 'DESC')
+        .limit(10)
+        .getMany();
+
+      return {
+        stats: {
+          totalRequests,
+          pendingRequests,
+          approvedRequests,
+          rejectedRequests,
+          recentApprovals,
+          totalProducts,
+          activeProducts,
+          totalContents,
+          publishedContents,
+          connectedServices: parseInt(connectedServices?.count || '0', 10),
+        },
+        serviceStats: serviceStats.map((s) => ({
+          serviceId: s.serviceId,
+          serviceName: s.serviceName,
+          pending: parseInt(s.pending, 10),
+          approved: parseInt(s.approved, 10),
+          rejected: parseInt(s.rejected, 10),
+        })),
+        recentActivity: recentEvents.map((e) => ({
+          id: e.id,
+          type: e.eventType,
+          sellerName: e.sellerName,
+          productName: e.productName,
+          serviceName: e.serviceName,
+          timestamp: e.createdAt,
+        })),
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching supplier dashboard summary:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /admin/dashboard/summary - 운영자/관리자 대시보드 통계 요약
+   */
+  async getAdminDashboardSummary() {
+    try {
+      // 공급자 통계
+      const totalSuppliers = await this.supplierRepo.count();
+      const activeSuppliers = await this.supplierRepo.count({
+        where: { status: SupplierStatus.ACTIVE },
+      });
+
+      // 요청 통계
+      const totalRequests = await this.supplierRequestRepo.count();
+      const pendingRequests = await this.supplierRequestRepo.count({
+        where: { status: SupplierRequestStatus.PENDING },
+      });
+      const approvedRequests = await this.supplierRequestRepo.count({
+        where: { status: SupplierRequestStatus.APPROVED },
+      });
+      const rejectedRequests = await this.supplierRequestRepo.count({
+        where: { status: SupplierRequestStatus.REJECTED },
+      });
+
+      // 파트너십 요청 통계
+      const totalPartnershipRequests = await this.partnershipRepo.count();
+      const openPartnershipRequests = await this.partnershipRepo.count({
+        where: { status: PartnershipStatus.OPEN },
+      });
+
+      // 콘텐츠 통계
+      const totalContents = await this.contentRepo.count();
+      const publishedContents = await this.contentRepo.count({
+        where: { status: ContentStatus.PUBLISHED },
+      });
+
+      // 서비스별 공급자/파트너 통계
+      const serviceStats = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .select('request.serviceId', 'serviceId')
+        .addSelect('request.serviceName', 'serviceName')
+        .addSelect('COUNT(DISTINCT CASE WHEN request.status = :approved THEN request.supplierId END)', 'suppliers')
+        .addSelect('COUNT(DISTINCT CASE WHEN request.status = :approved THEN request.sellerId END)', 'partners')
+        .setParameter('approved', SupplierRequestStatus.APPROVED)
+        .groupBy('request.serviceId')
+        .addGroupBy('request.serviceName')
+        .getRawMany();
+
+      // 최근 요청 (대기 중)
+      const recentPendingRequests = await this.supplierRequestRepo.find({
+        where: { status: SupplierRequestStatus.PENDING },
+        order: { createdAt: 'DESC' },
+        take: 5,
+      });
+
+      // 최근 활동
+      const recentEvents = await this.requestEventRepo.find({
+        order: { createdAt: 'DESC' },
+        take: 10,
+      });
+
+      return {
+        stats: {
+          totalSuppliers,
+          activeSuppliers,
+          totalRequests,
+          pendingRequests,
+          approvedRequests,
+          rejectedRequests,
+          totalPartnershipRequests,
+          openPartnershipRequests,
+          totalContents,
+          publishedContents,
+        },
+        serviceStatus: serviceStats.map((s) => ({
+          serviceId: s.serviceId,
+          serviceName: s.serviceName,
+          suppliers: parseInt(s.suppliers, 10),
+          partners: parseInt(s.partners, 10),
+          status: 'active',
+        })),
+        recentApplications: recentPendingRequests.map((r) => ({
+          id: r.id,
+          name: r.sellerName,
+          type: '공급자 신청',
+          date: r.createdAt,
+          status: '대기중',
+        })),
+        recentActivities: recentEvents.map((e) => ({
+          id: e.id,
+          type: e.eventType,
+          text: `${e.sellerName} - ${e.productName} (${e.serviceName})`,
+          time: e.createdAt,
+        })),
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching admin dashboard summary:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /partner/dashboard/summary - 파트너 대시보드 통계 요약
+   */
+  async getPartnerDashboardSummary(userId: string) {
+    try {
+      // 파트너십 요청 통계
+      const partnershipRequests = await this.partnershipRepo.find({
+        where: { sellerId: userId },
+      });
+
+      const totalRequests = partnershipRequests.length;
+      const openRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.OPEN).length;
+      const matchedRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.MATCHED).length;
+      const closedRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.CLOSED).length;
+
+      // 파트너 역할로 참여 중인 서비스 (공급자 요청에서 seller로 등록된 경우)
+      const sellerRequests = await this.supplierRequestRepo.find({
+        where: { sellerId: userId, status: SupplierRequestStatus.APPROVED },
+      });
+
+      // 연결된 서비스 (중복 제거)
+      const connectedServicesMap = new Map<string, {
+        serviceId: string;
+        serviceName: string;
+        supplierCount: number;
+        lastActivity: Date;
+      }>();
+
+      sellerRequests.forEach((r) => {
+        const existing = connectedServicesMap.get(r.serviceId);
+        if (existing) {
+          existing.supplierCount++;
+          if (new Date(r.createdAt) > existing.lastActivity) {
+            existing.lastActivity = new Date(r.createdAt);
+          }
+        } else {
+          connectedServicesMap.set(r.serviceId, {
+            serviceId: r.serviceId,
+            serviceName: r.serviceName,
+            supplierCount: 1,
+            lastActivity: new Date(r.createdAt),
+          });
+        }
+      });
+
+      const connectedServices = Array.from(connectedServicesMap.values());
+
+      // 알림 (최근 파트너십 요청 상태 변경, 정산 등)
+      const notifications: Array<{ type: string; text: string; link: string }> = [];
+
+      const recentMatchedRequests = partnershipRequests.filter(
+        (r) => r.status === PartnershipStatus.MATCHED && r.matchedAt
+      );
+      if (recentMatchedRequests.length > 0) {
+        notifications.push({
+          type: 'success',
+          text: `파트너십 매칭 완료 ${recentMatchedRequests.length}건`,
+          link: '/partner/collaboration',
+        });
+      }
+
+      if (openRequests > 0) {
+        notifications.push({
+          type: 'info',
+          text: `진행 중인 파트너십 요청 ${openRequests}건`,
+          link: '/partner/collaboration',
+        });
+      }
+
+      return {
+        stats: {
+          totalRequests,
+          openRequests,
+          matchedRequests,
+          closedRequests,
+          connectedServiceCount: connectedServices.length,
+          totalSupplierCount: sellerRequests.length,
+        },
+        connectedServices: connectedServices.map((s) => ({
+          ...s,
+          lastActivity: this.formatRelativeTime(s.lastActivity),
+        })),
+        notifications,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching partner dashboard summary:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 상대적 시간 포맷팅
+   */
+  private formatRelativeTime(date: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 60) return `${minutes}분 전`;
+    if (hours < 24) return `${hours}시간 전`;
+    return `${days}일 전`;
+  }
+
   // ==================== Request Events (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2) ====================
 
   /**

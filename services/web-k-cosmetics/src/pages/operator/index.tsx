@@ -1,32 +1,23 @@
 /**
  * Operator Dashboard - K-Cosmetics 운영자 대시보드
  * GlycoPharm 스타일 적용
+ * API Integration: WO-COSMETICS-DASHBOARD-API-V1
  */
 
+import { useState, useEffect, useCallback } from 'react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import { AiSummaryButton } from '@/components/ai/AiSummaryButton';
+import { operatorApi, type OperatorDashboardSummary } from '@/services/operatorApi';
 
-// 통계 카드 데이터
-const stats = [
-  { label: '총 매장', value: '156', change: '+12', trend: 'up', color: 'pink' },
-  { label: '활성 주문', value: '342', change: '+28', trend: 'up', color: 'blue' },
-  { label: '이번 달 매출', value: '₩45.2M', change: '+15.3%', trend: 'up', color: 'green' },
-  { label: '신규 가입', value: '89', change: '+23', trend: 'up', color: 'purple' },
-];
-
-// 최근 주문 데이터
-const recentOrders = [
-  { id: 'ORD-2024-001', store: '뷰티랩 강남점', amount: '₩1,250,000', status: '배송중', time: '10분 전' },
-  { id: 'ORD-2024-002', store: '코스메틱 홍대점', amount: '₩890,000', status: '준비중', time: '25분 전' },
-  { id: 'ORD-2024-003', store: '스킨케어 명동점', amount: '₩2,100,000', status: '완료', time: '1시간 전' },
-  { id: 'ORD-2024-004', store: '메이크업 신촌점', amount: '₩560,000', status: '배송중', time: '2시간 전' },
-];
-
-// 신규 신청 데이터
-const recentApplications = [
-  { name: '뷰티스타 압구정점', type: '신규 매장', date: '2024-01-15', status: '검토중' },
-  { name: '글로우업 이태원점', type: '신규 매장', date: '2024-01-14', status: '승인대기' },
-  { name: '스킨랩 성수점', type: '파트너 신청', date: '2024-01-13', status: '서류심사' },
-];
+// 빈 데이터 상태 컴포넌트
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="text-center py-8">
+      <AlertCircle size={36} className="mx-auto mb-3 text-gray-400" />
+      <p className="text-gray-500 text-sm">{message}</p>
+    </div>
+  );
+}
 
 const statusStyles: Record<string, string> = {
   '배송중': 'bg-blue-100 text-blue-700',
@@ -38,6 +29,34 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function OperatorDashboard() {
+  const [summary, setSummary] = useState<OperatorDashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await operatorApi.getDashboardSummary();
+      setSummary(data);
+    } catch (error) {
+      console.error('Failed to fetch operator dashboard data:', error);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const stats = summary?.stats || {
+    totalStores: 0,
+    activeOrders: 0,
+    monthlyRevenue: '₩0',
+    newSignups: 0,
+  };
+
+  const hasRecentOrders = summary?.recentOrders && summary.recentOrders.length > 0;
+  const hasRecentApplications = summary?.recentApplications && summary.recentApplications.length > 0;
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -46,25 +65,59 @@ export default function OperatorDashboard() {
           <h1 className="text-2xl font-bold text-slate-800">운영자 대시보드</h1>
           <p className="text-slate-500 mt-1">K-Cosmetics 플랫폼 운영 현황을 한눈에 확인하세요</p>
         </div>
-        <AiSummaryButton
-          contextLabel="운영자 대시보드 요약"
-          serviceId="k-cosmetics"
-        />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchData}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            새로고침
+          </button>
+          <AiSummaryButton
+            contextLabel="운영자 대시보드 요약"
+            serviceId="k-cosmetics"
+          />
+        </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-500">{stat.label}</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {stat.change}
-              </span>
+        {loading ? (
+          [1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 opacity-50">
+              <div className="text-sm font-medium text-slate-500">로딩 중...</div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">-</p>
             </div>
-            <p className="text-3xl font-bold text-slate-800 mt-2">{stat.value}</p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">총 매장</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.totalStores}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">활성 주문</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.activeOrders}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">이번 달 매출</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.monthlyRevenue}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-500">신규 가입</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-800 mt-2">{stats.newSignups}</p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Two Column Layout */}
@@ -79,24 +132,30 @@ export default function OperatorDashboard() {
               </a>
             </div>
           </div>
-          <div className="divide-y divide-slate-100">
-            {recentOrders.map((order) => (
-              <div key={order.id} className="p-4 hover:bg-slate-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-slate-800">{order.store}</p>
-                    <p className="text-sm text-slate-500">{order.id} · {order.time}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-slate-800">{order.amount}</p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${statusStyles[order.status]}`}>
-                      {order.status}
-                    </span>
+          {loading ? (
+            <div className="px-6 py-8 text-center text-gray-500">로딩 중...</div>
+          ) : !hasRecentOrders ? (
+            <EmptyState message="자료가 없습니다. 최근 주문 내역이 없습니다." />
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {summary!.recentOrders.map((order) => (
+                <div key={order.id} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-slate-800">{order.store}</p>
+                      <p className="text-sm text-slate-500">{order.id} · {order.time}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-slate-800">{order.amount}</p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${statusStyles[order.status] || 'bg-gray-100 text-gray-700'}`}>
+                        {order.status}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Recent Applications */}
@@ -109,21 +168,27 @@ export default function OperatorDashboard() {
               </a>
             </div>
           </div>
-          <div className="divide-y divide-slate-100">
-            {recentApplications.map((app, idx) => (
-              <div key={idx} className="p-4 hover:bg-slate-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-slate-800">{app.name}</p>
-                    <p className="text-sm text-slate-500">{app.type} · {app.date}</p>
+          {loading ? (
+            <div className="px-6 py-8 text-center text-gray-500">로딩 중...</div>
+          ) : !hasRecentApplications ? (
+            <EmptyState message="자료가 없습니다. 신규 신청 내역이 없습니다." />
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {summary!.recentApplications.map((app, idx) => (
+                <div key={idx} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-slate-800">{app.name}</p>
+                      <p className="text-sm text-slate-500">{app.type} · {app.date}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded-full ${statusStyles[app.status] || 'bg-gray-100 text-gray-700'}`}>
+                      {app.status}
+                    </span>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full ${statusStyles[app.status]}`}>
-                    {app.status}
-                  </span>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

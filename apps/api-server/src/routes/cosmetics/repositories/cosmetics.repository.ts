@@ -98,6 +98,14 @@ export class CosmeticsRepository {
     });
   }
 
+  async countAllProducts(): Promise<number> {
+    return this.productRepo.count();
+  }
+
+  async countProductsByStatus(status: CosmeticsProductStatus): Promise<number> {
+    return this.productRepo.count({ where: { status } });
+  }
+
   // ============================================================================
   // Product Repository Methods
   // ============================================================================

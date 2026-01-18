@@ -14,43 +14,64 @@
  * - 상세 분석/처리는 각 서비스에서
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight } from 'lucide-react';
+import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
+import { dashboardApi, type PartnerDashboardSummary } from '../../lib/api';
 
-// Mock 데이터: 연결된 서비스/공급자 목록
-const connectedServices = [
-  {
-    id: 'glycopharm',
-    name: 'GlycoPharm',
-    icon: '🏥',
-    status: 'active',
-    supplierCount: 3,
-    activeCampaigns: 2,
-    lastActivity: '2시간 전',
-    url: 'https://glycopharm.neture.co.kr/partner',
-  },
-  {
-    id: 'k-cosmetics',
-    name: 'K-Cosmetics',
-    icon: '💄',
-    status: 'active',
-    supplierCount: 5,
-    activeCampaigns: 1,
-    lastActivity: '1일 전',
-    url: 'https://k-cosmetics.neture.co.kr/partner',
-  },
-];
+// 서비스 URL 설정
+const SERVICE_URLS: Record<string, string> = {
+  glycopharm: 'https://glycopharm.neture.co.kr/partner',
+  'k-cosmetics': 'https://k-cosmetics.neture.co.kr/partner',
+  glucoseview: 'https://glucoseview.neture.co.kr/partner',
+};
 
-// Mock 데이터: 알림
-const notifications = [
-  { type: 'info', icon: '📬', text: '신규 협업 요청 2건', action: '검토하기', link: '#' },
-  { type: 'success', icon: '💰', text: '이번 달 정산 완료: ₩850,000', action: '상세 보기', link: '#' },
-];
+// 서비스 아이콘 설정
+const SERVICE_ICONS: Record<string, string> = {
+  glycopharm: '🏥',
+  'k-cosmetics': '💄',
+  glucoseview: '📊',
+};
+
+// 빈 데이터 상태 컴포넌트
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div style={styles.emptyState}>
+      <AlertCircle size={40} style={{ color: '#94a3b8', marginBottom: '16px' }} />
+      <p style={styles.emptyStateText}>{message}</p>
+    </div>
+  );
+}
 
 export function PartnerOverviewPage() {
-  const totalSuppliers = connectedServices.reduce((sum, s) => sum + s.supplierCount, 0);
-  const totalCampaigns = connectedServices.reduce((sum, s) => sum + s.activeCampaigns, 0);
+  const [summary, setSummary] = useState<PartnerDashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await dashboardApi.getPartnerDashboardSummary();
+      setSummary(data);
+    } catch (error) {
+      console.error('Failed to fetch partner dashboard data:', error);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const hasData = summary !== null;
+  const hasConnectedServices = summary?.connectedServices && summary.connectedServices.length > 0;
+  const hasNotifications = summary?.notifications && summary.notifications.length > 0;
+
+  const stats = summary?.stats || {
+    connectedServiceCount: 0,
+    totalSupplierCount: 0,
+    openRequests: 0,
+  };
 
   return (
     <div style={styles.container}>
@@ -67,7 +88,13 @@ export function PartnerOverviewPage() {
             </p>
           </div>
         </div>
-        <AiSummaryButton contextLabel="파트너 운영 현황" />
+        <div style={styles.headerActions}>
+          <button onClick={fetchData} style={styles.refreshButton} disabled={loading}>
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            새로고침
+          </button>
+          <AiSummaryButton contextLabel="파트너 운영 현황" />
+        </div>
       </div>
 
       {/* Hub Concept Info */}
@@ -83,36 +110,54 @@ export function PartnerOverviewPage() {
       </div>
 
       {/* Summary Stats */}
-      <div style={styles.statsRow}>
-        <div style={styles.statCard}>
-          <Users size={24} style={{ color: '#2563eb' }} />
-          <div>
-            <p style={styles.statValue}>{connectedServices.length}</p>
-            <p style={styles.statLabel}>연결된 서비스</p>
+      {loading ? (
+        <div style={styles.statsRow}>
+          {[1, 2, 3].map((i) => (
+            <div key={i} style={{ ...styles.statCard, opacity: 0.5 }}>
+              <div style={{ width: 24, height: 24, backgroundColor: '#e2e8f0', borderRadius: 4 }} />
+              <div>
+                <p style={styles.statValue}>-</p>
+                <p style={styles.statLabel}>로딩 중...</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={styles.statsRow}>
+          <div style={styles.statCard}>
+            <Users size={24} style={{ color: '#2563eb' }} />
+            <div>
+              <p style={styles.statValue}>{stats.connectedServiceCount}</p>
+              <p style={styles.statLabel}>연결된 서비스</p>
+            </div>
+          </div>
+          <div style={styles.statCard}>
+            <Users size={24} style={{ color: '#16a34a' }} />
+            <div>
+              <p style={styles.statValue}>{stats.totalSupplierCount}</p>
+              <p style={styles.statLabel}>협업 공급자</p>
+            </div>
+          </div>
+          <div style={styles.statCard}>
+            <Megaphone size={24} style={{ color: '#f59e0b' }} />
+            <div>
+              <p style={styles.statValue}>{stats.openRequests}</p>
+              <p style={styles.statLabel}>진행 중 요청</p>
+            </div>
           </div>
         </div>
-        <div style={styles.statCard}>
-          <Users size={24} style={{ color: '#16a34a' }} />
-          <div>
-            <p style={styles.statValue}>{totalSuppliers}</p>
-            <p style={styles.statLabel}>협업 공급자</p>
-          </div>
-        </div>
-        <div style={styles.statCard}>
-          <Megaphone size={24} style={{ color: '#f59e0b' }} />
-          <div>
-            <p style={styles.statValue}>{totalCampaigns}</p>
-            <p style={styles.statLabel}>진행 중 캠페인</p>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Notifications */}
-      {notifications.length > 0 && (
-        <div style={styles.notificationSection}>
-          <h2 style={styles.sectionTitle}>확인이 필요한 항목</h2>
+      <div style={styles.notificationSection}>
+        <h2 style={styles.sectionTitle}>확인이 필요한 항목</h2>
+        {loading ? (
+          <p style={styles.loadingText}>로딩 중...</p>
+        ) : !hasNotifications ? (
+          <EmptyState message="자료가 없습니다. 현재 확인이 필요한 항목이 없습니다." />
+        ) : (
           <div style={styles.notificationList}>
-            {notifications.map((noti, idx) => (
+            {summary!.notifications.map((noti, idx) => (
               <div
                 key={idx}
                 style={{
@@ -121,49 +166,51 @@ export function PartnerOverviewPage() {
                   borderColor: noti.type === 'success' ? '#86efac' : '#bfdbfe',
                 }}
               >
-                <span style={styles.notificationIcon}>{noti.icon}</span>
+                <span style={styles.notificationIcon}>
+                  {noti.type === 'success' ? '💰' : '📬'}
+                </span>
                 <span style={styles.notificationText}>{noti.text}</span>
                 <Link to={noti.link} style={styles.notificationAction}>
-                  {noti.action}
+                  확인하기
                   <ArrowRight size={14} />
                 </Link>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Service Entry Cards */}
       <div style={styles.serviceSection}>
         <h2 style={styles.sectionTitle}>서비스별 운영 현황</h2>
-        {connectedServices.length === 0 ? (
-          <div style={styles.emptyState}>
+        {loading ? (
+          <p style={styles.loadingText}>로딩 중...</p>
+        ) : !hasConnectedServices ? (
+          <div style={styles.emptyStateContainer}>
             <div style={styles.emptyStateIcon}>
               <Compass size={40} style={{ color: '#94a3b8' }} />
             </div>
-            <h3 style={styles.emptyStateTitle}>아직 연결된 서비스가 없습니다</h3>
-            <p style={styles.emptyStateText}>
-              공급자와 협업이 시작되면,<br />
-              해당 서비스가 이곳에 자동으로 표시됩니다.
+            <h3 style={styles.emptyStateTitle}>자료가 없습니다</h3>
+            <p style={styles.emptyStateDescription}>
+              아직 연결된 서비스가 없습니다.<br />
+              공급자와 협업이 시작되면, 해당 서비스가 이곳에 자동으로 표시됩니다.
             </p>
           </div>
         ) : (
           <div style={styles.serviceList}>
-            {connectedServices.map((service) => (
-              <div key={service.id} style={styles.serviceCard}>
+            {summary!.connectedServices.map((service) => (
+              <div key={service.serviceId} style={styles.serviceCard}>
                 <div style={styles.serviceHeader}>
                   <div style={styles.serviceInfo}>
-                    <span style={styles.serviceIcon}>{service.icon}</span>
+                    <span style={styles.serviceIcon}>
+                      {SERVICE_ICONS[service.serviceId] || '📦'}
+                    </span>
                     <div>
-                      <h3 style={styles.serviceName}>{service.name}</h3>
+                      <h3 style={styles.serviceName}>{service.serviceName}</h3>
                       <div style={styles.serviceStats}>
                         <span style={styles.serviceStat}>
                           <Users size={14} />
                           {service.supplierCount}개 공급자
-                        </span>
-                        <span style={styles.serviceStat}>
-                          <Megaphone size={14} />
-                          {service.activeCampaigns}개 캠페인
                         </span>
                       </div>
                     </div>
@@ -171,12 +218,12 @@ export function PartnerOverviewPage() {
                   <div style={styles.serviceActions}>
                     <p style={styles.lastActivity}>최근 활동: {service.lastActivity}</p>
                     <a
-                      href={service.url}
+                      href={SERVICE_URLS[service.serviceId] || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={styles.serviceLink}
                     >
-                      {service.name} 파트너 페이지로 이동
+                      {service.serviceName} 파트너 페이지로 이동
                       <ExternalLink size={14} />
                     </a>
                   </div>
@@ -261,6 +308,24 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: 0,
   },
+  headerActions: {
+    display: 'flex',
+    gap: '12px',
+    alignItems: 'center',
+  },
+  refreshButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 16px',
+    backgroundColor: '#f1f5f9',
+    color: '#475569',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
   infoCard: {
     display: 'flex',
     alignItems: 'flex-start',
@@ -312,6 +377,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     color: '#475569',
     margin: '0 0 16px 0',
+  },
+  loadingText: {
+    color: '#64748b',
+    textAlign: 'center',
+    padding: '40px',
   },
   notificationList: {
     display: 'flex',
@@ -413,6 +483,20 @@ const styles: Record<string, React.CSSProperties> = {
   },
   emptyState: {
     textAlign: 'center',
+    padding: '40px',
+    color: '#94a3b8',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyStateText: {
+    margin: 0,
+    fontSize: '14px',
+    color: '#64748b',
+  },
+  emptyStateContainer: {
+    textAlign: 'center',
     padding: '60px 40px',
     backgroundColor: '#fff',
     borderRadius: '16px',
@@ -434,7 +518,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#475569',
     margin: '0 0 12px 0',
   },
-  emptyStateText: {
+  emptyStateDescription: {
     fontSize: '14px',
     color: '#64748b',
     margin: 0,

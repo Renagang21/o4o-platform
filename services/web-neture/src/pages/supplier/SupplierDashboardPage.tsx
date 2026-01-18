@@ -18,9 +18,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FileCheck, ArrowRight, RefreshCw } from 'lucide-react';
+import { FileCheck, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { supplierApi, type SupplierRequest } from '../../lib/api';
+import { supplierApi, dashboardApi, type SupplierRequest, type SupplierDashboardSummary } from '../../lib/api';
 import {
   SupplierSummaryCards,
   SupplierServiceStatusBoard,
@@ -33,7 +33,7 @@ import {
 } from '../../components/supplier';
 
 // 서비스 설정
-const SERVICE_CONFIG = {
+const SERVICE_CONFIG: Record<string, { name: string; icon: string; url: string; color: string }> = {
   glycopharm: {
     name: 'GlycoPharm',
     icon: '🏥',
@@ -54,124 +54,91 @@ const SERVICE_CONFIG = {
   },
 };
 
-// Mock 데이터 생성 함수 (GET API 기반 집계 시뮬레이션)
-function calculateSummaryData(requests: SupplierRequest[]): SummaryData {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-  const recentApprovals = requests.filter(
-    (r) =>
-      r.status === 'approved' && new Date(r.requestedAt) >= sevenDaysAgo
-  ).length;
-
-  const connectedServices = new Set(requests.map((r) => r.serviceId)).size;
+// API 데이터를 컴포넌트 props 형식으로 변환
+function transformSummaryData(summary: SupplierDashboardSummary | null): SummaryData {
+  if (!summary) {
+    return {
+      activeProducts: 0,
+      pendingRequests: 0,
+      recentApprovals: 0,
+      activeOrders: 0,
+      publishedContents: 0,
+      connectedServices: 0,
+    };
+  }
 
   return {
-    activeProducts: requests.filter((r) => r.status === 'approved').length * 2, // 승인당 평균 2개 제품 가정
-    pendingRequests: requests.filter((r) => r.status === 'pending').length,
-    recentApprovals,
-    activeOrders: Math.floor(Math.random() * 5), // 시뮬레이션
-    publishedContents: Math.floor(Math.random() * 10) + 1, // 시뮬레이션
-    connectedServices: connectedServices || 3,
+    activeProducts: summary.stats.activeProducts,
+    pendingRequests: summary.stats.pendingRequests,
+    recentApprovals: summary.stats.recentApprovals,
+    activeOrders: 0, // Neture에서 주문 처리 안함
+    publishedContents: summary.stats.publishedContents,
+    connectedServices: summary.stats.connectedServices,
   };
 }
 
-function calculateServiceStatuses(requests: SupplierRequest[]): ServiceStatus[] {
-  const serviceMap = new Map<string, SupplierRequest[]>();
+function transformServiceStatuses(summary: SupplierDashboardSummary | null): ServiceStatus[] {
+  if (!summary || summary.serviceStats.length === 0) {
+    return [];
+  }
 
-  requests.forEach((r) => {
-    if (!serviceMap.has(r.serviceId)) {
-      serviceMap.set(r.serviceId, []);
-    }
-    serviceMap.get(r.serviceId)!.push(r);
-  });
+  return summary.serviceStats.map((stat) => {
+    const config = SERVICE_CONFIG[stat.serviceId] || {
+      name: stat.serviceName,
+      icon: '📦',
+      url: '#',
+      color: '#64748b',
+    };
 
-  const statuses: ServiceStatus[] = [];
-
-  Object.entries(SERVICE_CONFIG).forEach(([serviceId, config]) => {
-    const serviceRequests = serviceMap.get(serviceId) || [];
-
-    statuses.push({
-      serviceId,
+    return {
+      serviceId: stat.serviceId,
       serviceName: config.name,
       serviceIcon: config.icon,
       serviceUrl: config.url,
       requests: {
-        pending: serviceRequests.filter((r) => r.status === 'pending').length,
-        approved: serviceRequests.filter((r) => r.status === 'approved').length,
-        rejected: serviceRequests.filter((r) => r.status === 'rejected').length,
+        pending: stat.pending,
+        approved: stat.approved,
+        rejected: stat.rejected,
       },
-      orders: {
-        active: Math.floor(Math.random() * 3),
-        completed: Math.floor(Math.random() * 10),
-      },
-      activeProducts: serviceRequests.filter((r) => r.status === 'approved').length * 2,
-    });
+      orders: { active: 0, completed: 0 }, // Neture에서 주문 처리 안함
+      activeProducts: stat.approved * 2, // 승인당 평균 2개 제품 가정
+    };
   });
-
-  return statuses.filter(
-    (s) => s.requests.pending + s.requests.approved + s.requests.rejected > 0
-  );
 }
 
-function generateActivityEvents(requests: SupplierRequest[]): ActivityEvent[] {
-  const events: ActivityEvent[] = [];
+function transformActivityEvents(summary: SupplierDashboardSummary | null): ActivityEvent[] {
+  if (!summary || summary.recentActivity.length === 0) {
+    return [];
+  }
 
-  // 최근 신청 이벤트 생성
-  requests
-    .filter((r) => r.status !== 'pending')
-    .slice(0, 5)
-    .forEach((r) => {
-      const config = SERVICE_CONFIG[r.serviceId as keyof typeof SERVICE_CONFIG];
-      events.push({
-        id: `event-${r.id}`,
-        type: r.status === 'approved' ? 'request_approved' : 'request_rejected',
-        title: r.status === 'approved' ? '신청 승인' : '신청 거절',
-        description: `${r.sellerName}님의 ${r.productName} 신청`,
-        serviceName: config?.name || r.serviceName,
-        timestamp: r.requestedAt,
-      });
-    });
-
-  // 시뮬레이션: 주문/콘텐츠 이벤트 추가
-  events.push({
-    id: 'event-order-1',
-    type: 'order_created',
-    title: '새 주문 접수',
-    description: '글라이코팜 강남점에서 주문 발생',
-    serviceName: 'GlycoPharm',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  });
-
-  events.push({
-    id: 'event-content-1',
-    type: 'content_published',
-    title: '콘텐츠 게시',
-    description: '신제품 안내 콘텐츠가 게시되었습니다',
-    serviceName: 'Neture',
-    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-  });
-
-  // 시간순 정렬 (최신 순)
-  return events
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, 10);
+  return summary.recentActivity.map((activity) => ({
+    id: activity.id,
+    type: activity.type === 'approved' ? 'request_approved' : activity.type === 'rejected' ? 'request_rejected' : 'request_created',
+    title: activity.type === 'approved' ? '신청 승인' : activity.type === 'rejected' ? '신청 거절' : '신청 생성',
+    description: `${activity.sellerName}님의 ${activity.productName} 신청`,
+    serviceName: activity.serviceName,
+    timestamp: activity.timestamp,
+  }));
 }
 
-function calculateBasicStats(requests: SupplierRequest[]): BasicStatsData {
-  const total = requests.length;
-  const approved = requests.filter((r) => r.status === 'approved').length;
-
-  const serviceGroups = requests.reduce((acc, r) => {
-    acc[r.serviceId] = (acc[r.serviceId] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const distribution = Object.entries(serviceGroups).map(([serviceId, count]) => {
-    const config = SERVICE_CONFIG[serviceId as keyof typeof SERVICE_CONFIG];
+function transformBasicStats(summary: SupplierDashboardSummary | null): BasicStatsData {
+  if (!summary) {
     return {
-      serviceId,
-      serviceName: config?.name || serviceId,
+      approvalRate: { approved: 0, total: 0 },
+      serviceDistribution: [],
+      conversionCount: 0,
+    };
+  }
+
+  const total = summary.stats.totalRequests;
+  const approved = summary.stats.approvedRequests;
+
+  const distribution = summary.serviceStats.map((stat) => {
+    const config = SERVICE_CONFIG[stat.serviceId];
+    const count = stat.pending + stat.approved + stat.rejected;
+    return {
+      serviceId: stat.serviceId,
+      serviceName: config?.name || stat.serviceName,
       count,
       percentage: total > 0 ? Math.round((count / total) * 100) : 0,
       color: config?.color || '#64748b',
@@ -185,16 +152,36 @@ function calculateBasicStats(requests: SupplierRequest[]): BasicStatsData {
   };
 }
 
+// 빈 데이터 상태 컴포넌트
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div style={styles.emptyState}>
+      <AlertCircle size={40} style={{ color: '#94a3b8', marginBottom: '16px' }} />
+      <p style={styles.emptyStateText}>{message}</p>
+    </div>
+  );
+}
+
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
+  const [summary, setSummary] = useState<SupplierDashboardSummary | null>(null);
   const [requests, setRequests] = useState<SupplierRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const data = await supplierApi.getRequests();
-    setRequests(data);
+    try {
+      // 대시보드 요약 데이터와 대기 중인 요청 병렬 조회
+      const [summaryData, requestsData] = await Promise.all([
+        dashboardApi.getSupplierDashboardSummary(),
+        supplierApi.getRequests({ status: 'pending' }),
+      ]);
+      setSummary(summaryData);
+      setRequests(requestsData);
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    }
     setLastUpdated(new Date());
     setLoading(false);
   }, []);
@@ -203,13 +190,16 @@ export default function SupplierDashboardPage() {
     fetchData();
   }, [fetchData]);
 
-  // 파생 데이터 계산
-  const summaryData = calculateSummaryData(requests);
-  const serviceStatuses = calculateServiceStatuses(requests);
-  const activityEvents = generateActivityEvents(requests);
-  const basicStats = calculateBasicStats(requests);
+  // API 데이터를 컴포넌트 props 형식으로 변환
+  const summaryData = transformSummaryData(summary);
+  const serviceStatuses = transformServiceStatuses(summary);
+  const activityEvents = transformActivityEvents(summary);
+  const basicStats = transformBasicStats(summary);
 
-  const pendingRequests = requests.filter((r) => r.status === 'pending').slice(0, 3);
+  const pendingRequests = requests.slice(0, 3);
+  const hasData = summary !== null;
+  const hasServiceData = serviceStatuses.length > 0;
+  const hasActivityData = activityEvents.length > 0;
 
   return (
     <div>
@@ -232,26 +222,39 @@ export default function SupplierDashboardPage() {
       <SupplierSummaryCards data={summaryData} loading={loading} />
 
       {/* P2: 서비스별 상태판 */}
-      <SupplierServiceStatusBoard
-        services={serviceStatuses.length > 0 ? serviceStatuses : Object.entries(SERVICE_CONFIG).map(([id, config]) => ({
-          serviceId: id,
-          serviceName: config.name,
-          serviceIcon: config.icon,
-          serviceUrl: config.url,
-          requests: { pending: 0, approved: 0, rejected: 0 },
-          orders: { active: 0, completed: 0 },
-          activeProducts: 0,
-        }))}
-        loading={loading}
-      />
+      {!loading && !hasServiceData ? (
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>서비스별 상태판</h2>
+          <EmptyState message="자료가 없습니다. 아직 연결된 서비스가 없습니다." />
+        </div>
+      ) : (
+        <SupplierServiceStatusBoard
+          services={hasServiceData ? serviceStatuses : []}
+          loading={loading}
+        />
+      )}
 
       {/* P2: 2-Column Layout for Timeline & Stats */}
       <div style={styles.twoColumnGrid}>
         {/* 최근 활동 타임라인 */}
-        <SupplierActivityTimeline events={activityEvents} loading={loading} />
+        {!loading && !hasActivityData ? (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitleSmall}>최근 활동</h2>
+            <EmptyState message="자료가 없습니다. 아직 활동 내역이 없습니다." />
+          </div>
+        ) : (
+          <SupplierActivityTimeline events={activityEvents} loading={loading} />
+        )}
 
         {/* 최소 통계 영역 */}
-        <SupplierBasicStats data={basicStats} loading={loading} />
+        {!loading && !hasData ? (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitleSmall}>기본 통계</h2>
+            <EmptyState message="자료가 없습니다. 데이터가 쌓이면 통계가 표시됩니다." />
+          </div>
+        ) : (
+          <SupplierBasicStats data={basicStats} loading={loading} />
+        )}
       </div>
 
       {/* 기존: 대기 중인 신청 미리보기 */}
@@ -269,13 +272,11 @@ export default function SupplierDashboardPage() {
         {loading ? (
           <p style={styles.loading}>로딩 중...</p>
         ) : pendingRequests.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p>현재 대기 중인 신청이 없습니다.</p>
-          </div>
+          <EmptyState message="자료가 없습니다. 현재 대기 중인 신청이 없습니다." />
         ) : (
           <div style={styles.requestList}>
             {pendingRequests.map((req) => {
-              const config = SERVICE_CONFIG[req.serviceId as keyof typeof SERVICE_CONFIG];
+              const config = SERVICE_CONFIG[req.serviceId];
               return (
                 <Link
                   key={req.id}
@@ -380,6 +381,12 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#1e293b',
     margin: 0,
   },
+  sectionTitleSmall: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: '0 0 16px 0',
+  },
   viewAllLink: {
     display: 'flex',
     alignItems: 'center',
@@ -398,6 +405,15 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     padding: '40px',
     color: '#94a3b8',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyStateText: {
+    margin: 0,
+    fontSize: '14px',
+    color: '#64748b',
   },
   requestList: {
     display: 'flex',

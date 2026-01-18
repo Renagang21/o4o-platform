@@ -667,6 +667,190 @@ interface SupplierContentDetail extends SupplierContentItem {
   imageUrl: string;
 }
 
+// ==================== Dashboard Summary API ====================
+
+// Supplier Dashboard Summary Types
+interface SupplierDashboardStats {
+  totalRequests: number;
+  pendingRequests: number;
+  approvedRequests: number;
+  rejectedRequests: number;
+  recentApprovals: number;
+  totalProducts: number;
+  activeProducts: number;
+  totalContents: number;
+  publishedContents: number;
+  connectedServices: number;
+}
+
+interface ServiceStat {
+  serviceId: string;
+  serviceName: string;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: string;
+  sellerName: string;
+  productName: string;
+  serviceName: string;
+  timestamp: string;
+}
+
+interface SupplierDashboardSummary {
+  stats: SupplierDashboardStats;
+  serviceStats: ServiceStat[];
+  recentActivity: RecentActivity[];
+}
+
+// Admin/Operator Dashboard Summary Types
+interface AdminDashboardStats {
+  totalSuppliers: number;
+  activeSuppliers: number;
+  totalRequests: number;
+  pendingRequests: number;
+  approvedRequests: number;
+  rejectedRequests: number;
+  totalPartnershipRequests: number;
+  openPartnershipRequests: number;
+  totalContents: number;
+  publishedContents: number;
+}
+
+interface ServiceStatus {
+  serviceId: string;
+  serviceName: string;
+  suppliers: number;
+  partners: number;
+  status: string;
+}
+
+interface RecentApplication {
+  id: string;
+  name: string;
+  type: string;
+  date: string;
+  status: string;
+}
+
+interface RecentActivityItem {
+  id: string;
+  type: string;
+  text: string;
+  time: string;
+}
+
+interface AdminDashboardSummary {
+  stats: AdminDashboardStats;
+  serviceStatus: ServiceStatus[];
+  recentApplications: RecentApplication[];
+  recentActivities: RecentActivityItem[];
+}
+
+// Partner Dashboard Summary Types
+interface PartnerDashboardStats {
+  totalRequests: number;
+  openRequests: number;
+  matchedRequests: number;
+  closedRequests: number;
+  connectedServiceCount: number;
+  totalSupplierCount: number;
+}
+
+interface ConnectedService {
+  serviceId: string;
+  serviceName: string;
+  supplierCount: number;
+  lastActivity: string;
+}
+
+interface Notification {
+  type: string;
+  text: string;
+  link: string;
+}
+
+interface PartnerDashboardSummary {
+  stats: PartnerDashboardStats;
+  connectedServices: ConnectedService[];
+  notifications: Notification[];
+}
+
+// Dashboard API
+export const dashboardApi = {
+  /**
+   * GET /api/v1/neture/supplier/dashboard/summary
+   * 공급자 대시보드 통계 요약
+   */
+  async getSupplierDashboardSummary(): Promise<SupplierDashboardSummary | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/dashboard/summary`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.warn('[Dashboard API] Supplier dashboard summary not available');
+        return null;
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Dashboard API] Failed to fetch supplier dashboard summary:', error);
+      return null;
+    }
+  },
+
+  /**
+   * GET /api/v1/neture/admin/dashboard/summary
+   * 운영자/관리자 대시보드 통계 요약
+   */
+  async getAdminDashboardSummary(): Promise<AdminDashboardSummary | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/admin/dashboard/summary`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.warn('[Dashboard API] Admin dashboard summary not available');
+        return null;
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Dashboard API] Failed to fetch admin dashboard summary:', error);
+      return null;
+    }
+  },
+
+  /**
+   * GET /api/v1/neture/partner/dashboard/summary
+   * 파트너 대시보드 통계 요약
+   */
+  async getPartnerDashboardSummary(): Promise<PartnerDashboardSummary | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/partner/dashboard/summary`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.warn('[Dashboard API] Partner dashboard summary not available');
+        return null;
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Dashboard API] Failed to fetch partner dashboard summary:', error);
+      return null;
+    }
+  },
+};
+
 export type {
   Supplier,
   SupplierDetail,
@@ -681,4 +865,17 @@ export type {
   ServiceSummary,
   SupplierContentItem,
   SupplierContentDetail,
+  SupplierDashboardSummary,
+  SupplierDashboardStats,
+  ServiceStat,
+  RecentActivity,
+  AdminDashboardSummary,
+  AdminDashboardStats,
+  ServiceStatus,
+  RecentApplication,
+  RecentActivityItem,
+  PartnerDashboardSummary,
+  PartnerDashboardStats,
+  ConnectedService,
+  Notification,
 };
