@@ -70,7 +70,7 @@ function HeroSection() {
 
 /**
  * Section A: 비즈니스를 주도하는 운영자
- * 3-column card grid
+ * 3-column card grid - 클릭 가능한 카드
  */
 function SectionA() {
   const cards = [
@@ -79,17 +79,20 @@ function SectionA() {
       title: '전통시장 운영자',
       description: '시장 전체를\n하나의 서비스로 운영합니다.',
       smallNote: '운영 주체는 시장입니다',
+      linkTo: '/seller/overview/market',
     },
     {
       icon: '💇',
       title: '미용실 · 헬스장',
       description: '대기 공간을\n비즈니스 접점으로 전환합니다.',
       smallNote: '콘텐츠는 매장이 결정합니다',
+      linkTo: '/seller/overview/beauty',
     },
     {
       icon: '🏥',
       title: '의료·전문 조직',
       description: '신뢰가 중요한 공간일수록\n주도권은 내부에 있습니다.',
+      linkTo: '/channel/dental',
     },
   ];
 
@@ -108,14 +111,17 @@ function SectionA() {
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
-            <div key={index} style={styles.card}>
-              <div style={styles.cardIcon}>{card.icon}</div>
-              <h3 style={styles.cardTitle}>{card.title}</h3>
-              <p style={styles.cardDescription}>{card.description}</p>
-              {card.smallNote && (
-                <p style={styles.cardSmallNote}>{card.smallNote}</p>
-              )}
-            </div>
+            <Link key={index} to={card.linkTo} style={styles.cardLink}>
+              <div style={styles.cardClickable}>
+                <div style={styles.cardIcon}>{card.icon}</div>
+                <h3 style={styles.cardTitle}>{card.title}</h3>
+                <p style={styles.cardDescription}>{card.description}</p>
+                {card.smallNote && (
+                  <p style={styles.cardSmallNote}>{card.smallNote}</p>
+                )}
+                <span style={styles.cardArrow}>자세히 보기 →</span>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -126,7 +132,7 @@ function SectionA() {
 /**
  * Section A-2: 실제 판매를 담당하는 판매자(각 매장)
  * WO-NETURE-O4O-INTRO-PAGE-EXPANSION-V2
- * 3-column card grid
+ * 3-column card grid - 클릭 가능한 카드
  */
 function SectionSeller() {
   const cards = [
@@ -134,16 +140,19 @@ function SectionSeller() {
       icon: '🛒',
       title: '전통시장 내 개별 점포',
       description: '시장 운영 구조에 참여하여\n추가 비용 없이 노출과 참여 기회를 얻습니다.',
+      linkTo: '/seller/overview/market',
     },
     {
       icon: '💈',
       title: '미용실 · 헬스장 · 약국',
       description: '복잡한 설정 없이\n선택된 구조에 참여하기만 하면 됩니다.',
+      linkTo: '/seller/overview/pharmacy',
     },
     {
       icon: '🏬',
       title: '전문 매장',
       description: '매장의 정체성을 해치지 않는 범위에서\n새로운 홍보·수익 접점을 만듭니다.',
+      linkTo: '/seller/overview',
     },
   ];
 
@@ -160,11 +169,14 @@ function SectionSeller() {
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
-            <div key={index} style={styles.card}>
-              <div style={styles.cardIcon}>{card.icon}</div>
-              <h3 style={styles.cardTitle}>{card.title}</h3>
-              <p style={styles.cardDescription}>{card.description}</p>
-            </div>
+            <Link key={index} to={card.linkTo} style={styles.cardLink}>
+              <div style={styles.cardClickable}>
+                <div style={styles.cardIcon}>{card.icon}</div>
+                <h3 style={styles.cardTitle}>{card.title}</h3>
+                <p style={styles.cardDescription}>{card.description}</p>
+                <span style={styles.cardArrow}>자세히 보기 →</span>
+              </div>
+            </Link>
           ))}
         </div>
         <p style={styles.sellerNote}>
@@ -178,7 +190,7 @@ function SectionSeller() {
 /**
  * Section A-3: 채널 주도권과 무재고 판매
  * WO-NETURE-O4O-INTRO-PAGE-CHANNEL-UPDATE-V3
- * 핵심: 매장이 채널을 소유하고, 재고 없이 판매
+ * 핵심: 매장이 채널을 소유하고, 재고 없이 판매 - 클릭 가능한 카드
  */
 function SectionChannel() {
   const cards = [
@@ -187,18 +199,21 @@ function SectionChannel() {
       title: '채널 주도권',
       description: '매장이 디지털 채널을 소유합니다.\nQR 기반으로 고객 접점을 직접 관리합니다.',
       smallNote: '플랫폼은 도구만 제공',
+      linkTo: '/seller/qr-guide',
     },
     {
       icon: '📦',
       title: '무재고 판매',
       description: '재고 보유 없이 판매합니다.\n취급과 노출만 매장이 선택합니다.',
       smallNote: '보관·배송 부담 없음',
+      linkTo: '/channel/structure',
     },
     {
       icon: '🔄',
       title: 'B2B + B2C 동시',
       description: '공급사→매장(B2B)과\n매장→소비자(B2C)가 하나의 구조 안에서 연결됩니다.',
       smallNote: '중복 시스템 불필요',
+      linkTo: '/channel/structure',
     },
   ];
 
@@ -217,18 +232,21 @@ function SectionChannel() {
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
-            <div key={index} style={styles.card}>
-              <div style={styles.cardIcon}>{card.icon}</div>
-              <h3 style={styles.cardTitle}>{card.title}</h3>
-              <p style={styles.cardDescription}>{card.description}</p>
-              {card.smallNote && (
-                <p style={styles.cardSmallNote}>{card.smallNote}</p>
-              )}
-            </div>
+            <Link key={index} to={card.linkTo} style={styles.cardLink}>
+              <div style={styles.cardClickable}>
+                <div style={styles.cardIcon}>{card.icon}</div>
+                <h3 style={styles.cardTitle}>{card.title}</h3>
+                <p style={styles.cardDescription}>{card.description}</p>
+                {card.smallNote && (
+                  <p style={styles.cardSmallNote}>{card.smallNote}</p>
+                )}
+                <span style={styles.cardArrow}>자세히 보기 →</span>
+              </div>
+            </Link>
           ))}
         </div>
         <p style={styles.channelNote}>
-          <Link to="/channel/structure" style={styles.channelLink}>
+          <Link to="/channel/structure" style={styles.channelLinkBtn}>
             채널·판매 구조 상세 보기 →
           </Link>
         </p>
@@ -284,7 +302,7 @@ function SectionB() {
 
 /**
  * Section C: 스타트업 / 사업모델 설계자
- * 3-column card grid
+ * 3-column card grid - 클릭 가능한 카드
  */
 function SectionC() {
   const cards = [
@@ -292,16 +310,19 @@ function SectionC() {
       icon: '📦',
       title: '제품 공급사',
       description: '영업 없이도\n매장 기반 구조를 설계합니다.',
+      linkTo: '/partner/overview-info',
     },
     {
       icon: '🎬',
       title: '콘텐츠 사업자',
       description: '콘텐츠를\n실제 공간과 연결합니다.',
+      linkTo: '/partner/overview-info',
     },
     {
       icon: '📢',
       title: '마케팅 · 기획사',
       description: '광고가 아닌\n운영 가능한 구조를 만듭니다.',
+      linkTo: '/partners/info',
     },
   ];
 
@@ -320,11 +341,14 @@ function SectionC() {
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
-            <div key={index} style={styles.card}>
-              <div style={styles.cardIcon}>{card.icon}</div>
-              <h3 style={styles.cardTitle}>{card.title}</h3>
-              <p style={styles.cardDescription}>{card.description}</p>
-            </div>
+            <Link key={index} to={card.linkTo} style={styles.cardLink}>
+              <div style={styles.cardClickable}>
+                <div style={styles.cardIcon}>{card.icon}</div>
+                <h3 style={styles.cardTitle}>{card.title}</h3>
+                <p style={styles.cardDescription}>{card.description}</p>
+                <span style={styles.cardArrow}>자세히 보기 →</span>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -526,6 +550,27 @@ const styles: Record<string, React.CSSProperties> = {
     fontStyle: 'italic',
   },
 
+  // Clickable card styles
+  cardLink: {
+    textDecoration: 'none',
+  },
+  cardClickable: {
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    padding: '32px 24px',
+    textAlign: 'center',
+    transition: 'all 0.2s ease',
+    cursor: 'pointer',
+  },
+  cardArrow: {
+    display: 'block',
+    marginTop: '16px',
+    fontSize: '0.9rem',
+    color: PRIMARY_COLOR,
+    fontWeight: 500,
+  },
+
   // Seller section note (WO-NETURE-O4O-INTRO-PAGE-EXPANSION-V2)
   sellerNote: {
     fontSize: 'clamp(0.85rem, 1.5vw, 0.95rem)',
@@ -547,6 +592,16 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '12px 24px',
     backgroundColor: '#f1f5f9',
     color: PRIMARY_COLOR,
+    fontSize: '0.95rem',
+    fontWeight: 600,
+    borderRadius: '8px',
+    textDecoration: 'none',
+  },
+  channelLinkBtn: {
+    display: 'inline-block',
+    padding: '12px 24px',
+    backgroundColor: PRIMARY_COLOR,
+    color: '#fff',
     fontSize: '0.95rem',
     fontWeight: 600,
     borderRadius: '8px',

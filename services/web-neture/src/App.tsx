@@ -41,6 +41,7 @@ import PartnershipRequestListPage from './pages/partners/requests/PartnershipReq
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
+import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
 import SellerOverviewPage from './pages/SellerOverviewPage';
 import SellerQRGuidePage from './pages/SellerQRGuidePage';
 import {
@@ -204,6 +205,8 @@ function App() {
               <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
               <Route path="/partners/apply" element={<PartnersApplyPage />} />
               <Route path="/partners/info" element={<PartnerInfoPage />} />
+              {/* Platform Principles (WO-NETURE-PHARMA-LEGAL-JUDGMENT-V1) */}
+              <Route path="/platform/principles" element={<PlatformPrinciplesPage />} />
               {/* Seller Overview (WO-NETURE-SELLER-OVERVIEW-PAGE-V1) */}
               <Route path="/seller/overview" element={<SellerOverviewPage />} />
               {/* Seller QR Guide (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track A) */}
@@ -236,6 +239,7 @@ function App() {
               <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
 
               {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
+              <Route path="/forum" element={<ForumPage />} />
               <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
               <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
               <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />

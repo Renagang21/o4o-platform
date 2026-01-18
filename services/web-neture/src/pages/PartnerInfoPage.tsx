@@ -134,6 +134,19 @@ export function PartnerInfoPage() {
         </div>
       </section>
 
+      {/* 플랫폼 운영 원칙 안내 (WO-NETURE-PHARMA-LEGAL-JUDGMENT-V1) */}
+      <section style={styles.principlesSection}>
+        <h2 style={styles.principlesSectionTitle}>플랫폼 운영 원칙</h2>
+        <p style={styles.principlesSectionText}>
+          Neture는 왜 약국·도매상 자격을 직접 검증하지 않는지,
+          <br />
+          플랫폼의 역할과 책임 범위를 안내합니다.
+        </p>
+        <Link to="/platform/principles" style={styles.principlesLink}>
+          운영 원칙 자세히 보기 →
+        </Link>
+      </section>
+
       {/* 하단 */}
       <footer style={styles.footer}>
         <Link to="/" style={styles.backLink}>
@@ -331,6 +344,36 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     textDecoration: 'none',
     border: `1px solid ${PRIMARY_COLOR}`,
+  },
+  // Principles Section (WO-NETURE-PHARMA-LEGAL-JUDGMENT-V1)
+  principlesSection: {
+    backgroundColor: '#fef3c7',
+    borderRadius: '16px',
+    padding: '32px',
+    marginBottom: '32px',
+    textAlign: 'center',
+  },
+  principlesSectionTitle: {
+    fontSize: '20px',
+    fontWeight: 600,
+    color: '#92400e',
+    marginBottom: '16px',
+  },
+  principlesSectionText: {
+    fontSize: '15px',
+    color: '#78350f',
+    lineHeight: 1.7,
+    marginBottom: '20px',
+  },
+  principlesLink: {
+    display: 'inline-block',
+    padding: '12px 24px',
+    backgroundColor: '#92400e',
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    borderRadius: '8px',
+    textDecoration: 'none',
   },
   footer: {
     textAlign: 'center',
