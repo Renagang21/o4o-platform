@@ -17,13 +17,24 @@ interface MenuItem {
   roles?: string[];
 }
 
+/**
+ * WO-KPA-GROUPBUY-OPERATOR-UI-V1: 메뉴 정리
+ * WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1: 공동구매 메뉴 권한 체크 추가
+ *
+ * 유지: 홈, 공지, 일정, 문서, 회의, 공동구매, 조직 설정
+ * 테스트 피드백은 개발용으로 유지
+ *
+ * 공동구매 메뉴는 운영자(officer, chair, admin)에게만 노출
+ * 조직 설정은 관리자(officer, chair, admin)에게만 노출
+ */
 const menuItems: MenuItem[] = [
   { path: '', label: '홈', icon: '🏠' },
   { path: 'notice', label: '공지', icon: '📢' },
-  { path: 'meetings', label: '회의', icon: '📋' },
-  { path: 'documents', label: '문서', icon: '📁' },
   { path: 'schedule', label: '일정', icon: '📅' },
-  { path: 'feedback', label: '테스트 피드백', icon: '💬' }, // WO-KPA-TEST-FEEDBACK-BOARD-V1
+  { path: 'documents', label: '문서', icon: '📁' },
+  { path: 'meetings', label: '회의', icon: '📋' },
+  { path: 'groupbuy', label: '공동구매', icon: '🛒', roles: ['officer', 'chair', 'admin'] }, // WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1: 운영자만 접근
+  { path: 'feedback', label: '테스트 피드백', icon: '💬' }, // WO-KPA-TEST-FEEDBACK-BOARD-V1 (개발용)
   { path: 'settings', label: '조직 설정', icon: '⚙️', roles: ['officer', 'chair', 'admin'] },
 ];
 

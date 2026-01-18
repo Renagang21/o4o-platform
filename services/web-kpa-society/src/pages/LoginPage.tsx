@@ -1,9 +1,12 @@
 /**
  * LoginPage - KPA Society 로그인 페이지
  *
- * 역할별 로그인 후 이동:
- * - 관리자(admin, district_admin, branch_admin) -> 해당 대시보드
- * - 약사(pharmacist) 및 기타 -> 홈(/)
+ * WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 이동
+ * WO-KPA-FUNCTION-GATE-V1: 직능 미선택 시 게이트로 이동
+ *
+ * 로그인 후 이동:
+ * - 직능 미선택 -> /demo/select-function (게이트)
+ * - 직능 선택됨 -> /demo 홈
  */
 
 import { useState } from 'react';
@@ -24,11 +27,13 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      // 로그인 성공 - 역할에 따라 이동
-      // 실제 로그인 시 user 정보를 확인하여 대시보드로 이동
-      // 여기서는 일단 홈으로 이동 (AuthContext에서 역할 확인 후 리다이렉트)
-      navigate('/');
+      const loggedInUser = await login(email, password);
+      // WO-KPA-FUNCTION-GATE-V1: 직능 미선택 시 게이트로 이동
+      if (!loggedInUser.pharmacistFunction) {
+        navigate('/demo/select-function');
+      } else {
+        navigate('/demo');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
@@ -84,9 +89,9 @@ export function LoginPage() {
         </form>
 
         <div style={styles.footer}>
-          <a href="/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
+          <a href="/demo/forgot-password" style={styles.link}>비밀번호를 잊으셨나요?</a>
           <span style={styles.divider}>|</span>
-          <a href="/member/apply" style={styles.link}>회원가입</a>
+          <a href="/demo/member/apply" style={styles.link}>회원가입</a>
         </div>
       </div>
     </div>

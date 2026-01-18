@@ -1,3 +1,8 @@
+/**
+ * Navigation - 약사회 서비스 내비게이션
+ *
+ * WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
+ */
 import { Link, useLocation } from 'react-router-dom';
 
 interface NavItem {
@@ -6,10 +11,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: '홈', href: '/' },
-  { label: '조직', href: '/organizations' },
-  { label: '회원 신청', href: '/member/apply' },
-  { label: '내 신청', href: '/applications' },
+  { label: '홈', href: '/demo' },
+  { label: '조직', href: '/demo/organizations' },
+  { label: '회원 신청', href: '/demo/member/apply' },
+  { label: '내 신청', href: '/demo/applications' },
 ];
 
 export function Navigation() {

@@ -23,6 +23,8 @@ import { createOrganizationController } from './controllers/organization.control
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
+import { createBranchAdminDashboardController } from './controllers/branch-admin-dashboard.controller.js';
+import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
@@ -80,6 +82,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Admin Dashboard routes (WO-KPA-SOCIETY-DASHBOARD-P1-A)
   router.use('/admin', createAdminDashboardController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
+  router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
+
+  // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
+  router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

@@ -1,6 +1,8 @@
 /**
  * Header - 경기도약사회 스타일
  * 상단 로고 + 메인 네비게이션 + 로그인/회원가입 버튼
+ *
+ * WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
  */
 
 import { useState } from 'react';
@@ -16,68 +18,69 @@ interface MenuItem {
 }
 
 // IA 기준 메뉴 구조 (Design Package v1)
+// WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
 const menuItems: MenuItem[] = [
   {
     label: '공지',
-    href: '/news',
+    href: '/demo/news',
     children: [
-      { label: '공지사항', href: '/news/notice' },
-      { label: '지부/분회 소식', href: '/news/branch-news' },
-      { label: '전체 약사회 소식', href: '/news/kpa-news' },
-      { label: '갤러리', href: '/news/gallery' },
-      { label: '보도자료', href: '/news/press' },
+      { label: '공지사항', href: '/demo/news/notice' },
+      { label: '지부/분회 소식', href: '/demo/news/branch-news' },
+      { label: '전체 약사회 소식', href: '/demo/news/kpa-news' },
+      { label: '갤러리', href: '/demo/news/gallery' },
+      { label: '보도자료', href: '/demo/news/press' },
     ],
   },
   {
     label: '포럼',
-    href: '/forum',
+    href: '/demo/forum',
     children: [
-      { label: '전체 글', href: '/forum' },
-      { label: '글쓰기', href: '/forum/write' },
+      { label: '전체 글', href: '/demo/forum' },
+      { label: '글쓰기', href: '/demo/forum/write' },
     ],
   },
   {
     label: '교육',
-    href: '/lms',
+    href: '/demo/lms',
     children: [
-      { label: '교육 과정', href: '/lms/courses' },
-      { label: '수료증', href: '/lms/certificate' },
+      { label: '교육 과정', href: '/demo/lms/courses' },
+      { label: '수료증', href: '/demo/lms/certificate' },
     ],
   },
   {
     label: '공동구매',
-    href: '/groupbuy',
+    href: '/demo/groupbuy',
     children: [
-      { label: '진행중', href: '/groupbuy' },
-      { label: '참여 내역', href: '/groupbuy/history' },
+      { label: '진행중', href: '/demo/groupbuy' },
+      { label: '참여 내역', href: '/demo/groupbuy/history' },
     ],
   },
   {
     label: '자료실',
-    href: '/docs',
+    href: '/demo/docs',
     children: [
-      { label: '서식/양식', href: '/docs/forms' },
-      { label: '가이드라인', href: '/docs/guidelines' },
-      { label: '규정/정관', href: '/docs/policies' },
+      { label: '서식/양식', href: '/demo/docs/forms' },
+      { label: '가이드라인', href: '/demo/docs/guidelines' },
+      { label: '규정/정관', href: '/demo/docs/policies' },
     ],
   },
   {
     label: '조직소개',
-    href: '/organization',
+    href: '/demo/organization',
     children: [
-      { label: '약사회 소개', href: '/organization' },
-      { label: '지부/분회', href: '/organization/branches' },
-      { label: '임원 안내', href: '/organization/officers' },
-      { label: '연락처', href: '/organization/contact' },
+      { label: '약사회 소개', href: '/demo/organization' },
+      { label: '지부/분회', href: '/demo/organization/branches' },
+      { label: '임원 안내', href: '/demo/organization/officers' },
+      { label: '연락처', href: '/demo/organization/contact' },
     ],
   },
   {
     label: '마이페이지',
-    href: '/mypage',
+    href: '/demo/mypage',
     children: [
-      { label: '프로필', href: '/mypage/profile' },
-      { label: '설정', href: '/mypage/settings' },
-      { label: '수료증 관리', href: '/mypage/certificates' },
+      { label: '프로필', href: '/demo/mypage/profile' },
+      { label: '설정', href: '/demo/mypage/settings' },
+      { label: '수료증 관리', href: '/demo/mypage/certificates' },
     ],
   },
 ];
@@ -85,12 +88,12 @@ const menuItems: MenuItem[] = [
 // 관리자 메뉴 (로그인한 관리자에게만 표시)
 const adminMenu: MenuItem = {
   label: '관리자',
-  href: '/admin',
+  href: '/demo/admin',
   children: [
-    { label: '대시보드', href: '/admin' },
-    { label: '분회 관리', href: '/admin/branches' },
-    { label: '회원 관리', href: '/admin/members' },
-    { label: '공지 관리', href: '/admin/news' },
+    { label: '대시보드', href: '/demo/admin' },
+    { label: '분회 관리', href: '/demo/admin/branches' },
+    { label: '회원 관리', href: '/demo/admin/members' },
+    { label: '공지 관리', href: '/demo/admin/news' },
   ],
 };
 
@@ -152,7 +155,7 @@ export function Header({ serviceName }: { serviceName: string }) {
       <header style={styles.header}>
         <div style={styles.container}>
           {/* Logo */}
-          <Link to="/" style={styles.logo}>
+          <Link to="/demo" style={styles.logo}>
             <span style={styles.logoIcon}>💊</span>
             <span style={styles.logoText}>{serviceName || '약사회'}</span>
           </Link>
@@ -213,7 +216,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                 >
                   로그인
                 </button>
-                <Link to="/signup" style={styles.authButtonOutline}>
+                <Link to="/demo/register" style={styles.authButtonOutline}>
                   회원가입
                 </Link>
               </>

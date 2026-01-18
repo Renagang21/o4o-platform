@@ -23,6 +23,9 @@ import {
   FeedbackDetailPage,
 } from '../pages/feedback';
 
+// WO-KPA-GROUPBUY-OPERATOR-UI-V1: 공동구매 관리
+import { GroupbuyManagePage } from '../pages/intranet/groupbuy';
+
 export function IntranetRoutes() {
   return (
     <IntranetAuthGuard>
@@ -56,6 +59,9 @@ export function IntranetRoutes() {
           <Route path="feedback" element={<FeedbackListPage />} />
           <Route path="feedback/new" element={<FeedbackNewPage />} />
           <Route path="feedback/:id" element={<FeedbackDetailPage />} />
+
+          {/* WO-KPA-GROUPBUY-OPERATOR-UI-V1: 공동구매 관리 */}
+          <Route path="groupbuy" element={<GroupbuyManagePage />} />
 
           {/* 404 */}
           <Route path="*" element={<Navigate to="" replace />} />

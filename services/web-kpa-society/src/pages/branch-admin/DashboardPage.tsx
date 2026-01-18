@@ -1,46 +1,65 @@
 /**
  * DashboardPage - 분회 관리자 대시보드
+ *
+ * WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1
+ * - Mock 데이터 제거, 실제 API 연결
+ * - "요약 → 이동" 패턴
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
-
-interface DashboardStats {
-  totalMembers: number;
-  activeMembers: number;
-  pendingAnnualReports: number;
-  pendingMembershipFees: number;
-  recentPosts: number;
-  upcomingEvents: number;
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'annual_report' | 'membership_fee' | 'member_join' | 'post';
-  title: string;
-  date: string;
-  status?: 'pending' | 'approved' | 'rejected';
-}
+import { branchAdminApi, type BranchDashboardStats, type RecentActivity } from '../../api/branchAdmin';
 
 export function DashboardPage() {
   const { branchId } = useParams();
-  // 샘플 통계 데이터 (테스트용 최소 데이터)
-  const [stats] = useState<DashboardStats>({
-    totalMembers: 25,
-    activeMembers: 23,
-    pendingAnnualReports: 1,
-    pendingMembershipFees: 2,
-    recentPosts: 3,
-    upcomingEvents: 1,
-  });
 
-  // 샘플 활동 데이터 (테스트용)
-  const [recentActivities] = useState<RecentActivity[]>([
-    { id: '1', type: 'annual_report', title: '홍길동 - 2025년 신상신고서 제출', date: '2025-01-04', status: 'pending' },
-    { id: '2', type: 'membership_fee', title: '김테스트 - 2025년 연회비 납부', date: '2025-01-03', status: 'pending' },
-  ]);
+  // 실제 API 연결 상태
+  const [stats, setStats] = useState<BranchDashboardStats>({
+    totalMembers: 0,
+    activeMembers: 0,
+    pendingAnnualReports: 0,
+    pendingMembershipFees: 0,
+    recentPosts: 0,
+    upcomingEvents: 0,
+  });
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // API 데이터 로드
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // 병렬로 통계와 활동 데이터 로드
+        const [statsRes, activitiesRes] = await Promise.all([
+          branchAdminApi.getDashboardStats().catch(() => null),
+          branchAdminApi.getRecentActivities(5).catch(() => null),
+        ]);
+
+        // 통계 데이터 설정
+        if (statsRes?.data) {
+          setStats(statsRes.data);
+        }
+
+        // 활동 데이터 설정
+        if (activitiesRes?.data) {
+          setRecentActivities(activitiesRes.data);
+        }
+      } catch (err) {
+        console.error('Dashboard data load error:', err);
+        setError('데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [branchId]);
 
   const basePath = `/branch/${branchId}/admin`;
 
@@ -74,17 +93,19 @@ export function DashboardPage() {
     if (!status) return null;
     const statusStyles: Record<string, React.CSSProperties> = {
       pending: { backgroundColor: colors.accentYellow, color: colors.white },
+      completed: { backgroundColor: colors.accentGreen, color: colors.white },
       approved: { backgroundColor: colors.accentGreen, color: colors.white },
       rejected: { backgroundColor: colors.accentRed, color: colors.white },
     };
     const statusLabels: Record<string, string> = {
       pending: '대기중',
+      completed: '완료',
       approved: '승인',
       rejected: '반려',
     };
     return (
-      <span style={{ ...styles.statusBadge, ...statusStyles[status] }}>
-        {statusLabels[status]}
+      <span style={{ ...styles.statusBadge, ...(statusStyles[status] || {}) }}>
+        {statusLabels[status] || status}
       </span>
     );
   };
@@ -97,6 +118,20 @@ export function DashboardPage() {
       />
 
       <div style={styles.content}>
+        {/* 로딩 상태 */}
+        {loading && (
+          <div style={styles.loadingOverlay}>
+            <div style={styles.loadingText}>데이터를 불러오는 중...</div>
+          </div>
+        )}
+
+        {/* 에러 상태 */}
+        {error && (
+          <div style={styles.errorBanner}>
+            {error}
+          </div>
+        )}
+
         {/* 통계 카드 */}
         <div style={styles.statsGrid}>
           {statCards.map((stat) => (
@@ -104,7 +139,7 @@ export function DashboardPage() {
               <div style={styles.statCard}>
                 <div style={styles.statIcon}>{stat.icon}</div>
                 <div style={styles.statInfo}>
-                  <div style={styles.statValue}>{stat.value}</div>
+                  <div style={styles.statValue}>{loading ? '-' : stat.value}</div>
                   <div style={styles.statLabel}>{stat.label}</div>
                 </div>
               </div>
@@ -135,16 +170,22 @@ export function DashboardPage() {
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>최근 활동</h2>
             <div style={styles.activityList}>
-              {recentActivities.map((activity) => (
-                <div key={activity.id} style={styles.activityItem}>
-                  <span style={styles.activityIcon}>{getActivityIcon(activity.type)}</span>
-                  <div style={styles.activityInfo}>
-                    <div style={styles.activityTitle}>{activity.title}</div>
-                    <div style={styles.activityDate}>{activity.date}</div>
+              {loading ? (
+                <div style={styles.emptyState}>불러오는 중...</div>
+              ) : recentActivities.length === 0 ? (
+                <div style={styles.emptyState}>최근 활동이 없습니다.</div>
+              ) : (
+                recentActivities.map((activity) => (
+                  <div key={activity.id} style={styles.activityItem}>
+                    <span style={styles.activityIcon}>{getActivityIcon(activity.type)}</span>
+                    <div style={styles.activityInfo}>
+                      <div style={styles.activityTitle}>{activity.title}</div>
+                      <div style={styles.activityDate}>{activity.date}</div>
+                    </div>
+                    {getStatusBadge(activity.status)}
                   </div>
-                  {getStatusBadge(activity.status)}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -266,5 +307,30 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
     fontSize: '12px',
     fontWeight: 500,
+  },
+  loadingOverlay: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '20px',
+    marginBottom: '20px',
+  },
+  loadingText: {
+    fontSize: '14px',
+    color: colors.neutral500,
+  },
+  errorBanner: {
+    backgroundColor: '#FEE2E2',
+    color: '#DC2626',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    fontSize: '14px',
+  },
+  emptyState: {
+    textAlign: 'center',
+    padding: '24px',
+    color: colors.neutral500,
+    fontSize: '14px',
   },
 };

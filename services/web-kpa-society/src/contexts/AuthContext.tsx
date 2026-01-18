@@ -13,11 +13,18 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co
 // Types
 // ============================================================================
 
+/**
+ * 약사 직능 (Function) - WO-KPA-FUNCTION-GATE-V1
+ * 직능은 권한(Role)이 아닌 화면/업무 흐름을 위한 속성
+ */
+export type PharmacistFunction = 'pharmacy' | 'hospital' | 'industry' | 'other';
+
 export interface User {
   id: string;
   email: string;
   name: string;
   role?: string;
+  pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
 }
 
 /**
@@ -84,10 +91,11 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;  // WO-KPA-FUNCTION-GATE-V1: User 반환
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  setPharmacistFunction: (fn: PharmacistFunction) => void;  // WO-KPA-FUNCTION-GATE-V1
 }
 
 interface ApiUser {
@@ -159,11 +167,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.success && data.data) {
           const apiUser = data.data;
           const mappedRole = mapApiRoleToKpaRole(apiUser.role);
+          // WO-KPA-FUNCTION-GATE-V1: 저장된 직능 불러오기
+          const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
           const userData: User = {
             id: apiUser.id,
             email: apiUser.email,
             name: apiUser.fullName || apiUser.name || apiUser.email,
             role: mappedRole,
+            pharmacistFunction: savedFunction || undefined,
           };
           setUser(userData);
         } else {
@@ -203,13 +214,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (data.success && data.data?.user) {
       const apiUser = data.data.user;
       const mappedRole = mapApiRoleToKpaRole(apiUser.role);
+      // WO-KPA-FUNCTION-GATE-V1: 저장된 직능 불러오기
+      const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
       const userData: User = {
         id: apiUser.id,
         email: apiUser.email,
         name: apiUser.fullName || apiUser.name || apiUser.email,
         role: mappedRole,
+        pharmacistFunction: savedFunction || undefined,
       };
       setUser(userData);
+      return userData;  // WO-KPA-FUNCTION-GATE-V1: User 반환
     } else {
       throw new Error('로그인 응답 형식이 올바르지 않습니다.');
     }
@@ -241,6 +256,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(testUser);
   };
 
+  /**
+   * WO-KPA-FUNCTION-GATE-V1: 약사 직능 설정
+   * - 최초 1회 선택 후 저장
+   * - localStorage에 저장 (추후 API 연동 가능)
+   */
+  const setPharmacistFunction = (fn: PharmacistFunction) => {
+    if (user) {
+      const updatedUser = { ...user, pharmacistFunction: fn };
+      setUser(updatedUser);
+      // 로컬 저장 (사용자별)
+      localStorage.setItem(`kpa_function_${user.id}`, fn);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -251,6 +280,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginAsTestAccount,
         logout,
         checkAuth,
+        setPharmacistFunction,
       }}
     >
       {children}

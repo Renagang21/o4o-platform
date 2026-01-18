@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components';
 import { AuthProvider } from './contexts';
 import { DashboardPage } from './pages/DashboardPage';
@@ -47,6 +47,12 @@ import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 // Test Guide Pages
 import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchOfficerManualPage, AdminManualPage } from './pages/test-guide';
 
+// Platform Home (WO-KPA-HOME-FOUNDATION-V1)
+import { HomePage } from './pages/platform';
+
+// Function Gate (WO-KPA-FUNCTION-GATE-V1)
+import { FunctionGatePage } from './pages/FunctionGatePage';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -56,7 +62,11 @@ import {
 
 /**
  * KPA Society - 약사회 SaaS
- * IA Structure v1 (Design Package)
+ *
+ * WO-KPA-DEMO-ROUTE-ISOLATION-V1
+ * - 기존 약사회 서비스 전체를 /demo 하위로 이동
+ * - / 경로는 플랫폼 홈용으로 비워둠
+ * - 기존 서비스 코드 변경 없이 라우팅만 이동
  */
 
 const SERVICE_NAME = '청명광역약사회';
@@ -66,41 +76,81 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* ========================================
+           * 플랫폼 홈 (/ 경로)
+           * WO-KPA-HOME-FOUNDATION-V1: 실제 홈 페이지
+           * ======================================== */}
+          <Route path="/" element={<HomePage />} />
+
+          {/* ========================================
+           * 약사회 데모 서비스 (/demo 하위)
+           * WO-KPA-DEMO-ROUTE-ISOLATION-V1
+           * ======================================== */}
+
           {/* Login & Register Pages (레이아웃 없음) */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/register/pending" element={<RegisterPendingPage />} />
+          <Route path="/demo/login" element={<LoginPage />} />
+          <Route path="/demo/register" element={<RegisterPage />} />
+          <Route path="/demo/register/pending" element={<RegisterPendingPage />} />
+
+          {/* Function Gate (WO-KPA-FUNCTION-GATE-V1) */}
+          <Route path="/demo/select-function" element={<FunctionGatePage />} />
 
           {/* Test Guide (레이아웃 없음) */}
-          <Route path="/test-guide" element={<TestGuidePage />} />
-          <Route path="/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
-          <Route path="/test-guide/manual/district_officer" element={<DistrictOfficerManualPage />} />
-          <Route path="/test-guide/manual/branch_officer" element={<BranchOfficerManualPage />} />
-          <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
+          <Route path="/demo/test-guide" element={<TestGuidePage />} />
+          <Route path="/demo/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
+          <Route path="/demo/test-guide/manual/district_officer" element={<DistrictOfficerManualPage />} />
+          <Route path="/demo/test-guide/manual/branch_officer" element={<BranchOfficerManualPage />} />
+          <Route path="/demo/test-guide/manual/admin" element={<AdminManualPage />} />
 
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
-          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/demo/admin/*" element={<AdminRoutes />} />
 
           {/* Operator Routes (서비스 운영자 - 별도 레이아웃) */}
-          <Route path="/operator/*" element={<OperatorRoutes />} />
+          <Route path="/demo/operator/*" element={<OperatorRoutes />} />
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
-          <Route path="/intranet/*" element={<IntranetRoutes />} />
+          <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
 
           {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
-          <Route path="/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
-          <Route path="/branch/:branchId/*" element={<BranchRoutes />} />
+          <Route path="/demo/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
+          <Route path="/demo/branch/:branchId/*" element={<BranchRoutes />} />
 
-          {/* Main Layout Routes - 나머지 모든 경로 */}
-          <Route path="/*" element={<MainLayoutRoutes />} />
+          {/* Main Layout Routes - /demo 하위 나머지 경로 */}
+          <Route path="/demo/*" element={<DemoLayoutRoutes />} />
+
+          {/* ========================================
+           * 레거시 경로 리다이렉트 (기존 북마크 지원)
+           * ======================================== */}
+          <Route path="/login" element={<Navigate to="/demo/login" replace />} />
+          <Route path="/register" element={<Navigate to="/demo/register" replace />} />
+          <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
+          <Route path="/operator/*" element={<Navigate to="/demo/operator" replace />} />
+          <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
+          <Route path="/branch/*" element={<Navigate to="/demo/branch" replace />} />
+          <Route path="/test-guide/*" element={<Navigate to="/demo/test-guide" replace />} />
+
+          {/* 그 외 기존 경로들도 /demo로 리다이렉트 */}
+          <Route path="/news/*" element={<Navigate to="/demo/news" replace />} />
+          <Route path="/forum/*" element={<Navigate to="/demo/forum" replace />} />
+          <Route path="/lms/*" element={<Navigate to="/demo/lms" replace />} />
+          <Route path="/groupbuy/*" element={<Navigate to="/demo/groupbuy" replace />} />
+          <Route path="/docs/*" element={<Navigate to="/demo/docs" replace />} />
+          <Route path="/organization/*" element={<Navigate to="/demo/organization" replace />} />
+          <Route path="/mypage/*" element={<Navigate to="/demo/mypage" replace />} />
+
+          {/* 404 - 알 수 없는 경로 */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 }
 
-// Main Layout을 사용하는 라우트들
-function MainLayoutRoutes() {
+/**
+ * /demo 하위 Main Layout을 사용하는 라우트들
+ * 기존 MainLayoutRoutes와 동일 (경로만 /demo 하위로 이동)
+ */
+function DemoLayoutRoutes() {
   return (
     <Layout serviceName={SERVICE_NAME}>
       <Routes>
@@ -160,13 +210,15 @@ function MainLayoutRoutes() {
         <Route path="/events" element={<EventsPage />} />
 
         {/* 404 */}
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={<DemoNotFoundPage />} />
       </Routes>
     </Layout>
   );
 }
 
-// 404 페이지
+/**
+ * 404 페이지 (플랫폼 전체)
+ */
 function NotFoundPage() {
   return (
     <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
@@ -190,6 +242,37 @@ function NotFoundPage() {
         }}
       >
         홈으로 돌아가기
+      </a>
+    </div>
+  );
+}
+
+/**
+ * 404 페이지 (/demo 내부)
+ */
+function DemoNotFoundPage() {
+  return (
+    <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '4rem', margin: 0, color: '#2563EB' }}>404</h1>
+      <h2 style={{ fontSize: '1.5rem', marginTop: '16px', color: '#0F172A' }}>
+        페이지를 찾을 수 없습니다
+      </h2>
+      <p style={{ color: '#64748B', marginTop: '8px' }}>
+        요청하신 페이지가 존재하지 않거나 이동되었습니다.
+      </p>
+      <a
+        href="/demo"
+        style={{
+          display: 'inline-block',
+          marginTop: '24px',
+          padding: '12px 24px',
+          backgroundColor: '#2563EB',
+          color: '#fff',
+          textDecoration: 'none',
+          borderRadius: '6px',
+        }}
+      >
+        데모 홈으로 돌아가기
       </a>
     </div>
   );
