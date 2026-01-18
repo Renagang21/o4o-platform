@@ -240,6 +240,10 @@ const OnboardingHome = lazy(() => import('@/pages/marketing/onboarding/Onboardin
 const SupplierProfileForm = lazy(() => import('@/pages/marketing/onboarding/SupplierProfileForm'));
 const AutomationSettings = lazy(() => import('@/pages/marketing/automation/AutomationSettings'));
 
+// LMS-Marketing Engagement Dashboard (Phase R12)
+const SupplierEngagementDashboard = lazy(() => import('@/pages/marketing/supplier-engagement'));
+const OperatorConsole = lazy(() => import('@/pages/marketing/operator-console'));
+
 // Digital Signage Management (Phase 6)
 const DigitalSignageRouter = lazy(() => import('@/pages/digital-signage/DigitalSignageRouter'));
 
@@ -1650,6 +1654,22 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['marketing.manage']}>
                         <Suspense fallback={<PageLoader />}>
                           <AutomationSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* LMS-Marketing Engagement Dashboard (Phase R12) */}
+                    <Route path="/admin/marketing/supplier/engagement" element={
+                      <AdminProtectedRoute requiredPermissions={['marketing.read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierEngagementDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/marketing/operator/console" element={
+                      <AdminProtectedRoute requiredPermissions={['marketing.manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OperatorConsole />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
