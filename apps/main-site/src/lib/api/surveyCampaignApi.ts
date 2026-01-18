@@ -8,7 +8,7 @@
 import { authClient } from '@o4o/auth-client';
 
 const apiClient = authClient.api;
-const BASE_PATH = '/api/v1/lms-marketing/survey-campaign';
+const BASE_PATH = '/api/v1/lms/marketing/survey-campaigns';
 
 export interface ApiResponse<T> {
   success: boolean;

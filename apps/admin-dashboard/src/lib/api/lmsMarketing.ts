@@ -7,7 +7,7 @@
 
 import { authClient } from '@o4o/auth-client';
 
-const API_BASE = '/api/v1/lms-marketing';
+const API_BASE = '/api/v1/lms/marketing';
 
 // ===== Types =====
 
@@ -239,8 +239,8 @@ export const productContentApi = {
   async list(supplierId?: string): Promise<ApiResponse<PaginatedResponse<ProductContent>>> {
     try {
       const url = supplierId
-        ? `${API_BASE}/product?supplierId=${supplierId}`
-        : `${API_BASE}/product`;
+        ? `${API_BASE}/products?supplierId=${supplierId}`
+        : `${API_BASE}/products`;
       const response = await authClient.api.get(url);
       return { success: true, data: response.data };
     } catch (error) {
@@ -251,7 +251,7 @@ export const productContentApi = {
 
   async get(id: string): Promise<ApiResponse<ProductContent>> {
     try {
-      const response = await authClient.api.get(`${API_BASE}/product/${id}`);
+      const response = await authClient.api.get(`${API_BASE}/products/${id}`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to get product content:', error);
@@ -261,7 +261,7 @@ export const productContentApi = {
 
   async create(dto: CreateProductContentDto): Promise<ApiResponse<ProductContent>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/product`, dto);
+      const response = await authClient.api.post(`${API_BASE}/products`, dto);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to create product content:', error);
@@ -271,7 +271,7 @@ export const productContentApi = {
 
   async update(id: string, dto: UpdateProductContentDto): Promise<ApiResponse<ProductContent>> {
     try {
-      const response = await authClient.api.put(`${API_BASE}/product/${id}`, dto);
+      const response = await authClient.api.patch(`${API_BASE}/products/${id}`, dto);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to update product content:', error);
@@ -281,7 +281,7 @@ export const productContentApi = {
 
   async publish(id: string): Promise<ApiResponse<ProductContent>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/product/${id}/publish`);
+      const response = await authClient.api.post(`${API_BASE}/products/${id}/publish`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to publish product content:', error);
@@ -291,7 +291,7 @@ export const productContentApi = {
 
   async unpublish(id: string): Promise<ApiResponse<ProductContent>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/product/${id}/deactivate`);
+      const response = await authClient.api.post(`${API_BASE}/products/${id}/pause`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to unpublish product content:', error);
@@ -301,7 +301,7 @@ export const productContentApi = {
 
   async delete(id: string): Promise<ApiResponse<void>> {
     try {
-      await authClient.api.delete(`${API_BASE}/product/${id}`);
+      await authClient.api.delete(`${API_BASE}/products/${id}`);
       return { success: true };
     } catch (error) {
       console.error('Failed to delete product content:', error);
@@ -316,8 +316,8 @@ export const quizCampaignApi = {
   async list(supplierId?: string): Promise<ApiResponse<PaginatedResponse<QuizCampaign>>> {
     try {
       const url = supplierId
-        ? `${API_BASE}/quiz-campaign/supplier/${supplierId}`
-        : `${API_BASE}/quiz-campaign`;
+        ? `${API_BASE}/quiz-campaigns?supplierId=${supplierId}`
+        : `${API_BASE}/quiz-campaigns`;
       const response = await authClient.api.get(url);
       return { success: true, data: response.data };
     } catch (error) {
@@ -328,7 +328,7 @@ export const quizCampaignApi = {
 
   async get(id: string): Promise<ApiResponse<QuizCampaign>> {
     try {
-      const response = await authClient.api.get(`${API_BASE}/quiz-campaign/${id}`);
+      const response = await authClient.api.get(`${API_BASE}/quiz-campaigns/${id}`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to get quiz campaign:', error);
@@ -338,7 +338,7 @@ export const quizCampaignApi = {
 
   async create(dto: CreateQuizCampaignDto): Promise<ApiResponse<QuizCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/quiz-campaign`, dto);
+      const response = await authClient.api.post(`${API_BASE}/quiz-campaigns`, dto);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to create quiz campaign:', error);
@@ -348,7 +348,7 @@ export const quizCampaignApi = {
 
   async update(id: string, dto: UpdateQuizCampaignDto): Promise<ApiResponse<QuizCampaign>> {
     try {
-      const response = await authClient.api.put(`${API_BASE}/quiz-campaign/${id}`, dto);
+      const response = await authClient.api.patch(`${API_BASE}/quiz-campaigns/${id}`, dto);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to update quiz campaign:', error);
@@ -358,7 +358,7 @@ export const quizCampaignApi = {
 
   async publish(id: string): Promise<ApiResponse<QuizCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/quiz-campaign/${id}/publish`);
+      const response = await authClient.api.post(`${API_BASE}/quiz-campaigns/${id}/activate`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to publish quiz campaign:', error);
@@ -368,7 +368,7 @@ export const quizCampaignApi = {
 
   async unpublish(id: string): Promise<ApiResponse<QuizCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/quiz-campaign/${id}/unpublish`);
+      const response = await authClient.api.post(`${API_BASE}/quiz-campaigns/${id}/pause`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to unpublish quiz campaign:', error);
@@ -378,7 +378,7 @@ export const quizCampaignApi = {
 
   async end(id: string): Promise<ApiResponse<QuizCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/quiz-campaign/${id}/end`);
+      const response = await authClient.api.post(`${API_BASE}/quiz-campaigns/${id}/complete`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to end quiz campaign:', error);
@@ -388,7 +388,7 @@ export const quizCampaignApi = {
 
   async delete(id: string): Promise<ApiResponse<void>> {
     try {
-      await authClient.api.delete(`${API_BASE}/quiz-campaign/${id}`);
+      await authClient.api.delete(`${API_BASE}/quiz-campaigns/${id}`);
       return { success: true };
     } catch (error) {
       console.error('Failed to delete quiz campaign:', error);
@@ -403,8 +403,8 @@ export const surveyCampaignApi = {
   async list(supplierId?: string): Promise<ApiResponse<PaginatedResponse<SurveyCampaign>>> {
     try {
       const url = supplierId
-        ? `${API_BASE}/survey-campaign/supplier/${supplierId}`
-        : `${API_BASE}/survey-campaign`;
+        ? `${API_BASE}/survey-campaigns?supplierId=${supplierId}`
+        : `${API_BASE}/survey-campaigns`;
       const response = await authClient.api.get(url);
       return { success: true, data: response.data };
     } catch (error) {
@@ -415,7 +415,7 @@ export const surveyCampaignApi = {
 
   async get(id: string): Promise<ApiResponse<SurveyCampaign>> {
     try {
-      const response = await authClient.api.get(`${API_BASE}/survey-campaign/${id}`);
+      const response = await authClient.api.get(`${API_BASE}/survey-campaigns/${id}`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to get survey campaign:', error);
@@ -425,7 +425,7 @@ export const surveyCampaignApi = {
 
   async create(dto: CreateSurveyCampaignDto): Promise<ApiResponse<SurveyCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/survey-campaign`, dto);
+      const response = await authClient.api.post(`${API_BASE}/survey-campaigns`, dto);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to create survey campaign:', error);
@@ -435,7 +435,7 @@ export const surveyCampaignApi = {
 
   async update(id: string, dto: UpdateSurveyCampaignDto): Promise<ApiResponse<SurveyCampaign>> {
     try {
-      const response = await authClient.api.put(`${API_BASE}/survey-campaign/${id}`, dto);
+      const response = await authClient.api.patch(`${API_BASE}/survey-campaigns/${id}`, dto);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to update survey campaign:', error);
@@ -445,7 +445,7 @@ export const surveyCampaignApi = {
 
   async publish(id: string): Promise<ApiResponse<SurveyCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/survey-campaign/${id}/publish`);
+      const response = await authClient.api.post(`${API_BASE}/survey-campaigns/${id}/activate`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to publish survey campaign:', error);
@@ -455,7 +455,7 @@ export const surveyCampaignApi = {
 
   async unpublish(id: string): Promise<ApiResponse<SurveyCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/survey-campaign/${id}/unpublish`);
+      const response = await authClient.api.post(`${API_BASE}/survey-campaigns/${id}/pause`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to unpublish survey campaign:', error);
@@ -465,7 +465,7 @@ export const surveyCampaignApi = {
 
   async end(id: string): Promise<ApiResponse<SurveyCampaign>> {
     try {
-      const response = await authClient.api.post(`${API_BASE}/survey-campaign/${id}/end`);
+      const response = await authClient.api.post(`${API_BASE}/survey-campaigns/${id}/complete`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to end survey campaign:', error);
@@ -475,7 +475,7 @@ export const surveyCampaignApi = {
 
   async delete(id: string): Promise<ApiResponse<void>> {
     try {
-      await authClient.api.delete(`${API_BASE}/survey-campaign/${id}`);
+      await authClient.api.delete(`${API_BASE}/survey-campaigns/${id}`);
       return { success: true };
     } catch (error) {
       console.error('Failed to delete survey campaign:', error);
@@ -485,7 +485,7 @@ export const surveyCampaignApi = {
 
   async getStats(id: string): Promise<ApiResponse<Record<string, unknown>>> {
     try {
-      const response = await authClient.api.get(`${API_BASE}/survey-campaign/${id}/stats`);
+      const response = await authClient.api.get(`${API_BASE}/survey-campaigns/${id}/stats`);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Failed to get survey campaign stats:', error);
