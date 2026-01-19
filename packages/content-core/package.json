@@ -3,20 +3,20 @@
   "version": "0.1.0-skeleton",
   "description": "Content Core - Single Source of Truth for Content Assets (SKELETON)",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
     },
     "./entities": {
-      "import": "./dist/entities/index.js",
-      "types": "./dist/entities/index.d.ts"
+      "import": "./src/entities/index.ts",
+      "types": "./src/entities/index.ts"
     },
     "./types": {
-      "import": "./dist/types/index.js",
-      "types": "./dist/types/index.d.ts"
+      "import": "./src/types/index.ts",
+      "types": "./src/types/index.ts"
     }
   },
   "scripts": {
