@@ -25,6 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@o4o-apps/content-core": "workspace:^",
     "typeorm": "^0.3.20"
   },
   "peerDependencies": {
