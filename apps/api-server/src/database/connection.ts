@@ -189,6 +189,16 @@ import {
 } from '../modules/partner/entities/index.js';
 
 // ============================================================================
+// SITEGUIDE ENTITIES (WO-SITEGUIDE-CORE-EXECUTION-V1)
+// ============================================================================
+import {
+  SiteGuideBusiness,
+  SiteGuideApiKey,
+  SiteGuideUsageSummary,
+  SiteGuideExecutionLog,
+} from '../routes/siteguide/entities/index.js';
+
+// ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
@@ -484,6 +494,13 @@ export const AppDataSource = new DataSource({
     PartnerContent,
     PartnerEvent,
     PartnerTarget,
+    // ============================================================================
+    // SITEGUIDE ENTITIES (WO-SITEGUIDE-CORE-EXECUTION-V1)
+    // ============================================================================
+    SiteGuideBusiness,
+    SiteGuideApiKey,
+    SiteGuideUsageSummary,
+    SiteGuideExecutionLog,
     // ============================================================================
     // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
     // ============================================================================

@@ -67,7 +67,16 @@ import serviceAdminRoutes from './routes/service-admin.routes.js';
 import publicRoutes from './routes/public.routes.js';
 
 // SiteGuide Routes (independent service - siteguide.co.kr)
-import siteguideRoutes from './routes/siteguide.routes.js';
+// WO-SITEGUIDE-CORE-EXECUTION-V1: 새로운 모듈 기반 라우터
+import { createSiteGuideRoutes } from './routes/siteguide/index.js';
+
+// SiteGuide Entities (for DataSource registration)
+import {
+  SiteGuideBusiness,
+  SiteGuideApiKey,
+  SiteGuideUsageSummary,
+  SiteGuideExecutionLog,
+} from './routes/siteguide/entities/index.js';
 
 // User Role Routes
 import userRoleRoutes from './routes/user-role.routes.js';
@@ -680,6 +689,8 @@ const startServer = async () => {
     logger.info('✅ Public routes registered at /api/v1/public');
 
     // 8.5. Register SiteGuide routes (independent service - siteguide.co.kr, no auth)
+    // WO-SITEGUIDE-CORE-EXECUTION-V1: DataSource 기반 모듈 라우터
+    const siteguideRoutes = createSiteGuideRoutes(AppDataSource);
     app.use('/api/siteguide', siteguideRoutes);
     logger.info('✅ SiteGuide routes registered at /api/siteguide (independent service)');
 

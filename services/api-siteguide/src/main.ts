@@ -146,20 +146,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 // SERVER STARTUP
 // ============================================================================
 
-const PORT = config.PORT;
-
-app.listen(PORT, () => {
-  console.log('');
-  console.log('========================================');
-  console.log('  SiteGuide Core Service started');
-  console.log('========================================');
-  console.log(`  Domain:      ${config.SERVICE_DOMAIN}`);
-  console.log(`  Environment: ${config.NODE_ENV}`);
-  console.log(`  Port:        ${PORT}`);
-  console.log(`  AI Enabled:  ${config.AI_EXECUTION_ENABLED}`);
-  console.log('========================================');
-  console.log('');
-  console.log(`  Health:      http://localhost:${PORT}/health`);
-  console.log(`  API Health:  http://localhost:${PORT}/api/health`);
-  console.log('');
+const port = Number(process.env.PORT) || 8080;
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 SiteGuide Core listening on port ${port}`);
 });
