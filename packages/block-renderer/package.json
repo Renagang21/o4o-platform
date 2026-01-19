@@ -22,6 +22,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@o4o-apps/content-core": "workspace:^",
     "@o4o/types": "workspace:*",
     "@o4o/slide-app": "workspace:*",
     "@o4o/shortcodes": "workspace:*",
