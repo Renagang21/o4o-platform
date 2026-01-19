@@ -9,7 +9,6 @@ import { Routes, Route, useParams } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { RequireAuth } from '@/context';
 import { PageLoading } from '@/components/common';
-import { SellerDashboard } from '@/pages/seller/dashboard';
 
 // Lazy load pages
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
@@ -83,7 +82,7 @@ function PageFallback() {
 // Seller Dashboard Wrapper (URL 파라미터에서 sellerId 추출)
 function SellerDashboardWrapper() {
   const { sellerId } = useParams<{ sellerId: string }>();
-  return <SellerDashboard sellerId={sellerId || 'test-seller-001'} />;
+  return <SellerDashboardPage sellerId={sellerId || 'test-seller-001'} />;
 }
 
 export function AppRouter() {

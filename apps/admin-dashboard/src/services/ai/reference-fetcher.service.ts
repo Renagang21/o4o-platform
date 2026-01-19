@@ -73,7 +73,7 @@ class ReferenceFetcherService {
         this.hasWarnedFallback = true;
       }
 
-      return this.fetchLocalFallback();
+      return await this.fetchLocalFallback();
     }
   }
 
@@ -253,8 +253,8 @@ class ReferenceFetcherService {
   /**
    * 로컬 폴백 (기존 block-registry-extractor 사용)
    */
-  private fetchLocalFallback(): string {
-    return generateCompleteReference();
+  private async fetchLocalFallback(): Promise<string> {
+    return await generateCompleteReference();
   }
 
   /**

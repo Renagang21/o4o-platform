@@ -5,11 +5,21 @@
  * Phase P0-C: Uses @o4o/block-renderer metadata as SSOT
  */
 
-import { dropshippingShortcodes } from '@/components/shortcodes/dropshipping';
 import { generalShortcodes, extractFromRegistry } from './shortcode-registry';
 import { blockRegistry } from '@/blocks/registry/BlockRegistry';
 // Phase P0-C: Import metadata from SSOT
 import { blockMetadata, type BlockMetadata as BlockMetadataSSOT } from '@o4o/block-renderer';
+
+// Lazy load dropshippingShortcodes to avoid dynamic/static import mixing
+let _dropshippingShortcodesCache: Awaited<typeof import('@/components/shortcodes/dropshipping')>['dropshippingShortcodes'] | null = null;
+
+async function getDropshippingShortcodes() {
+  if (!_dropshippingShortcodesCache) {
+    const module = await import('@/components/shortcodes/dropshipping');
+    _dropshippingShortcodesCache = module.dropshippingShortcodes;
+  }
+  return _dropshippingShortcodesCache;
+}
 
 export interface BlockMetadata {
   name: string;
@@ -185,17 +195,19 @@ function getExampleContent(blockName: string): any {
  * 숏코드 메타데이터 추출 (동적)
  * 실제 등록된 숏코드를 스캔하여 추출
  */
-export function extractShortcodesMetadata(): ShortcodeMetadata[] {
+export async function extractShortcodesMetadata(): Promise<ShortcodeMetadata[]> {
   const shortcodes: ShortcodeMetadata[] = [];
 
   // 1. 일반 숏코드 레지스트리에서 추출
   const generalShortcodesMetadata = extractFromRegistry(generalShortcodes);
   shortcodes.push(...generalShortcodesMetadata);
 
-  // 2. Dropshipping 숏코드 (실제 레지스트리에서 추출)
-  Object.entries(dropshippingShortcodes).forEach(([name, config]) => {
+  // 2. Dropshipping 숏코드 (동적 로드하여 추출)
+  const dropshippingShortcodes = await getDropshippingShortcodes();
+  dropshippingShortcodes.forEach((config) => {
     const attrs = config.attributes || {};
     const attrNames = Object.keys(attrs);
+    const name = config.name;
 
     // 예제 생성
     let example = `[${name}`;
@@ -260,8 +272,8 @@ export function generateBlocksReference(): string {
 /**
  * AI 프롬프트용 숏코드 레퍼런스 생성
  */
-export function generateShortcodesReference(): string {
-  const shortcodes = extractShortcodesMetadata();
+export async function generateShortcodesReference(): Promise<string> {
+  const shortcodes = await extractShortcodesMetadata();
 
   const grouped = shortcodes.reduce((acc, sc) => {
     const category = getShortcodeCategory(sc.name);
@@ -328,6 +340,7 @@ function getShortcodeCategory(name: string): string {
 /**
  * 전체 레퍼런스 생성 (블록 + 숏코드)
  */
-export function generateCompleteReference(): string {
-  return generateBlocksReference() + '\n' + generateShortcodesReference();
+export async function generateCompleteReference(): Promise<string> {
+  const shortcodesRef = await generateShortcodesReference();
+  return generateBlocksReference() + '\n' + shortcodesRef;
 }

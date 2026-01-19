@@ -1,5 +1,8 @@
 /**
  * CGM Pharmacist App - Lifecycle Exports
+ *
+ * Note: Using only static exports to avoid Vite's dynamic/static import mixing warning.
+ * Lazy loading is handled at the app-store level, not here.
  */
 
 export { install } from './install.js';
@@ -7,11 +10,8 @@ export { activate } from './activate.js';
 export { deactivate } from './deactivate.js';
 export { uninstall } from './uninstall.js';
 
-export const lifecycle = {
-  install: () => import('./install.js').then((m) => m.install),
-  activate: () => import('./activate.js').then((m) => m.activate),
-  deactivate: () => import('./deactivate.js').then((m) => m.deactivate),
-  uninstall: () => import('./uninstall.js').then((m) => m.uninstall),
-};
-
-export default lifecycle;
+// Re-export as named object for convenience
+export { install as lifecycleInstall } from './install.js';
+export { activate as lifecycleActivate } from './activate.js';
+export { deactivate as lifecycleDeactivate } from './deactivate.js';
+export { uninstall as lifecycleUninstall } from './uninstall.js';

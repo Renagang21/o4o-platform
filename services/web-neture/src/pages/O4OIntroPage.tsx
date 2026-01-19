@@ -92,7 +92,8 @@ function SectionA() {
       icon: '🏥',
       title: '의료·전문 조직',
       description: '신뢰가 중요한 공간일수록\n주도권은 내부에 있습니다.',
-      linkTo: '/channel/dental',
+      smallNote: '치과·의원·병원 등',
+      linkTo: '/seller/overview/medical',
     },
   ];
 

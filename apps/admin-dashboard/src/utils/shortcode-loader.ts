@@ -105,13 +105,14 @@ export async function loadShortcodes(): Promise<{
     names: [] as string[]
   };
 
-  // Scan all .tsx and .ts files in shortcodes directory
-  const componentModules = import.meta.glob('../components/shortcodes/**/*.{ts,tsx}', {
+  // Scan only index files to avoid dynamic/static import mixing warnings
+  // Each index file should export a ShortcodeDefinition[] array
+  const componentModules = import.meta.glob('../components/shortcodes/**/index.{ts,tsx}', {
     eager: false
   });
 
   for (const [path, importFn] of Object.entries(componentModules)) {
-    // Skip utility files, tests, and type definitions
+    // Skip utility files, tests, and type definitions (shouldn't match index files, but just in case)
     if (
       path.includes('/types.') ||
       path.includes('/utils.') ||

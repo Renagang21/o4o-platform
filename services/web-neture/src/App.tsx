@@ -48,6 +48,7 @@ import {
   SellerOverviewPharmacy,
   SellerOverviewBeauty,
   SellerOverviewMarket,
+  MedicalOverviewPage,
 } from './pages/seller';
 import PartnerOverviewInfoPage from './pages/PartnerOverviewInfoPage';
 import {
@@ -215,6 +216,8 @@ function App() {
               <Route path="/seller/overview/pharmacy" element={<SellerOverviewPharmacy />} />
               <Route path="/seller/overview/beauty" element={<SellerOverviewBeauty />} />
               <Route path="/seller/overview/market" element={<SellerOverviewMarket />} />
+              {/* Medical Overview (WO-NETURE-O4O-MEDICAL-OVERVIEW-V1) */}
+              <Route path="/seller/overview/medical" element={<MedicalOverviewPage />} />
               {/* Partner Overview Info (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track C) */}
               <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
               {/* Channel Explanation Pages */}
