@@ -66,6 +66,9 @@ import serviceAdminRoutes from './routes/service-admin.routes.js';
 // Public Routes (no auth required)
 import publicRoutes from './routes/public.routes.js';
 
+// SiteGuide Routes (independent service - siteguide.co.kr)
+import siteguideRoutes from './routes/siteguide.routes.js';
+
 // User Role Routes
 import userRoleRoutes from './routes/user-role.routes.js';
 
@@ -675,6 +678,10 @@ const startServer = async () => {
     // 8. Register Public routes (no auth required)
     app.use('/api/v1/public', publicRoutes);
     logger.info('✅ Public routes registered at /api/v1/public');
+
+    // 8.5. Register SiteGuide routes (independent service - siteguide.co.kr, no auth)
+    app.use('/api/siteguide', siteguideRoutes);
+    logger.info('✅ SiteGuide routes registered at /api/siteguide (independent service)');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SiteGuide 위젯 테스트 페이지입니다. AI 기반 사이트 안내 서비스를 체험해 보세요.">
+  <meta name="keywords" content="SiteGuide, AI, 챗봇, 사이트 안내">
+  <title>SiteGuide 위젯 테스트</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f8f9fa;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #666;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+      color: #333;
+    }
+    p {
+      color: #555;
+      margin-bottom: 12px;
+    }
+    ul {
+      margin-left: 20px;
+      color: #555;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .highlight {
+      background: #e8f4ff;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+    }
+    .badge {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-right: 8px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+    a {
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SiteGuide 테스트 페이지</h1>
+      <p class="subtitle">AI 기반 사이트 안내 위젯을 체험해 보세요</p>
+    </header>
+
+    <div class="card">
+      <h2>SiteGuide란?</h2>
+      <p>SiteGuide는 방문자가 사이트를 이해하고 원하는 정보를 찾을 수 있도록 돕는 AI 안내 도우미입니다.</p>
+      <div class="highlight">
+        <p><strong>오른쪽 하단의 버튼을 클릭</strong>하여 AI 안내 위젯을 열어보세요!</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>주요 기능</h2>
+      <ul>
+        <li>페이지 맥락 기반 자연어 질의응답</li>
+        <li>자동 페이지 메타데이터 수집</li>
+        <li>다크/라이트 테마 지원</li>
+        <li>모바일 반응형 디자인</li>
+        <li>쉬운 설치 (스크립트 1줄)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>테스트 질문 예시</h2>
+      <p>다음과 같은 질문을 해보세요:</p>
+      <ul>
+        <li>"이 사이트는 뭐하는 곳이야?"</li>
+        <li>"SiteGuide의 주요 기능이 뭐야?"</li>
+        <li>"어떻게 설치하면 돼?"</li>
+        <li>"가격은 어떻게 돼?"</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>적용 분야</h2>
+      <p>
+        <span class="badge">커머스</span>
+        <span class="badge">미디어</span>
+        <span class="badge">기업 사이트</span>
+        <span class="badge">서비스 플랫폼</span>
+      </p>
+    </div>
+
+    <footer>
+      <p>Powered by <a href="https://siteguide.co.kr" target="_blank">SiteGuide</a></p>
+      <p style="margin-top: 8px; font-size: 0.8rem;">이 페이지는 위젯 테스트용입니다.</p>
+    </footer>
+  </div>
+
+  <!-- SiteGuide Widget -->
+  <!-- 로컬 테스트: ../dist/widget.js -->
+  <!-- 프로덕션: https://siteguide.co.kr/widget.js -->
+  <script src="../dist/widget.js"></script>
+  <script>
+    // 위젯 초기화
+    // 실제 사용 시에는 발급받은 API 키를 입력하세요
+    SiteGuide.init({
+      apiKey: 'test-api-key',
+      apiUrl: 'http://localhost:4000', // 로컬 테스트용
+      position: 'bottom-right',
+      theme: 'light',
+      primaryColor: '#3b82f6',
+      welcomeMessage: '안녕하세요! SiteGuide 테스트 페이지입니다. 무엇이든 물어보세요!',
+      autoOpen: false
+    });
+  </script>
+</body>
+</html>

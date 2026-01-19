@@ -81,6 +81,16 @@ ai-logs/
 | `@o4o/ai-common-core` | Chat UI, 프롬프트 레지스트리 | AI Core 정책 준수 |
 | 각 서비스 AI 컴포넌트 | 서비스별 AI UI | AI Core 계약 준수 |
 
+### 4.1 AI를 사용하는 독립 서비스
+
+다음 서비스들은 AI Core의 정책/계약을 준수하지만, **AI Core나 AI Extension이 아닌 독립 Service Layer**입니다:
+
+| 서비스 | 도메인 | 설명 | 문서 |
+|--------|--------|------|------|
+| SiteGuide | siteguide.co.kr | 외부 사업자용 AI 사이트 안내 | [docs/services/siteguide/](../../docs/services/siteguide/) |
+
+> **참고**: SiteGuide는 Neture 종속이 아닌 독립 서비스입니다. AI Core의 계약을 사용하지만, AI Core나 AI Extension에 포함되지 않습니다.
+
 ---
 
 ## 5. 향후 이관 대상
