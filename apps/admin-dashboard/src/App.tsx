@@ -285,6 +285,14 @@ const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePr
 // CPT/ACF Router
 const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
+// Content Core Shell Pages (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1)
+const ContentOverviewPage = lazy(() => import('@/pages/content'));
+const ContentAssetsPage = lazy(() => import('@/pages/content/assets'));
+const ContentAssetDetailPage = lazy(() => import('@/pages/content/assets/[assetId]'));
+const ContentCollectionsPage = lazy(() => import('@/pages/content/collections'));
+const ContentPoliciesPage = lazy(() => import('@/pages/content/policies'));
+const ContentAnalyticsPage = lazy(() => import('@/pages/content/analytics'));
+
 // CMS V2 Pages (Phase C-2.5 & C-3)
 const CMSCPTList = lazy(() => import('@/pages/cms/cpts/CMSCPTList'));
 const CMSCPTForm = lazy(() => import('@/pages/cms/cpts/CPTForm'));
@@ -325,6 +333,9 @@ const DropshippingSettlementDetailPage = lazy(() => import('@/pages/dropshipping
 // Admin Order Pages (Phase 4)
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'));
+
+// WO-O4O-BUSINESS-DASHBOARD-V1: Business Dashboard
+const BusinessDashboard = lazy(() => import('@/pages/dashboard/business/BusinessDashboard'));
 
 // PD-3: Seller Pages
 const SellerCatalog = lazy(() => import('@/pages/dashboard/seller/SellerCatalog'));
@@ -577,6 +588,14 @@ function App() {
                       </Suspense>
                     } />
 
+                    {/* WO-O4O-BUSINESS-DASHBOARD-V1: Business Dashboard */}
+                    <Route path="/dashboard/business" element={
+                      <AdminProtectedRoute requiredRoles={['partner', 'affiliate', 'seller', 'supplier']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <BusinessDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
 
                     {/* WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager */}
                     <Route path="/admin/service-content-manager" element={
@@ -858,6 +877,50 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['pages:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <PagesRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Content Core Shell (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1) */}
+                    <Route path="/content" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ContentOverviewPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/content/assets" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ContentAssetsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/content/assets/:assetId" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ContentAssetDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/content/collections" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ContentCollectionsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/content/policies" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ContentPoliciesPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/content/analytics" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ContentAnalyticsPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

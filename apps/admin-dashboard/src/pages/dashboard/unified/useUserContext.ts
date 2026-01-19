@@ -26,60 +26,18 @@ export interface UseUserContextReturn {
 }
 
 /**
- * v1.1: Mock 임원 컨텍스트 로드
- * 실제 구현 시 API에서 가져옴
+ * v1.2: 임원 컨텍스트 로드
+ *
+ * WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+ * - Mock 데이터 제거됨
+ * - 실제 구현 시 API에서 가져옴
+ * - 현재는 빈 배열 반환 (기능 미구현 상태)
  */
-function getMockExecutiveContexts(userId: string | number): ExecutiveContext[] {
-  // Mock: 일부 사용자에게 임원 컨텍스트 부여 (테스트용)
-  // 실제 구현 시 API 호출로 대체
-  const userIdStr = String(userId);
+function getExecutiveContexts(_userId: string | number): ExecutiveContext[] {
+  // TODO: 실제 API 구현 시 아래와 같이 호출
+  // return await authClient.api.get(`/api/v1/executive/contexts/${userId}`);
 
-  // Demo: 특정 조건에서 임원 컨텍스트 반환
-  if (userIdStr.endsWith('1') || userIdStr.endsWith('5')) {
-    return [
-      {
-        id: 'exec-1',
-        type: 'executive_branch',
-        organizationId: 'branch-001',
-        organizationName: '서울지부',
-        position: '부회장',
-        term: {
-          startAt: new Date('2025-01-01'),
-          endAt: new Date('2026-12-31'),
-        },
-        status: 'active',
-      },
-    ];
-  }
-
-  if (userIdStr.endsWith('3')) {
-    return [
-      {
-        id: 'exec-2',
-        type: 'executive_chapter',
-        organizationId: 'chapter-001',
-        organizationName: '강남분회',
-        position: '총무',
-        term: {
-          startAt: new Date('2025-03-01'),
-        },
-        status: 'active',
-      },
-      {
-        id: 'exec-3',
-        type: 'executive_branch',
-        organizationId: 'branch-002',
-        organizationName: '경기지부',
-        position: '이사',
-        term: {
-          startAt: new Date('2024-01-01'),
-          endAt: new Date('2025-12-31'),
-        },
-        status: 'active',
-      },
-    ];
-  }
-
+  // 현재 기능 미구현 - 빈 배열 반환
   return [];
 }
 
@@ -132,9 +90,9 @@ export function useUserContext(): UseUserContextReturn {
       contexts.push('operator');
     }
 
-    // v1.1: 임원 컨텍스트 (Role이 아닌 별도 데이터 구조)
-    // Mock 데이터 또는 API에서 임원 컨텍스트 로드
-    executiveContexts = getMockExecutiveContexts(user.id);
+    // v1.2: 임원 컨텍스트 (Role이 아닌 별도 데이터 구조)
+    // API에서 임원 컨텍스트 로드 (현재 미구현)
+    executiveContexts = getExecutiveContexts(user.id);
 
     // active 상태인 임원 컨텍스트가 있으면 executive 추가
     const hasActiveExecutive = executiveContexts.some((ctx) => ctx.status === 'active');

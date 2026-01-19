@@ -26,13 +26,17 @@ export const SupplierCard: React.FC<UnifiedCardProps> = ({ config }) => {
   const loadSupplierStats = async () => {
     setIsLoading(true);
     try {
-      // Mock data for PoC
-      await new Promise((r) => setTimeout(r, 300));
+      // v1.2: WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+      // TODO: 실제 API 구현 시 아래와 같이 호출
+      // const response = await authClient.api.get('/api/v1/supplier/stats');
+      // setStats(response.data);
+
+      // 현재 기능 미구현 - 빈 데이터 반환
       setStats({
-        pendingOrders: Math.floor(Math.random() * 20) + 3,
-        inTransit: Math.floor(Math.random() * 15) + 5,
-        lowStockItems: Math.floor(Math.random() * 8),
-        monthlyShipments: Math.floor(Math.random() * 200) + 50,
+        pendingOrders: 0,
+        inTransit: 0,
+        lowStockItems: 0,
+        monthlyShipments: 0,
       });
     } catch (err) {
       console.error('Error loading supplier stats:', err);

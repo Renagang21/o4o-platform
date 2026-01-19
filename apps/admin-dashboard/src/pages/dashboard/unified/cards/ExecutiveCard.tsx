@@ -20,7 +20,7 @@ const ORG_TYPE_LABELS: Record<ExecutiveContextType, { label: string; color: stri
   executive_chapter: { label: '분회', color: 'bg-violet-100 text-violet-700' },
 };
 
-// Mock 데이터 인터페이스
+// 요약 데이터 인터페이스
 interface ExecutiveSummary {
   notices: number;
   upcomingEvents: number;
@@ -46,13 +46,17 @@ export const ExecutiveCard: React.FC<ExecutiveCardProps> = ({ executiveContext }
   const loadExecutiveSummary = async () => {
     setIsLoading(true);
     try {
-      // Mock data for v1.1
-      await new Promise((r) => setTimeout(r, 300));
+      // v1.2: WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+      // TODO: 실제 API 구현 시 아래와 같이 호출
+      // const response = await authClient.api.get(`/api/v1/executive/summary/${executiveContext.organizationId}`);
+      // setSummary(response.data);
+
+      // 현재 기능 미구현 - 빈 데이터 반환
       setSummary({
-        notices: Math.floor(Math.random() * 5),
-        upcomingEvents: Math.floor(Math.random() * 3),
-        pendingAgendas: Math.floor(Math.random() * 2),
-        memberCount: Math.floor(Math.random() * 100) + 20,
+        notices: 0,
+        upcomingEvents: 0,
+        pendingAgendas: 0,
+        memberCount: 0,
       });
     } catch (err) {
       console.error('Error loading executive summary:', err);

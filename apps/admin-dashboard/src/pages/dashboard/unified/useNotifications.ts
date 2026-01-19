@@ -67,111 +67,20 @@ export interface UseNotificationsReturn {
 }
 
 /**
- * Mock 알림 데이터 생성
- * 실제 구현 시 API 호출로 대체
+ * 알림 데이터 로드
+ *
+ * WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+ * - Mock 데이터 제거됨
+ * - 실제 구현 시 API에서 가져옴
+ * - 현재는 빈 배열 반환 (기능 미구현 상태)
  */
-function generateMockNotifications(userId: string): Notification[] {
-  const now = new Date();
-  const mockNotifications: Notification[] = [];
+async function fetchNotifications(_userId: string): Promise<Notification[]> {
+  // TODO: 실제 API 구현 시 아래와 같이 호출
+  // const response = await authClient.api.get(`/api/v1/notifications?userId=${userId}`);
+  // return response.data.notifications;
 
-  // 시스템 알림
-  mockNotifications.push({
-    id: 'notif-1',
-    userId,
-    type: 'system',
-    priority: 'critical',
-    contextTag: 'global',
-    title: '시스템 점검 안내',
-    message: '1월 15일 새벽 2시-4시 시스템 점검 예정입니다.',
-    referenceType: 'notice',
-    referenceId: 'notice-001',
-    timestamp: new Date(now.getTime() - 1000 * 60 * 30),
-    isRead: false,
-  });
-
-  // 비즈니스 알림 - 판매자
-  mockNotifications.push({
-    id: 'notif-2',
-    userId,
-    type: 'business',
-    priority: 'high',
-    contextTag: 'seller',
-    title: '새 주문 3건',
-    message: '처리 대기 중인 주문이 있습니다.',
-    referenceType: 'order',
-    referenceId: 'order-batch-001',
-    timestamp: new Date(now.getTime() - 1000 * 60 * 5),
-    isRead: false,
-    actionUrl: '/orders',
-    actionLabel: '주문 확인',
-  });
-
-  // 비즈니스 알림 - 정산
-  mockNotifications.push({
-    id: 'notif-3',
-    userId,
-    type: 'business',
-    priority: 'medium',
-    contextTag: 'seller',
-    title: '정산 완료',
-    message: '12월 정산금 1,250,000원이 입금되었습니다.',
-    referenceType: 'settlement',
-    referenceId: 'settlement-202412',
-    timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 2),
-    isRead: true,
-    readAt: new Date(now.getTime() - 1000 * 60 * 60),
-  });
-
-  // 조직 알림
-  mockNotifications.push({
-    id: 'notif-4',
-    userId,
-    type: 'organization',
-    priority: 'high',
-    contextTag: 'executive',
-    title: '지부 회의 안건 등록',
-    message: '2건의 새 안건이 등록되었습니다.',
-    referenceType: 'agenda',
-    referenceId: 'agenda-batch-001',
-    timestamp: new Date(now.getTime() - 1000 * 60 * 15),
-    isRead: false,
-    actionUrl: '/organization/agendas',
-    actionLabel: '안건 확인',
-  });
-
-  // 정보성 알림
-  mockNotifications.push({
-    id: 'notif-5',
-    userId,
-    type: 'information',
-    priority: 'low',
-    contextTag: 'global',
-    title: '새로운 기능 안내',
-    message: '통합 대시보드가 업데이트되었습니다.',
-    referenceType: 'feature',
-    referenceId: 'feature-unified-dashboard',
-    timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24),
-    isRead: false,
-  });
-
-  // 운영자 알림
-  mockNotifications.push({
-    id: 'notif-6',
-    userId,
-    type: 'business',
-    priority: 'high',
-    contextTag: 'operator',
-    title: '신규 회원 가입 승인 대기',
-    message: '5건의 회원 가입 승인이 필요합니다.',
-    referenceType: 'membership',
-    referenceId: 'membership-batch-001',
-    timestamp: new Date(now.getTime() - 1000 * 60 * 10),
-    isRead: false,
-    actionUrl: '/membership/pending',
-    actionLabel: '승인 처리',
-  });
-
-  return mockNotifications;
+  // 현재 기능 미구현 - 빈 배열 반환
+  return [];
 }
 
 /**
@@ -350,9 +259,8 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     setError(null);
 
     try {
-      // Mock: 실제 구현 시 API 호출로 대체
-      await new Promise((r) => setTimeout(r, 200));
-      const notifications = generateMockNotifications(String(user.id));
+      // v1.2: API 호출 (현재 빈 배열 반환)
+      const notifications = await fetchNotifications(String(user.id));
       setRawNotifications(notifications);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('알림 로드 실패'));

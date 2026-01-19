@@ -464,6 +464,9 @@ import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/drops
 // CMS Content Routes (WO-P2-IMPLEMENT-CONTENT)
 import { createCmsContentRoutes } from './routes/cms-content/cms-content.routes.js';
 
+// Content Assets Routes (WO-O4O-CONTENT-ASSETS-DB-READONLY-V1)
+import { createContentAssetsRoutes } from './routes/content/content-assets.routes.js';
+
 // Signage Routes (Phase 2 Production Build - Sprint 2-2)
 import { createSignageRoutes } from './routes/signage/index.js';
 
@@ -835,6 +838,16 @@ const startServer = async () => {
       logger.info('✅ CMS Content routes registered at /api/v1/cms');
     } catch (cmsContentError) {
       logger.error('Failed to register CMS Content routes:', cmsContentError);
+    }
+
+    // 32-b. Register Content Assets routes (WO-O4O-CONTENT-ASSETS-DB-READONLY-V1)
+    // ⚠️ READ-ONLY: cms_media 데이터를 Content Core 관점으로 읽기만 함
+    try {
+      const contentAssetsRoutes = createContentAssetsRoutes(AppDataSource);
+      app.use('/api/v1/content/assets', contentAssetsRoutes);
+      logger.info('✅ Content Assets routes registered at /api/v1/content/assets (READ-ONLY)');
+    } catch (contentAssetsError) {
+      logger.error('Failed to register Content Assets routes:', contentAssetsError);
     }
 
     // 33. Register Channel routes (WO-P4-CHANNEL-IMPLEMENT-P0)

@@ -16,20 +16,16 @@ interface Partner {
   last7DaysTrend: number[]; // Sparkline data
 }
 
-// Mock data generator (in real scenario, this would come from API)
-const generateMockPartners = (): Partner[] => {
-  const tiers = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
-  const statuses = ['active', 'inactive'];
-
-  return Array.from({ length: 25 }, (_, i) => ({
-    id: `partner-${i + 1}`,
-    userId: `user_${1000 + i}@example.com`,
-    tier: tiers[Math.floor(Math.random() * tiers.length)],
-    totalRevenue: Math.floor(Math.random() * 10000000) + 100000,
-    refundRate: Math.random() * 0.15, // 0-15%
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    last7DaysTrend: Array.from({ length: 7 }, () => Math.floor(Math.random() * 500000)),
-  }));
+/**
+ * v1.2: WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+ * Mock 데이터 제거됨
+ * TODO: 실제 API 구현 시 아래와 같이 호출
+ * const response = await authClient.api.get('/api/v1/partners/stats');
+ * return response.data.partners;
+ */
+const getPartners = (): Partner[] => {
+  // 현재 기능 미구현 - 빈 배열 반환
+  return [];
 };
 
 export function PartnerStats() {
@@ -41,8 +37,8 @@ export function PartnerStats() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
   const itemsPerPage = 10;
 
-  // Mock data (replace with actual API call)
-  const allPartners = useMemo(() => generateMockPartners(), []);
+  // v1.2: API 호출 (현재 빈 배열 반환)
+  const allPartners = useMemo(() => getPartners(), []);
 
   // Filter and sort partners
   const filteredPartners = useMemo(() => {

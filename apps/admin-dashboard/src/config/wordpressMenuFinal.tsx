@@ -132,6 +132,47 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
+  // Content (콘텐츠 단일 진실 원천 - Core 메뉴)
+  // WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1
+  {
+    id: 'content',
+    label: 'Content',
+    icon: <FileText className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'content-overview',
+        label: 'Overview',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+        path: '/content',
+      },
+      {
+        id: 'content-assets',
+        label: 'Assets',
+        icon: <Image className="w-4 h-4" />,
+        path: '/content/assets',
+      },
+      {
+        id: 'content-collections',
+        label: 'Collections',
+        icon: <Layers className="w-4 h-4" />,
+        path: '/content/collections',
+      },
+      {
+        id: 'content-policies',
+        label: 'Policies',
+        icon: <Shield className="w-4 h-4" />,
+        path: '/content/policies',
+      },
+      {
+        id: 'content-analytics',
+        label: 'Analytics',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/content/analytics',
+      },
+    ],
+  },
+
   // CMS (플랫폼 콘텐츠 관리 - Core 하위)
   {
     id: 'cms',

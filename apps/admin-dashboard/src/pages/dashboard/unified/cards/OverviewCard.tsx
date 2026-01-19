@@ -41,11 +41,15 @@ export const OverviewCard: React.FC<UnifiedCardProps> = ({ config, userContexts 
   const loadOverviewData = async () => {
     setIsLoading(true);
     try {
-      // Mock data for PoC
-      await new Promise((r) => setTimeout(r, 300));
+      // v1.2: WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+      // TODO: 실제 API 구현 시 아래와 같이 호출
+      // const response = await authClient.api.get('/api/v1/dashboard/overview');
+      // setData(response.data);
+
+      // 현재 기능 미구현 - 빈 데이터 반환
       setData({
-        todayOrders: Math.floor(Math.random() * 50) + 10,
-        pendingTasks: Math.floor(Math.random() * 10) + 1,
+        todayOrders: 0,
+        pendingTasks: 0,
       });
     } catch (err) {
       console.error('Error loading overview:', err);

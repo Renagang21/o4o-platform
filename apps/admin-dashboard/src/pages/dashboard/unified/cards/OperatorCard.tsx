@@ -26,13 +26,17 @@ export const OperatorCard: React.FC<UnifiedCardProps> = ({ config }) => {
   const loadOperatorStats = async () => {
     setIsLoading(true);
     try {
-      // Mock data for v1
-      await new Promise((r) => setTimeout(r, 300));
+      // v1.2: WO-O4O-FINAL-MOCK-REMOVAL-DB-CONNECTION-V1
+      // TODO: 실제 API 구현 시 아래와 같이 호출
+      // const response = await authClient.api.get('/api/v1/operator/stats');
+      // setStats(response.data);
+
+      // 현재 기능 미구현 - 빈 데이터 반환
       setStats({
-        pendingApprovals: Math.floor(Math.random() * 15) + 1,
-        activeMembers: Math.floor(Math.random() * 500) + 100,
-        pendingVerifications: Math.floor(Math.random() * 10),
-        recentReports: Math.floor(Math.random() * 5),
+        pendingApprovals: 0,
+        activeMembers: 0,
+        pendingVerifications: 0,
+        recentReports: 0,
       });
     } catch (err) {
       console.error('Error loading operator stats:', err);
