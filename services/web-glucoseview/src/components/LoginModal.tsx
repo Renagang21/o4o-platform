@@ -142,7 +142,7 @@ export default function LoginModal({ isOpen, onClose, initialEmail, initialPassw
               type="button"
               onClick={() => {
                 setEmail('pharmacist@test.test');
-                setPassword('testID1234');
+                setPassword('TestPassword');
               }}
               className="flex-1 px-3 py-2 text-xs font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
             >
@@ -152,7 +152,7 @@ export default function LoginModal({ isOpen, onClose, initialEmail, initialPassw
               type="button"
               onClick={() => {
                 setEmail('admin@test.test');
-                setPassword('adminID1234');
+                setPassword('TestPassword');
               }}
               className="flex-1 px-3 py-2 text-xs font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
             >

@@ -103,6 +103,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -201,11 +202,58 @@ export function Header({ serviceName }: { serviceName: string }) {
           {/* Auth Buttons */}
           <div style={styles.authArea}>
             {user ? (
-              <div style={styles.userInfo}>
-                <span style={styles.userName}>{user.name}님</span>
-                <button style={styles.authButtonOutline} onClick={handleLogout}>
-                  로그아웃
+              <div
+                style={styles.userIconWrapper}
+                onMouseEnter={() => setShowUserDropdown(true)}
+                onMouseLeave={() => setShowUserDropdown(false)}
+              >
+                <button style={styles.userIconButton} aria-label="사용자 메뉴">
+                  <span style={styles.userIcon}>👤</span>
                 </button>
+                {showUserDropdown && (
+                  <div style={styles.userDropdown}>
+                    <div style={styles.userDropdownHeader}>
+                      <span style={styles.userDropdownName}>{user.name}님</span>
+                      <span style={styles.userDropdownEmail}>{user.email}</span>
+                    </div>
+                    <div style={styles.userDropdownDivider} />
+                    <Link
+                      to="/demo/mypage"
+                      style={styles.userDropdownItem}
+                      onClick={() => setShowUserDropdown(false)}
+                    >
+                      <span style={styles.userDropdownItemIcon}>📊</span>
+                      대시보드
+                    </Link>
+                    <Link
+                      to="/demo/mypage/profile"
+                      style={styles.userDropdownItem}
+                      onClick={() => setShowUserDropdown(false)}
+                    >
+                      <span style={styles.userDropdownItemIcon}>👤</span>
+                      프로필
+                    </Link>
+                    <Link
+                      to="/demo/mypage/settings"
+                      style={styles.userDropdownItem}
+                      onClick={() => setShowUserDropdown(false)}
+                    >
+                      <span style={styles.userDropdownItemIcon}>⚙️</span>
+                      설정
+                    </Link>
+                    <div style={styles.userDropdownDivider} />
+                    <button
+                      style={styles.userDropdownLogout}
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        handleLogout();
+                      }}
+                    >
+                      <span style={styles.userDropdownItemIcon}>🚪</span>
+                      로그아웃
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -453,15 +501,83 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '10px',
   },
-  userInfo: {
+  userIconWrapper: {
+    position: 'relative',
+  },
+  userIconButton: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    backgroundColor: colors.gray100,
+    border: `1px solid ${colors.gray300}`,
+    cursor: 'pointer',
+    transition: 'background-color 0.2s, border-color 0.2s',
   },
-  userName: {
-    fontSize: '14px',
+  userIcon: {
+    fontSize: '20px',
+  },
+  userDropdown: {
+    position: 'absolute',
+    top: '100%',
+    right: 0,
+    marginTop: '8px',
+    backgroundColor: colors.white,
+    borderRadius: '12px',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+    minWidth: '220px',
+    padding: '8px 0',
+    zIndex: 100,
+  },
+  userDropdownHeader: {
+    padding: '12px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  userDropdownName: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.gray900,
+  },
+  userDropdownEmail: {
+    fontSize: '12px',
+    color: colors.gray500,
+    wordBreak: 'break-all',
+  },
+  userDropdownDivider: {
+    height: '1px',
+    backgroundColor: colors.gray200,
+    margin: '4px 0',
+  },
+  userDropdownItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '10px 16px',
     color: colors.gray700,
-    fontWeight: 500,
+    textDecoration: 'none',
+    fontSize: '14px',
+    transition: 'background-color 0.2s',
+  },
+  userDropdownItemIcon: {
+    fontSize: '16px',
+  },
+  userDropdownLogout: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    width: '100%',
+    padding: '10px 16px',
+    color: colors.error || '#dc2626',
+    backgroundColor: 'transparent',
+    border: 'none',
+    fontSize: '14px',
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'background-color 0.2s',
   },
   authButton: {
     padding: '10px 20px',
