@@ -3,61 +3,81 @@
  * Based on GlycoPharm App structure
  */
 
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
-// Layouts
+// Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 
-// Public Pages
-import { HomePage, ContactPage, NotFoundPage, RoleNotAvailablePage, StoresPage, ProductsPage, SupplyPage, TouristHubPage } from '@/pages';
+// Public Pages (always loaded - first paint)
+import { HomePage, NotFoundPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
-import RegisterPage from '@/pages/auth/RegisterPage';
-import PartnerInfoPage from '@/pages/PartnerInfoPage';
-import MyPage from '@/pages/MyPage';
+
+// ============================================================================
+// Lazy loaded pages (heavy / rarely accessed)
+// ============================================================================
+
+// Public pages
+const ContactPage = lazy(() => import('@/pages').then(m => ({ default: m.ContactPage })));
+const RoleNotAvailablePage = lazy(() => import('@/pages').then(m => ({ default: m.RoleNotAvailablePage })));
+const StoresPage = lazy(() => import('@/pages').then(m => ({ default: m.StoresPage })));
+const ProductsPage = lazy(() => import('@/pages').then(m => ({ default: m.ProductsPage })));
+const SupplyPage = lazy(() => import('@/pages').then(m => ({ default: m.SupplyPage })));
+const TouristHubPage = lazy(() => import('@/pages').then(m => ({ default: m.TouristHubPage })));
+const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
+const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
+const MyPage = lazy(() => import('@/pages/MyPage'));
 
 // Partner Application (WO-PARTNER-APPLICATION-V1)
-import PartnerApplyPage from '@/pages/partners/ApplyPage';
+const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 
 // Test Guide Pages
-import {
-  TestGuidePage,
-  ConsumerManualPage,
-  SellerManualPage,
-  SupplierManualPage,
-  AdminManualPage,
-  OperatorManualPage,
-} from '@/pages/test-guide';
-import TestCenterPage from '@/pages/TestCenterPage';
+const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
+const ConsumerManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.ConsumerManualPage })));
+const SellerManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.SellerManualPage })));
+const SupplierManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.SupplierManualPage })));
+const AdminManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.AdminManualPage })));
+const OperatorManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.OperatorManualPage })));
+const TestCenterPage = lazy(() => import('@/pages/TestCenterPage'));
 
 // Forum Pages
-import { ForumPage, PostDetailPage } from '@/pages/forum';
+const ForumPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumPage })));
+const PostDetailPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.PostDetailPage })));
 
 // Partner Dashboard Pages
-import PartnerIndex from '@/pages/partner/index';
-import PartnerOverviewPage from '@/pages/partner/OverviewPage';
-import PartnerTargetsPage from '@/pages/partner/TargetsPage';
-import PartnerContentPage from '@/pages/partner/ContentPage';
-import PartnerEventsPage from '@/pages/partner/EventsPage';
-import PartnerStatusPage from '@/pages/partner/StatusPage';
+const PartnerIndex = lazy(() => import('@/pages/partner/index'));
+const PartnerOverviewPage = lazy(() => import('@/pages/partner/OverviewPage'));
+const PartnerTargetsPage = lazy(() => import('@/pages/partner/TargetsPage'));
+const PartnerContentPage = lazy(() => import('@/pages/partner/ContentPage'));
+const PartnerEventsPage = lazy(() => import('@/pages/partner/EventsPage'));
+const PartnerStatusPage = lazy(() => import('@/pages/partner/StatusPage'));
 
 // Operator Dashboard Pages
-import OperatorIndex from '@/pages/operator/index';
-import OperatorStoresPage from '@/pages/operator/StoresPage';
-import OperatorApplicationsPage from '@/pages/operator/ApplicationsPage';
-import OperatorProductsPage from '@/pages/operator/ProductsPage';
-import OperatorOrdersPage from '@/pages/operator/OrdersPage';
-import OperatorInventoryPage from '@/pages/operator/InventoryPage';
-import OperatorSettlementsPage from '@/pages/operator/SettlementsPage';
-import OperatorAnalyticsPage from '@/pages/operator/AnalyticsPage';
-import OperatorMarketingPage from '@/pages/operator/MarketingPage';
-import OperatorUsersPage from '@/pages/operator/UsersPage';
-import OperatorSupportPage from '@/pages/operator/SupportPage';
-import OperatorSettingsPage from '@/pages/operator/SettingsPage';
-import OperatorAiReportPage from '@/pages/operator/AiReportPage';
+const OperatorIndex = lazy(() => import('@/pages/operator/index'));
+const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
+const OperatorApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
+const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
+const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
+const OperatorInventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
+const OperatorSettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
+const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
+const OperatorMarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
+const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
+const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
+const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
+const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
+
+// Loading fallback
+function PageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+    </div>
+  );
+}
 
 // Protected Route Component - triggers auth check only when entering
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -196,7 +216,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <Suspense fallback={<PageLoading />}>
+          <AppRoutes />
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

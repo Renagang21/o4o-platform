@@ -1,7 +1,8 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
-// Layouts
+// Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import StoreLayout from '@/components/layouts/StoreLayout';
@@ -9,112 +10,126 @@ import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
 
-// Public Pages
+// Public Pages (always loaded - first paint)
 import HomePage from '@/pages/HomePage';
-import ContactPage from '@/pages/ContactPage';
 import LoginPage from '@/pages/auth/LoginPage';
-import RegisterPage from '@/pages/auth/RegisterPage';
-import RoleSelectPage from '@/pages/auth/RoleSelectPage';
-
-// Pharmacy Dashboard
-import PharmacyDashboard from '@/pages/pharmacy/PharmacyDashboard';
-import PharmacyProducts from '@/pages/pharmacy/PharmacyProducts';
-import PharmacyOrders from '@/pages/pharmacy/PharmacyOrders';
-import PharmacyPatients from '@/pages/pharmacy/PharmacyPatients';
-import PharmacySettings from '@/pages/pharmacy/PharmacySettings';
-
-// Smart Display (Legacy)
-import SmartDisplayPage from '@/pages/pharmacy/smart-display/SmartDisplayPage';
-import PlaylistsPage from '@/pages/pharmacy/smart-display/PlaylistsPage';
-import SchedulesPage from '@/pages/pharmacy/smart-display/SchedulesPage';
-import MediaLibraryPage from '@/pages/pharmacy/smart-display/MediaLibraryPage';
-import PlaylistForumPage from '@/pages/pharmacy/smart-display/PlaylistForumPage';
-
-// Signage Extension (New)
-import { ContentLibraryPage, MySignagePage, SignagePreviewPage } from '@/pages/pharmacy/signage';
-
-// Market Trial Extension
-import { MarketTrialListPage } from '@/pages/pharmacy/market-trial';
-import { OperatorTrialSelectorPage } from '@/pages/operator/market-trial';
-
-// B2B Order
-import { B2BOrderPage } from '@/pages/pharmacy/b2b-order';
-
-// B2B Supply
-import { SupplyPage } from '@/pages/b2b';
-
-// Forum Extension
-import { ForumListPage, ForumFeedPage } from '@/pages/forum-ext';
-import { OperatorForumManagementPage } from '@/pages/operator/forum-management';
-
-// Role Not Available Page (공급자/파트너는 Neture에서 관리)
-import RoleNotAvailablePage from '@/pages/RoleNotAvailablePage';
-import PartnerInfoPage from '@/pages/PartnerInfoPage';
-
-// Operator Dashboard
-import OperatorDashboard from '@/pages/operator/OperatorDashboard';
-import ForumRequestsPage from '@/pages/operator/ForumRequestsPage';
-import ApplicationsPage from '@/pages/operator/ApplicationsPage';
-import ApplicationDetailPage from '@/pages/operator/ApplicationDetailPage';
-import StoreApprovalsPage from '@/pages/operator/StoreApprovalsPage';
-import StoreApprovalDetailPage from '@/pages/operator/StoreApprovalDetailPage';
-import { StoreTemplateManagerPage } from '@/pages/operator/store-template';
-import UsersPage from '@/pages/operator/UsersPage';
-import SettingsPage from '@/pages/operator/SettingsPage';
-import AiReportPage from '@/pages/operator/AiReportPage';
-
-// Operator Semi-Franchise Pages
-import PharmaciesPage from '@/pages/operator/PharmaciesPage';
-import ProductsPage from '@/pages/operator/ProductsPage';
-import OrdersPage from '@/pages/operator/OrdersPage';
-import InventoryPage from '@/pages/operator/InventoryPage';
-import SettlementsPage from '@/pages/operator/SettlementsPage';
-import AnalyticsPage from '@/pages/operator/AnalyticsPage';
-import MarketingPage from '@/pages/operator/MarketingPage';
-import SupportPage from '@/pages/operator/SupportPage';
-
-// Pharmacy Store Apply
-import StoreApplyPage from '@/pages/pharmacy/StoreApplyPage';
-
-// Consumer Store
-import StoreFront from '@/pages/store/StoreFront';
-import StoreProducts from '@/pages/store/StoreProducts';
-import StoreProductDetail from '@/pages/store/StoreProductDetail';
-import StoreCart from '@/pages/store/StoreCart';
-
-// Forum & Education
-import ForumPage from '@/pages/forum/ForumPage';
-import RequestCategoryPage from '@/pages/forum/RequestCategoryPage';
-import MyRequestsPage from '@/pages/forum/MyRequestsPage';
-import EducationPage from '@/pages/education/EducationPage';
-
-// Common Pages
-import MyPage from '@/pages/MyPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
+// ============================================================================
+// Lazy loaded pages (heavy / rarely accessed)
+// ============================================================================
+
+// Auth & Public
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
+const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
+const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
+
+// Pharmacy Dashboard
+const PharmacyDashboard = lazy(() => import('@/pages/pharmacy/PharmacyDashboard'));
+const PharmacyProducts = lazy(() => import('@/pages/pharmacy/PharmacyProducts'));
+const PharmacyOrders = lazy(() => import('@/pages/pharmacy/PharmacyOrders'));
+const PharmacyPatients = lazy(() => import('@/pages/pharmacy/PharmacyPatients'));
+const PharmacySettings = lazy(() => import('@/pages/pharmacy/PharmacySettings'));
+
+// Smart Display (Legacy)
+const SmartDisplayPage = lazy(() => import('@/pages/pharmacy/smart-display/SmartDisplayPage'));
+const PlaylistsPage = lazy(() => import('@/pages/pharmacy/smart-display/PlaylistsPage'));
+const SchedulesPage = lazy(() => import('@/pages/pharmacy/smart-display/SchedulesPage'));
+const MediaLibraryPage = lazy(() => import('@/pages/pharmacy/smart-display/MediaLibraryPage'));
+const PlaylistForumPage = lazy(() => import('@/pages/pharmacy/smart-display/PlaylistForumPage'));
+
+// Signage Extension (New)
+const ContentLibraryPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentLibraryPage })));
+const MySignagePage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MySignagePage })));
+const SignagePreviewPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.SignagePreviewPage })));
+
+// Market Trial Extension
+const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
+const OperatorTrialSelectorPage = lazy(() => import('@/pages/operator/market-trial').then(m => ({ default: m.OperatorTrialSelectorPage })));
+
+// B2B Order & Supply
+const B2BOrderPage = lazy(() => import('@/pages/pharmacy/b2b-order').then(m => ({ default: m.B2BOrderPage })));
+const SupplyPage = lazy(() => import('@/pages/b2b').then(m => ({ default: m.SupplyPage })));
+
+// Forum Extension
+const ForumListPage = lazy(() => import('@/pages/forum-ext').then(m => ({ default: m.ForumListPage })));
+const ForumFeedPage = lazy(() => import('@/pages/forum-ext').then(m => ({ default: m.ForumFeedPage })));
+const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-management').then(m => ({ default: m.OperatorForumManagementPage })));
+
+// Role Not Available Page
+const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
+const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
+
+// Operator Dashboard
+const OperatorDashboard = lazy(() => import('@/pages/operator/OperatorDashboard'));
+const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
+const ApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
+const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDetailPage'));
+const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
+const StoreApprovalDetailPage = lazy(() => import('@/pages/operator/StoreApprovalDetailPage'));
+const StoreTemplateManagerPage = lazy(() => import('@/pages/operator/store-template').then(m => ({ default: m.StoreTemplateManagerPage })));
+const UsersPage = lazy(() => import('@/pages/operator/UsersPage'));
+const SettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
+const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
+
+// Operator Semi-Franchise Pages
+const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
+const ProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
+const OrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
+const InventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
+const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
+const AnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
+const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
+const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
+
+// Pharmacy Store Apply
+const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
+
+// Consumer Store
+const StoreFront = lazy(() => import('@/pages/store/StoreFront'));
+const StoreProducts = lazy(() => import('@/pages/store/StoreProducts'));
+const StoreProductDetail = lazy(() => import('@/pages/store/StoreProductDetail'));
+const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
+
+// Forum & Education
+const ForumPage = lazy(() => import('@/pages/forum/ForumPage'));
+const RequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
+const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
+const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
+
+// Common Pages
+const MyPage = lazy(() => import('@/pages/MyPage'));
+
 // Partner Application (WO-PARTNER-APPLICATION-V1)
-import PartnerApplyPage from '@/pages/partners/ApplyPage';
+const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 
 // Apply Pages (API 연동)
-import PharmacyApplyPage from '@/pages/apply/PharmacyApplyPage';
-import MyApplicationsPage from '@/pages/apply/MyApplicationsPage';
+const PharmacyApplyPage = lazy(() => import('@/pages/apply/PharmacyApplyPage'));
+const MyApplicationsPage = lazy(() => import('@/pages/apply/MyApplicationsPage'));
 
 // Test Guide Pages
-import {
-  TestGuidePage,
-  PharmacyManualPage,
-  ConsumerManualPage,
-  OperatorManualPage,
-} from '@/pages/test-guide';
-import TestCenterPage from '@/pages/TestCenterPage';
+const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
+const PharmacyManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.PharmacyManualPage })));
+const ConsumerManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.ConsumerManualPage })));
+const OperatorManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.OperatorManualPage })));
+const TestCenterPage = lazy(() => import('@/pages/TestCenterPage'));
 
 // Partner Dashboard Pages
-import PartnerIndex from '@/pages/partner/index';
-import PartnerOverviewPage from '@/pages/partner/OverviewPage';
-import PartnerTargetsPage from '@/pages/partner/TargetsPage';
-import PartnerContentPage from '@/pages/partner/ContentPage';
-import PartnerEventsPage from '@/pages/partner/EventsPage';
-import PartnerStatusPage from '@/pages/partner/StatusPage';
+const PartnerIndex = lazy(() => import('@/pages/partner/index'));
+const PartnerOverviewPage = lazy(() => import('@/pages/partner/OverviewPage'));
+const PartnerTargetsPage = lazy(() => import('@/pages/partner/TargetsPage'));
+const PartnerContentPage = lazy(() => import('@/pages/partner/ContentPage'));
+const PartnerEventsPage = lazy(() => import('@/pages/partner/EventsPage'));
+const PartnerStatusPage = lazy(() => import('@/pages/partner/StatusPage'));
+
+// Loading fallback
+function PageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+    </div>
+  );
+}
 
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
@@ -309,7 +324,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <Suspense fallback={<PageLoading />}>
+          <AppRoutes />
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

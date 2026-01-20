@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from '../components/LoginModal';
@@ -137,13 +137,13 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // 슬라이드 배너 상태
-  const [banners] = useState<SlideBanner[]>(() => loadBanners().filter(b => b.isActive).sort((a, b) => a.order - b.order));
+  // 슬라이드 배너 상태 - useMemo로 한번만 계산
+  const banners = useMemo(() => loadBanners().filter(b => b.isActive).sort((a, b) => a.order - b.order), []);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // 파트너 상태
-  const [partners] = useState<Partner[]>(() => loadPartners().filter(p => p.isActive).sort((a, b) => a.order - b.order));
+  // 파트너 상태 - useMemo로 한번만 계산
+  const partners = useMemo(() => loadPartners().filter(p => p.isActive).sort((a, b) => a.order - b.order), []);
 
   // 자동 슬라이드 기능
   const nextSlideAuto = useCallback(() => {
