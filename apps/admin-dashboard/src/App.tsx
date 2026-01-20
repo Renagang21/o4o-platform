@@ -273,6 +273,7 @@ const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
 // Debug Pages
 const AuthBootstrapDebug = lazy(() => import('@/pages/__debug__/AuthBootstrapDebug'));
+const AuthStateJsonDebug = lazy(() => import('@/pages/__debug__/AuthStateJsonDebug'));
 
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
@@ -472,6 +473,13 @@ function App() {
             <Route path="/__debug__/auth-bootstrap" element={
               <Suspense fallback={<PageLoader />}>
                 <AuthBootstrapDebug />
+              </Suspense>
+            } />
+
+            {/* Auth State JSON Debug - WO-DEBUG-ADMIN-AUTH-STATE-JSON-001 */}
+            <Route path="/debug/auth" element={
+              <Suspense fallback={<PageLoader />}>
+                <AuthStateJsonDebug />
               </Suspense>
             } />
 
