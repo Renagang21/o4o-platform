@@ -119,14 +119,11 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors"
+                  className="flex items-center gap-1 px-2 py-2 rounded-xl hover:bg-slate-100 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {user?.name?.charAt(0) || '?'}
-                    </span>
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700">{user?.name}</span>
                   <ChevronDown className="w-4 h-4 text-slate-400" />
                 </button>
 
