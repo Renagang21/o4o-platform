@@ -12,6 +12,7 @@ import type { DataSource } from 'typeorm';
 import { extensionRegistry } from './common/index.js';
 import { createPharmacyRouter } from './pharmacy/index.js';
 import { createCosmeticsRouter } from './cosmetics/index.js';
+import { createSellerRouter } from './seller/index.js';
 
 // ============================================================================
 // EXTENSION ROUTER FACTORY
@@ -43,9 +44,8 @@ export function createExtensionRouters(dataSource: DataSource): Router {
 
   // Seller Extension (P3)
   if (extensionRegistry.isEnabled('seller')) {
-    // TODO: Phase 3 Sprint 3-5에서 구현
-    // const sellerRouter = createSellerRouter(dataSource);
-    // router.use('/seller', sellerRouter);
+    const sellerRouter = createSellerRouter(dataSource);
+    router.use('/seller', sellerRouter);
   }
 
   // Tourist Extension (P4 - Deferred)
