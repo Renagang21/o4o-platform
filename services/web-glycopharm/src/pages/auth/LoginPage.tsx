@@ -4,11 +4,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
-// UX Trust Rules v1: 뱃지 색상 neutral (gray 계열)
+// 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'pharmacy@glycopharm.kr', password: TEST_PASSWORD, label: '약국' },
-  { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너' },
   { email: 'admin@neture.co.kr', password: TEST_PASSWORD, label: '운영자' },
 ];
 

@@ -92,39 +92,47 @@ function HeroSection() {
 function SuppliersPreviewSection() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSuppliers = async () => {
+    // Defer API call to reduce cold-start impact
+    // Wait 500ms after page mount to let auth check complete first
+    const timeoutId = setTimeout(async () => {
       try {
-        setLoading(true);
         const data = await netureApi.getSuppliers();
-        setSuppliers(data.slice(0, 4)); // Show first 4 for preview
-      } catch (err) {
-        setError((err as Error).message);
+        setSuppliers(data.slice(0, 4));
+      } catch {
+        // Graceful fallback - show empty state instead of error
+        setSuppliers([]);
       } finally {
         setLoading(false);
       }
-    };
+    }, 500);
 
-    fetchSuppliers();
+    return () => clearTimeout(timeoutId);
   }, []);
 
+  // Show skeleton during loading
   if (loading) {
     return (
       <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-600">Loading suppliers...</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-red-600">Error loading suppliers: {error}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Building2 className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">공급자 둘러보기</h2>
+            <p className="text-lg text-gray-600">검증된 공급자의 정보를 확인하세요</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+                <div className="flex flex-col items-center">
+                  <div className="w-20 h-20 bg-gray-200 rounded-full mb-4" />
+                  <div className="h-5 bg-gray-200 rounded w-24 mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-16 mb-3" />
+                  <div className="h-3 bg-gray-100 rounded w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -192,39 +200,50 @@ function SuppliersPreviewSection() {
 function PartnershipRequestsPreviewSection() {
   const [requests, setRequests] = useState<PartnershipRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchRequests = async () => {
+    // Defer API call - stagger after suppliers (1000ms)
+    // This sequences the calls: auth → suppliers → partnership
+    const timeoutId = setTimeout(async () => {
       try {
-        setLoading(true);
         const data = await netureApi.getPartnershipRequests('OPEN');
-        setRequests(data.slice(0, 3)); // Show first 3 for preview
-      } catch (err) {
-        setError((err as Error).message);
+        setRequests(data.slice(0, 3));
+      } catch {
+        // Graceful fallback - show empty state instead of error
+        setRequests([]);
       } finally {
         setLoading(false);
       }
-    };
+    }, 1000);
 
-    fetchRequests();
+    return () => clearTimeout(timeoutId);
   }, []);
 
+  // Show skeleton during loading
   if (loading) {
     return (
       <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-600">Loading partnership requests...</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-red-600">Error loading requests: {error}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Handshake className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">제휴 파트너를 찾는 판매자</h2>
+            <p className="text-lg text-gray-600">진행 중인 제휴 기회를 확인하세요</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="h-5 bg-gray-200 rounded w-32" />
+                  <div className="h-5 bg-gray-100 rounded w-16" />
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="h-4 bg-gray-100 rounded w-full" />
+                  <div className="h-4 bg-gray-100 rounded w-3/4" />
+                  <div className="h-4 bg-gray-100 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

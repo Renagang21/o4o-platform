@@ -8,11 +8,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, ROLE_DASHBOARDS } from '../contexts';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
+// 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'supplier@neture.test', password: TEST_PASSWORD, label: '공급자' },
   { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너' },
-  { email: 'seller@neture.test', password: TEST_PASSWORD, label: '판매자' },
   { email: 'admin@neture.test', password: TEST_PASSWORD, label: '운영자' },
 ];
 

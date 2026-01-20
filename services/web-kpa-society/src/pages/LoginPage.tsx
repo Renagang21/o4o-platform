@@ -14,12 +14,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
+// 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'member@kpa.test', password: TEST_PASSWORD, label: '일반회원' },
-  { email: 'branch-officer@kpa.test', password: TEST_PASSWORD, label: '분회 임원' },
-  { email: 'regional-officer@kpa.test', password: TEST_PASSWORD, label: '지부 임원' },
-  { email: 'admin@kpa.test', password: TEST_PASSWORD, label: '관리자' },
+  { email: 'pharmacist@kpa-test.kr', password: TEST_PASSWORD, label: '일반회원 (약사)' },
+  { email: 'branch-officer@kpa-test.kr', password: TEST_PASSWORD, label: '분회 임원' },
+  { email: 'district-officer@kpa-test.kr', password: TEST_PASSWORD, label: '지부 임원' },
+  { email: 'district-admin@kpa-test.kr', password: TEST_PASSWORD, label: '지부 운영자' },
 ];
 
 export function LoginPage() {

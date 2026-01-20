@@ -17,8 +17,8 @@ export type ProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
-// 빠른 timeout을 위한 fetch wrapper (3초)
-const fetchWithTimeout = async (url: string, options?: RequestInit, timeout = 3000): Promise<Response> => {
+// fetch wrapper with timeout (increased to 10s for cold-start tolerance)
+const fetchWithTimeout = async (url: string, options?: RequestInit, timeout = 10000): Promise<Response> => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
