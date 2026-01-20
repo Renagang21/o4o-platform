@@ -382,9 +382,17 @@ const PageLoader = () => (
 );
 
 // SSO 클라이언트 인스턴스 생성
-const ssoClient = new AuthClient(
-  import.meta.env.VITE_API_URL || 'https://api.neture.co.kr'
-);
+// Phase 6-7: Cookie Auth Primary - /api/v1 suffix required for auth endpoints
+const getAuthApiUrl = () => {
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+  // Ensure /api/v1 suffix for auth endpoints
+  if (baseUrl.endsWith('/api/v1')) return baseUrl;
+  if (baseUrl.endsWith('/api')) return `${baseUrl}/v1`;
+  if (baseUrl.endsWith('/')) return `${baseUrl}api/v1`;
+  return `${baseUrl}/api/v1`;
+};
+
+const ssoClient = new AuthClient(getAuthApiUrl(), { strategy: 'cookie' });
 
 /**
  * 관리자 대시보드 메인 앱

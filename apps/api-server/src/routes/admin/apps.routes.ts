@@ -28,8 +28,14 @@ const router: Router = Router();
 router.use(authenticate);
 router.use(requireAdmin);
 
-// Create singleton instance
-const appManager = new AppManager();
+// Lazy-initialized singleton to avoid accessing AppDataSource before it's initialized
+let _appManager: AppManager | null = null;
+const getAppManager = (): AppManager => {
+  if (!_appManager) {
+    _appManager = new AppManager();
+  }
+  return _appManager;
+};
 
 /**
  * GET /api/admin/apps/market
@@ -73,7 +79,7 @@ router.get('/disabled', async (req: Request, res: Response) => {
  */
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const apps = await appManager.listInstalled();
+    const apps = await getAppManager().listInstalled();
 
     // Enrich each app with update information and ownership data
     const enrichedApps = apps.map(app => {
@@ -110,7 +116,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 router.get('/:appId', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { appId } = req.params;
-    const app = await appManager.getAppStatus(appId);
+    const app = await getAppManager().getAppStatus(appId);
 
     if (!app) {
       return res.status(404).json({ error: `App ${appId} not found` });
@@ -142,7 +148,7 @@ router.post('/install', async (req: Request, res: Response) => {
   try {
     logger.info(`[Install] Starting install for app: ${appId}`);
 
-    await appManager.install(appId);
+    await getAppManager().install(appId);
 
     logger.info(`[Install] Completed successfully for app: ${appId}`);
     return res.json({
@@ -195,7 +201,7 @@ router.post('/activate', async (req: Request, res: Response, next: NextFunction)
       return res.status(400).json({ error: 'appId is required' });
     }
 
-    await appManager.activate(appId);
+    await getAppManager().activate(appId);
 
     res.json({
       ok: true,
@@ -220,7 +226,7 @@ router.post('/deactivate', async (req: Request, res: Response, next: NextFunctio
       return res.status(400).json({ error: 'appId is required' });
     }
 
-    await appManager.deactivate(appId);
+    await getAppManager().deactivate(appId);
 
     res.json({
       ok: true,
@@ -245,7 +251,7 @@ router.post('/uninstall', async (req: Request, res: Response, next: NextFunction
       return res.status(400).json({ error: 'appId is required' });
     }
 
-    await appManager.uninstall(appId, { force, purgeData: purge });
+    await getAppManager().uninstall(appId, { force, purgeData: purge });
 
     res.json({
       ok: true,
@@ -283,7 +289,7 @@ router.post('/update', async (req: Request, res: Response, next: NextFunction) =
       return res.status(400).json({ error: 'appId is required' });
     }
 
-    await appManager.update(appId);
+    await getAppManager().update(appId);
 
     res.json({
       ok: true,
@@ -314,7 +320,7 @@ router.post('/rollback', async (req: Request, res: Response) => {
   try {
     logger.info(`[Rollback] Starting rollback for app: ${appId}`);
 
-    const result = await appManager.rollback(appId);
+    const result = await getAppManager().rollback(appId);
 
     logger.info(`[Rollback] Completed successfully for app: ${appId}, reverted to: ${result.revertedTo}`);
     return res.json({
@@ -351,7 +357,7 @@ router.get('/:appId/version-info', async (req: Request, res: Response) => {
   const { appId } = req.params;
 
   try {
-    const versionInfo = await appManager.getVersionInfo(appId);
+    const versionInfo = await getAppManager().getVersionInfo(appId);
 
     return res.json({
       ok: true,
@@ -501,7 +507,7 @@ router.post('/install-remote', async (req: Request, res: Response) => {
     // For now, we store the manifest and mark as installed
     logger.info(`[InstallRemote] Installing remote app: ${manifest.appId}`);
 
-    // TODO: Implement appManager.installRemote(manifest) when ready
+    // TODO: Implement getAppManager().installRemote(manifest) when ready
     // For now, return success with manifest info
     logger.info(`[InstallRemote] Remote app ${manifest.appId} installed successfully`);
 
@@ -644,7 +650,7 @@ router.get('/:appId/compatibility', async (req: Request, res: Response) => {
     }
 
     // Get installed apps
-    const installedApps = await appManager.listInstalled();
+    const installedApps = await getAppManager().listInstalled();
     const installedAppIds = installedApps.map((a) => a.appId);
 
     // Check compatibility with each installed app

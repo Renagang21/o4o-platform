@@ -47,7 +47,7 @@ const AiQuerySettings: React.FC = () => {
   const loadPolicy = async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/api/ai/policy');
+      const response = await authClient.api.get('/ai/policy');
       if (response.data.success) {
         const data = response.data.data;
         setPolicy(data);
@@ -71,7 +71,7 @@ const AiQuerySettings: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      const response = await authClient.api.put('/api/ai/policy', formData);
+      const response = await authClient.api.put('/ai/policy', formData);
       if (response.data.success) {
         setPolicy(response.data.data);
         toast.success('AI 정책이 저장되었습니다.');

@@ -131,9 +131,9 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   }
 
   return (
-    <aside 
+    <aside
       className={clsx(
-        isCollapsed ? 'w-[36px] collapsed' : 'w-[160px]'
+        isCollapsed ? 'w-[36px] collapsed' : 'w-[180px]'
       )}
     >
       <div className="flex h-full flex-col">

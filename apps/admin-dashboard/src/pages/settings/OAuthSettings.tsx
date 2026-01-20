@@ -54,9 +54,19 @@ const OAuthSettings = () => {
   const { data: settings, isLoading } = useQuery<OAuthSettingsResponse>({
     queryKey: ['oauth-settings'],
     queryFn: async () => {
-      const response = await authClient.api.get('/settings/oauth/admin');
-      return response.data;
-    }
+      try {
+        const response = await authClient.api.get('/settings/oauth/admin');
+        return response.data;
+      } catch (error: any) {
+        // API not implemented yet - return empty settings
+        if (error.response?.status === 404) {
+          console.warn('[OAuthSettings] OAuth settings API not yet implemented');
+          return { success: true, data: { google: {}, kakao: {}, naver: {} } };
+        }
+        throw error;
+      }
+    },
+    retry: false, // Don't retry on 404
   });
 
   // Sync server settings to local state when data loads

@@ -14,16 +14,19 @@
 /* Menu Items - Base Styles */
 .admin-sidebar-item {
   color: #eee !important;
-  padding: 8px 12px;
+  padding: 8px 8px;
   transition: background-color 0.2s, color 0.2s;
   border: none;
   position: relative;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.4;
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   text-align: left;
+  white-space: nowrap;
 }
 
 /* Menu Item Text */
