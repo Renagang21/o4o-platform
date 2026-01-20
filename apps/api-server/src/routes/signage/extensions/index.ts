@@ -10,6 +10,7 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import { extensionRegistry } from './common/index.js';
+import { createPharmacyRouter } from './pharmacy/index.js';
 
 // ============================================================================
 // EXTENSION ROUTER FACTORY
@@ -29,9 +30,8 @@ export function createExtensionRouters(dataSource: DataSource): Router {
 
   // Pharmacy Extension (P1)
   if (extensionRegistry.isEnabled('pharmacy')) {
-    // TODO: Phase 3 Sprint 3-2에서 구현
-    // const pharmacyRouter = createPharmacyRouter(dataSource);
-    // router.use('/pharmacy', pharmacyRouter);
+    const pharmacyRouter = createPharmacyRouter(dataSource);
+    router.use('/pharmacy', pharmacyRouter);
   }
 
   // Cosmetics Extension (P2)
