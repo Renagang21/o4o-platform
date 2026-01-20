@@ -46,19 +46,19 @@ export class CreateTestAccounts1737400200000 implements MigrationInterface {
           `UPDATE users SET password = $1 WHERE email = $2`,
           [hashedPassword, account.email]
         );
-        console.log(`✅ Updated password for existing account: ${account.email}`);
+        console.log(`Updated password for existing account: ${account.email}`);
       } else {
         // Create new account
         await queryRunner.query(
-          `INSERT INTO users (email, password, "fullName", role, "isActive", "emailVerified", "createdAt", "updatedAt")
+          `INSERT INTO users (email, password, name, role, "isActive", "isEmailVerified", "createdAt", "updatedAt")
            VALUES ($1, $2, $3, $4, true, true, NOW(), NOW())`,
           [account.email, hashedPassword, account.fullName, account.role]
         );
-        console.log(`✅ Created test account: ${account.email}`);
+        console.log(`Created test account: ${account.email}`);
       }
     }
 
-    console.log('✅ All test accounts created/updated successfully');
+    console.log('All test accounts created/updated successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -75,6 +75,6 @@ export class CreateTestAccounts1737400200000 implements MigrationInterface {
       await queryRunner.query(`DELETE FROM users WHERE email = $1`, [email]);
     }
 
-    console.log('✅ Test accounts removed');
+    console.log('Test accounts removed');
   }
 }

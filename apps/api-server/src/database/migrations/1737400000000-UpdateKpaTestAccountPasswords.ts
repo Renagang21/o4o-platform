@@ -32,11 +32,11 @@ export class UpdateKpaTestAccountPasswords1737400000000 implements MigrationInte
       );
     }
 
-    console.log(`✅ Updated passwords for KPA test accounts: ${testEmails.join(', ')}`);
+    console.log(`Updated passwords for KPA test accounts: ${testEmails.join(', ')}`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Cannot revert password changes (one-way hash)
-    console.log('⚠️ Password changes cannot be reverted');
+    console.log('Password changes cannot be reverted');
   }
 }
