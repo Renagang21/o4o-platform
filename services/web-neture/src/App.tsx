@@ -268,38 +268,42 @@ function App() {
               <Route path="/supplier/contents/:id/edit" element={<ContentEditorPage />} />
             </Route>
 
-            {/* Partner Dashboard - Lazy */}
-            <Route path="/partner" element={<PartnerOverviewPage />} />
-            <Route path="/partner/collaboration" element={<CollaborationPage />} />
-            <Route path="/partner/promotions" element={<PromotionsPage />} />
-            <Route path="/partner/settlements" element={<SettlementsPage />} />
+            {/* Partner Dashboard - inside MainLayout for site navigation */}
+            <Route element={<MainLayout />}>
+              <Route path="/partner" element={<PartnerOverviewPage />} />
+              <Route path="/partner/collaboration" element={<CollaborationPage />} />
+              <Route path="/partner/promotions" element={<PromotionsPage />} />
+              <Route path="/partner/settlements" element={<SettlementsPage />} />
+            </Route>
 
-            {/* Admin Dashboard - Lazy */}
-            <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
-            <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
-            <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-            <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
+            {/* Admin Dashboard - inside MainLayout for site navigation */}
+            <Route element={<MainLayout />}>
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
+              <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
+              <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
+              {/* AI Admin Control Plane */}
+              <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
+              <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
+              <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
+              <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
+              <Route path="/admin/ai/cost" element={<AiCostPage />} />
+              <Route path="/admin/ai/context-assets" element={<ContextAssetListPage />} />
+              <Route path="/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
+              <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
+              <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
+              {/* Admin Settings */}
+              <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
+            </Route>
 
-            {/* AI Admin Control Plane - Lazy */}
-            <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
-            <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
-            <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
-            <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
-            <Route path="/admin/ai/cost" element={<AiCostPage />} />
-            <Route path="/admin/ai/context-assets" element={<ContextAssetListPage />} />
-            <Route path="/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
-            <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
-            <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
-
-            {/* Admin Settings - Lazy */}
-            <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
-
-            {/* Operator Dashboard - Lazy */}
-            <Route path="/operator" element={<OperatorDashboard />} />
-            <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
-            <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-            <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
+            {/* Operator Dashboard - inside MainLayout for site navigation */}
+            <Route element={<MainLayout />}>
+              <Route path="/operator" element={<OperatorDashboard />} />
+              <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
+              <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+              <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
+            </Route>
           </Routes>
         </Suspense>
       </BrowserRouter>

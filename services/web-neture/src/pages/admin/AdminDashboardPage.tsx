@@ -56,47 +56,27 @@ export default function AdminDashboardPage() {
   const hasRecentApplications = summary?.recentApplications && summary.recentApplications.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4">
-              <Link to="/" className="text-xl font-bold text-primary-600">
-                Neture
-              </Link>
-              <span className="text-gray-300">|</span>
-              <span className="text-sm font-medium text-gray-600">운영자 대시보드</span>
-            </div>
-            <Link to="/" className="text-sm text-gray-500 hover:text-gray-700">
-              메인으로
-            </Link>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">운영자 대시보드</h1>
+          <p className="text-gray-500 mt-1">플랫폼 전체 운영 현황을 확인합니다.</p>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">운영자 대시보드</h1>
-            <p className="text-gray-500 mt-1">플랫폼 전체 운영 현황을 확인합니다.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={fetchData}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-            >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-              새로고침
-            </button>
-            <AiSummaryButton contextLabel="플랫폼 운영 요약" />
-          </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchData}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            새로고침
+          </button>
+          <AiSummaryButton contextLabel="플랫폼 운영 요약" />
         </div>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 opacity-50">
@@ -276,11 +256,10 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Notice */}
-        <div className="mt-8 text-center text-sm text-gray-400">
-          상세 관리 기능은 순차적으로 추가됩니다.
-        </div>
-      </main>
+      {/* Notice */}
+      <div className="mt-8 text-center text-sm text-gray-400">
+        상세 관리 기능은 순차적으로 추가됩니다.
+      </div>
     </div>
   );
 }
