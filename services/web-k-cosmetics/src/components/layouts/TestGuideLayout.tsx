@@ -12,8 +12,8 @@ interface TestGuideLayoutProps {
   subtitle?: string;
 }
 
-// 테스트 포럼 URL (환경변수 또는 기본값)
-const FORUM_URL = import.meta.env.VITE_TEST_FORUM_URL || '/forum';
+// 테스트 의견 포럼 URL - Neture의 test-feedback 포럼으로 연결 (플랫폼 통합)
+const FORUM_URL = 'https://neture.co.kr/forum/test-feedback';
 
 export default function TestGuideLayout({ children, title, subtitle }: TestGuideLayoutProps) {
   const location = useLocation();
