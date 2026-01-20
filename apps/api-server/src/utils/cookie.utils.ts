@@ -85,17 +85,6 @@ function getCookieConfig(req?: Request) {
  */
 export function setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {
   const { baseOptions } = getCookieConfig(req);
-  const origin = req.get('origin');
-
-  // Debug log for cookie configuration
-  console.log('[Cookie.setAuthCookies] Setting auth cookies:', {
-    origin,
-    domain: baseOptions.domain,
-    secure: baseOptions.secure,
-    sameSite: baseOptions.sameSite,
-    httpOnly: baseOptions.httpOnly,
-    nodeEnv: process.env.NODE_ENV,
-  });
 
   // Access token cookie (15 minutes)
   res.cookie('accessToken', tokens.accessToken, {
