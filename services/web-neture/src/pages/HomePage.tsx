@@ -43,6 +43,11 @@ function HeroSection() {
   return (
     <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시 */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs text-primary-100 mb-4">
+          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+          <span>운영형 알파 · v0.8.0</span>
+        </div>
         {/* WO-NETURE-HOME-HERO-AND-NAV-O4O-ALIGNMENT-V1: o4o ↔ Neture 관계 명확화 */}
         <p className="text-primary-200 text-sm mb-4">
           o4o 플랫폼 기반 서비스
@@ -50,10 +55,14 @@ function HeroSection() {
         <h1 className="text-4xl sm:text-5xl font-bold mb-6">
           유통 정보 서비스, Neture
         </h1>
-        <p className="text-xl text-primary-100 mb-10">
+        <p className="text-xl text-primary-100 mb-6">
           공급자를 찾고, 제휴를 연결합니다.
           <br />
           주문·결제 없이 조건과 기회를 투명하게 확인하세요.
+        </p>
+        {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 알파 단계 안내 문구 */}
+        <p className="text-sm text-primary-200/70 mb-8">
+          현재 파트너 기반 운영 검증 단계입니다
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

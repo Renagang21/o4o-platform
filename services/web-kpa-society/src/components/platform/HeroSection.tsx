@@ -9,9 +9,17 @@ export function HeroSection() {
   return (
     <section style={styles.hero}>
       <div style={styles.container}>
+        {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시 */}
+        <div style={styles.alphaBadge}>
+          <span style={styles.alphaIndicator}></span>
+          <span>운영형 알파 · v0.8.0</span>
+        </div>
         <h1 style={styles.title}>약사 직능 공동 플랫폼</h1>
         <p style={styles.subtitle}>
           약국·병원·산업 약사를 위한 공통 서비스
+        </p>
+        <p style={styles.alphaNote}>
+          지역약사회와 함께 운영 구조를 검증하는 단계입니다
         </p>
         <a href="/demo/login" style={styles.ctaButton}>
           Login
@@ -32,6 +40,23 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '800px',
     margin: '0 auto',
   },
+  alphaBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '4px 12px',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: '20px',
+    fontSize: '12px',
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: '24px',
+  },
+  alphaIndicator: {
+    width: '6px',
+    height: '6px',
+    backgroundColor: '#34d399',
+    borderRadius: '50%',
+  },
   title: {
     fontSize: '2.5rem',
     fontWeight: 700,
@@ -41,8 +66,13 @@ const styles: Record<string, React.CSSProperties> = {
   subtitle: {
     fontSize: '1.25rem',
     color: '#94a3b8',
-    margin: '0 0 32px 0',
+    margin: '0 0 12px 0',
     lineHeight: 1.6,
+  },
+  alphaNote: {
+    fontSize: '0.875rem',
+    color: 'rgba(148, 163, 184, 0.7)',
+    margin: '0 0 32px 0',
   },
   ctaButton: {
     display: 'inline-block',

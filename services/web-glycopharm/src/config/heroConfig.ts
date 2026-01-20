@@ -39,7 +39,8 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'identity',
     title: '혈당관리 전문 약국\n운영 플랫폼',
-    subtitle: '약국 운영의 차별화를 만드는 도구와 콘텐츠를 제공합니다',
+    // WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시
+    subtitle: '약국 운영의 차별화를 만드는 도구와 콘텐츠를 제공합니다 · 운영형 알파 v0.8.0',
     bgGradient: 'from-primary-600 via-primary-700 to-primary-800',
     cta: {
       label: '운영 프레임 알아보기',

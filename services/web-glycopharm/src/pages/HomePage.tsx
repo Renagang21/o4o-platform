@@ -204,12 +204,25 @@ function HeroSection() {
             <div className={`h-full bg-gradient-to-br ${slide.bgGradient}`}>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center">
                 <div className="max-w-2xl">
+                  {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 배지 (첫 번째 슬라이드에만) */}
+                  {index === 0 && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs text-white/80 mb-4">
+                      <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+                      <span>운영형 알파 · v0.8.0</span>
+                    </div>
+                  )}
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 whitespace-pre-line">
                     {slide.title}
                   </h1>
-                  <p className="text-lg md:text-xl text-white/80 mb-8">
+                  <p className="text-lg md:text-xl text-white/80 mb-4">
                     {slide.subtitle}
                   </p>
+                  {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 알파 단계 안내 (첫 번째 슬라이드에만) */}
+                  {index === 0 && (
+                    <p className="text-sm text-white/50 mb-6">
+                      협력 약국과 함께 운영 구조를 검증하는 단계입니다
+                    </p>
+                  )}
                   {renderCta(slide)}
                 </div>
               </div>

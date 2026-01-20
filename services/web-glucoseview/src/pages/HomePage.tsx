@@ -28,11 +28,12 @@ interface Partner {
 }
 
 // 슬라이드 배너 데이터 - 여러 배너 지원
+// WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시
 const sampleBanners: SlideBanner[] = [
   {
     id: '1',
     title: 'GlucoseView',
-    subtitle: '약국용 CGM 데이터 관리',
+    subtitle: '약국용 CGM 데이터 관리 · 운영형 알파 v0.8.0',
     bgColor: 'bg-slate-800',
     textColor: 'text-white',
     isActive: true,

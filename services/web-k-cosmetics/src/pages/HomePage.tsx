@@ -261,6 +261,28 @@ function HeroSection() {
                 alignItems: 'center',
               }}>
                 <div style={{ maxWidth: '600px' }}>
+                  {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시 (첫 번째 슬라이드에만) */}
+                  {index === 0 && (
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '4px 12px',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      color: 'rgba(255,255,255,0.8)',
+                      marginBottom: '16px',
+                    }}>
+                      <span style={{
+                        width: '6px',
+                        height: '6px',
+                        backgroundColor: '#34d399',
+                        borderRadius: '50%',
+                      }}></span>
+                      <span>운영형 알파 · v0.8.0</span>
+                    </div>
+                  )}
                   <h1 style={{
                     fontSize: '32px',
                     fontWeight: 600,
@@ -274,10 +296,20 @@ function HeroSection() {
                   <p style={{
                     fontSize: '16px',
                     color: 'rgba(255,255,255,0.7)',
-                    marginBottom: '24px',
+                    marginBottom: index === 0 ? '8px' : '24px',
                   }}>
                     {slide.subtitle}
                   </p>
+                  {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 알파 단계 안내 문구 (첫 번째 슬라이드에만) */}
+                  {index === 0 && (
+                    <p style={{
+                      fontSize: '13px',
+                      color: 'rgba(255,255,255,0.5)',
+                      marginBottom: '24px',
+                    }}>
+                      매장·브랜드와 함께 운영 구조를 검증하는 단계입니다
+                    </p>
+                  )}
                   {slide.cta && (
                     <Link
                       to={slide.cta.link}
