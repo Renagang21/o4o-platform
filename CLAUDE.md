@@ -193,20 +193,55 @@ import type { RelatedEntity } from './related.entity.js';
 
 ---
 
-## 14. 화면 디버깅 규칙
+## 14. 화면 디버깅 규칙 (Alpha 기준)
+
+### 핵심 원칙
 
 ```
 ❌ AI가 브라우저 직접 테스트
-✅ 사람이 관측 → AI가 분석
+✅ 사람이 관측 → AI가 JSON 분석 → 코드 위치 추적
 ```
 
-| 디버그 페이지 | URL |
-|---------------|-----|
-| Login Probe | `/__debug__/login` |
-| Navigation Probe | `/__debug__/navigation` |
-| API Probe | `/__debug__/api` |
+### 공식 진단 Entry Point (Alpha)
 
-> 📄 상세: `docs/debugging/README.md`
+| 분류 | URL / 엔드포인트 | 용도 |
+|------|------------------|------|
+| **Auth 진단** | `/__debug__/auth-bootstrap` | 로그인/세션/토큰 문제 |
+| **시스템 상태** | `/health/detailed` | 전체 컴포넌트 상태 |
+| **DB 상태** | `/health/database` | DB 연결, 버전, 쿼리 |
+| **인증 상태** | `/api/v1/auth/status` | 현재 인증 여부 확인 |
+
+### 표준 진단 루틴
+
+```
+1. 재현: 브라우저에서 문제 확인
+2. JSON 진단: 위 Entry Point 실행 → JSON 복사
+3. 원인 특정: success/error/code 필드 분석
+4. 코드 추적: error.code → 해당 컨트롤러/미들웨어
+5. 수정 후 동일 진단으로 검증
+```
+
+### JSON 응답 표준
+
+```typescript
+// 성공
+{ success: true, data: T }
+
+// 에러 (머신 리더블 code 필수)
+{ success: false, error: "message", code: "ERROR_CODE" }
+```
+
+### Alpha 단계 상태
+
+| 항목 | 상태 | 비고 |
+|------|------|------|
+| `/__debug__/auth-bootstrap` | ✅ 구현됨 | admin-dashboard |
+| `/__debug__/login` | 📋 참고 설계 | 필요 시 구현 |
+| `/__debug__/navigation` | 📋 참고 설계 | 필요 시 구현 |
+| `/__debug__/api` | 📋 참고 설계 | 필요 시 구현 |
+
+> 📄 상세: `docs/debugging/DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md`
+> 📄 가이드: `docs/debugging/README.md`
 
 ---
 
@@ -220,7 +255,42 @@ import type { RelatedEntity } from './related.entity.js';
 
 ---
 
-## 16. 최종 원칙
+## 16. 플랫폼 개발 기준 참조 규칙 (중요)
+
+> **Content / LMS / Signage / CMS / Extension 관련 개발을 수행할 경우,
+> 반드시 다음 문서를 선행 참조한다.**
+
+### 필수 참조 문서
+
+| 영역 | 문서 | 경로 |
+|------|------|------|
+| Content Core | Content Core 개요 | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
+| LMS Core | Core-Extension 원칙 | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
+| LMS Core | 데이터 소유권 | `docs/platform/lms/LMS-CORE-DATA-OWNERSHIP.md` |
+| LMS Core | API 계약 | `docs/platform/lms/LMS-CORE-CONTRACT.md` |
+| LMS Core | 이벤트 표준 | `docs/platform/lms/LMS-EVENT-STANDARD.md` |
+| Navigation | 운영자 대시보드 네비게이션 | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
+| Extension | 일반 가이드 | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
+| Extension | 파트너 가이드 | `docs/platform/extensions/EXTENSION-PARTNER-GUIDE.md` |
+
+### 적용 규칙
+
+1. **선행 참조 필수**: 위 영역 개발 시작 전 해당 문서 확인
+2. **기준 준수**: 문서에 명시된 원칙과 제약을 따름
+3. **일관성 유지**: 기존 패턴과 구조를 벗어나지 않음
+4. **변경 시 승인**: 기준 문서 변경 시 CLAUDE.md 규칙에 따라 승인 필요
+
+### 핵심 원칙 요약
+
+- **Content는 단일 출처**: 모든 콘텐츠는 Content Core를 통해 관리
+- **Core는 불변**: Extension이 Core를 수정하지 않음
+- **데이터 소유권 명확**: Core 데이터와 Extension 데이터 분리
+- **이벤트 기반 통신**: Core → Extension 방향으로 이벤트 발행
+- **통합 네비게이션**: Extension은 통합 사이드바에 메뉴 등록
+
+---
+
+## 17. 최종 원칙
 
 > **새 앱을 만들기 전에,
 > "이게 위 기준을 모두 만족하는가?"를 먼저 확인하라.**
@@ -239,10 +309,15 @@ import type { RelatedEntity } from './related.entity.js';
 | Store Template | `docs/templates/o4o-store-template/` |
 | ESM Entity 규칙 | `docs/reports/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
 | 디버깅 가이드 | `docs/debugging/README.md` |
+| **진단 인프라 기준** | `docs/debugging/DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md` |
 | Design Core | `docs/app-guidelines/design-core-governance.md` |
+| **Content Core** | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
+| **LMS Core** | `docs/platform/lms/` |
+| **Navigation** | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
+| **Extension** | `docs/platform/extensions/` |
 
 ---
 
-*Updated: 2026-01-11*
-*Version: 4.0*
+*Updated: 2026-01-20*
+*Version: 4.2*
 *Status: Active Constitution*

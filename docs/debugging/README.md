@@ -6,6 +6,27 @@
 
 ---
 
+## 🚀 Alpha 단계 Quick Start
+
+**즉시 사용 가능한 공식 진단 Entry Point:**
+
+| 용도 | URL / 엔드포인트 | 인증 |
+|------|------------------|------|
+| **Auth 진단** | `https://admin.neture.co.kr/__debug__/auth-bootstrap` | 불필요 |
+| **시스템 상태** | `https://api.neture.co.kr/health/detailed` | 불필요 |
+| **DB 상태** | `https://api.neture.co.kr/health/database` | 불필요 |
+| **인증 상태 확인** | `https://api.neture.co.kr/api/v1/auth/status` | 불필요 |
+
+**표준 진단 루틴:**
+```
+1. 재현 → 2. JSON 진단 실행 → 3. error.code 확인 → 4. 코드 추적 → 5. 수정 후 재검증
+```
+
+> 📄 **상세 기준**: [DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md](./DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md)
+> 📄 **CLAUDE.md 연동**: Section 14 참조
+
+---
+
 ## 핵심 원칙
 
 ### AI 에이전트 디버깅의 올바른 접근
@@ -31,7 +52,36 @@
 
 ## 디버그 페이지 사용법
 
-### 1. 로그인 프로브 (`/__debug__/login`)
+### 0. Auth Bootstrap 프로브 (`/__debug__/auth-bootstrap`) ✅ 구현됨
+
+> **Alpha 단계 공식 Auth 진단 Entry Point**
+
+로그인 후 인증 상태 유지 문제를 분석합니다.
+
+**특징:**
+- 로그인 API 테스트 (POST `/api/v1/auth/login`)
+- 토큰 저장 확인 (Cookie vs localStorage)
+- `/auth/me` 호출 검증
+- 후속 API 호출 테스트
+- JSON 타임라인 출력
+
+**사용법:**
+1. `https://admin.neture.co.kr/__debug__/auth-bootstrap` 접속
+2. Email/Password 입력
+3. "Run Auth Bootstrap Probe" 클릭
+4. JSON 결과 분석 (Copy JSON / Open in New Tab)
+
+**분석 가능 항목:**
+- 로그인 API 응답 상태
+- 토큰 저장 위치 (cookie/localStorage)
+- `/auth/me` 호출 성공 여부
+- 후속 API 인증 전파 확인
+
+---
+
+### 1. 로그인 프로브 (`/__debug__/login`) 📋 참고 설계
+
+> **Alpha 상태**: 미구현 (필요 시 구현, Auth Bootstrap으로 대체 가능)
 
 로그인 과정의 성능과 동작을 분석합니다.
 
@@ -53,7 +103,9 @@
 - 세션 확인 API (me) 호출 시간
 - 총 로그인 소요 시간
 
-### 2. 네비게이션 프로브 (`/__debug__/navigation`)
+### 2. 네비게이션 프로브 (`/__debug__/navigation`) 📋 참고 설계
+
+> **Alpha 상태**: 미구현 (필요 시 구현)
 
 React Router 네비게이션 동작을 테스트합니다.
 
@@ -68,7 +120,9 @@ React Router 네비게이션 동작을 테스트합니다.
 3. 결과 확인 (성공/실패)
 4. "Copy JSON" 클릭하여 결과 복사
 
-### 3. API 프로브 (`/__debug__/api`)
+### 3. API 프로브 (`/__debug__/api`) 📋 참고 설계
+
+> **Alpha 상태**: 미구현 (Health API로 대체 가능)
 
 API 엔드포인트 성능과 응답을 개별적으로 테스트합니다.
 
