@@ -25,6 +25,17 @@ export default function PartnerOverviewInfoPage() {
           </button>
         </div>
 
+        {/* 운영형 알파 상태 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE) */}
+        <div style={styles.alphaBanner}>
+          <div style={styles.alphaBadgeWrapper}>
+            <span style={styles.alphaIndicator}></span>
+            <span style={styles.alphaBadgeText}>운영형 알파 · v0.8.0</span>
+          </div>
+          <p style={styles.alphaBannerText}>
+            파트너·운영자와 함께 운영 구조를 검증하는 단계입니다
+          </p>
+        </div>
+
         {/* [1] 헤드라인 */}
         <header style={styles.header}>
           <p style={styles.headerLabel}>파트너·운영자를 위한 안내</p>
@@ -224,6 +235,40 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '700px',
     margin: '0 auto',
     padding: '48px 24px',
+  },
+
+  // Alpha Banner (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
+  alphaBanner: {
+    backgroundColor: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    borderRadius: '12px',
+    padding: '16px 24px',
+    marginBottom: '24px',
+    textAlign: 'center',
+  },
+  alphaBadgeWrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '4px 12px',
+    backgroundColor: '#0f172a',
+    borderRadius: '20px',
+    marginBottom: '10px',
+  },
+  alphaIndicator: {
+    width: '6px',
+    height: '6px',
+    backgroundColor: '#34d399',
+    borderRadius: '50%',
+  },
+  alphaBadgeText: {
+    fontSize: '12px',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  alphaBannerText: {
+    fontSize: '14px',
+    color: '#065f46',
+    margin: 0,
   },
 
   // Print Button

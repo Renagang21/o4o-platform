@@ -16,6 +16,7 @@ const SECTIONS: ManualSection[] = [
   { id: 'suppliers', title: '공급자 탐색' },
   { id: 'requests', title: '제휴 요청하기' },
   { id: 'orders', title: '발주 관리' },
+  { id: 'alpha-checklist', title: '운영형 알파 체크리스트' },
   { id: 'tips', title: '테스트 팁' },
 ];
 
@@ -34,6 +35,8 @@ export default function PartnerManualPage() {
         return <RequestsSection />;
       case 'orders':
         return <OrdersSection />;
+      case 'alpha-checklist':
+        return <AlphaChecklistSection />;
       case 'tips':
         return <TipsSection />;
       default:
@@ -302,7 +305,78 @@ function OrdersSection() {
   );
 }
 
-// 섹션 6: 테스트 팁
+// 섹션 6: 운영형 알파 체크리스트 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
+function AlphaChecklistSection() {
+  return (
+    <div>
+      <h2 style={styles.sectionTitle}>운영형 알파(v0.8.x) 안정화 체크리스트</h2>
+      <p style={styles.text}>
+        현재 Neture 플랫폼은 <strong>운영형 알파 단계(v0.8.0)</strong>입니다.
+        파트너로서 아래 항목을 확인하고 참여해 주세요.
+      </p>
+
+      <div style={styles.alphaStatusBadge}>
+        <span style={styles.alphaIndicator}></span>
+        <span>운영형 알파 · v0.8.0</span>
+      </div>
+
+      <div style={styles.highlightBox}>
+        <h3 style={styles.highlightTitle}>운영형 알파란?</h3>
+        <p style={{ ...styles.text, marginBottom: 0 }}>
+          일반 사용자 공개 전, 파트너·운영자가 실제 사용하며 구조와 흐름을 함께 정비하는 단계입니다.
+        </p>
+      </div>
+
+      <div style={styles.checklistBox}>
+        <h3 style={styles.highlightTitle}>파트너 안정화 체크리스트</h3>
+        <ul style={styles.checkList}>
+          <li style={styles.checkItem}>
+            <span style={styles.checkIcon}>☐</span>
+            <span>공급자 목록에서 연결 가능한 공급자를 확인했습니다</span>
+          </li>
+          <li style={styles.checkItem}>
+            <span style={styles.checkIcon}>☐</span>
+            <span>제휴 요청 기능이 정상 동작하는지 테스트했습니다</span>
+          </li>
+          <li style={styles.checkItem}>
+            <span style={styles.checkIcon}>☐</span>
+            <span>대시보드에서 현황 카드가 올바르게 표시됩니다</span>
+          </li>
+          <li style={styles.checkItem}>
+            <span style={styles.checkIcon}>☐</span>
+            <span>발주 흐름(수량 입력 → 요청)을 한 번 이상 진행했습니다</span>
+          </li>
+          <li style={styles.checkItem}>
+            <span style={styles.checkIcon}>☐</span>
+            <span>불편하거나 이상한 점을 테스트 포럼에 공유했습니다</span>
+          </li>
+        </ul>
+      </div>
+
+      <div style={styles.infoCard}>
+        <AlertCircle size={24} style={{ color: '#0ea5e9' }} />
+        <div>
+          <strong>함께 만들어가는 단계입니다</strong>
+          <p style={styles.infoText}>
+            발견한 문제, 개선 아이디어, 사용 중 불편한 점을 알려주시면
+            플랫폼 안정화에 큰 도움이 됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.warningBox}>
+        <h3 style={styles.warningTitle}>알파 단계 유의사항</h3>
+        <ul style={styles.list}>
+          <li>화면이나 기능이 예고 없이 변경될 수 있습니다</li>
+          <li>일부 기능은 아직 개발 중이거나 미완성일 수 있습니다</li>
+          <li>테스트 데이터는 주기적으로 초기화될 수 있습니다</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// 섹션 7: 테스트 팁
 function TipsSection() {
   return (
     <div>
@@ -477,5 +551,48 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     fontSize: '14px',
     fontWeight: 500,
+  },
+  // Alpha Checklist Styles (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
+  alphaStatusBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '6px 14px',
+    backgroundColor: '#0f172a',
+    borderRadius: '20px',
+    fontSize: '13px',
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: '20px',
+  },
+  alphaIndicator: {
+    width: '6px',
+    height: '6px',
+    backgroundColor: '#34d399',
+    borderRadius: '50%',
+  },
+  checklistBox: {
+    backgroundColor: '#f0fdf4',
+    border: '1px solid #bbf7d0',
+    borderRadius: '10px',
+    padding: '20px',
+    marginBottom: '20px',
+  },
+  checkList: {
+    margin: 0,
+    padding: 0,
+    listStyle: 'none',
+  },
+  checkItem: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '10px',
+    fontSize: '14px',
+    color: '#166534',
+    lineHeight: 1.6,
+    marginBottom: '10px',
+  },
+  checkIcon: {
+    fontSize: '16px',
+    flexShrink: 0,
   },
 };

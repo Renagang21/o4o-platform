@@ -85,6 +85,8 @@ O4O Platform 전체 서비스는 현재 **운영형 알파 (Operational Alpha)**
 
 ## 7. 적용 서비스 목록
 
+### 7.1 Hero 영역 적용
+
 | 서비스 | 파일 | 상태 |
 |--------|------|------|
 | web-neture | `src/pages/HomePage.tsx` | ✅ 적용됨 |
@@ -92,6 +94,14 @@ O4O Platform 전체 서비스는 현재 **운영형 알파 (Operational Alpha)**
 | web-glycopharm | `src/pages/HomePage.tsx`, `src/config/heroConfig.ts` | ✅ 적용됨 |
 | web-glucoseview | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-kpa-society | `src/components/platform/HeroSection.tsx` | ✅ 적용됨 |
+
+### 7.2 파트너 안내 페이지 적용 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
+
+| 페이지 | 파일 | 상태 |
+|--------|------|------|
+| 파트너 매뉴얼 | `src/pages/test-guide/manual/PartnerManualPage.tsx` | ✅ 체크리스트 섹션 추가 |
+| 참여 안내 | `src/pages/PartnerInfoPage.tsx` | ✅ 상태 배너 추가 |
+| 운영자 안내 | `src/pages/PartnerOverviewInfoPage.tsx` | ✅ 상태 배너 추가 |
 
 ---
 
@@ -149,10 +159,31 @@ Alpha → Beta 전환 시:
 
 ---
 
-## 10. 참조
+## 10. 파트너 안정화 체크리스트
+
+> WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE에 따라 추가됨
+
+파트너가 운영형 알파 단계에서 확인해야 할 항목:
+
+1. ☐ 공급자 목록에서 연결 가능한 공급자를 확인했습니다
+2. ☐ 제휴 요청 기능이 정상 동작하는지 테스트했습니다
+3. ☐ 대시보드에서 현황 카드가 올바르게 표시됩니다
+4. ☐ 발주 흐름(수량 입력 → 요청)을 한 번 이상 진행했습니다
+5. ☐ 불편하거나 이상한 점을 테스트 포럼에 공유했습니다
+
+### 알파 단계 유의사항
+
+- 화면이나 기능이 예고 없이 변경될 수 있습니다
+- 일부 기능은 아직 개발 중이거나 미완성일 수 있습니다
+- 테스트 데이터는 주기적으로 초기화될 수 있습니다
+
+---
+
+## 11. 참조
 
 - [CLAUDE.md](../../CLAUDE.md) - 플랫폼 헌법
-- [WO-GLOBAL-ALPHA-STATUS-HERO-V080] - 본 작업 Work Order
+- [WO-GLOBAL-ALPHA-STATUS-HERO-V080] - Hero 영역 상태 표시 Work Order
+- [WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE] - 파트너 체크리스트 Work Order
 
 ---
 

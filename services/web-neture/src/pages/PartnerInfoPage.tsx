@@ -53,6 +53,17 @@ const ROLE_CARDS: RoleCard[] = [
 export function PartnerInfoPage() {
   return (
     <div style={styles.container}>
+      {/* 운영형 알파 상태 배너 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE) */}
+      <div style={styles.alphaBanner}>
+        <div style={styles.alphaBadgeWrapper}>
+          <span style={styles.alphaIndicator}></span>
+          <span style={styles.alphaBadgeText}>운영형 알파 · v0.8.0</span>
+        </div>
+        <p style={styles.alphaBannerText}>
+          현재 파트너·운영자와 함께 구조를 검증하는 단계입니다.
+        </p>
+      </div>
+
       {/* o4o 소개 유도 배너 (WO-NETURE-PARTNERS-INFO-O4O-REALIGNMENT-V1) */}
       <div style={styles.o4oBanner}>
         <p style={styles.o4oBannerText}>
@@ -164,6 +175,39 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '900px',
     margin: '0 auto',
     padding: '48px 24px',
+  },
+  // Alpha 상태 배너 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
+  alphaBanner: {
+    backgroundColor: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    borderRadius: '12px',
+    padding: '20px 24px',
+    marginBottom: '16px',
+    textAlign: 'center',
+  },
+  alphaBadgeWrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '4px 12px',
+    backgroundColor: '#0f172a',
+    borderRadius: '20px',
+    marginBottom: '12px',
+  },
+  alphaIndicator: {
+    width: '6px',
+    height: '6px',
+    backgroundColor: '#34d399',
+    borderRadius: '50%',
+  },
+  alphaBadgeText: {
+    fontSize: '12px',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  alphaBannerText: {
+    fontSize: '14px',
+    color: '#065f46',
+    margin: 0,
   },
   // o4o 유도 배너 (WO-NETURE-PARTNERS-INFO-O4O-REALIGNMENT-V1)
   o4oBanner: {
