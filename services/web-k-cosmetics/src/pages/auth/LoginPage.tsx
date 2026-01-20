@@ -8,9 +8,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
+// 계정은 SeedProductionTestAccounts migration에서 생성됨
+// consumer 계정 제거 (역할 불일치 문제)
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'consumer@k-cosmetics.test', password: TEST_PASSWORD, label: '소비자' },
   { email: 'seller@k-cosmetics.test', password: TEST_PASSWORD, label: '판매자' },
   { email: 'supplier@k-cosmetics.test', password: TEST_PASSWORD, label: '공급자' },
   { email: 'admin@k-cosmetics.test', password: TEST_PASSWORD, label: '운영자' },
