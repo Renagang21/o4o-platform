@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth, ROLE_DASHBOARDS } from '../contexts';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
@@ -18,11 +18,15 @@ const testAccounts = [
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // returnUrl이 있으면 로그인 후 해당 URL로 이동
+  const returnUrl = searchParams.get('returnUrl');
 
   // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
   const fillTestAccount = (account: { email: string; password: string }) => {
@@ -43,9 +47,13 @@ export function LoginPage() {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
 
-      // 로그인 성공 - 역할별 대시보드로 이동
-      const dashboardPath = result.role ? ROLE_DASHBOARDS[result.role] : '/';
-      navigate(dashboardPath);
+      // 로그인 성공 - returnUrl이 있으면 해당 URL로, 없으면 역할별 대시보드로 이동
+      if (returnUrl) {
+        navigate(returnUrl);
+      } else {
+        const dashboardPath = result.role ? ROLE_DASHBOARDS[result.role] : '/';
+        navigate(dashboardPath);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {

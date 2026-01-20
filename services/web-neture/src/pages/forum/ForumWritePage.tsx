@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import {
   createForumPost,
@@ -38,6 +38,7 @@ const MIN_CONTENT_LENGTH = 20;
 
 export function ForumWritePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated } = useAuth();
   // NOTE: 현재 AuthContext는 테스트용이라 token이 없음
   // Real API 연동 시 AuthContext에 token 추가 필요
@@ -72,7 +73,9 @@ export function ForumWritePage() {
   const hasContactInfo = contactSettings?.contactEnabled &&
     (contactSettings?.kakaoOpenChatUrl || contactSettings?.kakaoChannelUrl);
 
-  // 로그인 가드
+  // 로그인 가드 - returnUrl로 현재 페이지 전달하여 로그인 후 돌아오기
+  const loginUrl = `/login?returnUrl=${encodeURIComponent(location.pathname)}`;
+
   if (!isAuthenticated) {
     return (
       <div style={styles.container}>
@@ -82,7 +85,7 @@ export function ForumWritePage() {
             의견을 남기려면 먼저 로그인해주세요.
           </p>
           <div style={styles.loginGuardActions}>
-            <Link to="/login" style={styles.loginButton}>
+            <Link to={loginUrl} style={styles.loginButton}>
               로그인
             </Link>
             <Link to="/forum" style={styles.backLink}>
