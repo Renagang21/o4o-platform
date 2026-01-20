@@ -21,9 +21,14 @@ export function HeroSection() {
         <p style={styles.alphaNote}>
           지역약사회와 함께 운영 구조를 검증하는 단계입니다
         </p>
-        <a href="/demo/login" style={styles.ctaButton}>
-          Login
-        </a>
+        <div style={styles.ctaButtons}>
+          <a href="/demo" style={styles.ctaButton}>
+            약사회 서비스 살펴보기
+          </a>
+          <a href="/demo/login" style={styles.ctaButtonOutline}>
+            Login
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -74,6 +79,12 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'rgba(148, 163, 184, 0.7)',
     margin: '0 0 32px 0',
   },
+  ctaButtons: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
   ctaButton: {
     display: 'inline-block',
     padding: '14px 32px',
@@ -84,7 +95,21 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '1rem',
     fontWeight: 600,
     cursor: 'pointer',
+    textDecoration: 'none',
     transition: 'background-color 0.2s',
+  },
+  ctaButtonOutline: {
+    display: 'inline-block',
+    padding: '14px 32px',
+    backgroundColor: 'transparent',
+    color: '#94a3b8',
+    border: '1px solid #475569',
+    borderRadius: '8px',
+    fontSize: '1rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    textDecoration: 'none',
+    transition: 'all 0.2s',
   },
 };
 

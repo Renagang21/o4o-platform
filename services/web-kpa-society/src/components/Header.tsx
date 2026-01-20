@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts';
 import { TestAccountType } from '../contexts/AuthContext';
 import { colors } from '../styles/theme';
@@ -208,7 +209,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                 onMouseLeave={() => setShowUserDropdown(false)}
               >
                 <button style={styles.userIconButton} aria-label="사용자 메뉴">
-                  <span style={styles.userIcon}>👤</span>
+                  <User style={{ width: 20, height: 20, color: colors.gray600 }} />
                 </button>
                 {showUserDropdown && (
                   <div style={styles.userDropdown}>
@@ -222,7 +223,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                       style={styles.userDropdownItem}
                       onClick={() => setShowUserDropdown(false)}
                     >
-                      <span style={styles.userDropdownItemIcon}>📊</span>
+                      <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
                       대시보드
                     </Link>
                     <Link
@@ -230,7 +231,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                       style={styles.userDropdownItem}
                       onClick={() => setShowUserDropdown(false)}
                     >
-                      <span style={styles.userDropdownItemIcon}>👤</span>
+                      <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
                       프로필
                     </Link>
                     <Link
@@ -238,7 +239,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                       style={styles.userDropdownItem}
                       onClick={() => setShowUserDropdown(false)}
                     >
-                      <span style={styles.userDropdownItemIcon}>⚙️</span>
+                      <Settings style={{ width: 16, height: 16, color: colors.gray500 }} />
                       설정
                     </Link>
                     <div style={styles.userDropdownDivider} />
@@ -249,7 +250,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                         handleLogout();
                       }}
                     >
-                      <span style={styles.userDropdownItemIcon}>🚪</span>
+                      <LogOut style={{ width: 16, height: 16, color: colors.error || '#dc2626' }} />
                       로그아웃
                     </button>
                   </div>

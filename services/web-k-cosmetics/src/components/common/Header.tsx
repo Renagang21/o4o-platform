@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { User } from 'lucide-react';
 import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
 
 export default function Header() {
@@ -80,7 +81,7 @@ export default function Header() {
                   aria-label="사용자 메뉴"
                 >
                   <div style={styles.avatar}>
-                    {user?.name?.charAt(0) || '?'}
+                    <User style={{ width: 20, height: 20, color: '#fff' }} />
                   </div>
                 </button>
 
