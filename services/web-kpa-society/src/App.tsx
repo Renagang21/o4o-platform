@@ -49,6 +49,7 @@ import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchO
 
 // Platform Home (WO-KPA-HOME-FOUNDATION-V1)
 import { HomePage } from './pages/platform';
+import TestCenterPage from './pages/TestCenterPage';
 
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
@@ -81,6 +82,9 @@ function App() {
            * WO-KPA-HOME-FOUNDATION-V1: 실제 홈 페이지
            * ======================================== */}
           <Route path="/" element={<HomePage />} />
+
+          {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+          <Route path="/test-center" element={<TestCenterPage />} />
 
           {/* ========================================
            * 약사회 데모 서비스 (/demo 하위)

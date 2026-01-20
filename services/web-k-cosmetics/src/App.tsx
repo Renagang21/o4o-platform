@@ -31,6 +31,7 @@ import {
   AdminManualPage,
   OperatorManualPage,
 } from '@/pages/test-guide';
+import TestCenterPage from '@/pages/TestCenterPage';
 
 // Forum Pages
 import { ForumPage, PostDetailPage } from '@/pages/forum';
@@ -101,6 +102,9 @@ function AppRoutes() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
+
+        {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+        <Route path="test-center" element={<TestCenterPage />} />
 
         {/* Test Guide */}
         <Route path="test-guide" element={<TestGuidePage />} />

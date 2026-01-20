@@ -23,7 +23,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts';
-import { TestImprovementSection } from '../components/home/TestImprovementSection';
 
 // ========================================
 // Types
@@ -714,6 +713,64 @@ function CTASection() {
   );
 }
 
+// WO-TEST-CENTER-SEPARATION-V1: 테스트 센터 링크 배너
+function TestCenterBanner() {
+  return (
+    <section style={{ padding: '32px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{
+        backgroundColor: '#fff',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        padding: '24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            backgroundColor: '#fce4ec',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+          }}>🧪</div>
+          <div>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', margin: 0 }}>
+              서비스 테스트 & 개선 참여
+            </h3>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: '4px 0 0' }}>
+              테스트 의견, 서비스 업데이트 확인, 피드백 작성을 한곳에서
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/test-center"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 20px',
+            backgroundColor: '#e91e63',
+            color: '#fff',
+            fontWeight: 500,
+            borderRadius: '12px',
+            textDecoration: 'none',
+            fontSize: '14px',
+          }}
+        >
+          테스트 센터
+          <span>→</span>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 // ========================================
 // Main Component
 // ========================================
@@ -739,14 +796,8 @@ export function HomePage() {
       {/* 5. 협력 브랜드 신뢰 Zone */}
       <PartnerTrustSection />
 
-      {/* 서비스 테스트 & 개선 참여 (WO-TEST-HOMEPAGE-SECTION-V1) */}
-      <TestImprovementSection
-        config={{
-          serviceName: 'K-Cosmetics',
-          serviceDescription: '국내 화장품 브랜드를 한 곳에서 탐색하고 구매할 수 있는 뷰티 커머스 플랫폼',
-          primaryColor: '#e91e63',
-        }}
-      />
+      {/* 테스트 센터 바로가기 (WO-TEST-CENTER-SEPARATION-V1) */}
+      <TestCenterBanner />
     </div>
   );
 }

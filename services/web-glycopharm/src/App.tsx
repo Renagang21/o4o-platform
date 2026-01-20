@@ -106,6 +106,7 @@ import {
   ConsumerManualPage,
   OperatorManualPage,
 } from '@/pages/test-guide';
+import TestCenterPage from '@/pages/TestCenterPage';
 
 // Partner Dashboard Pages
 import PartnerIndex from '@/pages/partner/index';
@@ -159,6 +160,9 @@ function AppRoutes() {
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
+
+        {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+        <Route path="test-center" element={<TestCenterPage />} />
 
         {/* Test Guide */}
         <Route path="test-guide" element={<TestGuidePage />} />

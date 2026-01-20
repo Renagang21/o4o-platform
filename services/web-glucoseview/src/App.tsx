@@ -17,6 +17,7 @@ import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import OperatorAiReportPage from './pages/operator/AiReportPage';
 import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
+import TestCenterPage from './pages/TestCenterPage';
 
 // Partner Dashboard
 import PartnerLayout from './components/layouts/PartnerLayout';
@@ -122,6 +123,9 @@ function AppRoutes() {
       <Route path="/operator/glucoseview/applications/:id" element={<OperatorApplicationDetailPage />} />
       {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
       <Route path="/operator/glucoseview/ai-report" element={<OperatorAiReportPage />} />
+
+      {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+      <Route path="/test-center" element={<TestCenterPage />} />
 
       {/* Test Guide */}
       <Route path="/test-guide" element={<TestGuidePage />} />

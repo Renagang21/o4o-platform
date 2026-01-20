@@ -60,6 +60,7 @@ import {
 } from './pages/channel';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
+import TestCenterPage from './pages/TestCenterPage';
 
 // Test Guide Pages (always loaded - lightweight)
 import {
@@ -228,6 +229,9 @@ function App() {
               <Route path="/channel/medical" element={<MedicalChannelExplanationPage />} />
               <Route path="/content" element={<ContentListPage />} />
               <Route path="/content/:id" element={<ContentDetailPage />} />
+
+              {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+              <Route path="/test-center" element={<TestCenterPage />} />
 
               {/* Test Guide */}
               <Route path="/test-guide" element={<TestGuidePage />} />

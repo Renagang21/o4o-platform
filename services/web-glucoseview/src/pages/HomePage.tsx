@@ -430,6 +430,33 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* Test Center Banner (WO-TEST-CENTER-SEPARATION-V1) */}
+      <section className="py-8 px-6 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-2xl flex-shrink-0">
+                🧪
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-800">
+                  서비스 테스트 & 개선 참여
+                </h3>
+                <p className="text-sm text-slate-500">
+                  테스트 의견, 서비스 업데이트 확인, 피드백 작성을 한곳에서
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/test-center"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors"
+            >
+              테스트 센터 →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer note - 확장된 간격 */}
       <section className="py-12 px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto">
