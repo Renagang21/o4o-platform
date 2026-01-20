@@ -13,7 +13,7 @@
  * - Kill Switch 지원
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { SiteGuideService, ValidationResult } from './siteguide.service.js';
 import {
@@ -27,6 +27,63 @@ import logger from '../../utils/logger.js';
 
 // Gemini API Key (환경변수에서 가져옴)
 const GEMINI_API_KEY = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY || '';
+
+// SiteGuide Admin Key (환경변수에서 가져옴)
+// WO-SITEGUIDE-ADMIN-AUTH-GUARD-V1
+const SITEGUIDE_ADMIN_KEY = process.env.SITEGUIDE_ADMIN_KEY || '';
+
+/**
+ * Admin 인증 미들웨어
+ * WO-SITEGUIDE-ADMIN-AUTH-GUARD-V1
+ *
+ * X-SITEGUIDE-ADMIN-KEY 헤더로 인증
+ * 키 값은 절대 로그에 출력하지 않음
+ */
+function requireAdminAuth(req: Request, res: Response, next: NextFunction): void {
+  const adminKey = req.headers['x-siteguide-admin-key'] as string;
+
+  // 환경변수 미설정 시 서비스 불가
+  if (!SITEGUIDE_ADMIN_KEY) {
+    logger.error('[SiteGuide Admin] SITEGUIDE_ADMIN_KEY not configured');
+    res.status(503).json({
+      success: false,
+      error: 'Admin service not configured',
+      errorCode: 'ADMIN_NOT_CONFIGURED',
+    });
+    return;
+  }
+
+  // 키 누락
+  if (!adminKey) {
+    logger.warn('[SiteGuide Admin] Missing admin key', {
+      path: req.path,
+      ip: req.ip,
+    });
+    res.status(401).json({
+      success: false,
+      error: 'Admin authentication required',
+      errorCode: 'ADMIN_AUTH_REQUIRED',
+    });
+    return;
+  }
+
+  // 키 불일치 (키 값은 로그에 절대 출력하지 않음)
+  if (adminKey !== SITEGUIDE_ADMIN_KEY) {
+    logger.warn('[SiteGuide Admin] Invalid admin key', {
+      path: req.path,
+      ip: req.ip,
+    });
+    res.status(403).json({
+      success: false,
+      error: 'Invalid admin key',
+      errorCode: 'ADMIN_AUTH_FAILED',
+    });
+    return;
+  }
+
+  // 인증 성공
+  next();
+}
 
 interface SiteGuideQueryRequest {
   question: string;
@@ -275,15 +332,15 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
   });
 
   // ============================================================================
-  // Admin Endpoints (내부 관리용 - 추후 인증 추가 필요)
+  // Admin Endpoints (내부 관리용)
+  // WO-SITEGUIDE-ADMIN-AUTH-GUARD-V1: X-SITEGUIDE-ADMIN-KEY 헤더 인증 적용
   // ============================================================================
 
   /**
    * POST /api/siteguide/admin/kill-switch
    * 전역 Kill Switch 제어
    */
-  router.post('/admin/kill-switch', (req: Request, res: Response) => {
-    // TODO: 관리자 인증 추가 필요
+  router.post('/admin/kill-switch', requireAdminAuth, (req: Request, res: Response) => {
     const { enabled } = req.body;
 
     if (enabled === true) {
@@ -302,8 +359,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
    * POST /api/siteguide/admin/business
    * Business 생성
    */
-  router.post('/admin/business', async (req: Request, res: Response) => {
-    // TODO: 관리자 인증 추가 필요
+  router.post('/admin/business', requireAdminAuth, async (req: Request, res: Response) => {
     try {
       const { name, allowedDomains, dailyLimit, email, notes } = req.body;
 
@@ -339,8 +395,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
    * POST /api/siteguide/admin/business/:businessId/api-key
    * API Key 발급
    */
-  router.post('/admin/business/:businessId/api-key', async (req: Request, res: Response) => {
-    // TODO: 관리자 인증 추가 필요
+  router.post('/admin/business/:businessId/api-key', requireAdminAuth, async (req: Request, res: Response) => {
     try {
       const { businessId } = req.params;
       const { label } = req.body;
@@ -368,8 +423,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
    * PATCH /api/siteguide/admin/business/:businessId/status
    * Business 상태 변경
    */
-  router.patch('/admin/business/:businessId/status', async (req: Request, res: Response) => {
-    // TODO: 관리자 인증 추가 필요
+  router.patch('/admin/business/:businessId/status', requireAdminAuth, async (req: Request, res: Response) => {
     try {
       const { businessId } = req.params;
       const { status } = req.body;
@@ -400,8 +454,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
    * PATCH /api/siteguide/admin/api-key/:apiKeyId/status
    * API Key 상태 변경
    */
-  router.patch('/admin/api-key/:apiKeyId/status', async (req: Request, res: Response) => {
-    // TODO: 관리자 인증 추가 필요
+  router.patch('/admin/api-key/:apiKeyId/status', requireAdminAuth, async (req: Request, res: Response) => {
     try {
       const { apiKeyId } = req.params;
       const { status } = req.body;
@@ -432,8 +485,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
    * GET /api/siteguide/admin/businesses
    * Business 목록 조회
    */
-  router.get('/admin/businesses', async (_req: Request, res: Response) => {
-    // TODO: 관리자 인증 추가 필요
+  router.get('/admin/businesses', requireAdminAuth, async (_req: Request, res: Response) => {
     try {
       const businesses = await service.listBusinesses();
       return res.json({
