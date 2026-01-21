@@ -17,7 +17,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Store, Package, Users, Monitor, MessageSquare, GraduationCap } from 'lucide-react';
+import { Store, Package, Users, Monitor, MessageSquare, GraduationCap, ExternalLink } from 'lucide-react';
 
 export default function O4OMainPage() {
   return (
@@ -39,6 +39,9 @@ export default function O4OMainPage() {
 
       {/* 예제 서비스 */}
       <ExamplesSection />
+
+      {/* 사이트 연결 서비스 */}
+      <SiteServicesSection />
     </div>
   );
 }
@@ -246,6 +249,44 @@ function ExamplesSection() {
             전체 예제 보기
           </Link>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function SiteServicesSection() {
+  return (
+    <section className="py-16 bg-slate-50">
+      <div className="max-w-4xl mx-auto px-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
+          기존 사이트에 연결해 활용할 수 있는 서비스
+        </h2>
+        <p className="text-gray-600 text-center mb-6 text-sm leading-relaxed">
+          새 홈페이지를 만드는 서비스가 아닙니다.
+          <br />
+          Cafe24, SaaS 등으로 만든 기존 사이트에
+          <br />
+          배너·버튼·링크 형태로 연결하여 바로 활용할 수 있습니다.
+        </p>
+        <div className="flex justify-center">
+          <a
+            href="https://siteguide.co.kr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group p-6 bg-white rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all max-w-sm w-full"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-900">SiteGuide</h3>
+              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-primary-500 transition-colors" />
+            </div>
+            <p className="text-gray-600 text-sm">
+              방문자 질문에 사이트가 직접 답하는 AI 기반 안내 서비스
+            </p>
+          </a>
+        </div>
+        <p className="text-gray-400 text-center mt-6 text-xs">
+          기존 사이트를 그대로 두고, 필요한 기능만 추가합니다.
+        </p>
       </div>
     </section>
   );
