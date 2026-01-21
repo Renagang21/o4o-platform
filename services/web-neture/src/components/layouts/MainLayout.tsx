@@ -33,8 +33,9 @@ export default function MainLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="text-2xl font-bold text-slate-800">
-              o4o
+            <Link to="/" className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-slate-800">o4o</span>
+              <span className="text-xs text-slate-500 hidden sm:inline">(online for offline)</span>
             </Link>
 
             {/* Navigation */}
