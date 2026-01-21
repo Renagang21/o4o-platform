@@ -29,6 +29,9 @@ export function LoginPage() {
   // returnUrl이 있으면 로그인 후 해당 URL로 이동
   const returnUrl = searchParams.get('returnUrl');
 
+  // dev=true 파라미터가 있을 때만 테스트 계정 표시 (내부 개발/테스트용)
+  const showTestAccounts = searchParams.get('dev') === 'true';
+
   // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
   const fillTestAccount = (account: { email: string; password: string }) => {
     setEmail(account.email);
@@ -129,26 +132,28 @@ export function LoginPage() {
           <Link to="/" style={styles.link}>홈으로 돌아가기</Link>
         </div>
 
-        {/* 테스트 계정 */}
-        <div style={styles.testSection}>
-          <p style={styles.testLabel}>테스트 계정 (클릭 시 입력됨)</p>
-          <div style={styles.testAccounts}>
-            {testAccounts.map((account) => (
-              <button
-                key={account.email}
-                type="button"
-                onClick={() => fillTestAccount(account)}
-                style={styles.testAccountButton}
-              >
-                <div style={styles.testAccountInfo}>
-                  <span style={styles.testAccountBadge}>{account.label}</span>
-                  <p style={styles.testAccountEmail}>{account.email}</p>
-                </div>
-                <span style={styles.testAccountClick}>클릭하여 입력</span>
-              </button>
-            ))}
+        {/* 테스트 계정 - dev=true 파라미터가 있을 때만 표시 */}
+        {showTestAccounts && (
+          <div style={styles.testSection}>
+            <p style={styles.testLabel}>테스트 계정 (클릭 시 입력됨)</p>
+            <div style={styles.testAccounts}>
+              {testAccounts.map((account) => (
+                <button
+                  key={account.email}
+                  type="button"
+                  onClick={() => fillTestAccount(account)}
+                  style={styles.testAccountButton}
+                >
+                  <div style={styles.testAccountInfo}>
+                    <span style={styles.testAccountBadge}>{account.label}</span>
+                    <p style={styles.testAccountEmail}>{account.email}</p>
+                  </div>
+                  <span style={styles.testAccountClick}>클릭하여 입력</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         </div>
       </div>
     </div>
