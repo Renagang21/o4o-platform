@@ -1,11 +1,12 @@
 /**
- * ClinicTargetPage - 병원/의원 네트워크 대상 사업자 안내
+ * ClinicTargetPage - 의료기관 네트워크 대상 사업자 안내
  *
- * 관점: 병원/의원을 대상으로 비즈니스하는 사업자 (공급자, 본부, 파트너)
+ * 관점: 의료기관을 대상으로 비즈니스하는 사업자 (본부, 파트너)
+ * 참고: 의료기관은 제품을 취급하지 않으므로 무재고 상품 공급 제외
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
+import { ArrowLeft, Monitor, Tablet, Tv, GraduationCap, Building2, Megaphone } from 'lucide-react';
 
 export default function ClinicTargetPage() {
   return (
@@ -14,11 +15,11 @@ export default function ClinicTargetPage() {
       <div className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-primary-400 text-sm font-medium mb-3">
-            O4O Platform · 대상 매장 업종
+            O4O Platform · 대상 업종
           </p>
-          <h1 className="text-3xl font-bold mb-4">병원 / 의원 네트워크</h1>
+          <h1 className="text-3xl font-bold mb-4">의료기관 네트워크</h1>
           <p className="text-slate-300 leading-relaxed">
-            건강관리 상품을 취급하는 병원·의원 네트워크를 대상으로
+            병원·의원 네트워크를 대상으로
             <br />
             비즈니스하는 사업자를 위한 플랫폼
           </p>
@@ -28,24 +29,13 @@ export default function ClinicTargetPage() {
       {/* 대상 사업자 */}
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">
-          병원/의원 네트워크를 대상으로 비즈니스하는 사업자
+          의료기관 네트워크를 대상으로 비즈니스하는 사업자
         </h2>
         <p className="text-gray-500 text-sm text-center mb-8">
-          o4o를 통해 병원/의원 채널을 확보하고 비즈니스를 확장합니다
+          o4o를 통해 의료기관 채널을 확보하고 비즈니스를 확장합니다
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center">
-            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-4 border border-slate-200">
-              <Truck className="w-6 h-6 text-slate-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">공급자</h3>
-            <p className="text-gray-600 text-sm">
-              건강관리 상품 공급사가
-              <br />
-              병원/의원 판매 채널을 확보합니다
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center">
             <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-4 border border-slate-200">
               <Building2 className="w-6 h-6 text-slate-600" />
@@ -63,7 +53,7 @@ export default function ClinicTargetPage() {
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">마케팅 파트너</h3>
             <p className="text-gray-600 text-sm">
-              병원/의원 대상 마케팅·콘텐츠
+              의료기관 대상 마케팅·콘텐츠
               <br />
               서비스를 제공합니다
             </p>
@@ -72,10 +62,10 @@ export default function ClinicTargetPage() {
 
         {/* 제공 가능한 채널 */}
         <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">
-          병원/의원에 제공할 수 있는 채널
+          의료기관에 제공할 수 있는 채널
         </h2>
         <p className="text-gray-500 text-sm text-center mb-8">
-          사업자가 병원/의원 네트워크에 제공하는 채널 환경
+          사업자가 의료기관 네트워크에 제공하는 채널 환경
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -138,26 +128,12 @@ export default function ClinicTargetPage() {
               의료진과 환자에게 전달합니다.
             </p>
           </div>
-
-          {/* 무재고 상품 공급 */}
-          <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200">
-                <Package className="w-5 h-5 text-slate-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900">무재고 상품 공급</h3>
-            </div>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              병원/의원이 재고 부담 없이 건강관리 상품을 판매합니다. 주문 시 공급사에서 직접 배송합니다.
-              공급자는 병원/의원 네트워크를 판매 채널로 활용하고, 병원/의원은 추가 수익을 얻습니다.
-            </p>
-          </div>
         </div>
 
         {/* 핵심 가치 */}
         <div className="bg-primary-50 rounded-xl p-8 border border-primary-200 text-center">
           <p className="text-primary-800 leading-relaxed">
-            <strong>병원/의원 네트워크를 대상으로 비즈니스하는 사업자</strong>가
+            <strong>의료기관 네트워크를 대상으로 비즈니스하는 사업자</strong>가
             <br />
             o4o를 통해 채널을 확보하고 비즈니스를 확장합니다.
           </p>

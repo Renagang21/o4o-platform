@@ -9,7 +9,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Store, Package, Monitor, MessageSquare, GraduationCap, ExternalLink, Building2, Truck, Megaphone } from 'lucide-react';
+import { Store, Package, Monitor, MessageSquare, GraduationCap, ExternalLink, Building2, Truck, Megaphone, Globe } from 'lucide-react';
 
 export default function O4OMainPage() {
   return (
@@ -71,14 +71,14 @@ function HeroSection() {
 function CoreValueSection() {
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
           o4o가 제공하는 가치
         </h2>
         <p className="text-gray-600 text-center mb-10 text-sm">
-          공급자·본부·파트너가 매장 채널을 통해 비즈니스를 확장합니다
+          공급자·본부·파트너·사이트 운영자가 비즈니스를 확장합니다
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
             <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Truck className="w-6 h-6 text-slate-700" />
@@ -112,6 +112,17 @@ function CoreValueSection() {
               제공합니다
             </p>
           </div>
+          <div className="text-center">
+            <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Globe className="w-6 h-6 text-slate-700" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">사이트 운영자</h3>
+            <p className="text-gray-600 text-sm">
+              기존 사이트에 AI 기반 서비스를
+              <br />
+              연결하여 활용합니다
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -121,7 +132,7 @@ function CoreValueSection() {
 function TargetBusinessSection() {
   const storeTypes = [
     { name: '약국', desc: '건강기능식품, 의약외품', path: '/o4o/targets/pharmacy' },
-    { name: '병원/의원', desc: '건강관리 상품', path: '/o4o/targets/clinic' },
+    { name: '의료기관', desc: '서비스 향상', path: '/o4o/targets/clinic' },
     { name: '미용실', desc: '화장품, 미용용품', path: '/o4o/targets/salon' },
     { name: '안경원', desc: '안경, 렌즈 관련', path: '/o4o/targets/optical' },
   ];
