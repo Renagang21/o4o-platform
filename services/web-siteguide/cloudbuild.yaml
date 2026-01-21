@@ -1,0 +1,6 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/netureyoutube/siteguide-web:latest', '-f', 'services/web-siteguide/Dockerfile', '.']
+images:
+  - 'gcr.io/netureyoutube/siteguide-web:latest'
+timeout: '1200s'

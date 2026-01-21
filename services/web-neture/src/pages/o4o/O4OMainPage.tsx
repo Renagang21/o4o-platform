@@ -116,10 +116,10 @@ function WhyO4OSection() {
 
 function TargetBusinessSection() {
   const targets = [
-    { name: '약국', desc: '건강기능식품, 의약외품' },
-    { name: '병원/의원', desc: '건강관리 상품' },
-    { name: '미용실', desc: '화장품, 미용용품' },
-    { name: '안경원', desc: '안경, 렌즈 관련' },
+    { name: '약국', desc: '건강기능식품, 의약외품', path: '/o4o/targets/pharmacy' },
+    { name: '병원/의원', desc: '건강관리 상품', path: '/o4o/targets/clinic' },
+    { name: '미용실', desc: '화장품, 미용용품', path: '/o4o/targets/salon' },
+    { name: '안경원', desc: '안경, 렌즈 관련', path: '/o4o/targets/optical' },
   ];
 
   return (
@@ -130,14 +130,21 @@ function TargetBusinessSection() {
         </h2>
         <div className="flex flex-wrap justify-center gap-4">
           {targets.map((t) => (
-            <div
+            <Link
               key={t.name}
-              className="px-6 py-3 bg-white rounded-lg border border-gray-200"
+              to={t.path}
+              className="px-6 py-3 bg-white rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
             >
               <span className="font-medium text-gray-900">{t.name}</span>
               <span className="text-gray-500 text-sm ml-2">{t.desc}</span>
-            </div>
+            </Link>
           ))}
+          <Link
+            to="/o4o/site-operator"
+            className="px-6 py-3 bg-white rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors"
+          >
+            <span className="font-medium text-gray-900">사이트 운영자</span>
+          </Link>
           <Link
             to="/o4o/other-targets"
             className="px-6 py-3 bg-primary-50 rounded-lg border border-primary-200 hover:bg-primary-100 transition-colors"

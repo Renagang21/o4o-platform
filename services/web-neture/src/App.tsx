@@ -55,6 +55,13 @@ import {
 // o4o Public Site Pages (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1)
 import O4OMainPage from './pages/o4o/O4OMainPage';
 import OtherTargetsPage from './pages/o4o/OtherTargetsPage';
+import SiteOperatorPage from './pages/o4o/SiteOperatorPage';
+import {
+  PharmacyTargetPage,
+  ClinicTargetPage,
+  SalonTargetPage,
+  OpticalTargetPage,
+} from './pages/o4o/targets';
 import ConceptsPage from './pages/manual/concepts/ConceptsPage';
 import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
 import ExamplesPage from './pages/examples/ExamplesPage';
@@ -228,6 +235,11 @@ function App() {
               <Route path="/" element={<O4OMainPage />} />
               <Route path="/o4o" element={<O4OIntroPage />} />
               <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
+              <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
+              <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
+              <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />
+              <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
+              <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
               <Route path="/manual/concepts" element={<ConceptsPage />} />
               <Route path="/manual/concepts/channel-map" element={<ChannelMapPage />} />
               <Route path="/examples" element={<ExamplesPage />} />
