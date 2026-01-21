@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Home } from 'lucide-react';
 import { useAuth, ROLE_DASHBOARDS } from '../contexts';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
@@ -63,11 +64,26 @@ export function LoginPage() {
 
   // 로그인 폼
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.logo}>🌿</div>
-        <h1 style={styles.title}>로그인</h1>
-        <p style={styles.subtitle}>Neture 판매자 지원 서비스에 오신 것을 환영합니다</p>
+    <div style={styles.page}>
+      {/* 헤더 */}
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <Link to="/supplier-ops" style={styles.headerLogo}>
+            <span style={styles.headerLogoText}>Neture</span>
+            <span style={styles.headerLogoSub}>공급자 연결</span>
+          </Link>
+          <Link to="/" style={styles.headerHomeLink}>
+            <Home size={14} />
+            <span>메인</span>
+          </Link>
+        </div>
+      </header>
+
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.logo}>🌿</div>
+          <h1 style={styles.title}>로그인</h1>
+          <p style={styles.subtitle}>Neture 공급자 연결 서비스에 오신 것을 환영합니다</p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {error && <div style={styles.error}>{error}</div>}
@@ -133,6 +149,7 @@ export function LoginPage() {
             ))}
           </div>
         </div>
+        </div>
       </div>
     </div>
   );
@@ -143,8 +160,51 @@ export function LoginPage() {
  * CSS 변수 대신 직접 색상값 사용
  */
 const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: '100vh',
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e2e8f0',
+    padding: '0 24px',
+  },
+  headerContent: {
+    maxWidth: '1280px',
+    margin: '0 auto',
+    height: '64px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerLogo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    textDecoration: 'none',
+  },
+  headerLogoText: {
+    fontSize: '24px',
+    fontWeight: 700,
+    color: '#16a34a',
+  },
+  headerLogoSub: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#64748b',
+    borderLeft: '1px solid #cbd5e1',
+    paddingLeft: '8px',
+  },
+  headerHomeLink: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '12px',
+    color: '#94a3b8',
+    textDecoration: 'none',
+  },
   container: {
-    minHeight: '80vh',
+    minHeight: 'calc(100vh - 64px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
