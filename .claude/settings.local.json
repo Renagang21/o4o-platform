@@ -490,7 +490,9 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run list -R Renagang21/o4o-platform --limit 3)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 21031078868 -R Renagang21/o4o-platform --log-failed)",
       "Bash(git merge-base:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:*)",
+      "Bash(1 <<'EOF'\nsteps:\n  - name: 'gcr.io/cloud-builders/docker'\n    args: ['build', '-t', 'gcr.io/netureyoutube/siteguide-web:latest', '-f', 'services/web-siteguide/Dockerfile', '.']\nimages:\n  - 'gcr.io/netureyoutube/siteguide-web:latest'\nEOF)"
     ],
     "deny": []
   }

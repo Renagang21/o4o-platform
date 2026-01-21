@@ -1,13 +1,14 @@
 /**
  * SiteOperatorPage - 사이트 운영자 대상 안내
  *
- * 목적:
- * - Cafe24, SaaS 등으로 사이트를 운영하는 사업자 대상 안내
- * - SiteGuide 서비스 소개
+ * 관점:
+ * - 매장 네트워크를 대상으로 비즈니스하는 사업자 중
+ * - 이미 Cafe24, SaaS 등으로 사이트를 운영하고 있는 경우
+ * - 기존 사이트에 연결하여 활용할 수 있는 서비스 안내
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Globe, MessageCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Globe, MessageCircle, Sparkles, Truck, Building2, Megaphone } from 'lucide-react';
 
 export default function SiteOperatorPage() {
   return (
@@ -16,19 +17,47 @@ export default function SiteOperatorPage() {
       <div className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-primary-400 text-sm font-medium mb-3">
-            O4O Platform
+            O4O Platform · 기존 사이트 연결
           </p>
           <h1 className="text-3xl font-bold mb-4">사이트 운영자</h1>
           <p className="text-slate-300 leading-relaxed max-w-2xl mx-auto">
-            Cafe24, SaaS 등으로 이미 사이트를 운영하고 있는 사업자를 위한 서비스입니다.
+            매장 네트워크 대상 비즈니스를 위해
             <br />
-            기존 사이트를 그대로 두고, 필요한 기능만 연결하여 사용할 수 있습니다.
+            <strong className="text-white">이미 사이트를 운영하고 있는 사업자</strong>를 위한 서비스입니다.
+            <br />
+            기존 사이트에 연결하여 바로 활용할 수 있습니다.
           </p>
         </div>
       </div>
 
-      {/* 핵심 안내 */}
+      {/* 대상 사업자 */}
       <div className="max-w-4xl mx-auto px-4 py-12">
+        <h2 className="text-lg font-bold text-gray-900 mb-2 text-center">
+          이런 사업자가 활용합니다
+        </h2>
+        <p className="text-gray-500 text-sm text-center mb-6">
+          Cafe24, 아임웹, 기타 SaaS로 사이트를 이미 운영 중인 경우
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center">
+            <Truck className="w-6 h-6 text-slate-600 mx-auto mb-2" />
+            <p className="text-sm text-gray-700 font-medium">공급자</p>
+            <p className="text-xs text-gray-500 mt-1">매장 대상 상품 공급 사이트</p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center">
+            <Building2 className="w-6 h-6 text-slate-600 mx-auto mb-2" />
+            <p className="text-sm text-gray-700 font-medium">본부</p>
+            <p className="text-xs text-gray-500 mt-1">프랜차이즈 가맹점 지원 사이트</p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center">
+            <Megaphone className="w-6 h-6 text-slate-600 mx-auto mb-2" />
+            <p className="text-sm text-gray-700 font-medium">마케팅 파트너</p>
+            <p className="text-xs text-gray-500 mt-1">매장 대상 서비스 사이트</p>
+          </div>
+        </div>
+
+        {/* 핵심 안내 */}
         <div className="bg-slate-50 rounded-xl p-8 border border-slate-200 text-center mb-12">
           <p className="text-slate-700 leading-relaxed">
             새 홈페이지를 만들 필요가 없습니다.
@@ -42,7 +71,7 @@ export default function SiteOperatorPage() {
         {/* SiteGuide 소개 */}
         <div className="mb-12">
           <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
-            활용 가능한 서비스
+            기존 사이트에 연결할 수 있는 서비스
           </h2>
 
           <a
@@ -114,11 +143,11 @@ export default function SiteOperatorPage() {
       {/* Navigation */}
       <div className="max-w-4xl mx-auto px-4 py-8 border-t border-slate-200">
         <Link
-          to="/"
+          to="/o4o"
           className="inline-flex items-center text-slate-500 hover:text-slate-700 text-sm"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
-          메인으로
+          o4o 메인으로
         </Link>
       </div>
     </div>
