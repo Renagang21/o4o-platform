@@ -135,6 +135,12 @@ function TargetBusinessSection() {
               <span className="text-gray-500 text-sm ml-2">{t.desc}</span>
             </div>
           ))}
+          <Link
+            to="/o4o/other-targets"
+            className="px-6 py-3 bg-primary-50 rounded-lg border border-primary-200 hover:bg-primary-100 transition-colors"
+          >
+            <span className="font-medium text-primary-700">기타 대상 사업자</span>
+          </Link>
         </div>
       </div>
     </section>
@@ -143,11 +149,11 @@ function TargetBusinessSection() {
 
 function ChannelConceptSection() {
   const channels = [
-    { icon: Monitor, name: '온라인', desc: '웹/앱 판매' },
-    { icon: Store, name: '오프라인', desc: '매장 판매' },
-    { icon: Monitor, name: '사이니지', desc: '디지털 안내' },
-    { icon: MessageSquare, name: '포럼', desc: '커뮤니티' },
-    { icon: GraduationCap, name: 'LMS', desc: '교육' },
+    { icon: Monitor, name: '온라인', desc: '웹/앱을 통한 판매 채널' },
+    { icon: Store, name: '오프라인', desc: '웹/앱/키오스크/태블릿 기본 제공' },
+    { icon: Monitor, name: '사이니지', desc: '디지털 화면을 통한 안내 채널' },
+    { icon: MessageSquare, name: '포럼', desc: '커뮤니티 기반 소통 채널' },
+    { icon: GraduationCap, name: 'LMS', desc: '교육 콘텐츠 제공 채널' },
   ];
 
   return (

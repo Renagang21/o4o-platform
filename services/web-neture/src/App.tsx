@@ -54,6 +54,7 @@ import {
 
 // o4o Public Site Pages (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1)
 import O4OMainPage from './pages/o4o/O4OMainPage';
+import OtherTargetsPage from './pages/o4o/OtherTargetsPage';
 import ConceptsPage from './pages/manual/concepts/ConceptsPage';
 import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
 import ExamplesPage from './pages/examples/ExamplesPage';
@@ -226,6 +227,7 @@ function App() {
               {/* o4o 메인 (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1) */}
               <Route path="/" element={<O4OMainPage />} />
               <Route path="/o4o" element={<O4OIntroPage />} />
+              <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
               <Route path="/manual/concepts" element={<ConceptsPage />} />
               <Route path="/manual/concepts/channel-map" element={<ChannelMapPage />} />
               <Route path="/examples" element={<ExamplesPage />} />
