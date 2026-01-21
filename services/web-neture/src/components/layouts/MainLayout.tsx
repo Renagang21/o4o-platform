@@ -60,26 +60,6 @@ export default function MainLayout() {
               >
                 플랫폼 소개
               </Link>
-              <Link
-                to="/channel/structure"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/channel')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                채널
-              </Link>
-              <Link
-                to="/seller/overview"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/seller')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                판매자 안내
-              </Link>
               <span className="text-gray-300">|</span>
               <Link
                 to="/supplier-ops"
