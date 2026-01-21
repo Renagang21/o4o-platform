@@ -493,7 +493,8 @@
       "Bash(npx eslint:*)",
       "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:*)",
       "Bash(1 <<'EOF'\nsteps:\n  - name: 'gcr.io/cloud-builders/docker'\n    args: ['build', '-t', 'gcr.io/netureyoutube/siteguide-web:latest', '-f', 'services/web-siteguide/Dockerfile', '.']\nimages:\n  - 'gcr.io/netureyoutube/siteguide-web:latest'\nEOF)",
-      "Bash(targeting store networks\" \\(suppliers, headquarters, partners\\)\n- Update O4OMainPage hero and value sections\n- Refactor all target pages \\(pharmacy, clinic, salon, optical\\)\n  with new business-focused structure\n- Add \"무재고 상품 공급\" channel to all target pages\n- Update OtherTargetsPage with expanded network types\n- Update SiteOperatorPage for existing site operators\n- Fix navigation links to /o4o instead of /\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(targeting store networks\" \\(suppliers, headquarters, partners\\)\n- Update O4OMainPage hero and value sections\n- Refactor all target pages \\(pharmacy, clinic, salon, optical\\)\n  with new business-focused structure\n- Add \"무재고 상품 공급\" channel to all target pages\n- Update OtherTargetsPage with expanded network types\n- Update SiteOperatorPage for existing site operators\n- Fix navigation links to /o4o instead of /\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(공급자 연결\"\n- Add home icon link to navigate back to main site\n- Improve visual hierarchy with border separator\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": []
   }

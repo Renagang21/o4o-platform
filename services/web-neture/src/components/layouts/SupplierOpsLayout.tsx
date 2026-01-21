@@ -14,6 +14,7 @@
  */
 
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Home } from 'lucide-react';
 import AccountMenu from '../AccountMenu';
 
 export default function SupplierOpsLayout() {
@@ -31,12 +32,21 @@ export default function SupplierOpsLayout() {
           <div className="flex justify-between items-center h-16">
             {/* Logo - links to supplier-ops home */}
             <div className="flex items-center gap-4">
-              <Link to="/supplier-ops" className="text-2xl font-bold text-primary-600">
-                Neture
+              <Link to="/supplier-ops" className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-primary-600">Neture</span>
+                <span className="text-sm font-medium text-slate-500 border-l border-slate-300 pl-2">
+                  공급자 연결
+                </span>
               </Link>
-              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
-                Supplier Ops
-              </span>
+              {/* 메인 사이트 링크 */}
+              <Link
+                to="/"
+                className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary-500 transition-colors ml-2"
+                title="메인 사이트로 이동"
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span>메인</span>
+              </Link>
             </div>
 
             {/* Navigation */}
