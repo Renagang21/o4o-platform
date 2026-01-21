@@ -53,12 +53,12 @@ function HeroSection() {
         <h1 style={styles.heroTitle}>
           오프라인 사업자가
           <br />
-          스스로 비즈니스를 운영할 수 있는 구조
+          스스로 비즈니스를 운영합니다
         </h1>
         <p style={styles.heroSubtitle}>
           o4o는 사업을 대신하지 않습니다.
           <br />
-          대신, 구조를 제공합니다.
+          사업자가 직접 운영합니다.
         </p>
         <p style={styles.heroSmallNote}>
           네뚜레는 o4o 플랫폼 위에서 운영되는 서비스 중 하나입니다.
@@ -107,8 +107,6 @@ function SectionA() {
         </h2>
         <p style={styles.sectionSubtitle}>
           운영의 주도권은 사업자에게 있습니다.
-          <br />
-          o4o는 실행 구조만 제공합니다.
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
@@ -164,9 +162,7 @@ function SectionSeller() {
           매장을 운영하는 판매자라면
         </h2>
         <p style={styles.sectionSubtitle}>
-          각 매장은 구조를 설계하는 주체가 아니라,
-          <br />
-          구조에 참여하여 실제 판매를 담당하는 주체입니다.
+          각 매장은 실제 판매를 담당합니다.
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
@@ -181,7 +177,7 @@ function SectionSeller() {
           ))}
         </div>
         <p style={styles.sellerNote}>
-          운영과 구조 설계는 운영 주체와 플랫폼이 담당합니다. 매장은 참여에 집중합니다.
+          매장은 참여에 집중합니다.
         </p>
       </div>
     </section>
@@ -212,8 +208,8 @@ function SectionChannel() {
     {
       icon: '🔄',
       title: 'B2B + B2C 동시',
-      description: '공급사→매장(B2B)과\n매장→소비자(B2C)가 하나의 구조 안에서 연결됩니다.',
-      smallNote: '중복 시스템 불필요',
+      description: '공급사에서 매장으로,\n매장에서 소비자로 연결됩니다.',
+      smallNote: '하나의 흐름',
       linkTo: '/channel/structure',
     },
   ];
@@ -227,9 +223,9 @@ function SectionChannel() {
           재고 없이 판매할 수 있다면
         </h2>
         <p style={styles.sectionSubtitle}>
-          디지털 채널은 플랫폼이 아니라 매장의 것입니다.
+          디지털 채널은 매장의 것입니다.
           <br />
-          무재고 구조로 부담 없이 참여할 수 있습니다.
+          부담 없이 참여할 수 있습니다.
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
@@ -265,12 +261,12 @@ function SectionB() {
     {
       icon: '🛡️',
       title: '리스크 분리',
-      description: '개별 사업의 실패는\n플랫폼 실패가 아닙니다.',
+      description: '개별 사업의 성패는\n다른 사업에 영향을 주지 않습니다.',
     },
     {
       icon: '🧱',
-      title: '구조 자산',
-      description: '사업은 바뀌어도\nCore 구조는 누적됩니다.',
+      title: '누적',
+      description: '사업은 바뀌어도\n경험은 누적됩니다.',
     },
   ];
 
@@ -280,12 +276,10 @@ function SectionB() {
         <h2 style={styles.sectionTitle}>
           하나의 사업이 아닌
           <br />
-          여러 사업이 생성되는 구조
+          여러 사업이 함께 성장합니다
         </h2>
         <p style={styles.sectionSubtitle}>
-          투자의 대상은 매장이 아니라
-          <br />
-          플랫폼 구조입니다.
+          각 사업은 독립적으로 운영됩니다.
         </p>
         <div style={styles.cardGrid2}>
           {cards.map((card, index) => (
@@ -336,9 +330,7 @@ function SectionC() {
           매장 기반 비즈니스를 설계할 수 있다면
         </h2>
         <p style={styles.sectionSubtitle}>
-          o4o는 실행이 아닌
-          <br />
-          구조 실험의 기반입니다.
+          o4o와 함께 새로운 시도를 할 수 있습니다.
         </p>
         <div style={styles.cardGrid3}>
           {cards.map((card, index) => (
@@ -363,10 +355,9 @@ function SectionC() {
  */
 function SectionD() {
   const weDo = [
-    '구조',
+    '도구',
     '기술',
     '연결',
-    '확장 기반',
   ];
 
   const weDont = [
@@ -419,14 +410,14 @@ function NextStepSection() {
         <p style={styles.nextStepMessage}>
           o4o는 모든 사업에 열려 있지 않습니다.
           <br />
-          구조에 공감하는 경우에만 다음 단계로 진행합니다.
+          공감하는 경우에만 다음 단계로 진행합니다.
         </p>
         <div style={styles.ctaGroup}>
           <Link to="/partners/apply" style={styles.ctaPrimary}>
             플랫폼 기반 사업 문의
           </Link>
           <Link to="/partners/apply" style={styles.ctaSecondary}>
-            o4o 구조 상담 요청
+            o4o 상담 요청
           </Link>
         </div>
         <p style={styles.nextStepSmallNote}>

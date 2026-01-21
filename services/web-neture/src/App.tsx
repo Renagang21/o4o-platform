@@ -1,47 +1,30 @@
 /**
- * Neture - 유통 정보 플랫폼
+ * Neture - o4o 플랫폼 기반 서비스
  *
  * Work Orders:
- * - WO-NETURE-EXTENSION-P1~P5: 표현 계층 (Read-Only Information)
- * - WO-NETURE-SUPPLIER-DASHBOARD-P0: 실행 계층 (Supplier Actions)
+ * - WO-SUPPLIER-OPS-ROUTE-REFACTOR-V1: /supplier-ops 기준 라우트 분리
  *
- * Phase: P0 (Read-Only + Supplier Execution)
+ * 구조:
+ * 1. o4o 공통 영역 (/, /o4o, /channel/*, /seller/overview/*, /partner/overview-info)
+ * 2. Neture 고유 기능 (/supplier-ops/*) - 공급자 중심 운영·연결 서비스
  *
  * HARD RULES:
- * - NO 주문/결제/정산 (P1 이후)
- * - NO 관리자 승인 (공급자만 승인 주체)
- * - NO 내부 메시지
- * - 일반 사용자/판매자: 읽기 전용 정보 플랫폼
- * - 공급자: 신청 승인/거절 실행 가능
- *
- * Neture 책임 선언:
- * - Neture는 공급자 통합 운영 대시보드
- * - 신청 생성은 각 서비스에서 처리
- * - 신청 승인/거절은 공급자가 Neture에서 처리
- *
- * Code Splitting:
- * - Heavy pages (Admin, Supplier, Operator) are lazy loaded
- * - Content Editor (TipTap) is lazy loaded
+ * - /supplier-ops는 공급자 중심 운영·연결 서비스
+ * - admin/operator는 /supplier-ops 전용
+ * - o4o 공통 영역에서는 공급자/파트너 운영 기능 노출 금지
  */
 
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts';
 import MainLayout from './components/layouts/MainLayout';
+import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
+import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 
-// Core pages (always loaded)
-import HomePage from './pages/HomePage';
+// ============================================================================
+// o4o 공통 페이지 (항상 로드)
+// ============================================================================
 import O4OIntroPage from './pages/O4OIntroPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { RegisterPendingPage } from './pages/RegisterPendingPage';
-import SupplierListPage from './pages/suppliers/SupplierListPage';
-import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
-import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
-import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
-import PartnersApplyPage from './pages/partners/PartnersApplyPage';
-import PartnerInfoPage from './pages/PartnerInfoPage';
-import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
 import SellerOverviewPage from './pages/SellerOverviewPage';
 import SellerQRGuidePage from './pages/SellerQRGuidePage';
 import {
@@ -58,25 +41,61 @@ import {
   MedicalChannelExplanationPage,
   ChannelSalesStructurePage,
 } from './pages/channel';
-import ContentListPage from './pages/content/ContentListPage';
-import ContentDetailPage from './pages/content/ContentDetailPage';
-import TestCenterPage from './pages/TestCenterPage';
 
-// Test Guide Pages (always loaded - lightweight)
+// Test Guide Pages (o4o 공통 - 다중 서비스)
 import {
   TestGuidePage,
-  SupplierManualPage,
-  PartnerManualPage,
-  AdminManualPage,
   ContentEditorManualPage,
-  NetureServiceManualPage,
   KCosmeticsServiceManualPage,
   GlycoPharmServiceManualPage,
   GlucoseViewServiceManualPage,
   KpaSocietyServiceManualPage,
 } from './pages/test-guide';
 
-// Forum Pages (always loaded)
+// o4o Public Site Pages (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1)
+import O4OMainPage from './pages/o4o/O4OMainPage';
+import ConceptsPage from './pages/manual/concepts/ConceptsPage';
+import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
+import ExamplesPage from './pages/examples/ExamplesPage';
+import PharmacyStorePage from './pages/examples/PharmacyStorePage';
+
+// Admin Vault Pages (WO-O4O-ADMIN-VAULT-ACCESS-V1)
+import {
+  VaultOverviewPage,
+  VaultDocsPage,
+  VaultArchitecturePage,
+  VaultNotesPage,
+} from './pages/admin-vault';
+
+// Test Center (다중 서비스)
+import TestCenterPage from './pages/TestCenterPage';
+
+// ============================================================================
+// Neture 고유 페이지 (/supplier-ops)
+// ============================================================================
+import HomePage from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { RegisterPendingPage } from './pages/RegisterPendingPage';
+import SupplierListPage from './pages/suppliers/SupplierListPage';
+import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
+import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
+import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
+import PartnersApplyPage from './pages/partners/PartnersApplyPage';
+import PartnerInfoPage from './pages/PartnerInfoPage';
+import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
+import ContentListPage from './pages/content/ContentListPage';
+import ContentDetailPage from './pages/content/ContentDetailPage';
+
+// Neture 전용 Test Guide
+import {
+  SupplierManualPage,
+  PartnerManualPage,
+  AdminManualPage,
+  NetureServiceManualPage,
+} from './pages/test-guide';
+
+// Forum Pages
 import { ForumPage } from './pages/forum/ForumPage';
 import { ForumWritePage } from './pages/forum/ForumWritePage';
 import { ForumPostPage } from './pages/forum/ForumPostPage';
@@ -186,124 +205,212 @@ function PageLoading() {
   );
 }
 
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Suspense fallback={<PageLoading />}>
           <Routes>
-            {/* Login & Register - outside MainLayout */}
+            {/* ================================================================
+                인증 페이지 (레이아웃 없음)
+            ================================================================ */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
 
+            {/* ================================================================
+                o4o 공통 영역 (MainLayout)
+            ================================================================ */}
             <Route element={<MainLayout />}>
-              <Route path="/" element={<HomePage />} />
-              {/* O4O Platform Introduction (WO-NETURE-O4O-INTRO-PAGE-IMPLEMENTATION-V1) */}
+              {/* o4o 메인 (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1) */}
+              <Route path="/" element={<O4OMainPage />} />
               <Route path="/o4o" element={<O4OIntroPage />} />
-              <Route path="/suppliers" element={<SupplierListPage />} />
-              <Route path="/suppliers/:slug" element={<SupplierDetailPage />} />
-              <Route path="/partners/requests" element={<PartnershipRequestListPage />} />
-              <Route path="/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
-              <Route path="/partners/apply" element={<PartnersApplyPage />} />
-              <Route path="/partners/info" element={<PartnerInfoPage />} />
-              {/* Platform Principles (WO-NETURE-PHARMA-LEGAL-JUDGMENT-V1) */}
-              <Route path="/platform/principles" element={<PlatformPrinciplesPage />} />
-              {/* Seller Overview (WO-NETURE-SELLER-OVERVIEW-PAGE-V1) */}
-              <Route path="/seller/overview" element={<SellerOverviewPage />} />
-              {/* Seller QR Guide (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track A) */}
-              <Route path="/seller/qr-guide" element={<SellerQRGuidePage />} />
-              {/* Seller Overview by Industry (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track B) */}
-              <Route path="/seller/overview/pharmacy" element={<SellerOverviewPharmacy />} />
-              <Route path="/seller/overview/beauty" element={<SellerOverviewBeauty />} />
-              <Route path="/seller/overview/market" element={<SellerOverviewMarket />} />
-              {/* Medical Overview (WO-NETURE-O4O-MEDICAL-OVERVIEW-V1) */}
-              <Route path="/seller/overview/medical" element={<MedicalOverviewPage />} />
-              {/* Partner Overview Info (WO-NETURE-O4O-SELLER-ENABLEMENT-MASTER-V1 > Track C) */}
-              <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
-              {/* Channel Explanation Pages */}
+              <Route path="/manual/concepts" element={<ConceptsPage />} />
+              <Route path="/manual/concepts/channel-map" element={<ChannelMapPage />} />
+              <Route path="/examples" element={<ExamplesPage />} />
+              <Route path="/examples/store/pharmacy" element={<PharmacyStorePage />} />
+
+              {/* 채널 구조 설명 (o4o 공통) */}
               <Route path="/channel/structure" element={<ChannelSalesStructurePage />} />
               <Route path="/channel/dental" element={<DentalChannelExplanationPage />} />
               <Route path="/channel/pharmacy" element={<PharmacyChannelExplanationPage />} />
               <Route path="/channel/optical" element={<OpticalChannelExplanationPage />} />
               <Route path="/channel/medical" element={<MedicalChannelExplanationPage />} />
-              <Route path="/content" element={<ContentListPage />} />
-              <Route path="/content/:id" element={<ContentDetailPage />} />
 
-              {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+              {/* 판매자 개요 (o4o 공통) */}
+              <Route path="/seller/overview" element={<SellerOverviewPage />} />
+              <Route path="/seller/overview/pharmacy" element={<SellerOverviewPharmacy />} />
+              <Route path="/seller/overview/beauty" element={<SellerOverviewBeauty />} />
+              <Route path="/seller/overview/market" element={<SellerOverviewMarket />} />
+              <Route path="/seller/overview/medical" element={<MedicalOverviewPage />} />
+              <Route path="/seller/qr-guide" element={<SellerQRGuidePage />} />
+
+              {/* 파트너 개요 (o4o 공통) */}
+              <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
+
+              {/* 테스트 센터 (다중 서비스) */}
               <Route path="/test-center" element={<TestCenterPage />} />
 
-              {/* Test Guide */}
+              {/* 테스트 가이드 (다중 서비스 - o4o 레벨) */}
               <Route path="/test-guide" element={<TestGuidePage />} />
-              <Route path="/test-guide/manual/supplier" element={<SupplierManualPage />} />
-              <Route path="/test-guide/manual/partner" element={<PartnerManualPage />} />
-              <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
               <Route path="/test-guide/manual/content-editor" element={<ContentEditorManualPage />} />
-              <Route path="/test-guide/service/neture" element={<NetureServiceManualPage />} />
               <Route path="/test-guide/service/k-cosmetics" element={<KCosmeticsServiceManualPage />} />
               <Route path="/test-guide/service/glycopharm" element={<GlycoPharmServiceManualPage />} />
               <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
               <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
-
-              {/* Forum (WO-NETURE-TEST-SECTIONS-V1) */}
-              <Route path="/forum" element={<ForumPage />} />
-              <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
-              <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
-              <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />
-              <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
-              <Route path="/forum/service-update/new" element={<ForumWritePage />} />
-              <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
-              <Route path="/forum/write" element={<ForumWritePage />} />
             </Route>
 
-            {/* Supplier Dashboard (WO-NETURE-SUPPLIER-DASHBOARD-P0) - Lazy */}
+            {/* ================================================================
+                Admin Vault (/admin-vault) - 설계 보호 구역
+                WO-O4O-ADMIN-VAULT-ACCESS-V1
+            ================================================================ */}
+            <Route element={<AdminVaultLayout />}>
+              <Route path="/admin-vault" element={<VaultOverviewPage />} />
+              <Route path="/admin-vault/docs" element={<VaultDocsPage />} />
+              <Route path="/admin-vault/architecture" element={<VaultArchitecturePage />} />
+              <Route path="/admin-vault/notes" element={<VaultNotesPage />} />
+            </Route>
+
+            {/* ================================================================
+                Neture 고유 기능 (/supplier-ops) - SupplierOpsLayout
+            ================================================================ */}
+            <Route element={<SupplierOpsLayout />}>
+              {/* Neture 홈 */}
+              <Route path="/supplier-ops" element={<HomePage />} />
+
+              {/* 공급자 */}
+              <Route path="/supplier-ops/suppliers" element={<SupplierListPage />} />
+              <Route path="/supplier-ops/suppliers/:slug" element={<SupplierDetailPage />} />
+
+              {/* 파트너/제휴 */}
+              <Route path="/supplier-ops/partners/requests" element={<PartnershipRequestListPage />} />
+              <Route path="/supplier-ops/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
+              <Route path="/supplier-ops/partners/apply" element={<PartnersApplyPage />} />
+              <Route path="/supplier-ops/partners/info" element={<PartnerInfoPage />} />
+
+              {/* 플랫폼 정책 */}
+              <Route path="/supplier-ops/platform/principles" element={<PlatformPrinciplesPage />} />
+
+              {/* 콘텐츠 */}
+              <Route path="/supplier-ops/content" element={<ContentListPage />} />
+              <Route path="/supplier-ops/content/:id" element={<ContentDetailPage />} />
+
+              {/* 포럼 */}
+              <Route path="/supplier-ops/forum" element={<ForumPage />} />
+              <Route path="/supplier-ops/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
+              <Route path="/supplier-ops/forum/test-feedback/new" element={<ForumWritePage />} />
+              <Route path="/supplier-ops/forum/test-feedback/:slug" element={<ForumPostPage />} />
+              <Route path="/supplier-ops/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
+              <Route path="/supplier-ops/forum/service-update/new" element={<ForumWritePage />} />
+              <Route path="/supplier-ops/forum/service-update/:slug" element={<ForumPostPage />} />
+              <Route path="/supplier-ops/forum/write" element={<ForumWritePage />} />
+
+              {/* Neture 전용 테스트 가이드 */}
+              <Route path="/supplier-ops/manual/supplier" element={<SupplierManualPage />} />
+              <Route path="/supplier-ops/manual/partner" element={<PartnerManualPage />} />
+              <Route path="/supplier-ops/manual/admin" element={<AdminManualPage />} />
+              <Route path="/supplier-ops/manual/service" element={<NetureServiceManualPage />} />
+            </Route>
+
+            {/* ================================================================
+                Supplier Dashboard (/supplier-ops/supplier/*)
+            ================================================================ */}
             <Route element={<SupplierDashboardLayout />}>
-              <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
-              <Route path="/supplier/requests" element={<SellerRequestsPage />} />
-              <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
-              <Route path="/supplier/products" element={<SupplierProductsPage />} />
-              <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
-              <Route path="/supplier/contents" element={<SupplierContentsPage />} />
-              <Route path="/supplier/contents/new" element={<ContentEditorPage />} />
-              <Route path="/supplier/contents/:id/edit" element={<ContentEditorPage />} />
+              <Route path="/supplier-ops/supplier/dashboard" element={<SupplierDashboardPage />} />
+              <Route path="/supplier-ops/supplier/requests" element={<SellerRequestsPage />} />
+              <Route path="/supplier-ops/supplier/requests/:id" element={<SellerRequestDetailPage />} />
+              <Route path="/supplier-ops/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/supplier-ops/supplier/orders" element={<SupplierOrdersPage />} />
+              <Route path="/supplier-ops/supplier/contents" element={<SupplierContentsPage />} />
+              <Route path="/supplier-ops/supplier/contents/new" element={<ContentEditorPage />} />
+              <Route path="/supplier-ops/supplier/contents/:id/edit" element={<ContentEditorPage />} />
             </Route>
 
-            {/* Partner Dashboard - inside MainLayout for site navigation */}
-            <Route element={<MainLayout />}>
-              <Route path="/partner" element={<PartnerOverviewPage />} />
-              <Route path="/partner/collaboration" element={<CollaborationPage />} />
-              <Route path="/partner/promotions" element={<PromotionsPage />} />
-              <Route path="/partner/settlements" element={<SettlementsPage />} />
+            {/* ================================================================
+                Partner Dashboard (/supplier-ops/partner/*)
+            ================================================================ */}
+            <Route element={<SupplierOpsLayout />}>
+              <Route path="/supplier-ops/partner" element={<PartnerOverviewPage />} />
+              <Route path="/supplier-ops/partner/collaboration" element={<CollaborationPage />} />
+              <Route path="/supplier-ops/partner/promotions" element={<PromotionsPage />} />
+              <Route path="/supplier-ops/partner/settlements" element={<SettlementsPage />} />
             </Route>
 
-            {/* Admin Dashboard - inside MainLayout for site navigation */}
-            <Route element={<MainLayout />}>
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/ai-card-rules" element={<AiCardExplainPage />} />
-              <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
-              <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-              <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
+            {/* ================================================================
+                Admin Dashboard (/supplier-ops/admin/*)
+            ================================================================ */}
+            <Route element={<SupplierOpsLayout />}>
+              <Route path="/supplier-ops/admin" element={<AdminDashboardPage />} />
+              <Route path="/supplier-ops/admin/ai-card-rules" element={<AiCardExplainPage />} />
+              <Route path="/supplier-ops/admin/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/supplier-ops/admin/ai-business-pack" element={<AiBusinessPackPage />} />
+              <Route path="/supplier-ops/admin/ai-operations" element={<AiOperationsPage />} />
               {/* AI Admin Control Plane */}
-              <Route path="/admin/ai" element={<AiAdminDashboardPage />} />
-              <Route path="/admin/ai/engines" element={<AiEnginesPage />} />
-              <Route path="/admin/ai/policy" element={<AiPolicyPage />} />
-              <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
-              <Route path="/admin/ai/cost" element={<AiCostPage />} />
-              <Route path="/admin/ai/context-assets" element={<ContextAssetListPage />} />
-              <Route path="/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
-              <Route path="/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
-              <Route path="/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
+              <Route path="/supplier-ops/admin/ai" element={<AiAdminDashboardPage />} />
+              <Route path="/supplier-ops/admin/ai/engines" element={<AiEnginesPage />} />
+              <Route path="/supplier-ops/admin/ai/policy" element={<AiPolicyPage />} />
+              <Route path="/supplier-ops/admin/ai/asset-quality" element={<AssetQualityPage />} />
+              <Route path="/supplier-ops/admin/ai/cost" element={<AiCostPage />} />
+              <Route path="/supplier-ops/admin/ai/context-assets" element={<ContextAssetListPage />} />
+              <Route path="/supplier-ops/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
+              <Route path="/supplier-ops/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
+              <Route path="/supplier-ops/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
               {/* Admin Settings */}
-              <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
+              <Route path="/supplier-ops/admin/settings/email" element={<EmailSettingsPage />} />
             </Route>
 
-            {/* Operator Dashboard - inside MainLayout for site navigation */}
-            <Route element={<MainLayout />}>
-              <Route path="/operator" element={<OperatorDashboard />} />
-              <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
-              <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-              <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
+            {/* ================================================================
+                Operator Dashboard (/supplier-ops/operator/*)
+            ================================================================ */}
+            <Route element={<SupplierOpsLayout />}>
+              <Route path="/supplier-ops/operator" element={<OperatorDashboard />} />
+              <Route path="/supplier-ops/operator/ai-report" element={<OperatorAiReportPage />} />
+              <Route path="/supplier-ops/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+              <Route path="/supplier-ops/operator/registrations" element={<RegistrationRequestsPage />} />
             </Route>
+
+            {/* ================================================================
+                레거시 리다이렉트 (기존 경로 → 신규 경로)
+            ================================================================ */}
+            {/* Neture 고유 기능 리다이렉트 */}
+            <Route path="/suppliers" element={<Navigate to="/supplier-ops/suppliers" replace />} />
+            <Route path="/suppliers/:slug" element={<Navigate to="/supplier-ops/suppliers/:slug" replace />} />
+            <Route path="/partners/requests" element={<Navigate to="/supplier-ops/partners/requests" replace />} />
+            <Route path="/partners/requests/:id" element={<Navigate to="/supplier-ops/partners/requests/:id" replace />} />
+            <Route path="/partners/apply" element={<Navigate to="/supplier-ops/partners/apply" replace />} />
+            <Route path="/partners/info" element={<Navigate to="/supplier-ops/partners/info" replace />} />
+            <Route path="/platform/principles" element={<Navigate to="/supplier-ops/platform/principles" replace />} />
+            <Route path="/content" element={<Navigate to="/supplier-ops/content" replace />} />
+            <Route path="/content/:id" element={<Navigate to="/supplier-ops/content/:id" replace />} />
+            <Route path="/forum" element={<Navigate to="/supplier-ops/forum" replace />} />
+            <Route path="/forum/*" element={<Navigate to="/supplier-ops/forum" replace />} />
+
+            {/* Supplier Dashboard 리다이렉트 */}
+            <Route path="/supplier/dashboard" element={<Navigate to="/supplier-ops/supplier/dashboard" replace />} />
+            <Route path="/supplier/requests" element={<Navigate to="/supplier-ops/supplier/requests" replace />} />
+            <Route path="/supplier/products" element={<Navigate to="/supplier-ops/supplier/products" replace />} />
+            <Route path="/supplier/orders" element={<Navigate to="/supplier-ops/supplier/orders" replace />} />
+            <Route path="/supplier/contents" element={<Navigate to="/supplier-ops/supplier/contents" replace />} />
+            <Route path="/supplier/*" element={<Navigate to="/supplier-ops/supplier/dashboard" replace />} />
+
+            {/* Partner Dashboard 리다이렉트 */}
+            <Route path="/partner" element={<Navigate to="/supplier-ops/partner" replace />} />
+            <Route path="/partner/collaboration" element={<Navigate to="/supplier-ops/partner/collaboration" replace />} />
+            <Route path="/partner/promotions" element={<Navigate to="/supplier-ops/partner/promotions" replace />} />
+            <Route path="/partner/settlements" element={<Navigate to="/supplier-ops/partner/settlements" replace />} />
+
+            {/* Admin/Operator 리다이렉트 */}
+            <Route path="/admin" element={<Navigate to="/supplier-ops/admin" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/supplier-ops/admin" replace />} />
+            <Route path="/operator" element={<Navigate to="/supplier-ops/operator" replace />} />
+            <Route path="/operator/*" element={<Navigate to="/supplier-ops/operator" replace />} />
+
+            {/* Test Guide 리다이렉트 (Neture 전용) */}
+            <Route path="/test-guide/manual/supplier" element={<Navigate to="/supplier-ops/manual/supplier" replace />} />
+            <Route path="/test-guide/manual/partner" element={<Navigate to="/supplier-ops/manual/partner" replace />} />
+            <Route path="/test-guide/manual/admin" element={<Navigate to="/supplier-ops/manual/admin" replace />} />
+            <Route path="/test-guide/service/neture" element={<Navigate to="/supplier-ops/manual/service" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
