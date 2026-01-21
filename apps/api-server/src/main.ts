@@ -70,6 +70,9 @@ import publicRoutes from './routes/public.routes.js';
 // WO-SITEGUIDE-CORE-EXECUTION-V1: 새로운 모듈 기반 라우터
 import { createSiteGuideRoutes } from './routes/siteguide/index.js';
 
+// Platform Inquiry Routes (contact forms for SaaS operator)
+import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from './routes/v1/platformInquiry.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -693,6 +696,13 @@ const startServer = async () => {
     const siteguideRoutes = createSiteGuideRoutes(AppDataSource);
     app.use('/api/siteguide', siteguideRoutes);
     logger.info('✅ SiteGuide routes registered at /api/siteguide (independent service)');
+
+    // 8.6. Register Platform Inquiry routes (contact forms for SaaS operator)
+    // Public: POST /api/v1/platform/inquiries (no auth)
+    // Admin: GET/PATCH /api/v1/admin/platform/inquiries (auth required)
+    app.use('/api/v1/platform', platformInquiryRoutes);
+    app.use('/api/v1/admin/platform', platformInquiryAdminRoutes);
+    logger.info('✅ Platform Inquiry routes registered at /api/v1/platform and /api/v1/admin/platform');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

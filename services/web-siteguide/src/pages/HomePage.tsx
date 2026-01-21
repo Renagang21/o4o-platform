@@ -12,25 +12,35 @@
  * 6. CTA Section (마무리)
  */
 
+import { useState } from 'react';
 import { Mail, Shield, MessageCircle, Eye, Sparkles } from 'lucide-react';
-
-const CONTACT_EMAIL = 'contact@siteguide.co.kr';
+import ContactFormModal from '../components/ContactFormModal';
 
 export default function HomePage() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection />
+      <HeroSection onContactClick={() => setIsContactModalOpen(true)} />
       <ProblemSection />
       <SolutionSection />
       <FeatureSection />
       <SafetySection />
-      <CTASection />
+      <CTASection onContactClick={() => setIsContactModalOpen(true)} />
       <Footer />
+      <ContactFormModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     </div>
   );
 }
 
-function HeroSection() {
+interface SectionProps {
+  onContactClick: () => void;
+}
+
+function HeroSection({ onContactClick }: SectionProps) {
   return (
     <section className="bg-slate-900 text-white py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto text-center">
@@ -44,13 +54,13 @@ function HeroSection() {
           <br />
           SiteGuide는 지금 있는 홈페이지 위에서 바로 작동합니다.
         </p>
-        <a
-          href={`mailto:${CONTACT_EMAIL}?subject=SiteGuide 도입 상담 요청`}
+        <button
+          onClick={onContactClick}
           className="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors"
         >
           <Mail className="w-5 h-5" />
           도입 상담 요청
-        </a>
+        </button>
       </div>
     </section>
   );
@@ -175,7 +185,7 @@ function SafetySection() {
   );
 }
 
-function CTASection() {
+function CTASection({ onContactClick }: SectionProps) {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white">
       <div className="max-w-3xl mx-auto text-center">
@@ -189,13 +199,13 @@ function CTASection() {
           <br />
           현재는 사업자 단위로 도입을 진행합니다.
         </p>
-        <a
-          href={`mailto:${CONTACT_EMAIL}?subject=SiteGuide 도입 상담 요청`}
+        <button
+          onClick={onContactClick}
           className="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors"
         >
           <Mail className="w-5 h-5" />
           도입 상담 요청
-        </a>
+        </button>
       </div>
     </section>
   );

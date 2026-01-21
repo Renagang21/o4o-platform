@@ -73,6 +73,7 @@ import {
   VaultDocsPage,
   VaultArchitecturePage,
   VaultNotesPage,
+  VaultInquiriesPage,
 } from './pages/admin-vault';
 
 // Test Center (다중 서비스)
@@ -284,6 +285,7 @@ function App() {
               <Route path="/admin-vault/docs" element={<VaultDocsPage />} />
               <Route path="/admin-vault/architecture" element={<VaultArchitecturePage />} />
               <Route path="/admin-vault/notes" element={<VaultNotesPage />} />
+              <Route path="/admin-vault/inquiries" element={<VaultInquiriesPage />} />
             </Route>
 
             {/* ================================================================

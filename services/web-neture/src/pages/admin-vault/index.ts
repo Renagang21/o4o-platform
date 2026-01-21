@@ -8,3 +8,4 @@ export { default as VaultOverviewPage } from './VaultOverviewPage';
 export { default as VaultDocsPage } from './VaultDocsPage';
 export { default as VaultArchitecturePage } from './VaultArchitecturePage';
 export { default as VaultNotesPage } from './VaultNotesPage';
+export { default as VaultInquiriesPage } from './VaultInquiriesPage';

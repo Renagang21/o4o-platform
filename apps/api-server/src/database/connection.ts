@@ -199,6 +199,11 @@ import {
 } from '../routes/siteguide/entities/index.js';
 
 // ============================================================================
+// PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
+// ============================================================================
+import { PlatformInquiry } from '../entities/PlatformInquiry.js';
+
+// ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
@@ -501,6 +506,10 @@ export const AppDataSource = new DataSource({
     SiteGuideApiKey,
     SiteGuideUsageSummary,
     SiteGuideExecutionLog,
+    // ============================================================================
+    // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
+    // ============================================================================
+    PlatformInquiry,
     // ============================================================================
     // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
     // ============================================================================

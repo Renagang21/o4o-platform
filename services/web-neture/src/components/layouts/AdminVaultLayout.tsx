@@ -16,7 +16,7 @@
 import { Link, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { isAdminVaultAuthorized } from '../../utils/adminVaultAuth';
-import { Shield, FileText, Box, StickyNote, Home } from 'lucide-react';
+import { Shield, FileText, Box, StickyNote, Home, MessageSquare } from 'lucide-react';
 
 export default function AdminVaultLayout() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -42,6 +42,7 @@ export default function AdminVaultLayout() {
 
   const navItems = [
     { path: '/admin-vault', label: 'Overview', icon: Home, exact: true },
+    { path: '/admin-vault/inquiries', label: 'Inquiries', icon: MessageSquare },
     { path: '/admin-vault/docs', label: 'Docs', icon: FileText },
     { path: '/admin-vault/architecture', label: 'Architecture', icon: Box },
     { path: '/admin-vault/notes', label: 'Notes', icon: StickyNote },
