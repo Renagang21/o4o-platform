@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Member } from './Member.js';
+import type { Member } from './Member.js';
 
 /**
  * VerificationStatus

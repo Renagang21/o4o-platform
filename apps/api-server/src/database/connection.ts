@@ -269,6 +269,21 @@ import {
 } from '@o4o/lms-marketing/entities';
 
 // ============================================================================
+// MEMBERSHIP-YAKSA ENTITIES (Re-enabled for /api/v1/membership routes)
+// ============================================================================
+import {
+  MemberCategory,
+  Member,
+  Affiliation,
+  MembershipRoleAssignment,
+  MembershipYear,
+  Verification,
+  AffiliationChangeLog,
+  MemberAuditLog,
+  LicenseVerificationRequest,
+} from '@o4o/membership-yaksa/entities';
+
+// ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
 // ============================================================================
 // The following domain package entities remain removed:
@@ -558,9 +573,20 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     ...SignageCoreEntities,
     // ============================================================================
+    // MEMBERSHIP-YAKSA ENTITIES (Re-enabled for /api/v1/membership routes)
+    // ============================================================================
+    MemberCategory,
+    Member,
+    Affiliation,
+    MembershipRoleAssignment,
+    MembershipYear,
+    Verification,
+    AffiliationChangeLog,
+    MemberAuditLog,
+    LicenseVerificationRequest,
+    // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
-    // Membership-Yaksa: MemberCategory, Member, Affiliation, MembershipRoleAssignment, MembershipYear, Verification
     // Dropshipping-Cosmetics: CosmeticsFilter
     // Reporting-Yaksa: AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment
     // LMS-Yaksa: YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment

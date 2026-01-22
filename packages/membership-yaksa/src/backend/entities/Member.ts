@@ -9,10 +9,10 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { MemberCategory } from './MemberCategory.js';
-import { Affiliation } from './Affiliation.js';
-import { MembershipYear } from './MembershipYear.js';
-import { Verification } from './Verification.js';
+import type { MemberCategory } from './MemberCategory.js';
+import type { Affiliation } from './Affiliation.js';
+import type { MembershipYear } from './MembershipYear.js';
+import type { Verification } from './Verification.js';
 
 /**
  * PharmacistType
@@ -96,7 +96,7 @@ export class Member {
   @Column({ type: 'uuid', nullable: true })
   categoryId?: string;
 
-  @ManyToOne(() => MemberCategory, { nullable: true, eager: true })
+  @ManyToOne('MemberCategory', { nullable: true, eager: true })
   @JoinColumn({ name: 'categoryId' })
   category?: MemberCategory;
 
