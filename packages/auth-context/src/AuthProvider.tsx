@@ -55,22 +55,22 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     return null;
   };
 
-  // Phase 6-7: For cookie strategy, start with null and check via API
-  // For localStorage strategy, use stored state as initial value
+  // Phase 6-7 Optimized: Check localStorage for cached user first
+  // This allows instant UI render while API verification happens in background
   const [user, setUser] = useState<User | null>(() => {
-    if (strategy === 'localStorage') {
-      return getInitialStateFromStorage();
-    }
-    return null; // Cookie strategy checks via API
+    return getInitialStateFromStorage();
   });
 
-  // Phase 6-7: For cookie strategy, always start loading (need API check)
-  // For localStorage strategy, check if we have stored auth info
+  // Phase 6-7 Optimized: If we have cached user, don't show loading
+  // API verification happens in background without blocking render
   const [isLoading, setIsLoading] = useState(() => {
-    if (strategy === 'cookie') {
-      return true; // Cookie strategy needs API verification
-    }
     const storedUser = getInitialStateFromStorage();
+    if (storedUser) {
+      return false; // Instant render with cached user
+    }
+    if (strategy === 'cookie') {
+      return true; // No cache, need API verification
+    }
     const storedToken = getAccessToken();
     return !(storedUser && storedToken);
   });
@@ -84,15 +84,18 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     { strategy }
   );
 
-  // Phase 6-7: Initial auth check
-  // - Cookie strategy: Call /auth/status API to get auth state
-  // - localStorage strategy: Use stored tokens (legacy behavior)
+  // Phase 6-7 Optimized: Background auth verification
+  // - If cached user exists, verify in background (non-blocking)
+  // - If no cached user, blocking check is needed
   useEffect(() => {
     const checkInitialAuth = async () => {
+      const cachedUser = getInitialStateFromStorage();
+
       try {
         if (strategy === 'cookie') {
-          // Phase 6-7: Cookie strategy - check auth status via API
-          // Cookies are sent automatically with withCredentials: true
+          // Phase 6-7 Optimized: Cookie strategy
+          // If we have cached user, verify in background without blocking
+          // If no cached user, do blocking verification
           try {
             const response = await authClient.api.get('/auth/status');
             const statusData = response.data as any;
@@ -103,13 +106,22 @@ export const AuthProvider: FC<AuthProviderProps> = ({
                 createdAt: statusData.user.createdAt || new Date().toISOString(),
                 updatedAt: statusData.user.updatedAt || new Date().toISOString()
               };
-              setUser(userWithDates);
+              // Only update if different from cached (prevents unnecessary re-renders)
+              if (!cachedUser || cachedUser.id !== userWithDates.id) {
+                setUser(userWithDates);
+              }
             } else {
+              // Session expired - clear user
               setUser(null);
+              localStorage.removeItem('admin-auth-storage');
             }
           } catch (apiError) {
-            // API call failed (possibly 401) - user is not authenticated
-            setUser(null);
+            // API call failed (possibly 401) - session invalid
+            if (!cachedUser) {
+              setUser(null);
+            }
+            // If we had cached user, keep it but it may fail on next API call
+            // This prevents flash of login screen on temporary network issues
           }
           setIsLoading(false);
         } else {
@@ -136,7 +148,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({
         }
       } catch (error) {
         console.error('Initial auth check failed:', error);
-        setUser(null);
+        if (!cachedUser) {
+          setUser(null);
+        }
         setIsLoading(false);
       }
     };

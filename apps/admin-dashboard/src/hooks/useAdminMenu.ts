@@ -62,81 +62,72 @@ export const useAdminMenu = () => {
   const [dynamicMenuItems, setDynamicMenuItems] = useState<MenuItem[] | null>(null);
   const [apiLoading, setApiLoading] = useState(true);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
-  const [permissionsLoading, setPermissionsLoading] = useState(true);
 
   // Get user roles (support multiple roles)
   const rawRoles = (user as any)?.roles || (user?.role ? [{ name: user.role }] : []);
   const userRoles: string[] = rawRoles.map((r: any) => typeof r === 'string' ? r : r.name).filter(Boolean);
 
-  // Fetch navigation from API
+  // Optimized: Fetch navigation AND permissions in PARALLEL
   useEffect(() => {
-    const fetchNavigation = async () => {
+    const fetchMenuData = async () => {
+      if (!user?.id) {
+        setDynamicMenuItems(null);
+        setUserPermissions([]);
+        setApiLoading(false);
+        return;
+      }
+
       setApiLoading(true);
 
-      try {
-        // Fetch from Navigation API
-        const response = await unifiedApi.raw.get<NavigationApiResponse>('/v1/navigation/admin');
+      // Parallel fetch: navigation + permissions
+      const [navigationResult, permissionsResult] = await Promise.allSettled([
+        unifiedApi.raw.get<NavigationApiResponse>('/v1/navigation/admin'),
+        unifiedApi.raw.get(`/v1/userRole/${user.id}/permissions`)
+      ]);
 
+      // Process navigation result
+      if (navigationResult.status === 'fulfilled') {
+        const response = navigationResult.value;
         if (response.data?.success && response.data.data?.length > 0) {
-          // Transform API response to MenuItem format with icons
           const menuItems = transformApiMenuItems(response.data.data);
           setDynamicMenuItems(menuItems);
-
           if (process.env.NODE_ENV === 'development') {
             console.debug('[useAdminMenu] Loaded from API:', menuItems.length, 'items');
           }
         } else {
-          // API returned empty or failed - use fallback
           setDynamicMenuItems(null);
-
           if (process.env.NODE_ENV === 'development') {
             console.debug('[useAdminMenu] API returned empty, using fallback menu');
           }
         }
-      } catch (error) {
-        // API call failed - use fallback
+      } else {
         setDynamicMenuItems(null);
-
         if (process.env.NODE_ENV === 'development') {
-          console.debug('[useAdminMenu] API failed, using fallback menu:', error);
+          console.debug('[useAdminMenu] API failed, using fallback menu:', navigationResult.reason);
         }
-      } finally {
-        setApiLoading(false);
-      }
-    };
-
-    fetchNavigation();
-  }, [user?.id]);
-
-  // Fetch user permissions from API
-  useEffect(() => {
-    const fetchPermissions = async () => {
-      if (!user?.id) {
-        setUserPermissions([]);
-        setPermissionsLoading(false);
-        return;
       }
 
-      try {
-        const response = await unifiedApi.raw.get(`/v1/userRole/${user.id}/permissions`);
+      // Process permissions result
+      if (permissionsResult.status === 'fulfilled') {
+        const response = permissionsResult.value;
         if (response.data?.success) {
           setUserPermissions(response.data.data?.permissions || []);
         } else {
           setUserPermissions(user.permissions || []);
         }
-      } catch (error) {
+      } else {
         // Use fallback permissions
         const fallbackPermissions = user.permissions?.length
           ? user.permissions
           : ['content.view', 'dashboard:view'];
         setUserPermissions(fallbackPermissions);
-      } finally {
-        setPermissionsLoading(false);
       }
+
+      setApiLoading(false);
     };
 
-    fetchPermissions();
-  }, [user]);
+    fetchMenuData();
+  }, [user?.id]);
 
   // Determine base menu items - API or fallback
   const baseMenuItems = dynamicMenuItems || [...wordpressMenuItems];
@@ -204,7 +195,7 @@ export const useAdminMenu = () => {
 
   return {
     menuItems: filteredMenuItems,
-    isLoading: apiLoading || cptLoading || permissionsLoading || appStatusLoading,
+    isLoading: apiLoading || cptLoading || appStatusLoading,
     userRoles,
     userPermissions,
     isUsingFallback: !dynamicMenuItems
