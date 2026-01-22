@@ -82,6 +82,8 @@ const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
 // P4-Admin: Role Applications Management
 const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdminPage'));
+// WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: Operator Policy
+const MyPolicyPage = lazy(() => import('@/pages/operator/MyPolicyPage'));
 // Membership-Yaksa: Membership Management
 const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/MembershipDashboard'));
 const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
@@ -757,6 +759,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['users:update']}>
                         <Suspense fallback={<PageLoader />}>
                           <RoleApplicationsAdminPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: Operator Policy */}
+                    <Route path="/admin/operator/my-policy" element={
+                      <AdminProtectedRoute>
+                        <Suspense fallback={<PageLoader />}>
+                          <MyPolicyPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

@@ -9,6 +9,8 @@ export interface User {
   role: string
   roles?: string[]
   permissions?: string[]
+  /** 스코프 목록 (WO-KPA-OPERATOR-SCOPE-UNIFICATION-V1) */
+  scopes?: string[]
   avatar?: string
   createdAt?: string
   // Domain extension properties (WO-DOMAIN-TYPE-EXTENSION)
@@ -130,7 +132,8 @@ export const useAuthStore = create<AuthState>()(
                 name: response.user.name,
                 role: response.user.roles?.[0] || 'user',
                 roles: response.user.roles,
-                permissions: response.user.permissions
+                permissions: response.user.permissions,
+                scopes: response.user.scopes
               },
               token,
               isAuthenticated: true,

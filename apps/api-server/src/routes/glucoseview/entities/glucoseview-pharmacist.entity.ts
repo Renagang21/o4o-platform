@@ -18,7 +18,13 @@ import {
 import type { GlucoseViewChapter } from './glucoseview-chapter.entity.js';
 
 export type PharmacistApprovalStatus = 'pending' | 'approved' | 'rejected';
-export type PharmacistRole = 'pharmacist' | 'admin';
+/**
+ * Pharmacist Role
+ * - pharmacist: 일반 약사
+ * - operator: 운영자 (WO-KPA-OPERATOR-SCOPE-UNIFICATION-V1)
+ * - admin: 관리자
+ */
+export type PharmacistRole = 'pharmacist' | 'operator' | 'admin';
 
 @Entity({ name: 'glucoseview_pharmacists', schema: 'public' })
 @Index(['chapter_id', 'pharmacy_name'], { unique: true })

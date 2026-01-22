@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from '../entities/User.js';
 import { AccessTokenPayload, RefreshTokenPayload, AuthTokens } from '../types/auth.js';
 import logger from './logger.js';
+import { deriveUserScopes } from './scope-assignment.utils.js';
 
 /**
  * Token Utility Module
@@ -70,12 +71,19 @@ function getJwtSecrets() {
 export function generateAccessToken(user: User, domain: string = 'neture.co.kr'): string {
   const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
+  // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: 역할 기반 스코프 도출
+  const userScopes = deriveUserScopes({
+    role: user.role,
+    roles: user.getRoleNames?.() || [],
+  });
+
   const payload: AccessTokenPayload = {
     userId: user.id,
     sub: user.id,
     email: user.email,
     role: user.role,
     permissions: user.permissions || [],
+    scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     domain,
     iss: jwtIssuer,     // Phase 2.5: Server isolation
     aud: jwtAudience,   // Phase 2.5: Server isolation

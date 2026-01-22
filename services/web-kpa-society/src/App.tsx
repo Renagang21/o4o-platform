@@ -51,6 +51,12 @@ import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchO
 import { HomePage } from './pages/platform';
 import TestCenterPage from './pages/TestCenterPage';
 
+// Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
+import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
+
+// Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
+import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
+
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
 
@@ -85,6 +91,18 @@ function App() {
 
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
           <Route path="/test-center" element={<TestCenterPage />} />
+
+          {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
+          <Route path="/services/branch" element={<BranchServicePage />} />
+          <Route path="/services/division" element={<DivisionServicePage />} />
+          <Route path="/services/pharmacy" element={<PharmacyServicePage />} />
+          <Route path="/services/forum" element={<ForumServicePage />} />
+          <Route path="/services/lms" element={<LmsServicePage />} />
+
+          {/* Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
+          <Route path="/join/branch" element={<BranchJoinPage />} />
+          <Route path="/join/division" element={<DivisionJoinPage />} />
+          <Route path="/join/pharmacy" element={<PharmacyJoinPage />} />
 
           {/* ========================================
            * 약사회 데모 서비스 (/demo 하위)

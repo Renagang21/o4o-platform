@@ -131,6 +131,8 @@ export interface AccessTokenPayload {
   status?: UserStatus | string;
   businessInfo?: BusinessInfo;
   permissions?: string[];
+  /** 서비스 스코프 목록 (WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1) */
+  scopes?: string[];
   domain?: string;
   sub?: string; // JWT standard claim
   // Phase 2.5: Server isolation claims

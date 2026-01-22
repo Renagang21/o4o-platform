@@ -473,6 +473,9 @@ export class User {
       canSwitchRoles: this.hasMultipleRoles(),
       status: this.status,
       permissions: this.getAllPermissions(), // Include all permissions from roles and direct
+      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes placeholder
+      // 실제 scopes는 서비스 레이어에서 deriveUserScopes로 계산하여 덮어씀
+      scopes: [] as string[],
       isActive: this.isActive,
       isEmailVerified: this.isEmailVerified,
       lastLoginAt: this.lastLoginAt,

@@ -10,6 +10,7 @@ import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { LoginRequestDto, RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
+import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -367,15 +368,26 @@ export class AuthController extends BaseController {
     }
 
     try {
-      return BaseController.ok(res, {
-        user: req.user.toPublicData?.() || {
-          id: req.user.id,
-          email: req.user.email,
-          name: req.user.name,
-          role: req.user.role,
-          status: req.user.status,
-        },
+      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
+      // scopes 계산
+      const scopes = deriveUserScopes({
+        role: req.user.role,
+        roles: req.user.getRoleNames?.() || [],
       });
+
+      const userData = req.user.toPublicData?.() || {
+        id: req.user.id,
+        email: req.user.email,
+        name: req.user.name,
+        role: req.user.role,
+        status: req.user.status,
+        scopes: [] as string[],
+      };
+
+      // scopes 주입
+      userData.scopes = scopes;
+
+      return BaseController.ok(res, { user: userData });
     } catch (error: any) {
       logger.error('[AuthController.me] Get user error', {
         error: error.message,
@@ -423,9 +435,20 @@ export class AuthController extends BaseController {
   static async status(req: AuthRequest, res: Response): Promise<any> {
     const authenticated = !!req.user;
 
+    let userData = null;
+    if (authenticated && req.user) {
+      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
+      userData = req.user.toPublicData?.() || req.user;
+      const scopes = deriveUserScopes({
+        role: req.user.role,
+        roles: req.user.getRoleNames?.() || [],
+      });
+      userData.scopes = scopes;
+    }
+
     return BaseController.ok(res, {
       authenticated,
-      user: authenticated && req.user ? (req.user.toPublicData?.() || req.user) : null,
+      user: userData,
     });
   }
 }

@@ -50,6 +50,9 @@ export * from './app-lifecycle.js';
 // Export listing display types (Phase 1)
 export * from './listing-display.js';
 
+// Export operator policy types (WO-KPA-OPERATOR-SCOPE-UNIFICATION-V1)
+export * from './operator-policy.js';
+
 // For backward compatibility, re-export partner types with affiliate names
 export type {
   PartnerUser as AffiliateUser,
