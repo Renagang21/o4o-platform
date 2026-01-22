@@ -78,6 +78,7 @@ import {
   List,
   Settings,
   Eye,
+  ShoppingBag,
 } from 'lucide-react';
 
 // Block type configurations
@@ -90,6 +91,7 @@ const BLOCK_TYPE_CONFIGS: Record<ContentBlockType, { label: string; icon: typeof
   weather: { label: 'Weather', icon: Cloud, color: 'bg-yellow-500', description: 'Weather widget' },
   rss: { label: 'RSS Feed', icon: Rss, color: 'bg-red-500', description: 'RSS/Atom feed reader' },
   qr: { label: 'QR Code', icon: QrCode, color: 'bg-indigo-500', description: 'Generate QR codes' },
+  'corner-display': { label: '제품 표시', icon: ShoppingBag, color: 'bg-emerald-500', description: '선택한 코너의 제품을 자동으로 표시합니다' },
   custom: { label: 'Custom', icon: Box, color: 'bg-gray-500', description: 'Custom block type' },
 };
 
@@ -680,6 +682,89 @@ export default function ContentBlockLibrary() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </div>
+        );
+
+      case 'corner-display':
+        return (
+          <div className="space-y-4">
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <p className="text-sm text-emerald-800">
+                이 블록은 TV/사이니지에서 자동으로 제품을 표시합니다. 터치 인터랙션은 지원하지 않습니다.
+              </p>
+            </div>
+            <div>
+              <Label>코너 키 (필수)</Label>
+              <Input
+                value={(blockForm.content.cornerKey as string) || ''}
+                onChange={(e) =>
+                  setBlockForm({
+                    ...blockForm,
+                    content: { ...blockForm.content, cornerKey: e.target.value },
+                  })
+                }
+                placeholder="예: premium_zone, new_arrivals"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Phase 1 Listings에 등록된 코너 키를 입력하세요.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>새로고침 주기 (초)</Label>
+                <Input
+                  type="number"
+                  min={10}
+                  value={((blockForm.content.refreshIntervalMs as number) || 60000) / 1000}
+                  onChange={(e) =>
+                    setBlockForm({
+                      ...blockForm,
+                      content: {
+                        ...blockForm.content,
+                        refreshIntervalMs: Math.max(10, parseInt(e.target.value) || 60) * 1000
+                      },
+                    })
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  최소 10초
+                </p>
+              </div>
+              <div>
+                <Label>디바이스 타입</Label>
+                <Select
+                  value={(blockForm.content.deviceType as string) || 'signage'}
+                  onValueChange={(value) =>
+                    setBlockForm({
+                      ...blockForm,
+                      content: { ...blockForm.content, deviceType: value },
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="signage">사이니지 (기본)</SelectItem>
+                    <SelectItem value="tablet">태블릿</SelectItem>
+                    <SelectItem value="kiosk">키오스크</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label>표시 제목 (선택)</Label>
+              <Input
+                value={(blockForm.content.title as string) || ''}
+                onChange={(e) =>
+                  setBlockForm({
+                    ...blockForm,
+                    content: { ...blockForm.content, title: e.target.value },
+                  })
+                }
+                placeholder="예: 신상품, 추천 상품"
+              />
             </div>
           </div>
         );

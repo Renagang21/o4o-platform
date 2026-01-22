@@ -16,23 +16,16 @@ import type { PlayerConfig, PlayerMode } from '../types/signage';
 import { DEFAULT_PLAYER_CONFIG } from '../types/signage';
 
 // ============================================================================
-// Types
-// ============================================================================
-
-interface RouteParams {
-  serviceKey?: string;
-  channelId?: string;
-  code?: string;
-}
-
-// ============================================================================
 // SignagePlayerPage Component
 // ============================================================================
 
 export default function SignagePlayerPage() {
-  const { serviceKey, channelId, code } = useParams<RouteParams>();
+  const params = useParams();
+  const serviceKey = params.serviceKey;
+  const channelId = params.channelId;
+  const code = params.code;
   const [searchParams] = useSearchParams();
-  const [ready, setReady] = useState(false);
+  const [_ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Build configuration from URL params

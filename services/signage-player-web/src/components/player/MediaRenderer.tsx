@@ -9,8 +9,10 @@
  * Phase 2: Digital Signage Production Upgrade
  */
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import type { PlaylistItem, TransitionEffect, ContentCache } from '../../types/signage';
+import { useRef, useEffect, useState } from 'react';
+import type { PlaylistItem, TransitionEffect } from '../../types/signage';
+import type { ContentCache } from '../../services/ContentCache';
+import { CornerDisplayBlock } from '../blocks/CornerDisplayBlock.tsx';
 
 // ============================================================================
 // Types
@@ -216,6 +218,26 @@ function MediaContent({ type, url, metadata, onVideoEnded, muted }: MediaContent
         <TextContent
           text={metadata.text as string}
           style={metadata.style as React.CSSProperties}
+        />
+      );
+
+    case 'corner-display':
+      return (
+        <CornerDisplayBlock
+          settings={{
+            cornerKey: metadata.cornerKey as string | undefined,
+            cornerId: metadata.cornerId as string | undefined,
+            deviceType: metadata.deviceType as 'tablet' | 'signage' | 'kiosk' | undefined,
+            refreshIntervalMs: metadata.refreshIntervalMs as number | undefined,
+            listingsApiBaseUrl: metadata.listingsApiBaseUrl as string | undefined,
+            limit: metadata.limit as number | undefined,
+            columns: metadata.columns as number | undefined,
+            showPrice: metadata.showPrice as boolean | undefined,
+            backgroundColor: metadata.backgroundColor as string | undefined,
+            cardBackgroundColor: metadata.cardBackgroundColor as string | undefined,
+          }}
+          width="100%"
+          height="100%"
         />
       );
 

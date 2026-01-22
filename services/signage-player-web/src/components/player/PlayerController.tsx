@@ -14,7 +14,7 @@ import { PlaybackEngine, EngineState, PlaybackEventType } from '../../engine/Pla
 import { ScheduleResolver, type ResolvedContent } from '../../services/ScheduleResolver';
 import { getContentCache, type ContentCache } from '../../services/ContentCache';
 import { PlayerTelemetry, ErrorTracker } from '../../services/PlayerTelemetry';
-import type { PlayerConfig, PlayerMode, PlaylistItem } from '../../types/signage';
+import type { PlayerConfig, PlaylistItem } from '../../types/signage';
 import MediaRenderer from './MediaRenderer';
 import PlayerOverlay from './PlayerOverlay';
 import DebugPanel from './DebugPanel';

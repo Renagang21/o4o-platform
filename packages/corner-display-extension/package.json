@@ -1,0 +1,27 @@
+{
+  "name": "@o4o/corner-display-extension",
+  "version": "1.0.0",
+  "description": "Corner Display Extension - 매장 코너별 디스플레이 관리 (태블릿 = 코너 확장)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*",
+    "typeorm": "^0.3.20",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/react": "18.2.79",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0",
+    "react": "^18.2.0"
+  }
+}

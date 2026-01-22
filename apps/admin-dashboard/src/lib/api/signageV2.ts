@@ -158,7 +158,7 @@ export interface SignageTemplate {
 }
 
 // Content Block Types
-export type ContentBlockType = 'text' | 'image' | 'video' | 'html' | 'clock' | 'weather' | 'rss' | 'qr' | 'custom';
+export type ContentBlockType = 'text' | 'image' | 'video' | 'html' | 'clock' | 'weather' | 'rss' | 'qr' | 'custom' | 'corner-display';
 
 export interface ContentBlockSettings {
   fontSize?: number;
@@ -168,6 +168,11 @@ export interface ContentBlockSettings {
   alignment?: 'left' | 'center' | 'right';
   padding?: number;
   borderRadius?: number;
+  // Corner Display settings (blockType: 'corner-display')
+  cornerKey?: string;
+  deviceType?: 'tablet' | 'signage' | 'kiosk';
+  refreshIntervalMs?: number;
+  listingsApiBaseUrl?: string;
 }
 
 export interface SignageContentBlock {

@@ -35,12 +35,6 @@ interface CacheConfig {
   cleanupIntervalMs: number;
 }
 
-interface CacheMetadata {
-  key: string;
-  value: unknown;
-  updatedAt: number;
-}
-
 interface MediaCacheEntry extends CachedContent {
   lastAccessedAt: number;
 }

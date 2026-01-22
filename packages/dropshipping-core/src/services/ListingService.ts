@@ -12,6 +12,29 @@ import {
   ListingStatus,
   ListingChannel,
 } from '../entities/SellerListing.entity.js';
+import type { ListingVisibility, DeviceType } from '@o4o/types';
+
+/**
+ * Phase 1: 디스플레이 필터 옵션
+ */
+export interface ListingDisplayFilterOptions {
+  deviceId?: string;
+  corner?: string;
+  visibility?: ListingVisibility;
+  deviceType?: DeviceType;
+}
+
+/**
+ * Listing 조회 필터 옵션
+ */
+export interface ListingFilterOptions {
+  status?: ListingStatus;
+  channel?: ListingChannel;
+  sellerId?: string;
+  display?: ListingDisplayFilterOptions;
+  sortBy?: 'sortOrder' | 'createdAt' | 'updatedAt' | 'sellingPrice';
+  sortDirection?: 'asc' | 'desc';
+}
 
 @Injectable()
 export class ListingService {
@@ -65,14 +88,15 @@ export class ListingService {
 
   /**
    * Listing 목록 조회
+   *
+   * Phase 1: display 필터 지원 추가
+   * - deviceId, corner, visibility, deviceType으로 필터링
+   * - sortOrder 기반 정렬 지원
    */
-  async findAll(filters?: {
-    status?: ListingStatus;
-    channel?: ListingChannel;
-    sellerId?: string;
-  }): Promise<SellerListing[]> {
+  async findAll(filters?: ListingFilterOptions): Promise<SellerListing[]> {
     const query = this.listingRepository.createQueryBuilder('listing');
 
+    // 기존 필터 (하위 호환성 유지)
     if (filters?.status) {
       query.andWhere('listing.status = :status', { status: filters.status });
     }
@@ -85,6 +109,60 @@ export class ListingService {
       query.andWhere('listing.sellerId = :sellerId', {
         sellerId: filters.sellerId,
       });
+    }
+
+    // Phase 1: display 필터 (JSONB 필드)
+    if (filters?.display) {
+      const { deviceId, corner, visibility, deviceType } = filters.display;
+
+      if (deviceId) {
+        query.andWhere(
+          "listing.channelSpecificData->'display'->>'deviceId' = :deviceId",
+          { deviceId }
+        );
+      }
+
+      if (corner) {
+        query.andWhere(
+          "listing.channelSpecificData->'display'->>'corner' = :corner",
+          { corner }
+        );
+      }
+
+      if (visibility) {
+        query.andWhere(
+          "listing.channelSpecificData->'display'->>'visibility' = :visibility",
+          { visibility }
+        );
+      }
+
+      if (deviceType) {
+        query.andWhere(
+          "listing.channelSpecificData->'display'->>'deviceType' = :deviceType",
+          { deviceType }
+        );
+      }
+    }
+
+    // hidden 제외 (visibility가 명시적으로 지정되지 않은 경우)
+    if (!filters?.display?.visibility) {
+      query.andWhere(
+        "(listing.channelSpecificData->'display'->>'visibility' IS NULL OR listing.channelSpecificData->'display'->>'visibility' != 'hidden')"
+      );
+    }
+
+    // 정렬
+    if (filters?.sortBy === 'sortOrder') {
+      // JSONB 내부 sortOrder로 정렬
+      query.orderBy(
+        "COALESCE((listing.channelSpecificData->'display'->>'sortOrder')::int, 0)",
+        filters.sortDirection === 'desc' ? 'DESC' : 'ASC'
+      );
+    } else if (filters?.sortBy) {
+      query.orderBy(
+        `listing.${filters.sortBy}`,
+        filters.sortDirection === 'desc' ? 'DESC' : 'ASC'
+      );
     }
 
     return await query

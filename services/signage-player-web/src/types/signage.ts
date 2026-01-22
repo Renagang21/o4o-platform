@@ -9,7 +9,7 @@
 // Media Types
 // ============================================================================
 
-export type MediaType = 'image' | 'video' | 'html' | 'text' | 'youtube' | 'vimeo' | 'external';
+export type MediaType = 'image' | 'video' | 'html' | 'text' | 'youtube' | 'vimeo' | 'external' | 'corner-display';
 
 export interface MediaContent {
   id: string;

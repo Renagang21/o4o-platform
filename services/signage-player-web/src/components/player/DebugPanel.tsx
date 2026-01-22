@@ -194,13 +194,13 @@ function StatePanel({ info }: { info: Record<string, unknown> }) {
 
       <div className="debug-section">
         <div className="debug-section-title">Queue Status</div>
-        {info.queueStatus && typeof info.queueStatus === 'object' && (
+        {info.queueStatus && typeof info.queueStatus === 'object' ? (
           <>
-            <DebugRow label="Total Items" value={(info.queueStatus as any).total} />
-            <DebugRow label="Preloaded" value={(info.queueStatus as any).preloaded} />
-            <DebugRow label="Current Index" value={(info.queueStatus as any).current} />
+            <DebugRow label="Total Items" value={(info.queueStatus as Record<string, unknown>).total} />
+            <DebugRow label="Preloaded" value={(info.queueStatus as Record<string, unknown>).preloaded} />
+            <DebugRow label="Current Index" value={(info.queueStatus as Record<string, unknown>).current} />
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );

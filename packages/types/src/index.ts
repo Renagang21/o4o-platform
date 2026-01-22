@@ -47,6 +47,9 @@ export * from './app-manifest.js';
 // Export app lifecycle types
 export * from './app-lifecycle.js';
 
+// Export listing display types (Phase 1)
+export * from './listing-display.js';
+
 // For backward compatibility, re-export partner types with affiliate names
 export type {
   PartnerUser as AffiliateUser,

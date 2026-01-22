@@ -620,3 +620,6 @@ export * from './layout';
 
 // Theme Tokens
 export * from './theme';
+
+// Corner Display Components (Phase 1)
+export * from './corner-display';

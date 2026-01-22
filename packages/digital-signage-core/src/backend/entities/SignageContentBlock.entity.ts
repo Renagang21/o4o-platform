@@ -46,7 +46,7 @@ export class SignageContentBlock {
     type: 'varchar',
     length: 30,
   })
-  blockType!: 'text' | 'image' | 'video' | 'html' | 'clock' | 'weather' | 'ticker' | 'qr' | 'custom';
+  blockType!: 'text' | 'image' | 'video' | 'html' | 'clock' | 'weather' | 'ticker' | 'qr' | 'custom' | 'corner-display';
 
   // ========== Content ==========
   @Column({ type: 'text', nullable: true })
@@ -71,6 +71,12 @@ export class SignageContentBlock {
     // Animation
     animation?: string;
     animationDuration?: number;
+    // Corner Display settings (blockType: 'corner-display')
+    cornerId?: string;              // CornerDisplay.id
+    cornerKey?: string;             // CornerDisplay.cornerKey (대안)
+    deviceType?: 'tablet' | 'signage' | 'kiosk';
+    refreshIntervalMs?: number;     // 자동 새로고침 주기 (기본: 60000)
+    listingsApiBaseUrl?: string;    // Phase 1 Listings API 베이스 URL
     // Custom settings
     [key: string]: any;
   };

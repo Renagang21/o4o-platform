@@ -12,6 +12,7 @@ import SystemSetup from './SystemSetup';
 import BulkProductImport from './BulkProductImport';
 import ErpConnectorStatus from './ErpConnectorStatus';
 import ErpTransmissionHistory from './ErpTransmissionHistory';
+import CornerDisplaySettings from './CornerDisplaySettings';
 
 const DropshippingRouter: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const DropshippingRouter: React.FC = () => {
       <Route path="setup" element={<SystemSetup />} />
       <Route path="erp-status" element={<ErpConnectorStatus />} />
       <Route path="erp-transmissions" element={<ErpTransmissionHistory />} />
+      <Route path="corner-display" element={<CornerDisplaySettings />} />
       <Route path="/" element={<Navigate to="/dropshipping/products" replace />} />
     </Routes>
   );

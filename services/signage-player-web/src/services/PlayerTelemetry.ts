@@ -10,7 +10,7 @@
  * Phase 2: Digital Signage Production Upgrade
  */
 
-import type { HeartbeatPayload, PlaybackLogEntry, PlayerConfig } from '../types/signage';
+import type { HeartbeatPayload, PlaybackLogEntry } from '../types/signage';
 
 // ============================================================================
 // Constants
@@ -451,7 +451,7 @@ export class ErrorTracker {
   }
 
   private setupGlobalHandler(): void {
-    window.onerror = (message, source, lineno, colno, error) => {
+    window.onerror = (_message, source, lineno, colno, error) => {
       if (error) {
         this.track(error, { source, lineno, colno });
       }

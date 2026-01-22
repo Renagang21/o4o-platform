@@ -10,7 +10,7 @@
  * Phase 2: Digital Signage Production Upgrade
  */
 
-import type { PlaylistItem, MediaContent, ScheduleRule } from '../types/signage';
+import type { PlaylistItem, MediaContent } from '../types/signage';
 
 // ============================================================================
 // Types & Enums
