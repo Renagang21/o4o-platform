@@ -1,13 +1,9 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { initVersionCheck } from '@/utils/versionCheck'
-import { registerAllBlocks } from '@/blocks'
-import { registerAllWidgets } from '@/lib/widgets/registerWidgets'
 import { globalRegistry } from '@o4o/shortcodes'
-import { loadShortcodes, logShortcodeSummary } from '@/utils/shortcode-loader'
 import App from './App'
 import './styles/globals.css'
 // WordPress styles will be loaded only when needed
@@ -46,17 +42,6 @@ const queryClient = new QueryClient({
 
 // Initialize version checking
 initVersionCheck();
-
-// Register all blocks before rendering
-registerAllBlocks();
-
-// Register all dashboard widgets before rendering (P1 Phase C)
-registerAllWidgets();
-
-// Load and register all shortcodes
-loadShortcodes().then((stats) => {
-  logShortcodeSummary(stats);
-});
 
 // Debug: Expose globalRegistry to window (development only)
 if (import.meta.env.DEV) {

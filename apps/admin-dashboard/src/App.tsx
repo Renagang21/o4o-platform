@@ -401,10 +401,29 @@ const ssoClient = new AuthClient(getAuthApiUrl(), { strategy: 'cookie' });
  * SSO 인증 시스템 통합
  */
 function App() {
-  // Initialize auth on app start
+  // Initialize blocks, widgets, and shortcodes after first render (performance optimization)
   useEffect(() => {
-    // SSO 체크 비활성화 - 로컬 인증만 사용
-    // SSO는 백엔드 구현 완료 후 활성화
+    // Defer non-critical initialization to after render
+    const initializeFeatures = async () => {
+      // Dynamic imports to reduce initial bundle
+      const { registerAllBlocks } = await import('@/blocks');
+      const { registerAllWidgets } = await import('@/lib/widgets/registerWidgets');
+      const { loadShortcodes, logShortcodeSummary } = await import('@/utils/shortcode-loader');
+
+      // Register blocks and widgets
+      registerAllBlocks();
+      registerAllWidgets();
+
+      // Load shortcodes in background
+      loadShortcodes().then(logShortcodeSummary);
+    };
+
+    // Use requestIdleCallback for non-critical work, fallback to setTimeout
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(initializeFeatures, { timeout: 2000 });
+    } else {
+      setTimeout(initializeFeatures, 100);
+    }
   }, []);
   
   // 인증 오류 처리
