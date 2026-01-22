@@ -248,6 +248,7 @@ const corsOptions: CorsOptions = {
       "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
       "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
       "https://k-cosmetics.site", "https://www.k-cosmetics.site",
+      "https://siteguide.co.kr", "https://www.siteguide.co.kr",
     ];
 
     const allowedOrigins = [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
