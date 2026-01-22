@@ -13,3 +13,4 @@ export { HowItWorksSection } from './HowItWorksSection';
 export { PlatformHeader } from './PlatformHeader';
 export { PlatformFooter } from './PlatformFooter';
 export { InfoPageLayout } from './InfoPageLayout';
+export { JoinInquiryForm, type InquiryType, type JoinInquiryFormProps } from './JoinInquiryForm';

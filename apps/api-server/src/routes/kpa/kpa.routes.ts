@@ -15,6 +15,7 @@
  * - /api/v1/kpa/groupbuy - 공동구매
  * - /api/v1/kpa/mypage - 마이페이지
  * - /api/v1/kpa/organization - 조직정보 (공개)
+ * - /api/v1/kpa/join-inquiries - 참여 문의 관리 (관리자)
  */
 
 import { Router, RequestHandler, Request, Response } from 'express';
@@ -25,6 +26,7 @@ import { createApplicationController } from './controllers/application.controlle
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createBranchAdminDashboardController } from './controllers/branch-admin-dashboard.controller.js';
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
+import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
@@ -88,6 +90,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
+
+  // Join Inquiry Admin routes (WO-KPA-JOIN-CONVERSION-V1)
+  router.use('/join-inquiries', createJoinInquiryAdminRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*
@@ -362,4 +367,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   });
 
   return router;
+}
+
+/**
+ * Create public join inquiry routes
+ * Mounted at /api/v1/join (no auth required)
+ */
+export function createKpaJoinPublicRoutes(dataSource: DataSource): Router {
+  return createJoinInquiryPublicRoutes(dataSource);
 }

@@ -462,7 +462,7 @@ import { createYaksaRoutes } from './routes/yaksa/yaksa.routes.js';
 import { createGlycopharmRoutes } from './routes/glycopharm/glycopharm.routes.js';
 
 // KPA Routes (Pharmacist Association SaaS)
-import { createKpaRoutes } from './routes/kpa/kpa.routes.js';
+import { createKpaRoutes, createKpaJoinPublicRoutes } from './routes/kpa/kpa.routes.js';
 
 // GlucoseView Routes (Phase C-1)
 import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes.js';
@@ -855,6 +855,11 @@ const startServer = async () => {
       const kpaRoutes = createKpaRoutes(AppDataSource);
       app.use('/api/v1/kpa', kpaRoutes);
       logger.info('✅ KPA routes registered at /api/v1/kpa');
+
+      // 31-b. Register KPA Join Inquiry public routes (WO-KPA-JOIN-CONVERSION-V1)
+      const kpaJoinPublicRoutes = createKpaJoinPublicRoutes(AppDataSource);
+      app.use('/api/v1/join', kpaJoinPublicRoutes);
+      logger.info('✅ KPA Join public routes registered at /api/v1/join');
     } catch (kpaError) {
       logger.error('Failed to register KPA routes:', kpaError);
     }

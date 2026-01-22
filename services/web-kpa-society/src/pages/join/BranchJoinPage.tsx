@@ -9,6 +9,7 @@
 
 import React from 'react';
 import { InfoPageLayout } from '../../components/platform/InfoPageLayout';
+import { JoinInquiryForm } from '../../components/platform/JoinInquiryForm';
 
 export function BranchJoinPage() {
   return (
@@ -78,14 +79,12 @@ export function BranchJoinPage() {
       </div>
 
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>문의</h2>
+        <h2 style={styles.sectionTitle}>도입 문의</h2>
         <p style={styles.paragraph}>
-          도입에 관심이 있으시거나 궁금한 점이 있으시면 아래로 문의해 주세요.
+          도입에 관심이 있으시면 아래 양식을 통해 문의해 주세요.
+          담당자가 확인 후 연락드리겠습니다.
         </p>
-        <div style={styles.contactBox}>
-          <p style={styles.contactItem}>📧 이메일: contact@kpa-platform.kr</p>
-          <p style={styles.contactItem}>📞 전화: 02-XXX-XXXX</p>
-        </div>
+        <JoinInquiryForm inquiryType="branch" />
       </div>
 
       <div style={styles.ctaSection}>

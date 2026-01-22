@@ -177,6 +177,7 @@ import {
   KpaOrganization,
   KpaMember,
   KpaApplication,
+  KpaJoinInquiry,
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -493,6 +494,7 @@ export const AppDataSource = new DataSource({
     KpaOrganization,
     KpaMember,
     KpaApplication,
+    KpaJoinInquiry,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================

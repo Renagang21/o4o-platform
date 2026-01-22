@@ -5,3 +5,4 @@
 export * from './kpa-organization.entity.js';
 export * from './kpa-member.entity.js';
 export * from './kpa-application.entity.js';
+export * from './kpa-join-inquiry.entity.js';
