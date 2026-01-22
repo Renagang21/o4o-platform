@@ -28,35 +28,29 @@ export class AppRegistry {
   @Column({ type: 'varchar', length: 50 })
   version!: string; // semver format
 
-  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
-  @Column({ type: 'varchar', length: 50, nullable: true, select: false, insert: false })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   previousVersion?: string; // for rollback support
 
-  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
   @Column({
-    type: 'enum',
-    enum: ['core', 'extension', 'standalone'],
+    type: 'varchar',
+    length: 20,
     default: 'standalone',
-    select: false,
-    insert: false
   })
-  // @Index() // TEMPORARY: Disabled until type column is added to DB
+  @Index()
   type!: 'core' | 'extension' | 'standalone';
 
   @Column({
-    type: 'enum',
-    enum: ['installed', 'active', 'inactive'],
+    type: 'varchar',
+    length: 20,
     default: 'installed'
   })
   @Index()
   status!: 'installed' | 'active' | 'inactive';
 
-  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
-  @Column({ type: 'jsonb', nullable: true, select: false, insert: false })
+  @Column({ type: 'jsonb', nullable: true })
   dependencies?: Record<string, string>; // { "app-id": "version-range" }
 
-  // TEMPORARY FIX: select/insert: false to avoid querying/inserting non-existent column in DB
-  @Column({ type: 'varchar', length: 50, default: 'local', select: false, insert: false })
+  @Column({ type: 'varchar', length: 50, default: 'local' })
   source?: string; // 'local' for now, can be 'remote' later
 
   @CreateDateColumn()
