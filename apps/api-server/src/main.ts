@@ -411,18 +411,21 @@ import settingsRoutes from './routes/settingsRoutes.js';
 import adminAppsRoutes from './routes/admin/apps.routes.js';
 import adminUsersRoutes from './routes/admin/users.routes.js';
 import serviceMonitorRoutes from './routes/service-monitor.routes.js';
+
+// Membership Routes (re-enabled)
+import { createMembershipRoutes } from '@o4o/membership-yaksa';
+
 // ============================================================================
-// DOMAIN ROUTES REMOVED (Phase R1: Execution Boundary Cleanup)
+// DOMAIN ROUTES PARTIALLY RESTORED
 // ============================================================================
-// The following domain route factories have been removed from api-server:
-// - @o4o/membership-yaksa (createMembershipRoutes)
+// Re-enabled: @o4o/membership-yaksa (createMembershipRoutes)
+// Still disabled (Phase R2):
 // - @o4o/reporting-yaksa (createReportingRoutes)
 // - @o4o/annualfee-yaksa (createAnnualfeeRoutes)
 // - @o4o/cosmetics-seller-extension (createSellerExtensionRoutes)
 // - @o4o/cosmetics-sample-display-extension
 // - @o4o/cosmetics-supplier-extension
 // - @o4o/groupbuy-yaksa
-// These will be handled in Phase R2 (domain service separation).
 // ============================================================================
 
 // Market Trial Routes (Phase L-1)
@@ -732,18 +735,20 @@ const startServer = async () => {
     logger.info('✅ Linked Accounts routes registered at /api/accounts');
 
     // ============================================================================
-    // DOMAIN ROUTES REMOVED (Phase R1: Execution Boundary Cleanup)
+    // DOMAIN ROUTES PARTIALLY RESTORED
     // ============================================================================
-    // 14. Membership routes (/api/v1/membership) - @o4o/membership-yaksa
+    // 14. Membership routes (/api/v1/membership) - @o4o/membership-yaksa - RE-ENABLED
+    app.use('/api/v1/membership', createMembershipRoutes(AppDataSource));
+    logger.info('✅ Membership routes registered at /api/v1/membership');
+
+    // Still disabled (Phase R2):
     // 15. Reporting routes (/api/reporting) - @o4o/reporting-yaksa
     // 16. AnnualFee routes (/api/annualfee) - @o4o/annualfee-yaksa
     // 17. Cosmetics Seller routes (/api/v1/cosmetics-seller) - @o4o/cosmetics-seller-extension
     // 18. Cosmetics Sample Display routes - @o4o/cosmetics-sample-display-extension
     // 19. Cosmetics Supplier routes - @o4o/cosmetics-supplier-extension
     // 20. Groupbuy-Yaksa routes - @o4o/groupbuy-yaksa
-    // These will be handled in Phase R2 (domain service separation).
     // ============================================================================
-    logger.info('⚠️ Domain routes disabled (Phase R1: Execution Boundary Cleanup)');
 
     // 21. Register Partner routes (Phase K)
     app.use('/api/partner', partnerRoutes);

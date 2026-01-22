@@ -10,6 +10,7 @@
  */
 
 export { createMemberRoutes } from './memberRoutes.js';
+export { createCategoryRoutes } from './categoryRoutes.js';
 export { createVerificationRoutes } from './verificationRoutes.js';
 export { createStatsRoutes } from './statsRoutes.js';
 export { createExportRoutes } from './exportRoutes.js';
@@ -32,6 +33,7 @@ export {
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
 import { createMemberRoutes } from './memberRoutes.js';
+import { createCategoryRoutes } from './categoryRoutes.js';
 import { createVerificationRoutes } from './verificationRoutes.js';
 import { createStatsRoutes } from './statsRoutes.js';
 import { createExportRoutes } from './exportRoutes.js';
@@ -48,6 +50,9 @@ import {
 
 export function createMembershipRoutes(dataSource: DataSource): Router {
   const router = Router();
+
+  // /api/membership/categories
+  router.use('/categories', createCategoryRoutes(dataSource));
 
   // /api/membership/members
   router.use('/members', createMemberRoutes(dataSource));
