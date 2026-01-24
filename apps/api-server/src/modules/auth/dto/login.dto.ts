@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsBoolean } from 'class-validator';
 
 /**
  * Login Request DTO
@@ -16,6 +16,14 @@ export class LoginRequestDto {
   @IsOptional()
   @IsString()
   deviceId?: string;
+
+  /**
+   * Include tokens in response body for cross-domain authentication
+   * When true, accessToken and refreshToken are included in the JSON response
+   */
+  @IsOptional()
+  @IsBoolean()
+  includeLegacyTokens?: boolean;
 }
 
 /**
