@@ -168,16 +168,20 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     });
   });
 
-  newsRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'News not found' } });
-  });
-
+  // Static routes must be defined before dynamic :id route
   newsRouter.get('/gallery', optionalAuth, (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
     res.json({
       success: true,
       data: [],
-      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+      pagination: { page, limit, total: 0, totalPages: 0 },
+      message: 'Gallery API - Integration pending'
     });
+  });
+
+  newsRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
+    res.status(404).json({ success: false, error: { message: 'News not found' } });
   });
 
   router.use('/news', newsRouter);
