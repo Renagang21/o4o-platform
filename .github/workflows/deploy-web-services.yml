@@ -282,13 +282,14 @@ jobs:
           echo "Building kpa-society-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
-          # Use service-specific API URL for same-origin cookie auth
+          # Build from repo root with Dockerfile path (for workspace packages)
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
+            -f services/web-kpa-society/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
-            services/web-kpa-society
+            .
 
           docker push gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG}
           docker push gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest
