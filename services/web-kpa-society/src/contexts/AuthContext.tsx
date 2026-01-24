@@ -112,12 +112,42 @@ interface AuthResponse {
   success: boolean;
   data: {
     user: ApiUser;
+    tokens?: {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
   };
 }
 
 interface MeResponse {
   success: boolean;
   data: ApiUser;
+}
+
+// ============================================================================
+// Token Storage (Cross-domain authentication)
+// ============================================================================
+
+const TOKEN_KEY = 'kpa_access_token';
+const REFRESH_TOKEN_KEY = 'kpa_refresh_token';
+
+function saveTokens(accessToken: string, refreshToken: string): void {
+  localStorage.setItem(TOKEN_KEY, accessToken);
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+}
+
+export function getAccessToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+function clearTokens(): void {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 /**
@@ -154,12 +184,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = useCallback(async () => {
     try {
+      const token = getAccessToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
 
       if (response.ok) {
@@ -181,10 +217,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null);
         }
       } else {
+        clearTokens();
         setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      clearTokens();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -202,7 +240,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      // includeLegacyTokens: true to receive tokens in response body for cross-domain auth
+      body: JSON.stringify({ email, password, includeLegacyTokens: true }),
     });
 
     if (!response.ok) {
@@ -223,6 +262,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: mappedRole,
         pharmacistFunction: savedFunction || undefined,
       };
+
+      // Cross-domain auth: Store tokens in localStorage
+      if (data.data.tokens) {
+        saveTokens(data.data.tokens.accessToken, data.data.tokens.refreshToken);
+      }
+
       setUser(userData);
       return userData;  // WO-KPA-FUNCTION-GATE-V1: User 반환
     } else {
@@ -232,16 +277,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      const token = getAccessToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
     } catch (error) {
       console.error('Logout request failed:', error);
     } finally {
+      clearTokens();
       setUser(null);
     }
   };

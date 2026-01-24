@@ -3,7 +3,13 @@
  *
  * API Base URL: https://api.neture.co.kr/api/v1/kpa
  * All KPA Society API calls go through the /api/v1/kpa namespace
+ *
+ * Cross-domain authentication:
+ * - Uses Authorization header with Bearer token
+ * - Token is stored in localStorage by AuthContext
  */
+
+import { getAccessToken } from '../contexts/AuthContext';
 
 // VITE_API_BASE_URL is set via Docker build-arg in deploy workflow
 // Default: /api/v1/kpa (relative path for local development)
@@ -38,12 +44,15 @@ class ApiClient {
     const { params, ...fetchOptions } = options;
     const url = this.buildUrl(endpoint, params);
 
+    // Cross-domain auth: Add Authorization header with Bearer token
+    const token = getAccessToken();
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
       ...options.headers,
     };
 
-    // httpOnly Cookie 기반 인증 (credentials: 'include')
+    // credentials: 'include' for cookie fallback (same-origin)
     const response = await fetch(url, {
       ...fetchOptions,
       headers,
