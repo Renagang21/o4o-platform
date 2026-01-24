@@ -75,6 +75,16 @@ export class AuthClient {
 
         // Check if error is 401 and not already retried
         if (error.response?.status === 401 && !originalRequest._retry) {
+          // For localStorage strategy, skip refresh if no refresh token exists
+          // This prevents unnecessary refresh attempts when user is not logged in
+          if (this.strategy === 'localStorage') {
+            const refreshToken = getRefreshToken();
+            if (!refreshToken) {
+              // No refresh token - user is not logged in, just reject the error
+              return Promise.reject(error);
+            }
+          }
+
           if (this.isRefreshing) {
             // Wait for token refresh
             return new Promise((resolve) => {
@@ -120,13 +130,13 @@ export class AuthClient {
             }
             return this.api.request(originalRequest);
           } catch (refreshError) {
-            // Refresh failed, clear tokens and redirect to login
+            // Refresh failed, clear tokens
             if (this.strategy === 'localStorage') {
               clearAllTokens();
             }
 
-            // Show user-friendly message before redirect
-            if (typeof window !== 'undefined') {
+            // Don't redirect if already on login page
+            if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
               const errorData = (refreshError as any)?.response?.data;
               if (errorData?.code === 'TOKEN_EXPIRED') {
                 console.warn('Session expired, redirecting to login');
