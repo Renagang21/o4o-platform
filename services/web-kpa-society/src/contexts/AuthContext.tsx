@@ -1,14 +1,26 @@
 /**
  * Auth Context
  *
- * Cross-domain authentication using Bearer tokens.
- * Tokens are stored in localStorage and sent via Authorization header.
- * Server auto-detects cross-origin requests and includes tokens in response.
+ * Uses @o4o/auth-client with localStorage strategy for cross-domain auth.
+ * Server auto-detects cross-origin and includes tokens in response.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { AuthClient, getAccessToken } from '@o4o/auth-client';
+
+// Re-export for client.ts to use
+export { getAccessToken };
+
+// ============================================================================
+// Auth Client Instance
+// ============================================================================
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+
+// Create auth client with localStorage strategy for cross-domain authentication
+const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
+  strategy: 'localStorage',
+});
 
 // ============================================================================
 // Types
@@ -92,11 +104,11 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<User>;  // WO-KPA-FUNCTION-GATE-V1: User 반환
+  login: (email: string, password: string) => Promise<User>;
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  setPharmacistFunction: (fn: PharmacistFunction) => void;  // WO-KPA-FUNCTION-GATE-V1
+  setPharmacistFunction: (fn: PharmacistFunction) => void;
 }
 
 interface ApiUser {
@@ -107,48 +119,6 @@ interface ApiUser {
   role?: string;
   roles?: string[];
   [key: string]: unknown;
-}
-
-interface AuthResponse {
-  success: boolean;
-  data: {
-    user: ApiUser;
-    tokens?: {
-      accessToken: string;
-      refreshToken: string;
-      expiresIn: number;
-    };
-  };
-}
-
-interface MeResponse {
-  success: boolean;
-  data: ApiUser;
-}
-
-// ============================================================================
-// Token Storage (Cross-domain authentication)
-// ============================================================================
-
-const TOKEN_KEY = 'kpa_access_token';
-const REFRESH_TOKEN_KEY = 'kpa_refresh_token';
-
-function saveTokens(accessToken: string, refreshToken: string): void {
-  localStorage.setItem(TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-}
-
-export function getAccessToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function getRefreshToken(): string | null {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-}
-
-function clearTokens(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 /**
@@ -173,6 +143,22 @@ function mapApiRoleToKpaRole(apiRole: string | undefined): string {
   return roleMap[apiRole] || 'pharmacist';
 }
 
+/**
+ * API 응답에서 User 객체 생성
+ */
+function createUserFromApiResponse(apiUser: ApiUser): User {
+  const mappedRole = mapApiRoleToKpaRole(apiUser.role);
+  const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
+
+  return {
+    id: apiUser.id,
+    email: apiUser.email,
+    name: apiUser.fullName || apiUser.name || apiUser.email,
+    role: mappedRole,
+    pharmacistFunction: savedFunction || undefined,
+  };
+}
+
 // ============================================================================
 // Context
 // ============================================================================
@@ -185,45 +171,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = useCallback(async () => {
     try {
-      const token = getAccessToken();
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      const response = await authClient.api.get('/auth/me');
+      const data = response.data as { success: boolean; data: ApiUser };
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
-        method: 'GET',
-        credentials: 'include',
-        headers,
-      });
-
-      if (response.ok) {
-        const data: MeResponse = await response.json();
-        if (data.success && data.data) {
-          const apiUser = data.data;
-          const mappedRole = mapApiRoleToKpaRole(apiUser.role);
-          // WO-KPA-FUNCTION-GATE-V1: 저장된 직능 불러오기
-          const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
-          const userData: User = {
-            id: apiUser.id,
-            email: apiUser.email,
-            name: apiUser.fullName || apiUser.name || apiUser.email,
-            role: mappedRole,
-            pharmacistFunction: savedFunction || undefined,
-          };
-          setUser(userData);
-        } else {
-          setUser(null);
-        }
+      if (data.success && data.data) {
+        setUser(createUserFromApiResponse(data.data));
       } else {
-        clearTokens();
         setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      clearTokens();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -234,43 +191,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (email: string, password: string) => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // Cross-origin requests automatically receive tokens in response body
-      body: JSON.stringify({ email, password }),
-    });
+  const login = async (email: string, password: string): Promise<User> => {
+    const response = await authClient.login({ email, password });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || '로그인에 실패했습니다.');
-    }
-
-    const data: AuthResponse = await response.json();
-    if (data.success && data.data?.user) {
-      const apiUser = data.data.user;
-      const mappedRole = mapApiRoleToKpaRole(apiUser.role);
-      // WO-KPA-FUNCTION-GATE-V1: 저장된 직능 불러오기
-      const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
-      const userData: User = {
-        id: apiUser.id,
-        email: apiUser.email,
-        name: apiUser.fullName || apiUser.name || apiUser.email,
-        role: mappedRole,
-        pharmacistFunction: savedFunction || undefined,
-      };
-
-      // Cross-domain auth: Store tokens in localStorage
-      if (data.data.tokens) {
-        saveTokens(data.data.tokens.accessToken, data.data.tokens.refreshToken);
-      }
-
+    if (response.success && response.user) {
+      const userData = createUserFromApiResponse(response.user as ApiUser);
       setUser(userData);
-      return userData;  // WO-KPA-FUNCTION-GATE-V1: User 반환
+      return userData;
     } else {
       throw new Error('로그인 응답 형식이 올바르지 않습니다.');
     }
@@ -278,23 +205,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      const token = getAccessToken();
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers,
-      });
+      await authClient.logout();
     } catch (error) {
       console.error('Logout request failed:', error);
     } finally {
-      clearTokens();
       setUser(null);
     }
   };

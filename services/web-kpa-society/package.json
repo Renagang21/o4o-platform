@@ -10,6 +10,8 @@
     "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
+    "@o4o/auth-client": "workspace:*",
+    "axios": "^1.10.0",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
