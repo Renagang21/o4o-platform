@@ -75,15 +75,6 @@ const menuItems: MenuItem[] = [
       { label: '연락처', href: '/demo/organization/contact' },
     ],
   },
-  {
-    label: '마이페이지',
-    href: '/demo/mypage',
-    children: [
-      { label: '프로필', href: '/demo/mypage/profile' },
-      { label: '설정', href: '/demo/mypage/settings' },
-      { label: '수료증 관리', href: '/demo/mypage/certificates' },
-    ],
-  },
 ];
 
 // 관리자 메뉴 (로그인한 관리자에게만 표시)
@@ -109,8 +100,9 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 관리자 여부 확인 (데모: 로그인한 사용자는 관리자로 간주)
-  const isAdmin = !!user;
+  // 관리자 여부 확인 (admin, district_admin, branch_admin 역할만 관리자 메뉴 표시)
+  const adminRoles = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
+  const isAdmin = user && user.role && adminRoles.includes(user.role);
 
   // 메뉴 구성 (관리자인 경우 관리자 메뉴 추가)
   const displayMenuItems = isAdmin ? [...menuItems, adminMenu] : menuItems;
@@ -213,46 +205,48 @@ export function Header({ serviceName }: { serviceName: string }) {
                 </button>
                 {showUserDropdown && (
                   <div style={styles.userDropdown}>
-                    <div style={styles.userDropdownHeader}>
-                      <span style={styles.userDropdownName}>{user.name}님</span>
-                      <span style={styles.userDropdownEmail}>{user.email}</span>
+                    <div style={styles.userDropdownInner}>
+                      <div style={styles.userDropdownHeader}>
+                        <span style={styles.userDropdownName}>{user.name}님</span>
+                        <span style={styles.userDropdownEmail}>{user.email}</span>
+                      </div>
+                      <div style={styles.userDropdownDivider} />
+                      <Link
+                        to="/demo/mypage"
+                        style={styles.userDropdownItem}
+                        onClick={() => setShowUserDropdown(false)}
+                      >
+                        <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
+                        대시보드
+                      </Link>
+                      <Link
+                        to="/demo/mypage/profile"
+                        style={styles.userDropdownItem}
+                        onClick={() => setShowUserDropdown(false)}
+                      >
+                        <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
+                        프로필
+                      </Link>
+                      <Link
+                        to="/demo/mypage/settings"
+                        style={styles.userDropdownItem}
+                        onClick={() => setShowUserDropdown(false)}
+                      >
+                        <Settings style={{ width: 16, height: 16, color: colors.gray500 }} />
+                        설정
+                      </Link>
+                      <div style={styles.userDropdownDivider} />
+                      <button
+                        style={styles.userDropdownLogout}
+                        onClick={() => {
+                          setShowUserDropdown(false);
+                          handleLogout();
+                        }}
+                      >
+                        <LogOut style={{ width: 16, height: 16, color: colors.error || '#dc2626' }} />
+                        로그아웃
+                      </button>
                     </div>
-                    <div style={styles.userDropdownDivider} />
-                    <Link
-                      to="/demo/mypage"
-                      style={styles.userDropdownItem}
-                      onClick={() => setShowUserDropdown(false)}
-                    >
-                      <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
-                      대시보드
-                    </Link>
-                    <Link
-                      to="/demo/mypage/profile"
-                      style={styles.userDropdownItem}
-                      onClick={() => setShowUserDropdown(false)}
-                    >
-                      <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
-                      프로필
-                    </Link>
-                    <Link
-                      to="/demo/mypage/settings"
-                      style={styles.userDropdownItem}
-                      onClick={() => setShowUserDropdown(false)}
-                    >
-                      <Settings style={{ width: 16, height: 16, color: colors.gray500 }} />
-                      설정
-                    </Link>
-                    <div style={styles.userDropdownDivider} />
-                    <button
-                      style={styles.userDropdownLogout}
-                      onClick={() => {
-                        setShowUserDropdown(false);
-                        handleLogout();
-                      }}
-                    >
-                      <LogOut style={{ width: 16, height: 16, color: colors.error || '#dc2626' }} />
-                      로그아웃
-                    </button>
                   </div>
                 )}
               </div>
@@ -524,13 +518,16 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'absolute',
     top: '100%',
     right: 0,
-    marginTop: '8px',
+    paddingTop: '8px',  // Use paddingTop instead of marginTop to keep hover area connected
+    backgroundColor: 'transparent',
+    zIndex: 100,
+  },
+  userDropdownInner: {
     backgroundColor: colors.white,
     borderRadius: '12px',
     boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
     minWidth: '220px',
     padding: '8px 0',
-    zIndex: 100,
   },
   userDropdownHeader: {
     padding: '12px 16px',
