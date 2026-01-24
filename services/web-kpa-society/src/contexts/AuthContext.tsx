@@ -1,8 +1,9 @@
 /**
  * Auth Context
  *
- * Phase H8-4: KPA Society Core Auth v2 Integration
- * httpOnly cookie 기반 인증 (credentials: 'include')
+ * Cross-domain authentication using Bearer tokens.
+ * Tokens are stored in localStorage and sent via Authorization header.
+ * Server auto-detects cross-origin requests and includes tokens in response.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';

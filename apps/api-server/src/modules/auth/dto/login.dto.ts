@@ -18,8 +18,9 @@ export class LoginRequestDto {
   deviceId?: string;
 
   /**
-   * Include tokens in response body for cross-domain authentication
-   * When true, accessToken and refreshToken are included in the JSON response
+   * Request tokens in response body for localStorage strategy clients.
+   * Cross-origin requests automatically receive tokens without this flag.
+   * @see packages/auth-client for usage
    */
   @IsOptional()
   @IsBoolean()
