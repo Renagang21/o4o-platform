@@ -240,8 +240,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      // includeLegacyTokens: true to receive tokens in response body for cross-domain auth
-      body: JSON.stringify({ email, password, includeLegacyTokens: true }),
+      // Cross-origin requests automatically receive tokens in response body
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
