@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts';
 import { TestAccountType } from '../contexts/AuthContext';
@@ -92,6 +92,7 @@ const adminMenu: MenuItem = {
 export function Header({ serviceName }: { serviceName: string }) {
   const { user, login, logout, isLoading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -124,6 +125,7 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const handleLogout = async () => {
     await logout();
+    navigate('/demo');
   };
 
   /**

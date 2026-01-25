@@ -104,7 +104,7 @@ export function MyDashboardPage() {
               </span>
             </div>
           </div>
-          <Link to="/mypage/profile" style={styles.editButton}>
+          <Link to="profile" style={styles.editButton}>
             프로필 수정
           </Link>
         </div>

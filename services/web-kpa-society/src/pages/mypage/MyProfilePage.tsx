@@ -1,5 +1,8 @@
 /**
  * MyProfilePage - 프로필 관리 페이지
+ *
+ * 조회 모드: 프로필 정보 표시
+ * 수정 모드: 정보 수정 가능
  */
 
 import { useState, useEffect } from 'react';
@@ -9,17 +12,28 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { User } from '../../types';
 
+interface ProfileData extends User {
+  licenseNumber?: string;
+  university?: string;
+  workplace?: string;
+  phone?: string;
+  avatar?: string;
+}
+
 export function MyProfilePage() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<User | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
+    university: '',
+    workplace: '',
   });
 
   useEffect(() => {
@@ -32,11 +46,14 @@ export function MyProfilePage() {
       setError(null);
 
       const res = await mypageApi.getProfile();
-      setProfile(res.data);
+      const data = res.data as ProfileData;
+      setProfile(data);
       setFormData({
-        name: res.data.name || '',
-        phone: res.data.phone || '',
-        email: res.data.email || '',
+        name: data.name || '',
+        phone: data.phone || '',
+        email: data.email || '',
+        university: data.university || '',
+        workplace: data.workplace || '',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
@@ -45,12 +62,33 @@ export function MyProfilePage() {
     }
   };
 
+  const handleEdit = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCancel = () => {
+    // 원래 데이터로 복원
+    if (profile) {
+      setFormData({
+        name: profile.name || '',
+        phone: profile.phone || '',
+        email: profile.email || '',
+        university: profile.university || '',
+        workplace: profile.workplace || '',
+      });
+    }
+    setIsEditMode(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       setSaving(true);
       await mypageApi.updateProfile(formData);
+      // 프로필 데이터 업데이트
+      setProfile(prev => prev ? { ...prev, ...formData } : null);
+      setIsEditMode(false);
       alert('프로필이 저장되었습니다.');
     } catch (err) {
       alert('저장에 실패했습니다.');
@@ -65,7 +103,7 @@ export function MyProfilePage() {
         <EmptyState
           icon="🔒"
           title="로그인이 필요합니다"
-          description="프로필을 수정하려면 로그인해주세요."
+          description="프로필을 확인하려면 로그인해주세요."
         />
       </div>
     );
@@ -100,86 +138,153 @@ export function MyProfilePage() {
       />
 
       <Card padding="large">
-        <form onSubmit={handleSubmit}>
-          <div style={styles.avatarSection}>
-            <div style={styles.avatar}>
-              <span>👤</span>
-            </div>
+        {/* 프로필 사진 영역 */}
+        <div style={styles.avatarSection}>
+          <div style={styles.avatar}>
+            {profile?.avatar ? (
+              <img src={profile.avatar} alt="프로필" style={styles.avatarImage} />
+            ) : (
+              <span style={styles.avatarIcon}>👤</span>
+            )}
+          </div>
+          {isEditMode && (
             <button type="button" style={styles.avatarButton}>
               사진 변경
             </button>
-          </div>
+          )}
+        </div>
 
-          <div style={styles.field}>
-            <label style={styles.label}>이름</label>
-            <input
-              type="text"
-              style={styles.input}
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              placeholder="이름을 입력하세요"
-            />
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>이메일</label>
-            <input
-              type="email"
-              style={styles.input}
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              placeholder="이메일을 입력하세요"
-            />
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>연락처</label>
-            <input
-              type="tel"
-              style={styles.input}
-              value={formData.phone}
-              onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="연락처를 입력하세요"
-            />
-          </div>
-
-          {/* 읽기 전용 필드 */}
-          {profile?.licenseNumber && (
+        {isEditMode ? (
+          /* 수정 모드 */
+          <form onSubmit={handleSubmit}>
             <div style={styles.field}>
-              <label style={styles.label}>면허번호</label>
+              <label style={styles.label}>이름</label>
+              <input
+                type="text"
+                style={styles.input}
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                placeholder="이름을 입력하세요"
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>약사면허</label>
               <input
                 type="text"
                 style={{ ...styles.input, ...styles.inputReadonly }}
-                value={profile.licenseNumber}
+                value={profile?.licenseNumber || '-'}
                 disabled
               />
-              <p style={styles.hint}>면허번호는 수정할 수 없습니다.</p>
+              <p style={styles.hint}>약사면허는 수정할 수 없습니다.</p>
             </div>
-          )}
 
-          {profile?.organizationName && (
             <div style={styles.field}>
-              <label style={styles.label}>소속</label>
+              <label style={styles.label}>출신교 (대학)</label>
               <input
                 type="text"
-                style={{ ...styles.input, ...styles.inputReadonly }}
-                value={profile.organizationName}
-                disabled
+                style={styles.input}
+                value={formData.university}
+                onChange={e => setFormData({ ...formData, university: e.target.value })}
+                placeholder="출신 대학을 입력하세요"
               />
-              <p style={styles.hint}>소속 변경은 관리자에게 문의하세요.</p>
             </div>
-          )}
 
-          <div style={styles.actions}>
-            <button
-              type="submit"
-              style={styles.submitButton}
-              disabled={saving}
-            >
-              {saving ? '저장 중...' : '저장'}
-            </button>
+            <div style={styles.field}>
+              <label style={styles.label}>근무처</label>
+              <input
+                type="text"
+                style={styles.input}
+                value={formData.workplace}
+                onChange={e => setFormData({ ...formData, workplace: e.target.value })}
+                placeholder="근무처를 입력하세요"
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>핸드폰</label>
+              <input
+                type="tel"
+                style={styles.input}
+                value={formData.phone}
+                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="연락처를 입력하세요"
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>이메일</label>
+              <input
+                type="email"
+                style={styles.input}
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                placeholder="이메일을 입력하세요"
+              />
+            </div>
+
+            <div style={styles.actions}>
+              <button
+                type="button"
+                style={styles.cancelButton}
+                onClick={handleCancel}
+                disabled={saving}
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                style={styles.submitButton}
+                disabled={saving}
+              >
+                {saving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </form>
+        ) : (
+          /* 조회 모드 */
+          <div style={styles.profileView}>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>이름</span>
+              <span style={styles.infoValue}>{profile?.name || '-'}</span>
+            </div>
+
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>약사면허</span>
+              <span style={styles.infoValue}>{profile?.licenseNumber || '-'}</span>
+            </div>
+
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>출신교 (대학)</span>
+              <span style={styles.infoValue}>{profile?.university || '-'}</span>
+            </div>
+
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>근무처</span>
+              <span style={styles.infoValue}>{profile?.workplace || '-'}</span>
+            </div>
+
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>핸드폰</span>
+              <span style={styles.infoValue}>{profile?.phone || '-'}</span>
+            </div>
+
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>이메일</span>
+              <span style={styles.infoValue}>{profile?.email || '-'}</span>
+            </div>
+
+            <div style={styles.editButtonWrapper}>
+              <button
+                type="button"
+                style={styles.editButton}
+                onClick={handleEdit}
+              >
+                수정
+              </button>
+            </div>
           </div>
-        </form>
+        )}
       </Card>
 
       {/* 비밀번호 변경 */}
@@ -220,8 +325,16 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '48px',
+    overflow: 'hidden',
     marginBottom: '12px',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  avatarIcon: {
+    fontSize: '48px',
   },
   avatarButton: {
     padding: '8px 16px',
@@ -230,6 +343,41 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     borderRadius: '6px',
     fontSize: '14px',
+    cursor: 'pointer',
+  },
+  profileView: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  infoRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '16px 0',
+    borderBottom: `1px solid ${colors.neutral100}`,
+  },
+  infoLabel: {
+    ...typography.bodyM,
+    color: colors.neutral500,
+    fontWeight: 500,
+  },
+  infoValue: {
+    ...typography.bodyM,
+    color: colors.neutral900,
+  },
+  editButtonWrapper: {
+    marginTop: '24px',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  editButton: {
+    padding: '12px 48px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 500,
     cursor: 'pointer',
   },
   field: {
@@ -261,9 +409,22 @@ const styles: Record<string, React.CSSProperties> = {
   },
   actions: {
     marginTop: '32px',
+    display: 'flex',
+    gap: '12px',
+  },
+  cancelButton: {
+    flex: 1,
+    padding: '14px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   submitButton: {
-    width: '100%',
+    flex: 1,
     padding: '14px',
     backgroundColor: colors.primary,
     color: colors.white,

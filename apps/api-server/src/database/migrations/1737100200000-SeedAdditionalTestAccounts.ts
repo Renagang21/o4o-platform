@@ -31,35 +31,35 @@ const TEST_ACCOUNTS = [
   // KPA Society test accounts
   {
     email: 'district-admin@kpa-test.kr',
-    name: 'Test District Admin',
+    name: '김지부 (지부운영자)',
     role: 'admin',
     domain: 'kpa-society.kr',
     description: 'KPA 지부 운영자 테스트 계정',
   },
   {
     email: 'branch-admin@kpa-test.kr',
-    name: 'Test Branch Admin',
+    name: '이분회 (분회운영자)',
     role: 'admin',
     domain: 'kpa-society.kr',
     description: 'KPA 분회 운영자 테스트 계정',
   },
   {
     email: 'district-officer@kpa-test.kr',
-    name: 'Test District Officer',
+    name: '박임원 (지부임원)',
     role: 'user',
     domain: 'kpa-society.kr',
     description: 'KPA 지부 임원 테스트 계정',
   },
   {
     email: 'branch-officer@kpa-test.kr',
-    name: 'Test Branch Officer',
+    name: '최임원 (분회임원)',
     role: 'user',
     domain: 'kpa-society.kr',
     description: 'KPA 분회 임원 테스트 계정',
   },
   {
     email: 'pharmacist@kpa-test.kr',
-    name: 'Test Pharmacist',
+    name: '홍길동 (약사)',
     role: 'user',
     domain: 'kpa-society.kr',
     description: 'KPA 약사 테스트 계정',
@@ -100,12 +100,12 @@ export class SeedAdditionalTestAccounts1737100200000 implements MigrationInterfa
       );
 
       if (existing.length > 0) {
-        // Update password and activate if exists
+        // Update password, name, and activate if exists
         await queryRunner.query(
-          `UPDATE users SET password = $1, "isActive" = true, status = 'active' WHERE email = $2`,
-          [hashedPassword, account.email]
+          `UPDATE users SET password = $1, name = $2, "isActive" = true, status = 'active' WHERE email = $3`,
+          [hashedPassword, account.name, account.email]
         );
-        console.log(`Updated existing account: ${account.email}`);
+        console.log(`Updated existing account: ${account.email} (name: ${account.name})`);
         continue;
       }
 

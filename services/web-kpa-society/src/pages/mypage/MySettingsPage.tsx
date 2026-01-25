@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -10,11 +11,15 @@ import { colors, typography } from '../../styles/theme';
 import type { UserSettings } from '../../api/mypage';
 
 export function MySettingsPage() {
-  const { user } = useAuth();
+  const { user, logoutAll } = useAuth();
+  const navigate = useNavigate();
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawReason, setWithdrawReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) loadData();
@@ -46,6 +51,46 @@ export function MySettingsPage() {
       alert('설정 변경에 실패했습니다.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    const confirmed = window.confirm(
+      '모든 기기에서 로그아웃됩니다.\n현재 기기도 로그아웃됩니다.\n\n계속하시겠습니까?'
+    );
+    if (!confirmed) return;
+
+    try {
+      await logoutAll();
+      navigate('/login');
+    } catch (err) {
+      alert('로그아웃에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handleWithdrawRequest = async () => {
+    if (!withdrawReason.trim()) {
+      alert('탈퇴 사유를 입력해주세요.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      // TODO: 실제 API 연동 시 mypageApi.requestWithdraw() 호출
+      // await mypageApi.requestWithdraw({ reason: withdrawReason });
+
+      // 현재는 알림만 표시
+      alert(
+        '탈퇴 요청이 접수되었습니다.\n\n' +
+        '운영자 검토 후 처리됩니다.\n' +
+        '처리 결과는 등록된 이메일로 안내됩니다.'
+      );
+      setShowWithdrawModal(false);
+      setWithdrawReason('');
+    } catch (err) {
+      alert('탈퇴 요청에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -152,18 +197,60 @@ export function MySettingsPage() {
         <div style={styles.dangerZone}>
           <button
             style={styles.dangerButton}
-            onClick={() => alert('로그아웃 처리됩니다.')}
+            onClick={handleLogoutAll}
           >
             모든 기기에서 로그아웃
           </button>
           <button
             style={styles.dangerButton}
-            onClick={() => alert('계정 탈퇴는 관리자에게 문의하세요.')}
+            onClick={() => setShowWithdrawModal(true)}
           >
             계정 탈퇴
           </button>
         </div>
       </Card>
+
+      {/* 탈퇴 요청 모달 */}
+      {showWithdrawModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h3 style={styles.modalTitle}>계정 탈퇴 요청</h3>
+            <p style={styles.modalDesc}>
+              탈퇴 요청은 운영자 검토 후 처리됩니다.<br />
+              지부/분회 탈퇴는 관리자 승인이 필요합니다.
+            </p>
+            <div style={styles.field}>
+              <label style={styles.label}>탈퇴 사유</label>
+              <textarea
+                style={styles.textarea}
+                value={withdrawReason}
+                onChange={e => setWithdrawReason(e.target.value)}
+                placeholder="탈퇴 사유를 입력해주세요"
+                rows={4}
+              />
+            </div>
+            <div style={styles.modalActions}>
+              <button
+                style={styles.cancelButton}
+                onClick={() => {
+                  setShowWithdrawModal(false);
+                  setWithdrawReason('');
+                }}
+                disabled={isSubmitting}
+              >
+                취소
+              </button>
+              <button
+                style={styles.submitButton}
+                onClick={handleWithdrawRequest}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? '요청 중...' : '탈퇴 요청'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -242,5 +329,80 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     cursor: 'pointer',
     textAlign: 'left',
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: colors.white,
+    borderRadius: '12px',
+    padding: '24px',
+    width: '90%',
+    maxWidth: '400px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+  },
+  modalTitle: {
+    ...typography.headingM,
+    color: colors.neutral900,
+    marginTop: 0,
+    marginBottom: '8px',
+  },
+  modalDesc: {
+    ...typography.bodyM,
+    color: colors.neutral600,
+    marginBottom: '20px',
+    lineHeight: '1.5',
+  },
+  field: {
+    marginBottom: '20px',
+  },
+  label: {
+    display: 'block',
+    marginBottom: '8px',
+    fontWeight: 500,
+    color: colors.neutral700,
+    fontSize: '14px',
+  },
+  textarea: {
+    width: '100%',
+    padding: '12px',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    boxSizing: 'border-box',
+    resize: 'vertical',
+    fontFamily: 'inherit',
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'flex-end',
+  },
+  cancelButton: {
+    padding: '10px 20px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer',
+  },
+  submitButton: {
+    padding: '10px 20px',
+    backgroundColor: colors.accentRed,
+    color: colors.white,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer',
   },
 };

@@ -69,33 +69,33 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
   district_admin: {
     id: 'test-district-admin-001',
     email: 'district-admin@kpa-test.kr',
-    name: '지부 운영자 (테스트)',
+    name: '김지부 (지부운영자)',
     role: 'district_admin',
   },
   branch_admin: {
     id: 'test-branch-admin-001',
     email: 'branch-admin@kpa-test.kr',
-    name: '분회 운영자 (테스트)',
+    name: '이분회 (분회운영자)',
     role: 'branch_admin',
   },
   district_officer: {
     id: 'test-district-officer-001',
     email: 'district-officer@kpa-test.kr',
-    name: '지부 부회장 (테스트)',
+    name: '박임원 (지부임원)',
     role: 'pharmacist',  // 권한은 일반 회원
     position: 'vice_president',  // 직책: 부회장
   },
   branch_officer: {
     id: 'test-branch-officer-001',
     email: 'branch-officer@kpa-test.kr',
-    name: '분회 이사 (테스트)',
+    name: '최임원 (분회임원)',
     role: 'pharmacist',  // 권한은 일반 회원
     position: 'director',  // 직책: 이사
   },
   pharmacist: {
     id: 'test-pharmacist-001',
     email: 'pharmacist@kpa-test.kr',
-    name: '테스트 약사',
+    name: '홍길동 (약사)',
     role: 'pharmacist',
   },
 };
@@ -107,6 +107,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User>;
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
   setPharmacistFunction: (fn: PharmacistFunction) => void;
 }
@@ -213,6 +214,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const logoutAll = async () => {
+    try {
+      await authClient.api.post('/auth/logout-all');
+    } catch (error) {
+      console.error('Logout all request failed:', error);
+      throw error;
+    } finally {
+      setUser(null);
+    }
+  };
+
   /**
    * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정으로 즉시 로그인
    * - 실제 API 호출 없이 로컬 상태만 변경
@@ -246,6 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         loginAsTestAccount,
         logout,
+        logoutAll,
         checkAuth,
         setPharmacistFunction,
       }}

@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { SparklesIcon, CloseIcon, LoaderIcon, AlertIcon, RefreshIcon } from './icons';
+import { getAccessToken } from '../../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -46,11 +47,17 @@ export function AiSummaryModal({
     setSummary('');
 
     try {
+      const token = getAccessToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/ai/query`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify({
           question: `${contextLabel || '현재 화면'}의 주요 지표와 현황을 요약해 주세요.`,
