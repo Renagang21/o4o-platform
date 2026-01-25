@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, Card } from '../../components/common';
+import { PageHeader, Card } from '../../components/common';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
@@ -452,7 +452,7 @@ const styles: Record<string, React.CSSProperties> = {
   form: {
     marginTop: '24px',
     padding: '24px',
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.neutral50,
     borderRadius: '12px',
     border: `1px solid ${colors.gray200}`,
   },
@@ -558,7 +558,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'flex-start',
     gap: '16px',
     padding: '16px',
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.neutral50,
     borderRadius: '8px',
     border: `1px solid ${colors.gray200}`,
   },

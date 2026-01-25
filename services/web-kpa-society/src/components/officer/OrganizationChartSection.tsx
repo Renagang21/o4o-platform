@@ -13,13 +13,11 @@ import type {
   Officer,
   ExtendedCommittee,
   OfficerRole,
-  OFFICER_ROLE_LABELS,
-  EXTENDED_COMMITTEE_TYPE_LABELS,
 } from '../../types/organization';
 
 interface OrganizationChartSectionProps {
   chart: OrganizationChart;
-  currentUserRole: OfficerRole;
+  currentUserRole?: OfficerRole;
   canEdit?: boolean;
   onEditOfficer?: (officer: Officer) => void;
   onAddOfficer?: (role: OfficerRole) => void;
@@ -29,7 +27,7 @@ interface OrganizationChartSectionProps {
 
 export function OrganizationChartSection({
   chart,
-  currentUserRole,
+  currentUserRole: _currentUserRole,
   canEdit = false,
   onEditOfficer,
   onAddOfficer,
@@ -129,8 +127,6 @@ export function OrganizationChartSection({
             <div style={styles.committeeGrid}>
               {chart.committees.filter(c => c.isActive).map((committee) => {
                 const isExpanded = expandedCommittees.includes(committee.id);
-                const chair = chart.committees
-                  .find(c => c.id === committee.id);
 
                 return (
                   <div

@@ -8,14 +8,12 @@
  * - 고문: 요약만 (AI 없음)
  */
 
-import { useState } from 'react';
 import { AiSummaryButton } from '../ai';
 import { colors } from '../../styles/theme';
 import {
   type OfficerRole,
   type AccountingCategory,
   type AccountingEntryWithCommittee,
-  ACCOUNTING_CATEGORIES,
   getAccountingAccess,
   filterAccountingByRole,
   OFFICER_ROLE_LABELS,

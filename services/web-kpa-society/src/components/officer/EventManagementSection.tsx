@@ -7,7 +7,6 @@
  * - 특별위원회 또는 상임위원회 주관
  */
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import type { OrganizationEvent, OfficerRole } from '../../types/organization';
