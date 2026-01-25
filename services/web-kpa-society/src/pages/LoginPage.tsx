@@ -45,8 +45,18 @@ export function LoginPage() {
 
     try {
       const loggedInUser = await login(email, password);
-      // WO-KPA-FUNCTION-GATE-V1: 직능 미선택 시 게이트로 이동
-      if (!loggedInUser.pharmacistFunction) {
+
+      // WO-KPA-FUNCTION-GATE-V1: 직능 선택 로직
+      // 운영자(admin)는 직능 선택 없이 바로 운영자 대시보드로 이동
+      const isAdmin = loggedInUser.role === 'district_admin' ||
+                      loggedInUser.role === 'branch_admin' ||
+                      loggedInUser.role === 'super_admin';
+
+      if (isAdmin) {
+        // 운영자/관리자는 바로 운영자 대시보드로 이동
+        navigate('/demo/intranet/operator');
+      } else if (!loggedInUser.pharmacistFunction) {
+        // 일반 약사 회원은 직능 미선택 시 게이트로 이동
         navigate('/demo/select-function');
       } else {
         navigate('/demo');
