@@ -85,7 +85,13 @@ interface RecentActivity {
 export function OperatorDashboardPage() {
   const { currentOrganization } = useOrganization();
   const orgType = currentOrganization?.type === 'branch' ? 'branch' : 'district';
-  const basePath = orgType === 'branch' ? `/branch/${currentOrganization?.id}/admin` : '/admin';
+
+  // WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1: /demo 접두사 추가 및 올바른 경로 매핑
+  const adminBasePath = orgType === 'branch'
+    ? `/demo/branch/${currentOrganization?.id}/admin`
+    : '/demo/admin';
+  const intranetBasePath = '/demo/intranet';
+  const demoBasePath = '/demo';
 
   // 대시보드 통계 데이터
   const [stats, setStats] = useState<DashboardStats>({
@@ -202,13 +208,14 @@ export function OperatorDashboardPage() {
     );
   };
 
-  // 관리 섹션 정의
+  // 관리 섹션 정의 - WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1
+  // 각 링크를 실제 존재하는 라우트로 매핑
   const managementSections = [
     {
       id: 'members',
       title: '👥 회원 관리',
       description: '회원 목록, 승인, 상태 관리',
-      link: `${basePath}/members`,
+      link: `${adminBasePath}/members`,
       stats: [
         { label: '전체 회원', value: stats.members.total, color: colors.primary },
         { label: '활성', value: stats.members.active, color: '#059669' },
@@ -220,7 +227,7 @@ export function OperatorDashboardPage() {
       id: 'officers',
       title: '👔 임원 관리',
       description: '임원 현황, 조직도 관리',
-      link: `${basePath}/officers`,
+      link: `${adminBasePath}/officers`,
       stats: [
         { label: '총 임원', value: stats.officers.total, color: colors.primary },
         { label: '회장/부회장', value: stats.officers.president + stats.officers.vicePresidents, color: '#4F46E5' },
@@ -231,7 +238,7 @@ export function OperatorDashboardPage() {
       id: 'events',
       title: '🎪 행사 관리',
       description: '행사 기획, 일정, 참여 관리',
-      link: `${basePath}/events`,
+      link: `${intranetBasePath}/schedule`,
       stats: [
         { label: '예정 행사', value: stats.events.upcoming, color: '#4F46E5' },
         { label: '진행중', value: stats.events.inProgress, color: '#D97706' },
@@ -243,7 +250,7 @@ export function OperatorDashboardPage() {
       id: 'reports',
       title: '📝 신상신고 관리',
       description: '신상신고서 접수, 검토, 승인',
-      link: `${basePath}/annual-report`,
+      link: `${adminBasePath}/annual-report`,
       stats: [
         { label: '전체 신고', value: stats.personalReports.total, color: colors.primary },
         { label: '검토 대기', value: stats.personalReports.pending, color: '#D97706' },
@@ -255,7 +262,7 @@ export function OperatorDashboardPage() {
       id: 'training',
       title: '🎓 연수교육 관리',
       description: '교육 과정, 일정, 등록 관리',
-      link: `${basePath}/training`,
+      link: `${demoBasePath}/lms`,
       stats: [
         { label: '진행중 과정', value: stats.training.activeCourses, color: colors.primary },
         { label: '총 등록', value: stats.training.totalEnrollments, color: '#4F46E5' },
@@ -266,7 +273,7 @@ export function OperatorDashboardPage() {
       id: 'scores',
       title: '📊 교육 점수 관리',
       description: '약사 연수교육 점수 현황',
-      link: `${basePath}/training-scores`,
+      link: `${demoBasePath}/lms/certificate`,
       stats: [
         { label: '평균 점수', value: stats.trainingScores.avgScore, color: colors.primary },
         { label: '이수 완료', value: stats.trainingScores.completed, color: '#059669' },
@@ -278,7 +285,7 @@ export function OperatorDashboardPage() {
       id: 'finance',
       title: '💰 재정 관리',
       description: '회계, 연회비, 예산 관리',
-      link: `${basePath}/finance`,
+      link: orgType === 'branch' ? `${adminBasePath}/membership-fee` : `${adminBasePath}/fee`,
       stats: [
         { label: '현재 잔액', value: formatCurrency(stats.finance.currentBalance), color: colors.primary },
         { label: '월 수입', value: formatCurrency(stats.finance.monthlyIncome), color: '#059669' },
@@ -361,31 +368,31 @@ export function OperatorDashboardPage() {
 
         {/* 빠른 작업 + 최근 활동 */}
         <div style={styles.bottomGrid}>
-          {/* 빠른 작업 */}
+          {/* 빠른 작업 - WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1 */}
           <div style={styles.card}>
             <h3 style={styles.cardTitle}>⚡ 빠른 작업</h3>
             <div style={styles.quickActions}>
-              <Link to={`${basePath}/members/new`} style={styles.quickAction}>
+              <Link to={`${adminBasePath}/members`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>➕</span>
-                <span>회원 등록</span>
+                <span>회원 관리</span>
               </Link>
-              <Link to={`${basePath}/annual-report`} style={styles.quickAction}>
+              <Link to={`${adminBasePath}/annual-report`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>📝</span>
                 <span>신상신고 검토</span>
               </Link>
-              <Link to={`${basePath}/events/new`} style={styles.quickAction}>
+              <Link to={`${intranetBasePath}/schedule`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>📅</span>
-                <span>행사 등록</span>
+                <span>일정 관리</span>
               </Link>
-              <Link to={`${basePath}/news/new`} style={styles.quickAction}>
+              <Link to={`${intranetBasePath}/notice/write`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>📢</span>
                 <span>공지 작성</span>
               </Link>
-              <Link to={`${basePath}/finance/entry`} style={styles.quickAction}>
+              <Link to={orgType === 'branch' ? `${adminBasePath}/membership-fee` : `${adminBasePath}/fee`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>💰</span>
-                <span>회계 입력</span>
+                <span>연회비 관리</span>
               </Link>
-              <Link to={`${basePath}/settings`} style={styles.quickAction}>
+              <Link to={`${adminBasePath}/settings`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>⚙️</span>
                 <span>설정</span>
               </Link>
@@ -413,11 +420,11 @@ export function OperatorDashboardPage() {
           </div>
         </div>
 
-        {/* 재정 요약 */}
+        {/* 재정 요약 - WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1 */}
         <div style={styles.financeSection}>
           <div style={styles.financeHeader}>
             <h3 style={styles.cardTitle}>💰 재정 요약</h3>
-            <Link to={`${basePath}/finance`} style={styles.viewAllLink}>
+            <Link to={orgType === 'branch' ? `${adminBasePath}/membership-fee` : `${adminBasePath}/fee`} style={styles.viewAllLink}>
               상세 보기 →
             </Link>
           </div>
