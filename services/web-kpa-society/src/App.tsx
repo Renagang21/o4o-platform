@@ -137,6 +137,9 @@ function App() {
           <Route path="/demo/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
           <Route path="/demo/branch/:branchId/*" element={<BranchRoutes />} />
 
+          {/* /demo/branch (branchId 없음) - 인트라넷으로 리다이렉트 */}
+          <Route path="/demo/branch" element={<Navigate to="/demo/intranet" replace />} />
+
           {/* Main Layout Routes - /demo 하위 나머지 경로 */}
           <Route path="/demo/*" element={<DemoLayoutRoutes />} />
 
