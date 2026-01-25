@@ -2,6 +2,9 @@
  * KPA Society 타입 정의
  */
 
+// 약사 회원 타입 (신고서 양식 기반)
+export * from './pharmacist';
+
 // 공통 타입
 export interface PaginatedResponse<T> {
   data: T[];

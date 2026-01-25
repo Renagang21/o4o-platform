@@ -22,7 +22,7 @@ import { ResourcesListPage } from './pages/resources';
 import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage } from './pages/mypage';
+import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage } from './pages/mypage';
 
 // Branch Routes (분회 서브디렉토리)
 import { BranchRoutes } from './routes/BranchRoutes';
@@ -229,6 +229,7 @@ function DemoLayoutRoutes() {
         <Route path="/mypage/settings" element={<MySettingsPage />} />
         <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
         <Route path="/mypage/status-report" element={<PersonalStatusReportPage />} />
+        <Route path="/mypage/annual-report" element={<AnnualReportFormPage />} />
 
         {/* Legacy routes (for backward compatibility) */}
         <Route path="/member/apply" element={<MemberApplyPage />} />

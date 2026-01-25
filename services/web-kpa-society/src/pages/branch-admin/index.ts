@@ -6,6 +6,7 @@ export { DashboardPage } from './DashboardPage';
 export { MembersPage } from './MembersPage';
 export { AnnualReportPage } from './AnnualReportPage';
 export { MembershipFeePage } from './MembershipFeePage';
+export { MemberStatusPage } from './MemberStatusPage';
 export { NewsManagementPage } from './NewsManagementPage';
 export { ForumManagementPage } from './ForumManagementPage';
 export { DocsManagementPage } from './DocsManagementPage';

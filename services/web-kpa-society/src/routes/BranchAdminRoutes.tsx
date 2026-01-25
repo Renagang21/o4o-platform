@@ -14,6 +14,7 @@ import {
   MembersPage,
   AnnualReportPage,
   MembershipFeePage,
+  MemberStatusPage,
   NewsManagementPage,
   ForumManagementPage,
   DocsManagementPage,
@@ -39,6 +40,9 @@ export function BranchAdminRoutes() {
 
         {/* 연회비 */}
         <Route path="membership-fee" element={<MembershipFeePage />} />
+
+        {/* 회원 현황 (신상신고/연수교육/회비) */}
+        <Route path="member-status" element={<MemberStatusPage />} />
 
         {/* 공지사항 */}
         <Route path="news" element={<NewsManagementPage />} />
