@@ -108,6 +108,13 @@ function App() {
           <Route path="/join/pharmacy" element={<PharmacyJoinPage />} />
 
           {/* ========================================
+           * 약국 경영지원 (실 서비스 경로)
+           * WO-KPA-PHARMACY-LOCATION-V1: /pharmacy를 단일 기준 경로로
+           * ======================================== */}
+          <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
+          <Route path="/pharmacy/*" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
+
+          {/* ========================================
            * 약사회 데모 서비스 (/demo 하위)
            * WO-KPA-DEMO-ROUTE-ISOLATION-V1
            * ======================================== */}
@@ -213,9 +220,9 @@ function DemoLayoutRoutes() {
         <Route path="/groupbuy/history" element={<GroupbuyHistoryPage />} />
         <Route path="/groupbuy/:id" element={<GroupbuyDetailPage />} />
 
-        {/* Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1) */}
-        <Route path="/pharmacy" element={<PharmacyPage />} />
-        <Route path="/pharmacy/*" element={<PharmacyPage />} />
+        {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
+        <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />
+        <Route path="/pharmacy/*" element={<Navigate to="/pharmacy" replace />} />
 
         {/* Docs (자료실) */}
         <Route path="/docs" element={<ResourcesListPage />} />

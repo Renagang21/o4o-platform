@@ -43,7 +43,7 @@ export function ServiceBanner({
   return (
     <div style={{
       ...styles.banner,
-      backgroundColor: isPrimary ? colors.gray50 : colors.white,
+      backgroundColor: isPrimary ? colors.gray100 : colors.white,
       borderColor: isPrimary ? colors.primary : colors.gray300,
     }}>
       <div style={styles.bannerContent}>
@@ -85,7 +85,7 @@ export function ServiceBanner({
 export function ExternalServiceSection() {
   return (
     <section style={styles.section}>
-      {/* 약국 경영지원 (WO-KPA-PHARMACY-MANAGEMENT-V1) */}
+      {/* 약국 경영지원 (WO-KPA-PHARMACY-LOCATION-V1: /pharmacy 단일 기준 경로) */}
       <h2 style={styles.sectionTitle}>약국 경영지원</h2>
       <p style={styles.sectionDesc}>
         약국 운영에 필요한 모든 기능을 한 곳에서 관리하세요.
@@ -95,7 +95,7 @@ export function ExternalServiceSection() {
           icon="💊"
           title="내 약국 운영하기"
           description="B2B 구매, 약국 몰 관리, 연결 서비스를 통합 관리합니다."
-          linkUrl="/demo/pharmacy"
+          linkUrl="/pharmacy"
           linkText="내 약국 운영하기"
           variant="primary"
           showDisclaimer={false}

@@ -150,7 +150,7 @@ export function PharmacyPage() {
             </div>
           </div>
           <div style={styles.cardFooter}>
-            <Link to="/demo/pharmacy/mall" style={styles.cardLink}>
+            <Link to="/pharmacy/mall" style={styles.cardLink}>
               진열 관리 →
             </Link>
           </div>
@@ -203,7 +203,7 @@ export function PharmacyPage() {
           </div>
           <div style={styles.cardFooter}>
             <Link to="/demo/lms" style={styles.cardLinkSecondary}>교육</Link>
-            <Link to="/demo/pharmacy/signage" style={styles.cardLinkSecondary}>사이니지</Link>
+            <Link to="/pharmacy/signage" style={styles.cardLinkSecondary}>사이니지</Link>
             <Link to="/demo/forum" style={styles.cardLinkSecondary}>포럼</Link>
           </div>
         </div>
@@ -242,7 +242,7 @@ export function PharmacyPage() {
               </div>
             </div>
             <div style={styles.cardFooter}>
-              <Link to="/demo/pharmacy/analytics" style={styles.cardLink}>
+              <Link to="/pharmacy/analytics" style={styles.cardLink}>
                 상세 보기 →
               </Link>
             </div>
@@ -487,7 +487,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '16px 8px',
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.gray100,
     borderRadius: '8px',
   },
   summaryLabel: {
@@ -507,7 +507,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'flex-start',
     gap: '10px',
     padding: '16px 20px',
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.gray100,
     borderRadius: borderRadius.md,
     marginTop: '8px',
   },
