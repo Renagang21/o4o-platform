@@ -1,0 +1,32 @@
+{
+  "name": "@o4o-apps/forum-pharmacy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Forum Extension for Pharmacy Services - Context attribution, scoped visibility, and responsibility boundaries",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./src/*": "./src/*"
+  },
+  "scripts": {
+    "build": "tsc --skipLibCheck || true",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit --skipLibCheck"
+  },
+  "dependencies": {
+    "@o4o/forum-core": "workspace:*",
+    "@o4o/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  }
+}
