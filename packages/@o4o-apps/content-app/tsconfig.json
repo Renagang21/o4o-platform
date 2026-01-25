@@ -1,0 +1,22 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "jsx": "react-jsx",
+    "noEmit": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "strict": false,
+    "skipLibCheck": true,
+    "isolatedModules": false,
+    "lib": ["ES2022", "DOM"]
+  },
+  "include": ["index.ts", "manifest.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}

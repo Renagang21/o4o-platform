@@ -1,0 +1,18 @@
+{
+  "id": "flow-step",
+  "name": "단계 보기",
+  "description": "흐름 내 단계 콘텐츠 보기 (학습 아님)",
+  "layout": "viewer",
+  "component": "FlowStepPage",
+  "hidden": true,
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/flows/:flowId",
+    "method": "GET"
+  },
+  "features": [
+    "content-preview",
+    "step-navigation",
+    "progress-tracking"
+  ]
+}

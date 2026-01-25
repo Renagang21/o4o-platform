@@ -1,5 +1,10 @@
 /**
- * LmsCoursesPage - 교육 과정 목록 페이지
+ * LmsCoursesPage - 안내 흐름 목록 페이지
+ *
+ * 핵심 원칙:
+ * - 이 기능은 교육이나 평가를 위한 것이 아닙니다
+ * - 콘텐츠를 순서대로 안내하기 위한 도구입니다
+ * - Content App = 제작, Learning App = 순서, Participation App = 응답
  */
 
 import { useState, useEffect } from 'react';
@@ -75,16 +80,21 @@ export function LmsCoursesPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="교육 과정을 불러오는 중..." />;
+    return <LoadingSpinner message="안내 흐름을 불러오는 중..." />;
   }
 
   return (
     <div style={styles.container}>
       <PageHeader
-        title="교육 과정"
-        description="다양한 전문 교육 과정을 수강하세요"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '교육' }]}
+        title="안내 흐름"
+        description="콘텐츠를 순서대로 안내받으세요"
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '안내' }]}
       />
+
+      {/* 안내 메시지 */}
+      <div style={styles.infoBox}>
+        💡 이 기능은 교육·평가가 아닌, 콘텐츠를 순서대로 안내하기 위한 도구입니다.
+      </div>
 
       <div style={styles.filters}>
         <select
@@ -101,9 +111,9 @@ export function LmsCoursesPage() {
 
       {courses.length === 0 ? (
         <EmptyState
-          icon="📚"
-          title="등록된 과정이 없습니다"
-          description="곧 새로운 교육 과정이 등록될 예정입니다."
+          icon="📋"
+          title="등록된 안내 흐름이 없습니다"
+          description="곧 새로운 안내 흐름이 등록될 예정입니다."
         />
       ) : (
         <>
@@ -127,12 +137,12 @@ export function LmsCoursesPage() {
                     <p style={styles.courseDescription}>{course.description}</p>
                     <div style={styles.courseMeta}>
                       <span>👤 {course.instructorName}</span>
-                      <span>📖 {course.lessonCount}개 강의</span>
+                      <span>📖 {course.lessonCount}개 단계</span>
                       <span>⏱ {Math.floor(course.duration / 60)}시간</span>
                     </div>
                     <div style={styles.courseFooter}>
                       <span style={styles.enrollCount}>
-                        {course.enrollmentCount}명 수강중
+                        {course.enrollmentCount}명 진행중
                       </span>
                     </div>
                   </div>
@@ -157,6 +167,14 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '0 20px 40px',
+  },
+  infoBox: {
+    padding: '12px 16px',
+    backgroundColor: '#EFF6FF',
+    borderRadius: '8px',
+    color: '#1E40AF',
+    fontSize: '14px',
+    marginBottom: '24px',
   },
   filters: {
     display: 'flex',

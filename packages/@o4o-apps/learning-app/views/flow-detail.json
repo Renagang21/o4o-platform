@@ -1,0 +1,23 @@
+{
+  "id": "flow-detail",
+  "name": "Flow 상세",
+  "description": "콘텐츠 순서 흐름 상세 (강의 상세 아님)",
+  "layout": "detail",
+  "component": "FlowDetailPage",
+  "hidden": true,
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/flows/:id",
+    "method": "GET"
+  },
+  "sections": [
+    {
+      "id": "info",
+      "label": "흐름 정보"
+    },
+    {
+      "id": "steps",
+      "label": "단계 목록"
+    }
+  ]
+}

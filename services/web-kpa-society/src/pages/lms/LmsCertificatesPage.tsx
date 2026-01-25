@@ -1,5 +1,12 @@
 /**
- * LmsCertificatesPage - 수료증 관리 페이지
+ * LmsCertificatesPage - 완료 기록 페이지
+ *
+ * 핵심 원칙:
+ * - 이 기능은 교육이나 평가를 위한 것이 아닙니다
+ * - 안내 흐름의 완료 기록을 관리하는 도구입니다
+ *
+ * NOTE: 수료증/인증서 발급 기능은 도메인별로 판단해야 합니다.
+ * Learning App은 순차 전달 도구이며, 수료 인증은 별도 App 영역입니다.
  */
 
 import { useState, useEffect } from 'react';
@@ -34,7 +41,7 @@ export function LmsCertificatesPage() {
       setCertificates(res.data);
       setTotalPages(res.totalPages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '수료증을 불러오는데 실패했습니다.');
+      setError(err instanceof Error ? err.message : '완료 기록을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -57,14 +64,14 @@ export function LmsCertificatesPage() {
         <EmptyState
           icon="🔒"
           title="로그인이 필요합니다"
-          description="수료증을 확인하려면 로그인해주세요."
+          description="완료 기록을 확인하려면 로그인해주세요."
         />
       </div>
     );
   }
 
   if (loading) {
-    return <LoadingSpinner message="수료증을 불러오는 중..." />;
+    return <LoadingSpinner message="완료 기록을 불러오는 중..." />;
   }
 
   if (error) {
@@ -83,21 +90,21 @@ export function LmsCertificatesPage() {
   return (
     <div style={styles.container}>
       <PageHeader
-        title="수료증"
-        description="수료한 교육 과정의 수료증을 확인하세요"
+        title="완료 기록"
+        description="완료한 안내 흐름의 기록을 확인하세요"
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '교육', href: '/lms/courses' },
-          { label: '수료증' },
+          { label: '안내', href: '/lms/courses' },
+          { label: '완료 기록' },
         ]}
       />
 
       {certificates.length === 0 ? (
         <EmptyState
-          icon="🎓"
-          title="수료증이 없습니다"
-          description="교육 과정을 수료하면 수료증이 발급됩니다."
-          action={{ label: '교육 과정 보기', onClick: () => window.location.href = '/lms/courses' }}
+          icon="📋"
+          title="완료 기록이 없습니다"
+          description="안내 흐름을 완료하면 기록이 생성됩니다."
+          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = '/lms/courses' }}
         />
       ) : (
         <>

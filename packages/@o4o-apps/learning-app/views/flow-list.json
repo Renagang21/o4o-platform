@@ -1,0 +1,13 @@
+{
+  "id": "flow-list",
+  "name": "Flow 목록",
+  "description": "콘텐츠 순서 흐름 목록 (교육 목록 아님)",
+  "layout": "list",
+  "component": "FlowListPage",
+  "hidden": true,
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/flows",
+    "method": "GET"
+  }
+}

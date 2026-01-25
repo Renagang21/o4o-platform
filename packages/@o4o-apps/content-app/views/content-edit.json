@@ -1,0 +1,23 @@
+{
+  "id": "content-edit",
+  "name": "콘텐츠 수정",
+  "description": "콘텐츠 수정 화면",
+  "layout": "form",
+  "component": "ContentEditPage",
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/content/:id",
+    "method": "PATCH"
+  },
+  "actions": [
+    {
+      "id": "save",
+      "label": "저장",
+      "primary": true
+    },
+    {
+      "id": "cancel",
+      "label": "취소"
+    }
+  ]
+}

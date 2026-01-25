@@ -1,5 +1,8 @@
 /**
  * LMS API 서비스
+ *
+ * NOTE: Learning App은 교육/평가 도구가 아닌 순차 전달 도구입니다.
+ * API 명칭은 기존 호환성을 위해 유지하되, UI에서는 중립적 용어를 사용합니다.
  */
 
 import { apiClient } from './client';
@@ -13,7 +16,7 @@ import type {
 } from '../types';
 
 export const lmsApi = {
-  // 코스
+  // 안내 흐름
   getCourses: (params?: {
     category?: string;
     level?: string;
@@ -26,14 +29,14 @@ export const lmsApi = {
   getCourse: (id: string) =>
     apiClient.get<ApiResponse<Course>>(`/lms/courses/${id}`),
 
-  // 레슨
+  // 단계
   getLessons: (courseId: string) =>
     apiClient.get<ApiResponse<Lesson[]>>(`/lms/courses/${courseId}/lessons`),
 
   getLesson: (courseId: string, lessonId: string) =>
     apiClient.get<ApiResponse<Lesson>>(`/lms/courses/${courseId}/lessons/${lessonId}`),
 
-  // 수강
+  // 진행
   getMyEnrollments: (params?: { status?: string; page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<Enrollment>>('/lms/enrollments', params),
 
@@ -49,7 +52,7 @@ export const lmsApi = {
       completed,
     }),
 
-  // 수료증
+  // 완료 기록
   getMyCertificates: (params?: { page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<Certificate>>('/lms/certificates', params),
 

@@ -1,5 +1,9 @@
 /**
- * LmsLessonPage - 레슨 학습 페이지
+ * LmsLessonPage - 단계 보기 페이지
+ *
+ * 핵심 원칙:
+ * - 이 기능은 교육이나 평가를 위한 것이 아닙니다
+ * - 콘텐츠를 순서대로 안내하기 위한 도구입니다
  */
 
 import { useState, useEffect } from 'react';
@@ -42,10 +46,10 @@ export function LmsLessonPage() {
         const enrollmentRes = await lmsApi.getEnrollment(courseId!);
         setEnrollment(enrollmentRes.data);
       } catch {
-        // 미수강 상태
+        // 미시작 상태
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '레슨을 불러오는데 실패했습니다.');
+      setError(err instanceof Error ? err.message : '단계를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +68,7 @@ export function LmsLessonPage() {
         const nextLesson = lessons[currentIndex + 1];
         navigate(`/lms/course/${courseId}/lesson/${nextLesson.id}`);
       } else {
-        alert('모든 강의를 완료했습니다!');
+        alert('모든 단계를 완료했습니다!');
       }
     } catch (err) {
       alert('진도 업데이트에 실패했습니다.');
@@ -72,7 +76,7 @@ export function LmsLessonPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="레슨을 불러오는 중..." />;
+    return <LoadingSpinner message="단계를 불러오는 중..." />;
   }
 
   if (error || !course || !currentLesson) {
@@ -80,9 +84,9 @@ export function LmsLessonPage() {
       <div style={styles.container}>
         <EmptyState
           icon="⚠️"
-          title="레슨을 찾을 수 없습니다"
-          description={error || '삭제되었거나 존재하지 않는 레슨입니다.'}
-          action={{ label: '과정으로', onClick: () => navigate(`/lms/course/${courseId}`) }}
+          title="단계를 찾을 수 없습니다"
+          description={error || '삭제되었거나 존재하지 않는 단계입니다.'}
+          action={{ label: '안내 흐름으로', onClick: () => navigate(`/lms/course/${courseId}`) }}
         />
       </div>
     );
@@ -99,7 +103,7 @@ export function LmsLessonPage() {
       <aside style={styles.sidebar}>
         <div style={styles.sidebarHeader}>
           <Link to={`/lms/course/${courseId}`} style={styles.backLink}>
-            ← 과정으로
+            ← 안내 흐름으로
           </Link>
           <h2 style={styles.courseTitle}>{course.title}</h2>
         </div>
@@ -186,7 +190,7 @@ export function LmsLessonPage() {
               to={`/lms/course/${courseId}/lesson/${prevLesson.id}`}
               style={styles.navButton}
             >
-              ← 이전 강의
+              ← 이전 단계
             </Link>
           ) : (
             <div />
@@ -194,7 +198,7 @@ export function LmsLessonPage() {
 
           {!isCompleted && enrollment && (
             <button style={styles.completeButton} onClick={handleComplete}>
-              ✓ 학습 완료
+              ✓ 완료
             </button>
           )}
 
@@ -203,11 +207,11 @@ export function LmsLessonPage() {
               to={`/lms/course/${courseId}/lesson/${nextLesson.id}`}
               style={styles.navButton}
             >
-              다음 강의 →
+              다음 단계 →
             </Link>
           ) : (
             <Link to={`/lms/course/${courseId}`} style={styles.navButton}>
-              과정으로 →
+              안내 흐름으로 →
             </Link>
           )}
         </div>

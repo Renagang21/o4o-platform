@@ -1,0 +1,26 @@
+{
+  "id": "content-create",
+  "name": "콘텐츠 생성",
+  "description": "새 콘텐츠 생성 화면",
+  "layout": "form",
+  "component": "ContentCreatePage",
+  "steps": [
+    {
+      "id": "type",
+      "label": "콘텐츠 유형 선택"
+    },
+    {
+      "id": "owner",
+      "label": "소유 주체 선택"
+    },
+    {
+      "id": "content",
+      "label": "콘텐츠 작성"
+    }
+  ],
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/content",
+    "method": "POST"
+  }
+}

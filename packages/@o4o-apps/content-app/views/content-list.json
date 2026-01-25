@@ -1,0 +1,39 @@
+{
+  "id": "content-list",
+  "name": "콘텐츠 목록",
+  "description": "콘텐츠 목록 조회 화면",
+  "layout": "list",
+  "component": "ContentListPage",
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/content",
+    "method": "GET"
+  },
+  "filters": [
+    {
+      "field": "type",
+      "label": "콘텐츠 유형",
+      "type": "select",
+      "options": ["text", "image", "social", "reference"]
+    },
+    {
+      "field": "status",
+      "label": "상태",
+      "type": "select",
+      "options": ["draft", "ready", "archived"]
+    },
+    {
+      "field": "ownerType",
+      "label": "소유 주체",
+      "type": "select",
+      "options": ["individual", "business", "organization", "platform"]
+    }
+  ],
+  "actions": [
+    {
+      "id": "create",
+      "label": "새 콘텐츠 만들기",
+      "route": "/content/create"
+    }
+  ]
+}

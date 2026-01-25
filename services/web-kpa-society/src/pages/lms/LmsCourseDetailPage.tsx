@@ -1,5 +1,9 @@
 /**
- * LmsCourseDetailPage - 과정 상세 페이지
+ * LmsCourseDetailPage - 안내 흐름 상세 페이지
+ *
+ * 핵심 원칙:
+ * - 이 기능은 교육이나 평가를 위한 것이 아닙니다
+ * - 콘텐츠를 순서대로 안내하기 위한 도구입니다
  */
 
 import { useState, useEffect } from 'react';
@@ -38,17 +42,17 @@ export function LmsCourseDetailPage() {
       setCourse(courseRes.data);
       setLessons(lessonsRes.data);
 
-      // 수강 정보 확인 (로그인 시)
+      // 진행 정보 확인 (로그인 시)
       if (user) {
         try {
           const enrollmentRes = await lmsApi.getEnrollment(id!);
           setEnrollment(enrollmentRes.data);
         } catch {
-          // 미수강 상태
+          // 미시작 상태
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '과정을 불러오는데 실패했습니다.');
+      setError(err instanceof Error ? err.message : '안내 흐름을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -64,9 +68,9 @@ export function LmsCourseDetailPage() {
       setEnrolling(true);
       const res = await lmsApi.enrollCourse(id!);
       setEnrollment(res.data);
-      alert('수강 신청이 완료되었습니다.');
+      alert('시작 등록이 완료되었습니다.');
     } catch (err) {
-      alert('수강 신청에 실패했습니다.');
+      alert('시작 등록에 실패했습니다.');
     } finally {
       setEnrolling(false);
     }
@@ -82,7 +86,7 @@ export function LmsCourseDetailPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="과정을 불러오는 중..." />;
+    return <LoadingSpinner message="안내 흐름을 불러오는 중..." />;
   }
 
   if (error || !course) {
@@ -90,8 +94,8 @@ export function LmsCourseDetailPage() {
       <div style={styles.container}>
         <EmptyState
           icon="⚠️"
-          title="과정을 찾을 수 없습니다"
-          description={error || '삭제되었거나 존재하지 않는 과정입니다.'}
+          title="안내 흐름을 찾을 수 없습니다"
+          description={error || '삭제되었거나 존재하지 않는 안내 흐름입니다.'}
           action={{ label: '목록으로', onClick: () => navigate('/lms/courses') }}
         />
       </div>
@@ -104,7 +108,7 @@ export function LmsCourseDetailPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '교육', href: '/lms/courses' },
+          { label: '안내', href: '/lms/courses' },
           { label: course.title },
         ]}
       />
@@ -122,22 +126,22 @@ export function LmsCourseDetailPage() {
             <div style={styles.meta}>
               <span>👤 {course.instructorName}</span>
               <span>·</span>
-              <span>📖 {course.lessonCount}개 강의</span>
+              <span>📖 {course.lessonCount}개 단계</span>
               <span>·</span>
               <span>⏱ {Math.floor(course.duration / 60)}시간 {course.duration % 60}분</span>
               <span>·</span>
-              <span>{course.enrollmentCount}명 수강</span>
+              <span>{course.enrollmentCount}명 진행중</span>
             </div>
 
             <div style={styles.description}>
-              <h2 style={styles.sectionTitle}>과정 소개</h2>
+              <h2 style={styles.sectionTitle}>소개</h2>
               <p style={styles.descriptionText}>{course.description}</p>
             </div>
           </Card>
 
-          {/* 커리큘럼 */}
+          {/* 순서 목록 */}
           <Card padding="large" style={{ marginTop: '24px' }}>
-            <h2 style={styles.sectionTitle}>커리큘럼</h2>
+            <h2 style={styles.sectionTitle}>순서 목록</h2>
             <div style={styles.lessonList}>
               {lessons.map((lesson, index) => {
                 const isCompleted = enrollment?.completedLessons?.includes(lesson.id);
@@ -162,7 +166,7 @@ export function LmsCourseDetailPage() {
                         to={`/lms/course/${course.id}/lesson/${lesson.id}`}
                         style={styles.lessonLink}
                       >
-                        학습하기
+                        보기
                       </Link>
                     )}
                   </div>
@@ -196,7 +200,7 @@ export function LmsCourseDetailPage() {
                   to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`}
                   style={styles.continueButton}
                 >
-                  학습 계속하기
+                  계속 보기
                 </Link>
               </div>
             ) : (
@@ -205,7 +209,7 @@ export function LmsCourseDetailPage() {
                 onClick={handleEnroll}
                 disabled={enrolling}
               >
-                {enrolling ? '신청 중...' : '수강 신청하기'}
+                {enrolling ? '시작 중...' : '시작하기'}
               </button>
             )}
           </Card>

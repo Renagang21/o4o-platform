@@ -1,0 +1,38 @@
+{
+  "id": "content-detail",
+  "name": "콘텐츠 상세",
+  "description": "콘텐츠 상세 조회 화면",
+  "layout": "detail",
+  "component": "ContentDetailPage",
+  "dataSource": {
+    "type": "api",
+    "endpoint": "/api/v1/content/:id",
+    "method": "GET"
+  },
+  "sections": [
+    {
+      "id": "info",
+      "label": "기본 정보"
+    },
+    {
+      "id": "preview",
+      "label": "미리보기"
+    },
+    {
+      "id": "share",
+      "label": "공유"
+    }
+  ],
+  "actions": [
+    {
+      "id": "edit",
+      "label": "수정",
+      "route": "/content/:id/edit"
+    },
+    {
+      "id": "delete",
+      "label": "삭제",
+      "confirm": true
+    }
+  ]
+}
