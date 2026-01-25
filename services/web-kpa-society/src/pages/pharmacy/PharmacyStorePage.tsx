@@ -1,38 +1,105 @@
 /**
- * PharmacyStorePage - 내 약국 몰 진열/상태 화면
+ * PharmacyStorePage - 약국 매장 UI-UX 관리
  *
- * WO-KPA-PHARMACY-DEPTH-V1
- * - "우리 약국이 고객에게 어떻게 보이고 있는가"를 한 눈에 확인
- * - B2C 몰, 태블릿, 키오스크 상태 표시
- * - 상품 CRUD, 디자인/편집 UI는 제외
+ * WO-KPA-PHARMACY-STORE-UX-TEMPLATE-V1
+ * - 약국 매장 화면(B2C 몰, 태블릿, 키오스크) UI-UX 표준화
+ * - 템플릿 선택 (구조 변경 불가)
+ * - 테마 선택 (색상/폰트/스타일)
+ * - 컴포넌트 On/Off (순서 변경 불가)
+ * - 디바이스별 미리보기
+ *
+ * 핵심 원칙:
+ * "약국 매장 UI는 자유 편집 대상이 아니라 표준 템플릿을 선택하는 구조다."
+ *
+ * 표준 범위: 템플릿 선택, 테마 선택, 컴포넌트 On/Off
+ * 유료 커스텀: 템플릿 구조 변경, 신규 컴포넌트, 레이아웃 재배치
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
 
-// Mock 몰 상태 데이터
-const mockStoreStatus = {
-  mall: {
-    status: 'active',
-    lastUpdated: '2025-01-20 14:32',
-    productCount: 156,
-    activePromotions: 3,
-    todayOrders: 12,
-    weeklyRevenue: 2450000,
+// 템플릿 정의
+const templates = [
+  {
+    id: 'standard',
+    name: 'Standard',
+    description: '기본 레이아웃, 가장 많이 사용',
+    preview: '📋',
+    features: ['상단 배너', '카테고리 그리드', '추천 상품', '프로모션'],
   },
-  tablet: {
-    connected: true,
-    deviceName: '갤럭시탭 S9',
-    lastSync: '2025-01-24 09:15',
-    batteryLevel: 78,
-    displayMode: 'catalog',
+  {
+    id: 'compact',
+    name: 'Compact',
+    description: '정보 밀도 높음, 상품 중심',
+    preview: '📦',
+    features: ['미니 헤더', '리스트 뷰', '빠른 검색', '가격 강조'],
   },
-  kiosk: {
-    connected: false,
-    deviceName: null,
-    lastSync: null,
+  {
+    id: 'visual',
+    name: 'Visual',
+    description: '이미지 중심, 시각적 강조',
+    preview: '🖼️',
+    features: ['풀스크린 배너', '이미지 그리드', '캐러셀', '비주얼 프로모션'],
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal',
+    description: '깔끔하고 단순한 디자인',
+    preview: '✨',
+    features: ['심플 헤더', '여백 활용', '텍스트 중심', '깔끔한 카드'],
+  },
+];
+
+// 테마 정의
+const themes = [
+  { id: 'default', name: '기본', primaryColor: '#2563EB', accentColor: '#3B82F6' },
+  { id: 'warm', name: '따뜻한', primaryColor: '#EA580C', accentColor: '#F97316' },
+  { id: 'nature', name: '자연', primaryColor: '#16A34A', accentColor: '#22C55E' },
+  { id: 'elegant', name: '우아한', primaryColor: '#7C3AED', accentColor: '#8B5CF6' },
+  { id: 'modern', name: '모던', primaryColor: '#0F172A', accentColor: '#475569' },
+  { id: 'soft', name: '부드러운', primaryColor: '#EC4899', accentColor: '#F472B6' },
+];
+
+// 컴포넌트 정의 (On/Off 가능)
+const storeComponents = [
+  { id: 'banner', name: '상단 배너', description: '메인 프로모션 영역', required: true },
+  { id: 'categories', name: '카테고리', description: '상품 카테고리 네비게이션', required: true },
+  { id: 'featured', name: '추천 상품', description: '약사 추천 상품 영역', required: false },
+  { id: 'promotion', name: '프로모션', description: '할인/이벤트 영역', required: false },
+  { id: 'new-arrivals', name: '신상품', description: '최근 등록 상품', required: false },
+  { id: 'best-sellers', name: '베스트셀러', description: '인기 상품 목록', required: false },
+  { id: 'health-info', name: '건강 정보', description: '건강 팁/정보 콘텐츠', required: false },
+  { id: 'pharmacy-info', name: '약국 소개', description: '약국 정보 및 연락처', required: false },
+];
+
+// 디바이스 정의
+const devices = [
+  { id: 'mall', name: 'B2C 몰', icon: '🛒', description: '웹/모바일 쇼핑몰' },
+  { id: 'tablet', name: '태블릿', icon: '📱', description: '매장 태블릿 디스플레이' },
+  { id: 'kiosk', name: '키오스크', icon: '🖥️', description: '무인 주문/안내 키오스크' },
+];
+
+// Mock 현재 설정
+const mockCurrentSettings = {
+  template: 'standard',
+  theme: 'default',
+  components: {
+    'banner': true,
+    'categories': true,
+    'featured': true,
+    'promotion': true,
+    'new-arrivals': false,
+    'best-sellers': true,
+    'health-info': false,
+    'pharmacy-info': true,
+  },
+  deviceSettings: {
+    mall: { template: 'standard', theme: 'default' },
+    tablet: { template: 'compact', theme: 'default' },
+    kiosk: { template: 'visual', theme: 'warm' },
   },
 };
 
@@ -50,7 +117,45 @@ export function PharmacyStorePage() {
   const isOwner = isPharmacyOwner(userFeeCategory);
   const roleLabel = isOwner ? '개설약사' : '근무약사';
 
-  const store = mockStoreStatus;
+  // 상태 관리
+  const [selectedTemplate, setSelectedTemplate] = useState(mockCurrentSettings.template);
+  const [selectedTheme, setSelectedTheme] = useState(mockCurrentSettings.theme);
+  const [componentStates, setComponentStates] = useState(mockCurrentSettings.components);
+  const [previewDevice, setPreviewDevice] = useState<'mall' | 'tablet' | 'kiosk'>('mall');
+
+  // 컴포넌트 토글
+  const toggleComponent = (componentId: string) => {
+    if (!isOwner) return;
+    const component = storeComponents.find(c => c.id === componentId);
+    if (component?.required) return;
+
+    setComponentStates(prev => ({
+      ...prev,
+      [componentId]: !prev[componentId as keyof typeof prev],
+    }));
+  };
+
+  // 근무약사인 경우 안내
+  if (!isOwner) {
+    return (
+      <div style={styles.container}>
+        <header style={styles.header}>
+          <Link to="/pharmacy" style={styles.backLink}>← 돌아가기</Link>
+          <h1 style={styles.pageTitle}>내 약국 몰</h1>
+        </header>
+        <div style={styles.accessDenied}>
+          <span style={styles.accessDeniedIcon}>🔒</span>
+          <h2 style={styles.accessDeniedTitle}>접근 권한 없음</h2>
+          <p style={styles.accessDeniedText}>
+            매장 UI-UX 설정은 개설약사만 변경할 수 있습니다.
+          </p>
+          <Link to="/pharmacy" style={styles.backButton}>
+            돌아가기
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
@@ -61,7 +166,7 @@ export function PharmacyStorePage() {
           <div style={styles.headerMain}>
             <div style={styles.pharmacyInfo}>
               <h1 style={styles.pharmacyName}>{mockPharmacy.name}</h1>
-              <span style={styles.subLabel}>· 내 약국 몰</span>
+              <span style={styles.subLabel}>· 매장 UI-UX 관리</span>
             </div>
             <div style={styles.roleInfo}>
               <span style={styles.roleBadge}>{roleLabel}</span>
@@ -70,164 +175,232 @@ export function PharmacyStorePage() {
         </div>
       </header>
 
-      {/* 채널 상태 그리드 */}
-      <div style={styles.channelGrid}>
-        {/* B2C 몰 상태 */}
-        <div style={styles.channelCard}>
-          <div style={styles.channelHeader}>
-            <div style={styles.channelIcon}>🛒</div>
-            <div style={styles.channelTitleGroup}>
-              <h2 style={styles.channelTitle}>B2C 몰</h2>
-              <span style={{
-                ...styles.channelStatus,
-                backgroundColor: store.mall.status === 'active' ? '#dcfce7' : '#fef3c7',
-                color: store.mall.status === 'active' ? '#166534' : '#92400e',
-              }}>
-                {store.mall.status === 'active' ? '운영중' : '일시중지'}
-              </span>
+      {/* 정책 고지 */}
+      <div style={styles.policyNotice}>
+        <span style={styles.policyIcon}>📋</span>
+        <div style={styles.policyContent}>
+          <strong>UI-UX 표준화 정책</strong>
+          <p style={styles.policyText}>
+            약국 매장 화면은 플랫폼에서 제공하는 템플릿과 테마를 기반으로 운영됩니다.
+            템플릿 구조를 벗어나는 UI 변경은 별도 제작이 필요합니다.
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.mainGrid}>
+        {/* 좌측: 설정 패널 */}
+        <div style={styles.settingsPanel}>
+          {/* 템플릿 선택 */}
+          <section style={styles.section}>
+            <h2 style={styles.sectionTitle}>템플릿 선택</h2>
+            <p style={styles.sectionDesc}>페이지 레이아웃과 컴포넌트 배치 구조를 선택합니다.</p>
+            <div style={styles.templateGrid}>
+              {templates.map(template => (
+                <div
+                  key={template.id}
+                  style={{
+                    ...styles.templateCard,
+                    borderColor: selectedTemplate === template.id ? colors.primary : colors.neutral200,
+                    backgroundColor: selectedTemplate === template.id ? colors.primary + '08' : colors.white,
+                  }}
+                  onClick={() => setSelectedTemplate(template.id)}
+                >
+                  <div style={styles.templatePreview}>{template.preview}</div>
+                  <div style={styles.templateInfo}>
+                    <h3 style={styles.templateName}>{template.name}</h3>
+                    <p style={styles.templateDesc}>{template.description}</p>
+                  </div>
+                  {selectedTemplate === template.id && (
+                    <span style={styles.selectedBadge}>선택됨</span>
+                  )}
+                </div>
+              ))}
             </div>
-          </div>
-          <div style={styles.channelBody}>
-            <div style={styles.statGrid}>
-              <div style={styles.stat}>
-                <span style={styles.statValue}>{store.mall.productCount}</span>
-                <span style={styles.statLabel}>등록 상품</span>
-              </div>
-              <div style={styles.stat}>
-                <span style={styles.statValue}>{store.mall.activePromotions}</span>
-                <span style={styles.statLabel}>진행 프로모션</span>
-              </div>
-              <div style={styles.stat}>
-                <span style={styles.statValue}>{store.mall.todayOrders}</span>
-                <span style={styles.statLabel}>오늘 주문</span>
-              </div>
-              <div style={styles.stat}>
-                <span style={styles.statValue}>
-                  {(store.mall.weeklyRevenue / 10000).toLocaleString()}만
-                </span>
-                <span style={styles.statLabel}>주간 매출</span>
-              </div>
+          </section>
+
+          {/* 테마 선택 */}
+          <section style={styles.section}>
+            <h2 style={styles.sectionTitle}>테마 선택</h2>
+            <p style={styles.sectionDesc}>색상과 스타일을 선택합니다. 즉시 반영됩니다.</p>
+            <div style={styles.themeGrid}>
+              {themes.map(theme => (
+                <div
+                  key={theme.id}
+                  style={{
+                    ...styles.themeCard,
+                    borderColor: selectedTheme === theme.id ? theme.primaryColor : colors.neutral200,
+                  }}
+                  onClick={() => setSelectedTheme(theme.id)}
+                >
+                  <div style={styles.themeColors}>
+                    <span style={{ ...styles.colorDot, backgroundColor: theme.primaryColor }} />
+                    <span style={{ ...styles.colorDot, backgroundColor: theme.accentColor }} />
+                  </div>
+                  <span style={styles.themeName}>{theme.name}</span>
+                  {selectedTheme === theme.id && (
+                    <span style={styles.themeCheck}>✓</span>
+                  )}
+                </div>
+              ))}
             </div>
-            <div style={styles.channelMeta}>
-              <span style={styles.metaLabel}>최근 수정</span>
-              <span style={styles.metaValue}>{store.mall.lastUpdated}</span>
+          </section>
+
+          {/* 컴포넌트 On/Off */}
+          <section style={styles.section}>
+            <h2 style={styles.sectionTitle}>컴포넌트 표시 설정</h2>
+            <p style={styles.sectionDesc}>표시할 영역을 선택합니다. 순서 변경은 불가합니다.</p>
+            <div style={styles.componentList}>
+              {storeComponents.map(component => (
+                <div
+                  key={component.id}
+                  style={{
+                    ...styles.componentItem,
+                    opacity: component.required ? 0.7 : 1,
+                  }}
+                >
+                  <div style={styles.componentInfo}>
+                    <span style={styles.componentName}>{component.name}</span>
+                    <span style={styles.componentDesc}>{component.description}</span>
+                    {component.required && (
+                      <span style={styles.requiredBadge}>필수</span>
+                    )}
+                  </div>
+                  <button
+                    style={{
+                      ...styles.toggleButton,
+                      backgroundColor: componentStates[component.id as keyof typeof componentStates]
+                        ? colors.primary
+                        : colors.neutral300,
+                    }}
+                    onClick={() => toggleComponent(component.id)}
+                    disabled={component.required}
+                  >
+                    <span style={{
+                      ...styles.toggleKnob,
+                      transform: componentStates[component.id as keyof typeof componentStates]
+                        ? 'translateX(20px)'
+                        : 'translateX(0)',
+                    }} />
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
-          <div style={styles.channelFooter}>
-            <button style={styles.primaryButton}>
-              {isOwner ? '몰 관리하기' : '상태 보기'}
-            </button>
-          </div>
+          </section>
         </div>
 
-        {/* 태블릿 상태 */}
-        <div style={styles.channelCard}>
-          <div style={styles.channelHeader}>
-            <div style={styles.channelIcon}>📱</div>
-            <div style={styles.channelTitleGroup}>
-              <h2 style={styles.channelTitle}>태블릿</h2>
-              <span style={{
-                ...styles.channelStatus,
-                backgroundColor: store.tablet.connected ? '#dcfce7' : '#fee2e2',
-                color: store.tablet.connected ? '#166534' : '#991b1b',
-              }}>
-                {store.tablet.connected ? '연결됨' : '연결안됨'}
-              </span>
+        {/* 우측: 미리보기 패널 */}
+        <div style={styles.previewPanel}>
+          <div style={styles.previewHeader}>
+            <h2 style={styles.previewTitle}>미리보기</h2>
+            <div style={styles.deviceTabs}>
+              {devices.map(device => (
+                <button
+                  key={device.id}
+                  style={{
+                    ...styles.deviceTab,
+                    backgroundColor: previewDevice === device.id ? colors.primary : colors.white,
+                    color: previewDevice === device.id ? colors.white : colors.neutral600,
+                  }}
+                  onClick={() => setPreviewDevice(device.id as typeof previewDevice)}
+                >
+                  <span style={styles.deviceIcon}>{device.icon}</span>
+                  <span>{device.name}</span>
+                </button>
+              ))}
             </div>
           </div>
-          <div style={styles.channelBody}>
-            {store.tablet.connected ? (
-              <>
-                <div style={styles.deviceInfo}>
-                  <div style={styles.deviceRow}>
-                    <span style={styles.deviceLabel}>기기</span>
-                    <span style={styles.deviceValue}>{store.tablet.deviceName}</span>
-                  </div>
-                  <div style={styles.deviceRow}>
-                    <span style={styles.deviceLabel}>배터리</span>
-                    <span style={styles.deviceValue}>{store.tablet.batteryLevel}%</span>
-                  </div>
-                  <div style={styles.deviceRow}>
-                    <span style={styles.deviceLabel}>표시 모드</span>
-                    <span style={styles.deviceValue}>
-                      {store.tablet.displayMode === 'catalog' ? '카탈로그' : '프로모션'}
-                    </span>
-                  </div>
-                </div>
-                <div style={styles.channelMeta}>
-                  <span style={styles.metaLabel}>최근 동기화</span>
-                  <span style={styles.metaValue}>{store.tablet.lastSync}</span>
-                </div>
-              </>
-            ) : (
-              <div style={styles.disconnectedMessage}>
-                <span style={styles.disconnectedIcon}>📴</span>
-                <span style={styles.disconnectedText}>연결된 태블릿이 없습니다</span>
-              </div>
-            )}
-          </div>
-          <div style={styles.channelFooter}>
-            <button style={store.tablet.connected ? styles.primaryButton : styles.disabledButton}>
-              {store.tablet.connected ? '화면 관리' : '기기 연결'}
-            </button>
-          </div>
-        </div>
 
-        {/* 키오스크 상태 */}
-        <div style={styles.channelCard}>
-          <div style={styles.channelHeader}>
-            <div style={styles.channelIcon}>🖥️</div>
-            <div style={styles.channelTitleGroup}>
-              <h2 style={styles.channelTitle}>키오스크</h2>
-              <span style={{
-                ...styles.channelStatus,
-                backgroundColor: store.kiosk.connected ? '#dcfce7' : '#fee2e2',
-                color: store.kiosk.connected ? '#166534' : '#991b1b',
-              }}>
-                {store.kiosk.connected ? '연결됨' : '연결안됨'}
-              </span>
+          <div style={styles.previewFrame}>
+            <div style={{
+              ...styles.previewContent,
+              ...(previewDevice === 'tablet' ? styles.tabletFrame : {}),
+              ...(previewDevice === 'kiosk' ? styles.kioskFrame : {}),
+            }}>
+              {/* 미리보기 내용 */}
+              <div style={styles.mockScreen}>
+                <div style={{
+                  ...styles.mockHeader,
+                  backgroundColor: themes.find(t => t.id === selectedTheme)?.primaryColor,
+                }}>
+                  <span style={styles.mockLogo}>💊 {mockPharmacy.name}</span>
+                </div>
+                <div style={styles.mockBody}>
+                  {componentStates.banner && (
+                    <div style={styles.mockBanner}>
+                      <span>🏷️ 배너 영역</span>
+                    </div>
+                  )}
+                  {componentStates.categories && (
+                    <div style={styles.mockSection}>
+                      <span>📂 카테고리</span>
+                    </div>
+                  )}
+                  {componentStates.featured && (
+                    <div style={styles.mockSection}>
+                      <span>⭐ 추천 상품</span>
+                    </div>
+                  )}
+                  {componentStates.promotion && (
+                    <div style={styles.mockSection}>
+                      <span>🎁 프로모션</span>
+                    </div>
+                  )}
+                  {componentStates['best-sellers'] && (
+                    <div style={styles.mockSection}>
+                      <span>🔥 베스트셀러</span>
+                    </div>
+                  )}
+                  {componentStates['pharmacy-info'] && (
+                    <div style={styles.mockSection}>
+                      <span>🏥 약국 소개</span>
+                    </div>
+                  )}
+                </div>
+                <div style={styles.mockFooter}>
+                  <span style={styles.mockTemplateLabel}>
+                    {templates.find(t => t.id === selectedTemplate)?.name} 템플릿
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-          <div style={styles.channelBody}>
-            {store.kiosk.connected ? (
-              <>
-                <div style={styles.deviceInfo}>
-                  <div style={styles.deviceRow}>
-                    <span style={styles.deviceLabel}>기기</span>
-                    <span style={styles.deviceValue}>{store.kiosk.deviceName}</span>
-                  </div>
-                </div>
-                <div style={styles.channelMeta}>
-                  <span style={styles.metaLabel}>최근 동기화</span>
-                  <span style={styles.metaValue}>{store.kiosk.lastSync}</span>
-                </div>
-              </>
-            ) : (
-              <div style={styles.disconnectedMessage}>
-                <span style={styles.disconnectedIcon}>📴</span>
-                <span style={styles.disconnectedText}>연결된 키오스크가 없습니다</span>
-                {isOwner && (
-                  <span style={styles.disconnectedHint}>키오스크 도입 문의: 1588-1234</span>
-                )}
-              </div>
-            )}
-          </div>
-          <div style={styles.channelFooter}>
-            <button style={store.kiosk.connected ? styles.primaryButton : styles.disabledButton}>
-              {store.kiosk.connected ? '화면 관리' : '도입 문의'}
+
+          {/* 저장 버튼 */}
+          <div style={styles.actionButtons}>
+            <button style={styles.saveButton}>
+              변경사항 저장
+            </button>
+            <button style={styles.resetButton}>
+              기본값으로 초기화
             </button>
           </div>
         </div>
       </div>
 
-      {/* 안내 */}
-      <div style={styles.notice}>
-        <span style={styles.noticeIcon}>ℹ️</span>
-        <span style={styles.noticeText}>
-          {isOwner
-            ? '각 채널의 진열 상태를 확인하고 관리할 수 있습니다.'
-            : '약국의 채널 운영 상태를 확인할 수 있습니다. 진열 관리는 개설약사에게 문의하세요.'}
-        </span>
+      {/* 표준 vs 유료 경계 안내 */}
+      <div style={styles.boundaryNotice}>
+        <div style={styles.boundarySection}>
+          <h3 style={styles.boundaryTitle}>✅ 표준 범위 (기본 제공)</h3>
+          <ul style={styles.boundaryList}>
+            <li>템플릿 선택</li>
+            <li>테마 선택</li>
+            <li>컴포넌트 표시/숨김</li>
+            <li>디바이스별 프리셋</li>
+          </ul>
+        </div>
+        <div style={styles.boundaryDivider} />
+        <div style={styles.boundarySection}>
+          <h3 style={styles.boundaryTitlePaid}>💎 유료 커스텀</h3>
+          <ul style={styles.boundaryList}>
+            <li>템플릿 구조 변경</li>
+            <li>신규 UI 컴포넌트</li>
+            <li>레이아웃 재배치</li>
+            <li>브랜드 전용 UI</li>
+          </ul>
+          <button style={styles.inquiryButton}>
+            커스텀 문의 →
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -235,10 +408,12 @@ export function PharmacyStorePage() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: '1200px',
+    maxWidth: '1400px',
     margin: '0 auto',
     padding: '24px',
   },
+
+  // Header
   header: {
     marginBottom: '24px',
   },
@@ -269,6 +444,12 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral900,
     margin: 0,
   },
+  pageTitle: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    color: colors.neutral900,
+    margin: 0,
+  },
   subLabel: {
     fontSize: '1rem',
     color: colors.neutral500,
@@ -277,7 +458,6 @@ const styles: Record<string, React.CSSProperties> = {
   roleInfo: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
   },
   roleBadge: {
     padding: '4px 12px',
@@ -288,190 +468,428 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
   },
 
-  // Channel Grid
-  channelGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-    gap: '20px',
-    marginBottom: '24px',
-  },
-  channelCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.md,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  channelHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '20px',
-    borderBottom: `1px solid ${colors.neutral100}`,
-  },
-  channelIcon: {
-    fontSize: '32px',
-  },
-  channelTitleGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  channelTitle: {
-    fontSize: '1.125rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  channelStatus: {
-    padding: '4px 8px',
-    borderRadius: '4px',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-  },
-  channelBody: {
-    padding: '20px',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
-
-  // Stats
-  statGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-  },
-  stat: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '12px',
-    backgroundColor: colors.gray100,
-    borderRadius: borderRadius.md,
-  },
-  statValue: {
-    fontSize: '1.25rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-  },
-  statLabel: {
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-    marginTop: '4px',
-  },
-
-  // Device Info
-  deviceInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  deviceRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  deviceLabel: {
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-  deviceValue: {
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: colors.neutral800,
-  },
-
-  // Disconnected
-  disconnectedMessage: {
+  // Access Denied
+  accessDenied: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '24px',
+    padding: '80px 40px',
     textAlign: 'center',
-    flex: 1,
   },
-  disconnectedIcon: {
-    fontSize: '32px',
-    marginBottom: '8px',
-    opacity: 0.5,
+  accessDeniedIcon: {
+    fontSize: '48px',
+    marginBottom: '16px',
   },
-  disconnectedText: {
-    fontSize: '0.875rem',
+  accessDeniedTitle: {
+    fontSize: '1.25rem',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: '0 0 8px',
+  },
+  accessDeniedText: {
+    fontSize: '0.9375rem',
     color: colors.neutral500,
+    margin: '0 0 24px',
   },
-  disconnectedHint: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-    marginTop: '8px',
+  backButton: {
+    padding: '10px 24px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    textDecoration: 'none',
+    borderRadius: borderRadius.md,
+    fontSize: '0.875rem',
+    fontWeight: 500,
   },
 
-  // Meta
-  channelMeta: {
+  // Policy Notice
+  policyNotice: {
+    display: 'flex',
+    gap: '16px',
+    padding: '20px',
+    backgroundColor: colors.info + '10',
+    borderRadius: borderRadius.lg,
+    border: `1px solid ${colors.info}30`,
+    marginBottom: '24px',
+  },
+  policyIcon: {
+    fontSize: '24px',
+    flexShrink: 0,
+  },
+  policyContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  policyText: {
+    fontSize: '0.875rem',
+    color: colors.neutral600,
+    margin: 0,
+    lineHeight: 1.5,
+  },
+
+  // Main Grid
+  mainGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 400px',
+    gap: '24px',
+    marginBottom: '32px',
+  },
+
+  // Settings Panel
+  settingsPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+  },
+  section: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    padding: '24px',
+  },
+  sectionTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: '0 0 4px',
+  },
+  sectionDesc: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+    margin: '0 0 16px',
+  },
+
+  // Template Grid
+  templateGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '12px',
+  },
+  templateCard: {
+    position: 'relative',
+    padding: '16px',
+    border: '2px solid',
+    borderRadius: borderRadius.md,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  templatePreview: {
+    fontSize: '32px',
+    marginBottom: '12px',
+  },
+  templateInfo: {},
+  templateName: {
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  templateDesc: {
+    fontSize: '0.8125rem',
+    color: colors.neutral500,
+    margin: '4px 0 0',
+  },
+  selectedBadge: {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    padding: '2px 8px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    borderRadius: '10px',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+  },
+
+  // Theme Grid
+  themeGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '12px',
+  },
+  themeCard: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '16px',
+    border: '2px solid',
+    borderRadius: borderRadius.md,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  themeColors: {
+    display: 'flex',
+    gap: '6px',
+  },
+  colorDot: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+  },
+  themeName: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral700,
+  },
+  themeCheck: {
+    position: 'absolute',
+    top: '4px',
+    right: '4px',
+    width: '20px',
+    height: '20px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  },
+
+  // Component List
+  componentList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  componentItem: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: '12px',
-    borderTop: `1px solid ${colors.neutral100}`,
-    marginTop: 'auto',
+    padding: '12px 16px',
+    backgroundColor: colors.neutral50,
+    borderRadius: borderRadius.md,
   },
-  metaLabel: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
+  componentInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
   },
-  metaValue: {
+  componentName: {
+    fontSize: '0.9375rem',
+    fontWeight: 500,
+    color: colors.neutral800,
+  },
+  componentDesc: {
     fontSize: '0.75rem',
-    color: colors.neutral600,
+    color: colors.neutral500,
+  },
+  requiredBadge: {
+    display: 'inline-block',
+    marginTop: '4px',
+    padding: '2px 6px',
+    backgroundColor: colors.warning + '20',
+    color: colors.warning,
+    borderRadius: '4px',
+    fontSize: '0.625rem',
+    fontWeight: 500,
+  },
+  toggleButton: {
+    position: 'relative',
+    width: '44px',
+    height: '24px',
+    borderRadius: '12px',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
+  },
+  toggleKnob: {
+    position: 'absolute',
+    top: '2px',
+    left: '2px',
+    width: '20px',
+    height: '20px',
+    backgroundColor: colors.white,
+    borderRadius: '50%',
+    transition: 'transform 0.2s',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
   },
 
-  // Footer
-  channelFooter: {
-    padding: '16px 20px',
-    borderTop: `1px solid ${colors.neutral100}`,
-    backgroundColor: colors.gray100 + '50',
+  // Preview Panel
+  previewPanel: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'sticky',
+    top: '100px',
+    height: 'fit-content',
   },
-  primaryButton: {
-    width: '100%',
-    padding: '10px 16px',
+  previewHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '16px',
+  },
+  previewTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  deviceTabs: {
+    display: 'flex',
+    gap: '8px',
+  },
+  deviceTab: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 12px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: borderRadius.md,
+    fontSize: '0.8125rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  deviceIcon: {
+    fontSize: '1rem',
+  },
+  previewFrame: {
+    backgroundColor: colors.neutral100,
+    borderRadius: borderRadius.md,
+    padding: '16px',
+    marginBottom: '16px',
+  },
+  previewContent: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.sm,
+    overflow: 'hidden',
+    boxShadow: shadows.sm,
+  },
+  tabletFrame: {
+    maxWidth: '280px',
+    margin: '0 auto',
+  },
+  kioskFrame: {
+    maxWidth: '200px',
+    margin: '0 auto',
+    minHeight: '300px',
+  },
+
+  // Mock Screen
+  mockScreen: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '280px',
+  },
+  mockHeader: {
+    padding: '12px 16px',
+    color: colors.white,
+  },
+  mockLogo: {
+    fontSize: '0.875rem',
+    fontWeight: 600,
+  },
+  mockBody: {
+    flex: 1,
+    padding: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  mockBanner: {
+    padding: '20px',
+    backgroundColor: colors.neutral100,
+    borderRadius: borderRadius.sm,
+    textAlign: 'center',
+    fontSize: '0.8125rem',
+    color: colors.neutral600,
+  },
+  mockSection: {
+    padding: '12px',
+    backgroundColor: colors.neutral50,
+    borderRadius: borderRadius.sm,
+    fontSize: '0.75rem',
+    color: colors.neutral500,
+  },
+  mockFooter: {
+    padding: '8px 12px',
+    backgroundColor: colors.neutral50,
+    borderTop: `1px solid ${colors.neutral100}`,
+    textAlign: 'center',
+  },
+  mockTemplateLabel: {
+    fontSize: '0.6875rem',
+    color: colors.neutral400,
+  },
+
+  // Action Buttons
+  actionButtons: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  saveButton: {
+    padding: '12px',
     backgroundColor: colors.primary,
     color: colors.white,
     border: 'none',
     borderRadius: borderRadius.md,
-    fontSize: '0.875rem',
+    fontSize: '0.9375rem',
     fontWeight: 500,
     cursor: 'pointer',
   },
-  disabledButton: {
-    width: '100%',
-    padding: '10px 16px',
+  resetButton: {
+    padding: '12px',
+    backgroundColor: 'transparent',
+    color: colors.neutral600,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: borderRadius.md,
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+  },
+
+  // Boundary Notice
+  boundaryNotice: {
+    display: 'flex',
+    gap: '24px',
+    padding: '24px',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+  },
+  boundarySection: {
+    flex: 1,
+  },
+  boundaryDivider: {
+    width: '1px',
     backgroundColor: colors.neutral200,
-    color: colors.neutral500,
-    border: 'none',
+  },
+  boundaryTitle: {
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: colors.success,
+    margin: '0 0 12px',
+  },
+  boundaryTitlePaid: {
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: colors.warning,
+    margin: '0 0 12px',
+  },
+  boundaryList: {
+    margin: 0,
+    paddingLeft: '20px',
+    fontSize: '0.875rem',
+    color: colors.neutral600,
+    lineHeight: 1.8,
+  },
+  inquiryButton: {
+    marginTop: '16px',
+    padding: '10px 20px',
+    backgroundColor: colors.warning + '15',
+    color: colors.warning,
+    border: `1px solid ${colors.warning}`,
     borderRadius: borderRadius.md,
     fontSize: '0.875rem',
     fontWeight: 500,
-    cursor: 'not-allowed',
-  },
-
-  // Notice
-  notice: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '10px',
-    padding: '16px 20px',
-    backgroundColor: colors.gray100,
-    borderRadius: borderRadius.md,
-  },
-  noticeIcon: {
-    fontSize: '16px',
-    flexShrink: 0,
-  },
-  noticeText: {
-    fontSize: '0.875rem',
-    color: colors.neutral600,
-    lineHeight: 1.5,
+    cursor: 'pointer',
   },
 };
