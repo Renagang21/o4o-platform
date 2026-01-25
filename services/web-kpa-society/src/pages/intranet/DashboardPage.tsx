@@ -8,6 +8,11 @@
  * - 약사공론 기사 (API 연동)
  * - 광고/강좌 안내 (운영자 요청 반영)
  * - 공지/회의 목록
+ *
+ * WO-KPA-ACCOUNTING-DASHBOARD-V1
+ * - 회계 섹션 추가 (단식부기)
+ * - AI 통합 분석
+ * - 엑셀 다운로드 기능
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -19,8 +24,10 @@ import {
   NewsSection,
   PromoCardsSection,
 } from '../../components/intranet';
+
 import { useOrganization } from '../../contexts/OrganizationContext';
 import { colors } from '../../styles/theme';
+
 import {
   HeroSlide,
   PartnerLink,
@@ -31,6 +38,17 @@ import {
 } from '../../types/mainpage';
 import { cmsApi } from '../../api/cms';
 import { AiSummaryButton } from '../../components/ai';
+
+// 회계 항목 타입 (단식부기)
+interface AccountingEntry {
+  id: string;
+  date: string;
+  type: 'income' | 'expense';
+  category: string;
+  description: string;
+  amount: number;
+  balance: number;
+}
 
 interface Notice {
   id: string;
@@ -249,6 +267,50 @@ export function DashboardPage() {
     { id: '3', title: '분회장단 협의회', date: '2025-01-20', time: '15:00', isParticipant: false },
   ]);
 
+  // 회계 데이터 (단식부기) - 임원용
+  const [accountingEntries] = useState<AccountingEntry[]>([
+    { id: '1', date: '2025-01-02', type: 'income', category: '연회비', description: '1월 연회비 수납 총계', amount: 15000000, balance: 85000000 },
+    { id: '2', date: '2025-01-03', type: 'expense', category: '인건비', description: '1월 직원 급여', amount: 8000000, balance: 77000000 },
+    { id: '3', date: '2025-01-04', type: 'expense', category: '운영비', description: '사무실 관리비', amount: 2000000, balance: 75000000 },
+    { id: '4', date: '2025-01-05', type: 'income', category: '보조금', description: '대한약사회 사업비', amount: 5000000, balance: 80000000 },
+    { id: '5', date: '2025-01-06', type: 'expense', category: '행사비', description: '신년하례회 비용', amount: 3000000, balance: 77000000 },
+  ]);
+
+  // 회계 요약 계산
+  const accountingSummary = {
+    totalIncome: accountingEntries.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0),
+    totalExpense: accountingEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0),
+    currentBalance: accountingEntries.length > 0 ? accountingEntries[accountingEntries.length - 1].balance : 0,
+  };
+
+  // 엑셀 다운로드 함수
+  const handleExcelDownload = () => {
+    const BOM = '\uFEFF';
+    const headers = ['날짜', '구분', '분류', '적요', '수입', '지출', '잔액'];
+    const rows = accountingEntries.map(entry => [
+      entry.date,
+      entry.type === 'income' ? '수입' : '지출',
+      entry.category,
+      entry.description,
+      entry.type === 'income' ? entry.amount : '',
+      entry.type === 'expense' ? entry.amount : '',
+      entry.balance,
+    ]);
+
+    const csvContent = BOM + [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `회계_현황_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
+  };
+
   const handleEditHero = () => {
     // Hero 편집 모달 또는 페이지로 이동
     console.log('Edit hero slides');
@@ -369,6 +431,89 @@ export function DashboardPage() {
           canEdit={userCanManagePartnerLinks}
           onEdit={handleEditPartners}
         />
+
+        {/* 회계 현황 (단식부기) - AI 통합 */}
+        <div style={styles.accountingSection}>
+          <div style={styles.accountingHeader}>
+            <div style={styles.accountingTitleRow}>
+              <h3 style={styles.cardTitle}>💰 회계 현황</h3>
+              <AiSummaryButton
+                label="AI 분석"
+                contextLabel="조직 회계 현황"
+                size="sm"
+                serviceId="kpa-society"
+                contextData={{
+                  role: 'officer',
+                  summary: accountingSummary,
+                  recentEntries: accountingEntries.slice(0, 5),
+                  period: '2025년 1월',
+                  organizationType: orgType,
+                  organizationName: currentOrganization?.name,
+                }}
+              />
+            </div>
+            <button onClick={handleExcelDownload} style={styles.excelButton}>
+              📥 엑셀 다운로드
+            </button>
+          </div>
+
+          {/* 회계 요약 */}
+          <div style={styles.accountingSummaryGrid}>
+            <div style={styles.accountingSummaryCard}>
+              <div style={styles.accountingSummaryLabel}>총 수입</div>
+              <div style={{ ...styles.accountingSummaryValue, color: '#059669' }}>
+                {formatCurrency(accountingSummary.totalIncome)}
+              </div>
+            </div>
+            <div style={styles.accountingSummaryCard}>
+              <div style={styles.accountingSummaryLabel}>총 지출</div>
+              <div style={{ ...styles.accountingSummaryValue, color: '#DC2626' }}>
+                {formatCurrency(accountingSummary.totalExpense)}
+              </div>
+            </div>
+            <div style={styles.accountingSummaryCard}>
+              <div style={styles.accountingSummaryLabel}>현재 잔액</div>
+              <div style={{ ...styles.accountingSummaryValue, color: colors.primary }}>
+                {formatCurrency(accountingSummary.currentBalance)}
+              </div>
+            </div>
+          </div>
+
+          {/* 최근 회계 내역 */}
+          <div style={styles.accountingTable}>
+            <div style={styles.accountingTableHeader}>
+              <span style={styles.accountingColDate}>날짜</span>
+              <span style={styles.accountingColType}>구분</span>
+              <span style={styles.accountingColCategory}>분류</span>
+              <span style={styles.accountingColDesc}>적요</span>
+              <span style={styles.accountingColAmount}>금액</span>
+              <span style={styles.accountingColBalance}>잔액</span>
+            </div>
+            {accountingEntries.slice(0, 5).map((entry) => (
+              <div key={entry.id} style={styles.accountingRow}>
+                <span style={styles.accountingColDate}>{entry.date}</span>
+                <span style={styles.accountingColType}>
+                  <span style={{
+                    ...styles.typeTag,
+                    backgroundColor: entry.type === 'income' ? '#D1FAE5' : '#FEE2E2',
+                    color: entry.type === 'income' ? '#059669' : '#DC2626',
+                  }}>
+                    {entry.type === 'income' ? '수입' : '지출'}
+                  </span>
+                </span>
+                <span style={styles.accountingColCategory}>{entry.category}</span>
+                <span style={styles.accountingColDesc}>{entry.description}</span>
+                <span style={{
+                  ...styles.accountingColAmount,
+                  color: entry.type === 'income' ? '#059669' : '#DC2626',
+                }}>
+                  {entry.type === 'income' ? '+' : '-'}{formatCurrency(entry.amount)}
+                </span>
+                <span style={styles.accountingColBalance}>{formatCurrency(entry.balance)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -489,5 +634,104 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     fontSize: '14px',
     fontWeight: 600,
+  },
+  // 회계 섹션 스타일
+  accountingSection: {
+    backgroundColor: colors.white,
+    borderRadius: '12px',
+    padding: '24px',
+    marginTop: '24px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+  },
+  accountingHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  accountingTitleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  excelButton: {
+    padding: '8px 16px',
+    backgroundColor: '#10B981',
+    color: colors.white,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  accountingSummaryGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '16px',
+    marginBottom: '24px',
+  },
+  accountingSummaryCard: {
+    padding: '20px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '10px',
+    textAlign: 'center',
+  },
+  accountingSummaryLabel: {
+    fontSize: '14px',
+    color: colors.neutral500,
+    marginBottom: '8px',
+  },
+  accountingSummaryValue: {
+    fontSize: '24px',
+    fontWeight: 700,
+  },
+  accountingTable: {
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    overflow: 'hidden',
+  },
+  accountingTableHeader: {
+    display: 'grid',
+    gridTemplateColumns: '100px 70px 80px 1fr 130px 130px',
+    padding: '12px 16px',
+    backgroundColor: colors.neutral100,
+    fontSize: '13px',
+    fontWeight: 600,
+    color: colors.neutral700,
+  },
+  accountingRow: {
+    display: 'grid',
+    gridTemplateColumns: '100px 70px 80px 1fr 130px 130px',
+    padding: '12px 16px',
+    borderTop: `1px solid ${colors.neutral100}`,
+    fontSize: '13px',
+    alignItems: 'center',
+  },
+  accountingColDate: {
+    color: colors.neutral600,
+  },
+  accountingColType: {},
+  accountingColCategory: {
+    color: colors.neutral700,
+  },
+  accountingColDesc: {
+    color: colors.neutral800,
+  },
+  accountingColAmount: {
+    textAlign: 'right',
+    fontWeight: 500,
+  },
+  accountingColBalance: {
+    textAlign: 'right',
+    color: colors.neutral700,
+  },
+  typeTag: {
+    padding: '3px 8px',
+    borderRadius: '4px',
+    fontSize: '11px',
+    fontWeight: 500,
   },
 };

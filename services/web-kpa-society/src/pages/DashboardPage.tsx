@@ -59,7 +59,7 @@ const quickMenuItems = [
   { icon: '🎓', label: '교육/연수', href: '/lms', color: '#7C3AED' },
   { icon: '💬', label: '포럼', href: '/forum', color: '#F59E0B' },
   { icon: '📁', label: '자료실', href: '/docs', color: '#EC4899' },
-  { icon: '📝', label: '신상신고', href: '/mypage/profile', color: '#6366F1' },
+  { icon: '📝', label: '신상신고', href: '/mypage/status-report', color: '#6366F1' },
 ];
 
 // Mock activity data
