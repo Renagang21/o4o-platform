@@ -61,6 +61,9 @@ import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join
 import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
+// Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
+import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommunityPage } from './pages/work';
+
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
 
@@ -119,6 +122,18 @@ function App() {
           <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><SupplierDetailPage /></Layout>} />
           <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyStorePage /></Layout>} />
           <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicesPage /></Layout>} />
+
+          {/* ========================================
+           * 근무약사 업무 화면 (개인 기준)
+           * WO-KPA-WORK-IMPLEMENT-V1
+           * - /pharmacy와 명확히 분리된 개인 업무 화면
+           * - 경영/결정 기능 배제
+           * ======================================== */}
+          <Route path="/work" element={<Layout serviceName={SERVICE_NAME}><WorkPage /></Layout>} />
+          <Route path="/work/tasks" element={<Layout serviceName={SERVICE_NAME}><WorkTasksPage /></Layout>} />
+          <Route path="/work/learning" element={<Layout serviceName={SERVICE_NAME}><WorkLearningPage /></Layout>} />
+          <Route path="/work/display" element={<Layout serviceName={SERVICE_NAME}><WorkDisplayPage /></Layout>} />
+          <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
 
           {/* ========================================
            * 약사회 데모 서비스 (/demo 하위)

@@ -21,6 +21,7 @@ interface MenuItem {
 // IA 기준 메뉴 구조 (Design Package v1)
 // WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
 // WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 메뉴 제거 → 배너 전환
+// WO-KPA-WORK-IMPLEMENT-V1: 내 업무 메뉴 추가 (항상 노출)
 const menuItems: MenuItem[] = [
   {
     label: '공지',
@@ -59,6 +60,17 @@ const menuItems: MenuItem[] = [
       { label: '지부/분회', href: '/demo/organization/branches' },
       { label: '임원 안내', href: '/demo/organization/officers' },
       { label: '연락처', href: '/demo/organization/contact' },
+    ],
+  },
+  // WO-KPA-WORK-IMPLEMENT-V1: 근무약사 전용 업무 화면 (항상 노출)
+  {
+    label: '내 업무',
+    href: '/work',
+    children: [
+      { label: '업무 현황', href: '/work' },
+      { label: '업무 관리', href: '/work/tasks' },
+      { label: '학습/교육', href: '/work/learning' },
+      { label: '커뮤니티', href: '/work/community' },
     ],
   },
 ];
