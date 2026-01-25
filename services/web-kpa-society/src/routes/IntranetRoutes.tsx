@@ -14,6 +14,7 @@ import {
   DocumentListPage,
   SchedulePage,
   SettingsPage,
+  OperatorDashboardPage,
 } from '../pages/intranet';
 
 // WO-KPA-TEST-FEEDBACK-BOARD-V1: 피드백 게시판
@@ -54,6 +55,9 @@ export function IntranetRoutes() {
 
           {/* 조직 설정 (관리자) */}
           <Route path="settings" element={<SettingsPage />} />
+
+          {/* WO-KPA-OPERATOR-DASHBOARD-COMPREHENSIVE-V1: 운영자 종합 대시보드 */}
+          <Route path="operator" element={<OperatorDashboardPage />} />
 
           {/* WO-KPA-TEST-FEEDBACK-BOARD-V1: 피드백 게시판 */}
           <Route path="feedback" element={<FeedbackListPage />} />

@@ -11,3 +11,4 @@ export { MeetingDetailPage } from './MeetingDetailPage';
 export { DocumentListPage } from './DocumentListPage';
 export { SchedulePage } from './SchedulePage';
 export { SettingsPage } from './SettingsPage';
+export { OperatorDashboardPage } from './OperatorDashboardPage';

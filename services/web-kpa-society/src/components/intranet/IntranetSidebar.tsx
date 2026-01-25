@@ -34,6 +34,7 @@ const menuItems: MenuItem[] = [
   { path: 'documents', label: '문서', icon: '📁' },
   { path: 'meetings', label: '회의', icon: '📋' },
   { path: 'groupbuy', label: '공동구매', icon: '🛒', roles: ['officer', 'chair', 'admin'] }, // WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1: 운영자만 접근
+  { path: 'operator', label: '운영자 대시보드', icon: '📊', roles: ['officer', 'chair', 'admin'] }, // WO-KPA-OPERATOR-DASHBOARD-COMPREHENSIVE-V1
   { path: 'feedback', label: '테스트 피드백', icon: '💬' }, // WO-KPA-TEST-FEEDBACK-BOARD-V1 (개발용)
   { path: 'settings', label: '조직 설정', icon: '⚙️', roles: ['officer', 'chair', 'admin'] },
 ];
