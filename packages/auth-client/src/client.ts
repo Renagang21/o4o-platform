@@ -165,6 +165,8 @@ export class AuthClient {
    * Phase 6-7: Cookie Auth Primary
    * - Cookie strategy: Server sets httpOnly cookies, no tokens in response
    * - localStorage strategy: Server returns tokens in response body
+   *
+   * Server response format: { success: true, data: { user, tokens: { accessToken, refreshToken } } }
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     // Phase 6-7: For localStorage strategy, request tokens in body
@@ -173,18 +175,38 @@ export class AuthClient {
       : credentials;
 
     const response = await this.api.post('/auth/login', payload);
-    const data = response.data as AuthResponse;
+    const rawData = response.data as {
+      success: boolean;
+      data?: {
+        user?: any;
+        tokens?: { accessToken?: string; refreshToken?: string; expiresIn?: number };
+        message?: string;
+      };
+    };
+
+    // Unwrap the nested response format from BaseController.ok
+    const accessToken = rawData.data?.tokens?.accessToken;
+    const refreshToken = rawData.data?.tokens?.refreshToken;
+    const user = rawData.data?.user;
 
     // Phase 6-7: Only store tokens locally for localStorage strategy
-    if (this.strategy === 'localStorage' && data.accessToken) {
-      setAccessToken(data.accessToken);
-      if (data.refreshToken) {
-        setRefreshToken(data.refreshToken);
+    if (this.strategy === 'localStorage' && accessToken) {
+      setAccessToken(accessToken);
+      if (refreshToken) {
+        setRefreshToken(refreshToken);
       }
-      updateAuthStorage(data.accessToken, data.refreshToken);
+      updateAuthStorage(accessToken, refreshToken);
     }
 
-    return data;
+    // Return flattened AuthResponse for client consumption
+    return {
+      success: rawData.success,
+      message: rawData.data?.message,
+      accessToken,
+      refreshToken,
+      user,
+      expiresIn: rawData.data?.tokens?.expiresIn,
+    };
   }
 
   /**
