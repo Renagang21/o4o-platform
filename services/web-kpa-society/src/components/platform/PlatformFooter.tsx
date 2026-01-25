@@ -23,7 +23,7 @@ export function PlatformFooter() {
               <a href="/demo" style={styles.link}>약사회 서비스 (Demo)</a>
               <a href="#" style={styles.link}>Digital Signage</a>
               <a href="#" style={styles.link}>Forum</a>
-              <a href="#" style={styles.link}>LMS</a>
+              <a href="#" style={styles.link}>콘텐츠 안내</a>
             </div>
             <div style={styles.linkGroup}>
               <h4 style={styles.linkGroupTitle}>정보</h4>

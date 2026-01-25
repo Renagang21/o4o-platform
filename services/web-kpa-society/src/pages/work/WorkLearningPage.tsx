@@ -1,9 +1,11 @@
 /**
- * WorkLearningPage - 개인 학습/교육 현황
+ * WorkLearningPage - 개인 안내 흐름 현황
  *
  * WO-KPA-WORK-IMPLEMENT-V1
- * - 개인 수강 LMS 목록
- * - 수료 현황
+ * WO-O4O-LMS-REFACTOR-V1: LMS 용어 제거, 안내 흐름으로 통일
+ *
+ * - 개인 진행중인 안내 흐름 목록
+ * - 완료 현황
  * - 추천 콘텐츠 (정보성)
  */
 
@@ -11,45 +13,45 @@ import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 
-// Mock 학습 데이터
+// Mock 안내 흐름 데이터
 const mockLearningData = {
   inProgress: [
     {
       id: 'c1',
-      title: '2025 약사 보수교육',
-      category: '보수교육',
+      title: '2025 약사 보수교육 안내',
+      category: '필수 안내',
       progress: 65,
-      totalLessons: 20,
-      completedLessons: 13,
+      totalSteps: 20,
+      completedSteps: 13,
       deadline: '2025-03-31',
     },
     {
       id: 'c2',
-      title: '복약지도 심화과정',
-      category: '전문과정',
+      title: '복약지도 심화 안내',
+      category: '전문 안내',
       progress: 30,
-      totalLessons: 15,
-      completedLessons: 5,
+      totalSteps: 15,
+      completedSteps: 5,
       deadline: '2025-04-15',
     },
     {
       id: 'c3',
       title: '약국 서비스 품질 관리',
-      category: '일반과정',
+      category: '일반 안내',
       progress: 10,
-      totalLessons: 8,
-      completedLessons: 1,
+      totalSteps: 8,
+      completedSteps: 1,
       deadline: null,
     },
   ],
   completed: [
-    { id: 'cc1', title: '2024 약사 보수교육', completedDate: '2024-12-15', certificateId: 'cert-001' },
-    { id: 'cc2', title: '당뇨병 환자 복약지도', completedDate: '2024-11-20', certificateId: 'cert-002' },
+    { id: 'cc1', title: '2024 약사 보수교육 안내', completedDate: '2024-12-15', recordId: 'rec-001' },
+    { id: 'cc2', title: '당뇨병 환자 복약지도', completedDate: '2024-11-20', recordId: 'rec-002' },
   ],
   recommended: [
-    { id: 'r1', title: '당뇨병 환자 관리', category: '전문과정', duration: '8시간' },
-    { id: 'r2', title: '고혈압 약물 치료', category: '전문과정', duration: '6시간' },
-    { id: 'r3', title: 'AI 시대 약국 혁신', category: '일반과정', duration: '4시간' },
+    { id: 'r1', title: '당뇨병 환자 관리', category: '전문 안내', duration: '8시간' },
+    { id: 'r2', title: '고혈압 약물 치료', category: '전문 안내', duration: '6시간' },
+    { id: 'r3', title: 'AI 시대 약국 혁신', category: '일반 안내', duration: '4시간' },
   ],
 };
 
@@ -67,8 +69,8 @@ export function WorkLearningPage() {
         <Link to="/work" style={styles.backLink}>← 내 업무</Link>
         <div style={styles.headerMain}>
           <div>
-            <h1 style={styles.pageTitle}>학습 / 교육</h1>
-            <p style={styles.subTitle}>{userName}님의 학습 현황</p>
+            <h1 style={styles.pageTitle}>안내 흐름</h1>
+            <p style={styles.subTitle}>{userName}님의 진행 현황</p>
           </div>
           <div style={styles.statsRow}>
             <div style={styles.statBadge}>
@@ -77,15 +79,15 @@ export function WorkLearningPage() {
             </div>
             <div style={styles.statBadge}>
               <span style={styles.statNumber}>{data.completed.length}</span>
-              <span style={styles.statLabel}>수료</span>
+              <span style={styles.statLabel}>완료</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* 진행중 과정 */}
+      {/* 진행중 안내 흐름 */}
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>진행중인 과정</h2>
+        <h2 style={styles.sectionTitle}>진행중인 안내 흐름</h2>
         <div style={styles.courseList}>
           {data.inProgress.map(course => (
             <div key={course.id} style={styles.courseCard}>
@@ -99,7 +101,7 @@ export function WorkLearningPage() {
               <div style={styles.progressSection}>
                 <div style={styles.progressInfo}>
                   <span style={styles.progressLabel}>
-                    {course.completedLessons}/{course.totalLessons} 강의
+                    {course.completedSteps}/{course.totalSteps} 단계
                   </span>
                   <span style={styles.progressPercent}>{course.progress}%</span>
                 </div>
@@ -111,25 +113,25 @@ export function WorkLearningPage() {
                 </div>
               </div>
               <Link to={`/demo/lms/course/${course.id}`} style={styles.continueButton}>
-                이어서 학습
+                계속 보기
               </Link>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 수료 과정 */}
+      {/* 완료 기록 */}
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>수료 과정</h2>
+        <h2 style={styles.sectionTitle}>완료 기록</h2>
         <div style={styles.completedList}>
           {data.completed.map(course => (
             <div key={course.id} style={styles.completedCard}>
               <div style={styles.completedInfo}>
                 <h3 style={styles.completedTitle}>{course.title}</h3>
-                <span style={styles.completedDate}>수료: {course.completedDate}</span>
+                <span style={styles.completedDate}>완료: {course.completedDate}</span>
               </div>
               <Link to="/demo/lms/certificate" style={styles.certButton}>
-                수료증
+                기록 보기
               </Link>
             </div>
           ))}
@@ -139,7 +141,7 @@ export function WorkLearningPage() {
       {/* 추천 콘텐츠 */}
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>추천 콘텐츠</h2>
-        <p style={styles.sectionDesc}>관심 분야에 맞는 과정을 추천합니다.</p>
+        <p style={styles.sectionDesc}>관심 분야에 맞는 안내 흐름을 추천합니다.</p>
         <div style={styles.recommendList}>
           {data.recommended.map(course => (
             <div key={course.id} style={styles.recommendCard}>

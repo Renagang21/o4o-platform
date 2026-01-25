@@ -80,14 +80,14 @@ const services: ServiceItem[] = [
   },
   {
     id: 'lms',
-    icon: '📚',
-    title: '약사 LMS',
+    icon: '📄',
+    title: '콘텐츠 안내',
     description:
-      '약사 개인을 위한 학습·교육 관리 서비스입니다. ' +
-      '교육 콘텐츠 이용과 학습 이력을 관리할 수 있습니다.',
+      '약사 개인을 위한 콘텐츠 열람 및 진행 관리 서비스입니다. ' +
+      '콘텐츠 열람과 진행 이력을 관리할 수 있습니다.',
     href: '/services/lms',
     badgeType: 'none',
-    ctas: [{ label: '교육 서비스 보기', href: '/demo/lms', primary: true }],
+    ctas: [{ label: '콘텐츠 서비스 보기', href: '/demo/lms', primary: true }],
   },
 ];
 

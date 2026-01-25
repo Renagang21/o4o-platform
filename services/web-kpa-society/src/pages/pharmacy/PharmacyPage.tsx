@@ -166,16 +166,16 @@ export function PharmacyPage() {
             </div>
           </div>
           <div style={styles.cardBody}>
-            {/* LMS */}
+            {/* 콘텐츠 안내 */}
             <div style={styles.serviceItem}>
               <div style={styles.serviceHeader}>
-                <span style={styles.serviceIcon}>🎓</span>
-                <span style={styles.serviceName}>교육 (LMS)</span>
+                <span style={styles.serviceIcon}>📄</span>
+                <span style={styles.serviceName}>콘텐츠 안내</span>
               </div>
               <div style={styles.serviceStats}>
-                <span>수강중 {pharmacy.services.lms.inProgress}</span>
+                <span>진행중 {pharmacy.services.lms.inProgress}</span>
                 <span>·</span>
-                <span>수료 {pharmacy.services.lms.completed}</span>
+                <span>완료 {pharmacy.services.lms.completed}</span>
               </div>
             </div>
 

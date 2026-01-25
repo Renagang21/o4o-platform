@@ -41,8 +41,8 @@ export default function PharmacistManualPage() {
           <div style={styles.featureItem}>
             <span style={styles.featureNumber}>2</span>
             <div>
-              <strong>교육 (LMS)</strong>
-              <p style={styles.featureDesc}>온라인 교육을 수강하고 수료증을 발급받습니다.</p>
+              <strong>콘텐츠 안내</strong>
+              <p style={styles.featureDesc}>콘텐츠를 열람하고 진행 기록을 관리합니다.</p>
             </div>
           </div>
           <div style={styles.featureItem}>

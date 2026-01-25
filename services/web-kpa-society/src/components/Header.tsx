@@ -69,7 +69,7 @@ const menuItems: MenuItem[] = [
     children: [
       { label: '업무 현황', href: '/work' },
       { label: '업무 관리', href: '/work/tasks' },
-      { label: '학습/교육', href: '/work/learning' },
+      { label: '안내 흐름', href: '/work/learning' },
       { label: '커뮤니티', href: '/work/community' },
     ],
   },

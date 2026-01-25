@@ -80,19 +80,19 @@ export function PharmacyServicesPage() {
 
       {/* 서비스 그리드 */}
       <div style={styles.serviceGrid}>
-        {/* LMS - 교육 */}
+        {/* 콘텐츠 안내 */}
         <div style={styles.serviceCard}>
           <div style={styles.serviceHeader}>
-            <div style={styles.serviceIcon}>🎓</div>
+            <div style={styles.serviceIcon}>📄</div>
             <div style={styles.serviceTitleGroup}>
-              <h2 style={styles.serviceTitle}>교육 (LMS)</h2>
-              <span style={styles.serviceSubtitle}>약국 구성원 기준 교육 현황</span>
+              <h2 style={styles.serviceTitle}>콘텐츠 안내</h2>
+              <span style={styles.serviceSubtitle}>약국 구성원 기준 진행 현황</span>
             </div>
           </div>
           <div style={styles.serviceBody}>
-            {/* 구성원 교육 현황 */}
+            {/* 구성원 진행 현황 */}
             <div style={styles.staffSection}>
-              <h3 style={styles.subsectionTitle}>구성원 교육 현황</h3>
+              <h3 style={styles.subsectionTitle}>구성원 진행 현황</h3>
               <div style={styles.staffList}>
                 {services.lms.pharmacyStaff.map((staff, index) => (
                   <div key={index} style={styles.staffRow}>

@@ -89,10 +89,10 @@ export function MyCertificatesPage() {
 
       {certificates.length === 0 ? (
         <EmptyState
-          icon="🎓"
-          title="수료증이 없습니다"
-          description="교육 과정을 수료하면 수료증이 발급됩니다."
-          action={{ label: '교육 과정 보기', onClick: () => window.location.href = '/lms/courses' }}
+          icon="📋"
+          title="완료 기록이 없습니다"
+          description="안내 흐름을 완료하면 기록이 생성됩니다."
+          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = '/lms/courses' }}
         />
       ) : (
         <>
