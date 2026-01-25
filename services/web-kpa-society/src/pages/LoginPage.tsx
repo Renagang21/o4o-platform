@@ -19,6 +19,7 @@ const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'pharmacist@kpa-test.kr', password: TEST_PASSWORD, label: '일반회원 (약사)' },
   { email: 'branch-officer@kpa-test.kr', password: TEST_PASSWORD, label: '분회 임원' },
+  { email: 'branch-admin@kpa-test.kr', password: TEST_PASSWORD, label: '분회 운영자' },
   { email: 'district-officer@kpa-test.kr', password: TEST_PASSWORD, label: '지부 임원' },
   { email: 'district-admin@kpa-test.kr', password: TEST_PASSWORD, label: '지부 운영자' },
 ];
