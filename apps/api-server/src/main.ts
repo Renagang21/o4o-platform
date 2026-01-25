@@ -112,25 +112,42 @@ const port = Number(process.env.PORT) || 8080;
 logger.info(`[STARTUP] PORT configuration: process.env.PORT=${process.env.PORT}, resolved port=${port}`);
 
 // ============================================================================
+// SHARED CORS ORIGINS (used by both Socket.IO and Express)
+// ============================================================================
+const getAllowedOrigins = (): string[] => {
+  const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [];
+
+  const devOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:3011",
+    "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003",
+    "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177",
+  ];
+
+  const ipOrigins = process.env.NODE_ENV !== 'production' ? [
+    "http://13.125.144.8:3000", "http://13.125.144.8:3001", "http://13.125.144.8", "https://13.125.144.8",
+  ] : [];
+
+  const prodOrigins = [
+    "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
+    "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
+    "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
+    "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
+    "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
+    "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
+    "https://k-cosmetics.site", "https://www.k-cosmetics.site",
+    "https://siteguide.co.kr", "https://www.siteguide.co.kr",
+  ];
+
+  return [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
+};
+
+// ============================================================================
 // SOCKET.IO CONFIGURATION
 // ============================================================================
 const io = new Server(httpServer, {
   cors: {
     origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-      const allowedOrigins = [
-        process.env.FRONTEND_URL || "http://localhost:3011",
-        "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003",
-        "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177",
-        "http://13.125.144.8:3000", "http://13.125.144.8:3001", "http://13.125.144.8", "https://13.125.144.8",
-        "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr", "http://admin.neture.co.kr",
-        "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
-        "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr", "http://api.neture.co.kr",
-        "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
-        "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
-        "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
-        "https://k-cosmetics.site", "https://www.k-cosmetics.site"
-      ];
-
+      const allowedOrigins = getAllowedOrigins();
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -225,33 +242,10 @@ app.use(compression({
   level: 6,
 }) as any);
 
-// CORS configuration
+// CORS configuration (uses shared getAllowedOrigins function)
 const corsOptions: CorsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((o: any) => o.trim()) : [];
-
-    const devOrigins = [
-      process.env.FRONTEND_URL || "http://localhost:3011",
-      "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003",
-      "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177",
-    ];
-
-    const ipOrigins = process.env.NODE_ENV !== 'production' ? [
-      "http://13.125.144.8:3000", "http://13.125.144.8:3001", "http://13.125.144.8", "https://13.125.144.8",
-    ] : [];
-
-    const prodOrigins = [
-      "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
-      "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
-      "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
-      "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
-      "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
-      "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
-      "https://k-cosmetics.site", "https://www.k-cosmetics.site",
-      "https://siteguide.co.kr", "https://www.siteguide.co.kr",
-    ];
-
-    const allowedOrigins = [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
+    const allowedOrigins = getAllowedOrigins();
 
     if (!origin) {
       callback(null, true);
@@ -280,7 +274,6 @@ const corsOptions: CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 // Static file serving
 const projectRoot = path.resolve(__dirname, '../../../');
