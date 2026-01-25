@@ -57,8 +57,9 @@ import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServi
 // Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
-// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-PHARMACY-DEPTH-V1)
+// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-PHARMACY-DEPTH-V1, WO-KPA-PHARMACY-B2B-FUNCTION-V1)
 import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage } from './pages/pharmacy';
+import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
@@ -114,6 +115,8 @@ function App() {
            * ======================================== */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
           <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyB2BPage /></Layout>} />
+          <Route path="/pharmacy/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><SupplierListPage /></Layout>} />
+          <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><SupplierDetailPage /></Layout>} />
           <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyStorePage /></Layout>} />
           <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicesPage /></Layout>} />
 
