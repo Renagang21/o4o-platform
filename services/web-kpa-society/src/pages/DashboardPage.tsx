@@ -304,6 +304,7 @@ export function DashboardPage() {
                 <div style={styles.progressText}>{course.progress}% 완료</div>
               </div>
             ))}
+            <Link to="/lms" style={styles.activityLink}>계속 학습하기 →</Link>
           </div>
 
           {/* 참여 공동구매 */}
@@ -321,6 +322,7 @@ export function DashboardPage() {
                 <div style={styles.progressText}>D-{gb.daysLeft} | {gb.progress}% 달성</div>
               </div>
             ))}
+            <Link to="/groupbuy" style={styles.activityLink}>내 주문 보기 →</Link>
           </div>
 
           {/* 최근 본 포럼 */}
