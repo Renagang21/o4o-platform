@@ -2,10 +2,12 @@
  * ServiceBanner - 외부 서비스 연결 배너
  *
  * WO-KPA-MENU-CLEANUP-V1: 메뉴에서 제거된 기능을 배너로 전환
+ * WO-KPA-PHARMACY-MANAGEMENT-V1: 약국 경영지원 배너 추가
  * - 약사회 공식 서비스가 아님을 명확히 표시
  * - 외부 서비스로 연결
  */
 
+import { Link } from 'react-router-dom';
 import { colors, borderRadius } from '../styles/theme';
 
 interface ServiceBannerProps {
@@ -15,6 +17,8 @@ interface ServiceBannerProps {
   linkUrl: string;
   linkText: string;
   variant?: 'primary' | 'secondary';
+  showDisclaimer?: boolean;
+  isInternal?: boolean;
 }
 
 export function ServiceBanner({
@@ -24,8 +28,17 @@ export function ServiceBanner({
   linkUrl,
   linkText,
   variant = 'primary',
+  showDisclaimer = true,
+  isInternal = false,
 }: ServiceBannerProps) {
   const isPrimary = variant === 'primary';
+
+  const linkStyle = {
+    ...styles.bannerLink,
+    backgroundColor: isPrimary ? colors.primary : colors.white,
+    color: isPrimary ? colors.white : colors.primary,
+    borderColor: colors.primary,
+  };
 
   return (
     <div style={{
@@ -41,23 +54,26 @@ export function ServiceBanner({
         </div>
       </div>
       <div style={styles.bannerAction}>
-        <a
-          href={linkUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            ...styles.bannerLink,
-            backgroundColor: isPrimary ? colors.primary : colors.white,
-            color: isPrimary ? colors.white : colors.primary,
-            borderColor: colors.primary,
-          }}
-        >
-          {linkText} →
-        </a>
+        {isInternal ? (
+          <Link to={linkUrl} style={linkStyle}>
+            {linkText} →
+          </Link>
+        ) : (
+          <a
+            href={linkUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={linkStyle}
+          >
+            {linkText} →
+          </a>
+        )}
       </div>
-      <div style={styles.disclaimer}>
-        본 서비스는 약사회 공식 서비스가 아니며, 거래·운영·책임은 해당 서비스 운영 주체에 있습니다.
-      </div>
+      {showDisclaimer && (
+        <div style={styles.disclaimer}>
+          본 서비스는 약사회 공식 서비스가 아니며, 거래·운영·책임은 해당 서비스 운영 주체에 있습니다.
+        </div>
+      )}
     </div>
   );
 }
@@ -69,6 +85,25 @@ export function ServiceBanner({
 export function ExternalServiceSection() {
   return (
     <section style={styles.section}>
+      {/* 약국 경영지원 (WO-KPA-PHARMACY-MANAGEMENT-V1) */}
+      <h2 style={styles.sectionTitle}>약국 경영지원</h2>
+      <p style={styles.sectionDesc}>
+        약국 운영에 필요한 모든 기능을 한 곳에서 관리하세요.
+      </p>
+      <div style={{ marginBottom: '24px' }}>
+        <ServiceBanner
+          icon="💊"
+          title="내 약국 운영하기"
+          description="B2B 구매, 약국 몰 관리, 연결 서비스를 통합 관리합니다."
+          linkUrl="/demo/pharmacy"
+          linkText="내 약국 운영하기"
+          variant="primary"
+          showDisclaimer={false}
+          isInternal={true}
+        />
+      </div>
+
+      {/* 제휴 서비스 */}
       <h2 style={styles.sectionTitle}>제휴 서비스</h2>
       <p style={styles.sectionDesc}>
         아래 서비스는 약사회 공식 서비스가 아닌 외부 제휴 서비스입니다.

@@ -57,6 +57,9 @@ import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServi
 // Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
+// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1)
+import { PharmacyPage } from './pages/pharmacy';
+
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
 
@@ -209,6 +212,10 @@ function DemoLayoutRoutes() {
         <Route path="/groupbuy" element={<GroupbuyListPage />} />
         <Route path="/groupbuy/history" element={<GroupbuyHistoryPage />} />
         <Route path="/groupbuy/:id" element={<GroupbuyDetailPage />} />
+
+        {/* Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1) */}
+        <Route path="/pharmacy" element={<PharmacyPage />} />
+        <Route path="/pharmacy/*" element={<PharmacyPage />} />
 
         {/* Docs (자료실) */}
         <Route path="/docs" element={<ResourcesListPage />} />
