@@ -9,6 +9,14 @@ import { ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
 // LMS pages
 import { LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
 
+// Participation pages (WO-KPA-PARTICIPATION-APP-V1)
+import {
+  ParticipationListPage,
+  ParticipationCreatePage,
+  ParticipationRespondPage,
+  ParticipationResultPage,
+} from './pages/participation';
+
 // Groupbuy pages
 import { GroupbuyListPage, GroupbuyDetailPage, GroupbuyHistoryPage } from './pages/groupbuy';
 
@@ -193,6 +201,7 @@ function App() {
           <Route path="/docs/*" element={<Navigate to="/demo/docs" replace />} />
           <Route path="/organization/*" element={<Navigate to="/demo/organization" replace />} />
           <Route path="/mypage/*" element={<Navigate to="/demo/mypage" replace />} />
+          <Route path="/participation/*" element={<Navigate to="/demo/participation" replace />} />
 
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />
@@ -235,6 +244,12 @@ function DemoLayoutRoutes() {
         <Route path="/lms/course/:id" element={<LmsCourseDetailPage />} />
         <Route path="/lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
         <Route path="/lms/certificate" element={<LmsCertificatesPage />} />
+
+        {/* Participation (참여 - 설문/퀴즈) WO-KPA-PARTICIPATION-APP-V1 */}
+        <Route path="/participation" element={<ParticipationListPage />} />
+        <Route path="/participation/create" element={<ParticipationCreatePage />} />
+        <Route path="/participation/:id/respond" element={<ParticipationRespondPage />} />
+        <Route path="/participation/:id/results" element={<ParticipationResultPage />} />
 
         {/* Groupbuy (공동구매) */}
         <Route path="/groupbuy" element={<GroupbuyListPage />} />

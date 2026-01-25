@@ -15,3 +15,4 @@ export { branchApi } from './branch';
 export { adminApi } from './admin';
 export { branchAdminApi } from './branchAdmin';
 export { cmsApi } from './cms';
+export { participationApi } from './participation';
