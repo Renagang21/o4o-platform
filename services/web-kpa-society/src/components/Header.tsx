@@ -20,6 +20,7 @@ interface MenuItem {
 
 // IA 기준 메뉴 구조 (Design Package v1)
 // WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
+// WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 메뉴 제거 → 배너 전환
 const menuItems: MenuItem[] = [
   {
     label: '공지',
@@ -40,22 +41,7 @@ const menuItems: MenuItem[] = [
       { label: '글쓰기', href: '/demo/forum/write' },
     ],
   },
-  {
-    label: '교육',
-    href: '/demo/lms',
-    children: [
-      { label: '교육 과정', href: '/demo/lms/courses' },
-      { label: '수료증', href: '/demo/lms/certificate' },
-    ],
-  },
-  {
-    label: '공동구매',
-    href: '/demo/groupbuy',
-    children: [
-      { label: '진행중', href: '/demo/groupbuy' },
-      { label: '참여 내역', href: '/demo/groupbuy/history' },
-    ],
-  },
+  // 교육(LMS), 공동구매: 메뉴에서 제거 → 배너로 전환 (WO-KPA-MENU-CLEANUP-V1)
   {
     label: '자료실',
     href: '/demo/docs',

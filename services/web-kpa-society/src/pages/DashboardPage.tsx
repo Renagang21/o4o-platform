@@ -8,15 +8,17 @@
  * C. User Activity - 나의 활동
  * D. Org News - 지부/분회 소식
  * E. KPA News - 전체 약사회 소식
- * F. Recommended Courses - 추천 교육
- * G. Active Groupbuys - 진행중 공동구매
- * H. Organization Info - 조직 안내
+ * F. External Services - 제휴 서비스 (교육/공동구매 배너)
+ * G. Organization Info - 조직 안내
+ *
+ * WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 메뉴 제거 → 배너 전환
  */
 
 import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../styles/theme';
 import { useAuth, TestUser } from '../contexts/AuthContext';
 import { AiSummaryButton } from '../components/ai';
+import { ExternalServiceSection } from '../components/ServiceBanner';
 
 // Mock user data (fallback when not logged in)
 const mockUser = {
@@ -53,24 +55,20 @@ const mockOfficerData = {
 };
 
 // Quick Menu items
+// WO-KPA-MENU-CLEANUP-V1: 공동구매/교육 제거 (배너로 전환)
 const quickMenuItems = [
   { icon: '📢', label: '공지사항', href: '/news/notice', color: '#2563EB' },
-  { icon: '🛒', label: '공동구매', href: '/groupbuy', color: '#059669' },
-  { icon: '🎓', label: '교육/연수', href: '/lms', color: '#7C3AED' },
   { icon: '💬', label: '포럼', href: '/forum', color: '#F59E0B' },
   { icon: '📁', label: '자료실', href: '/docs', color: '#EC4899' },
   { icon: '📝', label: '신상신고', href: '/mypage/status-report', color: '#6366F1' },
+  { icon: '🏢', label: '조직소개', href: '/organization', color: '#8B5CF6' },
+  { icon: '📞', label: '연락처', href: '/organization/contact', color: '#10B981' },
 ];
 
 // Mock activity data
+// WO-KPA-MENU-CLEANUP-V1: ongoingCourses, activeGroupbuys 제거
 const mockActivity = {
   unreadNotices: 3,
-  ongoingCourses: [
-    { id: 1, title: '약물요법 심화과정', progress: 65 },
-  ],
-  activeGroupbuys: [
-    { id: 1, title: '겨울철 건강식품 공동구매', progress: 78, daysLeft: 5 },
-  ],
   recentForumPosts: [
     { id: 1, title: '신규 약사 취업 관련 질문', category: '자유게시판' },
   ],
@@ -90,19 +88,7 @@ const mockKpaNews = [
   { id: 3, title: '전국 약사회 정기총회 결과 보고', date: '2024-12-15' },
 ];
 
-// Mock recommended courses
-const mockCourses = [
-  { id: 1, title: '2024 필수 연수교육', duration: '8시간', thumbnail: '🎓', isRequired: true },
-  { id: 2, title: '복약지도 실무과정', duration: '4시간', thumbnail: '💊' },
-  { id: 3, title: '약국 경영 세미나', duration: '2시간', thumbnail: '📊' },
-];
-
-// Mock groupbuys
-const mockGroupbuys = [
-  { id: 1, title: '겨울철 건강식품 세트', price: '45,000원', progress: 78, endDate: '12/25' },
-  { id: 2, title: '약국용 소모품 패키지', price: '120,000원', progress: 45, endDate: '12/30' },
-  { id: 3, title: '2025년 달력/다이어리', price: '15,000원', progress: 92, endDate: '12/20' },
-];
+// WO-KPA-MENU-CLEANUP-V1: mockCourses, mockGroupbuys 제거 (배너 전환)
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -169,6 +155,7 @@ export function DashboardPage() {
               {displayUser.organization} &gt; {displayUser.branch}
             </span>
           </div>
+          {/* WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 통계 제거 */}
           <div style={styles.welcomeStats}>
             <AiSummaryButton contextLabel="약사회 활동 현황" />
             <div style={styles.welcomeStat}>
@@ -176,12 +163,8 @@ export function DashboardPage() {
               <span style={styles.welcomeStatLabel}>미확인 공지</span>
             </div>
             <div style={styles.welcomeStat}>
-              <span style={styles.welcomeStatValue}>{mockActivity.ongoingCourses.length}</span>
-              <span style={styles.welcomeStatLabel}>진행중 교육</span>
-            </div>
-            <div style={styles.welcomeStat}>
-              <span style={styles.welcomeStatValue}>{mockActivity.activeGroupbuys.length}</span>
-              <span style={styles.welcomeStatLabel}>참여 공동구매</span>
+              <span style={styles.welcomeStatValue}>{mockActivity.recentForumPosts.length}</span>
+              <span style={styles.welcomeStatLabel}>최근 활동</span>
             </div>
           </div>
         </div>
@@ -275,7 +258,7 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {/* C. User Activity */}
+      {/* C. User Activity - WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 카드 제거 */}
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>나의 활동</h2>
         <div style={styles.activityGrid}>
@@ -287,42 +270,6 @@ export function DashboardPage() {
             </div>
             <div style={styles.activityValue}>{mockActivity.unreadNotices}건</div>
             <Link to="/news/notice" style={styles.activityLink}>확인하기 →</Link>
-          </div>
-
-          {/* 진행중 교육 */}
-          <div style={styles.activityCard}>
-            <div style={styles.activityHeader}>
-              <span style={styles.activityIcon}>🎓</span>
-              <span style={styles.activityLabel}>진행중 교육</span>
-            </div>
-            {mockActivity.ongoingCourses.map((course) => (
-              <div key={course.id}>
-                <div style={styles.activityCourseTitle}>{course.title}</div>
-                <div style={styles.progressBar}>
-                  <div style={{ ...styles.progressFill, width: `${course.progress}%` }} />
-                </div>
-                <div style={styles.progressText}>{course.progress}% 완료</div>
-              </div>
-            ))}
-            <Link to="/lms" style={styles.activityLink}>계속 학습하기 →</Link>
-          </div>
-
-          {/* 참여 공동구매 */}
-          <div style={styles.activityCard}>
-            <div style={styles.activityHeader}>
-              <span style={styles.activityIcon}>🛒</span>
-              <span style={styles.activityLabel}>참여 공동구매</span>
-            </div>
-            {mockActivity.activeGroupbuys.map((gb) => (
-              <div key={gb.id}>
-                <div style={styles.activityCourseTitle}>{gb.title}</div>
-                <div style={styles.progressBar}>
-                  <div style={{ ...styles.progressFill, width: `${gb.progress}%`, backgroundColor: colors.accentGreen }} />
-                </div>
-                <div style={styles.progressText}>D-{gb.daysLeft} | {gb.progress}% 달성</div>
-              </div>
-            ))}
-            <Link to="/groupbuy" style={styles.activityLink}>내 주문 보기 →</Link>
           </div>
 
           {/* 최근 본 포럼 */}
@@ -338,6 +285,28 @@ export function DashboardPage() {
               </div>
             ))}
             <Link to="/forum" style={styles.activityLink}>포럼 가기 →</Link>
+          </div>
+
+          {/* 신상신고 */}
+          <div style={styles.activityCard}>
+            <div style={styles.activityHeader}>
+              <span style={styles.activityIcon}>📝</span>
+              <span style={styles.activityLabel}>신상신고</span>
+            </div>
+            <div style={styles.activityCourseTitle}>2025년 신상신고</div>
+            <div style={styles.activityMeta}>제출 마감: 1월 31일</div>
+            <Link to="/mypage/status-report" style={styles.activityLink}>신고하기 →</Link>
+          </div>
+
+          {/* 회원 정보 */}
+          <div style={styles.activityCard}>
+            <div style={styles.activityHeader}>
+              <span style={styles.activityIcon}>👤</span>
+              <span style={styles.activityLabel}>회원 정보</span>
+            </div>
+            <div style={styles.activityCourseTitle}>프로필 관리</div>
+            <div style={styles.activityMeta}>연락처, 근무지 정보 관리</div>
+            <Link to="/mypage/profile" style={styles.activityLink}>프로필 보기 →</Link>
           </div>
         </div>
       </section>
@@ -383,52 +352,10 @@ export function DashboardPage() {
         </section>
       </div>
 
-      {/* F. Recommended Courses */}
-      <section style={styles.section}>
-        <div style={styles.newsSectionHeader}>
-          <h2 style={styles.sectionTitle}>추천 교육</h2>
-          <Link to="/lms/courses" style={styles.moreLink}>전체보기 →</Link>
-        </div>
-        <div style={styles.coursesGrid}>
-          {mockCourses.map((course) => (
-            <Link key={course.id} to={`/lms/course/${course.id}`} style={styles.courseCard}>
-              <div style={styles.courseThumbnail}>{course.thumbnail}</div>
-              <div style={styles.courseInfo}>
-                <div style={styles.courseTitleRow}>
-                  {course.isRequired && <span style={styles.requiredBadge}>필수</span>}
-                  <span style={styles.courseTitle}>{course.title}</span>
-                </div>
-                <span style={styles.courseDuration}>{course.duration}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* F. External Services - 제휴 서비스 배너 (WO-KPA-MENU-CLEANUP-V1) */}
+      <ExternalServiceSection />
 
-      {/* G. Active Groupbuys */}
-      <section style={styles.section}>
-        <div style={styles.newsSectionHeader}>
-          <h2 style={styles.sectionTitle}>진행중 공동구매</h2>
-          <Link to="/groupbuy" style={styles.moreLink}>전체보기 →</Link>
-        </div>
-        <div style={styles.groupbuyGrid}>
-          {mockGroupbuys.map((gb) => (
-            <Link key={gb.id} to={`/groupbuy/${gb.id}`} style={styles.groupbuyCard}>
-              <div style={styles.groupbuyHeader}>
-                <span style={styles.groupbuyTitle}>{gb.title}</span>
-                <span style={styles.groupbuyEndDate}>~{gb.endDate}</span>
-              </div>
-              <div style={styles.groupbuyPrice}>{gb.price}</div>
-              <div style={styles.progressBar}>
-                <div style={{ ...styles.progressFill, width: `${gb.progress}%`, backgroundColor: colors.accentGreen }} />
-              </div>
-              <div style={styles.groupbuyProgress}>{gb.progress}% 달성</div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* H. Organization Info */}
+      {/* G. Organization Info */}
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>조직 안내</h2>
         <div style={styles.orgInfoGrid}>
