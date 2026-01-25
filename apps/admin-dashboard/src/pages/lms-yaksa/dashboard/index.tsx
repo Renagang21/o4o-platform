@@ -1,7 +1,8 @@
 /**
  * LMS-Yaksa Dashboard Page
  *
- * Overview dashboard for Yaksa LMS administration
+ * 보수교육 관리 대시보드
+ * WO-ADMIN-NETURE-LMS-REFACTOR-V1: LMS → 보수교육 관리로 명칭 변경
  */
 
 import { useEffect, useState } from 'react';
@@ -93,7 +94,7 @@ export default function YaksaDashboardPage({ variant = 'default' }: YaksaDashboa
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">약사 LMS 대시보드</h1>
+          <h1 className="text-2xl font-bold">보수교육 관리</h1>
           <p className="text-muted-foreground">
             보수교육 및 연수 현황을 한눈에 확인합니다.
           </p>

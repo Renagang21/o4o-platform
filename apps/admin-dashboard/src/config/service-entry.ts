@@ -21,7 +21,7 @@ export type ServiceEntryPoint =
   | 'pharmacy'         // 약국 서비스
   | 'glucosecare'      // 혈당관리 프로그램
   | 'forum'            // 약사 포럼
-  | 'lms'              // 약사 개인 LMS
+  | 'lms'              // 콘텐츠 안내 (WO-ADMIN-NETURE-LMS-REFACTOR-V1)
   | 'admin';           // 관리자 대시보드
 
 /**
@@ -85,10 +85,10 @@ export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfi
   lms: {
     entry: 'lms',
     defaultScopeKey: 'kpa_society',
-    displayName: '약사 LMS',
-    description: '약사 개인 학습 관리 시스템',
+    displayName: '콘텐츠 안내',
+    description: '콘텐츠 열람 및 진행 관리 (WO-ADMIN-NETURE-LMS-REFACTOR-V1)',
     isProgram: false,
-    routePatterns: ['/admin/lms', '/admin/learning'],
+    routePatterns: ['/admin/lms', '/admin/learning', '/admin/content', '/admin/participation'],
   },
   admin: {
     entry: 'admin',

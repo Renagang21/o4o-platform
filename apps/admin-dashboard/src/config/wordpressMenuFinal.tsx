@@ -173,6 +173,63 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
+  // Participation (응답 수집/결과 - WO-ADMIN-NETURE-LMS-REFACTOR-V1)
+  {
+    id: 'participation',
+    label: 'Participation',
+    icon: <ClipboardList className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'participation-overview',
+        label: 'Overview',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+        path: '/admin/participation',
+      },
+      {
+        id: 'participation-surveys',
+        label: '설문 목록',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/participation/surveys',
+      },
+      {
+        id: 'participation-responses',
+        label: '응답 현황',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/admin/participation/responses',
+      },
+    ],
+  },
+
+  // Learning (순서/흐름 관리 - WO-ADMIN-NETURE-LMS-REFACTOR-V1)
+  // ⚠️ 교육/평가가 아닌 콘텐츠 순서 안내 도구
+  {
+    id: 'learning',
+    label: 'Learning (Flow)',
+    icon: <PlayCircle className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'learning-overview',
+        label: 'Overview',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+        path: '/admin/learning',
+      },
+      {
+        id: 'learning-flows',
+        label: 'Flow 목록',
+        icon: <Layers className="w-4 h-4" />,
+        path: '/admin/learning/flows',
+      },
+      {
+        id: 'learning-progress',
+        label: '진행 현황',
+        icon: <TrendingUp className="w-4 h-4" />,
+        path: '/admin/learning/progress',
+      },
+    ],
+  },
+
   // CMS (플랫폼 콘텐츠 관리 - Core 하위)
   {
     id: 'cms',

@@ -6,6 +6,7 @@
  * @purpose Design Core v1.0 컴포넌트를 사용한 대시보드 Variant
  * @status Variant (기존 화면과 공존)
  * @date 2025-12-16
+ * @updated WO-ADMIN-NETURE-LMS-REFACTOR-V1: LMS → 보수교육 관리로 명칭 변경
  *
  * 사용 컴포넌트:
  * - AGPageHeader: 페이지 헤더
@@ -80,7 +81,7 @@ export function YaksaDashboardDesignCoreV1({ dashboardData }: YaksaDashboardDesi
     <div className="min-h-screen bg-gray-50">
       {/* Page Header - AGPageHeader 사용 */}
       <AGPageHeader
-        title="약사 LMS 대시보드"
+        title="보수교육 관리"
         description="보수교육 및 연수 현황을 한눈에 확인합니다."
         icon={<BookOpen className="w-5 h-5" />}
       />
