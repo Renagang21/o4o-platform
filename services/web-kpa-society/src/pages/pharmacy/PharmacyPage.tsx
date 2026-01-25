@@ -108,7 +108,7 @@ export function PharmacyPage() {
             )}
           </div>
           <div style={styles.cardFooter}>
-            <Link to="/demo/groupbuy" style={styles.cardLink}>
+            <Link to="/pharmacy/b2b" style={styles.cardLink}>
               {isOwner ? '구매하기 →' : '상품 보기 →'}
             </Link>
           </div>
@@ -150,7 +150,7 @@ export function PharmacyPage() {
             </div>
           </div>
           <div style={styles.cardFooter}>
-            <Link to="/pharmacy/mall" style={styles.cardLink}>
+            <Link to="/pharmacy/store" style={styles.cardLink}>
               진열 관리 →
             </Link>
           </div>
@@ -202,9 +202,9 @@ export function PharmacyPage() {
             </div>
           </div>
           <div style={styles.cardFooter}>
-            <Link to="/demo/lms" style={styles.cardLinkSecondary}>교육</Link>
-            <Link to="/pharmacy/signage" style={styles.cardLinkSecondary}>사이니지</Link>
-            <Link to="/demo/forum" style={styles.cardLinkSecondary}>포럼</Link>
+            <Link to="/pharmacy/services" style={styles.cardLink}>
+              서비스 현황 →
+            </Link>
           </div>
         </div>
 

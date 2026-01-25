@@ -57,8 +57,8 @@ import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServi
 // Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
-// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1)
-import { PharmacyPage } from './pages/pharmacy';
+// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-PHARMACY-DEPTH-V1)
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage } from './pages/pharmacy';
 
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
@@ -110,9 +110,12 @@ function App() {
           {/* ========================================
            * 약국 경영지원 (실 서비스 경로)
            * WO-KPA-PHARMACY-LOCATION-V1: /pharmacy를 단일 기준 경로로
+           * WO-KPA-PHARMACY-DEPTH-V1: 깊이 화면 추가
            * ======================================== */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
-          <Route path="/pharmacy/*" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
+          <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyB2BPage /></Layout>} />
+          <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyStorePage /></Layout>} />
+          <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicesPage /></Layout>} />
 
           {/* ========================================
            * 약사회 데모 서비스 (/demo 하위)
