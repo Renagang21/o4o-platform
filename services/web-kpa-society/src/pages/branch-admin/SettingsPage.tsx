@@ -18,16 +18,7 @@ import {
   PharmacistFeeCategory,
   FEE_CATEGORY_LABELS,
   FEE_CATEGORY_GROUPS,
-  FeeCategoryGroup,
 } from '../../types';
-
-// 그룹별 라벨 (참고용 - 실제로는 FEE_CATEGORY_GROUPS 사용)
-const _GROUP_LABELS: Record<FeeCategoryGroup, string> = {
-  'A': '면허사용자(갑)',
-  'B': '면허사용자(을)',
-  'C': '면허사용자(병)',
-  'D': '면허사용자(정)',
-};
 
 // 정렬된 회비 분류 목록
 const ORDERED_CATEGORIES: PharmacistFeeCategory[] = [
