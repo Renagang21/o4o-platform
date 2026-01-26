@@ -53,7 +53,7 @@ export const AccountLinkingCard: React.FC<AccountLinkingCardProps> = ({ onSucces
     try {
       // OAuth 연동은 실제로는 OAuth 플로우를 시작해야 함
       // 여기서는 데모를 위한 구현
-      window.location.href = `/api/auth/oauth/${provider}/link`;
+      window.location.href = `/api/v1/auth/oauth/${provider}/link`;
     } catch (error) {
       toast({
         title: '오류',
