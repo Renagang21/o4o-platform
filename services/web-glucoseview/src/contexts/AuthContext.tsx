@@ -75,8 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (response.ok) {
           const data = await response.json();
-          if (data.user) {
-            const apiUser = data.user;
+          // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }
+          const apiUser = data.data?.user || data.data || data.user;
+          if (apiUser && apiUser.id) {
             const mappedRole = mapApiRole(apiUser.role);
             const userData: User = {
               id: apiUser.id,
@@ -115,8 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, message: data.message || data.error || '이메일 또는 비밀번호가 올바르지 않습니다.' };
       }
 
-      if (data.user) {
-        const apiUser = data.user;
+      // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }
+      const apiUser = data.data?.user || data.user;
+      if (apiUser && apiUser.id) {
         const mappedRole = mapApiRole(apiUser.role);
         // API 상태를 ApprovalStatus로 매핑
         let approvalStatus: ApprovalStatus = 'pending';
