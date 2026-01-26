@@ -239,7 +239,7 @@ const Login: FC = () => {
             <button
               type="button"
               onClick={() => {
-                setEmail('admin-neture@o4o.com');
+                setEmail('admin@neture.co.kr');
                 setPassword('TestPassword');
               }}
               className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors border border-white/10"
@@ -248,7 +248,7 @@ const Login: FC = () => {
             </button>
           </div>
           <div className="mt-3 text-xs text-blue-200/60 space-y-1">
-            <div>📧 admin-neture@o4o.com / TestPassword</div>
+            <div>📧 admin@neture.co.kr / TestPassword</div>
           </div>
         </div>
 
