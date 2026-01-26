@@ -16,7 +16,8 @@
 
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts';
+import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
+import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
@@ -214,13 +215,27 @@ function PageLoading() {
   );
 }
 
+// 로그인 모달 렌더링 컴포넌트
+function LoginModalRenderer() {
+  const { isLoginModalOpen, closeLoginModal, loginReturnUrl } = useLoginModal();
+  return (
+    <LoginModal
+      isOpen={isLoginModalOpen}
+      onClose={closeLoginModal}
+      returnUrl={loginReturnUrl}
+    />
+  );
+}
+
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Suspense fallback={<PageLoading />}>
-          <Routes>
+      <LoginModalProvider>
+        <BrowserRouter>
+          <LoginModalRenderer />
+          <Suspense fallback={<PageLoading />}>
+            <Routes>
             {/* ================================================================
                 인증 페이지 (레이아웃 없음)
             ================================================================ */}
@@ -427,9 +442,10 @@ function App() {
             <Route path="/test-guide/manual/partner" element={<Navigate to="/supplier-ops/manual/partner" replace />} />
             <Route path="/test-guide/manual/admin" element={<Navigate to="/supplier-ops/manual/admin" replace />} />
             <Route path="/test-guide/service/neture" element={<Navigate to="/supplier-ops/manual/service" replace />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </LoginModalProvider>
     </AuthProvider>
   );
 }

@@ -11,10 +11,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, LayoutDashboard } from 'lucide-react';
-import { useAuth, ROLE_DASHBOARDS, ROLE_LABELS } from '../contexts/AuthContext';
+import { useAuth, ROLE_DASHBOARDS, ROLE_LABELS, useLoginModal } from '../contexts';
 
 export default function AccountMenu() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -51,15 +52,15 @@ export default function AccountMenu() {
     navigate('/');
   };
 
-  // 비로그인 상태: 로그인 버튼
+  // 비로그인 상태: 로그인 버튼 (모달 열기)
   if (!isAuthenticated || !user) {
     return (
-      <Link
-        to="/login"
+      <button
+        onClick={() => openLoginModal()}
         className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
       >
         로그인
-      </Link>
+      </button>
     );
   }
 
