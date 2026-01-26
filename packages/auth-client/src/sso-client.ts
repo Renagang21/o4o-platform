@@ -81,7 +81,7 @@ export class SSOClient {
    */
   async checkSession(): Promise<User | null> {
     try {
-      const response = await fetch(`${this.config.apiUrl}/auth/v2/me`, {
+      const response = await fetch(`${this.config.apiUrl}/auth/me`, {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',

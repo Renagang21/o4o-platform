@@ -138,7 +138,6 @@ const Login: FC = () => {
                   onChange={(e: any) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="admin@neture.co.kr"
-                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -162,13 +161,11 @@ const Login: FC = () => {
                   onChange={(e: any) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-10 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="비밀번호를 입력하세요"
-                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-600 hover:text-gray-900 transition-colors" />
@@ -190,7 +187,6 @@ const Login: FC = () => {
                 checked={rememberMe}
                 onChange={(e: any) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-0"
-                disabled={isLoading}
               />
               <label htmlFor="remember-me" className="ml-2 text-sm text-blue-200">
                 로그인 상태 유지

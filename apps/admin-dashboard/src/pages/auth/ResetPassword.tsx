@@ -60,7 +60,7 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await authClient.api.post('/auth/v2/reset-password', {
+      const response = await authClient.api.post('/auth/reset-password', {
         token,
         password
       });

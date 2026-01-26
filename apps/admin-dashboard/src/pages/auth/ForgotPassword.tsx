@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await authClient.api.post('/auth/v2/forgot-password', { email });
+      const response = await authClient.api.post('/auth/forgot-password', { email });
 
       if (response.data.success) {
         setIsSubmitted(true);
