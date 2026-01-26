@@ -82,18 +82,26 @@ export class UpdateOperatorPasswords1769408012358 implements MigrationInterface 
       );
 
       if (existing && existing.length > 0) {
-        // Update password
+        // Update password and ensure account is active
         await queryRunner.query(
-          `UPDATE users SET password = $1 WHERE email = $2`,
+          `UPDATE users SET password = $1, status = 'active', "isActive" = true WHERE email = $2`,
           [HASHED_PASSWORD, account.email]
         );
         console.log(`  Updated password for: ${account.email}`);
       } else {
-        // Create new account
+        // Create new account with all required columns
+        // Note: "name" is the display name column in the users table
         await queryRunner.query(
-          `INSERT INTO users (email, password, "fullName", role, status, "createdAt", "updatedAt")
-           VALUES ($1, $2, $3, $4, 'active', NOW(), NOW())`,
-          [account.email, HASHED_PASSWORD, account.name, account.role]
+          `INSERT INTO users (
+            email, password, name, role, status,
+            "isActive", "isEmailVerified", "loginAttempts",
+            permissions, roles, "createdAt", "updatedAt"
+          ) VALUES (
+            $1, $2, $3, $4, 'active',
+            true, true, 0,
+            '[]', $5, NOW(), NOW()
+          )`,
+          [account.email, HASHED_PASSWORD, account.name, account.role, account.role]
         );
         console.log(`  Created account: ${account.email}`);
       }
