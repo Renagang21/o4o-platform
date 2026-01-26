@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
         credentials: 'include',
       });
 
@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

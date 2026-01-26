@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!refreshToken) return false;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     // 로그인 API 호출 (isLoading은 버튼 상태용으로 LoginPage에서 별도 관리)
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -218,7 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     const { accessToken } = getStoredTokens();
     try {
-      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: accessToken ? {

@@ -35,7 +35,7 @@ COPY services/web-neture/ ./services/web-neture/
 RUN pnpm --filter @o4o/content-editor build
 
 # Build-time environment variable for Vite
-ARG VITE_API_BASE_URL=https://o4o-core-api-3e3aws7zqa-du.a.run.app
+ARG VITE_API_BASE_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build the service

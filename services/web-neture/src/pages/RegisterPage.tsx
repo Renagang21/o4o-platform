@@ -68,7 +68,7 @@ export function RegisterPage() {
 
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/auth/register`, {
+      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

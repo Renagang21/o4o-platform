@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
           credentials: 'include',
         });
 
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -156,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

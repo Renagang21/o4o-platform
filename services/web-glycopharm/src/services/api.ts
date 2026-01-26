@@ -99,17 +99,17 @@ export const apiClient = new ApiClient(API_BASE_URL);
 // Auth API
 export const authApi = {
   login: (email: string, password: string) =>
-    apiClient.post<{ user: unknown; accessToken: string; refreshToken: string }>('/api/auth/login', {
+    apiClient.post<{ user: unknown; accessToken: string; refreshToken: string }>('/api/v1/auth/login', {
       email,
       password
     }),
 
-  logout: () => apiClient.post('/api/auth/logout'),
+  logout: () => apiClient.post('/api/v1/auth/logout'),
 
-  me: () => apiClient.get<{ user: unknown }>('/api/auth/me'),
+  me: () => apiClient.get<{ user: unknown }>('/api/v1/auth/me'),
 
   refresh: (refreshToken: string) =>
-    apiClient.post<{ accessToken: string; refreshToken: string }>('/api/auth/refresh', { refreshToken }),
+    apiClient.post<{ accessToken: string; refreshToken: string }>('/api/v1/auth/refresh', { refreshToken }),
 };
 
 // GlycoPharm Display API
