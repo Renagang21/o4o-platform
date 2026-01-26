@@ -1,27 +1,9 @@
-# Multi-stage build for O4O Admin Dashboard
-# Stage 1: Build
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-COPY pnpm-lock.yaml* ./
-
-# Install pnpm and dependencies
-RUN npm install -g pnpm && pnpm install --frozen-lockfile || pnpm install
-
-# Copy source code
-COPY . .
-
-# Build the application
-RUN pnpm build
-
-# Stage 2: Production with nginx
+# Production Dockerfile for O4O Admin Dashboard
+# Requires pre-built dist folder (run `pnpm build` before deploying)
 FROM nginx:alpine
 
-# Copy built assets from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy pre-built assets
+COPY dist /usr/share/nginx/html
 
 # Copy nginx configuration for SPA routing
 RUN echo 'server { \

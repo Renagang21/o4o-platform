@@ -1,0 +1,10 @@
+node_modules
+src
+public
+*.md
+*.log
+coverage
+test-results
+playwright-report
+*.tar.gz
+.git
