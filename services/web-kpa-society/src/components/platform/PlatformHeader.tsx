@@ -28,7 +28,7 @@ export function PlatformHeader() {
               </li>
             ))}
           </ul>
-          <a href="/demo/login" style={styles.loginButton}>
+          <a href="/login" style={styles.loginButton}>
             Login
           </a>
         </nav>

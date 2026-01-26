@@ -15,9 +15,10 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import bcrypt from 'bcryptjs';
 
-const OPERATOR_PASSWORD = 'O4oTestPass';
+// Pre-computed bcrypt hash for 'O4oTestPass' (salt rounds: 10)
+// This avoids runtime dependency on bcryptjs in migration context
+const HASHED_PASSWORD = '$2a$10$3YjlNJQN4VC0r9g7UVYNz.dBw40P1mwo5ONt36NyvglEaJpEQWSQC';
 
 const OPERATOR_ACCOUNTS = [
   // KPA Society
@@ -73,8 +74,6 @@ export class UpdateOperatorPasswords1769408012358 implements MigrationInterface 
   name = 'UpdateOperatorPasswords1769408012358';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const hashedPassword = await bcrypt.hash(OPERATOR_PASSWORD, 10);
-
     for (const account of OPERATOR_ACCOUNTS) {
       // Check if account exists
       const existing = await queryRunner.query(
@@ -86,7 +85,7 @@ export class UpdateOperatorPasswords1769408012358 implements MigrationInterface 
         // Update password
         await queryRunner.query(
           `UPDATE users SET password = $1 WHERE email = $2`,
-          [hashedPassword, account.email]
+          [HASHED_PASSWORD, account.email]
         );
         console.log(`  Updated password for: ${account.email}`);
       } else {
@@ -94,7 +93,7 @@ export class UpdateOperatorPasswords1769408012358 implements MigrationInterface 
         await queryRunner.query(
           `INSERT INTO users (email, password, "fullName", role, status, "createdAt", "updatedAt")
            VALUES ($1, $2, $3, $4, 'active', NOW(), NOW())`,
-          [account.email, hashedPassword, account.name, account.role]
+          [account.email, HASHED_PASSWORD, account.name, account.role]
         );
         console.log(`  Created account: ${account.email}`);
       }
@@ -109,13 +108,13 @@ export class UpdateOperatorPasswords1769408012358 implements MigrationInterface 
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Revert to TestPassword for these accounts
-    const hashedPassword = await bcrypt.hash('TestPassword', 10);
+    // Pre-computed bcrypt hash for 'TestPassword' (salt rounds: 10)
+    const testPasswordHash = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
 
     for (const account of OPERATOR_ACCOUNTS) {
       await queryRunner.query(
         `UPDATE users SET password = $1 WHERE email = $2`,
-        [hashedPassword, account.email]
+        [testPasswordHash, account.email]
       );
     }
 

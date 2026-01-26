@@ -25,7 +25,7 @@ export function HeroSection() {
           <a href="/demo" style={styles.ctaButton}>
             약사회 서비스 살펴보기
           </a>
-          <a href="/demo/login" style={styles.ctaButtonOutline}>
+          <a href="/login" style={styles.ctaButtonOutline}>
             Login
           </a>
         </div>
