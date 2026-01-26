@@ -48,6 +48,9 @@ export class AuthController extends BaseController {
   /**
    * Check if request is cross-origin
    * Cross-origin requests need tokens in response body since cookies won't work
+   *
+   * Same base domain subdomains (e.g., admin.neture.co.kr + api.neture.co.kr)
+   * are NOT considered cross-origin since cookies with domain .neture.co.kr will work.
    */
   private static isCrossOriginRequest(req: Request): boolean {
     const origin = req.get('origin');
@@ -57,9 +60,25 @@ export class AuthController extends BaseController {
       const originHost = new URL(origin).hostname;
       const apiHost = req.get('host')?.split(':')[0] || '';
 
-      // Different domain = cross-origin
-      // e.g., glycopharm.co.kr calling api.neture.co.kr
-      return originHost !== apiHost && !originHost.endsWith(`.${apiHost}`) && !apiHost.endsWith(`.${originHost}`);
+      // Extract base domain (e.g., neture.co.kr from admin.neture.co.kr)
+      const getBaseDomain = (hostname: string) => {
+        const parts = hostname.split('.');
+        // For domains with two-part TLDs like .co.kr, .com.au, etc.
+        if (parts.length >= 3 && ['co', 'com', 'net', 'org', 'ac', 'go'].includes(parts[parts.length - 2])) {
+          return parts.slice(-3).join('.');
+        }
+        // For simple TLDs like .com, .kr, .site
+        return parts.slice(-2).join('.');
+      };
+
+      const originBaseDomain = getBaseDomain(originHost);
+      const apiBaseDomain = getBaseDomain(apiHost);
+
+      // Same base domain = NOT cross-origin (cookies with .domain will work)
+      // Different base domain = cross-origin (need tokens in body)
+      // e.g., admin.neture.co.kr + api.neture.co.kr = same base domain (neture.co.kr) = NOT cross-origin
+      // e.g., glycopharm.co.kr + api.neture.co.kr = different base domains = cross-origin
+      return originBaseDomain !== apiBaseDomain;
     } catch {
       return false;
     }
