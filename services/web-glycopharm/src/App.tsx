@@ -95,6 +95,7 @@ const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 const ForumPage = lazy(() => import('@/pages/forum/ForumPage'));
 const RequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
+const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
 const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
 
 // Common Pages
@@ -167,6 +168,7 @@ function AppRoutes() {
         <Route path="forum" element={<ForumPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
+        <Route path="forum/feedback" element={<ForumFeedbackPage />} />
         {/* Forum Extension */}
         <Route path="forum-ext" element={<ForumListPage />} />
         <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
