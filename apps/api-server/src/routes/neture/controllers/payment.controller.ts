@@ -13,6 +13,7 @@ import { NetureService } from '../services/neture.service.js';
 import { NeturePaymentMethod } from '../entities/neture-order.entity.js';
 import { ErrorResponseDto, OrderPaymentRequestDto } from '../dto/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { paymentEventHub } from '../../../services/payment/PaymentEventHub.js';
 
 /**
  * Error response helper
@@ -131,6 +132,28 @@ export function createPaymentController(
             paymentMethod
           );
 
+          // 6. payment.completed 이벤트 발행 (WO-O4O-PAYMENT-NETURE-INTEGRATION-V0.1)
+          paymentEventHub.emitCompleted({
+            paymentId: payment_key, // Neture는 별도 paymentId 없음, payment_key 사용
+            transactionId: `NETURE-${order.order_number}`,
+            orderId: order_id,
+            paymentKey: payment_key,
+            paidAmount: amount,
+            paymentMethod: paymentMethod,
+            approvedAt: tossResponse.data.approvedAt,
+            serviceKey: 'neture',
+            card: tossResponse.data.card ? {
+              company: tossResponse.data.card.company || '',
+              number: tossResponse.data.card.number || '',
+              installmentMonths: tossResponse.data.card.installmentPlanMonths || 0,
+            } : undefined,
+            receiptUrl: tossResponse.data.receipt?.url,
+            metadata: {
+              orderNumber: order.order_number,
+              tossPaymentKey: payment_key,
+            },
+          });
+
           res.json({
             data: {
               order: updatedOrder,
@@ -146,6 +169,21 @@ export function createPaymentController(
           console.error('[Neture] Toss Payments error:', tossError.response?.data || tossError.message);
 
           const tossErrorData = tossError.response?.data;
+
+          // payment.failed 이벤트 발행 (WO-O4O-PAYMENT-NETURE-INTEGRATION-V0.1)
+          paymentEventHub.emitFailed({
+            paymentId: payment_key,
+            transactionId: `NETURE-${order.order_number}`,
+            orderId: order_id,
+            errorCode: tossErrorData?.code || 'TOSS_ERROR',
+            errorMessage: tossErrorData?.message || tossError.message || 'Payment failed',
+            serviceKey: 'neture',
+            metadata: {
+              orderNumber: order.order_number,
+              tossResponse: tossErrorData,
+            },
+          });
+
           return errorResponse(res, 400, 'PAYMENT_FAILED', 'Payment confirmation failed', {
             toss_code: tossErrorData?.code,
             toss_message: tossErrorData?.message,
