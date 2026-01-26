@@ -244,15 +244,20 @@ export default function Layout() {
                 </p>
               </div>
 
-              <div className="text-center md:text-right">
-                <p className="text-xs text-slate-500">
-                  개발자: <span className="font-medium text-slate-700">서철환</span>
-                </p>
-                <p className="text-xs text-slate-400 mt-1">
-                  <a href="mailto:sohae21@naver.com" className="hover:text-blue-600 transition-colors">
-                    sohae21@naver.com
-                  </a>
-                </p>
+              <div className="text-center md:text-right flex flex-col items-center md:items-end gap-2">
+                <div>
+                  <p className="text-xs text-slate-500">
+                    개발자: <span className="font-medium text-slate-700">서철환</span>
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    <a href="mailto:sohae21@naver.com" className="hover:text-blue-600 transition-colors">
+                      sohae21@naver.com
+                    </a>
+                  </p>
+                </div>
+                <NavLink to="/test-center" className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1 transition-colors">
+                  🧪 테스트 센터
+                </NavLink>
               </div>
             </div>
           </div>

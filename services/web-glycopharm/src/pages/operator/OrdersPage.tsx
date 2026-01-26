@@ -5,9 +5,11 @@
  * - 약국 B2B 주문 모니터링
  * - 주문 상태 관리
  * - 배송 추적
+ *
+ * WO-GLYCOPHARM-ORDERS-API: Real database queries (no mock data)
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ShoppingCart,
   Search,
@@ -25,109 +27,35 @@ import {
   Download,
   Calendar,
   Store,
+  AlertCircle,
+  Loader2,
 } from 'lucide-react';
-
-// Types
-interface Order {
-  id: string;
-  orderNumber: string;
-  pharmacyName: string;
-  pharmacyRegion: string;
-  items: number;
-  totalAmount: number;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  paymentStatus: 'pending' | 'paid' | 'refunded';
-  createdAt: string;
-  estimatedDelivery?: string;
-  trackingNumber?: string;
-}
+import { glycopharmApi, type OperatorOrder, type OperatorOrderStats, type OrderStatus } from '@/api/glycopharm';
 
 type TabType = 'all' | 'pending' | 'processing' | 'shipped' | 'completed';
 
-// Sample data
-const sampleOrders: Order[] = [
-  {
-    id: '1',
-    orderNumber: 'ORD-2025-001234',
-    pharmacyName: '건강한약국',
-    pharmacyRegion: '서울 강남구',
-    items: 5,
-    totalAmount: 850000,
-    status: 'pending',
-    paymentStatus: 'pending',
-    createdAt: '2025-01-16T09:30:00',
-  },
-  {
-    id: '2',
-    orderNumber: 'ORD-2025-001233',
-    pharmacyName: '행복약국',
-    pharmacyRegion: '서울 마포구',
-    items: 3,
-    totalAmount: 420000,
-    status: 'confirmed',
-    paymentStatus: 'paid',
-    createdAt: '2025-01-16T08:15:00',
-  },
-  {
-    id: '3',
-    orderNumber: 'ORD-2025-001232',
-    pharmacyName: '사랑약국',
-    pharmacyRegion: '부산 해운대구',
-    items: 8,
-    totalAmount: 1250000,
-    status: 'processing',
-    paymentStatus: 'paid',
-    createdAt: '2025-01-15T16:45:00',
-  },
-  {
-    id: '4',
-    orderNumber: 'ORD-2025-001231',
-    pharmacyName: '미래약국',
-    pharmacyRegion: '인천 남동구',
-    items: 2,
-    totalAmount: 178000,
-    status: 'shipped',
-    paymentStatus: 'paid',
-    createdAt: '2025-01-15T11:20:00',
-    estimatedDelivery: '2025-01-17',
-    trackingNumber: 'CJ1234567890',
-  },
-  {
-    id: '5',
-    orderNumber: 'ORD-2025-001230',
-    pharmacyName: '청춘약국',
-    pharmacyRegion: '대전 유성구',
-    items: 4,
-    totalAmount: 560000,
-    status: 'delivered',
-    paymentStatus: 'paid',
-    createdAt: '2025-01-14T10:00:00',
-  },
-  {
-    id: '6',
-    orderNumber: 'ORD-2025-001229',
-    pharmacyName: '희망약국',
-    pharmacyRegion: '대구 수성구',
-    items: 1,
-    totalAmount: 89000,
-    status: 'cancelled',
-    paymentStatus: 'refunded',
-    createdAt: '2025-01-14T09:30:00',
-  },
-];
-
-// Stats
-const orderStats = {
-  todayOrders: 45,
-  todayRevenue: 12500000,
-  pendingOrders: 23,
-  processingOrders: 18,
-  shippedOrders: 32,
-  avgOrderValue: 278000,
+// Empty stats (no mock values)
+const EMPTY_STATS: OperatorOrderStats = {
+  todayOrders: 0,
+  todayRevenue: 0,
+  pendingOrders: 0,
+  processingOrders: 0,
+  shippedOrders: 0,
+  avgOrderValue: 0,
 };
 
+// Empty state component
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="text-center py-12">
+      <AlertCircle size={48} className="mx-auto mb-4 text-slate-300" />
+      <p className="text-slate-500 text-lg">{message}</p>
+    </div>
+  );
+}
+
 // Status badge
-function StatusBadge({ status }: { status: Order['status'] }) {
+function StatusBadge({ status }: { status: OrderStatus }) {
   const config = {
     pending: { label: '대기', color: 'bg-amber-100 text-amber-700', icon: Clock },
     confirmed: { label: '확인됨', color: 'bg-blue-100 text-blue-700', icon: CheckCircle },
@@ -148,7 +76,7 @@ function StatusBadge({ status }: { status: Order['status'] }) {
 }
 
 // Payment badge
-function PaymentBadge({ status }: { status: Order['paymentStatus'] }) {
+function PaymentBadge({ status }: { status: 'pending' | 'paid' | 'refunded' }) {
   const config = {
     pending: { label: '결제대기', color: 'text-amber-600' },
     paid: { label: '결제완료', color: 'text-green-600' },
@@ -161,46 +89,79 @@ function PaymentBadge({ status }: { status: Order['paymentStatus'] }) {
 }
 
 export default function OrdersPage() {
+  const [orders, setOrders] = useState<OperatorOrder[]>([]);
+  const [stats, setStats] = useState<OperatorOrderStats>(EMPTY_STATS);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
   const itemsPerPage = 10;
 
-  // Filter orders
-  const filteredOrders = sampleOrders.filter((order) => {
-    if (activeTab === 'pending' && order.status !== 'pending') return false;
-    if (activeTab === 'processing' && !['confirmed', 'processing'].includes(order.status)) return false;
-    if (activeTab === 'shipped' && order.status !== 'shipped') return false;
-    if (activeTab === 'completed' && !['delivered', 'cancelled'].includes(order.status)) return false;
-
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      if (
-        !order.orderNumber.toLowerCase().includes(search) &&
-        !order.pharmacyName.toLowerCase().includes(search)
-      ) {
-        return false;
-      }
+  // Map tab to status filter
+  const getStatusFilter = (tab: TabType): OrderStatus | undefined => {
+    switch (tab) {
+      case 'pending':
+        return 'pending';
+      case 'processing':
+        return 'processing';
+      case 'shipped':
+        return 'shipped';
+      case 'completed':
+        return 'delivered';
+      default:
+        return undefined;
     }
+  };
 
-    return true;
-  });
+  // Fetch orders from API
+  const fetchOrders = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await glycopharmApi.getOperatorOrders({
+        status: getStatusFilter(activeTab),
+        page: currentPage,
+        limit: itemsPerPage,
+        dateFilter: dateFilter !== 'all' ? dateFilter : undefined,
+        search: searchTerm || undefined,
+      });
 
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  const paginatedOrders = filteredOrders.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+      if (response.success && response.data) {
+        setOrders(response.data.orders);
+        setStats(response.data.stats);
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalOrders(response.data.pagination.total);
+      } else {
+        setOrders([]);
+        setStats(EMPTY_STATS);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch orders:', err);
+      setError(err?.message || '주문 데이터를 불러올 수 없습니다');
+      setOrders([]);
+      setStats(EMPTY_STATS);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeTab, currentPage, dateFilter, searchTerm]);
 
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  // Tab counts (based on stats)
   const tabs = [
-    { id: 'all' as const, label: '전체', count: sampleOrders.length },
-    { id: 'pending' as const, label: '대기', count: sampleOrders.filter(o => o.status === 'pending').length },
-    { id: 'processing' as const, label: '처리중', count: sampleOrders.filter(o => ['confirmed', 'processing'].includes(o.status)).length },
-    { id: 'shipped' as const, label: '배송중', count: sampleOrders.filter(o => o.status === 'shipped').length },
-    { id: 'completed' as const, label: '완료', count: sampleOrders.filter(o => ['delivered', 'cancelled'].includes(o.status)).length },
+    { id: 'all' as const, label: '전체', count: totalOrders },
+    { id: 'pending' as const, label: '대기', count: stats.pendingOrders },
+    { id: 'processing' as const, label: '처리중', count: stats.processingOrders },
+    { id: 'shipped' as const, label: '배송중', count: stats.shippedOrders },
+    { id: 'completed' as const, label: '완료', count: 0 },
   ];
 
   const formatDateTime = (dateStr: string) => {
@@ -212,6 +173,18 @@ export default function OrdersPage() {
       minute: '2-digit',
     });
   };
+
+  // Loading state
+  if (isLoading && orders.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+          <p className="text-slate-500 text-sm">주문 데이터 로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -226,12 +199,27 @@ export default function OrdersPage() {
             <Download className="w-4 h-4" />
             내보내기
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-            <RefreshCw className="w-4 h-4" />
+          <button
+            onClick={fetchOrders}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             새로고침
           </button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">{error}</p>
+            <p className="text-xs text-amber-600">빈 데이터로 표시됩니다.</p>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -241,7 +229,7 @@ export default function OrdersPage() {
               <ShoppingCart className="w-5 h-5 text-primary-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{orderStats.todayOrders}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.todayOrders}</p>
               <p className="text-xs text-slate-500">오늘 주문</p>
             </div>
           </div>
@@ -252,7 +240,9 @@ export default function OrdersPage() {
               <CheckCircle className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{(orderStats.todayRevenue / 10000).toLocaleString()}만</p>
+              <p className="text-2xl font-bold text-slate-800">
+                {stats.todayRevenue > 0 ? `${(stats.todayRevenue / 10000).toLocaleString()}만` : '0'}
+              </p>
               <p className="text-xs text-slate-500">오늘 매출</p>
             </div>
           </div>
@@ -263,7 +253,7 @@ export default function OrdersPage() {
               <Clock className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{orderStats.pendingOrders}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.pendingOrders}</p>
               <p className="text-xs text-slate-500">대기 중</p>
             </div>
           </div>
@@ -274,7 +264,7 @@ export default function OrdersPage() {
               <Package className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{orderStats.processingOrders}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.processingOrders}</p>
               <p className="text-xs text-slate-500">처리 중</p>
             </div>
           </div>
@@ -285,7 +275,7 @@ export default function OrdersPage() {
               <Truck className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{orderStats.shippedOrders}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.shippedOrders}</p>
               <p className="text-xs text-slate-500">배송 중</p>
             </div>
           </div>
@@ -296,7 +286,9 @@ export default function OrdersPage() {
               <FileText className="w-5 h-5 text-slate-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{(orderStats.avgOrderValue / 10000).toFixed(1)}만</p>
+              <p className="text-2xl font-bold text-slate-800">
+                {stats.avgOrderValue > 0 ? `${(stats.avgOrderValue / 10000).toFixed(1)}만` : '0'}
+              </p>
               <p className="text-xs text-slate-500">평균 주문액</p>
             </div>
           </div>
@@ -341,13 +333,19 @@ export default function OrdersPage() {
                 type="text"
                 placeholder="주문번호, 약국명 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             <select
               value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
+              onChange={(e) => {
+                setDateFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
             >
               <option value="all">전체 기간</option>
@@ -358,176 +356,185 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  주문 정보
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  약국
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  수량
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  금액
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  결제
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  주문일시
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  액션
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {paginatedOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <ShoppingCart className="w-5 h-5 text-slate-400" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-800">{order.orderNumber}</p>
-                        {order.trackingNumber && (
-                          <p className="text-xs text-slate-500">운송장: {order.trackingNumber}</p>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                      <Store className="w-4 h-4 text-slate-400" />
-                      <div>
-                        <p className="text-sm text-slate-800">{order.pharmacyName}</p>
-                        <p className="text-xs text-slate-500">{order.pharmacyRegion}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <span className="font-medium text-slate-800">{order.items}</span>
-                    <span className="text-slate-400 text-xs ml-1">종</span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <span className="font-medium text-slate-800">{order.totalAmount.toLocaleString()}</span>
-                    <span className="text-slate-400 text-xs ml-1">원</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <PaymentBadge status={order.paymentStatus} />
-                  </td>
-                  <td className="px-4 py-4">
-                    <StatusBadge status={order.status} />
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-1 text-sm text-slate-600">
-                      <Calendar className="w-3 h-3" />
-                      {formatDateTime(order.createdAt)}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center justify-center">
-                      <div className="relative">
-                        <button
-                          onClick={() => setSelectedOrder(selectedOrder === order.id ? null : order.id)}
-                          className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-                        >
-                          <MoreVertical className="w-4 h-4 text-slate-400" />
-                        </button>
-                        {selectedOrder === order.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setSelectedOrder(null)}
-                            />
-                            <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
-                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                <Eye className="w-4 h-4" />
-                                상세 보기
-                              </button>
-                              {order.status === 'pending' && (
-                                <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2">
-                                  <CheckCircle className="w-4 h-4" />
-                                  주문 확인
-                                </button>
-                              )}
-                              {order.status === 'processing' && (
-                                <button className="w-full px-4 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2">
-                                  <Truck className="w-4 h-4" />
-                                  배송 시작
-                                </button>
-                              )}
-                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                <FileText className="w-4 h-4" />
-                                송장 출력
-                              </button>
-                              {['pending', 'confirmed'].includes(order.status) && (
-                                <>
-                                  <hr className="my-1" />
-                                  <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                    <XCircle className="w-4 h-4" />
-                                    주문 취소
+        {/* Table or Empty State */}
+        {orders.length === 0 ? (
+          <EmptyState message="자료가 없습니다" />
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      주문 정보
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      약국
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      수량
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      금액
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      결제
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      주문일시
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      액션
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {orders.map((order) => (
+                    <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                            <ShoppingCart className="w-5 h-5 text-slate-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-800">{order.orderNumber}</p>
+                            {order.trackingNumber && (
+                              <p className="text-xs text-slate-500">운송장: {order.trackingNumber}</p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2">
+                          <Store className="w-4 h-4 text-slate-400" />
+                          <div>
+                            <p className="text-sm text-slate-800">{order.pharmacyName}</p>
+                            <p className="text-xs text-slate-500">{order.pharmacyRegion}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <span className="font-medium text-slate-800">{order.items}</span>
+                        <span className="text-slate-400 text-xs ml-1">종</span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <span className="font-medium text-slate-800">{order.totalAmount.toLocaleString()}</span>
+                        <span className="text-slate-400 text-xs ml-1">원</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <PaymentBadge status={order.paymentStatus} />
+                      </td>
+                      <td className="px-4 py-4">
+                        <StatusBadge status={order.status} />
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-1 text-sm text-slate-600">
+                          <Calendar className="w-3 h-3" />
+                          {formatDateTime(order.createdAt)}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-center">
+                          <div className="relative">
+                            <button
+                              onClick={() => setSelectedOrder(selectedOrder === order.id ? null : order.id)}
+                              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4 text-slate-400" />
+                            </button>
+                            {selectedOrder === order.id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setSelectedOrder(null)}
+                                />
+                                <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
+                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <Eye className="w-4 h-4" />
+                                    상세 보기
                                   </button>
-                                </>
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              총 {filteredOrders.length}개 중 {(currentPage - 1) * itemsPerPage + 1}-
-              {Math.min(currentPage * itemsPerPage, filteredOrders.length)}개 표시
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? 'bg-primary-500 text-white'
-                      : 'hover:bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+                                  {order.status === 'pending' && (
+                                    <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2">
+                                      <CheckCircle className="w-4 h-4" />
+                                      주문 확인
+                                    </button>
+                                  )}
+                                  {order.status === 'processing' && (
+                                    <button className="w-full px-4 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2">
+                                      <Truck className="w-4 h-4" />
+                                      배송 시작
+                                    </button>
+                                  )}
+                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <FileText className="w-4 h-4" />
+                                    송장 출력
+                                  </button>
+                                  {['pending', 'confirmed'].includes(order.status) && (
+                                    <>
+                                      <hr className="my-1" />
+                                      <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                        <XCircle className="w-4 h-4" />
+                                        주문 취소
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+                <p className="text-sm text-slate-500">
+                  총 {totalOrders}개 중 {(currentPage - 1) * itemsPerPage + 1}-
+                  {Math.min(currentPage * itemsPerPage, totalOrders)}개 표시
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const page = i + 1;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? 'bg-primary-500 text-white'
+                            : 'hover:bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

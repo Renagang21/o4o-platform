@@ -131,6 +131,142 @@ export interface OperatorDashboardResponse {
 }
 
 // ============================================================================
+// Operator Orders Types (WO-GLYCOPHARM-ORDERS-API)
+// ============================================================================
+
+export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type PaymentStatus = 'pending' | 'paid' | 'refunded';
+
+// ============================================================================
+// Operator Products Types
+// ============================================================================
+
+export type ProductStatus = 'active' | 'draft' | 'outOfStock' | 'discontinued';
+
+export interface OperatorProduct {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  brand: string;
+  basePrice: number;
+  sellingPrice: number;
+  stock: number;
+  minStock: number;
+  status: ProductStatus;
+  salesCount: number;
+  createdAt: string;
+  imageUrl?: string;
+}
+
+export interface OperatorProductStats {
+  totalProducts: number;
+  activeProducts: number;
+  lowStockProducts: number;
+  draftProducts: number;
+  totalInventoryValue: number;
+  avgMargin: number;
+}
+
+export interface OperatorProductsResponse {
+  success: boolean;
+  data: {
+    products: OperatorProduct[];
+    stats: OperatorProductStats;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}
+
+// ============================================================================
+// Operator Pharmacies Types
+// ============================================================================
+
+export type PharmacyStatus = 'active' | 'pending' | 'suspended' | 'inactive';
+export type PharmacyTier = 'gold' | 'silver' | 'bronze' | 'standard';
+
+export interface OperatorPharmacy {
+  id: string;
+  name: string;
+  ownerName: string;
+  region: string;
+  address: string;
+  phone: string;
+  email: string;
+  status: PharmacyStatus;
+  tier: PharmacyTier;
+  joinedAt: string;
+  monthlyOrders: number;
+  monthlyRevenue: number;
+  growthRate: number;
+  lastActivityAt: string;
+}
+
+export interface OperatorPharmacyStats {
+  totalPharmacies: number;
+  activePharmacies: number;
+  pendingApprovals: number;
+  issuePharmacies: number;
+  totalMonthlyRevenue: number;
+  avgOrdersPerPharmacy: number;
+}
+
+export interface OperatorPharmaciesResponse {
+  success: boolean;
+  data: {
+    pharmacies: OperatorPharmacy[];
+    stats: OperatorPharmacyStats;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}
+
+export interface OperatorOrder {
+  id: string;
+  orderNumber: string;
+  pharmacyName: string;
+  pharmacyRegion: string;
+  items: number;
+  totalAmount: number;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  createdAt: string;
+  estimatedDelivery?: string;
+  trackingNumber?: string;
+}
+
+export interface OperatorOrderStats {
+  todayOrders: number;
+  todayRevenue: number;
+  pendingOrders: number;
+  processingOrders: number;
+  shippedOrders: number;
+  avgOrderValue: number;
+}
+
+export interface OperatorOrdersResponse {
+  success: boolean;
+  data: {
+    orders: OperatorOrder[];
+    stats: OperatorOrderStats;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}
+
+// ============================================================================
 // Admin Types (운영 API)
 // ============================================================================
 
@@ -337,6 +473,77 @@ class GlycopharmApiClient {
    */
   async getOperatorDashboard(): Promise<OperatorDashboardResponse> {
     return this.request('/api/v1/glycopharm/operator/dashboard');
+  }
+
+  /**
+   * 운영자 주문 목록 조회
+   */
+  async getOperatorOrders(params?: {
+    status?: OrderStatus;
+    page?: number;
+    limit?: number;
+    dateFilter?: string;
+    search?: string;
+  }): Promise<OperatorOrdersResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set('status', params.status);
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.dateFilter) searchParams.set('dateFilter', params.dateFilter);
+    if (params?.search) searchParams.set('search', params.search);
+
+    const queryString = searchParams.toString();
+    const endpoint = `/api/v1/glycopharm/operator/orders${queryString ? `?${queryString}` : ''}`;
+
+    return this.request(endpoint);
+  }
+
+  /**
+   * 운영자 상품 목록 조회
+   */
+  async getOperatorProducts(params?: {
+    status?: ProductStatus;
+    category?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<OperatorProductsResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set('status', params.status);
+    if (params?.category) searchParams.set('category', params.category);
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.search) searchParams.set('search', params.search);
+
+    const queryString = searchParams.toString();
+    const endpoint = `/api/v1/glycopharm/operator/products${queryString ? `?${queryString}` : ''}`;
+
+    return this.request(endpoint);
+  }
+
+  /**
+   * 운영자 약국 목록 조회
+   */
+  async getOperatorPharmacies(params?: {
+    status?: PharmacyStatus;
+    tier?: PharmacyTier;
+    region?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<OperatorPharmaciesResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set('status', params.status);
+    if (params?.tier) searchParams.set('tier', params.tier);
+    if (params?.region) searchParams.set('region', params.region);
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.search) searchParams.set('search', params.search);
+
+    const queryString = searchParams.toString();
+    const endpoint = `/api/v1/glycopharm/operator/pharmacies${queryString ? `?${queryString}` : ''}`;
+
+    return this.request(endpoint);
   }
 }
 

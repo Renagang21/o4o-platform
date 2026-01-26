@@ -1,13 +1,22 @@
+import { Link } from 'react-router-dom';
+
 export function Footer() {
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
-        <p style={styles.company}>
-          © 2026 ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
-        </p>
-        <p style={styles.contact}>
-          고객센터 1577-2779 | sohae2100@gmail.com
-        </p>
+        <div style={styles.topRow}>
+          <div>
+            <p style={styles.company}>
+              © 2026 ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
+            </p>
+            <p style={styles.contact}>
+              고객센터 1577-2779 | sohae2100@gmail.com
+            </p>
+          </div>
+          <Link to="/supplier-ops/forum/test-feedback" style={styles.testCenterLink}>
+            🧪 테스트 센터
+          </Link>
+        </div>
       </div>
     </footer>
   );
@@ -22,7 +31,13 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: '1000px',
     margin: '0 auto',
-    textAlign: 'center',
+  },
+  topRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '16px',
   },
   company: {
     fontSize: '13px',
@@ -33,5 +48,13 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: '#666',
     margin: 0,
+  },
+  testCenterLink: {
+    fontSize: '12px',
+    color: '#16a34a',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
   },
 };

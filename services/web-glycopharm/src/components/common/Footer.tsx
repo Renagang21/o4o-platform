@@ -92,9 +92,17 @@ export default function Footer() {
             <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-slate-500">
               <p>&copy; 2025 GlycoPharm. All rights reserved.</p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-600">
-              <MapPin className="w-3 h-3" />
-              <span>서울특별시 서초구 강남대로 000, 0층</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs text-slate-600">
+                <MapPin className="w-3 h-3" />
+                <span>서울특별시 서초구 강남대로 000, 0층</span>
+              </div>
+              <NavLink
+                to="/test-center"
+                className="flex items-center gap-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+              >
+                🧪 테스트 센터
+              </NavLink>
             </div>
           </div>
 

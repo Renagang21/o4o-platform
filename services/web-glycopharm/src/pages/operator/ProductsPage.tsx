@@ -5,9 +5,11 @@
  * - 상품 목록 및 카테고리 관리
  * - 가격 정책 관리
  * - 재고 현황 모니터링
+ *
+ * WO-GLYCOPHARM-PRODUCTS-API: Real database queries (no mock data)
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Package,
   Search,
@@ -25,127 +27,35 @@ import {
   Copy,
   TrendingUp,
   Boxes,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
-
-// Types
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  category: string;
-  brand: string;
-  basePrice: number;
-  sellingPrice: number;
-  stock: number;
-  minStock: number;
-  status: 'active' | 'draft' | 'outOfStock' | 'discontinued';
-  salesCount: number;
-  createdAt: string;
-  imageUrl?: string;
-}
+import { glycopharmApi, type OperatorProduct, type OperatorProductStats, type ProductStatus } from '@/api/glycopharm';
 
 type TabType = 'all' | 'active' | 'lowStock' | 'draft';
 
-// Sample data
-const sampleProducts: Product[] = [
-  {
-    id: '1',
-    name: '글루코스 모니터링 키트 프로',
-    sku: 'GP-MON-001',
-    category: '혈당 모니터링',
-    brand: 'GlycoPharm',
-    basePrice: 89000,
-    sellingPrice: 99000,
-    stock: 245,
-    minStock: 50,
-    status: 'active',
-    salesCount: 1520,
-    createdAt: '2024-01-15',
-  },
-  {
-    id: '2',
-    name: '당뇨 관리 종합 세트',
-    sku: 'GP-SET-002',
-    category: '관리 세트',
-    brand: 'GlycoPharm',
-    basePrice: 156000,
-    sellingPrice: 179000,
-    stock: 89,
-    minStock: 30,
-    status: 'active',
-    salesCount: 856,
-    createdAt: '2024-02-20',
-  },
-  {
-    id: '3',
-    name: '혈당 측정 스트립 100매',
-    sku: 'GP-STR-003',
-    category: '소모품',
-    brand: 'GlycoPharm',
-    basePrice: 32000,
-    sellingPrice: 39000,
-    stock: 12,
-    minStock: 100,
-    status: 'outOfStock',
-    salesCount: 4520,
-    createdAt: '2024-01-10',
-  },
-  {
-    id: '4',
-    name: '인슐린 냉장 파우치',
-    sku: 'GP-ACC-004',
-    category: '액세서리',
-    brand: 'CoolMed',
-    basePrice: 28000,
-    sellingPrice: 35000,
-    stock: 156,
-    minStock: 40,
-    status: 'active',
-    salesCount: 623,
-    createdAt: '2024-03-05',
-  },
-  {
-    id: '5',
-    name: '디지털 혈압계 스마트',
-    sku: 'GP-BPM-005',
-    category: '측정기기',
-    brand: 'HealthTech',
-    basePrice: 65000,
-    sellingPrice: 79000,
-    stock: 0,
-    minStock: 20,
-    status: 'outOfStock',
-    salesCount: 312,
-    createdAt: '2024-04-12',
-  },
-  {
-    id: '6',
-    name: '당뇨 영양 보조제 (신제품)',
-    sku: 'GP-SUP-006',
-    category: '보조제',
-    brand: 'GlycoPharm',
-    basePrice: 45000,
-    sellingPrice: 55000,
-    stock: 200,
-    minStock: 50,
-    status: 'draft',
-    salesCount: 0,
-    createdAt: '2025-01-10',
-  },
-];
-
-// Stats
-const productStats = {
-  totalProducts: 156,
-  activeProducts: 132,
-  lowStockProducts: 18,
-  draftProducts: 6,
-  totalInventoryValue: 245000000,
-  avgMargin: 18.5,
+// Empty stats (no mock values)
+const EMPTY_STATS: OperatorProductStats = {
+  totalProducts: 0,
+  activeProducts: 0,
+  lowStockProducts: 0,
+  draftProducts: 0,
+  totalInventoryValue: 0,
+  avgMargin: 0,
 };
 
+// Empty state component
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="text-center py-12">
+      <AlertCircle size={48} className="mx-auto mb-4 text-slate-300" />
+      <p className="text-slate-500 text-lg">{message}</p>
+    </div>
+  );
+}
+
 // Status badge
-function StatusBadge({ status }: { status: Product['status'] }) {
+function StatusBadge({ status }: { status: ProductStatus }) {
   const config = {
     active: { label: '판매중', color: 'bg-green-100 text-green-700', icon: CheckCircle },
     draft: { label: '준비중', color: 'bg-slate-100 text-slate-600', icon: Clock },
@@ -164,50 +74,87 @@ function StatusBadge({ status }: { status: Product['status'] }) {
 }
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState<OperatorProduct[]>([]);
+  const [stats, setStats] = useState<OperatorProductStats>(EMPTY_STATS);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
   const itemsPerPage = 10;
 
-  // Filter products
-  const filteredProducts = sampleProducts.filter((product) => {
-    if (activeTab === 'active' && product.status !== 'active') return false;
-    if (activeTab === 'lowStock' && product.stock >= product.minStock) return false;
-    if (activeTab === 'draft' && product.status !== 'draft') return false;
-
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      if (
-        !product.name.toLowerCase().includes(search) &&
-        !product.sku.toLowerCase().includes(search) &&
-        !product.brand.toLowerCase().includes(search)
-      ) {
-        return false;
-      }
+  // Map tab to status filter
+  const getStatusFilter = (tab: TabType): ProductStatus | undefined => {
+    switch (tab) {
+      case 'active':
+        return 'active';
+      case 'draft':
+        return 'draft';
+      default:
+        return undefined;
     }
+  };
 
-    if (categoryFilter !== 'all' && product.category !== categoryFilter) return false;
+  // Fetch products from API
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await glycopharmApi.getOperatorProducts({
+        status: getStatusFilter(activeTab),
+        category: categoryFilter !== 'all' ? categoryFilter : undefined,
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm || undefined,
+      });
 
-    return true;
-  });
+      if (response.success && response.data) {
+        setProducts(response.data.products);
+        setStats(response.data.stats);
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalProducts(response.data.pagination.total);
+      } else {
+        setProducts([]);
+        setStats(EMPTY_STATS);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch products:', err);
+      setError(err?.message || '상품 데이터를 불러올 수 없습니다');
+      setProducts([]);
+      setStats(EMPTY_STATS);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeTab, currentPage, categoryFilter, searchTerm]);
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
+  // Tab counts (based on stats)
   const tabs = [
-    { id: 'all' as const, label: '전체 상품', count: sampleProducts.length },
-    { id: 'active' as const, label: '판매중', count: sampleProducts.filter(p => p.status === 'active').length },
-    { id: 'lowStock' as const, label: '재고 부족', count: sampleProducts.filter(p => p.stock < p.minStock).length },
-    { id: 'draft' as const, label: '준비중', count: sampleProducts.filter(p => p.status === 'draft').length },
+    { id: 'all' as const, label: '전체 상품', count: stats.totalProducts },
+    { id: 'active' as const, label: '판매중', count: stats.activeProducts },
+    { id: 'lowStock' as const, label: '재고 부족', count: stats.lowStockProducts },
+    { id: 'draft' as const, label: '준비중', count: stats.draftProducts },
   ];
 
-  const categories = [...new Set(sampleProducts.map(p => p.category))];
+  // Loading state
+  if (isLoading && products.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+          <p className="text-slate-500 text-sm">상품 데이터 로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -217,11 +164,32 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold text-slate-800">상품 관리</h1>
           <p className="text-slate-500 text-sm">네트워크 상품 카탈로그 및 가격 관리</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
-          <Plus className="w-4 h-4" />
-          상품 등록
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetchProducts}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            새로고침
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
+            <Plus className="w-4 h-4" />
+            상품 등록
+          </button>
+        </div>
       </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600" />
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">{error}</p>
+            <p className="text-xs text-amber-600">빈 데이터로 표시됩니다.</p>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -231,7 +199,7 @@ export default function ProductsPage() {
               <Package className="w-5 h-5 text-primary-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{productStats.totalProducts}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.totalProducts}</p>
               <p className="text-xs text-slate-500">전체 상품</p>
             </div>
           </div>
@@ -242,7 +210,7 @@ export default function ProductsPage() {
               <CheckCircle className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{productStats.activeProducts}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.activeProducts}</p>
               <p className="text-xs text-slate-500">판매중</p>
             </div>
           </div>
@@ -253,7 +221,7 @@ export default function ProductsPage() {
               <AlertCircle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{productStats.lowStockProducts}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.lowStockProducts}</p>
               <p className="text-xs text-slate-500">재고 부족</p>
             </div>
           </div>
@@ -264,7 +232,7 @@ export default function ProductsPage() {
               <Clock className="w-5 h-5 text-slate-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{productStats.draftProducts}</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.draftProducts}</p>
               <p className="text-xs text-slate-500">준비중</p>
             </div>
           </div>
@@ -275,7 +243,9 @@ export default function ProductsPage() {
               <Boxes className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{(productStats.totalInventoryValue / 100000000).toFixed(1)}억</p>
+              <p className="text-2xl font-bold text-slate-800">
+                {stats.totalInventoryValue > 0 ? `${(stats.totalInventoryValue / 100000000).toFixed(1)}억` : '0'}
+              </p>
               <p className="text-xs text-slate-500">재고 가치</p>
             </div>
           </div>
@@ -286,7 +256,7 @@ export default function ProductsPage() {
               <TrendingUp className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{productStats.avgMargin}%</p>
+              <p className="text-2xl font-bold text-slate-800">{stats.avgMargin}%</p>
               <p className="text-xs text-slate-500">평균 마진</p>
             </div>
           </div>
@@ -331,174 +301,183 @@ export default function ProductsPage() {
                 type="text"
                 placeholder="상품명, SKU, 브랜드 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             <select
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
             >
               <option value="all">전체 카테고리</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
             </select>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  상품 정보
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  카테고리
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  원가
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  판매가
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  재고
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  판매량
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  액션
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {paginatedProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <Package className="w-6 h-6 text-slate-400" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-800">{product.name}</p>
-                        <p className="text-xs text-slate-500">{product.sku} | {product.brand}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
-                      <Tag className="w-3 h-3" />
-                      {product.category}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <span className="text-slate-600">{product.basePrice.toLocaleString()}원</span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <span className="font-medium text-slate-800">{product.sellingPrice.toLocaleString()}원</span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <span className={`font-medium ${product.stock < product.minStock ? 'text-red-600' : 'text-slate-800'}`}>
-                      {product.stock}
-                    </span>
-                    <span className="text-slate-400 text-xs ml-1">/ {product.minStock}</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <StatusBadge status={product.status} />
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <span className="font-medium text-slate-800">{product.salesCount.toLocaleString()}</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center justify-center">
-                      <div className="relative">
-                        <button
-                          onClick={() => setSelectedProduct(selectedProduct === product.id ? null : product.id)}
-                          className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-                        >
-                          <MoreVertical className="w-4 h-4 text-slate-400" />
-                        </button>
-                        {selectedProduct === product.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setSelectedProduct(null)}
-                            />
-                            <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
-                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                <Eye className="w-4 h-4" />
-                                상세 보기
-                              </button>
-                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                <Edit className="w-4 h-4" />
-                                수정
-                              </button>
-                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                <Copy className="w-4 h-4" />
-                                복제
-                              </button>
-                              <hr className="my-1" />
-                              <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                <Trash2 className="w-4 h-4" />
-                                삭제
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              총 {filteredProducts.length}개 중 {(currentPage - 1) * itemsPerPage + 1}-
-              {Math.min(currentPage * itemsPerPage, filteredProducts.length)}개 표시
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? 'bg-primary-500 text-white'
-                      : 'hover:bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+        {/* Table or Empty State */}
+        {products.length === 0 ? (
+          <EmptyState message="자료가 없습니다" />
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      상품 정보
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      카테고리
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      원가
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      판매가
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      재고
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      판매량
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      액션
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {products.map((product) => (
+                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
+                            <Package className="w-6 h-6 text-slate-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-800">{product.name}</p>
+                            <p className="text-xs text-slate-500">{product.sku} | {product.brand}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
+                          <Tag className="w-3 h-3" />
+                          {product.category}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <span className="text-slate-600">{product.basePrice.toLocaleString()}원</span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <span className="font-medium text-slate-800">{product.sellingPrice.toLocaleString()}원</span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <span className={`font-medium ${product.stock < product.minStock ? 'text-red-600' : 'text-slate-800'}`}>
+                          {product.stock}
+                        </span>
+                        <span className="text-slate-400 text-xs ml-1">/ {product.minStock}</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <StatusBadge status={product.status} />
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <span className="font-medium text-slate-800">{product.salesCount.toLocaleString()}</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-center">
+                          <div className="relative">
+                            <button
+                              onClick={() => setSelectedProduct(selectedProduct === product.id ? null : product.id)}
+                              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4 text-slate-400" />
+                            </button>
+                            {selectedProduct === product.id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setSelectedProduct(null)}
+                                />
+                                <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
+                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <Eye className="w-4 h-4" />
+                                    상세 보기
+                                  </button>
+                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <Edit className="w-4 h-4" />
+                                    수정
+                                  </button>
+                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <Copy className="w-4 h-4" />
+                                    복제
+                                  </button>
+                                  <hr className="my-1" />
+                                  <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                    <Trash2 className="w-4 h-4" />
+                                    삭제
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+                <p className="text-sm text-slate-500">
+                  총 {totalProducts}개 중 {(currentPage - 1) * itemsPerPage + 1}-
+                  {Math.min(currentPage * itemsPerPage, totalProducts)}개 표시
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-primary-500 text-white'
+                          : 'hover:bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

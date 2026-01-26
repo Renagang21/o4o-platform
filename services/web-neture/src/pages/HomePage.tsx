@@ -12,7 +12,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowRight, Building2, Handshake, FlaskConical } from 'lucide-react';
+import { ArrowRight, Building2, Handshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { netureApi, type Supplier, type PartnershipRequest } from '../lib/api';
 
@@ -27,9 +27,6 @@ export default function HomePage() {
 
       {/* Partnership Requests Preview */}
       <PartnershipRequestsPreviewSection />
-
-      {/* Test Center Link Banner (WO-TEST-CENTER-SEPARATION-V1) */}
-      <TestCenterBanner />
     </div>
   );
 }
@@ -321,34 +318,3 @@ function PartnershipRequestsPreviewSection() {
   );
 }
 
-// WO-TEST-CENTER-SEPARATION-V1: 테스트 센터 링크 배너
-function TestCenterBanner() {
-  return (
-    <section className="py-12 bg-slate-50 border-t border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
-              <FlaskConical className="w-6 h-6 text-indigo-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-800">
-                서비스 테스트 & 개선 참여
-              </h3>
-              <p className="text-sm text-slate-500">
-                테스트 의견, 서비스 업데이트 확인, 피드백 작성을 한곳에서
-              </p>
-            </div>
-          </div>
-          <Link
-            to="/test-center"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
-          >
-            테스트 센터 바로가기
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}

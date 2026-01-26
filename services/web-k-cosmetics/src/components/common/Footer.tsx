@@ -73,7 +73,12 @@ export default function Footer() {
         <div style={styles.bottomContainer}>
           <div style={styles.bottomContent}>
             <p style={styles.copyright}>&copy; 2025 K-Cosmetics. All rights reserved.</p>
-            <p style={styles.address}>📍 서울특별시 서초구 강남대로 000, 0층</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <p style={styles.address}>📍 서울특별시 서초구 강남대로 000, 0층</p>
+              <Link to="/test-center" style={styles.testCenterLink}>
+                🧪 테스트 센터
+              </Link>
+            </div>
           </div>
           <div style={styles.businessInfo}>
             <p>(주)케이코스메틱스 | 대표: 홍길동 | 사업자등록번호: 000-00-00000</p>
@@ -202,5 +207,13 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: '1px solid #1e293b',
     fontSize: '12px',
     color: '#475569',
+  },
+  testCenterLink: {
+    fontSize: '12px',
+    color: '#f472b6',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
   },
 };

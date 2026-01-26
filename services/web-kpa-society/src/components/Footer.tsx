@@ -47,12 +47,19 @@ export function Footer() {
 
         {/* Copyright */}
         <div style={styles.copyright}>
-          <p style={styles.copyrightText}>
-            Copyright © 2024 약사회. All Rights Reserved.
-          </p>
-          <p style={styles.operatorText}>
-            운영: ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
-          </p>
+          <div style={styles.copyrightRow}>
+            <div>
+              <p style={styles.copyrightText}>
+                Copyright © 2024 약사회. All Rights Reserved.
+              </p>
+              <p style={styles.operatorText}>
+                운영: ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
+              </p>
+            </div>
+            <Link to="/test-center" style={styles.testCenterLink}>
+              🧪 테스트 센터
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
@@ -130,7 +137,13 @@ const styles: Record<string, React.CSSProperties> = {
   copyright: {
     paddingTop: '20px',
     borderTop: `1px solid ${colors.gray700}`,
-    textAlign: 'center',
+  },
+  copyrightRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '16px',
   },
   copyrightText: {
     fontSize: '12px',
@@ -141,5 +154,13 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: colors.gray600,
     margin: 0,
+  },
+  testCenterLink: {
+    fontSize: '12px',
+    color: colors.primary,
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
   },
 };

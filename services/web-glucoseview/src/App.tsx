@@ -31,6 +31,9 @@ import PartnerStatusPage from './pages/partner/StatusPage';
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 import PartnerApplyPage from './pages/partners/ApplyPage';
 
+// Operator Layout
+import OperatorLayout from './components/layouts/OperatorLayout';
+
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -119,10 +122,12 @@ function AppRoutes() {
       } />
 
       {/* 운영자 페이지 (Phase C-4) */}
-      <Route path="/operator/glucoseview/applications" element={<OperatorApplicationsPage />} />
-      <Route path="/operator/glucoseview/applications/:id" element={<OperatorApplicationDetailPage />} />
-      {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
-      <Route path="/operator/glucoseview/ai-report" element={<OperatorAiReportPage />} />
+      <Route path="/operator/glucoseview" element={<OperatorLayout />}>
+        <Route path="applications" element={<OperatorApplicationsPage />} />
+        <Route path="applications/:id" element={<OperatorApplicationDetailPage />} />
+        {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
+        <Route path="ai-report" element={<OperatorAiReportPage />} />
+      </Route>
 
       {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
       <Route path="/test-center" element={<TestCenterPage />} />

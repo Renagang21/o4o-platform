@@ -37,7 +37,6 @@ import {
   Users,
   Building2,
   ExternalLink,
-  FlaskConical,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -541,36 +540,6 @@ function CTASection() {
   );
 }
 
-// WO-TEST-CENTER-SEPARATION-V1: 테스트 센터 링크 배너
-function TestCenterBanner() {
-  return (
-    <section className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <FlaskConical className="w-6 h-6 text-primary-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-slate-800">
-              서비스 테스트 & 개선 참여
-            </h3>
-            <p className="text-sm text-slate-500">
-              테스트 의견, 서비스 업데이트 확인, 피드백 작성을 한곳에서
-            </p>
-          </div>
-        </div>
-        <NavLink
-          to="/test-center"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
-        >
-          테스트 센터
-          <ArrowRight className="w-4 h-4" />
-        </NavLink>
-      </div>
-    </section>
-  );
-}
-
 // ========================================
 // Main Component
 // ========================================
@@ -624,10 +593,7 @@ export default function HomePage() {
       {/* Block 5: Partner Trust - 협력 네트워크 */}
       <PartnerTrustSection />
 
-      {/* Block 6: Test Center Link - 테스트 센터 바로가기 (WO-TEST-CENTER-SEPARATION-V1) */}
-      <TestCenterBanner />
-
-      {/* Block 7: CTA - 비로그인 사용자용 */}
+      {/* Block 6: CTA - 비로그인 사용자용 */}
       <CTASection />
     </div>
   );
