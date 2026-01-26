@@ -8,6 +8,7 @@ import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'pharmacy-glycopharm@o4o.com', password: TEST_PASSWORD, label: '약국' },
+  { email: 'admin-glycopharm@o4o.com', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export default function LoginPage() {
