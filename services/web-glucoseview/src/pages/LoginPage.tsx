@@ -95,6 +95,20 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-slate-600">로그인 상태 유지</span>
+              </label>
+              <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
+                비밀번호 찾기
+              </a>
+            </div>
+
             {/* Error Message */}
             {error && (
               <div className="p-3 bg-red-50 border border-red-100 rounded-lg">

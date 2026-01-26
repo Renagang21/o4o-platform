@@ -115,6 +115,17 @@ export function LoginPage() {
             />
           </div>
 
+          {/* Remember Me & Forgot Password */}
+          <div style={styles.optionsRow}>
+            <label style={styles.checkboxLabel}>
+              <input type="checkbox" style={styles.checkbox} />
+              <span>로그인 상태 유지</span>
+            </label>
+            <Link to="/forgot-password" style={styles.forgotLink}>
+              비밀번호 찾기
+            </Link>
+          </div>
+
           <button
             type="submit"
             style={{
@@ -269,6 +280,29 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     outline: 'none',
     transition: 'border-color 0.2s',
+  },
+  optionsRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '14px',
+    color: '#64748b',
+    cursor: 'pointer',
+  },
+  checkbox: {
+    width: '16px',
+    height: '16px',
+    accentColor: '#16a34a',
+  },
+  forgotLink: {
+    fontSize: '14px',
+    color: '#16a34a',
+    textDecoration: 'none',
   },
   submitButton: {
     padding: '14px',
