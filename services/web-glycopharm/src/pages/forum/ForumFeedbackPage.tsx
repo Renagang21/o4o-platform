@@ -71,10 +71,15 @@ export default function ForumFeedbackPage() {
             <h1 className="text-2xl font-bold text-slate-800">테스트 의견</h1>
             <p className="text-slate-500">서비스 개선을 위한 의견을 남겨주세요</p>
           </div>
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25">
+          <a
+            href="https://neture.co.kr/supplier-ops/forum/test-feedback/new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
+          >
             <Plus className="w-5 h-5" />
             의견 작성
-          </button>
+          </a>
         </div>
       </div>
 

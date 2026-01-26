@@ -127,9 +127,14 @@ export function TestImprovementSection({ config = {} }: Props) {
                 <span style={styles.boardIcon}>💬</span>
                 <h3 style={styles.boardTitle}>테스트 의견</h3>
               </div>
-              <Link to="/forum/feedback" style={styles.writeLink}>
+              <a
+                href="https://neture.co.kr/supplier-ops/forum/test-feedback/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.writeLink}
+              >
                 글쓰기 →
-              </Link>
+              </a>
             </div>
             <div style={styles.boardContent}>
               {loading ? (
@@ -160,7 +165,14 @@ export function TestImprovementSection({ config = {} }: Props) {
               )}
             </div>
             <div style={styles.boardFooter}>
-              <Link to="/forum/feedback" style={styles.viewAllLink}>전체 보기 →</Link>
+              <a
+                href="https://neture.co.kr/supplier-ops/forum/test-feedback"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.viewAllLink}
+              >
+                전체 보기 →
+              </a>
             </div>
           </div>
 
@@ -196,7 +208,14 @@ export function TestImprovementSection({ config = {} }: Props) {
               )}
             </div>
             <div style={styles.boardFooter}>
-              <Link to="/forum/updates" style={styles.viewAllLink}>전체 보기 →</Link>
+              <a
+                href="https://neture.co.kr/supplier-ops/forum/service-update"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.viewAllLink}
+              >
+                전체 보기 →
+              </a>
             </div>
           </div>
         </div>

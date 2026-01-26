@@ -81,12 +81,22 @@ export function TestCenterPage() {
         {/* Quick Links */}
         <section style={styles.section}>
           <div style={styles.linksWrapper}>
-            <Link to="/demo/test-guide" style={styles.linkButton}>
-              테스트 가이드 보기 →
-            </Link>
-            <Link to="/demo/forum" style={styles.linkButton}>
-              포럼 바로가기 →
-            </Link>
+            <a
+              href="https://neture.co.kr/supplier-ops/forum/test-feedback"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.linkButton}
+            >
+              테스트 포럼 바로가기 →
+            </a>
+            <a
+              href="https://neture.co.kr/supplier-ops/forum/service-update"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.linkButton}
+            >
+              서비스 업데이트 보기 →
+            </a>
           </div>
         </section>
       </div>

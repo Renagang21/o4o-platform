@@ -59,19 +59,23 @@ export default function TestCenterPage() {
       <div className="bg-white border-t border-slate-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <NavLink
-              to="/forum/feedback"
+            <a
+              href="https://neture.co.kr/supplier-ops/forum/test-feedback"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               테스트 포럼 바로가기 →
-            </NavLink>
+            </a>
             <span className="hidden sm:inline text-slate-300">|</span>
-            <NavLink
-              to="/forum/updates"
+            <a
+              href="https://neture.co.kr/supplier-ops/forum/service-update"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               서비스 업데이트 보기 →
-            </NavLink>
+            </a>
           </div>
         </div>
       </div>

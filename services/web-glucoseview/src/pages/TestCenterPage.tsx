@@ -92,12 +92,22 @@ export default function TestCenterPage() {
         {/* Quick Links */}
         <section className="text-center">
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link
-              to="/test-guide"
+            <a
+              href="https://neture.co.kr/supplier-ops/forum/test-feedback"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
             >
-              테스트 가이드 보기 →
-            </Link>
+              테스트 포럼 바로가기 →
+            </a>
+            <a
+              href="https://neture.co.kr/supplier-ops/forum/service-update"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700"
+            >
+              서비스 업데이트 보기 →
+            </a>
           </div>
         </section>
       </div>
