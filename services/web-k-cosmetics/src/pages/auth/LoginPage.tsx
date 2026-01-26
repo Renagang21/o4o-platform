@@ -12,9 +12,9 @@ import { useAuth } from '@/contexts/AuthContext';
 // consumer 계정 제거 (역할 불일치 문제)
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'seller@k-cosmetics.test', password: TEST_PASSWORD, label: '판매자' },
-  { email: 'supplier@k-cosmetics.test', password: TEST_PASSWORD, label: '공급자' },
-  { email: 'admin@k-cosmetics.test', password: TEST_PASSWORD, label: '운영자' },
+  { email: 'seller-k-cosmetics@o4o.com', password: TEST_PASSWORD, label: '판매자' },
+  { email: 'supplier-k-cosmetics@o4o.com', password: TEST_PASSWORD, label: '공급자' },
+  { email: 'admin-k-cosmetics@o4o.com', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export default function LoginPage() {

@@ -12,9 +12,9 @@ import { useAuth, ROLE_DASHBOARDS } from '../contexts';
 // 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'supplier@neture.test', password: TEST_PASSWORD, label: '공급자' },
-  { email: 'partner@neture.test', password: TEST_PASSWORD, label: '파트너' },
-  { email: 'admin@neture.test', password: TEST_PASSWORD, label: '운영자' },
+  { email: 'supplier-neture@o4o.com', password: TEST_PASSWORD, label: '공급자' },
+  { email: 'partner-neture@o4o.com', password: TEST_PASSWORD, label: '파트너' },
+  { email: 'admin-neture@o4o.com', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export function LoginPage() {

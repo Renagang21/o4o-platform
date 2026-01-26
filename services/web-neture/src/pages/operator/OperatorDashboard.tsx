@@ -24,6 +24,7 @@ import {
   Settings,
   AlertCircle,
   RefreshCw,
+  Shield,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
@@ -337,6 +338,16 @@ export default function OperatorDashboard() {
             <div>
               <span className="font-medium text-slate-700">알림 설정</span>
               <p className="text-xs text-slate-500">이메일 알림 관리</p>
+            </div>
+          </Link>
+          <Link
+            to="/admin-vault"
+            className="flex items-center gap-3 p-4 rounded-xl border-2 border-amber-500 bg-amber-50 hover:border-amber-600 transition-colors"
+          >
+            <Shield className="w-5 h-5 text-amber-600" />
+            <div>
+              <span className="font-medium text-slate-700">Vault</span>
+              <p className="text-xs text-slate-500">기술 문서 보호 구역</p>
             </div>
           </Link>
         </div>

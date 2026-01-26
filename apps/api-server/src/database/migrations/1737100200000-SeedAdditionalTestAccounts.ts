@@ -15,14 +15,14 @@ const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNTS = [
   // GlycoPharm test accounts
   {
-    email: 'pharmacy@glycopharm.kr',
+    email: 'pharmacy-glycopharm@o4o.com',
     name: 'Test Pharmacy',
     role: 'user',
     domain: 'glycopharm.kr',
     description: 'GlycoPharm 약국 테스트 계정',
   },
   {
-    email: 'admin@neture.co.kr',
+    email: 'admin-glycopharm@o4o.com',
     name: 'Test Admin',
     role: 'admin',
     domain: 'glycopharm.kr',
@@ -30,35 +30,35 @@ const TEST_ACCOUNTS = [
   },
   // KPA Society test accounts
   {
-    email: 'district-admin@kpa-test.kr',
+    email: 'district-admin-kpa@o4o.com',
     name: '김지부 (지부운영자)',
     role: 'admin',
     domain: 'kpa-society.kr',
     description: 'KPA 지부 운영자 테스트 계정',
   },
   {
-    email: 'branch-admin@kpa-test.kr',
+    email: 'branch-admin-kpa@o4o.com',
     name: '이분회 (분회운영자)',
     role: 'admin',
     domain: 'kpa-society.kr',
     description: 'KPA 분회 운영자 테스트 계정',
   },
   {
-    email: 'district-officer@kpa-test.kr',
+    email: 'district-officer-kpa@o4o.com',
     name: '박임원 (지부임원)',
     role: 'user',
     domain: 'kpa-society.kr',
     description: 'KPA 지부 임원 테스트 계정',
   },
   {
-    email: 'branch-officer@kpa-test.kr',
+    email: 'branch-officer-kpa@o4o.com',
     name: '최임원 (분회임원)',
     role: 'user',
     domain: 'kpa-society.kr',
     description: 'KPA 분회 임원 테스트 계정',
   },
   {
-    email: 'pharmacist@kpa-test.kr',
+    email: 'pharmacist-kpa@o4o.com',
     name: '홍길동 (약사)',
     role: 'user',
     domain: 'kpa-society.kr',
@@ -66,21 +66,21 @@ const TEST_ACCOUNTS = [
   },
   // Neture test accounts
   {
-    email: 'supplier@neture.test',
+    email: 'supplier-neture@o4o.com',
     name: 'Test Supplier',
     role: 'supplier',
     domain: 'neture.co.kr',
     description: 'Neture 공급자 테스트 계정',
   },
   {
-    email: 'partner@neture.test',
+    email: 'partner-neture@o4o.com',
     name: 'Test Partner',
     role: 'partner',
     domain: 'neture.co.kr',
     description: 'Neture 파트너 테스트 계정',
   },
   {
-    email: 'admin@neture.test',
+    email: 'admin-neture@o4o.com',
     name: 'Test Admin',
     role: 'admin',
     domain: 'neture.co.kr',
@@ -138,20 +138,20 @@ export class SeedAdditionalTestAccounts1737100200000 implements MigrationInterfa
     console.log('Password: TestPassword');
     console.log('');
     console.log('GlycoPharm:');
-    console.log('  - pharmacy@glycopharm.kr (약국)');
-    console.log('  - admin@neture.co.kr (운영자)');
+    console.log('  - pharmacy-glycopharm@o4o.com (약국)');
+    console.log('  - admin-glycopharm@o4o.com (운영자)');
     console.log('');
     console.log('KPA Society:');
-    console.log('  - district-admin@kpa-test.kr (지부 운영자)');
-    console.log('  - branch-admin@kpa-test.kr (분회 운영자)');
-    console.log('  - district-officer@kpa-test.kr (지부 임원)');
-    console.log('  - branch-officer@kpa-test.kr (분회 임원)');
-    console.log('  - pharmacist@kpa-test.kr (약사)');
+    console.log('  - district-admin-kpa@o4o.com (지부 운영자)');
+    console.log('  - branch-admin-kpa@o4o.com (분회 운영자)');
+    console.log('  - district-officer-kpa@o4o.com (지부 임원)');
+    console.log('  - branch-officer-kpa@o4o.com (분회 임원)');
+    console.log('  - pharmacist-kpa@o4o.com (약사)');
     console.log('');
     console.log('Neture:');
-    console.log('  - supplier@neture.test (공급자)');
-    console.log('  - partner@neture.test (파트너)');
-    console.log('  - admin@neture.test (운영자)');
+    console.log('  - supplier-neture@o4o.com (공급자)');
+    console.log('  - partner-neture@o4o.com (파트너)');
+    console.log('  - admin-neture@o4o.com (운영자)');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

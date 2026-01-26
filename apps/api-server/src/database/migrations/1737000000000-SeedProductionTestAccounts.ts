@@ -26,14 +26,14 @@ const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNTS = [
   // GlucoseView test accounts
   {
-    email: 'pharmacist@test.test',
+    email: 'pharmacist@o4o.com',
     name: 'Test Pharmacist',
     role: 'user', // Use standard role, specific permissions via domain
     domain: 'glucoseview.co.kr',
     description: 'GlucoseView 약사 테스트 계정',
   },
   {
-    email: 'admin@test.test',
+    email: 'admin@o4o.com',
     name: 'Test Admin',
     role: 'admin',
     domain: 'glucoseview.co.kr',
@@ -41,28 +41,28 @@ const TEST_ACCOUNTS = [
   },
   // K-Cosmetics test accounts
   {
-    email: 'consumer@k-cosmetics.test',
+    email: 'consumer-k-cosmetics@o4o.com',
     name: 'Test Consumer',
     role: 'user',
     domain: 'k-cosmetics.site',
     description: 'K-Cosmetics 소비자 테스트 계정',
   },
   {
-    email: 'seller@k-cosmetics.test',
+    email: 'seller-k-cosmetics@o4o.com',
     name: 'Test Seller',
     role: 'seller',
     domain: 'k-cosmetics.site',
     description: 'K-Cosmetics 판매자 테스트 계정',
   },
   {
-    email: 'supplier@k-cosmetics.test',
+    email: 'supplier-k-cosmetics@o4o.com',
     name: 'Test Supplier',
     role: 'supplier',
     domain: 'k-cosmetics.site',
     description: 'K-Cosmetics 공급자 테스트 계정',
   },
   {
-    email: 'admin@k-cosmetics.test',
+    email: 'admin-k-cosmetics@o4o.com',
     name: 'Test Admin',
     role: 'admin',
     domain: 'k-cosmetics.site',
@@ -116,14 +116,14 @@ export class SeedProductionTestAccounts1737000000000 implements MigrationInterfa
     console.log('Password: TestPassword');
     console.log('');
     console.log('GlucoseView:');
-    console.log('  - pharmacist@test.test (약사)');
-    console.log('  - admin@test.test (관리자)');
+    console.log('  - pharmacist@o4o.com (약사)');
+    console.log('  - admin@o4o.com (관리자)');
     console.log('');
     console.log('K-Cosmetics:');
-    console.log('  - consumer@k-cosmetics.test (소비자)');
-    console.log('  - seller@k-cosmetics.test (판매자)');
-    console.log('  - supplier@k-cosmetics.test (공급자)');
-    console.log('  - admin@k-cosmetics.test (관리자)');
+    console.log('  - consumer-k-cosmetics@o4o.com (소비자)');
+    console.log('  - seller-k-cosmetics@o4o.com (판매자)');
+    console.log('  - supplier-k-cosmetics@o4o.com (공급자)');
+    console.log('  - admin-k-cosmetics@o4o.com (관리자)');
     console.log('');
     console.log('Note: Run cleanup Work Order after testing to deactivate/delete accounts');
   }
@@ -142,6 +142,6 @@ export class SeedProductionTestAccounts1737000000000 implements MigrationInterfa
 
     console.log('');
     console.log('All test accounts have been deactivated.');
-    console.log('To permanently delete, run: DELETE FROM users WHERE email LIKE \'%@test.test\' OR email LIKE \'%@k-cosmetics.test\'');
+    console.log('To permanently delete, run: DELETE FROM users WHERE email LIKE \'%@o4o.com\'');
   }
 }

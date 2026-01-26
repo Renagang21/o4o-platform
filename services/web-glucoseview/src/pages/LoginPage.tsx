@@ -5,8 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 // 테스트 계정 목록 (비밀번호 통일: TestPassword)
 const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNTS = [
-  { label: '약사', email: 'pharmacist@test.test', password: TEST_PASSWORD, role: 'pharmacist' },
-  { label: '관리자', email: 'admin@test.test', password: TEST_PASSWORD, role: 'admin' },
+  { label: '약사', email: 'pharmacist@o4o.com', password: TEST_PASSWORD, role: 'pharmacist' },
+  { label: '관리자', email: 'admin@o4o.com', password: TEST_PASSWORD, role: 'admin' },
 ];
 
 export default function LoginPage() {

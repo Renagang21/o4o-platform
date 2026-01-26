@@ -8,8 +8,9 @@
  */
 
 // Admin Vault 접근 허용 계정 목록
+// 운영자 계정으로 변경 (2026-01-26)
 const ADMIN_VAULT_ALLOWED_EMAILS = [
-  'o4o-admin-id@admin.co.kr',
+  'admin-neture@o4o.com',
 ];
 
 /**

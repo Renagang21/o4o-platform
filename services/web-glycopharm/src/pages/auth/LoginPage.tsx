@@ -7,8 +7,8 @@ import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 // 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'pharmacy@glycopharm.kr', password: TEST_PASSWORD, label: '약국' },
-  { email: 'admin@neture.co.kr', password: TEST_PASSWORD, label: '운영자' },
+  { email: 'pharmacy-glycopharm@o4o.com', password: TEST_PASSWORD, label: '약국' },
+  { email: 'admin-glycopharm@o4o.com', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export default function LoginPage() {
