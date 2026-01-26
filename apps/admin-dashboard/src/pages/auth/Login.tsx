@@ -239,27 +239,16 @@ const Login: FC = () => {
             <button
               type="button"
               onClick={() => {
-                setEmail('admin@neture.co.kr');
+                setEmail('admin-neture@o4o.com');
                 setPassword('TestPassword');
               }}
               className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors border border-white/10"
             >
               Super Admin
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('admin@neture.test');
-                setPassword('TestPassword');
-              }}
-              className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors border border-white/10"
-            >
-              테스트 관리자
-            </button>
           </div>
           <div className="mt-3 text-xs text-blue-200/60 space-y-1">
-            <div>📧 admin@neture.co.kr / TestPassword</div>
-            <div>📧 admin@neture.test / TestPassword</div>
+            <div>📧 admin-neture@o4o.com / TestPassword</div>
           </div>
         </div>
 
