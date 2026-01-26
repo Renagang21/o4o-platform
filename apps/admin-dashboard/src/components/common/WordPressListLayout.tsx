@@ -112,7 +112,7 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
       <div className="wp-header mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="wp-heading-inline text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <h1 className="o4o-heading-inline text-2xl font-semibold text-gray-900 dark:text-gray-100">
               {title}
             </h1>
             {(addNewHref || onAddNew) && (
@@ -167,7 +167,7 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
         )}
       </div>
       
-      <hr className="wp-header-end" />
+      <hr className="o4o-header-end" />
       
       {/* Single Filter Bar - No duplication */}
       <div className="tablenav top mb-4">
@@ -233,9 +233,9 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
       </div>
       
       {/* Main Content Area */}
-      <div className="wp-list-table-container">
+      <div className="o4o-list-table-container">
         {loading ? (
-          <div className="wp-list-table-loading-overlay">
+          <div className="o4o-list-table-loading-overlay">
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-4 text-gray-500 dark:text-gray-400">Loading...</p>

@@ -128,7 +128,7 @@
 }
 
 /* Modern Buttons (WordPress Layout with Modern Style) */
-.wp-button-primary {
+.o4o-button-primary {
   background-color: #2563eb; /* Modern blue */
   color: white;
   border: none;
@@ -141,13 +141,13 @@
   font-weight: 500;
 }
 
-.wp-button-primary:hover {
+.o4o-button-primary:hover {
   background-color: #1d4ed8; /* Darker blue on hover */
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.wp-button-secondary {
+.o4o-button-secondary {
   background-color: #f3f4f6;
   color: #374151;
   border: 1px solid #d1d5db;
@@ -160,19 +160,19 @@
   font-weight: 500;
 }
 
-.wp-button-secondary:hover {
+.o4o-button-secondary:hover {
   background-color: #e5e7eb;
   border-color: #9ca3af;
   transform: translateY(-1px);
 }
 
 /* WordPress Tables */
-.wp-list-table {
+.o4o-list-table {
   background-color: var(--wp-admin-box-bg);
   border: 1px solid var(--wp-admin-border);
 }
 
-.wp-list-table th {
+.o4o-list-table th {
   background-color: #fff;
   border-bottom: 1px solid var(--wp-admin-border);
   color: var(--wp-admin-text);
@@ -181,13 +181,13 @@
   padding: 8px 10px;
 }
 
-.wp-list-table td {
+.o4o-list-table td {
   border-top: 1px solid var(--wp-admin-border-light);
   padding: 8px 10px;
   font-size: 14px;
 }
 
-.wp-list-table tbody tr:hover {
+.o4o-list-table tbody tr:hover {
   background-color: #f5f5f5;
 }
 

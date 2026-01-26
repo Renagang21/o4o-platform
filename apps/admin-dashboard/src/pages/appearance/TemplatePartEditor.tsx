@@ -294,8 +294,8 @@ export default function TemplatePartEditor() {
         {/* Main content area */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic info */}
-          <div className="wp-card">
-            <div className="wp-card-body space-y-4">
+          <div className="o4o-card">
+            <div className="o4o-card-body space-y-4">
               <div>
                 <Label htmlFor="name">이름</Label>
                 <Input
@@ -341,11 +341,11 @@ export default function TemplatePartEditor() {
           </div>
 
           {/* Block Editor */}
-          <div className="wp-card">
-            <div className="wp-card-header">
+          <div className="o4o-card">
+            <div className="o4o-card-header">
               <h2 className="text-lg font-medium">콘텐츠 편집</h2>
             </div>
-            <div className="wp-card-body">
+            <div className="o4o-card-body">
               <WordPressEditorWrapper
                 initialContent=""
                 onChange={handleBlocksChange}
@@ -355,8 +355,8 @@ export default function TemplatePartEditor() {
           </div>
 
           {/* Advanced Settings */}
-          <div className="wp-card">
-            <div className="wp-card-body">
+          <div className="o4o-card">
+            <div className="o4o-card-body">
               <Tabs defaultValue="styles">
                 <TabsList>
                   <TabsTrigger value="styles">스타일</TabsTrigger>
@@ -593,11 +593,11 @@ export default function TemplatePartEditor() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Publish settings */}
-          <div className="wp-card">
-            <div className="wp-card-header">
+          <div className="o4o-card">
+            <div className="o4o-card-header">
               <h3 className="font-medium">게시</h3>
             </div>
-            <div className="wp-card-body space-y-4">
+            <div className="o4o-card-body space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm">영역:</span>
                 <Select
@@ -648,11 +648,11 @@ export default function TemplatePartEditor() {
           </div>
 
           {/* Preview */}
-          <div className="wp-card">
-            <div className="wp-card-header">
+          <div className="o4o-card">
+            <div className="o4o-card-header">
               <h3 className="font-medium">미리보기</h3>
             </div>
-            <div className="wp-card-body">
+            <div className="o4o-card-body">
               <p className="text-sm text-gray-600">
                 저장 후 사이트에서 실제로 어떻게 보이는지 확인할 수 있습니다.
               </p>

@@ -16,7 +16,7 @@ export const WordPressFilter: FC<WordPressFilterProps> = ({
   className 
 }) => {
   return (
-    <div className={clsx('wp-filter', className)}>
+    <div className={clsx('o4o-filter', className)}>
       <div className="filter-items">
         {children}
       </div>

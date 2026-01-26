@@ -61,7 +61,7 @@ const PageHeader: FC<PageHeaderProps> = ({
         return clsx(baseClass, 'bg-admin-red text-white border-admin-red hover:bg-red-700 hover:border-red-700');
       case 'secondary':
       default:
-        return clsx(baseClass, 'bg-white text-wp-text-secondary border border-gray-200 hover:bg-wp-bg-tertiary hover:border-gray-300');
+        return clsx(baseClass, 'bg-white text-o4o-text-secondary border border-gray-200 hover:bg-o4o-bg-tertiary hover:border-gray-300');
     }
   };
 
@@ -70,8 +70,8 @@ const PageHeader: FC<PageHeaderProps> = ({
   const secondaryActions = actions.filter((action: any) => action.variant !== 'primary');
 
   return (
-    <div className={clsx('wp-card mb-6', className)}>
-      <div className="wp-card-header">
+    <div className={clsx('o4o-card mb-6', className)}>
+      <div className="o4o-card-header">
         {/* Back Link */}
         {backUrl && (
           <Link
@@ -86,11 +86,11 @@ const PageHeader: FC<PageHeaderProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Title and Subtitle */}
           <div className="flex-1">
-            <h1 className="wp-card-title text-2xl font-bold text-wp-text-primary">
+            <h1 className="o4o-card-title text-2xl font-bold text-o4o-text-primary">
               {title}
             </h1>
             {subtitle && (
-              <p className="mt-1 text-sm text-wp-text-secondary">
+              <p className="mt-1 text-sm text-o4o-text-secondary">
                 {subtitle}
               </p>
             )}
@@ -150,13 +150,13 @@ const PageHeader: FC<PageHeaderProps> = ({
             {/* Search */}
             {showSearch && (
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-wp-text-tertiary" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-o4o-text-tertiary" />
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="wp-input pl-10 pr-4"
+                  className="o4o-input pl-10 pr-4"
                 />
               </div>
             )}

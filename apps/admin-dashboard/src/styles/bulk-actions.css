@@ -45,32 +45,32 @@
 }
 
 /* Checkbox Column */
-.wp-list-table .check-column {
+.o4o-list-table .check-column {
   width: 2.2em;
   padding: 6px 0 25px;
   vertical-align: top;
 }
 
-.wp-list-table thead .check-column,
-.wp-list-table tfoot .check-column {
+.o4o-list-table thead .check-column,
+.o4o-list-table tfoot .check-column {
   padding: 10px 0 0;
 }
 
-.wp-list-table tbody th.check-column {
+.o4o-list-table tbody th.check-column {
   padding: 9px 0 8px;
 }
 
 /* Selected Row Highlighting */
-.wp-list-table tbody tr.selected {
+.o4o-list-table tbody tr.selected {
   background-color: #f0f6fc;
 }
 
-.wp-list-table tbody tr.selected:hover {
+.o4o-list-table tbody tr.selected:hover {
   background-color: #e5f1fb;
 }
 
 /* Row Actions Visibility */
-.wp-list-table .row-actions {
+.o4o-list-table .row-actions {
   color: #787c82;
   font-size: 13px;
   padding: 2px 0 0;
@@ -78,7 +78,7 @@
   visibility: hidden;
 }
 
-.wp-list-table tr:hover .row-actions {
+.o4o-list-table tr:hover .row-actions {
   visibility: visible;
 }
 
@@ -115,13 +115,13 @@
     margin: 10px 0 0;
   }
   
-  .wp-list-table .check-column {
+  .o4o-list-table .check-column {
     width: 35px;
   }
 }
 
 /* Checkbox Styling */
-.wp-list-table input[type="checkbox"] {
+.o4o-list-table input[type="checkbox"] {
   border: 1px solid #8c8f94;
   border-radius: 4px;
   background: #fff;
@@ -143,20 +143,20 @@
   transition: border-color .05s ease-in-out;
 }
 
-.wp-list-table input[type="checkbox"]:checked::before {
+.o4o-list-table input[type="checkbox"]:checked::before {
   content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3E%3C/svg%3E");
   margin: -0.1875rem 0 0 -0.25rem;
   height: 1.3125rem;
   width: 1.3125rem;
 }
 
-.wp-list-table input[type="checkbox"]:checked {
+.o4o-list-table input[type="checkbox"]:checked {
   background: #2271b1;
   border-color: #2271b1;
 }
 
 /* Indeterminate State */
-.wp-list-table input[type="checkbox"]:indeterminate::before {
+.o4o-list-table input[type="checkbox"]:indeterminate::before {
   content: '';
   position: absolute;
   left: 50%;
@@ -167,7 +167,7 @@
   background-color: #fff;
 }
 
-.wp-list-table input[type="checkbox"]:indeterminate {
+.o4o-list-table input[type="checkbox"]:indeterminate {
   background: #2271b1;
   border-color: #2271b1;
 }
@@ -238,7 +238,7 @@
 }
 
 /* Clear floats */
-.wp-filter {
+.o4o-filter {
   clear: both;
   margin-bottom: 15px;
 }
@@ -250,7 +250,7 @@
 }
 
 /* WordPress header separator */
-hr.wp-header-end {
+hr.o4o-header-end {
   visibility: hidden;
   margin: -2px 0 0;
 }

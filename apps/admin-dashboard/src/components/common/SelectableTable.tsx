@@ -39,7 +39,7 @@ export const SelectableTable: FC<SelectableTableProps> = ({
   emptyMessage = 'No items found'
 }) => {
   return (
-    <table className="wp-list-table widefat fixed striped">
+    <table className="o4o-list-table widefat fixed striped">
       <thead>
         <tr>
           <td className="manage-column column-cb check-column">

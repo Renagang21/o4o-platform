@@ -148,7 +148,7 @@ const VendorsPendingWordPress = () => {
       />
       
       <div className="wordpress-page-header">
-        <h1 className="wp-heading-inline">승인 대기 판매자</h1>
+        <h1 className="o4o-heading-inline">승인 대기 판매자</h1>
         <VendorsPendingScreenOptions
           showScreenOptions={showScreenOptions}
           setShowScreenOptions={setShowScreenOptions}

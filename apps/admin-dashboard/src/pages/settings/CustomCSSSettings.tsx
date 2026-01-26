@@ -55,8 +55,8 @@ const CustomCSSSettings: FC = () => {
 
   if (loading) {
     return (
-      <div className="wp-card">
-        <div className="wp-card-body">
+      <div className="o4o-card">
+        <div className="o4o-card-body">
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
@@ -67,20 +67,20 @@ const CustomCSSSettings: FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="wp-card">
-        <div className="wp-card-header">
+      <div className="o4o-card">
+        <div className="o4o-card-header">
           <div className="flex items-center gap-2">
-            <Code className="w-5 h-5 text-wp-text-secondary" />
-            <h3 className="wp-card-title">Custom CSS</h3>
+            <Code className="w-5 h-5 text-o4o-text-secondary" />
+            <h3 className="o4o-card-title">Custom CSS</h3>
           </div>
         </div>
-        <div className="wp-card-body space-y-4">
-          <p className="text-sm text-wp-text-secondary">
+        <div className="o4o-card-body space-y-4">
+          <p className="text-sm text-o4o-text-secondary">
             사이트 전체에 적용될 CSS를 입력하세요. 이 CSS는 모든 페이지에서 로드됩니다.
           </p>
 
           <div>
-            <label className="block text-sm font-medium text-wp-text-primary mb-2">
+            <label className="block text-sm font-medium text-o4o-text-primary mb-2">
               CSS 코드
             </label>
             <textarea
@@ -90,7 +90,7 @@ const CustomCSSSettings: FC = () => {
               placeholder="/* 여기에 CSS를 입력하세요 */&#10;&#10;.my-custom-class {&#10;  color: #333;&#10;  font-size: 16px;&#10;}"
               spellCheck={false}
             />
-            <p className="mt-2 text-xs text-wp-text-secondary">
+            <p className="mt-2 text-xs text-o4o-text-secondary">
               {customCSS.length} 문자 | {customCSS.split('\n').length} 줄
             </p>
           </div>
@@ -109,7 +109,7 @@ const CustomCSSSettings: FC = () => {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="wp-button wp-button-primary"
+              className="o4o-button o4o-button-primary"
             >
               {saving ? (
                 <>
@@ -124,7 +124,7 @@ const CustomCSSSettings: FC = () => {
             <button
               onClick={loadCustomCSS}
               disabled={loading || saving}
-              className="wp-button wp-button-secondary"
+              className="o4o-button o4o-button-secondary"
             >
               새로고침
             </button>
@@ -133,12 +133,12 @@ const CustomCSSSettings: FC = () => {
       </div>
 
       {/* Preview Section */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <h3 className="wp-card-title">CSS 미리보기</h3>
+      <div className="o4o-card">
+        <div className="o4o-card-header">
+          <h3 className="o4o-card-title">CSS 미리보기</h3>
         </div>
-        <div className="wp-card-body">
-          <p className="text-sm text-wp-text-secondary mb-4">
+        <div className="o4o-card-body">
+          <p className="text-sm text-o4o-text-secondary mb-4">
             입력한 CSS가 어떻게 표시되는지 확인하세요.
           </p>
           <div className="bg-gray-50 border border-gray-300 rounded-md p-4">

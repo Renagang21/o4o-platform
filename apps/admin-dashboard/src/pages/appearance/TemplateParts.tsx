@@ -202,9 +202,9 @@ export default function TemplateParts() {
                 return (
                   <div
                     key={part.id}
-                    className="wp-card hover:shadow-md transition-shadow"
+                    className="o4o-card hover:shadow-md transition-shadow"
                   >
-                    <div className="wp-card-body">
+                    <div className="o4o-card-body">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <Icon className="w-8 h-8 text-gray-400" />

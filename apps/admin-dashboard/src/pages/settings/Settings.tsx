@@ -1,14 +1,16 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Key, Package, Bot } from 'lucide-react'
+import { Key, Package, Bot, Mail } from 'lucide-react'
 import OAuthSettings from './OAuthSettings'
 import AppServices from './AppServices'
 import AiQuerySettings from './AiQuerySettings'
+import EmailSettings from './EmailSettings'
 
 const settingsTabs = [
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings' },
   { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' },
-  { id: 'ai-query', label: 'AI Query', icon: <Bot className="w-4 h-4" />, path: '/settings/ai-query' }
+  { id: 'ai-query', label: 'AI Query', icon: <Bot className="w-4 h-4" />, path: '/settings/ai-query' },
+  { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, path: '/settings/email' }
 ]
 
 const Settings: FC = () => {
@@ -17,8 +19,8 @@ const Settings: FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-wp-text-primary">설정</h1>
-        <p className="text-wp-text-secondary mt-1">시스템 설정을 관리합니다</p>
+        <h1 className="text-2xl font-bold text-o4o-text-primary">설정</h1>
+        <p className="text-o4o-text-secondary mt-1">시스템 설정을 관리합니다</p>
       </div>
 
       {/* Settings Navigation Tabs */}
@@ -34,7 +36,7 @@ const Settings: FC = () => {
                   flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm
                   ${isActive
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-wp-text-secondary hover:text-wp-text-primary hover:border border-gray-200'
+                    : 'border-transparent text-o4o-text-secondary hover:text-o4o-text-primary hover:border border-gray-200'
                   }
                 `}
               >
@@ -51,6 +53,7 @@ const Settings: FC = () => {
         <Route index element={<OAuthSettings />} />
         <Route path="app-services" element={<AppServices />} />
         <Route path="ai-query" element={<AiQuerySettings />} />
+        <Route path="email" element={<EmailSettings />} />
         <Route path="*" element={<Navigate to="" replace />} />
       </Routes>
     </div>

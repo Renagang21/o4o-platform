@@ -101,8 +101,8 @@ const PartnerPartners = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">전체 파트너사</p>
@@ -112,8 +112,8 @@ const PartnerPartners = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 클릭수</p>
@@ -125,8 +125,8 @@ const PartnerPartners = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 전환수</p>
@@ -138,8 +138,8 @@ const PartnerPartners = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 매출액</p>
@@ -194,7 +194,7 @@ const PartnerPartners = () => {
       </div>
 
       {/* Partners Table */}
-      <div className="wp-card">
+      <div className="o4o-card">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-modern-bg-tertiary border-b border-modern-border-primary">

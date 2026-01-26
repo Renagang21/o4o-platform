@@ -124,33 +124,33 @@
     /* Background Colors */
     --wp-bg-body: var(--gray-0);
     --wp-bg-content: var(--gray-0);
-    --wp-bg-primary: var(--gray-0);
-    --wp-bg-secondary: var(--gray-50);
-    --wp-bg-tertiary: var(--gray-100);
+    --o4o-bg-primary: var(--gray-0);
+    --o4o-bg-secondary: var(--gray-50);
+    --o4o-bg-tertiary: var(--gray-100);
     --wp-bg-inverse: var(--gray-900);
 
     /* Text Colors */
-    --wp-text-primary: var(--gray-900);
-    --wp-text-secondary: var(--gray-700);
-    --wp-text-tertiary: var(--gray-600);
-    --wp-text-inverse: var(--gray-0);
+    --o4o-text-primary: var(--gray-900);
+    --o4o-text-secondary: var(--gray-700);
+    --o4o-text-tertiary: var(--gray-600);
+    --o4o-text-inverse: var(--gray-0);
 
     /* Border Colors */
-    --wp-border-primary: var(--gray-200);
-    --wp-border-secondary: var(--gray-300);
+    --o4o-border-primary: var(--gray-200);
+    --o4o-border-secondary: var(--gray-300);
     --wp-border-focus: var(--wp-color-primary-500);
 
     /* Legacy aliases */
-    --bg-primary: var(--wp-bg-primary);
-    --bg-secondary: var(--wp-bg-secondary);
-    --bg-tertiary: var(--wp-bg-tertiary);
+    --bg-primary: var(--o4o-bg-primary);
+    --bg-secondary: var(--o4o-bg-secondary);
+    --bg-tertiary: var(--o4o-bg-tertiary);
     --bg-inverse: var(--wp-bg-inverse);
-    --text-primary: var(--wp-text-primary);
-    --text-secondary: var(--wp-text-secondary);
-    --text-tertiary: var(--wp-text-tertiary);
-    --text-inverse: var(--wp-text-inverse);
-    --border-primary: var(--wp-border-primary);
-    --border-secondary: var(--wp-border-secondary);
+    --text-primary: var(--o4o-text-primary);
+    --text-secondary: var(--o4o-text-secondary);
+    --text-tertiary: var(--o4o-text-tertiary);
+    --text-inverse: var(--o4o-text-inverse);
+    --border-primary: var(--o4o-border-primary);
+    --border-secondary: var(--o4o-border-secondary);
     --border-focus: var(--wp-border-focus);
     
     /* Admin Bar - Clean Dark */
@@ -164,20 +164,20 @@
        ======================================== */
 
     /* Sidebar */
-    --wp-sidebar-bg: var(--gray-0);
-    --wp-sidebar-text: var(--gray-700);
-    --wp-sidebar-hover: var(--gray-50);
-    --wp-sidebar-active: var(--wp-color-primary-50);
-    --wp-sidebar-active-text: var(--wp-color-primary-600);
-    --wp-sidebar-border: var(--gray-200);
+    --o4o-sidebar-bg: var(--gray-0);
+    --o4o-sidebar-text: var(--gray-700);
+    --o4o-sidebar-hover: var(--gray-50);
+    --o4o-sidebar-active: var(--wp-color-primary-50);
+    --o4o-sidebar-active-text: var(--wp-color-primary-600);
+    --o4o-sidebar-border: var(--gray-200);
 
     /* Legacy aliases */
-    --sidebar-bg: var(--wp-sidebar-bg);
-    --sidebar-text: var(--wp-sidebar-text);
-    --sidebar-hover: var(--wp-sidebar-hover);
-    --sidebar-active-bg: var(--wp-sidebar-active);
-    --sidebar-active-text: var(--wp-sidebar-active-text);
-    --sidebar-border: var(--wp-sidebar-border);
+    --sidebar-bg: var(--o4o-sidebar-bg);
+    --sidebar-text: var(--o4o-sidebar-text);
+    --sidebar-hover: var(--o4o-sidebar-hover);
+    --sidebar-active-bg: var(--o4o-sidebar-active);
+    --sidebar-active-text: var(--o4o-sidebar-active-text);
+    --sidebar-border: var(--o4o-sidebar-border);
     
     /* Components */
     --card-bg: var(--gray-0);
@@ -298,33 +298,33 @@
     /* Background Colors */
     --wp-bg-body: var(--gray-950);
     --wp-bg-content: var(--gray-900);
-    --wp-bg-primary: var(--gray-950);
-    --wp-bg-secondary: var(--gray-900);
-    --wp-bg-tertiary: var(--gray-800);
+    --o4o-bg-primary: var(--gray-950);
+    --o4o-bg-secondary: var(--gray-900);
+    --o4o-bg-tertiary: var(--gray-800);
     --wp-bg-inverse: var(--gray-0);
 
     /* Text Colors */
-    --wp-text-primary: var(--gray-100);
-    --wp-text-secondary: var(--gray-400);
-    --wp-text-tertiary: var(--gray-500);
-    --wp-text-inverse: var(--gray-900);
+    --o4o-text-primary: var(--gray-100);
+    --o4o-text-secondary: var(--gray-400);
+    --o4o-text-tertiary: var(--gray-500);
+    --o4o-text-inverse: var(--gray-900);
 
     /* Border Colors */
-    --wp-border-primary: var(--gray-800);
-    --wp-border-secondary: var(--gray-700);
+    --o4o-border-primary: var(--gray-800);
+    --o4o-border-secondary: var(--gray-700);
     --wp-border-focus: var(--wp-color-primary-400);
 
     /* Legacy aliases */
-    --bg-primary: var(--wp-bg-primary);
-    --bg-secondary: var(--wp-bg-secondary);
-    --bg-tertiary: var(--wp-bg-tertiary);
+    --bg-primary: var(--o4o-bg-primary);
+    --bg-secondary: var(--o4o-bg-secondary);
+    --bg-tertiary: var(--o4o-bg-tertiary);
     --bg-inverse: var(--wp-bg-inverse);
-    --text-primary: var(--wp-text-primary);
-    --text-secondary: var(--wp-text-secondary);
-    --text-tertiary: var(--wp-text-tertiary);
-    --text-inverse: var(--wp-text-inverse);
-    --border-primary: var(--wp-border-primary);
-    --border-secondary: var(--wp-border-secondary);
+    --text-primary: var(--o4o-text-primary);
+    --text-secondary: var(--o4o-text-secondary);
+    --text-tertiary: var(--o4o-text-tertiary);
+    --text-inverse: var(--o4o-text-inverse);
+    --border-primary: var(--o4o-border-primary);
+    --border-secondary: var(--o4o-border-secondary);
     --border-focus: var(--wp-border-focus);
     
     /* Admin Bar - Dark Mode */
@@ -334,18 +334,18 @@
     --admin-bar-active: rgba(255, 255, 255, 0.2);
     
     /* Sidebar */
-    --wp-sidebar-bg: var(--gray-900);
-    --wp-sidebar-text: var(--gray-300);
-    --wp-sidebar-hover: var(--gray-800);
-    --wp-sidebar-active: var(--wp-color-primary-600);
-    --wp-sidebar-active-text: var(--gray-0);
+    --o4o-sidebar-bg: var(--gray-900);
+    --o4o-sidebar-text: var(--gray-300);
+    --o4o-sidebar-hover: var(--gray-800);
+    --o4o-sidebar-active: var(--wp-color-primary-600);
+    --o4o-sidebar-active-text: var(--gray-0);
 
     /* Legacy aliases */
-    --sidebar-bg: var(--wp-sidebar-bg);
-    --sidebar-text: var(--wp-sidebar-text);
-    --sidebar-hover: var(--wp-sidebar-hover);
-    --sidebar-active-bg: var(--wp-sidebar-active);
-    --sidebar-active-text: var(--wp-sidebar-active-text);
+    --sidebar-bg: var(--o4o-sidebar-bg);
+    --sidebar-text: var(--o4o-sidebar-text);
+    --sidebar-hover: var(--o4o-sidebar-hover);
+    --sidebar-active-bg: var(--o4o-sidebar-active);
+    --sidebar-active-text: var(--o4o-sidebar-active-text);
 
     /* Components */
     --card-bg: var(--gray-900);
@@ -390,14 +390,14 @@
     --table-border: var(--gray-800);
     
     /* WordPress Dark Mode Mappings */
-    --wp-bg-primary: var(--bg-secondary);
-    --wp-bg-secondary: var(--bg-primary);
-    --wp-bg-tertiary: var(--bg-tertiary);
-    --wp-text-primary: var(--text-primary);
-    --wp-text-secondary: var(--text-secondary);
-    --wp-text-tertiary: var(--text-tertiary);
-    --wp-border-primary: var(--border-primary);
-    --wp-border-secondary: var(--border-secondary);
+    --o4o-bg-primary: var(--bg-secondary);
+    --o4o-bg-secondary: var(--bg-primary);
+    --o4o-bg-tertiary: var(--bg-tertiary);
+    --o4o-text-primary: var(--text-primary);
+    --o4o-text-secondary: var(--text-secondary);
+    --o4o-text-tertiary: var(--text-tertiary);
+    --o4o-border-primary: var(--border-primary);
+    --o4o-border-secondary: var(--border-secondary);
     
     /* Legacy Shadcn/ui variables for compatibility */
     --background: 222.2 84% 4.9%;
@@ -446,7 +446,7 @@
 
 @layer components {
   /* WordPress-style buttons */
-  .wp-button {
+  .o4o-button {
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
@@ -457,7 +457,7 @@
     transition: color 200ms, background-color 200ms, border-color 200ms;
   }
   
-  .wp-button-primary {
+  .o4o-button-primary {
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
@@ -471,12 +471,12 @@
     border-color: var(--wp-admin-blue);
   }
   
-  .wp-button-primary:hover {
+  .o4o-button-primary:hover {
     background-color: var(--wp-admin-blue-dark);
     border-color: var(--wp-admin-blue-dark);
   }
   
-  .wp-button-secondary {
+  .o4o-button-secondary {
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
@@ -485,17 +485,17 @@
     border-radius: 0.25rem;
     border-width: 1px;
     transition: color 200ms, background-color 200ms, border-color 200ms;
-    background-color: var(--wp-bg-tertiary);
-    color: var(--wp-text-primary);
+    background-color: var(--o4o-bg-tertiary);
+    color: var(--o4o-text-primary);
     border: 1px solid rgb(229 231 235);
   }
   
-  .wp-button-secondary:hover {
-    background-color: var(--wp-bg-secondary);
+  .o4o-button-secondary:hover {
+    background-color: var(--o4o-bg-secondary);
     border-color: rgb(209 213 219);
   }
   
-  .wp-button-danger {
+  .o4o-button-danger {
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
@@ -509,13 +509,13 @@
     border-color: var(--wp-admin-red);
   }
   
-  .wp-button-danger:hover {
+  .o4o-button-danger:hover {
     background-color: rgb(185 28 28);
     border-color: rgb(185 28 28);
   }
   
   /* WordPress-style form elements */
-  .wp-input {
+  .o4o-input {
     @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded;
     @apply focus:outline-none focus:ring-2 focus:border-transparent;
     @apply transition-colors duration-200;
@@ -525,12 +525,12 @@
     box-sizing: border-box;
   }
   
-  .wp-input:focus {
+  .o4o-input:focus {
     --tw-ring-color: var(--wp-admin-blue);
   }
   
   /* 로그인 폼 전용 스타일 개선 */
-  .wp-input.h-12 {
+  .o4o-input.h-12 {
     height: 48px !important;
     padding-top: 0;
     padding-bottom: 0;
@@ -563,49 +563,49 @@
   /* WordPress-style tables */
   .wp-table {
     @apply w-full rounded-lg overflow-hidden;
-    border: 1px solid var(--wp-border-secondary);
+    border: 1px solid var(--o4o-border-secondary);
   }
   
   .wp-table th {
     @apply px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b;
-    background-color: var(--wp-bg-tertiary);
-    color: var(--wp-text-secondary);
-    border-color: var(--wp-border-secondary);
+    background-color: var(--o4o-bg-tertiary);
+    color: var(--o4o-text-secondary);
+    border-color: var(--o4o-border-secondary);
   }
   
   .wp-table td {
     @apply px-6 py-4 whitespace-nowrap text-sm border-b;
-    color: var(--wp-text-primary);
-    border-color: var(--wp-border-secondary);
+    color: var(--o4o-text-primary);
+    border-color: var(--o4o-border-secondary);
   }
   
   .wp-table tbody tr:hover {
-    background-color: var(--wp-bg-tertiary);
+    background-color: var(--o4o-bg-tertiary);
   }
   
   /* WordPress-style cards */
-  .wp-card {
+  .o4o-card {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
     @apply rounded-lg;
   }
   
-  .wp-card:hover {
+  .o4o-card:hover {
     box-shadow: var(--card-shadow-hover);
   }
   
-  .wp-card-header {
+  .o4o-card-header {
     @apply px-6 py-4;
     border-bottom: 1px solid var(--border-primary);
   }
   
-  .wp-card-title {
+  .o4o-card-title {
     @apply text-lg font-semibold;
     color: var(--text-primary);
   }
   
-  .wp-card-body {
+  .o4o-card-body {
     @apply p-6;
   }
   
@@ -755,38 +755,38 @@
   }
   
   /* WordPress Table Row Hover */
-  .wp-list-table tbody tr:hover td,
-  .wp-list-table tbody tr:hover th {
+  .o4o-list-table tbody tr:hover td,
+  .o4o-list-table tbody tr:hover th {
     background-color: rgba(0, 0, 0, 0.04);
   }
   
-  [data-theme="dark"] .wp-list-table tbody tr:hover td,
-  [data-theme="dark"] .wp-list-table tbody tr:hover th {
+  [data-theme="dark"] .o4o-list-table tbody tr:hover td,
+  [data-theme="dark"] .o4o-list-table tbody tr:hover th {
     background-color: rgba(255, 255, 255, 0.04);
   }
   
   /* WordPress List Table */
-  .wp-list-table {
+  .o4o-list-table {
     @apply w-full border-spacing-0;
     border: 1px solid #c3c4c7;
     box-shadow: 0 1px 1px rgba(0,0,0,0.04);
     background: #fff;
   }
   
-  .wp-list-table thead {
+  .o4o-list-table thead {
     background: #f0f0f1;
   }
   
-  .wp-list-table thead th,
-  .wp-list-table thead td {
+  .o4o-list-table thead th,
+  .o4o-list-table thead td {
     @apply text-left font-normal text-[11px] leading-[1.4] uppercase;
     padding: 8px 10px;
     color: #2c3338;
     border-bottom: 1px solid #c3c4c7;
   }
   
-  .wp-list-table tbody td,
-  .wp-list-table tbody th {
+  .o4o-list-table tbody td,
+  .o4o-list-table tbody th {
     @apply align-top;
     padding: 8px 10px;
     color: #2c3338;
@@ -794,72 +794,72 @@
     line-height: 1.5;
   }
   
-  .wp-list-table tbody tr {
+  .o4o-list-table tbody tr {
     background: #fff;
   }
   
-  .wp-list-table tbody tr:hover td,
-  .wp-list-table tbody tr:hover th {
+  .o4o-list-table tbody tr:hover td,
+  .o4o-list-table tbody tr:hover th {
     background: rgba(0,0,0,0.04);
   }
   
-  .wp-list-table tbody tr.alternate,
-  .wp-list-table.striped > tbody > tr:nth-child(odd) {
+  .o4o-list-table tbody tr.alternate,
+  .o4o-list-table.striped > tbody > tr:nth-child(odd) {
     background: #f6f7f7;
   }
   
-  .wp-list-table tbody tr.selected {
+  .o4o-list-table tbody tr.selected {
     background: #dcdcde;
   }
   
-  .wp-list-table .check-column {
+  .o4o-list-table .check-column {
     width: 2.2em;
     padding: 8px 0 8px 3px;
     vertical-align: top;
   }
   
-  .wp-list-table .column-primary {
+  .o4o-list-table .column-primary {
     @apply font-medium;
   }
   
   /* Posts table specific column widths */
-  .wp-list-table.posts .column-title {
+  .o4o-list-table.posts .column-title {
     width: 35%;
     min-width: 200px;
   }
   
-  .wp-list-table.posts .column-author {
+  .o4o-list-table.posts .column-author {
     width: 12%;
     min-width: 100px;
   }
   
-  .wp-list-table.posts .column-categories {
+  .o4o-list-table.posts .column-categories {
     width: 15%;
     min-width: 120px;
   }
   
-  .wp-list-table.posts .column-tags {
+  .o4o-list-table.posts .column-tags {
     width: 15%;
     min-width: 120px;
   }
   
-  .wp-list-table.posts .column-comments {
+  .o4o-list-table.posts .column-comments {
     width: 8%;
     min-width: 60px;
     text-align: center;
   }
   
-  .wp-list-table.posts .column-date {
+  .o4o-list-table.posts .column-date {
     width: 15%;
     min-width: 120px;
   }
   
   /* Fix alignment and spacing */
-  .wp-list-table tbody td {
+  .o4o-list-table tbody td {
     vertical-align: middle;
   }
   
-  .wp-list-table .column-comments .comment-count {
+  .o4o-list-table .column-comments .comment-count {
     display: inline-block;
     padding: 0 6px;
     background: #dcdcde;
@@ -903,52 +903,52 @@
   }
   
   /* Sorting */
-  .wp-list-table th.sortable,
-  .wp-list-table th.sorted {
+  .o4o-list-table th.sortable,
+  .o4o-list-table th.sorted {
     @apply cursor-pointer;
   }
   
   /* Row Actions styling */
-  .wp-list-table .row-actions {
+  .o4o-list-table .row-actions {
     @apply text-xs mt-1;
     color: #646970;
     visibility: hidden;
   }
   
-  .wp-list-table tbody tr:hover .row-actions {
+  .o4o-list-table tbody tr:hover .row-actions {
     visibility: visible;
   }
   
-  .wp-list-table .row-actions span {
+  .o4o-list-table .row-actions span {
     @apply inline-block;
     margin: 0;
   }
   
-  .wp-list-table .row-actions span:after {
+  .o4o-list-table .row-actions span:after {
     content: " | ";
     color: #c3c4c7;
   }
   
-  .wp-list-table .row-actions span:last-child:after {
+  .o4o-list-table .row-actions span:last-child:after {
     content: "";
   }
   
-  .wp-list-table .row-actions a {
+  .o4o-list-table .row-actions a {
     @apply text-xs;
     color: #2271b1;
     text-decoration: none;
   }
   
-  .wp-list-table .row-actions a:hover {
+  .o4o-list-table .row-actions a:hover {
     color: #135e96;
     text-decoration: underline;
   }
   
-  .wp-list-table .row-actions a.text-red-600 {
+  .o4o-list-table .row-actions a.text-red-600 {
     color: #d63638;
   }
   
-  .wp-list-table .row-actions a.text-red-600:hover {
+  .o4o-list-table .row-actions a.text-red-600:hover {
     color: #b32d2e;
   }
   
@@ -979,36 +979,36 @@
   }
   
   /* Dark mode adjustments */
-  [data-theme="dark"] .wp-list-table {
+  [data-theme="dark"] .o4o-list-table {
     background: var(--gray-900);
     border-color: var(--gray-700);
   }
   
-  [data-theme="dark"] .wp-list-table thead {
+  [data-theme="dark"] .o4o-list-table thead {
     background: var(--gray-800);
   }
   
-  [data-theme="dark"] .wp-list-table thead th,
-  [data-theme="dark"] .wp-list-table thead td {
+  [data-theme="dark"] .o4o-list-table thead th,
+  [data-theme="dark"] .o4o-list-table thead td {
     color: var(--gray-200);
     border-bottom-color: var(--gray-700);
   }
   
-  [data-theme="dark"] .wp-list-table tbody td,
-  [data-theme="dark"] .wp-list-table tbody th {
+  [data-theme="dark"] .o4o-list-table tbody td,
+  [data-theme="dark"] .o4o-list-table tbody th {
     color: var(--gray-200);
   }
   
-  [data-theme="dark"] .wp-list-table tbody tr {
+  [data-theme="dark"] .o4o-list-table tbody tr {
     background: var(--gray-900);
   }
   
-  [data-theme="dark"] .wp-list-table tbody tr.alternate,
-  [data-theme="dark"] .wp-list-table.striped > tbody > tr:nth-child(odd) {
+  [data-theme="dark"] .o4o-list-table tbody tr.alternate,
+  [data-theme="dark"] .o4o-list-table.striped > tbody > tr:nth-child(odd) {
     background: var(--gray-850);
   }
   
-  [data-theme="dark"] .wp-list-table tbody tr.selected {
+  [data-theme="dark"] .o4o-list-table tbody tr.selected {
     background: var(--gray-700);
   }
   
@@ -1032,7 +1032,7 @@
     @apply mx-0 my-2;
   }
   
-  .wp-heading-inline {
+  .o4o-heading-inline {
     @apply text-[23px] font-normal my-0 inline;
     font-weight: 400;
     padding: 9px 0 4px;

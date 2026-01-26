@@ -178,7 +178,7 @@ const CategoryList: FC = () => {
 
   return (
     <div className="wrap">
-      <h1 className="wp-heading-inline">Categories</h1>
+      <h1 className="o4o-heading-inline">Categories</h1>
       
       <Button 
         className="page-title-action ml-2"
@@ -187,7 +187,7 @@ const CategoryList: FC = () => {
         Add New
       </Button>
       
-      <hr className="wp-header-end" />
+      <hr className="o4o-header-end" />
 
       {/* Search and Filters */}
       <div className="tablenav top">
@@ -255,7 +255,7 @@ const CategoryList: FC = () => {
         }}
         loading={isLoading}
         emptyMessage="No categories found."
-        className="wp-list-table widefat fixed striped categories"
+        className="o4o-list-table widefat fixed striped categories"
       />
 
       {/* Bottom table nav */}

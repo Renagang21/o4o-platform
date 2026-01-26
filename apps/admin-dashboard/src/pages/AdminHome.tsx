@@ -108,14 +108,14 @@ const AdminHome: FC = () => {
       
       {/* WordPress 스타일 환영 메시지 */}
       <div>
-        <h1 className="text-2xl font-bold text-wp-text-primary">대시보드</h1>
-        <p className="text-sm text-wp-text-secondary mt-1">O4O Platform 관리자 홈 - v4.0 Updated</p>
+        <h1 className="text-2xl font-bold text-o4o-text-primary">대시보드</h1>
+        <p className="text-sm text-o4o-text-secondary mt-1">O4O Platform 관리자 홈 - v4.0 Updated</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 한눈에 보기 (At a Glance) - WordPress 스타일 */}
-        <div className="wp-card">
-          <h3 className="text-base font-semibold text-wp-text-primary mb-4">한눈에 보기</h3>
+        <div className="o4o-card">
+          <h3 className="text-base font-semibold text-o4o-text-primary mb-4">한눈에 보기</h3>
           <div className="space-y-2">
             {atAGlanceItems.map((item: any) => {
               const Icon = item.icon;
@@ -130,34 +130,34 @@ const AdminHome: FC = () => {
             })}
           </div>
           <div className="mt-4 pt-4 border-t border border-gray-200">
-            <p className="text-sm text-wp-text-secondary">
+            <p className="text-sm text-o4o-text-secondary">
               WordPress 5.8 테마 사용중
             </p>
           </div>
         </div>
 
         {/* 활동 (Activity) */}
-        <div className="wp-card">
-          <h3 className="text-base font-semibold text-wp-text-primary mb-4">활동</h3>
+        <div className="o4o-card">
+          <h3 className="text-base font-semibold text-o4o-text-primary mb-4">활동</h3>
           <div className="space-y-3">
             <div>
-              <h4 className="text-sm font-medium text-wp-text-primary mb-2">최근 게시됨</h4>
+              <h4 className="text-sm font-medium text-o4o-text-primary mb-2">최근 게시됨</h4>
               <div className="space-y-1">
                 <Link to="/content/posts/123" className="text-sm text-admin-blue hover:text-admin-blue-dark block">
                   신규 프로모션 안내
                 </Link>
-                <p className="text-xs text-wp-text-secondary">2시간 전</p>
+                <p className="text-xs text-o4o-text-secondary">2시간 전</p>
               </div>
             </div>
             <div className="pt-3 border-t border border-gray-200">
-              <h4 className="text-sm font-medium text-wp-text-primary mb-2">최근 댓글</h4>
+              <h4 className="text-sm font-medium text-o4o-text-primary mb-2">최근 댓글</h4>
               <div className="space-y-2">
                 <div className="text-sm">
-                  <span className="text-wp-text-secondary">김고객님이 </span>
+                  <span className="text-o4o-text-secondary">김고객님이 </span>
                   <Link to="/products/456" className="text-admin-blue hover:text-admin-blue-dark">
                     프리미엄 상품
                   </Link>
-                  <span className="text-wp-text-secondary">에 댓글</span>
+                  <span className="text-o4o-text-secondary">에 댓글</span>
                 </div>
               </div>
             </div>
@@ -165,8 +165,8 @@ const AdminHome: FC = () => {
         </div>
 
         {/* 빠른 작업 (Quick Draft) */}
-        <div className="wp-card">
-          <h3 className="text-base font-semibold text-wp-text-primary mb-4">빠른 작업</h3>
+        <div className="o4o-card">
+          <h3 className="text-base font-semibold text-o4o-text-primary mb-4">빠른 작업</h3>
           <div className="space-y-3">
             <Link to="/content/posts/new" className="flex items-center gap-2 text-sm text-admin-blue hover:text-admin-blue-dark">
               <Plus className="h-4 w-4" />
@@ -201,12 +201,12 @@ const AdminHome: FC = () => {
             <Link 
               key={stat.title} 
               to={stat.link}
-              className="wp-card hover:shadow-lg transition-shadow duration-200"
+              className="o4o-card hover:shadow-lg transition-shadow duration-200"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-wp-text-secondary">{stat.title}</p>
-                  <p className="text-2xl font-bold text-wp-text-primary mt-1">{stat.value}</p>
+                  <p className="text-sm text-o4o-text-secondary">{stat.title}</p>
+                  <p className="text-2xl font-bold text-o4o-text-primary mt-1">{stat.value}</p>
                   <p className="text-sm text-green-600 mt-1">{stat.change} 전일 대비</p>
                 </div>
                 <div className={`p-3 rounded-full ${stat.color} bg-opacity-10`}>
@@ -221,8 +221,8 @@ const AdminHome: FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 빠른 작업 */}
         <div className="lg:col-span-2">
-          <div className="wp-card">
-            <h2 className="text-lg font-semibold text-wp-text-primary mb-4">빠른 작업</h2>
+          <div className="o4o-card">
+            <h2 className="text-lg font-semibold text-o4o-text-primary mb-4">빠른 작업</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {quickActions.map((action: any) => {
                 const Icon = action.icon;
@@ -233,7 +233,7 @@ const AdminHome: FC = () => {
                     className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-admin-blue hover:bg-admin-blue hover:bg-opacity-5 transition-all duration-200"
                   >
                     <Icon className={`h-8 w-8 ${action.color} mb-2`} />
-                    <span className="text-sm text-center text-wp-text-primary">{action.title}</span>
+                    <span className="text-sm text-center text-o4o-text-primary">{action.title}</span>
                   </Link>
                 );
               })}
@@ -241,27 +241,27 @@ const AdminHome: FC = () => {
           </div>
 
           {/* 시스템 상태 */}
-          <div className="wp-card mt-6">
-            <h2 className="text-lg font-semibold text-wp-text-primary mb-4">시스템 상태</h2>
+          <div className="o4o-card mt-6">
+            <h2 className="text-lg font-semibold text-o4o-text-primary mb-4">시스템 상태</h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Activity className="h-5 w-5 text-green-500" />
-                  <span className="text-wp-text-primary">API 서버</span>
+                  <span className="text-o4o-text-primary">API 서버</span>
                 </div>
                 <span className="text-sm text-green-600 font-medium">정상 작동</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Activity className="h-5 w-5 text-green-500" />
-                  <span className="text-wp-text-primary">데이터베이스</span>
+                  <span className="text-o4o-text-primary">데이터베이스</span>
                 </div>
                 <span className="text-sm text-green-600 font-medium">정상 작동</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Activity className="h-5 w-5 text-yellow-500" />
-                  <span className="text-wp-text-primary">캐시 서버</span>
+                  <span className="text-o4o-text-primary">캐시 서버</span>
                 </div>
                 <span className="text-sm text-yellow-600 font-medium">사용률 85%</span>
               </div>
@@ -278,8 +278,8 @@ const AdminHome: FC = () => {
         </div>
 
         {/* 최근 활동 */}
-        <div className="wp-card">
-          <h2 className="text-lg font-semibold text-wp-text-primary mb-4">최근 활동</h2>
+        <div className="o4o-card">
+          <h2 className="text-lg font-semibold text-o4o-text-primary mb-4">최근 활동</h2>
           <div className="space-y-3">
             {recentActivity.map((activity: any) => (
               <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border border-gray-200 last:border-0 last:pb-0">
@@ -287,8 +287,8 @@ const AdminHome: FC = () => {
                   <div className="w-2 h-2 bg-admin-blue rounded-full"></div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-wp-text-primary">{activity.message}</p>
-                  <p className="text-xs text-wp-text-secondary mt-1">{activity.time}</p>
+                  <p className="text-sm text-o4o-text-primary">{activity.message}</p>
+                  <p className="text-xs text-o4o-text-secondary mt-1">{activity.time}</p>
                 </div>
               </div>
             ))}
@@ -306,38 +306,38 @@ const AdminHome: FC = () => {
 
       {/* 주요 기능 바로가기 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link to="/dashboard" className="wp-card hover:shadow-lg transition-shadow">
+        <Link to="/dashboard" className="o4o-card hover:shadow-lg transition-shadow">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-500 bg-opacity-10 rounded-lg">
               <LayoutDashboard className="h-6 w-6 text-blue-500" />
             </div>
             <div>
-              <h3 className="font-medium text-wp-text-primary">대시보드</h3>
-              <p className="text-sm text-wp-text-secondary">통계 및 분석 보기</p>
+              <h3 className="font-medium text-o4o-text-primary">대시보드</h3>
+              <p className="text-sm text-o4o-text-secondary">통계 및 분석 보기</p>
             </div>
           </div>
         </Link>
 
-        <Link to="/reports" className="wp-card hover:shadow-lg transition-shadow">
+        <Link to="/reports" className="o4o-card hover:shadow-lg transition-shadow">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-green-500 bg-opacity-10 rounded-lg">
               <TrendingUp className="h-6 w-6 text-green-500" />
             </div>
             <div>
-              <h3 className="font-medium text-wp-text-primary">리포트</h3>
-              <p className="text-sm text-wp-text-secondary">매출 및 성과 분석</p>
+              <h3 className="font-medium text-o4o-text-primary">리포트</h3>
+              <p className="text-sm text-o4o-text-secondary">매출 및 성과 분석</p>
             </div>
           </div>
         </Link>
 
-        <Link to="/settings" className="wp-card hover:shadow-lg transition-shadow">
+        <Link to="/settings" className="o4o-card hover:shadow-lg transition-shadow">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-gray-500 bg-opacity-10 rounded-lg">
               <Settings className="h-6 w-6 text-gray-500" />
             </div>
             <div>
-              <h3 className="font-medium text-wp-text-primary">설정</h3>
-              <p className="text-sm text-wp-text-secondary">시스템 환경 설정</p>
+              <h3 className="font-medium text-o4o-text-primary">설정</h3>
+              <p className="text-sm text-o4o-text-secondary">시스템 환경 설정</p>
             </div>
           </div>
         </Link>

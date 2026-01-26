@@ -118,14 +118,14 @@ const EmailSettings: FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="wp-card">
-        <div className="wp-card-body">
+      <div className="o4o-card">
+        <div className="o4o-card-body">
           <div className="flex items-center gap-3">
             <Mail className="w-8 h-8 text-blue-600" />
             <div>
-              <h2 className="text-xl font-semibold text-wp-text-primary">이메일 설정</h2>
-              <p className="text-sm text-wp-text-secondary mt-1">
-                WordPress에서 이메일을 발송하기 위한 SMTP 설정을 구성합니다.
+              <h2 className="text-xl font-semibold text-o4o-text-primary">이메일 설정</h2>
+              <p className="text-sm text-o4o-text-secondary mt-1">
+                O4O 플랫폼 전체에서 이메일을 발송하기 위한 SMTP 설정을 구성합니다.
               </p>
             </div>
           </div>
@@ -133,14 +133,14 @@ const EmailSettings: FC = () => {
       </div>
 
       {/* SMTP Settings Form */}
-      <form onSubmit={handleSubmit} className="wp-card">
-        <div className="wp-card-header">
-          <h3 className="wp-card-title">SMTP 서버 설정</h3>
+      <form onSubmit={handleSubmit} className="o4o-card">
+        <div className="o4o-card-header">
+          <h3 className="o4o-card-title">SMTP 서버 설정</h3>
         </div>
-        <div className="wp-card-body space-y-6">
+        <div className="o4o-card-body space-y-6">
           {/* SMTP Host */}
           <div>
-            <label className="wp-label">
+            <label className="o4o-label">
               SMTP 호스트 <span className="text-red-500">*</span>
             </label>
             <input
@@ -149,11 +149,11 @@ const EmailSettings: FC = () => {
               name="smtpHost"
               value={settings.smtpHost || ''}
               onChange={(e) => handleInputChange('smtpHost', e.target.value)}
-              className="wp-input"
+              className="o4o-input"
               placeholder="예: smtp.gmail.com"
               required
             />
-            <p className="mt-1 text-sm text-wp-text-secondary">
+            <p className="mt-1 text-sm text-o4o-text-secondary">
               이메일 서비스 제공자의 SMTP 서버 주소
             </p>
           </div>
@@ -161,7 +161,7 @@ const EmailSettings: FC = () => {
           {/* SMTP Port & Secure */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="wp-label">
+              <label className="o4o-label">
                 SMTP 포트 <span className="text-red-500">*</span>
               </label>
               <input
@@ -170,27 +170,27 @@ const EmailSettings: FC = () => {
                 name="smtpPort"
                 value={settings.smtpPort || 587}
                 onChange={(e) => handleInputChange('smtpPort', parseInt(e.target.value))}
-                className="wp-input"
+                className="o4o-input"
                 placeholder="587"
                 required
               />
-              <p className="mt-1 text-sm text-wp-text-secondary">
+              <p className="mt-1 text-sm text-o4o-text-secondary">
                 일반적으로 587 (TLS) 또는 465 (SSL)
               </p>
             </div>
             <div>
-              <label className="wp-label">암호화</label>
+              <label className="o4o-label">암호화</label>
               <select
                 id="smtpSecure"
                 name="smtpSecure"
                 value={settings.smtpSecure ? 'ssl' : 'tls'}
                 onChange={(e) => handleInputChange('smtpSecure', e.target.value === 'ssl')}
-                className="wp-input"
+                className="o4o-input"
               >
                 <option value="tls">TLS (권장)</option>
                 <option value="ssl">SSL</option>
               </select>
-              <p className="mt-1 text-sm text-wp-text-secondary">
+              <p className="mt-1 text-sm text-o4o-text-secondary">
                 포트 587은 TLS, 포트 465는 SSL 사용
               </p>
             </div>
@@ -198,7 +198,7 @@ const EmailSettings: FC = () => {
 
           {/* SMTP Authentication */}
           <div>
-            <label className="wp-label">
+            <label className="o4o-label">
               SMTP 사용자명 <span className="text-red-500">*</span>
             </label>
             <input
@@ -207,17 +207,17 @@ const EmailSettings: FC = () => {
               name="smtpUser"
               value={settings.smtpUser || ''}
               onChange={(e) => handleInputChange('smtpUser', e.target.value)}
-              className="wp-input"
+              className="o4o-input"
               placeholder="예: your-email@gmail.com"
               required
             />
-            <p className="mt-1 text-sm text-wp-text-secondary">
+            <p className="mt-1 text-sm text-o4o-text-secondary">
               일반적으로 이메일 주소와 동일
             </p>
           </div>
 
           <div>
-            <label className="wp-label">
+            <label className="o4o-label">
               SMTP 비밀번호 <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -227,30 +227,30 @@ const EmailSettings: FC = () => {
                 name="smtpPass"
                 value={settings.smtpPass || ''}
                 onChange={(e) => handleInputChange('smtpPass', e.target.value)}
-                className="wp-input pr-10"
+                className="o4o-input pr-10"
                 placeholder="••••••••"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-wp-text-secondary hover:text-wp-text-primary"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-o4o-text-secondary hover:text-o4o-text-primary"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            <p className="mt-1 text-sm text-wp-text-secondary">
+            <p className="mt-1 text-sm text-o4o-text-secondary">
               Gmail의 경우 앱 비밀번호를 사용하세요
             </p>
           </div>
 
           {/* From Email Settings */}
           <div className="border-t pt-6">
-            <h4 className="font-medium text-wp-text-primary mb-4">발신자 정보</h4>
+            <h4 className="font-medium text-o4o-text-primary mb-4">발신자 정보</h4>
             
             <div className="space-y-4">
               <div>
-                <label className="wp-label">
+                <label className="o4o-label">
                   발신자 이메일 <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -259,27 +259,27 @@ const EmailSettings: FC = () => {
                   name="fromEmail"
                   value={settings.fromEmail || ''}
                   onChange={(e) => handleInputChange('fromEmail', e.target.value)}
-                  className="wp-input"
+                  className="o4o-input"
                   placeholder="예: noreply@yourdomain.com"
                   required
                 />
-                <p className="mt-1 text-sm text-wp-text-secondary">
+                <p className="mt-1 text-sm text-o4o-text-secondary">
                   받는 사람에게 표시될 발신자 이메일 주소
                 </p>
               </div>
 
               <div>
-                <label className="wp-label">발신자 이름</label>
+                <label className="o4o-label">발신자 이름</label>
                 <input
                   type="text"
                   id="fromName"
                   name="fromName"
                   value={settings.fromName || ''}
                   onChange={(e) => handleInputChange('fromName', e.target.value)}
-                  className="wp-input"
+                  className="o4o-input"
                   placeholder="예: WordPress Site"
                 />
-                <p className="mt-1 text-sm text-wp-text-secondary">
+                <p className="mt-1 text-sm text-o4o-text-secondary">
                   받는 사람에게 표시될 발신자 이름 (선택사항)
                 </p>
               </div>
@@ -291,7 +291,7 @@ const EmailSettings: FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="wp-button-primary"
+              className="o4o-button-primary"
             >
               {loading ? '저장 중...' : '설정 저장'}
             </button>
@@ -300,11 +300,11 @@ const EmailSettings: FC = () => {
       </form>
 
       {/* Test Email Section */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <h3 className="wp-card-title">테스트 이메일 발송</h3>
+      <div className="o4o-card">
+        <div className="o4o-card-header">
+          <h3 className="o4o-card-title">테스트 이메일 발송</h3>
         </div>
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
             <div className="flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
@@ -326,7 +326,7 @@ const EmailSettings: FC = () => {
               name="testEmail"
               value={testEmail}
               onChange={(e) => setTestEmail(e.target.value)}
-              className="wp-input flex-1"
+              className="o4o-input flex-1"
               placeholder="테스트 이메일을 받을 주소 입력"
               disabled={testing}
             />
@@ -334,7 +334,7 @@ const EmailSettings: FC = () => {
               type="button"
               onClick={handleTestEmail}
               disabled={testing || !testEmail}
-              className="wp-button-primary flex items-center gap-2"
+              className="o4o-button-primary flex items-center gap-2"
             >
               {testing ? (
                 <>
@@ -350,33 +350,33 @@ const EmailSettings: FC = () => {
             </button>
           </div>
 
-          <p className="mt-2 text-sm text-wp-text-secondary">
+          <p className="mt-2 text-sm text-o4o-text-secondary">
             설정이 올바른지 확인하기 위해 테스트 이메일을 발송합니다.
           </p>
         </div>
       </div>
 
       {/* Common SMTP Settings Help */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <h3 className="wp-card-title">주요 이메일 서비스 SMTP 설정</h3>
+      <div className="o4o-card">
+        <div className="o4o-card-header">
+          <h3 className="o4o-card-title">주요 이메일 서비스 SMTP 설정</h3>
         </div>
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Gmail</h4>
                 <dl className="text-sm space-y-1">
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">호스트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">호스트:</dt>
                     <dd>smtp.gmail.com</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">포트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">포트:</dt>
                     <dd>587 (TLS) / 465 (SSL)</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">비밀번호:</dt>
+                    <dt className="text-o4o-text-secondary w-20">비밀번호:</dt>
                     <dd>앱 비밀번호 사용 필요</dd>
                   </div>
                 </dl>
@@ -386,15 +386,15 @@ const EmailSettings: FC = () => {
                 <h4 className="font-medium mb-2">Naver</h4>
                 <dl className="text-sm space-y-1">
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">호스트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">호스트:</dt>
                     <dd>smtp.naver.com</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">포트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">포트:</dt>
                     <dd>587 (TLS)</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">사용자명:</dt>
+                    <dt className="text-o4o-text-secondary w-20">사용자명:</dt>
                     <dd>네이버 아이디</dd>
                   </div>
                 </dl>
@@ -404,15 +404,15 @@ const EmailSettings: FC = () => {
                 <h4 className="font-medium mb-2">Outlook/Office 365</h4>
                 <dl className="text-sm space-y-1">
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">호스트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">호스트:</dt>
                     <dd>smtp.office365.com</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">포트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">포트:</dt>
                     <dd>587 (TLS)</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">사용자명:</dt>
+                    <dt className="text-o4o-text-secondary w-20">사용자명:</dt>
                     <dd>전체 이메일 주소</dd>
                   </div>
                 </dl>
@@ -422,15 +422,15 @@ const EmailSettings: FC = () => {
                 <h4 className="font-medium mb-2">SendGrid</h4>
                 <dl className="text-sm space-y-1">
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">호스트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">호스트:</dt>
                     <dd>smtp.sendgrid.net</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">포트:</dt>
+                    <dt className="text-o4o-text-secondary w-20">포트:</dt>
                     <dd>587 (TLS) / 465 (SSL)</dd>
                   </div>
                   <div className="flex">
-                    <dt className="text-wp-text-secondary w-20">사용자명:</dt>
+                    <dt className="text-o4o-text-secondary w-20">사용자명:</dt>
                     <dd>apikey</dd>
                   </div>
                 </dl>

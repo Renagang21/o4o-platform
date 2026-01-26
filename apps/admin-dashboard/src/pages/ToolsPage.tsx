@@ -22,14 +22,14 @@ const ToolsPage = () => {
       {/* Tool Categories */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Database Tools */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Database className="w-5 h-5 text-modern-primary" />
               데이터베이스 도구
             </h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <h3 className="font-medium text-modern-text-primary mb-1">데이터베이스 백업</h3>
@@ -52,14 +52,14 @@ const ToolsPage = () => {
         </div>
 
         {/* Import/Export Tools */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Upload className="w-5 h-5 text-modern-success" />
               가져오기/내보내기
             </h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <h3 className="font-medium text-modern-text-primary mb-1">사용자 데이터 내보내기</h3>
@@ -85,14 +85,14 @@ const ToolsPage = () => {
         </div>
 
         {/* Security Tools */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Shield className="w-5 h-5 text-modern-danger" />
               보안 도구
             </h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <h3 className="font-medium text-modern-text-primary mb-1">보안 스캔</h3>
@@ -118,14 +118,14 @@ const ToolsPage = () => {
       {/* Additional Tools */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Development Tools */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Code className="w-5 h-5 text-modern-warning" />
               개발자 도구
             </h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <div className="flex items-center gap-3">
@@ -159,14 +159,14 @@ const ToolsPage = () => {
         </div>
 
         {/* System Maintenance */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Settings className="w-5 h-5 text-modern-accent" />
               시스템 유지보수
             </h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <div className="flex items-center gap-3">
@@ -201,11 +201,11 @@ const ToolsPage = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="wp-card">
-        <div className="wp-card-header">
+      <div className="o4o-card">
+        <div className="o4o-card-header">
           <h2 className="text-lg font-semibold">시스템 상태</h2>
         </div>
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
               <p className="text-2xl font-bold text-modern-text-primary">98.2%</p>

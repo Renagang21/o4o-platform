@@ -365,7 +365,7 @@ const VendorsCommissionWordPress = () => {
       />
       
       <div className="wordpress-page-header">
-        <h1 className="wp-heading-inline">수수료 관리</h1>
+        <h1 className="o4o-heading-inline">수수료 관리</h1>
         <a href="#" className="page-title-action" onClick={(e) => {
           e.preventDefault();
           toast.success('수수료 내역을 다운로드하고 있습니다.');

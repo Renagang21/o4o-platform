@@ -46,12 +46,12 @@ const DraggableWidget: FC<DraggableDashboardWidgetProps> = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       className={cn(
-        "wp-card transition-all duration-200",
+        "o4o-card transition-all duration-200",
         isDragging && "opacity-50 scale-[0.98]",
         "hover:shadow-lg"
       )}
     >
-      <div className="wp-card-header flex items-center justify-between cursor-move select-none">
+      <div className="o4o-card-header flex items-center justify-between cursor-move select-none">
         <div className="flex items-center gap-2">
           <GripVertical className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           <h3 className="text-base font-semibold">{title}</h3>
@@ -98,7 +98,7 @@ const DraggableWidget: FC<DraggableDashboardWidgetProps> = ({
         </div>
       </div>
       {!isCollapsed && (
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           {children}
         </div>
       )}

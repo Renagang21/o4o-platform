@@ -31,16 +31,16 @@ const Login: FC = () => {
     } else {
       // 일반 사용자가 관리자 페이지에 접근하려는 경우
       return (
-        <div className="min-h-screen bg-wp-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-o4o-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
             <div className="text-center">
               <div className="mx-auto h-16 w-16 bg-red-500 rounded-full flex items-center justify-center">
                 <AlertTriangle className="h-8 w-8 text-white" />
               </div>
-              <h2 className="mt-6 text-center text-3xl font-bold text-wp-text-primary">
+              <h2 className="mt-6 text-center text-3xl font-bold text-o4o-text-primary">
                 접근 권한 없음
               </h2>
-              <p className="mt-2 text-center text-sm text-wp-text-secondary">
+              <p className="mt-2 text-center text-sm text-o4o-text-secondary">
                 관리자 권한이 필요합니다
               </p>
               <div className="mt-4">

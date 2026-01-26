@@ -98,7 +98,7 @@ const QuickDraftWidget: FC = () => {
             autoComplete="off"
             value={title}
             onChange={(e: any) => setTitle(e.target.value)}
-            className="wp-input"
+            className="o4o-input"
           />
         </div>
 

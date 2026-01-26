@@ -105,8 +105,8 @@ export const WordPressTable: FC<WordPressTableProps> = ({
   const someSelected = selectedIds.length > 0 && selectedIds.length < normalizedRows.length;
 
   return (
-    <div className={clsx('wp-list-table-wrapper overflow-x-auto', className)}>
-      <table className="wp-list-table widefat fixed striped table-view-list" style={{
+    <div className={clsx('o4o-list-table-wrapper overflow-x-auto', className)}>
+      <table className="o4o-list-table widefat fixed striped table-view-list" style={{
         border: '1px solid #c3c4c7',
         borderSpacing: 0,
         width: '100%',

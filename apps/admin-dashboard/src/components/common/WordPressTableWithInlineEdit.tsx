@@ -73,8 +73,8 @@ export const WordPressTableWithInlineEdit: FC<WordPressTableWithInlineEditProps>
   };
 
   return (
-    <div className={clsx('wp-list-table-wrapper overflow-x-auto', className)}>
-      <table className="wp-list-table widefat fixed striped table-view-list">
+    <div className={clsx('o4o-list-table-wrapper overflow-x-auto', className)}>
+      <table className="o4o-list-table widefat fixed striped table-view-list">
         <thead>
           <tr>
             {selectable && (

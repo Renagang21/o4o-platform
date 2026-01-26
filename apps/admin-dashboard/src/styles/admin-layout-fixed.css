@@ -87,7 +87,7 @@
 }
 
 /* Fix table overflow issues */
-.wp-list-table {
+.o4o-list-table {
   overflow-x: auto;
   width: 100%;
 }
@@ -160,7 +160,7 @@
 }
 
 /* Content Cards */
-.wp-card {
+.o4o-card {
   background: #fff;
   border: 1px solid #ccd0d4;
   box-shadow: 0 1px 1px rgba(0,0,0,0.04);
@@ -191,7 +191,7 @@
 
 /* Responsive tables */
 @media (max-width: 782px) {
-  .wp-list-table {
+  .o4o-list-table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

@@ -40,7 +40,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
   };
 
   const getSessionStatusColor = () => {
-    if (!sessionStatus) return 'text-wp-text-secondary';
+    if (!sessionStatus) return 'text-o4o-text-secondary';
     
     const remainingMinutes = Math.floor(sessionStatus.remainingTime / 60000);
     if (remainingMinutes > 10) {
@@ -83,10 +83,10 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             )}
             
             <div>
-              <h1 className="text-xl font-semibold text-wp-text-primary">
+              <h1 className="text-xl font-semibold text-o4o-text-primary">
                 관리자 대시보드
               </h1>
-              <p className="text-sm text-wp-text-secondary">
+              <p className="text-sm text-o4o-text-secondary">
                 O4O 플랫폼 통합 관리 시스템
               </p>
             </div>
@@ -101,7 +101,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
           </div>
 
           {/* Notifications */}
-          <button className="p-2 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary relative">
+          <button className="p-2 rounded-md text-o4o-text-secondary hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary relative">
             <Bell className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               3
@@ -111,7 +111,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <button className="flex items-center gap-3 p-2 rounded-md text-wp-text-primary hover:bg-wp-bg-tertiary">
+              <button className="flex items-center gap-3 p-2 rounded-md text-o4o-text-primary hover:bg-o4o-bg-tertiary">
                 <div className="w-8 h-8 bg-admin-blue text-white rounded-full flex items-center justify-center">
                   <User className="w-4 h-4" />
                 </div>
@@ -120,7 +120,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                     {user?.name || 'Admin'}
                     <Shield className="w-3 h-3 text-blue-600" />
                   </div>
-                  <div className="text-xs text-wp-text-secondary">{user?.email}</div>
+                  <div className="text-xs text-o4o-text-secondary">{user?.email}</div>
                 </div>
               </button>
             </DropdownMenuTrigger>
@@ -129,12 +129,12 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               {/* User Info Header */}
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <div className="font-medium text-wp-text-primary flex items-center gap-2">
+                  <div className="font-medium text-o4o-text-primary flex items-center gap-2">
                     <Shield className="w-4 h-4 text-blue-600" />
                     {user?.name || 'Admin'}
                   </div>
-                  <div className="text-sm text-wp-text-secondary">{user?.email}</div>
-                  <div className="text-xs text-wp-text-tertiary">
+                  <div className="text-sm text-o4o-text-secondary">{user?.email}</div>
+                  <div className="text-xs text-o4o-text-tertiary">
                     역할: {user?.role} | SSO 인증
                   </div>
                 </div>
@@ -144,7 +144,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
               {/* Security Status */}
               <div className="px-2 py-2">
-                <div className="text-xs text-wp-text-secondary space-y-1">
+                <div className="text-xs text-o4o-text-secondary space-y-1">
                   <div className="flex justify-between">
                     <span>세션 상태:</span>
                     <span className={getSessionStatusColor()}>
@@ -185,7 +185,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               
               {/* Security Section */}
               <DropdownMenuLabel className="font-normal">
-                <div className="text-xs text-wp-text-secondary">보안</div>
+                <div className="text-xs text-o4o-text-secondary">보안</div>
               </DropdownMenuLabel>
               
               <DropdownMenuItem 
@@ -212,7 +212,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               {/* Footer */}
               <DropdownMenuSeparator />
               <div className="px-2 py-2">
-                <div className="text-xs text-wp-text-tertiary text-center">
+                <div className="text-xs text-o4o-text-tertiary text-center">
                   🔒 보안 세션 | 8시간 후 자동 만료
                 </div>
               </div>

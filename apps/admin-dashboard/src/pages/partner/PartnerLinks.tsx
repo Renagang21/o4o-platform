@@ -98,8 +98,8 @@ const PartnerLinks = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">활성 링크</p>
@@ -111,8 +111,8 @@ const PartnerLinks = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 클릭수</p>
@@ -124,8 +124,8 @@ const PartnerLinks = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">전환수</p>
@@ -137,8 +137,8 @@ const PartnerLinks = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">평균 전환율</p>
@@ -179,8 +179,8 @@ const PartnerLinks = () => {
       {/* Links Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredLinks.map((link: any) => (
-          <div key={link.id} className="wp-card">
-            <div className="wp-card-body">
+          <div key={link.id} className="o4o-card">
+            <div className="o4o-card-body">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
@@ -277,8 +277,8 @@ const PartnerLinks = () => {
 
       {/* Empty State */}
       {filteredLinks.length === 0 && (
-        <div className="wp-card">
-          <div className="wp-card-body text-center py-12">
+        <div className="o4o-card">
+          <div className="o4o-card-body text-center py-12">
             <Link className="w-12 h-12 text-modern-text-tertiary mx-auto mb-4" />
             <p className="text-modern-text-secondary">추천 링크가 없습니다.</p>
             <button

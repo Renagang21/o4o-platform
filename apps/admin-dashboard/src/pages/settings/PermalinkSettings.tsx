@@ -197,8 +197,8 @@ const PermalinkSettings: FC = () => {
 
   if (isLoading) {
     return (
-      <div className="wp-card">
-        <div className="wp-card-body">
+      <div className="o4o-card">
+        <div className="o4o-card-body">
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <span className="ml-3 text-gray-600">설정을 불러오는 중...</span>
@@ -210,18 +210,18 @@ const PermalinkSettings: FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="wp-card">
-        <div className="wp-card-header">
+      <div className="o4o-card">
+        <div className="o4o-card-header">
           <div className="flex items-center space-x-2">
             <Link className="w-5 h-5 text-blue-600" />
             <h2>고유주소 설정</h2>
           </div>
-          <p className="text-wp-text-secondary mt-1">
+          <p className="text-o4o-text-secondary mt-1">
             게시글과 페이지의 URL 구조를 설정합니다. SEO와 사용자 경험에 중요한 영향을 줍니다.
           </p>
         </div>
         
-        <div className="wp-card-body space-y-6">
+        <div className="o4o-card-body space-y-6">
           {/* 공통 구조 선택 */}
           <div>
             <h3 className="font-medium mb-4 flex items-center space-x-2">

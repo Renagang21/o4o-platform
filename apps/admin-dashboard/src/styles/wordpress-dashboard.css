@@ -81,19 +81,19 @@
 }
 
 /* WordPress tables */
-.wp-list-table {
+.o4o-list-table {
   background: #fff;
   border: 1px solid #c3c4c7;
   box-shadow: 0 1px 1px rgba(0,0,0,.04);
 }
 
-.wp-list-table thead th,
-.wp-list-table tfoot th {
+.o4o-list-table thead th,
+.o4o-list-table tfoot th {
   background: #f6f7f7;
   border-bottom: 1px solid #c3c4c7;
 }
 
-.wp-list-table tbody tr:hover {
+.o4o-list-table tbody tr:hover {
   background: #f6f7f7;
 }
 

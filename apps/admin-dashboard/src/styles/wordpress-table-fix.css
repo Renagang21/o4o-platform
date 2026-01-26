@@ -2,40 +2,40 @@
 /* 전체 20개 리스트 컴포넌트에 적용되는 표준화된 스타일 */
 
 /* 1. 필터 레이아웃 수정 및 가시성 개선 */
-.wp-filter {
+.o4o-filter {
   @apply mb-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg;
   /* 명확한 구분을 위한 그림자 추가 */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* 다크 모드에서 필터 가시성 개선 */
-.dark .wp-filter,
-[data-theme="dark"] .wp-filter {
+.dark .o4o-filter,
+[data-theme="dark"] .o4o-filter {
   @apply bg-gray-800 border-gray-600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.wp-filter .filter-items {
+.o4o-filter .filter-items {
   @apply flex flex-wrap gap-3 items-center;
 }
 
-.wp-filter .search-box {
+.o4o-filter .search-box {
   @apply flex gap-2 ml-auto;
 }
 
 /* 필터 내부 요소 가시성 개선 */
-.wp-filter input[type="search"],
-.wp-filter input[type="text"] {
+.o4o-filter input[type="search"],
+.o4o-filter input[type="text"] {
   @apply bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100;
   @apply border-gray-300 dark:border-gray-600;
 }
 
-.wp-filter button {
+.o4o-filter button {
   @apply font-medium;
 }
 
 /* 2. 색상 대비 개선 - 라이트 모드 */
-.wp-list-table {
+.o4o-list-table {
   @apply bg-white border-gray-200;
   /* 테이블 전체 가시성 개선 */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -43,12 +43,12 @@
   overflow: hidden;
 }
 
-.wp-list-table thead {
+.o4o-list-table thead {
   @apply bg-gray-50 border-b border-gray-200;
 }
 
-.wp-list-table thead th,
-.wp-list-table thead td {
+.o4o-list-table thead th,
+.o4o-list-table thead td {
   @apply text-gray-700 dark:text-gray-200 font-semibold py-3 px-4;
   font-size: 13px !important;
   text-transform: none !important;
@@ -59,77 +59,77 @@
 }
 
 /* 다크 모드 헤더 개선 */
-.dark .wp-list-table thead th,
-.dark .wp-list-table thead td {
+.dark .o4o-list-table thead th,
+.dark .o4o-list-table thead td {
   background: linear-gradient(to bottom, #374151, #1f2937);
   border-bottom-color: #4b5563 !important;
 }
 
-.wp-list-table tbody tr {
+.o4o-list-table tbody tr {
   @apply border-b border-gray-100;
 }
 
-.wp-list-table tbody td {
+.o4o-list-table tbody td {
   @apply text-gray-900 dark:text-gray-100 py-3 px-4;
   font-size: 14px !important;
   line-height: 1.5;
 }
 
 /* 첫 번째 컬럼 강조 */
-.wp-list-table tbody td.column-primary {
+.o4o-list-table tbody td.column-primary {
   @apply font-medium;
 }
 
-.wp-list-table tbody tr:hover {
+.o4o-list-table tbody tr:hover {
   @apply bg-blue-50 dark:bg-blue-900/20;
   transition: background-color 0.15s ease;
 }
 
 /* 선택된 행 스타일 */
-.wp-list-table tbody tr.selected {
+.o4o-list-table tbody tr.selected {
   @apply bg-blue-100 dark:bg-blue-900/30;
 }
 
 /* 짝수 행 배경 (얼룩말 패턴) */
-.wp-list-table.striped tbody tr:nth-child(even) {
+.o4o-list-table.striped tbody tr:nth-child(even) {
   @apply bg-gray-50/50 dark:bg-gray-800/50;
 }
 
 /* 3. 색상 대비 개선 - 다크 모드 */
-[data-theme="dark"] .wp-list-table,
-.dark .wp-list-table {
+[data-theme="dark"] .o4o-list-table,
+.dark .o4o-list-table {
   @apply bg-gray-900 border-gray-700;
 }
 
-[data-theme="dark"] .wp-list-table thead,
-.dark .wp-list-table thead {
+[data-theme="dark"] .o4o-list-table thead,
+.dark .o4o-list-table thead {
   @apply bg-gray-800 border-b border-gray-700;
 }
 
-[data-theme="dark"] .wp-list-table thead th,
-[data-theme="dark"] .wp-list-table thead td,
-.dark .wp-list-table thead th,
-.dark .wp-list-table thead td {
+[data-theme="dark"] .o4o-list-table thead th,
+[data-theme="dark"] .o4o-list-table thead td,
+.dark .o4o-list-table thead th,
+.dark .o4o-list-table thead td {
   @apply text-gray-200;
 }
 
-[data-theme="dark"] .wp-list-table tbody tr,
-.dark .wp-list-table tbody tr {
+[data-theme="dark"] .o4o-list-table tbody tr,
+.dark .o4o-list-table tbody tr {
   @apply border-b border-gray-800;
 }
 
-[data-theme="dark"] .wp-list-table tbody td,
-.dark .wp-list-table tbody td {
+[data-theme="dark"] .o4o-list-table tbody td,
+.dark .o4o-list-table tbody td {
   @apply text-gray-100;
 }
 
-[data-theme="dark"] .wp-list-table tbody tr:hover,
-.dark .wp-list-table tbody tr:hover {
+[data-theme="dark"] .o4o-list-table tbody tr:hover,
+.dark .o4o-list-table tbody tr:hover {
   @apply bg-gray-800;
 }
 
 /* 4. 링크 색상 및 가독성 개선 */
-.wp-list-table a {
+.o4o-list-table a {
   @apply text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300;
   text-decoration: none !important;
   font-weight: 500;
@@ -137,16 +137,16 @@
 }
 
 /* 링크에 밑줄 호버 효과 */
-.wp-list-table a:hover {
+.o4o-list-table a:hover {
   text-decoration: underline !important;
 }
 
 /* 5. 체크박스 가시성 개선 */
-.wp-list-table .check-column {
+.o4o-list-table .check-column {
   @apply w-12 text-center;
 }
 
-.wp-list-table input[type="checkbox"] {
+.o4o-list-table input[type="checkbox"] {
   @apply w-4 h-4 cursor-pointer;
   @apply text-blue-600 dark:text-blue-400;
   @apply border-gray-300 dark:border-gray-600;
@@ -154,26 +154,26 @@
 }
 
 /* 체크박스 호버 효과 */
-.wp-list-table input[type="checkbox"]:hover {
+.o4o-list-table input[type="checkbox"]:hover {
   @apply border-blue-400 dark:border-blue-500;
 }
 
 /* 6. 정렬 인디케이터 가시성 개선 */
-.wp-list-table .sortable {
+.o4o-list-table .sortable {
   @apply cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700;
 }
 
-.wp-list-table .sorting-indicator {
+.o4o-list-table .sorting-indicator {
   @apply ml-1 inline-block w-0 h-0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
 }
 
-.wp-list-table .sorted.asc .sorting-indicator {
+.o4o-list-table .sorted.asc .sorting-indicator {
   border-bottom: 6px solid #2563eb;
 }
 
-.wp-list-table .sorted.desc .sorting-indicator {
+.o4o-list-table .sorted.desc .sorting-indicator {
   border-top: 6px solid #2563eb;
 }
 
@@ -186,7 +186,7 @@
 }
 
 /* 행 호버 시 Row Actions 표시 */
-.wp-list-table tbody tr:hover .row-actions {
+.o4o-list-table tbody tr:hover .row-actions {
   visibility: visible;
   opacity: 1;
 }
@@ -216,39 +216,39 @@
 }
 
 /* 8. 뱃지 가시성 및 스타일 개선 */
-.wp-list-table .badge,
-.wp-list-table [class*="badge"] {
+.o4o-list-table .badge,
+.o4o-list-table [class*="badge"] {
   @apply font-medium px-2 py-1 rounded text-xs;
   display: inline-block;
 }
 
 /* Badge 색상 테마 */
-.wp-list-table .badge-default {
+.o4o-list-table .badge-default {
   @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200;
 }
 
-.wp-list-table .badge-primary {
+.o4o-list-table .badge-primary {
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300;
 }
 
-.wp-list-table .badge-secondary {
+.o4o-list-table .badge-secondary {
   @apply bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300;
 }
 
-.wp-list-table .badge-success {
+.o4o-list-table .badge-success {
   @apply bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300;
 }
 
-.wp-list-table .badge-warning {
+.o4o-list-table .badge-warning {
   @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300;
 }
 
-.wp-list-table .badge-danger,
-.wp-list-table .badge-destructive {
+.o4o-list-table .badge-danger,
+.o4o-list-table .badge-destructive {
   @apply bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300;
 }
 
-.wp-list-table .badge-outline {
+.o4o-list-table .badge-outline {
   @apply bg-transparent border border-gray-300 text-gray-700;
   @apply dark:border-gray-600 dark:text-gray-300;
 }
@@ -285,7 +285,7 @@
 }
 
 /* 11. 헤더 스타일 개선 */
-.wrap h1.wp-heading-inline {
+.wrap h1.o4o-heading-inline {
   @apply text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4;
   display: inline-block;
 }
@@ -301,7 +301,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-hr.wp-header-end {
+hr.o4o-header-end {
   @apply my-4 border-gray-200 dark:border-gray-700;
   clear: both;
 }
@@ -313,64 +313,64 @@ hr.wp-header-end {
 
 /* 12. 반응형 개선 */
 @media (max-width: 768px) {
-  .wp-filter .filter-items {
+  .o4o-filter .filter-items {
     @apply flex-col items-stretch;
   }
   
-  .wp-filter .search-box {
+  .o4o-filter .search-box {
     @apply w-full ml-0 mt-2;
   }
   
-  .wp-list-table-wrapper {
+  .o4o-list-table-wrapper {
     @apply overflow-x-auto;
   }
   
-  .wp-list-table {
+  .o4o-list-table {
     @apply min-w-[600px];
   }
 }
 
 /* 13. 로딩 상태 개선 */
-.wp-list-table.loading {
+.o4o-list-table.loading {
   @apply opacity-50 pointer-events-none;
 }
 
-.wp-list-table-loading-overlay {
+.o4o-list-table-loading-overlay {
   @apply absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center;
 }
 
 /* 14. 빈 상태 개선 */
-.wp-list-table-empty {
+.o4o-list-table-empty {
   @apply text-center py-12 text-gray-500 dark:text-gray-400;
 }
 
 /* 15. 테이블 컨테이너 스타일 */
-.wp-list-table-container {
+.o4o-list-table-container {
   @apply bg-white dark:bg-gray-900 rounded-lg shadow-sm;
   @apply border border-gray-200 dark:border-gray-700;
   overflow: hidden;
 }
 
 /* 16. 스크롤바 스타일 개선 */
-.wp-list-table-wrapper::-webkit-scrollbar {
+.o4o-list-table-wrapper::-webkit-scrollbar {
   @apply h-2;
 }
 
-.wp-list-table-wrapper::-webkit-scrollbar-track {
+.o4o-list-table-wrapper::-webkit-scrollbar-track {
   @apply bg-gray-100 dark:bg-gray-800;
 }
 
-.wp-list-table-wrapper::-webkit-scrollbar-thumb {
+.o4o-list-table-wrapper::-webkit-scrollbar-thumb {
   @apply bg-gray-400 dark:bg-gray-600 rounded;
 }
 
-.wp-list-table-wrapper::-webkit-scrollbar-thumb:hover {
+.o4o-list-table-wrapper::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-500 dark:bg-gray-500;
 }
 
 /* 17. 버튼 공통 스타일 */
-.wp-list-table button,
-.wp-filter button,
+.o4o-list-table button,
+.o4o-filter button,
 .tablenav button {
   @apply font-medium transition-all duration-150;
   @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
@@ -407,11 +407,11 @@ hr.wp-header-end {
 }
 
 /* 20. 접근성 및 포커스 스타일 */
-.wp-list-table *:focus-visible {
+.o4o-list-table *:focus-visible {
   @apply outline-2 outline-offset-2 outline-blue-500;
 }
 
 /* 키보드 네비게이션 지원 */
-.wp-list-table tbody tr:focus-within {
+.o4o-list-table tbody tr:focus-within {
   @apply ring-2 ring-blue-500 ring-inset;
 }

@@ -260,7 +260,7 @@ export default function CommentsListEnhanced() {
         />
       </div>
       
-      <h1 className="wp-heading-inline">Comments</h1>
+      <h1 className="o4o-heading-inline">Comments</h1>
       
       {/* Views */}
       <ul className="subsubsub">

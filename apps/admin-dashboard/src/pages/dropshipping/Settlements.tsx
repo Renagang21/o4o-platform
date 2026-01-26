@@ -385,7 +385,7 @@ const Settlements: React.FC = () => {
 
       {/* Settlements Table */}
       <div className="bg-white border-x border-b border-gray-300 rounded-b-lg">
-        <table className="w-full wp-list-table widefat fixed striped">
+        <table className="w-full o4o-list-table widefat fixed striped">
           <thead>
             <tr>
               <th className="manage-column column-title column-primary">정산번호</th>

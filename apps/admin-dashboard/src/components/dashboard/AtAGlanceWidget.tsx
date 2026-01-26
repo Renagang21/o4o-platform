@@ -24,11 +24,11 @@ const AtAGlanceWidget: FC<AtAGlanceProps> = ({
   version = 'WordPress 6.4.2'
 }) => {
   return (
-    <div className="wp-card">
-      <div className="wp-card-header border-b border-modern-border-primary">
+    <div className="o4o-card">
+      <div className="o4o-card-header border-b border-modern-border-primary">
         <h2 className="text-lg font-semibold text-modern-text-primary">At a Glance</h2>
       </div>
-      <div className="wp-card-body">
+      <div className="o4o-card-body">
         {/* Content Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">

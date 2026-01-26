@@ -104,8 +104,8 @@ const VendorsReports = () => {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 매출액</p>
@@ -118,8 +118,8 @@ const VendorsReports = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">주문 수</p>
@@ -132,8 +132,8 @@ const VendorsReports = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">평균 주문액</p>
@@ -146,8 +146,8 @@ const VendorsReports = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">고객 만족도</p>
@@ -165,11 +165,11 @@ const VendorsReports = () => {
       {reportType === 'summary' ? (
         <>
           {/* Sales Trend Chart */}
-          <div className="wp-card">
-            <div className="wp-card-header">
+          <div className="o4o-card">
+            <div className="o4o-card-header">
               <h2 className="text-lg font-semibold">매출 추이</h2>
             </div>
-            <div className="wp-card-body">
+            <div className="o4o-card-body">
               <div className="h-64 flex items-center justify-center text-modern-text-secondary">
                 <div className="text-center">
                   <BarChart3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -182,11 +182,11 @@ const VendorsReports = () => {
 
           {/* Top Products */}
           {currentReport && (
-            <div className="wp-card">
-              <div className="wp-card-header">
+            <div className="o4o-card">
+              <div className="o4o-card-header">
                 <h2 className="text-lg font-semibold">인기 상품 TOP 3</h2>
               </div>
-              <div className="wp-card-body">
+              <div className="o4o-card-body">
                 <div className="space-y-4">
                   {currentReport.topProducts.map((product, index) => (
                     <div key={product.id} className="flex items-center justify-between p-4 bg-modern-bg-tertiary rounded-lg">
@@ -217,11 +217,11 @@ const VendorsReports = () => {
           {/* Detailed Performance Metrics */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Category Performance */}
-            <div className="wp-card">
-              <div className="wp-card-header">
+            <div className="o4o-card">
+              <div className="o4o-card-header">
                 <h2 className="text-lg font-semibold">카테고리별 성과</h2>
               </div>
-              <div className="wp-card-body">
+              <div className="o4o-card-body">
                 <div className="space-y-3">
                   {categoryPerformance.map((category: any) => (
                     <div key={category.category}>
@@ -249,11 +249,11 @@ const VendorsReports = () => {
             </div>
 
             {/* Performance Indicators */}
-            <div className="wp-card">
-              <div className="wp-card-header">
+            <div className="o4o-card">
+              <div className="o4o-card-header">
                 <h2 className="text-lg font-semibold">성과 지표</h2>
               </div>
-              <div className="wp-card-body">
+              <div className="o4o-card-body">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
                     <Package className="w-8 h-8 text-modern-primary mx-auto mb-2" />
@@ -285,11 +285,11 @@ const VendorsReports = () => {
           </div>
 
           {/* Recommendations */}
-          <div className="wp-card">
-            <div className="wp-card-header">
+          <div className="o4o-card">
+            <div className="o4o-card-header">
               <h2 className="text-lg font-semibold">추천 사항</h2>
             </div>
-            <div className="wp-card-body">
+            <div className="o4o-card-body">
               <div className="space-y-3">
                 <div className="flex gap-3">
                   <TrendingUp className="w-5 h-5 text-modern-success flex-shrink-0 mt-0.5" />

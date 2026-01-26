@@ -317,7 +317,7 @@ html.js .hide-if-no-js {
 }
 
 /* WordPress Page Title Spacing */
-.wp-heading-inline {
+.o4o-heading-inline {
   display: inline-block;
   margin-right: 5px;
 }
@@ -326,6 +326,6 @@ html.js .hide-if-no-js {
   margin-bottom: 15px;
 }
 
-hr.wp-header-end {
+hr.o4o-header-end {
   clear: both;
 }

@@ -135,8 +135,8 @@ const SystemMonitoring: FC = () => {
       {/* 시스템 상태 카드 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* 전체 상태 */}
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">시스템 상태</p>
@@ -164,8 +164,8 @@ const SystemMonitoring: FC = () => {
         </div>
 
         {/* CPU 사용률 */}
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">CPU 사용률</p>
@@ -192,8 +192,8 @@ const SystemMonitoring: FC = () => {
         </div>
 
         {/* 메모리 사용률 */}
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">메모리 사용률</p>
@@ -212,8 +212,8 @@ const SystemMonitoring: FC = () => {
         </div>
 
         {/* 데이터베이스 상태 */}
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">데이터베이스</p>
@@ -241,11 +241,11 @@ const SystemMonitoring: FC = () => {
       {/* 성능 차트 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* API 응답 시간 테이블 */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h3 className="text-lg font-medium text-gray-900">API 응답 시간</h3>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             {performanceMetrics && performanceMetrics.length > 0 ? (
               <div className="space-y-4">
                 {performanceMetrics?.slice(0, 10).map((metric: PerformanceMetric) => (
@@ -271,11 +271,11 @@ const SystemMonitoring: FC = () => {
         </div>
 
         {/* 에러율 통계 */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h3 className="text-lg font-medium text-gray-900">API 에러율</h3>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-4">
               {performanceMetrics?.slice(0, 5).map((metric: PerformanceMetric) => (
                 <div key={metric.endpoint} className="flex items-center justify-between">
@@ -297,11 +297,11 @@ const SystemMonitoring: FC = () => {
       </div>
 
       {/* 최근 에러 로그 */}
-      <div className="wp-card">
-        <div className="wp-card-header">
+      <div className="o4o-card">
+        <div className="o4o-card-header">
           <h3 className="text-lg font-medium text-gray-900">최근 에러 로그</h3>
         </div>
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

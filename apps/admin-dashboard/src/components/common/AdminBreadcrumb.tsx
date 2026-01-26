@@ -130,12 +130,12 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
   }
   
   return (
-    <nav className={`flex items-center space-x-2 text-sm text-wp-text-secondary mb-6 ${className}`}>
+    <nav className={`flex items-center space-x-2 text-sm text-o4o-text-secondary mb-6 ${className}`}>
       <Home className="w-4 h-4" />
       
       {breadcrumbItems.map((item, index) => (
         <Fragment key={index}>
-          {index > 0 && <ChevronRight className="w-4 h-4 text-wp-text-secondary" />}
+          {index > 0 && <ChevronRight className="w-4 h-4 text-o4o-text-secondary" />}
           
           {(item.path ?? item.href) ? (
             <Link
@@ -145,7 +145,7 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
               {item.label}
             </Link>
           ) : (
-            <span className="text-wp-text-primary font-semibold">
+            <span className="text-o4o-text-primary font-semibold">
               {item.label}
             </span>
           )}

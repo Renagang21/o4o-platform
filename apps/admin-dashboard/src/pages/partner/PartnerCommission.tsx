@@ -106,8 +106,8 @@ const PartnerCommission = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 수수료</p>
@@ -119,8 +119,8 @@ const PartnerCommission = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">지급 완료</p>
@@ -132,8 +132,8 @@ const PartnerCommission = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">미지급 금액</p>
@@ -145,8 +145,8 @@ const PartnerCommission = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">평균 수수료율</p>
@@ -161,8 +161,8 @@ const PartnerCommission = () => {
       </div>
 
       {/* Payment Schedule Notice */}
-      <div className="wp-card bg-blue-50 border-blue-200">
-        <div className="wp-card-body">
+      <div className="o4o-card bg-blue-50 border-blue-200">
+        <div className="o4o-card-body">
           <div className="flex items-start gap-3">
             <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
@@ -202,7 +202,7 @@ const PartnerCommission = () => {
       </div>
 
       {/* Commission Table */}
-      <div className="wp-card">
+      <div className="o4o-card">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-modern-bg-tertiary border-b border-modern-border-primary">
@@ -297,11 +297,11 @@ const PartnerCommission = () => {
 
       {/* Payment Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold">이번 달 정산 예정</h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               {filteredCommissions
                 .filter((c: any) => c.status === 'pending' && c.period === selectedPeriod)
@@ -331,11 +331,11 @@ const PartnerCommission = () => {
           </div>
         </div>
 
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold">정산 방법별 현황</h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-modern-text-secondary">계좌이체</span>

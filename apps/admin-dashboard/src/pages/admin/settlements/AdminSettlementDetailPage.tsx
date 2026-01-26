@@ -361,7 +361,7 @@ export const AdminSettlementDetailPage: React.FC = () => {
               </p>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full wp-list-table widefat">
+              <table className="w-full o4o-list-table widefat">
                 <thead>
                   <tr>
                     <th className="manage-column">주문번호</th>

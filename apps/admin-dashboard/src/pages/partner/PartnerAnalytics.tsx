@@ -130,8 +130,8 @@ const PartnerAnalytics = () => {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 매출액</p>
@@ -146,8 +146,8 @@ const PartnerAnalytics = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">총 클릭수</p>
@@ -162,8 +162,8 @@ const PartnerAnalytics = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">전환율</p>
@@ -178,8 +178,8 @@ const PartnerAnalytics = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <div className="o4o-card">
+          <div className="o4o-card-body">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-modern-text-secondary">평균 주문액</p>
@@ -197,8 +197,8 @@ const PartnerAnalytics = () => {
       </div>
 
       {/* Performance Chart */}
-      <div className="wp-card">
-        <div className="wp-card-header">
+      <div className="o4o-card">
+        <div className="o4o-card-header">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">성과 추이</h2>
             <div className="flex bg-modern-bg-tertiary rounded-lg p-1">
@@ -235,7 +235,7 @@ const PartnerAnalytics = () => {
             </div>
           </div>
         </div>
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           <div className="h-64 flex items-center justify-center text-modern-text-secondary">
             <div className="text-center">
               <BarChart3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -248,11 +248,11 @@ const PartnerAnalytics = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Performers */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold">상위 성과 파트너사</h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-4">
               {topPerformers.map((performer, index) => (
                 <div key={performer.id} className="flex items-center justify-between">
@@ -283,11 +283,11 @@ const PartnerAnalytics = () => {
         </div>
 
         {/* Product Performance */}
-        <div className="wp-card">
-          <div className="wp-card-header">
+        <div className="o4o-card">
+          <div className="o4o-card-header">
             <h2 className="text-lg font-semibold">인기 파트너 상품</h2>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-4">
               {productPerformance.map((product: any) => (
                 <div key={product.id}>
@@ -320,11 +320,11 @@ const PartnerAnalytics = () => {
       </div>
 
       {/* Insights */}
-      <div className="wp-card">
-        <div className="wp-card-header">
+      <div className="o4o-card">
+        <div className="o4o-card-header">
           <h2 className="text-lg font-semibold">주요 인사이트</h2>
         </div>
-        <div className="wp-card-body">
+        <div className="o4o-card-body">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
               <Users className="w-8 h-8 text-modern-primary mx-auto mb-2" />
@@ -350,11 +350,11 @@ const PartnerAnalytics = () => {
 
       {/* Recommendations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="wp-card bg-blue-50 border-blue-200">
-          <div className="wp-card-header">
+        <div className="o4o-card bg-blue-50 border-blue-200">
+          <div className="o4o-card-header">
             <h3 className="text-lg font-semibold text-blue-900">최적화 제안</h3>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <div className="flex gap-3">
                 <TrendingUp className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -379,11 +379,11 @@ const PartnerAnalytics = () => {
           </div>
         </div>
 
-        <div className="wp-card bg-green-50 border-green-200">
-          <div className="wp-card-header">
+        <div className="o4o-card bg-green-50 border-green-200">
+          <div className="o4o-card-header">
             <h3 className="text-lg font-semibold text-green-900">성장 기회</h3>
           </div>
-          <div className="wp-card-body">
+          <div className="o4o-card-body">
             <div className="space-y-3">
               <div className="flex gap-3">
                 <DollarSign className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
