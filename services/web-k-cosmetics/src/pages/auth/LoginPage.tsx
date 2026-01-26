@@ -14,7 +14,6 @@ const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'seller-k-cosmetics@o4o.com', password: TEST_PASSWORD, label: '판매자' },
   { email: 'supplier-k-cosmetics@o4o.com', password: TEST_PASSWORD, label: '공급자' },
-  { email: 'admin-k-cosmetics@o4o.com', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export default function LoginPage() {

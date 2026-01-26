@@ -6,7 +6,6 @@ import { useAuth } from '../contexts/AuthContext';
 const TEST_PASSWORD = 'TestPassword';
 const TEST_ACCOUNTS = [
   { label: '약사', email: 'pharmacist@o4o.com', password: TEST_PASSWORD, role: 'pharmacist' },
-  { label: '관리자', email: 'admin@o4o.com', password: TEST_PASSWORD, role: 'admin' },
 ];
 
 export default function LoginPage() {

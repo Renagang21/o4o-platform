@@ -19,9 +19,7 @@ const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '일반회원 (약사)' },
   { email: 'branch-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '분회 임원' },
-  { email: 'branch-admin-kpa@o4o.com', password: TEST_PASSWORD, label: '분회 운영자' },
   { email: 'district-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '지부 임원' },
-  { email: 'district-admin-kpa@o4o.com', password: TEST_PASSWORD, label: '지부 운영자' },
 ];
 
 export function LoginPage() {

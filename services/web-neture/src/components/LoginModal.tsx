@@ -12,7 +12,6 @@ import { useAuth, ROLE_DASHBOARDS } from '../contexts';
 // 테스트 계정 (비밀번호 통일: TestPassword)
 const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
-  { email: 'admin-neture@o4o.com', password: TEST_PASSWORD, label: '운영자', color: 'red' },
   { email: 'supplier-neture@o4o.com', password: TEST_PASSWORD, label: '공급자', color: 'green' },
   { email: 'partner-neture@o4o.com', password: TEST_PASSWORD, label: '파트너', color: 'blue' },
 ];

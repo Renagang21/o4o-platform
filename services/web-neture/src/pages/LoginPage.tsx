@@ -14,7 +14,6 @@ const TEST_PASSWORD = 'TestPassword';
 const testAccounts = [
   { email: 'supplier-neture@o4o.com', password: TEST_PASSWORD, label: '공급자' },
   { email: 'partner-neture@o4o.com', password: TEST_PASSWORD, label: '파트너' },
-  { email: 'admin-neture@o4o.com', password: TEST_PASSWORD, label: '운영자' },
 ];
 
 export function LoginPage() {
