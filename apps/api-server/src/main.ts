@@ -402,8 +402,8 @@ import guestAuthRoutes from './modules/auth/routes/guest-auth.routes.js';
 import usersRoutes from './routes/users.routes.js';
 import cptRoutes from './routes/cpt.js';
 import healthRoutes from './routes/health.js';
-// Forum routes - REMOVED (Phase R1: Domain separation)
-// import forumRoutes from './routes/forum/forum.routes.js';
+// Forum routes - RE-ENABLED
+import forumRoutes from './routes/forum/forum.routes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import adminAppsRoutes from './routes/admin/apps.routes.js';
 import adminUsersRoutes from './routes/admin/users.routes.js';
@@ -516,7 +516,7 @@ app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/health', healthRoutes); // Cloud Run HEALTHCHECK compatibility
-// app.use('/api/v1/forum', forumRoutes);
+app.use('/api/v1/forum', forumRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/admin/apps', adminAppsRoutes);
 app.use('/api/v1/admin/users', adminUsersRoutes);
