@@ -18,61 +18,16 @@ interface MenuItem {
   children?: { label: string; href: string }[];
 }
 
-// IA 기준 메뉴 구조 (Design Package v1)
-// WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
-// WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 메뉴 제거 → 배너 전환
-// WO-KPA-WORK-IMPLEMENT-V1: 내 업무 메뉴 추가 (항상 노출)
+// 커뮤니티 홈 기준 메뉴 구조 (7개 항목)
+// WO-KPA-COMMUNITY-HOME-V1: 마케팅 랜딩 → 커뮤니티 실사용 홈 전환
 const menuItems: MenuItem[] = [
-  {
-    label: '공지',
-    href: '/demo/news',
-    children: [
-      { label: '공지사항', href: '/demo/news/notice' },
-      { label: '지부/분회 소식', href: '/demo/news/branch-news' },
-      { label: '전체 약사회 소식', href: '/demo/news/kpa-news' },
-      { label: '갤러리', href: '/demo/news/gallery' },
-      { label: '보도자료', href: '/demo/news/press' },
-    ],
-  },
-  {
-    label: '포럼',
-    href: '/demo/forum',
-    children: [
-      { label: '전체 글', href: '/demo/forum' },
-      { label: '글쓰기', href: '/demo/forum/write' },
-    ],
-  },
-  // 교육(LMS), 공동구매: 메뉴에서 제거 → 배너로 전환 (WO-KPA-MENU-CLEANUP-V1)
-  {
-    label: '자료실',
-    href: '/demo/docs',
-    children: [
-      { label: '서식/양식', href: '/demo/docs/forms' },
-      { label: '가이드라인', href: '/demo/docs/guidelines' },
-      { label: '규정/정관', href: '/demo/docs/policies' },
-    ],
-  },
-  {
-    label: '조직소개',
-    href: '/demo/organization',
-    children: [
-      { label: '약사회 소개', href: '/demo/organization' },
-      { label: '지부/분회', href: '/demo/organization/branches' },
-      { label: '임원 안내', href: '/demo/organization/officers' },
-      { label: '연락처', href: '/demo/organization/contact' },
-    ],
-  },
-  // WO-KPA-WORK-IMPLEMENT-V1: 근무약사 전용 업무 화면 (항상 노출)
-  {
-    label: '내 업무',
-    href: '/work',
-    children: [
-      { label: '업무 현황', href: '/work' },
-      { label: '업무 관리', href: '/work/tasks' },
-      { label: '안내 흐름', href: '/work/learning' },
-      { label: '커뮤니티', href: '/work/community' },
-    ],
-  },
+  { label: '홈', href: '/' },
+  { label: '포럼', href: '/demo/forum' },
+  { label: '교육', href: '/demo/lms' },
+  { label: '자료실', href: '/demo/docs' },
+  { label: '이벤트', href: '/demo/events' },
+  { label: '약사회 서비스 (데모)', href: '/demo/organization-service' },
+  { label: '약국경영', href: '/pharmacy' },
 ];
 
 // 관리자 메뉴 (로그인한 관리자에게만 표시)
@@ -149,7 +104,7 @@ export function Header({ serviceName }: { serviceName: string }) {
       <header style={styles.header}>
         <div style={styles.container}>
           {/* Logo */}
-          <Link to="/demo" style={styles.logo}>
+          <Link to="/" style={styles.logo}>
             <span style={styles.logoIcon}>💊</span>
             <span style={styles.logoText}>{serviceName || '약사회'}</span>
           </Link>
@@ -168,7 +123,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                     to={item.href}
                     style={{
                       ...styles.navLink,
-                      ...(location.pathname.startsWith(item.href) ? styles.navLinkActive : {}),
+                      ...((item.href === '/' ? location.pathname === '/' : location.pathname.startsWith(item.href)) ? styles.navLinkActive : {}),
                     }}
                   >
                     {item.label}
@@ -461,7 +416,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   navLink: {
     display: 'block',
-    padding: '24px 20px',
+    padding: '24px 12px',
     color: colors.gray800,
     textDecoration: 'none',
     fontSize: '16px',

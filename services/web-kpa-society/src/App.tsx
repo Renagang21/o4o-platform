@@ -5,10 +5,16 @@ import { AuthProvider } from './contexts';
 import { DashboardPage } from './pages/DashboardPage';
 
 // Forum pages
-import { ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
+import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
 
 // LMS pages
-import { LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
+import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
+
+// Events pages (WO-KPA-COMMUNITY-HOME-V1)
+import { EventsHomePage } from './pages/events/EventsHomePage';
+
+// Organization Service page (WO-KPA-COMMUNITY-HOME-V1)
+import { OrganizationServicePage } from './pages/OrganizationServicePage';
 
 // Participation pages (WO-KPA-PARTICIPATION-APP-V1)
 import {
@@ -25,7 +31,7 @@ import { GroupbuyListPage, GroupbuyDetailPage, GroupbuyHistoryPage } from './pag
 import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 
 // Resources pages
-import { ResourcesListPage } from './pages/resources';
+import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
 
 // Organization pages
 import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, ContactPage } from './pages/organization';
@@ -56,9 +62,12 @@ import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 // Test Guide Pages
 import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchOfficerManualPage, AdminManualPage } from './pages/test-guide';
 
-// Platform Home (WO-KPA-HOME-FOUNDATION-V1)
-import { HomePage } from './pages/platform';
+// Platform Home (WO-KPA-HOME-FOUNDATION-V1) - legacy, kept for reference
+// import { HomePage } from './pages/platform';
 import TestCenterPage from './pages/TestCenterPage';
+
+// Community Home (WO-KPA-COMMUNITY-HOME-V1)
+import { CommunityHomePage } from './pages/CommunityHomePage';
 
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
@@ -83,7 +92,6 @@ import { FunctionGatePage } from './pages/FunctionGatePage';
 import {
   MemberApplyPage,
   MyApplicationsPage,
-  EventsPage,
 } from './pages';
 
 /**
@@ -128,10 +136,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* ========================================
-           * 플랫폼 홈 (/ 경로)
-           * WO-KPA-HOME-FOUNDATION-V1: 실제 홈 페이지
+           * 커뮤니티 홈 (/ 경로)
+           * WO-KPA-COMMUNITY-HOME-V1: 마케팅 랜딩 → 커뮤니티 실사용 홈
            * ======================================== */}
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>} />
 
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
           <Route path="/test-center" element={<TestCenterPage />} />
@@ -271,15 +279,16 @@ function DemoLayoutRoutes() {
         <Route path="/news/press" element={<NewsListPage />} />
         <Route path="/news/:id" element={<NewsDetailPage />} />
 
-        {/* Forum (포럼) */}
-        <Route path="/forum" element={<ForumListPage />} />
+        {/* Forum (포럼) - WO-KPA-COMMUNITY-HOME-V1 */}
+        <Route path="/forum" element={<ForumHomePage />} />
+        <Route path="/forum/all" element={<ForumListPage />} />
         <Route path="/forum/category/:id" element={<ForumListPage />} />
         <Route path="/forum/post/:id" element={<ForumDetailPage />} />
         <Route path="/forum/write" element={<ForumWritePage />} />
         <Route path="/forum/edit/:id" element={<ForumWritePage />} />
 
-        {/* LMS (교육) */}
-        <Route path="/lms" element={<LmsCoursesPage />} />
+        {/* LMS (교육) - WO-KPA-COMMUNITY-HOME-V1 */}
+        <Route path="/lms" element={<EducationPage />} />
         <Route path="/lms/courses" element={<LmsCoursesPage />} />
         <Route path="/lms/course/:id" element={<LmsCourseDetailPage />} />
         <Route path="/lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
@@ -300,8 +309,9 @@ function DemoLayoutRoutes() {
         <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />
         <Route path="/pharmacy/*" element={<Navigate to="/pharmacy" replace />} />
 
-        {/* Docs (자료실) */}
-        <Route path="/docs" element={<ResourcesListPage />} />
+        {/* Docs (자료실) - WO-KPA-LMS-RESTRUCTURE-APPLY-V1: Content 집중 */}
+        <Route path="/docs" element={<ResourcesHomePage />} />
+        <Route path="/docs/list" element={<ResourcesListPage />} />
         <Route path="/docs/forms" element={<ResourcesListPage />} />
         <Route path="/docs/guidelines" element={<ResourcesListPage />} />
         <Route path="/docs/policies" element={<ResourcesListPage />} />
@@ -321,10 +331,15 @@ function DemoLayoutRoutes() {
         <Route path="/mypage/status-report" element={<PersonalStatusReportPage />} />
         <Route path="/mypage/annual-report" element={<AnnualReportFormPage />} />
 
+        {/* Events (이벤트) - WO-KPA-COMMUNITY-HOME-V1 */}
+        <Route path="/events" element={<EventsHomePage />} />
+
+        {/* Organization Service (약사회 서비스 데모) - WO-KPA-COMMUNITY-HOME-V1 */}
+        <Route path="/organization-service" element={<OrganizationServicePage />} />
+
         {/* Legacy routes (for backward compatibility) */}
         <Route path="/member/apply" element={<MemberApplyPage />} />
         <Route path="/applications" element={<MyApplicationsPage />} />
-        <Route path="/events" element={<EventsPage />} />
 
         {/* 404 */}
         <Route path="*" element={<DemoNotFoundPage />} />
