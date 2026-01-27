@@ -4,6 +4,11 @@ export class CreateForumCategoryRequest2026012700002 implements MigrationInterfa
   name = 'CreateForumCategoryRequest2026012700002';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const hasTable = await queryRunner.hasTable('forum_category_requests');
+    if (hasTable) {
+      console.log('Table forum_category_requests already exists, skipping');
+      return;
+    }
     await queryRunner.query(`
       CREATE TABLE "forum_category_requests" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
