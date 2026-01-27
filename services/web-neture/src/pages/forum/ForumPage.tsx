@@ -178,7 +178,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
               o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.
             </p>
           </div>
-          <Link to="/supplier-ops/forum/write" style={styles.writeButton}>
+          <Link to="/forum/write" style={styles.writeButton}>
             의견 남기기
           </Link>
         </div>

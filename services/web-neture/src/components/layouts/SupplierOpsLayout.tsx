@@ -113,9 +113,9 @@ export default function SupplierOpsLayout() {
                 참여 신청
               </Link>
               <Link
-                to="/supplier-ops/forum"
+                to="/forum"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/forum')
+                  isActive('/forum')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
@@ -150,7 +150,7 @@ export default function SupplierOpsLayout() {
                 </Link>
               </p>
             </div>
-            <Link to="/supplier-ops/forum/test-feedback" className="text-xs text-green-600 hover:text-green-700 transition-colors">
+            <Link to="/forum/test-feedback" className="text-xs text-green-600 hover:text-green-700 transition-colors">
               🧪 테스트 센터
             </Link>
           </div>

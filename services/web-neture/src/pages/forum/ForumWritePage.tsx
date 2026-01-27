@@ -5,7 +5,7 @@
  * Phase B-3: 글 작성 기능 구현
  *
  * 역할: o4o·네뚜레에 대해 의견을 남길 수 있는 공식 입구
- * - 로그인 필수
+ * - 로그인 불필요 (게스트 포함 누구나 작성 가능)
  * - 제목/내용 입력
  * - 성공 시 포럼 목록으로 이동
  *
@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import {
   createForumPost,
@@ -38,7 +38,6 @@ const MIN_CONTENT_LENGTH = 20;
 
 export function ForumWritePage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { isAuthenticated } = useAuth();
   // NOTE: 현재 AuthContext는 테스트용이라 token이 없음
   // Real API 연동 시 AuthContext에 token 추가 필요
@@ -53,7 +52,7 @@ export function ForumWritePage() {
   const [contactSettings, setContactSettings] = useState<UserContactSettings | null>(null);
   const [showContactOnPost, setShowContactOnPost] = useState(false);
 
-  // Load contact settings on mount
+  // Load contact settings on mount (only for authenticated users)
   useEffect(() => {
     async function loadContactSettings() {
       if (!isAuthenticated) return;
@@ -72,30 +71,6 @@ export function ForumWritePage() {
   // Check if user has contact info configured
   const hasContactInfo = contactSettings?.contactEnabled &&
     (contactSettings?.kakaoOpenChatUrl || contactSettings?.kakaoChannelUrl);
-
-  // 로그인 가드 - returnUrl로 현재 페이지 전달하여 로그인 후 돌아오기
-  const loginUrl = `/login?returnUrl=${encodeURIComponent(location.pathname)}`;
-
-  if (!isAuthenticated) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.loginGuard}>
-          <h2 style={styles.loginGuardTitle}>로그인이 필요합니다</h2>
-          <p style={styles.loginGuardText}>
-            의견을 남기려면 먼저 로그인해주세요.
-          </p>
-          <div style={styles.loginGuardActions}>
-            <Link to={loginUrl} style={styles.loginButton}>
-              로그인
-            </Link>
-            <Link to="/forum" style={styles.backLink}>
-              포럼으로 돌아가기
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const isFormValid = title.trim().length > 0 && content.trim().length >= MIN_CONTENT_LENGTH;
 
@@ -502,43 +477,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'not-allowed',
   },
 
-  // Login Guard
-  loginGuard: {
-    textAlign: 'center',
-    padding: '80px 20px',
-  },
-  loginGuardTitle: {
-    fontSize: '24px',
-    fontWeight: 600,
-    color: GRAY_900,
-    margin: '0 0 12px 0',
-  },
-  loginGuardText: {
-    fontSize: '15px',
-    color: GRAY_500,
-    margin: '0 0 32px 0',
-  },
-  loginGuardActions: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '16px',
-  },
-  loginButton: {
-    display: 'inline-block',
-    padding: '12px 32px',
-    fontSize: '15px',
-    fontWeight: 600,
-    color: '#fff',
-    backgroundColor: PRIMARY_COLOR,
-    textDecoration: 'none',
-    borderRadius: '8px',
-  },
-  backLink: {
-    fontSize: '14px',
-    color: GRAY_500,
-    textDecoration: 'none',
-  },
 };
 
 export default ForumWritePage;

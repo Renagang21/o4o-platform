@@ -289,6 +289,17 @@ function App() {
               <Route path="/test-guide/service/glycopharm" element={<GlycoPharmServiceManualPage />} />
               <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
               <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
+
+              {/* 포럼 (o4o 공통 - /forum) */}
+              <Route path="/forum" element={<ForumPage />} />
+              <Route path="/forum/write" element={<ForumWritePage />} />
+              <Route path="/forum/post/:slug" element={<ForumPostPage />} />
+              <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
+              <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
+              <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />
+              <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
+              <Route path="/forum/service-update/new" element={<ForumWritePage />} />
+              <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
             </Route>
 
             {/* ================================================================
@@ -326,16 +337,6 @@ function App() {
               {/* 콘텐츠 */}
               <Route path="/supplier-ops/content" element={<ContentListPage />} />
               <Route path="/supplier-ops/content/:id" element={<ContentDetailPage />} />
-
-              {/* 포럼 */}
-              <Route path="/supplier-ops/forum" element={<ForumPage />} />
-              <Route path="/supplier-ops/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
-              <Route path="/supplier-ops/forum/test-feedback/new" element={<ForumWritePage />} />
-              <Route path="/supplier-ops/forum/test-feedback/:slug" element={<ForumPostPage />} />
-              <Route path="/supplier-ops/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
-              <Route path="/supplier-ops/forum/service-update/new" element={<ForumWritePage />} />
-              <Route path="/supplier-ops/forum/service-update/:slug" element={<ForumPostPage />} />
-              <Route path="/supplier-ops/forum/write" element={<ForumWritePage />} />
 
               {/* Neture 전용 테스트 가이드 */}
               <Route path="/supplier-ops/manual/supplier" element={<SupplierManualPage />} />
@@ -414,8 +415,9 @@ function App() {
             <Route path="/platform/principles" element={<Navigate to="/supplier-ops/platform/principles" replace />} />
             <Route path="/content" element={<Navigate to="/supplier-ops/content" replace />} />
             <Route path="/content/:id" element={<Navigate to="/supplier-ops/content/:id" replace />} />
-            <Route path="/forum" element={<Navigate to="/supplier-ops/forum" replace />} />
-            <Route path="/forum/*" element={<Navigate to="/supplier-ops/forum" replace />} />
+            {/* /supplier-ops/forum → /forum 리다이렉트 */}
+            <Route path="/supplier-ops/forum" element={<Navigate to="/forum" replace />} />
+            <Route path="/supplier-ops/forum/*" element={<Navigate to="/forum" replace />} />
 
             {/* Supplier Dashboard 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/supplier-ops/supplier/dashboard" replace />} />

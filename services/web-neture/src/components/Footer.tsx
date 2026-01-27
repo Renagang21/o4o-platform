@@ -13,7 +13,7 @@ export function Footer() {
               고객센터 1577-2779 | sohae2100@gmail.com
             </p>
           </div>
-          <Link to="/supplier-ops/forum/test-feedback" style={styles.testCenterLink}>
+          <Link to="/forum/test-feedback" style={styles.testCenterLink}>
             🧪 테스트 센터
           </Link>
         </div>
