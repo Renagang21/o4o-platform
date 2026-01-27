@@ -16,11 +16,9 @@ import { useAuth } from '../contexts/AuthContext';
 // 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
 
-// 메인 로그인: KPA 테스트 계정 (운영자 제외)
+// 메인 로그인: 약사/약국 서비스용 계정만
 const mainTestAccounts = [
-  { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '일반회원 (약사)' },
-  { email: 'district-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '지부 임원' },
-  { email: 'branch-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '분회 임원' },
+  { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '약사' },
 ];
 
 // 데모 로그인: 기존 데모 계정
