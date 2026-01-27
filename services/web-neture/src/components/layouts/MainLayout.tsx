@@ -65,7 +65,7 @@ export default function MainLayout() {
                 to="/supplier-ops"
                 className="px-3 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
               >
-                Neture
+                공급자 서비스
               </Link>
               <Link
                 to="/test-guide"
