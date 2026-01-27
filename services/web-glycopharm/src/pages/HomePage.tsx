@@ -1,23 +1,20 @@
 /**
  * HomePage - GlycoPharm 세미 프랜차이즈 쇼윈도
  *
- * Work Order: WO-GP-HOME-RESTRUCTURE-V1
+ * Work Order: WO-GP-HOME-SERVICE-SECTION-V1
  *
- * 화면 구조 (상→하) - 개편:
+ * 화면 구조 (상→하) - 서비스 중심 재구성:
  * 0. Hero - 플랫폼 정체성 선언 (heroConfig 분리)
- * 1. Now Running - 지금 진행 중인 것 (Trial/Event/Campaign)
- * 2. Operation Frame - 혈당관리 약국 운영 프레임 설명 [신규]
- * 3. Quick Action - 운영 도구 바로가기 (운영 가치 중심 메시지)
+ * 1. Service Overview - 약국 활용 서비스 개요 [신규]
+ * 2. Now Running - 지금 진행 중인 것 (보조 정보)
+ * 3. Operation Frame - 혈당관리 약국 운영 프레임
  * 4. Notice - 운영 공지
  * 5. Partner Trust - 협력 네트워크 / 신뢰 요소
  * 6. CTA - 비로그인 사용자용
  *
  * 원칙:
- * - 통계/차트 ❌
- * - 매출 데이터 ❌
- * - 환영 문구/기능 나열 ❌
- * - 지금 진행 중인 것 ⭕
- * - 참여 가능한 것 ⭕
+ * - "약국이 뭘 할 수 있는지"가 첫 인상 ⭕
+ * - Now Running은 보조 정보 ⭕
  * - 운영 주체의 존재감 ⭕
  * - 왜 이 서비스가 필요한가 ⭕
  */
@@ -28,20 +25,18 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Monitor,
   Tag,
   Pin,
-  Activity,
   Sparkles,
   Calendar,
   Users,
   Building2,
   ExternalLink,
-  type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { heroSlides, heroSettings, type HeroSlide } from '@/config/heroConfig';
 import OperationFrameSection from '@/components/home/OperationFrameSection';
+import ServiceOverviewSection from '@/components/home/ServiceOverviewSection';
 import {
   publicApi,
   fallbackNowRunning,
@@ -53,16 +48,6 @@ import {
 // ========================================
 // Types
 // ========================================
-
-interface QuickActionCard {
-  id: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  icon: LucideIcon;
-  link: string;
-  status: { label: string; value: string | number };
-}
 
 // NowRunningItem, Notice 타입은 @/api/public에서 import
 // ApiNowRunningItem, ApiNotice로 사용
@@ -78,46 +63,6 @@ interface Partner {
 // Static Data (운영자 관리 콘텐츠로 대체 예정)
 // heroSlides는 config/heroConfig.ts에서 import
 // ========================================
-
-// UX Trust Rules v1: 아이콘 색상 통일 (gray-500)
-const quickActionCards: QuickActionCard[] = [
-  {
-    id: 'signage',
-    title: 'Signage',
-    subtitle: '매장 콘텐츠',
-    description: '매장에서 바로 쓰는 콘텐츠로 신뢰를 형성합니다',
-    icon: Monitor,
-    link: '/pharmacy/signage/my',
-    status: { label: '방영 중', value: 3 },
-  },
-  {
-    id: 'supply',
-    title: 'Supply',
-    subtitle: 'B2B 공급',
-    description: '검증된 공급망으로 안정적인 운영을 지원합니다',
-    icon: Building2,
-    link: '/b2b/supply',
-    status: { label: '공급', value: '사용 중' },
-  },
-  {
-    id: 'trial',
-    title: 'Market Trial',
-    subtitle: '신제품 체험',
-    description: '새로운 수익 기회와 환자 가치를 동시에 얻으세요',
-    icon: Tag,
-    link: '/pharmacy/market-trial',
-    status: { label: '진행 중', value: 2 },
-  },
-  {
-    id: 'cgm-hub',
-    title: 'CGM Hub',
-    subtitle: '데이터 연결',
-    description: '데이터가 만드는 전문 약국의 차이를 경험하세요',
-    icon: Activity,
-    link: 'https://glucoseview.co.kr',
-    status: { label: '연결 중', value: '환자' },
-  },
-];
 
 // nowRunningItems와 notices는 API에서 로딩
 // fallback 데이터는 @/api/public에서 import
@@ -257,61 +202,6 @@ function HeroSection() {
         >
           <ChevronRight className="w-5 h-5" />
         </button>
-      </div>
-    </section>
-  );
-}
-
-function QuickActionSection() {
-  const { isAuthenticated } = useAuth();
-
-  return (
-    <section className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">운영 도구</h2>
-          <p className="text-sm text-slate-500">약국 운영에 필요한 핵심 기능</p>
-        </div>
-        {isAuthenticated && (
-          <NavLink
-            to="/pharmacy"
-            className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
-          >
-            대시보드
-            <ArrowRight className="w-4 h-4" />
-          </NavLink>
-        )}
-      </div>
-
-      {/* UX Trust Rules v1: 아이콘 gray-500, 배경 slate-100 */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {quickActionCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <NavLink
-              key={card.id}
-              to={card.link}
-              className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-slate-200"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-slate-500" />
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-slate-800">{card.status.value}</p>
-                  <p className="text-xs text-slate-400">{card.status.label}</p>
-                </div>
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-1">{card.title}</h3>
-              <p className="text-sm text-slate-600 font-medium mb-2">{card.subtitle}</p>
-              <p className="text-sm text-slate-500">{card.description}</p>
-              <div className="mt-4 flex items-center gap-1 text-sm text-primary-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                바로가기
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </NavLink>
-          );
-        })}
       </div>
     </section>
   );
@@ -576,16 +466,16 @@ export default function HomePage() {
       {/* Block 0: Hero - 플랫폼 정체성 선언 */}
       <HeroSection />
 
-      {/* Block 1: Now Running - 지금 진행 중인 것 */}
+      {/* Block 1: Service Overview - 약국 활용 서비스 개요 */}
+      <ServiceOverviewSection />
+
+      {/* Block 2: Now Running - 지금 참여 가능한 프로그램 (보조 정보) */}
       <NowRunningSection items={nowRunning} loading={loading} />
 
-      {/* Block 2: Operation Frame - 혈당관리 약국 운영 프레임 [신규] */}
+      {/* Block 3: Operation Frame - 혈당관리 약국 운영 프레임 */}
       <div id="operation-frame">
         <OperationFrameSection />
       </div>
-
-      {/* Block 3: Quick Action - 운영 도구 바로가기 */}
-      <QuickActionSection />
 
       {/* Block 4: Notice - 운영 공지 */}
       <NoticeSection items={notices} loading={loading} />
