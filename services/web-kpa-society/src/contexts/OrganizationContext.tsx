@@ -1,10 +1,13 @@
 /**
  * OrganizationContext - 현재 조직 컨텍스트 관리
  * WO-KPA-COMMITTEE-INTRANET-V1
+ * WO-CONTEXT-SWITCH-FOUNDATION-V1: persistence, auth 연동, ActiveContext 추가
  */
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
 import { Organization, OrganizationMember, MemberRole } from '../types/organization';
+import type { ActiveContext, PersistedContext } from '../types/organization';
 import {
   ALL_ORGANIZATIONS,
   getOrganizationById,
@@ -13,23 +16,24 @@ import {
   SAMPLE_BRANCH,
 } from '../data/sampleOrganizations';
 
+const STORAGE_KEY = 'kpa_active_context';
+
 interface OrganizationContextType {
-  // 현재 선택된 조직
+  // === 기존 API (보존) ===
   currentOrganization: Organization;
-  // 조직 체인 (위원회 → 분회 → 지부)
   organizationChain: Organization[];
-  // 사용자가 접근 가능한 조직 목록
   accessibleOrganizations: Organization[];
-  // 현재 사용자의 역할
   currentRole: MemberRole;
-  // 현재 사용자의 권한
   permissions: OrganizationMember['permissions'];
-  // 조직 변경
   setCurrentOrganization: (orgId: string) => void;
-  // 조직 유형별 필터링
   getOrganizationsByType: (type: Organization['type']) => Organization[];
-  // 특정 조직의 하위 조직 조회
   getChildOrganizations: (parentId: string) => Organization[];
+
+  // === WO-CONTEXT-SWITCH-FOUNDATION-V1 ===
+  activeContext: ActiveContext | null;
+  hasMultipleContexts: boolean;
+  isContextSet: boolean;
+  clearContext: () => void;
 }
 
 const OrganizationContext = createContext<OrganizationContextType | null>(null);
@@ -38,32 +42,90 @@ interface OrganizationProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Role → 접근 가능 조직 매핑 (Phase 1: sample data 기반)
+ */
+function getAccessibleOrganizationsForRole(role: string | undefined): Organization[] {
+  if (!role) return ALL_ORGANIZATIONS;
+  switch (role) {
+    case 'super_admin':
+    case 'operator':
+    case 'district_admin':
+      return ALL_ORGANIZATIONS;
+    case 'branch_admin':
+      return ALL_ORGANIZATIONS.filter(
+        (org) => org.type === 'branch' || org.type === 'division' || org.type === 'committee'
+      );
+    case 'pharmacist':
+    default:
+      return ALL_ORGANIZATIONS;
+  }
+}
+
+/**
+ * localStorage에서 영속된 컨텍스트 복원
+ */
+function restorePersistedContext(): Organization | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return null;
+    const persisted: PersistedContext = JSON.parse(stored);
+    const org = getOrganizationById(persisted.organizationId);
+    return org || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 컨텍스트를 localStorage에 영속
+ */
+function persistContext(org: Organization, role: MemberRole): void {
+  const persisted: PersistedContext = {
+    organizationId: org.id,
+    contextType: org.type,
+    role,
+    timestamp: Date.now(),
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+}
+
 export function OrganizationProvider({ children }: OrganizationProviderProps) {
-  // 기본 조직: 샘플지부
-  const [currentOrganization, setCurrentOrg] = useState<Organization>(SAMPLE_BRANCH);
-  const [organizationChain, setOrganizationChain] = useState<Organization[]>([SAMPLE_BRANCH]);
+  const { user } = useAuth();
 
-  // 샘플: 모든 조직 접근 가능
-  const accessibleOrganizations = ALL_ORGANIZATIONS;
+  // 초기 조직: localStorage 복원 → 기본값 SAMPLE_BRANCH
+  const initialOrg = restorePersistedContext() || SAMPLE_BRANCH;
+  const [currentOrganization, setCurrentOrg] = useState<Organization>(initialOrg);
+  const [organizationChain, setOrganizationChain] = useState<Organization[]>(
+    getOrganizationChain(initialOrg.id)
+  );
 
-  // 샘플: 기본 역할은 officer
+  // Role 기반 접근 가능 조직
+  const accessibleOrganizations = useMemo(
+    () => getAccessibleOrganizationsForRole(user?.role),
+    [user?.role]
+  );
+
+  // 기본 역할: officer (Phase 1)
   const [currentRole] = useState<MemberRole>('officer');
 
-  // 권한 (역할 기반)
-  const permissions: OrganizationMember['permissions'] = {
+  // 권한
+  const permissions: OrganizationMember['permissions'] = useMemo(() => ({
     canWriteNotice: currentRole === 'chair' || currentRole === 'officer',
     canCreateMeeting: currentRole === 'chair',
     canUploadDocument: currentRole === 'chair' || currentRole === 'officer',
     canChangeSettings: currentRole === 'chair',
-  };
+  }), [currentRole]);
 
+  // 조직 전환 + 영속
   const setCurrentOrganization = useCallback((orgId: string) => {
     const org = getOrganizationById(orgId);
     if (org) {
       setCurrentOrg(org);
       setOrganizationChain(getOrganizationChain(orgId));
+      persistContext(org, currentRole);
     }
-  }, []);
+  }, [currentRole]);
 
   const getOrganizationsByType = useCallback((type: Organization['type']) => {
     return accessibleOrganizations.filter((org) => org.type === type);
@@ -72,6 +134,32 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
   const getChildOrganizations = useCallback((parentId: string) => {
     return accessibleOrganizations.filter((org) => org.parentId === parentId);
   }, [accessibleOrganizations]);
+
+  // === WO-CONTEXT-SWITCH-FOUNDATION-V1 ===
+
+  const activeContext: ActiveContext | null = useMemo(() => ({
+    organization: currentOrganization,
+    chain: organizationChain,
+    contextType: currentOrganization.type,
+    role: currentRole,
+    permissions,
+  }), [currentOrganization, organizationChain, currentRole, permissions]);
+
+  const hasMultipleContexts = accessibleOrganizations.length > 1;
+  const isContextSet = true; // Phase 1: 항상 기본 조직이 설정됨
+
+  const clearContext = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCurrentOrg(SAMPLE_BRANCH);
+    setOrganizationChain(getOrganizationChain(SAMPLE_BRANCH.id));
+  }, []);
+
+  // 로그아웃 시 컨텍스트 초기화
+  useEffect(() => {
+    if (!user) {
+      clearContext();
+    }
+  }, [user, clearContext]);
 
   return (
     <OrganizationContext.Provider
@@ -84,6 +172,10 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
         setCurrentOrganization,
         getOrganizationsByType,
         getChildOrganizations,
+        activeContext,
+        hasMultipleContexts,
+        isContextSet,
+        clearContext,
       }}
     >
       {children}

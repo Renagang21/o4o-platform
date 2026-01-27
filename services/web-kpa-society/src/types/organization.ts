@@ -446,3 +446,41 @@ export function filterAccountingByRole(
       return [];
   }
 }
+
+// ============================================
+// WO-CONTEXT-SWITCH-FOUNDATION-V1
+// Context switching types
+// ============================================
+
+/** Context 유형 = OrganizationType + pharmacy */
+export type ContextType = OrganizationType | 'pharmacy';
+
+/** Context 유형 라벨 */
+export const CONTEXT_TYPE_LABELS: Record<ContextType, string> = {
+  branch: '지부',
+  division: '분회',
+  committee: '위원회',
+  pharmacy: '약국',
+};
+
+/** 활성 컨텍스트 객체 */
+export interface ActiveContext {
+  /** 선택된 조직 */
+  organization: Organization;
+  /** 조직 체인 (root → current) */
+  chain: Organization[];
+  /** 컨텍스트 유형 */
+  contextType: ContextType;
+  /** 사용자 역할 */
+  role: MemberRole;
+  /** 사용자 권한 */
+  permissions: OrganizationMember['permissions'];
+}
+
+/** localStorage 영속용 직렬화 형태 */
+export interface PersistedContext {
+  organizationId: string;
+  contextType: ContextType;
+  role: MemberRole;
+  timestamp: number;
+}

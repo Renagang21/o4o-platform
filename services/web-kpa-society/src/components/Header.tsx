@@ -11,6 +11,7 @@ import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-reac
 import { useAuth } from '../contexts';
 import { TestAccountType } from '../contexts/AuthContext';
 import { colors } from '../styles/theme';
+import { ContextIndicator } from './common/ContextIndicator';
 
 interface MenuItem {
   label: string;
@@ -108,6 +109,9 @@ export function Header({ serviceName }: { serviceName: string }) {
             <span style={styles.logoIcon}>💊</span>
             <span style={styles.logoText}>{serviceName || '약사회'}</span>
           </Link>
+
+          {/* Context Indicator - WO-CONTEXT-SWITCH-FOUNDATION-V1 */}
+          <ContextIndicator />
 
           {/* Desktop Navigation */}
           <nav style={styles.nav}>

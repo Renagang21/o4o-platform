@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components';
-import { AuthProvider } from './contexts';
+import { AuthProvider, OrganizationProvider } from './contexts';
 import { DashboardPage } from './pages/DashboardPage';
 
 // Forum pages
@@ -133,6 +133,7 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
 function App() {
   return (
     <AuthProvider>
+      <OrganizationProvider>
       <BrowserRouter>
         <Routes>
           {/* ========================================
@@ -255,6 +256,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
+      </OrganizationProvider>
     </AuthProvider>
   );
 }
