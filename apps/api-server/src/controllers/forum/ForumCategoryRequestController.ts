@@ -41,8 +41,9 @@ function generateSlug(name: string): string {
 
 export function createForumCategoryRequestRoutes(): Router {
   const router = Router();
-  const requestRepo = AppDataSource.getRepository(ForumCategoryRequest);
-  const categoryRepo = AppDataSource.getRepository(ForumCategory);
+  // Lazy repository access — AppDataSource may not be initialized at route setup time
+  const getRequestRepo = () => AppDataSource.getRepository(ForumCategoryRequest);
+  const getCategoryRepo = () => AppDataSource.getRepository(ForumCategory);
 
   // ============================================================================
   // USER ROUTES
@@ -68,6 +69,7 @@ export function createForumCategoryRequestRoutes(): Router {
           return;
         }
 
+        const requestRepo = getRequestRepo();
         const request = requestRepo.create({
           name: req.body.name,
           description: req.body.description,
@@ -98,6 +100,7 @@ export function createForumCategoryRequestRoutes(): Router {
         const user = (req as any).user;
         const serviceCode = req.query.serviceCode as string;
 
+        const requestRepo = getRequestRepo();
         const where: any = { requesterId: user.id };
         if (serviceCode) where.serviceCode = serviceCode;
 
@@ -144,6 +147,7 @@ export function createForumCategoryRequestRoutes(): Router {
           return;
         }
 
+        const requestRepo = getRequestRepo();
         const qb = requestRepo.createQueryBuilder('r');
 
         if (serviceCode) {
@@ -186,6 +190,7 @@ export function createForumCategoryRequestRoutes(): Router {
         const serviceCode = req.query.serviceCode as string;
         const organizationId = req.query.organizationId as string;
 
+        const requestRepo = getRequestRepo();
         const where: any = { status: 'pending' as const };
         if (serviceCode) where.serviceCode = serviceCode;
         if (organizationId) where.organizationId = organizationId;
@@ -207,6 +212,8 @@ export function createForumCategoryRequestRoutes(): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const user = (req as any).user;
+        const requestRepo = getRequestRepo();
+        const categoryRepo = getCategoryRepo();
         const request = await requestRepo.findOne({ where: { id: req.params.id } });
 
         if (!request) {
@@ -258,6 +265,7 @@ export function createForumCategoryRequestRoutes(): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const user = (req as any).user;
+        const requestRepo = getRequestRepo();
         const request = await requestRepo.findOne({ where: { id: req.params.id } });
 
         if (!request) {
