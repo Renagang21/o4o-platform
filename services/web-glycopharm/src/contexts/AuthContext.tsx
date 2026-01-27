@@ -11,6 +11,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co
 const ACCESS_TOKEN_KEY = 'glycopharm_access_token';
 const REFRESH_TOKEN_KEY = 'glycopharm_refresh_token';
 
+// Service User token storage keys (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2)
+const SERVICE_ACCESS_TOKEN_KEY = 'glycopharm_service_access_token';
+const SERVICE_REFRESH_TOKEN_KEY = 'glycopharm_service_refresh_token';
+
 // Token management functions
 function getStoredTokens() {
   return {
@@ -34,7 +38,53 @@ export function getAccessToken(): string | null {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
+// ============================================================================
+// Phase 2: Service User 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+// ============================================================================
+
+// Service User types
+export interface ServiceUser {
+  providerUserId: string;
+  provider: 'google' | 'kakao' | 'naver';
+  email: string;
+  displayName?: string;
+  profileImage?: string;
+  serviceId: string;
+  storeId?: string;
+}
+
+export interface ServiceLoginCredentials {
+  provider: 'google' | 'kakao' | 'naver';
+  oauthToken: string; // OAuth profile JSON for Phase 1 testing
+  serviceId: string;
+  storeId?: string;
+}
+
+// Service User token management
+function getStoredServiceTokens() {
+  return {
+    accessToken: localStorage.getItem(SERVICE_ACCESS_TOKEN_KEY),
+    refreshToken: localStorage.getItem(SERVICE_REFRESH_TOKEN_KEY),
+  };
+}
+
+function storeServiceTokens(accessToken: string, refreshToken: string) {
+  localStorage.setItem(SERVICE_ACCESS_TOKEN_KEY, accessToken);
+  localStorage.setItem(SERVICE_REFRESH_TOKEN_KEY, refreshToken);
+}
+
+function clearServiceTokens() {
+  localStorage.removeItem(SERVICE_ACCESS_TOKEN_KEY);
+  localStorage.removeItem(SERVICE_REFRESH_TOKEN_KEY);
+}
+
+// Export for use in Service API clients
+export function getServiceAccessToken(): string | null {
+  return localStorage.getItem(SERVICE_ACCESS_TOKEN_KEY);
+}
+
 interface AuthContextType {
+  // Platform User
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -44,6 +94,11 @@ interface AuthContextType {
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
   availableRoles: UserRole[];
+  // Phase 2: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+  serviceUser: ServiceUser | null;
+  isServiceUserAuthenticated: boolean;
+  serviceUserLogin: (credentials: ServiceLoginCredentials) => Promise<void>;
+  serviceUserLogout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,6 +147,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 토큰이 있으면 세션 확인 필요, 없으면 바로 로딩 완료
   const [isLoading, setIsLoading] = useState(() => !!localStorage.getItem(ACCESS_TOKEN_KEY));
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
+
+  // Phase 2: Service User state (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+  const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
 
   // Token refresh function
   const refreshAccessToken = async (): Promise<boolean> => {
@@ -242,9 +300,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const switchRole = selectRole;
   const hasMultipleRoles = availableRoles.length > 1;
 
+  // ============================================================================
+  // Phase 2: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+  // ============================================================================
+
+  /**
+   * Service User 로그인
+   *
+   * Phase 1 API 기반: /api/v1/auth/service/login
+   * Service User는 Platform User와 완전히 분리됨
+   */
+  const serviceUserLogin = async (credentials: ServiceLoginCredentials) => {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/service/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credentials }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || data.error || 'Service User 로그인에 실패했습니다.');
+    }
+
+    // Service JWT 저장 (tokenType: 'service')
+    const tokens = data.tokens;
+    if (tokens?.accessToken && tokens?.refreshToken) {
+      storeServiceTokens(tokens.accessToken, tokens.refreshToken);
+    }
+
+    // Service User 상태 설정
+    const serviceUserData: ServiceUser = {
+      providerUserId: data.user.providerUserId,
+      provider: data.user.provider,
+      email: data.user.email,
+      displayName: data.user.displayName,
+      profileImage: data.user.profileImage,
+      serviceId: data.user.serviceId,
+      storeId: data.user.storeId,
+    };
+
+    setServiceUser(serviceUserData);
+  };
+
+  /**
+   * Service User 로그아웃
+   */
+  const serviceUserLogout = () => {
+    clearServiceTokens();
+    setServiceUser(null);
+  };
+
   return (
     <AuthContext.Provider
       value={{
+        // Platform User
         user,
         isAuthenticated: !!user,
         isLoading,
@@ -254,6 +364,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         switchRole,
         hasMultipleRoles,
         availableRoles,
+        // Phase 2: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+        serviceUser,
+        isServiceUserAuthenticated: !!serviceUser,
+        serviceUserLogin,
+        serviceUserLogout,
       }}
     >
       {children}

@@ -121,6 +121,10 @@ export interface BusinessInfo {
   metadata?: Record<string, any>;
 }
 
+// Token type discriminator for Platform vs Service User authentication
+// Phase 1: Service User 인증 기반 구축 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+export type TokenType = 'user' | 'service';
+
 // Token-specific types
 export interface AccessTokenPayload {
   userId?: string;
@@ -143,6 +147,13 @@ export interface AccessTokenPayload {
   lastLoginAt?: Date | string;
   iat?: number;
   exp?: number;
+  // Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+  /** Token type: 'user' for platform users, 'service' for service users */
+  tokenType?: TokenType;
+  /** Service ID for service user tokens */
+  serviceId?: string;
+  /** Store ID for service user tokens (optional) */
+  storeId?: string;
 }
 
 export interface RefreshTokenPayload {

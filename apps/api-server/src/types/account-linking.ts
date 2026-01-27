@@ -1,6 +1,8 @@
 // Account Linking Types
 
-export type AuthProvider = 'email' | 'google' | 'kakao' | 'naver';
+// Phase 1: Service User 인증 기반 구축 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+// 'service' provider는 서비스/매장 사용자 인증용으로, Platform User와 분리된 경로
+export type AuthProvider = 'email' | 'google' | 'kakao' | 'naver' | 'service';
 
 // Account linking status
 export enum LinkingStatus {
@@ -187,4 +189,67 @@ export interface UnifiedLoginResponse {
   linkedAccounts: LinkedAccount[];
   isNewUser: boolean;
   autoLinked?: boolean;
+}
+
+// ============================================================================
+// Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+// ============================================================================
+
+/**
+ * Service User Login Credentials
+ * OAuth provider 기반 서비스 사용자 인증
+ */
+export interface ServiceLoginCredentials {
+  /** OAuth provider (google, kakao, naver) */
+  provider: 'google' | 'kakao' | 'naver';
+  /** OAuth provider's access token or authorization code */
+  oauthToken: string;
+  /** Service identifier (e.g., 'neture', 'k-cosmetics') */
+  serviceId: string;
+  /** Optional store identifier */
+  storeId?: string;
+}
+
+/**
+ * Service User Login Request
+ */
+export interface ServiceUserLoginRequest {
+  credentials: ServiceLoginCredentials;
+  ipAddress: string;
+  userAgent: string;
+}
+
+/**
+ * Service User public data (returned in login response)
+ */
+export interface ServiceUserData {
+  /** Provider's user ID */
+  providerUserId: string;
+  /** OAuth provider */
+  provider: 'google' | 'kakao' | 'naver';
+  /** User email from OAuth */
+  email: string;
+  /** Display name from OAuth */
+  displayName?: string;
+  /** Profile image from OAuth */
+  profileImage?: string;
+  /** Service ID */
+  serviceId: string;
+  /** Store ID (optional) */
+  storeId?: string;
+}
+
+/**
+ * Service User Login Response
+ */
+export interface ServiceUserLoginResponse {
+  success: boolean;
+  user: ServiceUserData;
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+  };
+  /** Token type is always 'service' for service users */
+  tokenType: 'service';
 }

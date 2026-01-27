@@ -391,6 +391,8 @@ app.use(httpMetrics.middleware());
 // ============================================================================
 // Core routes are registered here, while dynamic app routes are registered via module loader
 import authRoutes from './modules/auth/routes/auth.routes.js';
+// Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+import serviceAuthRoutes from './modules/auth/routes/service-auth.routes.js';
 // CMS routes - REMOVED (Phase R1: Domain separation)
 // import cmsRoutes from './modules/cms/routes/cms.routes.js';
 // LMS routes - REMOVED (Phase R1: Domain separation)
@@ -501,6 +503,8 @@ import { createAdminOpsMetricsRoutes } from './routes/admin/ops-metrics.routes.j
 // Register core API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
+// Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+app.use('/api/v1/auth/service', serviceAuthRoutes);
 // CMS/LMS/Forum routes - REMOVED (Phase R1: Domain separation)
 // app.use('/api/v1/cms', cmsRoutes);
 // app.use('/api/v1/lms', lmsRoutes);

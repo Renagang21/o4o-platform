@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../entities/User.js';
-import { AccessTokenPayload, RefreshTokenPayload, AuthTokens } from '../types/auth.js';
+import { AccessTokenPayload, RefreshTokenPayload, AuthTokens, TokenType } from '../types/auth.js';
+import type { ServiceUserData } from '../types/account-linking.js';
 import logger from './logger.js';
 import { deriveUserScopes } from './scope-assignment.utils.js';
 
@@ -59,7 +60,7 @@ function getJwtSecrets() {
 }
 
 /**
- * Generate access token
+ * Generate access token for Platform Users
  *
  * @param user - User entity
  * @param domain - Domain for the token (default: neture.co.kr)
@@ -67,6 +68,9 @@ function getJwtSecrets() {
  *
  * === Phase 2.5: Server Isolation ===
  * Token includes iss (issuer) and aud (audience) for cross-server protection
+ *
+ * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
+ * Token includes tokenType: 'user' to distinguish from service tokens
  */
 export function generateAccessToken(user: User, domain: string = 'neture.co.kr'): string {
   const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
@@ -85,6 +89,7 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
     permissions: user.permissions || [],
     scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     domain,
+    tokenType: 'user',  // Phase 1: Service User 인증 기반
     iss: jwtIssuer,     // Phase 2.5: Server isolation
     aud: jwtAudience,   // Phase 2.5: Server isolation
     exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
@@ -92,6 +97,102 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
   };
 
   return jwt.sign(payload, jwtSecret);
+}
+
+/**
+ * Generate access token for Service Users
+ *
+ * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
+ *
+ * Service User tokens are distinct from Platform User tokens:
+ * - tokenType: 'service' (not 'user')
+ * - Contains serviceId and optional storeId
+ * - No platform role/permissions
+ * - Cannot access Admin/Operator APIs
+ *
+ * @param serviceUser - Service user data from OAuth
+ * @param domain - Domain for the token (default: neture.co.kr)
+ * @returns JWT access token string
+ */
+export function generateServiceAccessToken(
+  serviceUser: ServiceUserData,
+  domain: string = 'neture.co.kr'
+): string {
+  const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
+
+  const payload: AccessTokenPayload = {
+    userId: serviceUser.providerUserId,
+    sub: serviceUser.providerUserId,
+    email: serviceUser.email,
+    name: serviceUser.displayName,
+    role: 'service_user', // Not a platform role, just for identification
+    permissions: [],       // Service users have no platform permissions
+    scopes: [],            // Service users have no platform scopes
+    domain,
+    tokenType: 'service',  // Phase 1: Service User 인증 기반
+    serviceId: serviceUser.serviceId,
+    storeId: serviceUser.storeId,
+    iss: jwtIssuer,        // Phase 2.5: Server isolation
+    aud: jwtAudience,      // Phase 2.5: Server isolation
+    exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
+    iat: Math.floor(Date.now() / 1000)
+  };
+
+  return jwt.sign(payload, jwtSecret);
+}
+
+/**
+ * Generate refresh token for Service Users
+ *
+ * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
+ *
+ * @param serviceUser - Service user data from OAuth
+ * @param tokenFamily - Token family ID for refresh token rotation
+ * @returns JWT refresh token string
+ */
+export function generateServiceRefreshToken(
+  serviceUser: ServiceUserData,
+  tokenFamily?: string
+): string {
+  const { jwtRefreshSecret, jwtIssuer, jwtAudience } = getJwtConfig();
+
+  const payload: RefreshTokenPayload = {
+    userId: serviceUser.providerUserId,
+    sub: serviceUser.providerUserId,
+    tokenVersion: 1,
+    tokenFamily: tokenFamily || uuidv4(),
+    iss: jwtIssuer,     // Phase 2.5: Server isolation
+    aud: jwtAudience,   // Phase 2.5: Server isolation
+    exp: Math.floor(Date.now() / 1000) + REFRESH_TOKEN_EXPIRES_IN,
+    iat: Math.floor(Date.now() / 1000)
+  };
+
+  return jwt.sign(payload, jwtRefreshSecret);
+}
+
+/**
+ * Generate both access and refresh tokens for Service Users
+ *
+ * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
+ *
+ * @param serviceUser - Service user data from OAuth
+ * @param domain - Domain for the token (default: neture.co.kr)
+ * @returns AuthTokens object with both tokens
+ */
+export function generateServiceTokens(
+  serviceUser: ServiceUserData,
+  domain: string = 'neture.co.kr'
+): AuthTokens {
+  const tokenFamily = uuidv4();
+
+  const accessToken = generateServiceAccessToken(serviceUser, domain);
+  const refreshToken = generateServiceRefreshToken(serviceUser, tokenFamily);
+
+  return {
+    accessToken,
+    refreshToken,
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN
+  };
 }
 
 /**
@@ -287,4 +388,44 @@ export function getTokenConfig() {
     accessTokenExpiresInMs: ACCESS_TOKEN_EXPIRES_IN * 1000,
     refreshTokenExpiresInMs: REFRESH_TOKEN_EXPIRES_IN * 1000
   };
+}
+
+// ============================================================================
+// Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+// ============================================================================
+
+/**
+ * Check if token is a service user token
+ *
+ * @param token - JWT access token string
+ * @returns true if service token, false otherwise
+ */
+export function isServiceToken(token: string): boolean {
+  const payload = verifyAccessToken(token);
+  return payload?.tokenType === 'service';
+}
+
+/**
+ * Check if token is a platform user token
+ *
+ * @param token - JWT access token string
+ * @returns true if platform user token, false otherwise
+ */
+export function isPlatformUserToken(token: string): boolean {
+  const payload = verifyAccessToken(token);
+  // For backward compatibility, tokens without tokenType are considered user tokens
+  return payload?.tokenType === 'user' || payload?.tokenType === undefined;
+}
+
+/**
+ * Get token type from token
+ *
+ * @param token - JWT access token string
+ * @returns TokenType or null if invalid
+ */
+export function getTokenType(token: string): TokenType | null {
+  const payload = verifyAccessToken(token);
+  if (!payload) return null;
+  // Default to 'user' for backward compatibility
+  return payload.tokenType || 'user';
 }

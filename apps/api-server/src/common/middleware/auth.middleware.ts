@@ -3,7 +3,8 @@ import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import { RoleAssignment } from '../../modules/auth/entities/RoleAssignment.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
-import { verifyAccessToken } from '../../utils/token.utils.js';
+import { verifyAccessToken, isServiceToken, isPlatformUserToken } from '../../utils/token.utils.js';
+import type { AccessTokenPayload, TokenType } from '../../types/auth.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -459,6 +460,244 @@ export const requireAnyPermission = (permissions: string[]) => {
       });
     }
   };
+};
+
+// ============================================================================
+// Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
+// ============================================================================
+
+/**
+ * Extended Request interface for Service Users
+ */
+export interface ServiceAuthRequest extends Request {
+  serviceUser?: {
+    providerUserId: string;
+    email: string;
+    serviceId?: string;
+    storeId?: string;
+    tokenType: 'service';
+  };
+  tokenPayload?: AccessTokenPayload;
+}
+
+/**
+ * Require Platform User Authentication
+ *
+ * Similar to requireAuth but explicitly rejects Service User tokens.
+ * Use this for Admin/Operator APIs that should NEVER be accessible
+ * by Service Users.
+ *
+ * Returns 403 if token is a Service User token.
+ *
+ * @example
+ * ```typescript
+ * router.delete('/admin/users/:id', requirePlatformUser, AdminController.deleteUser);
+ * ```
+ */
+export const requirePlatformUser = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  try {
+    const token = extractToken(req);
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED',
+      });
+    }
+
+    // Phase 1: Check token type - reject Service tokens
+    if (isServiceToken(token)) {
+      logger.warn('[requirePlatformUser] Service token rejected for platform-only endpoint', {
+        path: req.path,
+        method: req.method,
+      });
+
+      return res.status(403).json({
+        success: false,
+        error: 'Platform user authentication required. Service tokens are not allowed.',
+        code: 'SERVICE_TOKEN_NOT_ALLOWED',
+      });
+    }
+
+    // Continue with standard platform user auth
+    const payload = verifyAccessToken(token);
+
+    if (!payload) {
+      return res.status(401).json({
+        success: false,
+        error: 'Access token is invalid or has expired',
+        code: 'INVALID_TOKEN',
+      });
+    }
+
+    // Get user from database
+    const userRepo = AppDataSource.getRepository(User);
+    const user = await userRepo.findOne({
+      where: { id: payload.userId },
+      relations: ['linkedAccounts'],
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'User account not found or has been deactivated',
+        code: 'INVALID_USER',
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: 'User account is inactive',
+        code: 'USER_INACTIVE',
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    logger.error('[requirePlatformUser] Token verification failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: 'Access token is invalid or has expired',
+      code: 'INVALID_TOKEN',
+    });
+  }
+};
+
+/**
+ * Require Service User Authentication
+ *
+ * Validates that the token is a Service User token (tokenType: 'service').
+ * Does NOT look up user in database - Service Users are not stored.
+ *
+ * Attaches serviceUser object to request with token payload data.
+ *
+ * Returns 401 if no token or invalid token.
+ * Returns 403 if token is a Platform User token.
+ *
+ * @example
+ * ```typescript
+ * router.get('/service/profile', requireServiceUser, ServiceController.getProfile);
+ * ```
+ */
+export const requireServiceUser = async (
+  req: ServiceAuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  try {
+    const token = extractToken(req);
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED',
+      });
+    }
+
+    // Phase 1: Check token type - reject Platform tokens
+    if (isPlatformUserToken(token)) {
+      logger.warn('[requireServiceUser] Platform token rejected for service-only endpoint', {
+        path: req.path,
+        method: req.method,
+      });
+
+      return res.status(403).json({
+        success: false,
+        error: 'Service user authentication required. Platform tokens are not allowed.',
+        code: 'PLATFORM_TOKEN_NOT_ALLOWED',
+      });
+    }
+
+    const payload = verifyAccessToken(token);
+
+    if (!payload) {
+      return res.status(401).json({
+        success: false,
+        error: 'Access token is invalid or has expired',
+        code: 'INVALID_TOKEN',
+      });
+    }
+
+    // Attach service user data from token (no DB lookup)
+    req.serviceUser = {
+      providerUserId: payload.userId || payload.sub || '',
+      email: payload.email || '',
+      serviceId: payload.serviceId,
+      storeId: payload.storeId,
+      tokenType: 'service',
+    };
+    req.tokenPayload = payload;
+
+    next();
+  } catch (error) {
+    logger.error('[requireServiceUser] Token verification failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: 'Access token is invalid or has expired',
+      code: 'INVALID_TOKEN',
+    });
+  }
+};
+
+/**
+ * Optional Service User Authentication
+ *
+ * Attempts to authenticate as Service User but doesn't fail if no token.
+ * Useful for endpoints that have different behavior for authenticated vs anonymous users.
+ *
+ * @example
+ * ```typescript
+ * router.get('/service/products', optionalServiceAuth, ProductController.list);
+ * ```
+ */
+export const optionalServiceAuth = async (
+  req: ServiceAuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const token = extractToken(req);
+
+    if (!token) {
+      return next();
+    }
+
+    // Only process if it's a service token
+    if (!isServiceToken(token)) {
+      return next();
+    }
+
+    const payload = verifyAccessToken(token);
+
+    if (payload) {
+      req.serviceUser = {
+        providerUserId: payload.userId || payload.sub || '',
+        email: payload.email || '',
+        serviceId: payload.serviceId,
+        storeId: payload.storeId,
+        tokenType: 'service',
+      };
+      req.tokenPayload = payload;
+    }
+
+    next();
+  } catch (error) {
+    next();
+  }
 };
 
 /**

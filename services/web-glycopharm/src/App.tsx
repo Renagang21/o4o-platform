@@ -15,6 +15,10 @@ import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/auth/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
+// Phase 2: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+const ServiceLoginPage = lazy(() => import('@/pages/auth/ServiceLoginPage'));
+const ServiceDashboardPage = lazy(() => import('@/pages/service/ServiceDashboardPage'));
+
 // ============================================================================
 // Lazy loaded pages (heavy / rarely accessed)
 // ============================================================================
@@ -132,7 +136,7 @@ function PageLoading() {
   );
 }
 
-// Protected Route Component
+// Protected Route Component (Platform User)
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
   const { isAuthenticated, user, isLoading } = useAuth();
 
@@ -150,6 +154,25 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Service User Protected Route (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isServiceUserAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!isServiceUserAuthenticated) {
+    return <Navigate to="/service-login" replace />;
   }
 
   return <>{children}</>;
@@ -194,6 +217,23 @@ function AppRoutes() {
             <MyPage />
           </ProtectedRoute>
         } />
+      </Route>
+
+      {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
+      <Route path="service-login" element={<MainLayout />}>
+        <Route index element={<ServiceLoginPage />} />
+      </Route>
+
+      <Route
+        path="service"
+        element={
+          <ServiceUserProtectedRoute>
+            <DashboardLayout role="consumer" />
+          </ServiceUserProtectedRoute>
+        }
+      >
+        <Route index element={<ServiceDashboardPage />} />
+        <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
 
       {/* Pharmacy Dashboard */}
