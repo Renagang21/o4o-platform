@@ -186,28 +186,32 @@ export const displayApi = {
 export const forumRequestApi = {
   // User APIs
   create: (data: { name: string; description: string; reason?: string }) =>
-    apiClient.post<unknown>('/api/v1/glycopharm/forum-requests', data),
+    apiClient.post<unknown>('/api/v1/forum/category-requests', {
+      ...data,
+      serviceCode: 'glycopharm',
+    }),
 
   getMyRequests: () =>
-    apiClient.get<unknown[]>('/api/v1/glycopharm/forum-requests/my'),
-
-  getRequest: (id: string) =>
-    apiClient.get<unknown>(`/api/v1/glycopharm/forum-requests/${id}`),
+    apiClient.get<unknown[]>('/api/v1/forum/category-requests/my?serviceCode=glycopharm'),
 
   // Admin APIs
   getAllRequests: (params?: { status?: string; page?: number; limit?: number }) => {
     const query = new URLSearchParams();
+    query.set('serviceCode', 'glycopharm');
     if (params?.status) query.set('status', params.status);
     if (params?.page) query.set('page', params.page.toString());
     if (params?.limit) query.set('limit', params.limit.toString());
-    return apiClient.get<unknown[]>(`/api/v1/glycopharm/forum-requests/admin/all?${query}`);
+    return apiClient.get<unknown[]>(`/api/v1/forum/category-requests?${query}`);
   },
 
   getPendingCount: () =>
-    apiClient.get<{ count: number }>('/api/v1/glycopharm/forum-requests/admin/pending-count'),
+    apiClient.get<{ count: number }>('/api/v1/forum/category-requests/pending-count?serviceCode=glycopharm'),
 
-  review: (id: string, data: { status: 'approved' | 'rejected'; review_comment?: string }) =>
-    apiClient.patch<unknown>(`/api/v1/glycopharm/forum-requests/${id}/review`, data),
+  approve: (id: string, data: { review_comment?: string }) =>
+    apiClient.patch<unknown>(`/api/v1/forum/category-requests/${id}/approve`, data),
+
+  reject: (id: string, data: { review_comment?: string }) =>
+    apiClient.patch<unknown>(`/api/v1/forum/category-requests/${id}/reject`, data),
 };
 
 // Partner Dashboard API (WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1)

@@ -19,17 +19,17 @@ interface RequestData {
   description: string;
   reason?: string;
   status: CategoryRequestStatus;
-  requester_id: string;
-  requester_name: string;
-  requester_email?: string;
-  reviewer_id?: string;
-  reviewer_name?: string;
-  review_comment?: string;
-  reviewed_at?: string;
-  created_category_id?: string;
-  created_category_slug?: string;
-  created_at: string;
-  updated_at: string;
+  requesterId: string;
+  requesterName: string;
+  requesterEmail?: string;
+  reviewerId?: string;
+  reviewerName?: string;
+  reviewComment?: string;
+  reviewedAt?: string;
+  createdCategoryId?: string;
+  createdCategorySlug?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
@@ -97,7 +97,7 @@ export default function ForumRequestsPage() {
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       request.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.requester_name.toLowerCase().includes(searchQuery.toLowerCase());
+      request.requesterName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -109,10 +109,10 @@ export default function ForumRequestsPage() {
     setIsProcessing(true);
 
     try {
-      const response = await forumRequestApi.review(selectedRequest.id, {
-        status,
-        review_comment: reviewComment || undefined,
-      });
+      const reviewData = { review_comment: reviewComment || undefined };
+      const response = status === 'approved'
+        ? await forumRequestApi.approve(selectedRequest.id, reviewData)
+        : await forumRequestApi.reject(selectedRequest.id, reviewData);
 
       if (response.error) {
         alert(response.error.message);
@@ -237,14 +237,14 @@ export default function ForumRequestsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-slate-800">{request.requester_name}</div>
-                      {request.requester_email && (
-                        <div className="text-sm text-slate-500">{request.requester_email}</div>
+                      <div className="text-slate-800">{request.requesterName}</div>
+                      {request.requesterEmail && (
+                        <div className="text-sm text-slate-500">{request.requesterEmail}</div>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.created_at)}
+                    {formatDate(request.createdAt)}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
@@ -345,11 +345,11 @@ export default function ForumRequestsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h4 className="text-sm font-medium text-slate-500 mb-1">신청자</h4>
-                    <p className="text-slate-800">{selectedRequest.requester_name}</p>
+                    <p className="text-slate-800">{selectedRequest.requesterName}</p>
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-slate-500 mb-1">신청일</h4>
-                    <p className="text-slate-800">{formatDate(selectedRequest.created_at)}</p>
+                    <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
                   </div>
                 </div>
 
@@ -370,7 +370,7 @@ export default function ForumRequestsPage() {
                 )}
 
                 {/* Already reviewed */}
-                {selectedRequest.status !== 'pending' && selectedRequest.review_comment && (
+                {selectedRequest.status !== 'pending' && selectedRequest.reviewComment && (
                   <div className={`p-4 rounded-lg ${
                     selectedRequest.status === 'approved' ? 'bg-green-50' : 'bg-red-50'
                   }`}>
@@ -382,11 +382,11 @@ export default function ForumRequestsPage() {
                     <p className={
                       selectedRequest.status === 'approved' ? 'text-green-600' : 'text-red-600'
                     }>
-                      {selectedRequest.review_comment}
+                      {selectedRequest.reviewComment}
                     </p>
-                    {selectedRequest.reviewed_at && (
+                    {selectedRequest.reviewedAt && (
                       <p className="text-xs text-slate-500 mt-2">
-                        {selectedRequest.reviewer_name} | {formatDate(selectedRequest.reviewed_at)}
+                        {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
                       </p>
                     )}
                   </div>

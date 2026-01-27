@@ -4,7 +4,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorDashboard, OperatorAiReportPage } from '../pages/operator';
+import { OperatorDashboard, OperatorAiReportPage, ForumManagementPage } from '../pages/operator';
 
 // 간단한 Operator Layout
 function OperatorLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +26,9 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
             </a>
             <a href="/operator/ai-report" className="text-sm text-slate-600 hover:text-blue-600">
               AI 리포트
+            </a>
+            <a href="/operator/forum-management" className="text-sm text-slate-600 hover:text-blue-600">
+              포럼 관리
             </a>
             <a href="/" className="text-sm text-slate-500 hover:text-slate-700">
               메인으로
@@ -51,6 +54,9 @@ export function OperatorRoutes() {
 
         {/* AI 리포트 */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
+
+        {/* 포럼 관리 */}
+        <Route path="forum-management" element={<ForumManagementPage />} />
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="" replace />} />

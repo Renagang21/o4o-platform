@@ -205,6 +205,9 @@ const EmailNotificationSettingsPage = lazy(() =>
 const RegistrationRequestsPage = lazy(() =>
   import('./pages/operator/registrations').then((m) => ({ default: m.RegistrationRequestsPage }))
 );
+const ForumManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ForumManagementPage }))
+);
 
 // Loading fallback
 function PageLoading() {
@@ -400,6 +403,7 @@ function App() {
               <Route path="/supplier-ops/operator/ai-report" element={<OperatorAiReportPage />} />
               <Route path="/supplier-ops/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
               <Route path="/supplier-ops/operator/registrations" element={<RegistrationRequestsPage />} />
+              <Route path="/supplier-ops/operator/forum-management" element={<ForumManagementPage />} />
             </Route>
 
             {/* ================================================================

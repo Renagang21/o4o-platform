@@ -19,6 +19,7 @@ import {
   ArrowUpRight,
   Building2,
   Calendar,
+  MessageSquarePlus,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 
@@ -213,6 +214,7 @@ export default function OperatorDashboard() {
             { label: '강좌 관리', href: '/operator/courses', icon: GraduationCap, color: 'green' },
             { label: '공동구매 관리', href: '/operator/groupbuy', icon: ShoppingCart, color: 'purple' },
             { label: 'AI 리포트', href: '/operator/ai-report', icon: TrendingUp, color: 'amber' },
+            { label: '포럼 관리', href: '/operator/forum-management', icon: MessageSquarePlus, color: 'emerald' },
           ].map((action) => (
             <Link
               key={action.label}

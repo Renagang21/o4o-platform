@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ForumController } from '../../controllers/forum/ForumController.js';
+import { createForumCategoryRequestRoutes } from '../../controllers/forum/ForumCategoryRequestController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import notificationRoutes from './forum.notifications.routes.js';
 import aiRoutes from './forum.ai.routes.js';
@@ -103,5 +104,10 @@ router.use('/ai', aiRoutes);
 // Recommendations (Phase 17)
 // ============================================================================
 router.use('/recommendations', recommendationRoutes);
+
+// ============================================================================
+// Category Requests (서비스 운영자 포럼 개설 요청)
+// ============================================================================
+router.use('/category-requests', createForumCategoryRequestRoutes());
 
 export default router;

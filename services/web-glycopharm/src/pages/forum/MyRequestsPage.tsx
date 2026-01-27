@@ -20,17 +20,17 @@ interface RequestData {
   description: string;
   reason?: string;
   status: CategoryRequestStatus;
-  requester_id: string;
-  requester_name: string;
-  requester_email?: string;
-  reviewer_id?: string;
-  reviewer_name?: string;
-  review_comment?: string;
-  reviewed_at?: string;
-  created_category_id?: string;
-  created_category_slug?: string;
-  created_at: string;
-  updated_at: string;
+  requesterId: string;
+  requesterName: string;
+  requesterEmail?: string;
+  reviewerId?: string;
+  reviewerName?: string;
+  reviewComment?: string;
+  reviewedAt?: string;
+  createdCategoryId?: string;
+  createdCategorySlug?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; icon: typeof Clock }> = {
@@ -168,7 +168,7 @@ export default function MyRequestsPage() {
                   <div className="text-left">
                     <h3 className="font-semibold text-slate-800">{request.name}</h3>
                     <p className="text-sm text-slate-500">
-                      {formatDate(request.created_at)} 신청
+                      {formatDate(request.createdAt)} 신청
                     </p>
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export default function MyRequestsPage() {
                     )}
 
                     {/* Review Comment (for approved/rejected) */}
-                    {request.review_comment && (
+                    {request.reviewComment && (
                       <div className={`p-4 rounded-lg ${
                         request.status === 'approved'
                           ? 'bg-green-50'
@@ -221,20 +221,20 @@ export default function MyRequestsPage() {
                             ? 'text-green-600'
                             : 'text-red-600'
                         }>
-                          {request.review_comment}
+                          {request.reviewComment}
                         </p>
-                        {request.reviewed_at && (
+                        {request.reviewedAt && (
                           <p className="text-xs text-slate-500 mt-2">
-                            {formatDate(request.reviewed_at)} 검토
+                            {formatDate(request.reviewedAt)} 검토
                           </p>
                         )}
                       </div>
                     )}
 
                     {/* Link to created forum (for approved) */}
-                    {request.status === 'approved' && request.created_category_slug && (
+                    {request.status === 'approved' && request.createdCategorySlug && (
                       <NavLink
-                        to={`/forum?category=${request.created_category_slug}`}
+                        to={`/forum?category=${request.createdCategorySlug}`}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors"
                       >
                         <CheckCircle className="w-4 h-4" />

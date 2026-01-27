@@ -25,6 +25,7 @@ import {
   AlertCircle,
   RefreshCw,
   Shield,
+  MessageSquarePlus,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
@@ -338,6 +339,16 @@ export default function OperatorDashboard() {
             <div>
               <span className="font-medium text-slate-700">알림 설정</span>
               <p className="text-xs text-slate-500">이메일 알림 관리</p>
+            </div>
+          </Link>
+          <Link
+            to="/operator/forum-management"
+            className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-green-300 hover:bg-green-50 transition-colors"
+          >
+            <MessageSquarePlus className="w-5 h-5 text-green-600" />
+            <div>
+              <span className="font-medium text-slate-700">포럼 관리</span>
+              <p className="text-xs text-slate-500">포럼 개설 요청 관리</p>
             </div>
           </Link>
           <Link
