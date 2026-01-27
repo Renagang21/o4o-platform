@@ -61,7 +61,7 @@ export interface ServiceLoginCredentials {
 }
 
 // Service User token management
-function getStoredServiceTokens() {
+function _getStoredServiceTokens() {
   return {
     accessToken: localStorage.getItem(SERVICE_ACCESS_TOKEN_KEY),
     refreshToken: localStorage.getItem(SERVICE_REFRESH_TOKEN_KEY),

@@ -121,9 +121,10 @@ export interface BusinessInfo {
   metadata?: Record<string, any>;
 }
 
-// Token type discriminator for Platform vs Service User authentication
+// Token type discriminator for Platform vs Service vs Guest authentication
 // Phase 1: Service User 인증 기반 구축 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
-export type TokenType = 'user' | 'service';
+// Phase 3: Guest 인증 추가 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
+export type TokenType = 'user' | 'service' | 'guest';
 
 // Token-specific types
 export interface AccessTokenPayload {
@@ -148,12 +149,17 @@ export interface AccessTokenPayload {
   iat?: number;
   exp?: number;
   // Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
-  /** Token type: 'user' for platform users, 'service' for service users */
+  /** Token type: 'user' for platform users, 'service' for service users, 'guest' for guest users */
   tokenType?: TokenType;
   /** Service ID for service user tokens */
   serviceId?: string;
   /** Store ID for service user tokens (optional) */
   storeId?: string;
+  // Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
+  /** Device ID for guest tokens (QR, kiosk, signage) */
+  deviceId?: string;
+  /** Guest session ID for tracking guest activity */
+  guestSessionId?: string;
 }
 
 export interface RefreshTokenPayload {

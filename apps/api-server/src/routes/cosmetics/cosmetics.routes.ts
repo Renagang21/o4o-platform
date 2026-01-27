@@ -11,6 +11,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { createCosmeticsController } from './controllers/cosmetics.controller.js';
 import { createCosmeticsOrderController } from './controllers/cosmetics-order.controller.js';
+import { createCosmeticsPaymentController } from './controllers/cosmetics-payment.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 
@@ -63,9 +64,16 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     requireCosmeticsScope
   );
 
+  // Create payment controller (WO-O4O-PAYMENT-EXTENSION-ROLL-OUT-V0.1)
+  const paymentController = createCosmeticsPaymentController(
+    dataSource,
+    coreRequireAuth as any
+  );
+
   // Mount controllers
   router.use('/', cosmeticsController);
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
+  router.use('/payments', paymentController); // Payment EventHub 연결
 
   return router;
 }

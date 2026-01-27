@@ -393,6 +393,8 @@ app.use(httpMetrics.middleware());
 import authRoutes from './modules/auth/routes/auth.routes.js';
 // Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
 import serviceAuthRoutes from './modules/auth/routes/service-auth.routes.js';
+// Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
+import guestAuthRoutes from './modules/auth/routes/guest-auth.routes.js';
 // CMS routes - REMOVED (Phase R1: Domain separation)
 // import cmsRoutes from './modules/cms/routes/cms.routes.js';
 // LMS routes - REMOVED (Phase R1: Domain separation)
@@ -505,6 +507,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
 // Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1)
 app.use('/api/v1/auth/service', serviceAuthRoutes);
+// Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
+app.use('/api/v1/auth/guest', guestAuthRoutes);
 // CMS/LMS/Forum routes - REMOVED (Phase R1: Domain separation)
 // app.use('/api/v1/cms', cmsRoutes);
 // app.use('/api/v1/lms', lmsRoutes);
@@ -798,6 +802,11 @@ const startServer = async () => {
       const cosmeticsRoutes = createCosmeticsRoutes(AppDataSource);
       app.use('/api/v1/cosmetics', cosmeticsRoutes);
       logger.info('✅ Cosmetics routes registered at /api/v1/cosmetics');
+
+      // WO-O4O-PAYMENT-EXTENSION-ROLL-OUT-V0.1: 결제 이벤트 핸들러 초기화
+      const { initializeKCosmeticsPaymentHandler } = await import('./services/cosmetics/KCosmeticsPaymentEventHandler.js');
+      initializeKCosmeticsPaymentHandler(AppDataSource);
+      logger.info('✅ KCosmeticsPaymentEventHandler initialized');
     } catch (cosmeticsError) {
       logger.error('Failed to register Cosmetics routes:', cosmeticsError);
     }

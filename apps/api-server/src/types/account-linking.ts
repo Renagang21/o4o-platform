@@ -253,3 +253,102 @@ export interface ServiceUserLoginResponse {
   /** Token type is always 'service' for service users */
   tokenType: 'service';
 }
+
+// ============================================================================
+// Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
+// ============================================================================
+
+/**
+ * Guest Token Issue Request
+ * QR/키오스크/사이니지 진입 시 Guest Token 발급 요청
+ */
+export interface GuestTokenIssueRequest {
+  /** Service identifier (e.g., 'kpa-pharmacy', 'glycopharm') */
+  serviceId: string;
+  /** Store identifier (optional, for store-specific access) */
+  storeId?: string;
+  /** Device identifier (QR code ID, kiosk ID, etc.) */
+  deviceId?: string;
+  /** Entry point type */
+  entryType: 'qr' | 'kiosk' | 'signage' | 'web';
+  /** Optional metadata */
+  metadata?: Record<string, any>;
+}
+
+/**
+ * Guest Token Issue Response
+ */
+export interface GuestTokenIssueResponse {
+  success: boolean;
+  /** Guest session ID for tracking */
+  guestSessionId: string;
+  tokens: {
+    accessToken: string;
+    /** No refresh token for guests - short-lived only */
+    expiresIn: number;
+  };
+  /** Token type is always 'guest' */
+  tokenType: 'guest';
+  /** Service context */
+  context: {
+    serviceId: string;
+    storeId?: string;
+    deviceId?: string;
+    entryType: string;
+  };
+}
+
+/**
+ * Guest to Service User Upgrade Request
+ * Guest → Service User 승격 요청
+ */
+export interface GuestUpgradeRequest {
+  /** Existing guest token */
+  guestToken: string;
+  /** OAuth credentials for Service User authentication */
+  credentials: ServiceLoginCredentials;
+  /** IP address for logging */
+  ipAddress: string;
+  /** User agent for logging */
+  userAgent: string;
+}
+
+/**
+ * Guest to Service User Upgrade Response
+ */
+export interface GuestUpgradeResponse {
+  success: boolean;
+  /** Service user data after upgrade */
+  user: ServiceUserData;
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+  };
+  /** Token type changes to 'service' after upgrade */
+  tokenType: 'service';
+  /** Previous guest session ID (for activity transfer) */
+  previousGuestSessionId: string;
+  /** Indicates guest activity was preserved */
+  activityPreserved: boolean;
+}
+
+/**
+ * Guest User data (minimal, for tracking purposes)
+ */
+export interface GuestUserData {
+  /** Guest session ID */
+  guestSessionId: string;
+  /** Service ID */
+  serviceId: string;
+  /** Store ID (optional) */
+  storeId?: string;
+  /** Device ID (optional) */
+  deviceId?: string;
+  /** Entry type */
+  entryType: 'qr' | 'kiosk' | 'signage' | 'web';
+  /** Created timestamp */
+  createdAt: Date;
+  /** Expiry timestamp */
+  expiresAt: Date;
+}

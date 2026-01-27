@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../entities/User.js';
 import { AccessTokenPayload, RefreshTokenPayload, AuthTokens, TokenType } from '../types/auth.js';
-import type { ServiceUserData } from '../types/account-linking.js';
+import type { ServiceUserData, GuestUserData } from '../types/account-linking.js';
 import logger from './logger.js';
 import { deriveUserScopes } from './scope-assignment.utils.js';
 
@@ -428,4 +428,91 @@ export function getTokenType(token: string): TokenType | null {
   if (!payload) return null;
   // Default to 'user' for backward compatibility
   return payload.tokenType || 'user';
+}
+
+// ============================================================================
+// Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
+// ============================================================================
+
+// Guest tokens are short-lived (2 hours) - no refresh token
+const GUEST_TOKEN_EXPIRES_IN = 2 * 60 * 60; // 2 hours in seconds
+
+/**
+ * Generate access token for Guest Users (QR, Kiosk, Signage)
+ *
+ * === Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE) ===
+ *
+ * Guest User tokens are:
+ * - tokenType: 'guest'
+ * - Short-lived (2 hours, no refresh)
+ * - No platform role/permissions
+ * - Contains guestSessionId, deviceId, serviceId
+ * - Used for anonymous/temporary access via QR, kiosk, signage
+ *
+ * @param guestData - Guest user data
+ * @param domain - Domain for the token (default: neture.co.kr)
+ * @returns JWT access token string
+ */
+export function generateGuestAccessToken(
+  guestData: GuestUserData,
+  domain: string = 'neture.co.kr'
+): string {
+  const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
+
+  const payload: AccessTokenPayload = {
+    userId: guestData.guestSessionId, // Use guestSessionId as userId for consistency
+    sub: guestData.guestSessionId,
+    role: 'guest', // Not a platform role, just for identification
+    permissions: [],    // Guest users have no platform permissions
+    scopes: [],         // Guest users have no platform scopes
+    domain,
+    tokenType: 'guest', // Phase 3: Guest 인증
+    serviceId: guestData.serviceId,
+    storeId: guestData.storeId,
+    deviceId: guestData.deviceId,
+    guestSessionId: guestData.guestSessionId,
+    iss: jwtIssuer,     // Phase 2.5: Server isolation
+    aud: jwtAudience,   // Phase 2.5: Server isolation
+    exp: Math.floor(Date.now() / 1000) + GUEST_TOKEN_EXPIRES_IN,
+    iat: Math.floor(Date.now() / 1000)
+  };
+
+  return jwt.sign(payload, jwtSecret);
+}
+
+/**
+ * Check if token is a guest token
+ *
+ * @param token - JWT access token string
+ * @returns true if guest token, false otherwise
+ */
+export function isGuestToken(token: string): boolean {
+  const payload = verifyAccessToken(token);
+  return payload?.tokenType === 'guest';
+}
+
+/**
+ * Check if token is a guest or service token
+ *
+ * Used by guards that allow both guest and service users
+ * (e.g., store browsing, product catalog access)
+ *
+ * @param token - JWT access token string
+ * @returns true if guest or service token, false otherwise
+ */
+export function isGuestOrServiceToken(token: string): boolean {
+  const payload = verifyAccessToken(token);
+  return payload?.tokenType === 'guest' || payload?.tokenType === 'service';
+}
+
+/**
+ * Get guest token configuration for client
+ *
+ * @returns Guest token configuration object
+ */
+export function getGuestTokenConfig() {
+  return {
+    guestTokenExpiresIn: GUEST_TOKEN_EXPIRES_IN,
+    guestTokenExpiresInMs: GUEST_TOKEN_EXPIRES_IN * 1000
+  };
 }
