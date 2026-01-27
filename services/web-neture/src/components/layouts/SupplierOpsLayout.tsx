@@ -137,17 +137,22 @@ export default function SupplierOpsLayout() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p>&copy; 2026 Neture. 공급자 중심 운영·연결 서비스</p>
-            <p className="mt-1 text-xs text-gray-400">
-              <Link to="/o4o" className="hover:text-primary-600">
-                o4o 플랫폼 소개
-              </Link>
-              {' · '}
-              <Link to="/" className="hover:text-primary-600">
-                메인으로
-              </Link>
-            </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+            <div className="text-center sm:text-left">
+              <p>&copy; 2026 Neture. 공급자 중심 운영·연결 서비스</p>
+              <p className="mt-1 text-xs text-gray-400">
+                <Link to="/o4o" className="hover:text-primary-600">
+                  o4o 플랫폼 소개
+                </Link>
+                {' · '}
+                <Link to="/" className="hover:text-primary-600">
+                  메인으로
+                </Link>
+              </p>
+            </div>
+            <Link to="/supplier-ops/forum/test-feedback" className="text-xs text-green-600 hover:text-green-700 transition-colors">
+              🧪 테스트 센터
+            </Link>
           </div>
         </div>
       </footer>

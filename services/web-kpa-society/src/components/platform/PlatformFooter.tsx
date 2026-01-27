@@ -34,9 +34,14 @@ export function PlatformFooter() {
           </div>
         </div>
         <div style={styles.copyright}>
-          <p style={styles.copyrightText}>
-            © {currentYear} O4O Platform. All rights reserved.
-          </p>
+          <div style={styles.copyrightRow}>
+            <p style={styles.copyrightText}>
+              © {currentYear} O4O Platform. All rights reserved.
+            </p>
+            <a href="/test-center" style={styles.testCenterLink}>
+              🧪 테스트 센터
+            </a>
+          </div>
         </div>
       </div>
     </footer>
@@ -100,11 +105,25 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: '1px solid #1e293b',
     paddingTop: '24px',
   },
+  copyrightRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '16px',
+  },
   copyrightText: {
     fontSize: '0.75rem',
     color: '#64748b',
     margin: 0,
-    textAlign: 'center',
+  },
+  testCenterLink: {
+    fontSize: '0.75rem',
+    color: '#4ade80',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
   },
 };
 
