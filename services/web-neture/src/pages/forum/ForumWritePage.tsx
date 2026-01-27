@@ -30,7 +30,7 @@ import {
 // ============================================================================
 
 const CATEGORY_SLUG = 'neture-forum';
-const MIN_CONTENT_LENGTH = 20;
+const MIN_CONTENT_LENGTH = 5;
 
 // ============================================================================
 // Main Component

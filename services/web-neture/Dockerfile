@@ -34,9 +34,13 @@ COPY services/web-neture/ ./services/web-neture/
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/content-editor build
 
-# Build-time environment variable for Vite
+# Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
+ARG VITE_USE_REAL_FORUM_API=true
+ARG VITE_API_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_USE_REAL_FORUM_API=$VITE_USE_REAL_FORUM_API
+ENV VITE_API_URL=$VITE_API_URL
 
 # Build the service
 WORKDIR /app/services/web-neture

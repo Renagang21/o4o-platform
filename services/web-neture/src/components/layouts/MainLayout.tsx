@@ -19,7 +19,7 @@ import { isAdminVaultAuthorized } from '../../utils/adminVaultAuth';
  */
 export default function MainLayout() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const showAdminVault = isAdminVaultAuthorized(user?.email);
 
   const isActive = (path: string) => {
@@ -90,8 +90,8 @@ export default function MainLayout() {
                   </Link>
                 </>
               )}
-              {/* Account Menu */}
-              <AccountMenu />
+              {/* Account Menu - o4o 공통 영역에서는 로그인 버튼 미노출, 로그인 후에만 표시 */}
+              {isAuthenticated && <AccountMenu />}
             </nav>
           </div>
         </div>

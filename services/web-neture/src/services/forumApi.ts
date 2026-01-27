@@ -331,20 +331,16 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
     };
   }
 
-  // Real API call - find post by slug
+  // Real API call - get post by slug directly
   try {
-    // First, search for the post by slug
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?search=${encodeURIComponent(slug)}&limit=1`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${encodeURIComponent(slug)}`);
     const data = await response.json();
 
-    if (!data.success || data.data.length === 0) {
+    if (!response.ok || !data.success) {
       return null;
     }
 
-    // Get full post details by ID
-    const postId = data.data[0].id;
-    const detailResponse = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`);
-    return await detailResponse.json();
+    return data;
   } catch (error) {
     console.error('Error fetching forum post:', error);
     return null;

@@ -53,11 +53,11 @@ export class ForumPost {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.PUBLISHED })
   status!: PostStatus;
 
-  @Column({ type: 'uuid' })
-  categoryId!: string;
+  @Column({ type: 'uuid', nullable: true })
+  categoryId?: string | null;
 
-  @Column({ name: 'author_id', type: 'uuid' })
-  authorId!: string;
+  @Column({ name: 'author_id', type: 'uuid', nullable: true })
+  authorId?: string | null;
 
   @Column({ name: 'organization_id', type: 'uuid', nullable: true })
   organizationId?: string;

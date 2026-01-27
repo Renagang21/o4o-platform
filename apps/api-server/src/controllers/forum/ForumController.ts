@@ -152,8 +152,12 @@ export class ForumController {
     try {
       const { id } = req.params;
 
+      // Support both UUID and slug-based lookup
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      const where = isUuid ? { id } : { slug: id };
+
       const post = await this.postRepository.findOne({
-        where: { id },
+        where,
         relations: ['category', 'author'],
       });
 
@@ -184,30 +188,27 @@ export class ForumController {
    */
   async createPost(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
+      const userId = (req as any).user?.id || null;
 
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Unauthorized',
-        });
-        return;
-      }
-
-      const { title, content, excerpt, categoryId, type, tags, isPinned, allowComments, metadata } = req.body;
+      const { title, content, excerpt, categoryId, categorySlug, type, tags, isPinned, allowComments, metadata, showContactOnPost } = req.body;
 
       // Generate slug from title
       const slug = this.generateSlug(title);
 
-      // Check if category exists
-      const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
-      if (!category) {
-        res.status(400).json({
-          success: false,
-          error: 'Category not found',
-        });
-        return;
+      // Resolve category by ID or slug
+      let category;
+      if (categoryId) {
+        category = await this.categoryRepository.findOne({ where: { id: categoryId } });
+      } else if (categorySlug) {
+        category = await this.categoryRepository.findOne({ where: { slug: categorySlug } });
       }
+
+      if (!category) {
+        // Fallback: find first active category
+        category = await this.categoryRepository.findOne({ where: { isActive: true }, order: { sortOrder: 'ASC' } });
+      }
+
+      const resolvedCategoryId = category?.id || null;
 
       // Normalize content to Block[] format
       const normalizedContent = normalizeContent(content);
@@ -222,16 +223,17 @@ export class ForumController {
         title,
         content: normalizedContent,
         excerpt: postExcerpt,
-        categoryId,
+        categoryId: resolvedCategoryId,
         type,
         tags,
         isPinned,
         allowComments: allowComments !== false,
         metadata: normalizedMeta,
+        showContactOnPost: showContactOnPost || false,
         authorId: userId,
         slug,
-        status: category.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
-        publishedAt: category.requireApproval ? undefined : new Date(),
+        status: category?.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
+        publishedAt: category?.requireApproval ? undefined : new Date(),
       });
 
       const savedPost = await this.postRepository.save(post);
