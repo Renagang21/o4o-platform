@@ -1,22 +1,30 @@
 /**
  * LoginPage - KPA Society 로그인 페이지
  *
- * WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 이동
- * WO-KPA-FUNCTION-GATE-V1: 직능 미선택 시 게이트로 이동
+ * 경로에 따른 동작:
+ * - /login (메인): 전체 KPA 테스트 계정 (운영자 포함), 로그인 후 / 이동
+ * - /demo/login (데모): 데모용 계정, 로그인 후 /demo 이동
  *
- * 로그인 후 이동:
- * - 직능 미선택 -> /demo/select-function (게이트)
- * - 직능 선택됨 -> /demo 홈
+ * WO-KPA-FUNCTION-GATE-V1: 직능 미선택 시 게이트로 이동
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
 // 계정은 SeedAdditionalTestAccounts migration에서 생성됨
 const TEST_PASSWORD = 'TestPassword';
-const testAccounts = [
+
+// 메인 로그인: KPA 테스트 계정 (운영자 제외)
+const mainTestAccounts = [
+  { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '일반회원 (약사)' },
+  { email: 'district-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '지부 임원' },
+  { email: 'branch-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '분회 임원' },
+];
+
+// 데모 로그인: 기존 데모 계정
+const demoTestAccounts = [
   { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '일반회원 (약사)' },
   { email: 'branch-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '분회 임원' },
   { email: 'district-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '지부 임원' },
@@ -24,6 +32,7 @@ const testAccounts = [
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +40,8 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // 경로 기반 모드 판별: /demo/login → 데모, /login → 메인
+  const isDemo = location.pathname.startsWith('/demo');
   // 테스트 계정 정보를 입력 필드에 채우기
   const fillTestAccount = (account: { email: string; password: string }) => {
     setEmail(account.email);
@@ -52,14 +63,15 @@ export function LoginPage() {
                       loggedInUser.role === 'branch_admin' ||
                       loggedInUser.role === 'super_admin';
 
+      // 경로 prefix: 메인은 /demo 기준 (현재 전체 구조가 /demo 하위)
+      const prefix = isDemo ? '/demo' : '/demo';
+
       if (isAdmin) {
-        // 운영자/관리자는 바로 운영자 대시보드로 이동
-        navigate('/demo/intranet/operator');
+        navigate(`${prefix}/intranet/operator`);
       } else if (!loggedInUser.pharmacistFunction) {
-        // 일반 약사 회원은 직능 미선택 시 게이트로 이동
-        navigate('/demo/select-function');
+        navigate(`${prefix}/select-function`);
       } else {
-        navigate('/demo');
+        navigate(prefix);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
@@ -153,7 +165,7 @@ export function LoginPage() {
         <div style={styles.testSection}>
           <p style={styles.testLabel}>테스트 계정 (클릭 시 입력됨)</p>
           <div style={styles.testAccounts}>
-            {testAccounts.map((account) => (
+            {(isDemo ? demoTestAccounts : mainTestAccounts).map((account) => (
               <button
                 key={account.email}
                 type="button"

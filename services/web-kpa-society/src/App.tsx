@@ -225,7 +225,7 @@ function App() {
           {/* ========================================
            * 레거시 경로 리다이렉트 (기존 북마크 지원)
            * ======================================== */}
-          <Route path="/login" element={<Navigate to="/demo/login" replace />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Navigate to="/demo/register" replace />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
           <Route path="/operator/*" element={<Navigate to="/demo/operator" replace />} />
