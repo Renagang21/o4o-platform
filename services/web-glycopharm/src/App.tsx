@@ -34,6 +34,8 @@ const PharmacyProducts = lazy(() => import('@/pages/pharmacy/PharmacyProducts'))
 const PharmacyOrders = lazy(() => import('@/pages/pharmacy/PharmacyOrders'));
 const PharmacyPatients = lazy(() => import('@/pages/pharmacy/PharmacyPatients'));
 const PharmacySettings = lazy(() => import('@/pages/pharmacy/PharmacySettings'));
+const PharmacyManagement = lazy(() => import('@/pages/pharmacy/PharmacyManagement'));
+const PharmacyB2BProducts = lazy(() => import('@/pages/pharmacy/PharmacyB2BProducts'));
 
 // Smart Display (Legacy)
 const SmartDisplayPage = lazy(() => import('@/pages/pharmacy/smart-display/SmartDisplayPage'));
@@ -265,6 +267,9 @@ function AppRoutes() {
         {/* Store Apply */}
         <Route path="store-apply" element={<StoreApplyPage />} />
         <Route path="settings" element={<PharmacySettings />} />
+        {/* 약국 경영 */}
+        <Route path="management" element={<PharmacyManagement />} />
+        <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>
 
       {/* Supplier Dashboard - Neture에서 관리 */}

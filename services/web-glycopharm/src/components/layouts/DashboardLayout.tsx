@@ -33,6 +33,7 @@ import {
   Megaphone,
   HelpCircle,
   FileText,
+  Briefcase,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -53,6 +54,7 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/pharmacy/smart-display', label: '스마트 디스플레이', icon: Tv },
       { path: '/pharmacy/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
       { path: '/pharmacy/market-trial', label: 'Market Trial', icon: Tag },
+      { path: '/pharmacy/management', label: '약국 경영', icon: Briefcase },
       { path: '/pharmacy/settings', label: '설정', icon: Settings },
     ],
   },
