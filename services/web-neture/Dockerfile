@@ -17,6 +17,7 @@ COPY pnpm-workspace.yaml ./
 COPY package.json ./
 
 # Copy workspace packages needed for this service
+COPY packages/types/package.json ./packages/types/
 COPY packages/content-editor/package.json ./packages/content-editor/
 
 # Copy service package.json
@@ -26,12 +27,14 @@ COPY services/web-neture/package.json ./services/web-neture/
 RUN pnpm install --filter @o4o/web-neture...
 
 # Copy workspace package source
+COPY packages/types/ ./packages/types/
 COPY packages/content-editor/ ./packages/content-editor/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
-# Build workspace dependencies first
+# Build workspace dependencies first (types -> content-editor)
+RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/content-editor build
 
 # Build-time environment variables for Vite

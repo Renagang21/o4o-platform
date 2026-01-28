@@ -215,13 +215,14 @@ jobs:
           echo "Building k-cosmetics-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
-          # Use service-specific API URL for same-origin cookie auth
+          # Build from repo root with Dockerfile path (for workspace packages)
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_K_COSMETICS }} \
+            -f services/web-k-cosmetics/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest \
-            services/web-k-cosmetics
+            .
 
           docker push gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG}
           docker push gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest
@@ -350,13 +351,14 @@ jobs:
           echo "Building glycopharm-web Docker image..."
           IMAGE_TAG="${{ github.sha }}"
 
-          # Use service-specific API URL for same-origin cookie auth
+          # Build from repo root with Dockerfile path (for workspace packages)
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_GLYCOPHARM }} \
+            -f services/web-glycopharm/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest \
-            services/web-glycopharm
+            .
 
           docker push gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG}
           docker push gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest
