@@ -81,7 +81,7 @@ export function LoginPage() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <div style={styles.logo}>청명광역약사회</div>
+        <div style={styles.logo}>KPA-Society</div>
         <h1 style={styles.title}>로그인</h1>
         <p style={styles.subtitle}>약사회 SaaS에 오신 것을 환영합니다</p>
 

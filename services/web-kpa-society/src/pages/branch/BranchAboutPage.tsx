@@ -75,7 +75,7 @@ export function BranchAboutPage() {
       <div style={styles.hero}>
         <div style={styles.heroIcon}>🏢</div>
         <h1 style={styles.heroTitle}>{branchName} 분회</h1>
-        <p style={styles.heroSubtitle}>청명광역약사회 소속</p>
+        <p style={styles.heroSubtitle}>KPA-Society 소속</p>
       </div>
 
       {/* Info Cards */}
@@ -89,7 +89,7 @@ export function BranchAboutPage() {
             </div>
             <div style={styles.infoItem}>
               <span style={styles.infoLabel}>소속</span>
-              <span style={styles.infoValue}>청명광역약사회</span>
+              <span style={styles.infoValue}>KPA-Society</span>
             </div>
             <div style={styles.infoItem}>
               <span style={styles.infoLabel}>관할지역</span>

@@ -31,7 +31,7 @@ interface ServiceConfig {
 
 // 기본 설정 (KPA Society)
 const defaultConfig: ServiceConfig = {
-  serviceName: '청명광역약사회',
+  serviceName: 'KPA-Society',
   serviceDescription: '지부·분회 회원 관리, 교육 신청, 공동구매 등 약사회 운영을 지원하는 SaaS 플랫폼',
   primaryColor: colors.primary,
 };

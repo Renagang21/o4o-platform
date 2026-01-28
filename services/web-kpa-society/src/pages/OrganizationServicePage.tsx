@@ -20,7 +20,7 @@ import { colors, spacing, borderRadius, typography } from '../styles/theme';
 // 지부 데모 카드
 const branchCards: DemoCardData[] = [
   {
-    title: '청명광역약사회',
+    title: 'KPA-Society',
     description: '지부 운영을 위한 서비스 화면 예시',
     badge: '도입 검토용 데모',
     ctaLabel: '데모 보기',

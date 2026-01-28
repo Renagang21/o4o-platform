@@ -168,7 +168,7 @@ export function HomePage() {
       {/* 서비스 테스트 & 개선 참여 (WO-TEST-HOMEPAGE-SECTION-V1) */}
       <TestImprovementSection
         config={{
-          serviceName: '청명광역약사회',
+          serviceName: 'KPA-Society',
           serviceDescription: '지부·분회 회원 관리, 교육 신청, 공동구매 등 약사회 운영을 지원하는 SaaS 플랫폼',
           primaryColor: colors.primary,
         }}

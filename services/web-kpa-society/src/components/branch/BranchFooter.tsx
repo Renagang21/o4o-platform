@@ -19,7 +19,7 @@ export function BranchFooter({ branchName }: BranchFooterProps) {
               <span style={styles.logoIcon}>💊</span>
               {branchName} 분회
             </h3>
-            <p style={styles.address}>청명광역약사회 소속</p>
+            <p style={styles.address}>KPA-Society 소속</p>
           </div>
 
           <div style={styles.links}>
@@ -32,7 +32,7 @@ export function BranchFooter({ branchName }: BranchFooterProps) {
         </div>
 
         <div style={styles.copyright}>
-          © {new Date().getFullYear()} {branchName} 분회 (청명광역약사회)
+          © {new Date().getFullYear()} {branchName} 분회 (KPA-Society)
         </div>
       </div>
     </footer>

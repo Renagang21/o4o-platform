@@ -76,7 +76,7 @@ import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServi
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-PHARMACY-DEPTH-V1, WO-KPA-PHARMACY-B2B-FUNCTION-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, ServiceLoginPage, ServiceDashboardPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, ServiceLoginPage, ServiceDashboardPage, PharmacyDashboardPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Phase 2-b: Service User Protected Route (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
@@ -103,7 +103,7 @@ import {
  * - 기존 서비스 코드 변경 없이 라우팅만 이동
  */
 
-const SERVICE_NAME = '청명광역약사회';
+const SERVICE_NAME = 'KPA-Society';
 
 /**
  * Service User Protected Route
@@ -163,6 +163,8 @@ function App() {
            * WO-KPA-PHARMACY-DEPTH-V1: 깊이 화면 추가
            * ======================================== */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
+          {/* WO-PHARMACY-CONTEXT-MVP-V1: 약국경영 대시보드 (Context 기반 보호) */}
+          <Route path="/pharmacy/dashboard" element={<Layout serviceName={SERVICE_NAME}><PharmacyDashboardPage /></Layout>} />
           <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyB2BPage /></Layout>} />
           <Route path="/pharmacy/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><SupplierListPage /></Layout>} />
           <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><SupplierDetailPage /></Layout>} />

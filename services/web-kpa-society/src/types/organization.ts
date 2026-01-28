@@ -3,7 +3,7 @@
  * WO-KPA-COMMITTEE-INTRANET-V1
  */
 
-export type OrganizationType = 'branch' | 'division' | 'committee';
+export type OrganizationType = 'branch' | 'division' | 'committee' | 'pharmacy';
 export type CommitteeType = 'academic' | 'it' | 'general';
 export type MemberRole = 'chair' | 'officer' | 'member';
 
@@ -30,6 +30,16 @@ export interface OrganizationMember {
     canChangeSettings: boolean;
   };
 }
+
+/**
+ * 조직 유형 라벨
+ */
+export const ORGANIZATION_TYPE_LABELS: Record<OrganizationType, string> = {
+  branch: '지부',
+  division: '분회',
+  committee: '위원회',
+  pharmacy: '약국',
+};
 
 /**
  * 위원회 유형 라벨

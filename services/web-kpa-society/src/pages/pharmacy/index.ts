@@ -13,3 +13,6 @@ export { PharmacyServicesPage } from './PharmacyServicesPage';
 // Phase 2-b: Service User pages (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
 export { ServiceLoginPage } from './ServiceLoginPage';
 export { ServiceDashboardPage } from './ServiceDashboardPage';
+
+// WO-PHARMACY-CONTEXT-MVP-V1: 약국경영 대시보드 (Context 기반)
+export { PharmacyDashboardPage } from './PharmacyDashboardPage';

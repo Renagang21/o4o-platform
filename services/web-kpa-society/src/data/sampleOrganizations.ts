@@ -51,11 +51,18 @@ function generateCommittees(): Organization[] {
 
 export const SAMPLE_COMMITTEES: Organization[] = generateCommittees();
 
-// 전체 조직 목록 (지부 + 분회 + 위원회)
+// 약국 (WO-PHARMACY-CONTEXT-MVP-V1)
+export const SAMPLE_PHARMACIES: Organization[] = [
+  { id: 'pharmacy-1', name: '샘플약국', type: 'pharmacy', memberCount: 0 },
+  { id: 'pharmacy-2', name: '건강약국', type: 'pharmacy', memberCount: 0 },
+];
+
+// 전체 조직 목록 (지부 + 분회 + 위원회 + 약국)
 export const ALL_ORGANIZATIONS: Organization[] = [
   SAMPLE_BRANCH,
   ...SAMPLE_DIVISIONS,
   ...SAMPLE_COMMITTEES,
+  ...SAMPLE_PHARMACIES,
 ];
 
 // 위원회 멤버 샘플 데이터 생성

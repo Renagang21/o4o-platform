@@ -1,0 +1,416 @@
+/**
+ * Organization Join Request Controller
+ *
+ * WO-CONTEXT-JOIN-REQUEST-MVP-V1
+ *
+ * 조직 가입 / 역할 승격 / 운영자 요청 API
+ *
+ * Endpoints:
+ * - POST   /                 요청 생성 (인증 필수)
+ * - GET    /my               내 요청 목록
+ * - GET    /pending          운영자용 대기 목록
+ * - PATCH  /:id/approve      승인
+ * - PATCH  /:id/reject       반려
+ */
+
+import { Router, Request, Response, RequestHandler } from 'express';
+import { DataSource } from 'typeorm';
+import {
+  KpaOrganizationJoinRequest,
+  JoinRequestType,
+  JoinRequestStatus,
+  RequestedRole,
+} from '../entities/kpa-organization-join-request.entity.js';
+import { OrganizationMemberService } from '@o4o/organization-core/services';
+import logger from '../../../utils/logger.js';
+
+const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator', 'pharmacy_join', 'pharmacy_operator'];
+const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator'];
+
+/**
+ * RBAC 검사: admin 또는 kpa operator 여부
+ */
+function isAdminOrOperator(user: any): boolean {
+  const userRoles: string[] = user.roles || [];
+  const userScopes: string[] = user.scopes || [];
+  const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin');
+  const isOperator = userScopes.some(
+    (s: string) => s.includes(':admin') || s.includes(':operator')
+  );
+  return isAdmin || isOperator;
+}
+
+/**
+ * Create Organization Join Request Routes
+ */
+export function createOrganizationJoinRequestRoutes(
+  dataSource: DataSource,
+  requireAuth: RequestHandler,
+  requireScope: (scope: string) => RequestHandler
+): Router {
+  const router = Router();
+  const getRepo = () => dataSource.getRepository(KpaOrganizationJoinRequest);
+  const getMemberService = () => new OrganizationMemberService(dataSource);
+
+  // 모든 엔드포인트 인증 필수
+  router.use(requireAuth);
+
+  // =========================================================================
+  // POST / — 요청 생성
+  // =========================================================================
+  router.post('/', async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const {
+        organizationId,
+        requestType,
+        requestedRole,
+        requestedSubRole,
+        payload,
+      } = req.body;
+
+      // 유효성 검사
+      if (!organizationId) {
+        return res.status(400).json({
+          success: false,
+          error: '조직 ID가 필요합니다.',
+          code: 'MISSING_ORGANIZATION_ID',
+        });
+      }
+
+      if (!requestType || !VALID_REQUEST_TYPES.includes(requestType)) {
+        return res.status(400).json({
+          success: false,
+          error: '유효하지 않은 요청 유형입니다.',
+          code: 'INVALID_REQUEST_TYPE',
+        });
+      }
+
+      const role = requestedRole || 'member';
+      if (!VALID_ROLES.includes(role)) {
+        return res.status(400).json({
+          success: false,
+          error: '유효하지 않은 역할입니다.',
+          code: 'INVALID_ROLE',
+        });
+      }
+
+      const repo = getRepo();
+
+      // 중복 요청 확인: 동일 user + org + requestType의 pending 요청
+      const existingPending = await repo.findOne({
+        where: {
+          user_id: user.id,
+          organization_id: organizationId,
+          request_type: requestType,
+          status: 'pending' as JoinRequestStatus,
+        },
+      });
+
+      if (existingPending) {
+        return res.status(409).json({
+          success: false,
+          error: '이미 처리 대기 중인 동일한 요청이 있습니다.',
+          code: 'DUPLICATE_PENDING_REQUEST',
+        });
+      }
+
+      // join 요청 시: 이미 멤버인지 확인
+      if (requestType === 'join' || requestType === 'pharmacy_join') {
+        try {
+          const memberService = getMemberService();
+          const isMember = await memberService.isMember(user.id, organizationId);
+          if (isMember) {
+            return res.status(409).json({
+              success: false,
+              error: '이미 해당 조직의 멤버입니다.',
+              code: 'ALREADY_MEMBER',
+            });
+          }
+        } catch {
+          // organization-core isMember 실패 시 무시 (조직이 없을 수 있음)
+        }
+      }
+
+      // 요청 생성
+      const request = repo.create({
+        user_id: user.id,
+        organization_id: organizationId,
+        request_type: requestType as JoinRequestType,
+        requested_role: role as RequestedRole,
+        requested_sub_role: requestedSubRole?.trim() || null,
+        payload: payload || null,
+        status: 'pending' as JoinRequestStatus,
+      });
+
+      await repo.save(request);
+
+      logger.info(
+        `Organization join request created: ${request.id} (${requestType}) by user ${user.id} for org ${organizationId}`
+      );
+
+      return res.status(201).json({
+        success: true,
+        data: request,
+      });
+    } catch (error) {
+      logger.error('Failed to create organization join request:', error);
+      return res.status(500).json({
+        success: false,
+        error: '요청 생성 중 오류가 발생했습니다.',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  // =========================================================================
+  // GET /my — 내 요청 목록
+  // =========================================================================
+  router.get('/my', async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const { status } = req.query;
+
+      const repo = getRepo();
+      const qb = repo
+        .createQueryBuilder('r')
+        .where('r.user_id = :userId', { userId: user.id });
+
+      if (status && ['pending', 'approved', 'rejected'].includes(status as string)) {
+        qb.andWhere('r.status = :status', { status });
+      }
+
+      qb.orderBy('r.created_at', 'DESC');
+
+      const items = await qb.getMany();
+
+      return res.json({
+        success: true,
+        data: items,
+      });
+    } catch (error) {
+      logger.error('Failed to list my join requests:', error);
+      return res.status(500).json({
+        success: false,
+        error: '요청 목록 조회 중 오류가 발생했습니다.',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  // =========================================================================
+  // GET /pending — 운영자용 대기 목록
+  // =========================================================================
+  router.get('/pending', async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+
+      if (!isAdminOrOperator(user)) {
+        return res.status(403).json({
+          success: false,
+          error: '운영자 또는 관리자 권한이 필요합니다.',
+          code: 'FORBIDDEN',
+        });
+      }
+
+      const { organizationId, page = '1', limit = '20' } = req.query;
+      const pageNum = parseInt(page as string) || 1;
+      const limitNum = Math.min(parseInt(limit as string) || 20, 100);
+
+      const repo = getRepo();
+      const qb = repo
+        .createQueryBuilder('r')
+        .where('r.status = :status', { status: 'pending' });
+
+      if (organizationId) {
+        qb.andWhere('r.organization_id = :organizationId', { organizationId });
+      }
+
+      qb.orderBy('r.created_at', 'ASC')
+        .skip((pageNum - 1) * limitNum)
+        .take(limitNum);
+
+      const [items, total] = await qb.getManyAndCount();
+
+      return res.json({
+        success: true,
+        data: {
+          items,
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            totalPages: Math.ceil(total / limitNum),
+          },
+        },
+      });
+    } catch (error) {
+      logger.error('Failed to list pending join requests:', error);
+      return res.status(500).json({
+        success: false,
+        error: '대기 요청 목록 조회 중 오류가 발생했습니다.',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  // =========================================================================
+  // PATCH /:id/approve — 승인
+  // =========================================================================
+  router.patch('/:id/approve', async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+
+      if (!isAdminOrOperator(user)) {
+        return res.status(403).json({
+          success: false,
+          error: '운영자 또는 관리자 권한이 필요합니다.',
+          code: 'FORBIDDEN',
+        });
+      }
+
+      const { id } = req.params;
+      const { reviewNote } = req.body;
+
+      const repo = getRepo();
+      const request = await repo.findOne({ where: { id } });
+
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          error: '요청을 찾을 수 없습니다.',
+          code: 'NOT_FOUND',
+        });
+      }
+
+      if (request.status !== 'pending') {
+        return res.status(409).json({
+          success: false,
+          error: `이미 처리된 요청입니다. (현재 상태: ${request.status})`,
+          code: 'ALREADY_PROCESSED',
+        });
+      }
+
+      // OrganizationMember 반영
+      const memberService = getMemberService();
+
+      try {
+        if (request.request_type === 'join' || request.request_type === 'pharmacy_join') {
+          await memberService.addMember(request.organization_id, {
+            userId: request.user_id,
+            role: request.requested_role,
+            metadata: request.requested_sub_role
+              ? { subRole: request.requested_sub_role }
+              : undefined,
+          });
+        } else {
+          // promotion / operator → updateMemberRole
+          await memberService.updateMemberRole(
+            request.organization_id,
+            request.user_id,
+            {
+              role: request.requested_role,
+              metadata: request.requested_sub_role
+                ? { subRole: request.requested_sub_role }
+                : undefined,
+            }
+          );
+        }
+      } catch (memberError: any) {
+        logger.warn(
+          `Member service error during approval of request ${id}: ${memberError.message}`
+        );
+        // 멤버 서비스 오류 시에도 요청은 승인 처리 (best-effort)
+        // 이미 멤버인 경우 등 non-critical 에러 허용
+      }
+
+      // 요청 상태 업데이트
+      request.status = 'approved';
+      request.reviewed_by = user.id;
+      request.reviewed_at = new Date();
+      request.review_note = reviewNote?.trim() || null;
+
+      await repo.save(request);
+
+      logger.info(
+        `Organization join request approved: ${id} by ${user.id}`
+      );
+
+      return res.json({
+        success: true,
+        data: request,
+      });
+    } catch (error) {
+      logger.error('Failed to approve join request:', error);
+      return res.status(500).json({
+        success: false,
+        error: '승인 처리 중 오류가 발생했습니다.',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  // =========================================================================
+  // PATCH /:id/reject — 반려
+  // =========================================================================
+  router.patch('/:id/reject', async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+
+      if (!isAdminOrOperator(user)) {
+        return res.status(403).json({
+          success: false,
+          error: '운영자 또는 관리자 권한이 필요합니다.',
+          code: 'FORBIDDEN',
+        });
+      }
+
+      const { id } = req.params;
+      const { reviewNote } = req.body;
+
+      const repo = getRepo();
+      const request = await repo.findOne({ where: { id } });
+
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          error: '요청을 찾을 수 없습니다.',
+          code: 'NOT_FOUND',
+        });
+      }
+
+      if (request.status !== 'pending') {
+        return res.status(409).json({
+          success: false,
+          error: `이미 처리된 요청입니다. (현재 상태: ${request.status})`,
+          code: 'ALREADY_PROCESSED',
+        });
+      }
+
+      request.status = 'rejected';
+      request.reviewed_by = user.id;
+      request.reviewed_at = new Date();
+      request.review_note = reviewNote?.trim() || null;
+
+      await repo.save(request);
+
+      logger.info(
+        `Organization join request rejected: ${id} by ${user.id}`
+      );
+
+      return res.json({
+        success: true,
+        data: request,
+      });
+    } catch (error) {
+      logger.error('Failed to reject join request:', error);
+      return res.status(500).json({
+        success: false,
+        error: '반려 처리 중 오류가 발생했습니다.',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  return router;
+}

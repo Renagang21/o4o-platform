@@ -27,6 +27,7 @@ import { createAdminDashboardController } from './controllers/admin-dashboard.co
 import { createBranchAdminDashboardController } from './controllers/branch-admin-dashboard.controller.js';
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
+import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
@@ -93,6 +94,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Join Inquiry Admin routes (WO-KPA-JOIN-CONVERSION-V1)
   router.use('/join-inquiries', createJoinInquiryAdminRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
+  router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

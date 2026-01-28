@@ -116,7 +116,7 @@ export function DashboardPage() {
         <div style={styles.heroOverlay} />
         <div style={styles.heroPattern} />
         <div style={styles.heroContent}>
-          <div style={styles.heroBadge}>청명광역약사회</div>
+          <div style={styles.heroBadge}>KPA-Society</div>
           <h1 style={styles.heroTitle}>
             약사회는 회원 여러분과<br />함께합니다
           </h1>

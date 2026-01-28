@@ -19,6 +19,7 @@ import {
   SettingsPage,
 } from '../pages/admin-branch';
 import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
+import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 
 export function AdminRoutes() {
   return (
@@ -40,6 +41,9 @@ export function AdminRoutes() {
 
           {/* 위원회 관리 (요청 기반) */}
           <Route path="committee-requests" element={<CommitteeRequestsPage />} />
+
+          {/* 조직 가입/역할 요청 관리 (WO-CONTEXT-JOIN-REQUEST-MVP-V1) */}
+          <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
 
           {/* 신상신고 */}
           <Route path="annual-report" element={<AnnualReportPage />} />

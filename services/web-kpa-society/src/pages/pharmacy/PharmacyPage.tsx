@@ -49,6 +49,8 @@ interface ManagementCard {
   status: string;
   statusType: 'active' | 'ready' | 'coming';
   ownerOnly?: boolean;
+  /** true면 외부 URL (새 창으로 열기) */
+  external?: boolean;
 }
 
 const activeServices: ManagementCard[] = [
@@ -89,14 +91,6 @@ const activeServices: ManagementCard[] = [
 
 const availableServices: ManagementCard[] = [
   {
-    title: '혈당관리 프로그램',
-    description: '약국 기반 혈당관리 서비스 운영',
-    icon: '🩸',
-    href: '/pharmacy/services',
-    status: '참여 가능',
-    statusType: 'ready',
-  },
-  {
     title: '디지털 사이니지',
     description: '매장 디지털 디스플레이 콘텐츠 관리',
     icon: '📺',
@@ -112,6 +106,23 @@ const availableServices: ManagementCard[] = [
     status: '준비중',
     statusType: 'coming',
     ownerOnly: true,
+  },
+];
+
+const GLUCOSEVIEW_URL = import.meta.env.DEV
+  ? 'http://localhost:4101'
+  : 'https://glucoseview.neture.co.kr';
+
+/** 약국 경영 지원 서비스 (외부, 새 창) */
+const supportServices: ManagementCard[] = [
+  {
+    title: '혈당관리 지원 약국',
+    description: '(사)한국당뇨협회와 함께 하는 혈당관리 약국 서비스',
+    icon: '🩸',
+    href: GLUCOSEVIEW_URL,
+    status: '참여 가능',
+    statusType: 'ready',
+    external: true,
   },
 ];
 
@@ -167,6 +178,16 @@ function PharmacyDashboard() {
           </div>
         </section>
 
+        {/* 약국 경영 지원 서비스 (외부) */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>약국 경영 지원 서비스</h2>
+          <div style={styles.cardGrid}>
+            {supportServices.map((card) => (
+              <ServiceCard key={card.title} card={card} />
+            ))}
+          </div>
+        </section>
+
         {/* PharmacyUtilitySection */}
         <div style={styles.utility}>
           <p style={styles.utilityText}>
@@ -189,11 +210,16 @@ function ServiceCard({ card }: { card: ManagementCard }) {
 
   const isComing = card.statusType === 'coming';
 
-  return (
-    <div style={{
-      ...styles.card,
-      ...(isComing ? styles.cardDisabled : {}),
-    }}>
+  function handleClick() {
+    if (isComing) return;
+    if (card.external) {
+      window.open(card.href, '_blank', 'noopener,noreferrer');
+    }
+    // 내부 링크는 Link 컴포넌트가 처리
+  }
+
+  const cardContent = (
+    <>
       <div style={styles.cardHeader}>
         <span style={styles.cardIcon}>{card.icon}</span>
         <span style={{ ...styles.cardStatus, ...statusStyle }}>{card.status}</span>
@@ -201,13 +227,37 @@ function ServiceCard({ card }: { card: ManagementCard }) {
       <h3 style={styles.cardTitle}>{card.title}</h3>
       <p style={styles.cardDesc}>{card.description}</p>
       {!isComing ? (
-        <Link to={card.href} style={styles.cardCta}>
-          바로가기 →
-        </Link>
+        <span style={styles.cardCta}>
+          {card.external ? '새 창으로 열기 ↗' : '바로가기 →'}
+        </span>
       ) : (
         <span style={styles.cardCtaDisabled}>준비중</span>
       )}
-    </div>
+    </>
+  );
+
+  // 외부 링크 또는 비활성 카드
+  if (card.external || isComing) {
+    return (
+      <div
+        style={{
+          ...styles.card,
+          ...(isComing ? styles.cardDisabled : { cursor: 'pointer' }),
+        }}
+        onClick={handleClick}
+      >
+        {cardContent}
+      </div>
+    );
+  }
+
+  // 내부 링크 카드
+  return (
+    <Link to={card.href} style={{ textDecoration: 'none' }}>
+      <div style={{ ...styles.card, cursor: 'pointer' }}>
+        {cardContent}
+      </div>
+    </Link>
   );
 }
 

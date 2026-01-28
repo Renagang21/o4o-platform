@@ -34,6 +34,9 @@ interface OrganizationContextType {
   hasMultipleContexts: boolean;
   isContextSet: boolean;
   clearContext: () => void;
+
+  // === WO-CONTEXT-JOIN-REQUEST-MVP-V1 ===
+  refreshAccessibleOrganizations: () => void;
 }
 
 const OrganizationContext = createContext<OrganizationContextType | null>(null);
@@ -100,10 +103,14 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
     getOrganizationChain(initialOrg.id)
   );
 
+  // WO-PHARMACY-CONTEXT-AUTO-REFRESH-V1: refresh counter to force re-computation
+  const [refreshCounter, setRefreshCounter] = useState(0);
+
   // Role 기반 접근 가능 조직
   const accessibleOrganizations = useMemo(
     () => getAccessibleOrganizationsForRole(user?.role),
-    [user?.role]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user?.role, refreshCounter]
   );
 
   // 기본 역할: officer (Phase 1)
@@ -154,6 +161,24 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
     setOrganizationChain(getOrganizationChain(SAMPLE_BRANCH.id));
   }, []);
 
+  // === WO-CONTEXT-JOIN-REQUEST-MVP-V1 + WO-PHARMACY-CONTEXT-AUTO-REFRESH-V1 ===
+  // 승인 후 프론트엔드에서 호출하여 accessibleOrganizations 갱신
+  // Sample data 기반: refreshCounter 증가로 useMemo 재실행 트리거
+  // 실제 API 연동 시: fetch → setAccessibleOrganizations 로 교체
+  const refreshAccessibleOrganizations = useCallback(() => {
+    setRefreshCounter((c) => c + 1);
+
+    // 현재 org가 refresh 후에도 접근 가능한지 검증
+    const refreshed = getAccessibleOrganizationsForRole(user?.role);
+    const stillAccessible = refreshed.some((org) => org.id === currentOrganization.id);
+    if (!stillAccessible && refreshed.length > 0) {
+      const fallback = refreshed[0];
+      setCurrentOrg(fallback);
+      setOrganizationChain(getOrganizationChain(fallback.id));
+      persistContext(fallback, currentRole);
+    }
+  }, [user?.role, currentOrganization.id, currentRole]);
+
   // 로그아웃 시 컨텍스트 초기화
   useEffect(() => {
     if (!user) {
@@ -176,6 +201,7 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
         hasMultipleContexts,
         isContextSet,
         clearContext,
+        refreshAccessibleOrganizations,
       }}
     >
       {children}

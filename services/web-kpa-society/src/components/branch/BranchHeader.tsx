@@ -75,7 +75,7 @@ export function BranchHeader({ branchId, branchName }: BranchHeaderProps) {
       <div style={styles.topBar}>
         <div style={styles.topBarContent}>
           <Link to="/" style={styles.backToMain}>
-            ← 청명광역약사회 본부로 이동
+            ← KPA-Society 본부로 이동
           </Link>
           <span style={styles.branchBadge}>분회 사이트</span>
         </div>

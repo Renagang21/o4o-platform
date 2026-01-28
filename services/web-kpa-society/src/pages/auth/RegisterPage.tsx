@@ -98,7 +98,7 @@ export default function RegisterPage() {
       <div style={styles.card}>
         <div style={styles.logo}>KPA</div>
         <h1 style={styles.title}>회원가입 신청</h1>
-        <p style={styles.subtitle}>청명광역약사회 회원가입을 신청합니다</p>
+        <p style={styles.subtitle}>KPA-Society 회원가입을 신청합니다</p>
 
         <div style={styles.notice}>
           <span style={styles.noticeIcon}>!</span>
