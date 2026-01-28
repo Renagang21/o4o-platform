@@ -192,7 +192,7 @@ export interface Address {
 import type { ForumPostResponse } from '@o4o/types/forum';
 export type { ForumPostResponse };
 
-export interface ForumPost extends Partial<ForumPostResponse> {
+export interface ForumPost {
   id: string;
   title: string;
   content: string;
