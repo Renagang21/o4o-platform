@@ -20,6 +20,7 @@ import {
 } from '../pages/admin-branch';
 import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
+import { KpaOperatorDashboardPage } from '../pages/admin/KpaOperatorDashboardPage';
 
 export function AdminRoutes() {
   return (
@@ -31,6 +32,9 @@ export function AdminRoutes() {
 
           {/* 대시보드 */}
           <Route path="dashboard" element={<DashboardPage />} />
+
+          {/* 플랫폼 운영 대시보드 (WO-KPA-SOCIETY-OPERATOR-DASHBOARD-FRAME-V1) */}
+          <Route path="kpa-dashboard" element={<KpaOperatorDashboardPage />} />
 
           {/* 분회 관리 */}
           <Route path="divisions" element={<DivisionsPage />} />

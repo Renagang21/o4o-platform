@@ -18,6 +18,7 @@ export function AdminSidebar() {
 
   const menuItems: MenuItem[] = [
     { path: '', label: '대시보드', icon: '📊' },
+    { path: '/kpa-dashboard', label: '플랫폼 운영', icon: '🖥️' },
     { path: '/divisions', label: '분회 관리', icon: '🏢', badge: 5 },
     { path: '/members', label: '회원 관리', icon: '👥' },
     { path: '/committee-requests', label: '위원회 관리', icon: '👥' },
