@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from '../components/LoginModal';
+import { ServiceOnboardingBanner } from '../components/onboarding/ServiceOnboardingBanner';
 
 // 슬라이드 배너 타입
 interface SlideBanner {
@@ -268,6 +269,9 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Service Onboarding Banner - 미승인 사용자 */}
+      <ServiceOnboardingBanner />
 
       {/* CTA Section - 로그인 후에만 표시 */}
       {isAuthenticated && isApproved && (

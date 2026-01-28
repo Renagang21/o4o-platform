@@ -23,6 +23,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts';
+import { BusinessOnboardingBanner } from '../components/onboarding/BusinessOnboardingBanner';
 
 // ========================================
 // Types
@@ -722,6 +723,11 @@ export function HomePage() {
     <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       {/* 1. Hero / Campaign Slider */}
       <HeroSection />
+
+      {/* Business Onboarding Banner */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 24px 0' }}>
+        <BusinessOnboardingBanner />
+      </div>
 
       {/* 2. Quick Action - 운영 도구 요약 */}
       <QuickActionSection />
