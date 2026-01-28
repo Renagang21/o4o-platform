@@ -21,7 +21,7 @@ import {
   JoinRequestStatus,
   RequestedRole,
 } from '../entities/kpa-organization-join-request.entity.js';
-import { OrganizationMemberService } from '@o4o/organization-core/services';
+import { OrganizationMemberService } from '@o4o/organization-core';
 import logger from '../../../utils/logger.js';
 
 const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator', 'pharmacy_join', 'pharmacy_operator'];
