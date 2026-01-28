@@ -15,6 +15,8 @@ RUN npm install -g pnpm
 # Copy workspace configuration
 COPY pnpm-workspace.yaml ./
 COPY package.json ./
+COPY tsconfig.base.json ./
+COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
 COPY packages/types/package.json ./packages/types/
