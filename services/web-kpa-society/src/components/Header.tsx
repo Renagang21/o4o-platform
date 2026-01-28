@@ -12,6 +12,7 @@ import { useAuth, useOrganization } from '../contexts';
 import { TestAccountType } from '../contexts/AuthContext';
 import { colors } from '../styles/theme';
 import { ContextIndicator } from './common/ContextIndicator';
+import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
 
 interface MenuItem {
   label: string;
@@ -56,6 +57,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { accessibleOrganizations } = useOrganization();
+  const accessibleDashboards = useAccessibleDashboards();
 
   // 관리자 여부 확인 (admin, district_admin, branch_admin 역할만 관리자 메뉴 표시)
   const adminRoles = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
@@ -179,14 +181,21 @@ export function Header({ serviceName }: { serviceName: string }) {
                         <span style={styles.userDropdownEmail}>{user.email}</span>
                       </div>
                       <div style={styles.userDropdownDivider} />
-                      <Link
-                        to="/demo/mypage"
-                        style={styles.userDropdownItem}
-                        onClick={() => setShowUserDropdown(false)}
-                      >
-                        <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
-                        대시보드
-                      </Link>
+                      {accessibleDashboards.length >= 2 ? (
+                        <>
+                          <DashboardSwitcher onNavigate={() => setShowUserDropdown(false)} />
+                          <div style={styles.userDropdownDivider} />
+                        </>
+                      ) : (
+                        <Link
+                          to="/demo/mypage"
+                          style={styles.userDropdownItem}
+                          onClick={() => setShowUserDropdown(false)}
+                        >
+                          <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
+                          대시보드
+                        </Link>
+                      )}
                       <Link
                         to="/demo/mypage/profile"
                         style={styles.userDropdownItem}
