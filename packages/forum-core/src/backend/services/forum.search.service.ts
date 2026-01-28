@@ -4,7 +4,7 @@
  * Phase 15-A: Full-text Search Engine for Forum
  *
  * Provides PostgreSQL full-text search functionality for forum posts.
- * Supports weighted ranking, filtering by type/cosmetics/yaksa, and pagination.
+ * Supports weighted ranking, generic extension filtering, and pagination.
  */
 
 import type { DataSource, SelectQueryBuilder } from 'typeorm';
@@ -19,17 +19,25 @@ export interface ForumSearchQuery {
   query: string;
 
   // Filters
-  type?: 'all' | 'cosmetics' | 'yaksa';
   postType?: PostType;
   status?: PostStatus;
   categoryId?: string;
   organizationId?: string;
   authorId?: string;
 
-  // Cosmetics-specific filters
-  brand?: string;
-  skinType?: string;
-  concerns?: string[];
+  /**
+   * Generic extension key filter.
+   * Filters posts that have metadata under `metadata->'extensions'->extensionKey`.
+   * Replaces the old domain-specific `type` field.
+   */
+  extensionKey?: string;
+
+  /**
+   * Extension hook: apply custom query builder filters.
+   * Used by extension packages (forum-cosmetics, forum-yaksa) to add
+   * domain-specific WHERE clauses without Core knowing the domain.
+   */
+  applyExtensionFilters?: (qb: any) => void;
 
   // Sorting
   sort?: 'relevance' | 'latest' | 'popular' | 'oldest';
@@ -117,15 +125,13 @@ export class ForumSearchService {
     const startTime = Date.now();
     const {
       query,
-      type = 'all',
       postType,
       status = PostStatus.PUBLISHED,
       categoryId,
       organizationId,
       authorId,
-      brand,
-      skinType,
-      concerns,
+      extensionKey,
+      applyExtensionFilters,
       sort = 'relevance',
       page = 1,
       limit = 20,
@@ -184,16 +190,11 @@ export class ForumSearchService {
     // Status filter (default: published)
     qb.andWhere('post.status = :status', { status });
 
-    // Type-specific filters
-    if (type === 'cosmetics') {
-      // Filter posts with cosmetics metadata (neture extension)
+    // Extension key filter (generic)
+    if (extensionKey) {
       qb.andWhere(
-        `(post.metadata->'extensions'->'neture' IS NOT NULL OR post.metadata->'neture' IS NOT NULL)`
-      );
-    } else if (type === 'yaksa') {
-      // Filter posts with yaksa metadata
-      qb.andWhere(
-        `(post.metadata->'extensions'->'yaksa' IS NOT NULL OR post.metadata->'yaksa' IS NOT NULL)`
+        `(post.metadata->'extensions'->:extKey IS NOT NULL OR post.metadata->:extKey IS NOT NULL)`,
+        { extKey: extensionKey }
       );
     }
 
@@ -217,30 +218,9 @@ export class ForumSearchService {
       qb.andWhere('post.authorId = :authorId', { authorId });
     }
 
-    // Cosmetics-specific filters
-    if (brand) {
-      qb.andWhere(
-        `(post.metadata->'extensions'->'neture'->>'brand' ILIKE :brand OR post.metadata->>'brand' ILIKE :brand)`,
-        { brand: `%${brand}%` }
-      );
-    }
-
-    if (skinType) {
-      qb.andWhere(
-        `(post.metadata->'extensions'->'neture'->>'skinType' = :skinType OR post.metadata->'neture'->>'skinType' = :skinType)`,
-        { skinType }
-      );
-    }
-
-    if (concerns && concerns.length > 0) {
-      // Check if any of the concerns match
-      qb.andWhere(
-        `(
-          post.metadata->'extensions'->'neture'->'concerns' ?| :concerns
-          OR post.metadata->'neture'->'concerns' ?| :concerns
-        )`,
-        { concerns }
-      );
+    // Extension-specific filters (applied via hook callback)
+    if (applyExtensionFilters) {
+      applyExtensionFilters(qb);
     }
 
     // Sorting
@@ -310,64 +290,14 @@ export class ForumSearchService {
   }
 
   /**
-   * Search posts by cosmetics-specific criteria
-   */
-  async searchByCosmetics(options: {
-    query?: string;
-    skinType?: string;
-    concerns?: string[];
-    brand?: string;
-    categoryId?: string;
-    sort?: 'relevance' | 'latest' | 'popular';
-    page?: number;
-    limit?: number;
-  }): Promise<SearchResults> {
-    return this.searchPosts({
-      query: options.query || '',
-      type: 'cosmetics',
-      skinType: options.skinType,
-      concerns: options.concerns,
-      brand: options.brand,
-      categoryId: options.categoryId,
-      sort: options.sort || 'relevance',
-      page: options.page,
-      limit: options.limit,
-    });
-  }
-
-  /**
-   * Search posts by yaksa organization
-   */
-  async searchByYaksa(options: {
-    query?: string;
-    organizationId: string;
-    categoryId?: string;
-    postType?: PostType;
-    sort?: 'relevance' | 'latest' | 'popular';
-    page?: number;
-    limit?: number;
-  }): Promise<SearchResults> {
-    return this.searchPosts({
-      query: options.query || '',
-      type: 'yaksa',
-      organizationId: options.organizationId,
-      categoryId: options.categoryId,
-      postType: options.postType,
-      sort: options.sort || 'relevance',
-      page: options.page,
-      limit: options.limit,
-    });
-  }
-
-  /**
    * Get search suggestions (autocomplete)
    */
   async getSuggestions(options: {
     query: string;
-    type?: 'all' | 'cosmetics' | 'yaksa';
+    extensionKey?: string;
     limit?: number;
   }): Promise<string[]> {
-    const { query, type = 'all', limit = 10 } = options;
+    const { query, extensionKey, limit = 10 } = options;
 
     if (!query || query.trim().length < 2) {
       return [];
@@ -384,13 +314,10 @@ export class ForumSearchService {
       .where(`post.search_vector @@ to_tsquery('simple', :tsQuery)`, { tsQuery })
       .andWhere('post.status = :status', { status: PostStatus.PUBLISHED });
 
-    if (type === 'cosmetics') {
+    if (extensionKey) {
       qb.andWhere(
-        `(post.metadata->'extensions'->'neture' IS NOT NULL OR post.metadata->'neture' IS NOT NULL)`
-      );
-    } else if (type === 'yaksa') {
-      qb.andWhere(
-        `(post.metadata->'extensions'->'yaksa' IS NOT NULL OR post.metadata->'yaksa' IS NOT NULL)`
+        `(post.metadata->'extensions'->:extKey IS NOT NULL OR post.metadata->:extKey IS NOT NULL)`,
+        { extKey: extensionKey }
       );
     }
 
@@ -406,10 +333,15 @@ export class ForumSearchService {
    * Get popular search terms (based on tags and common keywords)
    */
   async getPopularSearchTerms(options: {
-    type?: 'all' | 'cosmetics' | 'yaksa';
+    extensionKey?: string;
     limit?: number;
   }): Promise<Array<{ term: string; count: number }>> {
-    const { type = 'all', limit = 10 } = options;
+    const { extensionKey, limit = 10 } = options;
+
+    // Build extension filter clause
+    const extFilter = extensionKey
+      ? `AND (metadata->'extensions'->'${extensionKey.replace(/'/g, "''")}' IS NOT NULL OR metadata->'${extensionKey.replace(/'/g, "''")}' IS NOT NULL)`
+      : '';
 
     // Get popular tags
     const result = await this.dataSource.query(`
@@ -418,8 +350,7 @@ export class ForumSearchService {
         SELECT UNNEST(tags) as tag
         FROM forum_post
         WHERE status = 'publish'
-        ${type === 'cosmetics' ? `AND (metadata->'extensions'->'neture' IS NOT NULL OR metadata->'neture' IS NOT NULL)` : ''}
-        ${type === 'yaksa' ? `AND (metadata->'extensions'->'yaksa' IS NOT NULL OR metadata->'yaksa' IS NOT NULL)` : ''}
+        ${extFilter}
       ) sub
       GROUP BY tag
       ORDER BY count DESC

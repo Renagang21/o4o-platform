@@ -65,13 +65,13 @@ function formatRelativeTime(dateString: string): string {
 
 function getTypeBadge(type: PostType): { label: string; bgColor: string; textColor: string } {
   const badges: Record<string, { label: string; bgColor: string; textColor: string }> = {
-    ANNOUNCEMENT: { label: '공지', bgColor: '#fef2f2', textColor: '#dc2626' },
-    QUESTION: { label: '질문', bgColor: '#f0fdf4', textColor: '#16a34a' },
-    GUIDE: { label: '가이드', bgColor: '#fefce8', textColor: '#ca8a04' },
-    DISCUSSION: { label: '토론', bgColor: '#eff6ff', textColor: '#2563eb' },
-    POLL: { label: '투표', bgColor: '#faf5ff', textColor: '#9333ea' },
+    announcement: { label: '공지', bgColor: '#fef2f2', textColor: '#dc2626' },
+    question: { label: '질문', bgColor: '#f0fdf4', textColor: '#16a34a' },
+    guide: { label: '가이드', bgColor: '#fefce8', textColor: '#ca8a04' },
+    discussion: { label: '토론', bgColor: '#eff6ff', textColor: '#2563eb' },
+    poll: { label: '투표', bgColor: '#faf5ff', textColor: '#9333ea' },
   };
-  return badges[type] || badges.DISCUSSION;
+  return badges[type] || badges.discussion;
 }
 
 function toDisplayComment(comment: ApiForumComment): DisplayComment {

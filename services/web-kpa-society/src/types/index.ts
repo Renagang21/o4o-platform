@@ -33,7 +33,16 @@ export interface User {
   createdAt: string;
 }
 
-// 포럼
+// 포럼 — shared API response types from @o4o/types/forum (Phase 19-B)
+import type {
+  ForumPostResponse,
+  ForumCommentResponse,
+  ForumCategoryResponse,
+} from '@o4o/types/forum';
+
+export type { ForumPostResponse, ForumCommentResponse, ForumCategoryResponse };
+
+// Local view types with KPA-specific flattened fields
 export interface ForumCategory {
   id: string;
   name: string;
@@ -42,20 +51,20 @@ export interface ForumCategory {
   postCount: number;
 }
 
-export interface ForumPost {
+export interface ForumPost extends Partial<ForumPostResponse> {
   id: string;
   title: string;
   content: string;
   excerpt?: string;
   authorId: string;
-  authorName: string;
+  authorName: string;       // flattened from author.name
   categoryId: string;
-  categoryName: string;
+  categoryName: string;     // flattened from category.name
   viewCount: number;
-  views: number; // alias for viewCount
+  views: number;            // alias for viewCount
   commentCount: number;
   likeCount: number;
-  likes: number; // alias for likeCount
+  likes: number;            // alias for likeCount
   isPinned: boolean;
   createdAt: string;
   updatedAt: string;
@@ -66,7 +75,7 @@ export interface ForumComment {
   postId: string;
   content: string;
   authorId: string;
-  authorName: string;
+  authorName: string;       // flattened from author.name
   parentId?: string;
   createdAt: string;
 }

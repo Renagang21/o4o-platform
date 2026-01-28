@@ -28,14 +28,14 @@ import {
   getAuthorName,
   extractTextContent,
   type ForumPost,
-  type PostType,
 } from '../../services/forumApi';
+import type { ForumPostType } from '@o4o/types/forum';
 
 // ============================================================
 // Types
 // ============================================================
 
-type DisplayPostType = 'discussion' | 'question' | 'announcement' | 'poll' | 'guide';
+type DisplayPostType = ForumPostType;
 
 interface HomeForumPost {
   id: string;
@@ -69,15 +69,11 @@ const FORUM_CONFIG = {
 // Helper Functions
 // ============================================================
 
-function apiTypeToDisplayType(type: PostType): DisplayPostType {
-  const mapping: Record<PostType, DisplayPostType> = {
-    'DISCUSSION': 'discussion',
-    'QUESTION': 'question',
-    'ANNOUNCEMENT': 'announcement',
-    'POLL': 'poll',
-    'GUIDE': 'guide',
-  };
-  return mapping[type] || 'discussion';
+function apiTypeToDisplayType(type: string): DisplayPostType {
+  // API now returns lowercase values matching DisplayPostType directly
+  const valid: DisplayPostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
+  const lower = type.toLowerCase() as DisplayPostType;
+  return valid.includes(lower) ? lower : 'discussion';
 }
 
 function toHomeForumPost(post: ForumPost): HomeForumPost {

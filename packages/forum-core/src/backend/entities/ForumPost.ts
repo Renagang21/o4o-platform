@@ -12,19 +12,45 @@ import { ForumCategory } from './ForumCategory.js';
 import type { Block } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 
+/**
+ * 게시글 생명주기 상태 (Core 기준, 확장 금지)
+ *
+ * Core는 "승인/공개 관점"까지만 책임진다.
+ * App/Extension 고유 상태(예: GlycoPharm ForumStatus)는 각 서비스에서 별도 정의한다.
+ *
+ * @remarks 값을 추가·삭제하려면 반드시 Phase 승인이 필요하다.
+ */
 export enum PostStatus {
+  /** 작성 중 — 비공개, 작성자만 조회 가능 */
   DRAFT = 'draft',
+  /** 공개 — 정상 노출 */
   PUBLISHED = 'publish',
+  /** 승인 대기 — requireApproval 카테고리에서 사용 */
   PENDING = 'pending',
+  /** 반려 — 운영자가 거부 */
   REJECTED = 'rejected',
+  /** 보관 — 공개 목록에서 숨김, 직접 링크로 조회 가능 */
   ARCHIVED = 'archived'
 }
 
+/**
+ * 게시글 콘텐츠 성격 분류 (Core 기준, 확장 금지)
+ *
+ * App에서 추가 유형이 필요한 경우 자체 매핑으로 처리한다.
+ * (예: GlycoPharm 'normal'|'notice' → App-level PostType)
+ *
+ * @remarks 값을 추가·삭제하려면 반드시 Phase 승인이 필요하다.
+ */
 export enum PostType {
+  /** 일반 토론 (기본값) */
   DISCUSSION = 'discussion',
+  /** 질문 */
   QUESTION = 'question',
+  /** 공지사항 */
   ANNOUNCEMENT = 'announcement',
+  /** 투표 */
   POLL = 'poll',
+  /** 가이드/안내 */
   GUIDE = 'guide'
 }
 

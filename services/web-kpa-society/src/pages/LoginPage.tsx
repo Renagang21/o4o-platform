@@ -66,7 +66,7 @@ export function LoginPage() {
 
       if (isAdmin) {
         navigate(`${prefix}/intranet/operator`);
-      } else if (!loggedInUser.pharmacistFunction) {
+      } else if (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole) {
         navigate(`${prefix}/select-function`);
       } else {
         navigate(prefix);

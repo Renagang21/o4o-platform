@@ -78,12 +78,23 @@ const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
  */
 export type PharmacistFunction = 'pharmacy' | 'hospital' | 'industry' | 'other';
 
+/**
+ * 약사 직역 (Role) - WO-PHARMACIST-PROFILE-ROLE-ONBOARDING-V1
+ * 직역은 안내/온보딩 용도 메타데이터 (권한과 무관)
+ * - general: 일반 약사 (근무약사/산업약사 등)
+ * - pharmacy_owner: 약국 개설자 (약국 경영)
+ * - hospital: 병원 약사
+ * - other: 기타
+ */
+export type PharmacistRole = 'general' | 'pharmacy_owner' | 'hospital' | 'other';
+
 export interface User {
   id: string;
   email: string;
   name: string;
   role?: string;
   pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
+  pharmacistRole?: PharmacistRole;          // 직역 (최초 1회 선택, 프로필에서 수정 가능)
 }
 
 /**
@@ -157,6 +168,7 @@ interface AuthContextType {
   logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
   setPharmacistFunction: (fn: PharmacistFunction) => void;
+  setPharmacistRole: (role: PharmacistRole) => void;
   // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -202,6 +214,7 @@ function mapApiRoleToKpaRole(apiRole: string | undefined): string {
 function createUserFromApiResponse(apiUser: ApiUser): User {
   const mappedRole = mapApiRoleToKpaRole(apiUser.role);
   const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
+  const savedPharmacistRole = localStorage.getItem(`kpa_pharmacist_role_${apiUser.id}`) as PharmacistRole | null;
 
   return {
     id: apiUser.id,
@@ -209,6 +222,7 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
     name: apiUser.fullName || apiUser.name || apiUser.email,
     role: mappedRole,
     pharmacistFunction: savedFunction || undefined,
+    pharmacistRole: savedPharmacistRole || undefined,
   };
 }
 
@@ -299,8 +313,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       const updatedUser = { ...user, pharmacistFunction: fn };
       setUser(updatedUser);
-      // 로컬 저장 (사용자별)
       localStorage.setItem(`kpa_function_${user.id}`, fn);
+    }
+  };
+
+  /**
+   * WO-PHARMACIST-PROFILE-ROLE-ONBOARDING-V1: 약사 직역 설정
+   * - 최초 가입 시 선택, 이후 프로필에서 수정 가능
+   * - localStorage에 저장 (추후 API 연동 가능)
+   */
+  const setPharmacistRole = (role: PharmacistRole) => {
+    if (user) {
+      const updatedUser = { ...user, pharmacistRole: role };
+      setUser(updatedUser);
+      localStorage.setItem(`kpa_pharmacist_role_${user.id}`, role);
     }
   };
 
@@ -369,6 +395,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logoutAll,
         checkAuth,
         setPharmacistFunction,
+        setPharmacistRole,
         // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
         serviceUser,
         isServiceUserAuthenticated: !!serviceUser,

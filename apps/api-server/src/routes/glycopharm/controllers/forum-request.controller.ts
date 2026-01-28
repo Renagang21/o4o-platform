@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { ForumCategoryRequest } from '../entities/index.js';
+import { GlycopharmForumCategoryRequest } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -29,7 +29,7 @@ export function createForumRequestController(
   requireScope: ScopeMiddleware
 ): Router {
   const router = Router();
-  const requestRepo = dataSource.getRepository(ForumCategoryRequest);
+  const requestRepo = dataSource.getRepository(GlycopharmForumCategoryRequest);
 
   // ============================================================================
   // USER ROUTES

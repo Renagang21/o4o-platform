@@ -8,9 +8,16 @@
 import { useState, useEffect } from 'react';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi } from '../../api';
-import { useAuth } from '../../contexts';
+import { useAuth, type PharmacistRole } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { User } from '../../types';
+
+const PHARMACIST_ROLE_LABELS: Record<PharmacistRole, string> = {
+  general: '일반 약사',
+  pharmacy_owner: '약국 개설자',
+  hospital: '병원 약사',
+  other: '기타',
+};
 
 interface ProfileData extends User {
   licenseNumber?: string;
@@ -21,7 +28,7 @@ interface ProfileData extends User {
 }
 
 export function MyProfilePage() {
-  const { user } = useAuth();
+  const { user, setPharmacistRole } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -34,6 +41,7 @@ export function MyProfilePage() {
     email: '',
     university: '',
     workplace: '',
+    pharmacistRole: '' as PharmacistRole | '',
   });
 
   useEffect(() => {
@@ -54,6 +62,7 @@ export function MyProfilePage() {
         email: data.email || '',
         university: data.university || '',
         workplace: data.workplace || '',
+        pharmacistRole: user?.pharmacistRole || '',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
@@ -75,6 +84,7 @@ export function MyProfilePage() {
         email: profile.email || '',
         university: profile.university || '',
         workplace: profile.workplace || '',
+        pharmacistRole: user?.pharmacistRole || '',
       });
     }
     setIsEditMode(false);
@@ -85,9 +95,14 @@ export function MyProfilePage() {
 
     try {
       setSaving(true);
-      await mypageApi.updateProfile(formData);
+      // pharmacistRole은 localStorage 기반이므로 API와 분리 저장
+      const { pharmacistRole: roleValue, ...apiFormData } = formData;
+      await mypageApi.updateProfile(apiFormData);
+      if (roleValue) {
+        setPharmacistRole(roleValue as PharmacistRole);
+      }
       // 프로필 데이터 업데이트
-      setProfile(prev => prev ? { ...prev, ...formData } : null);
+      setProfile(prev => prev ? { ...prev, ...apiFormData } : null);
       setIsEditMode(false);
       alert('프로필이 저장되었습니다.');
     } catch (err) {
@@ -180,6 +195,20 @@ export function MyProfilePage() {
             </div>
 
             <div style={styles.field}>
+              <label style={styles.label}>직역</label>
+              <select
+                style={styles.input}
+                value={formData.pharmacistRole}
+                onChange={e => setFormData({ ...formData, pharmacistRole: e.target.value as PharmacistRole })}
+              >
+                <option value="">선택하세요</option>
+                {(Object.entries(PHARMACIST_ROLE_LABELS) as [PharmacistRole, string][]).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={styles.field}>
               <label style={styles.label}>출신교 (대학)</label>
               <input
                 type="text"
@@ -252,6 +281,13 @@ export function MyProfilePage() {
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>약사면허</span>
               <span style={styles.infoValue}>{profile?.licenseNumber || '-'}</span>
+            </div>
+
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>직역</span>
+              <span style={styles.infoValue}>
+                {user?.pharmacistRole ? PHARMACIST_ROLE_LABELS[user.pharmacistRole] : '-'}
+              </span>
             </div>
 
             <div style={styles.infoRow}>

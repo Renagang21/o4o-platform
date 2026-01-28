@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '../contexts';
+import { useAuth, useOrganization } from '../contexts';
 import { TestAccountType } from '../contexts/AuthContext';
 import { colors } from '../styles/theme';
 import { ContextIndicator } from './common/ContextIndicator';
@@ -55,12 +55,21 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { accessibleOrganizations } = useOrganization();
+
   // 관리자 여부 확인 (admin, district_admin, branch_admin 역할만 관리자 메뉴 표시)
   const adminRoles = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
   const isAdmin = user && user.role && adminRoles.includes(user.role);
 
+  // 약국경영 메뉴: pharmacy context가 있을 때만 노출
+  const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
+  const filteredMenuItems = menuItems.filter(item => {
+    if (item.href === '/pharmacy') return hasPharmacyContext;
+    return true;
+  });
+
   // 메뉴 구성 (관리자인 경우 관리자 메뉴 추가)
-  const displayMenuItems = isAdmin ? [...menuItems, adminMenu] : menuItems;
+  const displayMenuItems = isAdmin ? [...filteredMenuItems, adminMenu] : filteredMenuItems;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

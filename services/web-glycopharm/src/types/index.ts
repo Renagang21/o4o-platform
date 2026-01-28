@@ -188,13 +188,16 @@ export interface Address {
   phone: string;
 }
 
-// Forum post
-export interface ForumPost {
+// Forum post — shared API type + GlycoPharm-specific flat fields
+import type { ForumPostResponse } from '@o4o/types/forum';
+export type { ForumPostResponse };
+
+export interface ForumPost extends Partial<ForumPostResponse> {
   id: string;
   title: string;
   content: string;
   authorId: string;
-  authorName: string;
+  authorName: string;       // flattened from author.name
   category: string;
   tags: string[];
   viewCount: number;

@@ -15,6 +15,10 @@
     "./cpt": {
       "types": "./dist/cpt/index.d.ts",
       "import": "./dist/cpt/index.js"
+    },
+    "./forum": {
+      "types": "./dist/forum.d.ts",
+      "import": "./dist/forum.js"
     }
   },
   "sideEffects": false,

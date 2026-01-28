@@ -138,18 +138,8 @@ export interface ForumPostAITags {
   suggestedCategory?: string;
   /** Confidence score (0-1) */
   confidence: number;
-  /** Domain-specific tags (cosmetics) */
-  cosmeticsTags?: {
-    skinType?: string;
-    concerns?: string[];
-    productTypes?: string[];
-  };
-  /** Domain-specific tags (yaksa) */
-  yaksaTags?: {
-    documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
-    isOrganizational?: boolean;
-    topics?: string[];
-  };
+  /** Domain-specific tags (extensible by domain packages) */
+  domainTags?: Record<string, unknown>;
 }
 
 /**
@@ -176,36 +166,11 @@ export interface ForumPostAIMeta {
 }
 
 // =============================================================================
-// Extension Metadata Types (for forum-neture, forum-yaksa)
+// Extension Metadata Types
 // =============================================================================
-
-/**
- * Neture Forum Extension Metadata
- * Used for cosmetics-related forum features
- */
-export interface NetureForumMeta {
-  skinType?: 'dry' | 'oily' | 'combination' | 'sensitive' | 'normal';
-  concerns?: string[];
-  routine?: string[];
-  productIds?: string[];
-  ingredientPreferences?: string[];
-  ageGroup?: string;
-}
-
-/**
- * Yaksa Forum Extension Metadata
- * Used for pharmacist community features
- */
-export interface YaksaForumMeta {
-  communityId?: string;
-  isAnnouncement?: boolean;
-  pinned?: boolean;
-  pharmacistVerified?: boolean;
-  drugInteractionWarning?: boolean;
-  professionalOnly?: boolean;
-  /** Document type for yaksa content classification */
-  documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
-}
+// Domain-specific extension metadata (NetureForumMeta, YaksaForumMeta, etc.)
+// should be defined in their respective extension packages (forum-cosmetics,
+// forum-yaksa). Core only provides the generic container.
 
 // =============================================================================
 // Forum Post Metadata Interface (Core)
@@ -263,13 +228,10 @@ export interface ForumPostDisplayMeta {
 
 /**
  * Extensions Metadata Section
- * Contains app-specific metadata (Neture, Yaksa, etc.)
+ * Generic container for domain-specific metadata.
+ * Each extension key maps to its own metadata shape.
  */
-export interface ForumPostExtensionsMeta {
-  neture?: NetureForumMeta;
-  yaksa?: YaksaForumMeta;
-  // Additional custom extensions can be added here
-}
+export type ForumPostExtensionsMeta = Record<string, unknown>;
 
 /**
  * Forum Post Metadata Interface
@@ -306,12 +268,6 @@ export interface ForumPostMetadata {
   lastViewedAt?: string;
   /** @deprecated Use analytics.peakViewCount instead */
   peakViewCount?: number;
-
-  // Legacy extension fields (direct access - kept for backward compatibility)
-  /** @deprecated Use extensions.neture instead */
-  neture?: NetureForumMeta;
-  /** @deprecated Use extensions.yaksa instead */
-  yaksa?: YaksaForumMeta;
 
   // Custom fields (extensible)
   custom?: Record<string, unknown>;
@@ -362,8 +318,6 @@ export function normalizeMetadata(input: Record<string, unknown> | ForumPostMeta
   // Normalize extensions section
   result.extensions = {
     ...(metadata.extensions || {}),
-    neture: metadata.extensions?.neture || metadata.neture,
-    yaksa: metadata.extensions?.yaksa || metadata.yaksa,
   };
 
   // Preserve custom fields
@@ -384,7 +338,7 @@ export function normalizeMetadata(input: Record<string, unknown> | ForumPostMeta
   if (Object.values(result.display || {}).every(v => v === undefined)) {
     delete result.display;
   }
-  if (!result.extensions?.neture && !result.extensions?.yaksa) {
+  if (!result.extensions || Object.keys(result.extensions).length === 0) {
     delete result.extensions;
   }
 
@@ -396,18 +350,18 @@ export function normalizeMetadata(input: Record<string, unknown> | ForumPostMeta
  */
 export function hasExtensionMeta(metadata: ForumPostMetadata | null | undefined): boolean {
   if (!metadata) return false;
-  return !!(metadata.extensions?.neture || metadata.extensions?.yaksa || metadata.neture || metadata.yaksa);
+  return !!(metadata.extensions && Object.keys(metadata.extensions).length > 0);
 }
 
 /**
- * Get extension metadata safely
+ * Get extension metadata safely by key
  */
-export function getExtensionMeta<T extends keyof ForumPostExtensionsMeta>(
+export function getExtensionMeta<T = unknown>(
   metadata: ForumPostMetadata | null | undefined,
-  extension: T
-): ForumPostExtensionsMeta[T] | undefined {
+  extensionKey: string
+): T | undefined {
   if (!metadata) return undefined;
-  return metadata.extensions?.[extension] || (metadata as any)[extension];
+  return metadata.extensions?.[extensionKey] as T | undefined;
 }
 
 /**
@@ -429,3 +383,6 @@ export interface ForumPostQueryParams {
 }
 
 export { PostStatus, PostType } from '../entities/ForumPost.js';
+
+// API Response DTOs (Phase 19-B)
+export * from './api-response.js';

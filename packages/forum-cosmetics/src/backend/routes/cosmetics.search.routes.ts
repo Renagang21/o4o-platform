@@ -70,16 +70,34 @@ export function createCosmeticsSearchRoutes(dataSource: DataSource): Router {
         ? (concerns as string).split(',').map(c => c.trim()).filter(Boolean)
         : undefined;
 
-      // Search with cosmetics type filter
-      const results = await searchService.searchByCosmetics({
+      // Search with cosmetics extension filter
+      const results = await searchService.searchPosts({
         query: q as string,
-        skinType: skinType as string | undefined,
-        concerns: concernsArray,
-        brand: brand as string | undefined,
+        extensionKey: 'neture',
         categoryId: categoryId as string | undefined,
         sort: sort as 'relevance' | 'latest' | 'popular',
         page: pageNum,
         limit: limitNum,
+        applyExtensionFilters: (qb: any) => {
+          if (brand) {
+            qb.andWhere(
+              `(post.metadata->'extensions'->'neture'->>'brand' ILIKE :brand OR post.metadata->>'brand' ILIKE :brand)`,
+              { brand: `%${brand as string}%` }
+            );
+          }
+          if (skinType) {
+            qb.andWhere(
+              `(post.metadata->'extensions'->'neture'->>'skinType' = :skinType OR post.metadata->'neture'->>'skinType' = :skinType)`,
+              { skinType }
+            );
+          }
+          if (concernsArray && concernsArray.length > 0) {
+            qb.andWhere(
+              `(post.metadata->'extensions'->'neture'->'concerns' ?| :concerns OR post.metadata->'neture'->'concerns' ?| :concerns)`,
+              { concerns: concernsArray }
+            );
+          }
+        },
       });
 
       res.json({
@@ -127,7 +145,7 @@ export function createCosmeticsSearchRoutes(dataSource: DataSource): Router {
 
       const suggestions = await searchService.getSuggestions({
         query: q as string,
-        type: 'cosmetics',
+        extensionKey: 'neture',
         limit: limitNum,
       });
 
@@ -157,7 +175,7 @@ export function createCosmeticsSearchRoutes(dataSource: DataSource): Router {
       const limitNum = Math.min(30, Math.max(1, parseInt(limit as string, 10) || 10));
 
       const terms = await searchService.getPopularSearchTerms({
-        type: 'cosmetics',
+        extensionKey: 'neture',
         limit: limitNum,
       });
 
@@ -201,12 +219,18 @@ export function createCosmeticsSearchRoutes(dataSource: DataSource): Router {
       const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 20));
 
-      const results = await searchService.searchByCosmetics({
+      const results = await searchService.searchPosts({
         query: q as string,
-        skinType: skinType as string,
+        extensionKey: 'neture',
         sort: sort as 'relevance' | 'latest' | 'popular',
         page: pageNum,
         limit: limitNum,
+        applyExtensionFilters: (qb: any) => {
+          qb.andWhere(
+            `(post.metadata->'extensions'->'neture'->>'skinType' = :skinType OR post.metadata->'neture'->>'skinType' = :skinType)`,
+            { skinType }
+          );
+        },
       });
 
       res.json({
@@ -256,12 +280,18 @@ export function createCosmeticsSearchRoutes(dataSource: DataSource): Router {
       const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 20));
 
-      const results = await searchService.searchByCosmetics({
+      const results = await searchService.searchPosts({
         query: q as string,
-        concerns: concernsArray,
+        extensionKey: 'neture',
         sort: sort as 'relevance' | 'latest' | 'popular',
         page: pageNum,
         limit: limitNum,
+        applyExtensionFilters: (qb: any) => {
+          qb.andWhere(
+            `(post.metadata->'extensions'->'neture'->'concerns' ?| :concerns OR post.metadata->'neture'->'concerns' ?| :concerns)`,
+            { concerns: concernsArray }
+          );
+        },
       });
 
       res.json({

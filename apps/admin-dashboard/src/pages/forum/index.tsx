@@ -31,7 +31,9 @@ import {
 } from 'lucide-react';
 import { apiEndpoints } from '@/config/apps.config';
 
-// Types from forum-core
+// Shared types (Phase 19-B)
+import type { ForumCategoryResponse } from '@o4o/types/forum';
+
 interface ForumStats {
   totalPosts: number;
   totalComments: number;
@@ -40,12 +42,8 @@ interface ForumStats {
   pendingModeration: number;
 }
 
-interface ForumCategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  postCount: number;
+// Extends shared ForumCategoryResponse with admin-specific fields
+interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount'> {
   order: number;
 }
 

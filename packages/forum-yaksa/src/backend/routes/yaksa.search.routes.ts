@@ -63,9 +63,10 @@ export function createYaksaSearchRoutes(dataSource: DataSource): Router {
       const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 20));
 
-      // Search with yaksa type filter
-      const results = await searchService.searchByYaksa({
+      // Search with yaksa extension filter
+      const results = await searchService.searchPosts({
         query: q as string,
+        extensionKey: 'yaksa',
         organizationId: orgId as string,
         categoryId: categoryId as string | undefined,
         postType: postType as PostType | undefined,
@@ -119,7 +120,7 @@ export function createYaksaSearchRoutes(dataSource: DataSource): Router {
 
       const suggestions = await searchService.getSuggestions({
         query: q as string,
-        type: 'yaksa',
+        extensionKey: 'yaksa',
         limit: limitNum,
       });
 
@@ -149,7 +150,7 @@ export function createYaksaSearchRoutes(dataSource: DataSource): Router {
       const limitNum = Math.min(30, Math.max(1, parseInt(limit as string, 10) || 10));
 
       const terms = await searchService.getPopularSearchTerms({
-        type: 'yaksa',
+        extensionKey: 'yaksa',
         limit: limitNum,
       });
 

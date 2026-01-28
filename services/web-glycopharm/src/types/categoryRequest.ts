@@ -1,4 +1,9 @@
 // Forum Category Request Types
+// Phase 19-B: Shared types from @o4o/types/forum
+
+import type { ForumCategoryResponse } from '@o4o/types/forum';
+
+export type { ForumCategoryResponse };
 
 /**
  * 카테고리 신청 상태
@@ -52,7 +57,7 @@ export interface CategoryReviewForm {
 }
 
 /**
- * 포럼 카테고리
+ * 포럼 카테고리 (GlycoPharm local view — subset of ForumCategoryResponse)
  */
 export interface ForumCategory {
   id: string;

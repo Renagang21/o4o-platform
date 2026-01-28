@@ -30,13 +30,10 @@ export class SearchController {
    *
    * Query Parameters:
    * - q: Search query string (required)
-   * - type: 'all' | 'cosmetics' | 'yaksa' (default: 'all')
+   * - extensionKey: Extension key filter (e.g., 'neture', 'yaksa')
    * - postType: PostType enum value
    * - categoryId: Filter by category
    * - organizationId: Filter by organization
-   * - brand: Filter by brand (cosmetics)
-   * - skinType: Filter by skin type (cosmetics)
-   * - concerns: Comma-separated concerns (cosmetics)
    * - sort: 'relevance' | 'latest' | 'popular' | 'oldest' (default: 'relevance')
    * - page: Page number (default: 1)
    * - limit: Items per page (default: 20, max: 100)
@@ -45,14 +42,11 @@ export class SearchController {
     try {
       const {
         q,
-        type = 'all',
+        extensionKey,
         postType,
         categoryId,
         organizationId,
         authorId,
-        brand,
-        skinType,
-        concerns,
         sort = 'relevance',
         page = '1',
         limit = '20',
@@ -71,22 +65,14 @@ export class SearchController {
       const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 20));
 
-      // Parse concerns array
-      const concernsArray = concerns
-        ? (concerns as string).split(',').map(c => c.trim()).filter(Boolean)
-        : undefined;
-
       // Build search query
       const searchQuery: ForumSearchQuery = {
         query: q as string,
-        type: type as 'all' | 'cosmetics' | 'yaksa',
+        extensionKey: extensionKey as string | undefined,
         postType: postType as PostType | undefined,
         categoryId: categoryId as string | undefined,
         organizationId: organizationId as string | undefined,
         authorId: authorId as string | undefined,
-        brand: brand as string | undefined,
-        skinType: skinType as string | undefined,
-        concerns: concernsArray,
         sort: sort as 'relevance' | 'latest' | 'popular' | 'oldest',
         page: pageNum,
         limit: limitNum,
@@ -125,12 +111,12 @@ export class SearchController {
    *
    * Query Parameters:
    * - q: Partial search query (required, min 2 chars)
-   * - type: 'all' | 'cosmetics' | 'yaksa' (default: 'all')
+   * - extensionKey: Extension key filter
    * - limit: Max suggestions (default: 10, max: 20)
    */
   async suggestions(req: Request, res: Response): Promise<void> {
     try {
-      const { q, type = 'all', limit = '10' } = req.query;
+      const { q, extensionKey, limit = '10' } = req.query;
 
       if (!q || (typeof q === 'string' && q.trim().length < 2)) {
         res.json({
@@ -144,7 +130,7 @@ export class SearchController {
 
       const suggestions = await this.searchService.getSuggestions({
         query: q as string,
-        type: type as 'all' | 'cosmetics' | 'yaksa',
+        extensionKey: extensionKey as string | undefined,
         limit: limitNum,
       });
 
@@ -168,17 +154,17 @@ export class SearchController {
    * Get popular search terms
    *
    * Query Parameters:
-   * - type: 'all' | 'cosmetics' | 'yaksa' (default: 'all')
+   * - extensionKey: Extension key filter
    * - limit: Max terms (default: 10, max: 30)
    */
   async popular(req: Request, res: Response): Promise<void> {
     try {
-      const { type = 'all', limit = '10' } = req.query;
+      const { extensionKey, limit = '10' } = req.query;
 
       const limitNum = Math.min(30, Math.max(1, parseInt(limit as string, 10) || 10));
 
       const terms = await this.searchService.getPopularSearchTerms({
-        type: type as 'all' | 'cosmetics' | 'yaksa',
+        extensionKey: extensionKey as string | undefined,
         limit: limitNum,
       });
 

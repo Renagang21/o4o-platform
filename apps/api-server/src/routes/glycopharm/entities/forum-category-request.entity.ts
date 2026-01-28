@@ -1,6 +1,9 @@
 /**
- * Forum Category Request Entity
- * 포럼 카테고리 생성 신청
+ * GlycoPharm Forum Category Request Entity (Legacy)
+ * 포럼 카테고리 생성 신청 (GlycoPharm 전용 레거시)
+ *
+ * Renamed from ForumCategoryRequest → GlycopharmForumCategoryRequest
+ * to avoid class name collision with forum-core's shared ForumCategoryRequest entity.
  */
 
 import {
@@ -11,10 +14,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export type CategoryRequestStatus = 'pending' | 'approved' | 'rejected';
+export type GlycopharmCategoryRequestStatus = 'pending' | 'approved' | 'rejected';
 
 @Entity('glycopharm_forum_category_requests')
-export class ForumCategoryRequest {
+export class GlycopharmForumCategoryRequest {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -32,7 +35,7 @@ export class ForumCategoryRequest {
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending',
   })
-  status!: CategoryRequestStatus;
+  status!: GlycopharmCategoryRequestStatus;
 
   // 신청자 정보
   @Column({ type: 'uuid' })

@@ -7,72 +7,32 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.k-cosmetics.site';
 
 // ============================================================================
-// Types
+// Types — imported from @o4o/types/forum (Single Source of Truth)
+// Phase 19-B: Forum Frontend Type & API Contract 정합 리팩토링
 // ============================================================================
 
-export type PostType = 'DISCUSSION' | 'QUESTION' | 'ANNOUNCEMENT' | 'POLL' | 'GUIDE';
+import type {
+  ForumPostResponse,
+  ForumPostType,
+  ForumCommentResponse,
+  ForumAuthorResponse,
+  ForumPaginationInfo,
+  ForumListResponse,
+  ForumSingleResponse,
+} from '@o4o/types/forum';
 
-export interface ForumPost {
-  id: string;
-  title: string;
-  slug: string;
-  content?: string | object[];
-  excerpt?: string;
-  type: PostType;
-  authorId: string;
-  author?: {
-    id: string;
-    name?: string;
-    username?: string;
-  };
-  categoryId: string;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  isPinned: boolean;
-  commentCount: number;
-  createdAt: string;
-  publishedAt?: string;
-}
+// Re-export shared types
+export type { ForumPostResponse, ForumPostType, ForumCommentResponse, ForumAuthorResponse };
+export type { ForumPaginationInfo, ForumListResponse, ForumSingleResponse };
 
-export interface ForumComment {
-  id: string;
-  content: string | object[];
-  authorId: string;
-  author?: {
-    id: string;
-    name?: string;
-    username?: string;
-  };
-  createdAt: string;
-}
-
-export interface PaginationInfo {
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-export interface PostsResponse {
-  success: boolean;
-  data: ForumPost[];
-  pagination: PaginationInfo;
-  totalCount: number;
-}
-
-export interface PostResponse {
-  success: boolean;
-  data: ForumPost;
-}
-
-export interface CommentsResponse {
-  success: boolean;
-  data: ForumComment[];
-  pagination: PaginationInfo;
-  totalCount: number;
-}
+// Backward-compatible aliases
+export type ForumPost = ForumPostResponse;
+export type ForumComment = ForumCommentResponse;
+export type PaginationInfo = ForumPaginationInfo;
+export type PostType = ForumPostType;
+export type PostsResponse = ForumListResponse<ForumPostResponse>;
+export type PostResponse = ForumSingleResponse<ForumPostResponse>;
+export type CommentsResponse = ForumListResponse<ForumCommentResponse>;
 
 // ============================================================================
 // API Functions
@@ -169,12 +129,13 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 /**
  * Normalize post type from API response
  */
-export function normalizePostType(type: string): PostType {
-  const normalized = type.toUpperCase();
-  if (['DISCUSSION', 'QUESTION', 'ANNOUNCEMENT', 'POLL', 'GUIDE'].includes(normalized)) {
-    return normalized as PostType;
+export function normalizePostType(type: string): ForumPostType {
+  const normalized = type.toLowerCase();
+  const valid: ForumPostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
+  if (valid.includes(normalized as ForumPostType)) {
+    return normalized as ForumPostType;
   }
-  return 'DISCUSSION';
+  return 'discussion';
 }
 
 /**

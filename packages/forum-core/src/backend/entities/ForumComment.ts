@@ -10,9 +10,17 @@ import {
 } from 'typeorm';
 import { ForumPost } from './ForumPost.js';
 
+/**
+ * 댓글 상태 (Core 기준, 확장 금지)
+ *
+ * @remarks 값을 추가·삭제하려면 반드시 Phase 승인이 필요하다.
+ */
 export enum CommentStatus {
+  /** 공개 — 정상 노출 */
   PUBLISHED = 'publish',
+  /** 승인 대기 */
   PENDING = 'pending',
+  /** 삭제됨 — soft delete */
   DELETED = 'deleted'
 }
 

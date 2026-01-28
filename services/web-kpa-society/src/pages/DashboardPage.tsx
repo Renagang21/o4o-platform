@@ -19,6 +19,7 @@ import { colors, shadows, borderRadius } from '../styles/theme';
 import { useAuth, TestUser } from '../contexts/AuthContext';
 import { AiSummaryButton } from '../components/ai';
 import { ExternalServiceSection } from '../components/ServiceBanner';
+import { PharmacyOnboardingBanner } from '../components/pharmacy/PharmacyOnboardingBanner';
 
 // Mock user data (fallback when not logged in)
 const mockUser = {
@@ -242,6 +243,9 @@ export function DashboardPage() {
           </div>
         </section>
       )}
+
+      {/* Pharmacy Onboarding Banner (pharmacy_owner without pharmacy context) */}
+      <PharmacyOnboardingBanner />
 
       {/* B. Quick Menu */}
       <section style={styles.section}>

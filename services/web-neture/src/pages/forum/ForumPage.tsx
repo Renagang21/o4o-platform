@@ -17,11 +17,10 @@ import {
   normalizePostType,
   getAuthorName,
   type ForumPost as ApiForumPost,
-  type PostType as ApiPostType,
 } from '../../services/forumApi';
+import type { ForumPostType } from '@o4o/types/forum';
 
-// Local post type for UI
-type PostType = 'discussion' | 'question' | 'announcement' | 'poll' | 'guide';
+type PostType = ForumPostType;
 
 interface DisplayPost {
   id: string;
@@ -34,15 +33,11 @@ interface DisplayPost {
   createdAt: string;
 }
 
-function apiTypeToDisplayType(apiType: ApiPostType): PostType {
-  const map: Record<string, PostType> = {
-    DISCUSSION: 'discussion',
-    QUESTION: 'question',
-    ANNOUNCEMENT: 'announcement',
-    POLL: 'poll',
-    GUIDE: 'guide',
-  };
-  return map[apiType] || 'discussion';
+function apiTypeToDisplayType(apiType: string): PostType {
+  // API now returns lowercase values matching PostType directly
+  const valid: PostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
+  const lower = apiType.toLowerCase() as PostType;
+  return valid.includes(lower) ? lower : 'discussion';
 }
 
 function toDisplayPost(post: ApiForumPost): DisplayPost {

@@ -72,6 +72,9 @@ export type {
   ProcessCommissionRequest as ProcessAffiliateCommissionRequest
 } from './partner.js';
 
+// Export forum API response types (Phase 19-B)
+export * from './forum.js';
+
 // Export vendor management types (excluding duplicates)
 export type {
   // Types

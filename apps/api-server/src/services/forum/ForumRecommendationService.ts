@@ -21,6 +21,20 @@ import type {
   YaksaForumMeta,
 } from '../../types/forum.types.js';
 
+/** Cosmetics AI tags (domain-specific, defined locally) */
+interface CosmeticsAITags {
+  skinType?: string;
+  concerns?: string[];
+  productTypes?: string[];
+}
+
+/** Yaksa AI tags (domain-specific, defined locally) */
+interface YaksaAITags {
+  documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
+  isOrganizational?: boolean;
+  topics?: string[];
+}
+
 // =============================================================================
 // Configuration Types
 // =============================================================================
@@ -455,9 +469,9 @@ export class ForumRecommendationService {
     userContext: UserContext,
     includeBreakdown: boolean
   ): RecommendationItem {
-    const metadata = post.metadata;
-    const cosmeticsData = metadata?.extensions?.neture || metadata?.neture;
-    const aiTags = metadata?.ai?.tags?.cosmeticsTags;
+    const metadata = post.metadata as ForumPostMetadata | undefined;
+    const cosmeticsData = (metadata?.extensions?.['neture'] || (metadata as any)?.neture) as NetureForumMeta | undefined;
+    const aiTags = (metadata?.ai?.tags?.domainTags?.['cosmetics'] || {}) as CosmeticsAITags;
 
     let domainScore = 0;
     let reasonCode: ReasonCode = 'personalized';
@@ -530,9 +544,9 @@ export class ForumRecommendationService {
     userContext: UserContext,
     includeBreakdown: boolean
   ): RecommendationItem {
-    const metadata = post.metadata;
-    const yaksaData = metadata?.extensions?.yaksa || metadata?.yaksa;
-    const aiTags = metadata?.ai?.tags?.yaksaTags;
+    const metadata = post.metadata as ForumPostMetadata | undefined;
+    const yaksaData = (metadata?.extensions?.['yaksa'] || (metadata as any)?.yaksa) as YaksaForumMeta | undefined;
+    const aiTags = (metadata?.ai?.tags?.domainTags?.['yaksa'] || {}) as YaksaAITags;
 
     let domainScore = 0;
     let reasonCode: ReasonCode = 'personalized';
@@ -678,18 +692,18 @@ export class ForumRecommendationService {
    * Calculate domain-specific score
    */
   private calculateDomainScore(post: ForumPost, userContext: UserContext): number {
-    const metadata = post.metadata;
+    const metadata = post.metadata as ForumPostMetadata | undefined;
     if (!metadata) return 0;
 
     // Check cosmetics domain
-    const cosmeticsData = metadata.extensions?.neture || metadata.neture;
+    const cosmeticsData = (metadata.extensions?.['neture'] || (metadata as any).neture) as NetureForumMeta | undefined;
     if (cosmeticsData && userContext.skinType) {
       if (cosmeticsData.skinType === userContext.skinType) return 0.8;
       if (cosmeticsData.concerns?.some(c => userContext.concerns?.includes(c))) return 0.6;
     }
 
     // Check yaksa domain
-    const yaksaData = metadata.extensions?.yaksa || metadata.yaksa;
+    const yaksaData = (metadata.extensions?.['yaksa'] || (metadata as any).yaksa) as YaksaForumMeta | undefined;
     if (yaksaData && userContext.isPharmacist) {
       if (yaksaData.pharmacistVerified) return 0.7;
       if (yaksaData.professionalOnly) return 0.5;

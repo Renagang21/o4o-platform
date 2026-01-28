@@ -24,16 +24,7 @@ export interface ForumPostAITags {
   suggestedTags: string[];
   suggestedCategory?: string;
   confidence: number;
-  cosmeticsTags?: {
-    skinType?: string;
-    concerns?: string[];
-    productTypes?: string[];
-  };
-  yaksaTags?: {
-    documentType?: 'notice' | 'admin' | 'education' | 'resource' | 'inquiry';
-    isOrganizational?: boolean;
-    topics?: string[];
-  };
+  domainTags?: Record<string, unknown>;
 }
 
 /**
@@ -121,10 +112,7 @@ export interface ForumPostDisplayMeta {
   template?: string;
 }
 
-export interface ForumPostExtensionsMeta {
-  neture?: NetureForumMeta;
-  yaksa?: YaksaForumMeta;
-}
+export type ForumPostExtensionsMeta = Record<string, unknown>;
 
 /**
  * Forum Post Metadata Interface
@@ -148,7 +136,5 @@ export interface ForumPostMetadata {
   moderatedBy?: string;
   lastViewedAt?: string;
   peakViewCount?: number;
-  neture?: NetureForumMeta;
-  yaksa?: YaksaForumMeta;
   custom?: Record<string, unknown>;
 }

@@ -13,158 +13,129 @@ const USE_REAL_API = import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
 // ============================================================================
-// Types (matching forum-core and API responses)
+// Types — imported from @o4o/types/forum (Single Source of Truth)
+// Phase 19-B: Forum Frontend Type & API Contract 정합 리팩토링
 // ============================================================================
 
-export type PostType = 'DISCUSSION' | 'QUESTION' | 'ANNOUNCEMENT' | 'POLL' | 'GUIDE';
+import type {
+  ForumPostResponse,
+  ForumPostType,
+  ForumCommentResponse,
+  ForumCategoryResponse,
+  ForumAuthorResponse,
+  ForumPaginationInfo,
+  ForumListResponse,
+  ForumSingleResponse,
+  ForumCategoryListResponse,
+} from '@o4o/types/forum';
 
-// WO-NETURE-EXTERNAL-CONTACT-V1: Author contact info
-export interface AuthorContactInfo {
-  contactEnabled: boolean;
-  kakaoOpenChatUrl?: string | null;
-  kakaoChannelUrl?: string | null;
-}
+// Re-export shared types for consumers
+export type {
+  ForumPostResponse,
+  ForumPostType,
+  ForumCommentResponse,
+  ForumCategoryResponse,
+  ForumAuthorResponse,
+  ForumPaginationInfo,
+};
 
-export interface ForumPost {
-  id: string;
-  title: string;
-  slug: string;
-  content?: string | object[];
-  excerpt?: string;
-  type: PostType;
-  authorId: string;
-  author?: {
-    id: string;
-    name?: string;
-    username?: string;
-    // WO-NETURE-EXTERNAL-CONTACT-V1: Contact info
-    contactEnabled?: boolean;
-    kakaoOpenChatUrl?: string | null;
-    kakaoChannelUrl?: string | null;
-  };
-  categoryId: string;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  isPinned: boolean;
-  // WO-NETURE-EXTERNAL-CONTACT-V1: Show contact on this post
-  showContactOnPost?: boolean;
-  commentCount: number;
-  createdAt: string;
-  publishedAt?: string;
-}
-
-export interface ForumComment {
-  id: string;
-  content: string | object[];
-  authorId: string;
-  author?: {
-    id: string;
-    name?: string;
-    username?: string;
-  };
-  createdAt: string;
-}
-
-export interface ForumCategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-}
-
-export interface PaginationInfo {
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-export interface PostsResponse {
-  success: boolean;
-  data: ForumPost[];
-  pagination: PaginationInfo;
-  totalCount: number;
-}
-
-export interface PostResponse {
-  success: boolean;
-  data: ForumPost;
-}
-
-export interface CommentsResponse {
-  success: boolean;
-  data: ForumComment[];
-  pagination: PaginationInfo;
-  totalCount: number;
-}
-
-export interface CategoriesResponse {
-  success: boolean;
-  data: ForumCategory[];
-  count: number;
-}
+// Backward-compatible aliases used throughout web-neture
+export type ForumPost = ForumPostResponse;
+export type ForumComment = ForumCommentResponse;
+export type ForumCategory = ForumCategoryResponse;
+export type PaginationInfo = ForumPaginationInfo;
+export type PostType = ForumPostType;
+export type AuthorContactInfo = ForumAuthorResponse;
+export type PostsResponse = ForumListResponse<ForumPostResponse>;
+export type PostResponse = ForumSingleResponse<ForumPostResponse>;
+export type CommentsResponse = ForumListResponse<ForumCommentResponse>;
+export type CategoriesResponse = ForumCategoryListResponse;
 
 // ============================================================================
 // Mock Data
 // ============================================================================
 
-const MOCK_CATEGORY: ForumCategory = {
+const MOCK_CATEGORY = {
   id: 'neture-forum',
   name: 'Neture 포럼',
   slug: 'neture-forum',
   description: 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간',
-};
+  sortOrder: 0,
+  isActive: true,
+  requireApproval: false,
+  accessLevel: 'all',
+  postCount: 3,
+  isOrganizationExclusive: false,
+  createdAt: '2024-01-15T09:00:00Z',
+  updatedAt: '2024-01-15T09:00:00Z',
+} satisfies ForumCategory;
+
+// Mock post defaults for required fields
+const MOCK_POST_DEFAULTS = {
+  content: '',
+  status: 'publish',
+  isOrganizationExclusive: false,
+  isLocked: false,
+  allowComments: true,
+  showContactOnPost: false,
+  viewCount: 0,
+  likeCount: 0,
+} as const;
 
 // 운영자 초기 글 세트 (WO-NETURE-HOME-HUB-FORUM-V0.1)
 const MOCK_POSTS: ForumPost[] = [
   // 1. 포럼의 정체성을 고정하는 글 (ANNOUNCEMENT)
   {
+    ...MOCK_POST_DEFAULTS,
     id: '1',
     title: '이 포럼은 무엇을 위한 공간인가',
     slug: 'forum-purpose-and-scope',
     excerpt: '이 포럼은 네뚜레나 o4o 서비스를 홍보하기 위한 공간이 아닙니다. 또한 고객 문의나 거래를 처리하는 곳도 아닙니다...',
-    type: 'ANNOUNCEMENT',
+    type: 'announcement',
     authorId: 'admin',
     author: { id: 'admin', name: 'Neture 운영팀' },
     categoryId: 'neture-forum',
-    category: MOCK_CATEGORY,
+    category: { id: 'neture-forum', name: 'Neture 포럼', slug: 'neture-forum' },
     isPinned: true,
     commentCount: 0,
     createdAt: '2024-01-15T09:00:00Z',
+    updatedAt: '2024-01-15T09:00:00Z',
     publishedAt: '2024-01-15T09:00:00Z',
   },
   // 2. 참여를 유도하는 질문 글 (QUESTION)
   {
+    ...MOCK_POST_DEFAULTS,
     id: '2',
     title: '운영자가 묻습니다: o4o는 어떻게 보이시나요?',
     slug: 'what-is-o4o-question',
     excerpt: '이 포럼을 보시는 분들께 몇 가지를 여쭙고 싶습니다. o4o라는 개념을 처음 보셨을 때, 어떤 느낌이 드셨나요?...',
-    type: 'QUESTION',
+    type: 'question',
     authorId: 'admin',
     author: { id: 'admin', name: 'Neture 운영팀' },
     categoryId: 'neture-forum',
-    category: MOCK_CATEGORY,
+    category: { id: 'neture-forum', name: 'Neture 포럼', slug: 'neture-forum' },
     isPinned: true,
     commentCount: 0,
     createdAt: '2024-01-15T09:30:00Z',
+    updatedAt: '2024-01-15T09:30:00Z',
     publishedAt: '2024-01-15T09:30:00Z',
   },
   // 3. 기대하는 의견의 범위를 제시하는 글 (GUIDE)
   {
+    ...MOCK_POST_DEFAULTS,
     id: '3',
     title: '이 포럼에서 특히 듣고 싶은 이야기들',
     slug: 'forum-welcome-guide',
     excerpt: '이 포럼에서는 다음과 같은 이야기들을 특히 환영합니다. 이 구조가 현실과 맞지 않아 보이는 이유...',
-    type: 'GUIDE',
+    type: 'guide',
     authorId: 'admin',
     author: { id: 'admin', name: 'Neture 운영팀' },
     categoryId: 'neture-forum',
-    category: MOCK_CATEGORY,
+    category: { id: 'neture-forum', name: 'Neture 포럼', slug: 'neture-forum' },
     isPinned: false,
     commentCount: 0,
     createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
     publishedAt: '2024-01-15T10:00:00Z',
   },
 ];
@@ -320,7 +291,7 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
       if (post) {
         return {
           success: true,
-          data: { ...post, content: post.excerpt },
+          data: { ...post, content: post.excerpt || '' },
         };
       }
       return null;
@@ -386,7 +357,7 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 /**
  * Fetch categories
  */
-export async function fetchForumCategories(): Promise<CategoriesResponse> {
+export async function fetchForumCategories(): Promise<ForumCategoryListResponse> {
   if (!USE_REAL_API) {
     return {
       success: true,
@@ -415,12 +386,13 @@ export async function fetchForumCategories(): Promise<CategoriesResponse> {
 /**
  * Normalize post type from API response
  */
-export function normalizePostType(type: string): PostType {
-  const normalized = type.toUpperCase();
-  if (['DISCUSSION', 'QUESTION', 'ANNOUNCEMENT', 'POLL', 'GUIDE'].includes(normalized)) {
-    return normalized as PostType;
+export function normalizePostType(type: string): ForumPostType {
+  const normalized = type.toLowerCase();
+  const valid: ForumPostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
+  if (valid.includes(normalized as ForumPostType)) {
+    return normalized as ForumPostType;
   }
-  return 'DISCUSSION';
+  return 'discussion';
 }
 
 /**
@@ -587,7 +559,9 @@ export async function createForumPost(
 ): Promise<CreatePostResponse> {
   if (!USE_REAL_API) {
     // Mock response - simulate post creation
+    const now = new Date().toISOString();
     const newPost: ForumPost = {
+      ...MOCK_POST_DEFAULTS,
       id: `mock-${Date.now()}`,
       title: payload.title,
       slug: payload.title
@@ -596,17 +570,17 @@ export async function createForumPost(
         .replace(/\s+/g, '-')
         .slice(0, 50) + '-' + Date.now().toString(36),
       content: payload.content,
-      type: 'DISCUSSION',
+      type: 'discussion',
       authorId: 'current-user',
       author: { id: 'current-user', name: '작성자' },
       categoryId: 'neture-forum',
-      category: MOCK_CATEGORY,
+      category: { id: 'neture-forum', name: 'Neture 포럼', slug: 'neture-forum' },
       isPinned: false,
-      // WO-NETURE-EXTERNAL-CONTACT-V1
       showContactOnPost: payload.showContactOnPost || false,
       commentCount: 0,
-      createdAt: new Date().toISOString(),
-      publishedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
+      publishedAt: now,
     };
 
     // Simulate network delay
@@ -630,7 +604,7 @@ export async function createForumPost(
         title: payload.title,
         content: payload.content,
         categorySlug: payload.categorySlug,
-        type: 'DISCUSSION',
+        type: 'discussion',
         // WO-NETURE-EXTERNAL-CONTACT-V1
         showContactOnPost: payload.showContactOnPost || false,
       }),

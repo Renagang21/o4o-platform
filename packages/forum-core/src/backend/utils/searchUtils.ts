@@ -89,8 +89,26 @@ export function blocksToSearchText(blocks: Block[] | null | undefined): string {
 }
 
 /**
+ * Recursively extract searchable string values from a metadata object.
+ * Collects all string and string[] values (up to 1 level of nesting).
+ */
+function extractSearchableStrings(obj: Record<string, unknown>, out: string[]): void {
+  for (const value of Object.values(obj)) {
+    if (typeof value === 'string' && value.trim()) {
+      out.push(value);
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'string' && item.trim()) {
+          out.push(item);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Build search metadata text from forum post metadata
- * Extracts searchable text from metadata.extensions (cosmetics, yaksa, etc.)
+ * Extracts searchable text from metadata.extensions (generic, domain-agnostic)
  */
 export function metadataToSearchText(metadata: Record<string, any> | null | undefined): string {
   if (!metadata) return '';
@@ -106,28 +124,14 @@ export function metadataToSearchText(metadata: Record<string, any> | null | unde
     }
   }
 
-  // Extract extension metadata
-  const extensions = metadata.extensions || {};
-
-  // Cosmetics (neture) extension
-  const neture = extensions.neture || metadata.neture;
-  if (neture) {
-    if (neture.skinType) texts.push(neture.skinType);
-    if (neture.concerns && Array.isArray(neture.concerns)) {
-      texts.push(...neture.concerns);
+  // Extract extension metadata (generic - iterates all extension keys)
+  const extensions = metadata.extensions;
+  if (extensions && typeof extensions === 'object') {
+    for (const extData of Object.values(extensions)) {
+      if (extData && typeof extData === 'object') {
+        extractSearchableStrings(extData as Record<string, unknown>, texts);
+      }
     }
-    if (neture.routine && Array.isArray(neture.routine)) {
-      texts.push(...neture.routine);
-    }
-    if (neture.ingredientPreferences && Array.isArray(neture.ingredientPreferences)) {
-      texts.push(...neture.ingredientPreferences);
-    }
-  }
-
-  // Yaksa extension
-  const yaksa = extensions.yaksa || metadata.yaksa;
-  if (yaksa) {
-    if (yaksa.communityId) texts.push(yaksa.communityId);
   }
 
   // Custom fields

@@ -20,8 +20,8 @@ export { DisplayMedia, type MediaSourceType } from './display-media.entity.js';
 export { DisplayPlaylistItem, type TransitionType } from './display-playlist-item.entity.js';
 export { DisplaySchedule } from './display-schedule.entity.js';
 
-// Forum Category Request
-export { ForumCategoryRequest, type CategoryRequestStatus } from './forum-category-request.entity.js';
+// Forum Category Request (GlycoPharm legacy - renamed to avoid collision with forum-core)
+export { GlycopharmForumCategoryRequest, type GlycopharmCategoryRequestStatus } from './forum-category-request.entity.js';
 
 // Orders - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // GlycopharmOrder, GlycopharmOrderItem entities removed
