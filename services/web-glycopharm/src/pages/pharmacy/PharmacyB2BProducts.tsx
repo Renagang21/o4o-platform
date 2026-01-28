@@ -1,17 +1,28 @@
 /**
- * PharmacyB2BProducts - B2B 상품 리스트 (WordPress Admin 스타일)
+ * PharmacyB2BProducts - B2B 상품 리스트 (WordPress WooCommerce Admin 스타일)
  *
  * 약국 경영 → B2B 구매 상품 목록.
- * 워드프레스 상품 관리 화면 패턴:
+ * WordPress WooCommerce 상품 관리 화면 패턴을 충실히 모방:
  * - 화면 옵션 (컬럼 토글, 페이지당 항목 수)
- * - 상태 필터 탭
- * - 필터 바 (카테고리, 재고, 브랜드)
- * - 테이블 (20개씩 페이지네이션)
+ * - 상태 필터 탭 (모두 | 발행됨 | 임시글 | 대기중)
+ * - 필터 바 (일괄 작업, 카테고리, 재고, 브랜드)
+ * - 정렬 가능한 컬럼 헤더 (클릭 → ASC/DESC)
+ * - 호버 액션 (편집 | 빠른 편집 | 휴지통 | 미리보기 | 복사)
+ * - 이미지 썸네일, SKU, 재고, 가격, 카테고리, 태그, 브랜드, 공급자, 추천, 날짜
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, SlidersHorizontal } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Search,
+  SlidersHorizontal,
+  Star,
+  ImageIcon,
+} from 'lucide-react';
 
 // ─── 타입 ───────────────────────────────────────────────
 
@@ -32,6 +43,9 @@ interface B2BProduct {
   featured: boolean;
   createdAt: string;
 }
+
+type SortKey = 'name' | 'sku' | 'stock' | 'price' | 'category' | 'brand' | 'supplier' | 'date';
+type SortDir = 'asc' | 'desc';
 
 // ─── 목 데이터 ──────────────────────────────────────────
 
@@ -193,20 +207,21 @@ const MOCK_PRODUCTS: B2BProduct[] = [
 interface ColumnDef {
   key: string;
   label: string;
+  sortKey?: SortKey;
   defaultVisible: boolean;
 }
 
 const ALL_COLUMNS: ColumnDef[] = [
   { key: 'image', label: '이미지', defaultVisible: true },
-  { key: 'sku', label: 'SKU', defaultVisible: true },
-  { key: 'stock', label: '재고', defaultVisible: true },
-  { key: 'price', label: '가격', defaultVisible: true },
-  { key: 'category', label: '카테고리', defaultVisible: true },
+  { key: 'sku', label: 'SKU', sortKey: 'sku', defaultVisible: true },
+  { key: 'stock', label: '재고', sortKey: 'stock', defaultVisible: true },
+  { key: 'price', label: '가격', sortKey: 'price', defaultVisible: true },
+  { key: 'category', label: '카테고리', sortKey: 'category', defaultVisible: true },
   { key: 'tags', label: '태그', defaultVisible: true },
-  { key: 'brand', label: '브랜드', defaultVisible: true },
-  { key: 'featured', label: '추천 상품', defaultVisible: false },
-  { key: 'date', label: '날짜', defaultVisible: false },
-  { key: 'supplier', label: '공급자', defaultVisible: true },
+  { key: 'brand', label: '브랜드', sortKey: 'brand', defaultVisible: true },
+  { key: 'featured', label: '추천', defaultVisible: true },
+  { key: 'date', label: '날짜', sortKey: 'date', defaultVisible: true },
+  { key: 'supplier', label: '공급자', sortKey: 'supplier', defaultVisible: true },
 ];
 
 const STATUS_LABELS: Record<string, string> = {
@@ -224,7 +239,43 @@ const CATEGORY_OPTIONS = [
 const STOCK_OPTIONS = ['전체', '재고 있음', '재고 없음', '재고 부족'];
 const BRAND_OPTIONS = ['전체', 'Abbott', 'Dexcom', 'Roche', 'Novo Nordisk', 'LifeScan', 'i-SENS', 'BD', 'MediCool', '헬스팜', '한국당뇨협회', '일양약품'];
 
-// ─── 컴포넌트 ───────────────────────────────────────────
+// ─── 정렬 헬퍼 ──────────────────────────────────────────
+
+function getSortValue(product: B2BProduct, key: SortKey): string | number {
+  switch (key) {
+    case 'name': return product.name;
+    case 'sku': return product.sku;
+    case 'stock': return product.stock;
+    case 'price': return product.salePrice ?? product.price;
+    case 'category': return product.category;
+    case 'brand': return product.brand;
+    case 'supplier': return product.supplier;
+    case 'date': return product.createdAt;
+    default: return '';
+  }
+}
+
+function sortProducts(products: B2BProduct[], sortKey: SortKey | null, sortDir: SortDir): B2BProduct[] {
+  if (!sortKey) return products;
+  return [...products].sort((a, b) => {
+    const va = getSortValue(a, sortKey);
+    const vb = getSortValue(b, sortKey);
+    if (typeof va === 'number' && typeof vb === 'number') {
+      return sortDir === 'asc' ? va - vb : vb - va;
+    }
+    const sa = String(va).toLowerCase();
+    const sb = String(vb).toLowerCase();
+    return sortDir === 'asc' ? sa.localeCompare(sb) : sb.localeCompare(sa);
+  });
+}
+
+// ─── 가격 포맷 ──────────────────────────────────────────
+
+function formatPrice(n: number) {
+  return '₩' + n.toLocaleString();
+}
+
+// ─── 메인 컴포넌트 ──────────────────────────────────────
 
 export default function PharmacyB2BProducts() {
   const navigate = useNavigate();
@@ -235,6 +286,10 @@ export default function PharmacyB2BProducts() {
     () => new Set(ALL_COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key))
   );
   const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  // 정렬
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   // 필터
   const [statusFilter, setStatusFilter] = useState('all');
@@ -277,8 +332,12 @@ export default function PharmacyB2BProducts() {
           p.supplier.toLowerCase().includes(q)
       );
     }
+
+    // 정렬 적용
+    list = sortProducts(list, sortKey, sortDir);
+
     return list;
-  }, [statusFilter, categoryFilter, stockFilter, brandFilter, searchQuery]);
+  }, [statusFilter, categoryFilter, stockFilter, brandFilter, searchQuery, sortKey, sortDir]);
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: MOCK_PRODUCTS.length, published: 0, draft: 0, pending: 0 };
@@ -320,12 +379,53 @@ export default function PharmacyB2BProducts() {
     });
   }
 
-  function handleApplyItemsPerPage() {
+  const handleSort = useCallback((key: SortKey) => {
+    setSortKey((prev) => {
+      if (prev === key) {
+        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+        return key;
+      }
+      setSortDir('asc');
+      return key;
+    });
     setCurrentPage(1);
-  }
+  }, []);
 
   function isColVisible(key: string) {
     return visibleColumns.has(key);
+  }
+
+  // ─── 정렬 아이콘 ───────────────────────────────────
+
+  function SortIndicator({ columnKey }: { columnKey: SortKey }) {
+    const isActive = sortKey === columnKey;
+    return (
+      <span className={`inline-flex flex-col ml-1 leading-none ${isActive ? 'text-slate-700' : 'text-slate-300'}`}>
+        <span className={`text-[8px] leading-[8px] ${isActive && sortDir === 'asc' ? 'text-slate-700' : ''}`}>▲</span>
+        <span className={`text-[8px] leading-[8px] ${isActive && sortDir === 'desc' ? 'text-slate-700' : ''}`}>▼</span>
+      </span>
+    );
+  }
+
+  // ─── 정렬 가능 헤더 ─────────────────────────────────
+
+  function SortableHeader({ label, sortable, align }: { label: string; sortable?: SortKey; align?: 'left' | 'right' | 'center' }) {
+    const textAlign = align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
+    const justifyClass = align === 'right' ? 'justify-end' : align === 'center' ? 'justify-center' : 'justify-start';
+
+    if (!sortable) {
+      return <span className={`text-xs font-semibold text-slate-600 uppercase tracking-wide ${textAlign}`}>{label}</span>;
+    }
+
+    return (
+      <button
+        onClick={() => handleSort(sortable)}
+        className={`flex items-center gap-0.5 text-xs font-semibold text-slate-600 uppercase tracking-wide hover:text-slate-900 transition-colors ${justifyClass} w-full`}
+      >
+        {label}
+        <SortIndicator columnKey={sortable} />
+      </button>
+    );
   }
 
   // ─── 렌더링 ─────────────────────────────────────────
@@ -333,7 +433,7 @@ export default function PharmacyB2BProducts() {
   return (
     <div className="max-w-full">
       {/* 상단 헤더 */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/pharmacy/management')}
@@ -341,33 +441,34 @@ export default function PharmacyB2BProducts() {
           >
             ← 약국 경영
           </button>
-          <h1 className="text-xl font-bold text-slate-900">B2B 상품</h1>
+          <h1 className="text-xl font-bold text-slate-900">상품</h1>
+          <span className="text-sm text-slate-400">({MOCK_PRODUCTS.length})</span>
         </div>
 
         {/* 화면 옵션 토글 */}
         <button
           onClick={() => setScreenOptionsOpen(!screenOptionsOpen)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors"
         >
-          <SlidersHorizontal className="w-4 h-4" />
+          <SlidersHorizontal className="w-3.5 h-3.5" />
           화면 옵션 {screenOptionsOpen ? '▲' : '▼'}
         </button>
       </div>
 
       {/* ─── 화면 옵션 패널 ─────────────────────────── */}
       {screenOptionsOpen && (
-        <div className="bg-white border border-slate-300 rounded-md p-4 mb-4 shadow-sm">
+        <div className="bg-[#f1f1f1] border border-slate-300 rounded p-4 mb-3 shadow-sm">
           {/* 컬럼 토글 */}
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-slate-700 mb-2">컬럼</h3>
-            <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <div className="mb-3">
+            <h3 className="text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">컬럼</h3>
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5">
               {ALL_COLUMNS.map((col) => (
-                <label key={col.key} className="flex items-center gap-1.5 text-sm text-slate-700 cursor-pointer select-none">
+                <label key={col.key} className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={visibleColumns.has(col.key)}
                     onChange={() => toggleColumn(col.key)}
-                    className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                    className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 w-3.5 h-3.5"
                   />
                   {col.label}
                 </label>
@@ -377,18 +478,18 @@ export default function PharmacyB2BProducts() {
 
           {/* 페이지당 항목 수 */}
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-slate-700">페이지당 항목 수:</h3>
+            <span className="text-xs text-slate-600">페이지당 항목 수:</span>
             <input
               type="number"
               min={5}
               max={100}
               value={itemsPerPage}
               onChange={(e) => setItemsPerPage(Math.max(5, Math.min(100, Number(e.target.value) || 20)))}
-              className="w-16 px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-14 px-2 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
             <button
-              onClick={handleApplyItemsPerPage}
-              className="px-3 py-1 text-sm font-medium text-white bg-primary-600 rounded hover:bg-primary-700 transition-colors"
+              onClick={() => setCurrentPage(1)}
+              className="px-3 py-1 text-xs font-medium text-white bg-primary-600 rounded hover:bg-primary-700 transition-colors"
             >
               적용
             </button>
@@ -398,56 +499,59 @@ export default function PharmacyB2BProducts() {
 
       {/* ─── 상태 탭 + 검색 ─────────────────────────── */}
       <div className="bg-white border border-slate-200 rounded-t-lg">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-          {/* 상태 탭 */}
-          <div className="flex items-center gap-1 text-sm">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
+          {/* 상태 탭 — WordPress 스타일 */}
+          <ul className="flex items-center gap-0 text-[13px]">
             {Object.entries(STATUS_LABELS).map(([key, label], idx) => (
-              <span key={key} className="flex items-center">
+              <li key={key} className="flex items-center">
                 {idx > 0 && <span className="text-slate-300 mx-1">|</span>}
                 <button
                   onClick={() => { setStatusFilter(key); setCurrentPage(1); }}
                   className={`hover:text-primary-700 ${
                     statusFilter === key
-                      ? 'text-primary-700 font-semibold'
-                      : 'text-slate-600'
+                      ? 'text-slate-900 font-semibold'
+                      : 'text-slate-500'
                   }`}
                 >
                   {label}
-                  <span className="text-slate-400 ml-0.5">({statusCounts[key] || 0})</span>
+                  {' '}
+                  <span className="text-slate-400">({statusCounts[key] || 0})</span>
                 </button>
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
 
           {/* 검색 */}
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              placeholder="상품 검색"
-              className="pl-8 pr-3 py-1.5 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500 w-52"
+              placeholder="상품 검색..."
+              className="pl-7 pr-3 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500 w-48"
             />
           </div>
         </div>
 
-        {/* ─── 필터 바 ──────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-slate-200 bg-slate-50/50">
+        {/* ─── 필터 바 (WordPress tablenav top) ────── */}
+        <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-slate-200 bg-[#fafafa]">
           {/* 일괄 작업 */}
-          <select className="text-sm border border-slate-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500">
+          <select className="text-xs border border-slate-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500">
             <option>일괄 작업</option>
             <option>장바구니에 추가</option>
           </select>
-          <button className="text-sm px-3 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-50 font-medium text-slate-700">
+          <button className="text-xs px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 font-medium text-slate-600">
             적용
           </button>
+
+          <span className="text-slate-300">|</span>
 
           {/* 카테고리 필터 */}
           <select
             value={categoryFilter}
             onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
-            className="text-sm border border-slate-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="text-xs border border-slate-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {CATEGORY_OPTIONS.map((c) => (
               <option key={c} value={c}>{c === '전체' ? '카테고리 선택' : c}</option>
@@ -458,7 +562,7 @@ export default function PharmacyB2BProducts() {
           <select
             value={stockFilter}
             onChange={(e) => { setStockFilter(e.target.value); setCurrentPage(1); }}
-            className="text-sm border border-slate-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="text-xs border border-slate-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {STOCK_OPTIONS.map((s) => (
               <option key={s} value={s}>{s === '전체' ? '재고 상태별 필터링' : s}</option>
@@ -469,7 +573,7 @@ export default function PharmacyB2BProducts() {
           <select
             value={brandFilter}
             onChange={(e) => { setBrandFilter(e.target.value); setCurrentPage(1); }}
-            className="text-sm border border-slate-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="text-xs border border-slate-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {BRAND_OPTIONS.map((b) => (
               <option key={b} value={b}>{b === '전체' ? '브랜드로 필터링' : b}</option>
@@ -478,14 +582,14 @@ export default function PharmacyB2BProducts() {
 
           <button
             onClick={() => { setCategoryFilter('전체'); setStockFilter('전체'); setBrandFilter('전체'); setSearchQuery(''); setCurrentPage(1); }}
-            className="text-sm px-3 py-1.5 bg-white border border-slate-300 rounded hover:bg-slate-50 font-medium text-slate-700"
+            className="text-xs px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 font-medium text-slate-600"
           >
-            필터 초기화
+            필터
           </button>
 
           {/* 우측: 아이템 수 + 페이지네이션 */}
-          <div className="ml-auto flex items-center gap-2 text-sm text-slate-500">
-            <span>{filteredProducts.length} 아이템</span>
+          <div className="ml-auto flex items-center gap-2 text-xs text-slate-500">
+            <span>{filteredProducts.length}개 아이템</span>
             <PaginationCompact
               currentPage={currentPage}
               totalPages={totalPages}
@@ -496,28 +600,73 @@ export default function PharmacyB2BProducts() {
 
         {/* ─── 테이블 ──────────────────────────────── */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-[13px] border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="w-8 px-3 py-2.5">
+              <tr className="border-b border-slate-200 bg-[#f9f9f9]">
+                {/* 체크박스 */}
+                <th className="w-[2.5%] px-2 py-2">
                   <input
                     type="checkbox"
                     checked={paginatedProducts.length > 0 && selectedIds.size === paginatedProducts.length}
                     onChange={toggleSelectAll}
-                    className="rounded border-slate-300 text-primary-600"
+                    className="rounded border-slate-300 text-primary-600 w-3.5 h-3.5"
                   />
                 </th>
-                {isColVisible('image') && <th className="w-12 px-2 py-2.5" />}
-                <th className="px-3 py-2.5 text-left font-semibold text-slate-700">이름</th>
-                {isColVisible('sku') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">SKU</th>}
-                {isColVisible('stock') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">재고</th>}
-                {isColVisible('price') && <th className="px-3 py-2.5 text-right font-semibold text-slate-700">가격</th>}
-                {isColVisible('category') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">카테고리</th>}
-                {isColVisible('tags') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">태그</th>}
-                {isColVisible('brand') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">브랜드</th>}
-                {isColVisible('featured') && <th className="px-3 py-2.5 text-center font-semibold text-slate-700">★</th>}
-                {isColVisible('date') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">날짜</th>}
-                {isColVisible('supplier') && <th className="px-3 py-2.5 text-left font-semibold text-slate-700">공급자</th>}
+                {/* 이미지 (썸네일) */}
+                {isColVisible('image') && (
+                  <th className="w-[52px] px-1 py-2">
+                    <ImageIcon className="w-3.5 h-3.5 text-slate-400 mx-auto" />
+                  </th>
+                )}
+                {/* 이름 — 항상 표시, 정렬 가능 */}
+                <th className="px-2 py-2 text-left">
+                  <SortableHeader label="이름" sortable="name" />
+                </th>
+                {isColVisible('sku') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="SKU" sortable="sku" />
+                  </th>
+                )}
+                {isColVisible('stock') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="재고" sortable="stock" />
+                  </th>
+                )}
+                {isColVisible('price') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="가격" sortable="price" />
+                  </th>
+                )}
+                {isColVisible('category') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="카테고리" sortable="category" />
+                  </th>
+                )}
+                {isColVisible('tags') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="태그" />
+                  </th>
+                )}
+                {isColVisible('brand') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="브랜드" sortable="brand" />
+                  </th>
+                )}
+                {isColVisible('featured') && (
+                  <th className="w-[40px] px-1 py-2 text-center">
+                    <Star className="w-3.5 h-3.5 text-slate-400 mx-auto" />
+                  </th>
+                )}
+                {isColVisible('date') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="날짜" sortable="date" />
+                  </th>
+                )}
+                {isColVisible('supplier') && (
+                  <th className="px-2 py-2 text-left">
+                    <SortableHeader label="공급자" sortable="supplier" />
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -525,19 +674,20 @@ export default function PharmacyB2BProducts() {
                 <tr>
                   <td
                     colSpan={3 + ALL_COLUMNS.filter((c) => visibleColumns.has(c.key)).length}
-                    className="px-4 py-12 text-center text-slate-400"
+                    className="px-4 py-10 text-center text-slate-400 text-sm"
                   >
                     조건에 맞는 상품이 없습니다
                   </td>
                 </tr>
               ) : (
-                paginatedProducts.map((product) => (
+                paginatedProducts.map((product, idx) => (
                   <ProductRow
                     key={product.id}
                     product={product}
                     selected={selectedIds.has(product.id)}
                     onToggle={() => toggleSelect(product.id)}
                     visibleColumns={visibleColumns}
+                    isAlt={idx % 2 === 1}
                   />
                 ))
               )}
@@ -545,51 +695,58 @@ export default function PharmacyB2BProducts() {
           </table>
         </div>
 
-        {/* ─── 하단 페이지네이션 ─────────────────────── */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50/50">
-          <div className="text-sm text-slate-500">
-            {filteredProducts.length}개 중 {(currentPage - 1) * itemsPerPage + 1}–
-            {Math.min(currentPage * itemsPerPage, filteredProducts.length)}개 표시
+        {/* ─── 하단 tablenav (WordPress bottom bar) ── */}
+        <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-t border-slate-200 bg-[#fafafa]">
+          <select className="text-xs border border-slate-300 rounded px-2 py-1 bg-white">
+            <option>일괄 작업</option>
+            <option>장바구니에 추가</option>
+          </select>
+          <button className="text-xs px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 font-medium text-slate-600">
+            적용
+          </button>
+
+          <div className="ml-auto flex items-center gap-2 text-xs text-slate-500">
+            <span>
+              {filteredProducts.length}개 중 {(currentPage - 1) * itemsPerPage + 1}–
+              {Math.min(currentPage * itemsPerPage, filteredProducts.length)}개
+            </span>
+            <PaginationCompact
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
-          <PaginationCompact
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
         </div>
       </div>
     </div>
   );
 }
 
-// ─── 상품 행 ────────────────────────────────────────────
+// ─── 상품 행 (WordPress WooCommerce 스타일) ─────────────
 
 function ProductRow({
   product,
   selected,
   onToggle,
   visibleColumns,
+  isAlt,
 }: {
   product: B2BProduct;
   selected: boolean;
   onToggle: () => void;
   visibleColumns: Set<string>;
+  isAlt: boolean;
 }) {
   const vis = (key: string) => visibleColumns.has(key);
 
-  const stockLabel =
-    product.stockStatus === 'out_of_stock'
-      ? '품절'
-      : product.stockStatus === 'low_stock'
-        ? `재고 부족 (${product.stock})`
-        : `재고 있음 (${product.stock})`;
-  const stockColor =
-    product.stockStatus === 'out_of_stock'
-      ? 'text-red-600 font-semibold'
-      : product.stockStatus === 'low_stock'
-        ? 'text-amber-600 font-medium'
-        : 'text-emerald-600';
+  // 재고 표시 (WordPress 스타일: "재고 있음 (76)")
+  const stockDisplay = (() => {
+    if (product.stockStatus === 'out_of_stock') return { text: '품절', cls: 'text-red-600 font-semibold' };
+    if (product.stockStatus === 'low_stock') return { text: `재고 부족 (${product.stock})`, cls: 'text-amber-600 font-medium' };
+    return { text: `재고 있음 (${product.stock})`, cls: 'text-emerald-700' };
+  })();
 
+  // 상태 접미사 (WordPress: "— 임시글", "— 대기중")
   const statusSuffix =
     product.status === 'draft'
       ? ' — 임시글'
@@ -597,124 +754,143 @@ function ProductRow({
         ? ' — 대기중'
         : '';
 
+  const bgClass = isAlt ? 'bg-[#f9f9f9]' : 'bg-white';
+
   return (
-    <tr className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors group">
+    <tr className={`border-b border-slate-100 ${bgClass} hover:bg-[#f0f6fc] transition-colors group`}>
       {/* 체크박스 */}
-      <td className="px-3 py-2.5">
+      <td className="px-2 py-1.5 align-top">
         <input
           type="checkbox"
           checked={selected}
           onChange={onToggle}
-          className="rounded border-slate-300 text-primary-600"
+          className="rounded border-slate-300 text-primary-600 w-3.5 h-3.5 mt-1"
         />
       </td>
 
-      {/* 이미지 */}
+      {/* 이미지 (썸네일 — 40x40) */}
       {vis('image') && (
-        <td className="px-2 py-2.5">
-          <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-slate-400 text-xs overflow-hidden">
+        <td className="px-1 py-1.5 align-top">
+          <div className="w-10 h-10 rounded border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300 overflow-hidden flex-shrink-0">
             {product.image ? (
               <img src={product.image} alt="" className="w-full h-full object-cover" />
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <ImageIcon className="w-5 h-5" />
             )}
           </div>
         </td>
       )}
 
-      {/* 이름 */}
-      <td className="px-3 py-2.5">
-        <div className="max-w-xs">
-          <span className="text-sm text-primary-700 hover:text-primary-900 cursor-pointer font-medium leading-snug">
+      {/* 이름 (WordPress: 상품명 링크 + 상태 + 호버 액션) */}
+      <td className="px-2 py-1.5 align-top">
+        <div>
+          <a href="#" className="text-[13px] text-primary-700 hover:text-primary-900 hover:underline font-semibold leading-tight">
             {product.name}
-          </span>
+          </a>
           {statusSuffix && (
-            <span className="text-slate-400 text-xs">{statusSuffix}</span>
+            <span className="text-slate-400 text-xs font-normal">{statusSuffix}</span>
           )}
-          {/* 호버 시 액션 링크 */}
-          <div className="hidden group-hover:flex items-center gap-2 mt-1 text-xs">
+          {/* WordPress 호버 액션 행 */}
+          <div className="hidden group-hover:block mt-0.5 text-[11px] leading-relaxed">
             <span className="text-slate-500">ID: {product.id}</span>
-            <span className="text-slate-300">|</span>
-            <button className="text-primary-600 hover:text-primary-800">상세</button>
-            <span className="text-slate-300">|</span>
-            <button className="text-primary-600 hover:text-primary-800">장바구니</button>
+            <span className="text-slate-300 mx-1">|</span>
+            <a href="#" className="text-primary-600 hover:text-primary-800 hover:underline">편집</a>
+            <span className="text-slate-300 mx-1">|</span>
+            <a href="#" className="text-primary-600 hover:text-primary-800 hover:underline">빠른 편집</a>
+            <span className="text-slate-300 mx-1">|</span>
+            <a href="#" className="text-red-600 hover:text-red-800 hover:underline">휴지통</a>
+            <span className="text-slate-300 mx-1">|</span>
+            <a href="#" className="text-primary-600 hover:text-primary-800 hover:underline">미리보기</a>
+            <span className="text-slate-300 mx-1">|</span>
+            <a href="#" className="text-primary-600 hover:text-primary-800 hover:underline">복사</a>
           </div>
         </div>
       </td>
 
       {/* SKU */}
       {vis('sku') && (
-        <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{product.sku || '—'}</td>
+        <td className="px-2 py-1.5 text-slate-500 whitespace-nowrap align-top text-[13px]">{product.sku}</td>
       )}
 
       {/* 재고 */}
       {vis('stock') && (
-        <td className={`px-3 py-2.5 whitespace-nowrap text-xs ${stockColor}`}>
-          {stockLabel}
+        <td className={`px-2 py-1.5 whitespace-nowrap align-top text-[12px] ${stockDisplay.cls}`}>
+          {stockDisplay.text}
         </td>
       )}
 
-      {/* 가격 */}
+      {/* 가격 (WordPress: 정가 취소선 + 할인가) */}
       {vis('price') && (
-        <td className="px-3 py-2.5 text-right whitespace-nowrap">
+        <td className="px-2 py-1.5 whitespace-nowrap align-top text-[13px]">
           {product.salePrice ? (
-            <div>
-              <span className="text-slate-400 line-through text-xs">
-                ₩{product.price.toLocaleString()}
-              </span>
+            <>
+              <del className="text-slate-400">{formatPrice(product.price)}</del>
               <br />
-              <span className="text-slate-900 font-semibold text-sm">
-                ₩{product.salePrice.toLocaleString()}
-              </span>
-            </div>
+              <ins className="no-underline text-slate-900 font-medium">{formatPrice(product.salePrice)}</ins>
+            </>
           ) : (
-            <span className="text-slate-900">₩{product.price.toLocaleString()}</span>
+            <span className="text-slate-900">{formatPrice(product.price)}</span>
           )}
         </td>
       )}
 
       {/* 카테고리 */}
       {vis('category') && (
-        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{product.category}</td>
+        <td className="px-2 py-1.5 align-top">
+          <a href="#" className="text-[13px] text-primary-600 hover:text-primary-800 hover:underline">{product.category}</a>
+        </td>
       )}
 
-      {/* 태그 */}
+      {/* 태그 (WordPress: 콤마 구분 링크) */}
       {vis('tags') && (
-        <td className="px-3 py-2.5">
-          <div className="max-w-[200px] text-xs text-slate-500 leading-relaxed">
-            {product.tags.join(', ')}
+        <td className="px-2 py-1.5 align-top">
+          <div className="max-w-[180px] text-[12px] leading-relaxed">
+            {product.tags.map((tag, i) => (
+              <span key={tag}>
+                {i > 0 && <span className="text-slate-300">, </span>}
+                <a href="#" className="text-primary-600 hover:text-primary-800 hover:underline">{tag}</a>
+              </span>
+            ))}
           </div>
         </td>
       )}
 
       {/* 브랜드 */}
       {vis('brand') && (
-        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{product.brand || '—'}</td>
+        <td className="px-2 py-1.5 text-slate-600 whitespace-nowrap align-top text-[13px]">{product.brand}</td>
       )}
 
-      {/* 추천 */}
+      {/* 추천 (WordPress: 별표 토글) */}
       {vis('featured') && (
-        <td className="px-3 py-2.5 text-center">
-          <span className={product.featured ? 'text-amber-400' : 'text-slate-200'}>★</span>
+        <td className="px-1 py-1.5 text-center align-top">
+          <button className="hover:opacity-80 transition-opacity">
+            <Star
+              className={`w-4 h-4 ${product.featured ? 'fill-amber-400 text-amber-400' : 'text-slate-200 hover:text-slate-400'}`}
+            />
+          </button>
         </td>
       )}
 
       {/* 날짜 */}
       {vis('date') && (
-        <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{product.createdAt}</td>
+        <td className="px-2 py-1.5 text-slate-500 whitespace-nowrap align-top text-[12px]">
+          {product.status === 'published' ? '발행됨' : product.status === 'draft' ? '최종 수정일' : '대기중'}
+          <br />
+          <span className="text-slate-400">{product.createdAt}</span>
+        </td>
       )}
 
       {/* 공급자 */}
       {vis('supplier') && (
-        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap text-xs">{product.supplier}</td>
+        <td className="px-2 py-1.5 align-top">
+          <span className="text-[12px] text-slate-600">{product.supplier}</span>
+        </td>
       )}
     </tr>
   );
 }
 
-// ─── 컴팩트 페이지네이션 ────────────────────────────────
+// ─── 컴팩트 페이지네이션 (WordPress 스타일) ──────────────
 
 function PaginationCompact({
   currentPage,
@@ -726,37 +902,41 @@ function PaginationCompact({
   onPageChange: (page: number) => void;
 }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5">
       <button
         onClick={() => onPageChange(1)}
         disabled={currentPage <= 1}
-        className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        className="p-0.5 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        title="처음 페이지"
       >
-        <ChevronsLeft className="w-4 h-4 text-slate-600" />
+        <ChevronsLeft className="w-3.5 h-3.5 text-slate-600" />
       </button>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        className="p-0.5 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        title="이전 페이지"
       >
-        <ChevronLeft className="w-4 h-4 text-slate-600" />
+        <ChevronLeft className="w-3.5 h-3.5 text-slate-600" />
       </button>
-      <span className="text-sm text-slate-600 px-1">
-        {currentPage} / {totalPages} 쪽
+      <span className="text-xs text-slate-600 px-1 tabular-nums">
+        {currentPage} / {totalPages}
       </span>
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        className="p-0.5 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        title="다음 페이지"
       >
-        <ChevronRight className="w-4 h-4 text-slate-600" />
+        <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
       </button>
       <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage >= totalPages}
-        className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        className="p-0.5 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-default"
+        title="마지막 페이지"
       >
-        <ChevronsRight className="w-4 h-4 text-slate-600" />
+        <ChevronsRight className="w-3.5 h-3.5 text-slate-600" />
       </button>
     </div>
   );
