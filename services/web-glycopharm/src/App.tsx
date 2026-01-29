@@ -297,6 +297,10 @@ function AppRoutes() {
         <Route path="content" element={<PartnerContentPage />} />
         <Route path="events" element={<PartnerEventsPage />} />
         <Route path="status" element={<PartnerStatusPage />} />
+        {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
+        <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/my" element={<MySignagePage />} />
+        <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
       {/* Operator Dashboard */}
@@ -335,6 +339,10 @@ function AppRoutes() {
         <Route path="settings" element={<SettingsPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<AiReportPage />} />
+        {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
+        <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/my" element={<MySignagePage />} />
+        <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
