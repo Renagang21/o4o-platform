@@ -9,6 +9,9 @@
  * - Added origin_country, legal_category, certification_ids
  * - Added usage_info, caution_info for product details
  * - Added barcodes for identification (Product DB Constitution v1)
+ *
+ * WO-PRODUCT-IMAGES-AND-BARCODE-UNBLOCK-V1:
+ * - Added images field for UI rendering (schema parity with Neture/Cosmetics)
  */
 
 import {
@@ -26,6 +29,16 @@ import type { GlycopharmProductLog } from './glycopharm-product-log.entity.js';
 
 export type GlycopharmProductStatus = 'draft' | 'active' | 'inactive' | 'discontinued';
 export type GlycopharmProductCategory = 'cgm_device' | 'test_strip' | 'lancet' | 'meter' | 'accessory' | 'other';
+
+/**
+ * Product Image Interface
+ */
+export interface GlycopharmProductImage {
+  url: string;
+  alt?: string;
+  is_primary: boolean;
+  order?: number;
+}
 
 @Entity({ name: 'glycopharm_products', schema: 'public' })
 export class GlycopharmProduct {
@@ -46,6 +59,9 @@ export class GlycopharmProduct {
 
   @Column({ type: 'jsonb', nullable: true })
   barcodes?: string[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  images?: GlycopharmProductImage[] | null;
 
   @Column({ type: 'varchar', length: 50, default: 'other' })
   category!: GlycopharmProductCategory;

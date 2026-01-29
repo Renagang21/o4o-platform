@@ -6,6 +6,10 @@
  * - 5 suppliers (S1-S5)
  * - ~65-70 products total
  * - Tests new Product DB Constitution v1 fields
+ *
+ * WO-PRODUCT-IMAGES-AND-BARCODE-UNBLOCK-V1
+ * - Added placeholder images for all 57 products
+ * - Added missing barcodes for complete dataset
  */
 
 import 'reflect-metadata';
@@ -19,6 +23,45 @@ const pool = new Pool({
   password: 'postgres',
   ssl: false
 });
+
+// ============================================================================
+// Helper Functions for Images and Barcodes
+// ============================================================================
+
+interface ProductImage {
+  url: string;
+  alt?: string;
+  is_primary: boolean;
+  order?: number;
+}
+
+type ProductCategory = 'pharmaceutical' | 'health' | 'cosmetics' | 'device' | 'pilot';
+
+const CATEGORY_COLORS = {
+  pharmaceutical: { bg: 'FFE4E1', fg: '8B0000' },
+  health: { bg: 'E0F2F7', fg: '01579B' },
+  cosmetics: { bg: 'FFF8DC', fg: 'CD853F' },
+  device: { bg: 'F0FFF0', fg: '228B22' },
+  pilot: { bg: 'F5F5DC', fg: '8B4513' }
+};
+
+function generatePlaceholderImage(productName: string, category: ProductCategory): ProductImage[] {
+  const colors = CATEGORY_COLORS[category];
+  const text = encodeURIComponent(productName.substring(0, 15));
+
+  return [{
+    url: `https://placehold.co/600x600/${colors.bg}/${colors.fg}/png?text=${text}`,
+    alt: `${productName} 제품 이미지`,
+    is_primary: true,
+    order: 1
+  }];
+}
+
+function generateBarcode(prefix: string, index: number): string {
+  // Generate EAN-13 format: 880 + 10 digits
+  const baseNumber = `880${prefix}${String(index).padStart(6, '0')}`;
+  return baseNumber.substring(0, 13);
+}
 
 // ============================================================================
 // Supplier Definitions
@@ -74,6 +117,7 @@ const S1_PRODUCTS = [
     usage_info: '1일 2-3회 환부에 적당량 도포',
     caution_info: '눈, 입에 들어가지 않도록 주의. 임산부는 사용 전 의사와 상담',
     barcodes: ['8801234567890'],
+    images: generatePlaceholderImage('후시딘 연고', 'pharmaceutical'),
     status: 'active',
     is_featured: true
   },
@@ -91,6 +135,8 @@ const S1_PRODUCTS = [
     legal_category: '의약외품',
     usage_info: '손에 적당량 분사 후 문지르기',
     caution_info: '화기 근처 사용 금지. 어린이 손이 닿지 않는 곳 보관',
+    barcodes: [generateBarcode('1002', 1)],
+    images: generatePlaceholderImage('박테리신 살균소독제', 'pharmaceutical'),
     status: 'active',
     is_featured: false
   },
@@ -110,6 +156,7 @@ const S1_PRODUCTS = [
     certification_ids: ['품목허가번호: 198800034'],
     usage_info: '1일 2-3회 환부에 얇게 도포',
     barcodes: ['8801234567891'],
+    images: generatePlaceholderImage('마데카솔 연고', 'pharmaceutical'),
     status: 'active',
     is_featured: true
   },
@@ -126,6 +173,8 @@ const S1_PRODUCTS = [
     legal_category: '전문의약품',
     certification_ids: ['품목허가번호: 199200056'],
     caution_info: '의사 처방 필요. 임의 사용 금지',
+    barcodes: [generateBarcode('1004', 1)],
+    images: generatePlaceholderImage('겐타마이신 안연고', 'pharmaceutical'),
     status: 'draft',
     is_featured: false
   },
@@ -142,6 +191,8 @@ const S1_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '의약외품',
     usage_info: '상처 부위에 도포 후 자연 건조',
+    barcodes: [generateBarcode('1005', 1)],
+    images: generatePlaceholderImage('포비돈 소독약', 'pharmaceutical'),
     status: 'active',
     is_featured: false
   },
@@ -156,6 +207,8 @@ const S1_PRODUCTS = [
     manufacturer: '동인당',
     origin_country: '대한민국',
     legal_category: '의료기기',
+    barcodes: [generateBarcode('1006', 1)],
+    images: generatePlaceholderImage('멸균밴드', 'pharmaceutical'),
     status: 'active',
     is_featured: false
   },
@@ -174,6 +227,8 @@ const S1_PRODUCTS = [
     legal_category: '전문의약품',
     certification_ids: ['품목허가번호: 199400078'],
     caution_info: '의사 처방 필요',
+    barcodes: [generateBarcode('1007', 1)],
+    images: generatePlaceholderImage('히루도이드 크림', 'pharmaceutical'),
     status: 'active',
     is_featured: true
   },
@@ -191,6 +246,8 @@ const S1_PRODUCTS = [
     legal_category: '의료기기',
     certification_ids: ['의료기기허가번호: 제허18-1234호'],
     usage_info: '이마 중앙에서 3-5cm 거리에서 측정',
+    barcodes: [generateBarcode('1008', 1)],
+    images: generatePlaceholderImage('비접촉 체온계', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -208,6 +265,8 @@ const S1_PRODUCTS = [
     legal_category: '의료기기',
     usage_info: '상처 부위 크기에 맞게 잘라 붙이기',
     caution_info: '감염된 상처에는 사용 금지',
+    barcodes: [generateBarcode('1009', 1)],
+    images: generatePlaceholderImage('하이드로콜로이드', 'pharmaceutical'),
     status: 'active',
     is_featured: false
   },
@@ -224,6 +283,8 @@ const S1_PRODUCTS = [
     legal_category: '전문의약품',
     certification_ids: ['품목허가번호: 199700089'],
     caution_info: '의사 처방 필요. 장기 사용 금지',
+    barcodes: [generateBarcode('1010', 1)],
+    images: generatePlaceholderImage('뮤피로신 연고', 'pharmaceutical'),
     status: 'draft',
     is_featured: false
   }
@@ -251,6 +312,7 @@ const S2_PRODUCTS = [
     usage_info: '1일 1회, 1회 1정을 물과 함께 섭취',
     caution_info: '과량 섭취 시 설사, 복통 발생 가능. 의약품 복용 시 전문가 상담',
     barcodes: ['8809012345001'],
+    images: generatePlaceholderImage('멀티비타민', 'health'),
     status: 'active',
     is_featured: true
   },
@@ -271,6 +333,7 @@ const S2_PRODUCTS = [
     usage_info: '1일 1회, 1회 1포를 물과 함께 섭취',
     caution_info: '냉장 보관 권장. 개봉 후 빠른 시일 내 섭취',
     barcodes: ['8809012345002'],
+    images: generatePlaceholderImage('프로바이오틱스', 'health'),
     status: 'active',
     is_featured: true
   },
@@ -290,6 +353,8 @@ const S2_PRODUCTS = [
     certification_ids: ['건기식 제2019-89호'],
     usage_info: '1일 1회, 1회 2캡슐을 식후 섭취',
     caution_info: '혈액 응고 저하제 복용자는 전문가 상담 필요',
+    barcodes: [generateBarcode('2003', 1)],
+    images: generatePlaceholderImage('오메가3', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -306,6 +371,8 @@ const S2_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1회 1캡슐 섭취',
+    barcodes: [generateBarcode('2004', 1)],
+    images: generatePlaceholderImage('루테인', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -325,6 +392,8 @@ const S2_PRODUCTS = [
     certification_ids: ['건기식 제2018-67호'],
     usage_info: '1일 2회, 1회 1정을 식후 섭취',
     caution_info: '간 질환 약물 복용자는 의사와 상담',
+    barcodes: [generateBarcode('2005', 1)],
+    images: generatePlaceholderImage('밀크씨슬', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -341,6 +410,8 @@ const S2_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1캡슐 섭취',
+    barcodes: [generateBarcode('2006', 1)],
+    images: generatePlaceholderImage('비타민D', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -360,6 +431,8 @@ const S2_PRODUCTS = [
     certification_ids: ['건기식 제2017-45호'],
     usage_info: '1일 1회, 1포(20ml)를 그대로 또는 물에 희석하여 섭취',
     caution_info: '어린이, 임산부, 수유부는 섭취 전 전문가 상담',
+    barcodes: [generateBarcode('2007', 1)],
+    images: generatePlaceholderImage('홍삼진액', 'health'),
     status: 'active',
     is_featured: true
   },
@@ -377,6 +450,8 @@ const S2_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1포를 물 또는 음료에 타서 섭취',
+    barcodes: [generateBarcode('2008', 1)],
+    images: generatePlaceholderImage('콜라겐', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -393,6 +468,8 @@ const S2_PRODUCTS = [
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1정 섭취',
     caution_info: '신장 질환자는 섭취 전 의사 상담',
+    barcodes: [generateBarcode('2009', 1)],
+    images: generatePlaceholderImage('마그네슘', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -410,6 +487,8 @@ const S2_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1포를 물과 함께 섭취',
+    barcodes: [generateBarcode('2010', 1)],
+    images: generatePlaceholderImage('아르기닌', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -428,6 +507,8 @@ const S2_PRODUCTS = [
     legal_category: '건강기능식품',
     certification_ids: ['건기식 제2020-112호'],
     usage_info: '1일 2회, 1회 2캡슐 섭취',
+    barcodes: [generateBarcode('2011', 1)],
+    images: generatePlaceholderImage('크릴오일', 'health'),
     status: 'active',
     is_featured: true
   },
@@ -443,6 +524,8 @@ const S2_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1캡슐 섭취',
+    barcodes: [generateBarcode('2012', 1)],
+    images: generatePlaceholderImage('코엔자임Q10', 'health'),
     status: 'active',
     is_featured: false
   }
@@ -470,6 +553,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '세안 후 적당량을 얼굴 전체에 부드럽게 펴 발라줍니다',
     caution_info: '눈에 들어갔을 경우 즉시 씻어내고, 이상 발생 시 사용 중지',
     sku: 'COS-S3-001',
+    barcodes: [generateBarcode('3001', 1)],
+    images: generatePlaceholderImage('세라마이드 크림', 'cosmetics'),
     status: 'published',
     is_featured: true
   },
@@ -487,6 +572,7 @@ const S3_PRODUCTS_DATA = [
     usage_info: '토너 후 2-3방울을 얼굴에 골고루 펴 발라줍니다',
     sku: 'COS-S3-002',
     barcodes: ['8801234500001'],
+    images: generatePlaceholderImage('히알루론산 세럼', 'cosmetics'),
     status: 'published',
     is_featured: true
   },
@@ -503,6 +589,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '적당량을 덜어 거품을 낸 후 얼굴을 마사지하듯 세안',
     caution_info: '눈에 들어가지 않도록 주의',
     sku: 'COS-S3-003',
+    barcodes: [generateBarcode('3003', 1)],
+    images: generatePlaceholderImage('클렌징 폼', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -521,6 +609,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '토너 후 얼굴 전체에 골고루 펴 발라줍니다',
     caution_info: '햇빛 노출 전 자외선차단제 사용 권장',
     sku: 'COS-S3-004',
+    barcodes: [generateBarcode('3004', 1)],
+    images: generatePlaceholderImage('미백 에센스', 'cosmetics'),
     status: 'published',
     is_featured: true
   },
@@ -539,6 +629,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '저녁 세안 후 소량을 얼굴에 펴 발라줍니다. 처음 사용 시 2-3일 간격으로 사용',
     caution_info: '레티놀 초보자는 저농도부터 시작 권장. 임산부 사용 금지',
     sku: 'COS-S3-005',
+    barcodes: [generateBarcode('3005', 1)],
+    images: generatePlaceholderImage('레티놀 세럼', 'cosmetics'),
     status: 'published',
     is_featured: true
   },
@@ -555,6 +647,8 @@ const S3_PRODUCTS_DATA = [
     ingredients: ['센텔라아시아티카추출물', '판테놀', '알란토인'],
     usage_info: '세안 후 화장솜에 적셔 피부결을 따라 닦아내거나 손으로 가볍게 두드려 흡수',
     sku: 'COS-S3-006',
+    barcodes: [generateBarcode('3006', 1)],
+    images: generatePlaceholderImage('센텔라 토너', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -572,6 +666,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '외출 30분 전 얼굴 전체에 골고루 펴 바르고, 2-3시간마다 덧발라줍니다',
     caution_info: '눈 주위는 피해서 사용',
     sku: 'COS-S3-007',
+    barcodes: [generateBarcode('3007', 1)],
+    images: generatePlaceholderImage('선크림', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -589,6 +685,7 @@ const S3_PRODUCTS_DATA = [
     usage_info: '샤워 직후 물기가 남아있을 때 바르면 효과적',
     sku: 'COS-S3-008',
     barcodes: ['8801234500002'],
+    images: generatePlaceholderImage('아토피 로션', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -605,6 +702,8 @@ const S3_PRODUCTS_DATA = [
     ingredients: ['티트리오일', '살리실산', '센텔라추출물'],
     usage_info: '토너 후 트러블 부위에 집중 발라줍니다',
     sku: 'COS-S3-009',
+    barcodes: [generateBarcode('3009', 1)],
+    images: generatePlaceholderImage('티트리 앰플', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -621,6 +720,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '저녁 세안 후 화장솜에 적셔 피부결 따라 닦아내기. 주 2-3회 사용',
     caution_info: '각질 제거 후 보습제 필수. 햇빛 노출 시 자외선 차단제 사용',
     sku: 'COS-S3-010',
+    barcodes: [generateBarcode('3010', 1)],
+    images: generatePlaceholderImage('각질 토너', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -638,6 +739,8 @@ const S3_PRODUCTS_DATA = [
     ingredients: ['펩타이드복합체', '아데노신', '카페인'],
     usage_info: '아침 저녁 소량을 눈가에 두드려 흡수',
     sku: 'COS-S3-011',
+    barcodes: [generateBarcode('3011', 1)],
+    images: generatePlaceholderImage('아이크림', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -655,6 +758,8 @@ const S3_PRODUCTS_DATA = [
     usage_info: '토너 후 2-3방울 얼굴에 펴 바르기. 냉장 보관 권장',
     caution_info: '개봉 후 3개월 이내 사용. 산화 방지 위해 밀봉 보관',
     sku: 'COS-S3-012',
+    barcodes: [generateBarcode('3012', 1)],
+    images: generatePlaceholderImage('비타민C 세럼', 'cosmetics'),
     status: 'published',
     is_featured: true
   },
@@ -672,6 +777,8 @@ const S3_PRODUCTS_DATA = [
     ingredients: ['팔미토일펜타펩타이드-4', '레티놀', '세라마이드'],
     usage_info: '세안 후 마지막 단계에 얼굴 전체에 펴 바르기',
     sku: 'COS-S3-013',
+    barcodes: [generateBarcode('3013', 1)],
+    images: generatePlaceholderImage('콜라겐 크림', 'cosmetics'),
     status: 'published',
     is_featured: true
   },
@@ -688,6 +795,8 @@ const S3_PRODUCTS_DATA = [
     ingredients: ['히알루론산', '베타글루칸', '트레할로스'],
     usage_info: '세안 후 얼굴 전체에 골고루 펴 바르기',
     sku: 'COS-S3-014',
+    barcodes: [generateBarcode('3014', 1)],
+    images: generatePlaceholderImage('수분크림', 'cosmetics'),
     status: 'published',
     is_featured: false
   },
@@ -705,6 +814,7 @@ const S3_PRODUCTS_DATA = [
     usage_info: '세안 후 얼굴에 밀착시켜 15-20분 후 제거',
     sku: 'COS-S3-015',
     barcodes: ['8801234500003'],
+    images: generatePlaceholderImage('마스크팩', 'cosmetics'),
     status: 'published',
     is_featured: false
   }
@@ -732,6 +842,7 @@ const S4_PRODUCTS = [
     usage_info: '겨드랑이 또는 구강에 넣고 1분간 측정',
     caution_info: '측정 전 소독 필수. 37.5℃ 이상 시 의료기관 방문',
     barcodes: ['8801234400001'],
+    images: generatePlaceholderImage('체온계', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -750,6 +861,8 @@ const S4_PRODUCTS = [
     legal_category: '의료기기',
     usage_info: '손목에 적당한 압력으로 착용',
     caution_info: '너무 조이면 혈액 순환 방해',
+    barcodes: [generateBarcode('4002', 1)],
+    images: generatePlaceholderImage('손목 보호대', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -765,6 +878,8 @@ const S4_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강용품',
     usage_info: '운동 전 무릎에 착용',
+    barcodes: [generateBarcode('4003', 1)],
+    images: generatePlaceholderImage('무릎 보호대', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -784,6 +899,8 @@ const S4_PRODUCTS = [
     certification_ids: ['의약외품 제2020-1234호'],
     usage_info: '통증 부위에 1일 1-2회 부착',
     caution_info: '피부 발진 시 사용 중지',
+    barcodes: [generateBarcode('4004', 1)],
+    images: generatePlaceholderImage('파스', 'health'),
     status: 'active',
     is_featured: false
   },
@@ -804,6 +921,7 @@ const S4_PRODUCTS = [
     usage_info: '안정된 자세로 팔에 커프 착용 후 측정',
     caution_info: '부정확 시 재측정. 고혈압 의심 시 병원 방문',
     barcodes: ['8801234400002'],
+    images: generatePlaceholderImage('혈압계', 'device'),
     status: 'active',
     is_featured: true
   },
@@ -820,6 +938,8 @@ const S4_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강용품',
     usage_info: '발목에 적당히 조여 착용',
+    barcodes: [generateBarcode('4006', 1)],
+    images: generatePlaceholderImage('발목 보호대', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -837,6 +957,8 @@ const S4_PRODUCTS = [
     legal_category: '건강용품',
     usage_info: '냉찜질: 냉동 2시간 후 사용 / 온찜질: 전자레인지 30초',
     caution_info: '피부에 직접 닿지 않도록 수건으로 감싸기',
+    barcodes: [generateBarcode('4007', 1)],
+    images: generatePlaceholderImage('찜질팩', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -855,6 +977,8 @@ const S4_PRODUCTS = [
     certification_ids: ['의료기기신고번호: 제허21-2345호'],
     usage_info: '귀 안쪽에 삽입 후 버튼 누르기',
     caution_info: '귀지 제거 후 측정 권장',
+    barcodes: [generateBarcode('4008', 1)],
+    images: generatePlaceholderImage('귀 체온계', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -873,6 +997,8 @@ const S4_PRODUCTS = [
     legal_category: '의료기기',
     usage_info: '허리에 착용 후 벨크로로 조절',
     caution_info: '장시간 착용 시 근육 약화 가능',
+    barcodes: [generateBarcode('4009', 1)],
+    images: generatePlaceholderImage('허리 보호대', 'device'),
     status: 'active',
     is_featured: false
   },
@@ -889,6 +1015,8 @@ const S4_PRODUCTS = [
     legal_category: '의약외품',
     usage_info: '손에 적당량 짜서 문지르기',
     caution_info: '화기 주의. 어린이 손이 닿지 않는 곳 보관',
+    barcodes: [generateBarcode('4010', 1)],
+    images: generatePlaceholderImage('손 소독 젤', 'health'),
     status: 'active',
     is_featured: false
   }
@@ -915,6 +1043,7 @@ const S5_PRODUCTS = [
     usage_info: '1회 30g을 물 또는 우유 250ml에 섞어 섭취',
     caution_info: '단백질 알레르기 주의',
     barcodes: ['8801234500101'],
+    images: generatePlaceholderImage('프로틴 파우더', 'pilot'),
     status: 'active',
     is_featured: true
   },
@@ -933,6 +1062,8 @@ const S5_PRODUCTS = [
     legal_category: '일반식품',
     usage_info: '1일 1-2회, 1회 1스푼(15ml)을 음식이나 음료에 섞어 섭취',
     caution_info: '과량 섭취 시 복통, 설사 가능',
+    barcodes: [generateBarcode('5002', 1)],
+    images: generatePlaceholderImage('MCT 오일', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -949,6 +1080,8 @@ const S5_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '일반식품',
     usage_info: '냉장 보관 후 섭취',
+    barcodes: [generateBarcode('5003', 1)],
+    images: generatePlaceholderImage('콤부차', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -968,6 +1101,8 @@ const S5_PRODUCTS = [
     certification_ids: ['건기식 제2022-123호'],
     usage_info: '1일 1회, 1포를 물에 타서 섭취',
     caution_info: '과민 반응 주의',
+    barcodes: [generateBarcode('5004', 1)],
+    images: generatePlaceholderImage('차가버섯', 'pilot'),
     status: 'active',
     is_featured: true
   },
@@ -985,6 +1120,8 @@ const S5_PRODUCTS = [
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 1캡슐 섭취',
     caution_info: '임산부, 수유부는 섭취 전 상담',
+    barcodes: [generateBarcode('5005', 1)],
+    images: generatePlaceholderImage('아슈와간다', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -1002,6 +1139,8 @@ const S5_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1포 섭취',
+    barcodes: [generateBarcode('5006', 1)],
+    images: generatePlaceholderImage('콜라겐 드링크', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -1018,6 +1157,8 @@ const S5_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 2회, 1회 3정 섭취',
+    barcodes: [generateBarcode('5007', 1)],
+    images: generatePlaceholderImage('스피룰리나', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -1035,6 +1176,8 @@ const S5_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '건강기능식품',
     usage_info: '1일 1회, 2캡슐 섭취',
+    barcodes: [generateBarcode('5008', 1)],
+    images: generatePlaceholderImage('버섯 추출물', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -1051,6 +1194,8 @@ const S5_PRODUCTS = [
     origin_country: '대한민국',
     legal_category: '일반식품',
     usage_info: '물 500ml에 1스틱 섞어 섭취',
+    barcodes: [generateBarcode('5009', 1)],
+    images: generatePlaceholderImage('전해질', 'pilot'),
     status: 'active',
     is_featured: false
   },
@@ -1068,6 +1213,8 @@ const S5_PRODUCTS = [
     legal_category: '일반식품',
     usage_info: '1일 2회, 1회 2캡슐 식전 섭취',
     caution_info: '위장 장애 시 섭취 중지',
+    barcodes: [generateBarcode('5010', 1)],
+    images: generatePlaceholderImage('사과식초', 'pilot'),
     status: 'active',
     is_featured: false
   }
@@ -1084,13 +1231,13 @@ async function seedGlycopharmProducts() {
     try {
       const result = await pool.query(`
         INSERT INTO public.glycopharm_products (
-          name, subtitle, sku, barcodes, category, description, short_description,
+          name, subtitle, sku, barcodes, images, category, description, short_description,
           price, sale_price, stock_quantity,
           manufacturer, origin_country, legal_category, certification_ids,
           usage_info, caution_info,
           status, is_featured, sort_order
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
         )
         ON CONFLICT (sku) DO NOTHING
         RETURNING id, name
@@ -1100,6 +1247,7 @@ async function seedGlycopharmProducts() {
           product.subtitle || null,
           product.sku,
           product.barcodes ? JSON.stringify(product.barcodes) : null,
+          product.images ? JSON.stringify(product.images) : null,
           product.category,
           product.description || null,
           product.short_description || null,
@@ -1136,13 +1284,13 @@ async function seedNetureProducts(products: any[]) {
     try {
       const result = await pool.query(`
         INSERT INTO neture.neture_products (
-          name, subtitle, sku, barcodes, category, description, short_description,
+          name, subtitle, sku, barcodes, images, category, description, short_description,
           base_price, sale_price, stock,
           manufacturer, origin_country, legal_category, certification_ids,
           usage_info, caution_info,
           status, is_featured
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
         )
         ON CONFLICT (sku) DO NOTHING
         RETURNING id, name
@@ -1152,6 +1300,7 @@ async function seedNetureProducts(products: any[]) {
           product.subtitle || null,
           product.sku,
           product.barcodes ? JSON.stringify(product.barcodes) : null,
+          product.images ? JSON.stringify(product.images) : null,
           product.category,
           product.description || null,
           product.short_description || null,
@@ -1203,14 +1352,14 @@ async function seedCosmeticsProducts() {
     try {
       const result = await pool.query(`
         INSERT INTO cosmetics.cosmetics_products (
-          brand_id, name, subtitle, sku, barcodes,
+          brand_id, name, subtitle, sku, barcodes, images,
           description, short_description, ingredients,
           manufacturer, origin_country, legal_category, certification_ids,
           usage_info, caution_info,
           base_price, sale_price, currency,
           status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
         )
         ON CONFLICT (sku) DO NOTHING
         RETURNING id, name
@@ -1221,6 +1370,7 @@ async function seedCosmeticsProducts() {
           productData.subtitle || null,
           productData.sku,
           productData.barcodes ? JSON.stringify(productData.barcodes) : null,
+          productData.images ? JSON.stringify(productData.images) : null,
           productData.description || null,
           productData.short_description || null,
           productData.ingredients ? JSON.stringify(productData.ingredients) : null,
