@@ -12,7 +12,6 @@ import {
   Handshake,
   Shield,
   Activity,
-  MonitorPlay,
 } from 'lucide-react';
 
 const roleNavigation: Record<string, { path: string; label: string; icon: typeof Building2 }> = {
