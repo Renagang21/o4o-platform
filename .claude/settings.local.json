@@ -494,7 +494,27 @@
       "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:*)",
       "Bash(1 <<'EOF'\nsteps:\n  - name: 'gcr.io/cloud-builders/docker'\n    args: ['build', '-t', 'gcr.io/netureyoutube/siteguide-web:latest', '-f', 'services/web-siteguide/Dockerfile', '.']\nimages:\n  - 'gcr.io/netureyoutube/siteguide-web:latest'\nEOF)",
       "Bash(targeting store networks\" \\(suppliers, headquarters, partners\\)\n- Update O4OMainPage hero and value sections\n- Refactor all target pages \\(pharmacy, clinic, salon, optical\\)\n  with new business-focused structure\n- Add \"무재고 상품 공급\" channel to all target pages\n- Update OtherTargetsPage with expanded network types\n- Update SiteOperatorPage for existing site operators\n- Fix navigation links to /o4o instead of /\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(공급자 연결\"\n- Add home icon link to navigate back to main site\n- Improve visual hierarchy with border separator\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(공급자 연결\"\n- Add home icon link to navigate back to main site\n- Improve visual hierarchy with border separator\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(PGPASSWORD='seoChuran1!' psql:*)",
+      "Bash(npx pnpm run build:*)",
+      "Bash(npx pnpm:*)",
+      "Bash(git status:*)",
+      "Bash(git -C \"c:\\\\Users\\\\home\\\\coding\\\\o4o-platform\" log --oneline --all -- \"apps/api-server/src/controllers/forum/*\" \"apps/api-server/src/routes/forum/*\")",
+      "Bash(git -C \"c:\\\\Users\\\\home\\\\coding\\\\o4o-platform\" log --oneline -20)",
+      "Bash(git -C \"c:\\\\Users\\\\home\\\\coding\\\\o4o-platform\" show 676af48e2 --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\home\\\\coding\\\\o4o-platform\" show 4619d092c --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\home\\\\coding\\\\o4o-platform\" log -p 676af48e2 -- \"apps/api-server/src/controllers/forum/ForumCategoryRequestController.ts\")",
+      "Bash(git -C \"c:\\\\Users\\\\home\\\\coding\\\\o4o-platform\" log -p --all -- \"packages/forum-core/src/backend/entities/ForumPost.ts\")",
+      "Bash(npx tsx:*)",
+      "Bash(test -f:*)",
+      "Bash(DB_PASSWORD=\"seoChuran1!\" npx tsx:*)",
+      "Bash(DB_USERNAME=\"o4o_api\" DB_PASSWORD=\"seoChuran1!\" npx tsx:*)",
+      "Bash(DB_HOST=\"34.64.96.252\" DB_PORT=\"5432\" DB_NAME=\"o4o_platform\" DB_USERNAME=\"o4o_api\" DB_PASSWORD=\"seoChuran1!\" npx tsx src/scripts/seed-sample-products.ts)",
+      "Bash(DB_HOST=\"34.64.96.252\" DB_PASSWORD=\"seoChuran1!\" npx tsx:*)",
+      "Bash(DB_PASSWORD='Xptmxm!3498' npx tsx:*)",
+      "Bash(DB_HOST=34.64.96.252 DB_USERNAME=o4o_api DB_PASSWORD='Xptmxm!3498' DB_NAME=o4o_platform npx tsx src/scripts/update-glycopharm-status-orm.ts)",
+      "Bash(DB_PASSWORD=O4O_API_2025_SECURE npx tsx:*)",
+      "Bash(DB_PASSWORD=O4O_API_2025_SECURE timeout 15 npx tsx:*)"
     ],
     "deny": []
   }
