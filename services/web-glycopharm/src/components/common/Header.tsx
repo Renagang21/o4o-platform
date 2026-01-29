@@ -12,6 +12,7 @@ import {
   Handshake,
   Shield,
   Activity,
+  MonitorPlay,
 } from 'lucide-react';
 
 const roleNavigation: Record<string, { path: string; label: string; icon: typeof Building2 }> = {
@@ -86,6 +87,17 @@ export default function Header() {
               }
             >
               교육/자료
+            </NavLink>
+            <NavLink
+              to="/pharmacy/signage/library"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`
+              }
+            >
+              콘텐츠
             </NavLink>
             <NavLink
               to="/apply"
@@ -232,6 +244,16 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 교육/자료
+              </NavLink>
+              <NavLink
+                to="/pharmacy/signage/library"
+                className={({ isActive }) =>
+                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
+                  }`
+                }
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                콘텐츠
               </NavLink>
               <NavLink
                 to="/apply"
