@@ -543,5 +543,85 @@ export function createAdminController(
     }) as unknown as RequestHandler
   );
 
+  /**
+   * POST /api/v1/glycopharm/admin/migrate/add-product-fields
+   * Add missing fields to glycopharm_products table
+   *
+   * This is a one-time migration to sync Entity with production DB
+   */
+  router.post(
+    '/admin/migrate/add-product-fields',
+    requireAuth,
+    (async (req, res) => {
+      try {
+        const user = (req as unknown as AuthRequest).user;
+        const userRoles = user?.roles || [];
+
+        // Check operator/admin permission
+        if (!isOperatorOrAdmin(userRoles)) {
+          res.status(403).json({
+            error: 'Forbidden',
+            code: 'FORBIDDEN',
+            message: 'Operator or administrator role required',
+          });
+          return;
+        }
+
+        logger.info('[Glycopharm Admin] Running product fields migration');
+
+        // Execute migration SQL directly
+        const sql = `
+          -- Add subtitle for product listing
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS subtitle VARCHAR(500);
+
+          -- Add short_description for listing pages
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS short_description TEXT;
+
+          -- Add barcodes (JSONB array)
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS barcodes JSONB;
+
+          -- Add images (JSONB array)
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS images JSONB;
+
+          -- Add origin and legal fields
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS origin_country VARCHAR(100);
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS legal_category VARCHAR(100);
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS certification_ids JSONB;
+
+          -- Add usage information
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS usage_info TEXT;
+          ALTER TABLE glycopharm_products ADD COLUMN IF NOT EXISTS caution_info TEXT;
+        `;
+
+        await dataSource.query(sql);
+
+        logger.info('[Glycopharm Admin] Product fields migration completed');
+
+        res.json({
+          success: true,
+          message: 'Product fields migration completed successfully',
+          fieldsAdded: [
+            'subtitle',
+            'short_description',
+            'barcodes',
+            'images',
+            'origin_country',
+            'legal_category',
+            'certification_ids',
+            'usage_info',
+            'caution_info',
+          ],
+        });
+      } catch (error) {
+        logger.error('[Glycopharm Admin] Migration error:', error);
+        res.status(500).json({
+          error: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }) as unknown as RequestHandler
+  );
+
   return router;
 }
