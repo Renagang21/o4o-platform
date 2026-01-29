@@ -283,9 +283,12 @@ export function createB2BController(
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 100;
 
-        // Query active products from database
+        // Query active products from database with type filter
+        // franchise → is_featured = true (exclusive products for franchise partners)
+        // general → all active products
         const result = await repository.findAllProducts({
           status: 'active',
+          is_featured: type === 'franchise' ? true : undefined,
           page,
           limit,
         });
@@ -301,7 +304,6 @@ export function createB2BController(
           image: product.images?.[0]?.url,
           stock: product.stock_quantity,
           status: product.status,
-          // B2B-specific fields (placeholder for future implementation)
           type: type || 'general',
           isRecommended: product.is_featured || false,
         }));
