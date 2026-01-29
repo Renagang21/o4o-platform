@@ -327,30 +327,62 @@ router.post('/supplier/requests/:id/reject', requireAuth, async (req: Authentica
 });
 
 /**
- * POST /api/v1/neture/supplier/requests (테스트/시드용)
- * Create a new supplier request
+ * POST /api/v1/neture/supplier/requests
+ * Create a new supplier request (판매자 취급 요청)
+ *
+ * WO-S2S-FLOW-RECOVERY-PHASE1-V1:
+ * - requireAuth 추가 (인증 필수)
+ * - 인증된 사용자 정보를 sellerId/sellerName으로 자동 설정
+ * - 중복 요청 시 409 Conflict
  */
-router.post('/supplier/requests', async (req: Request, res: Response) => {
+router.post('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const data = req.body;
+    const userId = req.user?.id;
 
-    // 필수 필드 검증
-    if (!data.supplierId || !data.sellerId || !data.sellerName ||
-        !data.serviceId || !data.serviceName || !data.productId || !data.productName) {
-      return res.status(400).json({
+    if (!userId) {
+      return res.status(401).json({
         success: false,
-        error: 'VALIDATION_ERROR',
-        message: 'Missing required fields',
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
       });
     }
 
-    const result = await netureService.createSupplierRequest(data);
+    // 인증된 사용자 정보를 기본값으로 사용
+    const sellerId = data.sellerId || userId;
+    const sellerName = data.sellerName || req.user?.name || '';
+
+    // 필수 필드 검증
+    if (!data.supplierId || !data.serviceId || !data.serviceName ||
+        !data.productId || !data.productName) {
+      return res.status(400).json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Missing required fields: supplierId, serviceId, serviceName, productId, productName',
+      });
+    }
+
+    const result = await netureService.createSupplierRequest({
+      ...data,
+      sellerId,
+      sellerName,
+    });
 
     res.status(201).json({
       success: true,
       data: result,
     });
   } catch (error) {
+    // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 중복 요청 처리
+    if ((error as Error).message === 'DUPLICATE_REQUEST') {
+      return res.status(409).json({
+        success: false,
+        error: 'DUPLICATE_REQUEST',
+        message: '이미 동일한 취급 요청이 존재합니다.',
+        existingStatus: (error as any).existingStatus,
+      });
+    }
+
     logger.error('[Neture API] Error creating supplier request:', error);
     res.status(500).json({
       success: false,

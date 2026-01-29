@@ -2,22 +2,19 @@
  * SupplierDetailPage - 공급자 상세 페이지
  *
  * Work Order: WO-NETURE-EXTENSION-P4
+ * WO-S2S-FLOW-RECOVERY-PHASE1-V1: 취급 요청 버튼 추가
  *
  * 표현 기능:
  * - P2: 콘텐츠 활용 안내 (Content Utilization Visibility)
  * - P3: 제품 목적 표시 (Product Purpose Visibility)
  * - P4: 판매 중 매장 표시 (Active Usage Visibility)
- *
- * 금지사항:
- * - 신청/승인 버튼 없음
- * - 상태 변경 없음
- * - Read-Only 유지
+ * - Phase1: 판매자 취급 요청 (APPLICATION/ACTIVE_SALES 제품)
  */
 
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Mail, Phone, Globe, MessageCircle, ArrowLeft } from 'lucide-react';
-import { netureApi, type SupplierDetail } from '../../lib/api';
+import { Mail, Phone, Globe, MessageCircle, ArrowLeft, Send, CheckCircle, Loader2 } from 'lucide-react';
+import { netureApi, sellerApi, type SupplierDetail } from '../../lib/api';
 import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
 import { ProductPurposeBadge } from '../../components/ProductPurposeBadge';
 import { ActiveUsageList } from '../../components/ActiveUsageList';
@@ -28,6 +25,38 @@ export default function SupplierDetailPage() {
   const [supplier, setSupplier] = useState<SupplierDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 취급 요청 상태 관리
+  const [requestingProducts, setRequestingProducts] = useState<Set<string>>(new Set());
+  const [requestedProducts, setRequestedProducts] = useState<Set<string>>(new Set());
+  const [requestErrors, setRequestErrors] = useState<Record<string, string>>({});
+
+  const handleRequestHandling = async (product: { id: string; name: string; category: string; purpose?: string }) => {
+    if (!supplier) return;
+
+    setRequestingProducts((prev) => new Set(prev).add(product.id));
+    setRequestErrors((prev) => { const next = { ...prev }; delete next[product.id]; return next; });
+
+    const result = await sellerApi.createHandlingRequest({
+      supplierId: supplier.id,
+      productId: product.id,
+      productName: product.name,
+      productCategory: product.category,
+      productPurpose: product.purpose || 'APPLICATION',
+      serviceId: 'neture',
+      serviceName: 'Neture',
+    });
+
+    setRequestingProducts((prev) => { const next = new Set(prev); next.delete(product.id); return next; });
+
+    if (result.success) {
+      setRequestedProducts((prev) => new Set(prev).add(product.id));
+    } else if (result.error === 'DUPLICATE_REQUEST') {
+      setRequestedProducts((prev) => new Set(prev).add(product.id));
+    } else {
+      setRequestErrors((prev) => ({ ...prev, [product.id]: result.error || '요청 실패' }));
+    }
+  };
 
   useEffect(() => {
     const fetchSupplier = async () => {
@@ -124,18 +153,53 @@ export default function SupplierDetailPage() {
       <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">취급 제품</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {supplier.products.map((product) => (
-            <div key={product.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                <ProductPurposeBadge purpose={product.purpose} size="small" />
+          {supplier.products.map((product) => {
+            const isRequesting = requestingProducts.has(product.id);
+            const isRequested = requestedProducts.has(product.id);
+            const errorMsg = requestErrors[product.id];
+            const canRequest = product.purpose === 'APPLICATION' || product.purpose === 'ACTIVE_SALES';
+
+            return (
+              <div key={product.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                  <ProductPurposeBadge purpose={product.purpose} size="small" />
+                </div>
+                <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded mb-2">
+                  {product.category}
+                </span>
+                <p className="text-sm text-gray-600 mb-3">{product.description}</p>
+
+                {/* WO-S2S-FLOW-RECOVERY-PHASE1-V1: 취급 요청 버튼 */}
+                {canRequest && (
+                  <div className="mt-2 pt-2 border-t border-gray-100">
+                    {isRequested ? (
+                      <span className="inline-flex items-center gap-1.5 text-sm text-green-600">
+                        <CheckCircle className="w-4 h-4" />
+                        요청됨
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleRequestHandling(product)}
+                        disabled={isRequesting}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-700 bg-primary-50 rounded-md hover:bg-primary-100 transition-colors disabled:opacity-50"
+                      >
+                        {isRequesting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
+                        {isRequesting ? '요청 중...' : '취급 요청'}
+                      </button>
+                    )}
+                    {errorMsg && (
+                      <p className="mt-1 text-xs text-red-500">{errorMsg}</p>
+                    )}
+                  </div>
+                )}
               </div>
-              <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded mb-2">
-                {product.category}
-              </span>
-              <p className="text-sm text-gray-600">{product.description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

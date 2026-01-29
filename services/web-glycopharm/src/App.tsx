@@ -214,6 +214,8 @@ function AppRoutes() {
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}
         <Route path="b2b/supply" element={<SupplyPage />} />
+        {/* Signage Public (WO-SIGNAGE-CONTENT-HUB-V1) */}
+        <Route path="signage" element={<ContentLibraryPage />} />
         <Route path="mypage" element={
           <ProtectedRoute>
             <MyPage />

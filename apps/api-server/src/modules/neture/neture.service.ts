@@ -651,6 +651,24 @@ export class NetureService {
     productPurpose?: string;
   }) {
     try {
+      // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 중복 요청 방지
+      // 동일 supplier + seller + product에 pending 또는 approved 상태가 존재하면 차단
+      const existing = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .where('request.supplierId = :supplierId', { supplierId: data.supplierId })
+        .andWhere('request.sellerId = :sellerId', { sellerId: data.sellerId })
+        .andWhere('request.productId = :productId', { productId: data.productId })
+        .andWhere('request.status IN (:...statuses)', {
+          statuses: [SupplierRequestStatus.PENDING, SupplierRequestStatus.APPROVED],
+        })
+        .getOne();
+
+      if (existing) {
+        const error = new Error('DUPLICATE_REQUEST');
+        (error as any).existingStatus = existing.status;
+        throw error;
+      }
+
       const request = this.supplierRequestRepo.create({
         supplierId: data.supplierId,
         supplierName: data.supplierName || '',

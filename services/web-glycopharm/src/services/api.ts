@@ -295,3 +295,21 @@ export const partnerApi = {
   getStatus: () =>
     apiClient.get<PartnerStatusData>(`/api/v1/partner/status?serviceId=${PARTNER_SERVICE_ID}`),
 };
+
+// WO-S2S-FLOW-RECOVERY-PHASE1-V1: Supplier Handling Request API
+export const supplierRequestApi = {
+  createHandlingRequest: (data: {
+    supplierId: string;
+    productId: string;
+    productName: string;
+    productCategory?: string;
+  }) =>
+    apiClient.post<{ id: string; status: string; createdAt: string }>(
+      '/api/v1/neture/supplier/requests',
+      {
+        ...data,
+        serviceId: 'glycopharm',
+        serviceName: 'GlycoPharm',
+      }
+    ),
+};

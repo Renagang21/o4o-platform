@@ -588,6 +588,40 @@ export const supplierApi = {
   },
 };
 
+// ==================== Seller API (WO-S2S-FLOW-RECOVERY-PHASE1-V1) ====================
+
+/**
+ * 판매자(Seller)가 공급자에게 취급 요청을 보내는 API
+ */
+export const sellerApi = {
+  /**
+   * POST /api/v1/neture/supplier/requests
+   * 판매자가 공급자 상품에 대한 취급 요청 생성
+   */
+  async createHandlingRequest(data: {
+    supplierId: string;
+    productId: string;
+    productName: string;
+    productCategory?: string;
+    productPurpose?: string;
+    serviceId: string;
+    serviceName: string;
+  }): Promise<{ success: boolean; error?: string; data?: { id: string; status: string; createdAt: string } }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+};
+
 // ==================== Additional Types ====================
 
 export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
