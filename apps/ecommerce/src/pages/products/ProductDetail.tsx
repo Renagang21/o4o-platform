@@ -137,7 +137,12 @@ export function ProductDetail() {
               )}
             </div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            <p className="text-gray-600">{product.shortDescription}</p>
+            {product.subtitle && (
+              <p className="text-lg text-gray-700 mb-2">{product.subtitle}</p>
+            )}
+            {product.shortDescription && (
+              <p className="text-gray-600">{product.shortDescription}</p>
+            )}
           </div>
 
           {/* Price */}
@@ -263,9 +268,11 @@ export function ProductDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="description">상품 설명</TabsTrigger>
           <TabsTrigger value="specs">상세 정보</TabsTrigger>
+          <TabsTrigger value="product-info">상품 정보</TabsTrigger>
+          <TabsTrigger value="usage">사용/주의</TabsTrigger>
           <TabsTrigger value="shipping">배송 정보</TabsTrigger>
           <TabsTrigger value="reviews">
             리뷰 ({product.reviewCount})
@@ -290,6 +297,68 @@ export function ProductDetail() {
                 </div>
               ))}
             </dl>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="product-info" className="mt-6">
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h3 className="font-semibold mb-4">상품 정보</h3>
+            <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {product.manufacturer && (
+                <div className="flex">
+                  <dt className="font-medium text-gray-600 w-32">제조사</dt>
+                  <dd className="text-gray-900">{product.manufacturer}</dd>
+                </div>
+              )}
+              {product.originCountry && (
+                <div className="flex">
+                  <dt className="font-medium text-gray-600 w-32">원산지</dt>
+                  <dd className="text-gray-900">{product.originCountry}</dd>
+                </div>
+              )}
+              {product.legalCategory && (
+                <div className="flex">
+                  <dt className="font-medium text-gray-600 w-32">법적 분류</dt>
+                  <dd className="text-gray-900">{product.legalCategory}</dd>
+                </div>
+              )}
+              {product.certificationIds && product.certificationIds.length > 0 && (
+                <div className="flex">
+                  <dt className="font-medium text-gray-600 w-32">인증/허가 번호</dt>
+                  <dd className="text-gray-900">
+                    <ul className="space-y-1">
+                      {product.certificationIds.map((cert: string, index: number) => (
+                        <li key={index}>{cert}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="usage" className="mt-6">
+          <div className="space-y-6">
+            {product.usageInfo && (
+              <div>
+                <h3 className="font-semibold mb-2">사용 정보</h3>
+                <div className="prose prose-gray max-w-none text-gray-600">
+                  {product.usageInfo}
+                </div>
+              </div>
+            )}
+            {product.cautionInfo && (
+              <div>
+                <h3 className="font-semibold mb-2">주의사항</h3>
+                <div className="prose prose-gray max-w-none text-gray-600">
+                  {product.cautionInfo}
+                </div>
+              </div>
+            )}
+            {!product.usageInfo && !product.cautionInfo && (
+              <p className="text-gray-500 text-center py-8">사용 및 주의 정보가 없습니다.</p>
+            )}
           </div>
         </TabsContent>
 

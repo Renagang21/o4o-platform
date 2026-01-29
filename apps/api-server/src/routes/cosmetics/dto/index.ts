@@ -13,23 +13,43 @@ import { CosmeticsProductStatus, CosmeticsCurrency, CosmeticsProductImage, Cosme
 
 export interface CreateProductRequestDto {
   name: string;
+  subtitle?: string;
   brand_id: string;
   line_id?: string;
   description?: string;
+  short_description?: string;
   ingredients?: string[];
+  manufacturer?: string;
+  origin_country?: string;
+  legal_category?: string;
+  certification_ids?: string[];
+  usage_info?: string;
+  caution_info?: string;
   price: {
     base: number;
     sale?: number | null;
   };
+  sku?: string;
+  barcodes?: string[];
   status?: CosmeticsProductStatus;
 }
 
 export interface UpdateProductRequestDto {
   name?: string;
+  subtitle?: string;
   brand_id?: string;
   line_id?: string;
   description?: string;
+  short_description?: string;
   ingredients?: string[];
+  manufacturer?: string;
+  origin_country?: string;
+  legal_category?: string;
+  certification_ids?: string[];
+  usage_info?: string;
+  caution_info?: string;
+  sku?: string;
+  barcodes?: string[];
 }
 
 export interface UpdateStatusRequestDto {
@@ -127,12 +147,14 @@ export interface PriceDto {
 export interface ProductSummaryDto {
   id: string;
   name: string;
+  subtitle?: string | null;
   brand: BrandSummaryDto;
   line?: LineSummaryDto | null;
   description?: string | null;
   status: CosmeticsProductStatus;
   price: PriceDto;
   images?: CosmeticsProductImage[] | null;
+  sku?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -140,14 +162,24 @@ export interface ProductSummaryDto {
 export interface ProductDetailDto {
   id: string;
   name: string;
+  subtitle?: string | null;
   brand: BrandDetailDto;
   line?: LineSummaryDto | null;
   description?: string | null;
+  short_description?: string | null;
   ingredients?: string[] | null;
+  manufacturer?: string | null;
+  origin_country?: string | null;
+  legal_category?: string | null;
+  certification_ids?: string[] | null;
+  usage_info?: string | null;
+  caution_info?: string | null;
   status: CosmeticsProductStatus;
   price: PriceDto;
   variants?: CosmeticsProductVariant[] | null;
   images?: CosmeticsProductImage[] | null;
+  sku?: string | null;
+  barcodes?: string[] | null;
   created_at: string;
   updated_at: string;
 }

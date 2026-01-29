@@ -23,6 +23,7 @@ interface Product {
   name: string;
   subtitle: string | null;
   description: string | null;
+  short_description: string | null;
   category: string;
   status: string;
   base_price: number;
@@ -30,6 +31,13 @@ interface Product {
   currency: string;
   stock: number;
   sku: string | null;
+  manufacturer: string | null;
+  origin_country: string | null;
+  legal_category: string | null;
+  certification_ids: string[] | null;
+  usage_info: string | null;
+  caution_info: string | null;
+  barcodes: string[] | null;
   images: ProductImage[] | null;
   tags: string[] | null;
   is_featured: boolean;
@@ -41,11 +49,19 @@ interface ProductFormData {
   name: string;
   subtitle: string;
   description: string;
+  short_description: string;
   category: string;
   base_price: number;
   sale_price: number | null;
   stock: number;
   sku: string;
+  manufacturer: string;
+  origin_country: string;
+  legal_category: string;
+  certification_ids: string;
+  usage_info: string;
+  caution_info: string;
+  barcodes: string;
   tags: string;
   is_featured: boolean;
 }
@@ -83,11 +99,19 @@ const ProductDetailPage: React.FC = () => {
     name: '',
     subtitle: '',
     description: '',
+    short_description: '',
     category: 'other',
     base_price: 0,
     sale_price: null,
     stock: 0,
     sku: '',
+    manufacturer: '',
+    origin_country: '',
+    legal_category: '',
+    certification_ids: '',
+    usage_info: '',
+    caution_info: '',
+    barcodes: '',
     tags: '',
     is_featured: false,
   });
@@ -105,11 +129,19 @@ const ProductDetailPage: React.FC = () => {
         name: product.name,
         subtitle: product.subtitle || '',
         description: product.description || '',
+        short_description: product.short_description || '',
         category: product.category,
         base_price: product.base_price,
         sale_price: product.sale_price,
         stock: product.stock,
         sku: product.sku || '',
+        manufacturer: product.manufacturer || '',
+        origin_country: product.origin_country || '',
+        legal_category: product.legal_category || '',
+        certification_ids: product.certification_ids?.join('\n') || '',
+        usage_info: product.usage_info || '',
+        caution_info: product.caution_info || '',
+        barcodes: product.barcodes?.join('\n') || '',
         tags: product.tags?.join(', ') || '',
         is_featured: product.is_featured,
       });
@@ -136,11 +168,19 @@ const ProductDetailPage: React.FC = () => {
       name: formData.name,
       subtitle: formData.subtitle || null,
       description: formData.description || null,
+      short_description: formData.short_description || null,
       category: formData.category,
       base_price: formData.base_price,
       sale_price: formData.sale_price,
       stock: formData.stock,
       sku: formData.sku || null,
+      manufacturer: formData.manufacturer || null,
+      origin_country: formData.origin_country || null,
+      legal_category: formData.legal_category || null,
+      certification_ids: formData.certification_ids ? formData.certification_ids.split('\n').map((c) => c.trim()).filter(Boolean) : null,
+      usage_info: formData.usage_info || null,
+      caution_info: formData.caution_info || null,
+      barcodes: formData.barcodes ? formData.barcodes.split('\n').map((b) => b.trim()).filter(Boolean) : null,
       tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()).filter(Boolean) : null,
       is_featured: formData.is_featured,
     };
@@ -235,6 +275,103 @@ const ProductDetailPage: React.FC = () => {
               placeholder="상품에 대한 상세 설명을 입력하세요"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">짧은 설명</label>
+            <textarea
+              name="short_description"
+              value={formData.short_description}
+              onChange={handleChange}
+              rows={2}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="목록 페이지에 표시될 짧은 설명을 입력하세요"
+            />
+          </div>
+        </div>
+
+        {/* Legal Info */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">법적 정보</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">제조사</label>
+              <input
+                type="text"
+                name="manufacturer"
+                value={formData.manufacturer}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="제조사명을 입력하세요"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">원산지</label>
+              <input
+                type="text"
+                name="origin_country"
+                value={formData.origin_country}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="예: 대한민국"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">법적 분류</label>
+            <input
+              type="text"
+              name="legal_category"
+              value={formData.legal_category}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="예: 건강기능식품"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">인증/허가 번호</label>
+            <textarea
+              name="certification_ids"
+              value={formData.certification_ids}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="한 줄에 하나씩 입력하세요"
+            />
+            <p className="mt-1 text-xs text-gray-500">각 인증번호를 줄바꿈으로 구분하여 입력하세요</p>
+          </div>
+        </div>
+
+        {/* Product Details */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">상세 정보</h2>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">사용 정보</label>
+            <textarea
+              name="usage_info"
+              value={formData.usage_info}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="사용 방법, 사용 시기 등을 입력하세요"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">주의사항</label>
+            <textarea
+              name="caution_info"
+              value={formData.caution_info}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="사용 시 주의사항을 입력하세요"
+            />
+          </div>
         </div>
 
         {/* Pricing */}
@@ -283,16 +420,31 @@ const ProductDetailPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">SKU (재고 관리 코드)</label>
               <input
                 type="text"
                 name="sku"
                 value={formData.sku}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="상품 고유 코드"
+                placeholder="예: NET-001"
+                disabled={!isNew && !!formData.sku}
               />
+              <p className="mt-1 text-xs text-gray-500">⚠️ SKU는 한 번 설정하면 변경할 수 없습니다 (Product DB Constitution v1)</p>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">바코드</label>
+            <textarea
+              name="barcodes"
+              value={formData.barcodes}
+              onChange={handleChange}
+              rows={2}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="한 줄에 하나씩 입력하세요"
+            />
+            <p className="mt-1 text-xs text-gray-500">각 바코드를 줄바꿈으로 구분하여 입력하세요</p>
           </div>
         </div>
 

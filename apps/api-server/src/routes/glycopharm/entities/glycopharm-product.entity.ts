@@ -3,6 +3,12 @@
  *
  * Phase B-1: Glycopharm API Implementation
  * Blood glucose related products (CGM devices, test strips, etc.)
+ *
+ * WO-PRODUCT-DB-CLEANUP-FOR-SITE-V1:
+ * - Added subtitle, short_description for listing/detail
+ * - Added origin_country, legal_category, certification_ids
+ * - Added usage_info, caution_info for product details
+ * - Added barcodes for identification (Product DB Constitution v1)
  */
 
 import {
@@ -32,14 +38,23 @@ export class GlycopharmProduct {
   @Column({ type: 'varchar', length: 255 })
   name!: string;
 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  subtitle?: string;
+
   @Column({ type: 'varchar', length: 100, unique: true })
   sku!: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  barcodes?: string[];
 
   @Column({ type: 'varchar', length: 50, default: 'other' })
   category!: GlycopharmProductCategory;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
+
+  @Column({ type: 'text', nullable: true })
+  short_description?: string;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   price!: number;
@@ -52,6 +67,21 @@ export class GlycopharmProduct {
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   manufacturer?: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  origin_country?: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  legal_category?: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  certification_ids?: string[];
+
+  @Column({ type: 'text', nullable: true })
+  usage_info?: string;
+
+  @Column({ type: 'text', nullable: true })
+  caution_info?: string;
 
   @Column({ type: 'varchar', length: 20, default: 'draft' })
   status!: GlycopharmProductStatus;

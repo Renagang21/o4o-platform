@@ -3,6 +3,12 @@
  *
  * Phase 7-A-1: Cosmetics API Implementation
  * Schema: cosmetics (isolated from Core)
+ *
+ * WO-PRODUCT-DB-CLEANUP-FOR-SITE-V1:
+ * - Added subtitle, shortDescription for listing/detail
+ * - Added manufacturer, originCountry, legalCategory, certificationIds
+ * - Added usageInfo, cautionInfo for product details
+ * - Added sku, barcodes for identification (Product DB Constitution v1)
  */
 
 import {
@@ -79,11 +85,35 @@ export class CosmeticsProduct {
   @Index()
   name!: string;
 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  subtitle?: string | null;
+
   @Column({ type: 'text', nullable: true })
   description?: string | null;
 
+  @Column({ name: 'short_description', type: 'text', nullable: true })
+  shortDescription?: string | null;
+
   @Column({ type: 'jsonb', nullable: true })
   ingredients?: string[] | null;
+
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  manufacturer?: string | null;
+
+  @Column({ name: 'origin_country', type: 'varchar', length: 100, nullable: true })
+  originCountry?: string | null;
+
+  @Column({ name: 'legal_category', type: 'varchar', length: 100, nullable: true })
+  legalCategory?: string | null;
+
+  @Column({ name: 'certification_ids', type: 'jsonb', nullable: true })
+  certificationIds?: string[] | null;
+
+  @Column({ name: 'usage_info', type: 'text', nullable: true })
+  usageInfo?: string | null;
+
+  @Column({ name: 'caution_info', type: 'text', nullable: true })
+  cautionInfo?: string | null;
 
   @Column({
     type: 'varchar',
@@ -105,6 +135,13 @@ export class CosmeticsProduct {
     default: CosmeticsCurrency.KRW,
   })
   currency!: CosmeticsCurrency;
+
+  @Column({ type: 'varchar', length: 100, nullable: true, unique: true })
+  @Index()
+  sku?: string | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  barcodes?: string[] | null;
 
   @Column({ type: 'jsonb', nullable: true })
   images?: CosmeticsProductImage[] | null;

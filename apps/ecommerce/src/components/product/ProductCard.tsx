@@ -100,9 +100,16 @@ export const ProductCard: FC<ProductCardProps> = ({
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">
+        <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
           {product.name}
         </h3>
+
+        {/* Subtitle */}
+        {product.subtitle && (
+          <p className="text-xs text-gray-600 line-clamp-1 mb-2">
+            {product.subtitle}
+          </p>
+        )}
 
         {/* SKU for admin mode */}
         {mode === 'admin' && product.sku && (

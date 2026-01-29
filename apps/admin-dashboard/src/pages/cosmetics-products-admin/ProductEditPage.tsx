@@ -30,11 +30,21 @@ import {
 
 interface FormData {
   name: string;
+  subtitle?: string;
   brand_id: string;
   line_id?: string;
   description?: string;
+  short_description?: string;
   base_price: number;
   sale_price?: number;
+  manufacturer?: string;
+  origin_country?: string;
+  legal_category?: string;
+  certification_ids?: string[];
+  usage_info?: string;
+  caution_info?: string;
+  sku?: string;
+  barcodes?: string[];
 }
 
 interface FormErrors {
@@ -187,6 +197,20 @@ const ProductEditPage: React.FC = () => {
                   {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
                 </div>
 
+                {/* 서브타이틀 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    서브타이틀
+                  </label>
+                  <AGInput
+                    type="text"
+                    value={formData.subtitle || ''}
+                    onChange={(e) => handleChange('subtitle', e.target.value)}
+                    placeholder="서브타이틀을 입력하세요"
+                    className="w-full"
+                  />
+                </div>
+
                 {/* 브랜드 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -220,7 +244,7 @@ const ProductEditPage: React.FC = () => {
                 {/* 상품 설명 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    상품 설명 
+                    상품 설명
                   </label>
                   <textarea
                     value={formData.description || ''}
@@ -230,6 +254,157 @@ const ProductEditPage: React.FC = () => {
                     rows={4}
                   />
                   {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description}</p>}
+                </div>
+
+                {/* 짧은 설명 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    짧은 설명
+                  </label>
+                  <textarea
+                    value={formData.short_description || ''}
+                    onChange={(e) => handleChange('short_description', e.target.value)}
+                    placeholder="목록 페이지에 표시될 짧은 설명을 입력하세요"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={2}
+                  />
+                </div>
+
+                {/* 법적 정보 섹션 */}
+                <div className="pt-4 border-t">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">법적 정보</h3>
+
+                  <div className="space-y-4">
+                    {/* 제조사 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        제조사
+                      </label>
+                      <AGInput
+                        type="text"
+                        value={formData.manufacturer || ''}
+                        onChange={(e) => handleChange('manufacturer', e.target.value)}
+                        placeholder="제조사명을 입력하세요"
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* 원산지 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        원산지
+                      </label>
+                      <AGInput
+                        type="text"
+                        value={formData.origin_country || ''}
+                        onChange={(e) => handleChange('origin_country', e.target.value)}
+                        placeholder="예: 대한민국"
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* 법적 분류 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        법적 분류
+                      </label>
+                      <AGInput
+                        type="text"
+                        value={formData.legal_category || ''}
+                        onChange={(e) => handleChange('legal_category', e.target.value)}
+                        placeholder="예: 기능성화장품"
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* 인증/허가 번호 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        인증/허가 번호
+                      </label>
+                      <textarea
+                        value={formData.certification_ids?.join('\n') || ''}
+                        onChange={(e) => handleChange('certification_ids', e.target.value.split('\n').filter(Boolean))}
+                        placeholder="한 줄에 하나씩 입력하세요"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows={3}
+                      />
+                      <p className="mt-1 text-xs text-gray-500">각 인증번호를 줄바꿈으로 구분하여 입력하세요</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 상세 정보 섹션 */}
+                <div className="pt-4 border-t">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">상세 정보</h3>
+
+                  <div className="space-y-4">
+                    {/* 사용 정보 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        사용 정보
+                      </label>
+                      <textarea
+                        value={formData.usage_info || ''}
+                        onChange={(e) => handleChange('usage_info', e.target.value)}
+                        placeholder="사용 방법, 사용 시기 등을 입력하세요"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows={3}
+                      />
+                    </div>
+
+                    {/* 주의사항 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        주의사항
+                      </label>
+                      <textarea
+                        value={formData.caution_info || ''}
+                        onChange={(e) => handleChange('caution_info', e.target.value)}
+                        placeholder="사용 시 주의사항을 입력하세요"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 식별자 섹션 */}
+                <div className="pt-4 border-t">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">식별자</h3>
+
+                  <div className="space-y-4">
+                    {/* SKU */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        SKU (재고 관리 코드)
+                      </label>
+                      <AGInput
+                        type="text"
+                        value={formData.sku || ''}
+                        onChange={(e) => handleChange('sku', e.target.value)}
+                        placeholder="예: COS-001"
+                        className="w-full"
+                        disabled={!!formData.sku}
+                      />
+                      <p className="mt-1 text-xs text-gray-500">⚠️ SKU는 한 번 설정하면 변경할 수 없습니다 (Product DB Constitution v1)</p>
+                    </div>
+
+                    {/* 바코드 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        바코드
+                      </label>
+                      <textarea
+                        value={formData.barcodes?.join('\n') || ''}
+                        onChange={(e) => handleChange('barcodes', e.target.value.split('\n').filter(Boolean))}
+                        placeholder="한 줄에 하나씩 입력하세요"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows={2}
+                      />
+                      <p className="mt-1 text-xs text-gray-500">각 바코드를 줄바꿈으로 구분하여 입력하세요</p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 기본가 */}
