@@ -8,6 +8,8 @@ import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { GlycopharmForumCategoryRequest } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { ForumCategory } from '@o4o/forum-core';
+import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -23,6 +25,18 @@ const handleValidationErrors = (req: Request, res: Response, next: any): void =>
   next();
 };
 
+/**
+ * Generate URL-safe slug from name
+ */
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD') // Decompose Korean characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^a-z0-9가-힣]+/g, '-') // Replace non-alphanumeric with dash
+    .replace(/^-+|-+$/g, ''); // Trim dashes
+}
+
 export function createForumRequestController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -30,6 +44,7 @@ export function createForumRequestController(
 ): Router {
   const router = Router();
   const requestRepo = dataSource.getRepository(GlycopharmForumCategoryRequest);
+  const categoryRepo = dataSource.getRepository(ForumCategory);
 
   // ============================================================================
   // USER ROUTES
@@ -198,18 +213,58 @@ export function createForumRequestController(
         request.reviewer_name = req.user!.name || req.user!.email || 'Admin';
         request.reviewed_at = new Date();
 
-        // 승인 시 카테고리 생성 로직은 추후 구현
-        // 현재는 승인 상태만 변경
+        let createdCategory = null;
+
+        // 승인 시 실제 포럼 카테고리 생성
         if (req.body.status === 'approved') {
-          // TODO: 실제 포럼 카테고리 생성
-          request.created_category_slug = request.name
-            .toLowerCase()
-            .replace(/[^a-z0-9가-힣]/g, '-')
-            .replace(/-+/g, '-');
+          try {
+            const slug = generateSlug(request.name);
+
+            // Check if category with same slug already exists
+            const existingCategory = await categoryRepo.findOne({ where: { slug } });
+
+            if (existingCategory) {
+              // Category already exists - just link it
+              request.created_category_slug = slug;
+              logger.info(`[Forum Request] Category already exists: ${slug}`);
+            } else {
+              // Create new forum category
+              const category = categoryRepo.create({
+                name: request.name,
+                description: request.description,
+                slug,
+                color: '#3B82F6', // Default blue color
+                sortOrder: 100, // Default sort order
+                isActive: true,
+                requireApproval: false,
+                accessLevel: 'all',
+                createdBy: request.requester_id,
+              });
+
+              createdCategory = await categoryRepo.save(category);
+              request.created_category_slug = slug;
+
+              logger.info(
+                `[Forum Request] Created forum category: ${createdCategory.name} (${createdCategory.slug}) for request ${request.id}`
+              );
+            }
+          } catch (error: any) {
+            logger.error(`[Forum Request] Failed to create category: ${error.message}`, error);
+            // Continue with approval even if category creation fails
+            // Admin can manually create category later
+          }
         }
 
         const saved = await requestRepo.save(request);
-        res.json({ data: saved });
+
+        res.json({
+          data: saved,
+          category: createdCategory ? {
+            id: createdCategory.id,
+            name: createdCategory.name,
+            slug: createdCategory.slug,
+          } : null,
+        });
       } catch (error: any) {
         console.error('Failed to review request:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
