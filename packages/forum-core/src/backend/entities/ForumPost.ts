@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { ForumCategory } from './ForumCategory.js';
+import type { ForumCategory } from './ForumCategory.js';
 import type { Block } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 

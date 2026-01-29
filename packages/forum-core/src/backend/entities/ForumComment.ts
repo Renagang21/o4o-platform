@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { ForumPost } from './ForumPost.js';
+import type { ForumPost } from './ForumPost.js';
 
 /**
  * 댓글 상태 (Core 기준, 확장 금지)
