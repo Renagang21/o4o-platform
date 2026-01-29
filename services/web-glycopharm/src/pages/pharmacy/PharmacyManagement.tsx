@@ -11,6 +11,7 @@
  * - PharmacyUtilitySection (안내)
  */
 
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Package,
@@ -99,17 +100,8 @@ function ServiceCard({ card }: { card: ManagementCard }) {
   const isComing = card.statusType === 'coming';
   const Icon = card.icon;
 
-  return (
-    <a
-      href={isComing ? undefined : card.href}
-      onClick={(e) => {
-        if (isComing) e.preventDefault();
-      }}
-      className={`block bg-white rounded-2xl border border-slate-200 shadow-sm p-5 transition-all ${
-        isComing ? 'opacity-60 cursor-default' : 'hover:shadow-md hover:border-slate-300 cursor-pointer'
-      }`}
-      style={{ textDecoration: 'none' }}
-    >
+  const content = (
+    <>
       <div className="flex items-center justify-between mb-3">
         <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
           <Icon className="w-5 h-5 text-slate-600" />
@@ -127,7 +119,27 @@ function ServiceCard({ card }: { card: ManagementCard }) {
       ) : (
         <span className="text-xs text-slate-400">준비중</span>
       )}
-    </a>
+    </>
+  );
+
+  if (isComing) {
+    return (
+      <div
+        className={`block bg-white rounded-2xl border border-slate-200 shadow-sm p-5 transition-all opacity-60 cursor-default`}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={card.href}
+      className={`block bg-white rounded-2xl border border-slate-200 shadow-sm p-5 transition-all hover:shadow-md hover:border-slate-300 cursor-pointer`}
+      style={{ textDecoration: 'none' }}
+    >
+      {content}
+    </Link>
   );
 }
 
