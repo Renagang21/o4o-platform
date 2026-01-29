@@ -32,12 +32,25 @@
 | Database | `o4o_platform` |
 | Zone | `asia-northeast3-a` |
 
+### 로컬 환경 제약사항
+
+**로컬 개발 머신 (Windows):**
+- `psql` 클라이언트 없음
+- 프로덕션 DB 직접 연결 불가 (방화벽/타임아웃)
+- 데이터베이스 작업은 Cloud Run 또는 Google Cloud Console에서 수행
+
+**데이터베이스 작업 방법:**
+1. Admin API 엔드포인트를 통한 마이그레이션 (권장)
+2. Google Cloud Console SQL Editor
+3. Cloud Run 컨테이너 내부에서 실행
+
 ### 마이그레이션 실행 원칙
 
 1. SQL 파일 작성 시 즉시 프로덕션 실행
-2. Google Cloud Console SQL Editor 사용
+2. Admin API 엔드포인트 또는 Google Cloud Console SQL Editor 사용
 3. TypeORM migration:run은 Cloud Run 배포 시 자동 실행
 4. Seed 데이터도 프로덕션에 즉시 삽입
+5. ❌ 로컬 psql 사용 불가 - Cloud 환경에서만 실행
 
 ---
 
