@@ -18,6 +18,7 @@ import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
 import type { AuthRequest } from '../../../types/auth.js';
+import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -257,12 +258,17 @@ export function createPharmacyController(
 
 /**
  * Create B2B products controller
+ *
+ * WO-GLYCOPHARM-B2B-PRODUCT-SEED-LINKING-V1 (Task T1-T2)
+ * - Query actual products from database
+ * - Filter by status='active' for both franchise and general B2B
  */
 export function createB2BController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
+  const repository = new GlycopharmRepository(dataSource);
 
   /**
    * GET /b2b/products
@@ -274,12 +280,36 @@ export function createB2BController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const type = req.query.type as string; // 'franchise' or 'general'
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 100;
 
-        // For now, return empty array as B2B products need separate implementation
-        // This prevents 404 errors while the feature is being developed
+        // Query active products from database
+        const result = await repository.findAllProducts({
+          status: 'active',
+          page,
+          limit,
+        });
+
+        // Map to B2B product format
+        const products = result.data.map((product) => ({
+          id: product.id,
+          name: product.name,
+          category: product.category,
+          price: Number(product.price),
+          discountPrice: product.sale_price ? Number(product.sale_price) : undefined,
+          supplierName: product.manufacturer || 'Unknown',
+          image: product.images?.[0]?.url,
+          stock: product.stock_quantity,
+          status: product.status,
+          // B2B-specific fields (placeholder for future implementation)
+          type: type || 'general',
+          isRecommended: product.is_featured || false,
+        }));
+
         res.json({
           success: true,
-          data: [],
+          data: products,
+          meta: result.meta,
         });
       } catch (error: any) {
         console.error('Failed to get B2B products:', error);

@@ -10,6 +10,7 @@ import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
 
@@ -414,6 +415,126 @@ export function createAdminController(
         });
       } catch (error) {
         logger.error('[Glycopharm Admin] Get application detail error:', error);
+        res.status(500).json({
+          error: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+    }) as unknown as RequestHandler
+  );
+
+  /**
+   * POST /api/v1/glycopharm/admin/products/activate-all
+   * Activate all products (set status to 'active')
+   *
+   * WO-GLYCOPHARM-B2B-PRODUCT-SEED-LINKING-V1 (Task T3)
+   * This is a one-time operation to fix seeded products that don't have active status
+   */
+  router.post(
+    '/admin/products/activate-all',
+    requireAuth,
+    (async (req, res) => {
+      try {
+        const user = (req as unknown as AuthRequest).user;
+        const userRoles = user?.roles || [];
+
+        // Check operator/admin permission
+        if (!isOperatorOrAdmin(userRoles)) {
+          res.status(403).json({
+            error: 'Forbidden',
+            code: 'FORBIDDEN',
+            message: 'Operator or administrator role required',
+          });
+          return;
+        }
+
+        const productRepo = dataSource.getRepository(GlycopharmProduct);
+
+        // Get current counts
+        const totalCount = await productRepo.count();
+        const activeCount = await productRepo.count({ where: { status: 'active' } });
+
+        logger.info(`[Glycopharm Admin] Current status - Total: ${totalCount}, Active: ${activeCount}`);
+
+        // Update all non-active products to active
+        const updateResult = await productRepo
+          .createQueryBuilder()
+          .update(GlycopharmProduct)
+          .set({ status: 'active', updated_at: new Date() })
+          .where('status != :status', { status: 'active' })
+          .execute();
+
+        const updatedCount = updateResult.affected || 0;
+
+        // Get new counts
+        const newActiveCount = await productRepo.count({ where: { status: 'active' } });
+
+        logger.info(`[Glycopharm Admin] Updated ${updatedCount} products to active status`);
+        logger.info(`[Glycopharm Admin] New status - Total: ${totalCount}, Active: ${newActiveCount}`);
+
+        res.json({
+          success: true,
+          data: {
+            totalProducts: totalCount,
+            previousActiveCount: activeCount,
+            updatedCount,
+            currentActiveCount: newActiveCount,
+          },
+        });
+      } catch (error) {
+        logger.error('[Glycopharm Admin] Activate products error:', error);
+        res.status(500).json({
+          error: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+    }) as unknown as RequestHandler
+  );
+
+  /**
+   * GET /api/v1/glycopharm/admin/products/stats
+   * Get product statistics
+   */
+  router.get(
+    '/admin/products/stats',
+    requireAuth,
+    (async (req, res) => {
+      try {
+        const user = (req as unknown as AuthRequest).user;
+        const userRoles = user?.roles || [];
+
+        // Check operator/admin permission
+        if (!isOperatorOrAdmin(userRoles)) {
+          res.status(403).json({
+            error: 'Forbidden',
+            code: 'FORBIDDEN',
+            message: 'Operator or administrator role required',
+          });
+          return;
+        }
+
+        const productRepo = dataSource.getRepository(GlycopharmProduct);
+
+        const total = await productRepo.count();
+        const active = await productRepo.count({ where: { status: 'active' } });
+        const draft = await productRepo.count({ where: { status: 'draft' } });
+        const inactive = await productRepo.count({ where: { status: 'inactive' } });
+        const discontinued = await productRepo.count({ where: { status: 'discontinued' } });
+
+        res.json({
+          success: true,
+          data: {
+            total,
+            byStatus: {
+              active,
+              draft,
+              inactive,
+              discontinued,
+            },
+          },
+        });
+      } catch (error) {
+        logger.error('[Glycopharm Admin] Get product stats error:', error);
         res.status(500).json({
           error: 'Internal server error',
           code: 'INTERNAL_SERVER_ERROR',
