@@ -29,6 +29,9 @@ import { AppGuard } from '@/components/common/AppGuard';
 // System Dashboard / Monitoring
 const SystemDashboard = lazy(() => import('./v2/MonitoringDashboard'));
 
+// Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
+const ContentHub = lazy(() => import('./v2/ContentHub'));
+
 // System Settings
 const SystemSettings = lazy(() => import('./admin/SystemSettings'));
 
@@ -101,6 +104,7 @@ export default function DigitalSignageRouter() {
 
           {/* ========== Admin: System Management ========== */}
           <Route path="monitoring" element={<SystemDashboard />} />
+          <Route path="content" element={<ContentHub />} />
           <Route path="settings" element={<SystemSettings />} />
           <Route path="extensions" element={<ExtensionList />} />
           <Route path="suppliers" element={<SupplierList />} />
