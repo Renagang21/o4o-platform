@@ -272,5 +272,103 @@ export function createForumRequestController(
     }
   );
 
+  // POST /forum-requests/admin/create-missing-categories - 기존 승인된 요청의 카테고리 생성
+  router.post(
+    '/admin/create-missing-categories',
+    requireAuth,
+    requireScope('glycopharm:admin'),
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        // Find all approved requests without created_category_slug
+        const approvedRequests = await requestRepo.find({
+          where: { status: 'approved' },
+        });
+
+        const results = [];
+        let created = 0;
+        let skipped = 0;
+        let errors = 0;
+
+        for (const request of approvedRequests) {
+          try {
+            // Skip if category already linked
+            if (request.created_category_slug) {
+              const existingCat = await categoryRepo.findOne({
+                where: { slug: request.created_category_slug },
+              });
+              if (existingCat) {
+                results.push({
+                  requestId: request.id,
+                  requestName: request.name,
+                  status: 'skipped',
+                  reason: 'Category already exists',
+                  categorySlug: request.created_category_slug,
+                });
+                skipped++;
+                continue;
+              }
+            }
+
+            // Create category
+            const slug = generateSlug(request.name);
+            const category = categoryRepo.create({
+              name: request.name,
+              description: request.description,
+              slug,
+              color: '#3B82F6',
+              sortOrder: 100,
+              isActive: true,
+              requireApproval: false,
+              accessLevel: 'all',
+              createdBy: request.requester_id,
+            });
+
+            const savedCategory = await categoryRepo.save(category);
+
+            // Update request
+            request.created_category_slug = slug;
+            await requestRepo.save(request);
+
+            results.push({
+              requestId: request.id,
+              requestName: request.name,
+              status: 'created',
+              categoryId: savedCategory.id,
+              categorySlug: savedCategory.slug,
+            });
+            created++;
+
+            logger.info(
+              `[Forum Request] Created missing category: ${savedCategory.name} (${savedCategory.slug}) for request ${request.id}`
+            );
+          } catch (error: any) {
+            results.push({
+              requestId: request.id,
+              requestName: request.name,
+              status: 'error',
+              error: error.message,
+            });
+            errors++;
+            logger.error(`[Forum Request] Failed to create category for request ${request.id}:`, error);
+          }
+        }
+
+        res.json({
+          success: true,
+          summary: {
+            total: approvedRequests.length,
+            created,
+            skipped,
+            errors,
+          },
+          results,
+        });
+      } catch (error: any) {
+        console.error('Failed to create missing categories:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
   return router;
 }
