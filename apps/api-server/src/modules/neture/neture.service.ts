@@ -632,6 +632,213 @@ export class NetureService {
     }
   }
 
+  // ==================== Admin Request Management (WO-S2S-FLOW-RECOVERY-PHASE2-V1) ====================
+
+  /**
+   * Admin override: 소유권 검증 없이 승인
+   * 상태 전이: pending → approved
+   */
+  async approveSupplierRequestAsAdmin(id: string, actorId: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({ where: { id } });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (request.status !== SupplierRequestStatus.PENDING) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot approve request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.APPROVED;
+      request.decidedBy = actorId;
+      request.decidedAt = new Date();
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.APPROVED,
+        actorId,
+        actorName: actorName || 'Admin',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.APPROVED,
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Admin approved supplier request ${id} by ${actorId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          decidedBy: updatedRequest.decidedBy,
+          decidedAt: updatedRequest.decidedAt,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error admin-approving supplier request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Admin override: 소유권 검증 없이 거절
+   * 상태 전이: pending → rejected
+   */
+  async rejectSupplierRequestAsAdmin(id: string, actorId: string, reason?: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({ where: { id } });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (request.status !== SupplierRequestStatus.PENDING) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot reject request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.REJECTED;
+      request.decidedBy = actorId;
+      request.decidedAt = new Date();
+      request.rejectReason = reason || '';
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.REJECTED,
+        actorId,
+        actorName: actorName || 'Admin',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.REJECTED,
+        reason: reason || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Admin rejected supplier request ${id} by ${actorId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          decidedBy: updatedRequest.decidedBy,
+          decidedAt: updatedRequest.decidedAt,
+          rejectReason: updatedRequest.rejectReason,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error admin-rejecting supplier request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Admin: 전체 취급 요청 목록 조회 (cross-supplier)
+   */
+  async getAllSupplierRequests(filters?: { status?: string; supplierId?: string; serviceId?: string }) {
+    try {
+      const query = this.supplierRequestRepo.createQueryBuilder('request');
+
+      if (filters?.status) {
+        query.andWhere('request.status = :status', { status: filters.status });
+      }
+      if (filters?.supplierId) {
+        query.andWhere('request.supplierId = :supplierId', { supplierId: filters.supplierId });
+      }
+      if (filters?.serviceId) {
+        query.andWhere('request.serviceId = :serviceId', { serviceId: filters.serviceId });
+      }
+
+      query.orderBy('request.createdAt', 'DESC');
+
+      const requests = await query.getMany();
+
+      return requests.map((req) => ({
+        id: req.id,
+        status: req.status,
+        supplierId: req.supplierId,
+        supplierName: req.supplierName,
+        sellerName: req.sellerName,
+        sellerEmail: req.sellerEmail,
+        serviceName: req.serviceName,
+        serviceId: req.serviceId,
+        productName: req.productName,
+        productId: req.productId,
+        productPurpose: req.productPurpose,
+        requestedAt: req.createdAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching all supplier requests:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Seller Product Query (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T1) ====================
+
+  /**
+   * 판매자의 승인된 취급 상품 목록 조회
+   * sellerId로 APPROVED 상태인 요청만 반환
+   */
+  async getSellerApprovedProducts(sellerId: string) {
+    try {
+      const requests = await this.supplierRequestRepo.find({
+        where: {
+          sellerId,
+          status: SupplierRequestStatus.APPROVED,
+        },
+        order: { decidedAt: 'DESC' },
+      });
+
+      return {
+        success: true,
+        data: requests.map((r) => ({
+          id: r.id,
+          supplierId: r.supplierId,
+          supplierName: r.supplierName,
+          productId: r.productId,
+          productName: r.productName,
+          productCategory: r.productCategory,
+          productPurpose: r.productPurpose,
+          serviceId: r.serviceId,
+          serviceName: r.serviceName,
+          approvedAt: r.decidedAt,
+        })),
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching seller approved products:', error);
+      throw error;
+    }
+  }
+
   /**
    * 테스트용 신청 생성 (서비스에서 호출)
    */

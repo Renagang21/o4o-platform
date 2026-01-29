@@ -118,6 +118,9 @@ import { ForumPostPage } from './pages/forum/ForumPostPage';
 const SupplierDashboardLayout = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardLayout }))
 );
+const MyHandledProductsPage = lazy(() =>
+  import('./pages/seller/MyHandledProductsPage')
+);
 const SupplierDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardPage }))
 );
@@ -278,6 +281,7 @@ function App() {
               <Route path="/seller/overview/market" element={<SellerOverviewMarket />} />
               <Route path="/seller/overview/medical" element={<MedicalOverviewPage />} />
               <Route path="/seller/qr-guide" element={<SellerQRGuidePage />} />
+              <Route path="/seller/my-products" element={<MyHandledProductsPage />} />
 
               {/* 파트너 개요 (o4o 공통) */}
               <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />

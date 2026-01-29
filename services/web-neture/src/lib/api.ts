@@ -593,6 +593,19 @@ export const supplierApi = {
 /**
  * 판매자(Seller)가 공급자에게 취급 요청을 보내는 API
  */
+export interface SellerApprovedProduct {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  productId: string;
+  productName: string;
+  productCategory: string;
+  productPurpose: string;
+  serviceId: string;
+  serviceName: string;
+  approvedAt: string;
+}
+
 export const sellerApi = {
   /**
    * POST /api/v1/neture/supplier/requests
@@ -615,6 +628,25 @@ export const sellerApi = {
         body: JSON.stringify(data),
       });
 
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * GET /api/v1/neture/seller/my-products
+   * 판매자의 승인된 취급 상품 목록 조회 (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T2)
+   */
+  async getMyApprovedProducts(): Promise<{
+    success: boolean;
+    data?: SellerApprovedProduct[];
+    error?: string;
+  }> {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/seller/my-products`, {
+        credentials: 'include',
+      });
       return response.json();
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };

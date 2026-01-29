@@ -3,7 +3,7 @@ import type { Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
 import { SupplierStatus, PartnershipStatus, SupplierRequestStatus } from './entities/index.js';
 import logger from '../../utils/logger.js';
-import { requireAuth } from '../../middleware/auth.middleware.js';
+import { requireAuth, requireAdmin, requireRole } from '../../middleware/auth.middleware.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -252,7 +252,7 @@ router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedReque
  *
  * State transition: pending → approved
  */
-router.post('/supplier/requests/:id/approve', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/requests/:id/approve', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = await getSupplierIdFromUser(req);
 
@@ -293,7 +293,7 @@ router.post('/supplier/requests/:id/approve', requireAuth, async (req: Authentic
  * Body:
  * - reason (optional): Rejection reason
  */
-router.post('/supplier/requests/:id/reject', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/requests/:id/reject', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = await getSupplierIdFromUser(req);
 
@@ -873,6 +873,119 @@ router.get('/supplier/events', requireAuth, async (req: AuthenticatedRequest, re
       success: false,
       error: 'INTERNAL_ERROR',
       message: 'Failed to fetch supplier events',
+    });
+  }
+});
+
+// ==================== Seller Product Query (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T1) ====================
+
+/**
+ * GET /api/v1/neture/seller/my-products
+ * 판매자의 승인된 취급 상품 목록 조회
+ */
+router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = req.user?.id;
+    if (!sellerId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const result = await netureService.getSellerApprovedProducts(sellerId);
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error fetching seller approved products:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch seller approved products',
+    });
+  }
+});
+
+// ==================== Admin Request Management (WO-S2S-FLOW-RECOVERY-PHASE2-V1 T2) ====================
+
+/**
+ * GET /api/v1/neture/admin/requests
+ * Admin: 전체 취급 요청 목록 조회 (cross-supplier)
+ */
+router.get('/admin/requests', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { status, supplierId, serviceId } = req.query;
+    const filters: { status?: string; supplierId?: string; serviceId?: string } = {};
+    if (status && typeof status === 'string') filters.status = status;
+    if (supplierId && typeof supplierId === 'string') filters.supplierId = supplierId;
+    if (serviceId && typeof serviceId === 'string') filters.serviceId = serviceId;
+
+    const requests = await netureService.getAllSupplierRequests(filters);
+
+    res.json({ success: true, data: requests });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin requests:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch requests',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/requests/:id/approve
+ * Admin override: 소유권 무관 승인
+ */
+router.post('/admin/requests/:id/approve', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const actorId = req.user?.id || '';
+    const actorName = req.user?.name || 'Admin';
+
+    const result = await netureService.approveSupplierRequestAsAdmin(id, actorId, actorName);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error admin-approving supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to approve supplier request',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/requests/:id/reject
+ * Admin override: 소유권 무관 거절
+ */
+router.post('/admin/requests/:id/reject', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const actorId = req.user?.id || '';
+    const actorName = req.user?.name || 'Admin';
+
+    const result = await netureService.rejectSupplierRequestAsAdmin(id, actorId, reason, actorName);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error admin-rejecting supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to reject supplier request',
     });
   }
 });
