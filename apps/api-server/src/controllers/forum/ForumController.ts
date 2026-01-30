@@ -686,6 +686,16 @@ export class ForumController {
 
       const { postId, content, parentId } = req.body;
 
+      // Validate required fields
+      if (!postId) {
+        res.status(400).json({ success: false, error: 'postId is required' });
+        return;
+      }
+      if (!content || !content.trim()) {
+        res.status(400).json({ success: false, error: 'content is required' });
+        return;
+      }
+
       // Check if post exists
       const post = await this.postRepository.findOne({ where: { id: postId } });
       if (!post) {
@@ -698,7 +708,7 @@ export class ForumController {
 
       const comment = this.commentRepository.create({
         postId,
-        content,
+        content: content.trim(),
         parentId,
         authorId: userId,
         status: CommentStatus.PUBLISHED,
@@ -712,9 +722,15 @@ export class ForumController {
       post.lastCommentBy = userId;
       await this.postRepository.save(post);
 
+      // Reload with author relation to match listComments response shape
+      const commentWithAuthor = await this.commentRepository.findOne({
+        where: { id: savedComment.id },
+        relations: ['author'],
+      });
+
       res.status(201).json({
         success: true,
-        data: savedComment,
+        data: commentWithAuthor,
       });
     } catch (error: any) {
       logger.error('Error creating forum comment:', error);
