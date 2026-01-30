@@ -8,7 +8,9 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
-    "./entities": "./dist/backend/entities/index.js"
+    "./entities": "./dist/backend/entities/index.js",
+    "./public-ui": "./dist/public-ui/components/index.js",
+    "./utils": "./dist/utils/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

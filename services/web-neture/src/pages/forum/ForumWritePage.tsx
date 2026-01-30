@@ -19,7 +19,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
-import { htmlToBlocks } from '@o4o/forum-core';
+import { htmlToBlocks } from '@o4o/forum-core/utils';
 import { useAuth } from '../../contexts';
 import {
   createForumPost,
