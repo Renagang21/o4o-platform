@@ -4,8 +4,8 @@
  * Components for rendering forum content on public-facing pages.
  */
 
-export { ForumBlockRenderer } from './ForumBlockRenderer.js';
-export type { ForumBlockRendererProps } from './ForumBlockRenderer.js';
+export { ForumBlockRenderer } from './ForumBlockRenderer';
+export type { ForumBlockRendererProps } from './ForumBlockRenderer';
 
-export { CommentSection } from './CommentSection.js';
-export type { CommentSectionProps, ForumComment } from './CommentSection.js';
+export { CommentSection } from './CommentSection';
+export type { CommentSectionProps, ForumComment } from './CommentSection';

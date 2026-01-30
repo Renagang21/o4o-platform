@@ -7,8 +7,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // Map forum-core to source for better tree-shaking
-      '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core/src'),
+      // Map forum-core to dist (build fix)
+      '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core/dist'),
     },
   },
   server: {
