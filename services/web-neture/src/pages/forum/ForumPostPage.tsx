@@ -16,6 +16,7 @@ import { useAuth } from '../../contexts';
 import {
   fetchForumPostBySlug,
   fetchForumComments,
+  createForumComment,
   normalizePostType,
   getAuthorName,
   extractTextContent,
@@ -108,6 +109,8 @@ export function ForumPostPage() {
   const [comments, setComments] = useState<DisplayComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [commentText, setCommentText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function loadPost() {
@@ -146,6 +149,21 @@ export function ForumPostPage() {
 
     loadPost();
   }, [slug]);
+
+  const handleSubmitComment = async () => {
+    if (!post || !commentText.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    const result = await createForumComment(post.id, commentText.trim());
+
+    if (result.success && result.data) {
+      setComments(prev => [...prev, toDisplayComment(result.data!)]);
+      setCommentText('');
+    } else {
+      alert(result.error || '댓글 작성에 실패했습니다.');
+    }
+    setIsSubmitting(false);
+  };
 
   if (isLoading) {
     return (
@@ -267,9 +285,21 @@ export function ForumPostPage() {
               style={styles.commentTextarea}
               placeholder="댓글을 입력하세요..."
               rows={4}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
             />
             <div style={styles.commentFormActions}>
-              <button style={styles.submitButton}>댓글 작성</button>
+              <button
+                style={{
+                  ...styles.submitButton,
+                  opacity: !commentText.trim() || isSubmitting ? 0.5 : 1,
+                  cursor: !commentText.trim() || isSubmitting ? 'not-allowed' : 'pointer',
+                }}
+                onClick={handleSubmitComment}
+                disabled={!commentText.trim() || isSubmitting}
+              >
+                {isSubmitting ? '작성 중...' : '댓글 작성'}
+              </button>
             </div>
           </div>
         ) : (

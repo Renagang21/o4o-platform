@@ -631,3 +631,38 @@ export async function createForumPost(
     };
   }
 }
+
+/**
+ * Create a new forum comment (cookie-based auth)
+ */
+export async function createForumComment(
+  postId: string,
+  content: string,
+  parentId?: string
+): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ postId, content, parentId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.message || data.error || '댓글 작성에 실패했습니다.',
+      };
+    }
+
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Error creating forum comment:', error);
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다.',
+    };
+  }
+}
