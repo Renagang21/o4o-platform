@@ -20,7 +20,9 @@ COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
 COPY packages/types/package.json ./packages/types/
+COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/content-editor/package.json ./packages/content-editor/
+COPY packages/forum-core/package.json ./packages/forum-core/
 
 # Copy service package.json
 COPY services/web-neture/package.json ./services/web-neture/
@@ -30,14 +32,18 @@ RUN pnpm install --filter @o4o/web-neture...
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
+COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/content-editor/ ./packages/content-editor/
+COPY packages/forum-core/ ./packages/forum-core/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
-# Build workspace dependencies first (types -> content-editor)
+# Build workspace dependencies first (types -> auth-client -> content-editor -> forum-core)
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/content-editor build
+RUN pnpm --filter @o4o/forum-core build
 
 # Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
