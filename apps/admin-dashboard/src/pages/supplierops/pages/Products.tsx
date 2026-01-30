@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Edit, Trash2, Settings } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
 import { DataTable, Column } from '../../../components/common/DataTable';
@@ -20,6 +21,7 @@ interface Product {
 }
 
 const Products: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

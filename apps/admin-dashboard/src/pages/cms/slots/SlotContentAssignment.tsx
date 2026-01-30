@@ -53,7 +53,7 @@ export default function SlotContentAssignment({
                 type: slot.content.type,
                 title: slot.content.title,
                 status: slot.content.status,
-              }
+              } as CmsContent
             : null,
           sortOrder: slot.sortOrder,
           isActive: slot.isActive,

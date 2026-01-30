@@ -79,7 +79,7 @@ export default function MenuDebug() {
             {menuItems.map((item, idx) => (
               <div key={idx} className={item.separator ? 'text-gray-400' : ''}>
                 {item.separator ? '---' : `${item.id}: ${item.label}`}
-                {item.appId && <span className="text-blue-600 ml-2">(appId: {item.appId})</span>}
+                {(item as any).appId && <span className="text-blue-600 ml-2">(appId: {(item as any).appId})</span>}
               </div>
             ))}
           </div>

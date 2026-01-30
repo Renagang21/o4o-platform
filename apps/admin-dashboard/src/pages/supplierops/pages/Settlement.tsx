@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DollarSign, TrendingUp, Clock, CheckCircle, Calendar, Download, Eye } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
 import { DataTable, Column } from '../../../components/common/DataTable';
@@ -21,6 +22,7 @@ interface SettlementBatch {
 }
 
 const Settlement: React.FC = () => {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState({
     totalSettled: 25000000,
     pendingSettlement: 3500000,

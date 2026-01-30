@@ -330,6 +330,8 @@ const EnrollmentManagement = () => {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
+                totalItems={0}
+                itemsPerPage={10}
               />
             </div>
           )}

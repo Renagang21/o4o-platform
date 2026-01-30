@@ -24,10 +24,10 @@ import {
 import {
   actionApi,
   type ActionExecution,
-  type ActionStatus,
+  type ExecutionStatus,
 } from '@/lib/api/digitalSignage';
 
-const STATUS_CONFIG: Record<ActionStatus, { color: string; label: string }> = {
+const STATUS_CONFIG: Record<ExecutionStatus, { color: string; label: string }> = {
   pending: { color: 'bg-gray-100 text-gray-700', label: 'Pending' },
   running: { color: 'bg-blue-100 text-blue-700', label: 'Running' },
   paused: { color: 'bg-yellow-100 text-yellow-700', label: 'Paused' },
@@ -46,7 +46,7 @@ export default function ActionExecutionList() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await actionApi.list({ limit: 50 });
+      const response = await actionApi.listExecutions();
       if (response.success && response.data) {
         setActions(response.data.data || []);
       } else {
@@ -120,7 +120,7 @@ export default function ActionExecutionList() {
           to={`/admin/digital-signage/actions/${action.id}`}
           className="font-medium text-primary hover:underline"
         >
-          {action.mediaSource?.name || action.mediaSourceId}
+          {action.mediaList?.name || action.mediaListId}
         </Link>
       ),
     },
@@ -163,12 +163,12 @@ export default function ActionExecutionList() {
       ),
     },
     {
-      key: 'endedAt',
+      key: 'completedAt',
       header: 'Ended',
       render: (action) => (
         <span className="text-sm text-muted-foreground">
-          {action.endedAt
-            ? new Date(action.endedAt).toLocaleString()
+          {action.completedAt
+            ? new Date(action.completedAt).toLocaleString()
             : '-'}
         </span>
       ),
@@ -305,7 +305,7 @@ export default function ActionExecutionList() {
               <p className="text-sm">Actions are created from schedules</p>
             </div>
           ) : (
-            <AGTable data={actions} columns={columns} keyField="id" />
+            <AGTable data={actions} columns={columns} rowKey="id" />
           )}
         </CardContent>
       </Card>

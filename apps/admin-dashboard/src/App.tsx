@@ -153,16 +153,19 @@ const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/Foru
 // Yaksa Community Pages (from @o4o/forum-core-yaksa package - source imports)
 // Note: Package not yet implemented, using fallback placeholders
 const YaksaCommunityList = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityList').catch(() => ({
     default: () => <div className="p-6">Yaksa Community List - Coming Soon</div>,
   }))
 );
 const YaksaCommunityDetail = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityDetail').catch(() => ({
     default: () => <div className="p-6">Yaksa Community Detail - Coming Soon</div>,
   }))
 );
 const YaksaCommunityFeed = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityFeed').catch(() => ({
     default: () => <div className="p-6">Yaksa Community Feed - Coming Soon</div>,
   }))
@@ -214,23 +217,27 @@ const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').t
 // CGM Pharmacist App (Phase 1 - Development)
 // Note: Package not yet implemented, using fallback placeholders
 const CGMPatientListPage = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
-    .then(m => ({ default: m.PatientListPage }))
+    .then((m: any) => ({ default: m.PatientListPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Patient List - Coming Soon</div> }))
 );
 const CGMPatientDetailPage = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
-    .then(m => ({ default: m.PatientDetailPage }))
+    .then((m: any) => ({ default: m.PatientDetailPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Patient Detail - Coming Soon</div> }))
 );
 const CGMCoachingPage = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
-    .then(m => ({ default: m.CoachingPage }))
+    .then((m: any) => ({ default: m.CoachingPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Coaching - Coming Soon</div> }))
 );
 const CGMAlertsPage = lazy(() =>
+  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
-    .then(m => ({ default: m.AlertsPage }))
+    .then((m: any) => ({ default: m.AlertsPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Alerts - Coming Soon</div> }))
 );
 

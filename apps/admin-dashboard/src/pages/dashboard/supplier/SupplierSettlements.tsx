@@ -79,10 +79,11 @@ export default function SupplierSettlements() {
         `/v1/supplier/settlements?${params.toString()}`
       );
 
-      if (response.success && response.settlements) {
-        setSettlements(response.settlements);
-        setTotalPages(response.totalPages);
-        setTotal(response.total);
+      const data = response.data as SettlementsResponse;
+      if (data.success && data.settlements) {
+        setSettlements(data.settlements);
+        setTotalPages(data.totalPages);
+        setTotal(data.total);
       }
     } catch (error) {
       console.error('Failed to fetch settlements:', error);
@@ -114,8 +115,9 @@ export default function SupplierSettlements() {
         `/v1/supplier/settlements/preview?${params.toString()}`
       );
 
-      if (response.success && response.preview) {
-        setPreview(response.preview);
+      const previewData = response.data as { success: boolean; preview: SettlementPreview };
+      if (previewData.success && previewData.preview) {
+        setPreview(previewData.preview);
       }
     } catch (error) {
       console.error('Failed to fetch settlement preview:', error);

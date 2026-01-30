@@ -85,7 +85,7 @@ export default function StorefrontProductDetailPage() {
         setRelatedRoutines(data.relatedRoutines || []);
         setSimilarProducts(data.similarProducts || []);
       }
-    } catch {
+    } catch (err) {
       console.error('Error loading product detail:', err);
       // Demo data
       setPartner({

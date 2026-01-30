@@ -57,7 +57,7 @@ export default function ScheduleDetail() {
     try {
       const [scheduleRes, actionsRes] = await Promise.all([
         scheduleApi.get(id),
-        actionApi.list({ scheduleId: id, limit: 10 }),
+        actionApi.listExecutions(),
       ]);
 
       if (scheduleRes.success && scheduleRes.data) {
@@ -188,20 +188,6 @@ export default function ScheduleDetail() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Start Date</p>
-              <p className="font-medium">
-                {new Date(schedule.startDate).toLocaleDateString()}
-              </p>
-            </div>
-            {schedule.endDate && (
-              <div>
-                <p className="text-sm text-muted-foreground">End Date</p>
-                <p className="font-medium">
-                  {new Date(schedule.endDate).toLocaleDateString()}
-                </p>
-              </div>
-            )}
             {schedule.scheduleType === 'weekly' && schedule.daysOfWeek && (
               <div className="col-span-2">
                 <p className="text-sm text-muted-foreground">Days of Week</p>
@@ -315,9 +301,9 @@ export default function ScheduleDetail() {
                         {new Date(action.startedAt || action.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    {action.mediaSource && (
+                    {action.mediaList && (
                       <span className="text-sm text-muted-foreground">
-                        {action.mediaSource.name}
+                        {action.mediaList.name}
                       </span>
                     )}
                   </div>

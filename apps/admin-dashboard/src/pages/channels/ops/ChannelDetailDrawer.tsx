@@ -145,7 +145,7 @@ export default function ChannelDetailDrawer({ channel, open, onClose }: ChannelD
           {/* Online Status Section */}
           <Section title="Online Status">
             <div style={{ marginBottom: '12px' }}>
-              <ChannelStatusBadge status={channel.onlineStatus} size="md" showLabel />
+              <ChannelStatusBadge status={channel.onlineStatus} size="md" />
             </div>
             <InfoRow label="Last Heartbeat" value={formatDateTime(channel.lastHeartbeatAt)} />
             <InfoRow label="Uptime" value={formatUptime(channel.uptimeSec)} />

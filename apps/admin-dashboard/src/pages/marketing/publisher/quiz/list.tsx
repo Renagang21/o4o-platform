@@ -25,7 +25,7 @@ import {
   StopCircle,
 } from 'lucide-react';
 import { AGTable, type AGTableColumn } from '@/components/ag/AGTable';
-import { AGModal } from '@/components/ag/AGModal';
+import { AGConfirmModal } from '@/components/ag/AGModal';
 import { quizCampaignApi, type QuizCampaign } from '@/lib/api/lmsMarketing';
 import { useAuth } from '@o4o/auth-context';
 
@@ -47,7 +47,7 @@ export default function QuizListPage() {
     campaign: null,
   });
 
-  const supplierId = user?.supplierId || user?.id || 'default-supplier';
+  const supplierId = String(user?.supplierId || user?.id || 'default-supplier');
 
   const fetchCampaigns = async () => {
     setIsLoading(true);
@@ -295,18 +295,18 @@ export default function QuizListPage() {
             <AGTable
               data={campaigns}
               columns={columns}
-              keyField="id"
+              rowKey="id"
             />
           )}
         </CardContent>
       </Card>
 
       {/* Delete Confirmation Modal */}
-      <AGModal
-        open={deleteModal.open}
+      <AGConfirmModal
+        isOpen={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, campaign: null })}
         title="Delete Quiz Campaign"
-        description={`Are you sure you want to delete "${deleteModal.campaign?.title}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${deleteModal.campaign?.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
         confirmVariant="destructive"
         onConfirm={handleDelete}

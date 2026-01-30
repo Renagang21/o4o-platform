@@ -72,10 +72,10 @@ export default function SupplierEngagementDashboard() {
 
       try {
         const [dashboardRes, productsRes, quizRes, surveyRes] = await Promise.all([
-          insightsApi.getDashboard(supplierId),
-          productContentApi.list(supplierId),
-          quizCampaignApi.list(supplierId),
-          surveyCampaignApi.list(supplierId),
+          insightsApi.getDashboard(String(supplierId)),
+          productContentApi.list(String(supplierId)),
+          quizCampaignApi.list(String(supplierId)),
+          surveyCampaignApi.list(String(supplierId)),
         ]);
 
         if (dashboardRes.success && dashboardRes.data) {

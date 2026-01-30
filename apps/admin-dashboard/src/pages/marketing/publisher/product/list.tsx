@@ -23,7 +23,7 @@ import {
   GlobeLock,
 } from 'lucide-react';
 import { AGTable, type AGTableColumn } from '@/components/ag/AGTable';
-import { AGModal } from '@/components/ag/AGModal';
+import { AGConfirmModal } from '@/components/ag/AGModal';
 import { productContentApi, type ProductContent } from '@/lib/api/lmsMarketing';
 import { useAuth } from '@o4o/auth-context';
 
@@ -43,7 +43,7 @@ export default function ProductListPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await productContentApi.list(supplierId);
+      const response = await productContentApi.list(String(supplierId));
       if (response.success && response.data) {
         setProducts(response.data.data || []);
       } else {
@@ -247,18 +247,18 @@ export default function ProductListPage() {
             <AGTable
               data={products}
               columns={columns}
-              keyField="id"
+              rowKey="id"
             />
           )}
         </CardContent>
       </Card>
 
       {/* Delete Confirmation Modal */}
-      <AGModal
-        open={deleteModal.open}
+      <AGConfirmModal
+        isOpen={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, product: null })}
         title="Delete Product Content"
-        description={`Are you sure you want to delete "${deleteModal.product?.title}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${deleteModal.product?.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
         confirmVariant="destructive"
         onConfirm={handleDelete}

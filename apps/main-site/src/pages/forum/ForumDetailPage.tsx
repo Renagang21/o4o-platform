@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
-import { PageHeader, PageLoading, EmptyState } from '@/components/common';
+import { PageHeader, EmptyState } from '@/components/common';
 
 // 게시글 타입
 interface ForumPost {
@@ -84,7 +84,9 @@ export function ForumDetailPage() {
   // 댓글 작성 상태
   const [commentContent, setCommentContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // 게시글 로드
   const loadPost = useCallback(async () => {
@@ -104,10 +106,15 @@ export function ForumDetailPage() {
       loadComments(response.data.id);
     } catch (err: any) {
       console.error('Failed to load post:', err);
-      if (err.response?.status === 404) {
+      const status = err.response?.status;
+      if (status === 401) {
+        setError('로그인이 필요합니다.');
+      } else if (status === 403) {
+        setError('접근 권한이 없습니다.');
+      } else if (status === 404) {
         setError('게시글을 찾을 수 없습니다.');
       } else {
-        setError('게시글을 불러오는데 실패했습니다.');
+        setError('일시적인 오류가 발생했습니다.');
       }
     } finally {
       setIsLoading(false);
@@ -144,6 +151,7 @@ export function ForumDetailPage() {
     if (!post || !commentContent.trim() || !isAuthenticated) return;
 
     setIsSubmitting(true);
+    setCommentError(null);
 
     try {
       await authClient.api.post(`/forum/posts/${post.id}/comments`, {
@@ -159,7 +167,8 @@ export function ForumDetailPage() {
       setReplyTo(null);
     } catch (err: any) {
       console.error('Failed to submit comment:', err);
-      alert(err.response?.data?.message || '댓글 작성에 실패했습니다.');
+      // 입력 내용 유지, inline error 표시
+      setCommentError(err.response?.data?.message || '댓글 작성에 실패했습니다.');
     } finally {
       setIsSubmitting(false);
     }
@@ -169,12 +178,14 @@ export function ForumDetailPage() {
   const handleDeletePost = async () => {
     if (!post || !confirm('정말 삭제하시겠습니까?')) return;
 
+    setIsDeleting(true);
     try {
       await authClient.api.delete(`/forum/posts/${post.id}`);
       navigate('/forum');
     } catch (err: any) {
       console.error('Failed to delete post:', err);
-      alert(err.response?.data?.message || '삭제에 실패했습니다.');
+      setCommentError(err.response?.data?.message || '삭제에 실패했습니다.');
+      setIsDeleting(false);
     }
   };
 
@@ -199,7 +210,60 @@ export function ForumDetailPage() {
   const canDelete = user?.id === post?.authorId || can('forum.posts.manage');
 
   if (isLoading) {
-    return <PageLoading message="게시글을 불러오는 중..." />;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          {/* Breadcrumb skeleton */}
+          <div className="flex items-center gap-2 mb-6">
+            <div className="h-4 w-8 bg-gray-200 rounded animate-pulse" />
+            <span className="text-gray-300">/</span>
+            <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+            <span className="text-gray-300">/</span>
+            <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+          </div>
+          {/* Post header skeleton */}
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-5 w-12 bg-gray-100 rounded animate-pulse" />
+              </div>
+              <div className="h-8 bg-gray-100 rounded animate-pulse w-3/4 mb-4" />
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
+                  <div>
+                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-3 w-32 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Content skeleton */}
+            <div className="p-6 space-y-3">
+              <div className="h-4 bg-gray-100 rounded animate-pulse w-full" />
+              <div className="h-4 bg-gray-100 rounded animate-pulse w-11/12" />
+              <div className="h-4 bg-gray-100 rounded animate-pulse w-4/5" />
+              <div className="h-4 bg-gray-100 rounded animate-pulse w-9/12" />
+            </div>
+          </div>
+          {/* Comments skeleton */}
+          <div className="mt-6">
+            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-4" />
+            <div className="space-y-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                  <div className="h-4 bg-gray-100 rounded animate-pulse w-3/4" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error || !post) {
@@ -345,9 +409,10 @@ export function ForumDetailPage() {
                     <button
                       type="button"
                       onClick={handleDeletePost}
-                      className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                      disabled={isDeleting}
+                      className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      삭제
+                      {isDeleting ? '삭제 중...' : '삭제'}
                     </button>
                   )}
                 </div>
@@ -400,9 +465,14 @@ export function ForumDetailPage() {
                     </button>
                   </div>
                 )}
+                {commentError && (
+                  <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-700">{commentError}</p>
+                  </div>
+                )}
                 <textarea
                   value={commentContent}
-                  onChange={(e) => setCommentContent(e.target.value)}
+                  onChange={(e) => { setCommentContent(e.target.value); setCommentError(null); }}
                   placeholder="댓글을 입력하세요"
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"

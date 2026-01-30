@@ -133,7 +133,7 @@ export const useAuthStore = create<AuthState>()(
                 role: response.user.roles?.[0] || 'user',
                 roles: response.user.roles,
                 permissions: response.user.permissions,
-                scopes: response.user.scopes
+                scopes: (response.user as any).scopes
               },
               token,
               isAuthenticated: true,

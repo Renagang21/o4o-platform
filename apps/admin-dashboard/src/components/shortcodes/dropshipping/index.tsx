@@ -64,7 +64,7 @@ export const dropshippingShortcodes: ShortcodeDefinition[] = [
     name: 'role_verification',
     component: ({ attributes }) => (
       <React.Suspense fallback={<Loading />}>
-        <RoleVerificationLazy {...attributes} />
+        <RoleVerificationLazy type="supplier" {...attributes} />
       </React.Suspense>
     ),
     description: 'Role verification form for dropshipping users'

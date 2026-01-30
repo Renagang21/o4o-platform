@@ -199,7 +199,7 @@ const HeaderBuilderPage: React.FC = () => {
 
   const renderRow = (row: keyof HeaderBuilderLayout, rowLabel: string) => {
     const rowData = layout[row];
-    const isEnabled = row === 'primary' || rowData.settings.enabled;
+    const isEnabled = row === 'primary' || ('enabled' in rowData.settings && rowData.settings.enabled);
 
     return (
       <div key={row} className="border border-gray-300 rounded-lg overflow-hidden bg-white">

@@ -235,7 +235,7 @@ const SettlementDetailPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-gray-600">현재 상태:</span>
-                <AGTag color={SETTLEMENT_STATUS_COLORS[settlement.status]} size="lg">
+                <AGTag color={SETTLEMENT_STATUS_COLORS[settlement.status]} size="md">
                   {SETTLEMENT_STATUS_LABELS[settlement.status]}
                 </AGTag>
               </div>

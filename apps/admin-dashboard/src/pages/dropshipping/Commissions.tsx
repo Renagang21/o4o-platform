@@ -262,10 +262,10 @@ const Commissions: React.FC = () => {
 
       {/* DataTable */}
       <DataTable<CommissionPolicy>
+        rowKey="id"
         columns={columns}
-        data={policies}
+        dataSource={policies}
         loading={loading}
-        emptyMessage="수수료 정책이 없습니다"
       />
     </div>
   );

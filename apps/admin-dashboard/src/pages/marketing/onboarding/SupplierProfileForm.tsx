@@ -35,7 +35,7 @@ export default function SupplierProfileForm() {
     productTypes: '',
   });
 
-  const supplierId = user?.supplierId || user?.id || 'default-supplier';
+  const supplierId = String(user?.supplierId || user?.id || 'default-supplier');
 
   useEffect(() => {
     const fetchProfile = async () => {

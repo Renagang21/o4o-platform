@@ -54,7 +54,7 @@ export default function OnboardingHome() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supplierId = user?.supplierId || user?.id || 'default-supplier';
+  const supplierId = String(user?.supplierId || user?.id || 'default-supplier');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,7 +84,7 @@ export default function OnboardingHome() {
   }, [supplierId]);
 
   const handleMarkComplete = async () => {
-    const response = await onboardingApi.markComplete(supplierId);
+    const response = await onboardingApi.markComplete(String(supplierId));
     if (response.success && response.data) {
       setProfile(response.data);
     }

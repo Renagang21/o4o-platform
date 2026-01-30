@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DollarSign,
   TrendingUp,
@@ -29,6 +30,7 @@ interface SettlementBatch {
 }
 
 const SettlementDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState({
     totalSettled: 12500000,
     pendingSettlement: 2340000,

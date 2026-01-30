@@ -114,7 +114,7 @@ export default function StorefrontRoutineDetailPage() {
         setRoutine(data.routine);
         setProducts(data.products || []);
       }
-    } catch {
+    } catch (err) {
       console.error('Error loading routine detail:', err);
       // Demo data
       setPartner({

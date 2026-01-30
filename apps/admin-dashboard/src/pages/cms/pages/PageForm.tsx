@@ -71,7 +71,7 @@ export default function PageForm() {
 
   const loadViews = async () => {
     try {
-      const response = await cmsAPI.listViews({ status: 'active' });
+      const response = await cmsAPI.listViews({ status: 'active' as any });
       setViews(response.data);
     } catch (error) {
       console.error('Failed to load views:', error);

@@ -31,6 +31,7 @@ import {
   displaySlotApi,
   type Schedule,
   type ScheduleType,
+  type DayOfWeek,
   type MediaList,
   type DisplaySlot,
 } from '@/lib/api/digitalSignage';
@@ -65,12 +66,8 @@ export default function ScheduleForm({
     scheduleType: schedule?.scheduleType || 'daily' as ScheduleType,
     startTime: schedule?.startTime || '09:00',
     endTime: schedule?.endTime || '18:00',
-    startDate: schedule?.startDate
-      ? new Date(schedule.startDate).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0],
-    endDate: schedule?.endDate
-      ? new Date(schedule.endDate).toISOString().split('T')[0]
-      : '',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: '',
     daysOfWeek: schedule?.daysOfWeek || [],
     mediaListId: schedule?.mediaListId || '',
     displaySlotId: schedule?.displaySlotId || '',
@@ -139,16 +136,24 @@ export default function ScheduleForm({
     }
   };
 
-  const toggleDayOfWeek = (day: number) => {
+  const toggleDayOfWeek = (day: DayOfWeek) => {
     setFormData((prev) => ({
       ...prev,
       daysOfWeek: prev.daysOfWeek.includes(day)
         ? prev.daysOfWeek.filter((d) => d !== day)
-        : [...prev.daysOfWeek, day].sort(),
+        : [...prev.daysOfWeek, day],
     }));
   };
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayOptions: { value: DayOfWeek; label: string }[] = [
+    { value: 'sun', label: 'Sun' },
+    { value: 'mon', label: 'Mon' },
+    { value: 'tue', label: 'Tue' },
+    { value: 'wed', label: 'Wed' },
+    { value: 'thu', label: 'Thu' },
+    { value: 'fri', label: 'Fri' },
+    { value: 'sat', label: 'Sat' },
+  ];
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -256,16 +261,16 @@ export default function ScheduleForm({
             <div className="space-y-2">
               <Label>Days of Week</Label>
               <div className="flex gap-1">
-                {dayNames.map((day, index) => (
+                {dayOptions.map((day) => (
                   <Button
-                    key={day}
+                    key={day.value}
                     type="button"
                     size="sm"
-                    variant={formData.daysOfWeek.includes(index) ? 'default' : 'outline'}
+                    variant={formData.daysOfWeek.includes(day.value) ? 'default' : 'outline'}
                     className="flex-1 px-1"
-                    onClick={() => toggleDayOfWeek(index)}
+                    onClick={() => toggleDayOfWeek(day.value)}
                   >
-                    {day}
+                    {day.label}
                   </Button>
                 ))}
               </div>
@@ -279,7 +284,6 @@ export default function ScheduleForm({
               onValueChange={(value) =>
                 setFormData((prev) => ({ ...prev, mediaListId: value }))
               }
-              disabled={isLoadingOptions}
             >
               <SelectTrigger>
                 <SelectValue placeholder={isLoadingOptions ? 'Loading...' : 'Select media list'} />
@@ -301,7 +305,6 @@ export default function ScheduleForm({
               onValueChange={(value) =>
                 setFormData((prev) => ({ ...prev, displaySlotId: value }))
               }
-              disabled={isLoadingOptions}
             >
               <SelectTrigger>
                 <SelectValue placeholder={isLoadingOptions ? 'Loading...' : 'Select display slot'} />

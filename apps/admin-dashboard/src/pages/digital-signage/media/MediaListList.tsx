@@ -207,7 +207,7 @@ export default function MediaListList() {
               </Button>
             </div>
           ) : (
-            <AGTable data={lists} columns={columns} keyField="id" />
+            <AGTable data={lists} columns={columns} rowKey="id" />
           )}
         </CardContent>
       </Card>

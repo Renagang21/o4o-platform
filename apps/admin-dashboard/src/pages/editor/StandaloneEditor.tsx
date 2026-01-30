@@ -479,11 +479,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         slug: trimmedSlug,  // Use the validated/trimmed slug
         status: publish ? 'publish' : (currentSettings.status || 'draft'),
         type: contentType,  // Explicitly set type based on mode
-        categories: currentSettings.categories,
-        tags: currentSettings.tags,
+        categories: currentSettings.categories as any,
+        tags: currentSettings.tags as any,
         featured: false,
         sticky: currentSettings.sticky,
-        featuredImage: currentSettings.featuredImage,
+        featuredImage: currentSettings.featuredImage as any,
         format: currentSettings.format,
         allowComments: currentSettings.commentStatus
       };

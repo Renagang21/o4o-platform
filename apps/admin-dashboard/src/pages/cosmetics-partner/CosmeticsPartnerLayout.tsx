@@ -8,7 +8,18 @@
 
 import React, { useState, ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NavItem, NavGroup } from '../../components/ag/../../components/ag/../../../packages/ui/src/layout/types';
+// NavItem/NavGroup types used locally for navigation structure
+interface NavItem {
+  label: string;
+  path: string;
+  icon?: React.ReactNode;
+  badge?: string | number;
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
 
 interface CosmeticsPartnerLayoutProps {
   children: ReactNode;

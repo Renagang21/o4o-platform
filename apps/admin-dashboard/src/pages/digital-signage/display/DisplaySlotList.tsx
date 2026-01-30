@@ -152,7 +152,7 @@ export default function DisplaySlotList() {
               <p className="text-sm">Create slots on individual displays</p>
             </div>
           ) : (
-            <AGTable data={slots} columns={columns} keyField="id" />
+            <AGTable data={slots} columns={columns} rowKey="id" />
           )}
         </CardContent>
       </Card>

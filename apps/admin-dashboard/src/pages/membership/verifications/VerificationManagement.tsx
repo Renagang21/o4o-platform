@@ -337,6 +337,8 @@ const VerificationManagement = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
+                totalItems={totalVerifications}
+                itemsPerPage={itemsPerPage}
                 onPageChange={setCurrentPage}
               />
             </div>

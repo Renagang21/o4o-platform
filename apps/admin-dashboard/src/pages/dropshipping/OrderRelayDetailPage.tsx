@@ -197,7 +197,7 @@ const OrderRelayDetailPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-gray-600">현재 상태:</span>
-                <AGTag color={ORDER_RELAY_STATUS_COLORS[orderRelay.status]} size="lg">
+                <AGTag color={ORDER_RELAY_STATUS_COLORS[orderRelay.status]} size="md">
                   {ORDER_RELAY_STATUS_LABELS[orderRelay.status]}
                 </AGTag>
               </div>

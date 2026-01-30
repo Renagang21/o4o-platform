@@ -19,7 +19,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ClipboardList, ArrowLeft, Save, Globe, GlobeLock, Plus, Trash2, ExternalLink, BarChart3, StopCircle } from 'lucide-react';
-import { AGTabs, type AGTab } from '@/components/ag/AGTabs';
+import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { surveyCampaignApi, type UpdateSurveyCampaignDto, type SurveyCampaign, type SurveyQuestion, type SurveyReward, type TargetAudience } from '@/lib/api/lmsMarketing';
 
 const TARGET_OPTIONS = [
@@ -300,9 +300,9 @@ export default function SurveyEditPage() {
 
   const isEditable = campaign.status === 'draft';
 
-  const tabs: AGTab[] = [
+  const tabs: AGTabItem[] = [
     {
-      id: 'basic',
+      key: 'basic',
       label: 'Basic Info',
       content: (
         <div className="space-y-4 pt-4">
@@ -359,7 +359,7 @@ export default function SurveyEditPage() {
           {!isEditable && (
             <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg mt-4">
               <div className="text-center">
-                <div className="text-2xl font-bold">{campaign.responseCount}</div>
+                <div className="text-2xl font-bold">{(campaign as any).responseCount}</div>
                 <div className="text-sm text-muted-foreground">Responses</div>
               </div>
               <div className="text-center">
@@ -372,7 +372,7 @@ export default function SurveyEditPage() {
       ),
     },
     {
-      id: 'questions',
+      key: 'questions',
       label: `Questions (${questions.length})`,
       content: (
         <div className="space-y-4 pt-4">
@@ -403,7 +403,6 @@ export default function SurveyEditPage() {
                         }
                         updateQuestion(qIndex, updates);
                       }}
-                      disabled={!isEditable}
                     >
                       <SelectTrigger className="w-40">
                         <SelectValue />
@@ -484,7 +483,7 @@ export default function SurveyEditPage() {
       ),
     },
     {
-      id: 'targeting',
+      key: 'targeting',
       label: 'Targeting',
       content: (
         <div className="space-y-6 pt-4">
@@ -548,7 +547,7 @@ export default function SurveyEditPage() {
       ),
     },
     {
-      id: 'reward',
+      key: 'reward',
       label: 'Reward',
       content: (
         <div className="space-y-4 pt-4">
@@ -574,7 +573,6 @@ export default function SurveyEditPage() {
                   <Select
                     value={reward.type}
                     onValueChange={(value) => setReward({ ...reward, type: value as SurveyReward['type'] })}
-                    disabled={!isEditable}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -659,7 +657,7 @@ export default function SurveyEditPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AGTabs tabs={tabs} defaultTab="basic" />
+          <AGTabs items={tabs} defaultActiveKey="basic" />
 
           {/* Actions */}
           <div className="flex justify-between mt-8 pt-6 border-t">

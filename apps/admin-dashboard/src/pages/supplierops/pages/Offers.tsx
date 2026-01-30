@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Edit, Tag, Users } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
 
@@ -20,6 +21,7 @@ interface Offer {
 }
 
 const Offers: React.FC = () => {
+  const navigate = useNavigate();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

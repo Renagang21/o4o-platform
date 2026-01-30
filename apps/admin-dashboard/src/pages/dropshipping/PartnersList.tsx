@@ -331,10 +331,10 @@ const PartnersList: React.FC = () => {
 
       {/* DataTable */}
       <DataTable<User>
+        rowKey="id"
         columns={columns}
-        data={partners}
+        dataSource={partners}
         loading={loading}
-        emptyMessage="파트너가 없습니다"
         pagination={{
           current: page,
           total: stats.total,

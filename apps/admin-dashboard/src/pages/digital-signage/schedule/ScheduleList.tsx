@@ -226,7 +226,7 @@ export default function ScheduleList() {
               </Button>
             </div>
           ) : (
-            <AGTable data={schedules} columns={columns} keyField="id" />
+            <AGTable data={schedules} columns={columns} rowKey="id" />
           )}
         </CardContent>
       </Card>

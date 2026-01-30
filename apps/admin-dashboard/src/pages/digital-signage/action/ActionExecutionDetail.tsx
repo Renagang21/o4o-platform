@@ -27,10 +27,10 @@ import {
 import {
   actionApi,
   type ActionExecution,
-  type ActionStatus,
+  type ExecutionStatus,
 } from '@/lib/api/digitalSignage';
 
-const STATUS_CONFIG: Record<ActionStatus, { color: string; label: string; bgColor: string }> = {
+const STATUS_CONFIG: Record<ExecutionStatus, { color: string; label: string; bgColor: string }> = {
   pending: { color: 'text-gray-700', label: 'Pending', bgColor: 'bg-gray-100' },
   running: { color: 'text-blue-700', label: 'Running', bgColor: 'bg-blue-100' },
   paused: { color: 'text-yellow-700', label: 'Paused', bgColor: 'bg-yellow-100' },
@@ -53,7 +53,7 @@ export default function ActionExecutionDetail() {
     setError(null);
 
     try {
-      const response = await actionApi.get(id);
+      const response = await actionApi.getExecution(id);
       if (response.success && response.data) {
         setAction(response.data);
       } else {
@@ -158,7 +158,7 @@ export default function ActionExecutionDetail() {
               Action Execution
             </h1>
             <p className="text-muted-foreground">
-              {action.mediaSource?.name || action.mediaSourceId}
+              {action.mediaList?.name || action.mediaListId}
             </p>
           </div>
         </div>
@@ -263,17 +263,17 @@ export default function ActionExecutionDetail() {
             <div>
               <p className="text-sm text-muted-foreground">Ended</p>
               <p className="font-medium">
-                {action.endedAt
-                  ? new Date(action.endedAt).toLocaleString()
+                {action.completedAt
+                  ? new Date(action.completedAt).toLocaleString()
                   : '-'}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Duration</p>
               <p className="font-medium">
-                {action.startedAt && action.endedAt
+                {action.startedAt && action.completedAt
                   ? `${Math.round(
-                      (new Date(action.endedAt).getTime() -
+                      (new Date(action.completedAt).getTime() -
                         new Date(action.startedAt).getTime()) /
                         1000
                     )} seconds`
@@ -297,15 +297,15 @@ export default function ActionExecutionDetail() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {action.mediaSource ? (
+            {action.mediaList ? (
               <Link
-                to={`/admin/digital-signage/media/sources/${action.mediaSourceId}`}
+                to={`/admin/digital-signage/media/sources/${action.mediaListId}`}
                 className="text-primary hover:underline font-medium"
               >
-                {action.mediaSource.name}
+                {action.mediaList.name}
               </Link>
             ) : (
-              <span className="text-muted-foreground">{action.mediaSourceId}</span>
+              <span className="text-muted-foreground">{action.mediaListId}</span>
             )}
           </CardContent>
         </Card>
@@ -363,10 +363,10 @@ export default function ActionExecutionDetail() {
       </div>
 
       {/* Error Info */}
-      {action.status === 'failed' && action.errorMessage && (
+      {action.status === 'failed' && action.error && (
         <Alert variant="destructive">
           <AlertDescription>
-            <strong>Error:</strong> {action.errorMessage}
+            <strong>Error:</strong> {action.error}
           </AlertDescription>
         </Alert>
       )}

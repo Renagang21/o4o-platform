@@ -34,7 +34,7 @@ export default function PublisherHome() {
   const [error, setError] = useState<string | null>(null);
 
   // Use supplier ID from user context or default
-  const supplierId = user?.supplierId || user?.id || 'default-supplier';
+  const supplierId = String(user?.supplierId || user?.id || 'default-supplier');
 
   useEffect(() => {
     const fetchDashboard = async () => {

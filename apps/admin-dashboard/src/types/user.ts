@@ -23,7 +23,7 @@ export interface User extends Omit<BaseUser, 'role' | 'status' | 'lastLoginAt'> 
   businessInfo?: BusinessInfo;
   createdAt: string | Date;
   created_at?: Date;
-  updatedAt?: string | Date;
+  updatedAt: string | Date;
   updated_at?: Date;
   isEmailVerified?: boolean;
   isActive?: boolean;

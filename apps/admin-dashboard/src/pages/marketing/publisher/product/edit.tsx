@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Package, ArrowLeft, Save, Globe, GlobeLock, ExternalLink } from 'lucide-react';
-import { AGTabs, type AGTab } from '@/components/ag/AGTabs';
+import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { productContentApi, type UpdateProductContentDto, type ProductContent, type TargetAudience } from '@/lib/api/lmsMarketing';
 
 const TARGET_OPTIONS = [
@@ -181,9 +181,9 @@ export default function ProductEditPage() {
     );
   }
 
-  const tabs: AGTab[] = [
+  const tabs: AGTabItem[] = [
     {
-      id: 'basic',
+      key: 'basic',
       label: 'Basic Info',
       content: (
         <div className="space-y-4 pt-4">
@@ -219,7 +219,7 @@ export default function ProductEditPage() {
       ),
     },
     {
-      id: 'targeting',
+      key: 'targeting',
       label: 'Targeting',
       content: (
         <div className="space-y-6 pt-4">
@@ -323,7 +323,7 @@ export default function ProductEditPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AGTabs tabs={tabs} defaultTab="basic" />
+          <AGTabs items={tabs} defaultActiveKey="basic" />
 
           {/* Actions */}
           <div className="flex justify-between mt-8 pt-6 border-t">

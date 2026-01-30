@@ -20,9 +20,13 @@
 
 import React from 'react';
 import { DashboardData } from '@/lib/api/lmsYaksa';
+// @ts-expect-error Package not yet available
 import { AGPageHeader } from '@o4o/ui/layout';
+// @ts-expect-error Package not yet available
 import { AGSection } from '@o4o/ui/layout';
+// @ts-expect-error Package not yet available
 import { AGKPIBlock, AGKPIGrid } from '@o4o/ui/ag-components';
+// @ts-expect-error Package not yet available
 import { AGCard } from '@o4o/ui/ag-components';
 import {
   Users,

@@ -259,7 +259,7 @@ export function OfficerManagePage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {member.organizationName || '-'}
+                    {(member as any).organizationName || '-'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(member.joinedAt).toLocaleDateString('ko-KR')}

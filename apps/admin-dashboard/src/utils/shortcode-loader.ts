@@ -12,7 +12,7 @@
  * await loadShortcodes()
  */
 
-import { registerLazyShortcode, hasShortcode, ShortcodeDefinition } from '@o4o/shortcodes';
+import { registerLazyShortcode, hasShortcodeRegistered as hasShortcode, ShortcodeDefinition } from '@o4o/shortcodes';
 
 /**
  * Type guard to check if a value is a ShortcodeDefinition

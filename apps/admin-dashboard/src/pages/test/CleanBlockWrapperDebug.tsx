@@ -45,7 +45,7 @@ export const CleanBlockWrapperDebug: React.FC<CleanBlockWrapperDebugProps> = ({
       minute: '2-digit',
       second: '2-digit',
       fractionalSecondDigits: 3
-    });
+    } as any);
 
     // Also log to console for easier debugging
     // eslint-disable-next-line no-console

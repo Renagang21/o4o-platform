@@ -124,7 +124,7 @@ function EmptyState({ message, icon }: { message: string; icon?: ReactNode }) {
   );
 }
 
-export function AGTable<T extends Record<string, unknown>>({
+export function AGTable<T extends object>({
   data,
   columns,
   rowKey = 'id' as keyof T,

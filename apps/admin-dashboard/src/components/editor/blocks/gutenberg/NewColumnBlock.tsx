@@ -60,7 +60,7 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
           ? {
               ...block,
               content: typeof content === 'string' ? content : block.content,
-              attributes: { ...block.attributes, ...blockAttributes },
+              attributes: { ...(block.attributes as Record<string, unknown>), ...(blockAttributes as Record<string, unknown>) },
             }
           : block
       );

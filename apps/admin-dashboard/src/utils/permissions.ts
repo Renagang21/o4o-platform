@@ -32,14 +32,14 @@ export const hasAnyPermission = (user: User | null, permissions: Permission[]): 
  * Check if user can write content (posts, pages)
  */
 export const canWriteContent = (user: User | null): boolean => {
-  return hasPermission(user, 'content:write');
+  return hasPermission(user, 'content:write' as any);
 };
 
 /**
  * Check if user can edit categories
  */
 export const canEditCategories = (user: User | null): boolean => {
-  return hasPermission(user, 'categories:write');
+  return hasPermission(user, 'categories:write' as any);
 };
 
 /**
@@ -47,12 +47,12 @@ export const canEditCategories = (user: User | null): boolean => {
  * Users with content:write permission can set featured images
  */
 export const canSetFeaturedImage = (user: User | null): boolean => {
-  return hasPermission(user, 'content:write');
+  return hasPermission(user, 'content:write' as any);
 };
 
 /**
  * Check if user can publish content
  */
 export const canPublish = (user: User | null): boolean => {
-  return hasAnyPermission(user, ['content:write', 'system:admin']);
+  return hasAnyPermission(user, ['content:write' as any, 'system:admin' as any]);
 };

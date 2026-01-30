@@ -44,14 +44,14 @@ export default function ContentHub() {
       if (contentType === 'playlists') {
         const result = await globalContentApi.listPlaylists(activeSource, 'neture', { page: 1, limit: 50 });
         if (result.success && result.data) {
-          setPlaylists(result.data.data || []);
+          setPlaylists(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load playlists');
         }
       } else {
         const result = await globalContentApi.listMedia(activeSource, 'neture', { page: 1, limit: 50 });
         if (result.success && result.data) {
-          setMedia(result.data.data || []);
+          setMedia(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load media');
         }

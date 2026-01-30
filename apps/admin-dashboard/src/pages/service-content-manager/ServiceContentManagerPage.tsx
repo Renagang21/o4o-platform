@@ -202,7 +202,7 @@ function NewsSlotTab({ serviceId }: { serviceId: string }) {
   const [settings, setSettings] = useState({
     enabled: true,
     maxItems: 4,
-    sortBy: 'latest' as const,
+    sortBy: 'latest' as string,
     refreshInterval: 30,
   });
 
@@ -395,7 +395,7 @@ function SystemNoticeTab({ serviceId }: { serviceId: string }) {
     {
       id: '1',
       title: '시스템 점검 안내',
-      level: 'info' as const,
+      level: 'info' as string,
       startDate: '2025-01-05',
       endDate: '2025-01-05',
       forceTop: false,

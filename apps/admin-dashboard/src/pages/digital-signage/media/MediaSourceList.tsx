@@ -220,7 +220,7 @@ export default function MediaSourceList() {
               </Button>
             </div>
           ) : (
-            <AGTable data={sources} columns={columns} keyField="id" />
+            <AGTable data={sources} columns={columns} rowKey="id" />
           )}
         </CardContent>
       </Card>

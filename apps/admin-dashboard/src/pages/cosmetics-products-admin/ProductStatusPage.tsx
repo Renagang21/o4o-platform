@@ -189,7 +189,7 @@ const ProductStatusPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     현재 상태
                   </label>
-                  <AGTag color={statusColors[data.status]} size="lg">
+                  <AGTag color={statusColors[data.status]} size="md">
                     {statusLabels[data.status]}
                   </AGTag>
                 </div>

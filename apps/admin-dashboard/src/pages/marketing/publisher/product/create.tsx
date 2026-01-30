@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Package, ArrowLeft, Save, Globe } from 'lucide-react';
-import { AGTabs, type AGTab } from '@/components/ag/AGTabs';
+import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { productContentApi, type CreateProductContentDto, type TargetAudience } from '@/lib/api/lmsMarketing';
 import { useAuth } from '@o4o/auth-context';
 
@@ -81,7 +81,7 @@ export default function ProductCreatePage() {
     };
 
     const dto: CreateProductContentDto = {
-      supplierId,
+      supplierId: String(supplierId),
       title: formData.title,
       description: formData.description || undefined,
       bundleId: formData.bundleId || undefined,
@@ -106,9 +106,9 @@ export default function ProductCreatePage() {
     }
   };
 
-  const tabs: AGTab[] = [
+  const tabs: AGTabItem[] = [
     {
-      id: 'basic',
+      key: 'basic',
       label: 'Basic Info',
       content: (
         <div className="space-y-4 pt-4">
@@ -147,7 +147,7 @@ export default function ProductCreatePage() {
       ),
     },
     {
-      id: 'targeting',
+      key: 'targeting',
       label: 'Targeting',
       content: (
         <div className="space-y-6 pt-4">
@@ -239,7 +239,7 @@ export default function ProductCreatePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AGTabs tabs={tabs} defaultTab="basic" />
+          <AGTabs items={tabs} defaultActiveKey="basic" />
 
           {/* Actions */}
           <div className="flex justify-end gap-4 mt-8 pt-6 border-t">

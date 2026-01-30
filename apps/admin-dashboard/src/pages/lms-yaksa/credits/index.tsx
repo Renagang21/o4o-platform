@@ -141,7 +141,7 @@ export default function CreditsPage() {
   // Verify credit
   const handleVerify = async (credit: CreditRecord) => {
     try {
-      await creditsApi.verify(credit.id, user?.id || 'admin');
+      await creditsApi.verify(credit.id, String(user?.id || 'admin'));
       if (searchUserId) {
         handleSearch(searchUserId);
       }
@@ -470,7 +470,7 @@ export default function CreditsPage() {
           try {
             await creditsApi.addManualAdjustment({
               ...data,
-              verifiedBy: user?.id || 'admin',
+              verifiedBy: String(user?.id || 'admin'),
             });
             if (searchUserId) {
               handleSearch(searchUserId);

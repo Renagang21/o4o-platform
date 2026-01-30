@@ -224,7 +224,7 @@ export default function DisplayList() {
               </Button>
             </div>
           ) : (
-            <AGTable data={displays} columns={columns} keyField="id" />
+            <AGTable data={displays} columns={columns} rowKey="id" />
           )}
         </CardContent>
       </Card>

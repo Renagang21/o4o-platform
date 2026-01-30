@@ -146,7 +146,7 @@ export default function UserForm() {
         }
         payload.password = data.password;
 
-        await UserApi.createUser(payload);
+        await UserApi.createUser(payload as any);
 
         toast.success('User created successfully');
       }

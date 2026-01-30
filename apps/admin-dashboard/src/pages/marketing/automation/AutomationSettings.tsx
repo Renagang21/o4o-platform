@@ -339,7 +339,7 @@ export default function AutomationSettings() {
               <p className="text-sm">Run automation to see activity here</p>
             </div>
           ) : (
-            <AGTable data={logs} columns={logColumns} keyField="timestamp" />
+            <AGTable data={logs} columns={logColumns} rowKey="timestamp" />
           )}
         </CardContent>
       </Card>

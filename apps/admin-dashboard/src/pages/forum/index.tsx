@@ -222,8 +222,16 @@ export default function ForumDashboard() {
             </CardHeader>
             <CardContent>
               {categories.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  등록된 카테고리가 없습니다.
+                <div className="text-center py-8">
+                  <Folder className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+                  <p className="text-muted-foreground mb-1">등록된 카테고리가 없습니다.</p>
+                  <p className="text-sm text-muted-foreground/70 mb-4">포럼을 시작하려면 카테고리를 먼저 만들어주세요.</p>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/forum/categories">
+                      <Plus className="w-4 h-4 mr-1" />
+                      카테고리 만들기
+                    </Link>
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -297,48 +305,57 @@ export default function ForumDashboard() {
           </Card>
 
           {/* Moderation Queue */}
-          {moderationQueue.length > 0 && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-destructive" />
-                    신고 대기
-                  </CardTitle>
-                </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className={`w-5 h-5 ${moderationQueue.length > 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
+                  신고 대기
+                </CardTitle>
+              </div>
+              {moderationQueue.length > 0 && (
                 <Badge variant="destructive">{moderationQueue.length}</Badge>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {moderationQueue.slice(0, 3).map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-3 rounded-lg border border-destructive/20 bg-destructive/5"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <Badge variant="outline" className="text-xs">
-                          {item.type === 'post' ? '게시글' : item.type === 'comment' ? '댓글' : '사용자'}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                        </span>
-                      </div>
-                      <p className="text-sm truncate">{item.reason}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        신고자: {item.reportedBy.name}
-                      </p>
-                    </div>
-                  ))}
+              )}
+            </CardHeader>
+            <CardContent>
+              {moderationQueue.length === 0 ? (
+                <div className="text-center py-6">
+                  <Shield className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">대기 중인 신고가 없습니다.</p>
                 </div>
-                <Button variant="outline" size="sm" className="w-full mt-3" asChild>
-                  <Link to="/forum/moderation">
-                    <Eye className="w-4 h-4 mr-2" />
-                    모든 신고 보기
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    {moderationQueue.slice(0, 3).map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-3 rounded-lg border border-destructive/20 bg-destructive/5"
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <Badge variant="outline" className="text-xs">
+                            {item.type === 'post' ? '게시글' : item.type === 'comment' ? '댓글' : '사용자'}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                          </span>
+                        </div>
+                        <p className="text-sm truncate">{item.reason}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          신고자: {item.reportedBy.name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <Button variant="outline" size="sm" className="w-full mt-3" asChild>
+                    <Link to="/forum/moderation">
+                      <Eye className="w-4 h-4 mr-2" />
+                      모든 신고 보기
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -308,10 +308,10 @@ const ErpTransmissionHistory: React.FC = () => {
 
       {/* DataTable */}
       <DataTable<ErpTransmission>
+        rowKey="id"
         columns={columns}
-        data={transmissions}
+        dataSource={transmissions}
         loading={loading}
-        emptyMessage="전송 내역이 없습니다"
       />
     </div>
   );

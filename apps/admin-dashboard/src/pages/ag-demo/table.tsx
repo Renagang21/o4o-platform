@@ -10,7 +10,7 @@ import { AGSearchBar } from '../../components/ag/AGSearchBar';
 import { AGToolbar } from '../../components/ag/AGToolbar';
 import { usePagination, useSearch, useSort } from '../../hooks/ag';
 
-interface DemoItem {
+interface DemoItem extends Record<string, unknown> {
   id: string;
   name: string;
   email: string;

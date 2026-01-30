@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileQuestion, ArrowLeft, Save, Globe, Plus, Trash2 } from 'lucide-react';
-import { AGTabs, type AGTab } from '@/components/ag/AGTabs';
+import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { quizCampaignApi, type CreateQuizCampaignDto, type QuizQuestion, type QuizReward, type TargetAudience } from '@/lib/api/lmsMarketing';
 import { useAuth } from '@o4o/auth-context';
 
@@ -182,7 +182,7 @@ export default function QuizCreatePage() {
     };
 
     const dto: CreateQuizCampaignDto = {
-      supplierId,
+      supplierId: String(supplierId),
       title: formData.title,
       description: formData.description || undefined,
       bundleId: formData.bundleId || undefined,
@@ -212,9 +212,9 @@ export default function QuizCreatePage() {
     }
   };
 
-  const tabs: AGTab[] = [
+  const tabs: AGTabItem[] = [
     {
-      id: 'basic',
+      key: 'basic',
       label: 'Basic Info',
       content: (
         <div className="space-y-4 pt-4">
@@ -263,7 +263,7 @@ export default function QuizCreatePage() {
       ),
     },
     {
-      id: 'questions',
+      key: 'questions',
       label: `Questions (${questions.length})`,
       content: (
         <div className="space-y-4 pt-4">
@@ -372,7 +372,7 @@ export default function QuizCreatePage() {
       ),
     },
     {
-      id: 'targeting',
+      key: 'targeting',
       label: 'Targeting',
       content: (
         <div className="space-y-6 pt-4">
@@ -435,7 +435,7 @@ export default function QuizCreatePage() {
       ),
     },
     {
-      id: 'rewards',
+      key: 'rewards',
       label: `Rewards (${rewards.length})`,
       content: (
         <div className="space-y-4 pt-4">
@@ -531,7 +531,7 @@ export default function QuizCreatePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AGTabs tabs={tabs} defaultTab="basic" />
+          <AGTabs items={tabs} defaultActiveKey="basic" />
 
           {/* Actions */}
           <div className="flex justify-end gap-4 mt-8 pt-6 border-t">

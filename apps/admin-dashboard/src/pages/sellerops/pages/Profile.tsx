@@ -53,7 +53,7 @@ const Profile: React.FC = () => {
                 <User className="w-12 h-12 text-blue-600" />
               </div>
               <h2 className="text-xl font-bold">{user?.name || '판매자'}</h2>
-              <div className="mt-2">{getStatusBadge(user?.status || 'active')}</div>
+              <div className="mt-2">{getStatusBadge((user as any)?.status || 'active')}</div>
             </div>
 
             <div className="space-y-3 text-sm">
@@ -116,7 +116,7 @@ const Profile: React.FC = () => {
                     계정 상태
                   </label>
                   <p className="px-4 py-2 bg-gray-50 rounded-lg">
-                    {getStatusBadge(user?.status || 'active')}
+                    {getStatusBadge((user as any)?.status || 'active')}
                   </p>
                 </div>
               </div>

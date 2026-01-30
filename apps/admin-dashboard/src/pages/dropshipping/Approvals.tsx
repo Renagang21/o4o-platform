@@ -290,10 +290,10 @@ const Approvals: React.FC = () => {
 
       {/* DataTable */}
       <DataTable<ApprovalLog>
+        rowKey="id"
         columns={columns}
-        data={filteredApprovals}
+        dataSource={filteredApprovals}
         loading={loading}
-        emptyMessage="승인 요청이 없습니다"
       />
     </div>
   );

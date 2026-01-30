@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useOrganization } from '@/context';
-import { PageHeader, Pagination, EmptyState, PageLoading } from '@/components/common';
+import { PageHeader, Pagination, EmptyState } from '@/components/common';
 
 // 게시글 타입
 interface ForumPost {
@@ -195,10 +195,6 @@ export function ForumListPage() {
     return '방금 전';
   };
 
-  if (isLoading && posts.length === 0) {
-    return <PageLoading message="게시글을 불러오는 중..." />;
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
@@ -224,42 +220,50 @@ export function ForumListPage() {
           <aside className="w-64 flex-shrink-0 hidden lg:block">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-3">카테고리</h3>
-              <ul className="space-y-1">
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => handleCategoryChange(null)}
-                    className={`
-                      w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors
-                      ${!categorySlug
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-50'
-                      }
-                    `}
-                  >
-                    <span>전체</span>
-                    <span className="text-xs text-gray-500">{pagination.totalCount}</span>
-                  </button>
-                </li>
-                {categories.map((category) => (
-                  <li key={category.id}>
+              {isLoading && categories.length === 0 ? (
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="h-9 bg-gray-100 rounded-md animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <ul className="space-y-1">
+                  <li>
                     <button
                       type="button"
-                      onClick={() => handleCategoryChange(category.slug)}
+                      onClick={() => handleCategoryChange(null)}
                       className={`
                         w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors
-                        ${categorySlug === category.slug
+                        ${!categorySlug
                           ? 'bg-blue-50 text-blue-700 font-medium'
                           : 'text-gray-700 hover:bg-gray-50'
                         }
                       `}
                     >
-                      <span>{category.name}</span>
-                      <span className="text-xs text-gray-500">{category.postCount}</span>
+                      <span>전체</span>
+                      <span className="text-xs text-gray-500">{pagination.totalCount}</span>
                     </button>
                   </li>
-                ))}
-              </ul>
+                  {categories.map((category) => (
+                    <li key={category.id}>
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryChange(category.slug)}
+                        className={`
+                          w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors
+                          ${categorySlug === category.slug
+                            ? 'bg-blue-50 text-blue-700 font-medium'
+                            : 'text-gray-700 hover:bg-gray-50'
+                          }
+                        `}
+                      >
+                        <span>{category.name}</span>
+                        <span className="text-xs text-gray-500">{category.postCount}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </aside>
 
@@ -309,9 +313,34 @@ export function ForumListPage() {
             </div>
 
             {/* 게시글 목록 */}
-            {error ? (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
-                {error}
+            {isLoading && posts.length === 0 ? (
+              <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="h-5 w-12 bg-gray-100 rounded animate-pulse" />
+                      <div className="h-5 w-16 bg-gray-100 rounded animate-pulse" />
+                    </div>
+                    <div className="h-5 bg-gray-100 rounded animate-pulse mb-2" style={{ width: `${60 + (i % 3) * 15}%` }} />
+                    <div className="h-4 bg-gray-50 rounded animate-pulse w-3/4 mb-3" />
+                    <div className="flex items-center gap-3">
+                      <div className="h-3 w-16 bg-gray-50 rounded animate-pulse" />
+                      <div className="h-3 w-20 bg-gray-50 rounded animate-pulse" />
+                      <div className="h-3 w-14 bg-gray-50 rounded animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+                <p className="text-red-800 mb-4">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => loadPosts()}
+                  className="px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  다시 시도
+                </button>
               </div>
             ) : posts.length === 0 ? (
               <div className="bg-white rounded-lg border border-gray-200">

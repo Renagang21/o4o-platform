@@ -16,7 +16,7 @@ export default function CMSViewCreateTest() {
     slug: 'test-view-' + Date.now(),
     description: 'Test view created from debug page',
     type: 'standard',
-    status: 'draft',
+    status: 'draft' as any,
   });
 
   const [schema] = useState({

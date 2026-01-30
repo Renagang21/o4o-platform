@@ -21,7 +21,7 @@ export interface DesignerNode {
 export interface ComponentDefinition {
   type: string;
   label: string;
-  category: 'Layout' | 'Basic' | 'Media' | 'CMS' | 'Marketing' | 'basic' | 'layout' | 'marketing' | 'cms';
+  category: 'Layout' | 'Basic' | 'Media' | 'CMS' | 'Marketing' | 'basic' | 'layout' | 'marketing' | 'cms' | 'forum';
   icon: string;
   description?: string;
   defaultProps: Record<string, any>;

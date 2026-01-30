@@ -56,9 +56,10 @@ export const useCPTData = ({
         });
 
         // Handle both response formats: { data: [...] } or { success: true, data: [...] }
-        const postsArray = Array.isArray(response.data)
-          ? response.data
-          : (response.data?.data || response.data || []);
+        const responseData = response.data as any;
+        const postsArray = Array.isArray(responseData)
+          ? responseData
+          : (responseData?.data || responseData || []);
 
         // Ensure postsArray is actually an array
         const safePostsArray = Array.isArray(postsArray) ? postsArray : [];

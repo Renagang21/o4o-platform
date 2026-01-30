@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileQuestion, ArrowLeft, Save, Globe, GlobeLock, Plus, Trash2, ExternalLink, BarChart3, StopCircle } from 'lucide-react';
-import { AGTabs, type AGTab } from '@/components/ag/AGTabs';
+import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { quizCampaignApi, type UpdateQuizCampaignDto, type QuizCampaign, type QuizQuestion, type QuizReward, type TargetAudience } from '@/lib/api/lmsMarketing';
 
 const TARGET_OPTIONS = [
@@ -310,9 +310,9 @@ export default function QuizEditPage() {
 
   const isEditable = campaign.status === 'draft';
 
-  const tabs: AGTab[] = [
+  const tabs: AGTabItem[] = [
     {
-      id: 'basic',
+      key: 'basic',
       label: 'Basic Info',
       content: (
         <div className="space-y-4 pt-4">
@@ -376,7 +376,7 @@ export default function QuizEditPage() {
       ),
     },
     {
-      id: 'questions',
+      key: 'questions',
       label: `Questions (${questions.length})`,
       content: (
         <div className="space-y-4 pt-4">
@@ -397,7 +397,6 @@ export default function QuizEditPage() {
                     <Select
                       value={question.type}
                       onValueChange={(value) => updateQuestion(qIndex, { type: value as QuizQuestion['type'] })}
-                      disabled={!isEditable}
                     >
                       <SelectTrigger className="w-40">
                         <SelectValue />
@@ -470,7 +469,7 @@ export default function QuizEditPage() {
       ),
     },
     {
-      id: 'targeting',
+      key: 'targeting',
       label: 'Targeting',
       content: (
         <div className="space-y-6 pt-4">
@@ -524,7 +523,7 @@ export default function QuizEditPage() {
       ),
     },
     {
-      id: 'rewards',
+      key: 'rewards',
       label: `Rewards (${rewards.length})`,
       content: (
         <div className="space-y-4 pt-4">
@@ -536,7 +535,6 @@ export default function QuizEditPage() {
                   <Select
                     value={reward.type}
                     onValueChange={(value) => updateReward(index, { type: value as QuizReward['type'] })}
-                    disabled={!isEditable}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -631,7 +629,7 @@ export default function QuizEditPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AGTabs tabs={tabs} defaultTab="basic" />
+          <AGTabs items={tabs} defaultActiveKey="basic" />
 
           {/* Actions */}
           <div className="flex justify-between mt-8 pt-6 border-t">
