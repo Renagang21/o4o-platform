@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PlaceholderChart from '../components/PlaceholderChart';
 import { useAuth } from '../contexts/AuthContext';
+import { GlucoseTable } from '../components/common/GlucoseTable';
 
 // 고객 타입 정의
 interface Customer {
@@ -376,50 +377,48 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* List */}
-              <div className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
-                {paginatedMembers.length > 0 ? (
-                  paginatedMembers.map((member) => (
-                    <button
-                      key={member.id}
-                      onClick={() => setSelectedPatient(member.id)}
-                      className={`w-full px-4 py-3 text-left transition-colors ${
-                        selectedPatient === member.id
-                          ? 'bg-blue-50 border-l-2 border-l-blue-500'
-                          : 'hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs text-slate-500 font-medium">
-                            {member.name.slice(0, 2)}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-slate-900 truncate">{member.name}</p>
-                            <span className={`text-xs px-1.5 py-0.5 rounded ${
-                              member.lastSync === '동기화됨'
-                                ? 'bg-green-50 text-green-600'
-                                : 'bg-slate-100 text-slate-500'
-                            }`}>
-                              {member.lastSync}
+              {/* Table (Spike - Condensed) */}
+              <div className="max-h-[400px] overflow-y-auto">
+                <GlucoseTable
+                  columns={[
+                    { id: 'patient', label: '환자', width: '40%' },
+                    { id: 'visit', label: '방문 정보', width: '35%' },
+                    { id: 'status', label: '상태', width: '25%', align: 'center' },
+                  ]}
+                  rows={paginatedMembers.map((member) => ({
+                    id: member.id.toString(),
+                    data: {
+                      patient: (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-slate-500 font-medium">
+                              {member.name.slice(0, 2)}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-xs text-slate-400">{formatDate(member.lastVisit)}</span>
-                            <span className="text-xs text-slate-300">•</span>
-                            <span className="text-xs text-slate-400">{member.visitCount}회 방문</span>
-                          </div>
+                          <span className="text-sm font-medium text-slate-900">{member.name}</span>
                         </div>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="px-4 py-8 text-center">
-                    <p className="text-sm text-slate-400">검색 결과가 없습니다</p>
-                  </div>
-                )}
+                      ),
+                      visit: (
+                        <div className="text-sm text-slate-600">
+                          <p>{formatDate(member.lastVisit)}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{member.visitCount}회 방문</p>
+                        </div>
+                      ),
+                      status: (
+                        <span className={`inline-block text-xs px-2 py-1 rounded ${
+                          member.lastSync === '동기화됨'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {member.lastSync}
+                        </span>
+                      ),
+                    },
+                    onClick: () => setSelectedPatient(member.id),
+                    isSelected: selectedPatient === member.id,
+                  }))}
+                  emptyMessage="검색 결과가 없습니다"
+                />
               </div>
 
               {/* Pagination */}
