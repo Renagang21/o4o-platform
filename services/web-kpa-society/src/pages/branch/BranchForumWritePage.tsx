@@ -35,9 +35,13 @@ export function BranchForumWritePage() {
     try {
       setLoading(true);
       const res = await branchApi.getForumPostDetail(branchId!, id!);
+      // Convert Block[] to plain text if needed
+      const contentText = Array.isArray(res.data.post.content)
+        ? res.data.post.content.map((block: any) => block.content || '').join('\n')
+        : (res.data.post.content || '');
       setFormData({
         title: res.data.post.title,
-        content: res.data.post.content,
+        content: contentText,
         categoryId: res.data.post.categoryId || 'general',
       });
     } catch (err) {

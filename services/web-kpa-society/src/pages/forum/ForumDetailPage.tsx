@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ForumBlockRenderer } from '@o4o/forum-core';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -127,7 +128,13 @@ export function ForumDetailPage() {
           <span>조회 {post.viewCount}</span>
         </div>
 
-        <div style={styles.content} dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div style={styles.content}>
+          {Array.isArray(post.content) ? (
+            <ForumBlockRenderer content={post.content} />
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          )}
+        </div>
 
         <div style={styles.actions}>
           <button style={styles.likeButton} onClick={handleLike}>

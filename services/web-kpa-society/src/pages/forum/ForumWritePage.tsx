@@ -4,6 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { RichTextEditor } from '@o4o/content-editor';
+import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -22,9 +24,10 @@ export function ForumWritePage() {
 
   const [formData, setFormData] = useState({
     title: '',
-    content: '',
     categoryId: '',
   });
+
+  const [editorHtml, setEditorHtml] = useState('');
 
   useEffect(() => {
     loadData();
@@ -39,9 +42,15 @@ export function ForumWritePage() {
       if (isEdit && id) {
         const postRes = await forumApi.getPost(id);
         const post = postRes.data;
+
+        // Convert Block[] to HTML for editor
+        const htmlContent = Array.isArray(post.content)
+          ? blocksToHtml(post.content)
+          : (typeof post.content === 'string' ? post.content : '');
+
+        setEditorHtml(htmlContent);
         setFormData({
           title: post.title,
-          content: post.content,
           categoryId: post.categoryId,
         });
       }
@@ -55,7 +64,7 @@ export function ForumWritePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.content.trim() || !formData.categoryId) {
+    if (!formData.title.trim() || !editorHtml.trim() || !formData.categoryId) {
       alert('모든 필드를 입력해주세요.');
       return;
     }
@@ -63,11 +72,18 @@ export function ForumWritePage() {
     try {
       setSubmitting(true);
 
+      // Convert HTML to Block[]
+      const blocks = htmlToBlocks(editorHtml);
+      const submitData = {
+        ...formData,
+        content: blocks,
+      };
+
       if (isEdit && id) {
-        await forumApi.updatePost(id, formData);
+        await forumApi.updatePost(id, submitData);
         navigate(`/forum/post/${id}`);
       } else {
-        const res = await forumApi.createPost(formData);
+        const res = await forumApi.createPost(submitData);
         navigate(`/forum/post/${res.data.id}`);
       }
     } catch (err) {
@@ -135,13 +151,12 @@ export function ForumWritePage() {
 
           <div style={styles.field}>
             <label style={styles.label}>내용</label>
-            <textarea
-              style={styles.textarea}
-              value={formData.content}
-              onChange={e => setFormData({ ...formData, content: e.target.value })}
+            <RichTextEditor
+              value={editorHtml}
+              onChange={(content) => setEditorHtml(content.html)}
               placeholder="내용을 입력하세요"
-              rows={15}
-              required
+              minHeight="400px"
+              editable={!submitting}
             />
           </div>
 

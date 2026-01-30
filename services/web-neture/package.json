@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",
+    "@o4o/forum-core": "workspace:*",
     "@o4o/types": "workspace:*",
     "lucide-react": "^0.468.0",
     "qrcode.react": "^4.2.0",

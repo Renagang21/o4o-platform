@@ -538,7 +538,7 @@ export function extractTextContent(content: string | object[] | undefined): stri
 
 export interface CreateForumPostPayload {
   title: string;
-  content: string;
+  content: string | any[]; // Block[] or string for backward compatibility
   categorySlug: string;
   // WO-NETURE-EXTERNAL-CONTACT-V1: Show author's contact on this post
   showContactOnPost?: boolean;

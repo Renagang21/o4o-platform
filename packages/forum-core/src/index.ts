@@ -25,6 +25,9 @@ export * from './backend/controllers/index.js';
 // Backend utils
 export * from './backend/utils/index.js';
 
+// Shared utils (browser + backend compatible)
+export { htmlToBlocks, blocksToHtml, normalizeContent } from './utils/htmlToBlocks.js';
+
 // Manifest export
 export { forumManifest, manifest, default as manifestDefault } from './manifest.js';
 

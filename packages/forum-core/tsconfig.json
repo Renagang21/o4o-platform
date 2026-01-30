@@ -23,7 +23,8 @@
     "src/lifecycle/**/*",
     "src/backend/**/*",
     "src/public-ui/**/*",
-    "src/templates/**/*"
+    "src/templates/**/*",
+    "src/utils/**/*"
   ],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

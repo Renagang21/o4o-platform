@@ -18,6 +18,8 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { RichTextEditor } from '@o4o/content-editor';
+import { htmlToBlocks } from '@o4o/forum-core';
 import { useAuth } from '../../contexts';
 import {
   createForumPost,
@@ -44,7 +46,7 @@ export function ForumWritePage() {
   const token = '';
 
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [editorHtml, setEditorHtml] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,7 +74,7 @@ export function ForumWritePage() {
   const hasContactInfo = contactSettings?.contactEnabled &&
     (contactSettings?.kakaoOpenChatUrl || contactSettings?.kakaoChannelUrl);
 
-  const isFormValid = title.trim().length > 0 && content.trim().length >= MIN_CONTENT_LENGTH;
+  const isFormValid = title.trim().length > 0 && editorHtml.trim().length >= MIN_CONTENT_LENGTH;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,10 +88,13 @@ export function ForumWritePage() {
     setError(null);
 
     try {
+      // Convert HTML to Block[]
+      const blocks = htmlToBlocks(editorHtml);
+
       const response = await createForumPost(
         {
           title: title.trim(),
-          content: content.trim(),
+          content: blocks,
           categorySlug: CATEGORY_SLUG,
           // WO-NETURE-EXTERNAL-CONTACT-V1
           showContactOnPost: hasContactInfo ? showContactOnPost : false,
@@ -112,7 +117,7 @@ export function ForumWritePage() {
   }
 
   function handleCancel() {
-    if (title.trim() || content.trim()) {
+    if (title.trim() || editorHtml.trim()) {
       if (!window.confirm('작성 중인 내용이 있습니다. 정말 취소하시겠습니까?')) {
         return;
       }
@@ -180,20 +185,18 @@ export function ForumWritePage() {
             내용 <span style={styles.required}>*</span>
             <span style={styles.hint}> (최소 {MIN_CONTENT_LENGTH}자)</span>
           </label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+          <RichTextEditor
+            value={editorHtml}
+            onChange={(content) => setEditorHtml(content.html)}
             placeholder="의견을 작성해주세요..."
-            style={styles.textarea}
-            disabled={isSubmitting}
-            rows={12}
+            minHeight="300px"
+            editable={!isSubmitting}
           />
           <div style={styles.charCount}>
-            {content.length}자
-            {content.length < MIN_CONTENT_LENGTH && content.length > 0 && (
+            {editorHtml.length}자
+            {editorHtml.length < MIN_CONTENT_LENGTH && editorHtml.length > 0 && (
               <span style={styles.charCountWarning}>
-                {' '}(최소 {MIN_CONTENT_LENGTH - content.length}자 더 필요)
+                {' '}(최소 {MIN_CONTENT_LENGTH - editorHtml.length}자 더 필요)
               </span>
             )}
           </div>

@@ -54,7 +54,7 @@ export interface ForumCategory {
 export interface ForumPost extends Partial<ForumPostResponse> {
   id: string;
   title: string;
-  content: string;
+  content: string | any[]; // Block[] or string
   excerpt?: string;
   authorId: string;
   authorName: string;       // flattened from author.name
@@ -85,7 +85,7 @@ export type Comment = ForumComment;
 
 export interface CreatePostRequest {
   title: string;
-  content: string;
+  content: string | any[]; // Block[] or string for backward compatibility
   categoryId: string;
 }
 

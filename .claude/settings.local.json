@@ -514,7 +514,8 @@
       "Bash(DB_PASSWORD='Xptmxm!3498' npx tsx:*)",
       "Bash(DB_HOST=34.64.96.252 DB_USERNAME=o4o_api DB_PASSWORD='Xptmxm!3498' DB_NAME=o4o_platform npx tsx src/scripts/update-glycopharm-status-orm.ts)",
       "Bash(DB_PASSWORD=O4O_API_2025_SECURE npx tsx:*)",
-      "Bash(DB_PASSWORD=O4O_API_2025_SECURE timeout 15 npx tsx:*)"
+      "Bash(DB_PASSWORD=O4O_API_2025_SECURE timeout 15 npx tsx:*)",
+      "Bash(npx turbo build:*)"
     ],
     "deny": []
   }

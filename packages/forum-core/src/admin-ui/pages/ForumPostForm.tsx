@@ -3,10 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
+import { RichTextEditor } from '@o4o/content-editor';
+import { htmlToBlocks, blocksToHtml } from '../../utils/htmlToBlocks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
@@ -20,7 +21,7 @@ import toast from 'react-hot-toast';
 
 interface ForumPostFormData {
   title: string;
-  content: string;
+  content: any; // Block[] or HTML string
   categoryId: string;
   status: 'published' | 'draft';
   isPinned: boolean;
@@ -41,6 +42,9 @@ const ForumPostForm: FC = () => {
     isPinned: false,
     isLocked: false
   });
+
+  // Editor state for HTML content
+  const [editorHtml, setEditorHtml] = useState('');
 
   // Fetch categories
   const { data: categoriesData } = useQuery({
@@ -98,6 +102,12 @@ const ForumPostForm: FC = () => {
   // Load post data in edit mode
   useEffect(() => {
     if (post) {
+      // Convert Block[] to HTML for editor
+      const htmlContent = Array.isArray(post.content)
+        ? blocksToHtml(post.content)
+        : (typeof post.content === 'string' ? post.content : '');
+
+      setEditorHtml(htmlContent);
       setFormData({
         title: post.title,
         content: post.content,
@@ -111,26 +121,33 @@ const ForumPostForm: FC = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       toast.error('제목을 입력하세요');
       return;
     }
-    
-    if (!formData.content.trim()) {
+
+    if (!editorHtml.trim()) {
       toast.error('내용을 입력하세요');
       return;
     }
-    
+
     if (!formData.categoryId) {
       toast.error('카테고리를 선택하세요');
       return;
     }
 
+    // Convert HTML to Block[] for API
+    const blocks = htmlToBlocks(editorHtml);
+    const submitData = {
+      ...formData,
+      content: blocks,
+    };
+
     if (isEditMode) {
-      updateMutation.mutate(formData);
+      updateMutation.mutate(submitData);
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(submitData);
     }
   };
 
@@ -208,13 +225,13 @@ const ForumPostForm: FC = () => {
 
               <div>
                 <Label htmlFor="content">내용 *</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e: any) => handleChange('content', e.target.value)}
+                <RichTextEditor
+                  value={editorHtml}
+                  onChange={(content) => {
+                    setEditorHtml(content.html);
+                  }}
                   placeholder="게시글 내용을 입력하세요..."
-                  rows={12}
-                  required
+                  minHeight="400px"
                 />
               </div>
             </CardContent>
