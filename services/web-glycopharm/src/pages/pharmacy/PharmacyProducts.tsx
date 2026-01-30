@@ -14,8 +14,13 @@ import {
   MoreVertical,
   Loader2,
   AlertCircle,
+  LayoutGrid,
+  Table,
+  Tag,
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyProduct } from '@/api/pharmacy';
+import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
+import { type RowAction } from '@/components/common/RowActions';
 
 export default function PharmacyProducts() {
   const [products, setProducts] = useState<PharmacyProduct[]>([]);
@@ -28,6 +33,7 @@ export default function PharmacyProducts() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
   // 검색어 디바운스
   useEffect(() => {
@@ -94,6 +100,109 @@ export default function PharmacyProducts() {
     }
   };
 
+  // Format price
+  const formatPrice = (price: number) => `${price.toLocaleString()}원`;
+
+  // WordPress Table Columns
+  const columns: WordPressTableColumn[] = [
+    { id: 'image', label: '이미지', width: '80px' },
+    { id: 'name', label: '상품명', sortable: true },
+    { id: 'supplier', label: '공급자', width: '150px' },
+    { id: 'category', label: '카테고리', width: '120px' },
+    { id: 'price', label: '가격', width: '120px', align: 'right', sortable: true },
+    { id: 'stock', label: '재고', width: '80px', align: 'center', sortable: true },
+    { id: 'status', label: '상태', width: '100px', align: 'center' },
+  ];
+
+  // Transform products to table rows
+  const tableRows: WordPressTableRow[] = products.map((product) => {
+    const actions: RowAction[] = [
+      {
+        label: '보기',
+        onClick: () => console.log('View:', product.id),
+      },
+      {
+        label: '수정',
+        onClick: () => console.log('Edit:', product.id),
+      },
+      {
+        label: '삭제',
+        onClick: () => handleDeleteProduct(product.id),
+        className: 'text-red-600 hover:bg-red-50',
+      },
+    ];
+
+    // Status badge
+    const renderStatusBadge = () => {
+      if (product.status === 'out_of_stock') {
+        return (
+          <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-700">
+            품절
+          </span>
+        );
+      } else if (product.status === 'inactive') {
+        return (
+          <span className="px-2 py-1 text-xs font-medium rounded bg-slate-100 text-slate-600">
+            비활성
+          </span>
+        );
+      } else {
+        return (
+          <span className="px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-700">
+            활성
+          </span>
+        );
+      }
+    };
+
+    return {
+      id: product.id,
+      data: {
+        image: product.thumbnailUrl ? (
+          <img
+            src={product.thumbnailUrl}
+            alt={product.name}
+            className="w-12 h-12 object-cover rounded"
+          />
+        ) : (
+          <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
+            <Package className="w-6 h-6 text-slate-400" />
+          </div>
+        ),
+        name: (
+          <div>
+            <span className="font-medium">{product.name}</span>
+            {product.isDropshipping && (
+              <p className="text-xs text-primary-600 mt-1">공급자 직배송</p>
+            )}
+          </div>
+        ),
+        supplier: <span className="text-sm text-slate-600">{product.supplierName}</span>,
+        category: (
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
+            <Tag className="w-3 h-3" />
+            {product.categoryName}
+          </span>
+        ),
+        price: (
+          <div className="text-right">
+            {product.salePrice ? (
+              <>
+                <div className="font-bold text-red-600">{formatPrice(product.salePrice)}</div>
+                <div className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</div>
+              </>
+            ) : (
+              <div className="font-bold">{formatPrice(product.price)}</div>
+            )}
+          </div>
+        ),
+        stock: <span className={product.stock === 0 ? 'text-red-600' : ''}>{product.stock}</span>,
+        status: renderStatusBadge(),
+      },
+      actions,
+    };
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -104,13 +213,38 @@ export default function PharmacyProducts() {
             {loading ? '불러오는 중...' : `총 ${totalCount}개의 상품`}
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
-        >
-          <Plus className="w-5 h-5" />
-          상품 등록
-        </button>
+        <div className="flex items-center gap-2">
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+            <button
+              onClick={() => setViewMode('card')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'card'
+                  ? 'bg-white text-primary-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-white text-primary-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Table className="w-4 h-4" />
+            </button>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
+          >
+            <Plus className="w-5 h-5" />
+            상품 등록
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -179,94 +313,109 @@ export default function PharmacyProducts() {
         </div>
       )}
 
-      {/* Products Grid */}
+      {/* Products - Card View or Table View */}
       {!loading && !error && products.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              {/* Product Image */}
-              <div className="aspect-video bg-slate-100 flex items-center justify-center">
-                {product.thumbnailUrl ? (
-                  <img
-                    src={product.thumbnailUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Package className="w-12 h-12 text-slate-300" />
-                )}
-              </div>
-
-              {/* Product Info */}
-              <div className="p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-xs text-slate-400">{product.categoryName}</span>
-                    <h3 className="font-semibold text-slate-800 mt-1">{product.name}</h3>
-                    {product.isDropshipping && (
-                      <p className="text-xs text-primary-600 mt-1">공급자 직배송</p>
+        <>
+          {viewMode === 'card' ? (
+            /* Card View */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  {/* Product Image */}
+                  <div className="aspect-video bg-slate-100 flex items-center justify-center">
+                    {product.thumbnailUrl ? (
+                      <img
+                        src={product.thumbnailUrl}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Package className="w-12 h-12 text-slate-300" />
                     )}
                   </div>
-                  <button className="p-1 hover:bg-slate-100 rounded-lg">
-                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                  </button>
-                </div>
 
-                <div className="flex items-center justify-between mt-4">
-                  <div>
-                    {product.salePrice ? (
+                  {/* Product Info */}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-lg font-bold text-red-600">
-                          {product.salePrice.toLocaleString()}원
-                        </p>
-                        <p className="text-sm text-slate-400 line-through">
-                          {product.price.toLocaleString()}원
-                        </p>
+                        <span className="text-xs text-slate-400">{product.categoryName}</span>
+                        <h3 className="font-semibold text-slate-800 mt-1">{product.name}</h3>
+                        {product.isDropshipping && (
+                          <p className="text-xs text-primary-600 mt-1">공급자 직배송</p>
+                        )}
                       </div>
-                    ) : (
-                      <p className="text-lg font-bold text-primary-600">
-                        {product.price.toLocaleString()}원
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {product.status === 'out_of_stock' ? (
-                      <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-lg">
-                        품절
-                      </span>
-                    ) : product.status === 'inactive' ? (
-                      <span className="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-lg">
-                        비활성
-                      </span>
-                    ) : (
-                      <span className="text-sm text-slate-500">재고 {product.stock}개</span>
-                    )}
-                  </div>
-                </div>
+                      <button className="p-1 hover:bg-slate-100 rounded-lg">
+                        <MoreVertical className="w-5 h-5 text-slate-400" />
+                      </button>
+                    </div>
 
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-                  <button className="flex-1 flex items-center justify-center gap-1 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
-                    <Eye className="w-4 h-4" />
-                    보기
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-1 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors">
-                    <Edit2 className="w-4 h-4" />
-                    수정
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <div className="flex items-center justify-between mt-4">
+                      <div>
+                        {product.salePrice ? (
+                          <div>
+                            <p className="text-lg font-bold text-red-600">
+                              {product.salePrice.toLocaleString()}원
+                            </p>
+                            <p className="text-sm text-slate-400 line-through">
+                              {product.price.toLocaleString()}원
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-lg font-bold text-primary-600">
+                            {product.price.toLocaleString()}원
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {product.status === 'out_of_stock' ? (
+                          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-lg">
+                            품절
+                          </span>
+                        ) : product.status === 'inactive' ? (
+                          <span className="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-lg">
+                            비활성
+                          </span>
+                        ) : (
+                          <span className="text-sm text-slate-500">재고 {product.stock}개</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+                      <button className="flex-1 flex items-center justify-center gap-1 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
+                        <Eye className="w-4 h-4" />
+                        보기
+                      </button>
+                      <button className="flex-1 flex items-center justify-center gap-1 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors">
+                        <Edit2 className="w-4 h-4" />
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          ) : (
+            /* Table View */
+            <div className="bg-white rounded-xl shadow-sm">
+              <WordPressTable
+                columns={columns}
+                rows={tableRows}
+                loading={loading}
+                emptyMessage="등록된 상품이 없습니다"
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Empty State */}

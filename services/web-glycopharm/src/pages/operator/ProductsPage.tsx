@@ -14,23 +14,20 @@ import {
   Package,
   Search,
   Plus,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   Tag,
   AlertCircle,
   CheckCircle,
   Clock,
-  Eye,
-  Edit,
-  Trash2,
-  Copy,
   TrendingUp,
   Boxes,
   RefreshCw,
   Loader2,
 } from 'lucide-react';
 import { glycopharmApi, type OperatorProduct, type OperatorProductStats, type ProductStatus } from '@/api/glycopharm';
+import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
+import { type RowAction } from '@/components/common/RowActions';
 
 type TabType = 'all' | 'active' | 'lowStock' | 'draft';
 
@@ -43,16 +40,6 @@ const EMPTY_STATS: OperatorProductStats = {
   totalInventoryValue: 0,
   avgMargin: 0,
 };
-
-// Empty state component
-function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="text-center py-12">
-      <AlertCircle size={48} className="mx-auto mb-4 text-slate-300" />
-      <p className="text-slate-500 text-lg">{message}</p>
-    </div>
-  );
-}
 
 // Status badge
 function StatusBadge({ status }: { status: ProductStatus }) {
@@ -84,9 +71,11 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
   const itemsPerPage = 10;
+
+  // Format price
+  const formatPrice = (price: number) => `${price.toLocaleString()}원`;
 
   // Map tab to status filter
   const getStatusFilter = (tab: TabType): ProductStatus | undefined => {
@@ -155,6 +144,77 @@ export default function ProductsPage() {
       </div>
     );
   }
+
+  // WordPress Table Columns
+  const columns: WordPressTableColumn[] = [
+    { id: 'image', label: '이미지', width: '80px' },
+    { id: 'name', label: '상품명', sortable: true },
+    { id: 'category', label: '카테고리', width: '120px' },
+    { id: 'basePrice', label: '원가', width: '120px', align: 'right' },
+    { id: 'sellingPrice', label: '판매가', width: '120px', align: 'right', sortable: true },
+    { id: 'stock', label: '재고', width: '100px', align: 'right', sortable: true },
+    { id: 'status', label: '상태', width: '120px', align: 'center' },
+    { id: 'salesCount', label: '판매량', width: '100px', align: 'right', sortable: true },
+  ];
+
+  // Transform products to table rows
+  const tableRows: WordPressTableRow[] = products.map((product) => {
+    const actions: RowAction[] = [
+      {
+        label: '상세 보기',
+        onClick: () => console.log('View:', product.id),
+      },
+      {
+        label: '수정',
+        onClick: () => console.log('Edit:', product.id),
+      },
+      {
+        label: '복제',
+        onClick: () => console.log('Copy:', product.id),
+      },
+      {
+        label: '삭제',
+        onClick: () => console.log('Delete:', product.id),
+        className: 'text-red-600 hover:bg-red-50',
+      },
+    ];
+
+    return {
+      id: product.id,
+      data: {
+        image: (
+          <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
+            <Package className="w-6 h-6 text-slate-400" />
+          </div>
+        ),
+        name: (
+          <div>
+            <p className="font-medium text-slate-800">{product.name}</p>
+            <p className="text-xs text-slate-500">{product.sku} | {product.brand}</p>
+          </div>
+        ),
+        category: (
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
+            <Tag className="w-3 h-3" />
+            {product.category}
+          </span>
+        ),
+        basePrice: <span className="text-slate-600">{formatPrice(product.basePrice)}</span>,
+        sellingPrice: <span className="font-medium text-slate-800">{formatPrice(product.sellingPrice)}</span>,
+        stock: (
+          <div className="text-right">
+            <span className={`font-medium ${product.stock < product.minStock ? 'text-red-600' : 'text-slate-800'}`}>
+              {product.stock}
+            </span>
+            <span className="text-slate-400 text-xs ml-1">/ {product.minStock}</span>
+          </div>
+        ),
+        status: <StatusBadge status={product.status} />,
+        salesCount: <span className="font-medium text-slate-800">{product.salesCount.toLocaleString()}</span>,
+      },
+      actions,
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -321,163 +381,51 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Table or Empty State */}
-        {products.length === 0 ? (
-          <EmptyState message="자료가 없습니다" />
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      상품 정보
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      카테고리
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      원가
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      판매가
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      재고
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      상태
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      판매량
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      액션
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
-                            <Package className="w-6 h-6 text-slate-400" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-800">{product.name}</p>
-                            <p className="text-xs text-slate-500">{product.sku} | {product.brand}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
-                          <Tag className="w-3 h-3" />
-                          {product.category}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className="text-slate-600">{product.basePrice.toLocaleString()}원</span>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className="font-medium text-slate-800">{product.sellingPrice.toLocaleString()}원</span>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className={`font-medium ${product.stock < product.minStock ? 'text-red-600' : 'text-slate-800'}`}>
-                          {product.stock}
-                        </span>
-                        <span className="text-slate-400 text-xs ml-1">/ {product.minStock}</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <StatusBadge status={product.status} />
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className="font-medium text-slate-800">{product.salesCount.toLocaleString()}</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center justify-center">
-                          <div className="relative">
-                            <button
-                              onClick={() => setSelectedProduct(selectedProduct === product.id ? null : product.id)}
-                              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-                            >
-                              <MoreVertical className="w-4 h-4 text-slate-400" />
-                            </button>
-                            {selectedProduct === product.id && (
-                              <>
-                                <div
-                                  className="fixed inset-0 z-10"
-                                  onClick={() => setSelectedProduct(null)}
-                                />
-                                <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
-                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                    <Eye className="w-4 h-4" />
-                                    상세 보기
-                                  </button>
-                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                    <Edit className="w-4 h-4" />
-                                    수정
-                                  </button>
-                                  <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                                    <Copy className="w-4 h-4" />
-                                    복제
-                                  </button>
-                                  <hr className="my-1" />
-                                  <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                    <Trash2 className="w-4 h-4" />
-                                    삭제
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {/* WordPress Table */}
+        <WordPressTable
+          columns={columns}
+          rows={tableRows}
+          loading={isLoading}
+          emptyMessage="자료가 없습니다"
+        />
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-                <p className="text-sm text-slate-500">
-                  총 {totalProducts}개 중 {(currentPage - 1) * itemsPerPage + 1}-
-                  {Math.min(currentPage * itemsPerPage, totalProducts)}개 표시
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                        currentPage === page
-                          ? 'bg-primary-500 text-white'
-                          : 'hover:bg-slate-100 text-slate-600'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
+        {/* Pagination */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+            <p className="text-sm text-slate-500">
+              총 {totalProducts}개 중 {(currentPage - 1) * itemsPerPage + 1}-
+              {Math.min(currentPage * itemsPerPage, totalProducts)}개 표시
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === page
+                      ? 'bg-primary-500 text-white'
+                      : 'hover:bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
