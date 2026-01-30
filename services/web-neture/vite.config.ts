@@ -18,6 +18,14 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
+      external: [
+        // Server-only modules that should not be bundled
+        'express',
+        'typeorm',
+        'pg',
+        'mysql',
+        'sqlite3',
+      ],
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
