@@ -152,6 +152,17 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         if (id === 'zod/v4/core') {
           return true;
         }
+
+        // Exclude backend/Node.js modules that forum-core imports
+        if (id === 'express' || id === 'typeorm') {
+          return true;
+        }
+
+        // Exclude @o4o/content-editor (imported by forum-core admin-ui)
+        if (id.includes('@o4o/content-editor')) {
+          return true;
+        }
+
         return false;
       },
       plugins: [],
