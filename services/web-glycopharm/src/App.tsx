@@ -46,6 +46,7 @@ const PlaylistForumPage = lazy(() => import('@/pages/pharmacy/smart-display/Play
 
 // Signage Extension (New)
 const ContentLibraryPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentLibraryPage })));
+const ContentHubPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentHubPage })));
 const MySignagePage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MySignagePage })));
 const SignagePreviewPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.SignagePreviewPage })));
 
@@ -260,6 +261,7 @@ function AppRoutes() {
         <Route path="smart-display/forum" element={<PlaylistForumPage />} />
         {/* Signage Extension (New) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         {/* Market Trial Extension */}
@@ -301,6 +303,7 @@ function AppRoutes() {
         <Route path="status" element={<PartnerStatusPage />} />
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
@@ -343,6 +346,7 @@ function AppRoutes() {
         <Route path="ai-report" element={<AiReportPage />} />
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
