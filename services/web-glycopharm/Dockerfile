@@ -20,6 +20,7 @@ COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
 COPY packages/types/package.json ./packages/types/
+COPY packages/auth-client/package.json ./packages/auth-client/
 
 # Copy service package.json
 COPY services/web-glycopharm/package.json ./services/web-glycopharm/
@@ -29,12 +30,14 @@ RUN pnpm install --filter glycopharm-web...
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
+COPY packages/auth-client/ ./packages/auth-client/
 
 # Copy service source
 COPY services/web-glycopharm/ ./services/web-glycopharm/
 
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-client build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
