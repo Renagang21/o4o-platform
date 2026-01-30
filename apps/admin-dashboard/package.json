@@ -36,6 +36,7 @@
     "@mui/icons-material": "7.3.1",
     "@mui/material": "7.3.1",
     "@o4o-apps/content-core": "workspace:^",
+    "@o4o/content-editor": "file:../../packages/content-editor",
     "@o4o/forum-core": "file:../../packages/forum-core",
     "@o4o/appearance-system": "workspace:^",
     "@o4o/auth-client": "file:../../packages/auth-client",
