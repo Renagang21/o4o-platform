@@ -178,6 +178,30 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
               <BookOpen className="w-4 h-4" />
               교육/자료
             </NavLink>
+            <NavLink
+              to="/apply"
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              <FileText className="w-4 h-4" />
+              참여 신청
+            </NavLink>
+            <NavLink
+              to="/signage"
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              <Monitor className="w-4 h-4" />
+              디지털 사이니지
+            </NavLink>
             <span className="mx-2 h-5 w-px bg-slate-200" />
             <span className={`px-3 py-1.5 rounded-lg text-sm font-medium bg-${config.color}-100 text-${config.color}-700`}>
               {config.title}
