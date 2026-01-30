@@ -7,9 +7,9 @@
 
 import { useState, useEffect } from 'react';
 import { Search, AlertCircle } from 'lucide-react';
-import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
-import { RowAction } from '@/components/common/RowActions';
-import { pharmacyApi, PharmacyProduct } from '@/api/pharmacy';
+import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
+import { type RowAction } from '@/components/common/RowActions';
+import { pharmacyApi, type PharmacyProduct } from '@/api/pharmacy';
 
 export default function PharmacyB2BProducts() {
   const [products, setProducts] = useState<PharmacyProduct[]>([]);

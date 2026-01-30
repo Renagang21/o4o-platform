@@ -1,4 +1,4 @@
-import { forwardRef, InputHTMLAttributes, useEffect, useRef } from 'react';
+import { forwardRef, type InputHTMLAttributes, useEffect, useRef } from 'react';
 import { Check, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

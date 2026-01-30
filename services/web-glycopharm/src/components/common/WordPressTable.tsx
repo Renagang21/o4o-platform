@@ -1,7 +1,7 @@
-import { FC, ReactNode, useState } from 'react';
+import { type FC, type ReactNode, useState } from 'react';
 import { clsx } from 'clsx';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RowActions, RowAction, useRowActions } from './RowActions';
+import { RowActions, type RowAction, useRowActions } from './RowActions';
 
 export interface WordPressTableColumn {
   id: string;
