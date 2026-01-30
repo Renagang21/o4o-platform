@@ -67,16 +67,14 @@ export default function MainLayout() {
               >
                 공급자 서비스
               </Link>
-              <Link
-                to="/test-guide"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/test-guide') || isActive('/test-center')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                테스트
-              </Link>
+              {!isAuthenticated && (
+                <Link
+                  to="/login"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
+                >
+                  로그인
+                </Link>
+              )}
               {/* Admin Vault - 권한 있는 경우만 노출 */}
               {showAdminVault && (
                 <>
