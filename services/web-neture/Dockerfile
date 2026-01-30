@@ -22,6 +22,7 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/content-editor/package.json ./packages/content-editor/
+# Note: forum-core and organization-core are backend packages, copied but not built
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 
@@ -41,12 +42,12 @@ COPY packages/forum-core/ ./packages/forum-core/
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
-# Build workspace dependencies first (types -> auth-client -> content-editor -> forum-core)
-# Note: organization-core is a backend package and doesn't need to be built for frontend
+# Build workspace dependencies (only frontend packages)
+# Note: forum-core and organization-core are backend packages, not built here
+# web-neture imports utils directly from source
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/content-editor build
-RUN pnpm --filter @o4o/forum-core build
 
 # Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
