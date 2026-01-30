@@ -19,10 +19,10 @@ COPY tsconfig.base.json ./
 COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
+# Dependency chain: types -> auth-client -> content-editor -> organization-core -> forum-core
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/content-editor/package.json ./packages/content-editor/
-# Note: forum-core and organization-core are backend packages, copied but not built
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 
