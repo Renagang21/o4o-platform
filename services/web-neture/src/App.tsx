@@ -14,7 +14,7 @@
  * - o4o 공통 영역에서는 공급자/파트너 운영 기능 노출 금지
  */
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
@@ -84,7 +84,6 @@ import TestCenterPage from './pages/TestCenterPage';
 // Neture 고유 페이지 (/supplier-ops)
 // ============================================================================
 import HomePage from './pages/HomePage';
-import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 import SupplierListPage from './pages/suppliers/SupplierListPage';
@@ -236,6 +235,18 @@ function LoginModalRenderer() {
   );
 }
 
+// /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
+function LoginRedirect() {
+  const { openLoginModal } = useLoginModal();
+
+  // 컴포넌트 마운트 시 로그인 모달 열기
+  useEffect(() => {
+    openLoginModal();
+  }, [openLoginModal]);
+
+  return <Navigate to="/" replace />;
+}
+
 
 function App() {
   return (
@@ -248,7 +259,7 @@ function App() {
             {/* ================================================================
                 인증 페이지 (레이아웃 없음)
             ================================================================ */}
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
 
