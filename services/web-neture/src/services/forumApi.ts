@@ -666,3 +666,68 @@ export async function createForumComment(
     };
   }
 }
+
+/**
+ * Update an existing forum comment (cookie-based auth)
+ */
+export async function updateForumComment(
+  commentId: string,
+  content: string
+): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments/${commentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ content }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.message || data.error || '댓글 수정에 실패했습니다.',
+      };
+    }
+
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Error updating forum comment:', error);
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다.',
+    };
+  }
+}
+
+/**
+ * Delete a forum comment (cookie-based auth, soft delete)
+ */
+export async function deleteForumComment(
+  commentId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments/${commentId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.message || data.error || '댓글 삭제에 실패했습니다.',
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting forum comment:', error);
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다.',
+    };
+  }
+}

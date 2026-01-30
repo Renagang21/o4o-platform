@@ -17,6 +17,8 @@ import {
   fetchForumPostBySlug,
   fetchForumComments,
   createForumComment,
+  updateForumComment,
+  deleteForumComment,
   normalizePostType,
   getAuthorName,
   extractTextContent,
@@ -29,8 +31,10 @@ import {
 interface DisplayComment {
   id: string;
   content: string;
+  authorId: string;
   authorName: string;
   createdAt: string;
+  isEdited?: boolean;
 }
 
 function formatDate(dateString: string): string {
@@ -84,26 +88,84 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   return {
     id: comment.id,
     content,
+    authorId: comment.authorId || comment.author?.id || '',
     authorName,
     createdAt: comment.createdAt,
+    isEdited: comment.isEdited,
   };
 }
 
-function CommentItem({ comment }: { comment: DisplayComment }) {
+function CommentItem({ comment, currentUserId, onUpdate, onDelete }: {
+  comment: DisplayComment;
+  currentUserId?: string;
+  onUpdate: (id: string, content: string) => Promise<boolean>;
+  onDelete: (id: string) => Promise<boolean>;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(comment.content);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const isOwner = currentUserId && comment.authorId === currentUserId;
+
+  const handleSave = async () => {
+    if (!editText.trim() || isSaving) return;
+    setIsSaving(true);
+    const success = await onUpdate(comment.id, editText.trim());
+    if (success) {
+      setIsEditing(false);
+    }
+    setIsSaving(false);
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('정말 이 댓글을 삭제하시겠습니까?')) return;
+    await onDelete(comment.id);
+  };
+
   return (
     <div style={styles.comment}>
       <div style={styles.commentHeader}>
         <span style={styles.commentAuthor}>{comment.authorName}</span>
-        <span style={styles.commentDate}>{formatRelativeTime(comment.createdAt)}</span>
+        <span style={styles.commentDate}>
+          {formatRelativeTime(comment.createdAt)}
+          {comment.isEdited && <span style={styles.editedBadge}>(수정됨)</span>}
+        </span>
+        {isOwner && !isEditing && (
+          <span style={styles.commentActions}>
+            <button style={styles.commentActionBtn} onClick={() => { setIsEditing(true); setEditText(comment.content); }}>수정</button>
+            <button style={{ ...styles.commentActionBtn, color: '#dc2626' }} onClick={handleDelete}>삭제</button>
+          </span>
+        )}
       </div>
-      <p style={styles.commentContent}>{comment.content}</p>
+      {isEditing ? (
+        <div style={styles.commentEditArea}>
+          <textarea
+            style={styles.commentEditTextarea}
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            rows={3}
+          />
+          <div style={styles.commentEditActions}>
+            <button style={styles.commentEditCancel} onClick={() => setIsEditing(false)} disabled={isSaving}>취소</button>
+            <button
+              style={{ ...styles.commentEditSave, opacity: !editText.trim() || isSaving ? 0.5 : 1 }}
+              onClick={handleSave}
+              disabled={!editText.trim() || isSaving}
+            >
+              {isSaving ? '저장 중...' : '저장'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p style={styles.commentContent}>{comment.content}</p>
+      )}
     </div>
   );
 }
 
 export function ForumPostPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<DisplayComment[]>([]);
@@ -163,6 +225,28 @@ export function ForumPostPage() {
       alert(result.error || '댓글 작성에 실패했습니다.');
     }
     setIsSubmitting(false);
+  };
+
+  const handleUpdateComment = async (commentId: string, content: string): Promise<boolean> => {
+    const result = await updateForumComment(commentId, content);
+    if (result.success && result.data) {
+      setComments(prev => prev.map(c =>
+        c.id === commentId ? toDisplayComment(result.data!) : c
+      ));
+      return true;
+    }
+    alert(result.error || '댓글 수정에 실패했습니다.');
+    return false;
+  };
+
+  const handleDeleteComment = async (commentId: string): Promise<boolean> => {
+    const result = await deleteForumComment(commentId);
+    if (result.success) {
+      setComments(prev => prev.filter(c => c.id !== commentId));
+      return true;
+    }
+    alert(result.error || '댓글 삭제에 실패했습니다.');
+    return false;
   };
 
   if (isLoading) {
@@ -312,7 +396,13 @@ export function ForumPostPage() {
         <div style={styles.commentsList}>
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} />
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                currentUserId={user?.id}
+                onUpdate={handleUpdateComment}
+                onDelete={handleDeleteComment}
+              />
             ))
           ) : (
             <div style={styles.noComments}>
@@ -568,6 +658,62 @@ const styles: Record<string, React.CSSProperties> = {
   commentDate: {
     fontSize: '13px',
     color: '#94a3b8',
+  },
+  editedBadge: {
+    marginLeft: '4px',
+    color: '#94a3b8',
+    fontStyle: 'italic',
+  },
+  commentActions: {
+    marginLeft: 'auto',
+    display: 'flex',
+    gap: '8px',
+  },
+  commentActionBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '13px',
+    color: '#64748b',
+    cursor: 'pointer',
+    padding: '0',
+  },
+  commentEditArea: {
+    marginTop: '8px',
+  },
+  commentEditTextarea: {
+    width: '100%',
+    padding: '10px 12px',
+    fontSize: '14px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    resize: 'vertical',
+    fontFamily: 'inherit',
+    lineHeight: 1.6,
+  },
+  commentEditActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '8px',
+    marginTop: '8px',
+  },
+  commentEditCancel: {
+    padding: '6px 14px',
+    fontSize: '13px',
+    color: '#64748b',
+    backgroundColor: 'transparent',
+    border: '1px solid #e2e8f0',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  commentEditSave: {
+    padding: '6px 14px',
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: '#2563eb',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
   },
   commentContent: {
     fontSize: '14px',
