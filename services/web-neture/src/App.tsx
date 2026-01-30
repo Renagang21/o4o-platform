@@ -328,6 +328,7 @@ function App() {
               {/* 포럼 (o4o 공통 - /forum) */}
               <Route path="/forum" element={<ForumPage />} />
               <Route path="/forum/write" element={<ForumWritePage />} />
+              <Route path="/forum/edit/:postId" element={<ForumWritePage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
               <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
               <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />

@@ -11,12 +11,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import {
   fetchForumPostBySlug,
   fetchForumComments,
   createForumComment,
+  deleteForumPost,
   normalizePostType,
   getAuthorName,
   extractTextContent,
@@ -103,7 +104,8 @@ function CommentItem({ comment }: { comment: DisplayComment }) {
 
 export function ForumPostPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
 
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<DisplayComment[]>([]);
@@ -111,6 +113,10 @@ export function ForumPostPage() {
   const [error, setError] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Check if current user is the author
+  const isAuthor = isAuthenticated && user && post?.authorId === user.id;
 
   useEffect(() => {
     async function loadPost() {
@@ -163,6 +169,21 @@ export function ForumPostPage() {
       alert(result.error || '댓글 작성에 실패했습니다.');
     }
     setIsSubmitting(false);
+  };
+
+  const handleDelete = async () => {
+    if (!post || isDeleting) return;
+    if (!window.confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
+
+    setIsDeleting(true);
+    const result = await deleteForumPost(post.id);
+
+    if (result.success) {
+      navigate('/forum');
+    } else {
+      alert(result.error || '게시글 삭제에 실패했습니다.');
+      setIsDeleting(false);
+    }
   };
 
   if (isLoading) {
@@ -221,6 +242,25 @@ export function ForumPostPage() {
           <span style={styles.metaDivider}>·</span>
           <span>{formatDate(post.publishedAt || post.createdAt)}</span>
         </div>
+
+        {/* Author Actions: Edit / Delete */}
+        {isAuthor && (
+          <div style={styles.authorActions}>
+            <button
+              style={styles.editButton}
+              onClick={() => navigate(`/forum/edit/${post.id}`)}
+            >
+              수정
+            </button>
+            <button
+              style={styles.deleteButton}
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? '삭제 중...' : '삭제'}
+            </button>
+          </div>
+        )}
       </header>
 
       {/* Post Content */}
@@ -412,6 +452,31 @@ const styles: Record<string, React.CSSProperties> = {
   },
   metaDivider: {
     color: '#cbd5e1',
+  },
+  authorActions: {
+    display: 'flex',
+    gap: '8px',
+    marginTop: '16px',
+  },
+  editButton: {
+    padding: '6px 16px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: '#2563eb',
+    backgroundColor: '#eff6ff',
+    border: '1px solid #bfdbfe',
+    borderRadius: '6px',
+    cursor: 'pointer',
+  },
+  deleteButton: {
+    padding: '6px 16px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: '#dc2626',
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
   postContent: {
     marginBottom: '32px',

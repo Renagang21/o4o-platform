@@ -633,6 +633,92 @@ export async function createForumPost(
 }
 
 /**
+ * Update an existing forum post (cookie-based auth)
+ */
+export async function updateForumPost(
+  postId: string,
+  payload: { title: string; content: string | any[] }
+): Promise<CreatePostResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.message || data.error || '게시글 수정에 실패했습니다.',
+      };
+    }
+
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Error updating forum post:', error);
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다.',
+    };
+  }
+}
+
+/**
+ * Delete a forum post (cookie-based auth, soft delete)
+ */
+export async function deleteForumPost(
+  postId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.message || data.error || '게시글 삭제에 실패했습니다.',
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting forum post:', error);
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다.',
+    };
+  }
+}
+
+/**
+ * Fetch a single forum post by ID (for edit mode)
+ */
+export async function fetchForumPostById(postId: string): Promise<PostResponse | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
+      credentials: 'include',
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching forum post by id:', error);
+    return null;
+  }
+}
+
+/**
  * Create a new forum comment (cookie-based auth)
  */
 export async function createForumComment(

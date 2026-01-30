@@ -17,13 +17,16 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
 import { useAuth } from '../../contexts';
 import {
   createForumPost,
+  updateForumPost,
+  fetchForumPostById,
   fetchUserContactSettings,
+  extractTextContent,
   type UserContactSettings,
 } from '../../services/forumApi';
 
@@ -40,6 +43,8 @@ const MIN_CONTENT_LENGTH = 5;
 
 export function ForumWritePage() {
   const navigate = useNavigate();
+  const { postId } = useParams<{ postId: string }>();
+  const isEditMode = !!postId;
   const { isAuthenticated } = useAuth();
   // NOTE: 현재 AuthContext는 테스트용이라 token이 없음
   // Real API 연동 시 AuthContext에 token 추가 필요
@@ -48,11 +53,37 @@ export function ForumWritePage() {
   const [title, setTitle] = useState('');
   const [editorHtml, setEditorHtml] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [postSlug, setPostSlug] = useState<string | null>(null);
 
   // WO-NETURE-EXTERNAL-CONTACT-V1: Contact settings
   const [contactSettings, setContactSettings] = useState<UserContactSettings | null>(null);
   const [showContactOnPost, setShowContactOnPost] = useState(false);
+
+  // Load existing post data in edit mode
+  useEffect(() => {
+    if (!isEditMode || !postId) return;
+
+    async function loadPost() {
+      setIsLoadingPost(true);
+      const response = await fetchForumPostById(postId!);
+      if (response?.data) {
+        setTitle(response.data.title);
+        setPostSlug(response.data.slug);
+        // Convert content to HTML string for the editor
+        const text = extractTextContent(response.data.content);
+        // Wrap paragraphs in <p> tags for the rich text editor
+        const html = text.split('\n').map(line => `<p>${line || '<br>'}</p>`).join('');
+        setEditorHtml(html);
+      } else {
+        setError('게시글을 불러올 수 없습니다.');
+      }
+      setIsLoadingPost(false);
+    }
+
+    loadPost();
+  }, [isEditMode, postId]);
 
   // Load contact settings on mount (only for authenticated users)
   useEffect(() => {
@@ -91,22 +122,31 @@ export function ForumWritePage() {
       // Convert HTML to Block[]
       const blocks = htmlToBlocks(editorHtml);
 
-      const response = await createForumPost(
-        {
+      let response;
+      if (isEditMode && postId) {
+        response = await updateForumPost(postId, {
           title: title.trim(),
           content: blocks,
-          categorySlug: CATEGORY_SLUG,
-          // WO-NETURE-EXTERNAL-CONTACT-V1
-          showContactOnPost: hasContactInfo ? showContactOnPost : false,
-        },
-        token || ''
-      );
+        });
+      } else {
+        response = await createForumPost(
+          {
+            title: title.trim(),
+            content: blocks,
+            categorySlug: CATEGORY_SLUG,
+            // WO-NETURE-EXTERNAL-CONTACT-V1
+            showContactOnPost: hasContactInfo ? showContactOnPost : false,
+          },
+          token || ''
+        );
+      }
 
       if (response.success && response.data) {
         // 성공 시 작성한 글로 이동
-        navigate(`/forum/post/${response.data.slug}`);
+        const targetSlug = response.data.slug || postSlug;
+        navigate(`/forum/post/${targetSlug}`);
       } else {
-        setError(response.error || '게시글 작성에 실패했습니다.');
+        setError(response.error || (isEditMode ? '게시글 수정에 실패했습니다.' : '게시글 작성에 실패했습니다.'));
       }
     } catch (err) {
       console.error('Error submitting post:', err);
@@ -125,6 +165,16 @@ export function ForumWritePage() {
     navigate('/forum');
   }
 
+  if (isLoadingPost) {
+    return (
+      <div style={styles.container}>
+        <div style={{ padding: '80px 20px', textAlign: 'center', color: '#64748b', fontSize: '15px' }}>
+          <p>게시글을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       {/* Breadcrumb */}
@@ -133,14 +183,16 @@ export function ForumWritePage() {
         <span style={styles.breadcrumbDivider}>/</span>
         <Link to="/forum" style={styles.breadcrumbLink}>포럼</Link>
         <span style={styles.breadcrumbDivider}>/</span>
-        <span style={styles.breadcrumbCurrent}>글쓰기</span>
+        <span style={styles.breadcrumbCurrent}>{isEditMode ? '수정' : '글쓰기'}</span>
       </nav>
 
       {/* Page Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>의견 남기기</h1>
+        <h1 style={styles.title}>{isEditMode ? '게시글 수정' : '의견 남기기'}</h1>
         <p style={styles.description}>
-          o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.
+          {isEditMode
+            ? '게시글 내용을 수정합니다.'
+            : 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.'}
         </p>
       </header>
 
@@ -248,7 +300,7 @@ export function ForumWritePage() {
             }}
             disabled={!isFormValid || isSubmitting}
           >
-            {isSubmitting ? '등록 중...' : '등록하기'}
+            {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : (isEditMode ? '수정하기' : '등록하기')}
           </button>
         </div>
       </form>
