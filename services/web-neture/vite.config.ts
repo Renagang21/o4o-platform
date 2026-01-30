@@ -16,6 +16,8 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
+      // Exclude backend/Node.js modules from bundling
+      external: ['express', 'typeorm'],
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
