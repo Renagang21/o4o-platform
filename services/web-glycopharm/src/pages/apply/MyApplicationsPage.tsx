@@ -9,8 +9,6 @@ import type { GlycopharmApplication, ApplicationStatus, ServiceType } from '@/ap
  * (B) 내 신청 목록 / 상태 확인
  */
 
-type FilterStatus = 'all' | ApplicationStatus;
-
 const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building2 }> = {
   dropshipping: { label: '무재고 판매', icon: Truck },
   sample_sales: { label: '샘플 판매', icon: Building2 },
@@ -21,19 +19,17 @@ export default function MyApplicationsPage() {
   const [applications, setApplications] = useState<GlycopharmApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FilterStatus>('all');
 
   useEffect(() => {
     loadApplications();
-  }, [filter]);
+  }, []);
 
   const loadApplications = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const status = filter !== 'all' ? filter : undefined;
-      const response = await glycopharmApi.getMyApplications(status);
+      const response = await glycopharmApi.getMyApplications();
       setApplications(response.applications);
     } catch (err: any) {
       if (err.status === 401 || err.code === 'UNAUTHORIZED') {
@@ -79,13 +75,6 @@ export default function MyApplicationsPage() {
     }
   };
 
-  const filterOptions: { value: FilterStatus; label: string }[] = [
-    { value: 'all', label: '전체' },
-    { value: 'submitted', label: '심사 중' },
-    { value: 'approved', label: '승인됨' },
-    { value: 'rejected', label: '반려됨' },
-  ];
-
   return (
     <div className="min-h-screen bg-slate-50 py-16">
       <div className="max-w-3xl mx-auto px-4">
@@ -93,23 +82,6 @@ export default function MyApplicationsPage() {
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-slate-800 mb-3">내 신청 목록</h1>
           <p className="text-slate-500">제출한 신청서의 상태를 확인하세요.</p>
-        </div>
-
-        {/* Filter */}
-        <div className="flex justify-center gap-2 mb-8">
-          {filterOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setFilter(option.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filter === option.value
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
         </div>
 
         {/* Loading */}
@@ -160,9 +132,7 @@ export default function MyApplicationsPage() {
                       <h3 className="text-lg font-semibold text-slate-800 mb-1">
                         {app.organizationName}
                       </h3>
-                      <p className="text-sm text-slate-500">
-                        {app.organizationType === 'pharmacy' ? '개인 약국' : '약국 체인'}
-                      </p>
+                      <p className="text-sm text-slate-500">개인 약국</p>
                     </div>
                     <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusConfig.bgColor}`}>
                       <StatusIcon className={`w-4 h-4 ${statusConfig.textColor}`} />
