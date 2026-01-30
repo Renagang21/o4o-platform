@@ -111,6 +111,7 @@ export function ForumPostPage() {
   const [error, setError] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadPost() {
@@ -154,13 +155,15 @@ export function ForumPostPage() {
     if (!post || !commentText.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setCommentError(null);
     const result = await createForumComment(post.id, commentText.trim());
 
     if (result.success && result.data) {
       setComments(prev => [...prev, toDisplayComment(result.data!)]);
       setCommentText('');
     } else {
-      alert(result.error || '댓글 작성에 실패했습니다.');
+      // Keep input content, show inline error
+      setCommentError(result.error || '댓글 작성에 실패했습니다.');
     }
     setIsSubmitting(false);
   };
@@ -168,8 +171,35 @@ export function ForumPostPage() {
   if (isLoading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loadingState}>
-          <p>게시글을 불러오는 중...</p>
+        {/* Breadcrumb skeleton */}
+        <div style={{ ...styles.breadcrumb, marginBottom: '24px' }}>
+          <span style={{ ...styles.skeletonBar, width: '40px' }} />
+          <span style={styles.breadcrumbDivider}>/</span>
+          <span style={{ ...styles.skeletonBar, width: '40px' }} />
+          <span style={styles.breadcrumbDivider}>/</span>
+          <span style={{ ...styles.skeletonBar, width: '50px' }} />
+        </div>
+        {/* Title skeleton */}
+        <div style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: '1px solid #e2e8f0' }}>
+          <div style={{ ...styles.skeletonBar, width: '80px', height: '20px', marginBottom: '16px' }} />
+          <div style={{ ...styles.skeletonBar, width: '70%', height: '28px', marginBottom: '16px' }} />
+          <div style={{ ...styles.skeletonBar, width: '180px', height: '14px' }} />
+        </div>
+        {/* Content skeleton */}
+        <div style={{ marginBottom: '32px' }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} style={{ ...styles.skeletonBar, width: `${90 - (i * 10)}%`, height: '16px', marginBottom: '12px' }} />
+          ))}
+        </div>
+        {/* Comments skeleton */}
+        <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '32px' }}>
+          <div style={{ ...styles.skeletonBar, width: '100px', height: '18px', marginBottom: '24px' }} />
+          {[1, 2].map((i) => (
+            <div key={i} style={{ padding: '20px 0', borderBottom: '1px solid #f1f5f9' }}>
+              <div style={{ ...styles.skeletonBar, width: '120px', height: '14px', marginBottom: '8px' }} />
+              <div style={{ ...styles.skeletonBar, width: '80%', height: '14px' }} />
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -178,11 +208,16 @@ export function ForumPostPage() {
   if (error || !post) {
     return (
       <div style={styles.container}>
+        <nav style={styles.breadcrumb}>
+          <Link to="/" style={styles.breadcrumbLink}>홈</Link>
+          <span style={styles.breadcrumbDivider}>/</span>
+          <Link to="/forum" style={styles.breadcrumbLink}>포럼</Link>
+        </nav>
         <div style={styles.notFound}>
           <h2 style={styles.notFoundTitle}>게시글을 찾을 수 없습니다</h2>
           <p style={styles.notFoundText}>{error || '요청하신 게시글이 존재하지 않거나 삭제되었습니다.'}</p>
-          <Link to="/forum" style={styles.backToList}>
-            ← 목록으로 돌아가기
+          <Link to="/forum" style={styles.notFoundButton}>
+            목록으로 돌아가기
           </Link>
         </div>
       </div>
@@ -281,12 +316,17 @@ export function ForumPostPage() {
         {/* Comment Form */}
         {isAuthenticated ? (
           <div style={styles.commentForm}>
+            {commentError && (
+              <div style={styles.commentErrorBanner}>
+                <p style={styles.commentErrorText}>{commentError}</p>
+              </div>
+            )}
             <textarea
               style={styles.commentTextarea}
               placeholder="댓글을 입력하세요..."
               rows={4}
               value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
+              onChange={(e) => { setCommentText(e.target.value); setCommentError(null); }}
             />
             <div style={styles.commentFormActions}>
               <button
@@ -340,12 +380,13 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     padding: '40px 20px',
   },
-  loadingState: {
-    padding: '80px 20px',
-    textAlign: 'center',
-    color: '#64748b',
-    fontSize: '15px',
-  },
+  skeletonBar: {
+    display: 'block',
+    height: '14px',
+    backgroundColor: '#e2e8f0',
+    borderRadius: '4px',
+    animation: 'skeleton-pulse 1.5s ease-in-out infinite',
+  } as React.CSSProperties,
   breadcrumb: {
     display: 'flex',
     alignItems: 'center',
@@ -508,6 +549,18 @@ const styles: Record<string, React.CSSProperties> = {
   commentForm: {
     marginBottom: '32px',
   },
+  commentErrorBanner: {
+    padding: '10px 14px',
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: '6px',
+    marginBottom: '12px',
+  },
+  commentErrorText: {
+    fontSize: '13px',
+    color: '#dc2626',
+    margin: 0,
+  },
   commentTextarea: {
     width: '100%',
     padding: '12px 16px',
@@ -605,6 +658,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '15px',
     color: '#64748b',
     margin: '0 0 24px 0',
+  },
+  notFoundButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#fff',
+    backgroundColor: '#2563eb',
+    textDecoration: 'none',
+    borderRadius: '8px',
   },
 };
 

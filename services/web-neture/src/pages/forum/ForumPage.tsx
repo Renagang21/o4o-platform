@@ -189,17 +189,31 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
         </p>
       </div>
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton */}
       {isLoading && (
-        <div style={styles.loadingState}>
-          <p>게시글을 불러오는 중...</p>
+        <div style={styles.postList}>
+          <div style={styles.listHeader}>
+            <span style={{ ...styles.skeletonBar, width: '100px' }} />
+          </div>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} style={styles.skeletonPost}>
+              <div style={{ ...styles.skeletonBar, width: `${60 + (i % 3) * 15}%`, height: '16px' }} />
+              <div style={{ ...styles.skeletonBar, width: '120px', height: '12px', marginTop: '8px' }} />
+            </div>
+          ))}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div style={styles.errorState}>
-          <p>{error}</p>
+          <p style={styles.errorText}>{error}</p>
+          <button
+            style={styles.retryButton}
+            onClick={() => window.location.reload()}
+          >
+            다시 시도
+          </button>
         </div>
       )}
 
@@ -234,7 +248,11 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
               ))
             ) : (
               <div style={styles.emptyState}>
-                <p>아직 등록된 글이 없습니다.</p>
+                <p style={styles.emptyTitle}>아직 등록된 글이 없습니다.</p>
+                <p style={styles.emptyDescription}>첫 번째 의견을 남겨보세요.</p>
+                <Link to="/forum/write" style={styles.emptyWriteButton}>
+                  의견 남기기
+                </Link>
               </div>
             )}
           </section>
@@ -312,26 +330,67 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
     margin: 0,
   },
-  loadingState: {
-    padding: '60px 20px',
-    textAlign: 'center',
-    color: '#64748b',
-    fontSize: '15px',
+  // Skeleton loading
+  skeletonPost: {
+    padding: '16px',
+    borderBottom: '1px solid #f1f5f9',
   },
+  skeletonBar: {
+    display: 'block',
+    height: '14px',
+    backgroundColor: '#e2e8f0',
+    borderRadius: '4px',
+    animation: 'skeleton-pulse 1.5s ease-in-out infinite',
+  } as React.CSSProperties,
+  // Error state
   errorState: {
-    padding: '40px 20px',
+    padding: '48px 20px',
     textAlign: 'center',
-    color: '#dc2626',
-    fontSize: '15px',
     backgroundColor: '#fef2f2',
     borderRadius: '8px',
     marginBottom: '24px',
   },
+  errorText: {
+    color: '#dc2626',
+    fontSize: '15px',
+    margin: '0 0 16px 0',
+  },
+  retryButton: {
+    padding: '8px 20px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#dc2626',
+    backgroundColor: '#fff',
+    border: '1px solid #fecaca',
+    borderRadius: '6px',
+    cursor: 'pointer',
+  },
+  // Empty state
   emptyState: {
     padding: '60px 20px',
     textAlign: 'center',
+  },
+  emptyTitle: {
+    fontSize: '16px',
+    fontWeight: 500,
+    color: '#64748b',
+    margin: '0 0 8px 0',
+  },
+  emptyDescription: {
+    fontSize: '14px',
     color: '#94a3b8',
-    fontSize: '15px',
+    margin: '0 0 20px 0',
+  },
+  emptyWriteButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: PRIMARY_COLOR,
+    textDecoration: 'none',
+    borderRadius: '8px',
   },
   pinnedSection: {
     backgroundColor: '#fffbeb',
