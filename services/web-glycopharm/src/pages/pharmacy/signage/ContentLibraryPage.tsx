@@ -1,9 +1,9 @@
 /**
- * ContentLibraryPage - 콘텐츠 라이브러리
+ * ContentLibraryPage - 디지털 사이니지
  *
  * Signage Extension의 핵심 화면
- * - 모든 콘텐츠의 집합소
- * - 출처별 필터링 (Neture / 본부 / 공급자 / 약국 직접 등록)
+ * - 디지털 사이니지용 동영상 콘텐츠
+ * - 출처별 필터링 (본부 / 공급자 / 약국 직접 등록 / 광고)
  * - 기본 상태: 모두 OFF
  * - My Page로 가져오기 액션
  */
@@ -33,19 +33,12 @@ import type { ContentItem, ContentType, ContentSource } from '@/types';
 
 const sourceFilters: { value: ContentSource | 'all'; label: string; icon: typeof Building2 }[] = [
   { value: 'all', label: '전체', icon: Filter },
-  { value: 'neture', label: 'Neture', icon: Building2 },
   { value: 'hq', label: '본부', icon: Store },
   { value: 'supplier', label: '공급자', icon: Truck },
   { value: 'pharmacy', label: '내 등록', icon: Store },
   { value: 'operator_ad', label: '광고', icon: Megaphone },
 ];
 
-const typeFilters: { value: ContentType | 'all'; label: string; icon: typeof Video }[] = [
-  { value: 'all', label: '전체', icon: Filter },
-  { value: 'video', label: '영상', icon: Video },
-  { value: 'lms', label: 'LMS', icon: BookOpen },
-  { value: 'link', label: '링크', icon: LinkIcon },
-];
 
 function getSourceColor(source: ContentSource): string {
   switch (source) {
@@ -88,7 +81,6 @@ function formatDuration(seconds?: number): string {
 export default function ContentLibraryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSource, setSelectedSource] = useState<ContentSource | 'all'>('all');
-  const [selectedType, setSelectedType] = useState<ContentType | 'all'>('all');
   const [addedContents, setAddedContents] = useState<Set<string>>(new Set());
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
@@ -120,8 +112,7 @@ export default function ContentLibraryPage() {
       content.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (content.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
     const matchesSource = selectedSource === 'all' || content.source === selectedSource;
-    const matchesType = selectedType === 'all' || content.type === selectedType;
-    return matchesSearch && matchesSource && matchesType;
+    return matchesSearch && matchesSource;
   });
 
   const handleAddToMyPage = async (contentId: string) => {
@@ -142,9 +133,9 @@ export default function ContentLibraryPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">콘텐츠 라이브러리</h1>
+          <h1 className="text-2xl font-bold text-slate-800">디지털 사이니지</h1>
           <p className="text-slate-500 mt-1">
-            사이니지에 표시할 콘텐츠를 선택하세요
+            사이니지에 표시할 동영상 콘텐츠를 선택하세요
           </p>
         </div>
         <div className="flex gap-2">
@@ -191,28 +182,6 @@ export default function ContentLibraryPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   selectedSource === filter.value
                     ? 'bg-primary-100 text-primary-700'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {filter.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Type Filter */}
-        <div className="flex flex-wrap gap-2">
-          <span className="text-sm text-slate-500 py-2">유형:</span>
-          {typeFilters.map((filter) => {
-            const Icon = filter.icon;
-            return (
-              <button
-                key={filter.value}
-                onClick={() => setSelectedType(filter.value)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  selectedType === filter.value
-                    ? 'bg-accent-100 text-accent-700'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
