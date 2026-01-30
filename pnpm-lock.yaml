@@ -3519,6 +3519,12 @@ importers:
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@o4o/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      clsx:
+        specifier: ^2.1.0
+        version: 2.1.1
       lucide-react:
         specifier: ^0.454.0
         version: 0.454.0(react@19.2.0)
@@ -3531,6 +3537,9 @@ importers:
       react-router-dom:
         specifier: ^7.9.6
         version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      tailwind-merge:
+        specifier: ^2.2.0
+        version: 2.6.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
