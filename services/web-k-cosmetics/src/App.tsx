@@ -55,6 +55,9 @@ const PartnerContentPage = lazy(() => import('@/pages/partner/ContentPage'));
 const PartnerEventsPage = lazy(() => import('@/pages/partner/EventsPage'));
 const PartnerStatusPage = lazy(() => import('@/pages/partner/StatusPage'));
 
+// Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
+const SignageContentHubPage = lazy(() => import('@/pages/signage/ContentHubPage'));
+
 // Operator Dashboard Pages
 const OperatorIndex = lazy(() => import('@/pages/operator/index'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
@@ -177,6 +180,7 @@ function AppRoutes() {
         <Route path="overview" element={<PartnerOverviewPage />} />
         <Route path="targets" element={<PartnerTargetsPage />} />
         <Route path="content" element={<PartnerContentPage />} />
+        <Route path="signage/content" element={<SignageContentHubPage />} />
         <Route path="events" element={<PartnerEventsPage />} />
         <Route path="status" element={<PartnerStatusPage />} />
       </Route>
@@ -199,6 +203,7 @@ function AppRoutes() {
         <Route path="settlements" element={<OperatorSettlementsPage />} />
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
         <Route path="marketing" element={<OperatorMarketingPage />} />
+        <Route path="signage/content" element={<SignageContentHubPage />} />
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="support" element={<OperatorSupportPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />

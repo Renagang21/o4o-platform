@@ -133,6 +133,11 @@ const icons = {
       <path d="m11 17 2 2a1 1 0 1 0 3-3" /><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" /><path d="m21 3 1 11h-2" /><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" /><path d="M3 4h8" />
     </svg>
   ),
+  Monitor: ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" />
+    </svg>
+  ),
 };
 
 type IconType = (props: { className?: string }) => JSX.Element;
@@ -160,6 +165,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/partner/overview', label: '개요', icon: icons.BarChart3 },
       { path: '/partner/targets', label: '타겟 설정', icon: icons.Users },
       { path: '/partner/content', label: '콘텐츠', icon: icons.Package },
+      { path: '/partner/signage/content', label: '사이니지 콘텐츠', icon: icons.Monitor },
       { path: '/partner/events', label: '이벤트', icon: icons.Megaphone },
       { path: '/partner/status', label: '현황', icon: icons.FileCheck },
     ],
@@ -178,6 +184,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/operator/settlements', label: '정산 관리', icon: icons.CreditCard },
       { path: '/operator/analytics', label: '분석/리포트', icon: icons.BarChart3 },
       { path: '/operator/marketing', label: '마케팅', icon: icons.Megaphone },
+      { path: '/operator/signage/content', label: '사이니지 콘텐츠', icon: icons.Monitor },
       { path: '/operator/users', label: '회원 관리', icon: icons.Users },
       { path: '/operator/support', label: '고객지원', icon: icons.HelpCircle },
       { path: '/operator/settings', label: '설정', icon: icons.Settings },
