@@ -1,10 +1,12 @@
 /**
  * OperatorRoutes - 서비스 운영자 라우트 설정
  * WO-AI-SERVICE-OPERATOR-REPORT-V1: 운영자 AI 리포트 추가
+ * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { OperatorDashboard, OperatorAiReportPage, ForumManagementPage } from '../pages/operator';
+import ContentHubPage from '../pages/signage/ContentHubPage';
 
 // 간단한 Operator Layout
 function OperatorLayout({ children }: { children: React.ReactNode }) {
@@ -29,6 +31,9 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
             </a>
             <a href="/operator/forum-management" className="text-sm text-slate-600 hover:text-blue-600">
               포럼 관리
+            </a>
+            <a href="/operator/signage/content" className="text-sm text-slate-600 hover:text-blue-600">
+              콘텐츠 허브
             </a>
             <a href="/" className="text-sm text-slate-500 hover:text-slate-700">
               메인으로
@@ -57,6 +62,9 @@ export function OperatorRoutes() {
 
         {/* 포럼 관리 */}
         <Route path="forum-management" element={<ForumManagementPage />} />
+
+        {/* 사이니지 콘텐츠 허브 */}
+        <Route path="signage/content" element={<ContentHubPage />} />
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="" replace />} />

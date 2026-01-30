@@ -26,6 +26,7 @@ export function AdminSidebar() {
     { path: '/membership-fee', label: '연회비', icon: '💰', badge: 2 },
     { path: '/news', label: '공지사항', icon: '📢' },
     { path: '/docs', label: '자료실', icon: '📁' },
+    { path: '/signage/content', label: '안내 영상 · 자료', icon: '📹' },
     { path: '/forum', label: '게시판', icon: '💬' },
     { path: '/officers', label: '임원 관리', icon: '👔' },
     { path: '/settings', label: '설정', icon: '⚙️' },

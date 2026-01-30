@@ -1,5 +1,6 @@
 /**
  * IntranetRoutes - 인트라넷 라우트 설정
+ * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -27,6 +28,9 @@ import {
 // WO-KPA-GROUPBUY-OPERATOR-UI-V1: 공동구매 관리
 import { GroupbuyManagePage } from '../pages/intranet/groupbuy';
 
+// WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브
+import ContentHubPage from '../pages/signage/ContentHubPage';
+
 export function IntranetRoutes() {
   return (
     <IntranetAuthGuard>
@@ -49,6 +53,9 @@ export function IntranetRoutes() {
           {/* 문서 */}
           <Route path="documents" element={<DocumentListPage />} />
           <Route path="documents/:id" element={<DocumentListPage />} />
+
+          {/* 안내 영상 · 자료 */}
+          <Route path="signage/content" element={<ContentHubPage />} />
 
           {/* 일정 */}
           <Route path="schedule" element={<SchedulePage />} />

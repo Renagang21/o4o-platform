@@ -1,6 +1,7 @@
 /**
  * AdminRoutes - 지부 관리자 라우트 설정
  * WO-KPA-COMMITTEE-GOVERNANCE-V1: 위원회 관리 라우트 추가
+ * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -21,6 +22,7 @@ import {
 import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import { KpaOperatorDashboardPage } from '../pages/admin/KpaOperatorDashboardPage';
+import ContentHubPage from '../pages/signage/ContentHubPage';
 
 export function AdminRoutes() {
   return (
@@ -60,6 +62,9 @@ export function AdminRoutes() {
 
           {/* 자료실 */}
           <Route path="docs" element={<DocsPage />} />
+
+          {/* 안내 영상 · 자료 */}
+          <Route path="signage/content" element={<ContentHubPage />} />
 
           {/* 게시판 */}
           <Route path="forum" element={<ForumPage />} />
