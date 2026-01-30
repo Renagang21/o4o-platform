@@ -41,11 +41,11 @@ COPY packages/forum-core/ ./packages/forum-core/
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
-# Build workspace dependencies first (types -> auth-client -> content-editor -> organization-core -> forum-core)
+# Build workspace dependencies first (types -> auth-client -> content-editor -> forum-core)
+# Note: organization-core is a backend package and doesn't need to be built for frontend
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/content-editor build
-RUN pnpm --filter @o4o/organization-core build
 RUN pnpm --filter @o4o/forum-core build
 
 # Build-time environment variables for Vite
