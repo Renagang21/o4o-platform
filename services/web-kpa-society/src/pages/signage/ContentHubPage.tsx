@@ -9,8 +9,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Download, Play, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
-import { globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
+import { globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
 
 type ContentType = 'playlists' | 'media';
 
@@ -94,6 +94,8 @@ export default function ContentHubPage() {
         return '파트너 제공';
       case 'community':
         return '커뮤니티 공유';
+      default:
+        return '알 수 없음';
     }
   };
 
@@ -105,6 +107,8 @@ export default function ContentHubPage() {
         return '협력 기관 및 파트너가 등록한 안내 자료';
       case 'community':
         return '회원 간 공유된 유용한 안내 자료';
+      default:
+        return '';
     }
   };
 
