@@ -42,12 +42,13 @@ COPY packages/forum-core/ ./packages/forum-core/
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
 
-# Build workspace dependencies (only frontend packages)
-# Note: forum-core and organization-core are backend packages, not built here
-# web-neture imports utils directly from source
+# Build workspace dependencies
+# Note: organization-core is a backend package, not built here
+# forum-core is built (has @types/express for compilation)
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/content-editor build
+RUN pnpm --filter @o4o/forum-core build
 
 # Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
