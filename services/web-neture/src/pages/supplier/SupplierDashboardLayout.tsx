@@ -16,7 +16,7 @@
 
 import { Navigate, Outlet, NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, FileCheck, Package, ShoppingBag, FileText, Settings, LogOut, Home } from 'lucide-react';
+import { LayoutDashboard, FileCheck, Package, ShoppingBag, FileText, Monitor, Settings, LogOut, Home } from 'lucide-react';
 import AccountMenu from '../../components/AccountMenu';
 
 export default function SupplierDashboardLayout() {
@@ -53,6 +53,7 @@ export default function SupplierDashboardLayout() {
     { to: '/supplier/products', icon: Package, label: '내 제품' },
     { to: '/supplier/orders', icon: ShoppingBag, label: '주문 현황' },
     { to: '/supplier/contents', icon: FileText, label: '콘텐츠' },
+    { to: '/supplier/signage/content', icon: Monitor, label: '사이니지 콘텐츠' },
     { to: '/supplier/settings', icon: Settings, label: '설정', disabled: true },
   ];
 
