@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Download, Play, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
+import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
 import { globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
 
 type ContentType = 'playlists' | 'media';
@@ -93,6 +93,8 @@ export default function SignageContentHubPage() {
         return '공급자 콘텐츠';
       case 'community':
         return '커뮤니티 콘텐츠';
+      default:
+        return '알 수 없음';
     }
   };
 
@@ -104,6 +106,8 @@ export default function SignageContentHubPage() {
         return '네뚜레 공급자 대시보드에서 등록한 콘텐츠';
       case 'community':
         return '포럼 및 커뮤니티에서 공유된 콘텐츠';
+      default:
+        return '';
     }
   };
 
