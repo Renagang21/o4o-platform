@@ -128,39 +128,16 @@ export default function PharmacyApplyPage() {
           {/* Organization Type */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-slate-700 mb-3">조직 유형</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setFormData((prev) => ({ ...prev, organizationType: 'pharmacy' as OrganizationType }))}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${
-                  formData.organizationType === 'pharmacy'
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <Building2 className={`w-6 h-6 mb-2 ${formData.organizationType === 'pharmacy' ? 'text-primary-600' : 'text-slate-400'}`} />
-                <p className="font-medium text-slate-800">개인 약국</p>
-                <p className="text-xs text-slate-500">단일 약국 운영</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData((prev) => ({ ...prev, organizationType: 'pharmacy_chain' as OrganizationType }))}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${
-                  formData.organizationType === 'pharmacy_chain'
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <Building2 className={`w-6 h-6 mb-2 ${formData.organizationType === 'pharmacy_chain' ? 'text-primary-600' : 'text-slate-400'}`} />
-                <p className="font-medium text-slate-800">약국 체인</p>
-                <p className="text-xs text-slate-500">다점포 운영</p>
-              </button>
+            <div className="p-4 rounded-xl border-2 border-primary-500 bg-primary-50">
+              <Building2 className="w-6 h-6 mb-2 text-primary-600" />
+              <p className="font-medium text-slate-800">개인 약국</p>
+              <p className="text-xs text-slate-500">단일 약국 운영</p>
             </div>
           </div>
 
           {/* Organization Name */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">약국명 / 체인명</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">약국명</label>
             <input
               type="text"
               value={formData.organizationName}
