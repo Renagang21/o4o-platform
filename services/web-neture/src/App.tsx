@@ -140,6 +140,9 @@ const SupplierContentsPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierContentsPage }))
 );
 
+// Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
+const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
+
 // Content Editor (TipTap - heavy)
 const ContentEditorPage = lazy(() => import('./pages/supplier/content/ContentEditorPage'));
 
@@ -364,6 +367,8 @@ function App() {
               <Route path="/supplier-ops/supplier/contents" element={<SupplierContentsPage />} />
               <Route path="/supplier-ops/supplier/contents/new" element={<ContentEditorPage />} />
               <Route path="/supplier-ops/supplier/contents/:id/edit" element={<ContentEditorPage />} />
+              {/* Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1) */}
+              <Route path="/supplier-ops/supplier/signage/content" element={<SignageContentHubPage />} />
             </Route>
 
             {/* ================================================================
