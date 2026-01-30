@@ -7,6 +7,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Map forum-core to source for better tree-shaking
+      '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core/src'),
     },
   },
   server: {
@@ -16,8 +18,6 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
-      // Exclude backend/Node.js modules from bundling
-      external: ['express', 'typeorm'],
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
