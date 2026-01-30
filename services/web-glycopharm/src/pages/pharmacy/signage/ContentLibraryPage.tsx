@@ -288,15 +288,14 @@ export default function ContentLibraryPage() {
           <EmptyState
             icon={Video}
             title="콘텐츠가 없습니다"
-            description={searchQuery || selectedSource !== 'all' || selectedType !== 'all'
+            description={searchQuery || selectedSource !== 'all'
               ? "검색 조건에 맞는 콘텐츠가 없습니다."
               : "아직 등록된 콘텐츠가 없습니다. 콘텐츠를 등록해주세요."}
             action={{
-              label: searchQuery || selectedSource !== 'all' || selectedType !== 'all' ? '필터 초기화' : '콘텐츠 등록',
+              label: searchQuery || selectedSource !== 'all' ? '필터 초기화' : '콘텐츠 등록',
               onClick: () => {
-                if (searchQuery || selectedSource !== 'all' || selectedType !== 'all') {
+                if (searchQuery || selectedSource !== 'all') {
                   setSelectedSource('all');
-                  setSelectedType('all');
                   setSearchQuery('');
                 } else {
                   setShowRegisterModal(true);

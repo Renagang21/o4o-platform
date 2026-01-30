@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, Truck, Monitor, CheckCircle, AlertCircle } from 'lucide-react';
 import { glycopharmApi } from '@/api/glycopharm';
-import type { SubmitApplicationRequest, ServiceType, OrganizationType } from '@/api/glycopharm';
+import type { SubmitApplicationRequest, ServiceType } from '@/api/glycopharm';
 
 /**
  * Pharmacy Apply Page

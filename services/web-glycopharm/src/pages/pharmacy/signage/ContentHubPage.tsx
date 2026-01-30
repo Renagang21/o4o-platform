@@ -8,8 +8,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Download, Play, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
-import { globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
+import { globalContentApi, type SignagePlaylist, type SignageMedia, type ContentSource } from '@/lib/api/signageV2';
 
 type ContentType = 'playlists' | 'media';
 
