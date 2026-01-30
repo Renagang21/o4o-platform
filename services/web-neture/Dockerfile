@@ -43,11 +43,11 @@ COPY packages/forum-core/ ./packages/forum-core/
 COPY services/web-neture/ ./services/web-neture/
 
 # Build workspace dependencies
-# Note: organization-core is a backend package, not built here
-# forum-core is built (has @types/express for compilation)
+# Note: Both organization-core and forum-core have @types/express for compilation
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/content-editor build
+RUN pnpm --filter @o4o/organization-core build
 RUN pnpm --filter @o4o/forum-core build
 
 # Build-time environment variables for Vite
