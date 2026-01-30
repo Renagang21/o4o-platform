@@ -204,6 +204,17 @@ export class User {
     return `${this.firstName || ''} ${this.lastName || ''}`.trim() || this.email;
   }
 
+  // UI 표시 전용 이름 (email fallback 금지)
+  get displayName(): string {
+    // 1. name (단일 표시명)
+    if (this.name?.trim()) return this.name.trim();
+    // 2. fullName (firstName + lastName), email fallback 제외
+    const composed = `${this.firstName || ''} ${this.lastName || ''}`.trim();
+    if (composed) return composed;
+    // 3. 최종 fallback
+    return '사용자';
+  }
+
   // Relations - lazy loaded to prevent circular dependencies
   @OneToMany('RefreshToken', 'user')
   refreshTokens?: any[];
@@ -449,6 +460,7 @@ export class User {
     return {
       id: this.id,
       email: this.email,
+      displayName: this.displayName,
       firstName: this.firstName,
       lastName: this.lastName,
       fullName: this.fullName,
