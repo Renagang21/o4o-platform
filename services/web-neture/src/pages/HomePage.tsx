@@ -58,7 +58,7 @@ function HeroSection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            to="/suppliers"
+            to="/supplier-ops/suppliers"
             className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-slate-500 bg-white hover:bg-primary-50 transition-colors"
           >
             공급자 보기
@@ -156,7 +156,7 @@ function SuppliersPreviewSection() {
             {suppliers.map((supplier) => (
               <Link
                 key={supplier.id}
-                to={`/suppliers/${supplier.slug}`}
+                to={`/supplier-ops/suppliers/${supplier.slug}`}
                 className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
               >
                 <div className="flex flex-col items-center text-center">
@@ -182,7 +182,7 @@ function SuppliersPreviewSection() {
 
         <div className="text-center mt-10">
           <Link
-            to="/suppliers"
+            to="/supplier-ops/suppliers"
             className="inline-flex items-center text-slate-500 hover:text-primary-700 font-medium"
           >
             공급자 전체 보기

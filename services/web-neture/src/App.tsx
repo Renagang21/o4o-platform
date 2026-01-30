@@ -15,7 +15,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
@@ -235,6 +235,20 @@ function LoginModalRenderer() {
   );
 }
 
+// Legacy redirect helpers - React Router v6 Navigate doesn't interpolate params
+function RedirectSupplierDetail() {
+  const { slug } = useParams();
+  return <Navigate to={`/supplier-ops/suppliers/${slug}`} replace />;
+}
+function RedirectPartnershipRequestDetail() {
+  const { id } = useParams();
+  return <Navigate to={`/supplier-ops/partners/requests/${id}`} replace />;
+}
+function RedirectContentDetail() {
+  const { id } = useParams();
+  return <Navigate to={`/supplier-ops/content/${id}`} replace />;
+}
+
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
@@ -431,14 +445,14 @@ function App() {
             ================================================================ */}
             {/* Neture 고유 기능 리다이렉트 */}
             <Route path="/suppliers" element={<Navigate to="/supplier-ops/suppliers" replace />} />
-            <Route path="/suppliers/:slug" element={<Navigate to="/supplier-ops/suppliers/:slug" replace />} />
+            <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/partners/requests" element={<Navigate to="/supplier-ops/partners/requests" replace />} />
-            <Route path="/partners/requests/:id" element={<Navigate to="/supplier-ops/partners/requests/:id" replace />} />
+            <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
             <Route path="/partners/apply" element={<Navigate to="/supplier-ops/partners/apply" replace />} />
             <Route path="/partners/info" element={<Navigate to="/supplier-ops/partners/info" replace />} />
             <Route path="/platform/principles" element={<Navigate to="/supplier-ops/platform/principles" replace />} />
             <Route path="/content" element={<Navigate to="/supplier-ops/content" replace />} />
-            <Route path="/content/:id" element={<Navigate to="/supplier-ops/content/:id" replace />} />
+            <Route path="/content/:id" element={<RedirectContentDetail />} />
             {/* /supplier-ops/forum → /forum 리다이렉트 */}
             <Route path="/supplier-ops/forum" element={<Navigate to="/forum" replace />} />
             <Route path="/supplier-ops/forum/*" element={<Navigate to="/forum" replace />} />

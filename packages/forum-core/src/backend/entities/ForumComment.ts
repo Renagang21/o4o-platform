@@ -33,25 +33,25 @@ export class ForumComment {
   @Column({ type: 'text' })
   content!: string;
 
-  @Column({ name: 'post_id', type: 'uuid' })
+  @Column({ type: 'uuid' })
   postId!: string;
 
   @Column({ name: 'author_id', type: 'uuid' })
   authorId!: string;
 
-  @Column({ name: 'parent_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   parentId?: string;
 
   @Column({ type: 'enum', enum: CommentStatus, default: CommentStatus.PUBLISHED })
   status!: CommentStatus;
 
-  @Column({ name: 'like_count', type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0 })
   likeCount!: number;
 
-  @Column({ name: 'reply_count', type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0 })
   replyCount!: number;
 
-  @Column({ name: 'is_edited', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false })
   isEdited!: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -62,7 +62,7 @@ export class ForumComment {
 
   // Relations
   @ManyToOne('ForumPost', { lazy: true })
-  @JoinColumn({ name: 'post_id' })
+  @JoinColumn({ name: 'postId' })
   post?: Promise<ForumPost>;
 
   @ManyToOne('User')
@@ -70,7 +70,7 @@ export class ForumComment {
   author?: any; // Type resolved at runtime via TypeORM
 
   @ManyToOne('ForumComment', { nullable: true, lazy: true })
-  @JoinColumn({ name: 'parent_id' })
+  @JoinColumn({ name: 'parentId' })
   parent?: Promise<ForumComment>;
 
   // Note: OneToMany relationship with replies removed to prevent circular dependency
