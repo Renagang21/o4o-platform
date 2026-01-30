@@ -9,6 +9,7 @@ import { Router, Request, Response, NextFunction, RequestHandler } from 'express
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { GlycopharmService } from '../services/glycopharm.service.js';
+import { FeaturedProductsService } from '../services/featured-products.service.js';
 import {
   ListPharmaciesQueryDto,
   ListProductsQueryDto,
@@ -45,6 +46,7 @@ export function createGlycopharmController(
 ): Router {
   const router = Router();
   const service = new GlycopharmService(dataSource);
+  const featuredService = new FeaturedProductsService(dataSource);
 
   // ============================================================================
   // PUBLIC ROUTES
@@ -511,6 +513,198 @@ export function createGlycopharmController(
       } catch (error: any) {
         console.error('Failed to update product status:', error);
         res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  // ============================================================================
+  // FEATURED PRODUCTS (OPERATOR)
+  // WO-FEATURED-CURATION-API-V1
+  // ============================================================================
+
+  /**
+   * GET /operator/featured-products - List featured products
+   */
+  router.get(
+    '/operator/featured-products',
+    requireAuth,
+    requireScope('glycopharm:operator'),
+    [
+      query('service').isString().notEmpty(),
+      query('context').isString().notEmpty(),
+      handleValidationErrors,
+    ],
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const service = req.query.service as string;
+        const context = req.query.context as string;
+
+        const featuredProducts = await featuredService.listFeaturedProducts(service, context);
+
+        res.json({
+          success: true,
+          data: featuredProducts,
+        });
+      } catch (error: any) {
+        console.error('Failed to list featured products:', error);
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * POST /operator/featured-products - Add product to featured
+   */
+  router.post(
+    '/operator/featured-products',
+    requireAuth,
+    requireScope('glycopharm:operator'),
+    [
+      body('service').isString().notEmpty(),
+      body('context').isString().notEmpty(),
+      body('productId').isUUID(),
+      handleValidationErrors,
+    ],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        const featuredProduct = await featuredService.addFeaturedProduct({
+          service: req.body.service,
+          context: req.body.context,
+          productId: req.body.productId,
+          userId: req.user?.id,
+          userName: req.user?.name || req.user?.email,
+        });
+
+        res.status(201).json({
+          success: true,
+          data: featuredProduct,
+        });
+      } catch (error: any) {
+        console.error('Failed to add featured product:', error);
+
+        if (error.message.includes('이미 Featured로 등록된')) {
+          res.status(409).json({
+            success: false,
+            error: { code: 'ALREADY_EXISTS', message: error.message },
+          });
+        } else if (error.message.includes('찾을 수 없습니다')) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: error.message },
+          });
+        } else {
+          res.status(500).json({
+            success: false,
+            error: { code: 'INTERNAL_ERROR', message: error.message },
+          });
+        }
+      }
+    }
+  );
+
+  /**
+   * PATCH /operator/featured-products/order - Reorder featured products
+   */
+  router.patch(
+    '/operator/featured-products/order',
+    requireAuth,
+    requireScope('glycopharm:operator'),
+    [
+      body('ids').isArray().notEmpty(),
+      body('ids.*').isUUID(),
+      handleValidationErrors,
+    ],
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        await featuredService.reorderFeaturedProducts(req.body.ids);
+
+        res.json({
+          success: true,
+          message: '순서가 변경되었습니다',
+        });
+      } catch (error: any) {
+        console.error('Failed to reorder featured products:', error);
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * PATCH /operator/featured-products/:id - Update featured product active status
+   */
+  router.patch(
+    '/operator/featured-products/:id',
+    requireAuth,
+    requireScope('glycopharm:operator'),
+    [
+      param('id').isUUID(),
+      body('isActive').isBoolean(),
+      handleValidationErrors,
+    ],
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const featuredProduct = await featuredService.updateFeaturedActive(req.params.id, {
+          isActive: req.body.isActive,
+        });
+
+        if (!featuredProduct) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: 'Featured 상품을 찾을 수 없습니다' },
+          });
+          return;
+        }
+
+        res.json({
+          success: true,
+          data: featuredProduct,
+        });
+      } catch (error: any) {
+        console.error('Failed to update featured product:', error);
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * DELETE /operator/featured-products/:id - Remove product from featured
+   */
+  router.delete(
+    '/operator/featured-products/:id',
+    requireAuth,
+    requireScope('glycopharm:operator'),
+    [param('id').isUUID(), handleValidationErrors],
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const success = await featuredService.removeFeaturedProduct(req.params.id);
+
+        if (!success) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: 'Featured 상품을 찾을 수 없습니다' },
+          });
+          return;
+        }
+
+        res.json({
+          success: true,
+          message: 'Featured에서 제거되었습니다',
+        });
+      } catch (error: any) {
+        console.error('Failed to remove featured product:', error);
+        res.status(500).json({
+          success: false,
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }

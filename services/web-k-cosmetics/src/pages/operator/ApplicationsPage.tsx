@@ -1,8 +1,12 @@
 /**
  * ApplicationsPage - K-Cosmetics 신청 관리
+ *
+ * Spike: WO-COSMETICS-TABLE-UI-SPIKE-V1
+ * 축약 Table UI 적합성 테스트 (7→4 컬럼)
  */
 
 import { useState } from 'react';
+import { CosmeticsTable, type CosmeticsTableColumn, type CosmeticsTableRow } from '../../components/common/CosmeticsTable';
 
 const applications = [
   { id: 1, storeName: '뷰티마트 잠실점', owner: '김미영', phone: '010-1234-5678', type: '신규입점', status: '검토중', appliedDate: '2024-01-15' },
@@ -33,6 +37,48 @@ export default function ApplicationsPage() {
   const filteredApplications = applications.filter(app =>
     statusFilter === 'all' || app.status === statusFilter
   );
+
+  // CosmeticsTable 컬럼 정의 (4개 - 축약형, 기존 7개에서 축약)
+  const columns: CosmeticsTableColumn[] = [
+    { id: 'store', label: '매장 정보', width: '35%' },
+    { id: 'application', label: '신청 내용', width: '25%' },
+    { id: 'contact', label: '연락처', width: '20%' },
+    { id: 'status', label: '상태', width: '20%', align: 'center' },
+  ];
+
+  // CosmeticsTable 행 데이터 변환
+  const tableRows: CosmeticsTableRow[] = filteredApplications.map((app) => ({
+    id: app.id.toString(),
+    data: {
+      store: (
+        <div>
+          <p className="font-medium text-slate-800">{app.storeName}</p>
+          <p className="text-sm text-slate-600 mt-1">{app.owner}</p>
+        </div>
+      ),
+      application: (
+        <div>
+          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type]}`}>
+            {app.type}
+          </span>
+          <p className="text-sm text-slate-500 mt-1">{app.appliedDate}</p>
+        </div>
+      ),
+      contact: (
+        <p className="text-sm text-slate-600">{app.phone}</p>
+      ),
+      status: (
+        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status]}`}>
+          {app.status}
+        </span>
+      ),
+    },
+    actions: (
+      <button className="text-pink-600 hover:text-pink-700 font-medium text-sm">
+        상세보기
+      </button>
+    ),
+  }));
 
   return (
     <div className="space-y-6">
@@ -83,48 +129,13 @@ export default function ApplicationsPage() {
         </div>
       </div>
 
-      {/* Applications Table */}
+      {/* Applications Table - Condensed (Spike) */}
       <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-100">
-            <tr>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">매장명</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">대표자</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">연락처</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">신청유형</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상태</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">신청일</th>
-              <th className="text-center px-6 py-4 text-sm font-medium text-slate-500">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredApplications.map((app) => (
-              <tr key={app.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4">
-                  <p className="font-medium text-slate-800">{app.storeName}</p>
-                </td>
-                <td className="px-6 py-4 text-slate-600">{app.owner}</td>
-                <td className="px-6 py-4 text-sm text-slate-500">{app.phone}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type]}`}>
-                    {app.type}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status]}`}>
-                    {app.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-500">{app.appliedDate}</td>
-                <td className="px-6 py-4 text-center">
-                  <button className="text-pink-600 hover:text-pink-700 font-medium text-sm">
-                    상세보기
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <CosmeticsTable
+          columns={columns}
+          rows={tableRows}
+          emptyMessage="신청이 없습니다"
+        />
       </div>
     </div>
   );

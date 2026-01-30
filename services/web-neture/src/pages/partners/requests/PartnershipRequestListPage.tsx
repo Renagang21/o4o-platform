@@ -9,11 +9,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Info } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Info } from 'lucide-react';
 import { netureApi, type PartnershipRequest } from '../../../lib/api';
+import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../../components/common/SimpleTable';
 
 export default function PartnershipRequestListPage() {
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'OPEN' | 'MATCHED' | 'CLOSED'>('ALL');
   const [requests, setRequests] = useState<PartnershipRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +54,69 @@ export default function PartnershipRequestListPage() {
       </div>
     );
   }
+
+  // SimpleTable 컬럼 정의 (4개 - 축약형)
+  const columns: SimpleTableColumn[] = [
+    { id: 'seller', label: '판매자', width: '30%' },
+    { id: 'products', label: '제품 / 기간', width: '25%' },
+    { id: 'revenue', label: '수익 구조', width: '25%' },
+    { id: 'status', label: '상태', width: '20%', align: 'center' },
+  ];
+
+  // SimpleTable 행 데이터 변환
+  const tableRows: SimpleTableRow[] = requests.map((request) => {
+    const statusConfig = {
+      OPEN: { label: '모집 중', color: '#16a34a', bg: '#dcfce7' },
+      MATCHED: { label: '매칭 완료', color: '#2563eb', bg: '#dbeafe' },
+      CLOSED: { label: '종료', color: '#64748b', bg: '#f1f5f9' },
+    }[request.status];
+
+    return {
+      id: request.id,
+      data: {
+        seller: (
+          <div>
+            <div className="font-medium text-gray-900 mb-1">{request.seller.name}</div>
+            <span
+              className="inline-block px-3 py-1 text-xs rounded-full"
+              style={{ backgroundColor: '#e0f2fe', color: '#0284c7' }}
+            >
+              {request.seller.serviceType}
+            </span>
+          </div>
+        ),
+        products: (
+          <div>
+            <div className="text-sm text-gray-800 mb-1">
+              제품 {request.productCount}개
+            </div>
+            <div className="text-xs text-gray-600">
+              {request.period.start} ~ {request.period.end}
+            </div>
+          </div>
+        ),
+        revenue: (
+          <div className="text-sm text-gray-700">{request.revenueStructure}</div>
+        ),
+        status: (
+          <span
+            className="inline-block px-3 py-1 text-xs rounded-full font-medium"
+            style={{ backgroundColor: statusConfig.bg, color: statusConfig.color }}
+          >
+            {statusConfig.label}
+          </span>
+        ),
+      },
+      actions: (
+        <button
+          onClick={() => navigate(`/partners/requests/${request.id}`)}
+          className="text-sm text-blue-600 hover:text-blue-800"
+        >
+          조건 보기
+        </button>
+      ),
+    };
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -95,69 +160,13 @@ export default function PartnershipRequestListPage() {
         </div>
       </div>
 
-      {/* Request Cards */}
-      {requests.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-gray-600">해당하는 제휴 요청이 없습니다</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {requests.map((request) => (
-            <Link
-              key={request.id}
-              to={`/partners/requests/${request.id}`}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
-            >
-              {/* Header with Status */}
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {request.seller.name}
-                </h3>
-                <span className={`px-3 py-1 text-xs rounded-full ${
-                  request.status === 'OPEN'
-                    ? 'bg-green-100 text-green-700'
-                    : request.status === 'MATCHED'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-700'
-                }`}>
-                  {request.status === 'OPEN' ? '모집 중' : request.status === 'MATCHED' ? '매칭 완료' : '종료'}
-                </span>
-              </div>
-
-              {/* Service Type Badge */}
-              <div className="mb-4">
-                <span className="inline-block px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-full">
-                  {request.seller.serviceType}
-                </span>
-              </div>
-
-              {/* Info */}
-              <div className="space-y-2 mb-4">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">제품 수:</span> {request.productCount}개
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">기간:</span> {request.period.start} ~ {request.period.end}
-                </p>
-              </div>
-
-              {/* Revenue Structure */}
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-700 font-medium mb-2">수익 구조</p>
-                <p className="text-sm text-gray-600">{request.revenueStructure}</p>
-              </div>
-
-              {/* CTA */}
-              <div className="mt-4">
-                <span className="inline-flex items-center text-primary-600 hover:text-primary-700 text-sm font-medium">
-                  조건 보기
-                  <ArrowRight className="ml-1 w-4 h-4" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      {/* Request List - SimpleTable */}
+      <SimpleTable
+        columns={columns}
+        rows={tableRows}
+        loading={loading}
+        emptyMessage="해당하는 제휴 요청이 없습니다"
+      />
     </div>
   );
 }

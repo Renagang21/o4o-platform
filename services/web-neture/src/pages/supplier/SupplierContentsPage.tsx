@@ -30,8 +30,6 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  Edit2,
-  Trash2,
 } from 'lucide-react';
 import {
   supplierApi,
@@ -39,6 +37,7 @@ import {
   type ContentType,
   type ContentStatus,
 } from '../../lib/api';
+import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../components/common/SimpleTable';
 
 const CONTENT_TYPE_CONFIG: Record<ContentType, { label: string; icon: typeof FileText; color: string }> = {
   description: { label: '제품 설명', icon: FileText, color: '#3b82f6' },
@@ -85,6 +84,105 @@ export default function SupplierContentsPage() {
     published: contents.filter((c) => c.status === 'published').length,
     draft: contents.filter((c) => c.status === 'draft').length,
   };
+
+  // SimpleTable 컬럼 정의 (4개 - 축약형)
+  const columns: SimpleTableColumn[] = [
+    { id: 'content', label: '콘텐츠', width: '40%' },
+    { id: 'type', label: '유형', width: '20%' },
+    { id: 'updated', label: '수정일', width: '20%' },
+    { id: 'status', label: '상태', width: '20%', align: 'center' },
+  ];
+
+  // SimpleTable 행 데이터 변환
+  const tableRows: SimpleTableRow[] = contents.map((content) => {
+    const typeConfig = CONTENT_TYPE_CONFIG[content.type];
+    const TypeIcon = typeConfig.icon;
+
+    return {
+      id: content.id,
+      data: {
+        content: (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <TypeIcon size={18} style={{ color: typeConfig.color }} />
+              <span className="font-medium text-gray-900">{content.title}</span>
+            </div>
+            {content.description && (
+              <div className="text-sm text-gray-600">{content.description}</div>
+            )}
+          </div>
+        ),
+        type: (
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 500,
+              padding: '4px 8px',
+              borderRadius: '4px',
+              backgroundColor: `${typeConfig.color}20`,
+              color: typeConfig.color,
+            }}
+          >
+            {typeConfig.label}
+          </span>
+        ),
+        updated: (
+          <div>
+            <div className="text-sm text-gray-800">
+              {new Date(content.updatedAt).toLocaleDateString('ko-KR')}
+            </div>
+            {content.availableServices.length > 0 && (
+              <div className="text-xs text-gray-500 mt-1">
+                {content.availableServices.length}개 서비스
+              </div>
+            )}
+          </div>
+        ),
+        status: (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 500,
+              backgroundColor: content.status === 'published' ? '#dcfce7' : '#f1f5f9',
+              color: content.status === 'published' ? '#16a34a' : '#64748b',
+            }}
+          >
+            {content.status === 'published' ? <Eye size={12} /> : <EyeOff size={12} />}
+            {content.status === 'published' ? '공개' : '임시저장'}
+          </span>
+        ),
+      },
+      actions: (
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => handleToggleStatus(content.id, content.status)}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            {content.status === 'published' ? '비공개로 전환' : '공개로 전환'}
+          </button>
+          <span className="text-gray-400">|</span>
+          <button
+            onClick={() => navigate(`/supplier/contents/${content.id}/edit`)}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            수정
+          </button>
+          <span className="text-gray-400">|</span>
+          <button
+            onClick={() => setDeleteConfirm(content.id)}
+            className="text-sm text-red-600 hover:text-red-800"
+          >
+            삭제
+          </button>
+        </div>
+      ),
+    };
+  });
 
   return (
     <div>
@@ -136,10 +234,8 @@ export default function SupplierContentsPage() {
         </div>
       </div>
 
-      {/* Content List */}
-      {loading ? (
-        <div style={styles.loading}>로딩 중...</div>
-      ) : contents.length === 0 ? (
+      {/* Content List - SimpleTable */}
+      {contents.length === 0 && !loading ? (
         <div style={styles.emptyState}>
           <FileText size={48} style={{ color: '#94a3b8', marginBottom: '16px' }} />
           <p style={styles.emptyTitle}>등록된 콘텐츠가 없습니다</p>
@@ -155,65 +251,13 @@ export default function SupplierContentsPage() {
           </button>
         </div>
       ) : (
-        <div style={styles.contentList}>
-          {contents.map((content) => {
-            const typeConfig = CONTENT_TYPE_CONFIG[content.type];
-            const TypeIcon = typeConfig.icon;
-
-            return (
-              <div key={content.id} style={styles.contentCard}>
-                <div style={styles.contentInfo}>
-                  <TypeIcon size={20} style={{ color: typeConfig.color }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={styles.contentHeader}>
-                      <h3 style={styles.contentTitle}>{content.title}</h3>
-                      <span style={{ ...styles.typeBadge, backgroundColor: `${typeConfig.color}20`, color: typeConfig.color }}>
-                        {typeConfig.label}
-                      </span>
-                    </div>
-                    {content.description && <p style={styles.contentDesc}>{content.description}</p>}
-                    <div style={styles.contentMeta}>
-                      <span style={styles.metaText}>
-                        {new Date(content.updatedAt).toLocaleDateString('ko-KR')} 수정
-                      </span>
-                      {content.availableServices.length > 0 && (
-                        <span style={styles.metaText}>
-                          {content.availableServices.length}개 서비스
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div style={styles.contentActions}>
-                  <button
-                    onClick={() => handleToggleStatus(content.id, content.status)}
-                    style={{
-                      ...styles.statusButton,
-                      backgroundColor: content.status === 'published' ? '#dcfce7' : '#f1f5f9',
-                      color: content.status === 'published' ? '#16a34a' : '#64748b',
-                    }}
-                  >
-                    {content.status === 'published' ? <Eye size={14} /> : <EyeOff size={14} />}
-                    {content.status === 'published' ? '공개' : '임시저장'}
-                  </button>
-                  <button
-                    onClick={() => navigate(`/supplier/contents/${content.id}/edit`)}
-                    style={styles.iconButton}
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirm(content.id)}
-                    style={{ ...styles.iconButton, color: '#ef4444' }}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <SimpleTable
+          columns={columns}
+          rows={tableRows}
+          loading={loading}
+          emptyMessage="등록된 콘텐츠가 없습니다"
+          className="mb-6"
+        />
       )}
 
       {/* Delete Confirm Modal */}

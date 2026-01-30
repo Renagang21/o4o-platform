@@ -11,9 +11,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Filter, Clock, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Filter, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { supplierApi, type SupplierRequest, type SupplierRequestStatus } from '../../lib/api';
+import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../components/common/SimpleTable';
 
 // 서비스 아이콘 맵핑
 const SERVICE_ICONS: Record<string, string> = {
@@ -36,6 +37,7 @@ const SERVICES = [
 ];
 
 export default function SellerRequestsPage() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<SupplierRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<SupplierRequestStatus | 'ALL'>('ALL');
@@ -66,6 +68,63 @@ export default function SellerRequestsPage() {
       }
     }
     return true;
+  });
+
+  // SimpleTable columns (축약 버전: 4개 컬럼)
+  const columns: SimpleTableColumn[] = [
+    { id: 'seller', label: '판매자', width: '30%' },
+    { id: 'service', label: '서비스', width: '20%' },
+    { id: 'date', label: '신청일', width: '25%' },
+    { id: 'status', label: '상태', width: '25%', align: 'center' },
+  ];
+
+  // SimpleTable rows
+  const tableRows: SimpleTableRow[] = filteredRequests.map((req) => {
+    const statusConfig = STATUS_CONFIG[req.status];
+    const StatusIcon = statusConfig.icon;
+
+    return {
+      id: req.id,
+      data: {
+        seller: (
+          <div>
+            <div className="font-medium text-gray-900">{req.sellerName}</div>
+            <div className="text-sm text-gray-600">{req.productName}</div>
+          </div>
+        ),
+        service: (
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{SERVICE_ICONS[req.serviceId] || '📦'}</span>
+            <span className="text-sm text-gray-700">{req.serviceName}</span>
+          </div>
+        ),
+        date: (
+          <div className="text-sm text-gray-600">
+            {new Date(req.requestedAt).toLocaleString('ko-KR')}
+          </div>
+        ),
+        status: (
+          <div
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+            style={{
+              backgroundColor: statusConfig.bgColor,
+              color: statusConfig.color,
+            }}
+          >
+            <StatusIcon size={12} />
+            {statusConfig.label}
+          </div>
+        ),
+      },
+      actions: (
+        <button
+          onClick={() => navigate(`/supplier/requests/${req.id}`)}
+          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+        >
+          상세보기
+        </button>
+      ),
+    };
   });
 
   return (
@@ -133,61 +192,15 @@ export default function SellerRequestsPage() {
         )}
       </div>
 
-      {/* Request List */}
-      {loading ? (
-        <div style={styles.loading}>로딩 중...</div>
-      ) : filteredRequests.length === 0 ? (
-        <div style={styles.emptyState}>
-          <p>조건에 맞는 신청이 없습니다.</p>
-        </div>
-      ) : (
-        <div style={styles.requestList}>
-          {filteredRequests.map((req) => {
-            const statusConfig = STATUS_CONFIG[req.status];
-            const StatusIcon = statusConfig.icon;
-
-            return (
-              <Link
-                key={req.id}
-                to={`/supplier/requests/${req.id}`}
-                style={styles.requestCard}
-              >
-                {/* Left: Service & Status */}
-                <div style={styles.cardLeft}>
-                  <span style={styles.serviceIcon}>{SERVICE_ICONS[req.serviceId] || '📦'}</span>
-                  <div
-                    style={{
-                      ...styles.statusBadge,
-                      backgroundColor: statusConfig.bgColor,
-                      color: statusConfig.color,
-                    }}
-                  >
-                    <StatusIcon size={12} />
-                    {statusConfig.label}
-                  </div>
-                </div>
-
-                {/* Center: Info */}
-                <div style={styles.cardCenter}>
-                  <div style={styles.cardRow}>
-                    <span style={styles.sellerName}>{req.sellerName}</span>
-                    <span style={styles.serviceName}>{req.serviceName}</span>
-                  </div>
-                  <p style={styles.productName}>{req.productName}</p>
-                  <span style={styles.timestamp}>
-                    {new Date(req.requestedAt).toLocaleString('ko-KR')}
-                  </span>
-                </div>
-
-                {/* Right: Arrow */}
-                <div style={styles.cardRight}>
-                  <ArrowRight size={20} style={{ color: '#94a3b8' }} />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {/* Request List - SimpleTable */}
+      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <SimpleTable
+          columns={columns}
+          rows={tableRows}
+          loading={loading}
+          emptyMessage="조건에 맞는 신청이 없습니다"
+        />
+      </div>
     </div>
   );
 }

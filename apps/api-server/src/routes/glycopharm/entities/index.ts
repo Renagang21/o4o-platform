@@ -13,6 +13,7 @@ export {
   type GlycopharmServiceType,
   type GlycopharmOrganizationType,
 } from './glycopharm-application.entity.js';
+export { GlycopharmFeaturedProduct } from './glycopharm-featured-product.entity.js';
 
 // Smart Display
 export { DisplayPlaylist, type PlaylistStatus } from './display-playlist.entity.js';

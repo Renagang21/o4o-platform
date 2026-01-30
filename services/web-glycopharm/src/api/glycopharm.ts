@@ -547,6 +547,74 @@ class GlycopharmApiClient {
   }
 }
 
+  // ========================================================================
+  // Featured Products (Operator)
+  // WO-FEATURED-CURATION-API-V1
+  // ========================================================================
+
+  /**
+   * Featured 상품 목록 조회
+   */
+  async getFeaturedProducts(params: {
+    service: string;
+    context: string;
+  }): Promise<any> {
+    const searchParams = new URLSearchParams();
+    searchParams.set('service', params.service);
+    searchParams.set('context', params.context);
+
+    const endpoint = `/api/v1/glycopharm/operator/featured-products?${searchParams.toString()}`;
+    return this.request(endpoint);
+  }
+
+  /**
+   * Featured 상품 추가
+   */
+  async addFeaturedProduct(data: {
+    service: string;
+    context: string;
+    productId: string;
+  }): Promise<any> {
+    const endpoint = `/api/v1/glycopharm/operator/featured-products`;
+    return this.request(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Featured 상품 순서 변경
+   */
+  async reorderFeaturedProducts(ids: string[]): Promise<any> {
+    const endpoint = `/api/v1/glycopharm/operator/featured-products/order`;
+    return this.request(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify({ ids }),
+    });
+  }
+
+  /**
+   * Featured 상품 활성/비활성
+   */
+  async updateFeaturedProductActive(id: string, isActive: boolean): Promise<any> {
+    const endpoint = `/api/v1/glycopharm/operator/featured-products/${id}`;
+    return this.request(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive }),
+    });
+  }
+
+  /**
+   * Featured 상품 제거
+   */
+  async removeFeaturedProduct(id: string): Promise<any> {
+    const endpoint = `/api/v1/glycopharm/operator/featured-products/${id}`;
+    return this.request(endpoint, {
+      method: 'DELETE',
+    });
+  }
+}
+
 // Export singleton instance
 export const glycopharmApi = new GlycopharmApiClient(API_BASE_URL);
 

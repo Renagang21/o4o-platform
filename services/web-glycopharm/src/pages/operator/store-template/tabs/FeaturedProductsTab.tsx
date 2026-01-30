@@ -1,7 +1,9 @@
 /**
  * Featured Products Tab
  *
- * 운영자 Featured 상품 관리
+ * WO-FEATURED-CURATION-API-V1:
+ * 운영자 Featured 상품 관리 (API 연동)
+ *
  * - 전체 상품 검색
  * - Featured 지정 / 해제
  * - 현재 Featured 목록 확인
@@ -10,7 +12,7 @@
  * 운영자 지정 상품은 Market Trial 및 자동 추천보다 우선 노출됨
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
   Plus,
@@ -20,203 +22,186 @@ import {
   Package,
   Star,
   Check,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
-import type { StoreProduct } from '@/types/store';
+import { glycopharmApi } from '@/api/glycopharm';
 
-// Mock 상품 데이터 (실제로는 API에서 가져옴)
-const MOCK_ALL_PRODUCTS: StoreProduct[] = [
-  {
-    id: 'prod-1',
-    productId: 'prod-1',
-    name: '덱스콤 G7 스타터 키트',
-    description: '최신 연속혈당측정기',
-    categoryId: 'cgm',
-    categoryName: 'CGM',
-    price: 350000,
-    salePrice: 299000,
-    supplierId: 'sup-1',
-    supplierName: '덱스콤코리아',
-    images: [],
-    thumbnailUrl: '/images/product-cgm.jpg',
-    rating: 4.8,
-    reviewCount: 156,
-    isDropshipping: true,
-    isActive: true,
-    isFeatured: true,
-    isFeaturedByOperator: true,
-    createdAt: '2024-01-01',
-    serviceContext: 'glycopharm',
-  },
-  {
-    id: 'prod-2',
-    productId: 'prod-2',
-    name: '아큐첵 가이드 혈당측정기',
-    description: '정확한 혈당 측정',
-    categoryId: 'meter',
-    categoryName: '혈당측정기',
-    price: 45000,
-    supplierId: 'sup-2',
-    supplierName: '로슈진단',
-    images: [],
-    thumbnailUrl: '/images/product-meter.jpg',
-    rating: 4.6,
-    reviewCount: 89,
-    isDropshipping: true,
-    isActive: true,
-    isFeatured: true,
-    isFeaturedByOperator: true,
-    createdAt: '2024-01-02',
-    serviceContext: 'glycopharm',
-  },
-  {
-    id: 'prod-3',
-    productId: 'prod-3',
-    name: '란셋펜 + 란셋침 세트',
-    description: '편리한 채혈 도구',
-    categoryId: 'lancet',
-    categoryName: '채혈침',
-    price: 15000,
-    supplierId: 'sup-3',
-    supplierName: '메디서플라이',
-    images: [],
-    rating: 4.5,
-    reviewCount: 45,
-    isDropshipping: true,
-    isActive: true,
-    isFeatured: false,
-    isFeaturedByOperator: false,
-    createdAt: '2024-01-03',
-    serviceContext: 'glycopharm',
-  },
-  {
-    id: 'prod-4',
-    productId: 'prod-4',
-    name: '혈당 시험지 50매',
-    description: '정확한 측정을 위한 시험지',
-    categoryId: 'strip',
-    categoryName: '시험지',
-    price: 25000,
-    supplierId: 'sup-2',
-    supplierName: '로슈진단',
-    images: [],
-    rating: 4.7,
-    reviewCount: 120,
-    isDropshipping: true,
-    isActive: true,
-    isFeatured: false,
-    isFeaturedByOperator: false,
-    createdAt: '2024-01-04',
-    serviceContext: 'glycopharm',
-  },
-  {
-    id: 'prod-5',
-    productId: 'prod-5',
-    name: '당뇨 영양제 세트',
-    description: '혈당 관리에 도움되는 영양제',
-    categoryId: 'supplement',
-    categoryName: '영양제',
-    price: 89000,
-    salePrice: 79000,
-    supplierId: 'sup-4',
-    supplierName: '헬스케어플러스',
-    images: [],
-    rating: 4.4,
-    reviewCount: 67,
-    isDropshipping: true,
-    isActive: true,
-    isFeatured: false,
-    isFeaturedByOperator: false,
-    createdAt: '2024-01-05',
-    serviceContext: 'glycopharm',
-  },
-];
+const SERVICE = 'glycopharm';
+const CONTEXT = 'store-home';
+
+interface FeaturedProduct {
+  id: string;
+  service: string;
+  context: string;
+  product_id: string;
+  position: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  product?: {
+    id: string;
+    name: string;
+    sku: string;
+    category: string;
+    price: number;
+    sale_price?: number;
+    stock_quantity: number;
+    images?: any[];
+    status: string;
+  };
+}
 
 export function FeaturedProductsTab() {
-  const [products, setProducts] = useState<StoreProduct[]>(MOCK_ALL_PRODUCTS);
+  const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([]);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Featured 상품만 필터링 (운영자 지정)
-  const featuredProducts = products
-    .filter((p) => p.isFeaturedByOperator)
-    .sort((a, b) => {
-      // 등록 순서대로 (실제로는 별도 순서 필드 사용)
-      const aIndex = products.findIndex((p) => p.id === a.id);
-      const bIndex = products.findIndex((p) => p.id === b.id);
-      return aIndex - bIndex;
-    });
+  // Load featured products
+  useEffect(() => {
+    loadFeaturedProducts();
+    loadAllProducts();
+  }, []);
+
+  const loadFeaturedProducts = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await glycopharmApi.getFeaturedProducts({
+        service: SERVICE,
+        context: CONTEXT,
+      });
+
+      if (response.success) {
+        setFeaturedProducts(response.data || []);
+      }
+    } catch (err: any) {
+      console.error('Failed to load featured products:', err);
+      setError(err.message || 'Featured 상품을 불러오는데 실패했습니다');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadAllProducts = async () => {
+    try {
+      const response = await glycopharmApi.getOperatorProducts({
+        page: 1,
+        limit: 100,
+      });
+
+      if (response.success) {
+        setAllProducts(response.data.products || []);
+      }
+    } catch (err: any) {
+      console.error('Failed to load products:', err);
+    }
+  };
 
   // 검색 결과
+  const featuredProductIds = new Set(featuredProducts.map((fp) => fp.product_id));
   const searchResults = searchQuery.trim()
-    ? products.filter(
+    ? allProducts.filter(
         (p) =>
-          !p.isFeaturedByOperator &&
+          !featuredProductIds.has(p.id) &&
           (p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.categoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.supplierName.toLowerCase().includes(searchQuery.toLowerCase()))
+            p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.sku.toLowerCase().includes(searchQuery.toLowerCase()))
       )
-    : products.filter((p) => !p.isFeaturedByOperator);
+    : allProducts.filter((p) => !featuredProductIds.has(p.id));
 
   // Featured 지정
-  const addToFeatured = (productId: string) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId ? { ...p, isFeaturedByOperator: true, isFeatured: true } : p
-      )
-    );
-    setSearchQuery('');
-    setIsSearchModalOpen(false);
+  const addToFeatured = async (productId: string) => {
+    try {
+      await glycopharmApi.addFeaturedProduct({
+        service: SERVICE,
+        context: CONTEXT,
+        productId,
+      });
+
+      setSearchQuery('');
+      setIsSearchModalOpen(false);
+      await loadFeaturedProducts();
+    } catch (err: any) {
+      console.error('Failed to add featured product:', err);
+      alert(err.message || 'Featured 추가에 실패했습니다');
+    }
   };
 
   // Featured 해제
-  const removeFromFeatured = (productId: string) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId ? { ...p, isFeaturedByOperator: false } : p
-      )
-    );
+  const removeFromFeatured = async (featuredId: string) => {
+    try {
+      await glycopharmApi.removeFeaturedProduct(featuredId);
+      await loadFeaturedProducts();
+    } catch (err: any) {
+      console.error('Failed to remove featured product:', err);
+      alert(err.message || 'Featured 제거에 실패했습니다');
+    }
   };
 
   // 순서 변경
-  const moveUp = (productId: string) => {
-    const currentIndex = featuredProducts.findIndex((p) => p.id === productId);
-    if (currentIndex === 0) return;
+  const moveUp = async (index: number) => {
+    if (index === 0) return;
 
-    const newProducts = [...products];
-    const featuredIds = featuredProducts.map((p) => p.id);
+    const newOrder = [...featuredProducts];
+    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
 
-    // 순서 교환
-    const prevId = featuredIds[currentIndex - 1];
-    const prevIndex = newProducts.findIndex((p) => p.id === prevId);
-    const currIndex = newProducts.findIndex((p) => p.id === productId);
-
-    [newProducts[prevIndex], newProducts[currIndex]] = [
-      newProducts[currIndex],
-      newProducts[prevIndex],
-    ];
-
-    setProducts(newProducts);
+    const ids = newOrder.map((fp) => fp.id);
+    try {
+      await glycopharmApi.reorderFeaturedProducts(ids);
+      await loadFeaturedProducts();
+    } catch (err: any) {
+      console.error('Failed to reorder:', err);
+      alert('순서 변경에 실패했습니다');
+    }
   };
 
-  const moveDown = (productId: string) => {
-    const currentIndex = featuredProducts.findIndex((p) => p.id === productId);
-    if (currentIndex === featuredProducts.length - 1) return;
+  const moveDown = async (index: number) => {
+    if (index === featuredProducts.length - 1) return;
 
-    const newProducts = [...products];
-    const featuredIds = featuredProducts.map((p) => p.id);
+    const newOrder = [...featuredProducts];
+    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
 
-    // 순서 교환
-    const nextId = featuredIds[currentIndex + 1];
-    const nextIndex = newProducts.findIndex((p) => p.id === nextId);
-    const currIndex = newProducts.findIndex((p) => p.id === productId);
-
-    [newProducts[currIndex], newProducts[nextIndex]] = [
-      newProducts[nextIndex],
-      newProducts[currIndex],
-    ];
-
-    setProducts(newProducts);
+    const ids = newOrder.map((fp) => fp.id);
+    try {
+      await glycopharmApi.reorderFeaturedProducts(ids);
+      await loadFeaturedProducts();
+    } catch (err: any) {
+      console.error('Failed to reorder:', err);
+      alert('순서 변경에 실패했습니다');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+          <p className="text-slate-500 text-sm">불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-3">
+          <AlertCircle className="w-8 h-8 text-red-300" />
+          <p className="text-slate-500 text-sm">{error}</p>
+          <button
+            onClick={loadFeaturedProducts}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -248,79 +233,80 @@ export function FeaturedProductsTab() {
             </button>
           </div>
         ) : (
-          featuredProducts.map((product, index) => (
-            <div
-              key={product.id}
-              className="flex items-center gap-4 p-4 bg-white rounded-lg border border-slate-200"
-            >
-              {/* 순서 */}
-              <div className="flex flex-col gap-1">
-                <button
-                  onClick={() => moveUp(product.id)}
-                  disabled={index === 0}
-                  className="p-1 hover:bg-slate-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <ChevronUp className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => moveDown(product.id)}
-                  disabled={index === featuredProducts.length - 1}
-                  className="p-1 hover:bg-slate-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </div>
+          featuredProducts.map((featured, index) => {
+            const product = featured.product;
+            if (!product) return null;
 
-              {/* 썸네일 */}
-              <div className="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
-                {product.thumbnailUrl ? (
-                  <img
-                    src={product.thumbnailUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Package className="w-6 h-6 text-slate-300" />
-                  </div>
-                )}
-              </div>
-
-              {/* 상품 정보 */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">
-                    #{index + 1}
-                  </span>
-                  <span className="text-xs text-slate-400">{product.categoryName}</span>
-                </div>
-                <h3 className="font-medium text-slate-800 truncate mt-1">{product.name}</h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-sm font-semibold text-primary-600">
-                    {(product.salePrice || product.price).toLocaleString()}원
-                  </span>
-                  {product.salePrice && (
-                    <span className="text-xs text-slate-400 line-through">
-                      {product.price.toLocaleString()}원
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1 text-xs text-slate-500">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                    {product.rating.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-
-              {/* 액션 */}
-              <button
-                onClick={() => removeFromFeatured(product.id)}
-                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                title="Featured 해제"
+            return (
+              <div
+                key={featured.id}
+                className="flex items-center gap-4 p-4 bg-white rounded-lg border border-slate-200"
               >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          ))
+                {/* 순서 */}
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => moveUp(index)}
+                    disabled={index === 0}
+                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveDown(index)}
+                    disabled={index === featuredProducts.length - 1}
+                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* 썸네일 */}
+                <div className="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                  {product.images && product.images.length > 0 ? (
+                    <img
+                      src={product.images[0].url}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Package className="w-6 h-6 text-slate-300" />
+                    </div>
+                  )}
+                </div>
+
+                {/* 상품 정보 */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">
+                      #{index + 1}
+                    </span>
+                    <span className="text-xs text-slate-400">{product.category}</span>
+                  </div>
+                  <h3 className="font-medium text-slate-800 truncate mt-1">{product.name}</h3>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-sm font-semibold text-primary-600">
+                      {(product.sale_price || product.price).toLocaleString()}원
+                    </span>
+                    {product.sale_price && (
+                      <span className="text-xs text-slate-400 line-through">
+                        {product.price.toLocaleString()}원
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 액션 */}
+                <button
+                  onClick={() => removeFromFeatured(featured.id)}
+                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Featured 해제"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
 
@@ -349,7 +335,7 @@ export function FeaturedProductsTab() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="상품명, 카테고리, 공급자 검색..."
+                  placeholder="상품명, 카테고리, SKU 검색..."
                   className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   autoFocus
                 />
@@ -371,9 +357,9 @@ export function FeaturedProductsTab() {
                     >
                       {/* 썸네일 */}
                       <div className="w-12 h-12 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
-                        {product.thumbnailUrl ? (
+                        {product.images && product.images.length > 0 ? (
                           <img
-                            src={product.thumbnailUrl}
+                            src={product.images[0].url}
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />
@@ -386,10 +372,10 @@ export function FeaturedProductsTab() {
 
                       {/* 상품 정보 */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-slate-400">{product.categoryName}</p>
+                        <p className="text-xs text-slate-400">{product.category}</p>
                         <h4 className="font-medium text-slate-800 truncate">{product.name}</h4>
                         <p className="text-sm text-primary-600">
-                          {(product.salePrice || product.price).toLocaleString()}원
+                          {(product.sale_price || product.price).toLocaleString()}원
                         </p>
                       </div>
 

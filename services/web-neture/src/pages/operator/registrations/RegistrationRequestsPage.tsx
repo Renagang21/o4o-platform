@@ -15,11 +15,10 @@ import {
   Search,
   Filter,
   CheckCircle,
-  XCircle,
-  Eye,
   ArrowLeft,
   AlertCircle,
 } from 'lucide-react';
+import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../../components/common/SimpleTable';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
 type UserRole = 'supplier' | 'partner' | 'consumer' | 'seller' | 'pharmacist' | 'ALL';
@@ -219,6 +218,77 @@ export default function RegistrationRequestsPage() {
 
   const pendingCount = requests.filter(r => r.status === 'PENDING').length;
 
+  // SimpleTable columns (축약 버전: 4개 컬럼)
+  const columns: SimpleTableColumn[] = [
+    { id: 'applicant', label: '신청자', width: '35%' },
+    { id: 'company', label: '회사 / 면허', width: '25%' },
+    { id: 'date', label: '신청일', width: '20%' },
+    { id: 'status', label: '상태', width: '20%', align: 'center' },
+  ];
+
+  // SimpleTable rows
+  const tableRows: SimpleTableRow[] = filteredRequests.map((request) => ({
+    id: request.id,
+    data: {
+      applicant: (
+        <div>
+          <div className="font-medium text-gray-900">{request.name}</div>
+          <div className="text-sm text-gray-600">{roleLabels[request.role]}</div>
+          <div className="text-sm text-gray-500">{request.email}</div>
+        </div>
+      ),
+      company: (
+        <div className="text-sm text-gray-900">
+          {request.companyName || request.licenseNumber || '-'}
+          {request.businessNumber && (
+            <div className="text-sm text-gray-500 mt-1">{request.businessNumber}</div>
+          )}
+        </div>
+      ),
+      date: (
+        <div className="text-sm text-gray-600">
+          {new Date(request.createdAt).toLocaleDateString('ko-KR')}
+        </div>
+      ),
+      status: (
+        <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusStyles[request.status]}`}>
+          {statusLabels[request.status]}
+        </span>
+      ),
+    },
+    actions: (
+      <>
+        <button
+          onClick={() => setSelectedRequest(request)}
+          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+        >
+          상세보기
+        </button>
+        {request.status === 'PENDING' && (
+          <>
+            <button
+              onClick={() => handleApprove(request)}
+              disabled={processing}
+              className="text-xs text-green-600 hover:text-green-800 font-medium disabled:opacity-50"
+            >
+              승인
+            </button>
+            <button
+              onClick={() => {
+                setSelectedRequest(request);
+                setShowRejectModal(true);
+              }}
+              disabled={processing}
+              className="text-xs text-red-600 hover:text-red-800 font-medium disabled:opacity-50"
+            >
+              거부
+            </button>
+          </>
+        )}
+      </>
+    ),
+  }));
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -308,108 +378,14 @@ export default function RegistrationRequestsPage() {
           </div>
         </div>
 
-        {/* Request List */}
+        {/* Request List - SimpleTable */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    신청자
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    역할 / 서비스
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    회사 / 면허
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    신청일
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    상태
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    작업
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredRequests.map((request) => (
-                  <tr key={request.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="font-medium text-gray-900">{request.name}</div>
-                        <div className="text-sm text-gray-500">{request.email}</div>
-                        <div className="text-sm text-gray-400">{request.phone}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{roleLabels[request.role]}</div>
-                      <div className="text-sm text-gray-500">{request.service}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {request.companyName || request.licenseNumber || '-'}
-                      </div>
-                      {request.businessNumber && (
-                        <div className="text-sm text-gray-500">{request.businessNumber}</div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(request.createdAt).toLocaleDateString('ko-KR')}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyles[request.status]}`}>
-                        {statusLabels[request.status]}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => setSelectedRequest(request)}
-                          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                          title="상세보기"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {request.status === 'PENDING' && (
-                          <>
-                            <button
-                              onClick={() => handleApprove(request)}
-                              disabled={processing}
-                              className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg"
-                              title="승인"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedRequest(request);
-                                setShowRejectModal(true);
-                              }}
-                              disabled={processing}
-                              className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
-                              title="거부"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {filteredRequests.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">조건에 맞는 가입 신청이 없습니다.</p>
-            </div>
-          )}
+          <SimpleTable
+            columns={columns}
+            rows={tableRows}
+            loading={loading}
+            emptyMessage="조건에 맞는 가입 신청이 없습니다"
+          />
         </div>
 
         {/* Detail Modal */}
