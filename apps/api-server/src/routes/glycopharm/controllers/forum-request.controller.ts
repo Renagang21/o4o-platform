@@ -8,7 +8,7 @@ import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { GlycopharmForumCategoryRequest } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { ForumCategory } from '@o4o/forum-core';
+import { ForumCategory } from '@o4o/forum-core/entities';
 import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;

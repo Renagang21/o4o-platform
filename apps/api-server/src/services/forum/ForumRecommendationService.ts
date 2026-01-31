@@ -13,7 +13,7 @@
 
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumPost, PostStatus } from '@o4o/forum-core';
+import { ForumPost, PostStatus } from '@o4o/forum-core/entities';
 import type {
   ForumPostMetadata,
   ForumPostAIMeta,

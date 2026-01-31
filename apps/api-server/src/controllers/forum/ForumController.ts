@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumPost, PostStatus } from '@o4o/forum-core';
-import { ForumCategory } from '@o4o/forum-core';
-import { ForumComment, CommentStatus } from '@o4o/forum-core';
+import { ForumPost, PostStatus } from '@o4o/forum-core/entities';
+import { ForumCategory } from '@o4o/forum-core/entities';
+import { ForumComment, CommentStatus } from '@o4o/forum-core/entities';
 import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o/forum-core';
 import type { ForumPostMetadata } from '@o4o/forum-core';
 import { User } from '../../modules/auth/entities/User.js';
