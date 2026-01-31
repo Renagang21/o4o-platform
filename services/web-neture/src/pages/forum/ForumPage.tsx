@@ -9,8 +9,25 @@
  * - 질문·의견·제안의 공식 기록 공간
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+
+/** Inline media query hook — returns true when viewport matches */
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false,
+  );
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener('change', handler);
+    setMatches(mql.matches);
+    return () => mql.removeEventListener('change', handler);
+  }, [query]);
+
+  return matches;
+}
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -88,11 +105,11 @@ function getTypeBadge(type: PostType): { label: string; bgColor: string; textCol
   return badges[type];
 }
 
-function PostItem({ post, onClick }: { post: DisplayPost; onClick: () => void }) {
+function PostItem({ post, onClick, compact }: { post: DisplayPost; onClick: () => void; compact?: boolean }) {
   const badge = getTypeBadge(post.type);
 
   return (
-    <article style={styles.postItem} onClick={onClick}>
+    <article style={compact ? styles.postItemCompact : styles.postItem} onClick={onClick}>
       <div style={styles.postContent}>
         <div style={styles.postTitleRow}>
           {post.isPinned && (
@@ -103,7 +120,7 @@ function PostItem({ post, onClick }: { post: DisplayPost; onClick: () => void })
               {badge.label}
             </span>
           )}
-          <h3 style={styles.postTitle}>{post.title}</h3>
+          <h3 style={compact ? styles.postTitleCompact : styles.postTitle}>{post.title}</h3>
           {post.commentCount > 0 && (
             <span style={styles.commentCount}>[{post.commentCount}]</span>
           )}
@@ -138,6 +155,7 @@ const PAGE_SIZE = 20;
 export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // URL-driven state
   const searchQuery = searchParams.get('q') || '';
@@ -147,6 +165,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const hasFilters = !!searchQuery || !!categoryFilter || !!typeFilter || sortBy !== 'latest';
 
   const [searchInput, setSearchInput] = useState(searchQuery);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [pinnedPosts, setPinnedPosts] = useState<DisplayPost[]>([]);
   const [posts, setPosts] = useState<DisplayPost[]>([]);
@@ -335,35 +354,22 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const handleClearAll = () => {
     setSearchInput('');
     setSearchParams({});
+    setShowMobileFilters(false);
   };
 
-  return (
-    <div style={styles.container}>
-      {/* Page Header */}
-      <header style={styles.header}>
-        <div style={styles.headerTop}>
-          <div>
-            <h1 style={styles.pageTitle}>o4o · 네뚜레 의견 나누기</h1>
-            <p style={styles.pageDescription}>
-              o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.
-            </p>
-          </div>
-          <Link to="/forum/write" style={styles.writeButton}>
-            의견 남기기
-          </Link>
-        </div>
-      </header>
+  // Count active filters for mobile badge
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (searchQuery) count++;
+    if (categoryFilter) count++;
+    if (typeFilter) count++;
+    if (sortBy !== 'latest') count++;
+    return count;
+  }, [searchQuery, categoryFilter, typeFilter, sortBy]);
 
-      {/* Notice Banner */}
-      <div style={styles.noticeBanner}>
-        <span style={styles.noticeIcon}>ℹ️</span>
-        <p style={styles.noticeText}>
-          이 포럼은 상품 홍보나 고객 문의를 위한 공간이 아닙니다.
-          <br />
-          o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.
-        </p>
-      </div>
-
+  // ---- Shared filter controls (used in both desktop and mobile bottom sheet) ----
+  const filterControls = (
+    <>
       {/* Search Bar */}
       <form style={styles.searchForm} onSubmit={handleSearchSubmit}>
         <div style={styles.searchInputWrapper}>
@@ -391,13 +397,13 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
       </form>
 
       {/* Filter Bar */}
-      <div style={styles.filterBar}>
-        <div style={styles.filterGroup}>
+      <div style={isMobile ? styles.filterBarMobile : styles.filterBar}>
+        <div style={isMobile ? styles.filterGroupMobile : styles.filterGroup}>
           {categories.length > 0 && (
             <select
               value={categoryFilter}
               onChange={(e) => updateParam('category', e.target.value)}
-              style={styles.filterSelect}
+              style={isMobile ? styles.filterSelectMobile : styles.filterSelect}
             >
               <option value="">카테고리 전체</option>
               {categories.map((cat) => (
@@ -411,7 +417,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
                 key={value}
                 onClick={() => updateParam('type', value)}
                 style={{
-                  ...styles.typePill,
+                  ...(isMobile ? styles.typePillMobile : styles.typePill),
                   ...(typeFilter === value ? styles.typePillActive : {}),
                 }}
               >
@@ -420,11 +426,11 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
             ))}
           </div>
         </div>
-        <div style={styles.filterRight}>
+        <div style={isMobile ? { width: '100%' } : styles.filterRight}>
           <select
             value={sortBy}
             onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)}
-            style={styles.filterSelect}
+            style={isMobile ? styles.filterSelectMobile : styles.filterSelect}
           >
             {SORT_OPTIONS.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>
@@ -433,7 +439,6 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
         </div>
       </div>
 
-      {/* Active Filters Summary */}
       {hasFilters && (
         <div style={styles.activeFilters}>
           <span style={styles.activeFiltersLabel}>
@@ -451,6 +456,98 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
           <button onClick={handleClearAll} style={styles.clearAllButton}>
             초기화
           </button>
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <div style={isMobile ? styles.containerMobile : styles.container}>
+      {/* Page Header */}
+      <header style={styles.header}>
+        <div style={isMobile ? styles.headerTopMobile : styles.headerTop}>
+          <div style={isMobile ? { flex: 1, minWidth: 0 } : undefined}>
+            <h1 style={isMobile ? styles.pageTitleMobile : styles.pageTitle}>
+              o4o · 네뚜레 의견 나누기
+            </h1>
+            {!isMobile && (
+              <p style={styles.pageDescription}>
+                o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.
+              </p>
+            )}
+          </div>
+          <Link to="/forum/write" style={isMobile ? styles.writeButtonMobile : styles.writeButton}>
+            {isMobile ? '글쓰기' : '의견 남기기'}
+          </Link>
+        </div>
+      </header>
+
+      {/* Notice Banner — hidden on mobile for density */}
+      {!isMobile && (
+        <div style={styles.noticeBanner}>
+          <span style={styles.noticeIcon}>ℹ️</span>
+          <p style={styles.noticeText}>
+            이 포럼은 상품 홍보나 고객 문의를 위한 공간이 아닙니다.
+            <br />
+            o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.
+          </p>
+        </div>
+      )}
+
+      {/* Desktop: inline filters. Mobile: filter toggle button */}
+      {isMobile ? (
+        <div style={styles.mobileFilterToggleBar}>
+          <button
+            style={styles.mobileFilterButton}
+            onClick={() => setShowMobileFilters(true)}
+          >
+            필터 / 검색
+            {activeFilterCount > 0 && (
+              <span style={styles.filterBadge}>{activeFilterCount}</span>
+            )}
+          </button>
+          {hasFilters && (
+            <button onClick={handleClearAll} style={styles.mobileClearButton}>
+              초기화
+            </button>
+          )}
+        </div>
+      ) : (
+        filterControls
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && showMobileFilters && (
+        <div
+          style={styles.bottomSheetOverlay}
+          onClick={() => setShowMobileFilters(false)}
+        >
+          <div
+            style={styles.bottomSheet}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={styles.bottomSheetHandle} />
+            <div style={styles.bottomSheetHeader}>
+              <h3 style={styles.bottomSheetTitle}>검색 / 필터</h3>
+              <button
+                style={styles.bottomSheetClose}
+                onClick={() => setShowMobileFilters(false)}
+              >
+                닫기
+              </button>
+            </div>
+            <div style={styles.bottomSheetBody}>
+              {filterControls}
+            </div>
+            <div style={styles.bottomSheetFooter}>
+              <button
+                style={styles.bottomSheetApply}
+                onClick={() => setShowMobileFilters(false)}
+              >
+                적용하기
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -492,6 +589,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
                 <PostItem
                   key={post.id}
                   post={post}
+                  compact={isMobile}
                   onClick={() => handlePostClick(post)}
                 />
               ))}
@@ -514,6 +612,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
                   <PostItem
                     key={post.id}
                     post={post}
+                    compact={isMobile}
                     onClick={() => handlePostClick(post)}
                   />
                 ))}
@@ -574,6 +673,11 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     padding: '40px 20px',
   },
+  containerMobile: {
+    maxWidth: '100%',
+    margin: '0 auto',
+    padding: '16px 12px',
+  },
   header: {
     marginBottom: '32px',
   },
@@ -582,6 +686,12 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: '20px',
+  },
+  headerTopMobile: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '12px',
   },
   writeButton: {
     display: 'inline-flex',
@@ -596,11 +706,35 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap',
     flexShrink: 0,
   },
+  writeButtonMobile: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 16px',
+    minHeight: '44px',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: PRIMARY_COLOR,
+    textDecoration: 'none',
+    borderRadius: '8px',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
   pageTitle: {
     fontSize: '28px',
     fontWeight: 700,
     color: '#0f172a',
     margin: '0 0 12px 0',
+  },
+  pageTitleMobile: {
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#0f172a',
+    margin: '0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   pageDescription: {
     fontSize: '15px',
@@ -678,6 +812,178 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     borderColor: PRIMARY_COLOR,
   } as React.CSSProperties,
+  typePillMobile: {
+    padding: '8px 14px',
+    minHeight: '44px',
+    fontSize: '13px',
+    fontWeight: 500,
+    border: '1px solid #e2e8f0',
+    borderRadius: '16px',
+    backgroundColor: '#fff',
+    color: '#64748b',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+  } as React.CSSProperties,
+  // Mobile filter bar & bottom sheet
+  filterBarMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '12px',
+  } as React.CSSProperties,
+  filterGroupMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  } as React.CSSProperties,
+  filterSelectMobile: {
+    padding: '10px 12px',
+    minHeight: '44px',
+    fontSize: '14px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#334155',
+    cursor: 'pointer',
+    outline: 'none',
+    width: '100%',
+  } as React.CSSProperties,
+  mobileFilterToggleBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '12px',
+  },
+  mobileFilterButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 16px',
+    minHeight: '44px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#334155',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    flex: 1,
+    justifyContent: 'center',
+  } as React.CSSProperties,
+  filterBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '20px',
+    height: '20px',
+    padding: '0 6px',
+    fontSize: '11px',
+    fontWeight: 700,
+    color: '#fff',
+    backgroundColor: PRIMARY_COLOR,
+    borderRadius: '10px',
+  },
+  mobileClearButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 16px',
+    minHeight: '44px',
+    fontSize: '13px',
+    color: '#64748b',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  bottomSheetOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    zIndex: 1000,
+    display: 'flex',
+    alignItems: 'flex-end',
+  } as React.CSSProperties,
+  bottomSheet: {
+    width: '100%',
+    maxHeight: '85vh',
+    backgroundColor: '#fff',
+    borderRadius: '16px 16px 0 0',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+  } as React.CSSProperties,
+  bottomSheetHandle: {
+    width: '40px',
+    height: '4px',
+    backgroundColor: '#cbd5e1',
+    borderRadius: '2px',
+    margin: '12px auto 0',
+  },
+  bottomSheetHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '16px 20px 8px',
+  },
+  bottomSheetTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#0f172a',
+    margin: 0,
+  },
+  bottomSheetClose: {
+    background: 'none',
+    border: 'none',
+    fontSize: '14px',
+    color: '#64748b',
+    cursor: 'pointer',
+    padding: '8px',
+    minHeight: '44px',
+    minWidth: '44px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as React.CSSProperties,
+  bottomSheetBody: {
+    padding: '8px 20px 16px',
+    overflowY: 'auto',
+    flex: 1,
+  } as React.CSSProperties,
+  bottomSheetFooter: {
+    padding: '12px 20px 24px',
+    borderTop: '1px solid #e2e8f0',
+  },
+  bottomSheetApply: {
+    width: '100%',
+    padding: '14px',
+    minHeight: '48px',
+    fontSize: '15px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: PRIMARY_COLOR,
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  } as React.CSSProperties,
+  // Compact post item for mobile
+  postItemCompact: {
+    padding: '12px',
+    borderBottom: '1px solid #f1f5f9',
+    cursor: 'pointer',
+    transition: 'background-color 0.15s',
+    minHeight: '44px',
+  },
+  postTitleCompact: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#1e293b',
+    margin: 0,
+  },
   activeFilters: {
     display: 'flex',
     alignItems: 'center',

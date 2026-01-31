@@ -10,8 +10,25 @@
  * - 오직 글 → 댓글 흐름
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+
+/** Inline media query hook */
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false,
+  );
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener('change', handler);
+    setMatches(mql.matches);
+    return () => mql.removeEventListener('change', handler);
+  }, [query]);
+
+  return matches;
+}
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   fetchForumPostBySlug,
@@ -96,11 +113,12 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   };
 }
 
-function CommentItem({ comment, currentUserId, onUpdate, onDelete }: {
+function CommentItem({ comment, currentUserId, onUpdate, onDelete, compact }: {
   comment: DisplayComment;
   currentUserId?: string;
   onUpdate: (id: string, content: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  compact?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
@@ -122,7 +140,7 @@ function CommentItem({ comment, currentUserId, onUpdate, onDelete }: {
   };
 
   return (
-    <div style={styles.comment}>
+    <div style={compact ? styles.commentCompact : styles.comment}>
       <div style={styles.commentHeader}>
         <span style={styles.commentAuthor}>{comment.authorName}</span>
         <span style={styles.commentDate}>
@@ -131,8 +149,8 @@ function CommentItem({ comment, currentUserId, onUpdate, onDelete }: {
         </span>
         {isOwner && !isEditing && (
           <div style={styles.commentActions}>
-            <button style={styles.actionBtn} onClick={() => { setIsEditing(true); setEditContent(comment.content); }}>수정</button>
-            <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDelete}>삭제</button>
+            <button style={compact ? styles.actionBtnMobile : styles.actionBtn} onClick={() => { setIsEditing(true); setEditContent(comment.content); }}>수정</button>
+            <button style={compact ? { ...styles.actionBtnMobile, color: '#dc2626' } : { ...styles.actionBtn, color: '#dc2626' }} onClick={handleDelete}>삭제</button>
           </div>
         )}
       </div>
@@ -145,9 +163,9 @@ function CommentItem({ comment, currentUserId, onUpdate, onDelete }: {
             rows={3}
           />
           <div style={{ display: 'flex', gap: '8px', marginTop: '8px', justifyContent: 'flex-end' }}>
-            <button style={styles.cancelBtn} onClick={() => setIsEditing(false)}>취소</button>
+            <button style={compact ? styles.cancelBtnMobile : styles.cancelBtn} onClick={() => setIsEditing(false)}>취소</button>
             <button
-              style={{ ...styles.submitButton, padding: '6px 14px', fontSize: '13px', opacity: isSaving ? 0.5 : 1 }}
+              style={{ ...styles.submitButton, padding: compact ? '10px 18px' : '6px 14px', fontSize: '13px', opacity: isSaving ? 0.5 : 1, minHeight: compact ? '44px' : undefined }}
               onClick={handleSave}
               disabled={isSaving}
             >
@@ -167,6 +185,7 @@ export function ForumPostPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<DisplayComment[]>([]);
@@ -175,8 +194,22 @@ export function ForumPostPage() {
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+  const [showActionMenu, setShowActionMenu] = useState(false);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
 
   const currentUserId = user?.id;
+
+  // Close action menu on outside click
+  useEffect(() => {
+    if (!showActionMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setShowActionMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showActionMenu]);
 
   useEffect(() => {
     async function loadPost() {
@@ -323,7 +356,7 @@ export function ForumPostPage() {
   const contentText = extractTextContent(post.content);
 
   return (
-    <div style={styles.container}>
+    <div style={isMobile ? styles.containerMobile : styles.container}>
       {/* Breadcrumb */}
       <nav style={styles.breadcrumb}>
         <Link to="/" style={styles.breadcrumbLink}>홈</Link>
@@ -335,21 +368,52 @@ export function ForumPostPage() {
 
       {/* Post Header */}
       <header style={styles.postHeader}>
-        <div style={styles.badgeRow}>
-          {post.isPinned && (
-            <span style={styles.pinnedBadge}>고정</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={styles.badgeRow}>
+            {post.isPinned && (
+              <span style={styles.pinnedBadge}>고정</span>
+            )}
+            <span style={{ ...styles.typeBadge, backgroundColor: badge.bgColor, color: badge.textColor }}>
+              {badge.label}
+            </span>
+          </div>
+          {/* Mobile: ⋮ action menu */}
+          {isMobile && currentUserId && post.authorId === currentUserId && (
+            <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
+              <button
+                style={styles.moreMenuButton}
+                onClick={() => setShowActionMenu(!showActionMenu)}
+                aria-label="게시글 메뉴"
+              >
+                ⋮
+              </button>
+              {showActionMenu && (
+                <div style={styles.moreMenuDropdown}>
+                  <button
+                    style={styles.moreMenuItem}
+                    onClick={() => { setShowActionMenu(false); navigate(`/forum/write?edit=${post.id}`); }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    style={{ ...styles.moreMenuItem, color: '#dc2626' }}
+                    onClick={() => { setShowActionMenu(false); handleDeletePost(); }}
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
+            </div>
           )}
-          <span style={{ ...styles.typeBadge, backgroundColor: badge.bgColor, color: badge.textColor }}>
-            {badge.label}
-          </span>
         </div>
-        <h1 style={styles.postTitle}>{post.title}</h1>
+        <h1 style={isMobile ? styles.postTitleMobile : styles.postTitle}>{post.title}</h1>
         <div style={styles.postMeta}>
           <span style={styles.authorName}>{authorName}</span>
           <span style={styles.metaDivider}>·</span>
           <span>{formatDate(post.publishedAt || post.createdAt)}</span>
         </div>
-        {currentUserId && post.authorId === currentUserId && (
+        {/* Desktop: inline actions */}
+        {!isMobile && currentUserId && post.authorId === currentUserId && (
           <div style={styles.postActions}>
             <button style={styles.actionBtn} onClick={() => navigate(`/forum/write?edit=${post.id}`)}>수정</button>
             <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
@@ -431,6 +495,7 @@ export function ForumPostPage() {
               <button
                 style={{
                   ...styles.submitButton,
+                  ...(isMobile ? { minHeight: '44px', padding: '10px 18px' } : {}),
                   opacity: !commentText.trim() || isSubmitting ? 0.5 : 1,
                   cursor: !commentText.trim() || isSubmitting ? 'not-allowed' : 'pointer',
                 }}
@@ -451,7 +516,7 @@ export function ForumPostPage() {
         <div style={styles.commentsList}>
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} currentUserId={currentUserId} onUpdate={handleUpdateComment} onDelete={handleDeleteComment} />
+              <CommentItem key={comment.id} comment={comment} currentUserId={currentUserId} onUpdate={handleUpdateComment} onDelete={handleDeleteComment} compact={isMobile} />
             ))
           ) : (
             <div style={styles.noComments}>
@@ -478,6 +543,11 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '800px',
     margin: '0 auto',
     padding: '40px 20px',
+  },
+  containerMobile: {
+    maxWidth: '100%',
+    margin: '0 auto',
+    padding: '16px 12px',
   },
   skeletonBar: {
     display: 'block',
@@ -539,6 +609,58 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 0 16px 0',
     lineHeight: 1.4,
   },
+  postTitleMobile: {
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#0f172a',
+    margin: '0 0 12px 0',
+    lineHeight: 1.4,
+  },
+  // ⋮ action menu (mobile)
+  moreMenuWrapper: {
+    position: 'relative',
+  } as React.CSSProperties,
+  moreMenuButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '44px',
+    minHeight: '44px',
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#64748b',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    borderRadius: '8px',
+    padding: 0,
+    lineHeight: 1,
+  } as React.CSSProperties,
+  moreMenuDropdown: {
+    position: 'absolute',
+    top: '100%',
+    right: 0,
+    minWidth: '120px',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    zIndex: 100,
+    overflow: 'hidden',
+  } as React.CSSProperties,
+  moreMenuItem: {
+    display: 'block',
+    width: '100%',
+    padding: '12px 16px',
+    minHeight: '44px',
+    fontSize: '14px',
+    color: '#334155',
+    background: 'none',
+    border: 'none',
+    borderBottom: '1px solid #f1f5f9',
+    cursor: 'pointer',
+    textAlign: 'left',
+  } as React.CSSProperties,
   postMeta: {
     display: 'flex',
     alignItems: 'center',
@@ -739,6 +861,16 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     padding: '2px 6px',
   },
+  actionBtnMobile: {
+    background: 'none',
+    border: '1px solid #e2e8f0',
+    fontSize: '13px',
+    color: '#64748b',
+    cursor: 'pointer',
+    padding: '8px 12px',
+    minHeight: '36px',
+    borderRadius: '6px',
+  } as React.CSSProperties,
   cancelBtn: {
     background: 'none',
     border: '1px solid #e2e8f0',
@@ -747,6 +879,20 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     padding: '6px 14px',
     borderRadius: '6px',
+  },
+  cancelBtnMobile: {
+    background: 'none',
+    border: '1px solid #e2e8f0',
+    fontSize: '13px',
+    color: '#64748b',
+    cursor: 'pointer',
+    padding: '10px 18px',
+    minHeight: '44px',
+    borderRadius: '6px',
+  } as React.CSSProperties,
+  commentCompact: {
+    padding: '16px 0',
+    borderBottom: '1px solid #f1f5f9',
   },
   postActions: {
     display: 'flex',
