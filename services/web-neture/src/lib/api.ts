@@ -294,6 +294,25 @@ export const partnerDashboardApi = {
     const result = await response.json();
     return result.data || [];
   },
+
+  /**
+   * PATCH /api/v1/neture/partner/dashboard/items/:id
+   * 대시보드 아이템 상태 토글
+   * WO-PARTNER-DASHBOARD-UX-PHASE2-V1
+   */
+  async toggleStatus(itemId: string, status: 'active' | 'inactive'): Promise<{ id: string; status: string; updatedAt: string }> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to toggle status: ${response.status}`);
+    }
+    const result = await response.json();
+    return result.data;
+  },
 };
 
 // CMS Content API

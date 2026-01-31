@@ -14,9 +14,9 @@
  * - 상세 분석/처리는 각 서비스에서
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem } from '../../lib/api';
 
@@ -53,10 +53,22 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: '기타',
 };
 
+const SERVICE_LABELS: Record<string, string> = {
+  glycopharm: 'GlycoPharm',
+  'k-cosmetics': 'K-Cosmetics',
+  glucoseview: 'GlucoseView',
+};
+
+type SortOption = 'recent' | 'oldest' | 'name';
+
 export function PartnerOverviewPage() {
   const [summary, setSummary] = useState<PartnerDashboardSummary | null>(null);
   const [dashboardItems, setDashboardItems] = useState<PartnerDashboardItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<SortOption>('recent');
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -76,6 +88,65 @@ export function PartnerOverviewPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Sorted + grouped dashboard items (WO-PARTNER-DASHBOARD-UX-PHASE2-V1)
+  const groupedItems = useMemo(() => {
+    const sorted = [...dashboardItems].sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'name':
+          return a.productName.localeCompare(b.productName, 'ko');
+        default: // recent
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
+
+    const groups = new Map<string, PartnerDashboardItem[]>();
+    for (const item of sorted) {
+      const key = item.serviceId;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(item);
+    }
+    return groups;
+  }, [dashboardItems, sortBy]);
+
+  const toggleGroup = (serviceId: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(serviceId)) next.delete(serviceId);
+      else next.add(serviceId);
+      return next;
+    });
+  };
+
+  const handleToggleStatus = async (item: PartnerDashboardItem) => {
+    const newStatus = item.status === 'active' ? 'inactive' : 'active';
+    setTogglingIds((prev) => new Set(prev).add(item.id));
+
+    // Optimistic update
+    setDashboardItems((prev) =>
+      prev.map((i) => (i.id === item.id ? { ...i, status: newStatus } : i)),
+    );
+
+    try {
+      await partnerDashboardApi.toggleStatus(item.id, newStatus);
+      setToastMessage(newStatus === 'active' ? '활성화되었습니다' : '비활성화되었습니다');
+    } catch {
+      // Revert on error
+      setDashboardItems((prev) =>
+        prev.map((i) => (i.id === item.id ? { ...i, status: item.status } : i)),
+      );
+      setToastMessage('상태 변경에 실패했습니다');
+    } finally {
+      setTogglingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
 
   const hasConnectedServices = summary?.connectedServices && summary.connectedServices.length > 0;
   const hasNotifications = summary?.notifications && summary.notifications.length > 0;
@@ -193,9 +264,30 @@ export function PartnerOverviewPage() {
         )}
       </div>
 
-      {/* 내가 소개하는 제품 (WO-PARTNER-DASHBOARD-PHASE1-V1) */}
+      {/* 내가 소개하는 제품 (WO-PARTNER-DASHBOARD-UX-PHASE2-V1) */}
       <div style={styles.notificationSection}>
-        <h2 style={styles.sectionTitle}>내가 소개하는 제품</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>내가 소개하는 제품</h2>
+          {dashboardItems.length > 0 && !loading && (
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              style={{
+                padding: '6px 12px',
+                fontSize: '13px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                color: '#475569',
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="recent">최근 추가순</option>
+              <option value="oldest">오래된 순</option>
+              <option value="name">제품명 A-Z</option>
+            </select>
+          )}
+        </div>
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[1, 2, 3].map((i) => (
@@ -215,36 +307,115 @@ export function PartnerOverviewPage() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
-            {dashboardItems.map((item) => (
-              <div key={item.id} style={{ ...styles.statCard, flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                  <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: '#1e293b' }}>
-                    {item.productName}
-                  </h4>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    backgroundColor: item.status === 'active' ? '#f0fdf4' : '#f1f5f9',
-                    color: item.status === 'active' ? '#16a34a' : '#64748b',
-                  }}>
-                    {item.status === 'active' ? '활성' : '비활성'}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {Array.from(groupedItems.entries()).map(([serviceId, items]) => (
+              <div key={serviceId} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fff' }}>
+                {/* Group Header */}
+                <button
+                  onClick={() => toggleGroup(serviceId)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '14px 18px',
+                    border: 'none',
+                    backgroundColor: '#f8fafc',
+                    cursor: 'pointer',
+                    borderBottom: collapsedGroups.has(serviceId) ? 'none' : '1px solid #e2e8f0',
+                  }}
+                >
+                  {collapsedGroups.has(serviceId) ? <ChevronRight size={16} color="#64748b" /> : <ChevronDown size={16} color="#64748b" />}
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>
+                    {SERVICE_LABELS[serviceId] || serviceId}
                   </span>
-                </div>
-                <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#64748b' }}>
-                  <span>{CATEGORY_LABELS[item.category] || item.category}</span>
-                  <span>{item.price.toLocaleString()}원</span>
-                </div>
-                {item.pharmacyName && (
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>공급: {item.pharmacyName}</span>
+                  <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '4px' }}>
+                    ({items.length})
+                  </span>
+                </button>
+
+                {/* Group Items */}
+                {!collapsedGroups.has(serviceId) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px', padding: '14px' }}>
+                    {items.map((item) => (
+                      <div
+                        key={item.id}
+                        style={{
+                          ...styles.statCard,
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: '8px',
+                          opacity: item.status === 'inactive' ? 0.6 : 1,
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                          <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: item.status === 'inactive' ? '#94a3b8' : '#1e293b' }}>
+                            {item.productName}
+                          </h4>
+                          <span style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            backgroundColor: item.status === 'active' ? '#f0fdf4' : '#f1f5f9',
+                            color: item.status === 'active' ? '#16a34a' : '#94a3b8',
+                          }}>
+                            {item.status === 'active' ? '활성' : '비활성'}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#64748b' }}>
+                          <span>{CATEGORY_LABELS[item.category] || item.category}</span>
+                          <span>{item.price.toLocaleString()}원</span>
+                        </div>
+                        {item.pharmacyName && (
+                          <span style={{ fontSize: '12px', color: '#94a3b8' }}>공급: {item.pharmacyName}</span>
+                        )}
+                        <button
+                          onClick={() => handleToggleStatus(item)}
+                          disabled={togglingIds.has(item.id)}
+                          style={{
+                            marginTop: '4px',
+                            padding: '4px 10px',
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '4px',
+                            backgroundColor: '#fff',
+                            color: item.status === 'active' ? '#64748b' : '#7c3aed',
+                            cursor: togglingIds.has(item.id) ? 'wait' : 'pointer',
+                          }}
+                        >
+                          {togglingIds.has(item.id) ? '변경 중...' : item.status === 'active' ? '비활성화' : '활성화'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Toast */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 50,
+          backgroundColor: '#1e293b',
+          color: '#fff',
+          padding: '12px 24px',
+          borderRadius: '8px',
+          fontSize: '14px',
+          fontWeight: 500,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        }}>
+          {toastMessage}
+        </div>
+      )}
 
       {/* Service Entry Cards */}
       <div style={styles.serviceSection}>

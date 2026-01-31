@@ -7,7 +7,6 @@ import { requireAuth, requireAdmin, requireRole } from '../../middleware/auth.mi
 import { AppDataSource } from '../../database/connection.js';
 import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glycopharm.repository.js';
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
-import { In } from 'typeorm';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -906,6 +905,42 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
   } catch (error) {
     logger.error('[Neture API] Error fetching partner dashboard items:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch dashboard items' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/partner/dashboard/items/:id
+ * Toggle status of a partner dashboard item
+ * WO-PARTNER-DASHBOARD-UX-PHASE2-V1
+ */
+router.patch('/partner/dashboard/items/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['active', 'inactive'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'status must be "active" or "inactive"' });
+    }
+
+    const repo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const item = await repo.findOne({ where: { id, partnerUserId: userId } });
+
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Dashboard item not found' });
+    }
+
+    item.status = status;
+    const updated = await repo.save(item);
+
+    res.json({ success: true, data: { id: updated.id, status: updated.status, updatedAt: updated.updatedAt.toISOString() } });
+  } catch (error) {
+    logger.error('[Neture API] Error updating partner dashboard item:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update dashboard item' });
   }
 });
 
