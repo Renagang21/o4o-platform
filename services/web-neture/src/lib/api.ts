@@ -258,6 +258,29 @@ export interface PartnerDashboardItem {
   pharmacyName?: string;
   serviceId: string;
   status: string;
+  contentCount: number;
+  createdAt: string;
+}
+
+// WO-PARTNER-CONTENT-LINK-PHASE1-V1
+export interface BrowsableContent {
+  id: string;
+  title: string;
+  summary: string | null;
+  type: string;
+  source: 'cms' | 'supplier';
+  imageUrl: string | null;
+  createdAt: string;
+}
+
+export interface LinkedContent {
+  linkId: string;
+  contentId: string;
+  contentSource: 'cms' | 'supplier';
+  title: string;
+  type: string;
+  summary: string | null;
+  imageUrl: string | null;
   createdAt: string;
 }
 
@@ -312,6 +335,69 @@ export const partnerDashboardApi = {
     }
     const result = await response.json();
     return result.data;
+  },
+
+  /**
+   * GET /api/v1/neture/partner/contents
+   * 연결 가능한 콘텐츠 탐색
+   * WO-PARTNER-CONTENT-LINK-PHASE1-V1
+   */
+  async browseContents(source?: string): Promise<BrowsableContent[]> {
+    const params = source && source !== 'all' ? `?source=${source}` : '';
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/contents${params}`);
+    if (!response.ok) {
+      console.warn('[Neture API] Browse contents API not available');
+      return [];
+    }
+    const result = await response.json();
+    return result.data || [];
+  },
+
+  /**
+   * POST /api/v1/neture/partner/dashboard/items/:itemId/contents
+   * 콘텐츠 연결
+   */
+  async linkContent(itemId: string, contentId: string, contentSource: string): Promise<{ success: boolean; already_linked?: boolean }> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ contentId, contentSource }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to link content: ${response.status}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * DELETE /api/v1/neture/partner/dashboard/items/:itemId/contents/:linkId
+   * 콘텐츠 연결 해제
+   */
+  async unlinkContent(itemId: string, linkId: string): Promise<void> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents/${linkId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to unlink content: ${response.status}`);
+    }
+  },
+
+  /**
+   * GET /api/v1/neture/partner/dashboard/items/:itemId/contents
+   * 연결된 콘텐츠 조회
+   */
+  async getLinkedContents(itemId: string): Promise<LinkedContent[]> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      console.warn('[Neture API] Linked contents API not available');
+      return [];
+    }
+    const result = await response.json();
+    return result.data || [];
   },
 };
 

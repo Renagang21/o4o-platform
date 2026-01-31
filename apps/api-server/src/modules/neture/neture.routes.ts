@@ -7,6 +7,8 @@ import { requireAuth, requireAdmin, requireRole } from '../../middleware/auth.mi
 import { AppDataSource } from '../../database/connection.js';
 import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glycopharm.repository.js';
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
+import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashboardItemContent.entity.js';
+import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -886,6 +888,19 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
       }
     }
 
+    // Batch-fetch content link counts (WO-PARTNER-CONTENT-LINK-PHASE1-V1)
+    const itemIds = items.map((item) => item.id);
+    const contentCountMap = new Map<string, number>();
+    if (itemIds.length > 0) {
+      const countRows: Array<{ dashboard_item_id: string; cnt: string }> = await AppDataSource.query(
+        `SELECT dashboard_item_id, COUNT(*)::text as cnt FROM neture_partner_dashboard_item_contents WHERE dashboard_item_id = ANY($1) GROUP BY dashboard_item_id`,
+        [itemIds],
+      );
+      for (const row of countRows) {
+        contentCountMap.set(row.dashboard_item_id, parseInt(row.cnt, 10));
+      }
+    }
+
     const data = items.map((item) => {
       const product = productMap.get(item.productId);
       return {
@@ -897,6 +912,7 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
         pharmacyName: product?.pharmacy?.name,
         serviceId: item.serviceId,
         status: item.status,
+        contentCount: contentCountMap.get(item.id) || 0,
         createdAt: item.createdAt.toISOString(),
       };
     });
@@ -941,6 +957,239 @@ router.patch('/partner/dashboard/items/:id', requireAuth, async (req: Authentica
   } catch (error) {
     logger.error('[Neture API] Error updating partner dashboard item:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update dashboard item' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/contents
+ * Browse available content (CMS + supplier) for partners
+ * WO-PARTNER-CONTENT-LINK-PHASE1-V1
+ */
+router.get('/partner/contents', async (req: Request, res: Response) => {
+  try {
+    const source = (req.query.source as string) || 'all';
+
+    const results: Array<{ id: string; title: string; summary: string | null; type: string; source: string; imageUrl: string | null; createdAt: string }> = [];
+
+    // CMS contents
+    if (source === 'all' || source === 'cms') {
+      const cmsRows = await AppDataSource.query(
+        `SELECT id, title, summary, type, image_url, created_at
+         FROM cms_contents
+         WHERE status = 'published'
+           AND (service_key IN ('neture', 'glycopharm') OR service_key IS NULL)
+         ORDER BY created_at DESC
+         LIMIT 100`,
+      );
+      for (const row of cmsRows) {
+        results.push({
+          id: row.id,
+          title: row.title,
+          summary: row.summary,
+          type: row.type,
+          source: 'cms',
+          imageUrl: row.image_url,
+          createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
+        });
+      }
+    }
+
+    // Supplier contents
+    if (source === 'all' || source === 'supplier') {
+      const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
+      const supplierContents = await supplierRepo.find({
+        where: { status: 'published' as any },
+        order: { createdAt: 'DESC' },
+        take: 100,
+      });
+      for (const sc of supplierContents) {
+        results.push({
+          id: sc.id,
+          title: sc.title,
+          summary: sc.description || null,
+          type: sc.type,
+          source: 'supplier',
+          imageUrl: sc.imageUrl || null,
+          createdAt: sc.createdAt instanceof Date ? sc.createdAt.toISOString() : String(sc.createdAt),
+        });
+      }
+    }
+
+    res.json({ success: true, data: results });
+  } catch (error) {
+    logger.error('[Neture API] Error browsing partner contents:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to browse contents' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/partner/dashboard/items/:itemId/contents
+ * Link content to a dashboard item
+ * WO-PARTNER-CONTENT-LINK-PHASE1-V1
+ */
+router.post('/partner/dashboard/items/:itemId/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { itemId } = req.params;
+    const { contentId, contentSource } = req.body;
+
+    if (!contentId || !contentSource || !['cms', 'supplier'].includes(contentSource)) {
+      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'contentId and contentSource (cms|supplier) are required' });
+    }
+
+    // Ownership check
+    const itemRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const item = await itemRepo.findOne({ where: { id: itemId, partnerUserId: userId } });
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Dashboard item not found' });
+    }
+
+    const linkRepo = AppDataSource.getRepository(NeturePartnerDashboardItemContent);
+
+    // Duplicate check
+    const existing = await linkRepo.findOne({
+      where: { dashboardItemId: itemId, contentId, contentSource },
+    });
+    if (existing) {
+      return res.json({ success: true, already_linked: true, data: existing });
+    }
+
+    const link = linkRepo.create({ dashboardItemId: itemId, contentId, contentSource });
+    const saved = await linkRepo.save(link);
+
+    res.status(201).json({ success: true, data: saved });
+  } catch (error) {
+    logger.error('[Neture API] Error linking content:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to link content' });
+  }
+});
+
+/**
+ * DELETE /api/v1/neture/partner/dashboard/items/:itemId/contents/:linkId
+ * Unlink content from a dashboard item
+ * WO-PARTNER-CONTENT-LINK-PHASE1-V1
+ */
+router.delete('/partner/dashboard/items/:itemId/contents/:linkId', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { itemId, linkId } = req.params;
+
+    // Ownership check
+    const itemRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const item = await itemRepo.findOne({ where: { id: itemId, partnerUserId: userId } });
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Dashboard item not found' });
+    }
+
+    const linkRepo = AppDataSource.getRepository(NeturePartnerDashboardItemContent);
+    const link = await linkRepo.findOne({ where: { id: linkId, dashboardItemId: itemId } });
+    if (!link) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Content link not found' });
+    }
+
+    await linkRepo.remove(link);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('[Neture API] Error unlinking content:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to unlink content' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/dashboard/items/:itemId/contents
+ * Get linked contents for a dashboard item
+ * WO-PARTNER-CONTENT-LINK-PHASE1-V1
+ */
+router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { itemId } = req.params;
+
+    // Ownership check
+    const itemRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const item = await itemRepo.findOne({ where: { id: itemId, partnerUserId: userId } });
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Dashboard item not found' });
+    }
+
+    const linkRepo = AppDataSource.getRepository(NeturePartnerDashboardItemContent);
+    const links = await linkRepo.find({
+      where: { dashboardItemId: itemId },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (links.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    // Batch-fetch content details
+    const cmsIds = links.filter((l) => l.contentSource === 'cms').map((l) => l.contentId);
+    const supplierIds = links.filter((l) => l.contentSource === 'supplier').map((l) => l.contentId);
+
+    const contentMap = new Map<string, { title: string; summary: string | null; type: string; imageUrl: string | null; createdAt: string }>();
+
+    if (cmsIds.length > 0) {
+      const cmsRows = await AppDataSource.query(
+        `SELECT id, title, summary, type, image_url, created_at FROM cms_contents WHERE id = ANY($1)`,
+        [cmsIds],
+      );
+      for (const row of cmsRows) {
+        contentMap.set(`cms:${row.id}`, {
+          title: row.title,
+          summary: row.summary,
+          type: row.type,
+          imageUrl: row.image_url,
+          createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
+        });
+      }
+    }
+
+    if (supplierIds.length > 0) {
+      const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
+      for (const sid of supplierIds) {
+        const sc = await supplierRepo.findOne({ where: { id: sid } });
+        if (sc) {
+          contentMap.set(`supplier:${sc.id}`, {
+            title: sc.title,
+            summary: sc.description || null,
+            type: sc.type,
+            imageUrl: sc.imageUrl || null,
+            createdAt: sc.createdAt instanceof Date ? sc.createdAt.toISOString() : String(sc.createdAt),
+          });
+        }
+      }
+    }
+
+    const data = links.map((link) => {
+      const detail = contentMap.get(`${link.contentSource}:${link.contentId}`);
+      return {
+        linkId: link.id,
+        contentId: link.contentId,
+        contentSource: link.contentSource,
+        title: detail?.title || '(삭제된 콘텐츠)',
+        type: detail?.type || 'unknown',
+        summary: detail?.summary || null,
+        imageUrl: detail?.imageUrl || null,
+        createdAt: detail?.createdAt || link.createdAt.toISOString(),
+      };
+    });
+
+    res.json({ success: true, data });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching linked contents:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch linked contents' });
   }
 });
 

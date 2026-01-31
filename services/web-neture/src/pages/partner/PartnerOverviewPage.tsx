@@ -16,9 +16,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Paperclip, X } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
-import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem } from '../../lib/api';
+import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem, type BrowsableContent, type LinkedContent } from '../../lib/api';
 
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
@@ -69,6 +69,14 @@ export function PartnerOverviewPage() {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Content linking modal state (WO-PARTNER-CONTENT-LINK-PHASE1-V1)
+  const [contentModalItemId, setContentModalItemId] = useState<string | null>(null);
+  const [browsableContents, setBrowsableContents] = useState<BrowsableContent[]>([]);
+  const [linkedContents, setLinkedContents] = useState<LinkedContent[]>([]);
+  const [contentSourceFilter, setContentSourceFilter] = useState<'all' | 'cms' | 'supplier'>('all');
+  const [contentLoading, setContentLoading] = useState(false);
+  const [linkingContentId, setLinkingContentId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -147,6 +155,80 @@ export function PartnerOverviewPage() {
       setTimeout(() => setToastMessage(null), 3000);
     }
   };
+
+  // Content modal handlers (WO-PARTNER-CONTENT-LINK-PHASE1-V1)
+  const openContentModal = async (itemId: string) => {
+    setContentModalItemId(itemId);
+    setContentLoading(true);
+    setContentSourceFilter('all');
+    try {
+      const [allContents, linked] = await Promise.all([
+        partnerDashboardApi.browseContents(),
+        partnerDashboardApi.getLinkedContents(itemId),
+      ]);
+      setBrowsableContents(allContents);
+      setLinkedContents(linked);
+    } catch {
+      setBrowsableContents([]);
+      setLinkedContents([]);
+    }
+    setContentLoading(false);
+  };
+
+  const closeContentModal = () => {
+    setContentModalItemId(null);
+    setBrowsableContents([]);
+    setLinkedContents([]);
+  };
+
+  const handleLinkContent = async (content: BrowsableContent) => {
+    if (!contentModalItemId) return;
+    setLinkingContentId(content.id);
+    try {
+      const result = await partnerDashboardApi.linkContent(contentModalItemId, content.id, content.source);
+      if (result.already_linked) {
+        setToastMessage('이미 연결된 자료입니다');
+      } else {
+        // Re-fetch linked contents
+        const linked = await partnerDashboardApi.getLinkedContents(contentModalItemId);
+        setLinkedContents(linked);
+        // Update contentCount in dashboard items
+        setDashboardItems((prev) =>
+          prev.map((i) => (i.id === contentModalItemId ? { ...i, contentCount: (i.contentCount || 0) + 1 } : i)),
+        );
+        setToastMessage('자료가 연결되었습니다');
+      }
+    } catch {
+      setToastMessage('연결에 실패했습니다');
+    }
+    setLinkingContentId(null);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleUnlinkContent = async (linkId: string) => {
+    if (!contentModalItemId) return;
+    try {
+      await partnerDashboardApi.unlinkContent(contentModalItemId, linkId);
+      setLinkedContents((prev) => prev.filter((l) => l.linkId !== linkId));
+      setDashboardItems((prev) =>
+        prev.map((i) => (i.id === contentModalItemId ? { ...i, contentCount: Math.max(0, (i.contentCount || 0) - 1) } : i)),
+      );
+      setToastMessage('연결이 해제되었습니다');
+    } catch {
+      setToastMessage('해제에 실패했습니다');
+    }
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const linkedContentIds = useMemo(
+    () => new Set(linkedContents.map((l) => `${l.contentSource}:${l.contentId}`)),
+    [linkedContents],
+  );
+
+  const filteredBrowsableContents = useMemo(
+    () => contentSourceFilter === 'all' ? browsableContents : browsableContents.filter((c) => c.source === contentSourceFilter),
+    [browsableContents, contentSourceFilter],
+  );
 
   const hasConnectedServices = summary?.connectedServices && summary.connectedServices.length > 0;
   const hasNotifications = summary?.notifications && summary.notifications.length > 0;
@@ -370,23 +452,56 @@ export function PartnerOverviewPage() {
                         {item.pharmacyName && (
                           <span style={{ fontSize: '12px', color: '#94a3b8' }}>공급: {item.pharmacyName}</span>
                         )}
-                        <button
-                          onClick={() => handleToggleStatus(item)}
-                          disabled={togglingIds.has(item.id)}
-                          style={{
-                            marginTop: '4px',
-                            padding: '4px 10px',
-                            fontSize: '12px',
-                            fontWeight: 500,
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '4px',
-                            backgroundColor: '#fff',
-                            color: item.status === 'active' ? '#64748b' : '#7c3aed',
-                            cursor: togglingIds.has(item.id) ? 'wait' : 'pointer',
-                          }}
-                        >
-                          {togglingIds.has(item.id) ? '변경 중...' : item.status === 'active' ? '비활성화' : '활성화'}
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '4px', alignItems: 'center' }}>
+                          <button
+                            onClick={() => handleToggleStatus(item)}
+                            disabled={togglingIds.has(item.id)}
+                            style={{
+                              padding: '4px 10px',
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '4px',
+                              backgroundColor: '#fff',
+                              color: item.status === 'active' ? '#64748b' : '#7c3aed',
+                              cursor: togglingIds.has(item.id) ? 'wait' : 'pointer',
+                            }}
+                          >
+                            {togglingIds.has(item.id) ? '변경 중...' : item.status === 'active' ? '비활성화' : '활성화'}
+                          </button>
+                          <button
+                            onClick={() => openContentModal(item.id)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              padding: '4px 10px',
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '4px',
+                              backgroundColor: '#fff',
+                              color: '#7c3aed',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <Paperclip size={12} />
+                            자료 연결
+                            {(item.contentCount || 0) > 0 && (
+                              <span style={{
+                                marginLeft: '2px',
+                                padding: '0 5px',
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                borderRadius: '8px',
+                                backgroundColor: '#7c3aed',
+                                color: '#fff',
+                              }}>
+                                {item.contentCount}
+                              </span>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -504,6 +619,131 @@ export function PartnerOverviewPage() {
         </div>
       </div>
 
+      {/* Content Linking Modal (WO-PARTNER-CONTENT-LINK-PHASE1-V1) */}
+      {contentModalItemId && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }} onClick={closeContentModal}>
+          <div
+            style={{
+              backgroundColor: '#fff', borderRadius: '16px', width: '600px', maxHeight: '80vh',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>자료 연결</h3>
+              <button onClick={closeContentModal} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '4px' }}>
+                <X size={20} color="#64748b" />
+              </button>
+            </div>
+
+            {/* Source filter tabs */}
+            <div style={{ display: 'flex', gap: '8px', padding: '12px 24px', borderBottom: '1px solid #f1f5f9' }}>
+              {[
+                { value: 'all' as const, label: '전체' },
+                { value: 'cms' as const, label: '운영자' },
+                { value: 'supplier' as const, label: '공급자' },
+              ].map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setContentSourceFilter(tab.value)}
+                  style={{
+                    padding: '6px 14px', fontSize: '13px', fontWeight: 500, borderRadius: '6px', border: 'none', cursor: 'pointer',
+                    backgroundColor: contentSourceFilter === tab.value ? '#7c3aed' : '#f1f5f9',
+                    color: contentSourceFilter === tab.value ? '#fff' : '#64748b',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Linked contents section */}
+            {linkedContents.length > 0 && (
+              <div style={{ padding: '12px 24px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#faf5ff' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 600, color: '#7c3aed' }}>연결된 자료 ({linkedContents.length})</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {linkedContents.map((lc) => (
+                    <span key={lc.linkId} style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '4px',
+                      padding: '4px 10px', fontSize: '12px', backgroundColor: '#fff',
+                      border: '1px solid #e9d5ff', borderRadius: '4px', color: '#6b21a8',
+                    }}>
+                      {lc.title.length > 20 ? lc.title.slice(0, 20) + '...' : lc.title}
+                      <button
+                        onClick={() => handleUnlinkContent(lc.linkId)}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0', display: 'flex' }}
+                      >
+                        <X size={12} color="#9333ea" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Browsable content list */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '12px 24px' }}>
+              {contentLoading ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>로딩 중...</div>
+              ) : filteredBrowsableContents.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>사용 가능한 콘텐츠가 없습니다</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {filteredBrowsableContents.map((content) => {
+                    const isLinked = linkedContentIds.has(`${content.source}:${content.id}`);
+                    return (
+                      <div
+                        key={`${content.source}:${content.id}`}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '12px',
+                          padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0',
+                          backgroundColor: isLinked ? '#faf5ff' : '#fff',
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                            <span style={{
+                              fontSize: '10px', fontWeight: 600, padding: '1px 6px', borderRadius: '3px',
+                              backgroundColor: content.source === 'cms' ? '#eff6ff' : '#f0fdf4',
+                              color: content.source === 'cms' ? '#2563eb' : '#16a34a',
+                            }}>
+                              {content.source === 'cms' ? '운영자' : '공급자'}
+                            </span>
+                            <span style={{ fontSize: '10px', color: '#94a3b8' }}>{content.type}</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: '#1e293b' }}>{content.title}</p>
+                          {content.summary && (
+                            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8', lineHeight: 1.4 }}>
+                              {content.summary.length > 60 ? content.summary.slice(0, 60) + '...' : content.summary}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => !isLinked && handleLinkContent(content)}
+                          disabled={isLinked || linkingContentId === content.id}
+                          style={{
+                            padding: '6px 12px', fontSize: '12px', fontWeight: 500, borderRadius: '6px', border: 'none', cursor: isLinked ? 'default' : 'pointer',
+                            backgroundColor: isLinked ? '#e9d5ff' : '#7c3aed',
+                            color: isLinked ? '#7c3aed' : '#fff',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {linkingContentId === content.id ? '연결 중...' : isLinked ? '연결됨' : '연결'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
