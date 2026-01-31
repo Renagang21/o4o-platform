@@ -901,8 +901,55 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
       }
     }
 
+    // Batch-fetch primary content info (WO-PARTNER-CONTENT-PRESENTATION-PHASE3-V1)
+    const primaryContentMap = new Map<string, { contentId: string; contentSource: string; title: string; type: string }>();
+    if (itemIds.length > 0) {
+      const primaryLinks: Array<{ dashboard_item_id: string; content_id: string; content_source: string }> = await AppDataSource.query(
+        `SELECT dashboard_item_id, content_id, content_source FROM neture_partner_dashboard_item_contents WHERE dashboard_item_id = ANY($1) AND is_primary = true`,
+        [itemIds],
+      );
+
+      // Fetch titles for primary contents
+      const cmsPrimaryIds = primaryLinks.filter((l) => l.content_source === 'cms').map((l) => l.content_id);
+      const supplierPrimaryIds = primaryLinks.filter((l) => l.content_source === 'supplier').map((l) => l.content_id);
+      const titleMap = new Map<string, { title: string; type: string }>();
+
+      if (cmsPrimaryIds.length > 0) {
+        const cmsRows: Array<{ id: string; title: string; type: string }> = await AppDataSource.query(
+          `SELECT id, title, type FROM cms_contents WHERE id = ANY($1)`,
+          [cmsPrimaryIds],
+        );
+        for (const row of cmsRows) {
+          titleMap.set(`cms:${row.id}`, { title: row.title, type: row.type });
+        }
+      }
+
+      if (supplierPrimaryIds.length > 0) {
+        const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
+        for (const sid of supplierPrimaryIds) {
+          const sc = await supplierRepo.findOne({ where: { id: sid } });
+          if (sc) {
+            titleMap.set(`supplier:${sc.id}`, { title: sc.title, type: sc.type });
+          }
+        }
+      }
+
+      for (const link of primaryLinks) {
+        const detail = titleMap.get(`${link.content_source}:${link.content_id}`);
+        if (detail) {
+          primaryContentMap.set(link.dashboard_item_id, {
+            contentId: link.content_id,
+            contentSource: link.content_source,
+            title: detail.title,
+            type: detail.type,
+          });
+        }
+      }
+    }
+
     const data = items.map((item) => {
       const product = productMap.get(item.productId);
+      const primaryContent = primaryContentMap.get(item.id) || null;
       return {
         id: item.id,
         productId: item.productId,
@@ -913,6 +960,7 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
         serviceId: item.serviceId,
         status: item.status,
         contentCount: contentCountMap.get(item.id) || 0,
+        primaryContent,
         createdAt: item.createdAt.toISOString(),
       };
     });

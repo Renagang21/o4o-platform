@@ -492,6 +492,33 @@ export function PartnerOverviewPage() {
                         {item.pharmacyName && (
                           <span style={{ fontSize: '12px', color: '#94a3b8' }}>공급: {item.pharmacyName}</span>
                         )}
+                        {/* Primary content summary (WO-PARTNER-CONTENT-PRESENTATION-PHASE3-V1) */}
+                        {item.primaryContent && (
+                          <div
+                            onClick={() => openContentModal(item.id)}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '6px',
+                              padding: '6px 10px', borderRadius: '6px',
+                              backgroundColor: '#faf5ff', border: '1px solid #ede9fe',
+                              cursor: 'pointer', width: '100%',
+                            }}
+                          >
+                            <Star size={12} fill="#f59e0b" color="#f59e0b" style={{ flexShrink: 0 }} />
+                            <span style={{
+                              fontSize: '10px', fontWeight: 600, padding: '1px 5px', borderRadius: '3px', flexShrink: 0,
+                              backgroundColor: item.primaryContent.contentSource === 'cms' ? '#eff6ff' : '#f0fdf4',
+                              color: item.primaryContent.contentSource === 'cms' ? '#2563eb' : '#16a34a',
+                            }}>
+                              {item.primaryContent.contentSource === 'cms' ? '운영자' : '공급자'}
+                            </span>
+                            <span style={{
+                              fontSize: '12px', color: '#6b21a8', fontWeight: 500,
+                              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1,
+                            }}>
+                              {item.primaryContent.title}
+                            </span>
+                          </div>
+                        )}
                         <div style={{ display: 'flex', gap: '8px', marginTop: '4px', alignItems: 'center' }}>
                           <button
                             onClick={() => handleToggleStatus(item)}

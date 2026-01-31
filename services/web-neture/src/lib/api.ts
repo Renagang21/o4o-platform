@@ -259,6 +259,12 @@ export interface PartnerDashboardItem {
   serviceId: string;
   status: string;
   contentCount: number;
+  primaryContent: {
+    contentId: string;
+    contentSource: string;
+    title: string;
+    type: string;
+  } | null;
   createdAt: string;
 }
 
