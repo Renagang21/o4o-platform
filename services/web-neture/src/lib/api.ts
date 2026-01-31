@@ -118,7 +118,9 @@ export const netureApi = {
    */
   async getSuppliers(): Promise<Supplier[]> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/suppliers`);
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/suppliers`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         console.warn('[Neture API] Suppliers API not available, returning empty array');
         return [];
@@ -135,7 +137,9 @@ export const netureApi = {
    * GET /api/v1/neture/suppliers/:slug
    */
   async getSupplierBySlug(slug: string): Promise<SupplierDetail> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/suppliers/${slug}`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/neture/suppliers/${slug}`, {
+      credentials: 'include',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch supplier detail');
     }
@@ -151,7 +155,7 @@ export const netureApi = {
         ? `${API_BASE_URL}/api/v1/neture/partnership/requests?status=${status}`
         : `${API_BASE_URL}/api/v1/neture/partnership/requests`;
 
-      const response = await fetchWithTimeout(url);
+      const response = await fetchWithTimeout(url, { credentials: 'include' });
       if (!response.ok) {
         console.warn('[Neture API] Partnership requests API not available, returning empty array');
         return [];
@@ -168,7 +172,9 @@ export const netureApi = {
    * GET /api/v1/neture/partnership/requests/:id
    */
   async getPartnershipRequestById(id: string): Promise<PartnershipRequestDetail> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partnership/requests/${id}`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partnership/requests/${id}`, {
+      credentials: 'include',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch partnership request detail');
     }
@@ -234,7 +240,9 @@ export const recruitingApi = {
    */
   async getRecruitingProducts(): Promise<RecruitingProduct[]> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/recruiting-products`);
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/recruiting-products`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         console.warn('[Neture API] Recruiting products API not available');
         return [];
@@ -352,7 +360,9 @@ export const partnerDashboardApi = {
    */
   async browseContents(source?: string): Promise<BrowsableContent[]> {
     const params = source && source !== 'all' ? `?source=${source}` : '';
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/contents${params}`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/contents${params}`, {
+      credentials: 'include',
+    });
     if (!response.ok) {
       console.warn('[Neture API] Browse contents API not available');
       return [];
