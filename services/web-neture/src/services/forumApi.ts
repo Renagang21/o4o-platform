@@ -250,7 +250,9 @@ export async function fetchForumPosts(params: {
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${queryParams}`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${queryParams}`, {
+      credentials: 'include',
+    });
     const data = await response.json();
 
     if (!data.success) {
@@ -304,7 +306,9 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
 
   // Real API call - get post by slug directly
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${encodeURIComponent(slug)}`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${encodeURIComponent(slug)}`, {
+      credentials: 'include',
+    });
     const data = await response.json();
 
     if (!response.ok || !data.success) {
@@ -341,7 +345,9 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 
   // Real API call
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/comments`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/comments`, {
+      credentials: 'include',
+    });
     return await response.json();
   } catch (error) {
     console.error('Error fetching forum comments:', error);

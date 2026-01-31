@@ -12,7 +12,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts';
+import { useAuth, useLoginModal } from '../../contexts';
 import {
   fetchForumPostBySlug,
   fetchForumComments,
@@ -166,6 +166,7 @@ export function ForumPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { openLoginModal } = useLoginModal();
 
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<DisplayComment[]>([]);
@@ -442,7 +443,7 @@ export function ForumPostPage() {
           </div>
         ) : (
           <div style={styles.loginPrompt}>
-            <p>댓글을 작성하려면 <Link to="/login" style={styles.loginLink}>로그인</Link>이 필요합니다.</p>
+            <p>댓글을 작성하려면 <button onClick={() => openLoginModal()} style={styles.loginLink}>로그인</button>이 필요합니다.</p>
           </div>
         )}
 
@@ -696,6 +697,11 @@ const styles: Record<string, React.CSSProperties> = {
     color: PRIMARY_COLOR,
     textDecoration: 'none',
     fontWeight: 500,
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 'inherit',
+    padding: 0,
   },
   commentsList: {
     display: 'flex',
