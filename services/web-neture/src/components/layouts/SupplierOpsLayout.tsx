@@ -35,7 +35,7 @@ export default function SupplierOpsLayout() {
               <Link to="/supplier-ops" className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-primary-600">Neture</span>
                 <span className="text-sm font-medium text-slate-500 border-l border-slate-300 pl-2">
-                  공급자 연결
+                  공급자 · 파트너
                 </span>
               </Link>
               {/* 메인 사이트 링크 */}
@@ -139,7 +139,7 @@ export default function SupplierOpsLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <div className="text-center sm:text-left">
-              <p>&copy; 2026 Neture. 공급자 중심 운영·연결 서비스</p>
+              <p>&copy; 2026 Neture. 공급자·파트너 연결 서비스</p>
               <p className="mt-1 text-xs text-gray-400">
                 <Link to="/o4o" className="hover:text-primary-600">
                   o4o 플랫폼 소개

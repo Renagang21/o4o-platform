@@ -45,12 +45,12 @@ function HeroSection() {
           o4o 플랫폼 기반 서비스
         </p>
         <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-          유통 정보 서비스, Neture
+          공급자·파트너 연결, Neture
         </h1>
         <p className="text-xl text-primary-100 mb-6">
-          공급자를 찾고, 제휴를 연결합니다.
+          공급자를 탐색하고, 파트너로 참여하세요.
           <br />
-          주문·결제 없이 조건과 기회를 투명하게 확인하세요.
+          주문·결제 없이 조건과 기회를 투명하게 확인합니다.
         </p>
         {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 알파 단계 안내 문구 */}
         <p className="text-sm text-primary-200/70 mb-8">

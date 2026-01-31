@@ -9,7 +9,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Store, Package, Monitor, MessageSquare, GraduationCap, ExternalLink, Building2, Truck, Megaphone, Globe } from 'lucide-react';
+import { Store, Package, Monitor, MessageSquare, GraduationCap, ExternalLink, Building2, Truck, Megaphone, Globe, ArrowRight } from 'lucide-react';
 
 export default function O4OMainPage() {
   return (
@@ -19,6 +19,9 @@ export default function O4OMainPage() {
 
       {/* 핵심 가치 */}
       <CoreValueSection />
+
+      {/* 참여 주체 진입 */}
+      <RoleEntrySection />
 
       {/* 대상 사업자 */}
       <TargetBusinessSection />
@@ -57,10 +60,16 @@ function HeroSection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            to="/examples"
+            to="/supplier-ops/suppliers"
             className="inline-flex items-center justify-center px-8 py-3 bg-white text-slate-800 font-medium rounded-lg hover:bg-slate-100 transition-colors"
           >
-            서비스 예제 보기
+            공급자로 참여하기
+          </Link>
+          <Link
+            to="/supplier-ops/partners/info"
+            className="inline-flex items-center justify-center px-8 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            파트너로 참여하기
           </Link>
         </div>
       </div>
@@ -123,6 +132,90 @@ function CoreValueSection() {
               연결하여 활용합니다
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RoleEntrySection() {
+  return (
+    <section className="py-20 bg-slate-50">
+      <div className="max-w-4xl mx-auto px-4">
+        <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+          어떻게 참여하시겠습니까?
+        </h2>
+        <p className="text-gray-500 text-center mb-10 text-sm">
+          o4o 플랫폼에서의 역할을 선택하세요
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 공급자 카드 */}
+          <Link
+            to="/supplier-ops/suppliers"
+            className="group p-8 bg-white rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-lg transition-all"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center">
+                <Truck className="w-6 h-6 text-primary-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">공급자</h3>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              제품이나 콘텐츠를 매장 네트워크에 공급합니다.
+              등록된 공급자를 탐색하고, 어떤 서비스를 통해 유통되는지 확인할 수 있습니다.
+            </p>
+            <ul className="space-y-2 mb-6">
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                공급자 프로필 탐색
+              </li>
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                서비스별 유통 현황 확인
+              </li>
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                제품 취급 요청
+              </li>
+            </ul>
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 group-hover:gap-2 transition-all">
+              공급자 보기 <ArrowRight className="w-4 h-4" />
+            </span>
+          </Link>
+
+          {/* 파트너 카드 */}
+          <Link
+            to="/supplier-ops/partners/info"
+            className="group p-8 bg-white rounded-2xl border border-slate-200 hover:border-emerald-300 hover:shadow-lg transition-all"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                <Megaphone className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">파트너</h3>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              공급자의 제품을 소개하고 매장에 연결합니다.
+              파트너 활동의 허브로, 제휴 요청 탐색과 협업 관리를 한 곳에서 진행합니다.
+            </p>
+            <ul className="space-y-2 mb-6">
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                제휴 요청 탐색
+              </li>
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                협업 및 프로모션 관리
+              </li>
+              <li className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                커미션 기반 참여
+              </li>
+            </ul>
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 group-hover:gap-2 transition-all">
+              파트너 안내 <ArrowRight className="w-4 h-4" />
+            </span>
+          </Link>
         </div>
       </div>
     </section>
