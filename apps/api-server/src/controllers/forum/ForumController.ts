@@ -757,7 +757,7 @@ export class ForumController {
   async updateComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.currentRole;
+      const userRole = (req as any).user?.role || 'customer';
       if (!userId) {
         res.status(401).json({ success: false, error: 'Unauthorized' });
         return;
@@ -782,8 +782,7 @@ export class ForumController {
       }
 
       // Author or admin/manager can edit
-      const isAdmin = userRole === 'admin' || userRole === 'manager';
-      if (comment.authorId !== userId && !isAdmin) {
+      if (!['admin', 'manager'].includes(userRole) && comment.authorId !== userId) {
         res.status(403).json({ success: false, error: 'Permission denied' });
         return;
       }
@@ -811,7 +810,7 @@ export class ForumController {
   async deleteComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.currentRole;
+      const userRole = (req as any).user?.role || 'customer';
       if (!userId) {
         res.status(401).json({ success: false, error: 'Unauthorized' });
         return;
@@ -825,8 +824,7 @@ export class ForumController {
         return;
       }
 
-      const isAdmin = userRole === 'admin' || userRole === 'manager';
-      if (comment.authorId !== userId && !isAdmin) {
+      if (!['admin', 'manager'].includes(userRole) && comment.authorId !== userId) {
         res.status(403).json({ success: false, error: 'Permission denied' });
         return;
       }
