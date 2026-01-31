@@ -217,6 +217,7 @@ export async function fetchForumPosts(params: {
   page?: number;
   limit?: number;
   isPinned?: boolean;
+  search?: string;
 }): Promise<PostsResponse> {
   if (!USE_REAL_API) {
     // Mock response
@@ -224,6 +225,14 @@ export async function fetchForumPosts(params: {
 
     if (params.isPinned !== undefined) {
       posts = posts.filter(p => p.isPinned === params.isPinned);
+    }
+
+    if (params.search) {
+      const q = params.search.toLowerCase();
+      posts = posts.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        (p.excerpt && p.excerpt.toLowerCase().includes(q))
+      );
     }
 
     const page = params.page || 1;
@@ -249,6 +258,7 @@ export async function fetchForumPosts(params: {
     if (params.categoryId) queryParams.append('categoryId', params.categoryId);
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.search) queryParams.append('search', params.search);
 
     const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${queryParams}`, {
       credentials: 'include',

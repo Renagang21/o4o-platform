@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -118,11 +118,21 @@ function PostItem({ post, onClick }: { post: DisplayPost; onClick: () => void })
 
 export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+  const isSearching = !!searchQuery;
+
+  const [searchInput, setSearchInput] = useState(searchQuery);
   const [pinnedPosts, setPinnedPosts] = useState<DisplayPost[]>([]);
   const [posts, setPosts] = useState<DisplayPost[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync input when URL query changes (e.g. browser back/forward)
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   useEffect(() => {
     async function loadPosts() {
@@ -130,36 +140,63 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
       setError(null);
 
       try {
-        // Fetch pinned and regular posts in parallel
-        // TODO: Add categorySlug filter when API supports it
-        const [pinnedResponse, postsResponse] = await Promise.all([
-          fetchPinnedPosts(2),
-          fetchForumPosts({ page: 1, limit: 20 }),
-        ]);
+        if (isSearching) {
+          // Search mode: fetch search results only, skip pinned
+          const postsResponse = await fetchForumPosts({
+            search: searchQuery,
+            page: 1,
+            limit: 20,
+          });
 
-        setPinnedPosts(pinnedResponse.map(toDisplayPost));
+          setPinnedPosts([]);
+          setPosts(postsResponse.data.map(toDisplayPost));
+          setTotalCount(postsResponse.totalCount);
+        } else {
+          // Default mode: fetch pinned and regular posts in parallel
+          const [pinnedResponse, postsResponse] = await Promise.all([
+            fetchPinnedPosts(2),
+            fetchForumPosts({ page: 1, limit: 20 }),
+          ]);
 
-        // Filter out pinned posts from regular list
-        const pinnedIds = new Set(pinnedResponse.map(p => p.id));
-        const regularPosts = postsResponse.data
-          .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
-          .map(toDisplayPost);
+          setPinnedPosts(pinnedResponse.map(toDisplayPost));
 
-        setPosts(regularPosts);
-        setTotalCount(postsResponse.totalCount);
+          // Filter out pinned posts from regular list
+          const pinnedIds = new Set(pinnedResponse.map(p => p.id));
+          const regularPosts = postsResponse.data
+            .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
+            .map(toDisplayPost);
+
+          setPosts(regularPosts);
+          setTotalCount(postsResponse.totalCount);
+        }
       } catch (err) {
         console.error('Error loading forum posts:', err);
-        setError('게시글을 불러오지 못했습니다.');
+        setError(isSearching ? '검색에 실패했습니다.' : '게시글을 불러오지 못했습니다.');
       } finally {
         setIsLoading(false);
       }
     }
 
     loadPosts();
-  }, [boardSlug]);
+  }, [boardSlug, searchQuery]);
 
   const handlePostClick = (post: DisplayPost) => {
     navigate(`/forum/post/${post.slug}`);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = searchInput.trim();
+    if (trimmed) {
+      setSearchParams({ q: trimmed });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSearchParams({});
   };
 
   return (
@@ -188,6 +225,32 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
           o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.
         </p>
       </div>
+
+      {/* Search Bar */}
+      <form style={styles.searchForm} onSubmit={handleSearchSubmit}>
+        <div style={styles.searchInputWrapper}>
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="검색어를 입력하세요"
+            style={styles.searchInput}
+          />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              style={styles.searchClearButton}
+              aria-label="검색어 지우기"
+            >
+              x
+            </button>
+          )}
+        </div>
+        <button type="submit" style={styles.searchButton}>
+          검색
+        </button>
+      </form>
 
       {/* Loading State - Skeleton */}
       {isLoading && (
@@ -220,8 +283,8 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
       {/* Content */}
       {!isLoading && !error && (
         <>
-          {/* Pinned Posts */}
-          {pinnedPosts.length > 0 && (
+          {/* Pinned Posts (hidden during search) */}
+          {!isSearching && pinnedPosts.length > 0 && (
             <section style={styles.pinnedSection}>
               {pinnedPosts.map((post) => (
                 <PostItem
@@ -236,7 +299,12 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
           {/* Post List */}
           <section style={styles.postList}>
             <div style={styles.listHeader}>
-              <span style={styles.totalCount}>총 {totalCount}개의 게시글</span>
+              <span style={styles.totalCount}>
+                {isSearching
+                  ? `"${searchQuery}" 검색 결과 ${totalCount}건`
+                  : `총 ${totalCount}개의 게시글`
+                }
+              </span>
             </div>
             {posts.length > 0 ? (
               posts.map((post) => (
@@ -246,6 +314,14 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
                   onClick={() => handlePostClick(post)}
                 />
               ))
+            ) : isSearching ? (
+              <div style={styles.emptyState}>
+                <p style={styles.emptyTitle}>검색 결과가 없습니다</p>
+                <p style={styles.emptyDescription}>다른 키워드로 검색해보세요.</p>
+                <button onClick={handleClearSearch} style={styles.emptyWriteButton}>
+                  전체 목록 보기
+                </button>
+              </div>
             ) : (
               <div style={styles.emptyState}>
                 <p style={styles.emptyTitle}>아직 등록된 글이 없습니다.</p>
@@ -318,7 +394,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#f8fafc',
     borderRadius: '8px',
     border: '1px solid #e2e8f0',
-    marginBottom: '24px',
+    marginBottom: '16px',
   },
   noticeIcon: {
     fontSize: '18px',
@@ -330,6 +406,51 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
     margin: 0,
   },
+  // Search
+  searchForm: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '16px',
+  },
+  searchInputWrapper: {
+    position: 'relative',
+    flex: 1,
+  } as React.CSSProperties,
+  searchInput: {
+    width: '100%',
+    padding: '10px 32px 10px 14px',
+    fontSize: '14px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    outline: 'none',
+    backgroundColor: '#fff',
+    boxSizing: 'border-box',
+  } as React.CSSProperties,
+  searchClearButton: {
+    position: 'absolute',
+    right: '8px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '14px',
+    color: '#94a3b8',
+    padding: '2px 6px',
+    lineHeight: 1,
+  } as React.CSSProperties,
+  searchButton: {
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#fff',
+    backgroundColor: PRIMARY_COLOR,
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  } as React.CSSProperties,
   // Skeleton loading
   skeletonPost: {
     padding: '16px',
