@@ -226,7 +226,7 @@ export default function SupplierDashboardPage() {
       {/* P2: 서비스별 상태판 */}
       {!loading && !hasServiceData ? (
         <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>서비스별 상태판</h2>
+          <h2 style={styles.sectionTitle}>제품·콘텐츠가 활용되는 서비스</h2>
           <EmptyState message="자료가 없습니다. 아직 연결된 서비스가 없습니다." />
         </div>
       ) : (
@@ -311,9 +311,9 @@ export default function SupplierDashboardPage() {
       <div style={styles.infoBox}>
         <h3 style={styles.infoTitle}>대시보드 안내</h3>
         <ul style={styles.infoList}>
-          <li>이 대시보드는 <strong>현재 상황 판단용</strong>입니다. 실제 관리는 각 서비스에서 진행해주세요.</li>
+          <li>이 대시보드는 <strong>현재 상황 확인용</strong>입니다.</li>
           <li>모든 수치는 실시간 집계 데이터입니다.</li>
-          <li>"이 서비스에서 관리" 버튼을 통해 해당 서비스로 이동할 수 있습니다.</li>
+          <li>"이 서비스에서 상품 보기" 링크를 통해 각 서비스의 상품을 확인할 수 있습니다.</li>
         </ul>
         <p style={styles.lastUpdatedText}>
           마지막 업데이트: {lastUpdated.toLocaleTimeString('ko-KR')}

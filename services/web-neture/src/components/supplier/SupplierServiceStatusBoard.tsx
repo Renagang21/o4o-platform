@@ -7,11 +7,13 @@
  * - 승인 상태 요약 (대기 / 승인 / 거절)
  * - 주문 상태 요약 (진행 / 완료)
  * - ACTIVE_SALES 제품 수
- * - 버튼: "이 서비스에서 관리" → 외부 링크
+ * - 링크: "이 서비스에서 상품 보기" → 외부 읽기 전용 링크
  *
- * 금지:
- * - 상태 변경 버튼
- * - 직접 수정 기능
+ * 원칙 (WO-SUPPLIER-PARTNER-SPACE-SPLIT-V1):
+ * - "센터에서 관리" / "이 서비스에서 관리" 등 관리 개념 금지
+ * - 정보 조회용 외부 링크만 허용
+ * - 상태 변경 버튼 금지
+ * - 직접 수정 기능 금지
  */
 
 import { ExternalLink, Clock, CheckCircle, XCircle, Package } from 'lucide-react';
@@ -42,8 +44,8 @@ export function SupplierServiceStatusBoard({ services, loading }: Props) {
   if (loading) {
     return (
       <div style={styles.container}>
-        <h2 style={styles.sectionTitle}>서비스별 현황</h2>
-        <p style={styles.sectionSubtitle}>연결된 서비스의 상태를 확인하세요</p>
+        <h2 style={styles.sectionTitle}>제품·콘텐츠가 활용되는 서비스</h2>
+        <p style={styles.sectionSubtitle}>연결된 서비스의 현황을 확인하세요</p>
         <div style={styles.grid}>
           {[...Array(3)].map((_, i) => (
             <div key={i} style={{ ...styles.card, opacity: 0.5 }}>
@@ -58,8 +60,8 @@ export function SupplierServiceStatusBoard({ services, loading }: Props) {
   if (services.length === 0) {
     return (
       <div style={styles.container}>
-        <h2 style={styles.sectionTitle}>서비스별 현황</h2>
-        <p style={styles.sectionSubtitle}>연결된 서비스의 상태를 확인하세요</p>
+        <h2 style={styles.sectionTitle}>제품·콘텐츠가 활용되는 서비스</h2>
+        <p style={styles.sectionSubtitle}>연결된 서비스의 현황을 확인하세요</p>
         <div style={styles.emptyState}>
           <p>연결된 서비스가 없습니다.</p>
         </div>
@@ -69,8 +71,8 @@ export function SupplierServiceStatusBoard({ services, loading }: Props) {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.sectionTitle}>서비스별 현황</h2>
-      <p style={styles.sectionSubtitle}>연결된 서비스의 상태를 확인하세요</p>
+      <h2 style={styles.sectionTitle}>제품·콘텐츠가 활용되는 서비스</h2>
+      <p style={styles.sectionSubtitle}>연결된 서비스의 현황을 확인하세요</p>
       <div style={styles.grid}>
         {services.map((service) => (
           <div key={service.serviceId} style={styles.card}>
@@ -123,14 +125,14 @@ export function SupplierServiceStatusBoard({ services, loading }: Props) {
               </span>
             </div>
 
-            {/* Action Button - External Link Only */}
+            {/* 읽기 전용 외부 링크 */}
             <a
               href={service.serviceUrl}
               target="_blank"
               rel="noopener noreferrer"
               style={styles.actionButton}
             >
-              이 서비스에서 관리
+              이 서비스에서 상품 보기
               <ExternalLink size={14} />
             </a>
           </div>

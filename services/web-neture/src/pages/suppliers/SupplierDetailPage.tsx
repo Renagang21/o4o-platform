@@ -36,7 +36,7 @@ const SERVICE_INFO: Record<string, { name: string; icon: string; description: st
     name: 'GlucoseView',
     icon: '📊',
     description: '혈당 관리 플랫폼',
-    usageAreas: ['파트너 소개 영역', '서비스 안내'],
+    usageAreas: ['공급자 소개 영역', '서비스 안내'],
   },
 };
 
