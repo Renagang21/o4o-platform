@@ -108,9 +108,6 @@ export default function MainLayout() {
               <p>&copy; 2026 ㈜쓰리라이프존 | 사업자등록번호 108-86-02873</p>
               <p className="text-xs text-gray-400 mt-1">고객센터 1577-2779 | sohae2100@gmail.com</p>
             </div>
-            <Link to="/forum/test-feedback" className="text-xs text-green-600 hover:text-green-700 transition-colors">
-              🧪 테스트 센터
-            </Link>
           </div>
         </div>
       </footer>

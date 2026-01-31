@@ -14,13 +14,18 @@
  * - 자동 승인 로직 (정책 미확정)
  */
 
-import { Navigate, Outlet, NavLink, Link } from 'react-router-dom';
+import { Navigate, Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { LayoutDashboard, FileCheck, Package, ShoppingBag, FileText, Monitor, Settings, LogOut, Home } from 'lucide-react';
 import AccountMenu from '../../components/AccountMenu';
 
 export default function SupplierDashboardLayout() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const location = useLocation();
+
+  const isNavActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
 
   if (isLoading) {
     return (
@@ -59,30 +64,100 @@ export default function SupplierDashboardLayout() {
 
   return (
     <div style={styles.wrapper}>
-      {/* Top Header */}
-      <header style={styles.topHeader}>
-        <div style={styles.topHeaderContent}>
+      {/* Top Header - SupplierOpsLayout 동일 */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-[100]">
+        <div className="max-w-full mx-auto px-6 flex justify-between items-center h-14">
           {/* Logo */}
-          <Link to="/" style={styles.topLogo}>
-            Neture
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/supplier-ops" className="flex items-center gap-2">
+              <span className="text-xl font-bold text-primary-600">Neture</span>
+              <span className="text-sm font-medium text-slate-500 border-l border-slate-300 pl-2">
+                공급자 연결
+              </span>
+            </Link>
+            <Link
+              to="/"
+              className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary-500 transition-colors ml-2"
+              title="메인 사이트로 이동"
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>메인</span>
+            </Link>
+          </div>
 
           {/* Navigation */}
-          <nav style={styles.topNav}>
-            <Link to="/" style={styles.topNavLink}>
-              <Home size={16} />
-              홈으로
+          <nav className="flex items-center space-x-4">
+            <Link
+              to="/supplier-ops"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === '/supplier-ops'
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
+              홈
             </Link>
-            <Link to="/suppliers" style={styles.topNavLink}>
+            <Link
+              to="/supplier-ops/suppliers"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/supplier-ops/suppliers')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
               공급자
             </Link>
-            <Link to="/partners/requests" style={styles.topNavLink}>
+            <Link
+              to="/supplier-ops/partners/info"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/supplier-ops/partners/info')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
+              참여 안내
+            </Link>
+            <Link
+              to="/supplier-ops/partners/requests"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/supplier-ops/partners/requests')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
               제휴 요청
             </Link>
-            <Link to="/content" style={styles.topNavLink}>
+            <Link
+              to="/supplier-ops/content"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/supplier-ops/content')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
               콘텐츠
             </Link>
-            <span style={styles.topNavDivider}>|</span>
+            <span className="text-gray-300">|</span>
+            <Link
+              to="/supplier-ops/partners/apply"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/supplier-ops/partners/apply')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
+              참여 신청
+            </Link>
+            <Link
+              to="/forum"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/forum')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
+              포럼
+            </Link>
             <AccountMenu />
           </nav>
         </div>
@@ -132,6 +207,26 @@ export default function SupplierDashboardLayout() {
         <Outlet />
       </main>
       </div>
+
+      {/* Footer - SupplierOpsLayout 동일 */}
+      <footer className="bg-white border-t border-gray-200 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+            <div className="text-center sm:text-left">
+              <p>&copy; 2026 Neture. 공급자 중심 운영·연결 서비스</p>
+              <p className="mt-1 text-xs text-gray-400">
+                <Link to="/o4o" className="hover:text-primary-600">
+                  o4o 플랫폼 소개
+                </Link>
+                {' · '}
+                <Link to="/" className="hover:text-primary-600">
+                  메인으로
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -141,48 +236,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
-  },
-  topHeader: {
-    backgroundColor: '#fff',
-    borderBottom: '1px solid #e2e8f0',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  },
-  topHeaderContent: {
-    maxWidth: '100%',
-    margin: '0 auto',
-    padding: '0 24px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: '56px',
-  },
-  topLogo: {
-    fontSize: '20px',
-    fontWeight: 700,
-    color: '#16a34a',
-    textDecoration: 'none',
-  },
-  topNav: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-  },
-  topNavLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    color: '#64748b',
-    textDecoration: 'none',
-    fontSize: '14px',
-    fontWeight: 500,
-    padding: '8px 12px',
-    borderRadius: '6px',
-    transition: 'all 0.15s',
-  },
-  topNavDivider: {
-    color: '#e2e8f0',
   },
   loadingContainer: {
     display: 'flex',
