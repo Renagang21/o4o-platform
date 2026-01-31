@@ -20,7 +20,6 @@ import {
   ChevronDown,
   X,
   Package,
-  Star,
   Check,
   Loader2,
   AlertCircle,
