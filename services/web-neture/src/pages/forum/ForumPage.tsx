@@ -9,7 +9,7 @@
  * - 질문·의견·제안의 공식 기록 공간
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   fetchForumPosts,
@@ -133,6 +133,8 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
   { value: 'oldest', label: '오래된순' },
 ];
 
+const PAGE_SIZE = 20;
+
 export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -150,9 +152,17 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const [posts, setPosts] = useState<DisplayPost[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  // Sync input when URL query changes (e.g. browser back/forward)
+  // Sentinel ref for IntersectionObserver
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  // Track current filter key to prevent stale appends
+  const filterKeyRef = useRef('');
+
+  // Sync input when URL query changes
   useEffect(() => {
     setSearchInput(searchQuery);
   }, [searchQuery]);
@@ -166,8 +176,17 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
     });
   }, []);
 
+  // Derive a stable filter key for detecting changes
+  const filterKey = `${boardSlug}|${searchQuery}|${categoryFilter}|${typeFilter}|${sortBy}`;
+
+  // Initial load: reset when filters change
   useEffect(() => {
-    async function loadPosts() {
+    filterKeyRef.current = filterKey;
+    setPage(1);
+    setHasMore(true);
+    setPosts([]);
+
+    async function loadInitial() {
       setIsLoading(true);
       setError(null);
 
@@ -175,64 +194,129 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
         const isFiltering = !!searchQuery || !!categoryFilter || sortBy !== 'latest';
 
         if (isFiltering) {
-          // Filtered mode: fetch with params, skip pinned
           const postsResponse = await fetchForumPosts({
             search: searchQuery || undefined,
             categoryId: categoryFilter || undefined,
             sortBy,
             page: 1,
-            limit: 20,
+            limit: PAGE_SIZE,
           });
+
+          if (filterKeyRef.current !== filterKey) return; // stale
 
           setPinnedPosts([]);
           let results = postsResponse.data.map(toDisplayPost);
-
-          // Client-side type filter (backend doesn't support postType param)
           if (typeFilter) {
             results = results.filter(p => p.type === typeFilter);
           }
 
           setPosts(results);
           setTotalCount(typeFilter ? results.length : postsResponse.totalCount);
+          setHasMore(postsResponse.data.length >= PAGE_SIZE);
         } else {
-          // Default mode: fetch pinned and regular posts in parallel
           const [pinnedResponse, postsResponse] = await Promise.all([
             fetchPinnedPosts(2),
-            fetchForumPosts({ page: 1, limit: 20 }),
+            fetchForumPosts({ page: 1, limit: PAGE_SIZE }),
           ]);
+
+          if (filterKeyRef.current !== filterKey) return; // stale
 
           setPinnedPosts(pinnedResponse.map(toDisplayPost));
 
-          // Filter out pinned posts from regular list
           const pinnedIds = new Set(pinnedResponse.map(p => p.id));
           let regularPosts = postsResponse.data
             .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
             .map(toDisplayPost);
 
-          // Client-side type filter
           if (typeFilter) {
             regularPosts = regularPosts.filter(p => p.type === typeFilter);
           }
 
           setPosts(regularPosts);
           setTotalCount(typeFilter ? regularPosts.length : postsResponse.totalCount);
+          setHasMore(postsResponse.data.length >= PAGE_SIZE);
         }
       } catch (err) {
         console.error('Error loading forum posts:', err);
-        setError(hasFilters ? '게시글을 불러오지 못했습니다.' : '게시글을 불러오지 못했습니다.');
+        if (filterKeyRef.current === filterKey) {
+          setError('게시글을 불러오지 못했습니다.');
+        }
       } finally {
-        setIsLoading(false);
+        if (filterKeyRef.current === filterKey) {
+          setIsLoading(false);
+        }
       }
     }
 
-    loadPosts();
-  }, [boardSlug, searchQuery, categoryFilter, typeFilter, sortBy]);
+    loadInitial();
+  }, [filterKey]);
+
+  // Load more pages
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore || isLoading) return;
+
+    const nextPage = page + 1;
+    const currentFilterKey = filterKeyRef.current;
+    setIsLoadingMore(true);
+
+    try {
+      const postsResponse = await fetchForumPosts({
+        search: searchQuery || undefined,
+        categoryId: categoryFilter || undefined,
+        sortBy,
+        page: nextPage,
+        limit: PAGE_SIZE,
+      });
+
+      if (filterKeyRef.current !== currentFilterKey) return; // stale
+
+      let newPosts = postsResponse.data.map(toDisplayPost);
+
+      // Remove pinned duplicates
+      if (!hasFilters) {
+        const pinnedIds = new Set(pinnedPosts.map(p => p.id));
+        newPosts = newPosts.filter(p => !pinnedIds.has(p.id) && !p.isPinned);
+      }
+
+      // Client-side type filter
+      if (typeFilter) {
+        newPosts = newPosts.filter(p => p.type === typeFilter);
+      }
+
+      setPosts(prev => [...prev, ...newPosts]);
+      setPage(nextPage);
+      setHasMore(postsResponse.data.length >= PAGE_SIZE);
+    } catch (err) {
+      console.error('Error loading more posts:', err);
+    } finally {
+      if (filterKeyRef.current === currentFilterKey) {
+        setIsLoadingMore(false);
+      }
+    }
+  }, [isLoadingMore, hasMore, isLoading, page, searchQuery, categoryFilter, sortBy, typeFilter, hasFilters, pinnedPosts]);
+
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   const handlePostClick = (post: DisplayPost) => {
     navigate(`/forum/post/${post.slug}`);
   };
 
-  // Helper to update URL params without losing other params
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
     if (value) {
@@ -309,7 +393,6 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
       {/* Filter Bar */}
       <div style={styles.filterBar}>
         <div style={styles.filterGroup}>
-          {/* Category Filter */}
           {categories.length > 0 && (
             <select
               value={categoryFilter}
@@ -322,8 +405,6 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
               ))}
             </select>
           )}
-
-          {/* Type Filter Pills */}
           <div style={styles.typePills}>
             {TYPE_FILTERS.map(({ value, label }) => (
               <button
@@ -339,9 +420,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
             ))}
           </div>
         </div>
-
         <div style={styles.filterRight}>
-          {/* Sort */}
           <select
             value={sortBy}
             onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)}
@@ -375,7 +454,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
         </div>
       )}
 
-      {/* Loading State - Skeleton */}
+      {/* Initial Loading State - Skeleton */}
       {isLoading && (
         <div style={styles.postList}>
           <div style={styles.listHeader}>
@@ -430,13 +509,32 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
               </span>
             </div>
             {posts.length > 0 ? (
-              posts.map((post) => (
-                <PostItem
-                  key={post.id}
-                  post={post}
-                  onClick={() => handlePostClick(post)}
-                />
-              ))
+              <>
+                {posts.map((post) => (
+                  <PostItem
+                    key={post.id}
+                    post={post}
+                    onClick={() => handlePostClick(post)}
+                  />
+                ))}
+
+                {/* Infinite scroll sentinel */}
+                <div ref={sentinelRef} style={styles.sentinel} />
+
+                {/* Loading more indicator */}
+                {isLoadingMore && (
+                  <div style={styles.loadingMore}>
+                    불러오는 중...
+                  </div>
+                )}
+
+                {/* End of list */}
+                {!hasMore && !isLoadingMore && posts.length > 0 && (
+                  <div style={styles.endOfList}>
+                    마지막 게시글입니다
+                  </div>
+                )}
+              </>
             ) : hasFilters ? (
               <div style={styles.emptyState}>
                 <p style={styles.emptyTitle}>검색 결과가 없습니다</p>
@@ -786,6 +884,21 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#94a3b8',
   },
   metaDivider: {
+    color: '#cbd5e1',
+  },
+  sentinel: {
+    height: '1px',
+  },
+  loadingMore: {
+    padding: '16px',
+    textAlign: 'center',
+    fontSize: '13px',
+    color: '#94a3b8',
+  },
+  endOfList: {
+    padding: '16px',
+    textAlign: 'center',
+    fontSize: '13px',
     color: '#cbd5e1',
   },
   footer: {
