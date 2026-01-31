@@ -42,8 +42,8 @@ router.get('/posts', optionalAuth, controller.listPosts.bind(controller));
 // Get single post (public with optional auth for view tracking)
 router.get('/posts/:id', optionalAuth, controller.getPost.bind(controller));
 
-// Create post (optional auth - guests can post)
-router.post('/posts', optionalAuth, controller.createPost.bind(controller));
+// Create post (authenticated - login required)
+router.post('/posts', authenticate, controller.createPost.bind(controller));
 
 // Update post (authenticated)
 router.put('/posts/:id', authenticate, controller.updatePost.bind(controller));

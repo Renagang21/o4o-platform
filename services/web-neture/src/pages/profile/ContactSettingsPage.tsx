@@ -28,8 +28,6 @@ import {
 
 export function ContactSettingsPage() {
   const { isAuthenticated } = useAuth();
-  // NOTE: 현재 AuthContext는 테스트용이라 token이 없음
-  const token = '';
 
   const [settings, setSettings] = useState<UserContactSettings>({
     contactEnabled: false,
@@ -70,7 +68,7 @@ export function ContactSettingsPage() {
       setError(null);
 
       try {
-        const data = await fetchUserContactSettings(token);
+        const data = await fetchUserContactSettings();
         if (data) {
           setSettings(data);
         }
@@ -83,7 +81,7 @@ export function ContactSettingsPage() {
     }
 
     loadSettings();
-  }, [token]);
+  }, []);
 
   async function handleSave() {
     setIsSaving(true);
@@ -91,7 +89,7 @@ export function ContactSettingsPage() {
     setSuccessMessage(null);
 
     try {
-      const result = await updateUserContactSettings(settings, token);
+      const result = await updateUserContactSettings(settings);
 
       if (result.success) {
         setSuccessMessage('설정이 저장되었습니다.');

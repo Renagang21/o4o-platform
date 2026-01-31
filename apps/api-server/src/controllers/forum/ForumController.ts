@@ -188,7 +188,16 @@ export class ForumController {
    */
   async createPost(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id || null;
+      const userId = (req as any).user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+          code: 'AUTH_REQUIRED',
+        });
+        return;
+      }
 
       const { title, content, excerpt, categoryId, categorySlug, type, tags, isPinned, allowComments, metadata, showContactOnPost } = req.body;
 

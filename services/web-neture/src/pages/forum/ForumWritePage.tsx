@@ -5,7 +5,7 @@
  * Phase B-3: 글 작성 기능 구현
  *
  * 역할: o4o·네뚜레에 대해 의견을 남길 수 있는 공식 입구
- * - 로그인 불필요 (게스트 포함 누구나 작성 가능)
+ * - 로그인 필수 (Phase 20-B: 작성자 귀속 강제)
  * - 제목/내용 입력
  * - 성공 시 포럼 목록으로 이동
  *
@@ -20,7 +20,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
-import { useAuth } from '../../contexts';
+import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
   updateForumPost,
@@ -47,9 +47,7 @@ export function ForumWritePage() {
   const editPostId = searchParams.get('edit');
   const isEditMode = !!editPostId;
   const { isAuthenticated } = useAuth();
-  // NOTE: 현재 AuthContext는 테스트용이라 token이 없음
-  // Real API 연동 시 AuthContext에 token 추가 필요
-  const token = '';
+  const { openLoginModal } = useLoginModal();
 
   const [title, setTitle] = useState('');
   const [editorHtml, setEditorHtml] = useState('');
@@ -96,7 +94,7 @@ export function ForumWritePage() {
       if (!isAuthenticated) return;
 
       try {
-        const settings = await fetchUserContactSettings(token);
+        const settings = await fetchUserContactSettings();
         setContactSettings(settings);
       } catch (err) {
         console.error('Error loading contact settings:', err);
@@ -104,7 +102,28 @@ export function ForumWritePage() {
     }
 
     loadContactSettings();
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated]);
+
+  // 비로그인 시 로그인 안내
+  if (!isAuthenticated) {
+    return (
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '80px 20px', textAlign: 'center' as const }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>로그인이 필요합니다</h2>
+        <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>게시글을 작성하려면 로그인해주세요.</p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <button
+            onClick={() => openLoginModal('/forum/write')}
+            style={{ padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}
+          >
+            로그인
+          </button>
+          <Link to="/forum" style={{ padding: '10px 24px', background: '#f1f5f9', color: '#475569', borderRadius: '8px', fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+            목록으로
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Check if user has contact info configured
   const hasContactInfo = contactSettings?.contactEnabled &&
@@ -140,15 +159,12 @@ export function ForumWritePage() {
           setError(response.error || '게시글 수정에 실패했습니다.');
         }
       } else {
-        const response = await createForumPost(
-          {
+        const response = await createForumPost({
             title: title.trim(),
             content: blocks,
             categorySlug: CATEGORY_SLUG,
             showContactOnPost: hasContactInfo ? showContactOnPost : false,
-          },
-          token || ''
-        );
+          });
 
         if (response.success && response.data) {
           navigate(`/forum/post/${response.data.slug}`);

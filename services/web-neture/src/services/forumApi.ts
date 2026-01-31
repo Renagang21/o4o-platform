@@ -415,7 +415,7 @@ export interface UserContactSettings {
 /**
  * Fetch current user's contact settings
  */
-export async function fetchUserContactSettings(authToken: string): Promise<UserContactSettings | null> {
+export async function fetchUserContactSettings(): Promise<UserContactSettings | null> {
   if (!USE_REAL_API) {
     // Mock response
     return {
@@ -427,9 +427,7 @@ export async function fetchUserContactSettings(authToken: string): Promise<UserC
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/users/me/contact`, {
-      headers: {
-        'Authorization': `Bearer ${authToken}`,
-      },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -449,7 +447,6 @@ export async function fetchUserContactSettings(authToken: string): Promise<UserC
  */
 export async function updateUserContactSettings(
   settings: Partial<UserContactSettings>,
-  authToken: string
 ): Promise<{ success: boolean; error?: string }> {
   if (!USE_REAL_API) {
     // Mock response
@@ -462,8 +459,8 @@ export async function updateUserContactSettings(
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
       },
+      credentials: 'include',
       body: JSON.stringify(settings),
     });
 
@@ -555,7 +552,6 @@ export interface CreatePostResponse {
  */
 export async function createForumPost(
   payload: CreateForumPostPayload,
-  authToken: string
 ): Promise<CreatePostResponse> {
   if (!USE_REAL_API) {
     // Mock response - simulate post creation
@@ -598,8 +594,8 @@ export async function createForumPost(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
       },
+      credentials: 'include',
       body: JSON.stringify({
         title: payload.title,
         content: payload.content,
