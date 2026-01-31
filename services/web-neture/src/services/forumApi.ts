@@ -666,3 +666,97 @@ export async function createForumComment(
     };
   }
 }
+
+/**
+ * Update a forum post
+ */
+export async function updateForumPost(
+  postId: string,
+  payload: { title?: string; content?: any; categorySlug?: string }
+): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || data.error || '게시글 수정에 실패했습니다.' };
+    }
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Error updating forum post:', error);
+    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+  }
+}
+
+/**
+ * Delete a forum post
+ */
+export async function deleteForumPost(
+  postId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || data.error || '게시글 삭제에 실패했습니다.' };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting forum post:', error);
+    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+  }
+}
+
+/**
+ * Update a forum comment
+ */
+export async function updateForumComment(
+  commentId: string,
+  content: string
+): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments/${commentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ content }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || data.error || '댓글 수정에 실패했습니다.' };
+    }
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Error updating forum comment:', error);
+    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+  }
+}
+
+/**
+ * Delete a forum comment
+ */
+export async function deleteForumComment(
+  commentId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments/${commentId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || data.error || '댓글 삭제에 실패했습니다.' };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting forum comment:', error);
+    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+  }
+}

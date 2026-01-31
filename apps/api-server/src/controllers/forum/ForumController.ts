@@ -741,6 +741,105 @@ export class ForumController {
     }
   }
 
+  /**
+   * PUT /forum/comments/:id
+   * Update comment (author only)
+   */
+  async updateComment(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const userRole = (req as any).user?.currentRole;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { id } = req.params;
+      const { content } = req.body;
+
+      if (!content || !content.trim()) {
+        res.status(400).json({ success: false, error: 'content is required' });
+        return;
+      }
+
+      const comment = await this.commentRepository.findOne({
+        where: { id },
+        relations: ['author'],
+      });
+
+      if (!comment) {
+        res.status(404).json({ success: false, error: 'Comment not found' });
+        return;
+      }
+
+      // Author or admin/manager can edit
+      const isAdmin = userRole === 'admin' || userRole === 'manager';
+      if (comment.authorId !== userId && !isAdmin) {
+        res.status(403).json({ success: false, error: 'Permission denied' });
+        return;
+      }
+
+      comment.content = content.trim();
+      comment.isEdited = true;
+      const saved = await this.commentRepository.save(comment);
+
+      const updated = await this.commentRepository.findOne({
+        where: { id: saved.id },
+        relations: ['author'],
+      });
+
+      res.status(200).json({ success: true, data: updated });
+    } catch (error: any) {
+      logger.error('Error updating forum comment:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to update comment' });
+    }
+  }
+
+  /**
+   * DELETE /forum/comments/:id
+   * Delete comment (author or admin)
+   */
+  async deleteComment(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const userRole = (req as any).user?.currentRole;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { id } = req.params;
+
+      const comment = await this.commentRepository.findOne({ where: { id } });
+      if (!comment) {
+        res.status(404).json({ success: false, error: 'Comment not found' });
+        return;
+      }
+
+      const isAdmin = userRole === 'admin' || userRole === 'manager';
+      if (comment.authorId !== userId && !isAdmin) {
+        res.status(403).json({ success: false, error: 'Permission denied' });
+        return;
+      }
+
+      // Soft delete
+      comment.status = CommentStatus.DELETED;
+      await this.commentRepository.save(comment);
+
+      // Decrement post comment count
+      const post = await this.postRepository.findOne({ where: { id: comment.postId } });
+      if (post && post.commentCount > 0) {
+        post.commentCount -= 1;
+        await this.postRepository.save(post);
+      }
+
+      res.status(200).json({ success: true, message: 'Comment deleted successfully' });
+    } catch (error: any) {
+      logger.error('Error deleting forum comment:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to delete comment' });
+    }
+  }
+
   // ============================================================================
   // Statistics
   // ============================================================================

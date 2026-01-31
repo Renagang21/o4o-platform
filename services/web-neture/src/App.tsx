@@ -15,7 +15,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
@@ -255,11 +255,15 @@ function RedirectContentDetail() {
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
+  const location = useLocation();
 
-  // 컴포넌트 마운트 시 로그인 모달 열기
+  // state.from 또는 query param에서 returnUrl 추출
+  const returnUrl = (location.state as any)?.from || new URLSearchParams(location.search).get('returnUrl');
+
+  // 컴포넌트 마운트 시 로그인 모달 열기 (returnUrl 전달)
   useEffect(() => {
-    openLoginModal();
-  }, [openLoginModal]);
+    openLoginModal(returnUrl || undefined);
+  }, [openLoginModal, returnUrl]);
 
   return <Navigate to="/" replace />;
 }

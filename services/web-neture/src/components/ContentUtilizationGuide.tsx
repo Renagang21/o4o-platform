@@ -14,7 +14,7 @@
  * - POST/PUT/DELETE 없음
  */
 
-import { ExternalLink, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 // 서비스별 콘텐츠 활용 정보
 interface ServiceUsageInfo {
@@ -23,8 +23,6 @@ interface ServiceUsageInfo {
   icon: string;
   description: string;
   usageAreas: string[];
-  manageUrl: string;
-  manageLabel: string;
 }
 
 // 지원 서비스 목록 (정적 데이터)
@@ -35,8 +33,6 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     icon: '🏥',
     description: '약국 공급 플랫폼',
     usageAreas: ['상품 상세 페이지', '약국 매장 콘텐츠'],
-    manageUrl: 'https://glycopharm.co.kr/seller/content',
-    manageLabel: '판매자 센터',
   },
   {
     id: 'k-cosmetics',
@@ -44,8 +40,6 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     icon: '💄',
     description: '화장품 유통 플랫폼',
     usageAreas: ['상품 상세 설명', '메인 배너', '프로모션 영역'],
-    manageUrl: 'https://k-cosmetics.site/seller/content',
-    manageLabel: '콘텐츠 관리',
   },
   {
     id: 'glucoseview',
@@ -53,8 +47,6 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     icon: '📊',
     description: '혈당 관리 플랫폼',
     usageAreas: ['파트너 소개 영역', '서비스 안내'],
-    manageUrl: 'https://glucoseview.co.kr/partner/content',
-    manageLabel: '파트너 센터',
   },
 ];
 
@@ -129,16 +121,7 @@ export function ContentUtilizationGuide({
               </ul>
             </div>
 
-            {/* External Link */}
-            <a
-              href={service.manageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.manageLink}
-            >
-              <span>{service.manageLabel}에서 관리</span>
-              <ExternalLink size={14} />
-            </a>
+            {/* 정보 안내만 제공 (WO-SUPPLIER-PROFILE-V1: 관리 링크 제거) */}
           </div>
         ))}
       </div>
@@ -255,18 +238,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: '#475569',
     lineHeight: 1.6,
-  },
-  manageLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: '#3b82f6',
-    textDecoration: 'none',
-    padding: '8px 12px',
-    backgroundColor: '#eff6ff',
-    borderRadius: '6px',
   },
   footer: {
     marginTop: '16px',

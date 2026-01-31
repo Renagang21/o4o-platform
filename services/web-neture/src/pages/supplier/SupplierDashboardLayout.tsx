@@ -35,9 +35,9 @@ export default function SupplierDashboardLayout() {
     );
   }
 
-  // 인증 확인
+  // 인증 확인 - 현재 페이지를 returnUrl로 전달
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
   // 역할 확인 (supplier 또는 partner만 접근)

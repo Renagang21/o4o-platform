@@ -63,6 +63,12 @@ router.get('/posts/:postId/comments', controller.listComments.bind(controller));
 // Create comment (authenticated)
 router.post('/comments', authenticate, controller.createComment.bind(controller));
 
+// Update comment (authenticated - author or admin)
+router.put('/comments/:id', authenticate, controller.updateComment.bind(controller));
+
+// Delete comment (authenticated - author or admin)
+router.delete('/comments/:id', authenticate, controller.deleteComment.bind(controller));
+
 // ============================================================================
 // Categories
 // ============================================================================

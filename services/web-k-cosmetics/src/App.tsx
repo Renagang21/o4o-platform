@@ -4,7 +4,7 @@
  */
 
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 // Layouts (always needed)
@@ -85,6 +85,7 @@ function PageLoading() {
 // Protected Route Component - triggers auth check only when entering
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
   const { isAuthenticated, user, isLoading, isSessionChecked, checkSession } = useAuth();
+  const location = useLocation();
 
   // Trigger session check when entering protected route
   React.useEffect(() => {
@@ -103,7 +104,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {

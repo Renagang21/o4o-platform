@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useAuth, type ServiceLoginCredentials } from '@/contexts/AuthContext';
 import { Activity, AlertCircle, User, Key } from 'lucide-react';
 
@@ -39,14 +39,16 @@ const TEST_PROFILES: Record<OAuthProvider, { id: string; email: string; displayN
 
 export default function ServiceLoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { serviceUserLogin, isServiceUserAuthenticated } = useAuth();
+  const returnUrl = (location.state as any)?.from || '/service/dashboard';
   const [selectedProvider, setSelectedProvider] = useState<OAuthProvider | null>(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 이미 Service User로 로그인된 경우 리다이렉트
   if (isServiceUserAuthenticated) {
-    navigate('/service/dashboard');
+    navigate(returnUrl);
     return null;
   }
 
@@ -74,7 +76,7 @@ export default function ServiceLoginPage() {
       await serviceUserLogin(credentials);
 
       // 로그인 성공 시 서비스 대시보드로 이동
-      navigate('/service/dashboard');
+      navigate(returnUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Service User 로그인에 실패했습니다.';
       setError(errorMessage);

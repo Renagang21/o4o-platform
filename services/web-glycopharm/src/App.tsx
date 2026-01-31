@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 // Layouts (always needed)
@@ -142,6 +142,7 @@ function PageLoading() {
 // Protected Route Component (Platform User)
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
   const { isAuthenticated, user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -152,7 +153,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
@@ -165,6 +166,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 // Service User Protected Route (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
 function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isServiceUserAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -175,7 +177,7 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
   }
 
   if (!isServiceUserAuthenticated) {
-    return <Navigate to="/service-login" replace />;
+    return <Navigate to="/service-login" state={{ from: location.pathname + location.search }} replace />;
   }
 
   return <>{children}</>;

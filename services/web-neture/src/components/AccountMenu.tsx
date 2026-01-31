@@ -9,7 +9,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth, ROLE_DASHBOARDS, ROLE_LABELS, useLoginModal } from '../contexts';
 
@@ -19,6 +19,7 @@ export default function AccountMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function AccountMenu() {
   if (!isAuthenticated || !user) {
     return (
       <button
-        onClick={() => openLoginModal()}
+        onClick={() => openLoginModal(location.pathname + location.search)}
         className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
       >
         로그인

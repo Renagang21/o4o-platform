@@ -7,9 +7,10 @@ interface LoginModalProps {
   onClose: () => void;
   initialEmail?: string;
   initialPassword?: string;
+  returnUrl?: string;
 }
 
-export default function LoginModal({ isOpen, onClose, initialEmail, initialPassword }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, initialEmail, initialPassword, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -42,6 +43,9 @@ export default function LoginModal({ isOpen, onClose, initialEmail, initialPassw
           navigate('/rejected');
         } else {
           onClose();
+          if (returnUrl) {
+            navigate(returnUrl);
+          }
         }
       } else {
         setError(result.message || '로그인에 실패했습니다.');

@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
@@ -18,7 +18,9 @@ const testAccounts = [
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+  const returnUrl = (location.state as any)?.from || '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +44,7 @@ export default function LoginPage() {
       if (!result.success) {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
-      navigate('/');
+      navigate(returnUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {

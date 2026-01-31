@@ -11,12 +11,15 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import {
   fetchForumPostBySlug,
   fetchForumComments,
   createForumComment,
+  updateForumComment,
+  deleteForumComment,
+  deleteForumPost,
   normalizePostType,
   getAuthorName,
   extractTextContent,
@@ -29,7 +32,9 @@ import {
 interface DisplayComment {
   id: string;
   content: string;
+  authorId: string;
   authorName: string;
+  isEdited?: boolean;
   createdAt: string;
 }
 
@@ -84,26 +89,83 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   return {
     id: comment.id,
     content,
+    authorId: comment.authorId || comment.author?.id || '',
     authorName,
+    isEdited: comment.isEdited,
     createdAt: comment.createdAt,
   };
 }
 
-function CommentItem({ comment }: { comment: DisplayComment }) {
+function CommentItem({ comment, currentUserId, onUpdate, onDelete }: {
+  comment: DisplayComment;
+  currentUserId?: string;
+  onUpdate: (id: string, content: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const isOwner = currentUserId && comment.authorId === currentUserId;
+
+  const handleSave = async () => {
+    if (!editContent.trim() || isSaving) return;
+    setIsSaving(true);
+    await onUpdate(comment.id, editContent.trim());
+    setIsEditing(false);
+    setIsSaving(false);
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    await onDelete(comment.id);
+  };
+
   return (
     <div style={styles.comment}>
       <div style={styles.commentHeader}>
         <span style={styles.commentAuthor}>{comment.authorName}</span>
-        <span style={styles.commentDate}>{formatRelativeTime(comment.createdAt)}</span>
+        <span style={styles.commentDate}>
+          {formatRelativeTime(comment.createdAt)}
+          {comment.isEdited && ' (수정됨)'}
+        </span>
+        {isOwner && !isEditing && (
+          <div style={styles.commentActions}>
+            <button style={styles.actionBtn} onClick={() => { setIsEditing(true); setEditContent(comment.content); }}>수정</button>
+            <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDelete}>삭제</button>
+          </div>
+        )}
       </div>
-      <p style={styles.commentContent}>{comment.content}</p>
+      {isEditing ? (
+        <div style={{ marginTop: '8px' }}>
+          <textarea
+            style={styles.commentTextarea}
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            rows={3}
+          />
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', justifyContent: 'flex-end' }}>
+            <button style={styles.cancelBtn} onClick={() => setIsEditing(false)}>취소</button>
+            <button
+              style={{ ...styles.submitButton, padding: '6px 14px', fontSize: '13px', opacity: isSaving ? 0.5 : 1 }}
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? '저장 중...' : '저장'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p style={styles.commentContent}>{comment.content}</p>
+      )}
     </div>
   );
 }
 
 export function ForumPostPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<DisplayComment[]>([]);
@@ -112,6 +174,8 @@ export function ForumPostPage() {
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+
+  const currentUserId = user?.id;
 
   useEffect(() => {
     async function loadPost() {
@@ -150,6 +214,34 @@ export function ForumPostPage() {
 
     loadPost();
   }, [slug]);
+
+  const handleDeletePost = async () => {
+    if (!post || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    const result = await deleteForumPost(post.id);
+    if (result.success) {
+      navigate('/forum');
+    } else {
+      alert(result.error || '게시글 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleUpdateComment = async (commentId: string, content: string) => {
+    const result = await updateForumComment(commentId, content);
+    if (result.success && result.data) {
+      setComments(prev => prev.map(c => c.id === commentId ? toDisplayComment(result.data!) : c));
+    } else {
+      alert(result.error || '댓글 수정에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    const result = await deleteForumComment(commentId);
+    if (result.success) {
+      setComments(prev => prev.filter(c => c.id !== commentId));
+    } else {
+      alert(result.error || '댓글 삭제에 실패했습니다.');
+    }
+  };
 
   const handleSubmitComment = async () => {
     if (!post || !commentText.trim() || isSubmitting) return;
@@ -256,6 +348,12 @@ export function ForumPostPage() {
           <span style={styles.metaDivider}>·</span>
           <span>{formatDate(post.publishedAt || post.createdAt)}</span>
         </div>
+        {currentUserId && post.authorId === currentUserId && (
+          <div style={styles.postActions}>
+            <button style={styles.actionBtn} onClick={() => navigate(`/forum/write?edit=${post.id}`)}>수정</button>
+            <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
+          </div>
+        )}
       </header>
 
       {/* Post Content */}
@@ -352,7 +450,7 @@ export function ForumPostPage() {
         <div style={styles.commentsList}>
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} />
+              <CommentItem key={comment.id} comment={comment} currentUserId={currentUserId} onUpdate={handleUpdateComment} onDelete={handleDeleteComment} />
             ))
           ) : (
             <div style={styles.noComments}>
@@ -621,6 +719,33 @@ const styles: Record<string, React.CSSProperties> = {
   commentDate: {
     fontSize: '13px',
     color: '#94a3b8',
+  },
+  commentActions: {
+    display: 'flex',
+    gap: '8px',
+    marginLeft: 'auto',
+  },
+  actionBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '13px',
+    color: '#64748b',
+    cursor: 'pointer',
+    padding: '2px 6px',
+  },
+  cancelBtn: {
+    background: 'none',
+    border: '1px solid #e2e8f0',
+    fontSize: '13px',
+    color: '#64748b',
+    cursor: 'pointer',
+    padding: '6px 14px',
+    borderRadius: '6px',
+  },
+  postActions: {
+    display: 'flex',
+    gap: '8px',
+    marginTop: '12px',
   },
   commentContent: {
     fontSize: '14px',

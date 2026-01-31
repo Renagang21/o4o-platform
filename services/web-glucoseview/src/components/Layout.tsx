@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './LoginModal';
 import { AIChatButton } from './ai';
@@ -14,9 +14,22 @@ const navItems = [
 export default function Layout() {
   const { user, logout, isAuthenticated, isApproved, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginReturnUrl, setLoginReturnUrl] = useState<string | undefined>();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // ProtectedRoute에서 리다이렉트된 경우 자동으로 로그인 모달 열기
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.requireLogin && !isAuthenticated) {
+      setLoginReturnUrl(state.from);
+      setShowLoginModal(true);
+      // state 정리 (뒤로가기 시 재트리거 방지)
+      window.history.replaceState({}, '');
+    }
+  }, [location.state, isAuthenticated]);
 
   const handleLogout = () => {
     logout();
@@ -267,7 +280,11 @@ export default function Layout() {
       {/* Login Modal */}
       <LoginModal
         isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
+        onClose={() => {
+          setShowLoginModal(false);
+          setLoginReturnUrl(undefined);
+        }}
+        returnUrl={loginReturnUrl}
       />
 
       {/* AI Chat Button - 로그인한 승인 사용자에게만 표시 */}

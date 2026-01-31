@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
@@ -39,9 +39,10 @@ import './index.css';
 // 인증이 필요한 라우트를 보호하는 컴포넌트
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isPending, isRejected } = useAuth();
+  const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" state={{ from: location.pathname + location.search, requireLogin: true }} replace />;
   }
 
   // 승인 대기 중이거나 거절된 경우 pending 페이지로 이동
@@ -70,6 +71,7 @@ function PendingRoute({ children }: { children: React.ReactNode }) {
 // 역할 기반 보호 라우트
 function RoleProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles: string[] }) {
   const { isAuthenticated, user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -80,7 +82,7 @@ function RoleProtectedRoute({ children, allowedRoles }: { children: React.ReactN
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" state={{ from: location.pathname + location.search, requireLogin: true }} replace />;
   }
 
   if (user && !allowedRoles.includes(user.role)) {
