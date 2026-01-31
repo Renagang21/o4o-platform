@@ -32,6 +32,12 @@ export class NeturePartnerDashboardItemContent {
   @Column({ type: 'varchar', length: 20, name: 'content_source', default: 'cms' })
   contentSource!: ContentSource;
 
+  @Column({ type: 'int', name: 'sort_order', default: 0 })
+  sortOrder!: number;
+
+  @Column({ type: 'boolean', name: 'is_primary', default: false })
+  isPrimary!: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 }

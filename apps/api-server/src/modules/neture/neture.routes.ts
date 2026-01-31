@@ -1127,7 +1127,7 @@ router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req:
     const linkRepo = AppDataSource.getRepository(NeturePartnerDashboardItemContent);
     const links = await linkRepo.find({
       where: { dashboardItemId: itemId },
-      order: { createdAt: 'DESC' },
+      order: { sortOrder: 'ASC', createdAt: 'DESC' },
     });
 
     if (links.length === 0) {
@@ -1182,6 +1182,8 @@ router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req:
         type: detail?.type || 'unknown',
         summary: detail?.summary || null,
         imageUrl: detail?.imageUrl || null,
+        sortOrder: link.sortOrder,
+        isPrimary: link.isPrimary,
         createdAt: detail?.createdAt || link.createdAt.toISOString(),
       };
     });
@@ -1190,6 +1192,99 @@ router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req:
   } catch (error) {
     logger.error('[Neture API] Error fetching linked contents:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch linked contents' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/partner/dashboard/items/:itemId/contents/reorder
+ * Reorder linked contents
+ * WO-PARTNER-CONTENT-ORDER-PHASE2-V1
+ */
+router.patch('/partner/dashboard/items/:itemId/contents/reorder', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { itemId } = req.params;
+    const { orderedIds } = req.body;
+
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'orderedIds array is required' });
+    }
+
+    // Ownership check
+    const itemRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const item = await itemRepo.findOne({ where: { id: itemId, partnerUserId: userId } });
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Dashboard item not found' });
+    }
+
+    const linkRepo = AppDataSource.getRepository(NeturePartnerDashboardItemContent);
+    const links = await linkRepo.find({ where: { dashboardItemId: itemId } });
+    const linkMap = new Map(links.map((l) => [l.id, l]));
+
+    // Validate all IDs belong to this item
+    for (const id of orderedIds) {
+      if (!linkMap.has(id)) {
+        return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: `Link ID ${id} not found for this item` });
+      }
+    }
+
+    // Update sort_order
+    for (let i = 0; i < orderedIds.length; i++) {
+      const link = linkMap.get(orderedIds[i])!;
+      link.sortOrder = i;
+    }
+    await linkRepo.save(links);
+
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('[Neture API] Error reordering contents:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to reorder contents' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/partner/dashboard/items/:itemId/contents/:linkId/primary
+ * Set a content link as primary
+ * WO-PARTNER-CONTENT-ORDER-PHASE2-V1
+ */
+router.patch('/partner/dashboard/items/:itemId/contents/:linkId/primary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { itemId, linkId } = req.params;
+
+    // Ownership check
+    const itemRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const item = await itemRepo.findOne({ where: { id: itemId, partnerUserId: userId } });
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Dashboard item not found' });
+    }
+
+    const linkRepo = AppDataSource.getRepository(NeturePartnerDashboardItemContent);
+
+    // Unset all primary for this item
+    await linkRepo.update({ dashboardItemId: itemId }, { isPrimary: false });
+
+    // Set target as primary
+    const link = await linkRepo.findOne({ where: { id: linkId, dashboardItemId: itemId } });
+    if (!link) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Content link not found' });
+    }
+
+    link.isPrimary = true;
+    await linkRepo.save(link);
+
+    res.json({ success: true, data: { linkId: link.id, isPrimary: true } });
+  } catch (error) {
+    logger.error('[Neture API] Error setting primary content:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to set primary content' });
   }
 });
 

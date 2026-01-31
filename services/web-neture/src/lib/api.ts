@@ -281,6 +281,8 @@ export interface LinkedContent {
   type: string;
   summary: string | null;
   imageUrl: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
   createdAt: string;
 }
 
@@ -398,6 +400,36 @@ export const partnerDashboardApi = {
     }
     const result = await response.json();
     return result.data || [];
+  },
+
+  /**
+   * PATCH /api/v1/neture/partner/dashboard/items/:itemId/contents/reorder
+   * 연결된 콘텐츠 순서 변경
+   */
+  async reorderContents(itemId: string, orderedIds: string[]): Promise<void> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents/reorder`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ orderedIds }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to reorder contents');
+    }
+  },
+
+  /**
+   * PATCH /api/v1/neture/partner/dashboard/items/:itemId/contents/:linkId/primary
+   * 대표 콘텐츠 지정
+   */
+  async setPrimaryContent(itemId: string, linkId: string): Promise<void> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents/${linkId}/primary`, {
+      method: 'PATCH',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to set primary content');
+    }
   },
 };
 

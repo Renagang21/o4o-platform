@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Paperclip, X } from 'lucide-react';
+import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Paperclip, X, ArrowUp, ArrowDown, Star } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem, type BrowsableContent, type LinkedContent } from '../../lib/api';
 
@@ -218,6 +218,46 @@ export function PartnerOverviewPage() {
       setToastMessage('해제에 실패했습니다');
     }
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleMoveContent = async (index: number, direction: 'up' | 'down') => {
+    if (!contentModalItemId) return;
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= linkedContents.length) return;
+
+    // Optimistic reorder
+    const reordered = [...linkedContents];
+    [reordered[index], reordered[swapIndex]] = [reordered[swapIndex], reordered[index]];
+    setLinkedContents(reordered);
+
+    try {
+      await partnerDashboardApi.reorderContents(contentModalItemId, reordered.map((lc) => lc.linkId));
+    } catch {
+      // Revert on error
+      const reverted = await partnerDashboardApi.getLinkedContents(contentModalItemId);
+      setLinkedContents(reverted);
+      setToastMessage('순서 변경에 실패했습니다');
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
+
+  const handleSetPrimary = async (linkId: string) => {
+    if (!contentModalItemId) return;
+
+    // Optimistic update
+    setLinkedContents((prev) =>
+      prev.map((lc) => ({ ...lc, isPrimary: lc.linkId === linkId })),
+    );
+
+    try {
+      await partnerDashboardApi.setPrimaryContent(contentModalItemId, linkId);
+    } catch {
+      // Revert on error
+      const reverted = await partnerDashboardApi.getLinkedContents(contentModalItemId);
+      setLinkedContents(reverted);
+      setToastMessage('대표 자료 지정에 실패했습니다');
+      setTimeout(() => setToastMessage(null), 3000);
+    }
   };
 
   const linkedContentIds = useMemo(
@@ -662,25 +702,61 @@ export function PartnerOverviewPage() {
               ))}
             </div>
 
-            {/* Linked contents section */}
+            {/* Linked contents section — ordered list with reorder & primary (WO-PARTNER-CONTENT-ORDER-PHASE2-V1) */}
             {linkedContents.length > 0 && (
               <div style={{ padding: '12px 24px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#faf5ff' }}>
                 <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 600, color: '#7c3aed' }}>연결된 자료 ({linkedContents.length})</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {linkedContents.map((lc) => (
-                    <span key={lc.linkId} style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '4px',
-                      padding: '4px 10px', fontSize: '12px', backgroundColor: '#fff',
-                      border: '1px solid #e9d5ff', borderRadius: '4px', color: '#6b21a8',
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {linkedContents.map((lc, idx) => (
+                    <div key={lc.linkId} style={{
+                      display: 'flex', alignItems: 'center', gap: '8px',
+                      padding: '6px 10px', fontSize: '13px', backgroundColor: lc.isPrimary ? '#f5f3ff' : '#fff',
+                      border: lc.isPrimary ? '1px solid #c4b5fd' : '1px solid #e9d5ff', borderRadius: '6px',
                     }}>
-                      {lc.title.length > 20 ? lc.title.slice(0, 20) + '...' : lc.title}
+                      {/* Star toggle */}
+                      <button
+                        onClick={() => handleSetPrimary(lc.linkId)}
+                        title={lc.isPrimary ? '대표 자료' : '대표로 지정'}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      >
+                        <Star size={14} fill={lc.isPrimary ? '#f59e0b' : 'none'} color={lc.isPrimary ? '#f59e0b' : '#d1d5db'} />
+                      </button>
+                      {/* Title */}
+                      <span style={{ flex: 1, color: '#6b21a8', fontWeight: lc.isPrimary ? 600 : 400 }}>
+                        {lc.title.length > 30 ? lc.title.slice(0, 30) + '...' : lc.title}
+                      </span>
+                      {/* Source badge */}
+                      <span style={{
+                        fontSize: '10px', fontWeight: 600, padding: '1px 5px', borderRadius: '3px',
+                        backgroundColor: lc.contentSource === 'cms' ? '#eff6ff' : '#f0fdf4',
+                        color: lc.contentSource === 'cms' ? '#2563eb' : '#16a34a',
+                      }}>
+                        {lc.contentSource === 'cms' ? '운영자' : '공급자'}
+                      </span>
+                      {/* Up/Down arrows */}
+                      <button
+                        onClick={() => handleMoveContent(idx, 'up')}
+                        disabled={idx === 0}
+                        style={{ border: 'none', background: 'none', cursor: idx === 0 ? 'default' : 'pointer', padding: '2px', display: 'flex', opacity: idx === 0 ? 0.3 : 1 }}
+                      >
+                        <ArrowUp size={14} color="#64748b" />
+                      </button>
+                      <button
+                        onClick={() => handleMoveContent(idx, 'down')}
+                        disabled={idx === linkedContents.length - 1}
+                        style={{ border: 'none', background: 'none', cursor: idx === linkedContents.length - 1 ? 'default' : 'pointer', padding: '2px', display: 'flex', opacity: idx === linkedContents.length - 1 ? 0.3 : 1 }}
+                      >
+                        <ArrowDown size={14} color="#64748b" />
+                      </button>
+                      {/* Unlink */}
                       <button
                         onClick={() => handleUnlinkContent(lc.linkId)}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0', display: 'flex' }}
+                        title="연결 해제"
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}
                       >
-                        <X size={12} color="#9333ea" />
+                        <X size={14} color="#9333ea" />
                       </button>
-                    </span>
+                    </div>
                   ))}
                 </div>
               </div>
