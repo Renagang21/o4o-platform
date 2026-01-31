@@ -545,7 +545,6 @@ class GlycopharmApiClient {
 
     return this.request(endpoint);
   }
-}
 
   // ========================================================================
   // Featured Products (Operator)

@@ -3589,6 +3589,9 @@ importers:
 
   services/web-k-cosmetics:
     dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
