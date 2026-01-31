@@ -160,6 +160,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
               </label>
               <input
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="이메일을 입력하세요"

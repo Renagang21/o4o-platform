@@ -18,7 +18,7 @@ import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
-import { optionalAuth } from '../../../middleware/auth.middleware.js';
+import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -40,7 +40,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * - category (optional): Filter by category
    * - status (optional): Filter by status (default: ACTIVE)
    */
-  router.get('/suppliers', async (req: Request, res: Response) => {
+  router.get('/suppliers', requireAuth, async (req: Request, res: Response) => {
     try {
       const { category, status } = req.query;
 
@@ -72,7 +72,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /suppliers/:slug
    * Get supplier detail by slug
    */
-  router.get('/suppliers/:slug', async (req: Request, res: Response) => {
+  router.get('/suppliers/:slug', requireAuth, async (req: Request, res: Response) => {
     try {
       const { slug } = req.params;
 
@@ -101,7 +101,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * Query Parameters:
    * - status (optional): Filter by status ('OPEN', 'MATCHED', 'CLOSED')
    */
-  router.get('/partnership/requests', async (req: Request, res: Response) => {
+  router.get('/partnership/requests', requireAuth, async (req: Request, res: Response) => {
     try {
       const { status } = req.query;
 
@@ -129,7 +129,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /partnership/requests/:id
    * Get partnership request detail by ID
    */
-  router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
+  router.get('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
 
@@ -159,7 +159,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * POST /partnership/requests
    * Create a new partnership request (requires login)
    */
-  router.post('/partnership/requests', optionalAuth, async (req: Request, res: Response) => {
+  router.post('/partnership/requests', requireAuth, async (req: Request, res: Response) => {
     try {
       // Check if user is logged in
       const user = (req as any).user;
@@ -233,7 +233,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * PATCH /partnership/requests/:id
    * Update partnership request status (admin only)
    */
-  router.patch('/partnership/requests/:id', optionalAuth, async (req: Request, res: Response) => {
+  router.patch('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
     try {
       // Check if user is logged in and is admin
       const user = (req as any).user;

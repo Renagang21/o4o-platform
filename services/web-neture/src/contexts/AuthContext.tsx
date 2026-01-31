@@ -37,9 +37,9 @@ const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  admin: '/admin',
-  supplier: '/supplier/dashboard',
-  partner: '/partner',
+  admin: '/supplier-ops/admin',
+  supplier: '/supplier-ops/supplier/dashboard',
+  partner: '/supplier-ops/partner',
   user: '/',
 };
 
@@ -130,6 +130,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
     } catch (error) {
+      // CORS/네트워크 오류 vs 서버 오류 구분
+      if (error instanceof TypeError) {
+        // fetch가 TypeError를 던지면 네트워크 오류 또는 CORS 차단
+        return { success: false, error: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' };
+      }
       return { success: false, error: '로그인에 실패했습니다.' };
     } finally {
       setIsLoading(false);

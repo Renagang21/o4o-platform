@@ -30,7 +30,7 @@ type AuthenticatedRequest = Request & {
  * - category (optional): Filter by category
  * - status (optional): Filter by status (default: ACTIVE)
  */
-router.get('/suppliers', async (req: Request, res: Response) => {
+router.get('/suppliers', requireAuth, async (req: Request, res: Response) => {
   try {
     const { category, status } = req.query;
 
@@ -62,7 +62,7 @@ router.get('/suppliers', async (req: Request, res: Response) => {
  * GET /api/v1/neture/suppliers/:slug
  * Get supplier detail by slug
  */
-router.get('/suppliers/:slug', async (req: Request, res: Response) => {
+router.get('/suppliers/:slug', requireAuth, async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
 
@@ -91,7 +91,7 @@ router.get('/suppliers/:slug', async (req: Request, res: Response) => {
  * Query Parameters:
  * - status (optional): Filter by status ('OPEN', 'MATCHED', 'CLOSED')
  */
-router.get('/partnership/requests', async (req: Request, res: Response) => {
+router.get('/partnership/requests', requireAuth, async (req: Request, res: Response) => {
   try {
     const { status } = req.query;
 
@@ -119,7 +119,7 @@ router.get('/partnership/requests', async (req: Request, res: Response) => {
  * GET /api/v1/neture/partnership/requests/:id
  * Get partnership request detail by ID
  */
-router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
+router.get('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -775,7 +775,7 @@ router.get('/admin/dashboard/summary', requireAuth, async (req: AuthenticatedReq
  * Get products marked for partner recruiting (public, no auth)
  * WO-PARTNER-RECRUIT-PHASE1-V1
  */
-router.get('/partner/recruiting-products', async (_req: Request, res: Response) => {
+router.get('/partner/recruiting-products', requireAuth, async (_req: Request, res: Response) => {
   try {
     const glycopharmRepo = new GlycopharmRepository(AppDataSource);
     const products = await glycopharmRepo.findPartnerRecruitingProducts();
@@ -1013,7 +1013,7 @@ router.patch('/partner/dashboard/items/:id', requireAuth, async (req: Authentica
  * Browse available content (CMS + supplier) for partners
  * WO-PARTNER-CONTENT-LINK-PHASE1-V1
  */
-router.get('/partner/contents', async (req: Request, res: Response) => {
+router.get('/partner/contents', requireAuth, async (req: Request, res: Response) => {
   try {
     const source = (req.query.source as string) || 'all';
 
