@@ -218,6 +218,7 @@ export async function fetchForumPosts(params: {
   limit?: number;
   isPinned?: boolean;
   search?: string;
+  sortBy?: 'latest' | 'popular' | 'oldest';
 }): Promise<PostsResponse> {
   if (!USE_REAL_API) {
     // Mock response
@@ -259,6 +260,7 @@ export async function fetchForumPosts(params: {
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
     if (params.search) queryParams.append('search', params.search);
+    if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
     const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${queryParams}`, {
       credentials: 'include',

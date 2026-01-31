@@ -14,9 +14,11 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
+  fetchForumCategories,
   normalizePostType,
   getAuthorName,
   type ForumPost as ApiForumPost,
+  type ForumCategory,
 } from '../../services/forumApi';
 import type { ForumPostType } from '@o4o/types/forum';
 
@@ -116,13 +118,34 @@ function PostItem({ post, onClick }: { post: DisplayPost; onClick: () => void })
   );
 }
 
+const TYPE_FILTERS: { value: PostType | ''; label: string }[] = [
+  { value: '', label: '전체' },
+  { value: 'question', label: '질문' },
+  { value: 'discussion', label: '토론' },
+  { value: 'announcement', label: '공지' },
+  { value: 'guide', label: '가이드' },
+  { value: 'poll', label: '투표' },
+];
+
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'latest', label: '최신순' },
+  { value: 'popular', label: '조회수순' },
+  { value: 'oldest', label: '오래된순' },
+];
+
 export function ForumPage({ boardSlug }: { boardSlug?: string }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // URL-driven state
   const searchQuery = searchParams.get('q') || '';
-  const isSearching = !!searchQuery;
+  const categoryFilter = searchParams.get('category') || '';
+  const typeFilter = (searchParams.get('type') || '') as PostType | '';
+  const sortBy = (searchParams.get('sort') || 'latest') as 'latest' | 'popular' | 'oldest';
+  const hasFilters = !!searchQuery || !!categoryFilter || !!typeFilter || sortBy !== 'latest';
 
   const [searchInput, setSearchInput] = useState(searchQuery);
+  const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [pinnedPosts, setPinnedPosts] = useState<DisplayPost[]>([]);
   const [posts, setPosts] = useState<DisplayPost[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -134,23 +157,43 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
     setSearchInput(searchQuery);
   }, [searchQuery]);
 
+  // Load categories once
+  useEffect(() => {
+    fetchForumCategories().then((res) => {
+      if (res.success && res.data) {
+        setCategories(res.data);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     async function loadPosts() {
       setIsLoading(true);
       setError(null);
 
       try {
-        if (isSearching) {
-          // Search mode: fetch search results only, skip pinned
+        const isFiltering = !!searchQuery || !!categoryFilter || sortBy !== 'latest';
+
+        if (isFiltering) {
+          // Filtered mode: fetch with params, skip pinned
           const postsResponse = await fetchForumPosts({
-            search: searchQuery,
+            search: searchQuery || undefined,
+            categoryId: categoryFilter || undefined,
+            sortBy,
             page: 1,
             limit: 20,
           });
 
           setPinnedPosts([]);
-          setPosts(postsResponse.data.map(toDisplayPost));
-          setTotalCount(postsResponse.totalCount);
+          let results = postsResponse.data.map(toDisplayPost);
+
+          // Client-side type filter (backend doesn't support postType param)
+          if (typeFilter) {
+            results = results.filter(p => p.type === typeFilter);
+          }
+
+          setPosts(results);
+          setTotalCount(typeFilter ? results.length : postsResponse.totalCount);
         } else {
           // Default mode: fetch pinned and regular posts in parallel
           const [pinnedResponse, postsResponse] = await Promise.all([
@@ -162,39 +205,50 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
 
           // Filter out pinned posts from regular list
           const pinnedIds = new Set(pinnedResponse.map(p => p.id));
-          const regularPosts = postsResponse.data
+          let regularPosts = postsResponse.data
             .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
             .map(toDisplayPost);
 
+          // Client-side type filter
+          if (typeFilter) {
+            regularPosts = regularPosts.filter(p => p.type === typeFilter);
+          }
+
           setPosts(regularPosts);
-          setTotalCount(postsResponse.totalCount);
+          setTotalCount(typeFilter ? regularPosts.length : postsResponse.totalCount);
         }
       } catch (err) {
         console.error('Error loading forum posts:', err);
-        setError(isSearching ? '검색에 실패했습니다.' : '게시글을 불러오지 못했습니다.');
+        setError(hasFilters ? '게시글을 불러오지 못했습니다.' : '게시글을 불러오지 못했습니다.');
       } finally {
         setIsLoading(false);
       }
     }
 
     loadPosts();
-  }, [boardSlug, searchQuery]);
+  }, [boardSlug, searchQuery, categoryFilter, typeFilter, sortBy]);
 
   const handlePostClick = (post: DisplayPost) => {
     navigate(`/forum/post/${post.slug}`);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = searchInput.trim();
-    if (trimmed) {
-      setSearchParams({ q: trimmed });
+  // Helper to update URL params without losing other params
+  const updateParam = (key: string, value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) {
+      next.set(key, value);
     } else {
-      setSearchParams({});
+      next.delete(key);
     }
+    setSearchParams(next);
   };
 
-  const handleClearSearch = () => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateParam('q', searchInput.trim());
+  };
+
+  const handleClearAll = () => {
     setSearchInput('');
     setSearchParams({});
   };
@@ -239,7 +293,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
           {searchInput && (
             <button
               type="button"
-              onClick={handleClearSearch}
+              onClick={() => { setSearchInput(''); updateParam('q', ''); }}
               style={styles.searchClearButton}
               aria-label="검색어 지우기"
             >
@@ -251,6 +305,75 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
           검색
         </button>
       </form>
+
+      {/* Filter Bar */}
+      <div style={styles.filterBar}>
+        <div style={styles.filterGroup}>
+          {/* Category Filter */}
+          {categories.length > 0 && (
+            <select
+              value={categoryFilter}
+              onChange={(e) => updateParam('category', e.target.value)}
+              style={styles.filterSelect}
+            >
+              <option value="">카테고리 전체</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          )}
+
+          {/* Type Filter Pills */}
+          <div style={styles.typePills}>
+            {TYPE_FILTERS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => updateParam('type', value)}
+                style={{
+                  ...styles.typePill,
+                  ...(typeFilter === value ? styles.typePillActive : {}),
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={styles.filterRight}>
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)}
+            style={styles.filterSelect}
+          >
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Active Filters Summary */}
+      {hasFilters && (
+        <div style={styles.activeFilters}>
+          <span style={styles.activeFiltersLabel}>
+            {searchQuery && `"${searchQuery}" `}
+            {categoryFilter && categories.find(c => c.id === categoryFilter)
+              ? `${categories.find(c => c.id === categoryFilter)!.name} `
+              : ''}
+            {typeFilter && TYPE_FILTERS.find(t => t.value === typeFilter)
+              ? `${TYPE_FILTERS.find(t => t.value === typeFilter)!.label} `
+              : ''}
+            {sortBy !== 'latest' && SORT_OPTIONS.find(s => s.value === sortBy)
+              ? `${SORT_OPTIONS.find(s => s.value === sortBy)!.label}`
+              : ''}
+          </span>
+          <button onClick={handleClearAll} style={styles.clearAllButton}>
+            초기화
+          </button>
+        </div>
+      )}
 
       {/* Loading State - Skeleton */}
       {isLoading && (
@@ -283,8 +406,8 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
       {/* Content */}
       {!isLoading && !error && (
         <>
-          {/* Pinned Posts (hidden during search) */}
-          {!isSearching && pinnedPosts.length > 0 && (
+          {/* Pinned Posts (hidden when filtering) */}
+          {!hasFilters && pinnedPosts.length > 0 && (
             <section style={styles.pinnedSection}>
               {pinnedPosts.map((post) => (
                 <PostItem
@@ -300,8 +423,8 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
           <section style={styles.postList}>
             <div style={styles.listHeader}>
               <span style={styles.totalCount}>
-                {isSearching
-                  ? `"${searchQuery}" 검색 결과 ${totalCount}건`
+                {hasFilters
+                  ? `검색 결과 ${totalCount}건`
                   : `총 ${totalCount}개의 게시글`
                 }
               </span>
@@ -314,11 +437,11 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
                   onClick={() => handlePostClick(post)}
                 />
               ))
-            ) : isSearching ? (
+            ) : hasFilters ? (
               <div style={styles.emptyState}>
                 <p style={styles.emptyTitle}>검색 결과가 없습니다</p>
-                <p style={styles.emptyDescription}>다른 키워드로 검색해보세요.</p>
-                <button onClick={handleClearSearch} style={styles.emptyWriteButton}>
+                <p style={styles.emptyDescription}>다른 조건으로 검색해보세요.</p>
+                <button onClick={handleClearAll} style={styles.emptyWriteButton}>
                   전체 목록 보기
                 </button>
               </div>
@@ -406,6 +529,80 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
     margin: 0,
   },
+  // Filter bar
+  filterBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '12px',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  filterGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  filterRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  filterSelect: {
+    padding: '6px 12px',
+    fontSize: '13px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#334155',
+    cursor: 'pointer',
+    outline: 'none',
+  } as React.CSSProperties,
+  typePills: {
+    display: 'flex',
+    gap: '4px',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  typePill: {
+    padding: '4px 12px',
+    fontSize: '12px',
+    fontWeight: 500,
+    border: '1px solid #e2e8f0',
+    borderRadius: '16px',
+    backgroundColor: '#fff',
+    color: '#64748b',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+  } as React.CSSProperties,
+  typePillActive: {
+    backgroundColor: PRIMARY_COLOR,
+    color: '#fff',
+    borderColor: PRIMARY_COLOR,
+  } as React.CSSProperties,
+  activeFilters: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '8px 12px',
+    marginBottom: '12px',
+    backgroundColor: '#f0f9ff',
+    borderRadius: '6px',
+    border: '1px solid #bae6fd',
+  },
+  activeFiltersLabel: {
+    fontSize: '13px',
+    color: '#0369a1',
+  },
+  clearAllButton: {
+    fontSize: '12px',
+    color: '#0369a1',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    padding: '2px 4px',
+  } as React.CSSProperties,
   // Search
   searchForm: {
     display: 'flex',
