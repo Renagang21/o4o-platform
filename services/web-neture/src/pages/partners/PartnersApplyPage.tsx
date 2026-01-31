@@ -18,7 +18,7 @@ const serviceApplications = [
     name: 'GlycoPharm',
     icon: '💊',
     description: '약국 공급자로 참여하여 의약품 및 건강기능식품을 공급합니다.',
-    applicationUrl: 'https://glycopharm.kr/partners/apply',
+    applicationUrl: 'https://glycopharm.co.kr/partners/apply',
     features: ['의약품/건강기능식품 공급', '약국 네트워크 연동', '정산 시스템'],
   },
   {
@@ -26,7 +26,7 @@ const serviceApplications = [
     name: 'K-Cosmetics',
     icon: '💄',
     description: '화장품 브랜드로 참여하여 국내 유통망에 입점합니다.',
-    applicationUrl: 'https://k-cosmetics.neture.co.kr/partners/apply',
+    applicationUrl: 'https://k-cosmetics.site/partners/apply',
     features: ['화장품 브랜드 입점', '유통 채널 연동', '마케팅 지원'],
   },
   {
@@ -34,7 +34,7 @@ const serviceApplications = [
     name: 'GlucoseView',
     icon: '📊',
     description: '혈당 관리 솔루션 파트너로 참여합니다.',
-    applicationUrl: 'https://glucoseview.neture.co.kr/partners/apply',
+    applicationUrl: 'https://glucoseview.co.kr/partners/apply',
     features: ['CGM 디바이스 연동', '건강 데이터 분석', '환자 관리'],
   },
 ];

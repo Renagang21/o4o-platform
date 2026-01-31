@@ -224,6 +224,9 @@ export default function SupplierDashboardLayout() {
                 </Link>
               </p>
             </div>
+            <Link to="/forum/test-feedback" className="text-xs text-green-600 hover:text-green-700 transition-colors">
+              🧪 테스트 센터
+            </Link>
           </div>
         </div>
       </footer>

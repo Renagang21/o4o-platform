@@ -52,7 +52,7 @@ const MOCK_ACTIVE_STORES: ActiveStore[] = [
     serviceName: 'GlycoPharm',
     serviceIcon: '🏥',
     storeName: '강남약국',
-    storeUrl: 'https://glycopharm.kr/store/gangnam',
+    storeUrl: 'https://glycopharm.co.kr/store/gangnam',
     status: 'active',
   },
   {
@@ -60,7 +60,7 @@ const MOCK_ACTIVE_STORES: ActiveStore[] = [
     serviceName: 'GlycoPharm',
     serviceIcon: '🏥',
     storeName: '서초중앙약국',
-    storeUrl: 'https://glycopharm.kr/store/seocho',
+    storeUrl: 'https://glycopharm.co.kr/store/seocho',
     status: 'active',
   },
   {
@@ -68,7 +68,7 @@ const MOCK_ACTIVE_STORES: ActiveStore[] = [
     serviceName: 'K-Cosmetics',
     serviceIcon: '💄',
     storeName: '뷰티플러스 명동점',
-    storeUrl: 'https://k-cosmetics.neture.co.kr/store/myeongdong',
+    storeUrl: 'https://k-cosmetics.site/store/myeongdong',
     status: 'active',
   },
 ];

@@ -80,6 +80,9 @@ import {
 // Test Center (다중 서비스)
 import TestCenterPage from './pages/TestCenterPage';
 
+// Contact (문의 안내)
+import ContactPage from './pages/ContactPage';
+
 // ============================================================================
 // Neture 고유 페이지 (/supplier-ops)
 // ============================================================================
@@ -313,6 +316,9 @@ function App() {
 
               {/* 파트너 개요 (o4o 공통) */}
               <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
+
+              {/* 문의 안내 */}
+              <Route path="/contact" element={<ContactPage />} />
 
               {/* 테스트 센터 (다중 서비스) */}
               <Route path="/test-center" element={<TestCenterPage />} />

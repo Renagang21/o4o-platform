@@ -22,9 +22,9 @@ import { dashboardApi, type PartnerDashboardSummary } from '../../lib/api';
 
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
-  glycopharm: 'https://glycopharm.neture.co.kr/partner',
-  'k-cosmetics': 'https://k-cosmetics.neture.co.kr/partner',
-  glucoseview: 'https://glucoseview.neture.co.kr/partner',
+  glycopharm: 'https://glycopharm.co.kr/partner',
+  'k-cosmetics': 'https://k-cosmetics.site/partner',
+  glucoseview: 'https://glucoseview.co.kr/partner',
 };
 
 // 서비스 아이콘 설정

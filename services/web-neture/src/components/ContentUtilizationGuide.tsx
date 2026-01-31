@@ -35,7 +35,7 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     icon: '🏥',
     description: '약국 공급 플랫폼',
     usageAreas: ['상품 상세 페이지', '약국 매장 콘텐츠'],
-    manageUrl: 'https://glycopharm.kr/seller/content',
+    manageUrl: 'https://glycopharm.co.kr/seller/content',
     manageLabel: '판매자 센터',
   },
   {
@@ -44,7 +44,7 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     icon: '💄',
     description: '화장품 유통 플랫폼',
     usageAreas: ['상품 상세 설명', '메인 배너', '프로모션 영역'],
-    manageUrl: 'https://k-cosmetics.neture.co.kr/seller/content',
+    manageUrl: 'https://k-cosmetics.site/seller/content',
     manageLabel: '콘텐츠 관리',
   },
   {
@@ -53,7 +53,7 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     icon: '📊',
     description: '혈당 관리 플랫폼',
     usageAreas: ['파트너 소개 영역', '서비스 안내'],
-    manageUrl: 'https://glucoseview.neture.co.kr/partner/content',
+    manageUrl: 'https://glucoseview.co.kr/partner/content',
     manageLabel: '파트너 센터',
   },
 ];
