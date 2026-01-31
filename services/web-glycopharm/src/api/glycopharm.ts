@@ -154,6 +154,7 @@ export interface OperatorProduct {
   stock: number;
   minStock: number;
   status: ProductStatus;
+  isPartnerRecruiting: boolean;
   salesCount: number;
   createdAt: string;
   imageUrl?: string;
@@ -544,6 +545,21 @@ class GlycopharmApiClient {
     const endpoint = `/api/v1/glycopharm/operator/pharmacies${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
+  }
+
+  // ========================================================================
+  // Partner Recruiting (Operator)
+  // WO-PARTNER-RECRUIT-PHASE1-V1
+  // ========================================================================
+
+  /**
+   * 파트너 모집 설정/해제
+   */
+  async togglePartnerRecruiting(productId: string, value: boolean): Promise<any> {
+    return this.request(`/api/v1/glycopharm/operator/products/${productId}/partner-recruiting`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_partner_recruiting: value }),
+    });
   }
 
   // ========================================================================

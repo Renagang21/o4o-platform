@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 
-export type GlycopharmProductLogAction = 'create' | 'update' | 'status_change' | 'delete';
+export type GlycopharmProductLogAction = 'create' | 'update' | 'status_change' | 'partner_recruiting_toggle' | 'delete';
 
 @Entity({ name: 'glycopharm_product_logs', schema: 'public' })
 export class GlycopharmProductLog {

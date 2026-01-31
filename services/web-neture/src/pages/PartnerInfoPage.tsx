@@ -101,6 +101,19 @@ export function PartnerInfoPage() {
         ))}
       </section>
 
+      {/* 파트너 모집 제품 안내 (WO-PARTNER-RECRUIT-PHASE1-V1) */}
+      <section style={styles.recruitSection}>
+        <h2 style={styles.recruitSectionTitle}>파트너 모집 중인 제품</h2>
+        <p style={styles.recruitSectionText}>
+          공급자가 파트너를 모집 중인 제품을 확인하고,
+          <br />
+          파트너로서 소개할 수 있는 기회를 탐색하세요.
+        </p>
+        <Link to="/supplier-ops/partner/recruiting-products" style={styles.recruitLink}>
+          모집 중인 제품 보기 →
+        </Link>
+      </section>
+
       {/* 참여 절차 안내 */}
       <section style={styles.processSection}>
         <h2 style={styles.processTitle}>참여 절차</h2>
@@ -341,6 +354,36 @@ const styles: Record<string, React.CSSProperties> = {
   stepArrow: {
     fontSize: '20px',
     color: '#ccc',
+  },
+  // Recruit Section (WO-PARTNER-RECRUIT-PHASE1-V1)
+  recruitSection: {
+    backgroundColor: '#f5f3ff',
+    borderRadius: '16px',
+    padding: '32px',
+    marginBottom: '32px',
+    textAlign: 'center',
+  },
+  recruitSectionTitle: {
+    fontSize: '20px',
+    fontWeight: 600,
+    color: '#6d28d9',
+    marginBottom: '16px',
+  },
+  recruitSectionText: {
+    fontSize: '15px',
+    color: '#334155',
+    lineHeight: 1.7,
+    marginBottom: '20px',
+  },
+  recruitLink: {
+    display: 'inline-block',
+    padding: '12px 24px',
+    backgroundColor: '#7c3aed',
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    borderRadius: '8px',
+    textDecoration: 'none',
   },
   // Channel Section (WO-NETURE-PARTNER-INFO-PAGE-V2)
   channelSection: {

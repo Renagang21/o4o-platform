@@ -24,6 +24,7 @@ import {
   Boxes,
   RefreshCw,
   Loader2,
+  Users,
 } from 'lucide-react';
 import { glycopharmApi, type OperatorProduct, type OperatorProductStats, type ProductStatus } from '@/api/glycopharm';
 import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
@@ -169,6 +170,17 @@ export default function ProductsPage() {
         onClick: () => console.log('Edit:', product.id),
       },
       {
+        label: product.isPartnerRecruiting ? '파트너 모집 해제' : '파트너 모집 설정',
+        onClick: async () => {
+          try {
+            await glycopharmApi.togglePartnerRecruiting(product.id, !product.isPartnerRecruiting);
+            fetchProducts();
+          } catch (err) {
+            console.error('Failed to toggle partner recruiting:', err);
+          }
+        },
+      },
+      {
         label: '복제',
         onClick: () => console.log('Copy:', product.id),
       },
@@ -189,7 +201,15 @@ export default function ProductsPage() {
         ),
         name: (
           <div>
-            <p className="font-medium text-slate-800">{product.name}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="font-medium text-slate-800">{product.name}</p>
+              {product.isPartnerRecruiting && (
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 text-[10px] font-medium">
+                  <Users className="w-2.5 h-2.5" />
+                  파트너 모집
+                </span>
+              )}
+            </div>
             <p className="text-xs text-slate-500">{product.sku} | {product.brand}</p>
           </div>
         ),

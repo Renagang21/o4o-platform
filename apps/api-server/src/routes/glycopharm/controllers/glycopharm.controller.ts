@@ -520,6 +520,47 @@ export function createGlycopharmController(
   );
 
   // ============================================================================
+  // OPERATOR ROUTES - Partner Recruiting
+  // WO-PARTNER-RECRUIT-PHASE1-V1
+  // ============================================================================
+
+  /**
+   * PATCH /operator/products/:id/partner-recruiting - Toggle partner recruiting
+   */
+  router.patch(
+    '/operator/products/:id/partner-recruiting',
+    requireAuth,
+    requireScope('glycopharm:operator'),
+    [
+      param('id').isUUID(),
+      body('is_partner_recruiting').isBoolean(),
+      handleValidationErrors,
+    ],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        const product = await service.togglePartnerRecruiting(
+          req.params.id,
+          req.body.is_partner_recruiting,
+          req.user?.id,
+          req.user?.name || req.user?.email
+        );
+        if (!product) {
+          res.status(404).json({
+            error: { code: 'NOT_FOUND', message: 'Product not found' },
+          });
+          return;
+        }
+        res.json({ success: true, data: product });
+      } catch (error: any) {
+        console.error('Failed to toggle partner recruiting:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  // ============================================================================
   // FEATURED PRODUCTS (OPERATOR)
   // WO-FEATURED-CURATION-API-V1
   // ============================================================================

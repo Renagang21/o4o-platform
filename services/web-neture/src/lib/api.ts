@@ -209,6 +209,45 @@ export const netureApi = {
   },
 };
 
+// ==================== Recruiting Products API (WO-PARTNER-RECRUIT-PHASE1-V1) ====================
+
+export interface RecruitingProduct {
+  id: string;
+  pharmacy_id?: string;
+  pharmacy_name?: string;
+  name: string;
+  sku: string;
+  category: string;
+  price: number;
+  sale_price?: number;
+  stock_quantity: number;
+  status: string;
+  is_featured: boolean;
+  is_partner_recruiting: boolean;
+  created_at: string;
+}
+
+export const recruitingApi = {
+  /**
+   * GET /api/v1/neture/partner/recruiting-products
+   * 파트너 모집 중인 제품 조회
+   */
+  async getRecruitingProducts(): Promise<RecruitingProduct[]> {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/recruiting-products`);
+      if (!response.ok) {
+        console.warn('[Neture API] Recruiting products API not available');
+        return [];
+      }
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Neture API] Failed to fetch recruiting products:', error);
+      return [];
+    }
+  },
+};
+
 // CMS Content API
 export const cmsApi = {
   /**

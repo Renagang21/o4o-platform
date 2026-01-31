@@ -117,6 +117,10 @@ export class GlycopharmRepository {
       qb.andWhere('product.is_featured = :isFeatured', { isFeatured: query.is_featured });
     }
 
+    if (query.is_partner_recruiting !== undefined) {
+      qb.andWhere('product.is_partner_recruiting = :isPartnerRecruiting', { isPartnerRecruiting: query.is_partner_recruiting });
+    }
+
     if (query.q && query.q.length >= 2) {
       qb.andWhere('(product.name ILIKE :q OR product.sku ILIKE :q OR product.description ILIKE :q)', {
         q: `%${query.q}%`,
@@ -171,6 +175,22 @@ export class GlycopharmRepository {
   async updateProduct(id: string, data: Partial<GlycopharmProduct>): Promise<GlycopharmProduct | null> {
     await this.productRepo.update(id, data);
     return this.findProductById(id);
+  }
+
+  /**
+   * Find products marked for partner recruiting (active only)
+   * WO-PARTNER-RECRUIT-PHASE1-V1
+   */
+  async findPartnerRecruitingProducts(): Promise<GlycopharmProduct[]> {
+    return this.productRepo.find({
+      where: {
+        is_partner_recruiting: true,
+        status: 'active' as any,
+      },
+      relations: ['pharmacy'],
+      order: { updated_at: 'DESC' },
+      take: 50,
+    });
   }
 
   // ============================================================================

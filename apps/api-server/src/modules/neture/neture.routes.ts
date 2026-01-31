@@ -4,6 +4,8 @@ import { NetureService } from './neture.service.js';
 import { SupplierStatus, PartnershipStatus, SupplierRequestStatus } from './entities/index.js';
 import logger from '../../utils/logger.js';
 import { requireAuth, requireAdmin, requireRole } from '../../middleware/auth.middleware.js';
+import { AppDataSource } from '../../database/connection.js';
+import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glycopharm.repository.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -761,6 +763,46 @@ router.get('/admin/dashboard/summary', requireAuth, async (req: AuthenticatedReq
       success: false,
       error: 'INTERNAL_ERROR',
       message: 'Failed to fetch admin dashboard summary',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/recruiting-products
+ * Get products marked for partner recruiting (public, no auth)
+ * WO-PARTNER-RECRUIT-PHASE1-V1
+ */
+router.get('/partner/recruiting-products', async (_req: Request, res: Response) => {
+  try {
+    const glycopharmRepo = new GlycopharmRepository(AppDataSource);
+    const products = await glycopharmRepo.findPartnerRecruitingProducts();
+
+    const data = products.map((p) => ({
+      id: p.id,
+      pharmacy_id: p.pharmacy_id,
+      pharmacy_name: p.pharmacy?.name,
+      name: p.name,
+      sku: p.sku,
+      category: p.category,
+      price: Number(p.price),
+      sale_price: p.sale_price ? Number(p.sale_price) : undefined,
+      stock_quantity: p.stock_quantity,
+      status: p.status,
+      is_featured: p.is_featured,
+      is_partner_recruiting: p.is_partner_recruiting,
+      created_at: p.created_at.toISOString(),
+    }));
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching recruiting products:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch recruiting products',
     });
   }
 });

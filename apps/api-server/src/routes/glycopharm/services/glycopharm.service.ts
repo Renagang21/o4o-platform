@@ -273,6 +273,48 @@ export class GlycopharmService {
     return this.toProductResponse(product);
   }
 
+  /**
+   * Toggle partner recruiting flag
+   * WO-PARTNER-RECRUIT-PHASE1-V1
+   */
+  async togglePartnerRecruiting(
+    id: string,
+    value: boolean,
+    userId?: string,
+    userName?: string
+  ): Promise<ProductResponseDto | null> {
+    const existing = await this.repository.findProductById(id);
+    if (!existing) return null;
+
+    const product = await this.repository.updateProduct(id, {
+      is_partner_recruiting: value,
+      updated_by_user_id: userId,
+      updated_by_user_name: userName,
+    });
+
+    if (!product) return null;
+
+    await this.repository.createProductLog({
+      product_id: product.id,
+      action: 'partner_recruiting_toggle',
+      before_data: { is_partner_recruiting: existing.is_partner_recruiting },
+      after_data: { is_partner_recruiting: value },
+      changed_by_user_id: userId,
+      changed_by_user_name: userName,
+    });
+
+    return this.toProductResponse(product);
+  }
+
+  /**
+   * Get products marked for partner recruiting (active only)
+   * WO-PARTNER-RECRUIT-PHASE1-V1
+   */
+  async getPartnerRecruitingProducts(): Promise<ProductListItemDto[]> {
+    const products = await this.repository.findPartnerRecruitingProducts();
+    return products.map((p) => this.toProductListItem(p));
+  }
+
   // ============================================================================
   // Response Mappers
   // ============================================================================
@@ -323,6 +365,7 @@ export class GlycopharmService {
       manufacturer: product.manufacturer,
       status: product.status,
       is_featured: product.is_featured,
+      is_partner_recruiting: product.is_partner_recruiting,
       sort_order: product.sort_order,
       created_by_user_id: product.created_by_user_id,
       created_by_user_name: product.created_by_user_name,
@@ -344,6 +387,7 @@ export class GlycopharmService {
       stock_quantity: product.stock_quantity,
       status: product.status,
       is_featured: product.is_featured,
+      is_partner_recruiting: product.is_partner_recruiting,
       created_by_user_name: product.created_by_user_name,
       created_at: product.created_at.toISOString(),
     };

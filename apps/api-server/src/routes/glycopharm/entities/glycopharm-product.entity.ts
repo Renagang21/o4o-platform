@@ -105,6 +105,9 @@ export class GlycopharmProduct {
   @Column({ type: 'boolean', default: false })
   is_featured!: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  is_partner_recruiting!: boolean;
+
   @Column({ type: 'int', default: 0 })
   sort_order!: number;
 

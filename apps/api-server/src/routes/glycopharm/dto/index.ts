@@ -99,6 +99,7 @@ export interface ListProductsQueryDto {
   category?: GlycopharmProductCategory;
   status?: GlycopharmProductStatus;
   is_featured?: boolean;
+  is_partner_recruiting?: boolean;
   sort?: 'created_at' | 'updated_at' | 'price' | 'name';
   order?: 'asc' | 'desc';
   q?: string;
@@ -152,6 +153,7 @@ export interface ProductResponseDto {
   manufacturer?: string;
   status: GlycopharmProductStatus;
   is_featured: boolean;
+  is_partner_recruiting: boolean;
   sort_order: number;
   created_by_user_id?: string;
   created_by_user_name?: string;
@@ -171,6 +173,7 @@ export interface ProductListItemDto {
   stock_quantity: number;
   status: GlycopharmProductStatus;
   is_featured: boolean;
+  is_partner_recruiting: boolean;
   created_by_user_name?: string;
   created_at: string;
 }

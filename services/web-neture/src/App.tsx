@@ -149,6 +149,7 @@ const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHu
 const ContentEditorPage = lazy(() => import('./pages/supplier/content/ContentEditorPage'));
 
 // Partner Dashboard
+const RecruitingProductsPage = lazy(() => import('./pages/partner/RecruitingProductsPage'));
 const PartnerOverviewPage = lazy(() =>
   import('./pages/partner/PartnerOverviewPage').then((m) => ({ default: m.PartnerOverviewPage }))
 );
@@ -411,6 +412,7 @@ function App() {
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
               <Route path="/supplier-ops/partner" element={<PartnerOverviewPage />} />
+              <Route path="/supplier-ops/partner/recruiting-products" element={<RecruitingProductsPage />} />
               <Route path="/supplier-ops/partner/collaboration" element={<CollaborationPage />} />
               <Route path="/supplier-ops/partner/promotions" element={<PromotionsPage />} />
               <Route path="/supplier-ops/partner/settlements" element={<SettlementsPage />} />
