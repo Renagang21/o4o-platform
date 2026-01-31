@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { recruitingApi, type RecruitingProduct } from '../../lib/api';
+import { recruitingApi, partnerDashboardApi, type RecruitingProduct } from '../../lib/api';
 
 const CATEGORY_LABELS: Record<string, string> = {
   cgm_device: 'CGM 기기',
@@ -23,6 +23,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function RecruitingProductsPage() {
   const [products, setProducts] = useState<RecruitingProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addingIds, setAddingIds] = useState<Set<string>>(new Set());
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -36,6 +38,32 @@ export default function RecruitingProductsPage() {
       }
     })();
   }, []);
+
+  const handleAddItem = async (productId: string) => {
+    setAddingIds((prev) => new Set(prev).add(productId));
+    try {
+      const result = await partnerDashboardApi.addItem(productId, 'glycopharm');
+      if (result.already_exists) {
+        setToastMessage('이미 소개 중인 제품입니다');
+      } else {
+        setToastMessage('내 대시보드에 추가되었습니다');
+      }
+    } catch (err: unknown) {
+      const status = err instanceof Error && err.message.includes('401') ? 401 : 0;
+      if (status === 401) {
+        setToastMessage('로그인이 필요합니다');
+      } else {
+        setToastMessage('추가에 실패했습니다. 다시 시도해 주세요.');
+      }
+    } finally {
+      setAddingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(productId);
+        return next;
+      });
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
 
   if (loading) {
     return (
@@ -119,14 +147,25 @@ export default function RecruitingProductsPage() {
               </div>
 
               <button
-                disabled
-                className="w-full py-2 px-4 rounded-lg text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
-                title="다음 단계에서 활성화됩니다"
+                onClick={() => handleAddItem(product.id)}
+                disabled={addingIds.has(product.id)}
+                className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                  addingIds.has(product.id)
+                    ? 'bg-violet-300 text-white cursor-wait'
+                    : 'bg-violet-600 text-white hover:bg-violet-700 cursor-pointer'
+                }`}
               >
-                이 제품 소개하기
+                {addingIds.has(product.id) ? '추가 중...' : '이 제품 소개하기'}
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Toast */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium">
+          {toastMessage}
         </div>
       )}
     </div>

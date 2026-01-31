@@ -18,7 +18,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
-import { dashboardApi, type PartnerDashboardSummary } from '../../lib/api';
+import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem } from '../../lib/api';
 
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
@@ -44,15 +44,29 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  cgm_device: 'CGM 기기',
+  test_strip: '시험지',
+  lancet: '란셋',
+  meter: '측정기',
+  accessory: '액세서리',
+  other: '기타',
+};
+
 export function PartnerOverviewPage() {
   const [summary, setSummary] = useState<PartnerDashboardSummary | null>(null);
+  const [dashboardItems, setDashboardItems] = useState<PartnerDashboardItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await dashboardApi.getPartnerDashboardSummary();
-      setSummary(data);
+      const [summaryData, items] = await Promise.all([
+        dashboardApi.getPartnerDashboardSummary(),
+        partnerDashboardApi.getItems(),
+      ]);
+      setSummary(summaryData);
+      setDashboardItems(items);
     } catch (error) {
       console.error('Failed to fetch partner dashboard data:', error);
     }
@@ -173,6 +187,59 @@ export function PartnerOverviewPage() {
                   확인하기
                   <ArrowRight size={14} />
                 </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 내가 소개하는 제품 (WO-PARTNER-DASHBOARD-PHASE1-V1) */}
+      <div style={styles.notificationSection}>
+        <h2 style={styles.sectionTitle}>내가 소개하는 제품</h2>
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            {[1, 2, 3].map((i) => (
+              <div key={i} style={{ ...styles.statCard, opacity: 0.5, height: '100px' }} />
+            ))}
+          </div>
+        ) : dashboardItems.length === 0 ? (
+          <div style={{ ...styles.emptyStateContainer, padding: '40px' }}>
+            <p style={styles.emptyStateDescription}>
+              아직 소개 중인 제품이 없습니다.
+            </p>
+            <Link
+              to="/supplier-ops/partner/recruiting-products"
+              style={{ display: 'inline-block', marginTop: '12px', fontSize: '14px', color: '#7c3aed', fontWeight: 500, textDecoration: 'none' }}
+            >
+              파트너 모집 제품 보기 &rarr;
+            </Link>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+            {dashboardItems.map((item) => (
+              <div key={item.id} style={{ ...styles.statCard, flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                  <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: '#1e293b' }}>
+                    {item.productName}
+                  </h4>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: item.status === 'active' ? '#f0fdf4' : '#f1f5f9',
+                    color: item.status === 'active' ? '#16a34a' : '#64748b',
+                  }}>
+                    {item.status === 'active' ? '활성' : '비활성'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#64748b' }}>
+                  <span>{CATEGORY_LABELS[item.category] || item.category}</span>
+                  <span>{item.price.toLocaleString()}원</span>
+                </div>
+                {item.pharmacyName && (
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>공급: {item.pharmacyName}</span>
+                )}
               </div>
             ))}
           </div>

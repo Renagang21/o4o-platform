@@ -248,6 +248,54 @@ export const recruitingApi = {
   },
 };
 
+// Partner Dashboard API (WO-PARTNER-DASHBOARD-PHASE1-V1)
+export interface PartnerDashboardItem {
+  id: string;
+  productId: string;
+  productName: string;
+  category: string;
+  price: number;
+  pharmacyName?: string;
+  serviceId: string;
+  status: string;
+  createdAt: string;
+}
+
+export const partnerDashboardApi = {
+  /**
+   * POST /api/v1/neture/partner/dashboard/items
+   * 대시보드에 제품 추가
+   */
+  async addItem(productId: string, serviceId?: string): Promise<{ success: boolean; already_exists?: boolean; data?: PartnerDashboardItem }> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ productId, serviceId }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to add dashboard item: ${response.status}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * GET /api/v1/neture/partner/dashboard/items
+   * 내 대시보드 제품 목록 조회
+   */
+  async getItems(): Promise<PartnerDashboardItem[]> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      console.warn('[Neture API] Dashboard items API not available');
+      return [];
+    }
+    const result = await response.json();
+    return result.data || [];
+  },
+};
+
 // CMS Content API
 export const cmsApi = {
   /**

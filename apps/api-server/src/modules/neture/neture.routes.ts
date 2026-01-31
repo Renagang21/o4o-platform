@@ -6,6 +6,8 @@ import logger from '../../utils/logger.js';
 import { requireAuth, requireAdmin, requireRole } from '../../middleware/auth.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glycopharm.repository.js';
+import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
+import { In } from 'typeorm';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -804,6 +806,106 @@ router.get('/partner/recruiting-products', async (_req: Request, res: Response) 
       error: 'INTERNAL_ERROR',
       message: 'Failed to fetch recruiting products',
     });
+  }
+});
+
+/**
+ * POST /api/v1/neture/partner/dashboard/items
+ * Add a product to partner's dashboard
+ * WO-PARTNER-DASHBOARD-PHASE1-V1
+ */
+router.post('/partner/dashboard/items', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { productId, serviceId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'productId is required' });
+    }
+
+    const repo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+
+    // Check duplicate
+    const existing = await repo.findOne({
+      where: { partnerUserId: userId, productId },
+    });
+
+    if (existing) {
+      return res.json({ success: true, already_exists: true, data: existing });
+    }
+
+    const item = repo.create({
+      partnerUserId: userId,
+      productId,
+      serviceId: serviceId || 'glycopharm',
+      status: 'active',
+    });
+
+    const saved = await repo.save(item);
+
+    res.status(201).json({ success: true, data: saved });
+  } catch (error) {
+    logger.error('[Neture API] Error adding partner dashboard item:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to add dashboard item' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/dashboard/items
+ * Get partner's dashboard items with product details
+ * WO-PARTNER-DASHBOARD-PHASE1-V1
+ */
+router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const repo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+    const items = await repo.find({
+      where: { partnerUserId: userId },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (items.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    // Batch-fetch product details
+    const productIds = items.map((item) => item.productId);
+    const glycopharmRepo = new GlycopharmRepository(AppDataSource);
+    const productMap = new Map<string, any>();
+
+    for (const id of productIds) {
+      const product = await glycopharmRepo.findProductById(id);
+      if (product) {
+        productMap.set(id, product);
+      }
+    }
+
+    const data = items.map((item) => {
+      const product = productMap.get(item.productId);
+      return {
+        id: item.id,
+        productId: item.productId,
+        productName: product?.name || '(삭제된 제품)',
+        category: product?.category || 'other',
+        price: product ? Number(product.price) : 0,
+        pharmacyName: product?.pharmacy?.name,
+        serviceId: item.serviceId,
+        status: item.status,
+        createdAt: item.createdAt.toISOString(),
+      };
+    });
+
+    res.json({ success: true, data });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner dashboard items:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch dashboard items' });
   }
 });
 
