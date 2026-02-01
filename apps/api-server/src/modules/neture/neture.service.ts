@@ -8,9 +8,14 @@ import {
   NetureSupplierRequest,
   NetureSupplierContent,
   NetureSupplierRequestEvent,
+  NeturePartnerRecruitment,
+  NeturePartnerApplication,
+  NeturePartnerDashboardItem,
   SupplierStatus,
   PartnershipStatus,
   SupplierRequestStatus,
+  RecruitmentStatus,
+  ApplicationStatus,
   ProductPurpose,
   ContentType,
   ContentStatus,
@@ -27,6 +32,8 @@ export class NetureService {
   private _supplierRequestRepo?: Repository<NetureSupplierRequest>;
   private _contentRepo?: Repository<NetureSupplierContent>;
   private _requestEventRepo?: Repository<NetureSupplierRequestEvent>;
+  private _recruitmentRepo?: Repository<NeturePartnerRecruitment>;
+  private _applicationRepo?: Repository<NeturePartnerApplication>;
 
   private get supplierRepo(): Repository<NetureSupplier> {
     if (!this._supplierRepo) {
@@ -75,6 +82,20 @@ export class NetureService {
       this._requestEventRepo = AppDataSource.getRepository(NetureSupplierRequestEvent);
     }
     return this._requestEventRepo;
+  }
+
+  private get recruitmentRepo(): Repository<NeturePartnerRecruitment> {
+    if (!this._recruitmentRepo) {
+      this._recruitmentRepo = AppDataSource.getRepository(NeturePartnerRecruitment);
+    }
+    return this._recruitmentRepo;
+  }
+
+  private get applicationRepo(): Repository<NeturePartnerApplication> {
+    if (!this._applicationRepo) {
+      this._applicationRepo = AppDataSource.getRepository(NeturePartnerApplication);
+    }
+    return this._applicationRepo;
   }
 
   // ==================== User-Supplier Linking ====================
@@ -1837,6 +1858,172 @@ export class NetureService {
       });
     } catch (error) {
       logger.error('[NetureService] Error fetching operator supply products:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Partner Recruitment (WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1) ====================
+
+  /**
+   * 파트너 모집 목록 조회
+   */
+  async getPartnerRecruitments(filters?: { status?: RecruitmentStatus }) {
+    try {
+      const where: Record<string, unknown> = {};
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      const recruitments = await this.recruitmentRepo.find({
+        where,
+        order: { createdAt: 'DESC' },
+      });
+
+      return recruitments.map((r) => ({
+        id: r.id,
+        productId: r.productId,
+        productName: r.productName,
+        manufacturer: r.manufacturer || '',
+        consumerPrice: Number(r.consumerPrice),
+        commissionRate: Number(r.commissionRate),
+        sellerId: r.sellerId,
+        sellerName: r.sellerName,
+        shopUrl: r.shopUrl || '',
+        serviceName: r.serviceName || '',
+        serviceId: r.serviceId || '',
+        imageUrl: r.imageUrl || '',
+        status: r.status,
+        createdAt: r.createdAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching partner recruitments:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 파트너 신청
+   */
+  async createPartnerApplication(recruitmentId: string, partnerId: string, partnerName: string) {
+    try {
+      // 모집 공고 확인
+      const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
+      if (!recruitment) {
+        throw new Error('RECRUITMENT_NOT_FOUND');
+      }
+      if (recruitment.status !== RecruitmentStatus.RECRUITING) {
+        throw new Error('RECRUITMENT_CLOSED');
+      }
+
+      // 중복 신청 확인
+      const existing = await this.applicationRepo.findOne({
+        where: { recruitmentId, partnerId },
+      });
+      if (existing) {
+        throw new Error('DUPLICATE_APPLICATION');
+      }
+
+      const application = this.applicationRepo.create({
+        recruitmentId,
+        partnerId,
+        partnerName,
+        status: ApplicationStatus.PENDING,
+        appliedAt: new Date(),
+      });
+
+      const saved = await this.applicationRepo.save(application);
+      logger.info(`[NetureService] Partner application created: ${saved.id}`);
+
+      return { id: saved.id, status: saved.status, appliedAt: saved.appliedAt };
+    } catch (error) {
+      logger.error('[NetureService] Error creating partner application:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 파트너 신청 승인 + 대시보드 자동 등록
+   */
+  async approvePartnerApplication(applicationId: string, sellerId: string) {
+    try {
+      const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
+      if (!application) {
+        throw new Error('APPLICATION_NOT_FOUND');
+      }
+      if (application.status !== ApplicationStatus.PENDING) {
+        throw new Error('INVALID_STATUS');
+      }
+
+      // 모집 주체 확인
+      const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
+      if (!recruitment) {
+        throw new Error('RECRUITMENT_NOT_FOUND');
+      }
+      if (recruitment.sellerId !== sellerId) {
+        throw new Error('NOT_RECRUITMENT_OWNER');
+      }
+
+      // 승인 처리
+      application.status = ApplicationStatus.APPROVED;
+      application.decidedAt = new Date();
+      application.decidedBy = sellerId;
+      await this.applicationRepo.save(application);
+
+      // 파트너 대시보드에 자동 등록
+      const dashboardRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
+      const existingItem = await dashboardRepo.findOne({
+        where: { partnerUserId: application.partnerId, productId: recruitment.productId },
+      });
+
+      if (!existingItem) {
+        const item = dashboardRepo.create({
+          partnerUserId: application.partnerId,
+          productId: recruitment.productId,
+          serviceId: recruitment.serviceId || 'glycopharm',
+          status: 'active',
+        });
+        await dashboardRepo.save(item);
+        logger.info(`[NetureService] Auto-added dashboard item for partner ${application.partnerId}`);
+      }
+
+      return { id: application.id, status: application.status };
+    } catch (error) {
+      logger.error('[NetureService] Error approving partner application:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 파트너 신청 거절
+   */
+  async rejectPartnerApplication(applicationId: string, sellerId: string, reason?: string) {
+    try {
+      const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
+      if (!application) {
+        throw new Error('APPLICATION_NOT_FOUND');
+      }
+      if (application.status !== ApplicationStatus.PENDING) {
+        throw new Error('INVALID_STATUS');
+      }
+
+      // 모집 주체 확인
+      const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
+      if (!recruitment) {
+        throw new Error('RECRUITMENT_NOT_FOUND');
+      }
+      if (recruitment.sellerId !== sellerId) {
+        throw new Error('NOT_RECRUITMENT_OWNER');
+      }
+
+      application.status = ApplicationStatus.REJECTED;
+      application.decidedAt = new Date();
+      application.decidedBy = sellerId;
+      application.reason = reason || '';
+      await this.applicationRepo.save(application);
+
+      return { id: application.id, status: application.status };
+    } catch (error) {
+      logger.error('[NetureService] Error rejecting partner application:', error);
       throw error;
     }
   }

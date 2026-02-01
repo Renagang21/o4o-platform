@@ -1246,6 +1246,62 @@ export type {
   ConnectedService,
   Notification,
   OperatorSupplyProduct,
+  PartnerRecruitment,
 };
 
 export { operatorSupplyApi };
+
+// ==================== Partner Recruitment API (WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1) ====================
+
+interface PartnerRecruitment {
+  id: string;
+  productId: string;
+  productName: string;
+  manufacturer: string;
+  consumerPrice: number;
+  commissionRate: number;
+  sellerId: string;
+  sellerName: string;
+  shopUrl: string;
+  serviceName: string;
+  serviceId: string;
+  imageUrl: string;
+  status: 'recruiting' | 'closed';
+}
+
+export const partnerRecruitmentApi = {
+  async getRecruitments(status?: string): Promise<PartnerRecruitment[]> {
+    try {
+      const url = status
+        ? `${API_BASE_URL}/api/v1/neture/partner/recruitments?status=${status}`
+        : `${API_BASE_URL}/api/v1/neture/partner/recruitments`;
+      const response = await fetchWithTimeout(url, { credentials: 'include' });
+      if (!response.ok) {
+        console.warn('[Recruitment API] Not available');
+        return [];
+      }
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Recruitment API] Failed to fetch recruitments:', error);
+      return [];
+    }
+  },
+
+  async apply(recruitmentId: string): Promise<{ success: boolean; error?: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partner/applications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ recruitmentId }),
+    });
+    const result = await response.json();
+    if (response.status === 409) {
+      return { success: false, error: 'DUPLICATE_APPLICATION' };
+    }
+    if (!response.ok) {
+      return { success: false, error: result.error || 'UNKNOWN_ERROR' };
+    }
+    return { success: true };
+  },
+};

@@ -7,3 +7,5 @@ export { NetureSupplierContent, ContentType, ContentStatus } from './NetureSuppl
 export { NetureSupplierRequestEvent, RequestEventType } from './NetureSupplierRequestEvent.entity.js';
 export { NeturePartnerDashboardItem, type PartnerDashboardItemStatus } from './NeturePartnerDashboardItem.entity.js';
 export { NeturePartnerDashboardItemContent, type ContentSource } from './NeturePartnerDashboardItemContent.entity.js';
+export { NeturePartnerRecruitment, RecruitmentStatus } from './NeturePartnerRecruitment.entity.js';
+export { NeturePartnerApplication, ApplicationStatus } from './NeturePartnerApplication.entity.js';

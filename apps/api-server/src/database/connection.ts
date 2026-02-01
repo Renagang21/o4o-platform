@@ -172,6 +172,8 @@ import {
   NetureSupplierRequestEvent,
   NeturePartnerDashboardItem,
   NeturePartnerDashboardItemContent,
+  NeturePartnerRecruitment,
+  NeturePartnerApplication,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -512,6 +514,8 @@ export const AppDataSource = new DataSource({
     NetureSupplierRequestEvent,
     NeturePartnerDashboardItem,
     NeturePartnerDashboardItemContent,
+    NeturePartnerRecruitment,
+    NeturePartnerApplication,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================
