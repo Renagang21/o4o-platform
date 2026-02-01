@@ -259,7 +259,7 @@ function RedirectContentDetail() {
   return <Navigate to={`/workspace/content/${id}`} replace />;
 }
 
-// /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
+// /login 경로 접근 시 workspace로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
   const location = useLocation();
@@ -272,7 +272,7 @@ function LoginRedirect() {
     openLoginModal(returnUrl || undefined);
   }, [openLoginModal, returnUrl]);
 
-  return <Navigate to="/" replace />;
+  return <Navigate to="/workspace" replace />;
 }
 
 

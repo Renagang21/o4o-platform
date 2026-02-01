@@ -50,7 +50,7 @@ export default function AccountMenu() {
   const handleLogout = async () => {
     setIsOpen(false);
     await logout();
-    navigate('/');
+    navigate('/workspace');
   };
 
   // 비로그인 상태: 로그인 버튼 (모달 열기)

@@ -1,6 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Shield } from 'lucide-react';
-import AccountMenu from '../AccountMenu';
 import { useAuth } from '../../contexts';
 import { isAdminVaultAuthorized } from '../../utils/adminVaultAuth';
 
@@ -19,7 +18,7 @@ import { isAdminVaultAuthorized } from '../../utils/adminVaultAuth';
  */
 export default function MainLayout() {
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const showAdminVault = isAdminVaultAuthorized(user?.email);
 
   const isActive = (path: string) => {
@@ -60,14 +59,6 @@ export default function MainLayout() {
               >
                 플랫폼 소개
               </Link>
-              {!isAuthenticated && (
-                <Link
-                  to="/login"
-                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
-                >
-                  로그인
-                </Link>
-              )}
               {/* Admin Vault - 권한 있는 경우만 노출 */}
               {showAdminVault && (
                 <>
@@ -81,8 +72,6 @@ export default function MainLayout() {
                   </Link>
                 </>
               )}
-              {/* Account Menu - o4o 공통 영역에서는 로그인 버튼 미노출, 로그인 후에만 표시 */}
-              {isAuthenticated && <AccountMenu />}
             </nav>
           </div>
         </div>
