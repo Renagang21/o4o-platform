@@ -8,7 +8,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { recruitingApi, partnerDashboardApi, type RecruitingProduct } from '../../lib/api';
 
 const CATEGORY_LABELS: Record<string, string> = {

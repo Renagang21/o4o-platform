@@ -6,7 +6,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Mail, Phone, ArrowLeft } from 'lucide-react';
+import { Mail, Phone, ArrowLeft, Building2 } from 'lucide-react';
 
 export default function ContactPage() {
   return (
@@ -18,6 +18,20 @@ export default function ContactPage() {
         <ArrowLeft className="w-4 h-4" />
         참여 안내로 돌아가기
       </Link>
+
+      {/* 회사 소개 */}
+      <div className="mb-10 p-6 bg-white border border-gray-200 rounded-lg">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-lg">
+            <Building2 className="w-5 h-5 text-primary-600" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800">네뚜레 (Neture)</h2>
+        </div>
+        <p className="text-gray-600 leading-relaxed">
+          네뚜레는 공급자·파트너·매장을 연결하는 유통 정보 플랫폼입니다.
+          건강기능식품, 화장품, 의료기기 등 다양한 카테고리의 상품을 하나의 플랫폼에서 관리하고 유통할 수 있도록 지원합니다.
+        </p>
+      </div>
 
       <h1 className="text-3xl font-bold text-slate-800 mb-4">문의하기</h1>
       <p className="text-gray-600 mb-8">
@@ -50,14 +64,13 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="mt-12 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500">
-        <p>
-          공급자/파트너 참여 신청은{' '}
-          <Link to="/supplier-ops/partners/apply" className="text-primary-600 hover:underline">
-            참여 신청 페이지
-          </Link>
-          에서 진행해 주세요.
-        </p>
+      <div className="mt-12">
+        <Link
+          to="/supplier-ops/partners/requests/new"
+          className="block w-full text-center py-3 px-6 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          참여 신청하기
+        </Link>
       </div>
     </div>
   );

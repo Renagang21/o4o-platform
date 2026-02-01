@@ -93,6 +93,7 @@ import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
+import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
 import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
 import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
@@ -373,6 +374,7 @@ function App() {
 
               {/* 파트너/제휴 */}
               <Route path="/supplier-ops/partners/requests" element={<PartnershipRequestListPage />} />
+              <Route path="/supplier-ops/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/supplier-ops/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
               <Route path="/supplier-ops/partners/apply" element={<PartnersApplyPage />} />
               <Route path="/supplier-ops/partners/info" element={<PartnerInfoPage />} />
