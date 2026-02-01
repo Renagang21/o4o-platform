@@ -379,6 +379,7 @@ function App() {
               <Route path="/supplier-ops/suppliers/:slug" element={<SupplierDetailPage />} />
 
               {/* 파트너/제휴 */}
+              <Route path="/supplier-ops/partners" element={<Navigate to="/supplier-ops/partners/requests" replace />} />
               <Route path="/supplier-ops/partners/requests" element={<PartnershipRequestListPage />} />
               <Route path="/supplier-ops/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/supplier-ops/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
