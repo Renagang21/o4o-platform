@@ -44,6 +44,7 @@ const OperatorManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ 
 const TestCenterPage = lazy(() => import('@/pages/TestCenterPage'));
 
 // Forum Pages
+const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumHubPage })));
 const ForumPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumPage })));
 const PostDetailPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.PostDetailPage })));
 
@@ -139,7 +140,8 @@ function AppRoutes() {
         <Route path="test-guide/manual/operator" element={<OperatorManualPage />} />
 
         {/* Forum */}
-        <Route path="forum" element={<ForumPage />} />
+        <Route path="forum" element={<ForumHubPage />} />
+        <Route path="forum/posts" element={<ForumPage />} />
         <Route path="forum/post/:postId" element={<PostDetailPage />} />
 
         {/* MyPage (Protected) */}

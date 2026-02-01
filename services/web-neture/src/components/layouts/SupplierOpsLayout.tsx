@@ -103,9 +103,9 @@ export default function SupplierOpsLayout() {
               </Link>
               <span className="text-gray-300">|</span>
               <Link
-                to="/forum"
+                to="/workspace/forum"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/forum')
+                  isActive('/workspace/forum')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}

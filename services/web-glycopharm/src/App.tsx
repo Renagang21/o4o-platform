@@ -99,6 +99,7 @@ const StoreProductDetail = lazy(() => import('@/pages/store/StoreProductDetail')
 const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 
 // Forum & Education
+const ForumHubPage = lazy(() => import('@/pages/forum/ForumHubPage'));
 const ForumPage = lazy(() => import('@/pages/forum/ForumPage'));
 const RequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
@@ -193,7 +194,8 @@ function AppRoutes() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />
-        <Route path="forum" element={<ForumPage />} />
+        <Route path="forum" element={<ForumHubPage />} />
+        <Route path="forum/posts" element={<ForumPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
         <Route path="forum/feedback" element={<ForumFeedbackPage />} />

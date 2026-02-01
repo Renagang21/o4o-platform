@@ -111,6 +111,7 @@ import {
 import { ForumPage } from './pages/forum/ForumPage';
 import { ForumWritePage } from './pages/forum/ForumWritePage';
 import { ForumPostPage } from './pages/forum/ForumPostPage';
+import ForumHubPage from './pages/forum/ForumHubPage';
 
 // ============================================================================
 // Lazy loaded pages (heavy / rarely accessed)
@@ -342,8 +343,8 @@ function App() {
               <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
               <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
 
-              {/* 포럼 (o4o 공통 - /forum) */}
-              <Route path="/forum" element={<ForumPage />} />
+              {/* 테스트 센터 포럼 (o4o 공통 - /forum) */}
+              <Route path="/forum" element={<ForumPage title="테스트 센터" description="모든 서비스의 테스트 피드백과 의견을 나누는 공간입니다." noticeText="서비스 테스트 후 발견한 문제점, 개선 의견, 질문을 남겨주세요." />} />
               <Route path="/forum/write" element={<ForumWritePage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
               <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
@@ -390,6 +391,12 @@ function App() {
               {/* 콘텐츠 */}
               <Route path="/workspace/content" element={<ContentListPage />} />
               <Route path="/workspace/content/:id" element={<ContentDetailPage />} />
+
+              {/* 포럼 허브 + 글 목록/작성/상세 */}
+              <Route path="/workspace/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/workspace/forum" />} />
+              <Route path="/workspace/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
+              <Route path="/workspace/forum/write" element={<ForumWritePage />} />
+              <Route path="/workspace/forum/post/:slug" element={<ForumPostPage />} />
 
               {/* Neture 전용 테스트 가이드 */}
               <Route path="/workspace/manual/supplier" element={<SupplierManualPage />} />
@@ -473,9 +480,6 @@ function App() {
             <Route path="/platform/principles" element={<Navigate to="/workspace/platform/principles" replace />} />
             <Route path="/content" element={<Navigate to="/workspace/content" replace />} />
             <Route path="/content/:id" element={<RedirectContentDetail />} />
-            {/* /workspace/forum → /forum 리다이렉트 */}
-            <Route path="/workspace/forum" element={<Navigate to="/forum" replace />} />
-            <Route path="/workspace/forum/*" element={<Navigate to="/forum" replace />} />
 
             {/* Supplier Dashboard 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/workspace/supplier/dashboard" replace />} />

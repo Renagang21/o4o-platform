@@ -152,7 +152,12 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
 
 const PAGE_SIZE = 20;
 
-export function ForumPage({ boardSlug }: { boardSlug?: string }) {
+export function ForumPage({ boardSlug, title: customTitle, description: customDescription, noticeText: customNotice }: {
+  boardSlug?: string;
+  title?: string;
+  description?: string;
+  noticeText?: string;
+}) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -468,11 +473,11 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
         <div style={isMobile ? styles.headerTopMobile : styles.headerTop}>
           <div style={isMobile ? { flex: 1, minWidth: 0 } : undefined}>
             <h1 style={isMobile ? styles.pageTitleMobile : styles.pageTitle}>
-              o4o · 네뚜레 의견 나누기
+              {customTitle || 'o4o · 네뚜레 의견 나누기'}
             </h1>
             {!isMobile && (
               <p style={styles.pageDescription}>
-                o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.
+                {customDescription || 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.'}
               </p>
             )}
           </div>
@@ -487,9 +492,7 @@ export function ForumPage({ boardSlug }: { boardSlug?: string }) {
         <div style={styles.noticeBanner}>
           <span style={styles.noticeIcon}>ℹ️</span>
           <p style={styles.noticeText}>
-            이 포럼은 상품 홍보나 고객 문의를 위한 공간이 아닙니다.
-            <br />
-            o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.
+            {customNotice || (<>이 포럼은 상품 홍보나 고객 문의를 위한 공간이 아닙니다.<br />o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.</>)}
           </p>
         </div>
       )}
