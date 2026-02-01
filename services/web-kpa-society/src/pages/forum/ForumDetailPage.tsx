@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ForumBlockRenderer } from '@o4o/forum-core';
+import { ForumBlockRenderer } from '@o4o/forum-core/public-ui';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';

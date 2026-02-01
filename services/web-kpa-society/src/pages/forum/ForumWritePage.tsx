@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
-import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core';
+import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core/utils';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';

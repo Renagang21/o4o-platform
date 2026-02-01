@@ -4,4 +4,4 @@
  * Utility functions for frontend use (safe for Vite bundling)
  */
 
-export { htmlToBlocks } from './htmlToBlocks';
+export { htmlToBlocks, blocksToHtml, normalizeContent } from './htmlToBlocks';
