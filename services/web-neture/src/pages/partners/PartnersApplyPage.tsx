@@ -1,41 +1,34 @@
 /**
- * PartnersApplyPage - 공급자/파트너 참여 안내 페이지
+ * PartnersApplyPage - 참여 정책 안내 페이지
  *
- * Work Order: WO-NETURE-EXTENSION-P1
+ * WO-O4O-SUPPLIER-PARTNER-APPLICATION-UI-REDEFINE-V1
  *
- * Neture 책임 선언:
- * - Neture는 중앙 신청 시스템이 아님
- * - 신청은 각 서비스에서 직접 처리
- * - 이 페이지는 안내 + 외부 링크만 제공 (Read-Only)
+ * 정책:
+ * - 공급자/파트너 참여 신청은 서비스별로 받지 않음
+ * - Neture는 모집 정보 허브 역할
+ * - 서비스 연결 진입점 제거, 정책 안내만 제공
  */
 
 import { Link } from 'react-router-dom';
 
-// 서비스별 신청 링크 정보
-const serviceApplications = [
+const services = [
   {
     id: 'glycopharm',
     name: 'GlycoPharm',
     icon: '💊',
-    description: '약국 공급자로 참여하여 의약품 및 건강기능식품을 공급합니다.',
-    applicationUrl: 'https://glycopharm.co.kr/partners/apply',
-    features: ['의약품/건강기능식품 공급', '약국 네트워크 연동', '정산 시스템'],
+    description: '의약품 및 건강기능식품 유통',
   },
   {
     id: 'cosmetics',
     name: 'K-Cosmetics',
     icon: '💄',
-    description: '화장품 브랜드로 참여하여 국내 유통망에 입점합니다.',
-    applicationUrl: 'https://k-cosmetics.site/partners/apply',
-    features: ['화장품 브랜드 입점', '유통 채널 연동', '마케팅 지원'],
+    description: '화장품 브랜드 유통',
   },
   {
     id: 'glucoseview',
     name: 'GlucoseView',
     icon: '📊',
-    description: '혈당 관리 솔루션 파트너로 참여합니다.',
-    applicationUrl: 'https://glucoseview.co.kr/partners/apply',
-    features: ['CGM 디바이스 연동', '건강 데이터 분석', '환자 관리'],
+    description: '혈당 관리 솔루션',
   },
 ];
 
@@ -45,45 +38,32 @@ export default function PartnersApplyPage() {
       <div style={styles.content}>
         {/* Header */}
         <div style={styles.header}>
-          <span style={styles.badge}>안내</span>
+          <span style={styles.badge}>참여 정책</span>
           <h1 style={styles.title}>공급자 / 파트너 참여 안내</h1>
           <p style={styles.subtitle}>
-            Neture 플랫폼의 각 서비스에서 직접 신청하세요
+            Neture 플랫폼의 참여 구조와 정책을 안내합니다
           </p>
         </div>
 
-        {/* 안내 메시지 */}
-        <div style={styles.noticeBox}>
-          <div style={styles.noticeIcon}>ℹ️</div>
-          <div>
-            <p style={styles.noticeTitle}>신청 안내</p>
-            <p style={styles.noticeText}>
-              공급자/파트너 신청은 각 서비스에서 개별적으로 진행됩니다.
-              아래에서 참여하고자 하는 서비스를 선택하여 해당 서비스의 신청 페이지로 이동하세요.
-            </p>
-          </div>
+        {/* 정책 안내 */}
+        <div style={styles.policyBox}>
+          <p style={styles.policyTitle}>참여 정책</p>
+          <ul style={styles.policyList}>
+            <li>공급자/파트너 참여 신청은 <strong>서비스별로 받지 않습니다.</strong></li>
+            <li>공급자는 <strong>제품 공개 범위(전체/서비스별)</strong>를 설정합니다.</li>
+            <li>파트너 모집은 <strong>각 서비스의 판매자 대시보드에서 제품별로 시작</strong>되며,
+              Neture는 <strong>모집 정보 허브</strong> 역할을 합니다.</li>
+            <li>판매자는 Neture에 접속하지 않아도 <strong>서비스 화면에서 구매</strong>합니다.</li>
+          </ul>
         </div>
 
-        {/* 서비스별 신청 카드 */}
+        {/* 연결 서비스 (정보만, 링크 없음) */}
         <div style={styles.cardGrid}>
-          {serviceApplications.map((service) => (
+          {services.map((service) => (
             <div key={service.id} style={styles.card}>
               <div style={styles.cardIcon}>{service.icon}</div>
               <h2 style={styles.cardTitle}>{service.name}</h2>
               <p style={styles.cardDesc}>{service.description}</p>
-              <ul style={styles.list}>
-                {service.features.map((feature, idx) => (
-                  <li key={idx}>{feature}</li>
-                ))}
-              </ul>
-              <a
-                href={service.applicationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.applyButton}
-              >
-                {service.name}에서 신청하기 ↗
-              </a>
             </div>
           ))}
         </div>
@@ -94,26 +74,26 @@ export default function PartnersApplyPage() {
           <div style={styles.processSteps}>
             <div style={styles.step}>
               <div style={styles.stepNumber}>1</div>
-              <div style={styles.stepText}>서비스 선택</div>
-              <div style={styles.stepSubtext}>참여할 서비스 선택</div>
+              <div style={styles.stepText}>공급자 등록</div>
+              <div style={styles.stepSubtext}>Neture에 정보 등록</div>
             </div>
             <div style={styles.stepArrow}>→</div>
             <div style={styles.step}>
               <div style={styles.stepNumber}>2</div>
-              <div style={styles.stepText}>해당 서비스 신청</div>
-              <div style={styles.stepSubtext}>서비스 페이지에서 직접 신청</div>
+              <div style={styles.stepText}>제품 공개 설정</div>
+              <div style={styles.stepSubtext}>서비스별 공개 범위 결정</div>
             </div>
             <div style={styles.stepArrow}>→</div>
             <div style={styles.step}>
               <div style={styles.stepNumber}>3</div>
-              <div style={styles.stepText}>심사 및 승인</div>
-              <div style={styles.stepSubtext}>각 서비스에서 처리</div>
+              <div style={styles.stepText}>파트너 모집</div>
+              <div style={styles.stepSubtext}>Neture 허브에서 노출</div>
             </div>
             <div style={styles.stepArrow}>→</div>
             <div style={styles.step}>
               <div style={styles.stepNumber}>4</div>
-              <div style={styles.stepText}>서비스 이용</div>
-              <div style={styles.stepSubtext}>계정 부여 후 이용</div>
+              <div style={styles.stepText}>판매 연결</div>
+              <div style={styles.stepSubtext}>서비스 내에서 자동 연결</div>
             </div>
           </div>
         </div>
@@ -122,7 +102,7 @@ export default function PartnersApplyPage() {
         <div style={styles.contactSection}>
           <h3 style={styles.sectionTitle}>문의하기</h3>
           <p style={styles.contactText}>
-            신청 관련 문의는 각 서비스의 고객센터로 연락해 주세요.
+            참여 관련 문의는 아래로 연락해 주세요.
           </p>
           <div style={styles.contactInfo}>
             <div style={styles.contactItem}>
@@ -134,9 +114,8 @@ export default function PartnersApplyPage() {
 
         {/* 하단 링크 */}
         <div style={styles.footer}>
-          <p style={styles.footerText}>이미 계정이 있으신가요?</p>
-          <Link to="/login" style={styles.loginLink}>
-            로그인하기 →
+          <Link to="/supplier-ops/partners/info" style={styles.backLink}>
+            ← 참여 안내로 돌아가기
           </Link>
         </div>
       </div>
@@ -179,30 +158,25 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: 0,
   },
-  noticeBox: {
-    display: 'flex',
-    gap: '16px',
-    padding: '20px 24px',
-    backgroundColor: '#f1f5f9',
+  policyBox: {
+    padding: '24px 28px',
+    backgroundColor: '#eff6ff',
     borderRadius: '12px',
-    border: '1px solid #e2e8f0',
+    border: '1px solid #bfdbfe',
     marginBottom: '32px',
   },
-  noticeIcon: {
-    fontSize: '24px',
-    flexShrink: 0,
-  },
-  noticeTitle: {
+  policyTitle: {
     fontSize: '16px',
     fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 4px 0',
+    color: '#1e40af',
+    margin: '0 0 12px 0',
   },
-  noticeText: {
-    fontSize: '14px',
-    color: '#64748b',
-    lineHeight: 1.6,
+  policyList: {
     margin: 0,
+    padding: '0 0 0 20px',
+    color: '#1e293b',
+    fontSize: '14px',
+    lineHeight: 2,
   },
   cardGrid: {
     display: 'grid',
@@ -224,33 +198,13 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '18px',
     fontWeight: 600,
     color: '#1e293b',
-    margin: '0 0 12px 0',
+    margin: '0 0 8px 0',
   },
   cardDesc: {
     fontSize: '14px',
     color: '#64748b',
     lineHeight: 1.6,
-    margin: '0 0 16px 0',
-  },
-  list: {
     margin: 0,
-    padding: '0 0 0 20px',
-    color: '#475569',
-    fontSize: '14px',
-    lineHeight: 1.8,
-    marginBottom: '20px',
-  },
-  applyButton: {
-    display: 'inline-block',
-    width: '100%',
-    padding: '12px 20px',
-    backgroundColor: '#1e293b',
-    color: '#ffffff',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 600,
-    textAlign: 'center' as const,
   },
   processSection: {
     backgroundColor: '#ffffff',
@@ -345,15 +299,9 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     padding: '24px',
   },
-  footerText: {
-    fontSize: '14px',
+  backLink: {
     color: '#64748b',
-    margin: '0 0 8px 0',
-  },
-  loginLink: {
-    color: '#3b82f6',
     textDecoration: 'none',
-    fontWeight: 600,
-    fontSize: '16px',
+    fontSize: '14px',
   },
 };
