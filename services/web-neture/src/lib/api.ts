@@ -117,20 +117,14 @@ export const netureApi = {
    * GET /api/v1/neture/suppliers
    */
   async getSuppliers(): Promise<Supplier[]> {
-    try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/suppliers`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        console.warn('[Neture API] Suppliers API not available, returning empty array');
-        return [];
-      }
-      const data = await response.json();
-      return data.suppliers || [];
-    } catch (error) {
-      console.warn('[Neture API] Failed to fetch suppliers:', error);
-      return [];
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/suppliers`, {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error(`[Neture API] Suppliers ${response.status}`);
     }
+    const data = await response.json();
+    return data.suppliers || [];
   },
 
   /**
@@ -1271,21 +1265,15 @@ interface PartnerRecruitment {
 
 export const partnerRecruitmentApi = {
   async getRecruitments(status?: string): Promise<PartnerRecruitment[]> {
-    try {
-      const url = status
-        ? `${API_BASE_URL}/api/v1/neture/partner/recruitments?status=${status}`
-        : `${API_BASE_URL}/api/v1/neture/partner/recruitments`;
-      const response = await fetchWithTimeout(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Recruitment API] Not available');
-        return [];
-      }
-      const result = await response.json();
-      return result.data || [];
-    } catch (error) {
-      console.warn('[Recruitment API] Failed to fetch recruitments:', error);
-      return [];
+    const url = status
+      ? `${API_BASE_URL}/api/v1/neture/partner/recruitments?status=${status}`
+      : `${API_BASE_URL}/api/v1/neture/partner/recruitments`;
+    const response = await fetchWithTimeout(url, { credentials: 'include' });
+    if (!response.ok) {
+      throw new Error(`[Recruitment API] ${response.status}`);
     }
+    const result = await response.json();
+    return result.data || [];
   },
 
   async apply(recruitmentId: string): Promise<{ success: boolean; error?: string }> {

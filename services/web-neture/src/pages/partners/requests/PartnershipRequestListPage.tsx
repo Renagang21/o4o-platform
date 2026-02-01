@@ -20,6 +20,7 @@ export default function PartnershipRequestListPage() {
   const { isAuthenticated } = useAuth();
   const [products, setProducts] = useState<PartnerRecruitment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'recruiting' | 'closed'>('all');
   const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
@@ -28,10 +29,12 @@ export default function PartnershipRequestListPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setApiError(false);
     try {
       const data = await partnerRecruitmentApi.getRecruitments();
       setProducts(data);
     } catch {
+      setApiError(true);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -131,6 +134,17 @@ export default function PartnershipRequestListPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
           <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-gray-400" />
           <p className="text-gray-500">로딩 중...</p>
+        </div>
+      ) : apiError ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+          <p className="text-red-500 text-lg mb-2">데이터를 불러올 수 없습니다</p>
+          <p className="text-gray-400 text-sm mb-4">서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.</p>
+          <button
+            onClick={fetchData}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 transition-colors"
+          >
+            다시 시도
+          </button>
         </div>
       ) : products.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
