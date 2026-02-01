@@ -20,6 +20,7 @@ interface PartnerProduct {
   consumerPrice: number;
   commissionRate: number; // 퍼센트 (예: 15)
   requestCompany: string;
+  serviceName: string;
   mallUrl: string;
   status: 'recruiting' | 'closed';
 }
@@ -34,6 +35,7 @@ const MOCK_PRODUCTS: PartnerProduct[] = [
     consumerPrice: 38000,
     commissionRate: 15,
     requestCompany: '글라이코팜 강남점',
+    serviceName: 'Glycopharm',
     mallUrl: 'https://glycopharm.neture.co.kr',
     status: 'recruiting',
   },
@@ -45,6 +47,7 @@ const MOCK_PRODUCTS: PartnerProduct[] = [
     consumerPrice: 45000,
     commissionRate: 12,
     requestCompany: '뷰티랩 코스메틱',
+    serviceName: 'K-Cosmetics',
     mallUrl: 'https://k-cosmetics.neture.co.kr',
     status: 'recruiting',
   },
@@ -56,6 +59,7 @@ const MOCK_PRODUCTS: PartnerProduct[] = [
     consumerPrice: 52000,
     commissionRate: 18,
     requestCompany: '우리동네약국',
+    serviceName: 'Glycopharm',
     mallUrl: 'https://glycopharm.neture.co.kr',
     status: 'recruiting',
   },
@@ -67,6 +71,7 @@ const MOCK_PRODUCTS: PartnerProduct[] = [
     consumerPrice: 28000,
     commissionRate: 20,
     requestCompany: '헬스케어 파마시',
+    serviceName: 'Glycopharm',
     mallUrl: 'https://glycopharm.neture.co.kr',
     status: 'recruiting',
   },
@@ -78,6 +83,7 @@ const MOCK_PRODUCTS: PartnerProduct[] = [
     consumerPrice: 62000,
     commissionRate: 10,
     requestCompany: '뷰티랩 코스메틱',
+    serviceName: 'K-Cosmetics',
     mallUrl: 'https://k-cosmetics.neture.co.kr',
     status: 'closed',
   },
@@ -89,6 +95,7 @@ const MOCK_PRODUCTS: PartnerProduct[] = [
     consumerPrice: 22000,
     commissionRate: 25,
     requestCompany: '글라이코팜 강남점',
+    serviceName: 'Glycopharm',
     mallUrl: 'https://glycopharm.neture.co.kr',
     status: 'recruiting',
   },
@@ -109,7 +116,8 @@ export default function PartnershipRequestListPage() {
       !searchTerm ||
       p.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.requestCompany.toLowerCase().includes(searchTerm.toLowerCase());
+      p.requestCompany.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.serviceName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -169,6 +177,7 @@ export default function PartnershipRequestListPage() {
                 <th className="text-right px-4 py-3 font-medium text-gray-600">소비자가</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-600">수수료</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">요청 업체</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">서비스명</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">몰 URL</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-600 w-28">신청</th>
               </tr>
@@ -176,7 +185,7 @@ export default function PartnershipRequestListPage() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-gray-500">
+                  <td colSpan={9} className="text-center py-12 text-gray-500">
                     해당하는 제품이 없습니다
                   </td>
                 </tr>
@@ -211,6 +220,12 @@ export default function PartnershipRequestListPage() {
                     </td>
                     {/* 요청 업체 */}
                     <td className="px-4 py-3 text-gray-700">{product.requestCompany}</td>
+                    {/* 서비스명 */}
+                    <td className="px-4 py-3">
+                      <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded">
+                        {product.serviceName}
+                      </span>
+                    </td>
                     {/* 몰 URL */}
                     <td className="px-4 py-3">
                       <a
