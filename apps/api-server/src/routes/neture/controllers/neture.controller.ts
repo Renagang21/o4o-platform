@@ -40,7 +40,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * - category (optional): Filter by category
    * - status (optional): Filter by status (default: ACTIVE)
    */
-  router.get('/suppliers', requireAuth, async (req: Request, res: Response) => {
+  router.get('/suppliers', async (req: Request, res: Response) => {
     try {
       const { category, status } = req.query;
 
@@ -72,7 +72,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /suppliers/:slug
    * Get supplier detail by slug
    */
-  router.get('/suppliers/:slug', requireAuth, async (req: Request, res: Response) => {
+  router.get('/suppliers/:slug', async (req: Request, res: Response) => {
     try {
       const { slug } = req.params;
 
@@ -129,7 +129,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /partnership/requests/:id
    * Get partnership request detail by ID
    */
-  router.get('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
+  router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
 
