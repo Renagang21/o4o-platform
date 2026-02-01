@@ -16,7 +16,7 @@
 
 import { Navigate, Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, FileCheck, Package, ShoppingBag, FileText, Monitor, Settings, LogOut, Home } from 'lucide-react';
+import { LayoutDashboard, FileCheck, Package, PackageCheck, ShoppingBag, FileText, Monitor, Settings, LogOut, Home } from 'lucide-react';
 import AccountMenu from '../../components/AccountMenu';
 
 export default function SupplierDashboardLayout() {
@@ -55,6 +55,7 @@ export default function SupplierDashboardLayout() {
   const navItems = [
     { to: '/supplier/dashboard', icon: LayoutDashboard, label: '대시보드' },
     { to: '/supplier/requests', icon: FileCheck, label: '판매자 신청' },
+    { to: '/supplier-ops/supplier/supply-requests', icon: PackageCheck, label: '공급 요청' },
     { to: '/supplier/products', icon: Package, label: '내 제품' },
     { to: '/supplier/orders', icon: ShoppingBag, label: '주문 현황' },
     { to: '/supplier/contents', icon: FileText, label: '콘텐츠' },
