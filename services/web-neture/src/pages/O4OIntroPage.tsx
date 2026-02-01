@@ -413,10 +413,10 @@ function NextStepSection() {
           공감하는 경우에만 다음 단계로 진행합니다.
         </p>
         <div style={styles.ctaGroup}>
-          <Link to="/partners/apply" style={styles.ctaPrimary}>
+          <Link to="/o4o/business-inquiry" style={styles.ctaPrimary}>
             플랫폼 기반 사업 문의
           </Link>
-          <Link to="/partners/apply" style={styles.ctaSecondary}>
+          <Link to="/o4o/consultation" style={styles.ctaSecondary}>
             o4o 상담 요청
           </Link>
         </div>

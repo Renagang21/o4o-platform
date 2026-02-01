@@ -32,8 +32,6 @@ export default function O4OMainPage() {
       {/* 사이트 연결 서비스 */}
       <SiteServicesSection />
 
-      {/* 예제 서비스 */}
-      <ExamplesSection />
     </div>
   );
 }
@@ -298,47 +296,3 @@ function SiteServicesSection() {
   );
 }
 
-function ExamplesSection() {
-  return (
-    <section className="py-16 bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
-          서비스 예제
-        </h2>
-        <p className="text-gray-600 text-center mb-8 text-sm">
-          o4o 기반으로 운영 중인 서비스를 직접 체험해 보세요
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link
-            to="/examples/store/pharmacy"
-            className="p-6 bg-white rounded-xl hover:bg-slate-100 hover:border-primary-300 transition-colors text-center border border-slate-200"
-          >
-            <h3 className="font-semibold text-gray-900 mb-1">약국 매장 예제</h3>
-            <p className="text-gray-500 text-sm">매장 운영 화면의 한 예시</p>
-          </Link>
-          <a
-            href="https://siteguide.co.kr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-6 bg-white rounded-xl hover:bg-slate-100 hover:border-primary-300 transition-colors text-center border border-slate-200"
-          >
-            <h3 className="font-semibold text-gray-900 mb-1">SiteGuide</h3>
-            <p className="text-gray-500 text-sm">AI 기반 사이트 안내 서비스</p>
-          </a>
-          <div className="p-6 bg-slate-100 rounded-xl text-center border border-slate-200 opacity-60">
-            <h3 className="font-semibold text-gray-400 mb-1">추가 예정</h3>
-            <p className="text-gray-400 text-sm">준비 중</p>
-          </div>
-        </div>
-        <div className="text-center mt-8">
-          <Link
-            to="/examples"
-            className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-          >
-            전체 예제 보기
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}

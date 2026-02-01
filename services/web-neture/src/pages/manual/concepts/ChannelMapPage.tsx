@@ -53,8 +53,8 @@ export default function ChannelMapPage() {
             <Link to="/manual/concepts" className="text-slate-500 hover:text-slate-700">
               개념 문서로
             </Link>
-            <Link to="/examples" className="text-primary-600 hover:text-primary-700">
-              예제 서비스 보기
+            <Link to="/o4o" className="text-primary-600 hover:text-primary-700">
+              o4o 소개
             </Link>
           </div>
         </div>

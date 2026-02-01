@@ -65,8 +65,8 @@ import {
 } from './pages/o4o/targets';
 import ConceptsPage from './pages/manual/concepts/ConceptsPage';
 import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
-import ExamplesPage from './pages/examples/ExamplesPage';
-import PharmacyStorePage from './pages/examples/PharmacyStorePage';
+import BusinessInquiryPage from './pages/o4o/BusinessInquiryPage';
+import ConsultationRequestPage from './pages/o4o/ConsultationRequestPage';
 
 // Admin Vault Pages (WO-O4O-ADMIN-VAULT-ACCESS-V1)
 import {
@@ -94,7 +94,6 @@ import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
-import PartnersApplyPage from './pages/partners/PartnersApplyPage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
 import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
 import ContentListPage from './pages/content/ContentListPage';
@@ -305,10 +304,10 @@ function App() {
               <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />
               <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
               <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
+              <Route path="/o4o/business-inquiry" element={<BusinessInquiryPage />} />
+              <Route path="/o4o/consultation" element={<ConsultationRequestPage />} />
               <Route path="/manual/concepts" element={<ConceptsPage />} />
               <Route path="/manual/concepts/channel-map" element={<ChannelMapPage />} />
-              <Route path="/examples" element={<ExamplesPage />} />
-              <Route path="/examples/store/pharmacy" element={<PharmacyStorePage />} />
 
               {/* 채널 구조 설명 (o4o 공통) */}
               <Route path="/channel/structure" element={<ChannelSalesStructurePage />} />
@@ -383,7 +382,6 @@ function App() {
               <Route path="/supplier-ops/partners/requests" element={<PartnershipRequestListPage />} />
               <Route path="/supplier-ops/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/supplier-ops/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
-              <Route path="/supplier-ops/partners/apply" element={<PartnersApplyPage />} />
               <Route path="/supplier-ops/partners/info" element={<PartnerInfoPage />} />
 
               {/* 플랫폼 정책 */}
@@ -471,7 +469,6 @@ function App() {
             <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/partners/requests" element={<Navigate to="/supplier-ops/partners/requests" replace />} />
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
-            <Route path="/partners/apply" element={<Navigate to="/supplier-ops/partners/apply" replace />} />
             <Route path="/partners/info" element={<Navigate to="/supplier-ops/partners/info" replace />} />
             <Route path="/platform/principles" element={<Navigate to="/supplier-ops/platform/principles" replace />} />
             <Route path="/content" element={<Navigate to="/supplier-ops/content" replace />} />

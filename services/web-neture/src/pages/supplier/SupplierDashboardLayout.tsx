@@ -140,16 +140,6 @@ export default function SupplierDashboardLayout() {
             </Link>
             <span className="text-gray-300">|</span>
             <Link
-              to="/supplier-ops/partners/apply"
-              className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/supplier-ops/partners/apply')
-                  ? 'text-primary-600'
-                  : 'text-gray-700 hover:text-primary-600'
-              }`}
-            >
-              참여 신청
-            </Link>
-            <Link
               to="/forum"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
                 isNavActive('/forum')
