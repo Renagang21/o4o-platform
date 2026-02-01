@@ -1782,4 +1782,62 @@ export class NetureService {
       throw error;
     }
   }
+
+  // ==================== Operator Supply Dashboard (WO-O4O-SERVICE-OPERATOR-SUPPLY-DASHBOARD-IMPLEMENTATION-V1) ====================
+
+  /**
+   * 운영자용 공급 가능 제품 목록 + 공급요청 상태 머지
+   */
+  async getOperatorSupplyProducts(operatorUserId: string) {
+    try {
+      // 1. 모든 활성 공급자 제품 조회
+      const products = await this.productRepo.find({
+        where: { isActive: true },
+        relations: ['supplier'],
+        order: { createdAt: 'DESC' },
+      });
+
+      // 2. 해당 운영자가 보낸 모든 공급요청 조회
+      const myRequests = await this.supplierRequestRepo.find({
+        where: { sellerId: operatorUserId },
+      });
+
+      // 3. productId → 가장 관련성 높은 요청 상태 매핑
+      // 우선순위: pending/approved > rejected (같은 supplier+product)
+      const requestMap = new Map<string, { status: string; requestId: string; rejectReason?: string }>();
+      for (const req of myRequests) {
+        const key = `${req.supplierId}:${req.productId}`;
+        const existing = requestMap.get(key);
+        if (!existing ||
+            req.status === SupplierRequestStatus.PENDING ||
+            req.status === SupplierRequestStatus.APPROVED) {
+          requestMap.set(key, {
+            status: req.status,
+            requestId: req.id,
+            rejectReason: req.rejectReason || undefined,
+          });
+        }
+      }
+
+      // 4. 머지하여 반환
+      return products.map((product) => {
+        const key = `${product.supplierId}:${product.id}`;
+        const request = requestMap.get(key);
+        return {
+          id: product.id,
+          name: product.name,
+          category: product.category || '',
+          description: product.description || '',
+          supplierId: product.supplierId,
+          supplierName: (product as any).supplier?.name || '',
+          supplyStatus: request?.status || 'available',
+          requestId: request?.requestId || null,
+          rejectReason: request?.rejectReason || null,
+        };
+      });
+    } catch (error) {
+      logger.error('[NetureService] Error fetching operator supply products:', error);
+      throw error;
+    }
+  }
 }

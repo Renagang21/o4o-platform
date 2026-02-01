@@ -749,6 +749,38 @@ router.get('/supplier/dashboard/summary', requireAuth, async (req: Authenticated
 });
 
 /**
+ * GET /api/v1/neture/operator/supply-products
+ * 운영자용 공급 가능 제품 목록 + 공급요청 상태
+ * WO-O4O-SERVICE-OPERATOR-SUPPLY-DASHBOARD-IMPLEMENTATION-V1
+ */
+router.get('/operator/supply-products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const data = await netureService.getOperatorSupplyProducts(userId);
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching operator supply products:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch operator supply products',
+    });
+  }
+});
+
+/**
  * GET /api/v1/neture/admin/dashboard/summary
  * Get admin/operator dashboard summary (requires admin role)
  */

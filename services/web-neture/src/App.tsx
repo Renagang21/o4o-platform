@@ -218,6 +218,9 @@ const RegistrationRequestsPage = lazy(() =>
 const ForumManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ForumManagementPage }))
 );
+const SupplyDashboardPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.SupplyDashboardPage }))
+);
 
 // Loading fallback
 function PageLoading() {
@@ -452,6 +455,7 @@ function App() {
               <Route path="/supplier-ops/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
               <Route path="/supplier-ops/operator/registrations" element={<RegistrationRequestsPage />} />
               <Route path="/supplier-ops/operator/forum-management" element={<ForumManagementPage />} />
+              <Route path="/supplier-ops/operator/supply" element={<SupplyDashboardPage />} />
             </Route>
 
             {/* ================================================================

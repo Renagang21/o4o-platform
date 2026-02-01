@@ -26,6 +26,7 @@ import {
   RefreshCw,
   Shield,
   MessageSquarePlus,
+  Package,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
@@ -299,6 +300,7 @@ export default function OperatorDashboard() {
             { label: '파트너 관리', href: '/operator/partners', icon: Users, color: 'green' },
             { label: '콘텐츠 관리', href: '/operator/contents', icon: FileText, color: 'purple' },
             { label: 'AI 리포트', href: '/operator/ai-report', icon: TrendingUp, color: 'amber' },
+            { label: '공급 요청', href: '/supplier-ops/operator/supply', icon: Package, color: 'violet' },
           ].map((action) => (
             <Link
               key={action.label}
