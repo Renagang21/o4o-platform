@@ -21,6 +21,7 @@ COPY tsconfig.packages.json ./
 # Copy workspace packages needed for this service
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/content-editor/package.json ./packages/content-editor/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -31,13 +32,15 @@ RUN pnpm install --filter @o4o/web-kpa-society...
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/content-editor/ ./packages/content-editor/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
 
-# Build workspace dependencies first (types -> auth-client)
+# Build workspace dependencies first (types -> auth-client -> content-editor)
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
+RUN pnpm --filter @o4o/content-editor build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
