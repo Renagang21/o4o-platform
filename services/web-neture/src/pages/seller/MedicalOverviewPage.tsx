@@ -381,9 +381,6 @@ function NextStepSection() {
         <Link to="/o4o" style={styles.ctaPrimary}>
           o4o 플랫폼 소개 보기
         </Link>
-        <Link to="/partners/apply" style={styles.ctaSecondary}>
-          구조 상담 요청
-        </Link>
       </div>
     </section>
   );

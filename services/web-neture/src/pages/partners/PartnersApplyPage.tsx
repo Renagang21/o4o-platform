@@ -98,20 +98,6 @@ export default function PartnersApplyPage() {
           </div>
         </div>
 
-        {/* 문의 안내 */}
-        <div style={styles.contactSection}>
-          <h3 style={styles.sectionTitle}>문의하기</h3>
-          <p style={styles.contactText}>
-            참여 관련 문의는 아래로 연락해 주세요.
-          </p>
-          <div style={styles.contactInfo}>
-            <div style={styles.contactItem}>
-              <span style={styles.contactLabel}>이메일</span>
-              <span style={styles.contactValue}>partners@neture.co.kr</span>
-            </div>
-          </div>
-        </div>
-
         {/* 하단 링크 */}
         <div style={styles.footer}>
           <Link to="/supplier-ops/partners/info" style={styles.backLink}>
