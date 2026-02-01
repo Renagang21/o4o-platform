@@ -101,7 +101,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * Query Parameters:
    * - status (optional): Filter by status ('OPEN', 'MATCHED', 'CLOSED')
    */
-  router.get('/partnership/requests', requireAuth, async (req: Request, res: Response) => {
+  router.get('/partnership/requests', async (req: Request, res: Response) => {
     try {
       const { status } = req.query;
 

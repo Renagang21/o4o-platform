@@ -775,7 +775,7 @@ router.get('/admin/dashboard/summary', requireAuth, async (req: AuthenticatedReq
  * Get products marked for partner recruiting (public, no auth)
  * WO-PARTNER-RECRUIT-PHASE1-V1
  */
-router.get('/partner/recruiting-products', requireAuth, async (_req: Request, res: Response) => {
+router.get('/partner/recruiting-products', async (_req: Request, res: Response) => {
   try {
     const glycopharmRepo = new GlycopharmRepository(AppDataSource);
     const products = await glycopharmRepo.findPartnerRecruitingProducts();

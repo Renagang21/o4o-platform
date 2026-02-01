@@ -93,14 +93,7 @@ export default function RecruitingProductsPage() {
 
       {products.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-gray-400 text-lg mb-2">모집 중인 제품이 없습니다</p>
-          <p className="text-gray-400 text-sm">공급자가 파트너 모집을 설정하면 여기에 표시됩니다.</p>
-          <Link
-            to="/supplier-ops/partners/info"
-            className="inline-block mt-6 text-sm text-primary-600 hover:text-primary-700 font-medium"
-          >
-            참여 안내 보기
-          </Link>
+          <p className="text-gray-500 text-lg">자료가 없습니다</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
