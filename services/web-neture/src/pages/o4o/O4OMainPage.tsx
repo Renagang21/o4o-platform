@@ -58,18 +58,12 @@ function HeroSection() {
           <br />
           <strong className="text-white">매장 네트워크를 대상으로 비즈니스하는 사업자</strong>를 위한 플랫폼입니다.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex justify-center">
           <Link
-            to="/supplier-ops/suppliers"
-            className="inline-flex items-center justify-center px-8 py-3 bg-white text-slate-800 font-medium rounded-lg hover:bg-slate-100 transition-colors"
-          >
-            공급자로 참여하기
-          </Link>
-          <Link
-            to="/supplier-ops/partners/info"
+            to="/supplier-ops"
             className="inline-flex items-center justify-center px-8 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
           >
-            파트너로 참여하기
+            공급자/파트너 Hub
           </Link>
         </div>
       </div>

@@ -60,27 +60,6 @@ export default function MainLayout() {
               >
                 플랫폼 소개
               </Link>
-              <span className="text-gray-300">|</span>
-              <Link
-                to="/supplier-ops/suppliers"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/supplier')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                공급자
-              </Link>
-              <Link
-                to="/supplier-ops/partners/info"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/partner')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                파트너
-              </Link>
               {!isAuthenticated && (
                 <Link
                   to="/login"
