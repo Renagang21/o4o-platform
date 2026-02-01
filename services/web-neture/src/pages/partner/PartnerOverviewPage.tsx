@@ -422,7 +422,7 @@ export function PartnerOverviewPage() {
               아직 소개 중인 제품이 없습니다.
             </p>
             <Link
-              to="/supplier-ops/partner/recruiting-products"
+              to="/workspace/partner/recruiting-products"
               style={{ display: 'inline-block', marginTop: '12px', fontSize: '14px', color: '#7c3aed', fontWeight: 500, textDecoration: 'none' }}
             >
               파트너 모집 제품 보기 &rarr;

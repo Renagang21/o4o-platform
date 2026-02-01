@@ -2,15 +2,15 @@
  * Neture - o4o 플랫폼 기반 서비스
  *
  * Work Orders:
- * - WO-SUPPLIER-OPS-ROUTE-REFACTOR-V1: /supplier-ops 기준 라우트 분리
+ * - WO-SUPPLIER-OPS-ROUTE-REFACTOR-V1: /workspace 기준 라우트 분리
  *
  * 구조:
  * 1. o4o 공통 영역 (/, /o4o, /channel/*, /seller/overview/*, /partner/overview-info)
- * 2. Neture 고유 기능 (/supplier-ops/*) - 공급자 중심 운영·연결 서비스
+ * 2. Neture 고유 기능 (/workspace/*) - 공급자 중심 운영·연결 서비스
  *
  * HARD RULES:
- * - /supplier-ops는 공급자 중심 운영·연결 서비스
- * - admin/operator는 /supplier-ops 전용
+ * - /workspace는 공급자 중심 운영·연결 서비스
+ * - admin/operator는 /workspace 전용
  * - o4o 공통 영역에서는 공급자/파트너 운영 기능 노출 금지
  */
 
@@ -84,7 +84,7 @@ import TestCenterPage from './pages/TestCenterPage';
 import ContactPage from './pages/ContactPage';
 
 // ============================================================================
-// Neture 고유 페이지 (/supplier-ops)
+// Neture 고유 페이지 (/workspace)
 // ============================================================================
 import HomePage from './pages/HomePage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -248,15 +248,15 @@ function LoginModalRenderer() {
 // Legacy redirect helpers - React Router v6 Navigate doesn't interpolate params
 function RedirectSupplierDetail() {
   const { slug } = useParams();
-  return <Navigate to={`/supplier-ops/suppliers/${slug}`} replace />;
+  return <Navigate to={`/workspace/suppliers/${slug}`} replace />;
 }
 function RedirectPartnershipRequestDetail() {
   const { id } = useParams();
-  return <Navigate to={`/supplier-ops/partners/requests/${id}`} replace />;
+  return <Navigate to={`/workspace/partners/requests/${id}`} replace />;
 }
 function RedirectContentDetail() {
   const { id } = useParams();
-  return <Navigate to={`/supplier-ops/content/${id}`} replace />;
+  return <Navigate to={`/workspace/content/${id}`} replace />;
 }
 
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
@@ -367,141 +367,141 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Neture 고유 기능 (/supplier-ops) - SupplierOpsLayout
+                Neture 고유 기능 (/workspace) - SupplierOpsLayout
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
               {/* Neture 홈 */}
-              <Route path="/supplier-ops" element={<HomePage />} />
+              <Route path="/workspace" element={<HomePage />} />
 
               {/* 공급자 */}
-              <Route path="/supplier-ops/suppliers" element={<SupplierListPage />} />
-              <Route path="/supplier-ops/suppliers/:slug" element={<SupplierDetailPage />} />
+              <Route path="/workspace/suppliers" element={<SupplierListPage />} />
+              <Route path="/workspace/suppliers/:slug" element={<SupplierDetailPage />} />
 
               {/* 파트너/제휴 */}
-              <Route path="/supplier-ops/partners" element={<Navigate to="/supplier-ops/partners/requests" replace />} />
-              <Route path="/supplier-ops/partners/requests" element={<PartnershipRequestListPage />} />
-              <Route path="/supplier-ops/partners/requests/new" element={<PartnershipRequestCreatePage />} />
-              <Route path="/supplier-ops/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
-              <Route path="/supplier-ops/partners/info" element={<PartnerInfoPage />} />
+              <Route path="/workspace/partners" element={<Navigate to="/workspace/partners/requests" replace />} />
+              <Route path="/workspace/partners/requests" element={<PartnershipRequestListPage />} />
+              <Route path="/workspace/partners/requests/new" element={<PartnershipRequestCreatePage />} />
+              <Route path="/workspace/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
+              <Route path="/workspace/partners/info" element={<PartnerInfoPage />} />
 
               {/* 플랫폼 정책 */}
-              <Route path="/supplier-ops/platform/principles" element={<PlatformPrinciplesPage />} />
+              <Route path="/workspace/platform/principles" element={<PlatformPrinciplesPage />} />
 
               {/* 콘텐츠 */}
-              <Route path="/supplier-ops/content" element={<ContentListPage />} />
-              <Route path="/supplier-ops/content/:id" element={<ContentDetailPage />} />
+              <Route path="/workspace/content" element={<ContentListPage />} />
+              <Route path="/workspace/content/:id" element={<ContentDetailPage />} />
 
               {/* Neture 전용 테스트 가이드 */}
-              <Route path="/supplier-ops/manual/supplier" element={<SupplierManualPage />} />
-              <Route path="/supplier-ops/manual/partner" element={<PartnerManualPage />} />
-              <Route path="/supplier-ops/manual/admin" element={<AdminManualPage />} />
-              <Route path="/supplier-ops/manual/service" element={<NetureServiceManualPage />} />
+              <Route path="/workspace/manual/supplier" element={<SupplierManualPage />} />
+              <Route path="/workspace/manual/partner" element={<PartnerManualPage />} />
+              <Route path="/workspace/manual/admin" element={<AdminManualPage />} />
+              <Route path="/workspace/manual/service" element={<NetureServiceManualPage />} />
             </Route>
 
             {/* ================================================================
-                Supplier Dashboard (/supplier-ops/supplier/*)
+                Supplier Dashboard (/workspace/supplier/*)
             ================================================================ */}
             <Route element={<SupplierDashboardLayout />}>
-              <Route path="/supplier-ops/supplier/dashboard" element={<SupplierDashboardPage />} />
-              <Route path="/supplier-ops/supplier/requests" element={<SellerRequestsPage />} />
-              <Route path="/supplier-ops/supplier/requests/:id" element={<SellerRequestDetailPage />} />
-              <Route path="/supplier-ops/supplier/products" element={<SupplierProductsPage />} />
-              <Route path="/supplier-ops/supplier/supply-requests" element={<SupplyRequestsPage />} />
-              <Route path="/supplier-ops/supplier/orders" element={<SupplierOrdersPage />} />
-              <Route path="/supplier-ops/supplier/contents" element={<SupplierContentsPage />} />
-              <Route path="/supplier-ops/supplier/contents/new" element={<ContentEditorPage />} />
-              <Route path="/supplier-ops/supplier/contents/:id/edit" element={<ContentEditorPage />} />
+              <Route path="/workspace/supplier/dashboard" element={<SupplierDashboardPage />} />
+              <Route path="/workspace/supplier/requests" element={<SellerRequestsPage />} />
+              <Route path="/workspace/supplier/requests/:id" element={<SellerRequestDetailPage />} />
+              <Route path="/workspace/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/workspace/supplier/supply-requests" element={<SupplyRequestsPage />} />
+              <Route path="/workspace/supplier/orders" element={<SupplierOrdersPage />} />
+              <Route path="/workspace/supplier/contents" element={<SupplierContentsPage />} />
+              <Route path="/workspace/supplier/contents/new" element={<ContentEditorPage />} />
+              <Route path="/workspace/supplier/contents/:id/edit" element={<ContentEditorPage />} />
               {/* Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1) */}
-              <Route path="/supplier-ops/supplier/signage/content" element={<SignageContentHubPage />} />
+              <Route path="/workspace/supplier/signage/content" element={<SignageContentHubPage />} />
             </Route>
 
             {/* ================================================================
-                Partner Dashboard (/supplier-ops/partner/*)
+                Partner Dashboard (/workspace/partner/*)
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
-              <Route path="/supplier-ops/partner" element={<PartnerOverviewPage />} />
-              <Route path="/supplier-ops/partner/recruiting-products" element={<RecruitingProductsPage />} />
-              <Route path="/supplier-ops/partner/collaboration" element={<CollaborationPage />} />
-              <Route path="/supplier-ops/partner/promotions" element={<PromotionsPage />} />
-              <Route path="/supplier-ops/partner/settlements" element={<SettlementsPage />} />
+              <Route path="/workspace/partner" element={<PartnerOverviewPage />} />
+              <Route path="/workspace/partner/recruiting-products" element={<RecruitingProductsPage />} />
+              <Route path="/workspace/partner/collaboration" element={<CollaborationPage />} />
+              <Route path="/workspace/partner/promotions" element={<PromotionsPage />} />
+              <Route path="/workspace/partner/settlements" element={<SettlementsPage />} />
             </Route>
 
             {/* ================================================================
-                Admin Dashboard (/supplier-ops/admin/*)
+                Admin Dashboard (/workspace/admin/*)
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
-              <Route path="/supplier-ops/admin" element={<AdminDashboardPage />} />
-              <Route path="/supplier-ops/admin/ai-card-rules" element={<AiCardExplainPage />} />
-              <Route path="/supplier-ops/admin/ai-card-report" element={<AiCardReportPage />} />
-              <Route path="/supplier-ops/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-              <Route path="/supplier-ops/admin/ai-operations" element={<AiOperationsPage />} />
+              <Route path="/workspace/admin" element={<AdminDashboardPage />} />
+              <Route path="/workspace/admin/ai-card-rules" element={<AiCardExplainPage />} />
+              <Route path="/workspace/admin/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/workspace/admin/ai-business-pack" element={<AiBusinessPackPage />} />
+              <Route path="/workspace/admin/ai-operations" element={<AiOperationsPage />} />
               {/* AI Admin Control Plane */}
-              <Route path="/supplier-ops/admin/ai" element={<AiAdminDashboardPage />} />
-              <Route path="/supplier-ops/admin/ai/engines" element={<AiEnginesPage />} />
-              <Route path="/supplier-ops/admin/ai/policy" element={<AiPolicyPage />} />
-              <Route path="/supplier-ops/admin/ai/asset-quality" element={<AssetQualityPage />} />
-              <Route path="/supplier-ops/admin/ai/cost" element={<AiCostPage />} />
-              <Route path="/supplier-ops/admin/ai/context-assets" element={<ContextAssetListPage />} />
-              <Route path="/supplier-ops/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
-              <Route path="/supplier-ops/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
-              <Route path="/supplier-ops/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
+              <Route path="/workspace/admin/ai" element={<AiAdminDashboardPage />} />
+              <Route path="/workspace/admin/ai/engines" element={<AiEnginesPage />} />
+              <Route path="/workspace/admin/ai/policy" element={<AiPolicyPage />} />
+              <Route path="/workspace/admin/ai/asset-quality" element={<AssetQualityPage />} />
+              <Route path="/workspace/admin/ai/cost" element={<AiCostPage />} />
+              <Route path="/workspace/admin/ai/context-assets" element={<ContextAssetListPage />} />
+              <Route path="/workspace/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
+              <Route path="/workspace/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
+              <Route path="/workspace/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
               {/* Admin Settings */}
-              <Route path="/supplier-ops/admin/settings/email" element={<EmailSettingsPage />} />
+              <Route path="/workspace/admin/settings/email" element={<EmailSettingsPage />} />
             </Route>
 
             {/* ================================================================
-                Operator Dashboard (/supplier-ops/operator/*)
+                Operator Dashboard (/workspace/operator/*)
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
-              <Route path="/supplier-ops/operator" element={<OperatorDashboard />} />
-              <Route path="/supplier-ops/operator/ai-report" element={<OperatorAiReportPage />} />
-              <Route path="/supplier-ops/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-              <Route path="/supplier-ops/operator/registrations" element={<RegistrationRequestsPage />} />
-              <Route path="/supplier-ops/operator/forum-management" element={<ForumManagementPage />} />
-              <Route path="/supplier-ops/operator/supply" element={<SupplyDashboardPage />} />
+              <Route path="/workspace/operator" element={<OperatorDashboard />} />
+              <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
+              <Route path="/workspace/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+              <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />
+              <Route path="/workspace/operator/forum-management" element={<ForumManagementPage />} />
+              <Route path="/workspace/operator/supply" element={<SupplyDashboardPage />} />
             </Route>
 
             {/* ================================================================
                 레거시 리다이렉트 (기존 경로 → 신규 경로)
             ================================================================ */}
             {/* Neture 고유 기능 리다이렉트 */}
-            <Route path="/suppliers" element={<Navigate to="/supplier-ops/suppliers" replace />} />
+            <Route path="/suppliers" element={<Navigate to="/workspace/suppliers" replace />} />
             <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
-            <Route path="/partners/requests" element={<Navigate to="/supplier-ops/partners/requests" replace />} />
+            <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
-            <Route path="/partners/info" element={<Navigate to="/supplier-ops/partners/info" replace />} />
-            <Route path="/platform/principles" element={<Navigate to="/supplier-ops/platform/principles" replace />} />
-            <Route path="/content" element={<Navigate to="/supplier-ops/content" replace />} />
+            <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
+            <Route path="/platform/principles" element={<Navigate to="/workspace/platform/principles" replace />} />
+            <Route path="/content" element={<Navigate to="/workspace/content" replace />} />
             <Route path="/content/:id" element={<RedirectContentDetail />} />
-            {/* /supplier-ops/forum → /forum 리다이렉트 */}
-            <Route path="/supplier-ops/forum" element={<Navigate to="/forum" replace />} />
-            <Route path="/supplier-ops/forum/*" element={<Navigate to="/forum" replace />} />
+            {/* /workspace/forum → /forum 리다이렉트 */}
+            <Route path="/workspace/forum" element={<Navigate to="/forum" replace />} />
+            <Route path="/workspace/forum/*" element={<Navigate to="/forum" replace />} />
 
             {/* Supplier Dashboard 리다이렉트 */}
-            <Route path="/supplier/dashboard" element={<Navigate to="/supplier-ops/supplier/dashboard" replace />} />
-            <Route path="/supplier/requests" element={<Navigate to="/supplier-ops/supplier/requests" replace />} />
-            <Route path="/supplier/products" element={<Navigate to="/supplier-ops/supplier/products" replace />} />
-            <Route path="/supplier/orders" element={<Navigate to="/supplier-ops/supplier/orders" replace />} />
-            <Route path="/supplier/contents" element={<Navigate to="/supplier-ops/supplier/contents" replace />} />
-            <Route path="/supplier/*" element={<Navigate to="/supplier-ops/supplier/dashboard" replace />} />
+            <Route path="/supplier/dashboard" element={<Navigate to="/workspace/supplier/dashboard" replace />} />
+            <Route path="/supplier/requests" element={<Navigate to="/workspace/supplier/requests" replace />} />
+            <Route path="/supplier/products" element={<Navigate to="/workspace/supplier/products" replace />} />
+            <Route path="/supplier/orders" element={<Navigate to="/workspace/supplier/orders" replace />} />
+            <Route path="/supplier/contents" element={<Navigate to="/workspace/supplier/contents" replace />} />
+            <Route path="/supplier/*" element={<Navigate to="/workspace/supplier/dashboard" replace />} />
 
             {/* Partner Dashboard 리다이렉트 */}
-            <Route path="/partner" element={<Navigate to="/supplier-ops/partner" replace />} />
-            <Route path="/partner/collaboration" element={<Navigate to="/supplier-ops/partner/collaboration" replace />} />
-            <Route path="/partner/promotions" element={<Navigate to="/supplier-ops/partner/promotions" replace />} />
-            <Route path="/partner/settlements" element={<Navigate to="/supplier-ops/partner/settlements" replace />} />
+            <Route path="/partner" element={<Navigate to="/workspace/partner" replace />} />
+            <Route path="/partner/collaboration" element={<Navigate to="/workspace/partner/collaboration" replace />} />
+            <Route path="/partner/promotions" element={<Navigate to="/workspace/partner/promotions" replace />} />
+            <Route path="/partner/settlements" element={<Navigate to="/workspace/partner/settlements" replace />} />
 
             {/* Admin/Operator 리다이렉트 */}
-            <Route path="/admin" element={<Navigate to="/supplier-ops/admin" replace />} />
-            <Route path="/admin/*" element={<Navigate to="/supplier-ops/admin" replace />} />
-            <Route path="/operator" element={<Navigate to="/supplier-ops/operator" replace />} />
-            <Route path="/operator/*" element={<Navigate to="/supplier-ops/operator" replace />} />
+            <Route path="/admin" element={<Navigate to="/workspace/admin" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/workspace/admin" replace />} />
+            <Route path="/operator" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/operator/*" element={<Navigate to="/workspace/operator" replace />} />
 
             {/* Test Guide 리다이렉트 (Neture 전용) */}
-            <Route path="/test-guide/manual/supplier" element={<Navigate to="/supplier-ops/manual/supplier" replace />} />
-            <Route path="/test-guide/manual/partner" element={<Navigate to="/supplier-ops/manual/partner" replace />} />
-            <Route path="/test-guide/manual/admin" element={<Navigate to="/supplier-ops/manual/admin" replace />} />
-            <Route path="/test-guide/service/neture" element={<Navigate to="/supplier-ops/manual/service" replace />} />
+            <Route path="/test-guide/manual/supplier" element={<Navigate to="/workspace/manual/supplier" replace />} />
+            <Route path="/test-guide/manual/partner" element={<Navigate to="/workspace/manual/partner" replace />} />
+            <Route path="/test-guide/manual/admin" element={<Navigate to="/workspace/manual/admin" replace />} />
+            <Route path="/test-guide/service/neture" element={<Navigate to="/workspace/manual/service" replace />} />
             </Routes>
           </Suspense>
         </BrowserRouter>

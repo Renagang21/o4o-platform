@@ -55,7 +55,7 @@ export default function SupplierDashboardLayout() {
   const navItems = [
     { to: '/supplier/dashboard', icon: LayoutDashboard, label: '대시보드' },
     { to: '/supplier/requests', icon: FileCheck, label: '판매자 신청' },
-    { to: '/supplier-ops/supplier/supply-requests', icon: PackageCheck, label: '공급 요청' },
+    { to: '/workspace/supplier/supply-requests', icon: PackageCheck, label: '공급 요청' },
     { to: '/supplier/products', icon: Package, label: '내 제품' },
     { to: '/supplier/orders', icon: ShoppingBag, label: '주문 현황' },
     { to: '/supplier/contents', icon: FileText, label: '콘텐츠' },
@@ -70,7 +70,7 @@ export default function SupplierDashboardLayout() {
         <div className="max-w-full mx-auto px-6 flex justify-between items-center h-14">
           {/* Logo */}
           <div className="flex items-center gap-4">
-            <Link to="/supplier-ops" className="flex items-center gap-2">
+            <Link to="/workspace" className="flex items-center gap-2">
               <span className="text-xl font-bold text-primary-600">Neture</span>
               <span className="text-sm font-medium text-slate-500 border-l border-slate-300 pl-2">
                 공급자 연결
@@ -89,9 +89,9 @@ export default function SupplierDashboardLayout() {
           {/* Navigation */}
           <nav className="flex items-center space-x-4">
             <Link
-              to="/supplier-ops"
+              to="/workspace"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                location.pathname === '/supplier-ops'
+                location.pathname === '/workspace'
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
@@ -99,9 +99,9 @@ export default function SupplierDashboardLayout() {
               홈
             </Link>
             <Link
-              to="/supplier-ops/suppliers"
+              to="/workspace/suppliers"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/supplier-ops/suppliers')
+                isNavActive('/workspace/suppliers')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
@@ -109,9 +109,9 @@ export default function SupplierDashboardLayout() {
               공급자
             </Link>
             <Link
-              to="/supplier-ops/partners/info"
+              to="/workspace/partners/info"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/supplier-ops/partners/info')
+                isNavActive('/workspace/partners/info')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
@@ -119,9 +119,9 @@ export default function SupplierDashboardLayout() {
               참여 안내
             </Link>
             <Link
-              to="/supplier-ops/partners/requests"
+              to="/workspace/partners/requests"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/supplier-ops/partners/requests')
+                isNavActive('/workspace/partners/requests')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
@@ -129,9 +129,9 @@ export default function SupplierDashboardLayout() {
               제휴 요청
             </Link>
             <Link
-              to="/supplier-ops/content"
+              to="/workspace/content"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/supplier-ops/content')
+                isNavActive('/workspace/content')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}

@@ -100,7 +100,7 @@ export default function PartnersApplyPage() {
 
         {/* 하단 링크 */}
         <div style={styles.footer}>
-          <Link to="/supplier-ops/partners/info" style={styles.backLink}>
+          <Link to="/workspace/partners/info" style={styles.backLink}>
             ← 참여 안내로 돌아가기
           </Link>
         </div>

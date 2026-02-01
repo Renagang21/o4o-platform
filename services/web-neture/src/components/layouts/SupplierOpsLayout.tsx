@@ -8,7 +8,7 @@
  * - o4o 공통 영역과 분리된 네비게이션 구조
  *
  * 스코프:
- * - /supplier-ops 하위 모든 페이지
+ * - /workspace 하위 모든 페이지
  * - 공급자, 파트너, 제휴 요청, 콘텐츠, 포럼
  * - admin, operator 대시보드
  */
@@ -30,9 +30,9 @@ export default function SupplierOpsLayout() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo - links to supplier-ops home */}
+            {/* Logo - links to workspace home */}
             <div className="flex items-center gap-4">
-              <Link to="/supplier-ops" className="flex items-center gap-2">
+              <Link to="/workspace" className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-primary-600">Neture</span>
                 <span className="text-sm font-medium text-slate-500 border-l border-slate-300 pl-2">
                   공급자 · 파트너
@@ -52,9 +52,9 @@ export default function SupplierOpsLayout() {
             {/* Navigation */}
             <nav className="flex items-center space-x-4">
               <Link
-                to="/supplier-ops"
+                to="/workspace"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  location.pathname === '/supplier-ops'
+                  location.pathname === '/workspace'
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
@@ -62,9 +62,9 @@ export default function SupplierOpsLayout() {
                 홈
               </Link>
               <Link
-                to="/supplier-ops/suppliers"
+                to="/workspace/suppliers"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/suppliers')
+                  isActive('/workspace/suppliers')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
@@ -72,9 +72,9 @@ export default function SupplierOpsLayout() {
                 공급자
               </Link>
               <Link
-                to="/supplier-ops/partners/info"
+                to="/workspace/partners/info"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/partners/info')
+                  isActive('/workspace/partners/info')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
@@ -82,9 +82,9 @@ export default function SupplierOpsLayout() {
                 참여 안내
               </Link>
               <Link
-                to="/supplier-ops/partners/requests"
+                to="/workspace/partners/requests"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/partners/requests')
+                  isActive('/workspace/partners/requests')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
@@ -92,9 +92,9 @@ export default function SupplierOpsLayout() {
                 제휴 요청
               </Link>
               <Link
-                to="/supplier-ops/content"
+                to="/workspace/content"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/supplier-ops/content')
+                  isActive('/workspace/content')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}

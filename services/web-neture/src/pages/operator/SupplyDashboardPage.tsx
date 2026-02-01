@@ -126,7 +126,7 @@ export default function SupplyDashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <Link
-            to="/supplier-ops/operator"
+            to="/workspace/operator"
             className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />

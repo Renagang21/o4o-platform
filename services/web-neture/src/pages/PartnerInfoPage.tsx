@@ -109,7 +109,7 @@ export function PartnerInfoPage() {
           <br />
           파트너로서 소개할 수 있는 기회를 탐색하세요.
         </p>
-        <Link to="/supplier-ops/partner/recruiting-products" style={styles.recruitLink}>
+        <Link to="/workspace/partner/recruiting-products" style={styles.recruitLink}>
           모집 중인 제품 보기 →
         </Link>
       </section>

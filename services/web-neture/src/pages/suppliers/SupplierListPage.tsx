@@ -73,7 +73,7 @@ export default function SupplierListPage() {
           {suppliers.map((supplier) => (
             <Link
               key={supplier.id}
-              to={`/supplier-ops/suppliers/${supplier.slug}`}
+              to={`/workspace/suppliers/${supplier.slug}`}
               className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-primary-300 transition-all"
             >
               <div className="flex flex-col items-center text-center">

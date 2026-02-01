@@ -55,7 +55,7 @@ function HeroSection() {
         </p>
         <div className="flex justify-center">
           <Link
-            to="/supplier-ops"
+            to="/workspace"
             className="inline-flex items-center justify-center px-8 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
           >
             공급자/파트너 Hub

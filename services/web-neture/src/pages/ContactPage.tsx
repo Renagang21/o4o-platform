@@ -12,7 +12,7 @@ export default function ContactPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-16">
       <Link
-        to="/supplier-ops/partners/info"
+        to="/workspace/partners/info"
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-8"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -66,7 +66,7 @@ export default function ContactPage() {
 
       <div className="mt-12">
         <Link
-          to="/supplier-ops/partners/requests/new"
+          to="/workspace/partners/requests/new"
           className="block w-full text-center py-3 px-6 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
         >
           참여 신청하기

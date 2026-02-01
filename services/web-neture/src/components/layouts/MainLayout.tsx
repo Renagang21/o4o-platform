@@ -15,7 +15,7 @@ import { isAdminVaultAuthorized } from '../../utils/adminVaultAuth';
  * - /, /o4o, /channel/*, /seller/overview/*, /partner/overview-info
  * - /test-center, /test-guide (다중 서비스)
  *
- * Neture 고유 기능은 /supplier-ops로 분리됨
+ * Neture 고유 기능은 /workspace로 분리됨
  */
 export default function MainLayout() {
   const location = useLocation();
