@@ -22,6 +22,8 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/content-editor/package.json ./packages/content-editor/
+COPY packages/organization-core/package.json ./packages/organization-core/
+COPY packages/forum-core/package.json ./packages/forum-core/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -33,13 +35,17 @@ RUN pnpm install --filter @o4o/web-kpa-society...
 COPY packages/types/ ./packages/types/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/content-editor/ ./packages/content-editor/
+COPY packages/organization-core/ ./packages/organization-core/
+COPY packages/forum-core/ ./packages/forum-core/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
 
-# Build workspace dependencies first (types -> auth-client -> content-editor)
+# Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
+RUN pnpm --filter @o4o/organization-core build
+RUN pnpm --filter @o4o/forum-core build
 RUN pnpm --filter @o4o/content-editor build
 
 # Build-time environment variable for Vite
