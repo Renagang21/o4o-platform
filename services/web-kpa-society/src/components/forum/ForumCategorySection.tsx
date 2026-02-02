@@ -1,8 +1,8 @@
 /**
- * ForumCategorySection - 카테고리 둘러보기
+ * ForumCategorySection - 카테고리 둘러보기 (다음카페 스타일 Hero)
  *
- * CommunityServiceSection 패턴: 카테고리별 카드 그리드
- * 각 카드: 아이콘 + 카테고리명 + 게시글 수 + 바로가기
+ * 핵심 정책: 카테고리 카드가 Forum Hub의 Hero 콘텐츠
+ * 리스트형 카드: 아이콘 + 이름 + 설명 + 게시글 수 + 화살표
  */
 
 import { useState, useEffect } from 'react';
@@ -11,30 +11,38 @@ import { forumApi } from '../../api';
 import type { ForumCategory } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-// 카테고리별 아이콘 매핑 (기본값 제공)
+// 카테고리별 아이콘 매핑
 const categoryIcons: Record<string, string> = {
   '자유게시판': '💬',
   '정보공유': '📌',
   '질문답변': '❓',
   '후기': '⭐',
   '공지사항': '📢',
+  '약국경영': '🏪',
+  '약학정보': '💊',
+  '법규정책': '📋',
+  '교육연수': '🎓',
+  '구인구직': '👥',
 };
 
+const DEFAULT_ICON = '📂';
+
 function CategoryCard({ category }: { category: ForumCategory }) {
-  const icon = categoryIcons[category.name] || '📂';
+  const icon = categoryIcons[category.name] || DEFAULT_ICON;
 
   return (
     <Link to={`/demo/forum/category/${category.id}`} style={styles.card}>
       <div style={styles.cardIcon}>{icon}</div>
-      <div style={styles.cardContent}>
+      <div style={styles.cardBody}>
         <h3 style={styles.cardTitle}>{category.name}</h3>
         {category.description && (
           <p style={styles.cardDesc}>{category.description}</p>
         )}
       </div>
-      <span style={styles.cardCount}>
-        {category.postCount}건
-      </span>
+      <div style={styles.cardRight}>
+        <span style={styles.postCount}>{category.postCount}건</span>
+        <span style={styles.chevron}>›</span>
+      </div>
     </Link>
   );
 }
@@ -52,13 +60,21 @@ export function ForumCategorySection() {
 
   return (
     <section style={styles.container}>
-      <h2 style={styles.sectionTitle}>카테고리 둘러보기</h2>
+      <div style={styles.header}>
+        <h2 style={styles.sectionTitle}>카테고리</h2>
+        <span style={styles.subtitle}>관심 있는 게시판을 둘러보세요</span>
+      </div>
       {categories.length === 0 ? (
-        <p style={styles.empty}>자료가 없습니다</p>
+        <div style={styles.emptyCard}>
+          <p style={styles.empty}>등록된 카테고리가 없습니다</p>
+        </div>
       ) : (
-        <div style={styles.grid}>
-          {categories.map((cat) => (
-            <CategoryCard key={cat.id} category={cat} />
+        <div style={styles.listCard}>
+          {categories.map((cat, idx) => (
+            <div key={cat.id}>
+              {idx > 0 && <div style={styles.divider} />}
+              <CategoryCard category={cat} />
+            </div>
           ))}
         </div>
       )}
@@ -68,36 +84,51 @@ export function ForumCategorySection() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    padding: `${spacing.xl} 0`,
+    padding: `${spacing.xl} 0 ${spacing.md}`,
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: spacing.md,
+    marginBottom: spacing.md,
   },
   sectionTitle: {
     ...typography.headingM,
     color: colors.neutral900,
-    marginBottom: spacing.lg,
+    margin: 0,
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: spacing.md,
+  subtitle: {
+    fontSize: '0.813rem',
+    color: colors.neutral400,
+  },
+  listCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.neutral100}`,
+    overflow: 'hidden',
   },
   card: {
     display: 'flex',
     alignItems: 'center',
     gap: spacing.md,
-    padding: spacing.lg,
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
+    padding: `${spacing.md} ${spacing.lg}`,
     textDecoration: 'none',
     color: colors.neutral800,
-    transition: 'box-shadow 0.2s',
-    border: `1px solid ${colors.neutral100}`,
+    transition: 'background-color 0.15s',
   },
   cardIcon: {
-    fontSize: '2rem',
+    fontSize: '1.75rem',
     flexShrink: 0,
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.neutral50,
+    borderRadius: borderRadius.md,
   },
-  cardContent: {
+  cardBody: {
     flex: 1,
     minWidth: 0,
   },
@@ -105,23 +136,49 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.headingS,
     margin: 0,
     color: colors.neutral900,
+    fontSize: '0.938rem',
   },
   cardDesc: {
-    margin: `${spacing.xs} 0 0`,
+    margin: `2px 0 0`,
     fontSize: '0.813rem',
     color: colors.neutral500,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
-  cardCount: {
+  cardRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexShrink: 0,
+  },
+  postCount: {
     fontSize: '0.75rem',
     fontWeight: 500,
-    whiteSpace: 'nowrap',
     padding: '2px 8px',
     borderRadius: borderRadius.sm,
     color: colors.primary,
     backgroundColor: `${colors.primary}10`,
+    whiteSpace: 'nowrap',
+  },
+  chevron: {
+    fontSize: '1.25rem',
+    color: colors.neutral300,
+    fontWeight: 300,
+  },
+  divider: {
+    height: '1px',
+    backgroundColor: colors.neutral100,
+    margin: `0 ${spacing.lg}`,
+  },
+  emptyCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.neutral100}`,
   },
   empty: {
-    textAlign: 'center',
+    textAlign: 'center' as const,
     color: colors.neutral500,
     padding: spacing.xl,
     margin: 0,
