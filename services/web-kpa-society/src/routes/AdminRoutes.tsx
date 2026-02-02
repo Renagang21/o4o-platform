@@ -22,6 +22,7 @@ import {
 import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import { KpaOperatorDashboardPage } from '../pages/admin/KpaOperatorDashboardPage';
+import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 
 export function AdminRoutes() {
@@ -50,6 +51,9 @@ export function AdminRoutes() {
 
           {/* 조직 가입/역할 요청 관리 (WO-CONTEXT-JOIN-REQUEST-MVP-V1) */}
           <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
+
+          {/* 서비스 신청 관리 (WO-ADMIN-SERVICE-ENROLLMENT-APPROVAL-V1) */}
+          <Route path="service-enrollments" element={<ServiceEnrollmentManagementPage />} />
 
           {/* 신상신고 */}
           <Route path="annual-report" element={<AnnualReportPage />} />

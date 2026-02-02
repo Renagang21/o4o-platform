@@ -229,6 +229,7 @@ export function KpaOperatorDashboardPage() {
               { label: '분회 관리', desc: '분회별 현황 조회', path: '/admin/divisions', type: '관리' },
               { label: '조직 요청', desc: '가입/역할 요청 처리', path: '/admin/organization-requests', type: '요청' },
               { label: '위원회 관리', desc: '위원회 요청 관리', path: '/admin/committee-requests', type: '요청' },
+              { label: '서비스 신청', desc: '서비스 이용 신청 승인/반려', path: '/admin/service-enrollments', type: '관리' },
               { label: '게시판', desc: '게시판 관리', path: '/admin/forum', type: '콘텐츠' },
               { label: '설정', desc: '지부 설정', path: '/admin/settings', type: '설정' },
             ].map((action) => (
