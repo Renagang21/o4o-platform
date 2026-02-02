@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // 테스트 계정 (비밀번호 통일: TestPassword)
@@ -31,7 +31,9 @@ const demoTestAccounts = [
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
+  const returnTo = searchParams.get('returnTo');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -68,6 +70,9 @@ export function LoginPage() {
         navigate(`${prefix}/intranet/operator`);
       } else if (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole) {
         navigate(`${prefix}/select-function`);
+      } else if (returnTo) {
+        // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: returnTo 지원
+        navigate(returnTo);
       } else {
         navigate(prefix);
       }

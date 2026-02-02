@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
@@ -75,12 +74,9 @@ import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServi
 // Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
-// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-PHARMACY-DEPTH-V1, WO-KPA-PHARMACY-B2B-FUNCTION-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, ServiceLoginPage, ServiceDashboardPage, PharmacyDashboardPage } from './pages/pharmacy';
+// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
-
-// Phase 2-b: Service User Protected Route (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
-import { useAuth } from './contexts';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
 import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommunityPage } from './pages/work';
@@ -105,30 +101,8 @@ import {
 
 const SERVICE_NAME = 'KPA-Society';
 
-/**
- * Service User Protected Route
- * Phase 2-b: WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY
- *
- * Protects routes that require Service User authentication.
- * Redirects to /pharmacy/service-login if not authenticated.
- */
-function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isServiceUserAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!isServiceUserAuthenticated) {
-    return <Navigate to="/pharmacy/service-login" replace />;
-  }
-
-  return <>{children}</>;
-}
+// ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
+// Service User 인증 제거, Platform User 단일 인증으로 통합
 
 function App() {
   return (
@@ -172,15 +146,12 @@ function App() {
           <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicesPage /></Layout>} />
 
           {/* ========================================
-           * 약국 Service User 인증 (Phase 2-b)
-           * WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY
-           * - Platform User와 완전 분리된 Service User 로그인
-           * - /pharmacy/service-login: 서비스 사용자 로그인
-           * - /pharmacy/service/*: 서비스 사용자 전용 영역
+           * 약국 서비스 신청 게이트
+           * WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
+           * - Service User 로그인 제거, Platform User 단일 인증
+           * - 약국 승인 미완료 시 신청 폼 표시
            * ======================================== */}
-          <Route path="/pharmacy/service-login" element={<ServiceLoginPage />} />
-          <Route path="/pharmacy/service" element={<ServiceUserProtectedRoute><ServiceDashboardPage /></ServiceUserProtectedRoute>} />
-          <Route path="/pharmacy/service/dashboard" element={<ServiceUserProtectedRoute><ServiceDashboardPage /></ServiceUserProtectedRoute>} />
+          <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyApprovalGatePage /></Layout>} />
 
           {/* ========================================
            * 근무약사 업무 화면 (개인 기준)

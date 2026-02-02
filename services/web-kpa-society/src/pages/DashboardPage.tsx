@@ -19,7 +19,9 @@ import { colors, shadows, borderRadius } from '../styles/theme';
 import { useAuth, TestUser } from '../contexts/AuthContext';
 import { AiSummaryButton } from '../components/ai';
 import { ExternalServiceSection } from '../components/ServiceBanner';
-import { PharmacyOnboardingBanner } from '../components/pharmacy/PharmacyOnboardingBanner';
+import { MyServicesSection } from '../components/MyServicesSection';
+// PharmacyOnboardingBanner removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
+// 약국 신청은 PharmacyApprovalGatePage에서 처리
 
 // Mock user data (fallback when not logged in)
 const mockUser = {
@@ -244,9 +246,6 @@ export function DashboardPage() {
         </section>
       )}
 
-      {/* Pharmacy Onboarding Banner (pharmacy_owner without pharmacy context) */}
-      <PharmacyOnboardingBanner />
-
       {/* B. Quick Menu */}
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>주요 기능 바로가기</h2>
@@ -356,7 +355,12 @@ export function DashboardPage() {
         </section>
       </div>
 
-      {/* F. External Services - 제휴 서비스 배너 (WO-KPA-MENU-CLEANUP-V1) */}
+      {/* F. Platform Services - 이용 중 / 추천 서비스 (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1) */}
+      <section style={styles.section}>
+        <MyServicesSection />
+      </section>
+
+      {/* G. External Services - 제휴 서비스 배너 (WO-KPA-MENU-CLEANUP-V1) */}
       <ExternalServiceSection />
 
       {/* G. Organization Info */}

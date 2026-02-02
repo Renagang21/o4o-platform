@@ -73,6 +73,10 @@ import { createSiteGuideRoutes } from './routes/siteguide/index.js';
 // Platform Inquiry Routes (contact forms for SaaS operator)
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from './routes/v1/platformInquiry.routes.js';
 
+// Platform Service Catalog (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
+import { createPlatformServicesRoutes } from './routes/platform-services/platform-services.routes.js';
+import { createAdminPlatformServicesRoutes } from './routes/platform-services/admin-platform-services.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -710,6 +714,11 @@ const startServer = async () => {
     app.use('/api/v1/platform', platformInquiryRoutes);
     app.use('/api/v1/admin/platform', platformInquiryAdminRoutes);
     logger.info('✅ Platform Inquiry routes registered at /api/v1/platform and /api/v1/admin/platform');
+
+    // 8.7. Register Platform Service Catalog routes (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
+    app.use('/api/v1/platform-services', createPlatformServicesRoutes(AppDataSource));
+    app.use('/api/v1/admin/platform-services', createAdminPlatformServicesRoutes(AppDataSource));
+    logger.info('✅ Platform Service Catalog routes registered at /api/v1/platform-services');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

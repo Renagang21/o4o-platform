@@ -212,6 +212,12 @@ import {
 import { PlatformInquiry } from '../entities/PlatformInquiry.js';
 
 // ============================================================================
+// PLATFORM SERVICE CATALOG (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
+// ============================================================================
+import { PlatformService } from '../entities/PlatformService.js';
+import { UserServiceEnrollment } from '../entities/UserServiceEnrollment.js';
+
+// ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
@@ -541,6 +547,11 @@ export const AppDataSource = new DataSource({
     // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
     // ============================================================================
     PlatformInquiry,
+    // ============================================================================
+    // PLATFORM SERVICE CATALOG (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
+    // ============================================================================
+    PlatformService,
+    UserServiceEnrollment,
     // ============================================================================
     // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
     // ============================================================================
