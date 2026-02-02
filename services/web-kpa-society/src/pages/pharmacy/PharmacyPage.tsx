@@ -24,11 +24,11 @@ export function PharmacyPage() {
           <h1 style={styles.title}>약국 개설자 서비스입니다</h1>
           <p style={styles.desc}>
             약국을 개설한 약사를 위한 경영지원 서비스입니다.<br />
-            약국 가입 후 이용할 수 있습니다.
+            약사회 회원 계정으로 로그인 후 이용할 수 있습니다.
           </p>
           <div style={styles.actions}>
-            <Link to="/pharmacy/service-login" style={styles.joinBtn}>
-              가입
+            <Link to="/demo/login" style={styles.joinBtn}>
+              로그인
             </Link>
             <button
               type="button"

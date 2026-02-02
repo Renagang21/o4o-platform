@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import toast from 'react-hot-toast';
+import OrganizationBadge from '../components/OrganizationBadge';
 
 
 interface ForumComment {
@@ -342,6 +343,11 @@ const ForumPostDetail: FC = () => {
               {post.isPinned && <Badge variant="secondary">고정</Badge>}
               {post.isLocked && <Badge variant={"outline" as const}>잠김</Badge>}
               <Badge variant={"outline" as const}>{post.category.name}</Badge>
+              <OrganizationBadge
+                organizationId={post.organizationId}
+                isOrganizationExclusive={post.isOrganizationExclusive}
+                size="md"
+              />
               {post.status === 'reported' && <Badge variant="destructive">신고됨</Badge>}
             </div>
             <h1 className="text-2xl font-bold text-modern-text-primary mb-4">{post.title}</h1>

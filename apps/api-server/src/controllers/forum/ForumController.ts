@@ -6,9 +6,10 @@ import { ForumComment, CommentStatus } from '@o4o/forum-core/entities';
 import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o/forum-core';
 import type { ForumPostMetadata } from '@o4o/forum-core';
 import { User } from '../../modules/auth/entities/User.js';
-import { MoreThanOrEqual } from 'typeorm';
+import { MoreThanOrEqual, type SelectQueryBuilder } from 'typeorm';
 import logger from '../../utils/logger.js';
 import { FORUM_ICON_SAMPLES } from './forumIconSamples.js';
+import type { ForumContext } from '../../middleware/forum-context.middleware.js';
 
 /**
  * ForumController
@@ -95,6 +96,9 @@ export class ForumController {
       if (categoryId) {
         queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
       }
+
+      // Forum context filter (service-bound visibility)
+      this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));
 
       // Search filter (search in title and excerpt, since content is JSONB)
       if (query) {
@@ -240,6 +244,9 @@ export class ForumController {
       // Normalize metadata to structured format
       const normalizedMeta = metadata ? normalizeMetadata(metadata) : undefined;
 
+      // Auto-set organizationId from forum context
+      const ctx = this.getForumContext(req);
+
       const post = this.postRepository.create({
         title,
         content: normalizedContent,
@@ -255,6 +262,7 @@ export class ForumController {
         slug,
         status: category?.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
         publishedAt: category?.requireApproval ? undefined : new Date(),
+        ...(ctx?.organizationId ? { organizationId: ctx.organizationId } : {}),
       });
 
       const savedPost = await this.postRepository.save(post);
@@ -421,13 +429,24 @@ export class ForumController {
   async listCategories(req: Request, res: Response): Promise<void> {
     try {
       const includeInactive = req.query.includeInactive === 'true';
+      const ctx = this.getForumContext(req);
 
-      const where = includeInactive ? {} : { isActive: true };
-      const categories = await this.categoryRepository.find({
-        where,
-        order: { isPinned: 'DESC', pinnedOrder: 'ASC', sortOrder: 'ASC', name: 'ASC' },
-        relations: ['creator'],
-      });
+      const qb = this.categoryRepository
+        .createQueryBuilder('cat')
+        .leftJoinAndSelect('cat.creator', 'creator');
+
+      if (!includeInactive) {
+        qb.where('cat.isActive = :isActive', { isActive: true });
+      }
+
+      this.applyContextFilter(qb, 'cat', ctx);
+
+      qb.orderBy('cat.isPinned', 'DESC')
+        .addOrderBy('cat.pinnedOrder', 'ASC')
+        .addOrderBy('cat.sortOrder', 'ASC')
+        .addOrderBy('cat.name', 'ASC');
+
+      const categories = await qb.getMany();
 
       res.json({
         success: true,
@@ -517,6 +536,9 @@ export class ForumController {
 
       const slug = this.generateSlug(name);
 
+      // Auto-set organizationId from forum context
+      const ctx = this.getForumContext(req);
+
       const category = this.categoryRepository.create({
         name,
         description,
@@ -531,6 +553,7 @@ export class ForumController {
         requireApproval: requireApproval || false,
         accessLevel: accessLevel || 'all',
         createdBy: userId,
+        ...(ctx?.organizationId ? { organizationId: ctx.organizationId } : {}),
       });
 
       const savedCategory = await this.categoryRepository.save(category);
@@ -879,6 +902,26 @@ export class ForumController {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      const ctx = this.getForumContext(req);
+
+      // Build context-aware count queries
+      const totalPostsQb = this.postRepository
+        .createQueryBuilder('post')
+        .where('post.status = :s', { s: PostStatus.PUBLISHED });
+      this.applyContextFilter(totalPostsQb, 'post', ctx);
+
+      const todayPostsQb = this.postRepository
+        .createQueryBuilder('post')
+        .where('post.status = :s', { s: PostStatus.PUBLISHED })
+        .andWhere('post."createdAt" >= :today', { today });
+      this.applyContextFilter(todayPostsQb, 'post', ctx);
+
+      const activeCatQb = this.categoryRepository
+        .createQueryBuilder('cat')
+        .where('cat.isActive = true')
+        .orderBy('cat.postCount', 'DESC')
+        .take(10);
+      this.applyContextFilter(activeCatQb, 'cat', ctx);
 
       const [
         totalPosts,
@@ -888,26 +931,17 @@ export class ForumController {
         todayComments,
         activeCategories,
       ] = await Promise.all([
-        this.postRepository.count({ where: { status: PostStatus.PUBLISHED } }),
+        totalPostsQb.getCount(),
         this.commentRepository.count({ where: { status: CommentStatus.PUBLISHED } }),
         this.userRepository.count(),
-        this.postRepository.count({
-          where: {
-            status: PostStatus.PUBLISHED,
-            createdAt: MoreThanOrEqual(today),
-          },
-        }),
+        todayPostsQb.getCount(),
         this.commentRepository.count({
           where: {
             status: CommentStatus.PUBLISHED,
             createdAt: MoreThanOrEqual(today),
           },
         }),
-        this.categoryRepository.find({
-          where: { isActive: true },
-          order: { postCount: 'DESC' },
-          take: 10,
-        }),
+        activeCatQb.getMany(),
       ]);
 
       res.json({
@@ -945,12 +979,17 @@ export class ForumController {
   async getPopularForums(req: Request, res: Response): Promise<void> {
     try {
       const limit = Math.min(parseInt(req.query.limit as string) || 6, 20);
+      const ctx = this.getForumContext(req);
 
       // 1. Fetch pinned categories first (always at top)
-      const pinnedCategories = await this.categoryRepository.find({
-        where: { isActive: true, isPinned: true },
-        order: { pinnedOrder: 'ASC', sortOrder: 'ASC' },
-      });
+      const pinnedQb = this.categoryRepository
+        .createQueryBuilder('cat')
+        .where('cat.isActive = :isActive', { isActive: true })
+        .andWhere('cat.isPinned = :isPinned', { isPinned: true })
+        .orderBy('cat.pinnedOrder', 'ASC')
+        .addOrderBy('cat.sortOrder', 'ASC');
+      this.applyContextFilter(pinnedQb, 'cat', ctx);
+      const pinnedCategories = await pinnedQb.getMany();
 
       const pinnedIds = new Set(pinnedCategories.map((c) => c.id));
       const remainingSlots = Math.max(0, limit - pinnedCategories.length);
@@ -959,7 +998,7 @@ export class ForumController {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const result = await this.postRepository
+      const activityQb = this.postRepository
         .createQueryBuilder('post')
         .select('post.categoryId', 'categoryId')
         .addSelect('COUNT(post.id)', 'postCount7d')
@@ -968,9 +1007,10 @@ export class ForumController {
         .addSelect('MAX(post."createdAt")', 'lastPostAt')
         .where('post.status = :status', { status: PostStatus.PUBLISHED })
         .andWhere('post."createdAt" >= :since', { since: sevenDaysAgo })
-        .andWhere('post."categoryId" IS NOT NULL')
-        .groupBy('post.categoryId')
-        .getRawMany();
+        .andWhere('post."categoryId" IS NOT NULL');
+      this.applyContextFilter(activityQb, 'post', ctx);
+      activityQb.groupBy('post.categoryId');
+      const result = await activityQb.getRawMany();
 
       // Calculate scores with recency bonus
       const now = Date.now();
@@ -1029,22 +1069,25 @@ export class ForumController {
       let popularResults: ReturnType<typeof formatCategory>[] = [];
 
       if (popularCategoryIds.length > 0) {
-        const popularCategories = await this.categoryRepository
+        const popCatQb = this.categoryRepository
           .createQueryBuilder('cat')
           .where('cat.id IN (:...ids)', { ids: popularCategoryIds })
-          .andWhere('cat.isActive = true')
-          .getMany();
+          .andWhere('cat.isActive = true');
+        this.applyContextFilter(popCatQb, 'cat', ctx);
+        const popularCategories = await popCatQb.getMany();
 
         popularResults = popularCategories
           .map((cat) => formatCategory(cat, false))
           .sort((a, b) => b.popularScore - a.popularScore);
       } else if (remainingSlots > 0) {
         // Fallback: fill with active categories by postCount
-        const fallback = await this.categoryRepository.find({
-          where: { isActive: true },
-          order: { postCount: 'DESC' },
-          take: remainingSlots + pinnedCategories.length,
-        });
+        const fallbackQb = this.categoryRepository
+          .createQueryBuilder('cat')
+          .where('cat.isActive = true')
+          .orderBy('cat.postCount', 'DESC')
+          .take(remainingSlots + pinnedCategories.length);
+        this.applyContextFilter(fallbackQb, 'cat', ctx);
+        const fallback = await fallbackQb.getMany();
 
         popularResults = fallback
           .filter((cat) => !pinnedIds.has(cat.id))
@@ -1211,6 +1254,43 @@ export class ForumController {
         success: false,
         error: error.message || 'Failed to moderate content',
       });
+    }
+  }
+
+  // ============================================================================
+  // Forum Context Helpers
+  // ============================================================================
+
+  /**
+   * Extract ForumContext from req (set by forumContextMiddleware).
+   * Returns undefined when no middleware is mounted (generic /api/v1/forum).
+   */
+  private getForumContext(req: Request): ForumContext | undefined {
+    return (req as any).forumContext;
+  }
+
+  /**
+   * Apply organizationId + isOrganizationExclusive filter to a QueryBuilder.
+   *
+   * Rules:
+   * - No context (admin-dashboard /api/v1/forum): no filter → see everything
+   * - Context with organizationId: show non-exclusive + matching exclusive
+   * - Context without organizationId: show only non-exclusive
+   */
+  private applyContextFilter<T>(
+    qb: SelectQueryBuilder<T>,
+    alias: string,
+    ctx: ForumContext | undefined,
+  ): void {
+    if (!ctx) return; // admin/generic route — no filter
+
+    if (ctx.organizationId) {
+      qb.andWhere(
+        `(${alias}."isOrganizationExclusive" = false OR ${alias}."organizationId" = :ctxOrgId)`,
+        { ctxOrgId: ctx.organizationId },
+      );
+    } else {
+      qb.andWhere(`${alias}."isOrganizationExclusive" = false`);
     }
   }
 

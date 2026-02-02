@@ -11,6 +11,34 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 
+interface ForumPostAuthor {
+  id: string;
+  name?: string;
+  email?: string;
+}
+
+interface ForumPostCategory {
+  id: string;
+  name: string;
+  slug?: string;
+}
+
+interface ForumPostRaw {
+  id: string;
+  title: string;
+  excerpt?: string;
+  slug?: string;
+  author?: ForumPostAuthor | null;
+  authorId?: string;
+  category?: ForumPostCategory | null;
+  categoryId?: string;
+  viewCount: number;
+  commentCount: number;
+  createdAt: string;
+  isPinned?: boolean;
+  status?: string;
+}
+
 interface ForumPost {
   id: string;
   title: string;
@@ -22,6 +50,21 @@ interface ForumPost {
   comments: number;
   createdAt: string;
   isHot: boolean;
+}
+
+function normalizePost(raw: ForumPostRaw): ForumPost {
+  return {
+    id: raw.id,
+    title: raw.title || '(제목 없음)',
+    author: raw.author?.name || raw.author?.email?.split('@')[0] || '익명',
+    authorRole: '',
+    category: raw.category?.name || '일반',
+    views: raw.viewCount || 0,
+    likes: 0,
+    comments: raw.commentCount || 0,
+    createdAt: raw.createdAt,
+    isHot: (raw.viewCount || 0) >= 50 || (raw.commentCount || 0) >= 10,
+  };
 }
 
 const categories = ['전체', 'CGM', '혈당측정기', '상담', '영양', '의약품', '기타'];
@@ -66,9 +109,13 @@ export default function ForumPage() {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    apiClient.get<ForumPost[]>('/api/v1/glycopharm/forum/posts')
+    apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=50')
       .then((res) => {
-        if (res.data) setAllPosts(res.data);
+        if (Array.isArray(res.data)) {
+          setAllPosts(res.data.map(normalizePost));
+        } else {
+          setAllPosts([]);
+        }
       })
       .catch(() => {
         setError('게시글을 불러오지 못했습니다.');

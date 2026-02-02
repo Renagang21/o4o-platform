@@ -17,9 +17,38 @@ import { apiClient } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 // ============================================================================
-// Types
+// Types (matches backend ForumController.listPosts / listCategories response)
 // ============================================================================
 
+interface ForumPostAuthor {
+  id: string;
+  name?: string;
+  email?: string;
+}
+
+interface ForumPostCategory {
+  id: string;
+  name: string;
+  slug?: string;
+}
+
+interface ForumPostRaw {
+  id: string;
+  title: string;
+  excerpt?: string;
+  slug?: string;
+  author?: ForumPostAuthor | null;
+  authorId?: string;
+  category?: ForumPostCategory | null;
+  categoryId?: string;
+  viewCount: number;
+  commentCount: number;
+  createdAt: string;
+  isPinned?: boolean;
+  status?: string;
+}
+
+/** Normalized post for display */
 interface ForumPost {
   id: string;
   title: string;
@@ -33,6 +62,21 @@ interface ForumPost {
   isHot: boolean;
 }
 
+function normalizePost(raw: ForumPostRaw): ForumPost {
+  return {
+    id: raw.id,
+    title: raw.title || '(제목 없음)',
+    author: raw.author?.name || raw.author?.email?.split('@')[0] || '익명',
+    authorRole: '',
+    category: raw.category?.name || '일반',
+    views: raw.viewCount || 0,
+    likes: 0,
+    comments: raw.commentCount || 0,
+    createdAt: raw.createdAt,
+    isHot: (raw.viewCount || 0) >= 50 || (raw.commentCount || 0) >= 10,
+  };
+}
+
 interface PopularForum {
   id: string;
   name: string;
@@ -40,6 +84,7 @@ interface PopularForum {
   slug: string;
   color?: string | null;
   iconUrl?: string | null;
+  iconEmoji?: string | null;
   postCount: number;
   popularScore: number;
   postCount7d: number;
@@ -109,9 +154,13 @@ function PopularForumsSection() {
   const [forums, setForums] = useState<PopularForum[]>([]);
 
   useEffect(() => {
-    apiClient.get<{ success: boolean; data: PopularForum[] }>('/api/v1/forum/categories/popular?limit=4')
+    apiClient.get<PopularForum[]>('/api/v1/glycopharm/forum/categories')
       .then((res) => {
-        if (res.data?.data) setForums(res.data.data);
+        if (Array.isArray(res.data)) {
+          // Sort by postCount descending and take top 4
+          const sorted = [...res.data].sort((a, b) => (b.postCount || 0) - (a.postCount || 0));
+          setForums(sorted.slice(0, 4));
+        }
       })
       .catch(() => {});
   }, []);
@@ -135,7 +184,7 @@ function PopularForumsSection() {
             >
               {forum.iconUrl ? (
                 <img src={forum.iconUrl} alt={forum.name} className="w-12 h-12 rounded-xl object-cover" />
-              ) : '📂'}
+              ) : forum.iconEmoji || '📂'}
             </div>
             <div className="text-center">
               <h3 className="text-sm font-semibold text-slate-800">{forum.name}</h3>
@@ -163,11 +212,12 @@ function ActivitySection() {
   const [popularPosts, setPopularPosts] = useState<ForumPost[]>([]);
 
   useEffect(() => {
-    apiClient.get<ForumPost[]>('/api/v1/glycopharm/forum/posts')
+    apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=10')
       .then((res) => {
-        if (res.data) {
-          setRecentPosts(res.data.slice(0, 5));
-          const sorted = [...res.data].sort((a, b) => b.views - a.views);
+        if (Array.isArray(res.data)) {
+          const posts = res.data.map(normalizePost);
+          setRecentPosts(posts.slice(0, 5));
+          const sorted = [...posts].sort((a, b) => b.views - a.views);
           setPopularPosts(sorted.slice(0, 5));
         }
       })

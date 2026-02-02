@@ -33,6 +33,8 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
+import { forumContextDynamic } from '../../middleware/forum-context.middleware.js';
+import { KpaMember } from './entities/kpa-member.entity.js';
 
 // LMS Controllers
 import { CourseController } from '../../modules/lms/controllers/CourseController.js';
@@ -103,6 +105,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const forumRouter = Router();
   const forumController = new ForumController();
+
+  // Inject service context: resolve organizationId from user's KPA membership
+  forumRouter.use(forumContextDynamic('kpa', async (userId) => {
+    if (!userId) return null;
+    const member = await dataSource.getRepository(KpaMember).findOne({
+      where: { user_id: userId },
+    });
+    return member?.organization_id ?? null;
+  }));
 
   // Health check
   forumRouter.get('/health', forumController.health.bind(forumController));

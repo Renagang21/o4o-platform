@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import OrganizationBadge from '../components/OrganizationBadge';
 
 interface ForumCategory {
   id: string;
@@ -38,6 +39,8 @@ interface ForumPost {
   replyCount: number;
   isPinned: boolean;
   isLocked: boolean;
+  organizationId?: string | null;
+  isOrganizationExclusive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -174,6 +177,9 @@ const ForumBoardList: FC = () => {
                   카테고리
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
+                  조직
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
                   작성자
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
@@ -193,7 +199,7 @@ const ForumBoardList: FC = () => {
             <tbody className="bg-white divide-y divide-modern-border-primary">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={8} className="px-6 py-12 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-modern-primary"></div>
                     </div>
@@ -201,7 +207,7 @@ const ForumBoardList: FC = () => {
                 </tr>
               ) : posts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-modern-text-secondary">
+                  <td colSpan={8} className="px-6 py-12 text-center text-modern-text-secondary">
                     게시글이 없습니다.
                   </td>
                 </tr>
@@ -230,6 +236,12 @@ const ForumBoardList: FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Badge variant={"outline" as const}>{post.category.name}</Badge>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <OrganizationBadge
+                        organizationId={post.organizationId}
+                        isOrganizationExclusive={post.isOrganizationExclusive}
+                      />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">

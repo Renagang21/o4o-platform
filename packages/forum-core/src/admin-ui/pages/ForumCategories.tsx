@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
+import OrganizationBadge from '../components/OrganizationBadge';
 
 interface ForumCategory {
   id: string;
@@ -25,6 +26,8 @@ interface ForumCategory {
   postCount: number;
   active: boolean;
   order: number;
+  organizationId?: string | null;
+  isOrganizationExclusive?: boolean;
 }
 
 interface CategoryFormData {
@@ -199,6 +202,9 @@ const ForumCategories: FC = () => {
                   설명
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
+                  조직
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
                   게시글 수
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
@@ -212,7 +218,7 @@ const ForumCategories: FC = () => {
             <tbody className="bg-white divide-y divide-modern-border-primary">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-modern-primary"></div>
                     </div>
@@ -220,7 +226,7 @@ const ForumCategories: FC = () => {
                 </tr>
               ) : categories.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-modern-text-secondary">
+                  <td colSpan={7} className="px-6 py-12 text-center text-modern-text-secondary">
                     카테고리가 없습니다.
                   </td>
                 </tr>
@@ -240,6 +246,12 @@ const ForumCategories: FC = () => {
                       <p className="text-sm text-modern-text-secondary truncate max-w-xs">
                         {category.description || '-'}
                       </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <OrganizationBadge
+                        organizationId={category.organizationId}
+                        isOrganizationExclusive={category.isOrganizationExclusive}
+                      />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
                       {category.postCount}

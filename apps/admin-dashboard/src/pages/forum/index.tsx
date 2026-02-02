@@ -34,6 +34,7 @@ import { apiEndpoints } from '@/config/apps.config';
 
 // Shared types (Phase 19-B)
 import type { ForumCategoryResponse } from '@o4o/types/forum';
+import OrganizationBadge from '@o4o/forum-core/src/admin-ui/components/OrganizationBadge';
 
 interface ForumStats {
   totalPosts: number;
@@ -44,7 +45,7 @@ interface ForumStats {
 }
 
 // Extends shared ForumCategoryResponse with admin-specific fields
-interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount' | 'iconUrl' | 'isPinned' | 'iconEmoji'> {
+interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount' | 'iconUrl' | 'isPinned' | 'iconEmoji' | 'organizationId' | 'isOrganizationExclusive'> {
   order: number;
 }
 
@@ -277,6 +278,10 @@ export default function ForumDashboard() {
                             {category.isPinned && (
                               <Pin className="w-3.5 h-3.5 text-primary" />
                             )}
+                            <OrganizationBadge
+                              organizationId={category.organizationId}
+                              isOrganizationExclusive={category.isOrganizationExclusive}
+                            />
                           </div>
                           {category.description && (
                             <p className="text-sm text-muted-foreground">{category.description}</p>

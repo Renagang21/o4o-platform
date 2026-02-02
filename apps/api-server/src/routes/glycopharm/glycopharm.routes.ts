@@ -22,6 +22,8 @@ import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../.
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
+import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
+import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
 
 /**
  * Scope verification middleware factory for Glycopharm
@@ -116,6 +118,9 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const forumRouter = Router();
   const forumController = new ForumController();
+
+  // Inject service context for all forum routes
+  forumRouter.use(forumContextMiddleware({ serviceCode: 'glycopharm', organizationId: FORUM_ORGS.GLYCOPHARM }));
 
   // Health check
   forumRouter.get('/health', forumController.health.bind(forumController));
