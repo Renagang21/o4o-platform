@@ -18,10 +18,12 @@ import { useAuth } from '../../contexts';
 import {
   fetchForumPosts,
   fetchForumCategories,
+  fetchPopularForums,
   normalizePostType,
   getAuthorName,
   type ForumPost,
   type ForumCategory,
+  type PopularForum,
 } from '../../services/forumApi';
 
 // ============================================================================
@@ -91,6 +93,23 @@ function getForumIcon(category: ForumCategory): string {
   if (category.iconUrl) return '';
   if (category.iconEmoji) return category.iconEmoji;
   return FALLBACK_ICONS[category.name] || DEFAULT_FORUM_ICON;
+}
+
+/** Activity signal per category */
+interface CategoryActivity {
+  postCount7d: number;
+  commentSum7d: number;
+  latestPostTitle?: string;
+  latestPostDate?: string;
+}
+
+function getActivityBadge(activity?: CategoryActivity): { label: string; className: string } | null {
+  if (!activity?.latestPostDate) return null;
+  const diff = Date.now() - new Date(activity.latestPostDate).getTime();
+  const hours = diff / (1000 * 60 * 60);
+  if (hours <= 24) return { label: '오늘 글 있음', className: 'bg-blue-500 text-white' };
+  if (hours <= 168) return { label: '최근 활동', className: 'bg-slate-100 text-slate-600' };
+  return null;
 }
 
 function formatDate(dateStr: string): string {
@@ -164,8 +183,8 @@ function HeroHeader({ title, description, basePath }: { title: string; descripti
   );
 }
 
-/** Forum Card Grid — 카테고리 카드 (다음 카페 스타일 핵심 UI) */
-function ForumCardGrid({ categories, basePath }: { categories: ForumCategory[]; basePath: string }) {
+/** Forum Card Grid — 카테고리 카드 (다음 카페 스타일 핵심 UI) + 활동 신호 */
+function ForumCardGrid({ categories, basePath, activityMap }: { categories: ForumCategory[]; basePath: string; activityMap: Record<string, CategoryActivity> }) {
   if (categories.length === 0) {
     return (
       <section className="py-8">
@@ -185,38 +204,57 @@ function ForumCardGrid({ categories, basePath }: { categories: ForumCategory[]; 
         <span className="text-sm text-slate-400">{categories.length}개 포럼</span>
       </div>
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            to={`${basePath}?category=${cat.id}`}
-            className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group"
-          >
-            <ForumIcon category={cat} size={52} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="text-[15px] font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                  {cat.name}
-                </h3>
-                {cat.isPinned && (
-                  <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                    추천
-                  </span>
+        {categories.map((cat) => {
+          const activity = activityMap[cat.id];
+          const badge = getActivityBadge(activity);
+          return (
+            <Link
+              key={cat.id}
+              to={`${basePath}?category=${cat.id}`}
+              className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group"
+            >
+              <ForumIcon category={cat} size={52} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[15px] font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                    {cat.name}
+                  </h3>
+                  {cat.isPinned && (
+                    <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                      추천
+                    </span>
+                  )}
+                  {badge && (
+                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  )}
+                </div>
+                {cat.description && (
+                  <p className="mt-0.5 text-xs text-slate-400 truncate">{cat.description}</p>
                 )}
+                {activity?.latestPostTitle && (
+                  <p className="mt-0.5 text-xs text-slate-500 truncate">
+                    최근: {activity.latestPostTitle}
+                  </p>
+                )}
+                <div className="flex items-center gap-3 mt-1.5">
+                  <span className="text-[11px] text-slate-400">
+                    글 {cat.postCount ?? 0}개
+                  </span>
+                  {activity && activity.postCount7d > 0 && (
+                    <span className="text-[11px] text-blue-500">
+                      이번 주 글 {activity.postCount7d}{activity.commentSum7d > 0 ? ` · 댓글 ${activity.commentSum7d}` : ''}
+                    </span>
+                  )}
+                </div>
               </div>
-              {cat.description && (
-                <p className="mt-0.5 text-xs text-slate-400 truncate">{cat.description}</p>
-              )}
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-[11px] text-slate-400">
-                  글 {cat.postCount ?? 0}개
-                </span>
-              </div>
-            </div>
-            <svg className="w-5 h-5 text-slate-300 group-hover:text-blue-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        ))}
+              <svg className="w-5 h-5 text-slate-300 group-hover:text-blue-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -425,11 +463,62 @@ export default function ForumHubPage({
   guidelines = DEFAULT_GUIDELINES,
 }: ForumHubPageProps) {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
+  const [activityMap, setActivityMap] = useState<Record<string, CategoryActivity>>({});
 
   useEffect(() => {
     fetchForumCategories()
       .then((res) => {
         if (res.success && res.data) setCategories(res.data);
+      })
+      .catch(() => {});
+
+    // Fetch 7d stats from popular forums endpoint
+    fetchPopularForums(50)
+      .then((res) => {
+        if (res.success && res.data) {
+          const map: Record<string, CategoryActivity> = {};
+          res.data.forEach((f: PopularForum) => {
+            map[f.id] = {
+              postCount7d: f.postCount7d,
+              commentSum7d: f.commentSum7d,
+            };
+          });
+          setActivityMap((prev) => {
+            const merged = { ...prev };
+            Object.keys(map).forEach((id) => {
+              merged[id] = { ...merged[id], ...map[id] };
+            });
+            return merged;
+          });
+        }
+      })
+      .catch(() => {});
+
+    // Fetch recent posts for latest post preview per category
+    fetchForumPosts({ limit: 30, sortBy: 'latest' })
+      .then((res) => {
+        if (res.data) {
+          const latestByCategory: Record<string, { title: string; date: string }> = {};
+          res.data.forEach((post) => {
+            const catId = post.categoryId || post.category?.id;
+            if (catId && !latestByCategory[catId]) {
+              latestByCategory[catId] = { title: post.title, date: post.createdAt };
+            }
+          });
+          setActivityMap((prev) => {
+            const merged = { ...prev };
+            Object.entries(latestByCategory).forEach(([id, info]) => {
+              merged[id] = {
+                ...merged[id],
+                postCount7d: merged[id]?.postCount7d ?? 0,
+                commentSum7d: merged[id]?.commentSum7d ?? 0,
+                latestPostTitle: info.title,
+                latestPostDate: info.date,
+              };
+            });
+            return merged;
+          });
+        }
       })
       .catch(() => {});
   }, []);
@@ -439,8 +528,8 @@ export default function ForumHubPage({
       <HeroHeader title={title} description={description} basePath={basePath} />
 
       <div className="max-w-[1040px] mx-auto px-4 md:px-6 pb-12">
-        {/* 1차 콘텐츠: 포럼(카테고리) 카드 */}
-        <ForumCardGrid categories={categories} basePath={basePath} />
+        {/* 1차 콘텐츠: 포럼(카테고리) 카드 + 활동 신호 */}
+        <ForumCardGrid categories={categories} basePath={basePath} activityMap={activityMap} />
 
         {/* 2차 콘텐츠: 인기 글 + 최근 글 */}
         <ActivitySection basePath={basePath} />

@@ -73,6 +73,25 @@ function getForumIcon(forum: PopularForum): string {
   return FALLBACK_ICONS[forum.name] || DEFAULT_FORUM_ICON;
 }
 
+/** Activity signal per forum */
+interface ForumActivity {
+  latestPostTitle?: string;
+  latestPostDate?: string;
+}
+
+function getActivityBadge(forum: PopularForum, activity?: ForumActivity): { label: string; className: string } | null {
+  const dateStr = activity?.latestPostDate;
+  if (!dateStr) {
+    if (forum.postCount7d > 0) return { label: '최근 활동', className: 'bg-slate-100 text-slate-600' };
+    return null;
+  }
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const hours = diff / (1000 * 60 * 60);
+  if (hours <= 24) return { label: '오늘 글 있음', className: 'bg-pink-500 text-white' };
+  if (hours <= 168) return { label: '최근 활동', className: 'bg-slate-100 text-slate-600' };
+  return null;
+}
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
@@ -146,8 +165,8 @@ function HeroHeader({ basePath }: { basePath: string }) {
   );
 }
 
-/** Forum Card Grid — 카테고리(포럼) 카드 (핵심 1차 콘텐츠) */
-function ForumCardGrid({ forums, basePath }: { forums: PopularForum[]; basePath: string }) {
+/** Forum Card Grid — 카테고리(포럼) 카드 (핵심 1차 콘텐츠) + 활동 신호 */
+function ForumCardGrid({ forums, basePath, activityMap }: { forums: PopularForum[]; basePath: string; activityMap: Record<string, ForumActivity> }) {
   if (forums.length === 0) {
     return (
       <section className="py-8">
@@ -167,38 +186,52 @@ function ForumCardGrid({ forums, basePath }: { forums: PopularForum[]; basePath:
         <span className="text-sm text-slate-400">{forums.length}개 포럼</span>
       </div>
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
-        {forums.map((forum) => (
-          <Link
-            key={forum.id}
-            to={`${basePath}?category=${forum.id}`}
-            className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group"
-          >
-            <ForumIcon forum={forum} size={52} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="text-[15px] font-semibold text-slate-800 group-hover:text-pink-600 transition-colors">
-                  {forum.name}
-                </h3>
-              </div>
-              {forum.description && (
-                <p className="mt-0.5 text-xs text-slate-400 truncate">{forum.description}</p>
-              )}
-              <div className="flex items-center gap-3 mt-1.5">
-                <span className="text-[11px] text-slate-400">
-                  글 {forum.postCount ?? 0}개
-                </span>
-                {forum.postCount7d > 0 && (
-                  <span className="text-[11px] text-pink-500">
-                    이번 주 +{forum.postCount7d}
-                  </span>
+        {forums.map((forum) => {
+          const activity = activityMap[forum.id];
+          const badge = getActivityBadge(forum, activity);
+          return (
+            <Link
+              key={forum.id}
+              to={`${basePath}?category=${forum.id}`}
+              className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group"
+            >
+              <ForumIcon forum={forum} size={52} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[15px] font-semibold text-slate-800 group-hover:text-pink-600 transition-colors">
+                    {forum.name}
+                  </h3>
+                  {badge && (
+                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  )}
+                </div>
+                {forum.description && (
+                  <p className="mt-0.5 text-xs text-slate-400 truncate">{forum.description}</p>
                 )}
+                {activity?.latestPostTitle && (
+                  <p className="mt-0.5 text-xs text-slate-500 truncate">
+                    최근: {activity.latestPostTitle}
+                  </p>
+                )}
+                <div className="flex items-center gap-3 mt-1.5">
+                  <span className="text-[11px] text-slate-400">
+                    글 {forum.postCount ?? 0}개
+                  </span>
+                  {forum.postCount7d > 0 && (
+                    <span className="text-[11px] text-pink-500">
+                      이번 주 글 {forum.postCount7d}{forum.commentSum7d > 0 ? ` · 댓글 ${forum.commentSum7d}` : ''}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-            <svg className="w-5 h-5 text-slate-300 group-hover:text-pink-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        ))}
+              <svg className="w-5 h-5 text-slate-300 group-hover:text-pink-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -387,11 +420,31 @@ function InfoSection({ basePath }: { basePath: string }) {
 export function ForumHubPage() {
   const basePath = '/forum';
   const [forums, setForums] = useState<PopularForum[]>([]);
+  const [activityMap, setActivityMap] = useState<Record<string, ForumActivity>>({});
 
   useEffect(() => {
     fetchPopularForums(20)
       .then((res) => {
         if (res.success && res.data) setForums(res.data);
+      })
+      .catch(() => {});
+
+    // Fetch recent posts for latest post preview per category
+    fetchForumPosts({ limit: 30 })
+      .then((res) => {
+        if (res.data) {
+          const latestByCategory: Record<string, ForumActivity> = {};
+          res.data.forEach((post) => {
+            const catId = (post as any).categoryId || (post as any).category?.id;
+            if (catId && !latestByCategory[catId]) {
+              latestByCategory[catId] = {
+                latestPostTitle: post.title,
+                latestPostDate: post.createdAt,
+              };
+            }
+          });
+          setActivityMap(latestByCategory);
+        }
       })
       .catch(() => {});
   }, []);
@@ -401,7 +454,7 @@ export function ForumHubPage() {
       <HeroHeader basePath={basePath} />
 
       <div className="max-w-[1040px] mx-auto px-4 md:px-6 pb-12">
-        <ForumCardGrid forums={forums} basePath={basePath} />
+        <ForumCardGrid forums={forums} basePath={basePath} activityMap={activityMap} />
         <ActivitySection basePath={basePath} />
         <WritePrompt basePath={basePath} />
         <InfoSection basePath={basePath} />

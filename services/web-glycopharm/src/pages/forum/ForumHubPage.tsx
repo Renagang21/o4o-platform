@@ -106,6 +106,54 @@ function getForumIcon(cat: ForumCategory): string {
   return FALLBACK_ICONS[cat.name] || DEFAULT_FORUM_ICON;
 }
 
+/** Activity signal per category (derived from posts) */
+interface CategoryActivity {
+  postCount7d: number;
+  commentSum7d: number;
+  latestPostTitle?: string;
+  latestPostDate?: string;
+}
+
+function getActivityBadge(activity?: CategoryActivity): { label: string; className: string } | null {
+  if (!activity?.latestPostDate) return null;
+  const diff = Date.now() - new Date(activity.latestPostDate).getTime();
+  const hours = diff / (1000 * 60 * 60);
+  if (hours <= 24) return { label: '오늘 글 있음', className: 'bg-emerald-500 text-white' };
+  if (hours <= 168) return { label: '최근 활동', className: 'bg-slate-100 text-slate-600' };
+  return null;
+}
+
+function buildActivityMap(posts: ForumPostRaw[]): Record<string, CategoryActivity> {
+  const now = Date.now();
+  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const map: Record<string, CategoryActivity> = {};
+
+  posts.forEach((post) => {
+    const catId = post.category?.id || post.categoryId;
+    if (!catId) return;
+
+    if (!map[catId]) {
+      map[catId] = { postCount7d: 0, commentSum7d: 0 };
+    }
+
+    const postTime = new Date(post.createdAt).getTime();
+
+    // Latest post for this category
+    if (!map[catId].latestPostDate || postTime > new Date(map[catId].latestPostDate!).getTime()) {
+      map[catId].latestPostTitle = post.title;
+      map[catId].latestPostDate = post.createdAt;
+    }
+
+    // Count posts within 7 days
+    if (postTime >= weekAgo) {
+      map[catId].postCount7d++;
+      map[catId].commentSum7d += post.commentCount || 0;
+    }
+  });
+
+  return map;
+}
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
@@ -179,8 +227,8 @@ function HeroHeader() {
   );
 }
 
-/** Forum Card Grid — 카테고리 카드 (핵심 1차 콘텐츠) */
-function ForumCardGrid({ categories }: { categories: ForumCategory[] }) {
+/** Forum Card Grid — 카테고리 카드 (핵심 1차 콘텐츠) + 활동 신호 */
+function ForumCardGrid({ categories, activityMap }: { categories: ForumCategory[]; activityMap: Record<string, CategoryActivity> }) {
   if (categories.length === 0) {
     return (
       <section className="py-8">
@@ -200,38 +248,57 @@ function ForumCardGrid({ categories }: { categories: ForumCategory[] }) {
         <span className="text-sm text-slate-400">{categories.length}개 포럼</span>
       </div>
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            to={`/forum?category=${cat.slug}`}
-            className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group"
-          >
-            <ForumIcon category={cat} size={52} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="text-[15px] font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors">
-                  {cat.name}
-                </h3>
-                {cat.isPinned && (
-                  <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                    추천
-                  </span>
+        {categories.map((cat) => {
+          const activity = activityMap[cat.id];
+          const badge = getActivityBadge(activity);
+          return (
+            <Link
+              key={cat.id}
+              to={`/forum?category=${cat.slug}`}
+              className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors group"
+            >
+              <ForumIcon category={cat} size={52} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[15px] font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors">
+                    {cat.name}
+                  </h3>
+                  {cat.isPinned && (
+                    <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      추천
+                    </span>
+                  )}
+                  {badge && (
+                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  )}
+                </div>
+                {cat.description && (
+                  <p className="mt-0.5 text-xs text-slate-400 truncate">{cat.description}</p>
                 )}
+                {activity?.latestPostTitle && (
+                  <p className="mt-0.5 text-xs text-slate-500 truncate">
+                    최근: {activity.latestPostTitle}
+                  </p>
+                )}
+                <div className="flex items-center gap-3 mt-1.5">
+                  <span className="text-[11px] text-slate-400">
+                    글 {cat.postCount ?? 0}개
+                  </span>
+                  {activity && activity.postCount7d > 0 && (
+                    <span className="text-[11px] text-emerald-500">
+                      이번 주 글 {activity.postCount7d}{activity.commentSum7d > 0 ? ` · 댓글 ${activity.commentSum7d}` : ''}
+                    </span>
+                  )}
+                </div>
               </div>
-              {cat.description && (
-                <p className="mt-0.5 text-xs text-slate-400 truncate">{cat.description}</p>
-              )}
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-[11px] text-slate-400">
-                  글 {cat.postCount ?? 0}개
-                </span>
-              </div>
-            </div>
-            <svg className="w-5 h-5 text-slate-300 group-hover:text-emerald-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        ))}
+              <svg className="w-5 h-5 text-slate-300 group-hover:text-emerald-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -416,12 +483,22 @@ function InfoSection() {
 
 export default function ForumHubPage() {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
+  const [activityMap, setActivityMap] = useState<Record<string, CategoryActivity>>({});
 
   useEffect(() => {
     apiClient.get<ForumCategory[]>('/api/v1/glycopharm/forum/categories')
       .then((res) => {
         if (Array.isArray(res.data)) {
           setCategories(res.data);
+        }
+      })
+      .catch(() => {});
+
+    // Fetch recent posts to build activity signals
+    apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=30')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setActivityMap(buildActivityMap(res.data));
         }
       })
       .catch(() => {});
@@ -432,8 +509,8 @@ export default function ForumHubPage() {
       <HeroHeader />
 
       <div className="max-w-[1040px] mx-auto px-4 md:px-6 pb-12">
-        {/* 1차 콘텐츠: 포럼(카테고리) 카드 */}
-        <ForumCardGrid categories={categories} />
+        {/* 1차 콘텐츠: 포럼(카테고리) 카드 + 활동 신호 */}
+        <ForumCardGrid categories={categories} activityMap={activityMap} />
 
         {/* 2차 콘텐츠: 인기 글 + 최근 글 */}
         <ActivitySection />
