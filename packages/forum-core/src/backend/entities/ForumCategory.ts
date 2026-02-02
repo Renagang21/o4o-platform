@@ -28,6 +28,9 @@ export class ForumCategory {
   @Column({ type: 'varchar', length: 50, nullable: true })
   color?: string;
 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  iconUrl?: string;
+
   @Column({ type: 'int', default: 0 })
   sortOrder!: number;
 

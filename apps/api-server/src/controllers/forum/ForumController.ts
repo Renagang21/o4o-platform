@@ -501,7 +501,7 @@ export class ForumController {
         return;
       }
 
-      const { name, description, color, sortOrder, isActive, requireApproval, accessLevel } = req.body;
+      const { name, description, color, iconUrl, sortOrder, isActive, requireApproval, accessLevel } = req.body;
 
       const slug = this.generateSlug(name);
 
@@ -510,6 +510,7 @@ export class ForumController {
         description,
         slug,
         color,
+        iconUrl,
         sortOrder: sortOrder || 0,
         isActive: isActive !== false,
         requireApproval: requireApproval || false,
@@ -558,7 +559,7 @@ export class ForumController {
         return;
       }
 
-      const { name, description, color, sortOrder, isActive, requireApproval, accessLevel } = req.body;
+      const { name, description, color, iconUrl, sortOrder, isActive, requireApproval, accessLevel } = req.body;
 
       // Update slug if name changed
       if (name && name !== category.name) {
@@ -569,6 +570,7 @@ export class ForumController {
       if (name !== undefined) category.name = name;
       if (description !== undefined) category.description = description;
       if (color !== undefined) category.color = color;
+      if (iconUrl !== undefined) category.iconUrl = iconUrl;
       if (sortOrder !== undefined) category.sortOrder = sortOrder;
       if (isActive !== undefined) category.isActive = isActive;
       if (requireApproval !== undefined) category.requireApproval = requireApproval;

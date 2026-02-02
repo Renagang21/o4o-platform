@@ -43,7 +43,7 @@ interface ForumStats {
 }
 
 // Extends shared ForumCategoryResponse with admin-specific fields
-interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount'> {
+interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount' | 'iconUrl'> {
   order: number;
 }
 
@@ -242,7 +242,15 @@ export default function ForumDashboard() {
                       onClick={() => navigate(`/forum/boards?category=${category.slug}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <Folder className="w-5 h-5 text-muted-foreground" />
+                        {category.iconUrl ? (
+                          <img
+                            src={category.iconUrl}
+                            alt={category.name}
+                            className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <Folder className="w-5 h-5 text-muted-foreground" />
+                        )}
                         <div>
                           <p className="font-medium">{category.name}</p>
                           {category.description && (

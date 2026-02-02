@@ -1,11 +1,11 @@
 /**
  * ForumHubPage - 포럼 허브 랜딩 페이지
  *
- * 통합 포럼 허브 디자인 (모든 서비스 공통 UI-UX)
+ * WO-O4O-FORUM-HUB-UI-REDESIGN-IMPLEMENTATION-V1
+ * Daum 커뮤니티 스타일 UI 전면 개편
  *
  * ForumHubPage
- * ├─ Header (타이틀 + 설명)
- * ├─ QuickActions (글쓰기, 전체 글, 인기 글, 공지사항)
+ * ├─ Header (타이틀 + 설명 + 글쓰기 CTA)
  * ├─ ActivitySection (최근 글 + 인기 글 2열 그리드)
  * ├─ WritePrompt (글쓰기 유도 CTA)
  * └─ InfoSection (이용안내 + 바로가기)
@@ -13,7 +13,6 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Pencil, FileText, Flame, Megaphone } from 'lucide-react';
 import { apiClient } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -35,56 +34,58 @@ interface ForumPost {
 }
 
 // ============================================================================
+// Helpers
+// ============================================================================
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+
+  if (hours < 1) return '방금 전';
+  if (hours < 24) return `${hours}시간 전`;
+  if (hours < 48) return '어제';
+  return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+}
+
+// ============================================================================
 // Sub-components
 // ============================================================================
 
-const quickActions = [
-  { label: '글쓰기', href: '/forum', icon: Pencil },
-  { label: '전체 글', href: '/forum', icon: FileText },
-  { label: '인기 글', href: '/forum', icon: Flame },
-  { label: '공지사항', href: '/forum', icon: Megaphone },
-];
-
-function QuickActions() {
-  return (
-    <section className="py-6">
-      <div className="flex justify-center gap-4 flex-wrap">
-        {quickActions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Link
-              key={action.label}
-              to={action.href}
-              className="flex flex-col items-center gap-2 px-6 py-4 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-600 hover:shadow-md hover:border-primary-200 transition-all min-w-[80px]"
-            >
-              <Icon className="w-6 h-6" />
-              <span className="text-sm font-medium">{action.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 function PostItem({ post }: { post: ForumPost }) {
   return (
-    <li className="py-2 border-b border-slate-50">
-      <div className="flex items-center gap-1.5 text-sm text-slate-700">
-        {post.isHot && (
-          <span className="inline-block px-1.5 py-0.5 rounded text-[11px] font-medium bg-red-50 text-red-600">HOT</span>
-        )}
-        <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-500 shrink-0">
-          {post.category}
-        </span>
-        <span className="truncate">{post.title}</span>
-      </div>
-      <div className="flex gap-1 mt-1 text-xs text-slate-400">
-        <span>{post.author}</span>
-        <span>·</span>
-        <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
-        <span>·</span>
-        <span>댓글 {post.comments}</span>
+    <li className="py-2.5 border-b border-slate-50 last:border-b-0">
+      <div className="group">
+        <div className="flex items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              {post.isHot && (
+                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-500 text-white">
+                  HOT
+                </span>
+              )}
+              <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500">
+                {post.category}
+              </span>
+              <span className="text-sm text-slate-700 group-hover:text-emerald-600 transition-colors truncate">
+                {post.title}
+              </span>
+              {post.comments > 0 && (
+                <span className="text-xs text-emerald-500 font-medium flex-shrink-0">
+                  [{post.comments}]
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 mt-1 text-xs text-slate-400">
+              <span>{post.author}</span>
+              <span className="text-slate-300">·</span>
+              <span>{formatDate(post.createdAt)}</span>
+              <span className="text-slate-300">·</span>
+              <span>조회 {post.views}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </li>
   );
@@ -107,41 +108,52 @@ function ActivitySection() {
   }, []);
 
   return (
-    <section className="py-8">
-      <h2 className="text-lg font-semibold text-slate-800 mb-4">최근 활동</h2>
+    <section className="py-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* 최근 글 */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
-          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
-            <h3 className="text-[15px] font-semibold text-slate-800">최근 글</h3>
-            <Link to="/forum" className="text-sm text-primary-600 hover:text-primary-700">더보기</Link>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-800">최근 글</h3>
+            <Link to="/forum" className="text-xs text-slate-400 hover:text-emerald-600">
+              더보기 →
+            </Link>
           </div>
-          {recentPosts.length === 0 ? (
-            <p className="text-center text-slate-400 py-8 text-sm">아직 게시글이 없습니다</p>
-          ) : (
-            <ul className="list-none m-0 p-0">
-              {recentPosts.map((post) => (
-                <PostItem key={post.id} post={post} />
-              ))}
-            </ul>
-          )}
+          <div className="px-5 py-2">
+            {recentPosts.length === 0 ? (
+              <p className="py-8 text-center text-sm text-slate-400">
+                아직 게시글이 없습니다
+              </p>
+            ) : (
+              <ul className="list-none m-0 p-0">
+                {recentPosts.map((post) => (
+                  <PostItem key={post.id} post={post} />
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* 인기 글 */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
-          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
-            <h3 className="text-[15px] font-semibold text-slate-800">인기 글</h3>
-            <Link to="/forum" className="text-sm text-primary-600 hover:text-primary-700">더보기</Link>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-800">인기 글</h3>
+            <Link to="/forum" className="text-xs text-slate-400 hover:text-emerald-600">
+              더보기 →
+            </Link>
           </div>
-          {popularPosts.length === 0 ? (
-            <p className="text-center text-slate-400 py-8 text-sm">아직 게시글이 없습니다</p>
-          ) : (
-            <ul className="list-none m-0 p-0">
-              {popularPosts.map((post) => (
-                <PostItem key={`popular-${post.id}`} post={post} />
-              ))}
-            </ul>
-          )}
+          <div className="px-5 py-2">
+            {popularPosts.length === 0 ? (
+              <p className="py-8 text-center text-sm text-slate-400">
+                아직 게시글이 없습니다
+              </p>
+            ) : (
+              <ul className="list-none m-0 p-0">
+                {popularPosts.map((post) => (
+                  <PostItem key={`popular-${post.id}`} post={post} />
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </section>
@@ -153,14 +165,16 @@ function WritePrompt() {
 
   return (
     <section className="py-6">
-      <div className="flex items-center justify-between p-5 bg-white rounded-xl shadow-sm border border-slate-100">
+      <div className="flex items-center justify-between p-5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100">
         <div className="flex items-center gap-3">
-          <span className="text-3xl shrink-0">✏️</span>
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-xl">
+            ✏️
+          </div>
           <div>
-            <h3 className="text-[15px] font-semibold text-slate-800">
+            <h3 className="text-sm font-bold text-slate-800">
               {isAuthenticated ? '새 글을 작성해 보세요' : '포럼에 참여해 보세요'}
             </h3>
-            <p className="text-[13px] text-slate-400 mt-1">
+            <p className="mt-0.5 text-xs text-slate-500">
               {isAuthenticated
                 ? '의견, 질문, 피드백을 자유롭게 공유하세요'
                 : '로그인 후 글을 작성하고 토론에 참여할 수 있습니다'}
@@ -168,11 +182,17 @@ function WritePrompt() {
           </div>
         </div>
         {isAuthenticated ? (
-          <Link to="/forum" className="px-5 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap">
+          <Link
+            to="/forum"
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors whitespace-nowrap"
+          >
             글쓰기
           </Link>
         ) : (
-          <Link to="/login" className="px-5 py-2 text-sm font-medium text-primary-600 border border-primary-600 rounded-lg hover:bg-primary-50 transition-colors whitespace-nowrap">
+          <Link
+            to="/login"
+            className="px-5 py-2.5 text-sm font-medium text-emerald-600 border border-emerald-200 rounded-xl hover:bg-emerald-50 transition-colors whitespace-nowrap"
+          >
             로그인
           </Link>
         )}
@@ -183,21 +203,25 @@ function WritePrompt() {
 
 function InfoSection() {
   return (
-    <section className="py-6 border-t border-slate-200">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-3">
-          <h4 className="text-sm font-semibold text-slate-500 mb-2">이용안내</h4>
-          <ul className="list-disc pl-5 text-[13px] text-slate-400 leading-7">
+    <section className="py-6 border-t border-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">이용안내</h4>
+          <ul className="space-y-1.5 text-xs text-slate-400 list-disc pl-4">
             <li>질문, 의견, 피드백을 자유롭게 남겨주세요</li>
             <li>상품 홍보나 고객 문의 용도가 아닌 공간입니다</li>
             <li>개인정보 보호에 유의해 주세요</li>
           </ul>
         </div>
-        <div className="p-3">
-          <h4 className="text-sm font-semibold text-slate-500 mb-2">바로가기</h4>
-          <div className="flex flex-col gap-1">
-            <Link to="/forum" className="text-[13px] text-slate-400 hover:text-primary-600 transition-colors">전체 글</Link>
-            <Link to="/forum/feedback" className="text-[13px] text-slate-400 hover:text-primary-600 transition-colors">피드백</Link>
+        <div>
+          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">바로가기</h4>
+          <div className="flex flex-wrap gap-2">
+            <Link to="/forum" className="text-xs text-slate-400 hover:text-emerald-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 transition-colors">
+              전체 글
+            </Link>
+            <Link to="/forum/feedback" className="text-xs text-slate-400 hover:text-emerald-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 transition-colors">
+              피드백
+            </Link>
           </div>
         </div>
       </div>
@@ -212,14 +236,28 @@ function InfoSection() {
 export default function ForumHubPage() {
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-200px)]">
-      <div className="max-w-[960px] mx-auto px-6 pb-12">
+      <div className="max-w-[960px] mx-auto px-4 md:px-6 pb-12">
         {/* Header */}
-        <header className="text-center pt-12 pb-4">
-          <h1 className="text-[28px] font-bold text-slate-800 mb-2">GlycoPharm 포럼</h1>
-          <p className="text-[15px] text-slate-500">의약품과 건강기능식품에 대한 정보를 교환하고 토론에 참여하세요</p>
+        <header className="pt-10 pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">GlycoPharm 포럼</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                의약품과 건강기능식품에 대한 정보를 교환하고 토론에 참여하세요
+              </p>
+            </div>
+            <Link
+              to="/forum"
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              글쓰기
+            </Link>
+          </div>
         </header>
 
-        <QuickActions />
         <ActivitySection />
         <WritePrompt />
         <InfoSection />

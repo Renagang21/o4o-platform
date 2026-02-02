@@ -108,6 +108,7 @@ export interface ForumCategoryResponse {
   description?: string | null;
   slug: string;
   color?: string | null;
+  iconUrl?: string | null;
   sortOrder: number;
   isActive: boolean;
   requireApproval: boolean;

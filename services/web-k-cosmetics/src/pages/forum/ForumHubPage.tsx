@@ -1,11 +1,11 @@
 /**
  * ForumHubPage - 포럼 허브 랜딩 페이지
  *
- * 통합 포럼 허브 디자인 (모든 서비스 공통 UI-UX)
+ * WO-O4O-FORUM-HUB-UI-REDESIGN-IMPLEMENTATION-V1
+ * Daum 커뮤니티 스타일 UI 전면 개편
  *
  * ForumHubPage
- * ├─ Header (타이틀 + 설명)
- * ├─ QuickActions (글쓰기, 전체 글, 인기 글, 공지사항)
+ * ├─ Header (타이틀 + 설명 + 글쓰기 CTA)
  * ├─ ActivitySection (최근 글 + 인기 글 2열 그리드)
  * ├─ WritePrompt (글쓰기 유도 CTA)
  * └─ InfoSection (이용안내 + 바로가기)
@@ -54,50 +54,61 @@ function toDisplayPost(post: ForumPost): DisplayPost {
 }
 
 // ============================================================================
+// Helpers
+// ============================================================================
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+
+  if (hours < 1) return '방금 전';
+  if (hours < 24) return `${hours}시간 전`;
+  if (hours < 48) return '어제';
+  return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+}
+
+// ============================================================================
 // Sub-components
 // ============================================================================
 
-const PRIMARY = '#e91e63';
-
-function QuickActions({ basePath }: { basePath: string }) {
-  const actions = [
-    { label: '글쓰기', href: `${basePath}/write`, icon: '✏️' },
-    { label: '전체 글', href: `${basePath}?view=all`, icon: '📋' },
-    { label: '인기 글', href: `${basePath}?sort=popular`, icon: '🔥' },
-    { label: '공지사항', href: `${basePath}?type=announcement`, icon: '📢' },
-  ];
-
-  return (
-    <section style={sectionStyles.quickActionsContainer}>
-      <div style={sectionStyles.quickActionsInner}>
-        {actions.map((action) => (
-          <Link key={action.label} to={action.href} style={sectionStyles.quickActionItem}>
-            <span style={sectionStyles.quickActionIcon}>{action.icon}</span>
-            <span style={sectionStyles.quickActionLabel}>{action.label}</span>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function PostItem({ post, basePath }: { post: DisplayPost; basePath: string }) {
   return (
-    <li style={sectionStyles.listItem}>
-      <Link to={`${basePath}/post/${post.id}`} style={sectionStyles.postLink}>
-        {post.isPinned && <span style={sectionStyles.pinnedBadge}>공지</span>}
-        {post.categoryName && (
-          <span style={sectionStyles.categoryBadge}>{post.categoryName}</span>
-        )}
-        <span style={sectionStyles.postTitle}>{post.title}</span>
+    <li className="py-2.5 border-b border-slate-50 last:border-b-0">
+      <Link to={`${basePath}/post/${post.id}`} className="block group">
+        <div className="flex items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              {post.isPinned && (
+                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-500 text-white">
+                  공지
+                </span>
+              )}
+              {post.categoryName && (
+                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500">
+                  {post.categoryName}
+                </span>
+              )}
+              <span className="text-sm text-slate-700 group-hover:text-pink-600 transition-colors truncate">
+                {post.title}
+              </span>
+              {post.commentCount > 0 && (
+                <span className="text-xs text-pink-500 font-medium flex-shrink-0">
+                  [{post.commentCount}]
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 mt-1 text-xs text-slate-400">
+              <span>{post.authorName}</span>
+              <span className="text-slate-300">·</span>
+              <span>{formatDate(post.createdAt)}</span>
+              <span className="text-slate-300">·</span>
+              <span>조회 {post.viewCount}</span>
+            </div>
+          </div>
+        </div>
       </Link>
-      <div style={sectionStyles.postMeta}>
-        <span>{post.authorName}</span>
-        <span style={sectionStyles.dot}>·</span>
-        <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
-        <span style={sectionStyles.dot}>·</span>
-        <span>댓글 {post.commentCount}</span>
-      </div>
     </li>
   );
 }
@@ -126,60 +137,73 @@ function ActivitySection({ basePath }: { basePath: string }) {
   }, []);
 
   return (
-    <section style={sectionStyles.activityContainer}>
-      <h2 style={sectionStyles.sectionTitle}>최근 활동</h2>
-      <div style={sectionStyles.activityGrid}>
-        <div style={sectionStyles.feedCard}>
-          <div style={sectionStyles.cardHeader}>
-            <h3 style={sectionStyles.cardTitle}>최근 글</h3>
-            <Link to={`${basePath}?sort=latest`} style={sectionStyles.moreLink}>더보기</Link>
+    <section className="py-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 최근 글 */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-800">최근 글</h3>
+            <Link to={`${basePath}?sort=latest`} className="text-xs text-slate-400 hover:text-pink-600">
+              더보기 →
+            </Link>
           </div>
-          {recentPosts.length === 0 ? (
-            <p style={sectionStyles.empty}>아직 게시글이 없습니다</p>
-          ) : (
-            <ul style={sectionStyles.list}>
-              {recentPosts.map((post) => (
-                <PostItem key={post.id} post={post} basePath={basePath} />
-              ))}
-            </ul>
-          )}
+          <div className="px-5 py-2">
+            {recentPosts.length === 0 ? (
+              <p className="py-8 text-center text-sm text-slate-400">
+                아직 게시글이 없습니다
+              </p>
+            ) : (
+              <ul className="list-none m-0 p-0">
+                {recentPosts.map((post) => (
+                  <PostItem key={post.id} post={post} basePath={basePath} />
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
-        <div style={sectionStyles.feedCard}>
-          <div style={sectionStyles.cardHeader}>
-            <h3 style={sectionStyles.cardTitle}>인기 글</h3>
-            <Link to={`${basePath}?sort=popular`} style={sectionStyles.moreLink}>더보기</Link>
+        {/* 인기 글 */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h3 className="text-sm font-bold text-slate-800">인기 글</h3>
+            <Link to={`${basePath}?sort=popular`} className="text-xs text-slate-400 hover:text-pink-600">
+              더보기 →
+            </Link>
           </div>
-          {popularPosts.length === 0 ? (
-            <p style={sectionStyles.empty}>아직 게시글이 없습니다</p>
-          ) : (
-            <ul style={sectionStyles.list}>
-              {popularPosts.map((post) => (
-                <PostItem key={`popular-${post.id}`} post={post} basePath={basePath} />
-              ))}
-            </ul>
-          )}
+          <div className="px-5 py-2">
+            {popularPosts.length === 0 ? (
+              <p className="py-8 text-center text-sm text-slate-400">
+                아직 게시글이 없습니다
+              </p>
+            ) : (
+              <ul className="list-none m-0 p-0">
+                {popularPosts.map((post) => (
+                  <PostItem key={`popular-${post.id}`} post={post} basePath={basePath} />
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// CategorySection omitted — k-cosmetics forumApi does not expose fetchForumCategories
-
 function WritePrompt({ basePath }: { basePath: string }) {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section style={sectionStyles.writePromptContainer}>
-      <div style={sectionStyles.writePromptCard}>
-        <div style={sectionStyles.writePromptContent}>
-          <span style={sectionStyles.writePromptIcon}>✏️</span>
+    <section className="py-6">
+      <div className="flex items-center justify-between p-5 bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl border border-pink-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center text-xl">
+            ✏️
+          </div>
           <div>
-            <h3 style={sectionStyles.writePromptTitle}>
+            <h3 className="text-sm font-bold text-slate-800">
               {isAuthenticated ? '새 글을 작성해 보세요' : '포럼에 참여해 보세요'}
             </h3>
-            <p style={sectionStyles.writePromptDesc}>
+            <p className="mt-0.5 text-xs text-slate-500">
               {isAuthenticated
                 ? '의견, 질문, 피드백을 자유롭게 공유하세요'
                 : '로그인 후 글을 작성하고 토론에 참여할 수 있습니다'}
@@ -187,9 +211,19 @@ function WritePrompt({ basePath }: { basePath: string }) {
           </div>
         </div>
         {isAuthenticated ? (
-          <Link to={`${basePath}/write`} style={sectionStyles.ctaPrimary}>글쓰기</Link>
+          <Link
+            to={`${basePath}/write`}
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-pink-600 rounded-xl hover:bg-pink-700 transition-colors whitespace-nowrap"
+          >
+            글쓰기
+          </Link>
         ) : (
-          <Link to="/login" style={sectionStyles.ctaOutline}>로그인</Link>
+          <Link
+            to="/login"
+            className="px-5 py-2.5 text-sm font-medium text-pink-600 border border-pink-200 rounded-xl hover:bg-pink-50 transition-colors whitespace-nowrap"
+          >
+            로그인
+          </Link>
         )}
       </div>
     </section>
@@ -198,22 +232,28 @@ function WritePrompt({ basePath }: { basePath: string }) {
 
 function InfoSection({ basePath }: { basePath: string }) {
   return (
-    <section style={sectionStyles.infoContainer}>
-      <div style={sectionStyles.infoGrid}>
-        <div style={sectionStyles.infoCard}>
-          <h4 style={sectionStyles.infoTitle}>이용안내</h4>
-          <ul style={sectionStyles.infoList}>
+    <section className="py-6 border-t border-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">이용안내</h4>
+          <ul className="space-y-1.5 text-xs text-slate-400 list-disc pl-4">
             <li>질문, 의견, 피드백을 자유롭게 남겨주세요</li>
             <li>상품 홍보나 고객 문의 용도가 아닌 공간입니다</li>
             <li>개인정보 보호에 유의해 주세요</li>
           </ul>
         </div>
-        <div style={sectionStyles.infoCard}>
-          <h4 style={sectionStyles.infoTitle}>바로가기</h4>
-          <div style={sectionStyles.linkList}>
-            <Link to={`${basePath}/write`} style={sectionStyles.infoLink}>글쓰기</Link>
-            <Link to={`${basePath}?sort=popular`} style={sectionStyles.infoLink}>인기 글</Link>
-            <Link to={`${basePath}?type=announcement`} style={sectionStyles.infoLink}>공지사항</Link>
+        <div>
+          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">바로가기</h4>
+          <div className="flex flex-wrap gap-2">
+            <Link to={`${basePath}/write`} className="text-xs text-slate-400 hover:text-pink-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 transition-colors">
+              글쓰기
+            </Link>
+            <Link to={`${basePath}?sort=popular`} className="text-xs text-slate-400 hover:text-pink-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 transition-colors">
+              인기 글
+            </Link>
+            <Link to={`${basePath}?type=announcement`} className="text-xs text-slate-400 hover:text-pink-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 transition-colors">
+              공지사항
+            </Link>
           </div>
         </div>
       </div>
@@ -229,14 +269,29 @@ export function ForumHubPage() {
   const basePath = '/forum';
 
   return (
-    <div style={pageStyles.page}>
-      <div style={pageStyles.content}>
-        <header style={pageStyles.header}>
-          <h1 style={pageStyles.title}>K-Cosmetics 포럼</h1>
-          <p style={pageStyles.description}>뷰티 트렌드와 화장품에 대한 정보를 교환하고 토론에 참여하세요</p>
+    <div className="bg-slate-50 min-h-[calc(100vh-200px)]">
+      <div className="max-w-[960px] mx-auto px-4 md:px-6 pb-12">
+        {/* Header */}
+        <header className="pt-10 pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">K-Cosmetics 포럼</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                뷰티 트렌드와 화장품에 대한 정보를 교환하고 토론에 참여하세요
+              </p>
+            </div>
+            <Link
+              to={`${basePath}/write`}
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-pink-600 rounded-xl hover:bg-pink-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              글쓰기
+            </Link>
+          </div>
         </header>
 
-        <QuickActions basePath={basePath} />
         <ActivitySection basePath={basePath} />
         <WritePrompt basePath={basePath} />
         <InfoSection basePath={basePath} />
@@ -246,89 +301,3 @@ export function ForumHubPage() {
 }
 
 export default ForumHubPage;
-
-// ============================================================================
-// Styles
-// ============================================================================
-
-const pageStyles: Record<string, React.CSSProperties> = {
-  page: { backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 200px)' },
-  content: { maxWidth: '960px', margin: '0 auto', padding: '0 24px 48px' },
-  header: { textAlign: 'center', padding: '48px 0 16px' },
-  title: { fontSize: '28px', fontWeight: 700, color: '#1e293b', margin: '0 0 8px 0' },
-  description: { fontSize: '15px', color: '#64748b', margin: 0 },
-};
-
-const sectionStyles: Record<string, React.CSSProperties> = {
-  quickActionsContainer: { padding: '24px 0' },
-  quickActionsInner: { display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' },
-  quickActionItem: {
-    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-    padding: '16px 24px', borderRadius: '12px', backgroundColor: '#ffffff',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.08)', textDecoration: 'none', color: '#475569',
-    minWidth: '80px', transition: 'box-shadow 0.2s', border: '1px solid #f1f5f9',
-  },
-  quickActionIcon: { fontSize: '1.5rem' },
-  quickActionLabel: { fontSize: '0.875rem', fontWeight: 500 },
-
-  activityContainer: { padding: '32px 0' },
-  sectionTitle: { fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '16px' },
-  activityGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
-  feedCard: {
-    backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #f1f5f9',
-  },
-  cardHeader: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid #e2e8f0',
-  },
-  cardTitle: { fontSize: '15px', fontWeight: 600, margin: 0, color: '#1e293b' },
-  moreLink: { fontSize: '0.875rem', color: PRIMARY, textDecoration: 'none' },
-  list: { listStyle: 'none', margin: 0, padding: 0 },
-  listItem: { padding: '8px 0', borderBottom: '1px solid #f1f5f9' },
-  postLink: {
-    display: 'flex', alignItems: 'center', gap: '6px',
-    textDecoration: 'none', color: '#334155',
-  },
-  pinnedBadge: {
-    display: 'inline-block', padding: '1px 6px', borderRadius: '4px',
-    backgroundColor: '#ef4444', color: '#ffffff', fontSize: '0.688rem',
-    fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0,
-  },
-  categoryBadge: {
-    display: 'inline-block', padding: '2px 8px', borderRadius: '4px',
-    backgroundColor: '#f1f5f9', color: '#64748b', fontSize: '0.75rem',
-    fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0,
-  },
-  postTitle: { fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  postMeta: { display: 'flex', gap: '4px', marginTop: '4px', fontSize: '0.75rem', color: '#94a3b8' },
-  dot: { color: '#cbd5e1' },
-  empty: { textAlign: 'center', color: '#94a3b8', padding: '32px', margin: 0, fontSize: '0.875rem' },
-
-  writePromptContainer: { padding: '24px 0' },
-  writePromptCard: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '20px 24px', backgroundColor: '#ffffff', borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: '1px solid #f1f5f9',
-  },
-  writePromptContent: { display: 'flex', alignItems: 'center', gap: '12px' },
-  writePromptIcon: { fontSize: '1.75rem', flexShrink: 0 },
-  writePromptTitle: { fontSize: '15px', fontWeight: 600, margin: 0, color: '#1e293b' },
-  writePromptDesc: { margin: '4px 0 0', fontSize: '0.813rem', color: '#94a3b8' },
-  ctaPrimary: {
-    padding: '8px 20px', fontSize: '0.875rem', fontWeight: 600, color: '#ffffff',
-    backgroundColor: PRIMARY, textDecoration: 'none', border: 'none', borderRadius: '8px', whiteSpace: 'nowrap',
-  },
-  ctaOutline: {
-    padding: '8px 20px', fontSize: '0.875rem', fontWeight: 500, color: PRIMARY,
-    textDecoration: 'none', border: `1px solid ${PRIMARY}`, borderRadius: '8px', whiteSpace: 'nowrap',
-  },
-
-  infoContainer: { padding: '24px 0', borderTop: '1px solid #e2e8f0' },
-  infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
-  infoCard: { padding: '12px' },
-  infoTitle: { fontSize: '14px', fontWeight: 600, color: '#475569', margin: '0 0 8px 0' },
-  infoList: { margin: 0, paddingLeft: '20px', color: '#94a3b8', fontSize: '0.813rem', lineHeight: '1.8' },
-  linkList: { display: 'flex', flexDirection: 'column', gap: '4px' },
-  infoLink: { fontSize: '0.813rem', color: '#94a3b8', textDecoration: 'none' },
-};
