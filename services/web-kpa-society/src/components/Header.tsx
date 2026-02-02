@@ -100,11 +100,11 @@ export function Header({ serviceName }: { serviceName: string }) {
   const fillTestAccount = (accountType: TestAccountType) => {
     // Note: Password must match API server seed (TestPassword)
     const testCredentials: Record<TestAccountType, { email: string; password: string }> = {
-      pharmacist: { email: 'pharmacist@kpa-test.kr', password: 'TestPassword' },
-      district_admin: { email: 'district-admin@kpa-test.kr', password: 'TestPassword' },
-      branch_admin: { email: 'branch-admin@kpa-test.kr', password: 'TestPassword' },
-      district_officer: { email: 'district-officer@kpa-test.kr', password: 'TestPassword' },
-      branch_officer: { email: 'branch-officer@kpa-test.kr', password: 'TestPassword' },
+      pharmacist: { email: 'pharmacist-kpa@o4o.com', password: 'TestPassword' },
+      district_admin: { email: 'district-admin-kpa@o4o.com', password: 'TestPassword' },
+      branch_admin: { email: 'branch-admin-kpa@o4o.com', password: 'TestPassword' },
+      district_officer: { email: 'district-officer-kpa@o4o.com', password: 'TestPassword' },
+      branch_officer: { email: 'branch-officer-kpa@o4o.com', password: 'TestPassword' },
     };
     const creds = testCredentials[accountType];
     setLoginForm({ email: creds.email, password: creds.password });
