@@ -145,6 +145,9 @@ const SupplierContentsPage = lazy(() =>
 const SupplyRequestsPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplyRequestsPage }))
 );
+const SupplierProfilePage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierProfilePage }))
+);
 
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
 const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
@@ -418,6 +421,7 @@ function App() {
               <Route path="/workspace/supplier/contents" element={<SupplierContentsPage />} />
               <Route path="/workspace/supplier/contents/new" element={<ContentEditorPage />} />
               <Route path="/workspace/supplier/contents/:id/edit" element={<ContentEditorPage />} />
+              <Route path="/workspace/supplier/profile" element={<SupplierProfilePage />} />
               {/* Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1) */}
               <Route path="/workspace/supplier/signage/content" element={<SignageContentHubPage />} />
             </Route>

@@ -28,6 +28,7 @@ import {
   Eye,
   Plus,
   ChevronRight,
+  Pin,
 } from 'lucide-react';
 import { apiEndpoints } from '@/config/apps.config';
 
@@ -43,7 +44,7 @@ interface ForumStats {
 }
 
 // Extends shared ForumCategoryResponse with admin-specific fields
-interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount' | 'iconUrl'> {
+interface ForumCategory extends Pick<ForumCategoryResponse, 'id' | 'name' | 'slug' | 'description' | 'postCount' | 'iconUrl' | 'isPinned' | 'iconEmoji'> {
   order: number;
 }
 
@@ -79,6 +80,23 @@ export default function ForumDashboard() {
   const [moderationQueue, setModerationQueue] = useState<ForumModerationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const togglePin = async (categoryId: string, pinned: boolean) => {
+    try {
+      const res = await fetch(`${apiEndpoints.forum.categories}/${categoryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPinned: pinned }),
+      });
+      if (res.ok) {
+        setCategories((prev) =>
+          prev.map((c) => (c.id === categoryId ? { ...c, isPinned: pinned } : c))
+        );
+      }
+    } catch (err) {
+      console.error('Failed to toggle pin:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -248,19 +266,39 @@ export default function ForumDashboard() {
                             alt={category.name}
                             className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
                           />
+                        ) : category.iconEmoji ? (
+                          <span className="text-2xl flex-shrink-0">{category.iconEmoji}</span>
                         ) : (
                           <Folder className="w-5 h-5 text-muted-foreground" />
                         )}
                         <div>
-                          <p className="font-medium">{category.name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{category.name}</p>
+                            {category.isPinned && (
+                              <Pin className="w-3.5 h-3.5 text-primary" />
+                            )}
+                          </div>
                           {category.description && (
                             <p className="text-sm text-muted-foreground">{category.description}</p>
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold">{category.postCount}</p>
-                        <p className="text-xs text-muted-foreground">게시글</p>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={category.isPinned ? 'text-primary' : 'text-muted-foreground'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            togglePin(category.id, !category.isPinned);
+                          }}
+                        >
+                          <Pin className="w-4 h-4" />
+                        </Button>
+                        <div className="text-right">
+                          <p className="text-lg font-bold">{category.postCount}</p>
+                          <p className="text-xs text-muted-foreground">게시글</p>
+                        </div>
                       </div>
                     </div>
                   ))}

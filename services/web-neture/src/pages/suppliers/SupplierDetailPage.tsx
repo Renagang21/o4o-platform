@@ -156,22 +156,50 @@ export default function SupplierDetailPage() {
 
             {/* Contact Info */}
             <div className="flex flex-wrap gap-3 mt-6">
-              <a href={`mailto:${supplier.contact.email}`} className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
-                <Mail className="w-4 h-4 mr-2" />
-                이메일 문의
-              </a>
-              <a href={`tel:${supplier.contact.phone}`} className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                <Phone className="w-4 h-4 mr-2" />
-                전화
-              </a>
-              <a href={supplier.contact.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                <Globe className="w-4 h-4 mr-2" />
-                웹사이트
-              </a>
-              <a href={supplier.contact.kakao} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                카카오톡
-              </a>
+              {supplier.contact.email ? (
+                <a href={`mailto:${supplier.contact.email}`} className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
+                  <Mail className="w-4 h-4 mr-2" />
+                  이메일 문의
+                </a>
+              ) : (
+                <span className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed">
+                  <Mail className="w-4 h-4 mr-2" />
+                  이메일 미등록
+                </span>
+              )}
+              {supplier.contact.phone ? (
+                <a href={`tel:${supplier.contact.phone}`} className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                  <Phone className="w-4 h-4 mr-2" />
+                  전화
+                </a>
+              ) : (
+                <span className="inline-flex items-center px-4 py-2 border border-gray-100 text-gray-400 rounded-lg text-sm cursor-not-allowed">
+                  <Phone className="w-4 h-4 mr-2" />
+                  전화 미등록
+                </span>
+              )}
+              {supplier.contact.website ? (
+                <a href={supplier.contact.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                  <Globe className="w-4 h-4 mr-2" />
+                  웹사이트
+                </a>
+              ) : (
+                <span className="inline-flex items-center px-4 py-2 border border-gray-100 text-gray-400 rounded-lg text-sm cursor-not-allowed">
+                  <Globe className="w-4 h-4 mr-2" />
+                  웹사이트 미등록
+                </span>
+              )}
+              {supplier.contact.kakao ? (
+                <a href={supplier.contact.kakao} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  카카오톡
+                </a>
+              ) : (
+                <span className="inline-flex items-center px-4 py-2 border border-gray-100 text-gray-400 rounded-lg text-sm cursor-not-allowed">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  카카오톡 미등록
+                </span>
+              )}
             </div>
           </div>
         </div>

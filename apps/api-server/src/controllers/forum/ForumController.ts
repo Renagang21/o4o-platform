@@ -8,6 +8,7 @@ import type { ForumPostMetadata } from '@o4o/forum-core';
 import { User } from '../../modules/auth/entities/User.js';
 import { MoreThanOrEqual } from 'typeorm';
 import logger from '../../utils/logger.js';
+import { FORUM_ICON_SAMPLES } from './forumIconSamples.js';
 
 /**
  * ForumController
@@ -45,6 +46,17 @@ export class ForumController {
       service: 'forum',
       status: 'ok',
       timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * GET /forum/icon-samples
+   * Returns grouped emoji icon samples for forum category creation
+   */
+  async getIconSamples(_req: Request, res: Response): Promise<void> {
+    res.json({
+      success: true,
+      data: FORUM_ICON_SAMPLES,
     });
   }
 
@@ -413,7 +425,7 @@ export class ForumController {
       const where = includeInactive ? {} : { isActive: true };
       const categories = await this.categoryRepository.find({
         where,
-        order: { sortOrder: 'ASC', name: 'ASC' },
+        order: { isPinned: 'DESC', pinnedOrder: 'ASC', sortOrder: 'ASC', name: 'ASC' },
         relations: ['creator'],
       });
 
@@ -501,7 +513,7 @@ export class ForumController {
         return;
       }
 
-      const { name, description, color, iconUrl, sortOrder, isActive, requireApproval, accessLevel } = req.body;
+      const { name, description, color, iconUrl, iconEmoji, sortOrder, isActive, isPinned, pinnedOrder, requireApproval, accessLevel } = req.body;
 
       const slug = this.generateSlug(name);
 
@@ -511,8 +523,11 @@ export class ForumController {
         slug,
         color,
         iconUrl,
+        iconEmoji,
         sortOrder: sortOrder || 0,
         isActive: isActive !== false,
+        isPinned: isPinned || false,
+        pinnedOrder: pinnedOrder ?? null,
         requireApproval: requireApproval || false,
         accessLevel: accessLevel || 'all',
         createdBy: userId,
@@ -559,7 +574,7 @@ export class ForumController {
         return;
       }
 
-      const { name, description, color, iconUrl, sortOrder, isActive, requireApproval, accessLevel } = req.body;
+      const { name, description, color, iconUrl, iconEmoji, sortOrder, isActive, isPinned, pinnedOrder, requireApproval, accessLevel } = req.body;
 
       // Update slug if name changed
       if (name && name !== category.name) {
@@ -571,8 +586,11 @@ export class ForumController {
       if (description !== undefined) category.description = description;
       if (color !== undefined) category.color = color;
       if (iconUrl !== undefined) category.iconUrl = iconUrl;
+      if (iconEmoji !== undefined) category.iconEmoji = iconEmoji;
       if (sortOrder !== undefined) category.sortOrder = sortOrder;
       if (isActive !== undefined) category.isActive = isActive;
+      if (isPinned !== undefined) category.isPinned = isPinned;
+      if (pinnedOrder !== undefined) category.pinnedOrder = pinnedOrder;
       if (requireApproval !== undefined) category.requireApproval = requireApproval;
       if (accessLevel !== undefined) category.accessLevel = accessLevel;
 
@@ -911,6 +929,138 @@ export class ForumController {
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to get forum statistics',
+      });
+    }
+  }
+
+  // ============================================================================
+  // Popular Forums
+  // ============================================================================
+
+  /**
+   * GET /forum/categories/popular
+   * Returns categories ranked by activity score over last 7 days
+   * Score = (posts×3) + (comments×2) + (views×1) + recency_bonus
+   */
+  async getPopularForums(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 6, 20);
+
+      // 1. Fetch pinned categories first (always at top)
+      const pinnedCategories = await this.categoryRepository.find({
+        where: { isActive: true, isPinned: true },
+        order: { pinnedOrder: 'ASC', sortOrder: 'ASC' },
+      });
+
+      const pinnedIds = new Set(pinnedCategories.map((c) => c.id));
+      const remainingSlots = Math.max(0, limit - pinnedCategories.length);
+
+      // 2. Aggregate activity per category over last 7 days
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const result = await this.postRepository
+        .createQueryBuilder('post')
+        .select('post.categoryId', 'categoryId')
+        .addSelect('COUNT(post.id)', 'postCount7d')
+        .addSelect('COALESCE(SUM(post."commentCount"), 0)', 'commentSum7d')
+        .addSelect('COALESCE(SUM(post."viewCount"), 0)', 'viewSum7d')
+        .addSelect('MAX(post."createdAt")', 'lastPostAt')
+        .where('post.status = :status', { status: PostStatus.PUBLISHED })
+        .andWhere('post."createdAt" >= :since', { since: sevenDaysAgo })
+        .andWhere('post."categoryId" IS NOT NULL')
+        .groupBy('post.categoryId')
+        .getRawMany();
+
+      // Calculate scores with recency bonus
+      const now = Date.now();
+      const scored = result.map((row) => {
+        const postScore = parseInt(row.postCount7d) * 3;
+        const commentScore = parseInt(row.commentSum7d) * 2;
+        const viewScore = parseInt(row.viewSum7d) * 1;
+        const lastPostTime = new Date(row.lastPostAt).getTime();
+        const hoursSinceLastPost = (now - lastPostTime) / (1000 * 60 * 60);
+
+        let recencyBonus = 0;
+        if (hoursSinceLastPost <= 24) recencyBonus = 10;
+        else if (hoursSinceLastPost <= 72) recencyBonus = 5;
+
+        return {
+          categoryId: row.categoryId,
+          postCount7d: parseInt(row.postCount7d),
+          commentSum7d: parseInt(row.commentSum7d),
+          viewSum7d: parseInt(row.viewSum7d),
+          popularScore: postScore + commentScore + viewScore + recencyBonus,
+        };
+      });
+
+      const scoreMap = new Map(scored.map((s) => [s.categoryId, s]));
+
+      // Helper to format category output
+      const formatCategory = (cat: ForumCategory, isPinnedItem: boolean) => {
+        const s = scoreMap.get(cat.id);
+        return {
+          id: cat.id,
+          name: cat.name,
+          description: cat.description,
+          slug: cat.slug,
+          color: cat.color,
+          iconUrl: cat.iconUrl || null,
+          iconEmoji: cat.iconEmoji || null,
+          isPinned: isPinnedItem,
+          postCount: cat.postCount,
+          popularScore: s?.popularScore || 0,
+          postCount7d: s?.postCount7d || 0,
+          commentSum7d: s?.commentSum7d || 0,
+          viewSum7d: s?.viewSum7d || 0,
+        };
+      };
+
+      // 3. Build pinned results
+      const pinnedResults = pinnedCategories.map((cat) => formatCategory(cat, true));
+
+      // 4. Build popular results (exclude pinned)
+      scored.sort((a, b) => b.popularScore - a.popularScore);
+      const popularCategoryIds = scored
+        .filter((s) => !pinnedIds.has(s.categoryId))
+        .slice(0, remainingSlots)
+        .map((s) => s.categoryId);
+
+      let popularResults: ReturnType<typeof formatCategory>[] = [];
+
+      if (popularCategoryIds.length > 0) {
+        const popularCategories = await this.categoryRepository
+          .createQueryBuilder('cat')
+          .where('cat.id IN (:...ids)', { ids: popularCategoryIds })
+          .andWhere('cat.isActive = true')
+          .getMany();
+
+        popularResults = popularCategories
+          .map((cat) => formatCategory(cat, false))
+          .sort((a, b) => b.popularScore - a.popularScore);
+      } else if (remainingSlots > 0) {
+        // Fallback: fill with active categories by postCount
+        const fallback = await this.categoryRepository.find({
+          where: { isActive: true },
+          order: { postCount: 'DESC' },
+          take: remainingSlots + pinnedCategories.length,
+        });
+
+        popularResults = fallback
+          .filter((cat) => !pinnedIds.has(cat.id))
+          .slice(0, remainingSlots)
+          .map((cat) => formatCategory(cat, false));
+      }
+
+      res.json({
+        success: true,
+        data: [...pinnedResults, ...popularResults],
+      });
+    } catch (error: any) {
+      logger.error('Error getting popular forums:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to get popular forums',
       });
     }
   }

@@ -33,6 +33,9 @@ router.get('/health', controller.health.bind(controller));
 // ============================================================================
 router.get('/stats', optionalAuth, controller.getStats.bind(controller));
 
+// Icon samples (public)
+router.get('/icon-samples', controller.getIconSamples.bind(controller));
+
 // ============================================================================
 // Posts
 // ============================================================================
@@ -74,6 +77,9 @@ router.delete('/comments/:id', authenticate, controller.deleteComment.bind(contr
 // ============================================================================
 // List categories (public)
 router.get('/categories', controller.listCategories.bind(controller));
+
+// Popular categories by activity score (public) - must be before :id
+router.get('/categories/popular', controller.getPopularForums.bind(controller));
 
 // Get single category (public)
 router.get('/categories/:id', controller.getCategory.bind(controller));

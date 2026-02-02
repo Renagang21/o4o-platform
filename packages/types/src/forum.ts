@@ -109,8 +109,11 @@ export interface ForumCategoryResponse {
   slug: string;
   color?: string | null;
   iconUrl?: string | null;
+  iconEmoji?: string | null;
   sortOrder: number;
   isActive: boolean;
+  isPinned: boolean;
+  pinnedOrder?: number | null;
   requireApproval: boolean;
   accessLevel: string; // ForumCategoryAccessLevel value
   postCount: number;

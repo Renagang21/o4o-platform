@@ -123,6 +123,34 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 }
 
 // ============================================================================
+// Popular Forums
+// ============================================================================
+
+export interface PopularForum {
+  id: string;
+  name: string;
+  description?: string | null;
+  slug: string;
+  color?: string | null;
+  iconUrl?: string | null;
+  postCount: number;
+  popularScore: number;
+  postCount7d: number;
+  commentSum7d: number;
+  viewSum7d: number;
+}
+
+export async function fetchPopularForums(limit: number = 6): Promise<{ success: boolean; data: PopularForum[] }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories/popular?limit=${limit}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching popular forums:', error);
+    return { success: false, data: [] };
+  }
+}
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 

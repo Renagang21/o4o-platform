@@ -20,10 +20,12 @@ import { useAuth } from '../../contexts';
 import {
   fetchForumPosts,
   fetchForumCategories,
+  fetchPopularForums,
   normalizePostType,
   getAuthorName,
   type ForumPost,
   type ForumCategory,
+  type PopularForum,
 } from '../../services/forumApi';
 
 // ============================================================================
@@ -88,6 +90,7 @@ function toDisplayPost(post: ForumPost): DisplayPost {
 
 function getForumIcon(category: ForumCategory): string {
   if (category.iconUrl) return '';
+  if (category.iconEmoji) return category.iconEmoji;
   return FALLBACK_ICONS[category.name] || DEFAULT_FORUM_ICON;
 }
 
@@ -180,50 +183,90 @@ function CategoryQuickLinks({
   );
 }
 
-/** 추천 포럼 카드형 그리드 */
+/** 인기 포럼 카드형 그리드 (활동 기반 순위) */
 function FeaturedForumsGrid({
+  popularForums,
   categories,
   basePath,
 }: {
+  popularForums: PopularForum[];
   categories: ForumCategory[];
   basePath: string;
 }) {
-  if (categories.length === 0) return null;
+  // popularForums가 있으면 사용, 없으면 카테고리 fallback
+  const featured: Array<{ id: string; name: string; description?: string | null; slug: string; color?: string | null; iconUrl?: string | null; postCount: number; postCount7d?: number }> =
+    popularForums.length > 0
+      ? popularForums.slice(0, 4)
+      : categories.slice(0, 4);
 
-  // 상위 4개 카테고리를 추천으로 표시
-  const featured = categories.slice(0, 4);
+  if (featured.length === 0) return null;
+
+  // Build a category lookup for ForumIcon rendering
+  const catMap = new Map(categories.map((c) => [c.id, c]));
 
   return (
     <section className="py-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-slate-900">추천 포럼</h2>
+        <h2 className="text-lg font-bold text-slate-900">인기 포럼</h2>
         <Link to={`${basePath}?view=all`} className="text-sm text-blue-600 hover:text-blue-700">
           전체보기 →
         </Link>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {featured.map((cat) => (
-          <Link
-            key={cat.id}
-            to={`${basePath}?category=${cat.id}`}
-            className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 transition-all"
-          >
-            <ForumIcon category={cat} size={48} />
-            <div className="text-center">
-              <h3 className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                {cat.name}
-              </h3>
-              {cat.description && (
-                <p className="mt-1 text-xs text-slate-400 line-clamp-2">
-                  {cat.description}
-                </p>
+        {featured.map((forum) => {
+          const cat = catMap.get(forum.id);
+          return (
+            <Link
+              key={forum.id}
+              to={`${basePath}?category=${forum.id}`}
+              className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 transition-all"
+            >
+              {cat ? (
+                <ForumIcon category={cat} size={48} />
+              ) : (
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 8,
+                    backgroundColor: forum.color ? `${forum.color}20` : '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 24,
+                    flexShrink: 0,
+                  }}
+                >
+                  {forum.iconUrl ? (
+                    <img src={forum.iconUrl} alt={forum.name} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
+                  ) : (
+                    FALLBACK_ICONS[forum.name] || DEFAULT_FORUM_ICON
+                  )}
+                </div>
               )}
-            </div>
-            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
-              {cat.postCount ?? 0}개 글
-            </span>
-          </Link>
-        ))}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                  {forum.name}
+                </h3>
+                {forum.description && (
+                  <p className="mt-1 text-xs text-slate-400 line-clamp-2">
+                    {forum.description}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+                  {forum.postCount ?? 0}개 글
+                </span>
+                {'postCount7d' in forum && (forum as PopularForum).postCount7d > 0 && (
+                  <span className="text-[10px] text-slate-400">
+                    이번 주 +{(forum as PopularForum).postCount7d}
+                  </span>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -487,11 +530,18 @@ export default function ForumHubPage({
   guidelines = DEFAULT_GUIDELINES,
 }: ForumHubPageProps) {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
+  const [popularForums, setPopularForums] = useState<PopularForum[]>([]);
 
   useEffect(() => {
     fetchForumCategories()
       .then((res) => {
         if (res.success && res.data) setCategories(res.data);
+      })
+      .catch(() => {});
+
+    fetchPopularForums(4)
+      .then((res) => {
+        if (res.success && res.data) setPopularForums(res.data);
       })
       .catch(() => {});
   }, []);
@@ -521,8 +571,8 @@ export default function ForumHubPage({
         {/* Category Quick Links */}
         <CategoryQuickLinks categories={categories} basePath={basePath} />
 
-        {/* Featured Forums */}
-        <FeaturedForumsGrid categories={categories} basePath={basePath} />
+        {/* Featured Forums (activity-based ranking) */}
+        <FeaturedForumsGrid popularForums={popularForums} categories={categories} basePath={basePath} />
 
         {/* Activity - Recent & Popular Posts */}
         <ActivitySection basePath={basePath} />

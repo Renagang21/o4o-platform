@@ -62,6 +62,7 @@ const MOCK_CATEGORY = {
   description: 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간',
   sortOrder: 0,
   isActive: true,
+  isPinned: false,
   requireApproval: false,
   accessLevel: 'all',
   postCount: 3,
@@ -394,6 +395,37 @@ export async function fetchForumCategories(): Promise<ForumCategoryListResponse>
       data: [],
       count: 0,
     };
+  }
+}
+
+/**
+ * Fetch popular forums ranked by activity score
+ */
+export interface PopularForum {
+  id: string;
+  name: string;
+  description?: string | null;
+  slug: string;
+  color?: string | null;
+  iconUrl?: string | null;
+  postCount: number;
+  popularScore: number;
+  postCount7d: number;
+  commentSum7d: number;
+  viewSum7d: number;
+}
+
+export async function fetchPopularForums(limit: number = 6): Promise<{ success: boolean; data: PopularForum[] }> {
+  if (!USE_REAL_API) {
+    return { success: true, data: [] };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories/popular?limit=${limit}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching popular forums:', error);
+    return { success: false, data: [] };
   }
 }
 

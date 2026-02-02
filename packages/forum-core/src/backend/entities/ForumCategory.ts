@@ -31,11 +31,20 @@ export class ForumCategory {
   @Column({ type: 'varchar', length: 500, nullable: true })
   iconUrl?: string;
 
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  iconEmoji?: string;
+
   @Column({ type: 'int', default: 0 })
   sortOrder!: number;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isPinned!: boolean;
+
+  @Column({ type: 'int', nullable: true })
+  pinnedOrder?: number;
 
   @Column({ type: 'boolean', default: false })
   requireApproval!: boolean;

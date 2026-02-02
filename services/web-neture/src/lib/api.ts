@@ -64,10 +64,10 @@ interface SupplierDetail {
     mountain: string;
   };
   contact: {
-    email: string;
-    phone: string;
-    website: string;
-    kakao: string;
+    email?: string | null;
+    phone?: string | null;
+    website?: string | null;
+    kakao?: string | null;
   };
 }
 
@@ -1244,6 +1244,53 @@ export type {
 };
 
 export { operatorSupplyApi };
+
+// ==================== Supplier Profile API ====================
+
+export interface SupplierProfile {
+  id: string;
+  name: string;
+  slug: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  contactWebsite: string | null;
+  contactKakao: string | null;
+}
+
+export const supplierProfileApi = {
+  async getProfile(): Promise<SupplierProfile | null> {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/supplier/profile`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Supplier Profile API] Failed to fetch profile:', error);
+      return null;
+    }
+  },
+
+  async updateProfile(data: {
+    contactEmail?: string;
+    contactPhone?: string;
+    contactWebsite?: string;
+    contactKakao?: string;
+  }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+};
 
 // ==================== Partner Recruitment API (WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1) ====================
 

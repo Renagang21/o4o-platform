@@ -16,7 +16,7 @@
 
 import { Navigate, Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, FileCheck, Package, PackageCheck, ShoppingBag, FileText, Monitor, Settings, LogOut, Home } from 'lucide-react';
+import { LayoutDashboard, FileCheck, Package, PackageCheck, ShoppingBag, FileText, Monitor, User, LogOut, Home } from 'lucide-react';
 import AccountMenu from '../../components/AccountMenu';
 
 export default function SupplierDashboardLayout() {
@@ -60,7 +60,7 @@ export default function SupplierDashboardLayout() {
     { to: '/supplier/orders', icon: ShoppingBag, label: '주문 현황' },
     { to: '/supplier/contents', icon: FileText, label: '콘텐츠' },
     { to: '/supplier/signage/content', icon: Monitor, label: '사이니지 콘텐츠' },
-    { to: '/supplier/settings', icon: Settings, label: '설정', disabled: true },
+    { to: '/workspace/supplier/profile', icon: User, label: '연락처 관리' },
   ];
 
   return (
@@ -166,17 +166,14 @@ export default function SupplierDashboardLayout() {
           {navItems.map((item) => (
             <NavLink
               key={item.to}
-              to={item.disabled ? '#' : item.to}
+              to={item.to}
               style={({ isActive }) => ({
                 ...styles.navItem,
-                ...(isActive && !item.disabled ? styles.navItemActive : {}),
-                ...(item.disabled ? styles.navItemDisabled : {}),
+                ...(isActive ? styles.navItemActive : {}),
               })}
-              onClick={(e) => item.disabled && e.preventDefault()}
             >
               <item.icon size={18} />
               <span>{item.label}</span>
-              {item.disabled && <span style={styles.comingSoon}>예정</span>}
             </NavLink>
           ))}
         </nav>

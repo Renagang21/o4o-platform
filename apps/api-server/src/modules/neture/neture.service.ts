@@ -225,6 +225,61 @@ export class NetureService {
     }
   }
 
+  // ==================== Supplier Profile ====================
+
+  async getSupplierProfile(supplierId: string) {
+    try {
+      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
+      if (!supplier) return null;
+
+      return {
+        id: supplier.id,
+        name: supplier.name,
+        slug: supplier.slug,
+        contactEmail: supplier.contactEmail || null,
+        contactPhone: supplier.contactPhone || null,
+        contactWebsite: supplier.contactWebsite || null,
+        contactKakao: supplier.contactKakao || null,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching supplier profile:', error);
+      throw error;
+    }
+  }
+
+  async updateSupplierProfile(
+    supplierId: string,
+    data: {
+      contactEmail?: string;
+      contactPhone?: string;
+      contactWebsite?: string;
+      contactKakao?: string;
+    },
+  ) {
+    try {
+      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
+      if (!supplier) return null;
+
+      if (data.contactEmail !== undefined) supplier.contactEmail = data.contactEmail || '';
+      if (data.contactPhone !== undefined) supplier.contactPhone = data.contactPhone || '';
+      if (data.contactWebsite !== undefined) supplier.contactWebsite = data.contactWebsite || '';
+      if (data.contactKakao !== undefined) supplier.contactKakao = data.contactKakao || '';
+
+      await this.supplierRepo.save(supplier);
+
+      return {
+        id: supplier.id,
+        contactEmail: supplier.contactEmail || null,
+        contactPhone: supplier.contactPhone || null,
+        contactWebsite: supplier.contactWebsite || null,
+        contactKakao: supplier.contactKakao || null,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error updating supplier profile:', error);
+      throw error;
+    }
+  }
+
   // ==================== Partnership Requests ====================
 
   /**

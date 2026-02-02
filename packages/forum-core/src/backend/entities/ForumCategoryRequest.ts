@@ -33,6 +33,9 @@ export class ForumCategoryRequest {
   @Column({ type: 'text', nullable: true })
   reason?: string;
 
+  @Column({ name: 'icon_emoji', type: 'varchar', length: 10, nullable: true })
+  iconEmoji?: string;
+
   @Column({
     type: 'varchar',
     length: 20,

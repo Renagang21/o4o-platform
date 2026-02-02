@@ -33,6 +33,20 @@ interface ForumPost {
   isHot: boolean;
 }
 
+interface PopularForum {
+  id: string;
+  name: string;
+  description?: string | null;
+  slug: string;
+  color?: string | null;
+  iconUrl?: string | null;
+  postCount: number;
+  popularScore: number;
+  postCount7d: number;
+  commentSum7d: number;
+  viewSum7d: number;
+}
+
 // ============================================================================
 // Helpers
 // ============================================================================
@@ -88,6 +102,59 @@ function PostItem({ post }: { post: ForumPost }) {
         </div>
       </div>
     </li>
+  );
+}
+
+function PopularForumsSection() {
+  const [forums, setForums] = useState<PopularForum[]>([]);
+
+  useEffect(() => {
+    apiClient.get<{ success: boolean; data: PopularForum[] }>('/api/v1/forum/categories/popular?limit=4')
+      .then((res) => {
+        if (res.data?.data) setForums(res.data.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (forums.length === 0) return null;
+
+  return (
+    <section className="py-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-slate-900">인기 포럼</h2>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {forums.map((forum) => (
+          <div
+            key={forum.id}
+            className="flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm"
+          >
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+              style={{ backgroundColor: forum.color ? `${forum.color}20` : '#f1f5f9' }}
+            >
+              {forum.iconUrl ? (
+                <img src={forum.iconUrl} alt={forum.name} className="w-12 h-12 rounded-xl object-cover" />
+              ) : '📂'}
+            </div>
+            <div className="text-center">
+              <h3 className="text-sm font-semibold text-slate-800">{forum.name}</h3>
+              {forum.description && (
+                <p className="mt-1 text-xs text-slate-400 line-clamp-2">{forum.description}</p>
+              )}
+            </div>
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                {forum.postCount}개 글
+              </span>
+              {forum.postCount7d > 0 && (
+                <span className="text-[10px] text-slate-400">이번 주 +{forum.postCount7d}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -258,6 +325,7 @@ export default function ForumHubPage() {
           </div>
         </header>
 
+        <PopularForumsSection />
         <ActivitySection />
         <WritePrompt />
         <InfoSection />

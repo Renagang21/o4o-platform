@@ -749,6 +749,60 @@ router.get('/supplier/dashboard/summary', requireAuth, async (req: Authenticated
 });
 
 /**
+ * GET /api/v1/neture/supplier/profile
+ * Get supplier profile for authenticated supplier (contact info etc.)
+ */
+router.get('/supplier/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+    if (!supplierId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+    }
+
+    const profile = await netureService.getSupplierProfile(supplierId);
+    if (!profile) {
+      return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });
+    }
+
+    res.json({ success: true, data: profile });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier profile:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/supplier/profile
+ * Update supplier contact info
+ */
+router.patch('/supplier/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+    if (!supplierId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+    }
+
+    const { contactEmail, contactPhone, contactWebsite, contactKakao } = req.body;
+
+    const result = await netureService.updateSupplierProfile(supplierId, {
+      contactEmail,
+      contactPhone,
+      contactWebsite,
+      contactKakao,
+    });
+
+    if (!result) {
+      return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });
+    }
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('[Neture API] Error updating supplier profile:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
  * GET /api/v1/neture/operator/supply-products
  * 운영자용 공급 가능 제품 목록 + 공급요청 상태
  * WO-O4O-SERVICE-OPERATOR-SUPPLY-DASHBOARD-IMPLEMENTATION-V1
