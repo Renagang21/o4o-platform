@@ -15,13 +15,11 @@
 
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useOrganization } from '../../contexts/OrganizationContext';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { accessibleOrganizations } = useOrganization();
 
   // 1. 미로그인
   if (!user) {
@@ -89,17 +87,10 @@ export function PharmacyPage() {
     );
   }
 
-  // 4. pharmacy_owner + 약국 Context 없음 → 신청 게이트
-  const hasPharmacyContext = accessibleOrganizations.some(
-    (org) => org.type === 'pharmacy',
-  );
-
-  if (!hasPharmacyContext) {
-    return <Navigate to="/pharmacy/approval" replace />;
-  }
-
-  // 5. 승인 완료 → 대시보드
-  return <Navigate to="/pharmacy/dashboard" replace />;
+  // 4. pharmacy_owner → 약국 신청 게이트로 이동
+  // 승인 여부는 PharmacyApprovalGatePage에서 판단
+  // (현재 Phase에서는 항상 신청 게이트로 이동)
+  return <Navigate to="/pharmacy/approval" replace />;
 }
 
 export default PharmacyPage;
