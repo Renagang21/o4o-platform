@@ -54,6 +54,9 @@ router.put('/posts/:id', authenticate, controller.updatePost.bind(controller));
 // Delete post (authenticated)
 router.delete('/posts/:id', authenticate, controller.deletePost.bind(controller));
 
+// Like/unlike post (authenticated)
+router.post('/posts/:id/like', authenticate, controller.toggleLike.bind(controller));
+
 // ============================================================================
 // Post Comments
 // ============================================================================

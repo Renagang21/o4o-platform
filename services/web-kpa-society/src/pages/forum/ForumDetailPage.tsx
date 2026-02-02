@@ -21,6 +21,8 @@ export function ForumDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
     if (id) loadData();
@@ -46,12 +48,16 @@ export function ForumDetailPage() {
   };
 
   const handleLike = async () => {
-    if (!post) return;
+    if (!post || !user || isLiking) return;
     try {
+      setIsLiking(true);
       const res = await forumApi.likePost(post.id);
       setPost({ ...post, likeCount: res.data.likeCount });
+      setIsLiked((res.data as any).isLiked ?? !isLiked);
     } catch (err) {
       alert('좋아요 처리에 실패했습니다.');
+    } finally {
+      setIsLiking(false);
     }
   };
 
@@ -137,8 +143,12 @@ export function ForumDetailPage() {
         </div>
 
         <div style={styles.actions}>
-          <button style={styles.likeButton} onClick={handleLike}>
-            ❤️ 좋아요 {post.likeCount}
+          <button
+            style={{ ...styles.likeButton, ...(isLiked ? styles.likeButtonActive : {}) }}
+            onClick={handleLike}
+            disabled={isLiking || !user}
+          >
+            {isLiked ? '❤️' : '🤍'} 좋아요{post.likeCount > 0 ? ` ${post.likeCount}` : ''}
           </button>
 
           {isAuthor && (
@@ -269,9 +279,15 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '10px 20px',
     backgroundColor: colors.neutral50,
     border: `1px solid ${colors.neutral200}`,
-    borderRadius: '6px',
+    borderRadius: '24px',
     fontSize: '14px',
     cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  likeButtonActive: {
+    borderColor: '#fecaca',
+    backgroundColor: '#fef2f2',
+    color: '#ef4444',
   },
   authorActions: {
     display: 'flex',

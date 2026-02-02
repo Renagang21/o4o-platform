@@ -741,6 +741,25 @@ export async function updateForumPost(
 /**
  * Delete a forum post
  */
+export async function toggleForumPostLike(
+  postId: string
+): Promise<{ success: boolean; data?: { likeCount: number; isLiked: boolean }; error?: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/like`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return { success: false, error: data.message || data.error || '좋아요 처리에 실패했습니다.' };
+    }
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Error toggling forum post like:', error);
+    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+  }
+}
+
 export async function deleteForumPost(
   postId: string
 ): Promise<{ success: boolean; error?: string }> {

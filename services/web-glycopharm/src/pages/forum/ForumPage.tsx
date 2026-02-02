@@ -34,6 +34,7 @@ interface ForumPostRaw {
   categoryId?: string;
   viewCount: number;
   commentCount: number;
+  likeCount?: number;
   createdAt: string;
   isPinned?: boolean;
   status?: string;
@@ -60,7 +61,7 @@ function normalizePost(raw: ForumPostRaw): ForumPost {
     authorRole: '',
     category: raw.category?.name || '일반',
     views: raw.viewCount || 0,
-    likes: 0,
+    likes: raw.likeCount || 0,
     comments: raw.commentCount || 0,
     createdAt: raw.createdAt,
     isHot: (raw.viewCount || 0) >= 50 || (raw.commentCount || 0) >= 10,
@@ -258,12 +259,13 @@ export default function ForumPage() {
                 <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
                 <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
                 <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '60px' }}>댓글</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>좋아요</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>댓글</th>
               </tr>
             </thead>
             <tbody>
               {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={5} className="px-3 py-3 border-b border-slate-50">
+                <tr key={i}><td colSpan={6} className="px-3 py-3 border-b border-slate-50">
                   <div className="h-3.5 bg-slate-200 rounded" style={{ width: `${50 + i * 8}%` }} />
                 </td></tr>
               ))}
@@ -300,7 +302,8 @@ export default function ForumPage() {
                       </td>
                       <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.author}</td>
                       <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-400 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
-                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '60px' }}>{post.comments}</td>
+                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.likes > 0 ? post.likes : ''}</td>
+                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.comments}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -343,11 +346,12 @@ export default function ForumPage() {
                     </td>
                     <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.author}</td>
                     <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-400 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
-                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '60px' }}>{post.comments}</td>
+                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.likes > 0 ? post.likes : ''}</td>
+                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.comments}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={5} className="py-16 text-center">
+                    <td colSpan={6} className="py-16 text-center">
                       {hasFilters ? (
                         <>
                           <p className="text-sm text-slate-500 mb-3">검색 결과가 없습니다</p>

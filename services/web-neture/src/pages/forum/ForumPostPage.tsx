@@ -37,6 +37,7 @@ import {
   updateForumComment,
   deleteForumComment,
   deleteForumPost,
+  toggleForumPostLike,
   normalizePostType,
   getAuthorName,
   extractTextContent,
@@ -213,6 +214,9 @@ export function ForumPostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
   const actionMenuRef = useRef<HTMLDivElement>(null);
 
   const currentUserId = user?.id;
@@ -250,6 +254,7 @@ export function ForumPostPage() {
         }
 
         setPost(response.data);
+        setLikeCount(response.data.likeCount || 0);
 
         // Fetch comments
         const commentsResponse = await fetchForumComments(response.data.id);
@@ -293,6 +298,21 @@ export function ForumPostPage() {
     } else {
       alert(result.error || '댓글 삭제에 실패했습니다.');
     }
+  };
+
+  const handleLike = async () => {
+    if (!post || isLiking) return;
+    if (!isAuthenticated) {
+      openLoginModal();
+      return;
+    }
+    setIsLiking(true);
+    const result = await toggleForumPostLike(post.id);
+    if (result.success && result.data) {
+      setLikeCount(result.data.likeCount);
+      setIsLiked(result.data.isLiked);
+    }
+    setIsLiking(false);
   };
 
   const handleSubmitComment = async () => {
@@ -484,6 +504,21 @@ export function ForumPostPage() {
           </p>
         </div>
       )}
+
+      {/* Like Button */}
+      <div style={styles.likeBar}>
+        <button
+          style={{
+            ...styles.likeButton,
+            ...(isLiked ? styles.likeButtonActive : {}),
+          }}
+          onClick={handleLike}
+          disabled={isLiking}
+        >
+          <span>{isLiked ? '❤️' : '🤍'}</span>
+          <span>좋아요{likeCount > 0 ? ` ${likeCount}` : ''}</span>
+        </button>
+      </div>
 
       {/* Comments Section */}
       <section style={styles.commentsSection}>
@@ -775,6 +810,32 @@ const styles: Record<string, React.CSSProperties> = {
     fontStyle: 'italic',
   },
 
+  likeBar: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '24px 0',
+    borderTop: '1px solid #e2e8f0',
+    marginTop: '32px',
+  },
+  likeButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 24px',
+    fontSize: '14px',
+    fontWeight: 500,
+    border: '1px solid #e2e8f0',
+    borderRadius: '24px',
+    backgroundColor: '#fff',
+    color: '#64748b',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  likeButtonActive: {
+    borderColor: '#fecaca',
+    backgroundColor: '#fef2f2',
+    color: '#ef4444',
+  },
   commentsSection: {
     borderTop: '1px solid #e2e8f0',
     paddingTop: '32px',

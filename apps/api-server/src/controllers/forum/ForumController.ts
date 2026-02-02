@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumPost, PostStatus } from '@o4o/forum-core/entities';
+import { ForumPost, PostStatus, ForumPostLike } from '@o4o/forum-core/entities';
 import { ForumCategory } from '@o4o/forum-core/entities';
 import { ForumComment, CommentStatus } from '@o4o/forum-core/entities';
 import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o/forum-core';
@@ -32,6 +32,10 @@ export class ForumController {
 
   private get userRepository() {
     return AppDataSource.getRepository(User);
+  }
+
+  private get likeRepository() {
+    return AppDataSource.getRepository(ForumPostLike);
   }
 
   // ============================================================================
@@ -671,6 +675,84 @@ export class ForumController {
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to delete category',
+      });
+    }
+  }
+
+  // ============================================================================
+  // Likes
+  // ============================================================================
+
+  /**
+   * POST /forum/posts/:id/like
+   * Toggle like on a post (like → unlike, unlike → like)
+   */
+  async toggleLike(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required' });
+        return;
+      }
+
+      const { id: postId } = req.params;
+      const post = await this.postRepository.findOne({ where: { id: postId } });
+      if (!post) {
+        res.status(404).json({ success: false, error: 'Post not found' });
+        return;
+      }
+
+      // Check if forum_post_like table exists (graceful fallback)
+      let tableExists = true;
+      try {
+        const check = await AppDataSource.query(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables
+            WHERE table_schema = 'public' AND table_name = 'forum_post_like'
+          ) AS "exists";
+        `);
+        tableExists = check[0]?.exists ?? false;
+      } catch {
+        tableExists = false;
+      }
+
+      if (!tableExists) {
+        // Fallback: just increment without dedup tracking
+        post.likeCount = (post.likeCount || 0) + 1;
+        await this.postRepository.save(post);
+        res.json({ success: true, data: { likeCount: post.likeCount, isLiked: true } });
+        return;
+      }
+
+      const existingLike = await this.likeRepository.findOne({
+        where: { postId, userId },
+      });
+
+      let isLiked: boolean;
+      if (existingLike) {
+        // Unlike
+        await this.likeRepository.remove(existingLike);
+        post.likeCount = Math.max(0, (post.likeCount || 0) - 1);
+        isLiked = false;
+      } else {
+        // Like
+        const like = this.likeRepository.create({ postId, userId });
+        await this.likeRepository.save(like);
+        post.likeCount = (post.likeCount || 0) + 1;
+        isLiked = true;
+      }
+
+      await this.postRepository.save(post);
+
+      res.json({
+        success: true,
+        data: { likeCount: post.likeCount, isLiked },
+      });
+    } catch (error: any) {
+      logger.error('Error toggling like:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to toggle like',
       });
     }
   }

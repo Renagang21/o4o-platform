@@ -3,7 +3,7 @@
  *
  * Phase 22-F: 테이블 형태 + 20건 단위 페이지 넘김
  *
- * 컬럼: 유형 | 제목 | 작성자 | 작성일 | 댓글
+ * 컬럼: 유형 | 제목 | 작성자 | 작성일 | 좋아요 | 댓글
  * 검색 + 카테고리/유형 필터 + 정렬
  */
 
@@ -30,6 +30,7 @@ interface DisplayPost {
   authorName: string;
   isPinned: boolean;
   commentCount: number;
+  likeCount: number;
   createdAt: string;
 }
 
@@ -44,6 +45,7 @@ function toDisplayPost(post: ApiForumPost): DisplayPost {
     authorName: getAuthorName(post),
     isPinned: post.isPinned,
     commentCount: post.commentCount || 0,
+    likeCount: post.likeCount || 0,
     createdAt: post.createdAt,
   };
 }
@@ -305,11 +307,12 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
               <th style={s.th}>제목</th>
               <th style={{ ...s.th, width: '100px' }}>작성자</th>
               <th style={{ ...s.th, width: '100px' }}>작성일</th>
-              <th style={{ ...s.th, width: '60px' }}>댓글</th>
+              <th style={{ ...s.th, width: '50px' }}>좋아요</th>
+              <th style={{ ...s.th, width: '50px' }}>댓글</th>
             </tr></thead>
             <tbody>
               {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={5} style={s.td}>
+                <tr key={i}><td colSpan={6} style={s.td}>
                   <div style={{ ...s.skeleton, width: `${50 + i * 8}%` }} />
                 </td></tr>
               ))}
@@ -348,7 +351,8 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
                         </td>
                         <td style={{ ...s.td, width: '100px', color: '#64748b' }}>{post.authorName}</td>
                         <td style={{ ...s.td, width: '100px', color: '#94a3b8' }}>{formatDate(post.createdAt)}</td>
-                        <td style={{ ...s.td, width: '60px', textAlign: 'center', color: '#64748b' }}>{post.commentCount}</td>
+                        <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
+                        <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b' }}>{post.commentCount}</td>
                       </tr>
                     );
                   })}
@@ -393,12 +397,13 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
                       </td>
                       <td style={{ ...s.td, width: '100px', color: '#64748b', fontSize: '13px' }}>{post.authorName}</td>
                       <td style={{ ...s.td, width: '100px', color: '#94a3b8', fontSize: '13px' }}>{formatDate(post.createdAt)}</td>
-                      <td style={{ ...s.td, width: '60px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.commentCount}</td>
+                      <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
+                      <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.commentCount}</td>
                     </tr>
                   );
                 }) : (
                   <tr>
-                    <td colSpan={5} style={s.emptyCell}>
+                    <td colSpan={6} style={s.emptyCell}>
                       {hasFilters ? (
                         <>
                           <p style={s.emptyTitle}>검색 결과가 없습니다</p>

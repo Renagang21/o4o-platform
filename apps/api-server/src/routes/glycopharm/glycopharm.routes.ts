@@ -134,6 +134,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   forumRouter.post('/posts', authenticate, forumController.createPost.bind(forumController));
   forumRouter.put('/posts/:id', authenticate, forumController.updatePost.bind(forumController));
   forumRouter.delete('/posts/:id', authenticate, forumController.deletePost.bind(forumController));
+  forumRouter.post('/posts/:id/like', authenticate, forumController.toggleLike.bind(forumController));
 
   // Comments
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));

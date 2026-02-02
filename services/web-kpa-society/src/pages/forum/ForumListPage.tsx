@@ -3,7 +3,7 @@
  *
  * Phase 22-F: 테이블 형태 + 20건 단위 페이지 넘김
  *
- * 컬럼: 카테고리 | 제목 | 작성자 | 작성일 | 조회 | 댓글
+ * 컬럼: 카테고리 | 제목 | 작성자 | 작성일 | 좋아요 | 조회 | 댓글
  * 검색 + 카테고리 필터
  */
 
@@ -170,12 +170,13 @@ export function ForumListPage() {
               <th style={s.th}>제목</th>
               <th style={{ ...s.th, width: '100px' }}>작성자</th>
               <th style={{ ...s.th, width: '100px' }}>작성일</th>
+              <th style={{ ...s.th, width: '50px' }}>좋아요</th>
               <th style={{ ...s.th, width: '50px' }}>조회</th>
               <th style={{ ...s.th, width: '50px' }}>댓글</th>
             </tr></thead>
             <tbody>
               {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={6} style={s.td}>
+                <tr key={i}><td colSpan={7} style={s.td}>
                   <div style={{ height: '14px', backgroundColor: colors.neutral200, borderRadius: '4px', width: `${50 + i * 8}%` }} />
                 </td></tr>
               ))}
@@ -224,12 +225,13 @@ export function ForumListPage() {
                     </td>
                     <td style={{ ...s.td, width: '100px', color: colors.neutral500, fontSize: '13px' }}>{post.authorName}</td>
                     <td style={{ ...s.td, width: '100px', color: colors.neutral400, fontSize: '13px' }}>{formatDate(post.createdAt)}</td>
+                    <td style={{ ...s.td, width: '50px', textAlign: 'center', color: colors.neutral500, fontSize: '13px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
                     <td style={{ ...s.td, width: '50px', textAlign: 'center', color: colors.neutral500, fontSize: '13px' }}>{post.viewCount}</td>
                     <td style={{ ...s.td, width: '50px', textAlign: 'center', color: colors.neutral500, fontSize: '13px' }}>{post.commentCount}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={6} style={s.emptyCell}>
+                    <td colSpan={7} style={s.emptyCell}>
                       {hasFilters ? (
                         <>
                           <p style={s.emptyTitle}>검색 결과가 없습니다</p>

@@ -23,6 +23,12 @@ function PostItem({ post }: { post: ForumPost }) {
         <span>{post.authorName}</span>
         <span style={styles.dot}>·</span>
         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+        {post.likeCount > 0 && (
+          <>
+            <span style={styles.dot}>·</span>
+            <span>좋아요 {post.likeCount}</span>
+          </>
+        )}
         <span style={styles.dot}>·</span>
         <span>댓글 {post.commentCount}</span>
       </div>
