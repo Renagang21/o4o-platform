@@ -12,6 +12,19 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  */
 export class SeedForumServiceOrganizations1706745602002 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Check if organizations table exists before seeding
+    const tableExists = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'organizations'
+      ) AS "exists";
+    `);
+
+    if (!tableExists[0]?.exists) {
+      console.log('[SeedForumServiceOrganizations] organizations table does not exist, skipping seed.');
+      return;
+    }
+
     // GlycoPharm service organization
     await queryRunner.query(`
       INSERT INTO organizations (id, name, code, type, level, path, metadata, "isActive", "childrenCount", "createdAt", "updatedAt")

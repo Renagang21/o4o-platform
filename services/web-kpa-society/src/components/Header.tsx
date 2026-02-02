@@ -20,15 +20,13 @@ interface MenuItem {
   children?: { label: string; href: string }[];
 }
 
-// 커뮤니티 홈 기준 메뉴 구조 (7개 항목)
-// WO-KPA-COMMUNITY-HOME-V1: 마케팅 랜딩 → 커뮤니티 실사용 홈 전환
+// 커뮤니티 홈 기준 메뉴 구조 (4개 항목)
+// WO-KPA-COMMUNITY-HOME-REDESIGN-V1: 메인에 있는 항목은 메뉴에서 제거
+// 교육/자료실/이벤트 → 메인 페이지 커뮤니티 섹션에서 접근
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/demo/forum' },
-  { label: '교육', href: '/demo/lms' },
-  { label: '자료실', href: '/demo/docs' },
-  { label: '이벤트', href: '/demo/events' },
-  { label: '약사회 서비스 (데모)', href: '/demo/organization-service' },
+  { label: '약사회 서비스', href: '/demo' },
   { label: '약국경영', href: '/pharmacy' },
 ];
 

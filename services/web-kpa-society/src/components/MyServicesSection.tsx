@@ -1,10 +1,11 @@
 /**
- * MyServicesSection - 플랫폼 서비스 목록
+ * MyServicesSection - 플랫폼 서비스 카드 UI
  *
- * Section A: "이용 중인 서비스" (status=approved)
- * Section B: "플랫폼이 권하는 서비스" (featured, 미등록)
+ * Section A: "이용 중인 서비스" (status=approved) — 카드 강조, "바로 이동" CTA
+ * Section B: "플랫폼이 권하는 서비스" (featured, 미등록) — 설명 중심, 상태별 버튼
  *
  * WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1
+ * WO-MY-DASHBOARD-SERVICE-CARDS-V1: 카드 그리드 UI 전환
  */
 
 import { useState, useEffect } from 'react';
@@ -31,7 +32,6 @@ export function MyServicesSection() {
     setApplyingCode(code);
     try {
       await applyForService(code);
-      // Refresh list
       const updated = await listPlatformServices();
       setServices(updated);
     } catch {
@@ -51,22 +51,24 @@ export function MyServicesSection() {
           <h3 style={styles.sectionTitle}>이용 중인 서비스</h3>
           <div style={styles.grid}>
             {enrolledServices.map((svc) => (
-              <a
-                key={svc.code}
-                href={svc.entryUrl || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.card}
-              >
-                <div style={styles.cardIcon}>{svc.iconEmoji || '📦'}</div>
-                <div style={styles.cardBody}>
-                  <div style={styles.cardName}>{svc.name}</div>
-                  {svc.shortDescription && (
-                    <div style={styles.cardDesc}>{svc.shortDescription}</div>
-                  )}
+              <div key={svc.code} style={styles.activeCard}>
+                <div style={styles.cardTop}>
+                  <span style={styles.cardIcon}>{svc.iconEmoji || '📦'}</span>
+                  <span style={styles.activeBadge}>이용중</span>
                 </div>
-                <span style={styles.chevron}>›</span>
-              </a>
+                <div style={styles.cardName}>{svc.name}</div>
+                {svc.shortDescription && (
+                  <div style={styles.cardDesc}>{svc.shortDescription}</div>
+                )}
+                <a
+                  href={svc.entryUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.primaryButton}
+                >
+                  바로 이동
+                </a>
+              </div>
             ))}
           </div>
         </section>
@@ -78,19 +80,15 @@ export function MyServicesSection() {
           <h3 style={styles.sectionTitle}>플랫폼이 권하는 서비스</h3>
           <div style={styles.grid}>
             {recommendedServices.map((svc) => (
-              <div key={svc.code} style={styles.card}>
-                <div style={styles.cardIcon}>{svc.iconEmoji || '📦'}</div>
-                <div style={styles.cardBody}>
-                  <div style={styles.cardNameRow}>
-                    <span style={styles.cardName}>{svc.name}</span>
-                    {svc.isFeatured && (
-                      <span style={styles.featuredBadge}>추천</span>
-                    )}
-                  </div>
-                  {svc.shortDescription && (
-                    <div style={styles.cardDesc}>{svc.shortDescription}</div>
-                  )}
+              <div key={svc.code} style={styles.recommendCard}>
+                <div style={styles.cardTop}>
+                  <span style={styles.cardIcon}>{svc.iconEmoji || '📦'}</span>
+                  {svc.isFeatured && <span style={styles.featuredBadge}>추천</span>}
                 </div>
+                <div style={styles.cardName}>{svc.name}</div>
+                {svc.shortDescription && (
+                  <div style={styles.cardDesc}>{svc.shortDescription}</div>
+                )}
                 <div style={styles.cardAction}>
                   {svc.enrollmentStatus === 'applied' ? (
                     <span style={styles.pendingBadge}>승인 대기</span>
@@ -125,12 +123,12 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.lg,
+    gap: spacing.xl,
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   sectionTitle: {
     ...typography.headingS,
@@ -138,94 +136,121 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
   },
   grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+    gap: spacing.md,
+  },
+
+  // 이용 중인 서비스 카드 — 강조
+  activeCard: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '1px',
-    backgroundColor: colors.neutral100,
-    borderRadius: borderRadius.xl,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.neutral100}`,
-    overflow: 'hidden',
-  },
-  card: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: `${spacing.md} ${spacing.lg}`,
+    padding: spacing.lg,
     backgroundColor: colors.white,
-    textDecoration: 'none',
-    color: colors.neutral800,
-    cursor: 'pointer',
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.md,
+    border: `2px solid ${colors.primary}`,
+  },
+  // 권장 서비스 카드 — 보조
+  recommendCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: spacing.lg,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.neutral200}`,
+  },
+  cardTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
   },
   cardIcon: {
-    fontSize: '1.5rem',
-    flexShrink: 0,
-    width: '40px',
-    height: '40px',
+    fontSize: '1.75rem',
+    width: '44px',
+    height: '44px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.neutral50,
     borderRadius: borderRadius.md,
-  },
-  cardBody: {
-    flex: 1,
-    minWidth: 0,
-  },
-  cardNameRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
+    flexShrink: 0,
   },
   cardName: {
     ...typography.bodyL,
-    fontWeight: 500,
+    fontWeight: 600,
     color: colors.neutral900,
+    marginBottom: '4px',
   },
   cardDesc: {
-    ...typography.bodyS,
+    ...typography.bodyM,
     color: colors.neutral500,
-    marginTop: '2px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    marginBottom: spacing.md,
+    lineHeight: 1.5,
+    flex: 1,
   },
   cardAction: {
-    flexShrink: 0,
+    marginTop: 'auto',
   },
-  chevron: {
-    fontSize: '1.25rem',
-    color: colors.neutral300,
-    fontWeight: 300,
-    flexShrink: 0,
-  },
-  featuredBadge: {
-    fontSize: '0.625rem',
-    fontWeight: 500,
-    padding: '1px 6px',
+
+  // Badges
+  activeBadge: {
+    fontSize: '0.688rem',
+    fontWeight: 600,
+    padding: '3px 8px',
     borderRadius: borderRadius.sm,
-    backgroundColor: `${colors.primary}10`,
+    backgroundColor: `${colors.primary}15`,
     color: colors.primary,
     whiteSpace: 'nowrap',
   },
-  pendingBadge: {
-    fontSize: '0.75rem',
+  featuredBadge: {
+    fontSize: '0.688rem',
     fontWeight: 500,
-    padding: '4px 12px',
+    padding: '3px 8px',
+    borderRadius: borderRadius.sm,
+    backgroundColor: '#FFF7ED',
+    color: '#C2410C',
+    whiteSpace: 'nowrap',
+  },
+  pendingBadge: {
+    display: 'inline-block',
+    fontSize: '0.813rem',
+    fontWeight: 500,
+    padding: '6px 16px',
     borderRadius: borderRadius.md,
     backgroundColor: colors.neutral100,
     color: colors.neutral600,
     whiteSpace: 'nowrap',
+    textAlign: 'center',
+    width: '100%',
   },
-  applyButton: {
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    padding: '6px 14px',
+
+  // Buttons
+  primaryButton: {
+    display: 'block',
+    textAlign: 'center',
+    padding: '8px 16px',
     borderRadius: borderRadius.md,
     backgroundColor: colors.primary,
     color: colors.white,
-    border: 'none',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    textDecoration: 'none',
+    marginTop: 'auto',
+  },
+  applyButton: {
+    display: 'block',
+    width: '100%',
+    padding: '8px 16px',
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.white,
+    color: colors.primary,
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    border: `1px solid ${colors.primary}`,
     cursor: 'pointer',
-    whiteSpace: 'nowrap',
+    textAlign: 'center',
   },
 };
