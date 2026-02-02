@@ -34,6 +34,21 @@ const fetchWithTimeout = async (url: string, options?: RequestInit, timeout = 10
   }
 };
 
+interface TrustSignals {
+  contactCompleteness: number; // 0-4
+  hasApprovedPartners: boolean;
+  recentActivity: boolean;
+}
+
+type ContactHint = 'available' | 'partner_exclusive' | 'not_registered' | 'private' | 'partners_only';
+
+interface ContactHints {
+  email: ContactHint;
+  phone: ContactHint;
+  website: ContactHint;
+  kakao: ContactHint;
+}
+
 interface Supplier {
   id: string;
   slug: string;
@@ -42,6 +57,7 @@ interface Supplier {
   category: string;
   shortDescription: string;
   productCount: number;
+  trustSignals?: TrustSignals;
 }
 
 interface SupplierDetail {
@@ -72,6 +88,8 @@ interface SupplierDetail {
     website?: string | null;
     kakao?: string | null;
   };
+  contactHints?: ContactHints;
+  trustSignals?: TrustSignals;
 }
 
 interface PartnershipRequest {
@@ -1216,6 +1234,9 @@ const operatorSupplyApi = {
 };
 
 export type {
+  ContactHint,
+  ContactHints,
+  TrustSignals,
   Supplier,
   SupplierDetail,
   PartnershipRequest,
@@ -1264,6 +1285,13 @@ export interface SupplierProfile {
   contactKakaoVisibility: ContactVisibility;
 }
 
+// Profile Completeness (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1)
+export interface ProfileCompleteness {
+  total: number;
+  completed: number;
+  missing: string[];
+}
+
 export const supplierProfileApi = {
   async getProfile(): Promise<SupplierProfile | null> {
     try {
@@ -1275,6 +1303,20 @@ export const supplierProfileApi = {
       return result.data;
     } catch (error) {
       console.warn('[Supplier Profile API] Failed to fetch profile:', error);
+      return null;
+    }
+  },
+
+  async getCompleteness(): Promise<ProfileCompleteness | null> {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/supplier/profile/completeness`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Supplier Profile API] Failed to fetch completeness:', error);
       return null;
     }
   },

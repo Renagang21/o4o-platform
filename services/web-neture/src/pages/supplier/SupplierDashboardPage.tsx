@@ -18,9 +18,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FileCheck, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react';
+import { FileCheck, ArrowRight, RefreshCw, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { supplierApi, dashboardApi, type SupplierRequest, type SupplierDashboardSummary } from '../../lib/api';
+import { supplierApi, dashboardApi, supplierProfileApi, type SupplierRequest, type SupplierDashboardSummary, type ProfileCompleteness } from '../../lib/api';
 import {
   SupplierSummaryCards,
   SupplierServiceStatusBoard,
@@ -154,6 +154,74 @@ function transformBasicStats(summary: SupplierDashboardSummary | null): BasicSta
   };
 }
 
+// 프로필 완성도 항목 라벨 (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1)
+const COMPLETENESS_LABELS: Record<string, string> = {
+  name: '상호명',
+  description: '소개글 (50자 이상)',
+  logoUrl: '프로필 이미지',
+  email: '이메일 (공개/파트너)',
+  website: '웹사이트 (공개/파트너)',
+  kakao: '카카오톡 (공개/파트너)',
+  partnerApproval: '파트너 승인 1건+',
+  recentActivity: '최근 30일 활동',
+};
+
+function getCompletenessColor(completed: number): string {
+  if (completed >= 7) return '#22c55e'; // green
+  if (completed >= 4) return '#3b82f6'; // blue
+  return '#94a3b8'; // gray
+}
+
+function ProfileCompletenessCard({ data }: { data: ProfileCompleteness }) {
+  const color = getCompletenessColor(data.completed);
+  const pct = Math.round((data.completed / data.total) * 100);
+  const allItems = Object.keys(COMPLETENESS_LABELS);
+
+  return (
+    <div style={styles.completenessCard}>
+      <div style={styles.completenessHeader}>
+        <div>
+          <h3 style={styles.completenessTitle}>프로필 완성도</h3>
+          <p style={{ ...styles.completenessRatio, color }}>
+            {data.completed} / {data.total}
+          </p>
+        </div>
+        <div style={styles.completenessBarOuter}>
+          <div
+            style={{
+              ...styles.completenessBarInner,
+              width: `${pct}%`,
+              backgroundColor: color,
+            }}
+          />
+        </div>
+      </div>
+      <div style={styles.completenessItems}>
+        {allItems.map((key) => {
+          const done = !data.missing.includes(key);
+          return (
+            <div key={key} style={styles.completenessItem}>
+              {done ? (
+                <CheckCircle2 size={14} style={{ color: '#22c55e', flexShrink: 0 }} />
+              ) : (
+                <Circle size={14} style={{ color: '#cbd5e1', flexShrink: 0 }} />
+              )}
+              <span style={{ color: done ? '#475569' : '#94a3b8', fontSize: '13px' }}>
+                {COMPLETENESS_LABELS[key]}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      {data.missing.length > 0 && (
+        <Link to="/supplier/profile" style={styles.completenessLink}>
+          프로필 관리 <ArrowRight size={14} />
+        </Link>
+      )}
+    </div>
+  );
+}
+
 // 빈 데이터 상태 컴포넌트
 function EmptyState({ message }: { message: string }) {
   return (
@@ -168,19 +236,21 @@ export default function SupplierDashboardPage() {
   const { user } = useAuth();
   const [summary, setSummary] = useState<SupplierDashboardSummary | null>(null);
   const [requests, setRequests] = useState<SupplierRequest[]>([]);
+  const [completeness, setCompleteness] = useState<ProfileCompleteness | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // 대시보드 요약 데이터와 대기 중인 요청 병렬 조회
-      const [summaryData, requestsData] = await Promise.all([
+      const [summaryData, requestsData, completenessData] = await Promise.all([
         dashboardApi.getSupplierDashboardSummary(),
         supplierApi.getRequests({ status: 'pending' }),
+        supplierProfileApi.getCompleteness(),
       ]);
       setSummary(summaryData);
       setRequests(requestsData);
+      setCompleteness(completenessData);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     }
@@ -219,6 +289,11 @@ export default function SupplierDashboardPage() {
           새로고침
         </button>
       </div>
+
+      {/* Profile Completeness (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1) */}
+      {!loading && completeness && (
+        <ProfileCompletenessCard data={completeness} />
+      )}
 
       {/* P2: 운영 요약 카드 */}
       <SupplierSummaryCards data={summaryData} loading={loading} />
@@ -500,5 +575,62 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: '#3b82f6',
     margin: 0,
+  },
+  completenessCard: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    padding: '24px',
+    marginBottom: '24px',
+  },
+  completenessHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px',
+    gap: '24px',
+  },
+  completenessTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: '0 0 4px 0',
+  },
+  completenessRatio: {
+    fontSize: '24px',
+    fontWeight: 700,
+    margin: 0,
+  },
+  completenessBarOuter: {
+    flex: 1,
+    height: '8px',
+    backgroundColor: '#e2e8f0',
+    borderRadius: '4px',
+    overflow: 'hidden',
+  },
+  completenessBarInner: {
+    height: '100%',
+    borderRadius: '4px',
+    transition: 'width 0.3s ease',
+  },
+  completenessItems: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '8px 24px',
+    marginBottom: '16px',
+  },
+  completenessItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  completenessLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '13px',
+    color: '#3b82f6',
+    textDecoration: 'none',
+    fontWeight: 500,
   },
 };

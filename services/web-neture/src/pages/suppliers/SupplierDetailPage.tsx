@@ -13,9 +13,9 @@
  */
 
 import { useParams, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Mail, Phone, Globe, MessageCircle, ArrowLeft, Send, CheckCircle, Loader2 } from 'lucide-react';
-import { netureApi, sellerApi, type SupplierDetail } from '../../lib/api';
+import { useState, useEffect, useCallback } from 'react';
+import { Mail, Phone, Globe, MessageCircle, ArrowLeft, Send, CheckCircle, Loader2, Shield, Users, Activity, Lock, Handshake } from 'lucide-react';
+import { netureApi, sellerApi, type SupplierDetail, type ContactHint } from '../../lib/api';
 import { ProductPurposeBadge } from '../../components/ProductPurposeBadge';
 
 // 서비스 참여 현황 정적 데이터
@@ -40,11 +40,111 @@ const SERVICE_INFO: Record<string, { name: string; icon: string; description: st
   },
 };
 
+const HINT_LABELS: Record<string, string> = {
+  not_registered: '공급자가 아직 등록하지 않았습니다',
+  private: '비공개 설정된 연락처입니다',
+  partners_only: '파트너에게만 공개된 연락처입니다',
+};
+
+const CONTACT_CONFIG = {
+  email: { icon: Mail, label: '이메일 문의', feedback: '메일 앱이 열렸습니다' },
+  phone: { icon: Phone, label: '전화', feedback: '전화 연결을 시도합니다' },
+  website: { icon: Globe, label: '웹사이트', feedback: '웹사이트로 이동합니다' },
+  kakao: { icon: MessageCircle, label: '카카오톡', feedback: '카카오톡으로 이동합니다' },
+} as const;
+
+function getContactHref(type: keyof typeof CONTACT_CONFIG, value: string): string {
+  if (type === 'email') return `mailto:${value}`;
+  if (type === 'phone') return `tel:${value}`;
+  return value;
+}
+
+function ContactButton({
+  type,
+  value,
+  hint,
+  onFeedback,
+}: {
+  type: keyof typeof CONTACT_CONFIG;
+  value?: string | null;
+  hint?: ContactHint;
+  onFeedback: (msg: string) => void;
+}) {
+  const config = CONTACT_CONFIG[type];
+  const Icon = config.icon;
+  const isPartnerExclusive = hint === 'partner_exclusive';
+  const isAvailable = value && (hint === 'available' || isPartnerExclusive);
+  const hintText = hint && !isAvailable ? HINT_LABELS[hint] || null : null;
+  const isExternal = type === 'website' || type === 'kakao';
+
+  if (isAvailable) {
+    return (
+      <a
+        href={getContactHref(type, value)}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+        onClick={() => onFeedback(config.feedback)}
+        className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          type === 'email'
+            ? 'bg-primary-600 text-white hover:bg-primary-700'
+            : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+        }`}
+      >
+        <Icon className="w-4 h-4 mr-2" />
+        {config.label}
+        {isPartnerExclusive && (
+          <span title="파트너 전용"><Handshake className="w-3.5 h-3.5 ml-1.5 text-amber-500" /></span>
+        )}
+      </a>
+    );
+  }
+
+  return (
+    <span
+      className="group relative inline-flex items-center px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed"
+      title={hintText || undefined}
+    >
+      {hint === 'partners_only' ? (
+        <Lock className="w-4 h-4 mr-2" />
+      ) : (
+        <Icon className="w-4 h-4 mr-2" />
+      )}
+      {hint === 'partners_only' ? '파트너 전용' : hint === 'private' ? '비공개' : `${config.label} 미등록`}
+      {hintText && (
+        <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap z-10">
+          {hintText}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function ContactPriorityGuide({ contact }: { contact: SupplierDetail['contact'] }) {
+  if (contact.kakao) return (
+    <p className="text-xs text-gray-500 mt-3">가장 빠른 응답은 <strong>카카오톡</strong>입니다.</p>
+  );
+  if (contact.email) return (
+    <p className="text-xs text-gray-500 mt-3">공식 문의는 <strong>이메일</strong>을 이용해 주세요.</p>
+  );
+  if (contact.phone) return (
+    <p className="text-xs text-gray-500 mt-3">긴급 문의는 <strong>전화</strong>를 이용해 주세요.</p>
+  );
+  return null;
+}
+
 export default function SupplierDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [supplier, setSupplier] = useState<SupplierDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 연락 클릭 피드백
+  const [contactFeedback, setContactFeedback] = useState<string | null>(null);
+
+  const showContactFeedback = useCallback((message: string) => {
+    setContactFeedback(message);
+    setTimeout(() => setContactFeedback(null), 2500);
+  }, []);
 
   // 취급 요청 상태 관리
   const [requestingProducts, setRequestingProducts] = useState<Set<string>>(new Set());
@@ -156,54 +256,94 @@ export default function SupplierDetailPage() {
 
             {/* Contact Info */}
             <div className="flex flex-wrap gap-3 mt-6">
-              {supplier.contact.email ? (
-                <a href={`mailto:${supplier.contact.email}`} className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
-                  <Mail className="w-4 h-4 mr-2" />
-                  이메일 문의
-                </a>
-              ) : (
-                <span className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed">
-                  <Mail className="w-4 h-4 mr-2" />
-                  이메일 미등록
-                </span>
-              )}
-              {supplier.contact.phone ? (
-                <a href={`tel:${supplier.contact.phone}`} className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                  <Phone className="w-4 h-4 mr-2" />
-                  전화
-                </a>
-              ) : (
-                <span className="inline-flex items-center px-4 py-2 border border-gray-100 text-gray-400 rounded-lg text-sm cursor-not-allowed">
-                  <Phone className="w-4 h-4 mr-2" />
-                  전화 미등록
-                </span>
-              )}
-              {supplier.contact.website ? (
-                <a href={supplier.contact.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                  <Globe className="w-4 h-4 mr-2" />
-                  웹사이트
-                </a>
-              ) : (
-                <span className="inline-flex items-center px-4 py-2 border border-gray-100 text-gray-400 rounded-lg text-sm cursor-not-allowed">
-                  <Globe className="w-4 h-4 mr-2" />
-                  웹사이트 미등록
-                </span>
-              )}
-              {supplier.contact.kakao ? (
-                <a href={supplier.contact.kakao} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  카카오톡
-                </a>
-              ) : (
-                <span className="inline-flex items-center px-4 py-2 border border-gray-100 text-gray-400 rounded-lg text-sm cursor-not-allowed">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  카카오톡 미등록
-                </span>
-              )}
+              <ContactButton
+                type="email"
+                value={supplier.contact.email}
+                hint={supplier.contactHints?.email}
+                onFeedback={showContactFeedback}
+              />
+              <ContactButton
+                type="phone"
+                value={supplier.contact.phone}
+                hint={supplier.contactHints?.phone}
+                onFeedback={showContactFeedback}
+              />
+              <ContactButton
+                type="website"
+                value={supplier.contact.website}
+                hint={supplier.contactHints?.website}
+                onFeedback={showContactFeedback}
+              />
+              <ContactButton
+                type="kakao"
+                value={supplier.contact.kakao}
+                hint={supplier.contactHints?.kakao}
+                onFeedback={showContactFeedback}
+              />
             </div>
+            {/* Contact priority guide */}
+            <ContactPriorityGuide contact={supplier.contact} />
+            {/* Click feedback toast */}
+            {contactFeedback && (
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg animate-fade-in">
+                <CheckCircle className="w-3.5 h-3.5" />
+                {contactFeedback}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Trust Signals */}
+      {supplier.trustSignals && (
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className={`flex items-center gap-3 rounded-xl border p-4 ${
+            supplier.trustSignals.contactCompleteness >= 3
+              ? 'bg-green-50 border-green-200'
+              : supplier.trustSignals.contactCompleteness >= 1
+                ? 'bg-yellow-50 border-yellow-200'
+                : 'bg-gray-50 border-gray-200'
+          }`}>
+            <Shield className={`w-5 h-5 ${
+              supplier.trustSignals.contactCompleteness >= 3
+                ? 'text-green-600'
+                : supplier.trustSignals.contactCompleteness >= 1
+                  ? 'text-yellow-600'
+                  : 'text-gray-400'
+            }`} />
+            <div>
+              <p className="text-sm font-medium text-gray-900">연락처 공개</p>
+              <p className="text-xs text-gray-500">{supplier.trustSignals.contactCompleteness}개 공개 중</p>
+            </div>
+          </div>
+
+          <div className={`flex items-center gap-3 rounded-xl border p-4 ${
+            supplier.trustSignals.hasApprovedPartners
+              ? 'bg-green-50 border-green-200'
+              : 'bg-gray-50 border-gray-200'
+          }`}>
+            <Users className={`w-5 h-5 ${
+              supplier.trustSignals.hasApprovedPartners ? 'text-green-600' : 'text-gray-400'
+            }`} />
+            <div>
+              <p className="text-sm font-medium text-gray-900">파트너 승인</p>
+              <p className="text-xs text-gray-500">
+                {supplier.trustSignals.hasApprovedPartners ? '승인된 파트너 있음' : '아직 없음'}
+              </p>
+            </div>
+          </div>
+
+          {supplier.trustSignals.recentActivity && (
+            <div className="flex items-center gap-3 rounded-xl border p-4 bg-green-50 border-green-200">
+              <Activity className="w-5 h-5 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">최근 활동</p>
+                <p className="text-xs text-gray-500">30일 내 거래 활동</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ② 공급자 소개 (About Supplier) */}
       <div className="bg-white border border-gray-200 rounded-xl p-8 mb-8">

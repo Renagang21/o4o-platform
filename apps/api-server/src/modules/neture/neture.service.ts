@@ -136,6 +136,43 @@ export class NetureService {
   // ==================== Suppliers ====================
 
   /**
+   * Compute trust signals for a supplier
+   * - contactCompleteness: count of publicly visible contact fields (0-4)
+   * - hasApprovedPartners: at least one approved partnership request exists
+   * - recentActivity: any request activity in the last 30 days
+   */
+  private async computeTrustSignals(supplierId: string, supplier: NetureSupplier) {
+    // Contact completeness: count non-null public contact fields
+    const publicContacts = [
+      supplier.contactEmail && supplier.contactEmailVisibility === ContactVisibility.PUBLIC,
+      supplier.contactPhone && supplier.contactPhoneVisibility === ContactVisibility.PUBLIC,
+      supplier.contactWebsite && supplier.contactWebsiteVisibility === ContactVisibility.PUBLIC,
+      supplier.contactKakao && supplier.contactKakaoVisibility === ContactVisibility.PUBLIC,
+    ].filter(Boolean).length;
+
+    // Has approved partners
+    const approvedCount = await this.supplierRequestRepo.count({
+      where: { supplierId, status: SupplierRequestStatus.APPROVED },
+    });
+
+    // Recent activity (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentCount = await this.supplierRequestRepo
+      .createQueryBuilder('request')
+      .where('request.supplierId = :supplierId', { supplierId })
+      .andWhere('request.createdAt >= :since', { since: thirtyDaysAgo })
+      .getCount();
+
+    return {
+      contactCompleteness: publicContacts,
+      hasApprovedPartners: approvedCount > 0,
+      recentActivity: recentCount > 0,
+    };
+  }
+
+  /**
    * GET /suppliers - List all suppliers
    */
   async getSuppliers(filters?: {
@@ -163,15 +200,23 @@ export class NetureService {
 
       const suppliers = await query.getMany();
 
-      return suppliers.map((supplier) => ({
-        id: supplier.id,
-        slug: supplier.slug,
-        name: supplier.name,
-        logo: supplier.logoUrl,
-        category: supplier.category,
-        shortDescription: supplier.shortDescription,
-        productCount: supplier.products?.length || 0,
-      }));
+      const results = await Promise.all(
+        suppliers.map(async (supplier) => {
+          const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
+          return {
+            id: supplier.id,
+            slug: supplier.slug,
+            name: supplier.name,
+            logo: supplier.logoUrl,
+            category: supplier.category,
+            shortDescription: supplier.shortDescription,
+            productCount: supplier.products?.length || 0,
+            trustSignals,
+          };
+        })
+      );
+
+      return results;
     } catch (error) {
       logger.error('[NetureService] Error fetching suppliers:', error);
       throw error;
@@ -215,6 +260,44 @@ export class NetureService {
     };
   }
 
+  /**
+   * Compute contact hints for the viewer
+   * Tells the UI *why* each contact field is in its current state
+   *
+   * Possible hint values:
+   * - available: contact visible and has data
+   * - partner_exclusive: visible because viewer is an approved partner
+   * - not_registered: supplier hasn't set this contact
+   * - private: set to private by supplier
+   * - partners_only: restricted to partners (viewer is not a partner)
+   */
+  private computeContactHints(
+    supplier: NetureSupplier,
+    isPartner: boolean,
+    isOwner: boolean,
+  ) {
+    type ContactHint = 'available' | 'partner_exclusive' | 'not_registered' | 'private' | 'partners_only';
+
+    const getHint = (value: string | null | undefined, visibility: ContactVisibility): ContactHint => {
+      if (isOwner) {
+        return value ? 'available' : 'not_registered';
+      }
+      if (!value) return 'not_registered';
+      if (visibility === ContactVisibility.PUBLIC) return 'available';
+      if (visibility === ContactVisibility.PARTNERS) {
+        return isPartner ? 'partner_exclusive' : 'partners_only';
+      }
+      return 'private';
+    };
+
+    return {
+      email: getHint(supplier.contactEmail, supplier.contactEmailVisibility),
+      phone: getHint(supplier.contactPhone, supplier.contactPhoneVisibility),
+      website: getHint(supplier.contactWebsite, supplier.contactWebsiteVisibility),
+      kakao: getHint(supplier.contactKakao, supplier.contactKakaoVisibility),
+    };
+  }
+
   async getSupplierBySlug(slug: string, viewerId?: string | null) {
     try {
       const supplier = await this.supplierRepo.findOne({
@@ -231,6 +314,8 @@ export class NetureService {
         ? await this.hasApprovedPartnership(supplier.id, viewerId)
         : false;
       const contact = this.filterContactInfo(supplier, viewerId || null, isPartner, isOwner);
+      const contactHints = this.computeContactHints(supplier, isPartner, isOwner);
+      const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
 
       return {
         id: supplier.id,
@@ -254,6 +339,8 @@ export class NetureService {
           mountain: supplier.shippingMountain,
         },
         contact,
+        contactHints,
+        trustSignals,
       };
     } catch (error) {
       logger.error('[NetureService] Error fetching supplier by slug:', error);
@@ -328,6 +415,100 @@ export class NetureService {
       };
     } catch (error) {
       logger.error('[NetureService] Error updating supplier profile:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Profile Completeness (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1) ====================
+
+  /**
+   * GET /supplier/profile/completeness
+   * Internal-only profile completeness indicator
+   *
+   * 8 items checked:
+   * 1. name - 상호명 등록
+   * 2. description - 소개글 50자 이상
+   * 3. logoUrl - 프로필 이미지
+   * 4. contactEmail - 이메일 (public/partners)
+   * 5. contactWebsite - 웹사이트 (public/partners)
+   * 6. contactKakao - 카카오톡 (public/partners)
+   * 7. hasApprovedPartners - 파트너 승인 1건+
+   * 8. recentActivity - 최근 30일 활동
+   *
+   * Phone excluded (private allowed).
+   */
+  async computeProfileCompleteness(supplierId: string) {
+    try {
+      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
+      if (!supplier) return null;
+
+      const missing: string[] = [];
+
+      // 1. name
+      if (!supplier.name || supplier.name.trim().length === 0) {
+        missing.push('name');
+      }
+
+      // 2. description (50+ chars)
+      if (!supplier.description || supplier.description.trim().length < 50) {
+        missing.push('description');
+      }
+
+      // 3. logoUrl
+      if (!supplier.logoUrl || supplier.logoUrl.trim().length === 0) {
+        missing.push('logoUrl');
+      }
+
+      // 4. email (public or partners visibility + value exists)
+      if (
+        !supplier.contactEmail ||
+        supplier.contactEmailVisibility === ContactVisibility.PRIVATE
+      ) {
+        missing.push('email');
+      }
+
+      // 5. website (public or partners visibility + value exists)
+      if (
+        !supplier.contactWebsite ||
+        supplier.contactWebsiteVisibility === ContactVisibility.PRIVATE
+      ) {
+        missing.push('website');
+      }
+
+      // 6. kakao (public or partners visibility + value exists)
+      if (
+        !supplier.contactKakao ||
+        supplier.contactKakaoVisibility === ContactVisibility.PRIVATE
+      ) {
+        missing.push('kakao');
+      }
+
+      // 7. hasApprovedPartners (1+ approved request)
+      const approvedCount = await this.supplierRequestRepo.count({
+        where: { supplierId, status: SupplierRequestStatus.APPROVED },
+      });
+      if (approvedCount === 0) {
+        missing.push('partnerApproval');
+      }
+
+      // 8. recentActivity (30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const recentCount = await this.supplierRequestRepo
+        .createQueryBuilder('request')
+        .where('request.supplierId = :supplierId', { supplierId })
+        .andWhere('request.createdAt >= :since', { since: thirtyDaysAgo })
+        .getCount();
+      if (recentCount === 0) {
+        missing.push('recentActivity');
+      }
+
+      const total = 8;
+      const completed = total - missing.length;
+
+      return { total, completed, missing };
+    } catch (error) {
+      logger.error('[NetureService] Error computing profile completeness:', error);
       throw error;
     }
   }

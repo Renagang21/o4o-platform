@@ -773,6 +773,30 @@ router.get('/supplier/profile', requireAuth, async (req: AuthenticatedRequest, r
 });
 
 /**
+ * GET /api/v1/neture/supplier/profile/completeness
+ * Get profile completeness indicator (internal, supplier-only)
+ * WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1
+ */
+router.get('/supplier/profile/completeness', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+    if (!supplierId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+    }
+
+    const result = await netureService.computeProfileCompleteness(supplierId);
+    if (!result) {
+      return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });
+    }
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching profile completeness:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
  * PATCH /api/v1/neture/supplier/profile
  * Update supplier contact info
  */
