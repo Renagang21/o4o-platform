@@ -45,6 +45,24 @@ import {
   type ForumComment as ApiForumComment,
   type PostType,
 } from '../../services/forumApi';
+import { blocksToHtml } from '@o4o/forum-core/utils';
+
+/** Convert post content (Block[] or string) to safe HTML */
+function contentToHtml(content: string | object[] | undefined): string {
+  if (!content) return '';
+  if (typeof content === 'string') {
+    // Legacy plain text: escape HTML and convert newlines to <br>
+    return content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br />');
+  }
+  if (Array.isArray(content)) {
+    return blocksToHtml(content as any);
+  }
+  return '';
+}
 
 interface DisplayComment {
   id: string;
@@ -353,7 +371,7 @@ export function ForumPostPage() {
   const postType = normalizePostType(post.type);
   const badge = getTypeBadge(postType);
   const authorName = getAuthorName(post);
-  const contentText = extractTextContent(post.content);
+
 
   return (
     <div style={isMobile ? styles.containerMobile : styles.container}>
@@ -422,13 +440,10 @@ export function ForumPostPage() {
       </header>
 
       {/* Post Content */}
-      <article style={styles.postContent}>
-        {contentText.split('\n').map((paragraph, index) => (
-          <p key={index} style={styles.paragraph}>
-            {paragraph || '\u00A0'}
-          </p>
-        ))}
-      </article>
+      <article
+        style={styles.postContent}
+        dangerouslySetInnerHTML={{ __html: contentToHtml(post.content) }}
+      />
 
       {/* WO-NETURE-EXTERNAL-CONTACT-V1: Author Contact Section */}
       {shouldShowAuthorContact(post) && (
@@ -677,6 +692,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   postContent: {
     marginBottom: '32px',
+    fontSize: '16px',
+    lineHeight: 1.8,
+    color: '#334155',
   },
   paragraph: {
     fontSize: '16px',

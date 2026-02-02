@@ -1286,11 +1286,11 @@ export class ForumController {
 
     if (ctx.organizationId) {
       qb.andWhere(
-        `(${alias}."isOrganizationExclusive" = false OR ${alias}."organizationId" = :ctxOrgId)`,
+        `(${alias}.isOrganizationExclusive = false OR ${alias}.organizationId = :ctxOrgId)`,
         { ctxOrgId: ctx.organizationId },
       );
     } else {
-      qb.andWhere(`${alias}."isOrganizationExclusive" = false`);
+      qb.andWhere(`${alias}.isOrganizationExclusive = false`);
     }
   }
 

@@ -106,6 +106,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   const forumRouter = Router();
   const forumController = new ForumController();
 
+  // Optional auth must run before context resolution so userId is available
+  forumRouter.use(optionalAuth as any);
+
   // Inject service context: resolve organizationId from user's KPA membership
   forumRouter.use(forumContextDynamic('kpa', async (userId) => {
     if (!userId) return null;
