@@ -62,11 +62,12 @@ router.get('/suppliers', requireAuth, async (req: Request, res: Response) => {
  * GET /api/v1/neture/suppliers/:slug
  * Get supplier detail by slug
  */
-router.get('/suppliers/:slug', requireAuth, async (req: Request, res: Response) => {
+router.get('/suppliers/:slug', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { slug } = req.params;
+    const viewerId = req.user?.id || null;
 
-    const supplier = await netureService.getSupplierBySlug(slug);
+    const supplier = await netureService.getSupplierBySlug(slug, viewerId);
 
     if (!supplier) {
       return res.status(404).json({
@@ -782,13 +783,21 @@ router.patch('/supplier/profile', requireAuth, async (req: AuthenticatedRequest,
       return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
     }
 
-    const { contactEmail, contactPhone, contactWebsite, contactKakao } = req.body;
+    const {
+      contactEmail, contactPhone, contactWebsite, contactKakao,
+      contactEmailVisibility, contactPhoneVisibility,
+      contactWebsiteVisibility, contactKakaoVisibility,
+    } = req.body;
 
     const result = await netureService.updateSupplierProfile(supplierId, {
       contactEmail,
       contactPhone,
       contactWebsite,
       contactKakao,
+      contactEmailVisibility,
+      contactPhoneVisibility,
+      contactWebsiteVisibility,
+      contactKakaoVisibility,
     });
 
     if (!result) {

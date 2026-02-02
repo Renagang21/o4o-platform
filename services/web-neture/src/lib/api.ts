@@ -15,6 +15,9 @@
 // 제품 목적 타입 (WO-NETURE-EXTENSION-P3)
 export type ProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
+// 연락처 공개 범위 (WO-O4O-SUPPLIER-PUBLIC-CONTACT-POLICY-V1)
+export type ContactVisibility = 'public' | 'partners' | 'private';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
 // fetch wrapper with timeout (increased to 10s for cold-start tolerance)
@@ -1255,6 +1258,10 @@ export interface SupplierProfile {
   contactPhone: string | null;
   contactWebsite: string | null;
   contactKakao: string | null;
+  contactEmailVisibility: ContactVisibility;
+  contactPhoneVisibility: ContactVisibility;
+  contactWebsiteVisibility: ContactVisibility;
+  contactKakaoVisibility: ContactVisibility;
 }
 
 export const supplierProfileApi = {
@@ -1277,6 +1284,10 @@ export const supplierProfileApi = {
     contactPhone?: string;
     contactWebsite?: string;
     contactKakao?: string;
+    contactEmailVisibility?: ContactVisibility;
+    contactPhoneVisibility?: ContactVisibility;
+    contactWebsiteVisibility?: ContactVisibility;
+    contactKakaoVisibility?: ContactVisibility;
   }): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/profile`, {

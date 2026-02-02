@@ -13,6 +13,12 @@ export enum SupplierStatus {
   INACTIVE = 'INACTIVE',
 }
 
+export enum ContactVisibility {
+  PUBLIC = 'public',
+  PARTNERS = 'partners',
+  PRIVATE = 'private',
+}
+
 @Entity('neture_suppliers')
 export class NetureSupplier {
   @PrimaryGeneratedColumn('uuid')
@@ -62,6 +68,18 @@ export class NetureSupplier {
 
   @Column({ name: 'contact_kakao', type: 'text', nullable: true })
   contactKakao: string;
+
+  @Column({ name: 'contact_email_visibility', type: 'varchar', length: 10, default: ContactVisibility.PUBLIC })
+  contactEmailVisibility: ContactVisibility;
+
+  @Column({ name: 'contact_phone_visibility', type: 'varchar', length: 10, default: ContactVisibility.PRIVATE })
+  contactPhoneVisibility: ContactVisibility;
+
+  @Column({ name: 'contact_website_visibility', type: 'varchar', length: 10, default: ContactVisibility.PUBLIC })
+  contactWebsiteVisibility: ContactVisibility;
+
+  @Column({ name: 'contact_kakao_visibility', type: 'varchar', length: 10, default: ContactVisibility.PARTNERS })
+  contactKakaoVisibility: ContactVisibility;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

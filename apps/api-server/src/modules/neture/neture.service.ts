@@ -20,6 +20,7 @@ import {
   ContentType,
   ContentStatus,
   RequestEventType,
+  ContactVisibility,
 } from './entities/index.js';
 import logger from '../../utils/logger.js';
 
@@ -180,7 +181,41 @@ export class NetureService {
   /**
    * GET /suppliers/:slug - Get supplier detail
    */
-  async getSupplierBySlug(slug: string) {
+  async hasApprovedPartnership(supplierId: string, viewerId: string): Promise<boolean> {
+    try {
+      const count = await this.supplierRequestRepo.count({
+        where: { supplierId, sellerId: viewerId, status: SupplierRequestStatus.APPROVED },
+      });
+      return count > 0;
+    } catch (error) {
+      logger.error('[NetureService] Error checking partnership:', error);
+      return false;
+    }
+  }
+
+  private filterContactInfo(
+    supplier: NetureSupplier,
+    viewerId: string | null,
+    isPartner: boolean,
+    isOwner: boolean,
+  ) {
+    const canView = (visibility: ContactVisibility): boolean => {
+      if (isOwner) return true;
+      if (!viewerId) return false;
+      if (visibility === ContactVisibility.PUBLIC) return true;
+      if (visibility === ContactVisibility.PARTNERS) return isPartner;
+      return false;
+    };
+
+    return {
+      email: canView(supplier.contactEmailVisibility) ? (supplier.contactEmail || null) : null,
+      phone: canView(supplier.contactPhoneVisibility) ? (supplier.contactPhone || null) : null,
+      website: canView(supplier.contactWebsiteVisibility) ? (supplier.contactWebsite || null) : null,
+      kakao: canView(supplier.contactKakaoVisibility) ? (supplier.contactKakao || null) : null,
+    };
+  }
+
+  async getSupplierBySlug(slug: string, viewerId?: string | null) {
     try {
       const supplier = await this.supplierRepo.findOne({
         where: { slug, status: SupplierStatus.ACTIVE },
@@ -190,6 +225,12 @@ export class NetureService {
       if (!supplier) {
         return null;
       }
+
+      const isOwner = !!viewerId && supplier.userId === viewerId;
+      const isPartner = !!viewerId && !isOwner
+        ? await this.hasApprovedPartnership(supplier.id, viewerId)
+        : false;
+      const contact = this.filterContactInfo(supplier, viewerId || null, isPartner, isOwner);
 
       return {
         id: supplier.id,
@@ -212,12 +253,7 @@ export class NetureService {
           island: supplier.shippingIsland,
           mountain: supplier.shippingMountain,
         },
-        contact: {
-          email: supplier.contactEmail,
-          phone: supplier.contactPhone,
-          website: supplier.contactWebsite,
-          kakao: supplier.contactKakao,
-        },
+        contact,
       };
     } catch (error) {
       logger.error('[NetureService] Error fetching supplier by slug:', error);
@@ -240,6 +276,10 @@ export class NetureService {
         contactPhone: supplier.contactPhone || null,
         contactWebsite: supplier.contactWebsite || null,
         contactKakao: supplier.contactKakao || null,
+        contactEmailVisibility: supplier.contactEmailVisibility,
+        contactPhoneVisibility: supplier.contactPhoneVisibility,
+        contactWebsiteVisibility: supplier.contactWebsiteVisibility,
+        contactKakaoVisibility: supplier.contactKakaoVisibility,
       };
     } catch (error) {
       logger.error('[NetureService] Error fetching supplier profile:', error);
@@ -254,6 +294,10 @@ export class NetureService {
       contactPhone?: string;
       contactWebsite?: string;
       contactKakao?: string;
+      contactEmailVisibility?: ContactVisibility;
+      contactPhoneVisibility?: ContactVisibility;
+      contactWebsiteVisibility?: ContactVisibility;
+      contactKakaoVisibility?: ContactVisibility;
     },
   ) {
     try {
@@ -264,6 +308,10 @@ export class NetureService {
       if (data.contactPhone !== undefined) supplier.contactPhone = data.contactPhone || '';
       if (data.contactWebsite !== undefined) supplier.contactWebsite = data.contactWebsite || '';
       if (data.contactKakao !== undefined) supplier.contactKakao = data.contactKakao || '';
+      if (data.contactEmailVisibility !== undefined) supplier.contactEmailVisibility = data.contactEmailVisibility;
+      if (data.contactPhoneVisibility !== undefined) supplier.contactPhoneVisibility = data.contactPhoneVisibility;
+      if (data.contactWebsiteVisibility !== undefined) supplier.contactWebsiteVisibility = data.contactWebsiteVisibility;
+      if (data.contactKakaoVisibility !== undefined) supplier.contactKakaoVisibility = data.contactKakaoVisibility;
 
       await this.supplierRepo.save(supplier);
 
@@ -273,6 +321,10 @@ export class NetureService {
         contactPhone: supplier.contactPhone || null,
         contactWebsite: supplier.contactWebsite || null,
         contactKakao: supplier.contactKakao || null,
+        contactEmailVisibility: supplier.contactEmailVisibility,
+        contactPhoneVisibility: supplier.contactPhoneVisibility,
+        contactWebsiteVisibility: supplier.contactWebsiteVisibility,
+        contactKakaoVisibility: supplier.contactKakaoVisibility,
       };
     } catch (error) {
       logger.error('[NetureService] Error updating supplier profile:', error);
