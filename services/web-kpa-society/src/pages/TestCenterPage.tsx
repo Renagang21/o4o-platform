@@ -82,20 +82,12 @@ export function TestCenterPage() {
         <section style={styles.section}>
           <div style={styles.linksWrapper}>
             <a
-              href="https://neture.co.kr/supplier-ops/forum/test-feedback"
+              href="https://neture.co.kr/forum/test-feedback"
               target="_blank"
               rel="noopener noreferrer"
               style={styles.linkButton}
             >
               테스트 포럼 바로가기 →
-            </a>
-            <a
-              href="https://neture.co.kr/supplier-ops/forum/service-update"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.linkButton}
-            >
-              서비스 업데이트 보기 →
             </a>
           </div>
         </section>
