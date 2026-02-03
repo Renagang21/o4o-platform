@@ -2,6 +2,7 @@
  * AdminRoutes - 지부 관리자 라우트 설정
  * WO-KPA-COMMITTEE-GOVERNANCE-V1: 위원회 관리 라우트 추가
  * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
+ * WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1: Steward 관리 추가
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import { KpaOperatorDashboardPage } from '../pages/admin/KpaOperatorDashboardPage';
 import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
+import { StewardManagementPage } from '../pages/admin/StewardManagementPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 
 export function AdminRoutes() {
@@ -54,6 +56,9 @@ export function AdminRoutes() {
 
           {/* 서비스 신청 관리 (WO-ADMIN-SERVICE-ENROLLMENT-APPROVAL-V1) */}
           <Route path="service-enrollments" element={<ServiceEnrollmentManagementPage />} />
+
+          {/* Steward 관리 (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1) */}
+          <Route path="stewards" element={<StewardManagementPage />} />
 
           {/* 신상신고 */}
           <Route path="annual-report" element={<AnnualReportPage />} />

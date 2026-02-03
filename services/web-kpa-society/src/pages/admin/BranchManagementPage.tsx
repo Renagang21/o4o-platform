@@ -1,5 +1,9 @@
 /**
  * BranchManagementPage - 분회 관리 (목록)
+ *
+ * WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1
+ * - 조직 삭제 금지 (비활성화만 허용)
+ * - 조직 자동 생성 금지
  */
 
 import { useState, useEffect } from 'react';
@@ -27,7 +31,6 @@ export function BranchManagementPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [_error, setError] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     loadBranches();
@@ -58,16 +61,8 @@ export function BranchManagementPage() {
     }
   };
 
-  const handleDelete = async (branchId: string) => {
-    try {
-      await adminApi.deleteBranch(branchId);
-      setBranches(branches.filter(b => b.id !== branchId));
-      setDeleteConfirm(null);
-      alert('분회가 삭제되었습니다.');
-    } catch (err) {
-      alert('삭제에 실패했습니다.');
-    }
-  };
+  // WO: 조직 삭제 금지 - 비활성화만 허용
+  // handleDelete 함수 제거됨
 
   const handleToggleActive = async (branch: Branch) => {
     try {
@@ -160,29 +155,7 @@ export function BranchManagementPage() {
                   >
                     {branch.isActive ? '비활성화' : '활성화'}
                   </button>
-                  {deleteConfirm === branch.id ? (
-                    <div style={styles.confirmButtons}>
-                      <button
-                        style={{ ...styles.actionButton, ...styles.deleteConfirmButton }}
-                        onClick={() => handleDelete(branch.id)}
-                      >
-                        확인
-                      </button>
-                      <button
-                        style={styles.actionButton}
-                        onClick={() => setDeleteConfirm(null)}
-                      >
-                        취소
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      style={{ ...styles.actionButton, ...styles.deleteButton }}
-                      onClick={() => setDeleteConfirm(branch.id)}
-                    >
-                      삭제
-                    </button>
-                  )}
+                  {/* WO: 조직 삭제 금지 - 비활성화만 허용 */}
                 </div>
               </div>
             </Card>
@@ -283,16 +256,5 @@ const styles: Record<string, React.CSSProperties> = {
   toggleButton: {
     backgroundColor: colors.neutral200,
   },
-  deleteButton: {
-    backgroundColor: '#FEE2E2',
-    color: '#DC2626',
-  },
-  confirmButtons: {
-    display: 'flex',
-    gap: '4px',
-  },
-  deleteConfirmButton: {
-    backgroundColor: '#DC2626',
-    color: colors.white,
-  },
+  // WO: 삭제 관련 스타일 제거 - 비활성화만 허용
 };
