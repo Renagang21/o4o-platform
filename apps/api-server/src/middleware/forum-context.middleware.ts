@@ -19,6 +19,15 @@ export interface ForumContext {
   organizationId?: string | null;
   /** Service code for logging/debugging */
   serviceCode?: string;
+  /**
+   * Forum scope — determines query filtering strategy
+   * - 'community': only posts with organizationId IS NULL (공동 커뮤니티)
+   * - 'organization': only posts matching organizationId (조직 전용)
+   * - undefined: legacy behavior (isOrganizationExclusive filter)
+   *
+   * WO-FORUM-SCOPE-SEPARATION-V1
+   */
+  scope?: 'community' | 'organization';
 }
 
 // Extend Express Request

@@ -1352,12 +1352,16 @@ export class ForumController {
   }
 
   /**
-   * Apply organizationId + isOrganizationExclusive filter to a QueryBuilder.
+   * Apply scope-aware filter to a QueryBuilder.
+   *
+   * WO-FORUM-SCOPE-SEPARATION-V1: scope-based filtering
    *
    * Rules:
    * - No context (admin-dashboard /api/v1/forum): no filter → see everything
-   * - Context with organizationId: show non-exclusive + matching exclusive
-   * - Context without organizationId: show only non-exclusive
+   * - scope='community': only organizationId IS NULL (커뮤니티 전용)
+   * - scope='organization' + organizationId: only matching org posts
+   * - Legacy (no scope) + organizationId: non-exclusive + matching exclusive
+   * - Legacy (no scope) + no organizationId: non-exclusive only
    */
   private applyContextFilter<T>(
     qb: SelectQueryBuilder<T>,
@@ -1366,6 +1370,18 @@ export class ForumController {
   ): void {
     if (!ctx) return; // admin/generic route — no filter
 
+    // WO-FORUM-SCOPE-SEPARATION-V1: explicit scope filtering
+    if (ctx.scope === 'community') {
+      qb.andWhere(`${alias}.organizationId IS NULL`);
+      return;
+    }
+
+    if (ctx.scope === 'organization' && ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+      return;
+    }
+
+    // Legacy behavior (no scope set — e.g. glycopharm)
     if (ctx.organizationId) {
       qb.andWhere(
         `(${alias}.isOrganizationExclusive = false OR ${alias}.organizationId = :ctxOrgId)`,
