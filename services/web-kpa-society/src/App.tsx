@@ -110,10 +110,18 @@ function App() {
       <OrganizationProvider>
       <BrowserRouter>
         <Routes>
-          {/* ========================================
-           * 커뮤니티 홈 (/ 경로)
-           * WO-KPA-COMMUNITY-HOME-V1: 마케팅 랜딩 → 커뮤니티 실사용 홈
-           * ======================================== */}
+          {/* =========================================================
+           * SCOPE: 분회 서비스 데모 (Community Demo)
+           * 단일 조직, 커뮤니티 중심 서비스
+           * - / : 커뮤니티 홈
+           * - /test-center : 테스트 센터
+           * - /services/* : 서비스 소개 페이지
+           * - /join/* : 서비스 참여 페이지
+           * - /pharmacy/* : 약국 경영지원 (실 서비스)
+           * - /work/* : 근무약사 업무
+           *
+           * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
+           * ========================================================= */}
           <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>} />
 
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
@@ -165,10 +173,20 @@ function App() {
           <Route path="/work/display" element={<Layout serviceName={SERVICE_NAME}><WorkDisplayPage /></Layout>} />
           <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
 
-          {/* ========================================
-           * 약사회 데모 서비스 (/demo 하위)
+          {/* =========================================================
+           * SCOPE: 지부/분회 서비스 데모 (District/Branch Admin Demo)
+           * 조직 관리 중심 서비스 — 커뮤니티 홈(/)과 혼합 금지
+           * - /demo : 조직 대시보드 (DashboardPage)
+           * - /demo/admin/* : 지부 관리자
+           * - /demo/operator/* : 서비스 운영자
+           * - /demo/intranet/* : 인트라넷
+           * - /demo/branch/:branchId/* : 분회 서비스
+           * - /demo/branch/:branchId/admin/* : 분회 관리자
+           * - /demo/login, /demo/register : 데모 인증
+           *
            * WO-KPA-DEMO-ROUTE-ISOLATION-V1
-           * ======================================== */}
+           * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
+           * ========================================================= */}
 
           {/* Login & Register Pages (레이아웃 없음) */}
           <Route path="/demo/login" element={<LoginPage />} />
@@ -204,9 +222,10 @@ function App() {
           {/* Main Layout Routes - /demo 하위 나머지 경로 */}
           <Route path="/demo/*" element={<DemoLayoutRoutes />} />
 
-          {/* ========================================
-           * 레거시 경로 리다이렉트 (기존 북마크 지원)
-           * ======================================== */}
+          {/* =========================================================
+           * SCOPE: 레거시 경로 리다이렉트 (Legacy Redirects)
+           * 기존 북마크 호환용, 신규 코드에서 참조 금지
+           * ========================================================= */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Navigate to="/demo/register" replace />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
@@ -235,8 +254,11 @@ function App() {
 }
 
 /**
- * /demo 하위 Main Layout을 사용하는 라우트들
- * 기존 MainLayoutRoutes와 동일 (경로만 /demo 하위로 이동)
+ * SCOPE: 지부/분회 서비스 데모 — Main Layout 하위 라우트
+ *
+ * /demo 하위에서 Layout을 사용하는 라우트들.
+ * 이 라우트들은 지부/분회 조직 관리 데모 범위에 속합니다.
+ * 커뮤니티 홈(/)과는 별도 스코프입니다.
  */
 function DemoLayoutRoutes() {
   return (

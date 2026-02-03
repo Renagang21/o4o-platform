@@ -1,19 +1,22 @@
 /**
  * CommunityHomePage - KPA Society 커뮤니티 홈 페이지
  *
+ * SCOPE: 분회 서비스 데모 (커뮤니티 중심)
+ *
  * 커뮤니티 중심 구조:
  * ├─ HeroSection              - 커뮤니티 소개 Hero
  * ├─ ActivitySection          - 최근 활동 (포럼 글 + 공지)
  * ├─ CommunityServiceSection  - 공용 서비스 2x2 그리드
- * ├─ OrganizationDemoSection  - 지부 서비스 데모
  * └─ UtilitySection           - 유틸리티 (로그인 패널 + 링크)
  *
- * QuickAccessBar 제거: CommunityServiceSection과 중복
+ * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1:
+ * - 지부/분회 서비스 데모(OrganizationDemoSection) 제거
+ * - 커뮤니티 홈은 분회 서비스 데모 전용
+ * - 지부/분회 관리 데모는 /demo 경로에서 별도 진입
  */
 
 import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
 import { CommunityServiceSection } from '../components/home/CommunityServiceSection';
-import { OrganizationDemoSection } from '../components/home/OrganizationDemoSection';
 import { UtilitySection } from '../components/home/UtilitySection';
 import { colors, spacing, typography, borderRadius } from '../styles/theme';
 
@@ -41,7 +44,6 @@ export function CommunityHomePage() {
       <div style={styles.content}>
         <ActivitySection />
         <CommunityServiceSection />
-        <OrganizationDemoSection />
         <UtilitySection />
       </div>
     </div>
