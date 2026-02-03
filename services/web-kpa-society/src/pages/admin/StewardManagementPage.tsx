@@ -61,8 +61,8 @@ export function StewardManagementPage() {
         adminApi.getOrganizations({ active_only: true }),
       ]);
 
-      setStewards(stewardRes.data?.data || []);
-      setOrganizations(orgRes.data?.data || []);
+      setStewards(stewardRes.data || []);
+      setOrganizations(orgRes.data || []);
     } catch (err: any) {
       setError(err.message || '데이터를 불러올 수 없습니다.');
       // Demo fallback
