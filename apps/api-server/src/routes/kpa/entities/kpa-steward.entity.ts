@@ -100,11 +100,12 @@ export class KpaSteward {
   updated_at: Date;
 
   // Relations (string-based per CLAUDE.md ESM rules)
+  // Type annotations use 'any' to avoid tsup/SWC decorator type issues
   @ManyToOne('KpaOrganization')
   @JoinColumn({ name: 'organization_id' })
-  organization: import('./kpa-organization.entity.js').KpaOrganization;
+  organization: any;
 
   @ManyToOne('KpaMember')
   @JoinColumn({ name: 'member_id' })
-  member: import('./kpa-member.entity.js').KpaMember;
+  member: any;
 }

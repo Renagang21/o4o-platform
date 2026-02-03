@@ -61,8 +61,8 @@ export function StewardManagementPage() {
         adminApi.getOrganizations({ active_only: true }),
       ]);
 
-      setStewards(stewardRes.data.data || []);
-      setOrganizations(orgRes.data.data || []);
+      setStewards(stewardRes.data?.data || []);
+      setOrganizations(orgRes.data?.data || []);
     } catch (err: any) {
       setError(err.message || '데이터를 불러올 수 없습니다.');
       // Demo fallback
@@ -78,7 +78,7 @@ export function StewardManagementPage() {
 
   const loadMembersForOrg = async (orgId: string) => {
     try {
-      const res = await adminApi.getMembers({ branchId: orgId });
+      const res = await adminApi.getMembers({ branchId: orgId }) as any;
       setMembers(res.data?.items || []);
     } catch {
       setMembers([]);
