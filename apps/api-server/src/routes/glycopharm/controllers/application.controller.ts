@@ -12,6 +12,8 @@ import { GlycopharmApplication } from '../entities/glycopharm-application.entity
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
+import { emailService } from '../../../services/email.service.js';
+import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -116,6 +118,58 @@ export function createApplicationController(
         await applicationRepo.save(application);
 
         logger.info(`[Glycopharm] New application submitted: ${application.id} by user ${userId}`);
+
+        // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send notification emails
+        try {
+          // Get user info for email
+          const userRepo = dataSource.getRepository(User);
+          const appUser = await userRepo.findOne({ where: { id: userId } });
+          const applicantName = appUser?.name || appUser?.email || 'Unknown';
+          const applicantEmail = appUser?.email || '';
+          const appliedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+          // 1. Send notification to operator
+          const operatorEmail = await OperatorNotificationController.getOperatorEmail('glycopharm');
+          if (operatorEmail && emailService.isServiceAvailable()) {
+            const isEnabled = await OperatorNotificationController.isNotificationEnabled('glycopharm', 'serviceApplication');
+            if (isEnabled) {
+              await emailService.sendServiceApplicationOperatorNotificationEmail(
+                operatorEmail.primary,
+                {
+                  serviceName: 'GlycoPharm',
+                  applicantName,
+                  applicantEmail,
+                  applicantPhone: appUser?.phone,
+                  appliedAt,
+                  businessName: application.organizationName,
+                  businessNumber: application.businessNumber || undefined,
+                  note: application.note || undefined,
+                  reviewUrl: `${process.env.OPERATOR_URL || 'https://glycopharm.co.kr'}/operator/glycopharm/applications/${application.id}`,
+                }
+              );
+              logger.info(`[Glycopharm] Operator notification sent to ${operatorEmail.primary}`);
+
+              await OperatorNotificationController.updateLastNotificationTime('glycopharm');
+            }
+          }
+
+          // 2. Send confirmation to applicant
+          if (applicantEmail && emailService.isServiceAvailable()) {
+            await emailService.sendServiceApplicationSubmittedEmail(
+              applicantEmail,
+              {
+                serviceName: 'GlycoPharm',
+                applicantName,
+                applicantEmail,
+                appliedAt,
+                supportEmail: 'support@glycopharm.co.kr',
+              }
+            );
+            logger.info(`[Glycopharm] Application confirmation sent to ${applicantEmail}`);
+          }
+        } catch (emailError) {
+          logger.error('[Glycopharm] Failed to send notification emails:', emailError);
+        }
 
         res.status(201).json({
           success: true,

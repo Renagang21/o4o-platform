@@ -8,6 +8,10 @@ import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { KpaApplication, KpaOrganization, KpaApplicationType } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { User } from '../../../modules/auth/entities/User.js';
+import { emailService } from '../../../services/email.service.js';
+import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
+import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -82,6 +86,56 @@ export function createApplicationController(
         });
 
         const saved = await appRepo.save(application);
+
+        // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send notification emails
+        try {
+          const userRepo = dataSource.getRepository(User);
+          const appUser = await userRepo.findOne({ where: { id: req.user!.id } });
+          const applicantName = appUser?.name || appUser?.email || 'Unknown';
+          const applicantEmail = appUser?.email || '';
+          const appliedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+          // 1. Send notification to operator
+          const operatorEmail = await OperatorNotificationController.getOperatorEmail('kpa-society');
+          if (operatorEmail && emailService.isServiceAvailable()) {
+            const isEnabled = await OperatorNotificationController.isNotificationEnabled('kpa-society', 'serviceApplication');
+            if (isEnabled) {
+              await emailService.sendServiceApplicationOperatorNotificationEmail(
+                operatorEmail.primary,
+                {
+                  serviceName: 'KPA Society',
+                  applicantName,
+                  applicantEmail,
+                  applicantPhone: appUser?.phone,
+                  appliedAt,
+                  businessName: org.name,
+                  note: req.body.note || undefined,
+                  reviewUrl: `${process.env.OPERATOR_URL || 'https://kpa-society.co.kr'}/operator/kpa/applications/${saved.id}`,
+                }
+              );
+              logger.info(`[KPA] Operator notification sent to ${operatorEmail.primary}`);
+              await OperatorNotificationController.updateLastNotificationTime('kpa-society');
+            }
+          }
+
+          // 2. Send confirmation to applicant
+          if (applicantEmail && emailService.isServiceAvailable()) {
+            await emailService.sendServiceApplicationSubmittedEmail(
+              applicantEmail,
+              {
+                serviceName: 'KPA Society',
+                applicantName,
+                applicantEmail,
+                appliedAt,
+                supportEmail: 'support@kpa-society.co.kr',
+              }
+            );
+            logger.info(`[KPA] Application confirmation sent to ${applicantEmail}`);
+          }
+        } catch (emailError) {
+          logger.error('[KPA] Failed to send notification emails:', emailError);
+        }
+
         res.status(201).json({ data: saved });
       } catch (error: any) {
         console.error('Failed to submit application:', error);
@@ -288,6 +342,46 @@ export function createApplicationController(
         application.reviewed_at = new Date();
 
         const saved = await appRepo.save(application);
+
+        // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send result notification to applicant
+        try {
+          const userRepo = dataSource.getRepository(User);
+          const appUser = await userRepo.findOne({ where: { id: application.user_id } });
+          const applicantEmail = appUser?.email;
+          const applicantName = appUser?.name || appUser?.email || 'Unknown';
+          const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+          if (applicantEmail && emailService.isServiceAvailable()) {
+            if (req.body.status === 'approved') {
+              await emailService.sendServiceApplicationApprovedEmail(
+                applicantEmail,
+                {
+                  serviceName: 'KPA Society',
+                  applicantName,
+                  approvedAt: decidedAt,
+                  serviceUrl: process.env.KPA_URL || 'https://kpa-society.co.kr',
+                  supportEmail: 'support@kpa-society.co.kr',
+                }
+              );
+              logger.info(`[KPA] Approval notification sent to ${applicantEmail}`);
+            } else if (req.body.status === 'rejected') {
+              await emailService.sendServiceApplicationRejectedEmail(
+                applicantEmail,
+                {
+                  serviceName: 'KPA Society',
+                  applicantName,
+                  rejectedAt: decidedAt,
+                  rejectionReason: req.body.review_comment || undefined,
+                  supportEmail: 'support@kpa-society.co.kr',
+                }
+              );
+              logger.info(`[KPA] Rejection notification sent to ${applicantEmail}`);
+            }
+          }
+        } catch (emailError) {
+          logger.error('[KPA] Failed to send result notification email:', emailError);
+        }
+
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to review application:', error);
