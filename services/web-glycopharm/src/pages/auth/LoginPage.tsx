@@ -3,13 +3,6 @@ import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
-// 테스트 계정 (비밀번호 통일: TestPassword)
-// 계정은 SeedAdditionalTestAccounts migration에서 생성됨
-const TEST_PASSWORD = 'TestPassword';
-const testAccounts = [
-  { email: 'pharmacy-glycopharm@o4o.com', password: TEST_PASSWORD, label: '약국' },
-];
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,13 +27,6 @@ export default function LoginPage() {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
       setIsSubmitting(false);
     }
-  };
-
-  // 테스트 계정 정보를 입력 필드에 채우기 (자동 로그인 아님)
-  const fillTestAccount = (account: { email: string; password: string }) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setError('');
   };
 
   return (
@@ -153,31 +139,6 @@ export default function LoginPage() {
                 회원가입
               </NavLink>
             </p>
-          </div>
-
-          {/* 테스트 계정 */}
-          <div className="mt-6 pt-6 border-t">
-            <p className="text-xs text-slate-400 text-center mb-3">테스트 계정 (클릭 시 입력됨)</p>
-            <div className="space-y-2">
-              {testAccounts.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => fillTestAccount(account)}
-                  className="w-full px-4 py-3 text-left rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="inline-block px-2 py-0.5 rounded text-xs font-medium mb-1 bg-slate-100 text-slate-700">
-                        {account.label}
-                      </span>
-                      <p className="text-sm text-slate-600">{account.email}</p>
-                    </div>
-                    <span className="text-xs text-slate-400">클릭하여 입력</span>
-                  </div>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>

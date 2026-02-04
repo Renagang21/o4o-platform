@@ -228,26 +228,6 @@ const Login: FC = () => {
           </div>
         )}
 
-        {/* 테스트 계정 정보 */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-          <p className="text-xs text-blue-300 mb-3 font-medium">로그인 계정</p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('admin@neture.co.kr');
-                setPassword('TestPassword');
-              }}
-              className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors border border-white/10"
-            >
-              Super Admin
-            </button>
-          </div>
-          <div className="mt-3 text-xs text-blue-200/60 space-y-1">
-            <div>📧 admin@neture.co.kr / TestPassword</div>
-          </div>
-        </div>
-
         {/* 하단 링크 */}
         <div className="text-center">
           <a 

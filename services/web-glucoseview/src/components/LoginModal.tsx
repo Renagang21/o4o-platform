@@ -137,23 +137,6 @@ export default function LoginModal({ isOpen, onClose, initialEmail, initialPassw
         >
           약사 회원가입
         </button>
-
-        {/* Test Account Buttons */}
-        <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-          <p className="text-sm font-medium text-amber-800 mb-3">테스트 계정으로 로그인</p>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('pharmacist@o4o.com');
-                setPassword('TestPassword');
-              }}
-              className="flex-1 px-3 py-2 text-xs font-medium text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
-            >
-              약사 계정
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );

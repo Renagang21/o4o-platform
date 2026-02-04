@@ -9,28 +9,11 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-
-// 테스트 계정 (비밀번호 통일: TestPassword)
-// 계정은 SeedAdditionalTestAccounts migration에서 생성됨
-const TEST_PASSWORD = 'TestPassword';
-
-// 메인 로그인: 약사/약국 서비스용 계정만
-const mainTestAccounts = [
-  { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '약사' },
-];
-
-// 데모 로그인: 기존 데모 계정
-const demoTestAccounts = [
-  { email: 'pharmacist-kpa@o4o.com', password: TEST_PASSWORD, label: '일반회원 (약사)' },
-  { email: 'branch-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '분회 임원' },
-  { email: 'district-officer-kpa@o4o.com', password: TEST_PASSWORD, label: '지부 임원' },
-];
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
   const returnTo = searchParams.get('returnTo');
@@ -39,15 +22,6 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // 경로 기반 모드 판별: /demo/login → 데모, /login → 메인
-  const isDemo = location.pathname.startsWith('/demo');
-  // 테스트 계정 정보를 입력 필드에 채우기
-  const fillTestAccount = (account: { email: string; password: string }) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setError(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,27 +135,6 @@ export function LoginPage() {
         <div style={styles.footer}>
           <span style={styles.footerText}>계정이 없으신가요?</span>
           <a href="/demo/member/apply" style={styles.link}>회원가입</a>
-        </div>
-
-        {/* 테스트 계정 */}
-        <div style={styles.testSection}>
-          <p style={styles.testLabel}>테스트 계정 (클릭 시 입력됨)</p>
-          <div style={styles.testAccounts}>
-            {(isDemo ? demoTestAccounts : mainTestAccounts).map((account) => (
-              <button
-                key={account.email}
-                type="button"
-                onClick={() => fillTestAccount(account)}
-                style={styles.testAccountButton}
-              >
-                <div style={styles.testAccountInfo}>
-                  <span style={styles.testAccountBadge}>{account.label}</span>
-                  <p style={styles.testAccountEmail}>{account.email}</p>
-                </div>
-                <span style={styles.testAccountClick}>클릭하여 입력</span>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>
@@ -335,58 +288,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'var(--color-primary)',  /* Primary 허용: 핵심 링크 */
     textDecoration: 'none',
     fontWeight: 500,
-  },
-  testSection: {
-    marginTop: 'var(--space-5)',
-    paddingTop: 'var(--space-4)',
-    borderTop: '1px solid var(--color-border-default)',
-  },
-  testLabel: {
-    fontSize: 'var(--text-body-sm)',
-    color: 'var(--color-text-secondary)',
-    textAlign: 'center',
-    marginBottom: 'var(--space-3)',
-  },
-  testAccounts: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-2)',
-  },
-  testAccountButton: {
-    width: '100%',
-    padding: 'var(--space-3)',
-    textAlign: 'left',
-    borderRadius: 'var(--radius-md)',
-    border: '1px solid var(--color-border-default)',
-    backgroundColor: 'var(--color-card-bg)',
-    cursor: 'pointer',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    transition: 'var(--transition-fast)',
-  },
-  testAccountInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-1)',
-  },
-  testAccountBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: 'var(--text-body-sm)',
-    fontWeight: 500,
-    backgroundColor: 'var(--color-bg-secondary)',
-    color: 'var(--color-text-secondary)',
-  },
-  testAccountEmail: {
-    fontSize: 'var(--text-body-md)',
-    color: 'var(--color-text-secondary)',
-    margin: 0,
-  },
-  testAccountClick: {
-    fontSize: 'var(--text-body-sm)',
-    color: 'var(--color-text-secondary)',
   },
 };
 

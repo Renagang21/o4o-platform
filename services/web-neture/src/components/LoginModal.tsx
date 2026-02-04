@@ -1,20 +1,12 @@
 /**
  * LoginModal - 로그인 오버레이 모달
  * 현재 페이지 위에 오버레이로 표시되어 메뉴 등이 보임
- * 테스트 계정 버튼 포함 (운영자/공급자/파트너)
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { useAuth, ROLE_DASHBOARDS } from '../contexts';
-
-// 테스트 계정 (비밀번호 통일: TestPassword)
-const TEST_PASSWORD = 'TestPassword';
-const testAccounts = [
-  { email: 'supplier-neture@o4o.com', password: TEST_PASSWORD, label: '공급자', color: 'green' },
-  { email: 'partner-neture@o4o.com', password: TEST_PASSWORD, label: '파트너', color: 'blue' },
-];
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -46,13 +38,6 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     };
   }, [isOpen, onClose]);
 
-  // 테스트 계정 정보를 입력 필드에 채우기
-  const fillTestAccount = (account: { email: string; password: string }) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setError(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -82,15 +67,6 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
   if (!isOpen) return null;
 
-  const getAccountButtonStyle = (color: string) => {
-    const colors: Record<string, { bg: string; border: string; text: string; hover: string }> = {
-      red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', hover: 'hover:bg-red-100' },
-      green: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', hover: 'hover:bg-green-100' },
-      blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', hover: 'hover:bg-blue-100' },
-    };
-    return colors[color] || colors.blue;
-  };
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
@@ -119,33 +95,6 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
         </div>
 
         <div className="p-6">
-          {/* 테스트 계정 버튼 */}
-          <div className="mb-6">
-            <p className="text-xs text-gray-500 mb-3 text-center">테스트 계정 (클릭 시 자동 입력)</p>
-            <div className="grid grid-cols-3 gap-2">
-              {testAccounts.map((account) => {
-                const style = getAccountButtonStyle(account.color);
-                return (
-                  <button
-                    key={account.email}
-                    type="button"
-                    onClick={() => fillTestAccount(account)}
-                    className={`px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors ${style.bg} ${style.border} ${style.text} ${style.hover}`}
-                  >
-                    {account.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 구분선 */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-gray-200"></div>
-            <span className="text-xs text-gray-400">또는 직접 입력</span>
-            <div className="flex-1 h-px bg-gray-200"></div>
-          </div>
-
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
