@@ -151,6 +151,43 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/forum', forumRouter);
 
   // ============================================================================
+  // Demo Forum Routes - /api/v1/kpa/demo-forum/*
+  // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: Separate demo forum with demo scope
+  // /demo/forum 경로는 커뮤니티 콘텐츠를 보여주면 안 됨
+  // ============================================================================
+  const demoForumRouter = Router();
+  const demoForumController = new ForumController();
+
+  demoForumRouter.use(optionalAuth as any);
+
+  // Demo scope — returns empty results (no community content)
+  demoForumRouter.use(forumContextMiddleware({
+    serviceCode: 'kpa-demo',
+    scope: 'demo',
+  }));
+
+  // Same endpoints as forum, but with demo scope
+  demoForumRouter.get('/health', demoForumController.health.bind(demoForumController));
+  demoForumRouter.get('/stats', optionalAuth, demoForumController.getStats.bind(demoForumController));
+  demoForumRouter.get('/posts', optionalAuth, demoForumController.listPosts.bind(demoForumController));
+  demoForumRouter.get('/posts/:id', optionalAuth, demoForumController.getPost.bind(demoForumController));
+  demoForumRouter.post('/posts', authenticate, demoForumController.createPost.bind(demoForumController));
+  demoForumRouter.put('/posts/:id', authenticate, demoForumController.updatePost.bind(demoForumController));
+  demoForumRouter.delete('/posts/:id', authenticate, demoForumController.deletePost.bind(demoForumController));
+  demoForumRouter.post('/posts/:id/like', authenticate, demoForumController.toggleLike.bind(demoForumController));
+  demoForumRouter.get('/posts/:postId/comments', demoForumController.listComments.bind(demoForumController));
+  demoForumRouter.post('/comments', authenticate, demoForumController.createComment.bind(demoForumController));
+  demoForumRouter.get('/categories', demoForumController.listCategories.bind(demoForumController));
+  demoForumRouter.get('/categories/:id', demoForumController.getCategory.bind(demoForumController));
+  demoForumRouter.post('/categories', authenticate, demoForumController.createCategory.bind(demoForumController));
+  demoForumRouter.put('/categories/:id', authenticate, demoForumController.updateCategory.bind(demoForumController));
+  demoForumRouter.delete('/categories/:id', authenticate, demoForumController.deleteCategory.bind(demoForumController));
+  demoForumRouter.get('/moderation', authenticate, demoForumController.getModerationQueue.bind(demoForumController));
+  demoForumRouter.post('/moderation/:type/:id', authenticate, demoForumController.moderateContent.bind(demoForumController));
+
+  router.use('/demo-forum', demoForumRouter);
+
+  // ============================================================================
   // LMS Routes - /api/v1/kpa/lms/*
   // ============================================================================
   const lmsRouter = Router();

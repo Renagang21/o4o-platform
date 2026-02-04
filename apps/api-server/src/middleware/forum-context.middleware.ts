@@ -23,11 +23,13 @@ export interface ForumContext {
    * Forum scope — determines query filtering strategy
    * - 'community': only posts with organizationId IS NULL (공동 커뮤니티)
    * - 'organization': only posts matching organizationId (조직 전용)
+   * - 'demo': demo/test mode — returns empty data, no community content
    * - undefined: legacy behavior (isOrganizationExclusive filter)
    *
    * WO-FORUM-SCOPE-SEPARATION-V1
+   * WO-FORUM-DEMO-SCOPE-ISOLATION-V1: Added 'demo' scope
    */
-  scope?: 'community' | 'organization';
+  scope?: 'community' | 'organization' | 'demo';
 }
 
 // Extend Express Request

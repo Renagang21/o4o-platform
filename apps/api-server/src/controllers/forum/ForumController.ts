@@ -1355,11 +1355,13 @@ export class ForumController {
    * Apply scope-aware filter to a QueryBuilder.
    *
    * WO-FORUM-SCOPE-SEPARATION-V1: scope-based filtering
+   * WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
    *
    * Rules:
    * - No context (admin-dashboard /api/v1/forum): no filter → see everything
    * - scope='community': only organizationId IS NULL (커뮤니티 전용)
    * - scope='organization' + organizationId: only matching org posts
+   * - scope='demo': returns empty results (demo mode — no community content)
    * - Legacy (no scope) + organizationId: non-exclusive + matching exclusive
    * - Legacy (no scope) + no organizationId: non-exclusive only
    */
@@ -1369,6 +1371,13 @@ export class ForumController {
     ctx: ForumContext | undefined,
   ): void {
     if (!ctx) return; // admin/generic route — no filter
+
+    // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
+    // /demo/forum should not show community content
+    if (ctx.scope === 'demo') {
+      qb.andWhere('1 = 0'); // Always false — returns empty results
+      return;
+    }
 
     // WO-FORUM-SCOPE-SEPARATION-V1: explicit scope filtering
     if (ctx.scope === 'community') {
