@@ -58,23 +58,22 @@ export function LoginPage() {
       const loggedInUser = await login(email, password);
 
       // WO-KPA-FUNCTION-GATE-V1: 직능 선택 로직
-      // 운영자(admin)는 직능 선택 없이 바로 운영자 대시보드로 이동
+      // 직능/직역 미선택 시 게이트로 이동, 그 외에는 홈으로 이동
       const isAdmin = loggedInUser.role === 'district_admin' ||
                       loggedInUser.role === 'branch_admin' ||
                       loggedInUser.role === 'super_admin';
 
-      // 경로 prefix: 메인은 /demo 기준 (현재 전체 구조가 /demo 하위)
-      const prefix = isDemo ? '/demo' : '/demo';
-
-      if (isAdmin) {
-        navigate(`${prefix}/intranet/operator`);
-      } else if (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole) {
-        navigate(`${prefix}/select-function`);
+      // 모든 로그인 후 홈 화면(/)으로 이동
+      // 관리자도 대시보드가 아닌 홈으로 이동하도록 변경
+      if (!isAdmin && (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole)) {
+        // 직능/직역 미선택 시 게이트로 이동 (게이트 완료 후 홈으로 이동)
+        navigate('/demo/select-function');
       } else if (returnTo) {
         // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: returnTo 지원
         navigate(returnTo);
       } else {
-        navigate(prefix);
+        // 기본: 홈 화면으로 이동 (대시보드 아님)
+        navigate('/');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
