@@ -181,7 +181,11 @@ export const gatewayConfig: GatewayConfig = {
       'http://localhost:3003', // crowdfunding
       'https://neture.co.kr',
       'https://admin.neture.co.kr',
-      'https://shop.neture.co.kr'
+      'https://shop.neture.co.kr',
+      'https://kpa-society.co.kr',
+      'https://glucoseview.com',
+      'https://glycopharm.com',
+      'https://k-cosmetics.co.kr'
     ],
     credentials: true
   },
