@@ -174,3 +174,12 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* ========================================
+ * Service Card Hover
+ * WO-KPA-SOCIETY-COMMUNITY-CARD-TONE-DOWN-V1
+ * ======================================== */
+.service-card:hover {
+  border-color: var(--color-neutral-300);
+  box-shadow: var(--shadow-sm);
+}

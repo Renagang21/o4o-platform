@@ -2,36 +2,36 @@
  * LoginModal - KPA Society 로그인 모달
  *
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
+ * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
  *
  * 원칙:
  * - 로그인은 항상 모달로만 수행
  * - 로그인 성공 후 현재 화면 유지 (navigate 없음)
- * - 아이디·비밀번호 찾기 / 회원가입 링크 포함
- * - 이메일 저장 기능 없음
+ * - 회원가입 클릭 시 RegisterModal로 전환 (페이지 이동 없음)
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useLoginModal } from '../contexts/LoginModalContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 
 export default function LoginModal() {
-  const navigate = useNavigate();
   const { login } = useAuth();
-  const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
+  const { activeModal, closeModal, openRegisterModal, onLoginSuccess } = useAuthModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isOpen = activeModal === 'login';
+
   // ESC 키로 닫기 + 배경 스크롤 방지
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLoginModal();
+      if (e.key === 'Escape') closeModal();
     };
-    if (isLoginModalOpen) {
+    if (isOpen) {
       document.addEventListener('keydown', handleEsc);
       document.body.style.overflow = 'hidden';
     }
@@ -39,16 +39,16 @@ export default function LoginModal() {
       document.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = '';
     };
-  }, [isLoginModalOpen, closeLoginModal]);
+  }, [isOpen, closeModal]);
 
   // 모달 열릴 때 입력 초기화
   useEffect(() => {
-    if (isLoginModalOpen) {
+    if (isOpen) {
       setEmail('');
       setPassword('');
       setError(null);
     }
-  }, [isLoginModalOpen]);
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +59,7 @@ export default function LoginModal() {
       await login(email, password);
 
       // 로그인 성공: 모달 닫고 현재 화면 유지
-      closeLoginModal();
+      closeModal();
 
       // 선택적 콜백 실행 (예: 글 작성 재시도)
       if (onLoginSuccess) {
@@ -74,22 +74,24 @@ export default function LoginModal() {
 
   const handleForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault();
-    closeLoginModal();
-    navigate('/forgot-password');
+    // TODO: ForgotPasswordModal로 전환
+    // 현재는 페이지 이동 유지 (추후 모달로 전환)
+    closeModal();
+    window.location.href = '/forgot-password';
   };
 
   const handleRegister = (e: React.MouseEvent) => {
     e.preventDefault();
-    closeLoginModal();
-    navigate('/demo/member/apply');
+    // 페이지 이동 대신 RegisterModal로 전환
+    openRegisterModal();
   };
 
-  if (!isLoginModalOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={(e) => e.target === e.currentTarget && closeLoginModal()}
+      onClick={(e) => e.target === e.currentTarget && closeModal()}
     >
       {/* 반투명 배경 */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
@@ -106,7 +108,7 @@ export default function LoginModal() {
             </div>
           </div>
           <button
-            onClick={closeLoginModal}
+            onClick={closeModal}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
@@ -193,7 +195,7 @@ export default function LoginModal() {
             <p className="text-sm text-gray-500">
               아직 계정이 없으신가요?{' '}
               <a
-                href="/demo/member/apply"
+                href="#"
                 onClick={handleRegister}
                 className="text-blue-600 font-medium hover:text-blue-700"
               >

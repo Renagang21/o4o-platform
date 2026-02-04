@@ -1,8 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
-import { LoginModalProvider } from './contexts/LoginModalContext';
+import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
+import RegisterModal from './components/RegisterModal';
 import { DashboardPage } from './pages/DashboardPage';
 
 // Forum pages
@@ -55,9 +57,8 @@ import { OperatorRoutes } from './routes/OperatorRoutes';
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
 
-// Login & Register pages
-import { LoginPage } from './pages/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
+// Login & Register pages - legacy imports (페이지는 제거, 모달로 대체)
+// WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
 import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 
 // Test Guide Pages
@@ -106,14 +107,43 @@ const SERVICE_NAME = 'KPA-Society';
 // ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
 // Service User 인증 제거, Platform User 단일 인증으로 통합
 
+/**
+ * WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
+ * /login, /register URL 접근 시 홈으로 리다이렉트 + 모달 오픈
+ */
+function LoginRedirect() {
+  const navigate = useNavigate();
+  const { openLoginModal } = useAuthModal();
+
+  useEffect(() => {
+    navigate('/', { replace: true });
+    openLoginModal();
+  }, [navigate, openLoginModal]);
+
+  return null;
+}
+
+function RegisterRedirect() {
+  const navigate = useNavigate();
+  const { openRegisterModal } = useAuthModal();
+
+  useEffect(() => {
+    navigate('/', { replace: true });
+    openRegisterModal();
+  }, [navigate, openRegisterModal]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <LoginModalProvider>
       <OrganizationProvider>
       <BrowserRouter>
-        {/* 전역 로그인 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1) */}
+        {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
+        <RegisterModal />
         <Routes>
           {/* =========================================================
            * SCOPE: 분회 서비스 데모 (Community Demo)
@@ -193,9 +223,9 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * ========================================================= */}
 
-          {/* Login & Register Pages (레이아웃 없음) */}
-          <Route path="/demo/login" element={<LoginPage />} />
-          <Route path="/demo/register" element={<RegisterPage />} />
+          {/* Login & Register - 모달로 대체 (WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1) */}
+          <Route path="/demo/login" element={<LoginRedirect />} />
+          <Route path="/demo/register" element={<RegisterRedirect />} />
           <Route path="/demo/register/pending" element={<RegisterPendingPage />} />
 
           {/* Function Gate (WO-KPA-FUNCTION-GATE-V1) */}
@@ -230,9 +260,10 @@ function App() {
           {/* =========================================================
            * SCOPE: 레거시 경로 리다이렉트 (Legacy Redirects)
            * 기존 북마크 호환용, 신규 코드에서 참조 금지
+           * WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
            * ========================================================= */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<Navigate to="/demo/register" replace />} />
+          <Route path="/login" element={<LoginRedirect />} />
+          <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
           <Route path="/operator/*" element={<Navigate to="/demo/operator" replace />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
