@@ -55,7 +55,11 @@ const heroStyles: Record<string, React.CSSProperties> = {
     position: 'relative',
     overflow: 'hidden',
     background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 100%)`,
-    padding: `${spacing.xxl} ${spacing.lg}`,
+    padding: '80px 40px',
+    minHeight: '400px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   inner: {
     position: 'relative',
