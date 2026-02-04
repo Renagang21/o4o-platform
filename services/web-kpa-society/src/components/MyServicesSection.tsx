@@ -16,6 +16,7 @@ import { colors, spacing, borderRadius, shadows, typography } from '../styles/th
 export function MyServicesSection() {
   const [services, setServices] = useState<PlatformServiceItem[]>([]);
   const [applyingCode, setApplyingCode] = useState<string | null>(null);
+  const [successApplied, setSuccessApplied] = useState<{ code: string; name: string } | null>(null);
 
   useEffect(() => {
     listPlatformServices()
@@ -28,17 +29,22 @@ export function MyServicesSection() {
     (s) => s.isFeatured && s.enrollmentStatus !== 'approved',
   );
 
-  const handleApply = async (code: string) => {
+  const handleApply = async (code: string, name: string) => {
     setApplyingCode(code);
     try {
       await applyForService(code);
       const updated = await listPlatformServices();
       setServices(updated);
+      setSuccessApplied({ code, name });
     } catch {
       // silent
     } finally {
       setApplyingCode(null);
     }
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessApplied(null);
   };
 
   if (services.length === 0) return null;
@@ -95,7 +101,7 @@ export function MyServicesSection() {
                   ) : svc.enrollmentStatus === 'rejected' ? (
                     <button
                       style={styles.applyButton}
-                      onClick={() => handleApply(svc.code)}
+                      onClick={() => handleApply(svc.code, svc.name)}
                       disabled={applyingCode === svc.code}
                     >
                       재신청
@@ -103,7 +109,7 @@ export function MyServicesSection() {
                   ) : (
                     <button
                       style={styles.applyButton}
-                      onClick={() => handleApply(svc.code)}
+                      onClick={() => handleApply(svc.code, svc.name)}
                       disabled={applyingCode === svc.code}
                     >
                       이용 신청
@@ -114,6 +120,28 @@ export function MyServicesSection() {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Success Modal */}
+      {successApplied && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <div style={styles.modalIconWrap}>
+              <span style={styles.modalIcon}>✅</span>
+            </div>
+            <h3 style={styles.modalTitle}>가입신청이 완료되었습니다</h3>
+            <p style={styles.modalDesc}>
+              <strong>{successApplied.name}</strong> 서비스 이용 신청이 접수되었습니다.<br />
+              운영자 승인 후 서비스를 이용하실 수 있습니다.
+            </p>
+            <button
+              style={styles.modalButton}
+              onClick={handleCloseSuccess}
+            >
+              확인
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -252,5 +280,58 @@ const styles: Record<string, React.CSSProperties> = {
     border: `1px solid ${colors.primary}`,
     cursor: 'pointer',
     textAlign: 'center',
+  },
+
+  // Success Modal Styles
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: spacing.md,
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.lg,
+    padding: spacing.xl,
+    maxWidth: '400px',
+    width: '100%',
+    textAlign: 'center',
+  },
+  modalIconWrap: {
+    marginBottom: spacing.md,
+  },
+  modalIcon: {
+    fontSize: '3rem',
+  },
+  modalTitle: {
+    ...typography.headingM,
+    color: colors.neutral900,
+    margin: `0 0 ${spacing.sm}`,
+  },
+  modalDesc: {
+    ...typography.bodyM,
+    color: colors.neutral600,
+    lineHeight: 1.6,
+    margin: `0 0 ${spacing.lg}`,
+  },
+  modalButton: {
+    display: 'inline-block',
+    padding: `${spacing.sm} ${spacing.xl}`,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.primary,
+    color: colors.white,
+    fontSize: '0.938rem',
+    fontWeight: 600,
+    border: 'none',
+    cursor: 'pointer',
+    minWidth: '120px',
   },
 };

@@ -22,6 +22,9 @@ import {
   RequestedRole,
 } from '../entities/kpa-organization-join-request.entity.js';
 import { OrganizationMemberService } from '@o4o/organization-core';
+import { User } from '../../../modules/auth/entities/User.js';
+import { emailService } from '../../../services/email.service.js';
+import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
 import logger from '../../../utils/logger.js';
 
 const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator', 'pharmacy_join', 'pharmacy_operator'];
@@ -148,6 +151,64 @@ export function createOrganizationJoinRequestRoutes(
       logger.info(
         `Organization join request created: ${request.id} (${requestType}) by user ${user.id} for org ${organizationId}`
       );
+
+      // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send notification emails
+      try {
+        const userRepo = dataSource.getRepository(User);
+        const appUser = await userRepo.findOne({ where: { id: user.id } });
+        const applicantName = appUser?.name || appUser?.email || 'Unknown';
+        const applicantEmail = appUser?.email || '';
+        const appliedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+        // Determine service name based on request type
+        const serviceNameMap: Record<string, string> = {
+          join: 'KPA 지부/분회',
+          promotion: 'KPA 역할 승격',
+          operator: 'KPA 운영자',
+          pharmacy_join: 'KPA 약국 서비스',
+          pharmacy_operator: 'KPA 약국 운영자',
+        };
+        const serviceName = serviceNameMap[requestType] || 'KPA Society';
+
+        // 1. Send notification to operator
+        const operatorEmail = await OperatorNotificationController.getOperatorEmail('kpa-society');
+        if (operatorEmail && emailService.isServiceAvailable()) {
+          const isEnabled = await OperatorNotificationController.isNotificationEnabled('kpa-society', 'serviceApplication');
+          if (isEnabled) {
+            await emailService.sendServiceApplicationOperatorNotificationEmail(
+              operatorEmail.primary,
+              {
+                serviceName,
+                applicantName,
+                applicantEmail,
+                applicantPhone: appUser?.phone,
+                appliedAt,
+                note: payload?.note || undefined,
+                reviewUrl: `${process.env.OPERATOR_URL || 'https://kpa-society.co.kr'}/operator/kpa/organization-join-requests`,
+              }
+            );
+            logger.info(`[KPA] Operator notification sent for join request to ${operatorEmail.primary}`);
+            await OperatorNotificationController.updateLastNotificationTime('kpa-society');
+          }
+        }
+
+        // 2. Send confirmation to applicant
+        if (applicantEmail && emailService.isServiceAvailable()) {
+          await emailService.sendServiceApplicationSubmittedEmail(
+            applicantEmail,
+            {
+              serviceName,
+              applicantName,
+              applicantEmail,
+              appliedAt,
+              supportEmail: 'support@kpa-society.co.kr',
+            }
+          );
+          logger.info(`[KPA] Join request confirmation sent to ${applicantEmail}`);
+        }
+      } catch (emailError) {
+        logger.error('[KPA] Failed to send join request notification emails:', emailError);
+      }
 
       return res.status(201).json({
         success: true,
@@ -336,6 +397,40 @@ export function createOrganizationJoinRequestRoutes(
         `Organization join request approved: ${id} by ${user.id}`
       );
 
+      // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send approval notification
+      try {
+        const userRepo = dataSource.getRepository(User);
+        const appUser = await userRepo.findOne({ where: { id: request.user_id } });
+        const applicantEmail = appUser?.email;
+        const applicantName = appUser?.name || appUser?.email || 'Unknown';
+        const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+        const serviceNameMap: Record<string, string> = {
+          join: 'KPA 지부/분회',
+          promotion: 'KPA 역할 승격',
+          operator: 'KPA 운영자',
+          pharmacy_join: 'KPA 약국 서비스',
+          pharmacy_operator: 'KPA 약국 운영자',
+        };
+        const serviceName = serviceNameMap[request.request_type] || 'KPA Society';
+
+        if (applicantEmail && emailService.isServiceAvailable()) {
+          await emailService.sendServiceApplicationApprovedEmail(
+            applicantEmail,
+            {
+              serviceName,
+              applicantName,
+              approvedAt: decidedAt,
+              serviceUrl: process.env.KPA_URL || 'https://kpa-society.co.kr',
+              supportEmail: 'support@kpa-society.co.kr',
+            }
+          );
+          logger.info(`[KPA] Join request approval notification sent to ${applicantEmail}`);
+        }
+      } catch (emailError) {
+        logger.error('[KPA] Failed to send join request approval email:', emailError);
+      }
+
       return res.json({
         success: true,
         data: request,
@@ -397,6 +492,40 @@ export function createOrganizationJoinRequestRoutes(
       logger.info(
         `Organization join request rejected: ${id} by ${user.id}`
       );
+
+      // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send rejection notification
+      try {
+        const userRepo = dataSource.getRepository(User);
+        const appUser = await userRepo.findOne({ where: { id: request.user_id } });
+        const applicantEmail = appUser?.email;
+        const applicantName = appUser?.name || appUser?.email || 'Unknown';
+        const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+        const serviceNameMap: Record<string, string> = {
+          join: 'KPA 지부/분회',
+          promotion: 'KPA 역할 승격',
+          operator: 'KPA 운영자',
+          pharmacy_join: 'KPA 약국 서비스',
+          pharmacy_operator: 'KPA 약국 운영자',
+        };
+        const serviceName = serviceNameMap[request.request_type] || 'KPA Society';
+
+        if (applicantEmail && emailService.isServiceAvailable()) {
+          await emailService.sendServiceApplicationRejectedEmail(
+            applicantEmail,
+            {
+              serviceName,
+              applicantName,
+              rejectedAt: decidedAt,
+              rejectionReason: reviewNote?.trim() || undefined,
+              supportEmail: 'support@kpa-society.co.kr',
+            }
+          );
+          logger.info(`[KPA] Join request rejection notification sent to ${applicantEmail}`);
+        }
+      } catch (emailError) {
+        logger.error('[KPA] Failed to send join request rejection email:', emailError);
+      }
 
       return res.json({
         success: true,
