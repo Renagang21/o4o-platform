@@ -35,11 +35,39 @@ export class RemoveNonAdminTestAccounts2026020800002 implements MigrationInterfa
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     for (const email of ACCOUNTS_TO_DELETE) {
-      await queryRunner.query(
-        `DELETE FROM users WHERE email = $1`,
+      // First, get the user id
+      const users = await queryRunner.query(
+        `SELECT id FROM users WHERE email = $1`,
         [email]
       );
-      console.log(`Deleted test account: ${email}`);
+
+      if (users.length > 0) {
+        const userId = users[0].id;
+
+        // Delete related forum posts authored by this user
+        const deletedPosts = await queryRunner.query(
+          `DELETE FROM forum_post WHERE author_id = $1`,
+          [userId]
+        );
+        if (deletedPosts.length > 0) {
+          console.log(`  - Deleted ${deletedPosts.length} forum posts by ${email}`);
+        }
+
+        // Delete related forum comments by this user
+        await queryRunner.query(
+          `DELETE FROM forum_comment WHERE author_id = $1`,
+          [userId]
+        );
+
+        // Delete the user
+        await queryRunner.query(
+          `DELETE FROM users WHERE id = $1`,
+          [userId]
+        );
+        console.log(`Deleted test account: ${email}`);
+      } else {
+        console.log(`Account not found (already deleted?): ${email}`);
+      }
     }
 
     console.log('');
