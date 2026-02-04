@@ -1,6 +1,7 @@
 /**
  * LoginModal - 로그인 오버레이 모달
  * 현재 페이지 위에 오버레이로 표시되어 메뉴 등이 보임
+ * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 비밀번호 찾기/회원가입 링크 포함
  */
 
 import { useState, useEffect } from 'react';
@@ -142,10 +143,21 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
             </button>
           </form>
 
-          {/* 회원가입 링크 */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              아직 계정이 없으신가요?{' '}
+          {/* 비밀번호 찾기/회원가입 링크 */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-center gap-4 text-sm">
+              <a
+                href="/forgot-password"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onClose();
+                  navigate('/forgot-password');
+                }}
+                className="text-gray-500 hover:text-green-600 transition-colors"
+              >
+                비밀번호 찾기
+              </a>
+              <span className="text-gray-300">|</span>
               <a
                 href="/register"
                 onClick={(e) => {
@@ -153,11 +165,11 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   onClose();
                   navigate('/register');
                 }}
-                className="text-green-600 font-medium hover:text-green-700"
+                className="text-green-600 font-medium hover:text-green-700 transition-colors"
               >
                 회원가입
               </a>
-            </p>
+            </div>
           </div>
         </div>
       </div>

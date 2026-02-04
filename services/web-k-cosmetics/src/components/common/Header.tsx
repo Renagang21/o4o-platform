@@ -1,15 +1,18 @@
 /**
  * Header - K-Cosmetics
  * Based on GlycoPharm Header structure
+ * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
  */
 
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
+import { useLoginModal } from '@/contexts/LoginModalContext';
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -109,7 +112,7 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <Link to="/login" style={styles.loginLink}>로그인</Link>
+                <button onClick={openLoginModal} style={styles.loginLink}>로그인</button>
                 <Link to="/register" style={styles.registerButton}>회원가입</Link>
               </>
             )}
@@ -142,7 +145,15 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link to="/login" style={styles.mobileLoginLink} onClick={() => setMobileMenuOpen(false)}>로그인</Link>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      openLoginModal();
+                    }}
+                    style={styles.mobileLoginLink}
+                  >
+                    로그인
+                  </button>
                   <Link to="/register" style={styles.mobileRegisterButton} onClick={() => setMobileMenuOpen(false)}>회원가입</Link>
                 </>
               )}
@@ -316,6 +327,9 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     color: '#475569',
     textDecoration: 'none',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
   },
   registerButton: {
     padding: '8px 16px',

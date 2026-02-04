@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginModalProvider } from './contexts/LoginModalContext';
 import Layout from './components/Layout';
+import LoginModal from './components/LoginModal';
 import HomePage from './pages/HomePage';
 import PatientsPage from './pages/PatientsPage';
 import InsightsPage from './pages/InsightsPage';
@@ -192,7 +194,10 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <LoginModalProvider>
+          <LoginModal />
+          <AppRoutes />
+        </LoginModalProvider>
       </AuthProvider>
     </BrowserRouter>
   );

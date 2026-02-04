@@ -6,6 +6,8 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { LoginModalProvider } from '@/contexts/LoginModalContext';
+import LoginModal from '@/components/common/LoginModal';
 
 // Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
@@ -224,9 +226,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Suspense fallback={<PageLoading />}>
-          <AppRoutes />
-        </Suspense>
+        <LoginModalProvider>
+          <LoginModal />
+          <Suspense fallback={<PageLoading />}>
+            <AppRoutes />
+          </Suspense>
+        </LoginModalProvider>
       </AuthProvider>
     </BrowserRouter>
   );

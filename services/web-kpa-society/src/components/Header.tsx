@@ -3,13 +3,14 @@
  * 상단 로고 + 메인 네비게이션 + 로그인/회원가입 버튼
  *
  * WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
+ * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
  */
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth, useOrganization } from '../contexts';
-import { TestAccountType } from '../contexts/AuthContext';
+import { useLoginModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
 
@@ -42,16 +43,13 @@ const adminMenu: MenuItem = {
 };
 
 export function Header({ serviceName }: { serviceName: string }) {
-  const { user, login, logout, isLoading } = useAuth();
+  const { user, logout, isLoading } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { accessibleOrganizations } = useOrganization();
   const accessibleDashboards = useAccessibleDashboards();
@@ -70,42 +68,9 @@ export function Header({ serviceName }: { serviceName: string }) {
   // 메뉴 구성 (관리자인 경우 관리자 메뉴 추가)
   const displayMenuItems = isAdmin ? [...filteredMenuItems, adminMenu] : filteredMenuItems;
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError(null);
-    setIsSubmitting(true);
-    try {
-      await login(loginForm.email, loginForm.password);
-      setShowLoginModal(false);
-      setLoginForm({ email: '', password: '' });
-    } catch (err: any) {
-      setLoginError(err.message || '로그인에 실패했습니다.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleLogout = async () => {
     await logout();
     navigate('/demo');
-  };
-
-  /**
-   * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 정보를 입력 필드에 채우기
-   * (즉시 로그인이 아닌 입력만)
-   */
-  const fillTestAccount = (accountType: TestAccountType) => {
-    // Note: Password must match API server seed (TestPassword)
-    const testCredentials: Record<TestAccountType, { email: string; password: string }> = {
-      pharmacist: { email: 'pharmacist-kpa@o4o.com', password: 'TestPassword' },
-      district_admin: { email: 'district-admin-kpa@o4o.com', password: 'TestPassword' },
-      branch_admin: { email: 'branch-admin-kpa@o4o.com', password: 'TestPassword' },
-      district_officer: { email: 'district-officer-kpa@o4o.com', password: 'TestPassword' },
-      branch_officer: { email: 'branch-officer-kpa@o4o.com', password: 'TestPassword' },
-    };
-    const creds = testCredentials[accountType];
-    setLoginForm({ email: creds.email, password: creds.password });
-    setLoginError(null);
   };
 
   return (
@@ -225,7 +190,7 @@ export function Header({ serviceName }: { serviceName: string }) {
               <>
                 <button
                   style={styles.authButton}
-                  onClick={() => setShowLoginModal(true)}
+                  onClick={openLoginModal}
                   disabled={isLoading}
                 >
                   로그인
@@ -277,111 +242,6 @@ export function Header({ serviceName }: { serviceName: string }) {
           </div>
         )}
       </header>
-
-      {/* Login Modal */}
-      {showLoginModal && (
-        <div style={styles.modalOverlay} onClick={() => setShowLoginModal(false)}>
-          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>로그인</h2>
-              <button
-                style={styles.closeButton}
-                onClick={() => setShowLoginModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <form onSubmit={handleLogin} style={styles.loginForm}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>이메일</label>
-                <input
-                  type="email"
-                  value={loginForm.email}
-                  onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                  style={styles.input}
-                  placeholder="email@example.com"
-                  required
-                  autoFocus
-                />
-              </div>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>비밀번호</label>
-                <input
-                  type="password"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  style={styles.input}
-                  placeholder="비밀번호 입력"
-                  required
-                />
-              </div>
-              {loginError && <div style={styles.errorMessage}>{loginError}</div>}
-              <button
-                type="submit"
-                style={{
-                  ...styles.submitButton,
-                  ...(isSubmitting ? styles.submitButtonDisabled : {}),
-                }}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? '로그인 중...' : '로그인'}
-              </button>
-            </form>
-
-            {/* WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 버튼 */}
-            <div style={styles.testAccountSection}>
-              <div style={styles.testAccountDivider}>
-                <span style={styles.testAccountDividerText}>테스트 환경</span>
-              </div>
-              <p style={styles.testAccountDesc}>
-                아래 버튼을 클릭하면 테스트 계정 정보가 입력됩니다.
-              </p>
-              <div style={styles.testAccountButtons}>
-                <button
-                  type="button"
-                  style={styles.testAccountButton}
-                  onClick={() => fillTestAccount('pharmacist')}
-                >
-                  <span style={styles.testAccountIcon}>💊</span>
-                  <span>약사 계정</span>
-                </button>
-                <button
-                  type="button"
-                  style={styles.testAccountButton}
-                  onClick={() => fillTestAccount('district_admin')}
-                >
-                  <span style={styles.testAccountIcon}>🏛️</span>
-                  <span>지부 운영자 계정</span>
-                </button>
-                <button
-                  type="button"
-                  style={styles.testAccountButton}
-                  onClick={() => fillTestAccount('branch_admin')}
-                >
-                  <span style={styles.testAccountIcon}>🏢</span>
-                  <span>분회 운영자 계정</span>
-                </button>
-                <button
-                  type="button"
-                  style={styles.testAccountButton}
-                  onClick={() => fillTestAccount('district_officer')}
-                >
-                  <span style={styles.testAccountIcon}>👔</span>
-                  <span>지부 임원 계정</span>
-                </button>
-                <button
-                  type="button"
-                  style={styles.testAccountButton}
-                  onClick={() => fillTestAccount('branch_officer')}
-                >
-                  <span style={styles.testAccountIcon}>👤</span>
-                  <span>분회 임원 계정</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -604,138 +464,5 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.gray600,
     textDecoration: 'none',
     fontSize: '14px',
-  },
-  // Modal styles
-  modalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2000,
-  },
-  modal: {
-    backgroundColor: colors.white,
-    borderRadius: '12px',
-    padding: '32px',
-    width: '100%',
-    maxWidth: '400px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-  },
-  modalHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '24px',
-  },
-  modalTitle: {
-    fontSize: '22px',
-    fontWeight: 600,
-    color: colors.gray900,
-    margin: 0,
-  },
-  closeButton: {
-    background: 'none',
-    border: 'none',
-    fontSize: '28px',
-    color: colors.gray500,
-    cursor: 'pointer',
-    padding: 0,
-    lineHeight: 1,
-  },
-  loginForm: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  label: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: colors.gray700,
-  },
-  input: {
-    padding: '12px 14px',
-    fontSize: '16px',
-    border: `1px solid ${colors.gray300}`,
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-  },
-  errorMessage: {
-    padding: '10px 14px',
-    backgroundColor: '#ffebee',
-    color: colors.error,
-    borderRadius: '6px',
-    fontSize: '14px',
-  },
-  submitButton: {
-    padding: '14px',
-    fontSize: '16px',
-    fontWeight: 600,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginTop: '8px',
-    transition: 'background-color 0.2s',
-  },
-  submitButtonDisabled: {
-    backgroundColor: colors.gray400,
-    cursor: 'not-allowed',
-  },
-  // WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 스타일
-  testAccountSection: {
-    marginTop: '24px',
-    paddingTop: '20px',
-    borderTop: `1px dashed ${colors.gray300}`,
-  },
-  testAccountDivider: {
-    textAlign: 'center',
-    marginBottom: '12px',
-  },
-  testAccountDividerText: {
-    fontSize: '12px',
-    color: colors.gray500,
-    backgroundColor: colors.white,
-    padding: '0 12px',
-  },
-  testAccountDesc: {
-    fontSize: '13px',
-    color: colors.gray600,
-    textAlign: 'center',
-    margin: '0 0 16px 0',
-  },
-  testAccountButtons: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-  },
-  testAccountButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '10px',
-    padding: '14px 16px',
-    backgroundColor: colors.gray100,
-    border: `1px solid ${colors.gray300}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    color: colors.gray700,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s, border-color 0.2s',
-  },
-  testAccountIcon: {
-    fontSize: '18px',
   },
 };

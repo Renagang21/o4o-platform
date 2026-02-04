@@ -1,6 +1,12 @@
+/**
+ * Header - GlycoPharm 헤더
+ * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
+ */
+
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   Menu,
   X,
@@ -23,6 +29,7 @@ const roleNavigation: Record<string, { path: string; label: string; icon: typeof
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -180,12 +187,12 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <NavLink
-                  to="/login"
+                <button
+                  onClick={openLoginModal}
                   className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"
                 >
                   로그인
-                </NavLink>
+                </button>
                 <NavLink
                   to="/register"
                   className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
@@ -299,13 +306,15 @@ export default function Header() {
                 </>
               ) : (
                 <div className="flex flex-col gap-2 px-4">
-                  <NavLink
-                    to="/login"
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      openLoginModal();
+                    }}
                     className="w-full py-3 text-center text-sm font-medium text-slate-600 border rounded-xl"
-                    onClick={() => setMobileMenuOpen(false)}
                   >
                     로그인
-                  </NavLink>
+                  </button>
                   <NavLink
                     to="/register"
                     className="w-full py-3 text-center text-sm font-medium text-white bg-primary-600 rounded-xl"

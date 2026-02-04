@@ -1,0 +1,208 @@
+/**
+ * LoginModal - KPA Society 로그인 모달
+ *
+ * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
+ *
+ * 원칙:
+ * - 로그인은 항상 모달로만 수행
+ * - 로그인 성공 후 현재 화면 유지 (navigate 없음)
+ * - 아이디·비밀번호 찾기 / 회원가입 링크 포함
+ * - 이메일 저장 기능 없음
+ */
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useLoginModal } from '../contexts/LoginModalContext';
+
+export default function LoginModal() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // ESC 키로 닫기 + 배경 스크롤 방지
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLoginModal();
+    };
+    if (isLoginModalOpen) {
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [isLoginModalOpen, closeLoginModal]);
+
+  // 모달 열릴 때 입력 초기화
+  useEffect(() => {
+    if (isLoginModalOpen) {
+      setEmail('');
+      setPassword('');
+      setError(null);
+    }
+  }, [isLoginModalOpen]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      await login(email, password);
+
+      // 로그인 성공: 모달 닫고 현재 화면 유지
+      closeLoginModal();
+
+      // 선택적 콜백 실행 (예: 글 작성 재시도)
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    closeLoginModal();
+    navigate('/forgot-password');
+  };
+
+  const handleRegister = (e: React.MouseEvent) => {
+    e.preventDefault();
+    closeLoginModal();
+    navigate('/demo/member/apply');
+  };
+
+  if (!isLoginModalOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      onClick={(e) => e.target === e.currentTarget && closeLoginModal()}
+    >
+      {/* 반투명 배경 */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+      {/* 모달 카드 */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🏛️</span>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">KPA Society 로그인</h2>
+              <p className="text-xs text-gray-500">약사회 SaaS 플랫폼</p>
+            </div>
+          </div>
+          <button
+            onClick={closeLoginModal}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-6">
+          {/* 로그인 폼 */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                이메일
+              </label>
+              <input
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="이메일을 입력하세요"
+                required
+                className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                비밀번호
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="비밀번호를 입력하세요"
+                  required
+                  className="w-full px-4 py-3 pr-12 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '로그인 중...' : '로그인'}
+            </button>
+          </form>
+
+          {/* 아이디·비밀번호 찾기 */}
+          <div className="mt-4 text-center">
+            <a
+              href="/forgot-password"
+              onClick={handleForgotPassword}
+              className="text-sm text-gray-500 hover:text-gray-700"
+            >
+              아이디 · 비밀번호 찾기
+            </a>
+          </div>
+
+          {/* 구분선 */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">또는</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          {/* 회원가입 */}
+          <div className="text-center">
+            <p className="text-sm text-gray-500">
+              아직 계정이 없으신가요?{' '}
+              <a
+                href="/demo/member/apply"
+                onClick={handleRegister}
+                className="text-blue-600 font-medium hover:text-blue-700"
+              >
+                회원가입
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

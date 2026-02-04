@@ -1,7 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+/**
+ * Layout - GlucoseView 메인 레이아웃
+ * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
+ */
+
+import { useRef, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import LoginModal from './LoginModal';
+import { useLoginModal } from '../contexts/LoginModalContext';
 import { AIChatButton } from './ai';
 
 const navItems = [
@@ -13,10 +18,9 @@ const navItems = [
 
 export default function Layout() {
   const { user, logout, isAuthenticated, isApproved, isAdmin } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const location = useLocation();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginReturnUrl, setLoginReturnUrl] = useState<string | undefined>();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -24,12 +28,11 @@ export default function Layout() {
   useEffect(() => {
     const state = location.state as any;
     if (state?.requireLogin && !isAuthenticated) {
-      setLoginReturnUrl(state.from);
-      setShowLoginModal(true);
+      openLoginModal(state.from);
       // state 정리 (뒤로가기 시 재트리거 방지)
       window.history.replaceState({}, '');
     }
-  }, [location.state, isAuthenticated]);
+  }, [location.state, isAuthenticated, openLoginModal]);
 
   const handleLogout = () => {
     logout();
@@ -40,7 +43,7 @@ export default function Layout() {
   const handleNavClick = (e: React.MouseEvent, item: typeof navItems[0]) => {
     if (item.protected && (!isAuthenticated || !isApproved)) {
       e.preventDefault();
-      setShowLoginModal(true);
+      openLoginModal();
     }
   };
 
@@ -170,7 +173,7 @@ export default function Layout() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => setShowLoginModal(true)}
+                    onClick={() => openLoginModal()}
                     className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                   >
                     로그인
@@ -276,16 +279,6 @@ export default function Layout() {
           </div>
         </div>
       </footer>
-
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => {
-          setShowLoginModal(false);
-          setLoginReturnUrl(undefined);
-        }}
-        returnUrl={loginReturnUrl}
-      />
 
       {/* AI Chat Button - 로그인한 승인 사용자에게만 표시 */}
       {isAuthenticated && isApproved && (

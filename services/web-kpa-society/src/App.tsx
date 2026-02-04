@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
+import { LoginModalProvider } from './contexts/LoginModalContext';
+import LoginModal from './components/LoginModal';
 import { DashboardPage } from './pages/DashboardPage';
 
 // Forum pages
@@ -107,8 +109,11 @@ const SERVICE_NAME = 'KPA-Society';
 function App() {
   return (
     <AuthProvider>
+      <LoginModalProvider>
       <OrganizationProvider>
       <BrowserRouter>
+        {/* 전역 로그인 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1) */}
+        <LoginModal />
         <Routes>
           {/* =========================================================
            * SCOPE: 분회 서비스 데모 (Community Demo)
@@ -249,6 +254,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       </OrganizationProvider>
+      </LoginModalProvider>
     </AuthProvider>
   );
 }
