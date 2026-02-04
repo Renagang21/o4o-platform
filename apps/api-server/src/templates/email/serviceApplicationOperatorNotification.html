@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>새로운 서비스 이용 신청</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">{{serviceName}}</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">새로운 서비스 이용 신청</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                새로운 이용 신청이 접수되었습니다
+              </h2>
+
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                <strong>{{serviceName}}</strong> 서비스에 새로운 이용 신청이 접수되었습니다.
+                아래 정보를 확인하고 승인 여부를 결정해 주세요.
+              </p>
+
+              <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 0 6px 6px 0; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">신청자 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #1e40af; width: 120px;">이름:</td>
+                    <td style="padding: 5px 0; color: #1e3a8a; font-weight: 600;">{{applicantName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #1e40af;">이메일:</td>
+                    <td style="padding: 5px 0; color: #1e3a8a; font-weight: 600;">{{applicantEmail}}</td>
+                  </tr>
+                  {{#if applicantPhone}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #1e40af;">연락처:</td>
+                    <td style="padding: 5px 0; color: #1e3a8a; font-weight: 600;">{{applicantPhone}}</td>
+                  </tr>
+                  {{/if}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #1e40af;">신청일시:</td>
+                    <td style="padding: 5px 0; color: #1e3a8a; font-weight: 600;">{{appliedAt}}</td>
+                  </tr>
+                </table>
+              </div>
+
+              {{#if businessName}}
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">사업자 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666; width: 120px;">사업자명:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{businessName}}</td>
+                  </tr>
+                  {{#if businessNumber}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">사업자번호:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{businessNumber}}</td>
+                  </tr>
+                  {{/if}}
+                  {{#if pharmacyName}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">약국명:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{pharmacyName}}</td>
+                  </tr>
+                  {{/if}}
+                  {{#if licenseNumber}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">면허번호:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{licenseNumber}}</td>
+                  </tr>
+                  {{/if}}
+                </table>
+              </div>
+              {{/if}}
+
+              {{#if note}}
+              <div style="background-color: #fef9c3; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 10px 0; color: #854d0e; font-size: 16px;">신청 메모</h3>
+                <p style="margin: 0; color: #713f12; font-size: 14px; line-height: 1.6;">{{note}}</p>
+              </div>
+              {{/if}}
+
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{reviewUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  신청서 검토하기
+                </a>
+              </div>
+
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                운영자 대시보드에서 신청을 승인하거나 거부할 수 있습니다.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 O4O Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                &copy; 2025 O4O Platform. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

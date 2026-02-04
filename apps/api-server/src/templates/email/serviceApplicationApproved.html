@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서비스 이용 승인 완료</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">{{serviceName}}</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">이용 신청 승인</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <span style="display: inline-block; width: 80px; height: 80px; background-color: #ecfdf5; border-radius: 50%; line-height: 80px; font-size: 40px;">&#10004;</span>
+              </div>
+
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600; text-align: center;">
+                축하합니다! 이용 신청이 승인되었습니다.
+              </h2>
+
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                {{applicantName}}님, <strong>{{serviceName}}</strong> 서비스 이용 신청이 승인되었습니다.
+                지금 바로 서비스를 이용하실 수 있습니다.
+              </p>
+
+              <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; border-radius: 0 6px 6px 0; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #047857; font-size: 18px;">승인 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #047857; width: 120px;">서비스:</td>
+                    <td style="padding: 5px 0; color: #065f46; font-weight: 600;">{{serviceName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #047857;">승인일시:</td>
+                    <td style="padding: 5px 0; color: #065f46; font-weight: 600;">{{approvedAt}}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{serviceUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  서비스 바로가기
+                </a>
+              </div>
+
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                서비스 이용 중 문의사항이 있으시면 {{supportEmail}}로 연락해 주세요.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 O4O Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                &copy; 2025 O4O Platform. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

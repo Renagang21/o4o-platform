@@ -12,6 +12,8 @@ import { GlucoseViewApplication } from '../entities/glucoseview-application.enti
 import { GlucoseViewPharmacy } from '../entities/glucoseview-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
+import { emailService } from '../../../services/email.service.js';
+import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -125,6 +127,60 @@ export function createGlucoseViewApplicationController(
         await applicationRepo.save(application);
 
         logger.info(`[GlucoseView] New application submitted: ${application.id} by user ${userId}`);
+
+        // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send notification emails
+        try {
+          // Get user info for email
+          const userRepo = dataSource.getRepository(User);
+          const appUser = await userRepo.findOne({ where: { id: userId } });
+          const applicantName = appUser?.name || appUser?.email || 'Unknown';
+          const applicantEmail = appUser?.email || '';
+          const appliedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+          // 1. Send notification to operator
+          const operatorEmail = await OperatorNotificationController.getOperatorEmail('glucoseview');
+          if (operatorEmail && emailService.isServiceAvailable()) {
+            const isEnabled = await OperatorNotificationController.isNotificationEnabled('glucoseview', 'serviceApplication');
+            if (isEnabled) {
+              await emailService.sendServiceApplicationOperatorNotificationEmail(
+                operatorEmail.primary,
+                {
+                  serviceName: 'GlucoseView',
+                  applicantName,
+                  applicantEmail,
+                  applicantPhone: appUser?.phone,
+                  appliedAt,
+                  pharmacyName: application.pharmacyName,
+                  businessNumber: application.businessNumber || undefined,
+                  note: application.note || undefined,
+                  reviewUrl: `${process.env.OPERATOR_URL || 'https://glucoseview.co.kr'}/operator/glucoseview/applications/${application.id}`,
+                }
+              );
+              logger.info(`[GlucoseView] Operator notification sent to ${operatorEmail.primary}`);
+
+              // Update last notification time
+              await OperatorNotificationController.updateLastNotificationTime('glucoseview');
+            }
+          }
+
+          // 2. Send confirmation to applicant
+          if (applicantEmail && emailService.isServiceAvailable()) {
+            await emailService.sendServiceApplicationSubmittedEmail(
+              applicantEmail,
+              {
+                serviceName: 'GlucoseView',
+                applicantName,
+                applicantEmail,
+                appliedAt,
+                supportEmail: 'support@glucoseview.co.kr',
+              }
+            );
+            logger.info(`[GlucoseView] Application confirmation sent to ${applicantEmail}`);
+          }
+        } catch (emailError) {
+          // Don't fail the application submission if email fails
+          logger.error('[GlucoseView] Failed to send notification emails:', emailError);
+        }
 
         res.status(201).json({
           success: true,
@@ -505,6 +561,46 @@ export function createGlucoseViewApplicationController(
         logger.info(
           `[GlucoseView Admin] Application ${id} ${status} by ${userId}`
         );
+
+        // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send result notification to applicant
+        try {
+          const userRepo = dataSource.getRepository(User);
+          const appUser = await userRepo.findOne({ where: { id: application.userId } });
+          const applicantEmail = appUser?.email;
+          const applicantName = appUser?.name || appUser?.email || 'Unknown';
+          const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+          if (applicantEmail && emailService.isServiceAvailable()) {
+            if (status === 'approved') {
+              await emailService.sendServiceApplicationApprovedEmail(
+                applicantEmail,
+                {
+                  serviceName: 'GlucoseView',
+                  applicantName,
+                  approvedAt: decidedAt,
+                  serviceUrl: process.env.GLUCOSEVIEW_URL || 'https://glucoseview.co.kr',
+                  supportEmail: 'support@glucoseview.co.kr',
+                }
+              );
+              logger.info(`[GlucoseView Admin] Approval notification sent to ${applicantEmail}`);
+            } else if (status === 'rejected') {
+              await emailService.sendServiceApplicationRejectedEmail(
+                applicantEmail,
+                {
+                  serviceName: 'GlucoseView',
+                  applicantName,
+                  rejectedAt: decidedAt,
+                  rejectionReason: application.rejectionReason || undefined,
+                  supportEmail: 'support@glucoseview.co.kr',
+                }
+              );
+              logger.info(`[GlucoseView Admin] Rejection notification sent to ${applicantEmail}`);
+            }
+          }
+        } catch (emailError) {
+          // Don't fail the review if email fails
+          logger.error('[GlucoseView Admin] Failed to send result notification email:', emailError);
+        }
 
         res.json({
           success: true,

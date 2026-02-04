@@ -794,6 +794,184 @@ export class EmailService {
     }
   }
 
+  /**
+   * WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1
+   * Send service application notification to operator
+   */
+  async sendServiceApplicationOperatorNotificationEmail(to: string, data: {
+    serviceName: string;
+    applicantName: string;
+    applicantEmail: string;
+    applicantPhone?: string;
+    appliedAt: string;
+    businessName?: string;
+    businessNumber?: string;
+    pharmacyName?: string;
+    licenseNumber?: string;
+    note?: string;
+    reviewUrl: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/serviceApplicationOperatorNotification.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{serviceName}}/g, data.serviceName)
+        .replace(/{{applicantName}}/g, data.applicantName)
+        .replace(/{{applicantEmail}}/g, data.applicantEmail)
+        .replace(/{{applicantPhone}}/g, data.applicantPhone || '')
+        .replace(/{{appliedAt}}/g, data.appliedAt)
+        .replace(/{{businessName}}/g, data.businessName || '')
+        .replace(/{{businessNumber}}/g, data.businessNumber || '')
+        .replace(/{{pharmacyName}}/g, data.pharmacyName || '')
+        .replace(/{{licenseNumber}}/g, data.licenseNumber || '')
+        .replace(/{{note}}/g, data.note || '')
+        .replace(/{{reviewUrl}}/g, data.reviewUrl);
+
+      // Remove optional sections if data not provided
+      if (!data.applicantPhone) {
+        htmlTemplate = htmlTemplate.replace(/{{#if applicantPhone}}[\s\S]*?{{\/if}}/g, '');
+      }
+      if (!data.businessName) {
+        htmlTemplate = htmlTemplate.replace(/{{#if businessName}}[\s\S]*?{{\/if}}/g, '');
+      }
+      if (!data.businessNumber) {
+        htmlTemplate = htmlTemplate.replace(/{{#if businessNumber}}[\s\S]*?{{\/if}}/g, '');
+      }
+      if (!data.pharmacyName) {
+        htmlTemplate = htmlTemplate.replace(/{{#if pharmacyName}}[\s\S]*?{{\/if}}/g, '');
+      }
+      if (!data.licenseNumber) {
+        htmlTemplate = htmlTemplate.replace(/{{#if licenseNumber}}[\s\S]*?{{\/if}}/g, '');
+      }
+      if (!data.note) {
+        htmlTemplate = htmlTemplate.replace(/{{#if note}}[\s\S]*?{{\/if}}/g, '');
+      }
+
+      await this.sendEmail({
+        to,
+        subject: `[${data.serviceName}] 새로운 서비스 이용 신청 - ${data.applicantName}`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send service application operator notification email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1
+   * Send service application confirmation to applicant
+   */
+  async sendServiceApplicationSubmittedEmail(to: string, data: {
+    serviceName: string;
+    applicantName: string;
+    applicantEmail: string;
+    appliedAt: string;
+    supportEmail: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/serviceApplicationSubmitted.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      htmlTemplate = htmlTemplate
+        .replace(/{{serviceName}}/g, data.serviceName)
+        .replace(/{{applicantName}}/g, data.applicantName)
+        .replace(/{{applicantEmail}}/g, data.applicantEmail)
+        .replace(/{{appliedAt}}/g, data.appliedAt)
+        .replace(/{{supportEmail}}/g, data.supportEmail);
+
+      await this.sendEmail({
+        to,
+        subject: `[${data.serviceName}] 서비스 이용 신청이 접수되었습니다`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send service application submitted email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1
+   * Send service application approved email
+   */
+  async sendServiceApplicationApprovedEmail(to: string, data: {
+    serviceName: string;
+    applicantName: string;
+    approvedAt: string;
+    serviceUrl: string;
+    supportEmail: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/serviceApplicationApproved.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      htmlTemplate = htmlTemplate
+        .replace(/{{serviceName}}/g, data.serviceName)
+        .replace(/{{applicantName}}/g, data.applicantName)
+        .replace(/{{approvedAt}}/g, data.approvedAt)
+        .replace(/{{serviceUrl}}/g, data.serviceUrl)
+        .replace(/{{supportEmail}}/g, data.supportEmail);
+
+      await this.sendEmail({
+        to,
+        subject: `[${data.serviceName}] 서비스 이용 신청이 승인되었습니다!`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send service application approved email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1
+   * Send service application rejected email
+   */
+  async sendServiceApplicationRejectedEmail(to: string, data: {
+    serviceName: string;
+    applicantName: string;
+    rejectedAt: string;
+    rejectionReason?: string;
+    supportEmail: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/serviceApplicationRejected.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      htmlTemplate = htmlTemplate
+        .replace(/{{serviceName}}/g, data.serviceName)
+        .replace(/{{applicantName}}/g, data.applicantName)
+        .replace(/{{rejectedAt}}/g, data.rejectedAt)
+        .replace(/{{rejectionReason}}/g, data.rejectionReason || '')
+        .replace(/{{supportEmail}}/g, data.supportEmail);
+
+      // Remove reason section if no reason provided
+      if (!data.rejectionReason) {
+        htmlTemplate = htmlTemplate.replace(/{{#if rejectionReason}}[\s\S]*?{{\/if}}/g, '');
+      }
+
+      await this.sendEmail({
+        to,
+        subject: `[${data.serviceName}] 서비스 이용 신청 결과 안내`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send service application rejected email:', error);
+      throw error;
+    }
+  }
+
   // Public method to check if email service is available
   isServiceAvailable(): boolean {
     return this.isEnabled && this.isInitialized && this.transporter !== null;

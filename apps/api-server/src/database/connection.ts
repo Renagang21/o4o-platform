@@ -37,6 +37,7 @@ import { TemplatePart } from '../entities/TemplatePart.js';
 // Shipment/ShipmentTrackingHistory removed - legacy commerce entities
 import { SmtpSettings } from '../entities/SmtpSettings.js';
 import { EmailLog } from '../entities/EmailLog.js';
+import { OperatorNotificationSettings } from '../entities/OperatorNotificationSettings.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
 import { CustomPost } from '../entities/CustomPost.js';
 import { CustomPostType } from '../entities/CustomPostType.js';
@@ -415,6 +416,7 @@ export const AppDataSource = new DataSource({
     // Shipment/ShipmentTrackingHistory removed
     SmtpSettings,
     EmailLog,
+    OperatorNotificationSettings,
     FieldGroup,
     CustomField,
     CustomFieldValue,

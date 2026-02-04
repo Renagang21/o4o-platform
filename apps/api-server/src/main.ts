@@ -458,6 +458,9 @@ import adminOrderRoutes from './routes/admin-orders.routes.js';
 // Admin Dashboard Routes (WO-ADMIN-API-IMPLEMENT-P0)
 import adminDashboardRoutes from './routes/admin/dashboard.routes.js';
 
+// Operator Notification Settings Routes (WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1)
+import operatorNotificationRoutes from './routes/operator-notification.routes.js';
+
 // Cosmetics Routes (Phase 7-A-1)
 import { createCosmeticsRoutes } from './routes/cosmetics/cosmetics.routes.js';
 
@@ -805,6 +808,10 @@ const startServer = async () => {
     // 24-b. Register Admin Dashboard routes (WO-ADMIN-API-IMPLEMENT-P0)
     app.use('/api/v1/admin', adminDashboardRoutes);
     logger.info('✅ Admin Dashboard routes registered at /api/v1/admin');
+
+    // 24-c. Register Operator Notification Settings routes (WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1)
+    app.use('/api/operator', operatorNotificationRoutes);
+    logger.info('✅ Operator Notification routes registered at /api/operator');
 
     // 25. Register Cosmetics routes (Phase 7-A-1)
     try {

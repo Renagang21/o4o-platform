@@ -28,6 +28,7 @@ import { TemplatePart } from '../entities/TemplatePart.js';
 // Shipment removed - legacy commerce
 import { SmtpSettings } from '../entities/SmtpSettings.js';
 import { EmailLog } from '../entities/EmailLog.js';
+import { OperatorNotificationSettings } from '../entities/OperatorNotificationSettings.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
 // Menu removed - legacy CMS
 import { CustomPostType } from '../entities/CustomPostType.js';
@@ -72,6 +73,7 @@ const CLIDataSource = new DataSource({
     // Shipment/ShipmentTrackingHistory removed
     SmtpSettings,
     EmailLog,
+    OperatorNotificationSettings,
     FieldGroup,
     CustomField,
     CustomFieldValue,
