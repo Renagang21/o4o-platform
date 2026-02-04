@@ -7,7 +7,7 @@
  * - 로그인 성공 후 페이지 유지 (리다이렉트 없음)
  */
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 
 interface LoginModalContextType {
   isLoginModalOpen: boolean;

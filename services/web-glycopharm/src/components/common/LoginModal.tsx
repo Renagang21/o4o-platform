@@ -8,7 +8,7 @@
  * - 비밀번호 찾기/회원가입 링크 제공
  */
 
-import { useState, FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';

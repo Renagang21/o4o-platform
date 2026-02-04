@@ -9,26 +9,19 @@ import {
   Eye,
   EyeOff,
   Building2,
-  UserCircle,
   Check,
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 
-// 이 서비스에서 가입 가능한 역할 (공급자/파트너는 Neture에서 관리)
+// GlycoPharm은 약사 전용 서비스입니다
 const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2 }> = [
   {
     role: 'pharmacy',
     label: '약사',
     description: '약국을 운영하며 혈당관리 제품을 판매합니다',
     icon: Building2,
-  },
-  {
-    role: 'consumer',
-    label: '소비자',
-    description: '약국 매장에서 제품을 구매합니다',
-    icon: UserCircle,
   },
 ];
 
@@ -113,29 +106,44 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Step 1: Role Selection */}
           {step === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-slate-800 text-center mb-6">
-                어떤 역할로 가입하시겠습니까?
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
+              {/* 약사 전용 안내 메시지 */}
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 text-center">
+                <p className="text-sm font-medium text-primary-800">
+                  GlycoPharm은 <span className="font-bold">약사 전용</span> 서비스입니다
+                </p>
+                <p className="text-xs text-primary-600 mt-1">
+                  약국을 운영하시는 약사님만 가입하실 수 있습니다
+                </p>
+              </div>
+
+              {/* 약사 선택 카드 */}
+              <div className="flex justify-center">
                 {roleOptions.map((option) => {
                   const Icon = option.icon;
                   return (
                     <button
                       key={option.role}
                       onClick={() => handleRoleSelect(option.role)}
-                      className="p-4 border-2 rounded-xl text-left hover:border-primary-500 hover:bg-primary-50 transition-all group"
+                      className="w-full max-w-xs p-6 border-2 border-primary-500 bg-primary-50 rounded-xl text-center hover:bg-primary-100 transition-all group"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 group-hover:bg-primary-100 flex items-center justify-center mb-3 transition-colors">
-                        <Icon className="w-6 h-6 text-slate-600 group-hover:text-primary-600" />
+                      <div className="flex justify-center mb-4">
+                        <div className="w-16 h-16 rounded-xl bg-primary-100 group-hover:bg-primary-200 flex items-center justify-center transition-colors">
+                          <Icon className="w-8 h-8 text-primary-600" />
+                        </div>
                       </div>
-                      <h3 className="font-semibold text-slate-800">{option.label}</h3>
-                      <p className="text-xs text-slate-500 mt-1">{option.description}</p>
+                      <h3 className="text-lg font-bold text-slate-800 mb-2">{option.label}</h3>
+                      <p className="text-sm text-slate-600 mb-4">{option.description}</p>
+                      <div className="flex items-center justify-center gap-2 text-primary-600 font-medium">
+                        <span>약사 회원가입 시작하기</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
                     </button>
                   );
                 })}
               </div>
-              <p className="text-center text-sm text-slate-500 mt-6">
+
+              <p className="text-center text-sm text-slate-500">
                 이미 계정이 있으신가요?{' '}
                 <NavLink to="/login" className="text-primary-600 font-medium hover:text-primary-700">
                   로그인
