@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth, useOrganization } from '../contexts';
-import { useLoginModal } from '../contexts/LoginModalContext';
+import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
 
@@ -44,7 +44,7 @@ const adminMenu: MenuItem = {
 
 export function Header({ serviceName }: { serviceName: string }) {
   const { user, logout, isLoading } = useAuth();
-  const { openLoginModal } = useLoginModal();
+  const { openLoginModal, openRegisterModal } = useAuthModal();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -195,9 +195,13 @@ export function Header({ serviceName }: { serviceName: string }) {
                 >
                   로그인
                 </button>
-                <Link to="/demo/register" style={styles.authButtonOutline}>
+                <button
+                  style={styles.authButtonOutline}
+                  onClick={openRegisterModal}
+                  disabled={isLoading}
+                >
                   회원가입
-                </Link>
+                </button>
               </>
             )}
           </div>
