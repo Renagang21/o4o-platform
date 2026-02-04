@@ -39,11 +39,12 @@ import {
 } from '../../lib/api';
 import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../components/common/SimpleTable';
 
+// WO-O4O-ICON-SYSTEM-MODERNIZATION-V1: 무채색 아이콘
 const CONTENT_TYPE_CONFIG: Record<ContentType, { label: string; icon: typeof FileText; color: string }> = {
-  description: { label: '제품 설명', icon: FileText, color: '#3b82f6' },
-  image: { label: '이미지', icon: Image, color: '#8b5cf6' },
-  banner: { label: '배너', icon: Flag, color: '#f59e0b' },
-  guide: { label: '가이드', icon: BookOpen, color: '#10b981' },
+  description: { label: '제품 설명', icon: FileText, color: '#64748b' },
+  image: { label: '이미지', icon: Image, color: '#64748b' },
+  banner: { label: '배너', icon: Flag, color: '#64748b' },
+  guide: { label: '가이드', icon: BookOpen, color: '#64748b' },
 };
 
 export default function SupplierContentsPage() {
@@ -148,8 +149,8 @@ export default function SupplierContentsPage() {
               borderRadius: '6px',
               fontSize: '12px',
               fontWeight: 500,
-              backgroundColor: content.status === 'published' ? '#dcfce7' : '#f1f5f9',
-              color: content.status === 'published' ? '#16a34a' : '#64748b',
+              backgroundColor: '#f1f5f9',
+              color: '#64748b',
             }}
           >
             {content.status === 'published' ? <Eye size={12} /> : <EyeOff size={12} />}
@@ -202,7 +203,7 @@ export default function SupplierContentsPage() {
 
       {/* Notice */}
       <div style={styles.noticeBox}>
-        <AlertCircle size={16} style={{ color: '#2563eb', flexShrink: 0 }} />
+        <AlertCircle size={16} style={{ color: '#64748b', flexShrink: 0 }} />
         <p style={styles.noticeText}>
           이 콘텐츠는 파트너/판매자가 <strong>참고 자료로 활용</strong>합니다.
           자동 적용되거나 강제 배포되지 않습니다.
@@ -212,14 +213,14 @@ export default function SupplierContentsPage() {
       {/* Stats */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
-          <FileText size={20} style={{ color: '#3b82f6' }} />
+          <FileText size={20} style={{ color: '#64748b' }} />
           <div>
             <p style={styles.statValue}>{stats.total}</p>
             <p style={styles.statLabel}>전체</p>
           </div>
         </div>
         <div style={styles.statCard}>
-          <Eye size={20} style={{ color: '#16a34a' }} />
+          <Eye size={20} style={{ color: '#64748b' }} />
           <div>
             <p style={styles.statValue}>{stats.published}</p>
             <p style={styles.statLabel}>공개</p>

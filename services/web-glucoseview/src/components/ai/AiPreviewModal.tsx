@@ -54,7 +54,7 @@ export function AiPreviewModal({
         <div style={styles.header}>
           <div style={styles.headerLeft}>
             <div style={styles.headerIcon}>
-              <Sparkles size={22} style={{ color: '#2563eb' }} />
+              <Sparkles size={22} style={{ color: '#64748b' }} />
             </div>
             <div>
               <h2 style={styles.title}>{title}</h2>
@@ -88,7 +88,7 @@ export function AiPreviewModal({
             <ul style={styles.featuresList}>
               {upcomingFeatures.map((feature) => (
                 <li key={feature} style={styles.featureItem}>
-                  <CheckCircle2 size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
+                  <CheckCircle2 size={16} style={{ color: '#64748b', flexShrink: 0 }} />
                   <span>{feature}</span>
                 </li>
               ))}

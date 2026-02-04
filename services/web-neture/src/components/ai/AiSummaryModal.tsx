@@ -110,7 +110,7 @@ export function AiSummaryModal({
         <div style={styles.header}>
           <div style={styles.headerLeft}>
             <div style={styles.headerIcon}>
-              <Sparkles size={22} style={{ color: '#2563eb' }} />
+              <Sparkles size={22} style={{ color: '#64748b' }} />
             </div>
             <div>
               <h2 style={styles.title}>AI 요약</h2>
@@ -128,14 +128,14 @@ export function AiSummaryModal({
         <div style={styles.body}>
           {state === 'loading' && (
             <div style={styles.loadingContainer}>
-              <Loader2 size={32} style={{ color: '#2563eb', animation: 'spin 1s linear infinite' }} />
+              <Loader2 size={32} style={{ color: '#64748b', animation: 'spin 1s linear infinite' }} />
               <p style={styles.loadingText}>AI가 데이터를 분석하고 있습니다...</p>
             </div>
           )}
 
           {state === 'error' && (
             <div style={styles.errorContainer}>
-              <AlertCircle size={32} style={{ color: '#dc2626' }} />
+              <AlertCircle size={32} style={{ color: '#64748b' }} />
               <p style={styles.errorText}>{error}</p>
               <button onClick={fetchSummary} style={styles.retryButton}>
                 <RefreshCw size={16} />

@@ -44,29 +44,30 @@ interface Props {
   loading?: boolean;
 }
 
+// WO-O4O-ICON-SYSTEM-MODERNIZATION-V1: 무채색 아이콘
 const eventConfig: Record<
   ActivityEventType,
   { icon: typeof CheckCircle; color: string; bgColor: string }
 > = {
   request_approved: {
     icon: CheckCircle,
-    color: '#22c55e',
-    bgColor: '#dcfce7',
+    color: '#64748b',
+    bgColor: '#f1f5f9',
   },
   request_rejected: {
     icon: XCircle,
-    color: '#ef4444',
-    bgColor: '#fee2e2',
+    color: '#64748b',
+    bgColor: '#f1f5f9',
   },
   order_created: {
     icon: ShoppingCart,
-    color: '#8b5cf6',
-    bgColor: '#f3e8ff',
+    color: '#64748b',
+    bgColor: '#f1f5f9',
   },
   content_published: {
     icon: FileText,
-    color: '#3b82f6',
-    bgColor: '#dbeafe',
+    color: '#64748b',
+    bgColor: '#f1f5f9',
   },
   content_unpublished: {
     icon: EyeOff,

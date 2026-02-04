@@ -45,41 +45,42 @@ interface Props {
 }
 
 export function SupplierSummaryCards({ data, loading }: Props) {
+  // WO-O4O-ICON-SYSTEM-MODERNIZATION-V1: 무채색 아이콘
   const cards = [
     {
       icon: Package,
       label: '판매 중 제품',
       value: data.activeProducts,
-      color: '#3b82f6',
-      bgColor: '#eff6ff',
+      color: '#64748b',
+      bgColor: '#f1f5f9',
     },
     {
       icon: Clock,
       label: '승인 대기',
       value: data.pendingRequests,
-      color: '#f59e0b',
-      bgColor: '#fef3c7',
+      color: '#64748b',
+      bgColor: '#f1f5f9',
     },
     {
       icon: CheckCircle,
       label: '최근 7일 승인',
       value: data.recentApprovals,
-      color: '#22c55e',
-      bgColor: '#dcfce7',
+      color: '#64748b',
+      bgColor: '#f1f5f9',
     },
     {
       icon: ShoppingCart,
       label: '진행 중 주문',
       value: data.activeOrders,
-      color: '#8b5cf6',
-      bgColor: '#f3e8ff',
+      color: '#64748b',
+      bgColor: '#f1f5f9',
     },
     {
       icon: FileText,
       label: '게시 중 콘텐츠',
       value: data.publishedContents,
-      color: '#06b6d4',
-      bgColor: '#cffafe',
+      color: '#64748b',
+      bgColor: '#f1f5f9',
     },
     {
       icon: Link2,

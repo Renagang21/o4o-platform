@@ -82,22 +82,22 @@ export function SupplierServiceStatusBoard({ services, loading }: Props) {
               <span style={styles.serviceName}>{service.serviceName}</span>
             </div>
 
-            {/* Request Status */}
+            {/* Request Status - WO-O4O-ICON-SYSTEM-MODERNIZATION-V1: 무채색 아이콘 */}
             <div style={styles.statusSection}>
               <p style={styles.statusLabel}>신청 상태</p>
               <div style={styles.statusRow}>
                 <div style={styles.statusItem}>
-                  <Clock size={14} style={{ color: '#f59e0b' }} />
+                  <Clock size={14} style={{ color: '#64748b' }} />
                   <span style={styles.statusValue}>{service.requests.pending}</span>
                   <span style={styles.statusText}>대기</span>
                 </div>
                 <div style={styles.statusItem}>
-                  <CheckCircle size={14} style={{ color: '#22c55e' }} />
+                  <CheckCircle size={14} style={{ color: '#64748b' }} />
                   <span style={styles.statusValue}>{service.requests.approved}</span>
                   <span style={styles.statusText}>승인</span>
                 </div>
                 <div style={styles.statusItem}>
-                  <XCircle size={14} style={{ color: '#ef4444' }} />
+                  <XCircle size={14} style={{ color: '#64748b' }} />
                   <span style={styles.statusValue}>{service.requests.rejected}</span>
                   <span style={styles.statusText}>거절</span>
                 </div>
