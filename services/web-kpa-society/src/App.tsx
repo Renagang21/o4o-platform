@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Layout } from './components';
+import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { DashboardPage } from './pages/DashboardPage';
 
@@ -256,13 +256,15 @@ function App() {
 /**
  * SCOPE: 지부/분회 서비스 데모 — Main Layout 하위 라우트
  *
- * /demo 하위에서 Layout을 사용하는 라우트들.
+ * WO-KPA-DEMO-HEADER-SEPARATION-V1: DemoLayout 사용
+ *
+ * /demo 하위에서 DemoLayout을 사용하는 라우트들.
  * 이 라우트들은 지부/분회 조직 관리 데모 범위에 속합니다.
- * 커뮤니티 홈(/)과는 별도 스코프입니다.
+ * 커뮤니티 홈(/)과는 별도 스코프이며, 시각적으로도 분리됩니다.
  */
 function DemoLayoutRoutes() {
   return (
-    <Layout serviceName={SERVICE_NAME}>
+    <DemoLayout serviceName={SERVICE_NAME}>
       <Routes>
         {/* Home / Dashboard */}
         <Route path="/" element={<DashboardPage />} />
@@ -341,7 +343,7 @@ function DemoLayoutRoutes() {
         {/* 404 */}
         <Route path="*" element={<DemoNotFoundPage />} />
       </Routes>
-    </Layout>
+    </DemoLayout>
   );
 }
 
