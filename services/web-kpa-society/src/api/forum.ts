@@ -20,15 +20,19 @@ import type {
 
 /**
  * Get forum API base path based on current route
- * /demo/* routes → /demo-forum (demo scope, returns empty)
- * Other routes → /forum (community scope)
+ * /demo/* routes → /kpa/demo-forum (demo scope, returns empty)
+ * Other routes → /kpa/forum (community scope, KPA 커뮤니티 글만)
+ *
+ * WO-FORUM-SCOPE-FIX: KPA-Society는 항상 /kpa/forum 사용
+ * - /kpa/forum: scope='community' → organizationId IS NULL 글만
+ * - /forum (generic): 필터 없음 → 모든 서비스 글 반환 (admin용)
  */
 function getForumBasePath(): string {
   if (typeof window !== 'undefined') {
     const isDemoRoute = window.location.pathname.startsWith('/demo/');
-    return isDemoRoute ? '/demo-forum' : '/forum';
+    return isDemoRoute ? '/kpa/demo-forum' : '/kpa/forum';
   }
-  return '/forum'; // SSR fallback
+  return '/kpa/forum'; // SSR fallback
 }
 
 export const forumApi = {
