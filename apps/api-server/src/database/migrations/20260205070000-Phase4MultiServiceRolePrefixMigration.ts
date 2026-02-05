@@ -45,72 +45,104 @@ export class Phase4MultiServiceRolePrefixMigration20260205070000 implements Migr
     // ========================================================================
     console.log('[MIGRATION] Step 1: Migrating GlycoPharm roles...');
 
-    // Add glycopharm:admin to users with approved GlycoPharm applications
-    await queryRunner.query(`
-      UPDATE users u
-      SET roles = array_append(roles, 'glycopharm:admin')
-      FROM glycopharm_applications ga
-      WHERE ga.user_id = u.id
-        AND ga.status = 'approved'
-        AND 'admin' = ANY(u.roles)
-        AND NOT ('glycopharm:admin' = ANY(u.roles))
+    // Check if glycopharm_applications table exists
+    const glycopharmTableExists = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'glycopharm_applications'
+      )
     `);
 
-    // Add glycopharm:operator to users with approved GlycoPharm applications
-    await queryRunner.query(`
-      UPDATE users u
-      SET roles = array_append(roles, 'glycopharm:operator')
-      FROM glycopharm_applications ga
-      WHERE ga.user_id = u.id
-        AND ga.status = 'approved'
-        AND 'operator' = ANY(u.roles)
-        AND NOT ('glycopharm:operator' = ANY(u.roles))
-    `);
+    if (glycopharmTableExists[0].exists) {
+      console.log('[MIGRATION] glycopharm_applications table found, migrating roles...');
 
-    const glycopharmStats = await queryRunner.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE 'glycopharm:admin' = ANY(roles)) as admins,
-        COUNT(*) FILTER (WHERE 'glycopharm:operator' = ANY(roles)) as operators
-      FROM users
-    `);
+      // Add glycopharm:admin to users with approved GlycoPharm applications
+      await queryRunner.query(`
+        UPDATE users u
+        SET roles = array_append(roles, 'glycopharm:admin')
+        FROM glycopharm_applications ga
+        WHERE ga.user_id = u.id
+          AND ga.status = 'approved'
+          AND 'admin' = ANY(u.roles)
+          AND NOT ('glycopharm:admin' = ANY(u.roles))
+      `);
 
-    console.log('[MIGRATION] GlycoPharm roles migrated:', glycopharmStats[0]);
+      // Add glycopharm:operator to users with approved GlycoPharm applications
+      await queryRunner.query(`
+        UPDATE users u
+        SET roles = array_append(roles, 'glycopharm:operator')
+        FROM glycopharm_applications ga
+        WHERE ga.user_id = u.id
+          AND ga.status = 'approved'
+          AND 'operator' = ANY(u.roles)
+          AND NOT ('glycopharm:operator' = ANY(u.roles))
+      `);
+
+      const glycopharmStats = await queryRunner.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE 'glycopharm:admin' = ANY(roles)) as admins,
+          COUNT(*) FILTER (WHERE 'glycopharm:operator' = ANY(roles)) as operators
+        FROM users
+      `);
+
+      console.log('[MIGRATION] GlycoPharm roles migrated:', glycopharmStats[0]);
+    } else {
+      console.log('[MIGRATION] glycopharm_applications table not found, skipping GlycoPharm role migration');
+      console.log('[MIGRATION] This is expected if GlycoPharm service is not yet deployed to production');
+    }
 
     // ========================================================================
     // STEP 2: GlucoseView Service
     // ========================================================================
     console.log('[MIGRATION] Step 2: Migrating GlucoseView roles...');
 
-    // Add glucoseview:admin to users with active GlucoseView pharmacies
-    await queryRunner.query(`
-      UPDATE users u
-      SET roles = array_append(roles, 'glucoseview:admin')
-      FROM glucoseview_pharmacies gp
-      WHERE gp.user_id = u.id
-        AND gp.status = 'active'
-        AND 'admin' = ANY(u.roles)
-        AND NOT ('glucoseview:admin' = ANY(u.roles))
+    // Check if glucoseview_pharmacies table exists
+    const glucoseviewTableExists = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'glucoseview_pharmacies'
+      )
     `);
 
-    // Add glucoseview:operator to users with active GlucoseView pharmacies
-    await queryRunner.query(`
-      UPDATE users u
-      SET roles = array_append(roles, 'glucoseview:operator')
-      FROM glucoseview_pharmacies gp
-      WHERE gp.user_id = u.id
-        AND gp.status = 'active'
-        AND 'operator' = ANY(u.roles)
-        AND NOT ('glucoseview:operator' = ANY(u.roles))
-    `);
+    if (glucoseviewTableExists[0].exists) {
+      console.log('[MIGRATION] glucoseview_pharmacies table found, migrating roles...');
 
-    const glucoseviewStats = await queryRunner.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE 'glucoseview:admin' = ANY(roles)) as admins,
-        COUNT(*) FILTER (WHERE 'glucoseview:operator' = ANY(roles)) as operators
-      FROM users
-    `);
+      // Add glucoseview:admin to users with active GlucoseView pharmacies
+      await queryRunner.query(`
+        UPDATE users u
+        SET roles = array_append(roles, 'glucoseview:admin')
+        FROM glucoseview_pharmacies gp
+        WHERE gp.user_id = u.id
+          AND gp.status = 'active'
+          AND 'admin' = ANY(u.roles)
+          AND NOT ('glucoseview:admin' = ANY(u.roles))
+      `);
 
-    console.log('[MIGRATION] GlucoseView roles migrated:', glucoseviewStats[0]);
+      // Add glucoseview:operator to users with active GlucoseView pharmacies
+      await queryRunner.query(`
+        UPDATE users u
+        SET roles = array_append(roles, 'glucoseview:operator')
+        FROM glucoseview_pharmacies gp
+        WHERE gp.user_id = u.id
+          AND gp.status = 'active'
+          AND 'operator' = ANY(u.roles)
+          AND NOT ('glucoseview:operator' = ANY(u.roles))
+      `);
+
+      const glucoseviewStats = await queryRunner.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE 'glucoseview:admin' = ANY(roles)) as admins,
+          COUNT(*) FILTER (WHERE 'glucoseview:operator' = ANY(roles)) as operators
+        FROM users
+      `);
+
+      console.log('[MIGRATION] GlucoseView roles migrated:', glucoseviewStats[0]);
+    } else {
+      console.log('[MIGRATION] glucoseview_pharmacies table not found, skipping GlucoseView role migration');
+      console.log('[MIGRATION] This is expected if GlucoseView service is not yet deployed to production');
+    }
 
     // ========================================================================
     // STEP 3: Platform Admin (Cross-Service)
