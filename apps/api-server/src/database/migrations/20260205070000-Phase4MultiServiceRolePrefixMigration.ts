@@ -178,6 +178,8 @@ export class Phase4MultiServiceRolePrefixMigration20260205070000 implements Migr
     console.log('[MIGRATION] Step 4: Updating migration log...');
 
     // Update existing migration log entries for users who got new roles
+    // Note: Using NOT EXISTS pattern (like KPA migration) instead of ON CONFLICT
+    // because role_migration_log table doesn't have a unique constraint on (user_id, service_key)
     await queryRunner.query(`
       INSERT INTO role_migration_log (user_id, service_key, legacy_roles, prefixed_roles, migration_status, migrated_at)
       SELECT
@@ -201,13 +203,7 @@ export class Phase4MultiServiceRolePrefixMigration20260205070000 implements Migr
       AND NOT EXISTS (
         SELECT 1 FROM role_migration_log rml
         WHERE rml.user_id = u.id
-          AND rml.migrated_at >= (now() - interval '1 hour')
       )
-      ON CONFLICT (user_id, service_key)
-      DO UPDATE SET
-        prefixed_roles = EXCLUDED.prefixed_roles,
-        migration_status = EXCLUDED.migration_status,
-        migrated_at = EXCLUDED.migrated_at
     `);
 
     // ========================================================================
