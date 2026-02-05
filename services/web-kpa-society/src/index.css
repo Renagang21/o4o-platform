@@ -1,4 +1,11 @@
 /**
+ * Tailwind CSS imports
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
  * O4O Platform Design Tokens v1.0
  * INLINED for Docker build (monorepo packages not available in Docker context)
  * KPA Society - Blue Theme
