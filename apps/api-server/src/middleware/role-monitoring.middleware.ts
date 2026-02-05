@@ -12,6 +12,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getRoleMigrationStatus, isPrefixedRole } from '../utils/role.utils.js';
 import type { AuthRequest } from '../types/auth.js';
+import logger from '../utils/logger.js';
 
 /**
  * Role usage metrics (in-memory for current session)
@@ -72,7 +73,7 @@ function logRoleUsage(req: AuthRequest): void {
   // Log warning if legacy roles are used
   if (migrationStatus.legacy > 0) {
     const legacyRoles = userRoles.filter(r => !isPrefixedRole(r));
-    console.warn(
+    logger.warn(
       `[ROLE_MONITORING] Legacy role format detected | User: ${user.id} | ` +
       `Roles: [${legacyRoles.join(', ')}] | Path: ${req.method} ${req.path}`
     );
@@ -139,23 +140,23 @@ export function resetRoleUsageMetrics(): void {
  * Useful for debugging or periodic logging.
  */
 export function printRoleUsageMetrics(): void {
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('                  ROLE USAGE METRICS                           ');
-  console.log('═══════════════════════════════════════════════════════════════');
+  logger.info('\n═══════════════════════════════════════════════════════════════');
+  logger.info('                  ROLE USAGE METRICS                           ');
+  logger.info('═══════════════════════════════════════════════════════════════');
 
-  console.log('\n📊 REQUEST STATISTICS');
-  console.log('─────────────────────────────────────────────────────────────');
-  console.log(`Total Requests:               ${metrics.totalRequests}`);
-  console.log(`Requests with Prefixed Roles: ${metrics.requestsWithPrefixedRoles}`);
-  console.log(`Requests with Legacy Roles:   ${metrics.requestsWithLegacyRoles}`);
-  console.log(`Requests with Mixed Roles:    ${metrics.requestsWithMixedRoles}`);
+  logger.info('\n📊 REQUEST STATISTICS');
+  logger.info('─────────────────────────────────────────────────────────────');
+  logger.info(`Total Requests:               ${metrics.totalRequests}`);
+  logger.info(`Requests with Prefixed Roles: ${metrics.requestsWithPrefixedRoles}`);
+  logger.info(`Requests with Legacy Roles:   ${metrics.requestsWithLegacyRoles}`);
+  logger.info(`Requests with Mixed Roles:    ${metrics.requestsWithMixedRoles}`);
 
   if (metrics.totalRequests > 0) {
     const prefixedPct = ((metrics.requestsWithPrefixedRoles / metrics.totalRequests) * 100).toFixed(1);
     const legacyPct = ((metrics.requestsWithLegacyRoles / metrics.totalRequests) * 100).toFixed(1);
     const mixedPct = ((metrics.requestsWithMixedRoles / metrics.totalRequests) * 100).toFixed(1);
 
-    console.log(`\nMigration Progress: ${prefixedPct}% prefixed, ${legacyPct}% legacy, ${mixedPct}% mixed`);
+    logger.info(`\nMigration Progress: ${prefixedPct}% prefixed, ${legacyPct}% legacy, ${mixedPct}% mixed`);
   }
 
   // Top legacy roles
@@ -164,10 +165,10 @@ export function printRoleUsageMetrics(): void {
     .slice(0, 10);
 
   if (legacyRoles.length > 0) {
-    console.log('\n❌ TOP LEGACY ROLES (Most Used):');
-    console.log('─────────────────────────────────────────────────────────────');
+    logger.info('\n❌ TOP LEGACY ROLES (Most Used):');
+    logger.info('─────────────────────────────────────────────────────────────');
     for (const [role, count] of legacyRoles) {
-      console.log(`  ${role.padEnd(25)} → ${count} requests`);
+      logger.info(`  ${role.padEnd(25)} → ${count} requests`);
     }
   }
 
@@ -177,14 +178,14 @@ export function printRoleUsageMetrics(): void {
     .slice(0, 10);
 
   if (prefixedRoles.length > 0) {
-    console.log('\n✅ TOP PREFIXED ROLES (Most Used):');
-    console.log('─────────────────────────────────────────────────────────────');
+    logger.info('\n✅ TOP PREFIXED ROLES (Most Used):');
+    logger.info('─────────────────────────────────────────────────────────────');
     for (const [role, count] of prefixedRoles) {
-      console.log(`  ${role.padEnd(25)} → ${count} requests`);
+      logger.info(`  ${role.padEnd(25)} → ${count} requests`);
     }
   }
 
-  console.log('\n═══════════════════════════════════════════════════════════════\n');
+  logger.info('\n═══════════════════════════════════════════════════════════════\n');
 }
 
 /**
@@ -202,12 +203,12 @@ export function schedulePeriodicMetricLogging(intervalMinutes: number = 60): Nod
 
   const timer = setInterval(() => {
     if (metrics.totalRequests > 0) {
-      console.log(`\n[ROLE_MONITORING] Periodic metrics report (every ${intervalMinutes} minutes):`);
+      logger.info(`\n[ROLE_MONITORING] Periodic metrics report (every ${intervalMinutes} minutes):`);
       printRoleUsageMetrics();
     }
   }, intervalMs);
 
-  console.log(`[ROLE_MONITORING] Scheduled periodic logging every ${intervalMinutes} minutes`);
+  logger.info(`[ROLE_MONITORING] Scheduled periodic logging every ${intervalMinutes} minutes`);
 
   return timer;
 }
@@ -233,7 +234,7 @@ export function strictLegacyRoleLogging(
     const legacyRoles = userRoles.filter(r => !isPrefixedRole(r));
 
     if (legacyRoles.length > 0) {
-      console.warn(
+      logger.warn(
         `[STRICT_ROLE_CHECK] Legacy roles detected!`,
         `\n  User ID: ${authReq.user.id}`,
         `\n  Email: ${authReq.user.email}`,

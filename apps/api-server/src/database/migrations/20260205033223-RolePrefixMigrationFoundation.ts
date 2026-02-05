@@ -67,9 +67,10 @@ export class RolePrefixMigrationFoundation20260205033223 implements MigrationInt
 
     // Create GIN index on users.roles for efficient array containment queries
     // This helps with queries like: WHERE 'kpa:admin' = ANY(roles)
+    // Use array_ops operator class for text array GIN index
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS "idx_users_roles_gin"
-      ON "users" USING GIN ("roles")
+      ON "users" USING GIN ("roles" array_ops)
     `);
 
     // Log migration execution
