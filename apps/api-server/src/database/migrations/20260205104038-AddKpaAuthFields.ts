@@ -63,13 +63,10 @@ export class AddKpaAuthFields20260205104038 implements MigrationInterface {
       WHERE "service_key" IS NULL
     `);
 
-    // Pre-approve test accounts for deployment
+    // Pre-approve test accounts for deployment (status only, no approval tracking yet)
     await queryRunner.query(`
       UPDATE "users"
-      SET
-        "status" = 'ACTIVE',
-        "approved_at" = NOW(),
-        "approved_by" = 'system-migration-20260205'
+      SET "status" = 'ACTIVE'
       WHERE "email" IN (
         'district-admin@kpa-test.kr',
         'branch-admin@kpa-test.kr',
