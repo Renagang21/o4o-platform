@@ -151,10 +151,10 @@ export class Phase4MultiServiceRolePrefixMigration20260205070000 implements Migr
       SELECT
         u.id,
         COALESCE(u.service_key, 'platform') as service_key,
-        ARRAY(SELECT unnest(u.roles) WHERE unnest NOT LIKE '%:%') as legacy_roles,
-        ARRAY(SELECT unnest(u.roles) WHERE unnest LIKE '%:%') as prefixed_roles,
+        ARRAY(SELECT role FROM unnest(u.roles) as role WHERE role NOT LIKE '%:%') as legacy_roles,
+        ARRAY(SELECT role FROM unnest(u.roles) as role WHERE role LIKE '%:%') as prefixed_roles,
         CASE
-          WHEN EXISTS (SELECT 1 FROM unnest(u.roles) WHERE unnest LIKE '%:%') THEN 'completed'
+          WHEN EXISTS (SELECT 1 FROM unnest(u.roles) as role WHERE role LIKE '%:%') THEN 'completed'
           ELSE 'pending'
         END as migration_status,
         now() as migrated_at
@@ -214,8 +214,8 @@ export class Phase4MultiServiceRolePrefixMigration20260205070000 implements Migr
     await queryRunner.query(`
       UPDATE users
       SET roles = ARRAY(
-        SELECT unnest(roles)
-        WHERE unnest NOT IN (
+        SELECT role FROM unnest(roles) as role
+        WHERE role NOT IN (
           'glycopharm:admin',
           'glycopharm:operator',
           'glucoseview:admin',
@@ -224,8 +224,8 @@ export class Phase4MultiServiceRolePrefixMigration20260205070000 implements Migr
           'cosmetics:operator'
         )
         AND (
-          unnest NOT LIKE 'platform:%'
-          OR unnest = 'platform:super_admin'  -- Keep platform:super_admin from Phase 1
+          role NOT LIKE 'platform:%'
+          OR role = 'platform:super_admin'  -- Keep platform:super_admin from Phase 1
         )
       )
       WHERE (

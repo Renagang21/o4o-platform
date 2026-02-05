@@ -64,11 +64,11 @@ export class NetureRolePrefixMigration20260205060000 implements MigrationInterfa
       SELECT
         u.id,
         u.service_key,
-        ARRAY(SELECT unnest(u.roles) WHERE unnest NOT LIKE '%:%') as legacy_roles,
-        ARRAY(SELECT unnest(u.roles) WHERE unnest LIKE '%:%') as prefixed_roles,
+        ARRAY(SELECT role FROM unnest(u.roles) as role WHERE role NOT LIKE '%:%') as legacy_roles,
+        ARRAY(SELECT role FROM unnest(u.roles) as role WHERE role LIKE '%:%') as prefixed_roles,
         CASE
-          WHEN NOT EXISTS (SELECT 1 FROM unnest(u.roles) WHERE unnest NOT LIKE '%:%') THEN 'completed'
-          WHEN EXISTS (SELECT 1 FROM unnest(u.roles) WHERE unnest LIKE '%:%') THEN 'completed'
+          WHEN NOT EXISTS (SELECT 1 FROM unnest(u.roles) as role WHERE role NOT LIKE '%:%') THEN 'completed'
+          WHEN EXISTS (SELECT 1 FROM unnest(u.roles) as role WHERE role LIKE '%:%') THEN 'completed'
           ELSE 'pending'
         END as migration_status,
         now() as migrated_at
@@ -104,7 +104,7 @@ export class NetureRolePrefixMigration20260205060000 implements MigrationInterfa
     // Remove prefixed neture roles
     await queryRunner.query(`
       UPDATE users
-      SET roles = ARRAY(SELECT unnest(roles) WHERE unnest NOT IN ('neture:admin', 'neture:operator'))
+      SET roles = ARRAY(SELECT role FROM unnest(roles) as role WHERE role NOT IN ('neture:admin', 'neture:operator'))
       WHERE service_key = 'neture'
         AND ('neture:admin' = ANY(roles) OR 'neture:operator' = ANY(roles))
     `);
