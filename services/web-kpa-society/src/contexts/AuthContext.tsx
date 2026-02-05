@@ -92,9 +92,21 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role?: string;
+  role?: string;  // Legacy single role (backward compatibility)
+  roles?: string[];  // P2-T1: Phase 4 support - array of roles (legacy + prefixed)
   pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
   pharmacistRole?: PharmacistRole;          // 직역 (최초 1회 선택, 프로필에서 수정 가능)
+
+  // ============================================
+  // P2-T4: Super Operator 확장 지점
+  // WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
+  // ============================================
+  // 향후 Super Operator 개념 도입 시:
+  // - isSuperOperator?: boolean;
+  // - operatorScopes?: string[];  // 서비스별 운영 권한
+  // - operatorLevel?: 'platform' | 'service' | 'branch';
+  // 구현 없음 (확장 지점만 표시)
+  // ============================================
 }
 
 /**
@@ -200,6 +212,10 @@ interface ApiUser {
  * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1:
  * - role 매핑 제거 (API role을 그대로 사용)
  * - KPA 프론트는 role 문자열을 해석하지 않음
+ *
+ * P2-T1 (WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1):
+ * - roles 배열 보존 (Phase 4 prefixed roles 지원)
+ * - Backward compatibility: role 필드 유지
  */
 function createUserFromApiResponse(apiUser: ApiUser): User {
   // P1-T3: Get pharmacistFunction/Role from API response (not localStorage)
@@ -207,7 +223,8 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
-    role: apiUser.role || 'pharmacist', // 매핑 없이 그대로 사용
+    role: apiUser.role || 'pharmacist', // 매핑 없이 그대로 사용 (Backward compatibility)
+    roles: apiUser.roles || [apiUser.role || 'pharmacist'], // P2-T1: Phase 4 support
     pharmacistFunction: (apiUser as any).pharmacistFunction as PharmacistFunction | undefined,
     pharmacistRole: (apiUser as any).pharmacistRole as PharmacistRole | undefined,
   };

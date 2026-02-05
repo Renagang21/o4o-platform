@@ -146,6 +146,9 @@ function App() {
         <RegisterModal />
         <Routes>
           {/* =========================================================
+           * P2-T3: Service A - 메인 커뮤니티 (Main Community)
+           * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
+           *
            * SCOPE: 분회 서비스 데모 (Community Demo)
            * 단일 조직, 커뮤니티 중심 서비스
            * - / : 커뮤니티 홈
@@ -209,15 +212,22 @@ function App() {
           <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
 
           {/* =========================================================
+           * P2-T3: Service B - 지부/분회 연동 서비스 (District/Branch Demo)
+           * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
+           *
            * SCOPE: 지부/분회 서비스 데모 (District/Branch Admin Demo)
            * 조직 관리 중심 서비스 — 커뮤니티 홈(/)과 혼합 금지
            * - /demo : 조직 대시보드 (DashboardPage)
            * - /demo/admin/* : 지부 관리자
            * - /demo/operator/* : 서비스 운영자
            * - /demo/intranet/* : 인트라넷
-           * - /demo/branch/:branchId/* : 분회 서비스
+           * - /demo/branch/:branchId/* : 분회 서비스 (⚠️ Service C 흡수됨)
            * - /demo/branch/:branchId/admin/* : 분회 관리자
            * - /demo/login, /demo/register : 데모 인증
+           *
+           * P2-T3 주의사항:
+           * - Service C (분회 독립 서비스)는 현재 /demo/branch/:branchId/* 에 흡수됨
+           * - 향후 분리 시 BranchRoutes, BranchProvider, BranchLayout 독립 검토 필요
            *
            * WO-KPA-DEMO-ROUTE-ISOLATION-V1
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
@@ -247,7 +257,19 @@ function App() {
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
 
-          {/* Branch Routes (분회 서브디렉토리 - 별도 레이아웃) */}
+          {/* ===================================================
+           * P2-T3: Service C - 분회 독립 서비스 (현재 흡수 상태)
+           * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
+           *
+           * 현재 상태: Service B (/demo) 내부에 흡수됨
+           * 향후 분리 시나리오: 독립 도메인 또는 서브도메인
+           * 분리 대상 컴포넌트:
+           * - BranchRoutes (routes/BranchRoutes.tsx)
+           * - BranchProvider (contexts/BranchContext.tsx)
+           * - BranchLayout (components/branch/BranchLayout.tsx)
+           *
+           * 분리 작업 없음 (P2-T3: 구조만 준비)
+           * =================================================== */}
           <Route path="/demo/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
           <Route path="/demo/branch/:branchId/*" element={<BranchRoutes />} />
 
