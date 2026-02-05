@@ -2,6 +2,7 @@
  * KPA Branch Admin Dashboard Controller
  *
  * WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1: 분회 운영자용 대시보드 API
+ * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 1: KPA Migration)
  * - 분회 단위 통계 제공
  * - 소속 분회 범위 내 데이터만 조회
  * - "요약 → 이동" 패턴 지원
@@ -13,6 +14,7 @@ import { KpaOrganization } from '../entities/kpa-organization.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { hasAnyServiceRole, hasRoleCompat, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -36,15 +38,53 @@ interface RecentActivity {
 
 /**
  * Check if user has branch admin/operator role
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.1: KPA District/Branch)
+ * - **KPA 조직 서비스는 오직 KPA role만 신뢰**
+ * - Priority 1: KPA prefixed roles ONLY (kpa:branch_admin, kpa:branch_operator, kpa:admin, kpa:operator)
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - platform:admin 자동 허용 제거 (KPA 조직 격리)
  */
-function isBranchOperator(roles: string[] = []): boolean {
-  return (
-    roles.includes('admin') ||
-    roles.includes('operator') ||
-    roles.includes('branch_admin') ||
-    roles.includes('branch_operator') ||
-    roles.includes('super_admin')
+function isBranchOperator(roles: string[] = [], userId: string = 'unknown'): boolean {
+  // Priority 1: Check KPA-specific prefixed roles ONLY
+  const hasKpaRole = hasAnyServiceRole(roles, [
+    'kpa:branch_admin',
+    'kpa:branch_operator',
+    'kpa:admin',
+    'kpa:operator'
+  ]);
+
+  if (hasKpaRole) {
+    return true;
+  }
+
+  // Priority 2: Detect legacy roles and DENY access
+  const legacyRoles = ['branch_admin', 'branch_operator', 'admin', 'operator', 'super_admin'];
+  const detectedLegacyRoles = roles.filter(r => legacyRoles.includes(r));
+
+  if (detectedLegacyRoles.length > 0) {
+    // Log legacy role usage and deny access
+    detectedLegacyRoles.forEach(role => {
+      logLegacyRoleUsage(userId, role, 'branch-admin-dashboard.controller:isBranchOperator');
+    });
+    return false; // ❌ DENY - Legacy roles no longer grant access
+  }
+
+  // Detect platform/other service roles and deny
+  const hasOtherServiceRole = roles.some(r =>
+    r.startsWith('platform:') ||
+    r.startsWith('neture:') ||
+    r.startsWith('glycopharm:') ||
+    r.startsWith('cosmetics:') ||
+    r.startsWith('glucoseview:')
   );
+
+  if (hasOtherServiceRole) {
+    // Platform/other service admins do NOT have KPA organization access
+    return false; // ❌ DENY - KPA organization requires kpa:* roles
+  }
+
+  return false;
 }
 
 /**
@@ -81,17 +121,17 @@ export function createBranchAdminDashboardController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // Check branch operator permission
-        if (!isBranchOperator(userRoles)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
           });
           return;
         }
 
-        if (!userId) {
-          res.status(401).json({
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+        // Check branch operator permission
+        if (!isBranchOperator(userRoles, userId)) {
+          res.status(403).json({
+            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
           });
           return;
         }
@@ -157,16 +197,16 @@ export function createBranchAdminDashboardController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!isBranchOperator(userRoles)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
           });
           return;
         }
 
-        if (!userId) {
-          res.status(401).json({
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+        if (!isBranchOperator(userRoles, userId)) {
+          res.status(403).json({
+            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
           });
           return;
         }
@@ -220,16 +260,16 @@ export function createBranchAdminDashboardController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!isBranchOperator(userRoles)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
           });
           return;
         }
 
-        if (!userId) {
-          res.status(401).json({
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+        if (!isBranchOperator(userRoles, userId)) {
+          res.status(403).json({
+            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
           });
           return;
         }

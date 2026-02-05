@@ -19,6 +19,7 @@ import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
+import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -27,6 +28,13 @@ import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
 
 /**
  * Scope verification middleware factory for Glycopharm
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
+ * - **GlycoPharm 서비스는 오직 glycopharm:* role만 신뢰**
+ * - Priority 1: GlycoPharm prefixed roles ONLY (glycopharm:admin, glycopharm:operator)
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - Scopes: glycopharm:* pattern (service-specific)
+ * - platform:admin 허용 (플랫폼 감독)
  */
 function requireGlycopharmScope(scope: string): RequestHandler {
   return (req, res, next) => {
@@ -39,21 +47,66 @@ function requireGlycopharmScope(scope: string): RequestHandler {
       return;
     }
 
-    // Check for glycopharm:admin scope or admin role
+    const userId = user.id || 'unknown';
     const userScopes: string[] = user.scopes || [];
     const userRoles: string[] = user.roles || [];
 
+    // Check scopes (service-specific)
     const hasScope = userScopes.includes(scope) || userScopes.includes('glycopharm:admin');
-    const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin');
 
-    if (!hasScope && !isAdmin) {
+    // Priority 1: Check GlycoPharm-specific prefixed roles
+    const hasGlycopharmRole = hasAnyServiceRole(userRoles, [
+      'glycopharm:admin',
+      'glycopharm:operator',
+      'platform:admin',
+      'platform:super_admin'
+    ]);
+
+    if (hasScope || hasGlycopharmRole) {
+      next();
+      return;
+    }
+
+    // Priority 2: Detect legacy roles and DENY access
+    const legacyRoles = ['admin', 'super_admin', 'operator'];
+    const detectedLegacyRoles = userRoles.filter(r => legacyRoles.includes(r));
+
+    if (detectedLegacyRoles.length > 0) {
+      // Log legacy role usage and deny access
+      detectedLegacyRoles.forEach(role => {
+        logLegacyRoleUsage(userId, role, `glycopharm.routes:requireGlycopharmScope(${scope})`);
+      });
       res.status(403).json({
-        error: { code: 'FORBIDDEN', message: `Required scope: ${scope}` },
+        error: {
+          code: 'FORBIDDEN',
+          message: `Required scope: ${scope}. Legacy roles are no longer supported. Please use glycopharm:* prefixed roles.`
+        },
       });
       return;
     }
 
-    next();
+    // Detect other service roles
+    const hasOtherServiceRole = userRoles.some(r =>
+      r.startsWith('kpa:') ||
+      r.startsWith('neture:') ||
+      r.startsWith('cosmetics:') ||
+      r.startsWith('glucoseview:')
+    );
+
+    if (hasOtherServiceRole) {
+      res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: `Required scope: ${scope}. GlycoPharm requires glycopharm:* roles.`
+        },
+      });
+      return;
+    }
+
+    // Access denied - No valid role
+    res.status(403).json({
+      error: { code: 'FORBIDDEN', message: `Required scope: ${scope}` },
+    });
   };
 }
 

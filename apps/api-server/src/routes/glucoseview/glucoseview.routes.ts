@@ -17,30 +17,78 @@ import { createGlucoseViewApplicationController } from './controllers/applicatio
 import { createGlucoseViewPharmacyController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import { GlucoseViewPharmacist } from './entities/index.js';
+import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
 /**
  * Scope verification middleware factory for GlucoseView
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.3: GlucoseView)
+ * - **GlucoseView 비즈니스 서비스는 glucoseview:* role + platform:admin 신뢰**
+ * - Priority 1: GlucoseView prefixed roles + platform admin
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - Cross-service isolation: Other service roles DENY
  */
 function requireGlucoseViewScope(scope: string): RequestHandler {
   return (req, res, next) => {
     const user = (req as any).user;
+    const userId = user?.id || user?.userId || 'unknown';
+    const userRoles = user?.roles || [];
 
-    // Allow super_admin to bypass scope checks
-    if (user?.roles?.includes('super_admin') || user?.role === 'super_admin') {
-      return next();
-    }
-
-    // Check for admin role
-    if (user?.roles?.includes('admin') || user?.role === 'admin') {
-      return next();
-    }
+    // Priority 1: Check GlucoseView-specific prefixed roles + platform admin
+    const hasGlucoseViewRole = hasAnyServiceRole(userRoles, [
+      'glucoseview:admin',
+      'glucoseview:operator',
+      'platform:admin',
+      'platform:super_admin'
+    ]);
 
     // Check for specific scope
     const userScopes = user?.scopes || [];
-    if (userScopes.includes(scope) || userScopes.includes('glucoseview:admin')) {
-      return next();
+    const hasScope = userScopes.includes(scope) || userScopes.includes('glucoseview:admin');
+
+    if (hasScope || hasGlucoseViewRole) {
+      next();
+      return;
     }
 
+    // Priority 2: Detect legacy roles and DENY with detailed error
+    const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
+    const detectedLegacyRoles = userRoles.filter((r: string) => legacyRoles.includes(r));
+
+    if (detectedLegacyRoles.length > 0) {
+      // Log legacy role usage
+      detectedLegacyRoles.forEach((role: string) => {
+        logLegacyRoleUsage(userId, role, 'glucoseview.routes:requireGlucoseViewScope');
+      });
+
+      res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: `Required scope: ${scope}. Legacy roles are no longer supported. Please use glucoseview:* or platform:* prefixed roles.`,
+        },
+      });
+      return;
+    }
+
+    // Detect other service roles and deny
+    const hasOtherServiceRole = userRoles.some((r: string) =>
+      r.startsWith('kpa:') ||
+      r.startsWith('neture:') ||
+      r.startsWith('glycopharm:') ||
+      r.startsWith('cosmetics:')
+    );
+
+    if (hasOtherServiceRole) {
+      res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: `Required scope: ${scope}. Cross-service access denied. GlucoseView requires glucoseview:* or platform:* roles.`,
+        },
+      });
+      return;
+    }
+
+    // Default deny
     res.status(403).json({
       error: {
         code: 'FORBIDDEN',

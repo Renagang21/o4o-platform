@@ -14,28 +14,79 @@ import { createCosmeticsOrderController } from './controllers/cosmetics-order.co
 import { createCosmeticsPaymentController } from './controllers/cosmetics-payment.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
+import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
 /**
  * Cosmetics scope verification middleware
- * Checks if user has required scope in their JWT
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.4: K-Cosmetics)
+ * - **Cosmetics 비즈니스 서비스는 cosmetics:* role + platform:admin 신뢰**
+ * - Priority 1: Cosmetics prefixed roles + platform admin
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - Cross-service isolation: Other service roles DENY
  */
 function requireCosmeticsScope(requiredScope: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthRequest;
+    const userId = authReq.user?.id || 'unknown';
+    const userRoles = authReq.user?.roles || [];
 
     // Get scopes from user object (set by auth middleware)
     const userScopes = authReq.user?.scopes || [];
 
-    // Check if user has the required scope or admin scope
-    if (
+    // Check if user has the required scope or cosmetics:admin scope
+    const hasScope =
       userScopes.includes(requiredScope) ||
-      userScopes.includes('cosmetics:admin') ||
-      userScopes.includes('admin') ||
-      authReq.user?.roles?.includes('admin')
-    ) {
+      userScopes.includes('cosmetics:admin');
+
+    // Priority 1: Check Cosmetics-specific prefixed roles + platform admin
+    const hasCosmeticsRole = hasAnyServiceRole(userRoles, [
+      'cosmetics:admin',
+      'cosmetics:operator',
+      'platform:admin',
+      'platform:super_admin'
+    ]);
+
+    if (hasScope || hasCosmeticsRole) {
       return next();
     }
 
+    // Priority 2: Detect legacy roles and DENY with detailed error
+    const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
+    const detectedLegacyRoles = userRoles.filter((r: string) => legacyRoles.includes(r));
+
+    if (detectedLegacyRoles.length > 0) {
+      // Log legacy role usage
+      detectedLegacyRoles.forEach((role: string) => {
+        logLegacyRoleUsage(userId, role, 'cosmetics.routes:requireCosmeticsScope');
+      });
+
+      return res.status(403).json({
+        error: {
+          code: 'COSMETICS_403',
+          message: `Required scope: ${requiredScope}. Legacy roles are no longer supported. Please use cosmetics:* or platform:* prefixed roles.`,
+        },
+      });
+    }
+
+    // Detect other service roles and deny
+    const hasOtherServiceRole = userRoles.some((r: string) =>
+      r.startsWith('kpa:') ||
+      r.startsWith('neture:') ||
+      r.startsWith('glycopharm:') ||
+      r.startsWith('glucoseview:')
+    );
+
+    if (hasOtherServiceRole) {
+      return res.status(403).json({
+        error: {
+          code: 'COSMETICS_403',
+          message: `Required scope: ${requiredScope}. Cross-service access denied. Cosmetics requires cosmetics:* or platform:* roles.`,
+        },
+      });
+    }
+
+    // Default deny
     return res.status(403).json({
       error: {
         code: 'COSMETICS_403',

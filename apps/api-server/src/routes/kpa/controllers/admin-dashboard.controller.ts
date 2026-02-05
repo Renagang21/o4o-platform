@@ -2,6 +2,7 @@
  * KPA Admin Dashboard Controller
  *
  * WO-KPA-SOCIETY-DASHBOARD-P1-A: Real database queries for admin dashboard
+ * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 1: KPA Migration)
  * - Uses existing entities only (no new schema)
  * - Returns empty state for unavailable data
  */
@@ -12,6 +13,7 @@ import { KpaOrganization } from '../entities/kpa-organization.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { hasAnyServiceRole, hasRoleCompat, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -68,14 +70,51 @@ interface ApplicationStats {
 
 /**
  * Check if user has admin/operator role
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.1: KPA District/Branch)
+ * - **KPA 조직 서비스는 오직 KPA role만 신뢰**
+ * - Priority 1: KPA prefixed roles ONLY (kpa:admin, kpa:operator)
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - platform:admin 자동 허용 제거 (KPA 조직 격리)
  */
-function isAdminOrOperator(roles: string[] = []): boolean {
-  return (
-    roles.includes('admin') ||
-    roles.includes('operator') ||
-    roles.includes('administrator') ||
-    roles.includes('super_admin')
+function isAdminOrOperator(roles: string[] = [], userId: string = 'unknown'): boolean {
+  // Priority 1: Check KPA-specific prefixed roles ONLY
+  const hasKpaRole = hasAnyServiceRole(roles, [
+    'kpa:admin',
+    'kpa:operator'
+  ]);
+
+  if (hasKpaRole) {
+    return true;
+  }
+
+  // Priority 2: Detect legacy roles and DENY access
+  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
+  const detectedLegacyRoles = roles.filter(r => legacyRoles.includes(r));
+
+  if (detectedLegacyRoles.length > 0) {
+    // Log legacy role usage and deny access
+    detectedLegacyRoles.forEach(role => {
+      logLegacyRoleUsage(userId, role, 'admin-dashboard.controller:isAdminOrOperator');
+    });
+    return false; // ❌ DENY - Legacy roles no longer grant access
+  }
+
+  // Detect platform/other service roles and deny
+  const hasOtherServiceRole = roles.some(r =>
+    r.startsWith('platform:') ||
+    r.startsWith('neture:') ||
+    r.startsWith('glycopharm:') ||
+    r.startsWith('cosmetics:') ||
+    r.startsWith('glucoseview:')
   );
+
+  if (hasOtherServiceRole) {
+    // Platform/other service admins do NOT have KPA organization access
+    return false; // ❌ DENY - KPA organization requires kpa:* roles
+  }
+
+  return false;
 }
 
 export function createAdminDashboardController(
@@ -95,10 +134,11 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || 'unknown';
         const userRoles = authReq.user?.roles || [];
 
         // Check admin permission
-        if (!isAdminOrOperator(userRoles)) {
+        if (!isAdminOrOperator(userRoles, userId)) {
           res.status(403).json({
             error: { code: 'FORBIDDEN', message: 'Admin or operator role required' },
           });
@@ -155,9 +195,10 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || 'unknown';
         const userRoles = authReq.user?.roles || [];
 
-        if (!isAdminOrOperator(userRoles)) {
+        if (!isAdminOrOperator(userRoles, userId)) {
           res.status(403).json({
             error: { code: 'FORBIDDEN', message: 'Admin or operator role required' },
           });
@@ -202,9 +243,10 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || 'unknown';
         const userRoles = authReq.user?.roles || [];
 
-        if (!isAdminOrOperator(userRoles)) {
+        if (!isAdminOrOperator(userRoles, userId)) {
           res.status(403).json({
             error: { code: 'FORBIDDEN', message: 'Admin or operator role required' },
           });
@@ -259,9 +301,10 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || 'unknown';
         const userRoles = authReq.user?.roles || [];
 
-        if (!isAdminOrOperator(userRoles)) {
+        if (!isAdminOrOperator(userRoles, userId)) {
           res.status(403).json({
             error: { code: 'FORBIDDEN', message: 'Admin or operator role required' },
           });
@@ -316,9 +359,10 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || 'unknown';
         const userRoles = authReq.user?.roles || [];
 
-        if (!isAdminOrOperator(userRoles)) {
+        if (!isAdminOrOperator(userRoles, userId)) {
           res.status(403).json({
             error: { code: 'FORBIDDEN', message: 'Admin or operator role required' },
           });

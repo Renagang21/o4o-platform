@@ -2,6 +2,8 @@
  * KPA Routes
  * 약사회 SaaS API 라우트 설정
  *
+ * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 1: KPA Migration)
+ *
  * API Namespace: /api/v1/kpa
  *
  * Domain routes for KPA Society service:
@@ -31,6 +33,7 @@ import { createOrganizationJoinRequestRoutes } from './controllers/organization-
 import { createStewardController } from './controllers/steward.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
+import { hasAnyServiceRole, hasRoleCompat, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -44,6 +47,13 @@ import { CertificateController } from '../../modules/lms/controllers/Certificate
 
 /**
  * Scope verification middleware factory for KPA
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.1: KPA District/Branch)
+ * - **KPA 조직 서비스는 오직 KPA role만 신뢰**
+ * - Priority 1: KPA prefixed roles ONLY (kpa:admin, kpa:*)
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - Scopes: kpa:* pattern (service-specific)
+ * - platform:admin 자동 허용 제거 (KPA 조직 격리)
  */
 function requireKpaScope(scope: string): RequestHandler {
   return (req, res, next) => {
@@ -56,21 +66,70 @@ function requireKpaScope(scope: string): RequestHandler {
       return;
     }
 
-    // Check for kpa:* scope or admin role
+    const userId = user.id || 'unknown';
     const userScopes: string[] = user.scopes || [];
     const userRoles: string[] = user.roles || [];
 
+    // Check scopes (already service-specific, no change needed)
     const hasScope = userScopes.includes(scope) || userScopes.includes('kpa:admin');
-    const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin');
 
-    if (!hasScope && !isAdmin) {
+    // Priority 1: Check KPA-specific prefixed roles ONLY
+    const hasKpaRole = hasAnyServiceRole(userRoles, [
+      'kpa:admin',
+      'kpa:operator',
+      'kpa:district_admin',
+      'kpa:branch_admin',
+      'kpa:branch_operator'
+    ]);
+
+    if (hasScope || hasKpaRole) {
+      next();
+      return;
+    }
+
+    // Priority 2: Detect legacy roles and DENY access
+    const legacyRoles = ['admin', 'super_admin', 'operator', 'district_admin', 'branch_admin', 'branch_operator'];
+    const detectedLegacyRoles = userRoles.filter(r => legacyRoles.includes(r));
+
+    if (detectedLegacyRoles.length > 0) {
+      // Log legacy role usage and deny access
+      detectedLegacyRoles.forEach(role => {
+        logLegacyRoleUsage(userId, role, `kpa.routes:requireKpaScope(${scope})`);
+      });
+      // Access denied - Legacy roles no longer grant access
       res.status(403).json({
-        error: { code: 'FORBIDDEN', message: `Required scope: ${scope}` },
+        error: {
+          code: 'FORBIDDEN',
+          message: `Required scope: ${scope}. Legacy roles are no longer supported. Please use kpa:* prefixed roles.`
+        },
       });
       return;
     }
 
-    next();
+    // Detect platform/other service roles
+    const hasOtherServiceRole = userRoles.some(r =>
+      r.startsWith('platform:') ||
+      r.startsWith('neture:') ||
+      r.startsWith('glycopharm:') ||
+      r.startsWith('cosmetics:') ||
+      r.startsWith('glucoseview:')
+    );
+
+    if (hasOtherServiceRole) {
+      // Platform/other service admins do NOT have KPA organization access
+      res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: `Required scope: ${scope}. KPA organization requires kpa:* roles.`
+        },
+      });
+      return;
+    }
+
+    // Access denied - No valid role
+    res.status(403).json({
+      error: { code: 'FORBIDDEN', message: `Required scope: ${scope}` },
+    });
   };
 }
 

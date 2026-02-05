@@ -5,7 +5,7 @@
  * KpaMember 기반 운영자 판별 (User.roles 사용 금지)
  */
 
-import { AppDataSource } from '../../../config/data-source.js';
+import AppDataSource from '../../../database/data-source.js';
 import { KpaMember, KpaMemberRole } from '../entities/kpa-member.entity.js';
 import { In } from 'typeorm';
 

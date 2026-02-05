@@ -14,6 +14,7 @@ import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
+import { isServiceAdmin } from '../../../utils/role.utils.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -297,7 +298,10 @@ export function createApplicationController(
         }
 
         // Only allow access if owner or admin
-        const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin') || userRoles.includes('operator');
+        // WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
+        // Check for glycopharm:admin/operator or platform:admin (legacy roles denied)
+        const isAdmin = isServiceAdmin(userRoles, 'glycopharm') ||
+                        userRoles.includes('glycopharm:operator');
         if (application.userId !== userId && !isAdmin) {
           res.status(403).json({
             error: 'Forbidden',

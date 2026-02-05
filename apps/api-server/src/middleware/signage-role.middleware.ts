@@ -1,6 +1,8 @@
 /**
  * Signage Role Middleware
  *
+ * WO-P2-PLATFORM-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 2)
+ *
  * Role-based access control for Digital Signage API routes.
  *
  * Role Hierarchy (Role Reform V1):
@@ -12,6 +14,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
+import { hasPlatformRole, logLegacyRoleUsage } from '../utils/role.utils.js';
 
 // Extend Express Request interface
 declare module 'express' {
@@ -27,12 +30,19 @@ declare module 'express' {
 
 /**
  * Check if user has Admin permission for Signage
+ *
+ * WO-P2-PLATFORM-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 2
+ * - Only platform:admin or platform:super_admin allowed
+ * - Legacy roles (admin, super_admin) logged and denied
  */
 export function hasSignageAdminPermission(user: any): boolean {
   if (!user) return false;
 
-  // Check for admin role
-  if (user.role === 'admin' || user.role === 'super_admin') {
+  const userId = user.id || 'unknown';
+  const userRoles: string[] = user.roles || [];
+
+  // Check for platform-level admin roles (Priority 1)
+  if (hasPlatformRole(userRoles, 'super_admin') || hasPlatformRole(userRoles, 'admin')) {
     return true;
   }
 
@@ -41,9 +51,20 @@ export function hasSignageAdminPermission(user: any): boolean {
     return true;
   }
 
-  // Check database roles
-  if (user.dbRoles?.some((r: any) => r.name === 'signage-admin' || r.name === 'admin')) {
+  // Check database roles for signage-specific admin
+  if (user.dbRoles?.some((r: any) => r.name === 'signage-admin')) {
     return true;
+  }
+
+  // Legacy role detection - log but deny access
+  if (user.role === 'admin' || user.role === 'super_admin') {
+    logLegacyRoleUsage(userId, user.role, 'signage-role.middleware:hasSignageAdminPermission');
+    return false; // Deny access for legacy roles
+  }
+
+  if (user.dbRoles?.some((r: any) => r.name === 'admin')) {
+    logLegacyRoleUsage(userId, 'admin', 'signage-role.middleware:hasSignageAdminPermission (dbRoles)');
+    return false; // Deny access for legacy dbRoles
   }
 
   return false;

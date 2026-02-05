@@ -10,6 +10,7 @@ import { GlycopharmForumCategoryRequest } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { ForumCategory } from '@o4o/forum-core/entities';
 import logger from '../../../utils/logger.js';
+import { isServiceAdmin } from '../../../utils/role.utils.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -109,7 +110,9 @@ export function createForumRequestController(
 
         // 본인 또는 관리자만 조회 가능
         const isOwner = request.requester_id === req.user!.id;
-        const isAdmin = req.user!.roles?.includes('admin') || req.user!.roles?.includes('super_admin');
+        // WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
+        // Check for glycopharm:admin or platform:admin (legacy roles denied)
+        const isAdmin = isServiceAdmin(req.user!.roles || [], 'glycopharm');
 
         if (!isOwner && !isAdmin) {
           res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Access denied' } });

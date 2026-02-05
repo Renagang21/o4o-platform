@@ -870,8 +870,12 @@ router.get('/operator/supply-products', requireAuth, async (req: AuthenticatedRe
 /**
  * GET /api/v1/neture/admin/dashboard/summary
  * Get admin/operator dashboard summary (requires admin role)
+ *
+ * WO-P1-SERVICE-ROLE-PREFIX-ROLLING-IMPLEMENTATION-V1 (Phase 3: Neture)
+ * Security Fix: Changed from requireAuth to requireAdmin
+ * - Enforces platform:admin or platform:super_admin (via Phase 2 middleware update)
  */
-router.get('/admin/dashboard/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/admin/dashboard/summary', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const summary = await netureService.getAdminDashboardSummary();
 

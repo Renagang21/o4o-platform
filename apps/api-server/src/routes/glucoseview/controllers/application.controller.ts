@@ -14,6 +14,7 @@ import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
+import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -28,14 +29,52 @@ interface AuthRequest extends Request {
 
 /**
  * Check if user has operator/admin role
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.3: GlucoseView)
+ * - **GlucoseView 비즈니스 서비스는 glucoseview:* role + platform:admin 신뢰**
+ * - Priority 1: GlucoseView prefixed roles + platform admin (platform:admin, platform:super_admin)
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - Cross-service isolation: Other service roles DENY
  */
-function isOperatorOrAdmin(roles: string[] = []): boolean {
-  return (
-    roles.includes('operator') ||
-    roles.includes('admin') ||
-    roles.includes('administrator') ||
-    roles.includes('super_admin')
+function isOperatorOrAdmin(roles: string[] = [], userId: string = 'unknown'): boolean {
+  // Priority 1: Check GlucoseView-specific prefixed roles + platform admin
+  const hasGlucoseViewRole = hasAnyServiceRole(roles, [
+    'glucoseview:admin',
+    'glucoseview:operator',
+    'platform:admin',
+    'platform:super_admin'
+  ]);
+
+  if (hasGlucoseViewRole) {
+    return true;
+  }
+
+  // Priority 2: Detect legacy roles and DENY access
+  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
+  const detectedLegacyRoles = roles.filter(r => legacyRoles.includes(r));
+
+  if (detectedLegacyRoles.length > 0) {
+    // Log legacy role usage and deny access
+    detectedLegacyRoles.forEach(role => {
+      logLegacyRoleUsage(userId, role, 'application.controller:isOperatorOrAdmin');
+    });
+    return false; // ❌ DENY - Legacy roles no longer grant access
+  }
+
+  // Detect other service roles and deny
+  const hasOtherServiceRole = roles.some(r =>
+    r.startsWith('kpa:') ||
+    r.startsWith('neture:') ||
+    r.startsWith('glycopharm:') ||
+    r.startsWith('cosmetics:')
   );
+
+  if (hasOtherServiceRole) {
+    // Other service admins do NOT have GlucoseView access
+    return false; // ❌ DENY - GlucoseView requires glucoseview:* or platform:* roles
+  }
+
+  return false;
 }
 
 /**
@@ -307,7 +346,7 @@ export function createGlucoseViewApplicationController(
         }
 
         // Only allow access if owner or admin
-        const isAdmin = isOperatorOrAdmin(userRoles);
+        const isAdmin = isOperatorOrAdmin(userRoles, userId);
         if (application.userId !== userId && !isAdmin) {
           res.status(403).json({
             error: 'Forbidden',
@@ -354,10 +393,11 @@ export function createGlucoseViewApplicationController(
     (async (req, res) => {
       try {
         const user = (req as unknown as AuthRequest).user;
+        const userId = user?.userId || user?.id || 'unknown';
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, userId)) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -451,11 +491,11 @@ export function createGlucoseViewApplicationController(
         }
 
         const user = (req as unknown as AuthRequest).user;
-        const userId = user?.userId || user?.id;
+        const userId = user?.userId || user?.id || 'unknown';
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, userId)) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -648,10 +688,11 @@ export function createGlucoseViewApplicationController(
         }
 
         const user = (req as unknown as AuthRequest).user;
+        const userId = user?.userId || user?.id || 'unknown';
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, userId)) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',

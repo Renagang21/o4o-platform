@@ -20,6 +20,7 @@ import { NetureService } from '../../../modules/neture/neture.service.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import logger from '../../../utils/logger.js';
+import { isServiceAdmin, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 /**
  * Create Neture Controller (P1 - GET Only)
@@ -232,6 +233,10 @@ export function createNetureController(dataSource: DataSource): Router {
   /**
    * PATCH /partnership/requests/:id
    * Update partnership request status (admin only)
+   *
+   * WO-P1-SERVICE-ROLE-PREFIX-ROLLING-IMPLEMENTATION-V1 (Phase 3: Neture)
+   * - Requires neture:admin OR platform:admin/super_admin
+   * - Legacy roles (admin, super_admin) are logged and denied
    */
   router.patch('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
     try {
@@ -245,11 +250,28 @@ export function createNetureController(dataSource: DataSource): Router {
         });
       }
 
-      // Check if user is admin
-      if (user.role !== 'admin' && user.role !== 'super_admin') {
+      const userId = user.id || 'unknown';
+      const userRoles: string[] = user.roles || [];
+
+      // Check if user is admin (Priority-based checking)
+      // Checks for: neture:admin, platform:admin, platform:super_admin
+      if (isServiceAdmin(userRoles, 'neture')) {
+        // Access granted - continue to business logic
+      } else {
+        // Fallback: Check for legacy roles and log/deny
+        if (user.role === 'admin' || user.role === 'super_admin') {
+          logLegacyRoleUsage(userId, user.role, 'neture.controller:PATCH/partnership/requests/:id');
+          return res.status(403).json({
+            success: false,
+            error: 'Admin access required (neture:admin or platform:admin)',
+            code: 'FORBIDDEN',
+          });
+        }
+
+        // No valid role found
         return res.status(403).json({
           success: false,
-          error: 'Admin access required',
+          error: 'Admin access required (neture:admin or platform:admin)',
           code: 'FORBIDDEN',
         });
       }

@@ -13,6 +13,7 @@ import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
+import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -27,14 +28,52 @@ interface AuthRequest extends Request {
 
 /**
  * Check if user has operator/admin role
+ *
+ * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
+ * - **GlycoPharm 서비스는 오직 glycopharm:* role만 신뢰**
+ * - Priority 1: GlycoPharm prefixed roles ONLY (glycopharm:admin, glycopharm:operator)
+ * - Priority 2: Legacy role detection → Log + DENY
+ * - platform:admin 허용 (플랫폼 감독)
  */
-function isOperatorOrAdmin(roles: string[] = []): boolean {
-  return (
-    roles.includes('operator') ||
-    roles.includes('admin') ||
-    roles.includes('administrator') ||
-    roles.includes('super_admin')
+function isOperatorOrAdmin(roles: string[] = [], userId: string = 'unknown'): boolean {
+  // Priority 1: Check GlycoPharm-specific prefixed roles
+  const hasGlycopharmRole = hasAnyServiceRole(roles, [
+    'glycopharm:admin',
+    'glycopharm:operator',
+    'platform:admin',
+    'platform:super_admin'
+  ]);
+
+  if (hasGlycopharmRole) {
+    return true;
+  }
+
+  // Priority 2: Detect legacy roles and DENY access
+  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
+  const detectedLegacyRoles = roles.filter(r => legacyRoles.includes(r));
+
+  if (detectedLegacyRoles.length > 0) {
+    // Log legacy role usage and deny access
+    detectedLegacyRoles.forEach(role => {
+      logLegacyRoleUsage(userId, role, 'glycopharm/admin.controller:isOperatorOrAdmin');
+    });
+    return false; // ❌ DENY - Legacy roles no longer grant access
+  }
+
+  // Detect other service roles and deny
+  const hasOtherServiceRole = roles.some(r =>
+    r.startsWith('kpa:') ||
+    r.startsWith('neture:') ||
+    r.startsWith('cosmetics:') ||
+    r.startsWith('glucoseview:')
   );
+
+  if (hasOtherServiceRole) {
+    // Other service admins do NOT have GlycoPharm access
+    return false; // ❌ DENY - GlycoPharm requires glycopharm:* roles
+  }
+
+  return false;
 }
 
 /**
@@ -74,7 +113,7 @@ export function createAdminController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, user?.id || 'unknown')) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -183,7 +222,7 @@ export function createAdminController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, user?.id || 'unknown')) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -339,7 +378,7 @@ export function createAdminController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, user?.id || 'unknown')) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -439,7 +478,7 @@ export function createAdminController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, user?.id || 'unknown')) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -504,7 +543,7 @@ export function createAdminController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, user?.id || 'unknown')) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -558,7 +597,7 @@ export function createAdminController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
+        if (!isOperatorOrAdmin(userRoles, user?.id || 'unknown')) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
