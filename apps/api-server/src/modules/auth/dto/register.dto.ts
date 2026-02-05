@@ -20,12 +20,24 @@ export class RegisterRequestDto {
   passwordConfirm: string;
 
   @IsString()
-  @MinLength(2, { message: 'Name must be at least 2 characters' })
-  name: string;
+  @MinLength(1, { message: 'Last name is required' })
+  lastName: string;
+
+  @IsString()
+  @MinLength(1, { message: 'First name is required' })
+  firstName: string;
+
+  @IsString()
+  @MinLength(2, { message: 'Nickname must be at least 2 characters' })
+  nickname: string; // P1-T2: Nickname for forum/public display
 
   @IsOptional()
   @IsString()
   role?: string;
+
+  @IsOptional()
+  @IsString()
+  service?: string; // P0-T2: Service key for data isolation
 
   @IsBoolean()
   tos: boolean;

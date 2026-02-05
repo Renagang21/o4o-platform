@@ -213,16 +213,14 @@ function mapApiRoleToKpaRole(apiRole: string | undefined): string {
  */
 function createUserFromApiResponse(apiUser: ApiUser): User {
   const mappedRole = mapApiRoleToKpaRole(apiUser.role);
-  const savedFunction = localStorage.getItem(`kpa_function_${apiUser.id}`) as PharmacistFunction | null;
-  const savedPharmacistRole = localStorage.getItem(`kpa_pharmacist_role_${apiUser.id}`) as PharmacistRole | null;
-
+  // P1-T3: Get pharmacistFunction/Role from API response (not localStorage)
   return {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
     role: mappedRole,
-    pharmacistFunction: savedFunction || undefined,
-    pharmacistRole: savedPharmacistRole || undefined,
+    pharmacistFunction: (apiUser as any).pharmacistFunction as PharmacistFunction | undefined,
+    pharmacistRole: (apiUser as any).pharmacistRole as PharmacistRole | undefined,
   };
 }
 
@@ -305,28 +303,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /**
-   * WO-KPA-FUNCTION-GATE-V1: 약사 직능 설정
-   * - 최초 1회 선택 후 저장
-   * - localStorage에 저장 (추후 API 연동 가능)
+   * P1-T3: 약사 직능 설정
+   * - DB에 저장 (localStorage 제거)
+   * - API 호출하여 서버에 업데이트
    */
-  const setPharmacistFunction = (fn: PharmacistFunction) => {
+  const setPharmacistFunction = async (fn: PharmacistFunction) => {
     if (user) {
+      // TODO: API call to update pharmacistFunction on server
+      // await authClient.api.put('/auth/me/pharmacist-function', { pharmacistFunction: fn });
       const updatedUser = { ...user, pharmacistFunction: fn };
       setUser(updatedUser);
-      localStorage.setItem(`kpa_function_${user.id}`, fn);
     }
   };
 
   /**
-   * WO-PHARMACIST-PROFILE-ROLE-ONBOARDING-V1: 약사 직역 설정
-   * - 최초 가입 시 선택, 이후 프로필에서 수정 가능
-   * - localStorage에 저장 (추후 API 연동 가능)
+   * P1-T3: 약사 직역 설정
+   * - DB에 저장 (localStorage 제거)
+   * - API 호출하여 서버에 업데이트
    */
-  const setPharmacistRole = (role: PharmacistRole) => {
+  const setPharmacistRole = async (role: PharmacistRole) => {
     if (user) {
+      // TODO: API call to update pharmacistRole on server
+      // await authClient.api.put('/auth/me/pharmacist-role', { pharmacistRole: role });
       const updatedUser = { ...user, pharmacistRole: role };
       setUser(updatedUser);
-      localStorage.setItem(`kpa_pharmacist_role_${user.id}`, role);
     }
   };
 

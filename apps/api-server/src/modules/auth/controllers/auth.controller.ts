@@ -197,9 +197,17 @@ export class AuthController extends BaseController {
       const user = new User();
       user.email = data.email;
       user.password = hashedPassword;
-      user.name = data.name;
+      // P1-T1: Use lastName/firstName instead of single name field
+      user.lastName = data.lastName;
+      user.firstName = data.firstName;
+      user.name = `${data.lastName}${data.firstName}`; // Keep name for backward compatibility
+      // P1-T2: Nickname for public/forum display
+      user.nickname = data.nickname;
       user.role = (data.role || 'customer') as UserRole;
-      user.status = UserStatus.ACTIVE; // Immediately active
+      // P0-T1: Status defaults to PENDING (requires operator approval)
+      // user.status will be set to default PENDING from entity definition
+      // P0-T2: Service key for data isolation
+      user.serviceKey = data.service || 'platform'; // Default to 'platform' if not specified
 
       await userRepository.save(user);
 
@@ -224,37 +232,17 @@ export class AuthController extends BaseController {
         });
       }
 
-      // Login the user automatically after registration
-      const userAgent = req.headers['user-agent'] || 'Unknown';
-      const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
-
-      const loginResult = await authenticationService.login({
-        provider: 'email',
-        credentials: { email: data.email, password: data.password },
-        ipAddress,
-        userAgent,
-      });
-
-      // Phase 6-7: Cookie Auth Primary
-      // Set httpOnly cookies as primary authentication method
-      // Uses request origin for multi-domain cookie support
-      authenticationService.setAuthCookies(req, res, loginResult.tokens, loginResult.sessionId);
-
-      // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
-      const isCrossOrigin = AuthController.isCrossOriginRequest(req);
-      const includeTokensInBody = (data as any).includeLegacyTokens === true || isCrossOrigin;
-
+      // P0-T1: No auto-login after registration (status = PENDING)
+      // User must wait for operator approval before login
       return BaseController.created(res, {
-        message: 'Registration successful',
-        user: loginResult.user,
-        // Include tokens for cross-origin requests or when explicitly requested
-        ...(includeTokensInBody && {
-          tokens: {
-            accessToken: loginResult.tokens.accessToken,
-            refreshToken: loginResult.tokens.refreshToken,
-            expiresIn: loginResult.tokens.expiresIn,
-          },
-        }),
+        message: 'Registration submitted. Please wait for operator approval.',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          status: user.status,
+        },
+        pendingApproval: true,
       });
     } catch (error: any) {
       logger.error('[AuthController.register] Registration error', {
