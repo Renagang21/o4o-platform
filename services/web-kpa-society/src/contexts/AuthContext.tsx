@@ -187,38 +187,27 @@ interface ApiUser {
 }
 
 /**
- * API 서버 역할을 KPA Society 역할로 매핑
+ * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1
+ * Role 자동 매핑 제거됨
+ *
+ * KPA는 더 이상 API role을 해석하지 않음
+ * 운영자 여부는 서버 응답(KpaMember 기반)으로만 판단
  */
-function mapApiRoleToKpaRole(apiRole: string | undefined): string {
-  if (!apiRole) return 'pharmacist';
-
-  const roleMap: Record<string, string> = {
-    // KPA 전용 역할
-    'pharmacist': 'pharmacist',
-    'membership_district_admin': 'district_admin',
-    'membership_branch_admin': 'branch_admin',
-    'membership_super_admin': 'super_admin',
-    // 일반 역할 매핑
-    'admin': 'district_admin',
-    'super_admin': 'super_admin',
-    'customer': 'pharmacist',
-    'user': 'pharmacist',
-  };
-
-  return roleMap[apiRole] || 'pharmacist';
-}
 
 /**
  * API 응답에서 User 객체 생성
+ *
+ * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1:
+ * - role 매핑 제거 (API role을 그대로 사용)
+ * - KPA 프론트는 role 문자열을 해석하지 않음
  */
 function createUserFromApiResponse(apiUser: ApiUser): User {
-  const mappedRole = mapApiRoleToKpaRole(apiUser.role);
   // P1-T3: Get pharmacistFunction/Role from API response (not localStorage)
   return {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
-    role: mappedRole,
+    role: apiUser.role || 'pharmacist', // 매핑 없이 그대로 사용
     pharmacistFunction: (apiUser as any).pharmacistFunction as PharmacistFunction | undefined,
     pharmacistRole: (apiUser as any).pharmacistRole as PharmacistRole | undefined,
   };

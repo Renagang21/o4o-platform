@@ -179,11 +179,26 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
     }
   }, [user?.role, currentOrganization.id, currentRole]);
 
-  // 로그아웃 시 컨텍스트 초기화
+  // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: 로그인/로그아웃 시 컨텍스트 초기화
   useEffect(() => {
+    // 로그아웃 시
     if (!user) {
       clearContext();
+      return;
     }
+
+    // 로그인 시 (user.id가 변경된 경우)
+    // 이전 사용자의 organization context가 유지되는 것을 방지
+    const prevUserId = localStorage.getItem('last_logged_in_user_id');
+    const currentUserId = user.id;
+
+    if (prevUserId && prevUserId !== currentUserId) {
+      // 사용자가 변경됨 → organization context 초기화
+      clearContext();
+    }
+
+    // 현재 사용자 ID 저장
+    localStorage.setItem('last_logged_in_user_id', currentUserId);
   }, [user, clearContext]);
 
   return (

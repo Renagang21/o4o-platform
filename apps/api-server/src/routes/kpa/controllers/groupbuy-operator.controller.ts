@@ -21,6 +21,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import { supplierStatsService } from '../services/supplier-stats.service.js';
+import { isKpaOperator } from '../services/kpa-operator.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -58,20 +59,10 @@ const ERROR_CODES = {
 } as const;
 
 /**
- * Check if user is operator (district_admin or branch_admin)
- * WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1: 권한 체크 강화
+ * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1
+ * 기존 isOperator() 함수 제거됨
+ * → isKpaOperator(userId) 사용 (KpaMember 기반)
  */
-function isOperator(roles: string[] = []): boolean {
-  const allowedRoles = [
-    'admin',
-    'super_admin',
-    'district_admin',
-    'branch_admin',
-    'operator',
-    'branch_operator',
-  ];
-  return roles.some(role => allowedRoles.includes(role));
-}
 
 /**
  * Create standardized error response
@@ -104,7 +95,6 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
 
         // 인증 확인
         if (!userId) {
@@ -112,8 +102,9 @@ export function createGroupbuyOperatorController(
           return;
         }
 
-        // 권한 확인
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
@@ -144,7 +135,7 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+        // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: User.roles 사용 금지
         const { id } = req.params;
         const { isVisible } = req.body;
 
@@ -153,7 +144,9 @@ export function createGroupbuyOperatorController(
           return;
         }
 
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
@@ -181,7 +174,7 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+        // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: User.roles 사용 금지
         const { id } = req.params;
         const { order } = req.body;
 
@@ -190,7 +183,9 @@ export function createGroupbuyOperatorController(
           return;
         }
 
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
@@ -218,14 +213,16 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+        // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: User.roles 사용 금지
 
         if (!userId) {
           createErrorResponse(res, 401, 'UNAUTHORIZED');
           return;
         }
 
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
@@ -264,7 +261,7 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+        // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: User.roles 사용 금지
         const { id } = req.params;
 
         if (!userId) {
@@ -272,7 +269,9 @@ export function createGroupbuyOperatorController(
           return;
         }
 
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
@@ -305,14 +304,16 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+        // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: User.roles 사용 금지
 
         if (!userId) {
           createErrorResponse(res, 401, 'UNAUTHORIZED');
           return;
         }
 
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
@@ -372,14 +373,16 @@ export function createGroupbuyOperatorController(
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+        // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: User.roles 사용 금지
 
         if (!userId) {
           createErrorResponse(res, 401, 'UNAUTHORIZED');
           return;
         }
 
-        if (!isOperator(userRoles)) {
+        // 권한 확인 (WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: KpaMember 기반)
+        const isOperator = await isKpaOperator(userId);
+        if (!isOperator) {
           createErrorResponse(res, 403, 'FORBIDDEN');
           return;
         }
