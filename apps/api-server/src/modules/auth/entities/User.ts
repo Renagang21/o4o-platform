@@ -89,11 +89,15 @@ export class User {
    * Legacy string array for multiple roles.
    * Use role_assignments table for RBAC instead.
    *
+   * Updated to PostgreSQL text[] array for Phase 4 role prefix support.
+   * Migration: 20260205035000-ConvertRolesToArrayType.ts
+   *
    * @see RoleAssignment entity
    */
   @Column({
-    type: 'simple-array',
-    default: () => `'${UserRole.USER}'`
+    type: 'text',
+    array: true,
+    default: () => `ARRAY['${UserRole.USER}']::text[]`
   })
   roles!: string[];
 
