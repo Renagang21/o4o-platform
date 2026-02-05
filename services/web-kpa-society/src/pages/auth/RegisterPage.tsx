@@ -15,7 +15,9 @@ export default function RegisterPage() {
     email: '',
     password: '',
     passwordConfirm: '',
-    name: '',
+    lastName: '', // P1-T1: Split name into lastName/firstName
+    firstName: '',
+    nickname: '', // P1-T2: Nickname for forum/public display
     phone: '',
     licenseNumber: '',
     pharmacyName: '',
@@ -75,7 +77,9 @@ export default function RegisterPage() {
       formData.password &&
       formData.password.length >= 8 &&
       formData.password === formData.passwordConfirm &&
-      formData.name &&
+      formData.lastName && // P1-T1: Check lastName/firstName
+      formData.firstName &&
+      formData.nickname && // P1-T2: Check nickname
       formData.phone &&
       formData.licenseNumber &&
       formData.agreeTerms &&
@@ -168,29 +172,56 @@ export default function RegisterPage() {
 
             <div style={styles.inputRow}>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>성명 *</label>
+                <label style={styles.label}>성 *</label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleInputChange}
-                  placeholder="홍길동"
+                  placeholder="홍"
                   style={styles.input}
                   required
                 />
               </div>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>연락처 *</label>
+                <label style={styles.label}>이름 *</label>
                 <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleInputChange}
-                  placeholder="010-1234-5678"
+                  placeholder="길동"
                   style={styles.input}
                   required
                 />
               </div>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>닉네임 (포럼 표시명) *</label>
+              <input
+                type="text"
+                name="nickname"
+                value={formData.nickname}
+                onChange={handleInputChange}
+                placeholder="포럼에서 사용할 닉네임"
+                style={styles.input}
+                required
+              />
+              <p style={styles.helpText}>실명 대신 포럼에 표시될 이름입니다</p>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>연락처 *</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="010-1234-5678"
+                style={styles.input}
+                required
+              />
             </div>
           </div>
 

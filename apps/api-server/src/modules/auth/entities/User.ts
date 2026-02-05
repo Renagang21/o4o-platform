@@ -33,6 +33,10 @@ export class User {
   @Column({ type: 'varchar', length: 200, nullable: true })
   name?: string;
 
+  // P1-T2: Nickname for forum/public display (separate from real name)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  nickname?: string;
+
   @Column({ type: 'varchar', length: 500, nullable: true })
   avatar?: string;
 
@@ -158,6 +162,20 @@ export class User {
   // Domain for multi-tenant support
   @Column({ type: 'varchar', length: 255, nullable: true })
   domain?: string;
+
+  // P0-T2: Service key for data isolation
+  // Ensures users from different pharmacy societies/services don't mix
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'service_key' })
+  serviceKey?: string;
+
+  // P1-T3: Pharmacist function and role (for KPA society workflow)
+  // pharmacistFunction: pharmacy/hospital/industry/other
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'pharmacist_function' })
+  pharmacistFunction?: string;
+
+  // pharmacistRole: general/pharmacy_owner/hospital/other
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'pharmacist_role' })
+  pharmacistRole?: string;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -488,6 +506,9 @@ export class User {
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes placeholder
       // 실제 scopes는 서비스 레이어에서 deriveUserScopes로 계산하여 덮어씀
       scopes: [] as string[],
+      // P1-T3: Pharmacist function and role
+      pharmacistFunction: this.pharmacistFunction,
+      pharmacistRole: this.pharmacistRole,
       isActive: this.isActive,
       isEmailVerified: this.isEmailVerified,
       lastLoginAt: this.lastLoginAt,
