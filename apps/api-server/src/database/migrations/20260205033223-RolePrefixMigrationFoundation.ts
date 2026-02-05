@@ -65,12 +65,12 @@ export class RolePrefixMigrationFoundation20260205033223 implements MigrationInt
        See: WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1'
     `);
 
-    // Create GIN index on users.roles for efficient array containment queries
+    // Create index on users.roles for efficient array queries
+    // Use BTREE instead of GIN for text arrays - more compatible and performant for simple lookups
     // This helps with queries like: WHERE 'kpa:admin' = ANY(roles)
-    // Use array_ops operator class for text array GIN index
     await queryRunner.query(`
-      CREATE INDEX IF NOT EXISTS "idx_users_roles_gin"
-      ON "users" USING GIN ("roles" array_ops)
+      CREATE INDEX IF NOT EXISTS "idx_users_roles"
+      ON "users" ("roles")
     `);
 
     // Log migration execution
@@ -81,9 +81,9 @@ export class RolePrefixMigrationFoundation20260205033223 implements MigrationInt
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Remove GIN index on users.roles
+    // Remove index on users.roles
     await queryRunner.query(`
-      DROP INDEX IF EXISTS "idx_users_roles_gin"
+      DROP INDEX IF EXISTS "idx_users_roles"
     `);
 
     // Remove comment from users.roles
