@@ -168,8 +168,19 @@ function App() {
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
           <Route path="/test-center" element={<TestCenterPage />} />
 
-          {/* Branch Services Landing (WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1) */}
+          {/* =========================================================
+           * Service C - 분회 서비스 (Branch Services)
+           * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
+           *
+           * 분회 서비스는 /branch-services 아래에서 독립 운영
+           * - /branch-services : 분회 서비스 홈 (허브)
+           * - /branch-services/demo : 분회 서비스 데모
+           * - /branch-services/:branchId/* : 실제 분회 서비스
+           *
+           * 이 구조는 /demo/* (Service B)와 완전히 분리됨
+           * ========================================================= */}
           <Route path="/branch-services" element={<BranchServicesPage />} />
+          <Route path="/branch-services/:branchId/*" element={<BranchRoutes />} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<BranchServicePage />} />
@@ -264,23 +275,15 @@ function App() {
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
 
           {/* ===================================================
-           * P2-T3: Service C - 분회 독립 서비스 (현재 흡수 상태)
-           * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
+           * Legacy: /demo/branch/* → /branch-services/* 리다이렉트
+           * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
            *
-           * 현재 상태: Service B (/demo) 내부에 흡수됨
-           * 향후 분리 시나리오: 독립 도메인 또는 서브도메인
-           * 분리 대상 컴포넌트:
-           * - BranchRoutes (routes/BranchRoutes.tsx)
-           * - BranchProvider (contexts/BranchContext.tsx)
-           * - BranchLayout (components/branch/BranchLayout.tsx)
-           *
-           * 분리 작업 없음 (P2-T3: 구조만 준비)
+           * 분회 서비스는 이제 /branch-services/* 에서 운영
+           * 기존 /demo/branch/* 경로는 호환성을 위해 리다이렉트
            * =================================================== */}
           <Route path="/demo/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
           <Route path="/demo/branch/:branchId/*" element={<BranchRoutes />} />
-
-          {/* /demo/branch (branchId 없음) - 인트라넷으로 리다이렉트 */}
-          <Route path="/demo/branch" element={<Navigate to="/demo/intranet" replace />} />
+          <Route path="/demo/branch" element={<Navigate to="/branch-services" replace />} />
 
           {/* Main Layout Routes - /demo 하위 나머지 경로 */}
           <Route path="/demo/*" element={<DemoLayoutRoutes />} />
@@ -295,7 +298,7 @@ function App() {
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
           <Route path="/operator/*" element={<Navigate to="/demo/operator" replace />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
-          <Route path="/branch/*" element={<Navigate to="/demo/branch" replace />} />
+          <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
           <Route path="/test-guide/*" element={<Navigate to="/demo/test-guide" replace />} />
 
           {/* 그 외 기존 경로들도 /demo로 리다이렉트 */}

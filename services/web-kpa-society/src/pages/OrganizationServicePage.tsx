@@ -35,7 +35,7 @@ const divisionCards: DemoCardData[] = [
     description: '분회 단위 커뮤니티·운영 서비스 예시',
     badge: '데모 분회',
     ctaLabel: '바로가기',
-    href: '/demo/branch/demo-branch',
+    href: '/branch-services/demo',
   },
 ];
 

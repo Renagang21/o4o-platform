@@ -86,9 +86,10 @@ export function OperatorDashboardPage() {
   const { currentOrganization } = useOrganization();
   const orgType = currentOrganization?.type === 'branch' ? 'branch' : 'district';
 
-  // WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1: /demo 접두사 추가 및 올바른 경로 매핑
+  // WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1: 분회 서비스 경로 마이그레이션
+  // WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1: /branch-services/:branchId/*
   const adminBasePath = orgType === 'branch'
-    ? `/demo/branch/${currentOrganization?.id}/admin`
+    ? `/branch-services/${currentOrganization?.id}/admin`
     : '/demo/admin';
   const intranetBasePath = '/demo/intranet';
   const demoBasePath = '/demo';

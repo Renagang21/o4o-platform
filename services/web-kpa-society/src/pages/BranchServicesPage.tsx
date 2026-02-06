@@ -63,7 +63,7 @@ export function BranchServicesPage() {
               소속 분회의 서비스 이용은 해당 분회 관리자에게 문의해주세요.
             </p>
             <div style={styles.actionButtons}>
-              <Link to="/demo/branch/demo-branch" style={styles.secondaryButton}>
+              <Link to="/branch-services/demo" style={styles.secondaryButton}>
                 데모 서비스 체험하기
                 <ArrowRight style={{ width: 16, height: 16 }} />
               </Link>

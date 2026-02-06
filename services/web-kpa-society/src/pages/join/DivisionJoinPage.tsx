@@ -90,7 +90,7 @@ export function DivisionJoinPage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo/branch/demo-branch" style={styles.ctaPrimary}>
+        <a href="/branch-services/demo" style={styles.ctaPrimary}>
           분회 서비스 시작하기
         </a>
         <a href="/services/division" style={styles.ctaSecondary}>

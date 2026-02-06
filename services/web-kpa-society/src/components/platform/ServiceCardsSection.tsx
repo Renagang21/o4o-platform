@@ -51,7 +51,7 @@ const services: ServiceItem[] = [
     href: '/services/division',
     badgeType: 'independent',
     ctas: [
-      { label: '분회 서비스 보기', href: '/demo/branch/demo-branch', primary: true },
+      { label: '분회 서비스 보기', href: '/branch-services/demo', primary: true },
       { label: '분회 참여 안내', href: '/join/division' },
     ],
   },
