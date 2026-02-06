@@ -36,6 +36,9 @@ import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 // Resources pages
 import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
 
+// Legal pages (WO-KPA-LEGAL-PAGES-V1)
+import { PolicyPage, PrivacyPage } from './pages/legal';
+
 // Organization pages
 import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, ContactPage } from './pages/organization';
 
@@ -315,15 +318,58 @@ function App() {
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
           <Route path="/test-guide/*" element={<Navigate to="/demo/test-guide" replace />} />
 
-          {/* 그 외 기존 경로들도 /demo로 리다이렉트 */}
-          <Route path="/news/*" element={<Navigate to="/demo/news" replace />} />
-          {/* /forum/* 은 실제 라우트로 추가됨 (WO-KPA-COMMUNITY-FORUM-ROUTES-V1) */}
-          <Route path="/lms/*" element={<Navigate to="/demo/lms" replace />} />
-          <Route path="/groupbuy/*" element={<Navigate to="/demo/groupbuy" replace />} />
-          <Route path="/docs/*" element={<Navigate to="/demo/docs" replace />} />
-          <Route path="/organization/*" element={<Navigate to="/demo/organization" replace />} />
-          <Route path="/mypage/*" element={<Navigate to="/demo/mypage" replace />} />
-          <Route path="/participation/*" element={<Navigate to="/demo/participation" replace />} />
+          {/* ========================================
+           * 커뮤니티 서비스 라우트 (메인 서비스)
+           * WO-KPA-COMMUNITY-ROOT-ROUTES-V1
+           *
+           * / 경로의 커뮤니티 홈에서 접근하는 서비스들
+           * /demo/* 와 분리된 실제 라우트
+           * ======================================== */}
+
+          {/* News (공지/소식) */}
+          <Route path="/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/news/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/news/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
+
+          {/* LMS (교육/강의) */}
+          <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />
+          <Route path="/lms/courses" element={<Layout serviceName={SERVICE_NAME}><LmsCoursesPage /></Layout>} />
+          <Route path="/lms/course/:id" element={<Layout serviceName={SERVICE_NAME}><LmsCourseDetailPage /></Layout>} />
+          <Route path="/lms/course/:courseId/lesson/:lessonId" element={<Layout serviceName={SERVICE_NAME}><LmsLessonPage /></Layout>} />
+          <Route path="/lms/certificate" element={<Layout serviceName={SERVICE_NAME}><LmsCertificatesPage /></Layout>} />
+
+          {/* Events (이벤트) */}
+          <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />
+
+          {/* Docs (자료실) */}
+          <Route path="/docs" element={<Layout serviceName={SERVICE_NAME}><ResourcesHomePage /></Layout>} />
+          <Route path="/docs/list" element={<Layout serviceName={SERVICE_NAME}><ResourcesListPage /></Layout>} />
+
+          {/* Organization (약사회 소개) */}
+          <Route path="/organization" element={<Layout serviceName={SERVICE_NAME}><OrganizationAboutPage /></Layout>} />
+          <Route path="/organization/branches" element={<Layout serviceName={SERVICE_NAME}><BranchesPage /></Layout>} />
+          <Route path="/organization/branch/:id" element={<Layout serviceName={SERVICE_NAME}><BranchDetailPage /></Layout>} />
+          <Route path="/organization/officers" element={<Layout serviceName={SERVICE_NAME}><OfficersPage /></Layout>} />
+          <Route path="/organization/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+
+          {/* MyPage (마이페이지) */}
+          <Route path="/mypage" element={<Layout serviceName={SERVICE_NAME}><MyDashboardPage /></Layout>} />
+          <Route path="/mypage/profile" element={<Layout serviceName={SERVICE_NAME}><MyProfilePage /></Layout>} />
+          <Route path="/mypage/settings" element={<Layout serviceName={SERVICE_NAME}><MySettingsPage /></Layout>} />
+          <Route path="/mypage/certificates" element={<Layout serviceName={SERVICE_NAME}><MyCertificatesPage /></Layout>} />
+
+          {/* Participation (참여) */}
+          <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />
+          <Route path="/participation/:id/respond" element={<Layout serviceName={SERVICE_NAME}><ParticipationRespondPage /></Layout>} />
+          <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
+
+          {/* Groupbuy (공동구매) */}
+          <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><GroupbuyListPage /></Layout>} />
+          <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><GroupbuyDetailPage /></Layout>} />
+
+          {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
+          <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
+          <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
 
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />

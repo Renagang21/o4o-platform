@@ -39,7 +39,7 @@ export function ActivityFeed() {
         <div style={styles.feedCard}>
           <div style={styles.cardHeader}>
             <h2 style={styles.cardTitle}>최근 글</h2>
-            <Link to="/demo/forum" style={styles.moreLink}>더보기</Link>
+            <Link to="/forum" style={styles.moreLink}>더보기</Link>
           </div>
           {posts.length === 0 ? (
             <p style={styles.empty}>자료가 없습니다</p>
@@ -47,7 +47,7 @@ export function ActivityFeed() {
             <ul style={styles.list}>
               {posts.map((post) => (
                 <li key={post.id} style={styles.listItem}>
-                  <Link to={`/demo/forum/post/${post.id}`} style={styles.postLink}>
+                  <Link to={`/forum/post/${post.id}`} style={styles.postLink}>
                     <span style={styles.category}>{post.categoryName}</span>
                     <span style={styles.postTitle}>{post.title}</span>
                   </Link>
@@ -66,7 +66,7 @@ export function ActivityFeed() {
         <div style={styles.feedCard}>
           <div style={styles.cardHeader}>
             <h2 style={styles.cardTitle}>공지사항</h2>
-            <Link to="/demo/news" style={styles.moreLink}>더보기</Link>
+            <Link to="/news" style={styles.moreLink}>더보기</Link>
           </div>
           {notices.length === 0 ? (
             <p style={styles.empty}>자료가 없습니다</p>
@@ -74,7 +74,7 @@ export function ActivityFeed() {
             <ul style={styles.list}>
               {notices.map((notice) => (
                 <li key={notice.id} style={styles.listItem}>
-                  <Link to={`/demo/news/${notice.id}`} style={styles.postLink}>
+                  <Link to={`/news/${notice.id}`} style={styles.postLink}>
                     <span style={styles.postTitle}>{notice.title}</span>
                   </Link>
                   <div style={styles.meta}>

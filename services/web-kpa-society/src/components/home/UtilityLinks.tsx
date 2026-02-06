@@ -15,16 +15,16 @@ export function UtilityLinks() {
     <section style={styles.container}>
       <div style={styles.row}>
         {/* 공통 링크 */}
-        <Link to="/demo/help" style={styles.link}>도움말</Link>
-        <Link to="/demo/policy" style={styles.link}>이용약관</Link>
-        <Link to="/demo/privacy" style={styles.link}>개인정보처리방침</Link>
+        <Link to="/help" style={styles.link}>도움말</Link>
+        <Link to="/policy" style={styles.link}>이용약관</Link>
+        <Link to="/privacy" style={styles.link}>개인정보처리방침</Link>
 
         {/* 로그인 후 전용 */}
         {isAuthenticated && (
           <>
-            <Link to="/demo/my/notifications" style={styles.link}>알림</Link>
-            <Link to="/demo/my/account" style={styles.link}>내 계정</Link>
-            <Link to="/demo/my/services" style={styles.link}>참여 중 서비스</Link>
+            <Link to="/my/notifications" style={styles.link}>알림</Link>
+            <Link to="/my/account" style={styles.link}>내 계정</Link>
+            <Link to="/my/services" style={styles.link}>참여 중 서비스</Link>
           </>
         )}
       </div>

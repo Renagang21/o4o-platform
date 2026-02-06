@@ -22,19 +22,19 @@ function LoggedInUserPanel() {
         <span style={styles.userGreeting}>{user?.name}님, 환영합니다</span>
       </div>
       <div style={styles.userPanelGrid}>
-        <Link to="/demo/mypage" style={styles.userPanelLink}>
+        <Link to="/mypage" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>📊</span>
           <span>내 활동 요약</span>
         </Link>
-        <Link to="/demo/mypage/settings" style={styles.userPanelLink}>
+        <Link to="/mypage/settings" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>🔔</span>
           <span>알림 설정</span>
         </Link>
-        <Link to="/demo/mypage/certificates" style={styles.userPanelLink}>
+        <Link to="/mypage/certificates" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>📜</span>
           <span>이수 현황</span>
         </Link>
-        <Link to="/demo/participation" style={styles.userPanelLink}>
+        <Link to="/participation" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>📝</span>
           <span>참여 중 서비스</span>
         </Link>
@@ -49,11 +49,11 @@ function LoggedInUserPanel() {
 function HelpAndPolicyLinks() {
   return (
     <div style={styles.linksRow}>
-      <Link to="/demo/help" style={styles.link}>도움말</Link>
-      <Link to="/demo/policy" style={styles.link}>이용약관</Link>
-      <Link to="/demo/privacy" style={styles.link}>개인정보처리방침</Link>
-      <Link to="/demo/organization" style={styles.link}>약사회 소개</Link>
-      <Link to="/demo/organization/contact" style={styles.link}>연락처</Link>
+      <Link to="/help" style={styles.link}>도움말</Link>
+      <Link to="/policy" style={styles.link}>이용약관</Link>
+      <Link to="/privacy" style={styles.link}>개인정보처리방침</Link>
+      <Link to="/organization" style={styles.link}>약사회 소개</Link>
+      <Link to="/organization/contact" style={styles.link}>연락처</Link>
     </div>
   );
 }

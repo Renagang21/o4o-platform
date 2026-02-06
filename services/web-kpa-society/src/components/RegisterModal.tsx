@@ -376,7 +376,10 @@ export default function RegisterModal() {
                 </div>
 
                 {/* 약관 동의 */}
-                <div className="space-y-3 pt-2 border-t border-gray-100">
+                <div className="space-y-3 pt-4 border-t border-gray-100">
+                  <p className="text-xs text-gray-500 mb-2">
+                    서비스 이용을 위해 아래 약관에 동의해 주세요. 약관을 클릭하여 내용을 확인할 수 있습니다.
+                  </p>
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -387,7 +390,17 @@ export default function RegisterModal() {
                       className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-600">
-                      <span className="text-red-500">*</span> 이용약관에 동의합니다
+                      <span className="text-red-500">*</span>{' '}
+                      <a
+                        href="/policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline hover:text-blue-700"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        이용약관
+                      </a>
+                      에 동의합니다
                     </span>
                   </label>
                   <label className="flex items-start gap-3 cursor-pointer">
@@ -400,7 +413,17 @@ export default function RegisterModal() {
                       className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-600">
-                      <span className="text-red-500">*</span> 개인정보처리방침에 동의합니다
+                      <span className="text-red-500">*</span>{' '}
+                      <a
+                        href="/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline hover:text-blue-700"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        개인정보처리방침
+                      </a>
+                      에 동의합니다
                     </span>
                   </label>
                 </div>

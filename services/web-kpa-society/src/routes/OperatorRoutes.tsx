@@ -5,7 +5,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorDashboard, OperatorAiReportPage, ForumManagementPage } from '../pages/operator';
+import { OperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage } from '../pages/operator';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 
 // 간단한 Operator Layout
@@ -34,6 +34,9 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
             </a>
             <a href="/operator/signage/content" className="text-sm text-slate-600 hover:text-blue-600">
               콘텐츠 허브
+            </a>
+            <a href="/operator/legal" className="text-sm text-slate-600 hover:text-blue-600">
+              약관 관리
             </a>
             <a href="/" className="text-sm text-slate-500 hover:text-slate-700">
               메인으로
@@ -65,6 +68,9 @@ export function OperatorRoutes() {
 
         {/* 사이니지 콘텐츠 허브 */}
         <Route path="signage/content" element={<ContentHubPage />} />
+
+        {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
+        <Route path="legal" element={<LegalManagementPage />} />
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="" replace />} />

@@ -9,10 +9,10 @@ import { Link } from 'react-router-dom';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
 
 const quickLinks = [
-  { label: '포럼', href: '/demo/forum', icon: '💬' },
-  { label: '교육', href: '/demo/lms', icon: '📚' },
-  { label: '자료실', href: '/demo/docs', icon: '📁' },
-  { label: '이벤트', href: '/demo/events', icon: '🎯' },
+  { label: '포럼', href: '/forum', icon: '💬' },
+  { label: '교육', href: '/lms', icon: '📚' },
+  { label: '자료실', href: '/docs', icon: '📁' },
+  { label: '이벤트', href: '/events', icon: '🎯' },
   { label: '약국경영', href: '/pharmacy', icon: '💊' },
 ];
 

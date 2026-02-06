@@ -25,7 +25,7 @@ export function ImportantNotices() {
     <div>
       <div style={styles.header}>
         <h3 style={styles.title}>공지사항</h3>
-        <Link to="/demo/news" style={styles.moreLink}>더보기</Link>
+        <Link to="/news" style={styles.moreLink}>더보기</Link>
       </div>
       {notices.length === 0 ? (
         <p style={styles.empty}>자료가 없습니다</p>
@@ -33,7 +33,7 @@ export function ImportantNotices() {
         <ul style={styles.list}>
           {notices.map((notice) => (
             <li key={notice.id} style={styles.listItem}>
-              <Link to={`/demo/news/${notice.id}`} style={styles.postLink}>
+              <Link to={`/news/${notice.id}`} style={styles.postLink}>
                 <span style={styles.postTitle}>{notice.title}</span>
               </Link>
               <div style={styles.meta}>
