@@ -14,6 +14,7 @@
 import { useOrganization } from '../../contexts';
 import { ContextGuard } from '../../components/common/ContextGuard';
 import { ActiveServicesSection } from './sections/ActiveServicesSection';
+import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
 import { ProgramsSection } from './sections/ProgramsSection';
 import { QuickActionsSection } from './sections/QuickActionsSection';
 import { MyRequestsSection } from './sections/MyRequestsSection';
@@ -39,6 +40,7 @@ function PharmacyDashboardContent() {
 
       {/* Sections */}
       <ActiveServicesSection />
+      <RecommendedServicesSection />
       <ProgramsSection />
       <QuickActionsSection />
       <MyRequestsSection />
