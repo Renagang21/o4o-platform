@@ -95,8 +95,23 @@ export default function LoginModal() {
       if (onLoginSuccess) {
         onLoginSuccess();
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+    } catch (err: any) {
+      // 에러 상세 정보 추출
+      let errorMessage = '로그인에 실패했습니다.';
+
+      if (err?.response) {
+        // 서버 응답이 있는 경우 (4xx, 5xx)
+        errorMessage = err.response.data?.message || err.response.data?.error || `서버 오류 (${err.response.status})`;
+      } else if (err?.request) {
+        // 요청이 전송됐지만 응답이 없는 경우 (네트워크 오류)
+        errorMessage = '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.';
+        console.error('[Login] Network error - request sent but no response:', err.request);
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      console.error('[Login] Error:', err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
