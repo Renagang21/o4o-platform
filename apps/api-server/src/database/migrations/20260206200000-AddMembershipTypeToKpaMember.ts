@@ -12,6 +12,13 @@ export class AddMembershipTypeToKpaMember20260206200000 implements MigrationInte
   name = 'AddMembershipTypeToKpaMember20260206200000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Guard: skip if table doesn't exist (created by CreateKpaFoundationTables)
+    const hasTable = await queryRunner.hasTable('kpa_members');
+    if (!hasTable) {
+      console.log('[Migration] kpa_members table does not exist, skipping ADD COLUMN (already created with columns by foundation migration)');
+      return;
+    }
+
     // 1. membership_type 컬럼 추가 (기존 레코드는 'pharmacist')
     await queryRunner.query(`
       ALTER TABLE kpa_members
