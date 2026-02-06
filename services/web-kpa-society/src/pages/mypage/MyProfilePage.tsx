@@ -11,10 +11,29 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi, type ProfileResponse } from '../../api';
 import { useAuth, type PharmacistRole } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
+
+/**
+ * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
+ * - /demo/* → '/demo'
+ * - /demo/branch/:branchId/* → '/demo/branch/:branchId'
+ * - 기타 → '' (빈 문자열)
+ */
+function getServicePrefix(pathname: string): string {
+  // 분회 서비스 컨텍스트: /demo/branch/:branchId/*
+  const branchMatch = pathname.match(/^(\/demo\/branch\/[^/]+)/);
+  if (branchMatch) return branchMatch[1];
+
+  // 데모 서비스 컨텍스트: /demo/*
+  if (pathname.startsWith('/demo')) return '/demo';
+
+  // 메인 커뮤니티 컨텍스트
+  return '';
+}
 
 const PHARMACIST_ROLE_LABELS: Record<PharmacistRole, string> = {
   general: '일반 약사',
@@ -32,6 +51,8 @@ const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
 };
 
 export function MyProfilePage() {
+  const location = useLocation();
+  const servicePrefix = getServicePrefix(location.pathname);
   const { user, setPharmacistRole, checkAuth } = useAuth();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -213,8 +234,8 @@ export function MyProfilePage() {
       <PageHeader
         title="프로필"
         breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: '/mypage' },
+          { label: '홈', href: servicePrefix || '/' },
+          { label: '마이페이지', href: `${servicePrefix}/mypage` },
           { label: '프로필' },
         ]}
       />

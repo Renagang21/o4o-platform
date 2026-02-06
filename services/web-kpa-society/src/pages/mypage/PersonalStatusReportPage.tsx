@@ -8,10 +8,20 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PageHeader, Card } from '../../components/common';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
+
+/**
+ * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
+ */
+function getServicePrefix(pathname: string): string {
+  const branchMatch = pathname.match(/^(\/demo\/branch\/[^/]+)/);
+  if (branchMatch) return branchMatch[1];
+  if (pathname.startsWith('/demo')) return '/demo';
+  return '';
+}
 
 // Mock 데이터 - 신상신고 현황
 interface StatusReportRecord {
@@ -69,6 +79,8 @@ const workplaceTypes = [
 ];
 
 export function PersonalStatusReportPage() {
+  const location = useLocation();
+  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -116,8 +128,8 @@ export function PersonalStatusReportPage() {
         <PageHeader
           title="신상신고"
           breadcrumb={[
-            { label: '홈', href: '/' },
-            { label: '마이페이지', href: '/mypage' },
+            { label: '홈', href: servicePrefix || '/' },
+            { label: '마이페이지', href: `${servicePrefix}/mypage` },
             { label: '신상신고' },
           ]}
         />
@@ -128,7 +140,7 @@ export function PersonalStatusReportPage() {
             <p style={styles.emptyDescription}>
               신상신고 현황을 확인하려면 로그인해주세요.
             </p>
-            <Link to="/demo/login" style={styles.primaryButton}>
+            <Link to={`${servicePrefix}/login`} style={styles.primaryButton}>
               로그인하기
             </Link>
           </div>
@@ -142,8 +154,8 @@ export function PersonalStatusReportPage() {
       <PageHeader
         title="신상신고"
         breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: '/mypage' },
+          { label: '홈', href: servicePrefix || '/' },
+          { label: '마이페이지', href: `${servicePrefix}/mypage` },
           { label: '신상신고' },
         ]}
       />

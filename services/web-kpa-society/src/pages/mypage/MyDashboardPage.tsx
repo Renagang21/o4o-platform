@@ -7,13 +7,23 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { AiSummaryButton } from '../../components/ai';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
+
+/**
+ * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
+ */
+function getServicePrefix(pathname: string): string {
+  const branchMatch = pathname.match(/^(\/demo\/branch\/[^/]+)/);
+  if (branchMatch) return branchMatch[1];
+  if (pathname.startsWith('/demo')) return '/demo';
+  return '';
+}
 
 // 회계 항목 타입 (단식부기)
 interface AccountingEntry {
@@ -44,6 +54,8 @@ function getUserDisplayName(user: any): string {
 }
 
 export function MyDashboardPage() {
+  const location = useLocation();
+  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
@@ -127,7 +139,7 @@ export function MyDashboardPage() {
     <div style={styles.container}>
       <PageHeader
         title="마이페이지"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+        breadcrumb={[{ label: '홈', href: servicePrefix || '/' }, { label: '마이페이지' }]}
       />
 
       {/* 사용자 프로필 요약 */}
@@ -221,7 +233,7 @@ export function MyDashboardPage() {
 
       {/* 활동 요약 카드 */}
       <div style={styles.summaryGrid}>
-        <Link to="/mypage/enrollments" style={styles.summaryLink}>
+        <Link to={`${servicePrefix}/mypage/enrollments`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>📚</span>
@@ -237,7 +249,7 @@ export function MyDashboardPage() {
             <span style={styles.summaryLabel}>수료 완료</span>
           </div>
         </Card>
-        <Link to="/mypage/certificates" style={styles.summaryLink}>
+        <Link to={`${servicePrefix}/mypage/certificates`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>🎓</span>
@@ -253,7 +265,7 @@ export function MyDashboardPage() {
             <span style={styles.summaryLabel}>작성 글</span>
           </div>
         </Card>
-        <Link to="/groupbuy/history" style={styles.summaryLink}>
+        <Link to={`${servicePrefix}/groupbuy/history`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>🛒</span>
@@ -294,15 +306,15 @@ export function MyDashboardPage() {
 
       {/* 바로가기 */}
       <div style={styles.quickLinks}>
-        <Link to="/mypage/profile" style={styles.quickLink}>
+        <Link to={`${servicePrefix}/mypage/profile`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>👤</span>
           <span>프로필</span>
         </Link>
-        <Link to="/mypage/settings" style={styles.quickLink}>
+        <Link to={`${servicePrefix}/mypage/settings`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>⚙️</span>
           <span>설정</span>
         </Link>
-        <Link to="/mypage/certificates" style={styles.quickLink}>
+        <Link to={`${servicePrefix}/mypage/certificates`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>🎓</span>
           <span>수료증</span>
         </Link>

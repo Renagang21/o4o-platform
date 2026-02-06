@@ -13,9 +13,19 @@
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
+
+/**
+ * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
+ */
+function getServicePrefix(pathname: string): string {
+  const branchMatch = pathname.match(/^(\/demo\/branch\/[^/]+)/);
+  if (branchMatch) return branchMatch[1];
+  if (pathname.startsWith('/demo')) return '/demo';
+  return '';
+}
 
 // 취업 활동 유형
 type ActivityType =
@@ -103,6 +113,8 @@ const currentYear = new Date().getFullYear();
 
 export function AnnualReportFormPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
 
   const [formData, setFormData] = useState<AnnualReportData>({
@@ -170,7 +182,7 @@ export function AnnualReportFormPage() {
       return;
     }
     alert(`${formData.year}년도 약사 회원 신고서가 제출되었습니다.`);
-    navigate('/demo/mypage');
+    navigate(`${servicePrefix}/mypage`);
   };
 
   const isPharmacyOwner = formData.employment.activityType === 'pharmacy_owner';

@@ -3,14 +3,26 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserSettings } from '../../api/mypage';
 
+/**
+ * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
+ */
+function getServicePrefix(pathname: string): string {
+  const branchMatch = pathname.match(/^(\/demo\/branch\/[^/]+)/);
+  if (branchMatch) return branchMatch[1];
+  if (pathname.startsWith('/demo')) return '/demo';
+  return '';
+}
+
 export function MySettingsPage() {
+  const location = useLocation();
+  const servicePrefix = getServicePrefix(location.pathname);
   const { user, logoutAll } = useAuth();
   const navigate = useNavigate();
   const [settings, setSettings] = useState<UserSettings | null>(null);
@@ -62,7 +74,7 @@ export function MySettingsPage() {
 
     try {
       await logoutAll();
-      navigate('/login');
+      navigate(servicePrefix || '/');
     } catch (err) {
       alert('로그아웃에 실패했습니다. 다시 시도해주세요.');
     }
@@ -128,8 +140,8 @@ export function MySettingsPage() {
       <PageHeader
         title="설정"
         breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: '/mypage' },
+          { label: '홈', href: servicePrefix || '/' },
+          { label: '마이페이지', href: `${servicePrefix}/mypage` },
           { label: '설정' },
         ]}
       />
