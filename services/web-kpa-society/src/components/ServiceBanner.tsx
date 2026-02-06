@@ -103,10 +103,10 @@ export function ExternalServiceSection() {
         />
       </div>
 
-      {/* 제휴 서비스 */}
-      <h2 style={styles.sectionTitle}>제휴 서비스</h2>
+      {/* 약사회 서비스 */}
+      <h2 style={styles.sectionTitle}>약사회 서비스</h2>
       <p style={styles.sectionDesc}>
-        아래 서비스는 약사회 공식 서비스가 아닌 외부 제휴 서비스입니다.
+        모든 지부·분회 회원에게 제공되는 약사회 기본 서비스입니다.
       </p>
       <div style={styles.bannerGrid}>
         <ServiceBanner
@@ -116,6 +116,8 @@ export function ExternalServiceSection() {
           linkUrl="/demo/lms"
           linkText="교육 서비스 이용하기"
           variant="primary"
+          showDisclaimer={false}
+          isInternal={true}
         />
         <ServiceBanner
           icon="🛒"
@@ -124,6 +126,8 @@ export function ExternalServiceSection() {
           linkUrl="/demo/groupbuy"
           linkText="공동구매 이용하기"
           variant="secondary"
+          showDisclaimer={false}
+          isInternal={true}
         />
       </div>
     </section>
