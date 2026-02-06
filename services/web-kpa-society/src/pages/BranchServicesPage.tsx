@@ -59,6 +59,9 @@ export function BranchServicesPage() {
             <Home style={{ width: 20, height: 20 }} />
             <span>KPA Platform</span>
           </Link>
+          <nav style={styles.nav}>
+            <Link to="/demo" style={styles.navLink}>커뮤니티 홈</Link>
+          </nav>
           <div style={styles.headerRight}>
             {user ? (
               <div style={styles.userArea}>
@@ -158,6 +161,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     fontWeight: 600,
     color: '#0f172a',
+    textDecoration: 'none',
+  },
+  nav: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+  },
+  navLink: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#475569',
     textDecoration: 'none',
   },
   headerRight: {
