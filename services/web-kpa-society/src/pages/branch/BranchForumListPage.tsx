@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { ForumPost } from '../../types';
 
 export function BranchForumListPage() {
   const { branchId } = useParams<{ branchId: string }>();
+  const { basePath } = useBranchContext();
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,14 +60,14 @@ export function BranchForumListPage() {
       <PageHeader
         title="분회 포럼"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
+          { label: '홈', href: `${basePath}` },
           { label: '포럼' },
         ]}
       />
 
       {/* Actions */}
       <div style={styles.actions}>
-        <Link to={`/branch/${branchId}/forum/write`} style={styles.writeButton}>
+        <Link to={`${basePath}/forum/write`} style={styles.writeButton}>
           ✏️ 글쓰기
         </Link>
       </div>
@@ -76,7 +78,7 @@ export function BranchForumListPage() {
           icon="💬"
           title="게시글이 없습니다"
           description="첫 번째 글을 작성해 보세요."
-          action={{ label: '글쓰기', onClick: () => window.location.href = `/branch/${branchId}/forum/write` }}
+          action={{ label: '글쓰기', onClick: () => window.location.href = `${basePath}/forum/write` }}
         />
       ) : (
         <Card>
@@ -84,7 +86,7 @@ export function BranchForumListPage() {
             {posts.map((post) => (
               <Link
                 key={post.id}
-                to={`/branch/${branchId}/forum/post/${post.id}`}
+                to={`${basePath}/forum/post/${post.id}`}
                 style={styles.item}
               >
                 <div style={styles.itemMain}>

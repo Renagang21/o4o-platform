@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination } from '../../components/common';
 
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors, borderRadius } from '../../styles/theme';
 import type { Groupbuy } from '../../types';
 
 export function BranchGroupbuyListPage() {
   const { branchId } = useParams<{ branchId: string }>();
+  const { basePath } = useBranchContext();
   const [groupbuys, setGroupbuys] = useState<Groupbuy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,17 +60,17 @@ export function BranchGroupbuyListPage() {
       <PageHeader
         title="공동구매"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
+          { label: '홈', href: `${basePath}` },
           { label: '공동구매' },
         ]}
       />
 
       {/* Tabs */}
       <div style={styles.tabs}>
-        <Link to={`/branch/${branchId}/groupbuy`} style={{ ...styles.tab, ...styles.tabActive }}>
+        <Link to={`${basePath}/groupbuy`} style={{ ...styles.tab, ...styles.tabActive }}>
           진행중
         </Link>
-        <Link to={`/branch/${branchId}/groupbuy/history`} style={styles.tab}>
+        <Link to={`${basePath}/groupbuy/history`} style={styles.tab}>
           참여 내역
         </Link>
       </div>
@@ -84,7 +86,7 @@ export function BranchGroupbuyListPage() {
           {groupbuys.map((gb) => (
             <Link
               key={gb.id}
-              to={`/branch/${branchId}/groupbuy/${gb.id}`}
+              to={`${basePath}/groupbuy/${gb.id}`}
               style={styles.card}
             >
               <div style={styles.cardImage}>

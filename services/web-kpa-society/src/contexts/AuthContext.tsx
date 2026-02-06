@@ -88,12 +88,15 @@ export type PharmacistFunction = 'pharmacy' | 'hospital' | 'industry' | 'other';
  */
 export type PharmacistRole = 'general' | 'pharmacy_owner' | 'hospital' | 'other';
 
+export type MembershipType = 'pharmacist' | 'student';
+
 export interface User {
   id: string;
   email: string;
   name: string;
   role?: string;  // Legacy single role (backward compatibility)
   roles?: string[];  // P2-T1: Phase 4 support - array of roles (legacy + prefixed)
+  membershipType?: MembershipType;  // Phase 3: 약사/약대생 구분
   pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
   pharmacistRole?: PharmacistRole;          // 직역 (최초 1회 선택, 프로필에서 수정 가능)
 
@@ -219,12 +222,15 @@ interface ApiUser {
  */
 function createUserFromApiResponse(apiUser: ApiUser): User {
   // P1-T3: Get pharmacistFunction/Role from API response (not localStorage)
+  // Phase 3: membershipType 매핑 추가
+  const role = apiUser.role || 'pharmacist';
   return {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
-    role: apiUser.role || 'pharmacist', // 매핑 없이 그대로 사용 (Backward compatibility)
-    roles: apiUser.roles || [apiUser.role || 'pharmacist'], // P2-T1: Phase 4 support
+    role, // 매핑 없이 그대로 사용 (Backward compatibility)
+    roles: apiUser.roles || [role], // P2-T1: Phase 4 support
+    membershipType: (role === 'student' ? 'student' : 'pharmacist') as MembershipType,
     pharmacistFunction: (apiUser as any).pharmacistFunction as PharmacistFunction | undefined,
     pharmacistRole: (apiUser as any).pharmacistRole as PharmacistRole | undefined,
   };

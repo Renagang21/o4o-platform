@@ -50,7 +50,7 @@ export function ForumServicePage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo/forum" style={styles.ctaPrimary}>
+        <a href="/forum" style={styles.ctaPrimary}>
           포럼 이용하기
         </a>
       </div>

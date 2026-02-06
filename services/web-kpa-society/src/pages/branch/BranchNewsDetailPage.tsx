@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { Notice } from '../../types';
 
 export function BranchNewsDetailPage() {
   const { branchId, id } = useParams<{ branchId: string; id: string }>();
+  const { basePath } = useBranchContext();
   const [notice, setNotice] = useState<Notice | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +57,8 @@ export function BranchNewsDetailPage() {
       <PageHeader
         title="분회 소식"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
-          { label: '소식', href: `/branch/${branchId}/news` },
+          { label: '홈', href: `${basePath}` },
+          { label: '소식', href: `${basePath}/news` },
           { label: notice.title },
         ]}
       />
@@ -93,7 +95,7 @@ export function BranchNewsDetailPage() {
       </Card>
 
       <div style={styles.actions}>
-        <Link to={`/branch/${branchId}/news`} style={styles.backButton}>
+        <Link to={`${basePath}/news`} style={styles.backButton}>
           ← 목록으로
         </Link>
       </div>

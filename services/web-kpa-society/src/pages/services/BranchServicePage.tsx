@@ -58,7 +58,7 @@ export function BranchServicePage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo" style={styles.ctaPrimary}>
+        <a href="/branch-services/demo" style={styles.ctaPrimary}>
           데모 화면 보기
         </a>
         <a href="/join/branch" style={styles.ctaSecondary}>

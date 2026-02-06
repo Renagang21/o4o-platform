@@ -64,7 +64,10 @@ export function createMemberController(
     requireAuth,
     [
       body('organization_id').isUUID(),
+      body('membership_type').optional().isIn(['pharmacist', 'student']),
       body('license_number').optional().isString().isLength({ max: 100 }),
+      body('university_name').optional().isString().isLength({ max: 200 }),
+      body('student_year').optional().isInt({ min: 1, max: 6 }),
       body('pharmacy_name').optional().isString().isLength({ max: 200 }),
       body('pharmacy_address').optional().isString().isLength({ max: 300 }),
       handleValidationErrors,
@@ -90,12 +93,17 @@ export function createMemberController(
           return;
         }
 
+        const membershipType = req.body.membership_type || 'pharmacist';
+
         const member = memberRepo.create({
           user_id: req.user!.id,
           organization_id: req.body.organization_id,
+          membership_type: membershipType,
           role: 'member',
           status: 'pending',
-          license_number: req.body.license_number || null,
+          license_number: membershipType === 'pharmacist' ? (req.body.license_number || null) : null,
+          university_name: membershipType === 'student' ? (req.body.university_name || null) : null,
+          student_year: membershipType === 'student' ? (req.body.student_year || null) : null,
           pharmacy_name: req.body.pharmacy_name || null,
           pharmacy_address: req.body.pharmacy_address || null,
         });

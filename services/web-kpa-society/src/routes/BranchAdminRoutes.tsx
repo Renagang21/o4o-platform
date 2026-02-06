@@ -1,6 +1,12 @@
 /**
  * BranchAdminRoutes - 분회 관리자 라우팅
- * 경로: /branch/:branchId/admin/*
+ *
+ * SVC-C: 분회 관리자 콘텐츠 관리
+ * WO-KPA-SOCIETY-PHASE6-BRANCH-UX-STANDARD-V1 (T6-4)
+ *
+ * 분회 관리자 역할: "콘텐츠 관리자" (content-only)
+ * - 공지사항(news), 자료실(docs), 임원(officers), 게시판(forum) 관리만 허용
+ * - 회원 관리, 신상신고, 연회비, 회원 현황, 설정은 본부/지부 관리자 전용
  *
  * 권한 체크: BranchAdminAuthGuard가 분회 관리자 권한을 확인합니다.
  * - 로그인 필수
@@ -11,15 +17,10 @@ import { Routes, Route } from 'react-router-dom';
 import { AdminLayout, BranchAdminAuthGuard } from '../components/branch-admin';
 import {
   DashboardPage,
-  MembersPage,
-  AnnualReportPage,
-  MembershipFeePage,
-  MemberStatusPage,
   NewsManagementPage,
   ForumManagementPage,
   DocsManagementPage,
   OfficersPage,
-  SettingsPage,
 } from '../pages/branch-admin';
 
 export function BranchAdminRoutes() {
@@ -30,19 +31,7 @@ export function BranchAdminRoutes() {
         {/* 대시보드 */}
         <Route index element={<DashboardPage />} />
 
-        {/* 회원 관리 */}
-        <Route path="members" element={<MembersPage />} />
-        <Route path="members/:memberId" element={<MembersPage />} />
-
-        {/* 신상신고 */}
-        <Route path="annual-report" element={<AnnualReportPage />} />
-        <Route path="annual-report/:reportId" element={<AnnualReportPage />} />
-
-        {/* 연회비 */}
-        <Route path="membership-fee" element={<MembershipFeePage />} />
-
-        {/* 회원 현황 (신상신고/연수교육/회비) */}
-        <Route path="member-status" element={<MemberStatusPage />} />
+        {/* ─── 콘텐츠 관리 (T6-4 허용 범위) ─── */}
 
         {/* 공지사항 */}
         <Route path="news" element={<NewsManagementPage />} />
@@ -60,8 +49,10 @@ export function BranchAdminRoutes() {
         {/* 임원 관리 */}
         <Route path="officers" element={<OfficersPage />} />
 
-        {/* 분회 설정 */}
-        <Route path="settings" element={<SettingsPage />} />
+        {/* ─── 본부/지부 전용 (분회 관리자 접근 제한) ─── */}
+        {/* T6-4: 아래 기능은 분회 관리자 범위 밖 — 본부/지부에서 관리 */}
+        {/* members, annual-report, membership-fee, member-status, settings */}
+
         </Route>
       </Routes>
     </BranchAdminAuthGuard>

@@ -203,7 +203,12 @@ export class AuthController extends BaseController {
       user.name = `${data.lastName}${data.firstName}`; // Keep name for backward compatibility
       // P1-T2: Nickname for public/forum display
       user.nickname = data.nickname;
-      user.role = (data.role || 'customer') as UserRole;
+      // Phase 3: membershipType에 따라 role 분기
+      // student인 경우 별도 처리, 그 외 기존 로직 유지
+      const effectiveRole = data.membershipType === 'student'
+        ? 'student'
+        : (data.role || 'customer');
+      user.role = effectiveRole as UserRole;
       // P0-T1: Status defaults to PENDING (requires operator approval)
       // user.status will be set to default PENDING from entity definition
       // P0-T2: Service key for data isolation
@@ -215,7 +220,7 @@ export class AuthController extends BaseController {
       const assignmentRepository = AppDataSource.getRepository(RoleAssignment);
       const assignment = new RoleAssignment();
       assignment.userId = user.id;
-      assignment.role = data.role || 'customer';
+      assignment.role = effectiveRole;
       assignment.isActive = true;
       assignment.validFrom = new Date();
       assignment.assignedAt = new Date();

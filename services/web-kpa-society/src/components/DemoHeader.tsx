@@ -1,15 +1,21 @@
 /**
- * DemoHeader - 약사회 서비스 데모 전용 헤더
+ * DemoHeader - SVC-B: 지부/분회 데모 서비스 전용 헤더
  *
+ * SVC-B: 지부/분회 데모 서비스
  * WO-KPA-DEMO-HEADER-SEPARATION-V1
+ * WO-KPA-SOCIETY-PHASE6-SVC-B-DEMO-UX-REFINE-V1
+ *
+ * - 실제 운영 서비스 아님
+ * - 지부/분회 서비스가 독립 도메인으로 제공되면 전체 삭제 대상
  *
  * /demo/* 경로에서 사용되는 독립된 헤더.
  * 커뮤니티 Header와 시각적으로 명확히 분리되어
- * "약사회 서비스 데모"임을 인식할 수 있도록 함.
+ * "데모 서비스"임을 항상 인식할 수 있도록 함.
  *
  * 금지 사항:
- * - 포럼 링크 노출 금지
+ * - /forum (커뮤니티 포럼) 직접 링크 금지
  * - 커뮤니티 서비스와의 자동 연결 UX 금지
+ * - 커뮤니티(/) 이동은 보조 CTA 형태로만 제공
  */
 
 import { useState } from 'react';
@@ -338,12 +344,14 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '18px',
   },
   serviceBadge: {
-    fontSize: '13px',
-    fontWeight: 500,
-    color: demoColors.primaryLight,
-    padding: '4px 10px',
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#fbbf24',
+    padding: '4px 12px',
+    backgroundColor: 'rgba(251, 191, 36, 0.15)',
     borderRadius: '4px',
+    border: '1px solid rgba(251, 191, 36, 0.3)',
+    letterSpacing: '0.02em',
   },
   nav: {
     display: 'flex',

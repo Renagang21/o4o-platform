@@ -1,9 +1,10 @@
-import { IsEmail, IsString, MinLength, IsOptional, IsBoolean, Matches } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsBoolean, IsIn, IsInt, Min, Max, Matches } from 'class-validator';
 
 /**
  * Register Request DTO
  *
  * Validates user registration data
+ * Phase 3: membershipType으로 약사/약대생 분기
  */
 export class RegisterRequestDto {
   @IsEmail({}, { message: 'Valid email is required' })
@@ -33,11 +34,33 @@ export class RegisterRequestDto {
 
   @IsOptional()
   @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
   role?: string;
 
   @IsOptional()
   @IsString()
   service?: string; // P0-T2: Service key for data isolation
+
+  @IsOptional()
+  @IsIn(['pharmacist', 'student'])
+  membershipType?: 'pharmacist' | 'student';
+
+  @IsOptional()
+  @IsString()
+  licenseNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  universityName?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(6)
+  studentYear?: number;
 
   @IsBoolean()
   tos: boolean;

@@ -46,7 +46,7 @@ export function BranchJoinPage() {
           <p style={styles.demoText}>
             데모 환경에서 지부 관리, 공지 발행, 회원 소통 등의 기능을 직접 확인하실 수 있습니다.
           </p>
-          <a href="/demo" style={styles.demoLink}>
+          <a href="/branch-services/demo" style={styles.demoLink}>
             데모 환경 둘러보기 →
           </a>
         </div>
@@ -88,7 +88,7 @@ export function BranchJoinPage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo" style={styles.ctaPrimary}>
+        <a href="/branch-services/demo" style={styles.ctaPrimary}>
           데모 환경 보기
         </a>
         <a href="/services/branch" style={styles.ctaSecondary}>

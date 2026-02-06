@@ -7,11 +7,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
 import { useAuth } from '../../contexts';
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 
 export function BranchForumWritePage() {
   const { branchId, id } = useParams<{ branchId: string; id?: string }>();
+  const { basePath } = useBranchContext();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -46,7 +48,7 @@ export function BranchForumWritePage() {
       });
     } catch (err) {
       alert('게시글을 불러오는데 실패했습니다.');
-      navigate(`/branch/${branchId}/forum`);
+      navigate(`${basePath}/forum`);
     } finally {
       setLoading(false);
     }
@@ -63,10 +65,10 @@ export function BranchForumWritePage() {
       setSubmitting(true);
       if (isEdit) {
         await branchApi.updateForumPost(branchId!, id!, formData);
-        navigate(`/branch/${branchId}/forum/post/${id}`);
+        navigate(`${basePath}/forum/post/${id}`);
       } else {
         const res = await branchApi.createForumPost(branchId!, formData);
-        navigate(`/branch/${branchId}/forum/post/${res.data.id}`);
+        navigate(`${basePath}/forum/post/${res.data.id}`);
       }
     } catch (err) {
       alert('저장에 실패했습니다.');
@@ -96,8 +98,8 @@ export function BranchForumWritePage() {
       <PageHeader
         title={isEdit ? '글 수정' : '글쓰기'}
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
-          { label: '포럼', href: `/branch/${branchId}/forum` },
+          { label: '홈', href: `${basePath}` },
+          { label: '포럼', href: `${basePath}/forum` },
           { label: isEdit ? '수정' : '글쓰기' },
         ]}
       />
@@ -146,7 +148,7 @@ export function BranchForumWritePage() {
             <button
               type="button"
               style={styles.cancelButton}
-              onClick={() => navigate(`/branch/${branchId}/forum`)}
+              onClick={() => navigate(`${basePath}/forum`)}
             >
               취소
             </button>

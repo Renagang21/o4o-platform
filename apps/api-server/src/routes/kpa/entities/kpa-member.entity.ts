@@ -16,6 +16,7 @@ import type { KpaOrganization } from './kpa-organization.entity.js';
 
 export type KpaMemberRole = 'member' | 'operator' | 'admin';
 export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'withdrawn';
+export type KpaMemberType = 'pharmacist' | 'student';
 
 @Entity('kpa_members')
 export class KpaMember {
@@ -34,8 +35,17 @@ export class KpaMember {
   @Column({ type: 'varchar', length: 50, default: 'pending' })
   status: KpaMemberStatus;
 
+  @Column({ type: 'varchar', length: 50, default: 'pharmacist' })
+  membership_type: KpaMemberType;
+
   @Column({ type: 'varchar', length: 100, nullable: true })
   license_number: string | null;  // 약사 면허번호
+
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  university_name: string | null;  // 약대생 재학 대학명
+
+  @Column({ type: 'int', nullable: true })
+  student_year: number | null;  // 약대생 학년 (1-6)
 
   @Column({ type: 'varchar', length: 200, nullable: true })
   pharmacy_name: string | null;  // 소속 약국명

@@ -27,8 +27,8 @@ export function useAccessibleDashboards(): DashboardItem[] {
 
   const items: DashboardItem[] = [];
 
-  // 모든 인증된 사용자: 약사 홈
-  items.push({ label: '약사 홈', icon: '🏠', path: '/' });
+  // 모든 인증된 사용자: 내 대시보드
+  items.push({ label: '내 대시보드', icon: '🏠', path: '/dashboard' });
 
   // 약국 context가 있는 사용자: 약국경영
   const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
@@ -59,9 +59,8 @@ export function DashboardSwitcher({ onNavigate }: { onNavigate?: () => void }) {
     <div>
       <div style={styles.sectionHeader}>대시보드 이동</div>
       {dashboards.map((item) => {
-        const isActive = item.path === '/'
-          ? location.pathname === '/'
-          : location.pathname.startsWith(item.path);
+        const isActive = location.pathname === item.path
+          || (item.path !== '/' && location.pathname.startsWith(item.path));
 
         return (
           <Link

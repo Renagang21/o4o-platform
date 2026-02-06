@@ -1,12 +1,18 @@
 /**
  * BranchHeader - 분회 전용 헤더
- * 지부로 돌아가기 링크 포함
+ *
+ * SVC-C: 분회 서비스 헤더
+ * WO-KPA-SOCIETY-PHASE6-BRANCH-UX-STANDARD-V1
+ *
+ * 메뉴 구조 (T6-2 표준): 홈 | 소식 | 자료 | 커뮤니티 | 소개
+ * NOTE: /demo/* 링크 금지. basePath는 BranchContext에서 가져옴.
  */
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts';
+import { useBranchContext } from '../../contexts/BranchContext';
 import { colors } from '../../styles/theme';
 
 interface MenuItem {
@@ -37,44 +43,40 @@ function getUserDisplayName(user: any): string {
   return '운영자';
 }
 
-// 분회용 메뉴 구조
-const getBranchMenuItems = (branchId: string): MenuItem[] => [
+// 분회용 메뉴 구조 (T6-2 표준: 홈, 소식, 자료, 커뮤니티, 소개)
+const getBranchMenuItems = (basePath: string): MenuItem[] => [
   {
-    label: '공지',
-    href: `/branch/${branchId}/news`,
+    label: '홈',
+    href: basePath,
+  },
+  {
+    label: '소식',
+    href: `${basePath}/news`,
     children: [
-      { label: '공지사항', href: `/branch/${branchId}/news/notice` },
-      { label: '분회 소식', href: `/branch/${branchId}/news/branch-news` },
-      { label: '갤러리', href: `/branch/${branchId}/news/gallery` },
+      { label: '공지사항', href: `${basePath}/news/notice` },
+      { label: '분회 소식', href: `${basePath}/news/branch-news` },
+      { label: '갤러리', href: `${basePath}/news/gallery` },
     ],
   },
   {
-    label: '포럼',
-    href: `/branch/${branchId}/forum`,
+    label: '자료',
+    href: `${basePath}/docs`,
+  },
+  {
+    label: '커뮤니티',
+    href: `${basePath}/forum`,
     children: [
-      { label: '전체 글', href: `/branch/${branchId}/forum` },
-      { label: '글쓰기', href: `/branch/${branchId}/forum/write` },
+      { label: '전체 글', href: `${basePath}/forum` },
+      { label: '글쓰기', href: `${basePath}/forum/write` },
     ],
   },
   {
-    label: '공동구매',
-    href: `/branch/${branchId}/groupbuy`,
+    label: '소개',
+    href: `${basePath}/about`,
     children: [
-      { label: '진행중', href: `/branch/${branchId}/groupbuy` },
-      { label: '참여 내역', href: `/branch/${branchId}/groupbuy/history` },
-    ],
-  },
-  {
-    label: '자료실',
-    href: `/branch/${branchId}/docs`,
-  },
-  {
-    label: '분회소개',
-    href: `/branch/${branchId}/about`,
-    children: [
-      { label: '분회 소개', href: `/branch/${branchId}/about` },
-      { label: '임원 안내', href: `/branch/${branchId}/about/officers` },
-      { label: '연락처', href: `/branch/${branchId}/about/contact` },
+      { label: '분회 소개', href: `${basePath}/about` },
+      { label: '임원 안내', href: `${basePath}/about/officers` },
+      { label: '연락처', href: `${basePath}/about/contact` },
     ],
   },
 ];
@@ -84,15 +86,16 @@ interface BranchHeaderProps {
   branchName: string;
 }
 
-export function BranchHeader({ branchId, branchName }: BranchHeaderProps) {
+export function BranchHeader({ branchName }: BranchHeaderProps) {
   const { user, logout } = useAuth();
+  const { basePath } = useBranchContext();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
-  const menuItems = getBranchMenuItems(branchId);
+  const menuItems = getBranchMenuItems(basePath);
 
   const handleLogout = async () => {
     await logout();
@@ -108,7 +111,7 @@ export function BranchHeader({ branchId, branchName }: BranchHeaderProps) {
           <Link to="/" style={styles.backToMain}>
             ← KPA-Society 본부로 이동
           </Link>
-          <span style={styles.branchBadge}>분회 사이트</span>
+          <span style={styles.branchBadge}>커뮤니티 소속 분회</span>
         </div>
       </div>
 
@@ -116,7 +119,7 @@ export function BranchHeader({ branchId, branchName }: BranchHeaderProps) {
       <div style={styles.mainHeader}>
         <div style={styles.container}>
           {/* Logo */}
-          <Link to={`/branch/${branchId}`} style={styles.logo}>
+          <Link to={basePath} style={styles.logo}>
             <span style={styles.logoIcon}>💊</span>
             <div style={styles.logoTextContainer}>
               <span style={styles.logoText}>{branchName}</span>
@@ -179,11 +182,11 @@ export function BranchHeader({ branchId, branchName }: BranchHeaderProps) {
                       <span style={styles.userDropdownEmail}>{user.email}</span>
                     </div>
                     <div style={styles.userDropdownDivider} />
-                    <Link to="/demo/mypage" style={styles.userDropdownItem}>
+                    <Link to="/mypage/profile" style={styles.userDropdownItem}>
                       <UserCircle style={{ width: 16, height: 16 }} />
                       마이페이지
                     </Link>
-                    <Link to="/demo/mypage/settings" style={styles.userDropdownItem}>
+                    <Link to="/mypage/settings" style={styles.userDropdownItem}>
                       <Settings style={{ width: 16, height: 16 }} />
                       설정
                     </Link>

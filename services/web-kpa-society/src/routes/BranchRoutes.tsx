@@ -1,9 +1,13 @@
 /**
  * BranchRoutes - 분회 라우팅 래퍼
- * /branch/:branchId/* 경로를 처리하고 분회 레이아웃을 적용
+ *
+ * SVC-C: 분회 서비스 라우트
+ * - /branch-services/:branchId/* 경로를 처리
+ * - /demo/branch/:branchId/* 경로도 호환 (레거시)
+ * - basePath를 자동 감지하여 BranchContext에 전달
  */
 
-import { Routes, Route, useParams } from 'react-router-dom';
+import { Routes, Route, useParams, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { BranchLayout } from '../components/branch';
 import { BranchProvider } from '../contexts/BranchContext';
@@ -45,8 +49,14 @@ const BRANCH_NAMES: Record<string, string> = {
 
 export function BranchRoutes() {
   const { branchId } = useParams<{ branchId: string }>();
+  const location = useLocation();
   const [branchName, setBranchName] = useState<string>('');
   const [loading, setLoading] = useState(true);
+
+  // basePath 자동 감지: /branch-services/:branchId 또는 /demo/branch/:branchId
+  const basePath = location.pathname.startsWith('/demo/branch/')
+    ? `/demo/branch/${branchId}`
+    : `/branch-services/${branchId}`;
 
   useEffect(() => {
     if (branchId) {
@@ -81,7 +91,7 @@ export function BranchRoutes() {
   }
 
   return (
-    <BranchProvider branchId={branchId || ''} branchName={branchName}>
+    <BranchProvider branchId={branchId || ''} branchName={branchName} basePath={basePath}>
       <BranchLayout branchId={branchId || ''} branchName={branchName}>
         <Routes>
           {/* Dashboard */}

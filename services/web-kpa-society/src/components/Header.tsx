@@ -190,7 +190,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                       {isSuperOperator(user) ? (
                         <>
                           <Link
-                            to="/demo/mypage/profile"
+                            to="/mypage/profile"
                             style={styles.userDropdownItem}
                             onClick={() => setShowUserDropdown(false)}
                           >
@@ -208,7 +208,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                             </>
                           ) : (
                             <Link
-                              to="/demo/mypage"
+                              to="/dashboard"
                               style={styles.userDropdownItem}
                               onClick={() => setShowUserDropdown(false)}
                             >
@@ -217,7 +217,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                             </Link>
                           )}
                           <Link
-                            to="/demo/mypage/profile"
+                            to="/mypage/profile"
                             style={styles.userDropdownItem}
                             onClick={() => setShowUserDropdown(false)}
                           >
@@ -225,7 +225,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                             프로필
                           </Link>
                           <Link
-                            to="/demo/mypage/settings"
+                            to="/mypage/settings"
                             style={styles.userDropdownItem}
                             onClick={() => setShowUserDropdown(false)}
                           >

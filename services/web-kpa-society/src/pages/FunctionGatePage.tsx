@@ -51,7 +51,7 @@ export function FunctionGatePage() {
   // Re-evaluate step when user changes (e.g., function just set)
   useEffect(() => {
     if (user?.pharmacistFunction && user?.pharmacistRole) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -62,7 +62,7 @@ export function FunctionGatePage() {
       if (!user?.pharmacistRole) {
         setStep('role');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     }
   };
@@ -70,7 +70,7 @@ export function FunctionGatePage() {
   const handleRoleConfirm = () => {
     if (selectedRole) {
       setPharmacistRole(selectedRole);
-      navigate('/');
+      navigate('/dashboard');
     }
   };
 

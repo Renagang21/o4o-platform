@@ -19,6 +19,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
@@ -26,6 +27,8 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
 
 export default function LoginModal() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const { activeModal, closeModal, openRegisterModal, onLoginSuccess } = useAuthModal();
   const [email, setEmail] = useState('');
@@ -33,6 +36,7 @@ export default function LoginModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPendingError, setIsPendingError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isOpen = activeModal === 'login';
@@ -76,6 +80,7 @@ export default function LoginModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsPendingError(false);
     setLoading(true);
 
     try {
@@ -91,6 +96,11 @@ export default function LoginModal() {
       // 로그인 성공: 모달 닫고 현재 화면 유지
       closeModal();
 
+      // 홈(/) 또는 /login에서 로그인한 경우 대시보드로 이동
+      if (location.pathname === '/' || location.pathname === '/login') {
+        navigate('/dashboard');
+      }
+
       // 선택적 콜백 실행 (예: 글 작성 재시도)
       if (onLoginSuccess) {
         onLoginSuccess();
@@ -105,7 +115,10 @@ export default function LoginModal() {
         const errorCode = err.response.data?.code;
 
         // 에러 코드/메시지별 한글화
-        if (errorCode === 'AUTH_REQUIRED' || serverError === 'Invalid credentials') {
+        if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
+          errorMessage = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
+          setIsPendingError(true);
+        } else if (errorCode === 'AUTH_REQUIRED' || serverError === 'Invalid credentials') {
           errorMessage = '비밀번호가 다릅니다.';
         } else {
           errorMessage = serverError || `서버 오류 (${err.response.status})`;
@@ -172,8 +185,8 @@ export default function LoginModal() {
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{error}</p>
+              <div className={`p-3 rounded-lg border ${isPendingError ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'}`}>
+                <p className={`text-sm ${isPendingError ? 'text-amber-700' : 'text-red-600'}`}>{error}</p>
               </div>
             )}
 

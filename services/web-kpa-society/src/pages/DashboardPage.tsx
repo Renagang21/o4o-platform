@@ -1,20 +1,20 @@
 /**
- * Dashboard (Home) 페이지
- * 약사회 SaaS - 사용자 대시보드
+ * DashboardPage - SVC-B: 지부/분회 서비스 데모 홈
+ *
+ * SVC-B: 지부/분회 데모 서비스
+ * WO-KPA-SOCIETY-PHASE6-SVC-B-DEMO-UX-REFINE-V1
+ *
+ * - 실제 운영 서비스 아님
+ * - 지부/분회 서비스가 독립 도메인으로 제공되면 전체 삭제 대상
  *
  * 섹션 구성 (WO-KPA-SOCIETY-BRANCH-DEMO-MAIN-UI-REFERENCE-V1):
- * A. Hero - 분회 소개 + 슬로건
+ * A. Hero - 데모 안내 + 슬로건
  * B. Quick Menu - 6열 그리드 아이콘 메뉴
  * C. 2열 레이아웃 - 공지사항 + 분회 일정
  * D. 나의 활동 - 간소화된 활동 카드
  * E. Platform Services - 이용 중 / 추천 서비스
  * F. External Services - 제휴 서비스 배너
  * G. Organization Info - 조직 안내
- *
- * 참조: kkpa.kr (경기도약사회) UI 구조
- * - 카드 기반 그리드 레이아웃
- * - 블루 계열 색상 톤
- * - 공식 기관 느낌의 깔끔한 정보 배열
  */
 
 import { Link } from 'react-router-dom';
@@ -133,27 +133,28 @@ export function DashboardPage() {
 
   return (
     <div style={styles.container}>
-      {/* A. Hero Section - 경기도약사회 스타일 */}
+      {/* A. Hero Section - 데모 서비스 안내 */}
       <section style={styles.heroSection}>
         <div style={styles.heroOverlay} />
         <div style={styles.heroPattern} />
         <div style={styles.heroContent}>
-          <div style={styles.heroBadge}>KPA-Society</div>
+          <div style={styles.heroBadge}>데모 서비스</div>
           <h1 style={styles.heroTitle}>
-            약사회는 회원 여러분과<br />함께합니다
+            지부/분회 서비스 체험
           </h1>
           <p style={styles.heroSubtitle}>
-            지역 약사회의 공식 업무 지원 플랫폼
+            지역 약사회 업무 지원 플랫폼의 예시 화면입니다
           </p>
           <p style={styles.heroDescription}>
-            공지사항, 교육연수, 공동구매, 회원관리를 하나의 플랫폼에서
+            이 서비스는 지부/분회 홈페이지의 예시 화면입니다.
+            실제 지부/분회 서비스는 별도 도메인에서 운영됩니다.
           </p>
           <div style={styles.heroButtons}>
-            <a href="/news/notice" style={styles.heroPrimaryButton}>
+            <a href="/demo/news/notice" style={styles.heroPrimaryButton}>
               공지사항 확인
             </a>
-            <a href="/organization" style={styles.heroSecondaryButton}>
-              약사회 소개
+            <a href="/demo/organization" style={styles.heroSecondaryButton}>
+              조직 소개
             </a>
           </div>
         </div>

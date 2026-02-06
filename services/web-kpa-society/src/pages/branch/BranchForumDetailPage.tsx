@@ -7,12 +7,14 @@ import { useParams, Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
 import { useAuth } from '../../contexts';
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { ForumPost, Comment } from '../../types';
 
 export function BranchForumDetailPage() {
   const { branchId, id } = useParams<{ branchId: string; id: string }>();
+  const { basePath } = useBranchContext();
   const { user } = useAuth();
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -77,8 +79,8 @@ export function BranchForumDetailPage() {
       <PageHeader
         title="포럼"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
-          { label: '포럼', href: `/branch/${branchId}/forum` },
+          { label: '홈', href: `${basePath}` },
+          { label: '포럼', href: `${basePath}/forum` },
           { label: post.title },
         ]}
       />
@@ -155,7 +157,7 @@ export function BranchForumDetailPage() {
       </div>
 
       <div style={styles.actions}>
-        <Link to={`/branch/${branchId}/forum`} style={styles.backButton}>
+        <Link to={`${basePath}/forum`} style={styles.backButton}>
           ← 목록으로
         </Link>
       </div>

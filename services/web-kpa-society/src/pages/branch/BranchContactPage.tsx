@@ -20,7 +20,7 @@ interface ContactInfo {
 
 export function BranchContactPage() {
   const { branchId } = useParams<{ branchId: string }>();
-  const { branchName } = useBranchContext();
+  const { branchName, basePath } = useBranchContext();
   const [contact, setContact] = useState<ContactInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,8 +90,8 @@ export function BranchContactPage() {
       <PageHeader
         title="연락처"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
-          { label: '분회 소개', href: `/branch/${branchId}/about` },
+          { label: '홈', href: `${basePath}` },
+          { label: '분회 소개', href: `${basePath}/about` },
           { label: '연락처' },
         ]}
       />

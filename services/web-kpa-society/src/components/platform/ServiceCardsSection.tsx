@@ -76,7 +76,7 @@ const services: ServiceItem[] = [
       '주제별 포럼을 통해 정보 공유와 소통이 가능합니다.',
     href: '/services/forum',
     badgeType: 'none',
-    ctas: [{ label: '포럼 바로가기', href: '/demo/forum', primary: true }],
+    ctas: [{ label: '포럼 바로가기', href: '/forum', primary: true }],
   },
   {
     id: 'lms',

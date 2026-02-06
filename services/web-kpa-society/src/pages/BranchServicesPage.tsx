@@ -1,12 +1,13 @@
 /**
  * BranchServicesPage - 분회 서비스 홈 (허브)
  *
+ * SVC-C: Branch Service Hub
  * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
+ * WO-KPA-SOCIETY-PHASE5-BRANCH-UX-IMPLEMENT-V1
  *
- * 역할: 여러 분회가 각각 독립적으로 사용하는 분회 서비스의 진입 허브
- * - 서비스 소개 페이지 ❌
- * - 데모 통합 페이지 ❌
- * - 분회 선택 허브 ⭕
+ * - 실제 분회 서비스 진입점
+ * - /demo/* (SVC-B)와 개념적으로 분리됨
+ * - 데모는 /branch-services/demo 로만 제공
  *
  * 구조:
  * - /branch-services : 이 페이지 (허브)
@@ -20,24 +21,15 @@ import { ArrowRight, Home, User, UserCircle, Settings, LogOut } from 'lucide-rea
 import { useAuth } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 
-// 분회 카드 데이터 타입
 interface BranchCard {
   id: string;
   name: string;
   description: string;
   href: string;
-  isDemo?: boolean;
 }
 
-// 분회 목록 (데모 + 실제 분회들)
-const branches: BranchCard[] = [
-  {
-    id: 'demo',
-    name: '분회 서비스 데모',
-    description: '분회 서비스 예시 화면',
-    href: '/branch-services/demo',
-    isDemo: true,
-  },
+// 이용 중인 분회 (실제 서비스)
+const activeBranches: BranchCard[] = [
   // 실제 분회들은 여기에 추가
   // {
   //   id: 'gangnam',
@@ -46,6 +38,14 @@ const branches: BranchCard[] = [
   //   href: '/branch-services/gangnam',
   // },
 ];
+
+// 분회 서비스 데모
+const demoBranch: BranchCard = {
+  id: 'demo',
+  name: '분회 서비스 데모',
+  description: '분회 서비스 화면을 미리 체험해볼 수 있습니다.',
+  href: '/branch-services/demo',
+};
 
 export function BranchServicesPage() {
   const { user, logout } = useAuth();
@@ -69,7 +69,7 @@ export function BranchServicesPage() {
             <span>KPA Platform</span>
           </Link>
           <nav style={styles.nav}>
-            <Link to="/demo" style={styles.navLink}>커뮤니티 홈</Link>
+            <Link to="/" style={styles.navLink}>커뮤니티 홈</Link>
           </nav>
           <div style={styles.headerRight}>
             {user ? (
@@ -88,7 +88,7 @@ export function BranchServicesPage() {
                     </div>
                     <div style={styles.dropdownDivider} />
                     <Link
-                      to="/demo/mypage"
+                      to="/mypage/profile"
                       style={styles.dropdownItem}
                       onClick={() => setShowUserDropdown(false)}
                     >
@@ -96,7 +96,7 @@ export function BranchServicesPage() {
                       마이페이지
                     </Link>
                     <Link
-                      to="/demo/mypage/settings"
+                      to="/mypage/settings"
                       style={styles.dropdownItem}
                       onClick={() => setShowUserDropdown(false)}
                     >
@@ -124,50 +124,68 @@ export function BranchServicesPage() {
       <div style={styles.hero}>
         <h1 style={styles.title}>분회 서비스</h1>
         <p style={styles.mainMessage}>
-          각 분회가 독립적으로 운영하는 전용 서비스입니다
+          각 분회는 독립적인 홈페이지와 커뮤니티 서비스를 운영할 수 있습니다
         </p>
         <p style={styles.subMessage}>
-          공지 · 커뮤니티 · 행사 · 자료를 분회 단위로 운영합니다
+          현재 여러 분회가 분회 서비스를 이용 중입니다
         </p>
-        <Link to="/branch-services/demo" style={styles.ctaButton}>
-          분회 서비스 데모 보기
-          <ArrowRight style={{ width: 18, height: 18 }} />
-        </Link>
       </div>
 
       {/* 분회 카드 리스트 */}
       <div style={styles.content}>
-        <h2 style={styles.sectionTitle}>분회 선택</h2>
-        <div style={styles.cardGrid}>
-          {branches.map((branch) => (
-            <Link
-              key={branch.id}
-              to={branch.href}
-              style={styles.card}
-            >
-              <div style={styles.cardHeader}>
-                <span style={styles.cardIcon}>🏢</span>
-                {branch.isDemo && (
-                  <span style={styles.demoBadge}>데모</span>
-                )}
-              </div>
-              <h3 style={styles.cardTitle}>{branch.name}</h3>
-              <p style={styles.cardDesc}>{branch.description}</p>
-              <div style={styles.cardFooter}>
-                <span style={styles.cardLink}>
-                  바로가기
-                  <ArrowRight style={{ width: 14, height: 14 }} />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* 이용 중인 분회 섹션 */}
+        <section>
+          <h2 style={styles.sectionTitle}>이용 중인 분회</h2>
+          {activeBranches.length > 0 ? (
+            <div style={styles.cardGrid}>
+              {activeBranches.map((branch) => (
+                <Link
+                  key={branch.id}
+                  to={branch.href}
+                  style={styles.card}
+                >
+                  <div style={styles.cardHeader}>
+                    <span style={styles.cardIcon}>🏢</span>
+                  </div>
+                  <h3 style={styles.cardTitle}>{branch.name}</h3>
+                  <p style={styles.cardDesc}>{branch.description}</p>
+                  <div style={styles.cardFooter}>
+                    <span style={styles.cardLink}>
+                      분회 서비스 바로가기
+                      <ArrowRight style={{ width: 14, height: 14 }} />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p style={styles.emptyNote}>
+              현재 이용 중인 분회가 없습니다. 분회 서비스는 순차적으로 오픈됩니다.
+            </p>
+          )}
+        </section>
 
-        {branches.length === 1 && (
-          <p style={styles.emptyNote}>
-            현재 데모 분회만 이용 가능합니다. 실제 분회 서비스는 순차적으로 오픈됩니다.
+        {/* 분회 서비스 데모 섹션 */}
+        <section style={styles.demoSection}>
+          <h2 style={styles.demoSectionTitle}>분회 서비스 데모</h2>
+          <p style={styles.demoSectionDesc}>
+            분회 서비스 화면을 미리 체험해볼 수 있습니다.
           </p>
-        )}
+          <Link to={demoBranch.href} style={styles.demoCard}>
+            <div style={styles.cardHeader}>
+              <span style={styles.cardIcon}>🏢</span>
+              <span style={styles.demoBadge}>데모</span>
+            </div>
+            <h3 style={styles.cardTitle}>{demoBranch.name}</h3>
+            <p style={styles.cardDesc}>{demoBranch.description}</p>
+            <div style={styles.cardFooter}>
+              <span style={styles.demoCardLink}>
+                데모 분회 보기
+                <ArrowRight style={{ width: 14, height: 14 }} />
+              </span>
+            </div>
+          </Link>
+        </section>
       </div>
     </div>
   );
@@ -322,21 +340,7 @@ const styles: Record<string, React.CSSProperties> = {
   subMessage: {
     fontSize: '17px',
     color: 'rgba(255, 255, 255, 0.85)',
-    margin: '0 0 36px',
-  },
-  ctaButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '14px 28px',
-    backgroundColor: '#fff',
-    color: '#1e40af',
-    fontSize: '16px',
-    fontWeight: 600,
-    borderRadius: '10px',
-    textDecoration: 'none',
-    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
+    margin: 0,
   },
   // Content
   content: {
@@ -374,14 +378,6 @@ const styles: Record<string, React.CSSProperties> = {
   cardIcon: {
     fontSize: '32px',
   },
-  demoBadge: {
-    padding: '4px 10px',
-    backgroundColor: '#dbeafe',
-    color: '#1d4ed8',
-    fontSize: '12px',
-    fontWeight: 600,
-    borderRadius: '12px',
-  },
   cardTitle: {
     fontSize: '18px',
     fontWeight: 600,
@@ -407,13 +403,56 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#2563eb',
   },
   emptyNote: {
-    marginTop: '24px',
-    padding: '16px',
+    padding: '24px 16px',
     backgroundColor: '#f1f5f9',
     borderRadius: '8px',
     fontSize: '14px',
     color: '#64748b',
     textAlign: 'center',
+  },
+  // Demo Section (시각적 구분)
+  demoSection: {
+    marginTop: '48px',
+    paddingTop: '32px',
+    borderTop: '1px solid #e2e8f0',
+  },
+  demoSectionTitle: {
+    fontSize: '18px',
+    fontWeight: 600,
+    color: '#64748b',
+    marginBottom: '8px',
+  },
+  demoSectionDesc: {
+    fontSize: '14px',
+    color: '#94a3b8',
+    marginBottom: '20px',
+  },
+  demoCard: {
+    display: 'block',
+    backgroundColor: '#fff',
+    padding: '24px',
+    borderRadius: '12px',
+    border: '1px dashed #cbd5e1',
+    textDecoration: 'none',
+    opacity: 0.85,
+    maxWidth: '340px',
+    transition: 'border-color 0.2s, opacity 0.2s',
+  },
+  demoBadge: {
+    padding: '4px 10px',
+    backgroundColor: '#f1f5f9',
+    color: '#64748b',
+    fontSize: '12px',
+    fontWeight: 600,
+    borderRadius: '12px',
+  },
+  demoCardLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#64748b',
   },
 };
 

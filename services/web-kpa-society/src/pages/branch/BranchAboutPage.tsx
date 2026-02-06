@@ -22,7 +22,7 @@ interface BranchInfo {
 
 export function BranchAboutPage() {
   const { branchId } = useParams<{ branchId: string }>();
-  const { branchName } = useBranchContext();
+  const { branchName, basePath } = useBranchContext();
   const [info, setInfo] = useState<BranchInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,7 @@ export function BranchAboutPage() {
       <PageHeader
         title="분회 소개"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
+          { label: '홈', href: `${basePath}` },
           { label: '분회 소개' },
         ]}
       />
@@ -135,12 +135,12 @@ export function BranchAboutPage() {
 
       {/* Quick Links */}
       <div style={styles.quickLinks}>
-        <Link to={`/branch/${branchId}/about/officers`} style={styles.quickLink}>
+        <Link to={`${basePath}/about/officers`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>👥</span>
           <span style={styles.quickLinkLabel}>임원 안내</span>
           <span style={styles.quickLinkArrow}>→</span>
         </Link>
-        <Link to={`/branch/${branchId}/about/contact`} style={styles.quickLink}>
+        <Link to={`${basePath}/about/contact`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>📞</span>
           <span style={styles.quickLinkLabel}>연락처 상세</span>
           <span style={styles.quickLinkArrow}>→</span>

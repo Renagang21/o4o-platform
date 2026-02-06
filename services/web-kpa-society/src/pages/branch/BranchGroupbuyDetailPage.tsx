@@ -7,12 +7,14 @@ import { useParams, Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
 import { useAuth } from '../../contexts';
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { Groupbuy } from '../../types';
 
 export function BranchGroupbuyDetailPage() {
   const { branchId, id } = useParams<{ branchId: string; id: string }>();
+  const { basePath } = useBranchContext();
   const { user } = useAuth();
   const [groupbuy, setGroupbuy] = useState<Groupbuy | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,8 +81,8 @@ export function BranchGroupbuyDetailPage() {
       <PageHeader
         title="공동구매"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
-          { label: '공동구매', href: `/branch/${branchId}/groupbuy` },
+          { label: '홈', href: `${basePath}` },
+          { label: '공동구매', href: `${basePath}/groupbuy` },
           { label: groupbuy.title },
         ]}
       />
@@ -167,7 +169,7 @@ export function BranchGroupbuyDetailPage() {
       </Card>
 
       <div style={styles.actions}>
-        <Link to={`/branch/${branchId}/groupbuy`} style={styles.backButton}>
+        <Link to={`${basePath}/groupbuy`} style={styles.backButton}>
           ← 목록으로
         </Link>
       </div>

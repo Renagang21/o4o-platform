@@ -370,6 +370,28 @@ kpa-society.co.kr에는 **3개 서비스**가 공존:
 - **상단 메뉴**: 서비스 진입점만 노출 (기능 나열 금지)
 - **혼선 발생 시**: 기준 문서로 즉시 판단
 
+### KPA-Society Membership Architecture Reference
+
+kpa-society.co.kr은 하나의 사이트처럼 보이지만,
+회원 구조상 다음 3개의 독립 서비스로 구성된다:
+
+- **SVC-A**: 커뮤니티 (약사 / 약대생)
+- **SVC-B**: 지부/분회 서비스 데모 (제거 예정)
+- **SVC-C**: 분회 서비스 (실서비스)
+
+모든 회원/로그인/승인/권한 논의는
+**"Account와 Service Membership 분리"** 원칙을 따른다.
+
+자세한 기준은 다음 문서를 참조한다:
+
+| 문서 | 경로 |
+|------|------|
+| 서비스 구조 기준 | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| Phase 0 현황 조사 | `docs/investigations/kpa-society-auth-current-state.md` |
+| Phase 2 데이터 모델 | `docs/investigations/KPA-SOCIETY-PHASE2-MEMBERSHIP-DATA-MODEL.md` |
+| Phase 2 가입/승인 흐름 | `docs/investigations/KPA-SOCIETY-PHASE2-SIGNUP-AND-APPROVAL-FLOW.md` |
+| Phase 2 서비스 이동 규칙 | `docs/investigations/KPA-SOCIETY-PHASE2-SERVICE-NAVIGATION-RULES.md` |
+
 ---
 
 ## 18. 최종 원칙

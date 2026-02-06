@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { Notice } from '../../types';
@@ -18,6 +19,7 @@ const categories = [
 
 export function BranchNewsListPage() {
   const { branchId } = useParams<{ branchId: string }>();
+  const { basePath } = useBranchContext();
   const [searchParams] = useSearchParams();
   const category = searchParams.get('category') || 'all';
 
@@ -67,7 +69,7 @@ export function BranchNewsListPage() {
       <PageHeader
         title="분회 소식"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
+          { label: '홈', href: `${basePath}` },
           { label: '소식' },
         ]}
       />
@@ -77,7 +79,7 @@ export function BranchNewsListPage() {
         {categories.map((cat) => (
           <Link
             key={cat.id}
-            to={`/branch/${branchId}/news${cat.id === 'all' ? '' : `?category=${cat.id}`}`}
+            to={`${basePath}/news${cat.id === 'all' ? '' : `?category=${cat.id}`}`}
             style={{
               ...styles.tab,
               ...(category === cat.id || (category === 'all' && cat.id === 'all') ? styles.tabActive : {}),
@@ -101,7 +103,7 @@ export function BranchNewsListPage() {
             {notices.map((notice) => (
               <Link
                 key={notice.id}
-                to={`/branch/${branchId}/news/${notice.id}`}
+                to={`${basePath}/news/${notice.id}`}
                 style={styles.item}
               >
                 <div style={styles.itemContent}>

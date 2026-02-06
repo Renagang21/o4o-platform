@@ -2,20 +2,22 @@
  * RegisterModal - KPA Society 회원가입 모달
  *
  * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
+ * Phase 3: 약사/약대생 유형 분기 추가
  *
- * 원칙:
- * - 가입은 항상 모달로만 수행
- * - 가입 완료 후 현재 화면 유지
- * - 로그인 모달과 자연스럽게 전환
+ * 흐름: type 선택 → form 입력 → success
  */
 
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Eye, EyeOff, AlertCircle, CheckCircle, GraduationCap, Stethoscope } from 'lucide-react';
 import { useAuthModal } from '../contexts/AuthModalContext';
+
+type MembershipType = 'pharmacist' | 'student';
+type Step = 'type' | 'form' | 'success';
 
 export default function RegisterModal() {
   const { activeModal, closeModal, openLoginModal } = useAuthModal();
-  const [step, setStep] = useState<'form' | 'success'>('form');
+  const [step, setStep] = useState<Step>('type');
+  const [membershipType, setMembershipType] = useState<MembershipType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +28,8 @@ export default function RegisterModal() {
     name: '',
     phone: '',
     licenseNumber: '',
+    universityName: '',
+    studentYear: '',
     pharmacyName: '',
     branch: '',
     agreeTerms: false,
@@ -52,7 +56,8 @@ export default function RegisterModal() {
   // 모달 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
-      setStep('form');
+      setStep('type');
+      setMembershipType(null);
       setFormData({
         email: '',
         password: '',
@@ -60,6 +65,8 @@ export default function RegisterModal() {
         name: '',
         phone: '',
         licenseNumber: '',
+        universityName: '',
+        studentYear: '',
         pharmacyName: '',
         branch: '',
         agreeTerms: false,
@@ -81,6 +88,11 @@ export default function RegisterModal() {
     }));
   };
 
+  const handleTypeSelect = (type: MembershipType) => {
+    setMembershipType(type);
+    setStep('form');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -92,9 +104,21 @@ export default function RegisterModal() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
-          role: 'pharmacist',
+          email: formData.email,
+          password: formData.password,
+          passwordConfirm: formData.passwordConfirm,
+          lastName: formData.name,
+          firstName: '',
+          nickname: formData.name,
+          phone: formData.phone,
+          role: membershipType === 'student' ? 'student' : 'pharmacist',
           service: 'kpa-society',
+          membershipType: membershipType,
+          licenseNumber: membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
+          universityName: membershipType === 'student' ? formData.universityName : undefined,
+          studentYear: membershipType === 'student' ? parseInt(formData.studentYear) || undefined : undefined,
+          tos: formData.agreeTerms,
+          privacyAccepted: formData.agreePrivacy,
         }),
       });
 
@@ -104,7 +128,6 @@ export default function RegisterModal() {
         throw new Error(data.error || '회원가입 신청에 실패했습니다.');
       }
 
-      // 성공 화면으로 전환
       setStep('success');
     } catch (err) {
       setError(err instanceof Error ? err.message : '회원가입 신청에 실패했습니다.');
@@ -114,22 +137,38 @@ export default function RegisterModal() {
   };
 
   const isFormValid = () => {
-    return (
+    const commonValid =
       formData.email &&
       formData.password &&
       formData.password.length >= 8 &&
       formData.password === formData.passwordConfirm &&
       formData.name &&
       formData.phone &&
-      formData.licenseNumber &&
       formData.agreeTerms &&
-      formData.agreePrivacy
-    );
+      formData.agreePrivacy;
+
+    if (!commonValid) return false;
+
+    if (membershipType === 'pharmacist') {
+      return !!formData.licenseNumber;
+    }
+
+    if (membershipType === 'student') {
+      return !!formData.universityName && !!formData.studentYear;
+    }
+
+    return false;
   };
 
   const handleSwitchToLogin = (e: React.MouseEvent) => {
     e.preventDefault();
     openLoginModal();
+  };
+
+  const handleBackToType = () => {
+    setStep('type');
+    setMembershipType(null);
+    setError(null);
   };
 
   const branchOptions = [
@@ -141,7 +180,23 @@ export default function RegisterModal() {
     { value: 'branch-5', label: '제5분회' },
   ];
 
+  const studentYearOptions = [
+    { value: '', label: '학년 선택' },
+    { value: '1', label: '1학년' },
+    { value: '2', label: '2학년' },
+    { value: '3', label: '3학년' },
+    { value: '4', label: '4학년' },
+    { value: '5', label: '5학년' },
+    { value: '6', label: '6학년' },
+  ];
+
   if (!isOpen) return null;
+
+  const getHeaderTitle = () => {
+    if (step === 'type') return '회원가입';
+    if (step === 'success') return '신청 완료';
+    return membershipType === 'student' ? '약대생 회원가입' : '약사 회원가입';
+  };
 
   return (
     <div
@@ -158,9 +213,7 @@ export default function RegisterModal() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🏛️</span>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                {step === 'form' ? '회원가입 신청' : '신청 완료'}
-              </h2>
+              <h2 className="text-lg font-bold text-gray-900">{getHeaderTitle()}</h2>
               <p className="text-xs text-gray-500">KPA Society</p>
             </div>
           </div>
@@ -174,43 +227,79 @@ export default function RegisterModal() {
 
         {/* 스크롤 가능한 콘텐츠 */}
         <div className="flex-1 overflow-y-auto p-6">
-          {step === 'success' ? (
-            // 성공 화면
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+          {/* Step 1: 유형 선택 */}
+          {step === 'type' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">회원 유형을 선택해 주세요</p>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">가입 신청이 완료되었습니다</h3>
-              <p className="text-gray-600 mb-6">
-                약사면허 확인 후 운영자 승인이 완료되면<br />
-                이메일로 안내해 드립니다.
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* 약사 카드 */}
+                <button
+                  onClick={() => handleTypeSelect('pharmacist')}
+                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                >
+                  <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <Stethoscope className="w-7 h-7 text-blue-600" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold text-gray-900">약사</p>
+                    <p className="text-xs text-gray-500 mt-1">약사면허번호 필요</p>
+                  </div>
+                </button>
+
+                {/* 약대생 카드 */}
+                <button
+                  onClick={() => handleTypeSelect('student')}
+                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
+                >
+                  <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                    <GraduationCap className="w-7 h-7 text-green-600" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold text-gray-900">약대생</p>
+                    <p className="text-xs text-gray-500 mt-1">재학 정보 필요</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* 로그인 전환 */}
+              <p className="text-center text-sm text-gray-500">
+                이미 계정이 있으신가요?{' '}
+                <a
+                  href="#"
+                  onClick={handleSwitchToLogin}
+                  className="text-blue-600 font-medium hover:text-blue-700"
+                >
+                  로그인
+                </a>
               </p>
-              <div className="bg-blue-50 rounded-lg p-4 text-left mb-6">
-                <p className="text-sm text-blue-800">
-                  <strong>신청 이메일:</strong> {formData.email}
-                </p>
-                <p className="text-sm text-blue-800 mt-1">
-                  승인까지 1-2 영업일이 소요될 수 있습니다.
-                </p>
-              </div>
-              <button
-                onClick={closeModal}
-                className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                확인
-              </button>
             </div>
-          ) : (
-            // 가입 폼
+          )}
+
+          {/* Step 2: 가입 폼 */}
+          {step === 'form' && (
             <>
-              {/* 승인제 안내 */}
-              <div className="flex gap-3 p-4 bg-blue-50 rounded-lg mb-6 border border-blue-100">
-                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900">승인제 가입 안내</p>
-                  <p className="text-xs text-blue-700 mt-1">
-                    약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.
-                  </p>
+              {/* 뒤로가기 + 승인제 안내 */}
+              <div className="mb-6">
+                <button
+                  onClick={handleBackToType}
+                  className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1"
+                >
+                  ← 유형 다시 선택
+                </button>
+
+                <div className="flex gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                  <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">승인제 가입 안내</p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      {membershipType === 'pharmacist'
+                        ? '약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.'
+                        : '재학 정보 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.'}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -319,61 +408,107 @@ export default function RegisterModal() {
                   </div>
                 </div>
 
-                {/* 약사 정보 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                    약사 정보
-                  </h4>
+                {/* 약사 정보 (약사 전용) */}
+                {membershipType === 'pharmacist' && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
+                      약사 정보
+                    </h4>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      약사면허번호 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="licenseNumber"
-                      value={formData.licenseNumber}
-                      onChange={handleInputChange}
-                      placeholder="00000"
-                      required
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">약사면허증에 기재된 면허번호</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        소속 분회
-                      </label>
-                      <select
-                        name="branch"
-                        value={formData.branch}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      >
-                        {branchOptions.map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        약국명
+                        약사면허번호 <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        name="pharmacyName"
-                        value={formData.pharmacyName}
+                        name="licenseNumber"
+                        value={formData.licenseNumber}
                         onChange={handleInputChange}
-                        placeholder="OO약국 (선택)"
+                        placeholder="00000"
+                        required
                         className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
+                      <p className="text-xs text-gray-500 mt-1">약사면허증에 기재된 면허번호</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          소속 분회
+                        </label>
+                        <select
+                          name="branch"
+                          value={formData.branch}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        >
+                          {branchOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          약국명
+                        </label>
+                        <input
+                          type="text"
+                          name="pharmacyName"
+                          value={formData.pharmacyName}
+                          onChange={handleInputChange}
+                          placeholder="OO약국 (선택)"
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* 약대생 정보 (약대생 전용) */}
+                {membershipType === 'student' && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
+                      재학 정보
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          재학 대학명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="universityName"
+                          value={formData.universityName}
+                          onChange={handleInputChange}
+                          placeholder="OO대학교 약학대학"
+                          required
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          학년 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="studentYear"
+                          value={formData.studentYear}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        >
+                          {studentYearOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* 약관 동의 */}
                 <div className="space-y-3 pt-4 border-t border-gray-100">
@@ -450,6 +585,38 @@ export default function RegisterModal() {
                 </p>
               </form>
             </>
+          )}
+
+          {/* Step 3: 성공 화면 */}
+          {step === 'success' && (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">가입 신청이 완료되었습니다</h3>
+              <p className="text-gray-600 mb-6">
+                {membershipType === 'pharmacist'
+                  ? <>약사면허 확인 후 운영자 승인이 완료되면<br />이메일로 안내해 드립니다.</>
+                  : <>재학 정보 확인 후 운영자 승인이 완료되면<br />이메일로 안내해 드립니다.</>}
+              </p>
+              <div className="bg-blue-50 rounded-lg p-4 text-left mb-6">
+                <p className="text-sm text-blue-800">
+                  <strong>신청 이메일:</strong> {formData.email}
+                </p>
+                <p className="text-sm text-blue-800 mt-1">
+                  <strong>회원 유형:</strong> {membershipType === 'pharmacist' ? '약사' : '약대생'}
+                </p>
+                <p className="text-sm text-blue-800 mt-1">
+                  승인까지 1-2 영업일이 소요될 수 있습니다.
+                </p>
+              </div>
+              <button
+                onClick={closeModal}
+                className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                확인
+              </button>
+            </div>
           )}
         </div>
       </div>

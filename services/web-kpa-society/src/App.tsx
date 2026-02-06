@@ -93,6 +93,9 @@ import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommuni
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
 
+// User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
+import { UserDashboardPage } from './pages/dashboard';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -122,7 +125,7 @@ function LoginRedirect() {
   const { openLoginModal } = useAuthModal();
 
   useEffect(() => {
-    navigate('/', { replace: true });
+    navigate('/dashboard', { replace: true });
     openLoginModal();
   }, [navigate, openLoginModal]);
 
@@ -134,7 +137,7 @@ function RegisterRedirect() {
   const { openRegisterModal } = useAuthModal();
 
   useEffect(() => {
-    navigate('/', { replace: true });
+    navigate('/dashboard', { replace: true });
     openRegisterModal();
   }, [navigate, openRegisterModal]);
 
@@ -152,21 +155,26 @@ function App() {
         <RegisterModal />
         <Routes>
           {/* =========================================================
-           * P2-T3: Service A - 메인 커뮤니티 (Main Community)
+           * SVC-A: 커뮤니티 서비스 (Community Service)
            * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
            *
-           * SCOPE: 분회 서비스 데모 (Community Demo)
-           * 단일 조직, 커뮤니티 중심 서비스
-           * - / : 커뮤니티 홈
-           * - /test-center : 테스트 센터
+           * SCOPE: 커뮤니티 중심 서비스
+           * - / : 커뮤니티 홈 (공개)
+           * - /dashboard : 사용자 대시보드 (로그인 필수)
+           * - /forum/* : 커뮤니티 포럼 (/demo/forum과 별도)
            * - /services/* : 서비스 소개 페이지
            * - /join/* : 서비스 참여 페이지
            * - /pharmacy/* : 약국 경영지원 (실 서비스)
            * - /work/* : 근무약사 업무
            *
+           * NOTE: 커뮤니티 UX에서 /demo/*로 연결 금지
+           * /demo는 지부/분회 서비스(SVC-B) 전용 영역
+           *
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
+           * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
           <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>} />
+          <Route path="/dashboard" element={<Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)
@@ -246,22 +254,22 @@ function App() {
           <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
 
           {/* =========================================================
-           * P2-T3: Service B - 지부/분회 연동 서비스 (District/Branch Demo)
-           * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
+           * SVC-B: 지부/분회 데모 서비스 (District/Branch Demo)
+           * WO-KPA-SOCIETY-PHASE6-SVC-B-DEMO-UX-REFINE-V1
            *
-           * SCOPE: 지부/분회 서비스 데모 (District/Branch Admin Demo)
+           * ⚠️ 삭제 대상: 실제 지부/분회 서비스가 독립 도메인으로
+           * 제공되면 이 블록(/demo/*)의 모든 라우트는 전체 삭제 대상.
+           * 삭제 시 관련 파일: DemoLayout, DemoHeader, DashboardPage,
+           * DemoLayoutRoutes 함수, 그리고 /demo/* 전용 페이지들.
+           *
+           * SCOPE: 순수 데모 서비스 (실운영 아님)
            * 조직 관리 중심 서비스 — 커뮤니티 홈(/)과 혼합 금지
-           * - /demo : 조직 대시보드 (DashboardPage)
-           * - /demo/admin/* : 지부 관리자
-           * - /demo/operator/* : 서비스 운영자
-           * - /demo/intranet/* : 인트라넷
-           * - /demo/branch/:branchId/* : 분회 서비스 (⚠️ Service C 흡수됨)
-           * - /demo/branch/:branchId/admin/* : 분회 관리자
-           * - /demo/login, /demo/register : 데모 인증
-           *
-           * P2-T3 주의사항:
-           * - Service C (분회 독립 서비스)는 현재 /demo/branch/:branchId/* 에 흡수됨
-           * - 향후 분리 시 BranchRoutes, BranchProvider, BranchLayout 독립 검토 필요
+           * - /demo : 데모 대시보드 (DashboardPage)
+           * - /demo/admin/* : 지부 관리자 데모
+           * - /demo/operator/* : 서비스 운영자 데모
+           * - /demo/intranet/* : 인트라넷 데모
+           * - /demo/forum/* : 지부/분회 포럼 데모 (NOT /forum)
+           * - /demo/branch/:branchId/* : 분회 서비스 데모 (레거시)
            *
            * WO-KPA-DEMO-ROUTE-ISOLATION-V1
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
@@ -367,6 +375,9 @@ function App() {
           <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><GroupbuyListPage /></Layout>} />
           <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><GroupbuyDetailPage /></Layout>} />
 
+          {/* Function Gate - SVC-A: 커뮤니티 직능/직역 선택 (WO-KPA-FUNCTION-GATE-V1) */}
+          <Route path="/select-function" element={<FunctionGatePage />} />
+
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
@@ -382,9 +393,13 @@ function App() {
 }
 
 /**
- * SCOPE: 지부/분회 서비스 데모 — Main Layout 하위 라우트
+ * SVC-B: 지부/분회 데모 서비스 — DemoLayout 하위 라우트
+ *
+ * ⚠️ 삭제 대상: 실제 지부/분회 서비스가 독립 도메인으로 제공되면
+ * 이 함수와 모든 하위 라우트는 전체 삭제 대상.
  *
  * WO-KPA-DEMO-HEADER-SEPARATION-V1: DemoLayout 사용
+ * WO-KPA-SOCIETY-PHASE6-SVC-B-DEMO-UX-REFINE-V1
  *
  * /demo 하위에서 DemoLayout을 사용하는 라우트들.
  * 이 라우트들은 지부/분회 조직 관리 데모 범위에 속합니다.

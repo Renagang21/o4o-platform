@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { Officer } from '../../types';
 
 export function BranchOfficersPage() {
   const { branchId } = useParams<{ branchId: string }>();
+  const { basePath } = useBranchContext();
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,8 +61,8 @@ export function BranchOfficersPage() {
       <PageHeader
         title="임원 안내"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
-          { label: '분회 소개', href: `/branch/${branchId}/about` },
+          { label: '홈', href: `${basePath}` },
+          { label: '분회 소개', href: `${basePath}/about` },
           { label: '임원 안내' },
         ]}
       />

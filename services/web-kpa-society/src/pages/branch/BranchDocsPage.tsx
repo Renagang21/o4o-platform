@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 
+import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
 import { colors } from '../../styles/theme';
 import type { Resource } from '../../types';
 
 export function BranchDocsPage() {
   const { branchId } = useParams<{ branchId: string }>();
+  const { basePath } = useBranchContext();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +74,7 @@ export function BranchDocsPage() {
       <PageHeader
         title="자료실"
         breadcrumb={[
-          { label: '홈', href: `/branch/${branchId}` },
+          { label: '홈', href: `${basePath}` },
           { label: '자료실' },
         ]}
       />

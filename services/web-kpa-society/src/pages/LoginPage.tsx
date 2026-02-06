@@ -36,18 +36,20 @@ export function LoginPage() {
       const isAdmin = loggedInUser.role === 'district_admin' ||
                       loggedInUser.role === 'branch_admin' ||
                       loggedInUser.role === 'super_admin';
+      // Phase 3: 약대생은 직능/직역 선택 불필요
+      const isStudent = loggedInUser.role === 'student' || loggedInUser.membershipType === 'student';
 
       // 모든 로그인 후 홈 화면(/)으로 이동
       // 관리자도 대시보드가 아닌 홈으로 이동하도록 변경
-      if (!isAdmin && (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole)) {
+      if (!isAdmin && !isStudent && (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole)) {
         // 직능/직역 미선택 시 게이트로 이동 (게이트 완료 후 홈으로 이동)
-        navigate('/demo/select-function');
+        navigate('/select-function');
       } else if (returnTo) {
         // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: returnTo 지원
         navigate(returnTo);
       } else {
-        // 기본: 홈 화면으로 이동 (대시보드 아님)
-        navigate('/');
+        // Phase 4: 대시보드로 이동
+        navigate('/dashboard');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
@@ -115,7 +117,7 @@ export function LoginPage() {
               <input type="checkbox" style={styles.checkbox} />
               <span>로그인 상태 유지</span>
             </label>
-            <a href="/demo/forgot-password" style={styles.forgotLink}>
+            <a href="/forgot-password" style={styles.forgotLink}>
               비밀번호 찾기
             </a>
           </div>
@@ -134,7 +136,7 @@ export function LoginPage() {
 
         <div style={styles.footer}>
           <span style={styles.footerText}>계정이 없으신가요?</span>
-          <a href="/demo/member/apply" style={styles.link}>회원가입</a>
+          <a href="/register" style={styles.link}>회원가입</a>
         </div>
       </div>
     </div>
