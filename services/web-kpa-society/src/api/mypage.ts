@@ -3,6 +3,7 @@
  */
 
 import { apiClient } from './client';
+import { authClient } from '@o4o/auth-client';
 import type {
   Enrollment,
   Certificate,
@@ -23,6 +24,7 @@ export interface ProfileUpdateRequest {
 export interface PasswordChangeRequest {
   currentPassword: string;
   newPassword: string;
+  newPasswordConfirm: string;
 }
 
 export interface UserSettings {
@@ -91,8 +93,11 @@ export const mypageApi = {
   updateProfile: (data: ProfileUpdateRequest) =>
     apiClient.put<ApiResponse<ProfileResponse>>('/mypage/profile', data),
 
-  changePassword: (data: PasswordChangeRequest) =>
-    apiClient.post<ApiResponse<void>>('/mypage/password', data),
+  // 비밀번호 변경 - /api/v1/users/password 엔드포인트 사용
+  changePassword: async (data: PasswordChangeRequest): Promise<ApiResponse<{ message: string }>> => {
+    const response = await authClient.api.put('/users/password', data);
+    return response.data;
+  },
 
   // 설정
   getSettings: () =>
