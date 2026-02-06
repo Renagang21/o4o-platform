@@ -16,13 +16,28 @@ import { User, Mail, Shield, Edit3, Check, X, LogOut, LayoutDashboard } from 'lu
 import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '../contexts';
 import { useLoginModal } from '../contexts/LoginModalContext';
 
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: any): string {
+  if (!user) return '사용자';
+  if (user.displayName?.trim()) return user.displayName.trim();
+  if (user.name?.trim()) return user.name.trim();
+  return '운영자';
+}
+
 export default function MyPage() {
   const { user, isAuthenticated, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+
+  // 표시 이름 계산
+  const displayName = getUserDisplayName(user);
+
   const [editData, setEditData] = useState({
-    name: user?.name || '',
+    name: displayName,
   });
 
   if (!isAuthenticated || !user) {
@@ -77,11 +92,11 @@ export default function MyPage() {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
               <span className="text-2xl font-bold text-white">
-                {user.name?.charAt(0) || '?'}
+                {displayName.charAt(0)}
               </span>
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-white">{user.name}</h2>
+              <h2 className="text-xl font-bold text-white">{displayName}</h2>
               <p className="text-primary-100 text-sm">{user.email}</p>
               <span className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white">
                 {roleLabel}
@@ -117,7 +132,7 @@ export default function MyPage() {
                     className="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mt-1"
                   />
                 ) : (
-                  <p className="text-sm font-medium text-gray-800">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-800">{displayName}</p>
                 )}
               </div>
             </div>

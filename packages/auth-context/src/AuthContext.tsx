@@ -14,6 +14,16 @@ export interface RoleAssignment {
   assignedBy?: string | null;
 }
 
+/**
+ * Super Operator Level
+ * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1
+ *
+ * - platform: 전체 플랫폼 관리 (모든 서비스 접근)
+ * - service: 특정 서비스 운영
+ * - branch: 특정 분회/지부 운영
+ */
+export type OperatorLevel = 'platform' | 'service' | 'branch';
+
 // Compatible with @o4o/types User interface but with more flexible field requirements
 export interface User {
   id: string | number;  // Support both string and number IDs
@@ -21,6 +31,8 @@ export interface User {
   name?: string | null;  // Optional for backward compatibility
   firstName?: string | null;
   lastName?: string | null;
+  nickname?: string | null;  // WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1
+  displayName?: string | null;  // 계산된 표시명
   avatar?: string | null;
   status: UserStatus | string;  // Allow string for flexibility
   isEmailVerified?: boolean;
@@ -48,6 +60,11 @@ export interface User {
   organizationName?: string;
   supplierId?: string;
   phone?: string;
+
+  // WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 필드
+  isSuperOperator?: boolean;
+  operatorScopes?: string[];  // ['platform', 'kpa', 'kpa:branch:123']
+  operatorLevel?: OperatorLevel;
 }
 
 export interface SessionStatus {

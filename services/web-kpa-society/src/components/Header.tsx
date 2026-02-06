@@ -3,6 +3,7 @@
  *
  * WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1: 서비스 단위 진입 중심 구조
  * WO-KPA-SOCIETY-SERVICE-STRUCTURE-BASELINE-V1: 3개 서비스 구조 기준
+ * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 공통 메뉴 지원
  *
  * 메뉴 구조 (서비스 진입점 중심):
  * - 홈: 커뮤니티 서비스 진입점 (Forum 포함)
@@ -15,11 +16,39 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
-import { useAuth, useOrganization } from '../contexts';
+import { User, LayoutDashboard, UserCircle, Settings, LogOut, Shield } from 'lucide-react';
+import { useAuth, useOrganization, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
+
+/**
+ * Super Operator 감지 헬퍼
+ * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1
+ */
+function isSuperOperator(user: UserType | null): boolean {
+  if (!user) return false;
+  if ((user as any).isSuperOperator) return true;
+  const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
+  if (user.roles?.some(r => operatorRoles.includes(r))) return true;
+  if (user.role && operatorRoles.includes(user.role)) return true;
+  return false;
+}
+
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: UserType | null): string {
+  if (!user) return '사용자';
+  // displayName이 서버에서 계산되어 옴
+  const displayName = (user as any).displayName;
+  if (displayName?.trim()) return displayName.trim();
+  // name fallback
+  if (user.name?.trim()) return user.name.trim();
+  // 최종 fallback
+  return '운영자';
+}
 
 interface MenuItem {
   label: string;
@@ -123,48 +152,84 @@ export function Header({ serviceName }: { serviceName: string }) {
                 onMouseEnter={() => setShowUserDropdown(true)}
                 onMouseLeave={() => setShowUserDropdown(false)}
               >
-                <button style={styles.userIconButton} aria-label="사용자 메뉴">
-                  <User style={{ width: 20, height: 20, color: colors.gray600 }} />
+                {/* Super Operator는 다른 아이콘/색상 */}
+                <button
+                  style={{
+                    ...styles.userIconButton,
+                    ...(isSuperOperator(user) ? styles.operatorIconButton : {}),
+                  }}
+                  aria-label="사용자 메뉴"
+                >
+                  {isSuperOperator(user) ? (
+                    <Shield style={{ width: 20, height: 20, color: '#d97706' }} />
+                  ) : (
+                    <User style={{ width: 20, height: 20, color: colors.gray600 }} />
+                  )}
                 </button>
                 {showUserDropdown && (
                   <div style={styles.userDropdown}>
                     <div style={styles.userDropdownInner}>
-                      <div style={styles.userDropdownHeader}>
-                        <span style={styles.userDropdownName}>{user.name}님</span>
+                      <div style={{
+                        ...styles.userDropdownHeader,
+                        ...(isSuperOperator(user) ? styles.operatorDropdownHeader : {}),
+                      }}>
+                        <span style={styles.userDropdownName}>{getUserDisplayName(user)}님</span>
                         <span style={styles.userDropdownEmail}>{user.email}</span>
+                        {isSuperOperator(user) && (
+                          <span style={styles.operatorBadge}>🛡️ Super Operator</span>
+                        )}
                       </div>
                       <div style={styles.userDropdownDivider} />
-                      {accessibleDashboards.length >= 2 ? (
+
+                      {/* Super Operator: 간소화된 메뉴 */}
+                      {isSuperOperator(user) ? (
                         <>
-                          <DashboardSwitcher onNavigate={() => setShowUserDropdown(false)} />
-                          <div style={styles.userDropdownDivider} />
+                          <Link
+                            to="/demo/mypage/profile"
+                            style={styles.userDropdownItem}
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
+                            프로필
+                          </Link>
                         </>
                       ) : (
-                        <Link
-                          to="/demo/mypage"
-                          style={styles.userDropdownItem}
-                          onClick={() => setShowUserDropdown(false)}
-                        >
-                          <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
-                          대시보드
-                        </Link>
+                        /* 일반 사용자: 전체 메뉴 */
+                        <>
+                          {accessibleDashboards.length >= 2 ? (
+                            <>
+                              <DashboardSwitcher onNavigate={() => setShowUserDropdown(false)} />
+                              <div style={styles.userDropdownDivider} />
+                            </>
+                          ) : (
+                            <Link
+                              to="/demo/mypage"
+                              style={styles.userDropdownItem}
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
+                              대시보드
+                            </Link>
+                          )}
+                          <Link
+                            to="/demo/mypage/profile"
+                            style={styles.userDropdownItem}
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
+                            프로필
+                          </Link>
+                          <Link
+                            to="/demo/mypage/settings"
+                            style={styles.userDropdownItem}
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <Settings style={{ width: 16, height: 16, color: colors.gray500 }} />
+                            설정
+                          </Link>
+                        </>
                       )}
-                      <Link
-                        to="/demo/mypage/profile"
-                        style={styles.userDropdownItem}
-                        onClick={() => setShowUserDropdown(false)}
-                      >
-                        <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
-                        프로필
-                      </Link>
-                      <Link
-                        to="/demo/mypage/settings"
-                        style={styles.userDropdownItem}
-                        onClick={() => setShowUserDropdown(false)}
-                      >
-                        <Settings style={{ width: 16, height: 16, color: colors.gray500 }} />
-                        설정
-                      </Link>
+
                       <div style={styles.userDropdownDivider} />
                       <button
                         style={styles.userDropdownLogout}
@@ -405,6 +470,20 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     textAlign: 'left',
     transition: 'background-color 0.2s',
+  },
+  // WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 스타일
+  operatorIconButton: {
+    backgroundColor: '#fef3c7',
+    borderColor: '#f59e0b',
+  },
+  operatorDropdownHeader: {
+    backgroundColor: '#fffbeb',
+  },
+  operatorBadge: {
+    marginTop: '4px',
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#d97706',
   },
   authButton: {
     padding: '10px 20px',

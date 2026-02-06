@@ -34,6 +34,17 @@ interface DashboardSummary {
   groupbuyParticipations: number;
 }
 
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: any): string {
+  if (!user) return '사용자';
+  if (user.displayName?.trim()) return user.displayName.trim();
+  if (user.name?.trim()) return user.name.trim();
+  return '운영자';
+}
+
 export function MyDashboardPage() {
   const { user } = useAuth();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -128,7 +139,7 @@ export function MyDashboardPage() {
             <span>👤</span>
           </div>
           <div style={styles.profileInfo}>
-            <h2 style={styles.userName}>{user.name}</h2>
+            <h2 style={styles.userName}>{getUserDisplayName(user)}</h2>
             <p style={styles.userEmail}>{user.email}</p>
             <div style={styles.userMeta}>
               {(user as any).organizationId && (

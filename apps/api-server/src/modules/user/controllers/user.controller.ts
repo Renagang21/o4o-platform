@@ -23,6 +23,9 @@ export class UserController extends BaseController {
   /**
    * GET /api/v1/users/profile
    * Get current user profile
+   *
+   * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: 이름 구조 확장
+   * - firstName, lastName, nickname, displayName 필드 추가
    */
   static async getProfile(req: AuthRequest, res: Response): Promise<any> {
     if (!req.user) {
@@ -33,7 +36,7 @@ export class UserController extends BaseController {
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
         where: { id: req.user.id },
-        select: ['id', 'email', 'name', 'phone', 'avatar', 'status', 'createdAt', 'updatedAt'],
+        select: ['id', 'email', 'name', 'firstName', 'lastName', 'nickname', 'phone', 'avatar', 'status', 'createdAt', 'updatedAt'],
         relations: ['dbRoles'],
       });
 
@@ -46,6 +49,10 @@ export class UserController extends BaseController {
           id: user.id,
           email: user.email,
           name: user.name,
+          firstName: user.firstName || null,
+          lastName: user.lastName || null,
+          nickname: user.nickname || null,
+          displayName: user.displayName,  // 계산된 표시명
           phone: user.phone || null,
           avatar: user.avatar || null,
           status: user.status,
@@ -70,6 +77,9 @@ export class UserController extends BaseController {
   /**
    * PUT /api/v1/users/profile
    * Update current user profile
+   *
+   * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: 이름 구조 확장
+   * - firstName, lastName, nickname 필드 지원 추가
    */
   static async updateProfile(req: AuthRequest, res: Response): Promise<any> {
     if (!req.user) {
@@ -90,6 +100,9 @@ export class UserController extends BaseController {
 
       // Update fields
       if (data.name) user.name = data.name;
+      if (data.firstName !== undefined) user.firstName = data.firstName;
+      if (data.lastName !== undefined) user.lastName = data.lastName;
+      if (data.nickname !== undefined) user.nickname = data.nickname;
       if (data.phone !== undefined) user.phone = data.phone;
       if (data.avatar !== undefined) user.avatar = data.avatar;
 
@@ -107,6 +120,10 @@ export class UserController extends BaseController {
           id: user.id,
           email: user.email,
           name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          nickname: user.nickname,
+          displayName: user.displayName,  // 계산된 표시명
           phone: user.phone,
           avatar: user.avatar,
         },

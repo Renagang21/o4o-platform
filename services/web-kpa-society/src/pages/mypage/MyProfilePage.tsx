@@ -3,6 +3,10 @@
  *
  * 조회 모드: 프로필 정보 표시
  * 수정 모드: 정보 수정 가능
+ *
+ * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: 프로필 버그 수정
+ * - 프로필 저장 후 AuthContext 상태 자동 갱신
+ * - checkAuth() 호출로 user 객체 최신화
  */
 
 import { useState, useEffect } from 'react';
@@ -28,7 +32,7 @@ interface ProfileData extends User {
 }
 
 export function MyProfilePage() {
-  const { user, setPharmacistRole } = useAuth();
+  const { user, setPharmacistRole, checkAuth } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -103,6 +107,11 @@ export function MyProfilePage() {
       }
       // 프로필 데이터 업데이트
       setProfile(prev => prev ? { ...prev, ...apiFormData } : null);
+
+      // WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: AuthContext user 갱신
+      // 프로필 저장 후 checkAuth() 호출로 Header 등에서 최신 이름 표시
+      await checkAuth();
+
       setIsEditMode(false);
       alert('프로필이 저장되었습니다.');
     } catch (err) {

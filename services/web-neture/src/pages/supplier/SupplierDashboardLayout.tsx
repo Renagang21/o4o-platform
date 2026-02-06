@@ -19,6 +19,17 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LayoutDashboard, FileCheck, Package, PackageCheck, ShoppingBag, FileText, Monitor, User, LogOut, Home } from 'lucide-react';
 import AccountMenu from '../../components/AccountMenu';
 
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: any): string {
+  if (!user) return '사용자';
+  if (user.displayName?.trim()) return user.displayName.trim();
+  if (user.name?.trim()) return user.name.trim();
+  return '운영자';
+}
+
 export default function SupplierDashboardLayout() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const location = useLocation();
@@ -180,7 +191,7 @@ export default function SupplierDashboardLayout() {
 
         <div style={styles.sidebarFooter}>
           <div style={styles.userInfo}>
-            <span style={styles.userName}>{user.name}</span>
+            <span style={styles.userName}>{getUserDisplayName(user)}</span>
             <span style={styles.userEmail}>{user.email}</span>
           </div>
           <button onClick={() => logout()} style={styles.logoutButton}>

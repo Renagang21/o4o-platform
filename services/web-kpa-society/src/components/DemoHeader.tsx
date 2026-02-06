@@ -24,6 +24,17 @@ interface MenuItem {
   children?: { label: string; href: string }[];
 }
 
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: any): string {
+  if (!user) return '사용자';
+  if (user.displayName?.trim()) return user.displayName.trim();
+  if (user.name?.trim()) return user.name.trim();
+  return '운영자';
+}
+
 // Demo 전용 메뉴 구조 (커뮤니티 메뉴 제외)
 const demoMenuItems: MenuItem[] = [
   { label: 'Demo 홈', href: '/demo' },
@@ -198,7 +209,7 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
                   <div style={styles.userDropdown}>
                     <div style={styles.userDropdownInner}>
                       <div style={styles.userDropdownHeader}>
-                        <span style={styles.userDropdownName}>{user.name}님</span>
+                        <span style={styles.userDropdownName}>{getUserDisplayName(user)}님</span>
                         <span style={styles.userDropdownEmail}>{user.email}</span>
                       </div>
                       <div style={styles.userDropdownDivider} />

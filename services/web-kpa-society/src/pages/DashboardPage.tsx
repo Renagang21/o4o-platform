@@ -2,16 +2,19 @@
  * Dashboard (Home) 페이지
  * 약사회 SaaS - 사용자 대시보드
  *
- * 섹션 구성:
- * A. Hero - 사용자 환영
- * B. Quick Menu - 주요 기능 바로가기
- * C. User Activity - 나의 활동
- * D. Org News - 지부/분회 소식
- * E. KPA News - 전체 약사회 소식
- * F. External Services - 제휴 서비스 (교육/공동구매 배너)
+ * 섹션 구성 (WO-KPA-SOCIETY-BRANCH-DEMO-MAIN-UI-REFERENCE-V1):
+ * A. Hero - 분회 소개 + 슬로건
+ * B. Quick Menu - 6열 그리드 아이콘 메뉴
+ * C. 2열 레이아웃 - 공지사항 + 분회 일정
+ * D. 나의 활동 - 간소화된 활동 카드
+ * E. Platform Services - 이용 중 / 추천 서비스
+ * F. External Services - 제휴 서비스 배너
  * G. Organization Info - 조직 안내
  *
- * WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 메뉴 제거 → 배너 전환
+ * 참조: kkpa.kr (경기도약사회) UI 구조
+ * - 카드 기반 그리드 레이아웃
+ * - 블루 계열 색상 톤
+ * - 공식 기관 느낌의 깔끔한 정보 배열
  */
 
 import { Link } from 'react-router-dom';
@@ -39,6 +42,18 @@ const positionLabels: Record<string, string> = {
   secretary: '총무',
 };
 
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: TestUser | null): string {
+  if (!user) return '사용자';
+  const displayName = (user as any).displayName;
+  if (displayName?.trim()) return displayName.trim();
+  if (user.name?.trim()) return user.name.trim();
+  return '운영자';
+}
+
 // 임원 전용 Mock 데이터
 const mockOfficerData = {
   upcomingMeetings: [
@@ -57,15 +72,22 @@ const mockOfficerData = {
   },
 };
 
-// Quick Menu items
-// WO-KPA-MENU-CLEANUP-V1: 공동구매/교육 제거 (배너로 전환)
+// Quick Menu items (kkpa.kr 참조 - 6열 그리드)
+// WO-KPA-SOCIETY-BRANCH-DEMO-MAIN-UI-REFERENCE-V1
 const quickMenuItems = [
-  { icon: '📢', label: '공지사항', href: '/news/notice', color: '#2563EB' },
-  { icon: '💬', label: '포럼', href: '/forum', color: '#F59E0B' },
-  { icon: '📁', label: '자료실', href: '/docs', color: '#EC4899' },
-  { icon: '📝', label: '신상신고', href: '/mypage/status-report', color: '#6366F1' },
-  { icon: '🏢', label: '조직소개', href: '/organization', color: '#8B5CF6' },
-  { icon: '📞', label: '연락처', href: '/organization/contact', color: '#10B981' },
+  { icon: '📢', label: '공지사항', href: '/demo/news/notice', color: '#1e40af' },
+  { icon: '📅', label: '분회일정', href: '/demo/calendar', color: '#1e40af' },
+  { icon: '📁', label: '자료실', href: '/demo/docs', color: '#1e40af' },
+  { icon: '📝', label: '회의록', href: '/demo/docs/minutes', color: '#1e40af' },
+  { icon: '💬', label: '게시판', href: '/demo/forum', color: '#1e40af' },
+  { icon: '📞', label: '문의', href: '/demo/contact', color: '#1e40af' },
+];
+
+// 분회 일정 Mock 데이터
+const mockSchedule = [
+  { id: 1, title: '1월 정기모임', date: '2025-01-15', type: 'meeting' },
+  { id: 2, title: '신년 워크샵', date: '2025-01-20', type: 'event' },
+  { id: 3, title: '연수교육', date: '2025-01-25', type: 'education' },
 ];
 
 // Mock activity data
@@ -106,7 +128,7 @@ export function DashboardPage() {
 
   // 표시용 사용자 정보
   const displayUser = user ? {
-    name: user.name,
+    name: getUserDisplayName(testUser),  // displayName > name > '운영자' fallback
     organization: isOfficer && officerPosition === 'vice_president' ? '서울지부' : '서울지부',
     branch: isOfficer && officerPosition === 'director' ? '강남분회' : '강남분회',
     role: isOfficer ? positionLabel : '일반회원',
@@ -146,29 +168,20 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {/* 환영 메시지 카드 */}
+      {/* 환영 메시지 카드 - 간소화 (kkpa.kr 참조) */}
       <section style={styles.welcomeCard}>
         <div style={styles.welcomeContent}>
-          <div style={styles.welcomeText}>
+          <div style={styles.welcomeLeft}>
             <span style={styles.welcomeGreeting}>
-              안녕하세요, <strong>{displayUser.name}</strong>님
+              <strong>{displayUser.name}</strong>님, 환영합니다
               {isOfficer && <span style={styles.officerBadge}>{positionLabel}</span>}
             </span>
             <span style={styles.welcomeOrg}>
-              {displayUser.organization} &gt; {displayUser.branch}
+              {displayUser.organization} · {displayUser.branch}
             </span>
           </div>
-          {/* WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 통계 제거 */}
-          <div style={styles.welcomeStats}>
+          <div style={styles.welcomeRight}>
             <AiSummaryButton contextLabel="약사회 활동 현황" />
-            <div style={styles.welcomeStat}>
-              <span style={styles.welcomeStatValue}>{mockActivity.unreadNotices}</span>
-              <span style={styles.welcomeStatLabel}>미확인 공지</span>
-            </div>
-            <div style={styles.welcomeStat}>
-              <span style={styles.welcomeStatValue}>{mockActivity.recentForumPosts.length}</span>
-              <span style={styles.welcomeStatLabel}>최근 활동</span>
-            </div>
           </div>
         </div>
       </section>
@@ -246,114 +259,102 @@ export function DashboardPage() {
         </section>
       )}
 
-      {/* B. Quick Menu */}
+      {/* B. Quick Menu - 6열 그리드 (kkpa.kr 참조) */}
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>주요 기능 바로가기</h2>
         <div style={styles.quickMenuGrid}>
           {quickMenuItems.map((item) => (
             <Link key={item.label} to={item.href} style={styles.quickMenuItem}>
-              <span style={{ ...styles.quickMenuIcon, backgroundColor: item.color }}>
-                {item.icon}
-              </span>
+              <span style={styles.quickMenuIcon}>{item.icon}</span>
               <span style={styles.quickMenuLabel}>{item.label}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* C. User Activity - WO-KPA-MENU-CLEANUP-V1: 교육/공동구매 카드 제거 */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>나의 활동</h2>
-        <div style={styles.activityGrid}>
-          {/* 미확인 공지 */}
-          <div style={styles.activityCard}>
-            <div style={styles.activityHeader}>
-              <span style={styles.activityIcon}>📢</span>
-              <span style={styles.activityLabel}>미확인 공지</span>
-            </div>
-            <div style={styles.activityValue}>{mockActivity.unreadNotices}건</div>
-            <Link to="/news/notice" style={styles.activityLink}>확인하기 →</Link>
+      {/* C. 2열 레이아웃: 공지사항 + 분회 일정 (kkpa.kr 참조) */}
+      <section style={styles.twoColumnSection}>
+        {/* 공지사항 */}
+        <div style={styles.noticeCard}>
+          <div style={styles.cardHeader}>
+            <h3 style={styles.cardTitle}>📢 공지사항</h3>
+            <Link to="/demo/news/notice" style={styles.moreLink}>더보기 →</Link>
           </div>
+          <div style={styles.noticeList}>
+            {mockOrgNews.map((news) => (
+              <Link key={news.id} to={`/demo/news/notice/${news.id}`} style={styles.noticeListItem}>
+                <span style={styles.noticeItemTitle}>{news.title}</span>
+                <span style={styles.noticeItemDate}>{news.date}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-          {/* 최근 본 포럼 */}
-          <div style={styles.activityCard}>
-            <div style={styles.activityHeader}>
-              <span style={styles.activityIcon}>💬</span>
-              <span style={styles.activityLabel}>최근 본 글</span>
-            </div>
-            {mockActivity.recentForumPosts.map((post) => (
-              <div key={post.id}>
-                <div style={styles.activityCourseTitle}>{post.title}</div>
-                <div style={styles.activityMeta}>{post.category}</div>
+        {/* 분회 일정 */}
+        <div style={styles.scheduleCard}>
+          <div style={styles.cardHeader}>
+            <h3 style={styles.cardTitle}>📅 분회 일정</h3>
+            <Link to="/demo/calendar" style={styles.moreLink}>전체보기 →</Link>
+          </div>
+          <div style={styles.scheduleList}>
+            {mockSchedule.map((item) => (
+              <div key={item.id} style={styles.scheduleItem}>
+                <div style={styles.scheduleDate}>
+                  <span style={styles.scheduleDateNum}>{item.date.split('-')[2]}</span>
+                  <span style={styles.scheduleDateMonth}>{item.date.split('-')[1]}월</span>
+                </div>
+                <div style={styles.scheduleInfo}>
+                  <span style={styles.scheduleTitle}>{item.title}</span>
+                  <span style={styles.scheduleType}>
+                    {item.type === 'meeting' ? '정기모임' : item.type === 'event' ? '행사' : '교육'}
+                  </span>
+                </div>
               </div>
             ))}
-            <Link to="/forum" style={styles.activityLink}>포럼 가기 →</Link>
-          </div>
-
-          {/* 신상신고 */}
-          <div style={styles.activityCard}>
-            <div style={styles.activityHeader}>
-              <span style={styles.activityIcon}>📝</span>
-              <span style={styles.activityLabel}>신상신고</span>
-            </div>
-            <div style={styles.activityCourseTitle}>2025년 신상신고</div>
-            <div style={styles.activityMeta}>제출 마감: 1월 31일</div>
-            <Link to="/mypage/status-report" style={styles.activityLink}>신고하기 →</Link>
-          </div>
-
-          {/* 회원 정보 */}
-          <div style={styles.activityCard}>
-            <div style={styles.activityHeader}>
-              <span style={styles.activityIcon}>👤</span>
-              <span style={styles.activityLabel}>회원 정보</span>
-            </div>
-            <div style={styles.activityCourseTitle}>프로필 관리</div>
-            <div style={styles.activityMeta}>연락처, 근무지 정보 관리</div>
-            <Link to="/mypage/profile" style={styles.activityLink}>프로필 보기 →</Link>
           </div>
         </div>
       </section>
 
-      {/* D & E. News Section (2 columns) */}
-      <div style={styles.newsGrid}>
-        {/* D. Org News */}
-        <section style={styles.newsSection}>
-          <div style={styles.newsSectionHeader}>
-            <h2 style={styles.sectionTitle}>지부/분회 소식</h2>
-            <Link to="/news/branch-news" style={styles.moreLink}>더보기 →</Link>
-          </div>
-          <div style={styles.newsList}>
-            {mockOrgNews.map((news) => (
-              <Link key={news.id} to={`/news/branch-news/${news.id}`} style={styles.newsItem}>
-                <div style={styles.newsContent}>
-                  <span style={styles.newsTitle}>{news.title}</span>
-                  <span style={styles.newsDate}>{news.date}</span>
-                </div>
-                {news.hasImage && <span style={styles.newsImageBadge}>📷</span>}
-              </Link>
-            ))}
-          </div>
-        </section>
+      {/* D. 나의 활동 - 간소화 (kkpa.kr 참조) */}
+      <section style={styles.section}>
+        <h2 style={styles.sectionTitle}>나의 활동</h2>
+        <div style={styles.activityRow}>
+          <Link to="/demo/news/notice" style={styles.activityChip}>
+            <span style={styles.activityChipIcon}>📢</span>
+            <span style={styles.activityChipLabel}>미확인 공지</span>
+            <span style={styles.activityChipBadge}>{mockActivity.unreadNotices}</span>
+          </Link>
+          <Link to="/demo/mypage/status-report" style={styles.activityChip}>
+            <span style={styles.activityChipIcon}>📝</span>
+            <span style={styles.activityChipLabel}>신상신고</span>
+            <span style={styles.activityChipStatus}>제출 전</span>
+          </Link>
+          <Link to="/demo/mypage/profile" style={styles.activityChip}>
+            <span style={styles.activityChipIcon}>👤</span>
+            <span style={styles.activityChipLabel}>내 프로필</span>
+          </Link>
+          <Link to="/demo/forum" style={styles.activityChip}>
+            <span style={styles.activityChipIcon}>💬</span>
+            <span style={styles.activityChipLabel}>게시판</span>
+          </Link>
+        </div>
+      </section>
 
-        {/* E. KPA News */}
-        <section style={styles.newsSection}>
-          <div style={styles.newsSectionHeader}>
-            <h2 style={styles.sectionTitle}>전체 약사회 소식</h2>
-            <Link to="/news/kpa-news" style={styles.moreLink}>더보기 →</Link>
-          </div>
-          <div style={styles.newsList}>
-            {mockKpaNews.map((news) => (
-              <Link key={news.id} to={`/news/kpa-news/${news.id}`} style={styles.newsItem}>
-                <div style={styles.newsContent}>
-                  {news.isImportant && <span style={styles.importantBadge}>중요</span>}
-                  <span style={styles.newsTitle}>{news.title}</span>
-                  <span style={styles.newsDate}>{news.date}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      </div>
+      {/* E. 전체 약사회 소식 - 간소화 */}
+      <section style={styles.section}>
+        <div style={styles.newsSectionHeader}>
+          <h2 style={styles.sectionTitle}>전체 약사회 소식</h2>
+          <Link to="/demo/news/kpa-news" style={styles.moreLink}>더보기 →</Link>
+        </div>
+        <div style={styles.kpaNewsList}>
+          {mockKpaNews.map((news) => (
+            <Link key={news.id} to={`/demo/news/kpa-news/${news.id}`} style={styles.kpaNewsItem}>
+              {news.isImportant && <span style={styles.importantBadge}>중요</span>}
+              <span style={styles.kpaNewsTitle}>{news.title}</span>
+              <span style={styles.kpaNewsDate}>{news.date}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* F. Platform Services - 이용 중 / 추천 서비스 (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1) */}
       <section style={styles.section}>
@@ -541,7 +542,7 @@ const styles: Record<string, React.CSSProperties> = {
     transform: 'translate(-50%, -50%)',
   },
 
-  // Welcome Card
+  // Welcome Card - 간소화 (kkpa.kr 참조)
   welcomeCard: {
     maxWidth: '1200px',
     margin: '-40px auto 32px',
@@ -553,44 +554,27 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '24px 32px',
+    padding: '20px 28px',
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     boxShadow: shadows.lg,
     border: `1px solid ${colors.gray200}`,
-    flexWrap: 'wrap',
-    gap: '20px',
   },
-  welcomeText: {
+  welcomeLeft: {
     display: 'flex',
     flexDirection: 'column',
     gap: '4px',
   },
+  welcomeRight: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   welcomeGreeting: {
-    fontSize: '1.125rem',
+    fontSize: '1rem',
     color: colors.neutral900,
   },
   welcomeOrg: {
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-  welcomeStats: {
-    display: 'flex',
-    gap: '32px',
-  },
-  welcomeStat: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '8px 16px',
-  },
-  welcomeStatValue: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: colors.primary,
-  },
-  welcomeStatLabel: {
-    fontSize: '0.75rem',
+    fontSize: '0.8125rem',
     color: colors.neutral500,
   },
 
@@ -605,271 +589,241 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '16px',
   },
 
-  // Quick Menu
+  // Quick Menu - 6열 그리드 (kkpa.kr 참조)
   quickMenuGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-    gap: '12px',
+    gridTemplateColumns: 'repeat(6, 1fr)',
+    gap: '8px',
   },
   quickMenuItem: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '20px 12px',
-    backgroundColor: colors.white,
+    justifyContent: 'center',
+    padding: '16px 8px',
+    backgroundColor: '#1e40af',
     borderRadius: borderRadius.md,
-    boxShadow: shadows.sm,
     textDecoration: 'none',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    border: `1px solid ${colors.gray200}`,
+    transition: 'background-color 0.2s',
+    minHeight: '80px',
   },
   quickMenuIcon: {
-    width: '48px',
-    height: '48px',
-    borderRadius: borderRadius.md,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     fontSize: '24px',
-    marginBottom: '8px',
+    marginBottom: '6px',
+    filter: 'grayscale(100%) brightness(200%)',
   },
   quickMenuLabel: {
-    fontSize: '0.875rem',
+    fontSize: '0.8125rem',
     fontWeight: 500,
-    color: colors.neutral700,
+    color: colors.white,
+    textAlign: 'center',
   },
 
-  // Activity Grid
-  activityGrid: {
+  // 2열 레이아웃 (kkpa.kr 참조)
+  twoColumnSection: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '16px',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '20px',
+    marginBottom: '32px',
   },
-  activityCard: {
-    padding: '20px',
+  noticeCard: {
     backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
+    padding: '20px',
     boxShadow: shadows.sm,
     border: `1px solid ${colors.gray200}`,
   },
-  activityHeader: {
+  scheduleCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: '20px',
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.gray200}`,
+  },
+  cardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px',
+    paddingBottom: '12px',
+    borderBottom: `1px solid ${colors.gray200}`,
+  },
+  cardTitle: {
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: colors.neutral900,
+    margin: 0,
+  },
+  noticeList: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  noticeListItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 0',
+    borderBottom: `1px solid ${colors.gray100}`,
+    textDecoration: 'none',
+  },
+  noticeItemTitle: {
+    fontSize: '0.875rem',
+    color: colors.neutral800,
+    flex: 1,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    paddingRight: '12px',
+  },
+  noticeItemDate: {
+    fontSize: '0.75rem',
+    color: colors.neutral500,
+    flexShrink: 0,
+  },
+  scheduleList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  scheduleItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    marginBottom: '12px',
+    gap: '16px',
   },
-  activityIcon: {
-    fontSize: '20px',
+  scheduleDate: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '48px',
+    height: '48px',
+    backgroundColor: '#1e40af',
+    borderRadius: borderRadius.md,
+    color: colors.white,
   },
-  activityLabel: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: colors.neutral700,
-  },
-  activityValue: {
-    fontSize: '1.5rem',
+  scheduleDateNum: {
+    fontSize: '1.125rem',
     fontWeight: 700,
-    color: colors.primary,
-    marginBottom: '8px',
+    lineHeight: 1,
   },
-  activityCourseTitle: {
+  scheduleDateMonth: {
+    fontSize: '0.625rem',
+    opacity: 0.9,
+  },
+  scheduleInfo: {
+    flex: 1,
+  },
+  scheduleTitle: {
+    display: 'block',
     fontSize: '0.875rem',
     fontWeight: 500,
     color: colors.neutral900,
-    marginBottom: '8px',
+    marginBottom: '2px',
   },
-  activityMeta: {
+  scheduleType: {
     fontSize: '0.75rem',
     color: colors.neutral500,
   },
-  activityLink: {
-    fontSize: '0.875rem',
-    color: colors.primary,
+
+  // 나의 활동 - 간소화
+  activityRow: {
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  activityChip: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '12px 20px',
+    backgroundColor: colors.white,
+    borderRadius: '40px',
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.gray200}`,
     textDecoration: 'none',
+    transition: 'box-shadow 0.2s',
+  },
+  activityChipIcon: {
+    fontSize: '18px',
+  },
+  activityChipLabel: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral700,
+  },
+  activityChipBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '20px',
+    height: '20px',
+    padding: '0 6px',
+    backgroundColor: '#ef4444',
+    color: colors.white,
+    borderRadius: '10px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  },
+  activityChipStatus: {
+    fontSize: '0.75rem',
+    color: '#f59e0b',
     fontWeight: 500,
   },
 
-  // Progress Bar
-  progressBar: {
-    height: '6px',
-    backgroundColor: colors.gray200,
-    borderRadius: '3px',
+  // KPA News 리스트
+  kpaNewsList: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.gray200}`,
     overflow: 'hidden',
-    marginBottom: '4px',
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: '3px',
-    transition: 'width 0.3s',
+  kpaNewsItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '14px 20px',
+    borderBottom: `1px solid ${colors.gray100}`,
+    textDecoration: 'none',
   },
-  progressText: {
+  kpaNewsTitle: {
+    flex: 1,
+    fontSize: '0.875rem',
+    color: colors.neutral800,
+  },
+  kpaNewsDate: {
     fontSize: '0.75rem',
     color: colors.neutral500,
   },
 
-  // News Grid
-  newsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-    gap: '24px',
-    marginBottom: '32px',
-  },
-  newsSection: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    padding: '20px',
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.gray200}`,
-  },
+
+
+  // News Section Header
   newsSectionHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '16px',
   },
-  newsList: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  newsItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 0',
-    borderBottom: `1px solid ${colors.gray200}`,
-    textDecoration: 'none',
-  },
-  newsContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-    flex: 1,
-  },
-  newsTitle: {
-    fontSize: '0.875rem',
-    color: colors.neutral900,
-    fontWeight: 500,
-  },
-  newsDate: {
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-  },
-  newsImageBadge: {
-    fontSize: '14px',
-  },
   importantBadge: {
     display: 'inline-block',
-    padding: '2px 6px',
-    backgroundColor: colors.accentRed,
+    padding: '3px 8px',
+    backgroundColor: '#ef4444',
     color: colors.white,
     borderRadius: '4px',
-    fontSize: '0.625rem',
+    fontSize: '0.6875rem',
     fontWeight: 600,
-    marginBottom: '4px',
+    flexShrink: 0,
   },
   moreLink: {
-    fontSize: '0.875rem',
-    color: colors.primary,
+    fontSize: '0.8125rem',
+    color: '#1e40af',
     textDecoration: 'none',
     fontWeight: 500,
   },
 
-  // Courses Grid
-  coursesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '16px',
-  },
-  courseCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    padding: '16px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.gray200}`,
-    textDecoration: 'none',
-  },
-  courseThumbnail: {
-    width: '56px',
-    height: '56px',
-    backgroundColor: colors.gray100,
-    borderRadius: borderRadius.md,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '28px',
-  },
-  courseInfo: {
-    flex: 1,
-  },
-  courseTitleRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '4px',
-  },
-  courseTitle: {
-    fontSize: '0.9375rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-  },
-  courseDuration: {
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-  },
-  requiredBadge: {
-    padding: '2px 6px',
-    backgroundColor: colors.accentRed,
-    color: colors.white,
-    borderRadius: '4px',
-    fontSize: '0.625rem',
-    fontWeight: 600,
-  },
-
-  // Groupbuy Grid
-  groupbuyGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '16px',
-  },
-  groupbuyCard: {
-    padding: '20px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.gray200}`,
-    textDecoration: 'none',
-  },
-  groupbuyHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '8px',
-  },
-  groupbuyTitle: {
-    fontSize: '0.9375rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-  },
-  groupbuyEndDate: {
-    fontSize: '0.75rem',
-    color: colors.accentRed,
-    fontWeight: 500,
-  },
-  groupbuyPrice: {
-    fontSize: '1.125rem',
-    fontWeight: 700,
-    color: colors.primary,
-    marginBottom: '12px',
-  },
-  groupbuyProgress: {
-    fontSize: '0.75rem',
-    color: colors.accentGreen,
-    fontWeight: 600,
-  },
 
   // Org Info Grid
   orgInfoGrid: {

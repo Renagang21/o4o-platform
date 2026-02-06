@@ -14,6 +14,17 @@ interface MenuItem {
   children?: { label: string; href: string }[];
 }
 
+/**
+ * 사용자 표시 이름 헬퍼
+ * displayName > name > '운영자' 순서로 fallback
+ */
+function getUserDisplayName(user: any): string {
+  if (!user) return '사용자';
+  if (user.displayName?.trim()) return user.displayName.trim();
+  if (user.name?.trim()) return user.name.trim();
+  return '운영자';
+}
+
 // 분회용 메뉴 구조
 const getBranchMenuItems = (branchId: string): MenuItem[] => [
   {
@@ -134,7 +145,7 @@ export function BranchHeader({ branchId, branchName }: BranchHeaderProps) {
           <div style={styles.authArea}>
             {user ? (
               <div style={styles.userInfo}>
-                <span style={styles.userName}>{user.name}님</span>
+                <span style={styles.userName}>{getUserDisplayName(user)}님</span>
                 <button style={styles.authButtonOutline} onClick={logout}>
                   로그아웃
                 </button>
