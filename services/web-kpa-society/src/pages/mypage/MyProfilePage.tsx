@@ -149,10 +149,7 @@ export function MyProfilePage() {
     );
   }
 
-  // API 응답 기반 사용자 유형 판단
-  const isSuperOperator = profile?.userType?.isSuperOperator ?? false;
-  const isPharmacyOwner = profile?.userType?.isPharmacyOwner ?? false;
-  const isOfficer = profile?.userType?.isOfficer ?? false;
+  // API 응답 기반 필드 표시 여부 판단
   const hasPharmacistInfo = profile?.pharmacist !== null;
   const hasPharmacyInfo = profile?.pharmacy !== null;
   const hasOrganizations = (profile?.organizations?.length ?? 0) > 0;
