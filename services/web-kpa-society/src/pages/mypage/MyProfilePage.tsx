@@ -31,6 +31,20 @@ interface ProfileData extends User {
   avatar?: string;
 }
 
+/**
+ * Super Operator 감지 헬퍼
+ * Super Operator는 약사 관련 프로필 필드를 표시하지 않음
+ */
+function isSuperOperator(user: User | null): boolean {
+  if (!user) return false;
+  const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
+  const extUser = user as any;
+  if (extUser.isSuperOperator) return true;
+  if (extUser.roles?.some((r: string) => operatorRoles.includes(r))) return true;
+  if (extUser.role && operatorRoles.includes(extUser.role)) return true;
+  return false;
+}
+
 export function MyProfilePage() {
   const { user, setPharmacistRole, checkAuth } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -207,52 +221,57 @@ export function MyProfilePage() {
               </div>
             </div>
 
-            <div style={styles.field}>
-              <label style={styles.label}>약사면허</label>
-              <input
-                type="text"
-                style={{ ...styles.input, ...styles.inputReadonly }}
-                value={profile?.licenseNumber || '-'}
-                disabled
-              />
-              <p style={styles.hint}>약사면허는 수정할 수 없습니다.</p>
-            </div>
+            {/* 약사 관련 필드 - Super Operator는 표시하지 않음 */}
+            {!isSuperOperator(user) && (
+              <>
+                <div style={styles.field}>
+                  <label style={styles.label}>약사면허</label>
+                  <input
+                    type="text"
+                    style={{ ...styles.input, ...styles.inputReadonly }}
+                    value={profile?.licenseNumber || '-'}
+                    disabled
+                  />
+                  <p style={styles.hint}>약사면허는 수정할 수 없습니다.</p>
+                </div>
 
-            <div style={styles.field}>
-              <label style={styles.label}>직역</label>
-              <select
-                style={styles.input}
-                value={formData.pharmacistRole}
-                onChange={e => setFormData({ ...formData, pharmacistRole: e.target.value as PharmacistRole })}
-              >
-                <option value="">선택하세요</option>
-                {(Object.entries(PHARMACIST_ROLE_LABELS) as [PharmacistRole, string][]).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
-            </div>
+                <div style={styles.field}>
+                  <label style={styles.label}>직역</label>
+                  <select
+                    style={styles.input}
+                    value={formData.pharmacistRole}
+                    onChange={e => setFormData({ ...formData, pharmacistRole: e.target.value as PharmacistRole })}
+                  >
+                    <option value="">선택하세요</option>
+                    {(Object.entries(PHARMACIST_ROLE_LABELS) as [PharmacistRole, string][]).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div style={styles.field}>
-              <label style={styles.label}>출신교 (대학)</label>
-              <input
-                type="text"
-                style={styles.input}
-                value={formData.university}
-                onChange={e => setFormData({ ...formData, university: e.target.value })}
-                placeholder="출신 대학을 입력하세요"
-              />
-            </div>
+                <div style={styles.field}>
+                  <label style={styles.label}>출신교 (대학)</label>
+                  <input
+                    type="text"
+                    style={styles.input}
+                    value={formData.university}
+                    onChange={e => setFormData({ ...formData, university: e.target.value })}
+                    placeholder="출신 대학을 입력하세요"
+                  />
+                </div>
 
-            <div style={styles.field}>
-              <label style={styles.label}>근무처</label>
-              <input
-                type="text"
-                style={styles.input}
-                value={formData.workplace}
-                onChange={e => setFormData({ ...formData, workplace: e.target.value })}
-                placeholder="근무처를 입력하세요"
-              />
-            </div>
+                <div style={styles.field}>
+                  <label style={styles.label}>근무처</label>
+                  <input
+                    type="text"
+                    style={styles.input}
+                    value={formData.workplace}
+                    onChange={e => setFormData({ ...formData, workplace: e.target.value })}
+                    placeholder="근무처를 입력하세요"
+                  />
+                </div>
+              </>
+            )}
 
             <div style={styles.field}>
               <label style={styles.label}>핸드폰</label>
@@ -302,27 +321,32 @@ export function MyProfilePage() {
               <span style={styles.infoValue}>{profile?.name || '-'}</span>
             </div>
 
-            <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>약사면허</span>
-              <span style={styles.infoValue}>{profile?.licenseNumber || '-'}</span>
-            </div>
+            {/* 약사 관련 필드 - Super Operator는 표시하지 않음 */}
+            {!isSuperOperator(user) && (
+              <>
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>약사면허</span>
+                  <span style={styles.infoValue}>{profile?.licenseNumber || '-'}</span>
+                </div>
 
-            <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>직역</span>
-              <span style={styles.infoValue}>
-                {user?.pharmacistRole ? PHARMACIST_ROLE_LABELS[user.pharmacistRole] : '-'}
-              </span>
-            </div>
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>직역</span>
+                  <span style={styles.infoValue}>
+                    {user?.pharmacistRole ? PHARMACIST_ROLE_LABELS[user.pharmacistRole] : '-'}
+                  </span>
+                </div>
 
-            <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>출신교 (대학)</span>
-              <span style={styles.infoValue}>{profile?.university || '-'}</span>
-            </div>
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>출신교 (대학)</span>
+                  <span style={styles.infoValue}>{profile?.university || '-'}</span>
+                </div>
 
-            <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>근무처</span>
-              <span style={styles.infoValue}>{profile?.workplace || '-'}</span>
-            </div>
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>근무처</span>
+                  <span style={styles.infoValue}>{profile?.workplace || '-'}</span>
+                </div>
+              </>
+            )}
 
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>핸드폰</span>
