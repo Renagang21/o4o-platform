@@ -37,16 +37,26 @@ function isSuperOperator(user: UserType | null): boolean {
 
 /**
  * 사용자 표시 이름 헬퍼
- * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
- * 단, name이 이메일과 동일한 경우 '운영자' 표시
+ * 우선순위: lastName+firstName > name > '운영자'
+ * name이 이메일과 동일한 경우 '운영자' 표시
  */
 function getUserDisplayName(user: UserType | null): string {
   if (!user) return '사용자';
-  // name이 없거나 이메일과 동일한 경우 '운영자' 표시
-  if (!user.name || user.name === user.email) {
-    return '운영자';
+
+  // 1. lastName + firstName 조합 시도
+  const extendedUser = user as any;
+  if (extendedUser.lastName || extendedUser.firstName) {
+    const fullName = `${extendedUser.lastName || ''}${extendedUser.firstName || ''}`.trim();
+    if (fullName) return fullName;
   }
-  return user.name;
+
+  // 2. name 필드 사용 (이메일과 다른 경우에만)
+  if (user.name && user.name !== user.email) {
+    return user.name;
+  }
+
+  // 3. 기본값
+  return '운영자';
 }
 
 interface MenuItem {

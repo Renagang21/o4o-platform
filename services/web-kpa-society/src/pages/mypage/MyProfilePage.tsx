@@ -40,7 +40,8 @@ export function MyProfilePage() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: '',
+    lastName: '',
+    firstName: '',
     phone: '',
     email: '',
     university: '',
@@ -61,7 +62,8 @@ export function MyProfilePage() {
       const data = res.data as ProfileData;
       setProfile(data);
       setFormData({
-        name: data.name || '',
+        lastName: data.lastName || '',
+        firstName: data.firstName || '',
         phone: data.phone || '',
         email: data.email || '',
         university: data.university || '',
@@ -83,7 +85,8 @@ export function MyProfilePage() {
     // 원래 데이터로 복원
     if (profile) {
       setFormData({
-        name: profile.name || '',
+        lastName: (profile as any).lastName || '',
+        firstName: (profile as any).firstName || '',
         phone: profile.phone || '',
         email: profile.email || '',
         university: profile.university || '',
@@ -181,15 +184,27 @@ export function MyProfilePage() {
         {isEditMode ? (
           /* 수정 모드 */
           <form onSubmit={handleSubmit}>
-            <div style={styles.field}>
-              <label style={styles.label}>이름</label>
-              <input
-                type="text"
-                style={styles.input}
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                placeholder="이름을 입력하세요"
-              />
+            <div style={styles.nameRow}>
+              <div style={styles.nameField}>
+                <label style={styles.label}>성</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  value={formData.lastName}
+                  onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                  placeholder="성"
+                />
+              </div>
+              <div style={styles.nameField}>
+                <label style={styles.label}>이름</label>
+                <input
+                  type="text"
+                  style={styles.input}
+                  value={formData.firstName}
+                  onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                  placeholder="이름"
+                />
+              </div>
             </div>
 
             <div style={styles.field}>
@@ -427,6 +442,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   field: {
     marginBottom: '20px',
+  },
+  nameRow: {
+    display: 'flex',
+    gap: '16px',
+    marginBottom: '20px',
+  },
+  nameField: {
+    flex: 1,
   },
   label: {
     display: 'block',

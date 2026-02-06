@@ -13,7 +13,8 @@ import type {
 } from '../types';
 
 export interface ProfileUpdateRequest {
-  name?: string;
+  lastName?: string;
+  firstName?: string;
   phone?: string;
   email?: string;
   university?: string;

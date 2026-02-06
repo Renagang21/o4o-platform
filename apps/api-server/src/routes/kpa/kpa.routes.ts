@@ -370,22 +370,71 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const mypageRouter = Router();
 
-  mypageRouter.get('/profile', authenticate, (req: Request, res: Response) => {
+  mypageRouter.get('/profile', authenticate, asyncHandler(async (req: Request, res: Response) => {
     const user = (req as any).user;
+    if (!user?.id) {
+      res.status(401).json({ success: false, error: 'Unauthorized' });
+      return;
+    }
+
+    // Fetch full user data from database
+    const userRepository = dataSource.getRepository('User');
+    const fullUser = await userRepository.findOne({ where: { id: user.id } });
+
     res.json({
       success: true,
       data: {
-        id: user?.id,
-        name: user?.name || '',
-        email: user?.email || '',
-        phone: user?.phone || '',
+        id: fullUser?.id,
+        name: fullUser?.name || '',
+        lastName: fullUser?.lastName || '',
+        firstName: fullUser?.firstName || '',
+        email: fullUser?.email || '',
+        phone: fullUser?.phone || '',
       }
     });
-  });
+  }));
 
-  mypageRouter.put('/profile', authenticate, (req: Request, res: Response) => {
-    res.json({ success: true, message: 'Profile update - Integration pending' });
-  });
+  mypageRouter.put('/profile', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    if (!user?.id) {
+      res.status(401).json({ success: false, error: 'Unauthorized' });
+      return;
+    }
+
+    const { name, lastName, firstName, phone } = req.body;
+    const userRepository = dataSource.getRepository('User');
+
+    // Build update object with only provided fields
+    const updateData: Record<string, any> = {};
+    if (name !== undefined) updateData.name = name;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (phone !== undefined) updateData.phone = phone;
+
+    // If lastName and firstName provided, auto-generate name
+    if (lastName !== undefined || firstName !== undefined) {
+      const newLastName = lastName ?? user.lastName ?? '';
+      const newFirstName = firstName ?? user.firstName ?? '';
+      updateData.name = `${newLastName}${newFirstName}`.trim() || updateData.name;
+    }
+
+    await userRepository.update(user.id, updateData);
+
+    // Fetch updated user
+    const updatedUser = await userRepository.findOne({ where: { id: user.id } });
+
+    res.json({
+      success: true,
+      data: {
+        id: updatedUser?.id,
+        name: updatedUser?.name || '',
+        lastName: updatedUser?.lastName || '',
+        firstName: updatedUser?.firstName || '',
+        email: updatedUser?.email || '',
+        phone: updatedUser?.phone || '',
+      }
+    });
+  }));
 
   mypageRouter.get('/settings', authenticate, (req: Request, res: Response) => {
     res.json({
