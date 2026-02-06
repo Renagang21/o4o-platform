@@ -20,10 +20,10 @@ const TEST_PASSWORD = 'kpaPass1';
 
 // Fixed UUIDs for organizations (deterministic for reference consistency)
 const ORG_IDS = {
-  ASSOCIATION: 'a0000000-kpa0-4000-a000-000000000001',   // 대한약사회
-  SEOUL_BRANCH: 'a0000000-kpa0-4000-a000-000000000002',  // 서울특별시약사회
-  JONGNO_GROUP: 'a0000000-kpa0-4000-a000-000000000003',  // 종로구약사회
-  GANGNAM_GROUP: 'a0000000-kpa0-4000-a000-000000000004',  // 강남구약사회
+  ASSOCIATION: 'a0000000-0a00-4000-a000-000000000001',   // 대한약사회
+  SEOUL_BRANCH: 'a0000000-0a00-4000-a000-000000000002',  // 서울특별시약사회
+  JONGNO_GROUP: 'a0000000-0a00-4000-a000-000000000003',  // 종로구약사회
+  GANGNAM_GROUP: 'a0000000-0a00-4000-a000-000000000004',  // 강남구약사회
 };
 
 interface TestUser {
