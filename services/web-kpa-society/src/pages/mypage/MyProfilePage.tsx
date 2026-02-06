@@ -12,7 +12,7 @@
 
 import { useState, useEffect } from 'react';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { mypageApi } from '../../api';
+import { mypageApi, type ProfileResponse } from '../../api';
 import { useAuth, type PharmacistRole } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
@@ -30,40 +30,6 @@ const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
   officer: '위원',
   member: '회원',
 };
-
-/**
- * API 응답 타입 정의
- */
-interface ProfileResponse {
-  id: string;
-  name: string;
-  lastName: string;
-  firstName: string;
-  email: string;
-  phone: string;
-  roles: string[];
-  userType: {
-    isSuperOperator: boolean;
-    isPharmacyOwner: boolean;
-    isOfficer: boolean;
-  };
-  pharmacist: {
-    licenseNumber: string | null;
-    university: string | null;
-    workplace: string | null;
-  } | null;
-  pharmacy: {
-    name: string | null;
-    address: string | null;
-  } | null;
-  organizations: Array<{
-    id: string;
-    name: string;
-    type: string;
-    role: string;
-    position: string | null;
-  }>;
-}
 
 export function MyProfilePage() {
   const { user, setPharmacistRole, checkAuth } = useAuth();

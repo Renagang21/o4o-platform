@@ -40,13 +40,57 @@ export interface UserActivity {
   link?: string;
 }
 
+/**
+ * 프로필 API 응답 타입
+ * API에서 반환하는 역할별 프로필 데이터 구조
+ */
+export interface ProfileResponse {
+  // 기본 정보 (모든 사용자)
+  id: string;
+  name: string;
+  lastName: string;
+  firstName: string;
+  email: string;
+  phone: string;
+  roles: string[];
+
+  // 사용자 유형 플래그
+  userType: {
+    isSuperOperator: boolean;
+    isPharmacyOwner: boolean;
+    isOfficer: boolean;
+  };
+
+  // 약사 정보 (Super Operator가 아닌 경우)
+  pharmacist: {
+    licenseNumber: string | null;
+    university: string | null;
+    workplace: string | null;
+  } | null;
+
+  // 약국 정보 (약국개설자인 경우)
+  pharmacy: {
+    name: string | null;
+    address: string | null;
+  } | null;
+
+  // 조직/임원 정보
+  organizations: Array<{
+    id: string;
+    name: string;
+    type: string;
+    role: string;
+    position: string | null;
+  }>;
+}
+
 export const mypageApi = {
   // 프로필
   getProfile: () =>
-    apiClient.get<ApiResponse<User>>('/mypage/profile'),
+    apiClient.get<ApiResponse<ProfileResponse>>('/mypage/profile'),
 
   updateProfile: (data: ProfileUpdateRequest) =>
-    apiClient.put<ApiResponse<User>>('/mypage/profile', data),
+    apiClient.put<ApiResponse<ProfileResponse>>('/mypage/profile', data),
 
   changePassword: (data: PasswordChangeRequest) =>
     apiClient.post<ApiResponse<void>>('/mypage/password', data),

@@ -10,7 +10,7 @@ export { groupbuyAdminApi } from './groupbuyAdmin';
 export { newsApi } from './news';
 export { resourcesApi } from './resources';
 export { organizationApi } from './organization';
-export { mypageApi } from './mypage';
+export { mypageApi, type ProfileResponse } from './mypage';
 export { branchApi } from './branch';
 export { adminApi } from './admin';
 export { branchAdminApi } from './branchAdmin';
