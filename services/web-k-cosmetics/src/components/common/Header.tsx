@@ -91,6 +91,15 @@ export default function Header() {
                 {userMenuOpen && (
                   <div style={styles.dropdown}>
                     <div style={styles.dropdownHeader}>
+                      <p style={styles.dropdownName}>
+                        {(() => {
+                          const extUser = user as any;
+                          if (extUser?.lastName || extUser?.firstName) {
+                            return `${extUser.lastName || ''}${extUser.firstName || ''}`.trim() || '운영자';
+                          }
+                          return (user?.name && user.name !== user.email) ? user.name : '운영자';
+                        })()}님
+                      </p>
                       <p style={styles.dropdownEmail}>{user?.email}</p>
                       <p style={styles.dropdownRole}>{roleLabel}</p>
                     </div>
@@ -286,6 +295,12 @@ const styles: Record<string, React.CSSProperties> = {
   dropdownHeader: {
     padding: '12px 16px',
     borderBottom: '1px solid #e2e8f0',
+  },
+  dropdownName: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: '0 0 4px 0',
   },
   dropdownEmail: {
     fontSize: '13px',

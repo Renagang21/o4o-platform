@@ -94,8 +94,14 @@ export default function AccountMenu() {
   const roleLabel = ROLE_LABELS[user.currentRole] || '사용자';
   const isOperator = isSuperOperator(user);
 
-  // 표시 이름: DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
-  const displayName = user.name || '사용자';
+  // 표시 이름: lastName + firstName > name > '운영자' 우선순위
+  const extUser = user as any;
+  let displayName = '운영자';
+  if (extUser.lastName || extUser.firstName) {
+    displayName = `${extUser.lastName || ''}${extUser.firstName || ''}`.trim() || displayName;
+  } else if (user.name && user.name !== user.email) {
+    displayName = user.name;
+  }
 
   return (
     <div ref={menuRef} className="relative">
