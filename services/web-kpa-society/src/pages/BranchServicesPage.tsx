@@ -14,8 +14,9 @@
  * - /branch-services/{branchKey} : 실제 분회 서비스
  */
 
-import { Link } from 'react-router-dom';
-import { ArrowRight, Home } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Home, User, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 
@@ -49,6 +50,14 @@ const branches: BranchCard[] = [
 export function BranchServicesPage() {
   const { user, logout } = useAuth();
   const { openLoginModal } = useAuthModal();
+  const navigate = useNavigate();
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    setShowUserDropdown(false);
+    navigate('/branch-services');
+  };
 
   return (
     <div style={styles.container}>
@@ -64,11 +73,43 @@ export function BranchServicesPage() {
           </nav>
           <div style={styles.headerRight}>
             {user ? (
-              <div style={styles.userArea}>
-                <span style={styles.userName}>{user.name || '사용자'}</span>
-                <button onClick={() => logout()} style={styles.logoutButton}>
-                  로그아웃
+              <div style={styles.userDropdownWrapper}>
+                <button
+                  style={styles.userButton}
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                >
+                  <User style={{ width: 20, height: 20 }} />
                 </button>
+                {showUserDropdown && (
+                  <div style={styles.userDropdown}>
+                    <div style={styles.dropdownHeader}>
+                      <span style={styles.dropdownName}>{user.name || '사용자'}</span>
+                      <span style={styles.dropdownEmail}>{user.email}</span>
+                    </div>
+                    <div style={styles.dropdownDivider} />
+                    <Link
+                      to="/demo/mypage"
+                      style={styles.dropdownItem}
+                      onClick={() => setShowUserDropdown(false)}
+                    >
+                      <UserCircle style={{ width: 16, height: 16 }} />
+                      마이페이지
+                    </Link>
+                    <Link
+                      to="/demo/mypage/settings"
+                      style={styles.dropdownItem}
+                      onClick={() => setShowUserDropdown(false)}
+                    >
+                      <Settings style={{ width: 16, height: 16 }} />
+                      설정
+                    </Link>
+                    <div style={styles.dropdownDivider} />
+                    <button style={styles.dropdownLogout} onClick={handleLogout}>
+                      <LogOut style={{ width: 16, height: 16 }} />
+                      로그아웃
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <button onClick={openLoginModal} style={styles.loginButton}>
@@ -179,14 +220,73 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '16px',
   },
-  userArea: {
+  userDropdownWrapper: {
+    position: 'relative',
+  },
+  userButton: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    justifyContent: 'center',
+    width: '40px',
+    height: '40px',
+    backgroundColor: '#f1f5f9',
+    border: 'none',
+    borderRadius: '50%',
+    cursor: 'pointer',
+    color: '#475569',
   },
-  userName: {
+  userDropdown: {
+    position: 'absolute',
+    top: '48px',
+    right: 0,
+    width: '220px',
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+    padding: '8px 0',
+    zIndex: 200,
+  },
+  dropdownHeader: {
+    padding: '12px 16px',
+  },
+  dropdownName: {
+    display: 'block',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#0f172a',
+  },
+  dropdownEmail: {
+    display: 'block',
+    fontSize: '12px',
+    color: '#64748b',
+    marginTop: '2px',
+  },
+  dropdownDivider: {
+    height: '1px',
+    backgroundColor: '#e2e8f0',
+    margin: '4px 0',
+  },
+  dropdownItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '10px 16px',
     fontSize: '14px',
     color: '#475569',
+    textDecoration: 'none',
+  },
+  dropdownLogout: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    width: '100%',
+    padding: '10px 16px',
+    fontSize: '14px',
+    color: '#ef4444',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    textAlign: 'left',
   },
   loginButton: {
     padding: '8px 20px',
@@ -196,15 +296,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '6px',
     fontSize: '14px',
     fontWeight: 500,
-    cursor: 'pointer',
-  },
-  logoutButton: {
-    padding: '6px 12px',
-    backgroundColor: '#f1f5f9',
-    color: '#475569',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
     cursor: 'pointer',
   },
   // Hero
