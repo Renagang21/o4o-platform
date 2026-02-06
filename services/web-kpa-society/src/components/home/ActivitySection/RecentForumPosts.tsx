@@ -25,7 +25,7 @@ export function RecentForumPosts() {
     <div>
       <div style={styles.header}>
         <h3 style={styles.title}>최근 글</h3>
-        <Link to="/demo/forum" style={styles.moreLink}>더보기</Link>
+        <Link to="/forum" style={styles.moreLink}>더보기</Link>
       </div>
       {posts.length === 0 ? (
         <p style={styles.empty}>자료가 없습니다</p>
@@ -33,7 +33,7 @@ export function RecentForumPosts() {
         <ul style={styles.list}>
           {posts.map((post) => (
             <li key={post.id} style={styles.listItem}>
-              <Link to={`/demo/forum/post/${post.id}`} style={styles.postLink}>
+              <Link to={`/forum/post/${post.id}`} style={styles.postLink}>
                 <span style={styles.category}>{post.categoryName}</span>
                 <span style={styles.postTitle}>{post.title}</span>
               </Link>

@@ -165,6 +165,20 @@ function App() {
            * ========================================================= */}
           <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>} />
 
+          {/* ========================================
+           * 커뮤니티 포럼 (메인 서비스)
+           * WO-KPA-COMMUNITY-FORUM-ROUTES-V1
+           *
+           * / 경로의 커뮤니티 홈에서 접근하는 포럼
+           * /demo/forum과 별도의 URL 구조
+           * ======================================== */}
+          <Route path="/forum" element={<Layout serviceName={SERVICE_NAME}><ForumHomePage /></Layout>} />
+          <Route path="/forum/all" element={<Layout serviceName={SERVICE_NAME}><ForumListPage /></Layout>} />
+          <Route path="/forum/category/:id" element={<Layout serviceName={SERVICE_NAME}><ForumListPage /></Layout>} />
+          <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
+          <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
+          <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
+
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
           <Route path="/test-center" element={<TestCenterPage />} />
 
@@ -303,7 +317,7 @@ function App() {
 
           {/* 그 외 기존 경로들도 /demo로 리다이렉트 */}
           <Route path="/news/*" element={<Navigate to="/demo/news" replace />} />
-          <Route path="/forum/*" element={<Navigate to="/demo/forum" replace />} />
+          {/* /forum/* 은 실제 라우트로 추가됨 (WO-KPA-COMMUNITY-FORUM-ROUTES-V1) */}
           <Route path="/lms/*" element={<Navigate to="/demo/lms" replace />} />
           <Route path="/groupbuy/*" element={<Navigate to="/demo/groupbuy" replace />} />
           <Route path="/docs/*" element={<Navigate to="/demo/docs" replace />} />
