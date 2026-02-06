@@ -1,90 +1,129 @@
 /**
- * BranchServicesPage - 분회 서비스 안내 페이지
+ * BranchServicesPage - 분회 서비스 홈 (허브)
  *
- * WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1: 서비스 단위 진입 중심 구조
- * WO-KPA-SOCIETY-SERVICE-STRUCTURE-BASELINE-V1: 분회 서비스 진입점
+ * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
  *
- * 실제 분회 서비스 안내 및 진입 페이지
- * - 분회별 서비스 선택/안내
- * - 도입 안내
+ * 역할: 여러 분회가 각각 독립적으로 사용하는 분회 서비스의 진입 허브
+ * - 서비스 소개 페이지 ❌
+ * - 데모 통합 페이지 ❌
+ * - 분회 선택 허브 ⭕
+ *
+ * 구조:
+ * - /branch-services : 이 페이지 (허브)
+ * - /branch-services/demo : 분회 서비스 데모
+ * - /branch-services/{branchKey} : 실제 분회 서비스
  */
 
 import { Link } from 'react-router-dom';
-import { Building2, Users, FileText, Calendar, ArrowRight } from 'lucide-react';
+import { ArrowRight, Home } from 'lucide-react';
+import { useAuth } from '../contexts';
+import { useAuthModal } from '../contexts/LoginModalContext';
+
+// 분회 카드 데이터 타입
+interface BranchCard {
+  id: string;
+  name: string;
+  description: string;
+  href: string;
+  isDemo?: boolean;
+}
+
+// 분회 목록 (데모 + 실제 분회들)
+const branches: BranchCard[] = [
+  {
+    id: 'demo',
+    name: '분회 서비스 데모',
+    description: '분회 서비스 예시 화면',
+    href: '/branch-services/demo',
+    isDemo: true,
+  },
+  // 실제 분회들은 여기에 추가
+  // {
+  //   id: 'gangnam',
+  //   name: '강남분회',
+  //   description: '서울특별시 강남구 약사회',
+  //   href: '/branch-services/gangnam',
+  // },
+];
 
 export function BranchServicesPage() {
+  const { user, logout } = useAuth();
+  const { openLoginModal } = useAuthModal();
+
   return (
     <div style={styles.container}>
+      {/* Header */}
+      <header style={styles.header}>
+        <div style={styles.headerContainer}>
+          <Link to="/" style={styles.headerLogo}>
+            <Home style={{ width: 20, height: 20 }} />
+            <span>KPA Platform</span>
+          </Link>
+          <div style={styles.headerRight}>
+            {user ? (
+              <div style={styles.userArea}>
+                <span style={styles.userName}>{user.name || '사용자'}</span>
+                <button onClick={() => logout()} style={styles.logoutButton}>
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <button onClick={openLoginModal} style={styles.loginButton}>
+                로그인
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
       <div style={styles.hero}>
-        <span style={styles.badge}>분회 서비스</span>
-        <h1 style={styles.title}>분회 서비스 안내</h1>
-        <p style={styles.subtitle}>
-          각 분회를 위한 독립적인 운영 서비스입니다.
-          <br />
-          분회별 커뮤니티, 공지사항, 행사 관리 등을 지원합니다.
+        <h1 style={styles.title}>분회 서비스</h1>
+        <p style={styles.mainMessage}>
+          각 분회가 독립적으로 운영하는 전용 서비스입니다
         </p>
+        <p style={styles.subMessage}>
+          공지 · 커뮤니티 · 행사 · 자료를 분회 단위로 운영합니다
+        </p>
+        <Link to="/branch-services/demo" style={styles.ctaButton}>
+          분회 서비스 데모 보기
+          <ArrowRight style={{ width: 18, height: 18 }} />
+        </Link>
       </div>
 
+      {/* 분회 카드 리스트 */}
       <div style={styles.content}>
-        {/* 서비스 기능 소개 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>주요 기능</h2>
-          <div style={styles.featureGrid}>
-            <div style={styles.featureCard}>
-              <Building2 style={styles.featureIcon} />
-              <h3 style={styles.featureTitle}>분회 전용 페이지</h3>
-              <p style={styles.featureDesc}>분회별 독립 공간에서 정보와 소식을 공유합니다.</p>
-            </div>
-            <div style={styles.featureCard}>
-              <Users style={styles.featureIcon} />
-              <h3 style={styles.featureTitle}>회원 관리</h3>
-              <p style={styles.featureDesc}>분회 회원 현황 파악 및 소통 채널을 제공합니다.</p>
-            </div>
-            <div style={styles.featureCard}>
-              <FileText style={styles.featureIcon} />
-              <h3 style={styles.featureTitle}>공지 및 자료</h3>
-              <p style={styles.featureDesc}>공지사항, 회의록, 자료실을 운영합니다.</p>
-            </div>
-            <div style={styles.featureCard}>
-              <Calendar style={styles.featureIcon} />
-              <h3 style={styles.featureTitle}>행사 관리</h3>
-              <p style={styles.featureDesc}>분회 행사 일정을 관리하고 안내합니다.</p>
-            </div>
-          </div>
-        </section>
+        <h2 style={styles.sectionTitle}>분회 선택</h2>
+        <div style={styles.cardGrid}>
+          {branches.map((branch) => (
+            <Link
+              key={branch.id}
+              to={branch.href}
+              style={styles.card}
+            >
+              <div style={styles.cardHeader}>
+                <span style={styles.cardIcon}>🏢</span>
+                {branch.isDemo && (
+                  <span style={styles.demoBadge}>데모</span>
+                )}
+              </div>
+              <h3 style={styles.cardTitle}>{branch.name}</h3>
+              <p style={styles.cardDesc}>{branch.description}</p>
+              <div style={styles.cardFooter}>
+                <span style={styles.cardLink}>
+                  바로가기
+                  <ArrowRight style={{ width: 14, height: 14 }} />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
 
-        {/* 분회 선택 안내 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>분회 서비스 이용</h2>
-          <div style={styles.infoCard}>
-            <p style={styles.infoText}>
-              분회 서비스는 각 지역 약사분회에서 독립적으로 운영됩니다.
-              <br />
-              소속 분회의 서비스 이용은 해당 분회 관리자에게 문의해주세요.
-            </p>
-            <div style={styles.actionButtons}>
-              <Link to="/branch-services/demo" style={styles.secondaryButton}>
-                데모 서비스 체험하기
-                <ArrowRight style={{ width: 16, height: 16 }} />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* 도입 안내 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>도입 문의</h2>
-          <div style={styles.contactCard}>
-            <p style={styles.contactText}>
-              분회 서비스 도입에 관심이 있으신 분회 담당자께서는
-              <br />
-              아래 연락처로 문의해주세요.
-            </p>
-            <div style={styles.contactInfo}>
-              <span>📧 kpa-society@example.com</span>
-            </div>
-          </div>
-        </section>
+        {branches.length === 1 && (
+          <p style={styles.emptyNote}>
+            현재 데모 분회만 이용 가능합니다. 실제 분회 서비스는 순차적으로 오픈됩니다.
+          </p>
+        )}
       </div>
     </div>
   );
@@ -92,129 +131,184 @@ export function BranchServicesPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    minHeight: 'calc(100vh - 70px)',
+    minHeight: '100vh',
     backgroundColor: '#f8fafc',
   },
+  // Header
+  header: {
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e2e8f0',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+  },
+  headerContainer: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '0 20px',
+    height: '64px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerLogo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#0f172a',
+    textDecoration: 'none',
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+  userArea: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  userName: {
+    fontSize: '14px',
+    color: '#475569',
+  },
+  loginButton: {
+    padding: '8px 20px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  logoutButton: {
+    padding: '6px 12px',
+    backgroundColor: '#f1f5f9',
+    color: '#475569',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    cursor: 'pointer',
+  },
+  // Hero
   hero: {
     backgroundColor: '#fff',
-    padding: '48px 20px',
+    padding: '64px 20px',
     textAlign: 'center',
     borderBottom: '1px solid #e2e8f0',
   },
-  badge: {
-    display: 'inline-block',
-    padding: '6px 16px',
-    backgroundColor: '#dbeafe',
-    color: '#1d4ed8',
+  title: {
     fontSize: '14px',
     fontWeight: 600,
-    borderRadius: '20px',
-    marginBottom: '16px',
+    color: '#2563eb',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    margin: '0 0 16px',
   },
-  title: {
-    fontSize: '32px',
+  mainMessage: {
+    fontSize: '28px',
     fontWeight: 700,
     color: '#0f172a',
     margin: '0 0 12px',
+    lineHeight: 1.3,
   },
-  subtitle: {
+  subMessage: {
     fontSize: '16px',
     color: '#64748b',
-    lineHeight: 1.6,
-    margin: 0,
+    margin: '0 0 32px',
   },
+  ctaButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '14px 28px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: 600,
+    borderRadius: '10px',
+    textDecoration: 'none',
+    transition: 'background-color 0.2s',
+  },
+  // Content
   content: {
     maxWidth: '900px',
     margin: '0 auto',
-    padding: '40px 20px',
-  },
-  section: {
-    marginBottom: '40px',
+    padding: '48px 20px',
   },
   sectionTitle: {
     fontSize: '20px',
     fontWeight: 600,
     color: '#1e293b',
-    marginBottom: '20px',
+    marginBottom: '24px',
   },
-  featureGrid: {
+  // Card Grid
+  cardGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '16px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '20px',
   },
-  featureCard: {
+  card: {
+    display: 'block',
     backgroundColor: '#fff',
     padding: '24px',
     borderRadius: '12px',
     border: '1px solid #e2e8f0',
+    textDecoration: 'none',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
   },
-  featureIcon: {
-    width: '32px',
-    height: '32px',
-    color: '#2563eb',
-    marginBottom: '12px',
+  cardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '16px',
   },
-  featureTitle: {
-    fontSize: '16px',
+  cardIcon: {
+    fontSize: '32px',
+  },
+  demoBadge: {
+    padding: '4px 10px',
+    backgroundColor: '#dbeafe',
+    color: '#1d4ed8',
+    fontSize: '12px',
+    fontWeight: 600,
+    borderRadius: '12px',
+  },
+  cardTitle: {
+    fontSize: '18px',
     fontWeight: 600,
     color: '#1e293b',
     margin: '0 0 8px',
   },
-  featureDesc: {
+  cardDesc: {
     fontSize: '14px',
     color: '#64748b',
-    margin: 0,
+    margin: '0 0 16px',
     lineHeight: 1.5,
   },
-  infoCard: {
-    backgroundColor: '#fff',
-    padding: '24px',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
+  cardFooter: {
+    paddingTop: '16px',
+    borderTop: '1px solid #f1f5f9',
   },
-  infoText: {
-    fontSize: '15px',
-    color: '#475569',
-    lineHeight: 1.7,
-    margin: '0 0 20px',
-  },
-  actionButtons: {
-    display: 'flex',
-    gap: '12px',
-    flexWrap: 'wrap',
-  },
-  secondaryButton: {
+  cardLink: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '12px 20px',
+    gap: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#2563eb',
+  },
+  emptyNote: {
+    marginTop: '24px',
+    padding: '16px',
     backgroundColor: '#f1f5f9',
-    color: '#475569',
-    fontSize: '14px',
-    fontWeight: 500,
     borderRadius: '8px',
-    textDecoration: 'none',
-    transition: 'background-color 0.2s',
-  },
-  contactCard: {
-    backgroundColor: '#f0f9ff',
-    padding: '24px',
-    borderRadius: '12px',
-    border: '1px solid #bae6fd',
-  },
-  contactText: {
-    fontSize: '15px',
-    color: '#0c4a6e',
-    lineHeight: 1.7,
-    margin: '0 0 16px',
-  },
-  contactInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
     fontSize: '14px',
-    color: '#0369a1',
-    fontWeight: 500,
+    color: '#64748b',
+    textAlign: 'center',
   },
 };
 
