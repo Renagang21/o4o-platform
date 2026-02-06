@@ -15,27 +15,27 @@ export class AddMembershipTypeToKpaMember20260206200000 implements MigrationInte
     // 1. membership_type 컬럼 추가 (기존 레코드는 'pharmacist')
     await queryRunner.query(`
       ALTER TABLE kpa_members
-      ADD COLUMN membership_type varchar(50) NOT NULL DEFAULT 'pharmacist'
+      ADD COLUMN IF NOT EXISTS membership_type varchar(50) NOT NULL DEFAULT 'pharmacist'
     `);
 
     // 2. university_name 컬럼 추가 (약대생용, nullable)
     await queryRunner.query(`
       ALTER TABLE kpa_members
-      ADD COLUMN university_name varchar(200) NULL
+      ADD COLUMN IF NOT EXISTS university_name varchar(200) NULL
     `);
 
     // 3. student_year 컬럼 추가 (약대생용, nullable)
     await queryRunner.query(`
       ALTER TABLE kpa_members
-      ADD COLUMN student_year integer NULL
+      ADD COLUMN IF NOT EXISTS student_year integer NULL
     `);
 
     console.log('[Migration] Added membership_type, university_name, student_year to kpa_members');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE kpa_members DROP COLUMN student_year`);
-    await queryRunner.query(`ALTER TABLE kpa_members DROP COLUMN university_name`);
-    await queryRunner.query(`ALTER TABLE kpa_members DROP COLUMN membership_type`);
+    await queryRunner.query(`ALTER TABLE kpa_members DROP COLUMN IF EXISTS student_year`);
+    await queryRunner.query(`ALTER TABLE kpa_members DROP COLUMN IF EXISTS university_name`);
+    await queryRunner.query(`ALTER TABLE kpa_members DROP COLUMN IF EXISTS membership_type`);
   }
 }
