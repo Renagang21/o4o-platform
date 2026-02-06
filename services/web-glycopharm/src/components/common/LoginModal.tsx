@@ -1,18 +1,28 @@
 /**
  * LoginModal - GlycoPharm 로그인 모달
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
+ * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
  *
  * 중앙화된 로그인 모달 컴포넌트
  * - 이메일/비밀번호 로그인
  * - 로그인 성공 시 현재 페이지 유지
  * - 비밀번호 찾기/회원가입 링크 제공
+ *
+ * 표준 기능:
+ * - 이메일/비밀번호 입력
+ * - 비밀번호 보기/숨기기 토글
+ * - 이메일 저장 (Remember Me)
+ * - 비밀번호 찾기 링크
+ * - 회원가입 링크
  */
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
+
+const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
 
 export default function LoginModal() {
   const { login } = useAuth();
@@ -21,8 +31,18 @@ export default function LoginModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 저장된 이메일 불러오기
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
 
   if (!isLoginModalOpen) return null;
 
@@ -33,6 +53,14 @@ export default function LoginModal() {
 
     try {
       await login(email, password);
+
+      // 이메일 저장 처리
+      if (rememberEmail) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+
       // 로그인 성공
       setEmail('');
       setPassword('');
@@ -136,6 +164,20 @@ export default function LoginModal() {
                 )}
               </button>
             </div>
+          </div>
+
+          {/* 이메일 저장 체크박스 */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberEmail"
+              checked={rememberEmail}
+              onChange={(e) => setRememberEmail(e.target.checked)}
+              className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500"
+            />
+            <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
+              이메일 저장
+            </label>
           </div>
 
           <button

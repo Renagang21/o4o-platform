@@ -1,17 +1,28 @@
 /**
  * LoginModal - GlucoseView 로그인 모달
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
+ * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
  *
  * 중앙화된 로그인 모달 컴포넌트
  * - Context 기반 상태 관리
  * - 로그인 성공 시 현재 페이지 유지 또는 returnUrl로 이동
  * - 비밀번호 찾기/회원가입 링크 제공
+ *
+ * 표준 기능:
+ * - 이메일/비밀번호 입력
+ * - 비밀번호 보기/숨기기 토글
+ * - 이메일 저장 (Remember Me)
+ * - 비밀번호 찾기 링크
+ * - 회원가입 링크
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
+
+const REMEMBER_EMAIL_KEY = 'glucoseview_remember_email';
 
 export default function LoginModal() {
   const navigate = useNavigate();
@@ -19,8 +30,19 @@ export default function LoginModal() {
   const { isLoginModalOpen, closeLoginModal, returnUrl, onLoginSuccess } = useLoginModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // 저장된 이메일 불러오기
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
 
   if (!isLoginModalOpen) return null;
 
@@ -33,6 +55,13 @@ export default function LoginModal() {
       const result = await login(email, password);
 
       if (result.success) {
+        // 이메일 저장 처리
+        if (rememberEmail) {
+          localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+        } else {
+          localStorage.removeItem(REMEMBER_EMAIL_KEY);
+        }
+
         if (result.message === 'pending') {
           navigate('/pending');
         } else if (result.message === 'rejected') {
@@ -106,14 +135,38 @@ export default function LoginModal() {
             <label className="block text-sm font-medium text-slate-700 mb-1">
               비밀번호
             </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="비밀번호를 입력하세요"
+                required
+                className="w-full px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* 이메일 저장 체크박스 */}
+          <div className="flex items-center">
             <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="비밀번호를 입력하세요"
-              required
-              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              type="checkbox"
+              id="rememberEmail"
+              checked={rememberEmail}
+              onChange={(e) => setRememberEmail(e.target.checked)}
+              className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
             />
+            <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
+              이메일 저장
+            </label>
           </div>
 
           <button

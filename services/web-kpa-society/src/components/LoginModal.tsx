@@ -3,11 +3,19 @@
  *
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1
  * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
+ * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
  *
  * 원칙:
  * - 로그인은 항상 모달로만 수행
  * - 로그인 성공 후 현재 화면 유지 (navigate 없음)
  * - 회원가입 클릭 시 RegisterModal로 전환 (페이지 이동 없음)
+ *
+ * 표준 기능:
+ * - 이메일/비밀번호 입력
+ * - 비밀번호 보기/숨기기 토글
+ * - 이메일 저장 (Remember Me)
+ * - 비밀번호 찾기 링크
+ * - 회원가입 링크
  */
 
 import { useState, useEffect } from 'react';
@@ -15,12 +23,15 @@ import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 
+const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
+
 export default function LoginModal() {
   const { login } = useAuth();
   const { activeModal, closeModal, openRegisterModal, onLoginSuccess } = useAuthModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -41,10 +52,22 @@ export default function LoginModal() {
     };
   }, [isOpen, closeModal]);
 
-  // 모달 열릴 때 입력 초기화
+  // 저장된 이메일 불러오기
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
+
+  // 모달 열릴 때 입력 초기화 (저장된 이메일 유지)
   useEffect(() => {
     if (isOpen) {
-      setEmail('');
+      const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
+      if (!savedEmail) {
+        setEmail('');
+      }
       setPassword('');
       setError(null);
     }
@@ -57,6 +80,13 @@ export default function LoginModal() {
 
     try {
       await login(email, password);
+
+      // 이메일 저장 처리
+      if (rememberEmail) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
 
       // 로그인 성공: 모달 닫고 현재 화면 유지
       closeModal();
@@ -161,6 +191,20 @@ export default function LoginModal() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+            </div>
+
+            {/* 이메일 저장 체크박스 */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="rememberEmail"
+                checked={rememberEmail}
+                onChange={(e) => setRememberEmail(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="rememberEmail" className="ml-2 text-sm text-gray-600">
+                이메일 저장
+              </label>
             </div>
 
             <button
