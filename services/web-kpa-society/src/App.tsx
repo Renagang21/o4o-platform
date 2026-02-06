@@ -74,6 +74,9 @@ import { CommunityHomePage } from './pages/CommunityHomePage';
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
 
+// Branch Services Landing (WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1)
+import { BranchServicesPage } from './pages/BranchServicesPage';
+
 // Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
@@ -164,6 +167,9 @@ function App() {
 
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
           <Route path="/test-center" element={<TestCenterPage />} />
+
+          {/* Branch Services Landing (WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1) */}
+          <Route path="/branch-services" element={<BranchServicesPage />} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<BranchServicePage />} />

@@ -1,9 +1,16 @@
 /**
- * Header - 경기도약사회 스타일
- * 상단 로고 + 메인 네비게이션 + 로그인/회원가입 버튼
+ * Header - KPA Society 메인 네비게이션
  *
- * WO-KPA-DEMO-ROUTE-ISOLATION-V1: /demo 하위로 경로 수정
- * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
+ * WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1: 서비스 단위 진입 중심 구조
+ * WO-KPA-SOCIETY-SERVICE-STRUCTURE-BASELINE-V1: 3개 서비스 구조 기준
+ *
+ * 메뉴 구조 (서비스 진입점 중심):
+ * - 홈: 커뮤니티 서비스 진입점 (Forum 포함)
+ * - 약국경영: 독립 실서비스
+ * - 분회 서비스: 실제 분회 운영 서비스
+ * - 지부/분회 서비스 데모: 데모 서비스 (/demo) - 제거 예정
+ *
+ * 원칙: 상단 메뉴는 서비스 진입점만 노출 (기능 나열 금지)
  */
 
 import { useState } from 'react';
@@ -20,27 +27,21 @@ interface MenuItem {
   children?: { label: string; href: string }[];
 }
 
-// 커뮤니티 홈 기준 메뉴 구조 (4개 항목)
-// WO-KPA-COMMUNITY-HOME-REDESIGN-V1: 메인에 있는 항목은 메뉴에서 제거
-// 교육/자료실/이벤트 → 메인 페이지 커뮤니티 섹션에서 접근
+/**
+ * 메뉴 구조 (WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1)
+ *
+ * 서비스 진입점 중심 (기능 나열 금지)
+ * - 홈: 커뮤니티 서비스 (Forum은 홈에서 접근)
+ * - 약국경영: 독립 실서비스
+ * - 분회 서비스: 실제 분회 운영 서비스
+ * - 지부/분회 서비스 데모: 데모 서비스 (제거 예정)
+ */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
-  { label: '포럼', href: '/demo/forum' },
-  { label: '약사회 서비스', href: '/demo' },
   { label: '약국경영', href: '/pharmacy' },
+  { label: '분회 서비스', href: '/branch-services' },
+  { label: '지부/분회 서비스 데모', href: '/demo' },
 ];
-
-// 관리자 메뉴 (로그인한 관리자에게만 표시)
-const adminMenu: MenuItem = {
-  label: '관리자',
-  href: '/demo/admin',
-  children: [
-    { label: '대시보드', href: '/demo/admin' },
-    { label: '분회 관리', href: '/demo/admin/branches' },
-    { label: '회원 관리', href: '/demo/admin/members' },
-    { label: '공지 관리', href: '/demo/admin/news' },
-  ],
-};
 
 export function Header({ serviceName }: { serviceName: string }) {
   const { user, logout, isLoading } = useAuth();
@@ -54,19 +55,12 @@ export function Header({ serviceName }: { serviceName: string }) {
   const { accessibleOrganizations } = useOrganization();
   const accessibleDashboards = useAccessibleDashboards();
 
-  // 관리자 여부 확인 (admin, district_admin, branch_admin 역할만 관리자 메뉴 표시)
-  const adminRoles = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
-  const isAdmin = user && user.role && adminRoles.includes(user.role);
-
   // 약국경영 메뉴: pharmacy context가 있을 때만 노출
   const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
-  const filteredMenuItems = menuItems.filter(item => {
+  const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/pharmacy') return hasPharmacyContext;
     return true;
   });
-
-  // 메뉴 구성 (관리자인 경우 관리자 메뉴 추가)
-  const displayMenuItems = isAdmin ? [...filteredMenuItems, adminMenu] : filteredMenuItems;
 
   const handleLogout = async () => {
     await logout();
