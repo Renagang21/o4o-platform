@@ -349,7 +349,30 @@ import type { RelatedEntity } from './related.entity.js';
 
 ---
 
-## 17. 최종 원칙
+## 17. KPA Society 구조 기준
+
+> kpa-society 관련 작업(기획, 조사, 개발, 정비)은
+> `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` 문서를 최상위 기준으로 참조한다.
+
+### 핵심 구조
+
+kpa-society.co.kr에는 **3개 서비스**가 공존:
+
+| 서비스 | 상태 | 설명 |
+|--------|------|------|
+| 커뮤니티 서비스 | 유지 | 약사/약대생 커뮤니티 (Forum 포함) |
+| 분회 서비스 | 유지 | 실제 분회 운영 서비스 |
+| 지부/분회 서비스 데모 | 제거 예정 | `/demo` 경로 |
+
+### 준수 규칙
+
+- **라우트 위치 ≠ 서비스 소속**: Forum은 "커뮤니티 서비스"의 기능
+- **상단 메뉴**: 서비스 진입점만 노출 (기능 나열 금지)
+- **혼선 발생 시**: 기준 문서로 즉시 판단
+
+---
+
+## 18. 최종 원칙
 
 > **새 앱을 만들기 전에,
 > "이게 위 기준을 모두 만족하는가?"를 먼저 확인하라.**
@@ -374,9 +397,10 @@ import type { RelatedEntity } from './related.entity.js';
 | **LMS Core** | `docs/platform/lms/` |
 | **Navigation** | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | **Extension** | `docs/platform/extensions/` |
+| **KPA Society 구조** | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
 
 ---
 
-*Updated: 2026-01-20*
-*Version: 4.2*
+*Updated: 2026-02-06*
+*Version: 4.3*
 *Status: Active Constitution*
