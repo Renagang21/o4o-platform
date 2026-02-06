@@ -10,7 +10,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, LogOut, LayoutDashboard } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
 import { useAuth, ROLE_DASHBOARDS, ROLE_LABELS, useLoginModal } from '../contexts';
 
 export default function AccountMenu() {
@@ -97,6 +97,16 @@ export default function AccountMenu() {
 
           {/* 메뉴 항목 */}
           <div className="py-1">
+            {/* 마이페이지 */}
+            <Link
+              to="/my"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Settings className="w-4 h-4 text-gray-500" />
+              마이페이지
+            </Link>
+
             {/* 내 대시보드 - user 역할이 아닌 경우에만 표시 */}
             {user.currentRole !== 'user' && (
               <Link

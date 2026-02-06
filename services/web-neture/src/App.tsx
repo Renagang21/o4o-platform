@@ -87,6 +87,7 @@ import ContactPage from './pages/ContactPage';
 // Neture 고유 페이지 (/workspace)
 // ============================================================================
 import HomePage from './pages/HomePage';
+import MyPage from './pages/MyPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 import SupplierListPage from './pages/suppliers/SupplierListPage';
@@ -294,6 +295,7 @@ function App() {
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
+            <Route path="/my" element={<MyPage />} />
 
             {/* ================================================================
                 o4o 공통 영역 (MainLayout)
