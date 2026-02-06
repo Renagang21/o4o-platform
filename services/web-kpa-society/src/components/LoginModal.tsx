@@ -101,7 +101,15 @@ export default function LoginModal() {
 
       if (err?.response) {
         // 서버 응답이 있는 경우 (4xx, 5xx)
-        errorMessage = err.response.data?.message || err.response.data?.error || `서버 오류 (${err.response.status})`;
+        const serverError = err.response.data?.error || err.response.data?.message;
+        const errorCode = err.response.data?.code;
+
+        // 에러 코드/메시지별 한글화
+        if (errorCode === 'AUTH_REQUIRED' || serverError === 'Invalid credentials') {
+          errorMessage = '비밀번호가 다릅니다.';
+        } else {
+          errorMessage = serverError || `서버 오류 (${err.response.status})`;
+        }
       } else if (err?.request) {
         // 요청이 전송됐지만 응답이 없는 경우 (네트워크 오류)
         errorMessage = '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.';
