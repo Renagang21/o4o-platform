@@ -253,15 +253,25 @@ export function Header({ serviceName }: { serviceName: string }) {
             ) : (
               <>
                 <button
+                  type="button"
                   style={styles.authButton}
-                  onClick={openLoginModal}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openLoginModal();
+                  }}
                   disabled={isLoading}
                 >
                   로그인
                 </button>
                 <button
+                  type="button"
                   style={styles.authButtonOutline}
-                  onClick={openRegisterModal}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openRegisterModal();
+                  }}
                   disabled={isLoading}
                 >
                   회원가입
