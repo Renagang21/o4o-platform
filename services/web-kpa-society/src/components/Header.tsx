@@ -38,10 +38,15 @@ function isSuperOperator(user: UserType | null): boolean {
 /**
  * 사용자 표시 이름 헬퍼
  * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
+ * 단, name이 이메일과 동일한 경우 '운영자' 표시
  */
 function getUserDisplayName(user: UserType | null): string {
   if (!user) return '사용자';
-  return user.name || '사용자';
+  // name이 없거나 이메일과 동일한 경우 '운영자' 표시
+  if (!user.name || user.name === user.email) {
+    return '운영자';
+  }
+  return user.name;
 }
 
 interface MenuItem {
@@ -154,11 +159,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                   }}
                   aria-label="사용자 메뉴"
                 >
-                  {isSuperOperator(user) ? (
-                    <Shield style={{ width: 20, height: 20, color: '#d97706' }} />
-                  ) : (
-                    <User style={{ width: 20, height: 20, color: colors.gray600 }} />
-                  )}
+                  <User style={{ width: 20, height: 20, color: isSuperOperator(user) ? '#d97706' : colors.gray600 }} />
                 </button>
                 {showUserDropdown && (
                   <div style={styles.userDropdown}>
