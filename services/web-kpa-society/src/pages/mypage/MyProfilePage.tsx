@@ -1,12 +1,13 @@
 /**
  * MyProfilePage - 프로필 관리 페이지
  *
- * 조회 모드: 프로필 정보 표시
- * 수정 모드: 정보 수정 가능
+ * API 응답 기반 역할별 프로필 필드 분기:
+ * - Super Operator: 기본정보만 (성/이름, 연락처, 이메일)
+ * - 일반 약사: + 약사면허, 직역, 출신교, 근무처
+ * - 약국개설자: + 약국명, 약국주소
+ * - 지부/분회 임원: + 직책, 소속조직
  *
- * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: 프로필 버그 수정
- * - 프로필 저장 후 AuthContext 상태 자동 갱신
- * - checkAuth() 호출로 user 객체 최신화
+ * WO-KPA-PROFILE-ROLE-BASED-V1: API 데이터 구조 기반 역할별 프로필
  */
 
 import { useState, useEffect } from 'react';
@@ -14,7 +15,6 @@ import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/c
 import { mypageApi } from '../../api';
 import { useAuth, type PharmacistRole } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-import type { User } from '../../types';
 
 const PHARMACIST_ROLE_LABELS: Record<PharmacistRole, string> = {
   general: '일반 약사',
@@ -23,31 +23,51 @@ const PHARMACIST_ROLE_LABELS: Record<PharmacistRole, string> = {
   other: '기타',
 };
 
-interface ProfileData extends User {
-  licenseNumber?: string;
-  university?: string;
-  workplace?: string;
-  phone?: string;
-  avatar?: string;
-}
+const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
+  admin: '관리자',
+  manager: '매니저',
+  chair: '위원장',
+  officer: '위원',
+  member: '회원',
+};
 
 /**
- * Super Operator 감지 헬퍼
- * Super Operator는 약사 관련 프로필 필드를 표시하지 않음
+ * API 응답 타입 정의
  */
-function isSuperOperator(user: User | null): boolean {
-  if (!user) return false;
-  const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
-  const extUser = user as any;
-  if (extUser.isSuperOperator) return true;
-  if (extUser.roles?.some((r: string) => operatorRoles.includes(r))) return true;
-  if (extUser.role && operatorRoles.includes(extUser.role)) return true;
-  return false;
+interface ProfileResponse {
+  id: string;
+  name: string;
+  lastName: string;
+  firstName: string;
+  email: string;
+  phone: string;
+  roles: string[];
+  userType: {
+    isSuperOperator: boolean;
+    isPharmacyOwner: boolean;
+    isOfficer: boolean;
+  };
+  pharmacist: {
+    licenseNumber: string | null;
+    university: string | null;
+    workplace: string | null;
+  } | null;
+  pharmacy: {
+    name: string | null;
+    address: string | null;
+  } | null;
+  organizations: Array<{
+    id: string;
+    name: string;
+    type: string;
+    role: string;
+    position: string | null;
+  }>;
 }
 
 export function MyProfilePage() {
   const { user, setPharmacistRole, checkAuth } = useAuth();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,15 +93,15 @@ export function MyProfilePage() {
       setError(null);
 
       const res = await mypageApi.getProfile();
-      const data = res.data as ProfileData;
+      const data = res.data as ProfileResponse;
       setProfile(data);
       setFormData({
         lastName: data.lastName || '',
         firstName: data.firstName || '',
         phone: data.phone || '',
         email: data.email || '',
-        university: data.university || '',
-        workplace: data.workplace || '',
+        university: data.pharmacist?.university || '',
+        workplace: data.pharmacist?.workplace || '',
         pharmacistRole: user?.pharmacistRole || '',
       });
     } catch (err) {
@@ -96,15 +116,14 @@ export function MyProfilePage() {
   };
 
   const handleCancel = () => {
-    // 원래 데이터로 복원
     if (profile) {
       setFormData({
-        lastName: (profile as any).lastName || '',
-        firstName: (profile as any).firstName || '',
+        lastName: profile.lastName || '',
+        firstName: profile.firstName || '',
         phone: profile.phone || '',
         email: profile.email || '',
-        university: profile.university || '',
-        workplace: profile.workplace || '',
+        university: profile.pharmacist?.university || '',
+        workplace: profile.pharmacist?.workplace || '',
         pharmacistRole: user?.pharmacistRole || '',
       });
     }
@@ -116,18 +135,15 @@ export function MyProfilePage() {
 
     try {
       setSaving(true);
-      // pharmacistRole은 localStorage 기반이므로 API와 분리 저장
       const { pharmacistRole: roleValue, ...apiFormData } = formData;
       await mypageApi.updateProfile(apiFormData);
       if (roleValue) {
         setPharmacistRole(roleValue as PharmacistRole);
       }
-      // 프로필 데이터 업데이트
-      setProfile(prev => prev ? { ...prev, ...apiFormData } : null);
 
-      // WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: AuthContext user 갱신
-      // 프로필 저장 후 checkAuth() 호출로 Header 등에서 최신 이름 표시
+      // AuthContext user 갱신
       await checkAuth();
+      await loadData();
 
       setIsEditMode(false);
       alert('프로필이 저장되었습니다.');
@@ -167,6 +183,14 @@ export function MyProfilePage() {
     );
   }
 
+  // API 응답 기반 사용자 유형 판단
+  const isSuperOperator = profile?.userType?.isSuperOperator ?? false;
+  const isPharmacyOwner = profile?.userType?.isPharmacyOwner ?? false;
+  const isOfficer = profile?.userType?.isOfficer ?? false;
+  const hasPharmacistInfo = profile?.pharmacist !== null;
+  const hasPharmacyInfo = profile?.pharmacy !== null;
+  const hasOrganizations = (profile?.organizations?.length ?? 0) > 0;
+
   return (
     <div style={styles.container}>
       <PageHeader
@@ -182,11 +206,7 @@ export function MyProfilePage() {
         {/* 프로필 사진 영역 */}
         <div style={styles.avatarSection}>
           <div style={styles.avatar}>
-            {profile?.avatar ? (
-              <img src={profile.avatar} alt="프로필" style={styles.avatarImage} />
-            ) : (
-              <span style={styles.avatarIcon}>👤</span>
-            )}
+            <span style={styles.avatarIcon}>👤</span>
           </div>
           {isEditMode && (
             <button type="button" style={styles.avatarButton}>
@@ -198,6 +218,7 @@ export function MyProfilePage() {
         {isEditMode ? (
           /* 수정 모드 */
           <form onSubmit={handleSubmit}>
+            {/* 기본 정보 - 모든 사용자 */}
             <div style={styles.nameRow}>
               <div style={styles.nameField}>
                 <label style={styles.label}>성</label>
@@ -221,15 +242,15 @@ export function MyProfilePage() {
               </div>
             </div>
 
-            {/* 약사 관련 필드 - Super Operator는 표시하지 않음 */}
-            {!isSuperOperator(user) && (
+            {/* 약사 정보 - API에서 pharmacist 데이터가 있는 경우에만 */}
+            {hasPharmacistInfo && (
               <>
                 <div style={styles.field}>
                   <label style={styles.label}>약사면허</label>
                   <input
                     type="text"
                     style={{ ...styles.input, ...styles.inputReadonly }}
-                    value={profile?.licenseNumber || '-'}
+                    value={profile?.pharmacist?.licenseNumber || '-'}
                     disabled
                   />
                   <p style={styles.hint}>약사면허는 수정할 수 없습니다.</p>
@@ -271,6 +292,46 @@ export function MyProfilePage() {
                   />
                 </div>
               </>
+            )}
+
+            {/* 약국 정보 - API에서 pharmacy 데이터가 있는 경우에만 */}
+            {hasPharmacyInfo && (
+              <>
+                <div style={styles.field}>
+                  <label style={styles.label}>약국명</label>
+                  <input
+                    type="text"
+                    style={{ ...styles.input, ...styles.inputReadonly }}
+                    value={profile?.pharmacy?.name || '-'}
+                    disabled
+                  />
+                </div>
+
+                <div style={styles.field}>
+                  <label style={styles.label}>약국주소</label>
+                  <input
+                    type="text"
+                    style={{ ...styles.input, ...styles.inputReadonly }}
+                    value={profile?.pharmacy?.address || '-'}
+                    disabled
+                  />
+                </div>
+              </>
+            )}
+
+            {/* 조직/임원 정보 - API에서 organizations 데이터가 있는 경우에만 */}
+            {hasOrganizations && (
+              <div style={styles.field}>
+                <label style={styles.label}>소속 조직</label>
+                {profile?.organizations.map((org, idx) => (
+                  <div key={org.id || idx} style={styles.orgItem}>
+                    <span>{org.name}</span>
+                    <span style={styles.orgRole}>
+                      {org.position || ORGANIZATION_ROLE_LABELS[org.role] || org.role}
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
 
             <div style={styles.field}>
@@ -316,17 +377,18 @@ export function MyProfilePage() {
         ) : (
           /* 조회 모드 */
           <div style={styles.profileView}>
+            {/* 기본 정보 - 모든 사용자 */}
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>이름</span>
               <span style={styles.infoValue}>{profile?.name || '-'}</span>
             </div>
 
-            {/* 약사 관련 필드 - Super Operator는 표시하지 않음 */}
-            {!isSuperOperator(user) && (
+            {/* 약사 정보 - API에서 pharmacist 데이터가 있는 경우에만 */}
+            {hasPharmacistInfo && (
               <>
                 <div style={styles.infoRow}>
                   <span style={styles.infoLabel}>약사면허</span>
-                  <span style={styles.infoValue}>{profile?.licenseNumber || '-'}</span>
+                  <span style={styles.infoValue}>{profile?.pharmacist?.licenseNumber || '-'}</span>
                 </div>
 
                 <div style={styles.infoRow}>
@@ -338,14 +400,46 @@ export function MyProfilePage() {
 
                 <div style={styles.infoRow}>
                   <span style={styles.infoLabel}>출신교 (대학)</span>
-                  <span style={styles.infoValue}>{profile?.university || '-'}</span>
+                  <span style={styles.infoValue}>{profile?.pharmacist?.university || '-'}</span>
                 </div>
 
                 <div style={styles.infoRow}>
                   <span style={styles.infoLabel}>근무처</span>
-                  <span style={styles.infoValue}>{profile?.workplace || '-'}</span>
+                  <span style={styles.infoValue}>{profile?.pharmacist?.workplace || '-'}</span>
                 </div>
               </>
+            )}
+
+            {/* 약국 정보 - API에서 pharmacy 데이터가 있는 경우에만 */}
+            {hasPharmacyInfo && (
+              <>
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>약국명</span>
+                  <span style={styles.infoValue}>{profile?.pharmacy?.name || '-'}</span>
+                </div>
+
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>약국주소</span>
+                  <span style={styles.infoValue}>{profile?.pharmacy?.address || '-'}</span>
+                </div>
+              </>
+            )}
+
+            {/* 조직/임원 정보 - API에서 organizations 데이터가 있는 경우에만 */}
+            {hasOrganizations && (
+              <div style={styles.infoRow}>
+                <span style={styles.infoLabel}>소속 조직</span>
+                <div style={styles.orgList}>
+                  {profile?.organizations.map((org, idx) => (
+                    <div key={org.id || idx} style={styles.orgItem}>
+                      <span>{org.name}</span>
+                      <span style={styles.orgRole}>
+                        {org.position || ORGANIZATION_ROLE_LABELS[org.role] || org.role}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             <div style={styles.infoRow}>
@@ -412,11 +506,6 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     marginBottom: '12px',
   },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
   avatarIcon: {
     fontSize: '48px',
   },
@@ -436,7 +525,7 @@ const styles: Record<string, React.CSSProperties> = {
   infoRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: '16px 0',
     borderBottom: `1px solid ${colors.neutral100}`,
   },
@@ -444,10 +533,12 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.bodyM,
     color: colors.neutral500,
     fontWeight: 500,
+    minWidth: '120px',
   },
   infoValue: {
     ...typography.bodyM,
     color: colors.neutral900,
+    textAlign: 'right',
   },
   editButtonWrapper: {
     marginTop: '24px',
@@ -545,5 +636,23 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '6px',
     fontSize: '14px',
     cursor: 'pointer',
+  },
+  orgList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  orgItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '8px 12px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '6px',
+  },
+  orgRole: {
+    fontSize: '12px',
+    color: colors.primary,
+    fontWeight: 500,
   },
 };

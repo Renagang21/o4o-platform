@@ -379,17 +379,82 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     // Fetch full user data from database
     const userRepository = dataSource.getRepository('User');
-    const fullUser = await userRepository.findOne({ where: { id: user.id } });
+    const fullUser = await userRepository.findOne({ where: { id: user.id } }) as any;
+
+    // Fetch KpaMember data (pharmacist/pharmacy info)
+    let kpaMember: any = null;
+    try {
+      const kpaMemberRepository = dataSource.getRepository('KpaMember');
+      kpaMember = await kpaMemberRepository.findOne({
+        where: { user_id: user.id },
+        relations: ['organization']
+      });
+    } catch {
+      // KpaMember may not exist for all users
+    }
+
+    // Fetch OrganizationMember data (officer info)
+    let organizationMemberships: any[] = [];
+    try {
+      const orgMemberRepository = dataSource.getRepository('OrganizationMember');
+      organizationMemberships = await orgMemberRepository.find({
+        where: { userId: user.id },
+        relations: ['organization']
+      });
+    } catch {
+      // OrganizationMember may not exist
+    }
+
+    // Determine user type based on roles
+    const roles: string[] = fullUser?.roles || [];
+    const isSuperOperator = roles.some((r: string) =>
+      ['platform:operator', 'platform:admin', 'super_operator'].includes(r)
+    );
+    const isPharmacyOwner = kpaMember?.pharmacy_name ? true : false;
+    const isOfficer = organizationMemberships.some((m: any) =>
+      ['admin', 'manager', 'chair', 'officer'].includes(m.role)
+    );
 
     res.json({
       success: true,
       data: {
+        // Basic info (all users)
         id: fullUser?.id,
         name: fullUser?.name || '',
         lastName: fullUser?.lastName || '',
         firstName: fullUser?.firstName || '',
         email: fullUser?.email || '',
         phone: fullUser?.phone || '',
+        roles: roles,
+
+        // User type flags
+        userType: {
+          isSuperOperator,
+          isPharmacyOwner,
+          isOfficer,
+        },
+
+        // Pharmacist info (약사 정보) - Super Operator가 아닌 경우에만
+        pharmacist: !isSuperOperator ? {
+          licenseNumber: kpaMember?.license_number || null,
+          university: fullUser?.university || null,
+          workplace: fullUser?.workplace || null,
+        } : null,
+
+        // Pharmacy info (약국 정보) - 약국개설자인 경우에만
+        pharmacy: isPharmacyOwner ? {
+          name: kpaMember?.pharmacy_name || null,
+          address: kpaMember?.pharmacy_address || null,
+        } : null,
+
+        // Organization/Officer info (조직/임원 정보)
+        organizations: organizationMemberships.map((m: any) => ({
+          id: m.organization?.id,
+          name: m.organization?.name,
+          type: m.organization?.type,
+          role: m.role,
+          position: m.metadata?.position || null,
+        })),
       }
     });
   }));
