@@ -149,7 +149,7 @@ export default function LoginModal() {
             <span className="text-2xl">🏛️</span>
             <div>
               <h2 className="text-lg font-bold text-gray-900">KPA Society 로그인</h2>
-              <p className="text-xs text-gray-500">약사회 SaaS 플랫폼</p>
+              <p className="text-xs text-gray-500">약사/약대생 커뮤니티</p>
             </div>
           </div>
           <button
