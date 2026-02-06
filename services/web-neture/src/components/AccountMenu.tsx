@@ -94,8 +94,8 @@ export default function AccountMenu() {
   const roleLabel = ROLE_LABELS[user.currentRole] || '사용자';
   const isOperator = isSuperOperator(user);
 
-  // 표시 이름: displayName > name > '운영자' (email fallback 제거)
-  const displayName = (user as any).displayName || user.name || '운영자';
+  // 표시 이름: DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
+  const displayName = user.name || '사용자';
 
   return (
     <div ref={menuRef} className="relative">

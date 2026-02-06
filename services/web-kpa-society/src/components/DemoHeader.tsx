@@ -26,13 +26,11 @@ interface MenuItem {
 
 /**
  * 사용자 표시 이름 헬퍼
- * displayName > name > '운영자' 순서로 fallback
+ * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
  */
 function getUserDisplayName(user: any): string {
   if (!user) return '사용자';
-  if (user.displayName?.trim()) return user.displayName.trim();
-  if (user.name?.trim()) return user.name.trim();
-  return '운영자';
+  return user.name || '사용자';
 }
 
 // Demo 전용 메뉴 구조 (커뮤니티 메뉴 제외)

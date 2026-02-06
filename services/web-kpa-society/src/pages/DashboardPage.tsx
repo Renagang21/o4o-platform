@@ -44,14 +44,11 @@ const positionLabels: Record<string, string> = {
 
 /**
  * 사용자 표시 이름 헬퍼
- * displayName > name > '운영자' 순서로 fallback
+ * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
  */
 function getUserDisplayName(user: TestUser | null): string {
   if (!user) return '사용자';
-  const displayName = (user as any).displayName;
-  if (displayName?.trim()) return displayName.trim();
-  if (user.name?.trim()) return user.name.trim();
-  return '운영자';
+  return user.name || '사용자';
 }
 
 // 임원 전용 Mock 데이터

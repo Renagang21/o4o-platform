@@ -30,8 +30,8 @@ export class User {
   // @IsOptional()
   lastName?: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
-  name?: string;
+  @Column({ type: 'varchar', length: 200, default: '운영자' })
+  name!: string;
 
   // P1-T2: Nickname for forum/public display (separate from real name)
   @Column({ type: 'varchar', length: 100, nullable: true })
@@ -232,25 +232,11 @@ export class User {
   }
 
   /**
-   * UI 표시 전용 이름 (email fallback 금지)
-   * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: 한국식 표시 규칙
-   *
-   * 표시 우선순위:
-   * 1. name (단일 표시명)
-   * 2. lastName + firstName (한국식)
-   * 3. nickname (별명)
-   * 4. '운영자' (최종 fallback - 이름 없는 경우 운영자로 표시)
+   * UI 표시 전용 이름
+   * name 필드는 기본값 '운영자'가 있으므로 항상 값이 존재
    */
   get displayName(): string {
-    // 1. name (단일 표시명)
-    if (this.name?.trim()) return this.name.trim();
-    // 2. 한국식 이름 조합 (성+이름)
-    const koreanName = `${this.lastName || ''}${this.firstName || ''}`.trim();
-    if (koreanName) return koreanName;
-    // 3. nickname
-    if (this.nickname?.trim()) return this.nickname.trim();
-    // 4. 최종 fallback (이름이 없는 경우 운영자로 표시)
-    return '운영자';
+    return this.name;
   }
 
   // Relations - lazy loaded to prevent circular dependencies
