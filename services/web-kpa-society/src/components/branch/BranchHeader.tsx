@@ -16,11 +16,24 @@ interface MenuItem {
 
 /**
  * 사용자 표시 이름 헬퍼
- * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
+ * 우선순위: lastName+firstName > name(이메일 아닌 경우) > '운영자'
  */
 function getUserDisplayName(user: any): string {
   if (!user) return '사용자';
-  return user.name || '사용자';
+
+  // Priority 1: lastName + firstName (한국어 이름)
+  if (user.lastName || user.firstName) {
+    const fullName = `${user.lastName || ''}${user.firstName || ''}`.trim();
+    if (fullName) return fullName;
+  }
+
+  // Priority 2: name (이메일/아이디가 아닌 경우)
+  if (user.name && user.name !== user.email) {
+    return user.name;
+  }
+
+  // Priority 3: 운영자용 기본값
+  return '운영자';
 }
 
 // 분회용 메뉴 구조

@@ -26,11 +26,25 @@ interface MenuItem {
 
 /**
  * 사용자 표시 이름 헬퍼
- * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
+ * 우선순위: lastName+firstName > name > '운영자'
+ * name이 이메일과 동일한 경우 '운영자' 표시
  */
 function getUserDisplayName(user: any): string {
   if (!user) return '사용자';
-  return user.name || '사용자';
+
+  // 1. lastName + firstName 조합 시도
+  if (user.lastName || user.firstName) {
+    const fullName = `${user.lastName || ''}${user.firstName || ''}`.trim();
+    if (fullName) return fullName;
+  }
+
+  // 2. name 필드 사용 (이메일과 다른 경우에만)
+  if (user.name && user.name !== user.email) {
+    return user.name;
+  }
+
+  // 3. 기본값
+  return '운영자';
 }
 
 // Demo 전용 메뉴 구조 (커뮤니티 메뉴 제외)
