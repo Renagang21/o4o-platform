@@ -1,5 +1,7 @@
 /**
- * NewsDetailPage - 공지/뉴스 상세 페이지
+ * NewsDetailPage - 콘텐츠 상세 페이지
+ *
+ * APP-CONTENT Phase 1: 출처 배지, CMS 타입 라벨
  */
 
 import { useState, useEffect } from 'react';
@@ -9,13 +11,26 @@ import { newsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 import type { Notice } from '../../types';
 
-type NoticeType = 'notice' | 'branch-news' | 'kpa-news' | 'press';
+// APP-CONTENT: CMS content types (aligned with DB)
+type ContentType = 'notice' | 'hero' | 'promo' | 'news';
 
-const typeLabels: Record<NoticeType, string> = {
+const typeLabels: Record<ContentType, string> = {
   notice: '공지사항',
-  'branch-news': '지부/분회 소식',
-  'kpa-news': '전체 약사회 소식',
-  press: '보도자료',
+  hero: '배너',
+  promo: '혜택/쿠폰',
+  news: '뉴스',
+};
+
+// APP-CONTENT: source badge colors per spec
+const sourceColors: Record<string, string> = {
+  operator: '#1a5276',
+  supplier: '#6c3483',
+  pharmacist: '#1e8449',
+};
+const sourceLabels: Record<string, string> = {
+  operator: '운영자',
+  supplier: '공급자',
+  pharmacist: '사용자',
 };
 
 export function NewsDetailPage() {
@@ -72,28 +87,49 @@ export function NewsDetailPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '공지/소식', href: '/news' },
-          { label: typeLabels[notice.type as NoticeType], href: `/news/${notice.type}` },
+          { label: '콘텐츠', href: '/news' },
+          ...(notice.type && typeLabels[notice.type as ContentType]
+            ? [{ label: typeLabels[notice.type as ContentType], href: `/news/${notice.type}` }]
+            : []),
         ]}
       />
 
       <Card padding="large">
         <div style={styles.header}>
           {notice.isPinned && <span style={styles.pinnedBadge}>중요</span>}
-          <span style={styles.typeBadge}>{typeLabels[notice.type as NoticeType]}</span>
+          {notice.type && typeLabels[notice.type as ContentType] && (
+            <span style={styles.typeBadge}>{typeLabels[notice.type as ContentType]}</span>
+          )}
+          {notice.metadata?.creatorType && sourceLabels[notice.metadata.creatorType] && (
+            <span style={{
+              ...styles.sourceBadge,
+              backgroundColor: sourceColors[notice.metadata.creatorType] || colors.neutral500,
+            }}>
+              {sourceLabels[notice.metadata.creatorType]}
+            </span>
+          )}
+          {notice.metadata?.category && (
+            <span style={styles.categoryBadge}>{notice.metadata.category}</span>
+          )}
         </div>
 
         <h1 style={styles.title}>{notice.title}</h1>
 
         <div style={styles.meta}>
-          <span style={styles.author}>{notice.authorName}</span>
-          <span style={styles.separator}>·</span>
-          <span>{new Date(notice.createdAt).toLocaleString()}</span>
-          <span style={styles.separator}>·</span>
-          <span>조회 {notice.viewCount}</span>
+          {(notice.metadata?.supplierName || notice.metadata?.pharmacyName) && (
+            <>
+              <span style={styles.author}>{notice.metadata?.supplierName || notice.metadata?.pharmacyName}</span>
+              <span style={styles.separator}>·</span>
+            </>
+          )}
+          <span>{new Date(notice.publishedAt || notice.createdAt).toLocaleString()}</span>
         </div>
 
-        <div style={styles.content} dangerouslySetInnerHTML={{ __html: notice.content }} />
+        {notice.summary && (
+          <p style={styles.summary}>{notice.summary}</p>
+        )}
+
+        <div style={styles.content} dangerouslySetInnerHTML={{ __html: notice.body || notice.content }} />
 
         {/* 첨부파일 */}
         {notice.attachments && notice.attachments.length > 0 && (
@@ -119,7 +155,7 @@ export function NewsDetailPage() {
       </Card>
 
       <div style={styles.footer}>
-        <Link to={`/news/${notice.type}`} style={styles.backButton}>
+        <Link to={notice.type ? `/news/${notice.type}` : '/news'} style={styles.backButton}>
           목록으로
         </Link>
       </div>
@@ -153,6 +189,20 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
     fontSize: '13px',
   },
+  sourceBadge: {
+    padding: '4px 12px',
+    color: colors.white,
+    borderRadius: '4px',
+    fontSize: '13px',
+    fontWeight: 500,
+  },
+  categoryBadge: {
+    padding: '4px 12px',
+    backgroundColor: colors.neutral50,
+    color: colors.neutral500,
+    borderRadius: '4px',
+    fontSize: '12px',
+  },
   title: {
     ...typography.headingXL,
     color: colors.neutral900,
@@ -175,6 +225,16 @@ const styles: Record<string, React.CSSProperties> = {
   },
   separator: {
     color: colors.neutral300,
+  },
+  summary: {
+    ...typography.bodyL,
+    color: colors.neutral600,
+    margin: 0,
+    marginBottom: '24px',
+    padding: '16px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '6px',
+    lineHeight: 1.6,
   },
   content: {
     ...typography.bodyL,

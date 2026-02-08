@@ -8,10 +8,12 @@ import { apiClient } from './client';
 
 interface HomeNotice {
   id: string;
+  type?: string;
   title: string;
   summary: string | null;
   imageUrl: string | null;
   isPinned: boolean;
+  metadata?: Record<string, any>;
   publishedAt: string | null;
   createdAt: string;
 }
@@ -26,10 +28,12 @@ interface HomeForumPost {
 
 interface HomeFeatured {
   id: string;
+  type?: string;
   title: string;
   summary: string | null;
   imageUrl: string | null;
   linkUrl: string | null;
+  metadata?: Record<string, any>;
   createdAt: string;
 }
 

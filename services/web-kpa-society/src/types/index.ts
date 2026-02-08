@@ -171,21 +171,36 @@ export interface GroupbuyParticipation {
   participatedAt: string;
 }
 
-// 공지사항/뉴스
+// 공지사항/뉴스 (APP-CONTENT Phase 1: CMS content types)
 export interface Notice {
   id: string;
   title: string;
   content: string;
+  summary?: string;
   excerpt?: string;
-  authorId: string;
-  authorName: string;
-  author: string; // alias for authorName
-  type: 'notice' | 'branch-news' | 'kpa-news' | 'press';
+  body?: string;
+  authorId?: string;
+  authorName?: string;
+  author?: string;
+  type: 'notice' | 'news' | 'hero' | 'promo' | 'featured' | 'event';
   isPinned: boolean;
-  isImportant: boolean; // alias for isPinned
-  viewCount: number;
-  views: number; // alias for viewCount
+  isImportant?: boolean;
+  isOperatorPicked?: boolean;
+  viewCount?: number;
+  views?: number;
+  imageUrl?: string | null;
+  linkUrl?: string | null;
+  linkText?: string | null;
+  metadata?: {
+    creatorType?: 'operator' | 'supplier' | 'pharmacist';
+    backgroundColor?: string;
+    category?: string;
+    supplierName?: string;
+    pharmacyName?: string;
+    [key: string]: any;
+  };
   attachments?: Attachment[];
+  publishedAt?: string;
   createdAt: string;
 }
 

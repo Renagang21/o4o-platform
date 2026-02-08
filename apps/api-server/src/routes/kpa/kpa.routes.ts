@@ -287,10 +287,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       success: true,
       data: notices.map(n => ({
         id: n.id,
+        type: n.type,
         title: n.title,
         summary: n.summary,
         imageUrl: n.imageUrl,
         isPinned: n.isPinned,
+        metadata: n.metadata,
         publishedAt: n.publishedAt,
         createdAt: n.createdAt,
       })),
@@ -327,10 +329,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         posts,
         featured: featured.map(f => ({
           id: f.id,
+          type: f.type,
           title: f.title,
           summary: f.summary,
           imageUrl: f.imageUrl,
           linkUrl: f.linkUrl,
+          metadata: f.metadata,
           createdAt: f.createdAt,
         })),
       },
@@ -376,6 +380,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const type = req.query.type as string;
+    const sort = (req.query.sort as string) || 'latest';
 
     const contentRepo = dataSource.getRepository(CmsContent);
     const where: any = { serviceKey: In(['kpa', 'kpa-society']), status: 'published' };
@@ -385,9 +390,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       where.type = In(['notice', 'news', 'hero', 'promo']);
     }
 
+    // APP-CONTENT Phase 1: sort parameter support
+    let order: any;
+    switch (sort) {
+      case 'featured': order = { isPinned: 'DESC', isOperatorPicked: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' }; break;
+      default:         order = { isPinned: 'DESC', createdAt: 'DESC' }; // latest, views (viewCount TBD)
+    }
+
     const [data, total] = await contentRepo.findAndCount({
       where,
-      order: { isPinned: 'DESC', createdAt: 'DESC' },
+      order,
       take: limit,
       skip: (page - 1) * limit,
     });
@@ -402,6 +414,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         imageUrl: c.imageUrl,
         linkUrl: c.linkUrl,
         isPinned: c.isPinned,
+        isOperatorPicked: c.isOperatorPicked,
+        metadata: c.metadata,
         publishedAt: c.publishedAt,
         createdAt: c.createdAt,
       })),
@@ -424,7 +438,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   newsRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const contentRepo = dataSource.getRepository(CmsContent);
     const content = await contentRepo.findOne({
-      where: { id: req.params.id, serviceKey: 'kpa-society' },
+      where: { id: req.params.id, serviceKey: In(['kpa', 'kpa-society']) },
     });
     if (!content) {
       res.status(404).json({ success: false, error: { message: 'News not found' } });
@@ -442,6 +456,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         linkUrl: content.linkUrl,
         linkText: content.linkText,
         isPinned: content.isPinned,
+        isOperatorPicked: content.isOperatorPicked,
+        metadata: content.metadata,
         publishedAt: content.publishedAt,
         createdAt: content.createdAt,
       },

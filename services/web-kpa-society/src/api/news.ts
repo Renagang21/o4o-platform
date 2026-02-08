@@ -11,12 +11,13 @@ import type {
 } from '../types';
 
 export const newsApi = {
-  // 공지사항/뉴스
+  // 공지사항/뉴스 (APP-CONTENT Phase 1: sort support)
   getNotices: (params?: {
-    type?: 'notice' | 'branch-news' | 'kpa-news' | 'press';
+    type?: string;
     page?: number;
     limit?: number;
     search?: string;
+    sort?: 'latest' | 'featured' | 'views';
   }) =>
     apiClient.get<PaginatedResponse<Notice>>('/news', params),
 
