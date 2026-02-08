@@ -1,7 +1,7 @@
 /**
  * NewsDetailPage - 콘텐츠 상세 페이지
  *
- * APP-CONTENT Phase 1: 출처 배지, CMS 타입 라벨
+ * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
  */
 
 import { useState, useEffect } from 'react';
@@ -9,29 +9,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { newsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
+import {
+  CONTENT_TYPE_LABELS,
+  CONTENT_SOURCE_COLORS,
+  CONTENT_SOURCE_LABELS,
+} from '@o4o/types/content';
+import type { ContentType } from '@o4o/types/content';
 import type { Notice } from '../../types';
-
-// APP-CONTENT: CMS content types (aligned with DB)
-type ContentType = 'notice' | 'hero' | 'promo' | 'news';
-
-const typeLabels: Record<ContentType, string> = {
-  notice: '공지사항',
-  hero: '배너',
-  promo: '혜택/쿠폰',
-  news: '뉴스',
-};
-
-// APP-CONTENT: source badge colors per spec
-const sourceColors: Record<string, string> = {
-  operator: '#1a5276',
-  supplier: '#6c3483',
-  pharmacist: '#1e8449',
-};
-const sourceLabels: Record<string, string> = {
-  operator: '운영자',
-  supplier: '공급자',
-  pharmacist: '사용자',
-};
 
 export function NewsDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -88,8 +72,8 @@ export function NewsDetailPage() {
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '콘텐츠', href: '/news' },
-          ...(notice.type && typeLabels[notice.type as ContentType]
-            ? [{ label: typeLabels[notice.type as ContentType], href: `/news/${notice.type}` }]
+          ...(notice.type && CONTENT_TYPE_LABELS[notice.type as ContentType]
+            ? [{ label: CONTENT_TYPE_LABELS[notice.type as ContentType], href: `/news/${notice.type}` }]
             : []),
         ]}
       />
@@ -97,15 +81,15 @@ export function NewsDetailPage() {
       <Card padding="large">
         <div style={styles.header}>
           {notice.isPinned && <span style={styles.pinnedBadge}>중요</span>}
-          {notice.type && typeLabels[notice.type as ContentType] && (
-            <span style={styles.typeBadge}>{typeLabels[notice.type as ContentType]}</span>
+          {notice.type && CONTENT_TYPE_LABELS[notice.type as ContentType] && (
+            <span style={styles.typeBadge}>{CONTENT_TYPE_LABELS[notice.type as ContentType]}</span>
           )}
-          {notice.metadata?.creatorType && sourceLabels[notice.metadata.creatorType] && (
+          {notice.metadata?.creatorType && CONTENT_SOURCE_LABELS[notice.metadata.creatorType] && (
             <span style={{
               ...styles.sourceBadge,
-              backgroundColor: sourceColors[notice.metadata.creatorType] || colors.neutral500,
+              backgroundColor: CONTENT_SOURCE_COLORS[notice.metadata.creatorType] || colors.neutral500,
             }}>
-              {sourceLabels[notice.metadata.creatorType]}
+              {CONTENT_SOURCE_LABELS[notice.metadata.creatorType]}
             </span>
           )}
           {notice.metadata?.category && (

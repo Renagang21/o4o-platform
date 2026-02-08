@@ -21,8 +21,8 @@
  */
 
 import { Router, RequestHandler, Request, Response } from 'express';
-import { DataSource, In } from 'typeorm';
-import { CmsContent } from '@o4o-apps/cms-core';
+import { DataSource } from 'typeorm';
+import { ContentQueryService } from '../../modules/content/index.js';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
@@ -139,6 +139,12 @@ function requireKpaScope(scope: string): RequestHandler {
  */
 export function createKpaRoutes(dataSource: DataSource): Router {
   const router = Router();
+
+  // APP-CONTENT Phase 2: shared content query service
+  const contentService = new ContentQueryService(dataSource, {
+    serviceKeys: ['kpa', 'kpa-society'],
+    defaultTypes: ['notice', 'news', 'hero', 'promo'],
+  });
 
   // Mount controllers with auth middleware
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
@@ -274,29 +280,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const homeRouter = Router();
 
-  // GET /home/notices - 공지사항 (cms_contents type=notice|hero)
+  // GET /home/notices - 공지사항 (APP-CONTENT Phase 2: ContentQueryService)
   homeRouter.get('/notices', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 5;
-    const contentRepo = dataSource.getRepository(CmsContent);
-    const notices = await contentRepo.find({
-      where: { serviceKey: In(['kpa', 'kpa-society']), type: In(['notice', 'hero']) as any, status: 'published' as any },
-      order: { isPinned: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
-      take: limit,
-    });
-    res.json({
-      success: true,
-      data: notices.map(n => ({
-        id: n.id,
-        type: n.type,
-        title: n.title,
-        summary: n.summary,
-        imageUrl: n.imageUrl,
-        isPinned: n.isPinned,
-        metadata: n.metadata,
-        publishedAt: n.publishedAt,
-        createdAt: n.createdAt,
-      })),
-    });
+    const data = await contentService.listForHome(['notice', 'hero'], limit);
+    res.json({ success: true, data });
   }));
 
   // GET /home/community - 포럼 최근글 + featured 콘텐츠
@@ -315,29 +303,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       LIMIT $1
     `, [postLimit]);
 
-    // Featured content
-    const contentRepo = dataSource.getRepository(CmsContent);
-    const featured = await contentRepo.find({
-      where: { serviceKey: In(['kpa', 'kpa-society']), type: In(['featured', 'promo']) as any, status: 'published' as any },
-      order: { isOperatorPicked: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
-      take: featuredLimit,
-    });
+    // Featured content (APP-CONTENT Phase 2: ContentQueryService)
+    const featured = await contentService.listFeatured(['featured', 'promo'], featuredLimit);
 
     res.json({
       success: true,
-      data: {
-        posts,
-        featured: featured.map(f => ({
-          id: f.id,
-          type: f.type,
-          title: f.title,
-          summary: f.summary,
-          imageUrl: f.imageUrl,
-          linkUrl: f.linkUrl,
-          metadata: f.metadata,
-          createdAt: f.createdAt,
-        })),
-      },
+      data: { posts, featured },
     });
   }));
 
@@ -376,51 +347,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const newsRouter = Router();
 
+  // APP-CONTENT Phase 2: ContentQueryService
   newsRouter.get('/', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const type = req.query.type as string;
-    const sort = (req.query.sort as string) || 'latest';
-
-    const contentRepo = dataSource.getRepository(CmsContent);
-    const where: any = { serviceKey: In(['kpa', 'kpa-society']), status: 'published' };
-    if (type) {
-      where.type = type;
-    } else {
-      where.type = In(['notice', 'news', 'hero', 'promo']);
-    }
-
-    // APP-CONTENT Phase 1: sort parameter support
-    let order: any;
-    switch (sort) {
-      case 'featured': order = { isPinned: 'DESC', isOperatorPicked: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' }; break;
-      default:         order = { isPinned: 'DESC', createdAt: 'DESC' }; // latest, views (viewCount TBD)
-    }
-
-    const [data, total] = await contentRepo.findAndCount({
-      where,
-      order,
-      take: limit,
-      skip: (page - 1) * limit,
+    const result = await contentService.listPublished({
+      type: req.query.type as string,
+      sort: (req.query.sort as string) as any || 'latest',
+      page: parseInt(req.query.page as string) || 1,
+      limit: parseInt(req.query.limit as string) || 20,
     });
-
-    res.json({
-      success: true,
-      data: data.map(c => ({
-        id: c.id,
-        type: c.type,
-        title: c.title,
-        summary: c.summary,
-        imageUrl: c.imageUrl,
-        linkUrl: c.linkUrl,
-        isPinned: c.isPinned,
-        isOperatorPicked: c.isOperatorPicked,
-        metadata: c.metadata,
-        publishedAt: c.publishedAt,
-        createdAt: c.createdAt,
-      })),
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    res.json({ success: true, ...result });
   }));
 
   // Static routes must be defined before dynamic :id route
@@ -435,33 +370,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     });
   });
 
+  // APP-CONTENT Phase 2: ContentQueryService
   newsRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const contentRepo = dataSource.getRepository(CmsContent);
-    const content = await contentRepo.findOne({
-      where: { id: req.params.id, serviceKey: In(['kpa', 'kpa-society']) },
-    });
+    const content = await contentService.getById(req.params.id);
     if (!content) {
       res.status(404).json({ success: false, error: { message: 'News not found' } });
       return;
     }
-    res.json({
-      success: true,
-      data: {
-        id: content.id,
-        type: content.type,
-        title: content.title,
-        summary: content.summary,
-        body: content.body,
-        imageUrl: content.imageUrl,
-        linkUrl: content.linkUrl,
-        linkText: content.linkText,
-        isPinned: content.isPinned,
-        isOperatorPicked: content.isOperatorPicked,
-        metadata: content.metadata,
-        publishedAt: content.publishedAt,
-        createdAt: content.createdAt,
-      },
-    });
+    res.json({ success: true, data: content });
   }));
 
   router.use('/news', newsRouter);

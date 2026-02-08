@@ -17,6 +17,7 @@
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { NetureService } from '../../../modules/neture/neture.service.js';
+import { ContentQueryService } from '../../../modules/content/index.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import logger from '../../../utils/logger.js';
@@ -28,6 +29,12 @@ import { isServiceAdmin, logLegacyRoleUsage } from '../../../utils/role.utils.js
 export function createNetureController(dataSource: DataSource): Router {
   const router = Router();
   const service = new NetureService();
+
+  // APP-CONTENT Phase 2: shared content query service
+  const contentService = new ContentQueryService(dataSource, {
+    serviceKeys: ['neture'],
+    defaultTypes: ['notice', 'news', 'hero'],
+  });
 
   // ============================================================================
   // PUBLIC ENDPOINTS (No Auth Required - Public Information Platform)
@@ -94,6 +101,50 @@ export function createNetureController(dataSource: DataSource): Router {
       });
     }
   });
+
+  // ============================================================================
+  // CONTENT ENDPOINTS (APP-CONTENT Phase 2: ContentQueryService)
+  // ============================================================================
+
+  /**
+   * GET /content
+   * List published content with sort/filter/pagination
+   */
+  router.get('/content', async (req: Request, res: Response) => {
+    try {
+      const result = await contentService.listPublished({
+        type: req.query.type as string,
+        sort: (req.query.sort as string) as any || 'latest',
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+      });
+      res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching content:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch content' });
+    }
+  });
+
+  /**
+   * GET /content/:id
+   * Get content detail by ID
+   */
+  router.get('/content/:id', async (req: Request, res: Response) => {
+    try {
+      const content = await contentService.getById(req.params.id);
+      if (!content) {
+        return res.status(404).json({ success: false, error: { message: 'Content not found' } });
+      }
+      res.json({ success: true, data: content });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching content detail:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch content detail' });
+    }
+  });
+
+  // ============================================================================
+  // PARTNERSHIP ENDPOINTS
+  // ============================================================================
 
   /**
    * GET /partnership/requests

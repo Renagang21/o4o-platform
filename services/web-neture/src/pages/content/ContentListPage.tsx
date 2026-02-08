@@ -1,25 +1,32 @@
 /**
  * ContentListPage - 콘텐츠 목록 페이지
  *
- * WO-NETURE-SMOKE-STABILIZATION-V1
- * - CMS API에서 serviceKey=neture 콘텐츠 조회
+ * APP-CONTENT Phase 2: @o4o/types/content 공유 상수, 정렬 토글, 출처 배지
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, FileText, Bell } from 'lucide-react';
 import { cmsApi, type CmsContent } from '../../lib/api';
+import {
+  CONTENT_TYPE_LABELS,
+  CONTENT_SORT_LABELS,
+  CONTENT_SOURCE_COLORS,
+  CONTENT_SOURCE_LABELS,
+} from '@o4o/types/content';
+import type { ContentSortType, ContentSourceType } from '@o4o/types/content';
 
 export default function ContentListPage() {
   const [contents, setContents] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<ContentSortType>('latest');
 
   useEffect(() => {
     const fetchContents = async () => {
       try {
         setLoading(true);
-        const data = await cmsApi.getContents();
+        const data = await cmsApi.getContents({ sort });
         setContents(data);
       } catch (err) {
         setError((err as Error).message);
@@ -29,7 +36,7 @@ export default function ContentListPage() {
     };
 
     fetchContents();
-  }, []);
+  }, [sort]);
 
   if (loading) {
     return (
@@ -57,16 +64,7 @@ export default function ContentListPage() {
   };
 
   const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'notice':
-        return '공지';
-      case 'hero':
-        return '메인';
-      case 'news':
-        return '뉴스';
-      default:
-        return type;
-    }
+    return CONTENT_TYPE_LABELS[type as keyof typeof CONTENT_TYPE_LABELS] || type;
   };
 
   return (
@@ -77,6 +75,21 @@ export default function ContentListPage() {
         <p className="text-lg text-gray-600">
           네뚜레 플랫폼의 공지사항과 가이드를 확인하세요
         </p>
+      </div>
+
+      {/* 정렬 토글 (APP-CONTENT Phase 2) */}
+      <div className="flex gap-2 mb-6">
+        {(['latest', 'featured', 'views'] as ContentSortType[]).map(s => (
+          <button
+            key={s}
+            className={sort === s
+              ? 'px-4 py-1.5 rounded-full text-sm bg-primary-600 text-white font-medium'
+              : 'px-4 py-1.5 rounded-full text-sm border border-gray-200 text-gray-600 hover:border-gray-300'}
+            onClick={() => setSort(s)}
+          >
+            {CONTENT_SORT_LABELS[s]}
+          </button>
+        ))}
       </div>
 
       {/* Content List */}
@@ -101,13 +114,27 @@ export default function ContentListPage() {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
                       {getTypeLabel(content.type)}
                     </span>
                     {content.isPinned && (
                       <span className="inline-block px-2 py-1 text-xs bg-primary-100 text-primary-700 rounded">
                         중요
+                      </span>
+                    )}
+                    {/* 출처 배지 (APP-CONTENT Phase 2) */}
+                    {content.metadata?.creatorType && CONTENT_SOURCE_LABELS[content.metadata.creatorType as ContentSourceType] && (
+                      <span
+                        className="inline-block px-2 py-1 text-xs text-white rounded font-medium"
+                        style={{ backgroundColor: CONTENT_SOURCE_COLORS[content.metadata.creatorType as ContentSourceType] }}
+                      >
+                        {CONTENT_SOURCE_LABELS[content.metadata.creatorType as ContentSourceType]}
+                      </span>
+                    )}
+                    {content.metadata?.category && (
+                      <span className="inline-block px-2 py-1 text-xs bg-gray-50 text-gray-500 rounded">
+                        {content.metadata.category}
                       </span>
                     )}
                   </div>
@@ -118,11 +145,16 @@ export default function ContentListPage() {
                     <p className="text-sm text-gray-600 line-clamp-2">{content.summary}</p>
                   )}
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {content.publishedAt
-                        ? new Date(content.publishedAt).toLocaleDateString('ko-KR')
-                        : new Date(content.createdAt).toLocaleDateString('ko-KR')}
-                    </span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      {content.metadata?.supplierName && (
+                        <span>{content.metadata.supplierName}</span>
+                      )}
+                      <span>
+                        {content.publishedAt
+                          ? new Date(content.publishedAt).toLocaleDateString('ko-KR')
+                          : new Date(content.createdAt).toLocaleDateString('ko-KR')}
+                      </span>
+                    </div>
                     <span className="inline-flex items-center text-primary-600 text-sm font-medium">
                       자세히 보기
                       <ArrowRight className="ml-1 w-4 h-4" />

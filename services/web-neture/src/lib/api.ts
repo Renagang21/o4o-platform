@@ -464,15 +464,27 @@ export const partnerDashboardApi = {
   },
 };
 
-// CMS Content API
+// CMS Content API (APP-CONTENT Phase 2: uses /api/v1/neture/content)
 export const cmsApi = {
   /**
-   * GET /api/v1/cms/contents?serviceKey=neture
+   * GET /api/v1/neture/content
+   * APP-CONTENT Phase 2: standardized content API with sort/filter/pagination
    */
-  async getContents(): Promise<CmsContent[]> {
+  async getContents(params?: {
+    type?: string;
+    sort?: 'latest' | 'featured' | 'views';
+    page?: number;
+    limit?: number;
+  }): Promise<CmsContent[]> {
     try {
+      const searchParams = new URLSearchParams();
+      if (params?.type) searchParams.append('type', params.type);
+      if (params?.sort) searchParams.append('sort', params.sort);
+      if (params?.page) searchParams.append('page', String(params.page));
+      if (params?.limit) searchParams.append('limit', String(params.limit));
+      const qs = searchParams.toString();
       const response = await fetch(
-        `${API_BASE_URL}/api/v1/cms/contents?serviceKey=neture&status=published`
+        `${API_BASE_URL}/api/v1/neture/content${qs ? `?${qs}` : ''}`
       );
       if (!response.ok) {
         console.warn('[CMS API] Contents API not available, returning empty array');
@@ -487,10 +499,10 @@ export const cmsApi = {
   },
 
   /**
-   * GET /api/v1/cms/contents/:id
+   * GET /api/v1/neture/content/:id
    */
   async getContentById(id: string): Promise<CmsContent> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/cms/contents/${id}`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/neture/content/${id}`);
     if (!response.ok) {
       throw new Error('Failed to fetch content detail');
     }
@@ -511,7 +523,9 @@ interface CmsContent {
   status: string;
   publishedAt: string | null;
   isPinned: boolean;
+  isOperatorPicked?: boolean;
   sortOrder: number;
+  metadata?: Record<string, any> | null;
   createdAt: string;
 }
 

@@ -171,7 +171,10 @@ export interface GroupbuyParticipation {
   participatedAt: string;
 }
 
-// 공지사항/뉴스 (APP-CONTENT Phase 1: CMS content types)
+// 공지사항/뉴스 (APP-CONTENT Phase 2: shared types from @o4o/types/content)
+import type { ContentType, ContentMetadata, ContentSourceType, ContentSortType } from '@o4o/types/content';
+export type { ContentType, ContentMetadata, ContentSourceType, ContentSortType };
+
 export interface Notice {
   id: string;
   title: string;
@@ -182,7 +185,7 @@ export interface Notice {
   authorId?: string;
   authorName?: string;
   author?: string;
-  type: 'notice' | 'news' | 'hero' | 'promo' | 'featured' | 'event';
+  type: ContentType;
   isPinned: boolean;
   isImportant?: boolean;
   isOperatorPicked?: boolean;
@@ -191,14 +194,7 @@ export interface Notice {
   imageUrl?: string | null;
   linkUrl?: string | null;
   linkText?: string | null;
-  metadata?: {
-    creatorType?: 'operator' | 'supplier' | 'pharmacist';
-    backgroundColor?: string;
-    category?: string;
-    supplierName?: string;
-    pharmacyName?: string;
-    [key: string]: any;
-  };
+  metadata?: ContentMetadata;
   attachments?: Attachment[];
   publishedAt?: string;
   createdAt: string;

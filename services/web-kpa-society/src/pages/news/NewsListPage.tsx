@@ -1,7 +1,7 @@
 /**
  * NewsListPage - 콘텐츠 목록 페이지
  *
- * APP-CONTENT Phase 1: 정렬 토글, 출처 배지, CMS 타입 필터
+ * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
  */
 
 import { useState, useEffect } from 'react';
@@ -9,37 +9,18 @@ import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { newsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
+import {
+  CONTENT_TYPE_LABELS,
+  CONTENT_SORT_LABELS,
+  CONTENT_SOURCE_COLORS,
+  CONTENT_SOURCE_LABELS,
+} from '@o4o/types/content';
+import type { ContentType, ContentSortType } from '@o4o/types/content';
 import type { Notice } from '../../types';
 
-// APP-CONTENT: CMS content types (aligned with DB)
-type ContentType = 'notice' | 'hero' | 'promo' | 'news';
-
-const typeLabels: Record<ContentType, string> = {
-  notice: '공지사항',
-  hero: '배너',
-  promo: '혜택/쿠폰',
-  news: '뉴스',
-};
-
-// APP-CONTENT: source badge colors per spec
-const sourceColors: Record<string, string> = {
-  operator: '#1a5276',
-  supplier: '#6c3483',
-  pharmacist: '#1e8449',
-};
-const sourceLabels: Record<string, string> = {
-  operator: '운영자',
-  supplier: '공급자',
-  pharmacist: '사용자',
-};
-
-// APP-CONTENT: sort options
-type SortType = 'latest' | 'featured' | 'views';
-const sortLabels: Record<SortType, string> = {
-  latest: '최신순',
-  featured: '추천순',
-  views: '조회순',
-};
+// Page-level filter types (subset of all content types shown in list)
+const filterTypes: ContentType[] = ['notice', 'hero', 'promo', 'news'];
+const sortTypes: ContentSortType[] = ['latest', 'featured', 'views'];
 
 export function NewsListPage() {
   const location = useLocation();
@@ -47,7 +28,7 @@ export function NewsListPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
-  const [sort, setSort] = useState<SortType>('latest');
+  const [sort, setSort] = useState<ContentSortType>('latest');
 
   const getTypeFromPath = (): ContentType | undefined => {
     const path = location.pathname;
@@ -94,7 +75,7 @@ export function NewsListPage() {
     });
   };
 
-  const handleSortChange = (newSort: SortType) => {
+  const handleSortChange = (newSort: ContentSortType) => {
     setSort(newSort);
     setSearchParams(prev => {
       prev.set('page', '1');
@@ -102,7 +83,7 @@ export function NewsListPage() {
     });
   };
 
-  const pageTitle = currentType ? typeLabels[currentType] : '콘텐츠';
+  const pageTitle = currentType ? CONTENT_TYPE_LABELS[currentType] : '콘텐츠';
 
   if (loading) {
     return <LoadingSpinner message="콘텐츠를 불러오는 중..." />;
@@ -115,28 +96,28 @@ export function NewsListPage() {
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '콘텐츠', href: '/news' },
-          ...(currentType ? [{ label: typeLabels[currentType] }] : []),
+          ...(currentType ? [{ label: CONTENT_TYPE_LABELS[currentType] }] : []),
         ]}
       />
 
       {/* 타입 필터 */}
       {!currentType && (
         <div style={styles.tabs}>
-          {(Object.keys(typeLabels) as ContentType[]).map(t => (
-            <Link key={t} to={`/news/${t}`} style={styles.tab}>{typeLabels[t]}</Link>
+          {filterTypes.map(t => (
+            <Link key={t} to={`/news/${t}`} style={styles.tab}>{CONTENT_TYPE_LABELS[t]}</Link>
           ))}
         </div>
       )}
 
       {/* 정렬 토글 */}
       <div style={styles.sortBar}>
-        {(Object.keys(sortLabels) as SortType[]).map(s => (
+        {sortTypes.map(s => (
           <button
             key={s}
             style={sort === s ? styles.sortBtnActive : styles.sortBtn}
             onClick={() => handleSortChange(s)}
           >
-            {sortLabels[s]}
+            {CONTENT_SORT_LABELS[s]}
           </button>
         ))}
       </div>
@@ -155,15 +136,15 @@ export function NewsListPage() {
                 <Card hover padding="medium">
                   <div style={styles.itemHeader}>
                     {notice.isPinned && <span style={styles.pinnedBadge}>중요</span>}
-                    {notice.type && typeLabels[notice.type as ContentType] && (
-                      <span style={styles.typeBadge}>{typeLabels[notice.type as ContentType]}</span>
+                    {notice.type && CONTENT_TYPE_LABELS[notice.type as ContentType] && (
+                      <span style={styles.typeBadge}>{CONTENT_TYPE_LABELS[notice.type as ContentType]}</span>
                     )}
-                    {notice.metadata?.creatorType && sourceLabels[notice.metadata.creatorType] && (
+                    {notice.metadata?.creatorType && CONTENT_SOURCE_LABELS[notice.metadata.creatorType] && (
                       <span style={{
                         ...styles.sourceBadge,
-                        backgroundColor: sourceColors[notice.metadata.creatorType] || colors.neutral500,
+                        backgroundColor: CONTENT_SOURCE_COLORS[notice.metadata.creatorType] || colors.neutral500,
                       }}>
-                        {sourceLabels[notice.metadata.creatorType]}
+                        {CONTENT_SOURCE_LABELS[notice.metadata.creatorType]}
                       </span>
                     )}
                     {notice.metadata?.category && (
