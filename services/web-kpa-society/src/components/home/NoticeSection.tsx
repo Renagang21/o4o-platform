@@ -16,7 +16,7 @@ export function NoticeSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    homeApi.getNotices(5)
+    homeApi.getNotices(3)
       .then((res) => {
         if (res.data) setNotices(res.data);
       })
@@ -28,13 +28,16 @@ export function NoticeSection() {
     <section style={styles.container}>
       <div style={styles.header}>
         <h2 style={styles.sectionTitle}>공지사항</h2>
-        <Link to="/news" style={styles.moreLink}>더보기</Link>
+        <Link to="/news" style={styles.moreLink}>공지 전체 보기 →</Link>
       </div>
       <div style={styles.card}>
         {loading ? (
           <p style={styles.empty}>불러오는 중...</p>
         ) : notices.length === 0 ? (
-          <p style={styles.empty}>등록된 공지가 없습니다</p>
+          <div style={styles.emptyWrap}>
+            <p style={styles.empty}>아직 등록된 공지가 없습니다.</p>
+            <p style={styles.emptyHint}>새 소식이 등록되면 여기에 표시됩니다.</p>
+          </div>
         ) : (
           <ul style={styles.list}>
             {notices.map((notice) => (
@@ -45,6 +48,9 @@ export function NoticeSection() {
                   )}
                   <span style={styles.postTitle}>{notice.title}</span>
                 </Link>
+                {notice.summary && (
+                  <p style={styles.summary}>{notice.summary}</p>
+                )}
                 <div style={styles.meta}>
                   <span>
                     {new Date(notice.publishedAt || notice.createdAt).toLocaleDateString()}
@@ -124,10 +130,27 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.75rem',
     color: colors.neutral400,
   },
+  summary: {
+    margin: `4px 0 0`,
+    fontSize: '0.8rem',
+    color: colors.neutral500,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  emptyWrap: {
+    textAlign: 'center',
+    padding: spacing.xl,
+  },
   empty: {
     textAlign: 'center',
     color: colors.neutral500,
-    padding: spacing.xl,
     margin: 0,
+  },
+  emptyHint: {
+    textAlign: 'center',
+    color: colors.neutral400,
+    fontSize: '0.8rem',
+    margin: `${spacing.xs} 0 0`,
   },
 };

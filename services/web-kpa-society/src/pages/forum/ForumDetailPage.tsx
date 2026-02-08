@@ -164,6 +164,18 @@ export function ForumDetailPage() {
         </div>
       </Card>
 
+      {/* 참여 안내 */}
+      <p style={styles.engagementGuide}>
+        {user
+          ? '의견이 있다면 아래 댓글로 나눠주세요.'
+          : ''}
+        {!user && (
+          <>
+            <Link to="/login" style={styles.engagementLink}>로그인</Link>하면 좋아요와 댓글을 남길 수 있습니다.
+          </>
+        )}
+      </p>
+
       {/* 댓글 섹션 */}
       <div style={styles.commentsSection}>
         <h2 style={styles.commentsTitle}>댓글 {comments.length}개</h2>
@@ -186,7 +198,10 @@ export function ForumDetailPage() {
             </button>
           </form>
         ) : (
-          <p style={styles.loginPrompt}>댓글을 작성하려면 로그인하세요.</p>
+          <div style={styles.loginPrompt}>
+            <p style={styles.loginPromptText}>로그인하고 대화에 참여하세요</p>
+            <Link to="/login" style={styles.loginButton}>로그인 →</Link>
+          </div>
         )}
 
         <div style={styles.commentList}>
@@ -206,7 +221,7 @@ export function ForumDetailPage() {
 
       <div style={styles.footer}>
         <Link to="/forum" style={styles.backButton}>
-          목록으로
+          다른 글 둘러보기 →
         </Link>
       </div>
     </div>
@@ -340,13 +355,38 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     cursor: 'pointer',
   },
-  loginPrompt: {
-    ...typography.bodyM,
+  engagementGuide: {
+    textAlign: 'center',
+    fontSize: '13px',
     color: colors.neutral500,
+    marginTop: '16px',
+    marginBottom: 0,
+  },
+  engagementLink: {
+    color: colors.primary,
+    textDecoration: 'none',
+    fontWeight: 500,
+  },
+  loginPrompt: {
     padding: '20px',
     backgroundColor: colors.neutral50,
     borderRadius: '8px',
     textAlign: 'center',
+  },
+  loginPromptText: {
+    ...typography.bodyM,
+    color: colors.neutral500,
+    margin: '0 0 12px',
+  },
+  loginButton: {
+    display: 'inline-block',
+    padding: '8px 20px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    textDecoration: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
   },
   commentList: {
     display: 'flex',

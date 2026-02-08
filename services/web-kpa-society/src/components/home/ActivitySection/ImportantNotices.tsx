@@ -27,10 +27,10 @@ export function ImportantNotices() {
     <div>
       <div style={styles.header}>
         <h3 style={styles.title}>추천 콘텐츠</h3>
-        <Link to="/news" style={styles.moreLink}>더보기</Link>
+        <Link to="/news" style={styles.moreLink}>추천 콘텐츠 보기 →</Link>
       </div>
       {featured.length === 0 ? (
-        <p style={styles.empty}>자료가 없습니다</p>
+        <p style={styles.empty}>추천 콘텐츠가 준비 중입니다.</p>
       ) : (
         <ul style={styles.list}>
           {featured.map((item) => (
@@ -43,6 +43,9 @@ export function ImportantNotices() {
                 <span style={styles.postLink}>
                   <span style={styles.postTitle}>{item.title}</span>
                 </span>
+              )}
+              {item.summary && (
+                <p style={styles.summary}>{item.summary}</p>
               )}
               <div style={styles.meta}>
                 <span>{new Date(item.createdAt).toLocaleDateString()}</span>
@@ -102,6 +105,14 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: '4px',
     fontSize: '0.75rem',
     color: colors.neutral400,
+  },
+  summary: {
+    margin: `4px 0 0`,
+    fontSize: '0.8rem',
+    color: colors.neutral500,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   empty: {
     textAlign: 'center',

@@ -570,7 +570,8 @@ export function ForumPostPage() {
             ))
           ) : (
             <div style={styles.noComments}>
-              <p>아직 댓글이 없습니다. 첫 댓글을 작성해보세요!</p>
+              <p>아직 댓글이 없습니다.</p>
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>의견을 나누면 더 깊은 대화가 시작됩니다.</p>
             </div>
           )}
         </div>
@@ -579,7 +580,7 @@ export function ForumPostPage() {
       {/* Footer */}
       <div style={styles.footer}>
         <Link to="/forum" style={styles.backToList}>
-          ← 목록으로 돌아가기
+          다른 글 둘러보기 →
         </Link>
       </div>
     </div>

@@ -189,14 +189,21 @@ export default function ContentDetailPage() {
         />
       </div>
 
+      {/* 다음 행동 안내 */}
+      <div className="mt-6 p-6 bg-gray-50 rounded-lg text-center">
+        <p className="text-sm text-gray-600 mb-3">관련 소식을 계속 확인하세요</p>
+        <Link to="/content" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
+          콘텐츠 더 보기 →
+        </Link>
+      </div>
+
       {/* Navigation */}
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center">
         <Link
           to="/content"
           className="inline-flex items-center text-gray-600 hover:text-gray-900"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          목록으로 돌아가기
+          콘텐츠 전체 보기 →
         </Link>
       </div>
     </div>

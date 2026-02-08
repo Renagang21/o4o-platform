@@ -138,9 +138,17 @@ export function NewsDetailPage() {
         )}
       </Card>
 
+      {/* 다음 행동 안내 */}
+      <div style={styles.nextAction}>
+        <p style={styles.nextActionText}>관련 소식을 계속 확인하세요</p>
+        <Link to={notice.type ? `/news/${notice.type}` : '/news'} style={styles.nextActionLink}>
+          콘텐츠 더 보기 →
+        </Link>
+      </div>
+
       <div style={styles.footer}>
         <Link to={notice.type ? `/news/${notice.type}` : '/news'} style={styles.backButton}>
-          목록으로
+          전체 콘텐츠 보기 →
         </Link>
       </div>
     </div>
@@ -262,8 +270,26 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.bodyS,
     color: colors.neutral500,
   },
+  nextAction: {
+    marginTop: '24px',
+    padding: '20px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  nextActionText: {
+    fontSize: '13px',
+    color: colors.neutral500,
+    margin: '0 0 8px',
+  },
+  nextActionLink: {
+    fontSize: '14px',
+    color: colors.primary,
+    textDecoration: 'none',
+    fontWeight: 500,
+  },
   footer: {
-    marginTop: '32px',
+    marginTop: '24px',
     textAlign: 'center',
   },
   backButton: {

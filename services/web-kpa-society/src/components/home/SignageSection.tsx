@@ -17,7 +17,7 @@ export function SignageSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    homeApi.getSignage(6, 4)
+    homeApi.getSignage(3, 2)
       .then((res) => {
         if (res.data) {
           setMedia(res.data.media || []);
@@ -34,13 +34,16 @@ export function SignageSection() {
     <section style={styles.container}>
       <div style={styles.header}>
         <h2 style={styles.sectionTitle}>디지털 사이니지</h2>
-        <Link to="/signage" style={styles.moreLink}>더보기</Link>
+        <Link to="/signage" style={styles.moreLink}>사이니지 콘텐츠 보기 →</Link>
       </div>
       <div style={styles.card}>
         {loading ? (
           <p style={styles.empty}>불러오는 중...</p>
         ) : !hasContent ? (
-          <p style={styles.empty}>등록된 콘텐츠가 없습니다</p>
+          <div style={styles.emptyWrap}>
+            <p style={styles.empty}>사이니지 콘텐츠가 준비 중입니다.</p>
+            <p style={styles.emptyHint}>디지털 사이니지로 약국을 꾸며보세요.</p>
+          </div>
         ) : (
           <div>
             {media.length > 0 && (
@@ -259,10 +262,19 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap',
     marginLeft: spacing.sm,
   },
+  emptyWrap: {
+    textAlign: 'center',
+    padding: spacing.xl,
+  },
   empty: {
     textAlign: 'center',
     color: colors.neutral500,
-    padding: spacing.xl,
     margin: 0,
+  },
+  emptyHint: {
+    textAlign: 'center',
+    color: colors.neutral400,
+    fontSize: '0.8rem',
+    margin: `${spacing.xs} 0 0`,
   },
 };

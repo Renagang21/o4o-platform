@@ -62,7 +62,7 @@ export default function ContentHubPage() {
     try {
       const result = await globalContentApi.clonePlaylist(playlistId, 'kpa-society');
       if (result.success) {
-        setCloneSuccess(`"${playlistName}"를 내 대시보드로 가져왔습니다.`);
+        setCloneSuccess(`"${playlistName}"를 내 대시보드로 가져왔습니다. 대시보드에서 확인하세요.`);
         setTimeout(() => setCloneSuccess(null), 3000);
       } else {
         setError(result.error || '플레이리스트를 복사하지 못했습니다.');
@@ -76,7 +76,7 @@ export default function ContentHubPage() {
     try {
       const result = await globalContentApi.cloneMedia(mediaId, 'kpa-society');
       if (result.success) {
-        setCloneSuccess(`"${mediaName}"를 내 대시보드로 가져왔습니다.`);
+        setCloneSuccess(`"${mediaName}"를 내 대시보드로 가져왔습니다. 대시보드에서 확인하세요.`);
         setTimeout(() => setCloneSuccess(null), 3000);
       } else {
         setError(result.error || '미디어를 복사하지 못했습니다.');
@@ -238,7 +238,7 @@ export default function ContentHubPage() {
       return (
         <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
           <p className="text-slate-500">
-            {contentType === 'playlists' ? '플레이리스트가' : '미디어가'} 없습니다.
+            아직 {contentType === 'playlists' ? '플레이리스트가' : '미디어가'} 없습니다. 다른 소스 탭을 확인해보세요.
           </p>
         </div>
       );

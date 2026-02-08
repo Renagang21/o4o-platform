@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Building2, Handshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { netureApi, type Supplier, type PartnershipRequest } from '../lib/api';
+import { HomeForumSection } from '../components/home/HomeForumSection';
 
 export default function HomePage() {
   return (
@@ -27,6 +28,9 @@ export default function HomePage() {
 
       {/* Partnership Requests Preview */}
       <PartnershipRequestsPreviewSection />
+
+      {/* Forum Section */}
+      <HomeForumSection />
     </div>
   );
 }

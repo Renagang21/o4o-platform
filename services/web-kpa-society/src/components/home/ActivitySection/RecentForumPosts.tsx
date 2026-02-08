@@ -14,7 +14,7 @@ export function RecentForumPosts() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
 
   useEffect(() => {
-    forumApi.getPosts({ limit: 5 })
+    forumApi.getPosts({ limit: 3 })
       .then((res) => {
         if (res.data) setPosts(res.data);
       })
@@ -25,10 +25,14 @@ export function RecentForumPosts() {
     <div>
       <div style={styles.header}>
         <h3 style={styles.title}>최근 글</h3>
-        <Link to="/forum" style={styles.moreLink}>더보기</Link>
+        <Link to="/forum" style={styles.moreLink}>포럼에서 소통하기 →</Link>
       </div>
       {posts.length === 0 ? (
-        <p style={styles.empty}>자료가 없습니다</p>
+        <div style={styles.emptyWrap}>
+          <p style={styles.empty}>아직 글이 없습니다.</p>
+          <p style={styles.emptyHint}>커뮤니티에서 첫 글을 작성해보세요.</p>
+          <Link to="/forum" style={styles.emptyAction}>포럼 바로가기 →</Link>
+        </div>
       ) : (
         <ul style={styles.list}>
           {posts.map((post) => (
@@ -111,10 +115,26 @@ const styles: Record<string, React.CSSProperties> = {
   dot: {
     color: colors.neutral300,
   },
+  emptyWrap: {
+    textAlign: 'center',
+    padding: spacing.xl,
+  },
   empty: {
     textAlign: 'center',
     color: colors.neutral500,
-    padding: spacing.xl,
     margin: 0,
+  },
+  emptyHint: {
+    textAlign: 'center',
+    color: colors.neutral400,
+    fontSize: '0.8rem',
+    margin: `${spacing.xs} 0 0`,
+  },
+  emptyAction: {
+    display: 'inline-block',
+    marginTop: spacing.sm,
+    fontSize: '0.813rem',
+    color: colors.primary,
+    textDecoration: 'none',
   },
 };

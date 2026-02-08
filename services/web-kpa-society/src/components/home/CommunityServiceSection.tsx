@@ -51,25 +51,25 @@ const ResourceIcon = () => (
 const services: ServiceCardData[] = [
   {
     title: '약사 포럼',
-    description: '약사 커뮤니티에서 정보를 교환하세요',
+    description: '동료 약사와 질문·토론으로 전문성을 높이세요',
     href: '/forum',
     icon: <ForumIcon />,
   },
   {
     title: '교육 / 강의',
-    description: '보수교육, 온라인 세미나',
+    description: '보수교육·세미나를 온라인으로 수강하세요',
     href: '/lms',
     icon: <EducationIcon />,
   },
   {
     title: '이벤트',
-    description: '퀴즈, 설문, 캠페인 참여',
+    description: '퀴즈·설문에 참여하고 최신 이슈를 확인하세요',
     href: '/events',
     icon: <EventIcon />,
   },
   {
     title: '자료실',
-    description: '문서, 영상, 이미지 자료 공유',
+    description: '문서·영상 자료를 검색하고 공유하세요',
     href: '/docs',
     icon: <ResourceIcon />,
   },
