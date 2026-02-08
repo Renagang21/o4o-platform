@@ -96,6 +96,9 @@ import { FunctionGatePage } from './pages/FunctionGatePage';
 // User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
 import { UserDashboardPage } from './pages/dashboard';
 
+// Debug Pages (CLAUDE.md Section 14)
+import { ApiDebugPage } from './pages/debug/ApiDebugPage';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -189,6 +192,9 @@ function App() {
           <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
+
+          {/* Debug Pages (CLAUDE.md Section 14) */}
+          <Route path="/__debug__/api" element={<ApiDebugPage />} />
 
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
           <Route path="/test-center" element={<TestCenterPage />} />
