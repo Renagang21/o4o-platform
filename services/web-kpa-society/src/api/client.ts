@@ -52,19 +52,29 @@ class ApiClient {
       ...options.headers,
     };
 
-    // credentials: 'include' for cookie fallback (same-origin)
-    const response = await fetch(url, {
-      ...fetchOptions,
-      headers,
-      credentials: 'include',
-    });
+    // Retry on 404 for GET requests (Cloud Run cold start: routes not yet registered)
+    const maxRetries = fetchOptions.method === 'GET' ? 2 : 0;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const response = await fetch(url, {
+        ...fetchOptions,
+        headers,
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Network error' }));
-      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+      if (response.status === 404 && attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Network error' }));
+        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
     }
 
-    return response.json();
+    throw new Error('Request failed after retries');
   }
 
   async get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {

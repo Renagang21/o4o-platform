@@ -29,8 +29,12 @@ interface ApiResponse<T> {
 
 type PaginatedResponse<T> = SignagePaginatedResponse<T>;
 
+// Signage routes are mounted at /api/signage/ (NOT under /api/v1/).
+// authClient.api has baseURL = .../api/v1, so we must use absolute URLs
+// to bypass axios baseURL concatenation.
+const SIGNAGE_ORIGIN = import.meta.env.VITE_API_BASE_URL || '';
 const getBaseUrl = (serviceKey: string = 'kpa-society') =>
-  `/api/signage/${serviceKey}`;
+  `${SIGNAGE_ORIGIN}/api/signage/${serviceKey}`;
 
 export const globalContentApi = {
   async listPlaylists(source: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignagePlaylist>>> {
