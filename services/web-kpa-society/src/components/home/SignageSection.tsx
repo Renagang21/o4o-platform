@@ -53,7 +53,7 @@ export function SignageSection() {
                   {media.map((item) => (
                     <a
                       key={item.id}
-                      href={item.url}
+                      href={item.url ?? undefined}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={styles.mediaCard}
