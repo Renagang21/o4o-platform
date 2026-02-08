@@ -274,12 +274,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const homeRouter = Router();
 
-  // GET /home/notices - 공지사항 (cms_contents type=notice)
+  // GET /home/notices - 공지사항 (cms_contents type=notice|hero)
   homeRouter.get('/notices', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 5;
     const contentRepo = dataSource.getRepository(CmsContent);
     const notices = await contentRepo.find({
-      where: { serviceKey: 'kpa-society', type: 'notice' as any, status: 'published' as any },
+      where: { serviceKey: In(['kpa', 'kpa-society']), type: In(['notice', 'hero']) as any, status: 'published' as any },
       order: { isPinned: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
       take: limit,
     });
@@ -315,7 +315,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     // Featured content
     const contentRepo = dataSource.getRepository(CmsContent);
     const featured = await contentRepo.find({
-      where: { serviceKey: 'kpa-society', type: 'featured' as any, status: 'published' as any },
+      where: { serviceKey: In(['kpa', 'kpa-society']), type: In(['featured', 'promo']) as any, status: 'published' as any },
       order: { isOperatorPicked: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
       take: featuredLimit,
     });
@@ -342,9 +342,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const playlistLimit = parseInt(req.query.playlistLimit as string) || 4;
 
     const media = await dataSource.query(`
-      SELECT id, name, "mediaType", url, "thumbnailUrl", duration, metadata
+      SELECT id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl", duration, metadata
       FROM signage_media
-      WHERE "serviceKey" = 'kpa-society' AND source = 'hq' AND "isActive" = true
+      WHERE "serviceKey" = 'kpa-society' AND source IN ('hq', 'store') AND status = 'active'
       ORDER BY "createdAt" DESC
       LIMIT $1
     `, [mediaLimit]);
@@ -352,7 +352,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const playlists = await dataSource.query(`
       SELECT id, name, description, "itemCount", "totalDuration"
       FROM signage_playlists
-      WHERE "serviceKey" = 'kpa-society' AND source = 'hq' AND "isActive" = true
+      WHERE "serviceKey" = 'kpa-society' AND source IN ('hq', 'store') AND status = 'active'
       ORDER BY "createdAt" DESC
       LIMIT $1
     `, [playlistLimit]);
@@ -377,11 +377,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const type = req.query.type as string;
 
     const contentRepo = dataSource.getRepository(CmsContent);
-    const where: any = { serviceKey: 'kpa-society', status: 'published' };
+    const where: any = { serviceKey: In(['kpa', 'kpa-society']), status: 'published' };
     if (type) {
       where.type = type;
     } else {
-      where.type = In(['notice', 'news']);
+      where.type = In(['notice', 'news', 'hero', 'promo']);
     }
 
     const [data, total] = await contentRepo.findAndCount({
