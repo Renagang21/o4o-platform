@@ -21,7 +21,8 @@
  */
 
 import { Router, RequestHandler, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
+import { CmsContent } from '@o4o-apps/cms-core';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
@@ -268,21 +269,144 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/lms', lmsRouter);
 
   // ============================================================================
+  // Home Routes - /api/v1/kpa/home/*
+  // WO-KPA-HOME-PHASE1-V1: Home page summary endpoints
+  // ============================================================================
+  const homeRouter = Router();
+
+  // GET /home/notices - 공지사항 (cms_contents type=notice)
+  homeRouter.get('/notices', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const limit = parseInt(req.query.limit as string) || 5;
+    const contentRepo = dataSource.getRepository(CmsContent);
+    const notices = await contentRepo.find({
+      where: { serviceKey: 'kpa-society', type: 'notice' as any, status: 'published' as any },
+      order: { isPinned: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
+      take: limit,
+    });
+    res.json({
+      success: true,
+      data: notices.map(n => ({
+        id: n.id,
+        title: n.title,
+        summary: n.summary,
+        imageUrl: n.imageUrl,
+        isPinned: n.isPinned,
+        publishedAt: n.publishedAt,
+        createdAt: n.createdAt,
+      })),
+    });
+  }));
+
+  // GET /home/community - 포럼 최근글 + featured 콘텐츠
+  homeRouter.get('/community', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const postLimit = parseInt(req.query.postLimit as string) || 5;
+    const featuredLimit = parseInt(req.query.featuredLimit as string) || 3;
+
+    // Forum posts (community scope: organization_id IS NULL)
+    const posts = await dataSource.query(`
+      SELECT p.id, p.title, p."authorName", p."createdAt", c.name as "categoryName"
+      FROM forum_post p
+      LEFT JOIN forum_category c ON p."categoryId" = c.id
+      WHERE p.status = 'publish' AND p.organization_id IS NULL
+      ORDER BY p."createdAt" DESC
+      LIMIT $1
+    `, [postLimit]);
+
+    // Featured content
+    const contentRepo = dataSource.getRepository(CmsContent);
+    const featured = await contentRepo.find({
+      where: { serviceKey: 'kpa-society', type: 'featured' as any, status: 'published' as any },
+      order: { isOperatorPicked: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
+      take: featuredLimit,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        posts,
+        featured: featured.map(f => ({
+          id: f.id,
+          title: f.title,
+          summary: f.summary,
+          imageUrl: f.imageUrl,
+          linkUrl: f.linkUrl,
+          createdAt: f.createdAt,
+        })),
+      },
+    });
+  }));
+
+  // GET /home/signage - 디지털 사이니지 미리보기
+  homeRouter.get('/signage', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const mediaLimit = parseInt(req.query.mediaLimit as string) || 6;
+    const playlistLimit = parseInt(req.query.playlistLimit as string) || 4;
+
+    const media = await dataSource.query(`
+      SELECT id, name, "mediaType", url, "thumbnailUrl", duration, metadata
+      FROM signage_media
+      WHERE "serviceKey" = 'kpa-society' AND source = 'hq' AND "isActive" = true
+      ORDER BY "createdAt" DESC
+      LIMIT $1
+    `, [mediaLimit]);
+
+    const playlists = await dataSource.query(`
+      SELECT id, name, description, "itemCount", "totalDuration"
+      FROM signage_playlists
+      WHERE "serviceKey" = 'kpa-society' AND source = 'hq' AND "isActive" = true
+      ORDER BY "createdAt" DESC
+      LIMIT $1
+    `, [playlistLimit]);
+
+    res.json({
+      success: true,
+      data: { media, playlists },
+    });
+  }));
+
+  router.use('/home', homeRouter);
+
+  // ============================================================================
   // News Routes - /api/v1/kpa/news/*
-  // Placeholder: Returns mock data until CMS integration is complete
+  // WO-KPA-HOME-PHASE1-V1: Connected to cms_contents (was placeholder)
   // ============================================================================
   const newsRouter = Router();
 
-  newsRouter.get('/', optionalAuth, (req: Request, res: Response) => {
+  newsRouter.get('/', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
+    const type = req.query.type as string;
+
+    const contentRepo = dataSource.getRepository(CmsContent);
+    const where: any = { serviceKey: 'kpa-society', status: 'published' };
+    if (type) {
+      where.type = type;
+    } else {
+      where.type = In(['notice', 'news']);
+    }
+
+    const [data, total] = await contentRepo.findAndCount({
+      where,
+      order: { isPinned: 'DESC', createdAt: 'DESC' },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
     res.json({
       success: true,
-      data: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
-      message: 'News API - Integration pending'
+      data: data.map(c => ({
+        id: c.id,
+        type: c.type,
+        title: c.title,
+        summary: c.summary,
+        imageUrl: c.imageUrl,
+        linkUrl: c.linkUrl,
+        isPinned: c.isPinned,
+        publishedAt: c.publishedAt,
+        createdAt: c.createdAt,
+      })),
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
-  });
+  }));
 
   // Static routes must be defined before dynamic :id route
   newsRouter.get('/gallery', optionalAuth, (req: Request, res: Response) => {
@@ -296,9 +420,32 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     });
   });
 
-  newsRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'News not found' } });
-  });
+  newsRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const contentRepo = dataSource.getRepository(CmsContent);
+    const content = await contentRepo.findOne({
+      where: { id: req.params.id, serviceKey: 'kpa-society' },
+    });
+    if (!content) {
+      res.status(404).json({ success: false, error: { message: 'News not found' } });
+      return;
+    }
+    res.json({
+      success: true,
+      data: {
+        id: content.id,
+        type: content.type,
+        title: content.title,
+        summary: content.summary,
+        body: content.body,
+        imageUrl: content.imageUrl,
+        linkUrl: content.linkUrl,
+        linkText: content.linkText,
+        isPinned: content.isPinned,
+        publishedAt: content.publishedAt,
+        createdAt: content.createdAt,
+      },
+    });
+  }));
 
   router.use('/news', newsRouter);
 

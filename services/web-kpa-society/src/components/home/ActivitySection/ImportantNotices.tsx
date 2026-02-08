@@ -1,22 +1,24 @@
 /**
- * ImportantNotices - 공지사항 목록
+ * ImportantNotices → FeaturedContent
  *
- * ActivitySection 하위 컴포넌트
+ * WO-KPA-HOME-PHASE1-V1: 공지사항은 NoticeSection으로 이동.
+ * ActivitySection 우측에는 추천 콘텐츠(featured) 표시.
+ * 데이터 소스: homeApi.getCommunity() → featured
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { newsApi } from '../../../api';
-import type { Notice } from '../../../types';
+import { homeApi } from '../../../api/home';
+import type { HomeFeatured } from '../../../api/home';
 import { colors, spacing, typography } from '../../../styles/theme';
 
 export function ImportantNotices() {
-  const [notices, setNotices] = useState<Notice[]>([]);
+  const [featured, setFeatured] = useState<HomeFeatured[]>([]);
 
   useEffect(() => {
-    newsApi.getNotices({ limit: 3 })
+    homeApi.getCommunity(0, 3)
       .then((res) => {
-        if (res.data) setNotices(res.data);
+        if (res.data?.featured) setFeatured(res.data.featured);
       })
       .catch(() => {});
   }, []);
@@ -24,20 +26,26 @@ export function ImportantNotices() {
   return (
     <div>
       <div style={styles.header}>
-        <h3 style={styles.title}>공지사항</h3>
+        <h3 style={styles.title}>추천 콘텐츠</h3>
         <Link to="/news" style={styles.moreLink}>더보기</Link>
       </div>
-      {notices.length === 0 ? (
+      {featured.length === 0 ? (
         <p style={styles.empty}>자료가 없습니다</p>
       ) : (
         <ul style={styles.list}>
-          {notices.map((notice) => (
-            <li key={notice.id} style={styles.listItem}>
-              <Link to={`/news/${notice.id}`} style={styles.postLink}>
-                <span style={styles.postTitle}>{notice.title}</span>
-              </Link>
+          {featured.map((item) => (
+            <li key={item.id} style={styles.listItem}>
+              {item.linkUrl ? (
+                <a href={item.linkUrl} style={styles.postLink} target="_blank" rel="noopener noreferrer">
+                  <span style={styles.postTitle}>{item.title}</span>
+                </a>
+              ) : (
+                <span style={styles.postLink}>
+                  <span style={styles.postTitle}>{item.title}</span>
+                </span>
+              )}
               <div style={styles.meta}>
-                <span>{new Date(notice.createdAt).toLocaleDateString()}</span>
+                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
               </div>
             </li>
           ))}

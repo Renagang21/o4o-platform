@@ -1,21 +1,20 @@
 /**
  * CommunityHomePage - KPA Society 커뮤니티 홈 페이지
  *
- * SCOPE: 분회 서비스 데모 (커뮤니티 중심)
+ * WO-KPA-HOME-PHASE1-V1: 플랫폼 요약 허브로 전환
  *
- * 커뮤니티 중심 구조:
+ * 섹션 구조:
  * ├─ HeroSection              - 커뮤니티 소개 Hero
- * ├─ ActivitySection          - 최근 활동 (포럼 글 + 공지)
- * ├─ CommunityServiceSection  - 공용 서비스 2x2 그리드
- * └─ UtilitySection           - 유틸리티 (로그인 패널 + 링크)
- *
- * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1:
- * - 지부/분회 서비스 데모(OrganizationDemoSection) 제거
- * - 커뮤니티 홈은 분회 서비스 데모 전용
- * - 지부/분회 관리 데모는 /demo 경로에서 별도 진입
+ * ├─ NoticeSection             - 공지사항 (cms_contents type=notice)
+ * ├─ ActivitySection           - 최근 활동 (포럼 글 + 추천 콘텐츠)
+ * ├─ SignageSection            - 디지털 사이니지 프리뷰
+ * ├─ CommunityServiceSection   - 공용 서비스 2x2 그리드
+ * └─ UtilitySection            - 유틸리티 (로그인 패널 + 링크)
  */
 
 import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
+import { NoticeSection } from '../components/home/NoticeSection';
+import { SignageSection } from '../components/home/SignageSection';
 import { CommunityServiceSection } from '../components/home/CommunityServiceSection';
 import { UtilitySection } from '../components/home/UtilitySection';
 import { colors, spacing, typography, borderRadius } from '../styles/theme';
@@ -42,7 +41,9 @@ export function CommunityHomePage() {
     <div style={styles.page}>
       <HeroSection />
       <div style={styles.content}>
+        <NoticeSection />
         <ActivitySection />
+        <SignageSection />
         <CommunityServiceSection />
         <UtilitySection />
       </div>
