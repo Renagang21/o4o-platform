@@ -1078,8 +1078,58 @@ interface RecentActivityItem {
   time: string;
 }
 
+// APP Summary types for operator dashboard
+interface AppContentSummary {
+  totalPublished: number;
+  recentItems: Array<{
+    id: string;
+    type: string;
+    title: string;
+    summary: string | null;
+    imageUrl: string | null;
+    isPinned: boolean;
+    publishedAt: string | null;
+    createdAt: string;
+  }>;
+}
+
+interface AppSignageSummary {
+  totalMedia: number;
+  totalPlaylists: number;
+  recentMedia: Array<{
+    id: string;
+    name: string;
+    mediaType: string;
+    url: string | null;
+    thumbnailUrl: string | null;
+    duration: number | null;
+    metadata: Record<string, unknown>;
+  }>;
+  recentPlaylists: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    itemCount: number;
+    totalDuration: number;
+  }>;
+}
+
+interface AppForumSummary {
+  totalPosts: number;
+  recentPosts: Array<{
+    id: string;
+    title: string;
+    authorName: string | null;
+    createdAt: string;
+    categoryName: string | null;
+  }>;
+}
+
 interface AdminDashboardSummary {
   stats: AdminDashboardStats;
+  content?: AppContentSummary;
+  signage?: AppSignageSummary;
+  forum?: AppForumSummary;
   serviceStatus: ServiceStatus[];
   recentApplications: RecentApplication[];
   recentActivities: RecentActivityItem[];
@@ -1270,6 +1320,9 @@ export type {
   RecentActivity,
   AdminDashboardSummary,
   AdminDashboardStats,
+  AppContentSummary,
+  AppSignageSummary,
+  AppForumSummary,
   ServiceStatus,
   RecentApplication,
   RecentActivityItem,

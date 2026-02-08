@@ -23,6 +23,10 @@
     "./content": {
       "types": "./dist/content.d.ts",
       "import": "./dist/content.js"
+    },
+    "./signage": {
+      "types": "./dist/signage.d.ts",
+      "import": "./dist/signage.js"
     }
   },
   "sideEffects": false,

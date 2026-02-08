@@ -5,6 +5,8 @@
  */
 
 import { apiClient } from './client';
+import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
+import type { ForumHomePost } from '@o4o/types/forum';
 
 interface HomeNotice {
   id: string;
@@ -18,13 +20,8 @@ interface HomeNotice {
   createdAt: string;
 }
 
-interface HomeForumPost {
-  id: string;
-  title: string;
-  authorName: string;
-  createdAt: string;
-  categoryName: string | null;
-}
+// APP-FORUM Phase 1: shared type from @o4o/types/forum
+type HomeForumPost = ForumHomePost;
 
 interface HomeFeatured {
   id: string;
@@ -37,23 +34,9 @@ interface HomeFeatured {
   createdAt: string;
 }
 
-interface HomeMedia {
-  id: string;
-  name: string;
-  mediaType: string;
-  url: string | null;
-  thumbnailUrl: string | null;
-  duration: number | null;
-  metadata: Record<string, unknown>;
-}
-
-interface HomePlaylist {
-  id: string;
-  name: string;
-  description: string | null;
-  itemCount: number;
-  totalDuration: number;
-}
+// APP-SIGNAGE Phase 1: shared types from @o4o/types/signage
+type HomeMedia = SignageHomeMedia;
+type HomePlaylist = SignageHomePlaylist;
 
 interface NoticesResponse {
   success: boolean;

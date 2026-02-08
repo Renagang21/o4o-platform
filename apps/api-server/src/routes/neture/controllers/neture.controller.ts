@@ -18,6 +18,8 @@ import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { ContentQueryService } from '../../../modules/content/index.js';
+import { SignageQueryService } from '../../../modules/signage/index.js';
+import { ForumQueryService } from '../../../modules/forum/index.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import logger from '../../../utils/logger.js';
@@ -34,6 +36,17 @@ export function createNetureController(dataSource: DataSource): Router {
   const contentService = new ContentQueryService(dataSource, {
     serviceKeys: ['neture'],
     defaultTypes: ['notice', 'news', 'hero'],
+  });
+
+  // APP-SIGNAGE Phase 1: shared signage query service
+  const signageService = new SignageQueryService(dataSource, {
+    serviceKey: 'neture',
+    sources: ['hq', 'supplier'],
+  });
+
+  // APP-FORUM Phase 1: shared forum query service
+  const forumService = new ForumQueryService(dataSource, {
+    scope: 'community',
   });
 
   // ============================================================================
@@ -139,6 +152,45 @@ export function createNetureController(dataSource: DataSource): Router {
     } catch (error) {
       logger.error('[Neture API] Error fetching content detail:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch content detail' });
+    }
+  });
+
+  // ============================================================================
+  // SIGNAGE ENDPOINTS (APP-SIGNAGE Phase 1: SignageQueryService)
+  // ============================================================================
+
+  /**
+   * GET /home/signage
+   * Home page signage preview (media + playlists)
+   */
+  router.get('/home/signage', async (req: Request, res: Response) => {
+    try {
+      const mediaLimit = parseInt(req.query.mediaLimit as string) || 6;
+      const playlistLimit = parseInt(req.query.playlistLimit as string) || 4;
+      const data = await signageService.listForHome(mediaLimit, playlistLimit);
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching signage:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch signage' });
+    }
+  });
+
+  // ============================================================================
+  // FORUM ENDPOINTS (APP-FORUM Phase 1: ForumQueryService)
+  // ============================================================================
+
+  /**
+   * GET /home/forum
+   * Home page forum preview (recent posts)
+   */
+  router.get('/home/forum', async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      const posts = await forumService.listRecentPosts(limit);
+      res.json({ success: true, data: { posts } });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching forum posts:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch forum posts' });
     }
   });
 
@@ -361,6 +413,85 @@ export function createNetureController(dataSource: DataSource): Router {
         error: 'Failed to update partnership request status',
         details: (error as Error).message,
       });
+    }
+  });
+
+  // ============================================================================
+  // ADMIN DASHBOARD ENDPOINT (운영자 실사용 화면 1단계)
+  // ============================================================================
+
+  /**
+   * GET /admin/dashboard/summary
+   * 운영자 대시보드 통합 요약: Stats + APP-CONTENT + APP-SIGNAGE + APP-FORUM
+   */
+  router.get('/admin/dashboard/summary', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+      }
+
+      const userRoles: string[] = user.roles || [];
+      if (!isServiceAdmin(userRoles, 'neture')) {
+        return res.status(403).json({ success: false, error: 'Neture admin role required' });
+      }
+
+      // Parallel fetch: Neture stats + APP summaries
+      const [
+        supplierCount,
+        requestCount,
+        pendingRequestCount,
+        contentPublishedCount,
+        recentContent,
+        signageHome,
+        recentPosts,
+        signageMediaCount,
+        signagePlaylistCount,
+        forumPostCount,
+      ] = await Promise.all([
+        dataSource.query(`SELECT COUNT(*) as count FROM neture_suppliers WHERE status = 'ACTIVE'`),
+        dataSource.query(`SELECT COUNT(*) as count FROM neture_partnership_requests`),
+        dataSource.query(`SELECT COUNT(*) as count FROM neture_partnership_requests WHERE status = 'OPEN'`),
+        dataSource.query(`SELECT COUNT(*) as count FROM cms_contents WHERE "serviceKey" = 'neture' AND status = 'published'`),
+        contentService.listForHome(['notice', 'news', 'hero'], 5),
+        signageService.listForHome(3, 3),
+        forumService.listRecentPosts(5),
+        dataSource.query(`SELECT COUNT(*) as count FROM signage_media WHERE "serviceKey" = 'neture' AND status = 'active'`),
+        dataSource.query(`SELECT COUNT(*) as count FROM signage_playlists WHERE "serviceKey" = 'neture' AND status = 'active'`),
+        dataSource.query(`SELECT COUNT(*) as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`),
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          stats: {
+            activeSuppliers: parseInt(supplierCount[0]?.count || '0', 10),
+            totalRequests: parseInt(requestCount[0]?.count || '0', 10),
+            pendingRequests: parseInt(pendingRequestCount[0]?.count || '0', 10),
+            publishedContents: parseInt(contentPublishedCount[0]?.count || '0', 10),
+          },
+          content: {
+            totalPublished: parseInt(contentPublishedCount[0]?.count || '0', 10),
+            recentItems: recentContent,
+          },
+          signage: {
+            totalMedia: parseInt(signageMediaCount[0]?.count || '0', 10),
+            totalPlaylists: parseInt(signagePlaylistCount[0]?.count || '0', 10),
+            recentMedia: signageHome.media,
+            recentPlaylists: signageHome.playlists,
+          },
+          forum: {
+            totalPosts: parseInt(forumPostCount[0]?.count || '0', 10),
+            recentPosts,
+          },
+          serviceStatus: [],
+          recentApplications: [],
+          recentActivities: [],
+        },
+      });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching admin dashboard summary:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch dashboard summary' });
     }
   });
 

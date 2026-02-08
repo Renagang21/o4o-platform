@@ -394,7 +394,44 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 ---
 
-## 18. 최종 원칙
+## 18. APP 표준화 규칙 (Baseline Lock · 2026-02)
+
+> **O4O 플랫폼은 APP 단위 표준화 구조를 기준선으로 고정한다.**
+
+### 핵심 원칙
+
+1. **APP 단위가 최상위 기준이다**
+   - O4O는 서비스가 아니라 **APP 단위**로 설계·구현한다
+   - 서비스는 APP를 조합·설정하여 구성한다
+
+2. **표준 APP 구조** — 모든 APP은 아래 3요소를 가진다
+   - `@o4o/types/{app}` : 공통 타입·라벨·상수
+   - `{App}QueryService` : 공통 조회/정렬 로직 (`apps/api-server/src/modules/{app}/`)
+   - 표준 UI 패턴 : APP별 1종 고정
+
+3. **서비스 코드는 얇게 유지한다**
+   - 서비스 라우트/컨트롤러는 **QueryService 호출 + 설정(serviceKey, scope, limit)만** 담당
+   - Raw SQL / 중복 로직 금지
+
+4. **서비스별 UI 예외를 허용하지 않는다**
+   - UI 차이가 필요하면 **APP를 분리**한다
+   - 기존 APP에 조건 분기 추가 금지
+
+### 기준선 APP (Frozen Baseline)
+
+| APP | Types | QueryService | 상태 |
+|-----|-------|-------------|------|
+| APP-CONTENT | `@o4o/types/content` | `ContentQueryService` | Frozen |
+| APP-SIGNAGE | `@o4o/types/signage` | `SignageQueryService` | Frozen |
+| APP-FORUM | `@o4o/types/forum` | `ForumQueryService` | Frozen |
+
+- 이 APP들은 **변경 없는 기준선**으로 취급한다
+- 추가 리팩토링 금지, 예외적 서비스 분기 금지
+- 신규 서비스/앱은 **이 패턴을 그대로 사용**
+
+---
+
+## 19. 최종 원칙
 
 > **새 앱을 만들기 전에,
 > "이게 위 기준을 모두 만족하는가?"를 먼저 확인하라.**
@@ -423,6 +460,6 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 ---
 
-*Updated: 2026-02-06*
-*Version: 4.3*
+*Updated: 2026-02-08*
+*Version: 4.4*
 *Status: Active Constitution*

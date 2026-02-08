@@ -186,3 +186,54 @@ export interface ForumErrorResponse {
   success: false;
   error: string;
 }
+
+// =============================================================================
+// Home Page DTOs (홈 요약용 경량 타입) — APP-FORUM Phase 1
+// =============================================================================
+
+/** 홈 페이지 포럼 게시글 요약 */
+export interface ForumHomePost {
+  id: string;
+  title: string;
+  authorName: string | null;
+  createdAt: string;
+  categoryName: string | null;
+}
+
+/** 홈 포럼 API 응답 */
+export interface ForumHomeResponse {
+  success: boolean;
+  data: {
+    posts: ForumHomePost[];
+  };
+}
+
+// =============================================================================
+// UI Constants (서비스 비의존) — APP-FORUM Phase 1
+// =============================================================================
+
+/** 게시글 타입별 한글 라벨 */
+export const FORUM_POST_TYPE_LABELS: Record<ForumPostType, string> = {
+  discussion: '토론',
+  question: '질문',
+  announcement: '공지',
+  poll: '투표',
+  guide: '가이드',
+};
+
+/** 게시글 상태별 한글 라벨 */
+export const FORUM_POST_STATUS_LABELS: Record<ForumPostStatus, string> = {
+  draft: '임시저장',
+  publish: '공개',
+  pending: '승인대기',
+  rejected: '반려',
+  archived: '보관',
+};
+
+/** 카테고리 접근 수준별 한글 라벨 */
+export const FORUM_ACCESS_LEVEL_LABELS: Record<ForumCategoryAccessLevel, string> = {
+  all: '전체',
+  member: '회원',
+  business: '사업자',
+  admin: '관리자',
+};

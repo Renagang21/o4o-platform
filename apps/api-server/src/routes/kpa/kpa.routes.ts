@@ -23,11 +23,14 @@
 import { Router, RequestHandler, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { ContentQueryService } from '../../modules/content/index.js';
+import { SignageQueryService } from '../../modules/signage/index.js';
+import { ForumQueryService } from '../../modules/forum/index.js';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createBranchAdminDashboardController } from './controllers/branch-admin-dashboard.controller.js';
+import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
@@ -146,6 +149,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     defaultTypes: ['notice', 'news', 'hero', 'promo'],
   });
 
+  // APP-SIGNAGE Phase 1: shared signage query service
+  const signageService = new SignageQueryService(dataSource, {
+    serviceKey: 'kpa-society',
+    sources: ['hq', 'store'],
+  });
+
+  // APP-FORUM Phase 1: shared forum query service
+  const forumService = new ForumQueryService(dataSource, {
+    scope: 'community',
+  });
+
   // Mount controllers with auth middleware
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/members', createMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
@@ -156,6 +170,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
   router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
+
+  // Operator Summary routes (운영자 실사용 화면 1단계)
+  router.use('/operator', createOperatorSummaryController(dataSource, {
+    contentService,
+    signageService,
+    forumService,
+  }));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
@@ -287,23 +308,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data });
   }));
 
-  // GET /home/community - 포럼 최근글 + featured 콘텐츠
+  // GET /home/community - 포럼 최근글 + featured 콘텐츠 (APP-FORUM Phase 1: ForumQueryService)
   homeRouter.get('/community', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const postLimit = parseInt(req.query.postLimit as string) || 5;
     const featuredLimit = parseInt(req.query.featuredLimit as string) || 3;
 
-    // Forum posts (community scope: organization_id IS NULL)
-    const posts = await dataSource.query(`
-      SELECT p.id, p.title, u.nickname as "authorName", p."createdAt", c.name as "categoryName"
-      FROM forum_post p
-      LEFT JOIN forum_category c ON p."categoryId" = c.id
-      LEFT JOIN users u ON p.author_id = u.id
-      WHERE p.status = 'publish' AND p.organization_id IS NULL
-      ORDER BY p."createdAt" DESC
-      LIMIT $1
-    `, [postLimit]);
-
-    // Featured content (APP-CONTENT Phase 2: ContentQueryService)
+    const posts = await forumService.listRecentPosts(postLimit);
     const featured = await contentService.listFeatured(['featured', 'promo'], featuredLimit);
 
     res.json({
@@ -312,31 +322,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     });
   }));
 
-  // GET /home/signage - 디지털 사이니지 미리보기
+  // GET /home/signage - 디지털 사이니지 미리보기 (APP-SIGNAGE Phase 1: SignageQueryService)
   homeRouter.get('/signage', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const mediaLimit = parseInt(req.query.mediaLimit as string) || 6;
     const playlistLimit = parseInt(req.query.playlistLimit as string) || 4;
-
-    const media = await dataSource.query(`
-      SELECT id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl", duration, metadata
-      FROM signage_media
-      WHERE "serviceKey" = 'kpa-society' AND source IN ('hq', 'store') AND status = 'active'
-      ORDER BY "createdAt" DESC
-      LIMIT $1
-    `, [mediaLimit]);
-
-    const playlists = await dataSource.query(`
-      SELECT id, name, description, "itemCount", "totalDuration"
-      FROM signage_playlists
-      WHERE "serviceKey" = 'kpa-society' AND source IN ('hq', 'store') AND status = 'active'
-      ORDER BY "createdAt" DESC
-      LIMIT $1
-    `, [playlistLimit]);
-
-    res.json({
-      success: true,
-      data: { media, playlists },
-    });
+    const data = await signageService.listForHome(mediaLimit, playlistLimit);
+    res.json({ success: true, data });
   }));
 
   router.use('/home', homeRouter);

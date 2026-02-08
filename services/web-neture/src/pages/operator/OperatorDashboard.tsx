@@ -27,6 +27,12 @@ import {
   Shield,
   MessageSquarePlus,
   Package,
+  Monitor,
+  ListMusic,
+  Image,
+  Video,
+  Globe,
+  Bookmark,
 } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
@@ -285,6 +291,87 @@ export default function OperatorDashboard() {
           )}
         </div>
       </div>
+
+      {/* APP Management Section: Content + Signage + Forum */}
+      {!loading && summary && (summary.content || summary.signage || summary.forum) && (
+        <>
+          {/* APP Stats */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
+            <div className="p-6 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                  <Monitor className="w-5 h-5 text-indigo-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-slate-800">APP 관리 현황</h2>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Content Summary */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-slate-600 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-600" /> 콘텐츠
+                    </h3>
+                    <span className="text-lg font-bold text-slate-800">{summary.content?.totalPublished ?? 0}</span>
+                  </div>
+                  {summary.content?.recentItems?.slice(0, 3).map((item) => (
+                    <div key={item.id} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {item.isPinned && <Bookmark className="w-3 h-3 text-blue-400 flex-shrink-0" />}
+                        <span className="text-slate-700 truncate">{item.title}</span>
+                      </div>
+                      <span className="text-xs text-slate-400 ml-2 flex-shrink-0">{item.type}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Signage Summary */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-slate-600 flex items-center gap-2">
+                      <Monitor className="w-4 h-4 text-purple-600" /> 사이니지
+                    </h3>
+                    <span className="text-lg font-bold text-slate-800">
+                      {(summary.signage?.totalMedia ?? 0) + (summary.signage?.totalPlaylists ?? 0)}
+                    </span>
+                  </div>
+                  {summary.signage?.recentMedia?.slice(0, 2).map((media) => {
+                    const IconComp = media.mediaType === 'video' || media.mediaType === 'youtube' ? Video : media.mediaType === 'image' ? Image : Globe;
+                    return (
+                      <div key={media.id} className="flex items-center gap-2 text-sm">
+                        <IconComp className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                        <span className="text-slate-700 truncate">{media.name}</span>
+                      </div>
+                    );
+                  })}
+                  {summary.signage?.recentPlaylists?.slice(0, 1).map((pl) => (
+                    <div key={pl.id} className="flex items-center gap-2 text-sm">
+                      <ListMusic className="w-3 h-3 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-700 truncate">{pl.name}</span>
+                      <span className="text-xs text-slate-400">({pl.itemCount})</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Forum Summary */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-slate-600 flex items-center gap-2">
+                      <MessageSquarePlus className="w-4 h-4 text-amber-600" /> 포럼
+                    </h3>
+                    <span className="text-lg font-bold text-slate-800">{summary.forum?.totalPosts ?? 0}</span>
+                  </div>
+                  {summary.forum?.recentPosts?.slice(0, 3).map((post) => (
+                    <div key={post.id} className="flex items-center justify-between text-sm">
+                      <span className="text-slate-700 truncate">{post.title}</span>
+                      <span className="text-xs text-slate-400 ml-2 flex-shrink-0">{post.authorName || '익명'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Quick Actions */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">

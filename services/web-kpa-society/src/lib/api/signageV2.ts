@@ -2,56 +2,24 @@
  * Signage V2 API Client - KPA-Society
  *
  * Global Content API for Digital Signage Content Hub
+ * APP-SIGNAGE Phase 1: Types from @o4o/types/signage
  */
 
 import { authClient } from '@o4o/auth-client';
+import type {
+  SignageMediaResponse,
+  SignagePlaylistResponse,
+  SignageMediaType,
+  MediaOwnerType,
+  TransitionEffect,
+  ContentSource,
+  SignagePaginatedResponse,
+} from '@o4o/types/signage';
 
-export type SignageMediaType = 'image' | 'video' | 'html' | 'text' | 'youtube' | 'vimeo' | 'external';
-export type MediaOwnerType = 'platform' | 'organization' | 'supplier' | 'user';
-
-export interface SignageMedia {
-  id: string;
-  serviceKey: string;
-  organizationId?: string;
-  supplierId?: string;
-  name: string;
-  mediaType: SignageMediaType;
-  mimeType?: string;
-  url?: string;
-  thumbnailUrl?: string;
-  duration?: number;
-  width?: number;
-  height?: number;
-  fileSize?: number;
-  ownerType: MediaOwnerType;
-  tags: string[];
-  metadata: Record<string, unknown>;
-  isActive: boolean;
-  createdByUserId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type TransitionEffect = 'none' | 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom';
-
-export interface SignagePlaylist {
-  id: string;
-  serviceKey: string;
-  organizationId?: string;
-  name: string;
-  description?: string;
-  defaultDuration: number;
-  defaultTransition: TransitionEffect;
-  totalDuration: number;
-  itemCount: number;
-  isActive: boolean;
-  isLoop: boolean;
-  tags: string[];
-  metadata: Record<string, unknown>;
-  createdByUserId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Re-export shared types with local aliases for backward compatibility
+export type SignageMedia = SignageMediaResponse;
+export type SignagePlaylist = SignagePlaylistResponse;
+export type { SignageMediaType, MediaOwnerType, TransitionEffect, ContentSource };
 
 interface ApiResponse<T> {
   data?: T;
@@ -59,16 +27,7 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
-interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
-
-export type ContentSource = 'hq' | 'supplier' | 'community';
+type PaginatedResponse<T> = SignagePaginatedResponse<T>;
 
 const getBaseUrl = (serviceKey: string = 'kpa-society') =>
   `/api/signage/${serviceKey}`;

@@ -517,7 +517,15 @@
       "Bash(DB_PASSWORD=O4O_API_2025_SECURE timeout 15 npx tsx:*)",
       "Bash(npx turbo build:*)",
       "WebFetch(domain:www.kkpa.kr)",
-      "Bash(for i in 1 2 3)"
+      "Bash(for i in 1 2 3)",
+      "Bash(npx:*)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" status -u)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" diff --stat)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" log --oneline -5)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" diff apps/api-server/src/routes/kpa/kpa.routes.ts)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" add apps/api-server/src/routes/kpa/kpa.routes.ts services/web-kpa-society/src/api/home.ts services/web-kpa-society/src/api/index.ts services/web-kpa-society/src/components/home/NoticeSection.tsx services/web-kpa-society/src/components/home/SignageSection.tsx services/web-kpa-society/src/components/home/ActivitySection/ImportantNotices.tsx services/web-kpa-society/src/pages/CommunityHomePage.tsx)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" commit:*)",
+      "Bash(git -C \"c:/Users/sohae/o4o-platform\" push origin main)"
     ],
     "deny": []
   }
