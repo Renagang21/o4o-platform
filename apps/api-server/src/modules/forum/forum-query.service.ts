@@ -27,24 +27,24 @@ export class ForumQueryService {
   async listRecentPosts(limit = 5) {
     if (this.config.scope === 'community') {
       return this.dataSource.query(`
-        SELECT p.id, p.title, u.nickname as "authorName", p."createdAt", c.name as "categoryName"
+        SELECT p.id, p.title, u.nickname as "authorName", p.created_at, c.name as "categoryName"
         FROM forum_post p
         LEFT JOIN forum_category c ON p."categoryId" = c.id
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p.organization_id IS NULL
-        ORDER BY p."createdAt" DESC
+        ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
     }
 
     // organization scope
     return this.dataSource.query(`
-      SELECT p.id, p.title, u.nickname as "authorName", p."createdAt", c.name as "categoryName"
+      SELECT p.id, p.title, u.nickname as "authorName", p.created_at, c.name as "categoryName"
       FROM forum_post p
       LEFT JOIN forum_category c ON p."categoryId" = c.id
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p.organization_id = $1
-      ORDER BY p."createdAt" DESC
+      ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);
   }
@@ -55,24 +55,24 @@ export class ForumQueryService {
   async listPinnedPosts(limit = 3) {
     if (this.config.scope === 'community') {
       return this.dataSource.query(`
-        SELECT p.id, p.title, u.nickname as "authorName", p."createdAt", c.name as "categoryName"
+        SELECT p.id, p.title, u.nickname as "authorName", p.created_at, c.name as "categoryName"
         FROM forum_post p
         LEFT JOIN forum_category c ON p."categoryId" = c.id
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id IS NULL
-        ORDER BY p."createdAt" DESC
+        ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
     }
 
     // organization scope
     return this.dataSource.query(`
-      SELECT p.id, p.title, u.nickname as "authorName", p."createdAt", c.name as "categoryName"
+      SELECT p.id, p.title, u.nickname as "authorName", p.created_at, c.name as "categoryName"
       FROM forum_post p
       LEFT JOIN forum_category c ON p."categoryId" = c.id
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id = $1
-      ORDER BY p."createdAt" DESC
+      ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);
   }
