@@ -33,6 +33,9 @@ import { GroupbuyListPage, GroupbuyDetailPage, GroupbuyHistoryPage } from './pag
 // News pages
 import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 
+// Signage pages
+import ContentHubPage from './pages/signage/ContentHubPage';
+
 // Resources pages
 import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
 
@@ -351,6 +354,9 @@ function App() {
           <Route path="/lms/course/:id" element={<Layout serviceName={SERVICE_NAME}><LmsCourseDetailPage /></Layout>} />
           <Route path="/lms/course/:courseId/lesson/:lessonId" element={<Layout serviceName={SERVICE_NAME}><LmsLessonPage /></Layout>} />
           <Route path="/lms/certificate" element={<Layout serviceName={SERVICE_NAME}><LmsCertificatesPage /></Layout>} />
+
+          {/* Signage (디지털 사이니지) */}
+          <Route path="/signage" element={<Layout serviceName={SERVICE_NAME}><ContentHubPage /></Layout>} />
 
           {/* Events (이벤트) */}
           <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />

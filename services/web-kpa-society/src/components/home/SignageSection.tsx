@@ -51,19 +51,15 @@ export function SignageSection() {
                 <h3 style={styles.subTitle}>최신 미디어</h3>
                 <div style={styles.mediaGrid}>
                   {media.map((item) => (
-                    <div key={item.id} style={styles.mediaCard}>
+                    <a
+                      key={item.id}
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={styles.mediaCard}
+                    >
                       <div style={styles.mediaThumbnail}>
-                        {item.thumbnailUrl ? (
-                          <img
-                            src={item.thumbnailUrl}
-                            alt={item.name}
-                            style={styles.thumbnailImg}
-                          />
-                        ) : (
-                          <div style={styles.thumbnailPlaceholder}>
-                            <MediaIcon type={item.mediaType} />
-                          </div>
-                        )}
+                        <MediaThumbnail url={item.thumbnailUrl} name={item.name} mediaType={item.mediaType} />
                         {item.duration != null && item.duration > 0 && (
                           <span style={styles.duration}>
                             {formatDuration(item.duration)}
@@ -71,7 +67,7 @@ export function SignageSection() {
                         )}
                       </div>
                       <p style={styles.mediaName}>{item.name}</p>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -82,24 +78,26 @@ export function SignageSection() {
                 <h3 style={styles.subTitle}>플레이리스트</h3>
                 <ul style={styles.playlistList}>
                   {playlists.map((pl) => (
-                    <li key={pl.id} style={styles.playlistItem}>
-                      <div style={styles.playlistIcon}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="8" y1="6" x2="21" y2="6" />
-                          <line x1="8" y1="12" x2="21" y2="12" />
-                          <line x1="8" y1="18" x2="21" y2="18" />
-                          <line x1="3" y1="6" x2="3.01" y2="6" />
-                          <line x1="3" y1="12" x2="3.01" y2="12" />
-                          <line x1="3" y1="18" x2="3.01" y2="18" />
-                        </svg>
-                      </div>
-                      <div style={styles.playlistInfo}>
-                        <span style={styles.playlistName}>{pl.name}</span>
-                        <span style={styles.playlistMeta}>
-                          {pl.itemCount}개 항목
-                          {pl.totalDuration > 0 && ` · ${formatDuration(pl.totalDuration)}`}
-                        </span>
-                      </div>
+                    <li key={pl.id}>
+                      <Link to="/signage" style={styles.playlistItem}>
+                        <div style={styles.playlistIcon}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                          </svg>
+                        </div>
+                        <div style={styles.playlistInfo}>
+                          <span style={styles.playlistName}>{pl.name}</span>
+                          <span style={styles.playlistMeta}>
+                            {pl.itemCount}개 항목
+                            {pl.totalDuration > 0 && ` · ${formatDuration(pl.totalDuration)}`}
+                          </span>
+                        </div>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -109,6 +107,27 @@ export function SignageSection() {
         )}
       </div>
     </section>
+  );
+}
+
+function MediaThumbnail({ url, name, mediaType }: { url: string | null; name: string; mediaType: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!url || failed) {
+    return (
+      <div style={styles.thumbnailPlaceholder}>
+        <MediaIcon type={mediaType} />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={url}
+      alt={name}
+      style={styles.thumbnailImg}
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -178,6 +197,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   mediaCard: {
     overflow: 'hidden',
+    textDecoration: 'none',
+    color: 'inherit',
+    cursor: 'pointer',
   },
   mediaThumbnail: {
     position: 'relative',
@@ -235,6 +257,9 @@ const styles: Record<string, React.CSSProperties> = {
     gap: spacing.sm,
     padding: `${spacing.sm} 0`,
     borderBottom: `1px solid ${colors.neutral100}`,
+    textDecoration: 'none',
+    color: 'inherit',
+    cursor: 'pointer',
   },
   playlistIcon: {
     flexShrink: 0,
