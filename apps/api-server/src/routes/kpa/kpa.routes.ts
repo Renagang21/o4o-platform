@@ -304,9 +304,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     // Forum posts (community scope: organization_id IS NULL)
     const posts = await dataSource.query(`
-      SELECT p.id, p.title, p."authorName", p."createdAt", c.name as "categoryName"
+      SELECT p.id, p.title, u.nickname as "authorName", p."createdAt", c.name as "categoryName"
       FROM forum_post p
       LEFT JOIN forum_category c ON p."categoryId" = c.id
+      LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p.organization_id IS NULL
       ORDER BY p."createdAt" DESC
       LIMIT $1
