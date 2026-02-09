@@ -139,7 +139,13 @@ const OperatorsPage: React.FC = () => {
     return operators.filter(op => {
       // Service filter
       if (serviceFilter !== 'all') {
-        const hasServiceRole = op.roles.some(role => role.startsWith(`${serviceFilter}:`));
+        const hasServiceRole = op.roles.some(role => {
+          // KPA는 kpa-a, kpa-b, kpa-c 모두 포함
+          if (serviceFilter === 'kpa') {
+            return role.startsWith('kpa-') || role.startsWith('kpa:');
+          }
+          return role.startsWith(`${serviceFilter}:`);
+        });
         if (!hasServiceRole) return false;
       }
 

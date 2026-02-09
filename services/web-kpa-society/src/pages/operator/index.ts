@@ -7,3 +7,4 @@ export { default as OperatorDashboard } from './OperatorDashboard';
 export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
 export { LegalManagementPage } from './LegalManagementPage';
+export { default as OperatorManagementPage } from './OperatorManagementPage';
