@@ -16,10 +16,10 @@ import {
   Check,
   AlertCircle,
   Users,
-  Shield
+  Shield,
+  CheckCircle
 } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
-import toast from 'react-hot-toast';
 
 // KPA 서비스 역할 정의
 const KPA_ROLES = [
@@ -53,6 +53,13 @@ export function OperatorManagementPage() {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // 알림 표시 헬퍼
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   // KPA 운영자 목록 조회
   const fetchOperators = async () => {
@@ -71,12 +78,12 @@ export function OperatorManagementPage() {
             const userRoles = user.roles || [user.role];
             return userRoles.some((role: string) => role?.startsWith('kpa'));
           })
-          .map((user: any) => ({
+          .map((user: any): Operator => ({
             id: user.id || user._id,
             name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || '이름없음',
             email: user.email || '',
             roles: (user.roles || [user.role]).filter((r: string) => r?.startsWith('kpa')),
-            status: user.isActive === false ? 'inactive' : 'active',
+            status: (user.isActive === false ? 'inactive' : 'active') as 'active' | 'inactive',
             createdAt: user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '',
             lastLogin: user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString('ko-KR') : undefined,
           }));
@@ -85,7 +92,7 @@ export function OperatorManagementPage() {
       }
     } catch (err: any) {
       console.error('Failed to fetch operators:', err);
-      toast.error('운영자 목록을 불러오지 못했습니다');
+      showNotification('error', '운영자 목록을 불러오지 못했습니다');
     } finally {
       setLoading(false);
     }
@@ -194,7 +201,7 @@ export function OperatorManagementPage() {
         }
 
         await authClient.api.put(`/admin/users/${editingOperator.id}`, updateData);
-        toast.success('운영자 정보가 수정되었습니다');
+        showNotification('success', '운영자 정보가 수정되었습니다');
       } else {
         // 등록
         await authClient.api.post('/admin/users', {
@@ -206,7 +213,7 @@ export function OperatorManagementPage() {
           isEmailVerified: true,
           isActive: true,
         });
-        toast.success('운영자가 등록되었습니다');
+        showNotification('success', '운영자가 등록되었습니다');
       }
 
       closeModal();
@@ -214,7 +221,7 @@ export function OperatorManagementPage() {
     } catch (err: any) {
       console.error('Failed to save operator:', err);
       const message = err.response?.data?.message || err.response?.data?.error || '저장에 실패했습니다';
-      toast.error(message);
+      showNotification('error', message);
     } finally {
       setSubmitting(false);
     }
@@ -228,11 +235,11 @@ export function OperatorManagementPage() {
 
     try {
       await authClient.api.delete(`/admin/users/${operator.id}`);
-      toast.success('운영자가 삭제되었습니다');
+      showNotification('success', '운영자가 삭제되었습니다');
       fetchOperators();
     } catch (err: any) {
       console.error('Failed to delete operator:', err);
-      toast.error('삭제에 실패했습니다');
+      showNotification('error', '삭제에 실패했습니다');
     }
   };
 
@@ -248,6 +255,20 @@ export function OperatorManagementPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
+      {/* 알림 */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg ${
+          notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {notification.type === 'success' ? (
+            <CheckCircle className="w-5 h-5" />
+          ) : (
+            <AlertCircle className="w-5 h-5" />
+          )}
+          {notification.message}
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
