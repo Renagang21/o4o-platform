@@ -516,13 +516,23 @@
   
   /* WordPress-style form elements */
   .o4o-input {
-    @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded;
+    @apply block w-full py-2 text-sm border border-gray-200 rounded;
     @apply focus:outline-none focus:ring-2 focus:border-transparent;
     @apply transition-colors duration-200;
+    /* 기본 패딩 - 아이콘이 있는 경우 pl-10 등으로 오버라이드 가능 */
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
     /* 일관된 높이와 정렬을 위한 추가 스타일 */
-    display: flex;
-    align-items: center;
     box-sizing: border-box;
+  }
+
+  /* 아이콘이 있는 입력창 */
+  .o4o-input.has-icon-left {
+    padding-left: 2.5rem;
+  }
+
+  .o4o-input.has-icon-right {
+    padding-right: 2.5rem;
   }
   
   .o4o-input:focus {

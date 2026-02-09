@@ -156,7 +156,7 @@ const PageHeader: FC<PageHeaderProps> = ({
                   placeholder={searchPlaceholder}
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="o4o-input pl-10 pr-4"
+                  className="o4o-input has-icon-left"
                 />
               </div>
             )}
