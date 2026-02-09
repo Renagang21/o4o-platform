@@ -191,6 +191,7 @@ export interface Notice {
   isOperatorPicked?: boolean;
   viewCount?: number;
   views?: number;
+  likeCount?: number;
   imageUrl?: string | null;
   linkUrl?: string | null;
   linkText?: string | null;
@@ -261,6 +262,7 @@ export interface GalleryItem {
   imageUrl: string;
   thumbnailUrl: string;
   eventDate?: string;
+  viewCount?: number;
   createdAt: string;
 }
 

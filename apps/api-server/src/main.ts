@@ -491,6 +491,9 @@ import { createCmsContentRoutes } from './routes/cms-content/cms-content.routes.
 // Content Assets Routes (WO-O4O-CONTENT-ASSETS-DB-READONLY-V1)
 import { createContentAssetsRoutes } from './routes/content/content-assets.routes.js';
 
+// Dashboard Assets Routes (WO-APP-DATA-HUB-COPY-PHASE2A-V1)
+import { createDashboardAssetsRoutes } from './routes/dashboard/dashboard-assets.routes.js';
+
 // Signage Routes (Phase 2 Production Build - Sprint 2-2)
 // WO-APP-SIGNAGE-PUBLIC-API-PHASE1-V1: Public + Authenticated routes
 import { createSignageRoutes, createSignagePublicRoutes } from './routes/signage/index.js';
@@ -912,6 +915,16 @@ const startServer = async () => {
       logger.info('✅ Content Assets routes registered at /api/v1/content/assets (READ-ONLY)');
     } catch (contentAssetsError) {
       logger.error('Failed to register Content Assets routes:', contentAssetsError);
+    }
+
+    // 32-c. Register Dashboard Assets routes (WO-APP-DATA-HUB-COPY-PHASE2A-V1)
+    // 허브 콘텐츠를 내 대시보드로 복사하는 API
+    try {
+      const dashboardAssetsRoutes = createDashboardAssetsRoutes(AppDataSource);
+      app.use('/api/v1/dashboard/assets', dashboardAssetsRoutes);
+      logger.info('✅ Dashboard Assets routes registered at /api/v1/dashboard/assets');
+    } catch (dashboardAssetsError) {
+      logger.error('Failed to register Dashboard Assets routes:', dashboardAssetsError);
     }
 
     // 33. Register Channel routes (WO-P4-CHANNEL-IMPLEMENT-P0)

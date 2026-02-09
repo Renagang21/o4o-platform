@@ -2,12 +2,14 @@
  * NewsListPage - 콘텐츠 목록 페이지
  *
  * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
+ * WO-APP-DATA-HUB-COPY-PHASE2A-V1: Dashboard copy 연동
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { newsApi } from '../../api';
+import { useDashboardCopy } from '../../hooks/useDashboardCopy';
 import { colors, typography } from '../../styles/theme';
 import {
   CONTENT_TYPE_LABELS,
@@ -16,7 +18,7 @@ import {
 } from '@o4o/types/content';
 import type { ContentType, ContentSortType } from '@o4o/types/content';
 import type { Notice } from '../../types';
-import { ContentSortButtons, ContentPagination, ContentMetaBar } from '@o4o/ui';
+import { ContentSortButtons, ContentPagination, ContentMetaBar, ContentCardActions, CopyOptionsModal } from '@o4o/ui';
 
 // Page-level filter types (subset of all content types shown in list)
 const filterTypes: ContentType[] = ['notice', 'hero', 'promo', 'news'];
@@ -29,6 +31,22 @@ export function NewsListPage() {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [sort, setSort] = useState<ContentSortType>('latest');
+
+  // Phase 2-B: Dashboard copy hook with modal support
+  const {
+    loading: copyLoading,
+    modalState,
+    openCopyModal,
+    closeCopyModal,
+    executeCopy,
+  } = useDashboardCopy({
+    sourceType: 'content',
+  });
+
+  // Copy handler - opens modal for options selection
+  const handleCopy = useCallback((noticeId: string, noticeTitle?: string) => {
+    openCopyModal(noticeId, noticeTitle);
+  }, [openCopyModal]);
 
   const getTypeFromPath = (): ContentType | undefined => {
     const path = location.pathname;
@@ -130,29 +148,41 @@ export function NewsListPage() {
             {notices.map(notice => (
               <Link key={notice.id} to={`/news/${notice.id}`} style={styles.itemLink}>
                 <Card hover padding="medium">
-                  <div style={styles.itemHeader}>
-                    {notice.isPinned && <span style={styles.pinnedBadge}>중요</span>}
-                    {notice.type && CONTENT_TYPE_LABELS[notice.type as ContentType] && (
-                      <span style={styles.typeBadge}>{CONTENT_TYPE_LABELS[notice.type as ContentType]}</span>
-                    )}
-                    {notice.metadata?.creatorType && CONTENT_SOURCE_LABELS[notice.metadata.creatorType] && (
-                      <span style={{
-                        ...styles.sourceBadge,
-                        backgroundColor: CONTENT_SOURCE_COLORS[notice.metadata.creatorType] || colors.neutral500,
-                      }}>
-                        {CONTENT_SOURCE_LABELS[notice.metadata.creatorType]}
-                      </span>
-                    )}
-                    {notice.metadata?.category && (
-                      <span style={styles.categoryBadge}>{notice.metadata.category}</span>
-                    )}
+                  {/* 상단: 배지 + 액션 버튼 */}
+                  <div style={styles.cardTop}>
+                    <div style={styles.badgeGroup}>
+                      {notice.isPinned && <span style={styles.pinnedBadge}>중요</span>}
+                      {notice.type && CONTENT_TYPE_LABELS[notice.type as ContentType] && (
+                        <span style={styles.typeBadge}>{CONTENT_TYPE_LABELS[notice.type as ContentType]}</span>
+                      )}
+                      {notice.metadata?.creatorType && CONTENT_SOURCE_LABELS[notice.metadata.creatorType] && (
+                        <span style={{
+                          ...styles.sourceBadge,
+                          backgroundColor: CONTENT_SOURCE_COLORS[notice.metadata.creatorType] || colors.neutral500,
+                        }}>
+                          {CONTENT_SOURCE_LABELS[notice.metadata.creatorType]}
+                        </span>
+                      )}
+                      {notice.metadata?.category && (
+                        <span style={styles.categoryBadge}>{notice.metadata.category}</span>
+                      )}
+                    </div>
+                    <ContentCardActions
+                      showCopy
+                      onCopy={() => handleCopy(notice.id, notice.title)}
+                    />
                   </div>
                   <h3 style={styles.itemTitle}>{notice.title}</h3>
                   {(notice.summary || notice.excerpt) && (
                     <p style={styles.itemExcerpt}>{notice.summary || notice.excerpt}</p>
                   )}
+                  {/* 하단: 조회수, 좋아요, 날짜 */}
                   <div style={{ marginTop: '12px' }}>
-                    <ContentMetaBar date={notice.publishedAt || notice.createdAt} />
+                    <ContentMetaBar
+                      viewCount={notice.viewCount || notice.views}
+                      likeCount={notice.likeCount}
+                      date={notice.publishedAt || notice.createdAt}
+                    />
                   </div>
                 </Card>
               </Link>
@@ -166,6 +196,15 @@ export function NewsListPage() {
           />
         </>
       )}
+
+      {/* Phase 2-B: Copy Options Modal */}
+      <CopyOptionsModal
+        isOpen={modalState.isOpen}
+        onClose={closeCopyModal}
+        onConfirm={executeCopy}
+        originalTitle={modalState.sourceTitle || ''}
+        loading={copyLoading}
+      />
     </div>
   );
 }
@@ -200,10 +239,15 @@ const styles: Record<string, React.CSSProperties> = {
     color: 'inherit',
     minHeight: '44px',
   },
-  itemHeader: {
+  cardTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '8px',
+  },
+  badgeGroup: {
     display: 'flex',
     gap: '6px',
-    marginBottom: '8px',
     flexWrap: 'wrap',
     alignItems: 'center',
   },

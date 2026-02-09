@@ -3,13 +3,15 @@
  *
  * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: MetaBar 추가
  * WO-APP-DATA-HUB-ACTION-PHASE1-V1: 복사 버튼 추가
+ * WO-APP-DATA-HUB-COPY-PHASE2B-V1: 복사 옵션 모달
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
-import { ContentMetaBar, ContentCardActions } from '@o4o/ui';
+import { ContentMetaBar, ContentCardActions, CopyOptionsModal } from '@o4o/ui';
 import { newsApi } from '../../api';
+import { useDashboardCopy } from '../../hooks/useDashboardCopy';
 import { colors, typography } from '../../styles/theme';
 import type { GalleryItem } from '../../types';
 
@@ -22,6 +24,22 @@ export function GalleryPage() {
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
+
+  // Phase 2-B: Dashboard copy hook with modal support
+  const {
+    loading: copyLoading,
+    modalState,
+    openCopyModal,
+    closeCopyModal,
+    executeCopy,
+  } = useDashboardCopy({
+    sourceType: 'content',
+  });
+
+  // Copy handler - opens modal for options selection
+  const handleCopy = useCallback((itemId: string, itemTitle: string) => {
+    openCopyModal(itemId, itemTitle);
+  }, [openCopyModal]);
 
   useEffect(() => {
     loadData();
@@ -106,15 +124,20 @@ export function GalleryPage() {
                         style={styles.thumbnailImage}
                       />
                     </div>
-                    {/* Data Hub Actions */}
+                    {/* Data Hub Actions - Phase 2-B */}
                     <div style={styles.cardActions}>
-                      <ContentCardActions showCopy isOwner={false} />
+                      <ContentCardActions
+                        showCopy
+                        isOwner={false}
+                        onCopy={() => handleCopy(item.id, item.title)}
+                      />
                     </div>
                   </div>
                   <div style={styles.itemContent}>
                     <h3 style={styles.itemTitle}>{item.title}</h3>
-                    {/* MetaBar */}
+                    {/* MetaBar - T1: viewCount 표시 */}
                     <ContentMetaBar
+                      viewCount={item.viewCount}
                       date={item.eventDate || item.createdAt}
                       size="sm"
                     />
@@ -158,6 +181,15 @@ export function GalleryPage() {
           </div>
         </div>
       )}
+
+      {/* Phase 2-B: Copy Options Modal */}
+      <CopyOptionsModal
+        isOpen={modalState.isOpen}
+        onClose={closeCopyModal}
+        onConfirm={executeCopy}
+        originalTitle={modalState.sourceTitle || ''}
+        loading={copyLoading}
+      />
     </div>
   );
 }
