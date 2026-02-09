@@ -34,9 +34,10 @@ interface ApiResponse<T> {
 type PaginatedResponse<T> = SignagePaginatedResponse<T>;
 
 // Signage routes are mounted at /api/signage/ (NOT under /api/v1/).
-// Use relative URLs - the production proxy forwards /api/* to the API server.
+// WO-FIX-SIGNAGE-API: Use direct API URL to avoid nginx proxy issues on Cloud Run
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const getBaseUrl = (serviceKey: string = 'kpa-society') =>
-  `/api/signage/${serviceKey}`;
+  `${API_BASE}/api/signage/${serviceKey}`;
 
 /**
  * Public Content API - 인증 불필요

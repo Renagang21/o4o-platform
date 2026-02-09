@@ -343,9 +343,12 @@ function App() {
            * /demo/* 와 분리된 실제 라우트
            * ======================================== */}
 
-          {/* News (공지/소식) */}
+          {/* News (공지/소식) - WO-FIX-NEWS-ROUTES: 모든 콘텐츠 타입 라우트 추가 */}
           <Route path="/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/news/hero" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/news/promo" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/news/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
 
           {/* LMS (교육/강의) */}

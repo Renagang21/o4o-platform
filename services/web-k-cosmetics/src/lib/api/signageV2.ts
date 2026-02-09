@@ -70,8 +70,10 @@ interface PaginatedResponse<T> {
 
 export type ContentSource = 'hq' | 'supplier' | 'community';
 
+// WO-FIX-SIGNAGE-API: Use direct API URL to avoid nginx proxy issues on Cloud Run
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const getBaseUrl = (serviceKey: string = 'k-cosmetics') =>
-  `/api/signage/${serviceKey}`;
+  `${API_BASE}/api/signage/${serviceKey}`;
 
 export const globalContentApi = {
   async listPlaylists(source: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignagePlaylist>>> {
