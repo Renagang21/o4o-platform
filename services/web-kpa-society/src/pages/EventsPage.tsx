@@ -1,9 +1,13 @@
 /**
  * 행사/교육 페이지
  * Phase H8-FE: KPA Society Frontend
+ * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentMetaBar + ContentPagination
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { ContentMetaBar, ContentPagination } from '@o4o/ui';
+
+const PAGE_SIZE = 6;
 
 interface Event {
   id: number;
@@ -30,6 +34,7 @@ const sampleEvents: Event[] = [
 export function EventsPage() {
   const [selectedType, setSelectedType] = useState<string>('전체');
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const types = ['전체', '행사', '교육'];
   const statuses = ['전체', '예정', '진행중', '마감'];
@@ -47,7 +52,7 @@ export function EventsPage() {
     return null;
   };
 
-  const filteredEvents = sampleEvents.filter((event) => {
+  const allFilteredEvents = sampleEvents.filter((event) => {
     const typeFilter = getTypeFilter(selectedType);
     const statusFilter = getStatusFilter(selectedStatus);
 
@@ -56,6 +61,28 @@ export function EventsPage() {
 
     return matchesType && matchesStatus;
   });
+
+  const totalPages = Math.ceil(allFilteredEvents.length / PAGE_SIZE);
+  const filteredEvents = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allFilteredEvents.slice(start, start + PAGE_SIZE);
+  }, [allFilteredEvents, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Reset page when filter changes
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (status: string) => {
+    setSelectedStatus(status);
+    setCurrentPage(1);
+  };
 
   const getStatusStyle = (status: string): React.CSSProperties => {
     const base: React.CSSProperties = {
@@ -103,7 +130,7 @@ export function EventsPage() {
           {types.map((type) => (
             <button
               key={type}
-              onClick={() => setSelectedType(type)}
+              onClick={() => handleTypeChange(type)}
               style={{
                 ...styles.filterButton,
                 ...(selectedType === type ? styles.filterButtonActive : {}),
@@ -118,7 +145,7 @@ export function EventsPage() {
           {statuses.map((status) => (
             <button
               key={status}
-              onClick={() => setSelectedStatus(status)}
+              onClick={() => handleStatusChange(status)}
               style={{
                 ...styles.filterButton,
                 ...(selectedStatus === status ? styles.filterButtonActive : {}),
@@ -172,12 +199,30 @@ export function EventsPage() {
               )}
               <button style={styles.detailButton}>상세보기</button>
             </div>
+            {/* MetaBar for date */}
+            <div style={styles.metaBarWrapper}>
+              <ContentMetaBar
+                date={event.date}
+                size="sm"
+              />
+            </div>
           </div>
         ))}
       </div>
 
       {filteredEvents.length === 0 && (
         <p style={styles.noData}>해당 조건의 행사/교육이 없습니다.</p>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <ContentPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          showItemRange
+          totalItems={allFilteredEvents.length}
+        />
       )}
     </div>
   );
@@ -321,5 +366,10 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     color: '#666',
     padding: '40px',
+  },
+  metaBarWrapper: {
+    marginTop: '12px',
+    paddingTop: '12px',
+    borderTop: '1px solid #e9ecef',
   },
 };

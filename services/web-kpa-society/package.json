@@ -14,6 +14,7 @@
     "@o4o/content-editor": "workspace:*",
     "@o4o/forum-core": "workspace:*",
     "@o4o/types": "workspace:*",
+    "@o4o/ui": "workspace:*",
     "axios": "^1.10.0",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",

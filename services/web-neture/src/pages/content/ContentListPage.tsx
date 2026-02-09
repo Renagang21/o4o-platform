@@ -2,9 +2,10 @@
  * ContentListPage - 콘텐츠 목록 페이지
  *
  * APP-CONTENT Phase 2: @o4o/types/content 공유 상수, 정렬 토글, 출처 배지
+ * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentPagination + ContentCardActions
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, FileText, Bell } from 'lucide-react';
 import { cmsApi, type CmsContent } from '../../lib/api';
@@ -15,19 +16,24 @@ import {
   CONTENT_SOURCE_LABELS,
 } from '@o4o/types/content';
 import type { ContentSortType, ContentSourceType } from '@o4o/types/content';
+import { ContentPagination, ContentCardActions } from '@o4o/ui';
+
+const PAGE_SIZE = 10;
 
 export default function ContentListPage() {
-  const [contents, setContents] = useState<CmsContent[]>([]);
+  const [allContents, setAllContents] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<ContentSortType>('latest');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchContents = async () => {
       try {
         setLoading(true);
         const data = await cmsApi.getContents({ sort });
-        setContents(data);
+        setAllContents(data);
+        setCurrentPage(1); // Reset page when sort changes
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -37,6 +43,17 @@ export default function ContentListPage() {
 
     fetchContents();
   }, [sort]);
+
+  const totalPages = Math.ceil(allContents.length / PAGE_SIZE);
+  const contents = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allContents.slice(start, start + PAGE_SIZE);
+  }, [allContents, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (loading) {
     return (
@@ -155,15 +172,31 @@ export default function ContentListPage() {
                           : new Date(content.createdAt).toLocaleDateString('ko-KR')}
                       </span>
                     </div>
-                    <span className="inline-flex items-center text-primary-600 text-sm font-medium">
-                      자세히 보기
-                      <ArrowRight className="ml-1 w-4 h-4" />
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <ContentCardActions showCopy isOwner={false} />
+                      <span className="inline-flex items-center text-primary-600 text-sm font-medium">
+                        자세히 보기
+                        <ArrowRight className="ml-1 w-4 h-4" />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <ContentPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            showItemRange
+            totalItems={allContents.length}
+          />
         </div>
       )}
     </div>

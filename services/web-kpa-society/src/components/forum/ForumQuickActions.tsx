@@ -7,7 +7,7 @@
  * WO-FIX-FORUM-LINKS: 현재 경로에 따라 링크 동적 생성
  */
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
 
 // 포럼 베이스 경로

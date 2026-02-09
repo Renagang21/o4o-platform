@@ -1,10 +1,14 @@
 /**
  * GalleryPage - 갤러리 페이지
+ *
+ * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: MetaBar 추가
+ * WO-APP-DATA-HUB-ACTION-PHASE1-V1: 복사 버튼 추가
  */
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { ContentMetaBar, ContentCardActions } from '@o4o/ui';
 import { newsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 import type { GalleryItem } from '../../types';
@@ -94,20 +98,26 @@ export function GalleryPage() {
                 onClick={() => setSelectedItem(item)}
               >
                 <Card hover padding="none">
-                  <div style={styles.thumbnail}>
-                    <img
-                      src={item.thumbnailUrl}
-                      alt={item.title}
-                      style={styles.thumbnailImage}
-                    />
+                  <div style={styles.thumbnailWrapper}>
+                    <div style={styles.thumbnail}>
+                      <img
+                        src={item.thumbnailUrl}
+                        alt={item.title}
+                        style={styles.thumbnailImage}
+                      />
+                    </div>
+                    {/* Data Hub Actions */}
+                    <div style={styles.cardActions}>
+                      <ContentCardActions showCopy isOwner={false} />
+                    </div>
                   </div>
                   <div style={styles.itemContent}>
                     <h3 style={styles.itemTitle}>{item.title}</h3>
-                    <span style={styles.itemDate}>
-                      {item.eventDate
-                        ? new Date(item.eventDate).toLocaleDateString()
-                        : new Date(item.createdAt).toLocaleDateString()}
-                    </span>
+                    {/* MetaBar */}
+                    <ContentMetaBar
+                      date={item.eventDate || item.createdAt}
+                      size="sm"
+                    />
                   </div>
                 </Card>
               </div>
@@ -166,9 +176,18 @@ const styles: Record<string, React.CSSProperties> = {
   item: {
     cursor: 'pointer',
   },
+  thumbnailWrapper: {
+    position: 'relative',
+  },
   thumbnail: {
     aspectRatio: '4/3',
     overflow: 'hidden',
+  },
+  cardActions: {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    zIndex: 1,
   },
   thumbnailImage: {
     width: '100%',

@@ -623,3 +623,6 @@ export * from './theme';
 
 // Corner Display Components (Phase 1)
 export * from './corner-display';
+
+// Content Discovery Components (Phase 1)
+export * from './content-discovery';

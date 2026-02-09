@@ -7,7 +7,7 @@
  * - basePath를 자동 감지하여 BranchContext에 전달
  */
 
-import { Routes, Route, useParams, useLocation } from 'react-router-dom';
+import { Routes, Route, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { BranchLayout } from '../components/branch';
 import { BranchProvider } from '../contexts/BranchContext';
@@ -49,7 +49,6 @@ const BRANCH_NAMES: Record<string, string> = {
 
 export function BranchRoutes() {
   const { branchId } = useParams<{ branchId: string }>();
-  const location = useLocation();
   const [branchName, setBranchName] = useState<string>('');
   const [loading, setLoading] = useState(true);
 

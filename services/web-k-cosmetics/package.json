@@ -12,6 +12,7 @@
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
     "@o4o/types": "workspace:*",
+    "@o4o/ui": "workspace:*",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

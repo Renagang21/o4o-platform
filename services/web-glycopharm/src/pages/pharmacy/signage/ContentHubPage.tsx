@@ -5,28 +5,33 @@
  * - 디지털 사이니지 콘텐츠 허브 페이지
  * - 운영자/공급자/커뮤니티 콘텐츠를 탭별로 표시
  * - 보기 + 내 대시보드로 가져오기(Clone) 기능
+ * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentPagination
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
 import { globalContentApi, type SignagePlaylist, type SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { ContentPagination } from '@o4o/ui';
 
 type ContentType = 'playlists' | 'media';
+const PAGE_SIZE = 9;
 
 export default function ContentHubPage() {
   const [activeSource, setActiveSource] = useState<ContentSource>('hq');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
   // Data states
-  const [playlists, setPlaylists] = useState<SignagePlaylist[]>([]);
-  const [media, setMedia] = useState<SignageMedia[]>([]);
+  const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
+  const [allMedia, setAllMedia] = useState<SignageMedia[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Load content when source or type changes
   useEffect(() => {
     loadContent();
+    setCurrentPage(1);
   }, [activeSource, contentType]);
 
   const loadContent = async () => {
@@ -37,14 +42,14 @@ export default function ContentHubPage() {
       if (contentType === 'playlists') {
         const result = await globalContentApi.listPlaylists(activeSource, 'glycopharm', { page: 1, limit: 50 });
         if (result.success && result.data) {
-          setPlaylists(result.data.items || []);
+          setAllPlaylists(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load playlists');
         }
       } else {
         const result = await globalContentApi.listMedia(activeSource, 'glycopharm', { page: 1, limit: 50 });
         if (result.success && result.data) {
-          setMedia(result.data.items || []);
+          setAllMedia(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load media');
         }
@@ -55,6 +60,25 @@ export default function ContentHubPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Paginated data
+  const playlists = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allPlaylists.slice(start, start + PAGE_SIZE);
+  }, [allPlaylists, currentPage]);
+
+  const media = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allMedia.slice(start, start + PAGE_SIZE);
+  }, [allMedia, currentPage]);
+
+  const totalItems = contentType === 'playlists' ? allPlaylists.length : allMedia.length;
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleClonePlaylist = async (playlistId: string, playlistName: string) => {
@@ -240,11 +264,24 @@ export default function ContentHubPage() {
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contentType === 'playlists'
-          ? playlists.map(renderPlaylistCard)
-          : media.map(renderMediaCard)}
-      </div>
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {contentType === 'playlists'
+            ? playlists.map(renderPlaylistCard)
+            : media.map(renderMediaCard)}
+        </div>
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <ContentPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              showItemRange
+              totalItems={totalItems}
+            />
+          </div>
+        )}
+      </>
     );
   };
 

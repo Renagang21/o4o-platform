@@ -1,13 +1,17 @@
 /**
  * NoticeListPage - 공지 목록 (Forum Board 기반)
  * Work Order 3: Forum 기능을 이용한 공지 전용 Board
+ * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentPagination
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { IntranetHeader } from '../../components/intranet';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
+import { ContentPagination } from '@o4o/ui';
+
+const PAGE_SIZE = 10;
 
 interface Notice {
   id: string;
@@ -25,6 +29,7 @@ export function NoticeListPage() {
   const { user } = useAuth();
   const userRole = user?.role || 'member';
   const canWrite = ['officer', 'chair', 'admin', 'super_admin'].includes(userRole);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [notices] = useState<Notice[]>([
     {
@@ -85,10 +90,21 @@ export function NoticeListPage() {
   ]);
 
   // 고정 공지를 상단에 배치
-  const sortedNotices = [
+  const allSortedNotices = [
     ...notices.filter((n) => n.isPinned),
     ...notices.filter((n) => !n.isPinned),
   ];
+
+  const totalPages = Math.ceil(allSortedNotices.length / PAGE_SIZE);
+  const sortedNotices = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allSortedNotices.slice(start, start + PAGE_SIZE);
+  }, [allSortedNotices, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div>
@@ -154,16 +170,16 @@ export function NoticeListPage() {
           </table>
         </div>
 
-        {/* 페이지네이션 (샘플) */}
-        <div style={styles.pagination}>
-          <button style={styles.pageButton} disabled>
-            ← 이전
-          </button>
-          <span style={styles.pageInfo}>1 / 1</span>
-          <button style={styles.pageButton} disabled>
-            다음 →
-          </button>
-        </div>
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <ContentPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            showItemRange
+            totalItems={allSortedNotices.length}
+          />
+        )}
       </div>
     </div>
   );
@@ -231,24 +247,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: colors.primary,
     fontWeight: 500,
-  },
-  pagination: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '16px',
-    marginTop: '24px',
-  },
-  pageButton: {
-    padding: '8px 16px',
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '6px',
-    fontSize: '13px',
-    cursor: 'pointer',
-  },
-  pageInfo: {
-    fontSize: '14px',
-    color: colors.neutral600,
   },
 };
