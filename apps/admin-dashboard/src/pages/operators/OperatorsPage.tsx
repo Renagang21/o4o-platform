@@ -98,27 +98,8 @@ const OperatorsPage: React.FC = () => {
       const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
 
       if (Array.isArray(userData)) {
-        // Filter users that have service roles (prefixed or legacy)
+        // 모든 사용자 표시 (레거시 역할 정리 가능하도록)
         const operatorUsers = userData
-          .filter((user: any) => {
-            const userRoles = user.roles || [user.role];
-            return userRoles.some((role: string) => {
-              if (!role) return false;
-              const roleLower = role.toLowerCase();
-              // 서비스 프리픽스가 있는 역할
-              if (role.includes(':')) {
-                return roleLower.includes('admin') ||
-                       roleLower.includes('operator') ||
-                       roleLower.includes('super_admin') ||
-                       roleLower.includes('supplier') ||
-                       roleLower.includes('partner');
-              }
-              // 레거시 역할 (프리픽스 없음)
-              return roleLower === 'admin' ||
-                     roleLower === 'super_admin' ||
-                     roleLower === 'operator';
-            });
-          })
           .map((user: any) => ({
             id: user.id || user._id,
             name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown',
@@ -146,24 +127,17 @@ const OperatorsPage: React.FC = () => {
   // Filter operators
   const filteredOperators = useMemo(() => {
     return operators.filter(op => {
-      // Service filter
+      // Service filter - 서비스 프리픽스로만 필터링 (깔끔하게)
       if (serviceFilter !== 'all') {
         const hasServiceRole = op.roles.some(role => {
           const roleLower = role.toLowerCase();
-
-          // Platform은 platform: 또는 레거시 admin/super_admin 역할 포함
           if (serviceFilter === 'platform') {
-            return roleLower.startsWith('platform:') ||
-                   roleLower === 'admin' ||
-                   roleLower === 'super_admin' ||
-                   roleLower.includes('platform');
+            return roleLower.startsWith('platform:');
           }
-          // KPA는 kpa-a, kpa-b, kpa-c, kpa: 모두 포함
           if (serviceFilter === 'kpa') {
-            return roleLower.startsWith('kpa-') || roleLower.startsWith('kpa:') || roleLower.includes('kpa');
+            return roleLower.startsWith('kpa-') || roleLower.startsWith('kpa:');
           }
-          // 그 외 서비스
-          return roleLower.startsWith(`${serviceFilter}:`) || roleLower.includes(serviceFilter);
+          return roleLower.startsWith(`${serviceFilter}:`);
         });
         if (!hasServiceRole) return false;
       }
