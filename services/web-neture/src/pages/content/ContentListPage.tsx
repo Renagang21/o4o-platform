@@ -70,9 +70,7 @@ export default function ContentListPage() {
   };
 
   // Phase 3A: 추천 토글 핸들러
-  const handleRecommend = useCallback(async (e: React.MouseEvent, contentId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleRecommend = useCallback(async (contentId: string) => {
     try {
       const result = await cmsApi.toggleRecommend(contentId);
       setContents(prev => prev.map(c =>
@@ -192,7 +190,7 @@ export default function ContentListPage() {
                       likeCount={content.recommendCount || 0}
                       date={content.publishedAt || content.createdAt}
                       isRecommended={content.isRecommendedByMe}
-                      onRecommendedClick={(e: any) => handleRecommend(e, content.id)}
+                      onRecommendedClick={() => handleRecommend(content.id)}
                       size="sm"
                     />
                     <div className="flex items-center gap-2">

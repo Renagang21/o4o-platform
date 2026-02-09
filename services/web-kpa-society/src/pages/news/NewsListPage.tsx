@@ -71,9 +71,7 @@ export function NewsListPage() {
   }, [openCopyModal]);
 
   // Phase 3A: 추천 토글 핸들러
-  const handleRecommend = useCallback(async (e: React.MouseEvent, noticeId: string) => {
-    e.preventDefault(); // Link 클릭 방지
-    e.stopPropagation();
+  const handleRecommend = useCallback(async (noticeId: string) => {
     try {
       const result = await newsApi.toggleRecommend(noticeId);
       const data = result.data || result;
@@ -228,7 +226,7 @@ export function NewsListPage() {
                       likeCount={notice.recommendCount ?? notice.likeCount ?? 0}
                       date={notice.publishedAt || notice.createdAt}
                       isRecommended={notice.isRecommendedByMe}
-                      onRecommendedClick={(e: any) => handleRecommend(e, notice.id)}
+                      onRecommendedClick={() => handleRecommend(notice.id)}
                     />
                   </div>
                 </Card>
