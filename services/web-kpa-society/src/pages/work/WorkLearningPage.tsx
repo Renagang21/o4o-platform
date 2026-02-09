@@ -112,7 +112,7 @@ export function WorkLearningPage() {
                   }} />
                 </div>
               </div>
-              <Link to={`/demo/lms/course/${course.id}`} style={styles.continueButton}>
+              <Link to={`/lms/course/${course.id}`} style={styles.continueButton}>
                 계속 보기
               </Link>
             </div>
@@ -130,7 +130,7 @@ export function WorkLearningPage() {
                 <h3 style={styles.completedTitle}>{course.title}</h3>
                 <span style={styles.completedDate}>완료: {course.completedDate}</span>
               </div>
-              <Link to="/demo/lms/certificate" style={styles.certButton}>
+              <Link to="/lms/certificate" style={styles.certButton}>
                 기록 보기
               </Link>
             </div>
@@ -150,7 +150,7 @@ export function WorkLearningPage() {
                 <h3 style={styles.recommendTitle}>{course.title}</h3>
                 <span style={styles.recommendDuration}>{course.duration}</span>
               </div>
-              <Link to="/demo/lms/courses" style={styles.viewButton}>
+              <Link to="/lms/courses" style={styles.viewButton}>
                 보기
               </Link>
             </div>

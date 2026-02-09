@@ -14,24 +14,8 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { Product, B2BDistributionSettings } from '../../../types';
 
-// Mock 상품 데이터
-const mockProduct: Product = {
-  id: 'prod-1',
-  name: '기초 보습 크림 (업소용)',
-  description: '대용량 보습 크림 500ml',
-  categoryId: 'cosmetics',
-  supplierId: 'sup-1',
-  supplierName: '코스메틱팜',
-  requiredBuyerTypes: ['general', 'pharmacy', 'medical'],
-  taxType: 'taxable',
-  minOrderQty: 10,
-  unit: '개',
-  contentIds: ['content-1'],
-  serviceDistribution: true,
-  b2bDistribution: {
-    enabled: false,
-  },
-};
+// TODO: API 연동 필요 - 빈 상품 (API 연동 전)
+const mockProduct: Product | null = null;
 
 export function SupplierProductSettingsPage() {
   const { productId } = useParams<{ productId: string }>();
@@ -39,17 +23,36 @@ export function SupplierProductSettingsPage() {
   // TODO: productId로 실제 상품 조회
   const product = productId ? mockProduct : mockProduct;
 
-  // 서비스 유통 설정 (기존)
-  const [serviceDistribution, setServiceDistribution] = useState(product.serviceDistribution);
+  // 서비스 유통 설정 (기존) - hooks는 조건문 전에 호출
+  const [serviceDistribution, setServiceDistribution] = useState(product?.serviceDistribution ?? false);
 
   // B2B 유통 설정
-  const [b2bEnabled, setB2bEnabled] = useState(product.b2bDistribution?.enabled ?? false);
+  const [b2bEnabled, setB2bEnabled] = useState(product?.b2bDistribution?.enabled ?? false);
   const [b2bPrice, setB2bPrice] = useState<string>(
-    product.b2bDistribution?.b2bPrice?.toString() ?? ''
+    product?.b2bDistribution?.b2bPrice?.toString() ?? ''
   );
   const [b2bMinOrderQty, setB2bMinOrderQty] = useState<string>(
-    product.b2bDistribution?.b2bMinOrderQty?.toString() ?? product.minOrderQty.toString()
+    product?.b2bDistribution?.b2bMinOrderQty?.toString() ?? product?.minOrderQty?.toString() ?? ''
   );
+
+  // 상품이 없을 때 빈 상태 표시
+  if (!product) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <Link to="/supplier/products" style={styles.backLink}>
+            ← 상품 목록
+          </Link>
+        </div>
+        <div style={styles.emptyState}>
+          <p style={styles.emptyText}>상품 정보가 없습니다.</p>
+          <p style={styles.emptySubText}>
+            API 연동 후 상품 정보가 표시됩니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSave = () => {
     const settings: B2BDistributionSettings = {
@@ -269,5 +272,22 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
+  },
+  emptyState: {
+    padding: '60px 20px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px dashed #e2e8f0',
+    textAlign: 'center' as const,
+  },
+  emptyText: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: '0 0 8px 0',
+  },
+  emptySubText: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: 0,
   },
 };

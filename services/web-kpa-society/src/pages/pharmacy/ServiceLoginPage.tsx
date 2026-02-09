@@ -93,7 +93,7 @@ export function ServiceLoginPage() {
                 </h3>
                 <p className="mt-1 text-sm text-blue-700">
                   이 로그인은 약국 서비스 전용입니다.
-                  약사회 회원 로그인은 <Link to="/demo/login" className="font-medium underline">여기</Link>를 이용하세요.
+                  약사회 회원 로그인은 <Link to="/login" className="font-medium underline">여기</Link>를 이용하세요.
                 </p>
               </div>
             </div>

@@ -94,7 +94,7 @@ export function LectureCard({ lecture }: { lecture: LectureData }) {
         <div style={styles.ctaArea}>
           {isAuthenticated ? (
             <Link
-              to={`/demo/lms/course/${lecture.id}`}
+              to={`/lms/course/${lecture.id}`}
               style={isInProgress ? styles.ctaContinue : styles.ctaStart}
             >
               {isCompleted ? '다시 보기' : isInProgress ? '이어보기' : '수강하기'}

@@ -9,14 +9,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { colors, spacing, typography } from '../../styles/theme';
 
-// 현재 경로에 따라 베이스 경로 결정
+// 베이스 경로
 function useBasePath(): { forum: string; mypage: string; policy: string } {
-  const location = useLocation();
-  const isDemo = location.pathname.startsWith('/demo/');
   return {
-    forum: isDemo ? '/demo/forum' : '/forum',
-    mypage: isDemo ? '/demo/mypage' : '/mypage',
-    policy: isDemo ? '/demo/policy' : '/policy',
+    forum: '/forum',
+    mypage: '/mypage',
+    policy: '/policy',
   };
 }
 

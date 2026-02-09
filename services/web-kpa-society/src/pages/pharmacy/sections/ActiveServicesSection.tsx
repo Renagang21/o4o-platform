@@ -59,7 +59,7 @@ const SERVICE_CARDS: ServiceCard[] = [
     description: '약국 운영 관련 포럼·교육·자료',
     status: 'active',
     icon: '🏛️',
-    internalPath: '/demo/forum',
+    internalPath: '/forum',
   },
 ];
 

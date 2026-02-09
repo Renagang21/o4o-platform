@@ -69,7 +69,7 @@ export function PharmacyServicePage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo/mypage" style={styles.ctaPrimary}>
+        <a href="/mypage" style={styles.ctaPrimary}>
           약국 서비스 안내
         </a>
         <a href="/join/pharmacy" style={styles.ctaSecondary}>

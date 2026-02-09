@@ -20,7 +20,7 @@ export function EducationHeader() {
       </div>
       <div style={styles.actions}>
         {isAuthenticated ? (
-          <Link to="/demo/lms/certificate" style={styles.myLearningBtn}>
+          <Link to="/lms/certificate" style={styles.myLearningBtn}>
             내 학습 현황
           </Link>
         ) : (

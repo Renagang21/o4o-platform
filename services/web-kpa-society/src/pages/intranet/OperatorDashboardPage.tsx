@@ -90,9 +90,9 @@ export function OperatorDashboardPage() {
   // WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1: /branch-services/:branchId/*
   const adminBasePath = orgType === 'branch'
     ? `/branch-services/${currentOrganization?.id}/admin`
-    : '/demo/admin';
-  const intranetBasePath = '/demo/intranet';
-  const demoBasePath = '/demo';
+    : '/admin';
+  const intranetBasePath = '/intranet';
+  const lmsBasePath = '';
 
   // 대시보드 통계 데이터
   const [stats, setStats] = useState<DashboardStats>({
@@ -263,7 +263,7 @@ export function OperatorDashboardPage() {
       id: 'training',
       title: '🎓 연수교육 관리',
       description: '교육 과정, 일정, 등록 관리',
-      link: `${demoBasePath}/lms`,
+      link: `${lmsBasePath}/lms`,
       stats: [
         { label: '진행중 과정', value: stats.training.activeCourses, color: colors.primary },
         { label: '총 등록', value: stats.training.totalEnrollments, color: '#4F46E5' },
@@ -274,7 +274,7 @@ export function OperatorDashboardPage() {
       id: 'scores',
       title: '📊 교육 점수 관리',
       description: '약사 연수교육 점수 현황',
-      link: `${demoBasePath}/lms/certificate`,
+      link: `${lmsBasePath}/lms/certificate`,
       stats: [
         { label: '평균 점수', value: stats.trainingScores.avgScore, color: colors.primary },
         { label: '이수 완료', value: stats.trainingScores.completed, color: '#059669' },

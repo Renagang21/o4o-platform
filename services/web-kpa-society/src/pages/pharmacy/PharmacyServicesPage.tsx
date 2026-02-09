@@ -139,7 +139,7 @@ export function PharmacyServicesPage() {
             </div>
           </div>
           <div style={styles.serviceFooter}>
-            <Link to="/demo/lms" style={styles.linkButton}>
+            <Link to="/lms" style={styles.linkButton}>
               교육 센터 가기 →
             </Link>
           </div>
@@ -244,7 +244,7 @@ export function PharmacyServicesPage() {
             </div>
           </div>
           <div style={styles.serviceFooter}>
-            <Link to="/demo/forum" style={styles.linkButton}>
+            <Link to="/forum" style={styles.linkButton}>
               포럼 가기 →
             </Link>
           </div>

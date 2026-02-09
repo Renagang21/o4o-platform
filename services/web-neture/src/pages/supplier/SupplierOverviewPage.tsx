@@ -8,48 +8,8 @@ import { Link } from 'react-router-dom';
 import { AIInsightCard, AIInsightDetailPanel } from '../../components/ai-insight';
 import type { AIAnalysisResult } from '../../types';
 
-// Mock AI 분석 결과들 (실제로는 API에서 가져옴)
-// 우선순위: 1. RECOMMENDATION 2. 최신 생성일
-const mockAIResults: AIAnalysisResult[] = [
-  {
-    id: 'ai-result-1',
-    type: 'RECOMMENDATION',
-    title: '약국 대상 콘텐츠 확대를 권장합니다',
-    scope: {
-      serviceId: 'neture',
-      participantRoles: ['pharmacy', 'general'],
-      dateRange: { from: '2025-12-01', to: '2025-12-31' },
-    },
-    keyFindings: [
-      '약국 참여자의 반응이 일반 사업자보다 긍정적인 경향이 있습니다.',
-      '제품 설명 콘텐츠에 대한 완료율이 높습니다.',
-    ],
-    evidence: [
-      { type: 'pattern', description: '약국 대상 콘텐츠 효과적' },
-    ],
-    suggestion: '약국 대상 상품 설명 콘텐츠를 추가로 제작해 보시는 것을 권장합니다.',
-    generatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'ai-result-2',
-    type: 'INSIGHT',
-    title: '교육형 콘텐츠보다 설문형이 참여율이 높은 경향',
-    scope: {
-      serviceId: 'neture',
-      participantRoles: ['pharmacy', 'general'],
-      dateRange: { from: '2025-12-01', to: '2025-12-31' },
-    },
-    keyFindings: [
-      '설문형 콘텐츠의 완료율이 교육형보다 높습니다.',
-      '짧은 콘텐츠일수록 완료율이 높은 경향이 있습니다.',
-    ],
-    evidence: [
-      { type: 'trend', description: '설문형 선호 경향' },
-    ],
-    caution: '응답 수가 50건 미만이므로 일반화에 주의가 필요합니다.',
-    generatedAt: new Date(Date.now() - 86400000).toISOString(), // 1일 전
-  },
-];
+// TODO: API 연동 필요 - 현재 빈 배열
+const mockAIResults: AIAnalysisResult[] = [];
 
 // 인사이트 정렬: RECOMMENDATION 우선, 그 다음 최신순
 function sortInsights(results: AIAnalysisResult[]): AIAnalysisResult[] {
@@ -92,39 +52,30 @@ export function SupplierOverviewPage() {
         <p style={styles.subtitle}>현재 상태를 확인하고 다음 작업을 시작하세요</p>
       </div>
 
-      {/* 요약 카드 */}
+      {/* 요약 카드 - TODO: API 연동 필요 */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
           <div style={styles.statIcon}>📦</div>
-          <div style={styles.statValue}>156</div>
+          <div style={styles.statValue}>0</div>
           <div style={styles.statLabel}>등록 상품</div>
         </div>
         <div style={styles.statCard}>
           <div style={styles.statIcon}>🧪</div>
-          <div style={styles.statValue}>8</div>
+          <div style={styles.statValue}>0</div>
           <div style={styles.statLabel}>진행 중 Trial</div>
         </div>
         <div style={styles.statCard}>
           <div style={styles.statIcon}>📋</div>
-          <div style={styles.statValue}>42</div>
+          <div style={styles.statValue}>0</div>
           <div style={styles.statLabel}>활성 주문</div>
         </div>
       </div>
 
-      {/* 상태 알림 */}
+      {/* 상태 알림 - TODO: API 연동 필요 */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>확인이 필요한 항목</h2>
-        <div style={styles.alertList}>
-          <div style={{ ...styles.alertItem, ...styles.alertWarning }}>
-            <span style={styles.alertIcon}>⏳</span>
-            <span style={styles.alertText}>승인 대기 상품 3건</span>
-            <Link to="/supplier/products?status=pending" style={styles.alertAction}>확인하기</Link>
-          </div>
-          <div style={{ ...styles.alertItem, ...styles.alertInfo }}>
-            <span style={styles.alertIcon}>🚚</span>
-            <span style={styles.alertText}>출고 대기 주문 5건</span>
-            <Link to="/supplier/orders?status=pending" style={styles.alertAction}>처리하기</Link>
-          </div>
+        <div style={styles.emptyAlerts}>
+          <p style={styles.emptyAlertsText}>확인이 필요한 항목이 없습니다.</p>
         </div>
       </div>
 
@@ -376,6 +327,18 @@ const styles: Record<string, React.CSSProperties> = {
   insufficientSubText: {
     fontSize: '13px',
     color: '#94a3b8',
+    margin: 0,
+  },
+  emptyAlerts: {
+    padding: '32px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px dashed #e2e8f0',
+    textAlign: 'center' as const,
+  },
+  emptyAlertsText: {
+    fontSize: '14px',
+    color: '#64748b',
     margin: 0,
   },
 };

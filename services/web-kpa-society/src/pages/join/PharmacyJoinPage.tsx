@@ -100,7 +100,7 @@ export function PharmacyJoinPage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo/register" style={styles.ctaPrimary}>
+        <a href="/register" style={styles.ctaPrimary}>
           회원 가입하기
         </a>
         <a href="/services/pharmacy" style={styles.ctaSecondary}>

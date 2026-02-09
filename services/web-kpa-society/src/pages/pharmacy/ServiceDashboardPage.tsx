@@ -216,7 +216,7 @@ export function ServiceDashboardPage() {
               <p className="mt-1 text-sm text-amber-700">
                 현재 서비스 사용자로 로그인되어 있습니다.
                 약사회 회원 기능(인트라넷, 관리자 등)에 접근하려면{' '}
-                <Link to="/demo/login" className="font-medium underline">
+                <Link to="/login" className="font-medium underline">
                   회원 로그인
                 </Link>
                 을 이용하세요.

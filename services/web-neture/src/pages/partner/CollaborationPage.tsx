@@ -12,36 +12,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, Building2, CheckCircle, Clock, FileText } from 'lucide-react';
 
-// Mock 데이터: 협업 공급자 목록
-const collaborations = [
-  {
-    id: '1',
-    supplierName: 'GlycoPharm 강남점',
-    service: 'GlycoPharm',
-    status: 'active',
-    contractDate: '2025-01-01',
-    productCount: 12,
-    lastActivity: '2시간 전',
-  },
-  {
-    id: '2',
-    supplierName: 'K-Beauty 본사',
-    service: 'K-Cosmetics',
-    status: 'active',
-    contractDate: '2024-12-15',
-    productCount: 35,
-    lastActivity: '1일 전',
-  },
-  {
-    id: '3',
-    supplierName: 'Health Plus',
-    service: 'GlycoPharm',
-    status: 'pending',
-    contractDate: null,
-    productCount: 0,
-    lastActivity: '협업 요청 대기 중',
-  },
-];
+// TODO: API 연동 필요 - 현재 빈 배열
+const collaborations: {
+  id: string;
+  supplierName: string;
+  service: string;
+  status: 'active' | 'pending';
+  contractDate: string | null;
+  productCount: number;
+  lastActivity: string;
+}[] = [];
 
 export function CollaborationPage() {
   const activeCount = collaborations.filter(c => c.status === 'active').length;
@@ -96,6 +76,11 @@ export function CollaborationPage() {
       {/* Collaboration List */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>협업 공급자 목록</h2>
+        {collaborations.length === 0 ? (
+          <div style={styles.emptyState}>
+            <p style={styles.emptyStateText}>협업 중인 공급자가 없습니다.</p>
+          </div>
+        ) : (
         <div style={styles.list}>
           {collaborations.map((collab) => (
             <div key={collab.id} style={styles.card}>
@@ -139,6 +124,7 @@ export function CollaborationPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Info Notice */}
@@ -309,5 +295,17 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: 0,
     lineHeight: 1.6,
+  },
+  emptyState: {
+    textAlign: 'center' as const,
+    padding: '40px 20px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+  },
+  emptyStateText: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0,
   },
 };

@@ -20,18 +20,14 @@ import { colors, typography } from '../../styles/theme';
 /**
  * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
  * - /branch-services/:branchId/* → '/branch-services/:branchId' (Service C)
- * - /demo/* → '/demo' (Service B)
- * - 기타 → '' (빈 문자열, Service A)
+ * - 기타 → '' (빈 문자열, 커뮤니티)
  */
 function getServicePrefix(pathname: string): string {
   // 분회 서비스 컨텍스트 (Service C): /branch-services/:branchId/*
   const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
   if (branchServicesMatch) return branchServicesMatch[1];
 
-  // 데모 서비스 컨텍스트 (Service B): /demo/*
-  if (pathname.startsWith('/demo')) return '/demo';
-
-  // 메인 커뮤니티 컨텍스트 (Service A)
+  // 메인 커뮤니티 컨텍스트
   return '';
 }
 

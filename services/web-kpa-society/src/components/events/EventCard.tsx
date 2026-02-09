@@ -97,7 +97,7 @@ export function EventCard({ event }: { event: EventData }) {
         ) : event.status === 'ended' ? (
           <span style={styles.endedLabel}>마감</span>
         ) : isAuthenticated ? (
-          <Link to={`/demo/participation/${event.id}/respond`} style={styles.participateBtn}>
+          <Link to={`/participation/${event.id}/respond`} style={styles.participateBtn}>
             참여하기
           </Link>
         ) : (
@@ -105,7 +105,7 @@ export function EventCard({ event }: { event: EventData }) {
             로그인 후 참여
           </Link>
         )}
-        <Link to={`/demo/events/${event.id}`} style={styles.detailBtn}>
+        <Link to={`/events/${event.id}`} style={styles.detailBtn}>
           상세보기
         </Link>
       </div>

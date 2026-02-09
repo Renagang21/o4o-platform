@@ -11,10 +11,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: '홈', href: '/demo' },
-  { label: '조직', href: '/demo/organizations' },
-  { label: '회원 신청', href: '/demo/member/apply' },
-  { label: '내 신청', href: '/demo/applications' },
+  { label: '홈', href: '/' },
+  { label: '조직', href: '/organizations' },
+  { label: '회원 신청', href: '/member/apply' },
+  { label: '내 신청', href: '/applications' },
 ];
 
 export function Navigation() {

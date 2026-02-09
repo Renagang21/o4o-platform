@@ -153,7 +153,7 @@ export function StewardManagementPage() {
         description="조직/공간 단위 운영 책임을 배정하고 관리합니다."
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '관리자', href: '/demo/admin' },
+          { label: '관리자', href: '/admin' },
           { label: 'Steward 관리' },
         ]}
       />

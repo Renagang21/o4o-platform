@@ -53,10 +53,8 @@ export function BranchRoutes() {
   const [branchName, setBranchName] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  // basePath 자동 감지: /branch-services/:branchId 또는 /demo/branch/:branchId
-  const basePath = location.pathname.startsWith('/demo/branch/')
-    ? `/demo/branch/${branchId}`
-    : `/branch-services/${branchId}`;
+  // basePath 자동 감지: /branch-services/:branchId 기준
+  const basePath = `/branch-services/${branchId}`;
 
   useEffect(() => {
     if (branchId) {

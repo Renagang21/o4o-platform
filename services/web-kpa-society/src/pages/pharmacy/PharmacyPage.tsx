@@ -36,7 +36,7 @@ export function PharmacyPage() {
               약사회 회원 계정으로 로그인 후 이용할 수 있습니다.
             </p>
             <div style={styles.actions}>
-              <Link to="/demo/login?returnTo=/pharmacy" style={styles.joinBtn}>
+              <Link to="/login?returnTo=/pharmacy" style={styles.joinBtn}>
                 로그인
               </Link>
               <button
@@ -55,7 +55,7 @@ export function PharmacyPage() {
 
   // 2. 직역 미설정 → FunctionGatePage
   if (!user.pharmacistRole) {
-    return <Navigate to="/demo/select-function" replace />;
+    return <Navigate to="/select-function" replace />;
   }
 
   // 3. 직역 != pharmacy_owner → 접근 불가

@@ -86,10 +86,9 @@ function buildActivityMap(posts: ForumPost[]): Record<string, CategoryActivity> 
   return map;
 }
 
-// 현재 경로에 따라 포럼 베이스 경로 결정
+// 포럼 베이스 경로
 function useForumBasePath(): string {
-  const location = useLocation();
-  return location.pathname.startsWith('/demo/') ? '/demo/forum' : '/forum';
+  return '/forum';
 }
 
 function CategoryCard({ category, activity, basePath }: { category: ForumCategory; activity?: CategoryActivity; basePath: string }) {

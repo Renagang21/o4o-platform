@@ -113,7 +113,7 @@ export function ExternalServiceSection() {
           icon="🎓"
           title="교육/연수 서비스"
           description="약사 연수교육, 보수교육, 전문교육 과정을 제공합니다."
-          linkUrl="/demo/lms"
+          linkUrl="/lms"
           linkText="교육 서비스 이용하기"
           variant="primary"
           showDisclaimer={false}
@@ -123,7 +123,7 @@ export function ExternalServiceSection() {
           icon="🛒"
           title="공동구매 서비스"
           description="약국 운영에 필요한 물품을 합리적인 가격에 공동구매합니다."
-          linkUrl="/demo/groupbuy"
+          linkUrl="/groupbuy"
           linkText="공동구매 이용하기"
           variant="secondary"
           showDisclaimer={false}

@@ -20,7 +20,7 @@ export function ResourcesHeader() {
       </div>
       <div style={styles.actions}>
         {isAuthenticated ? (
-          <Link to="/demo/docs/upload" style={styles.uploadBtn}>
+          <Link to="/docs/upload" style={styles.uploadBtn}>
             자료 등록
           </Link>
         ) : (

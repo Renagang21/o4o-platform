@@ -115,19 +115,14 @@ export function ForumScopeProvider({ children }: ForumScopeProviderProps) {
   const location = useLocation();
 
   const value = useMemo<ForumScopeContextValue>(() => {
-    // Determine scope based on route
-    const isDemoMode = location.pathname.startsWith('/demo/');
-    const scope: ForumScope = isDemoMode ? 'demo' : 'community';
-
-    // Select API base path based on scope
-    // /demo/* routes → /demo-forum API (returns empty results)
-    // Other routes → /forum API (community content)
-    const basePath = isDemoMode ? '/demo-forum' : '/forum';
+    // 항상 community scope 사용 (베타 테스트 - 하드코딩 제거)
+    const scope: ForumScope = 'community';
+    const basePath = '/forum';
 
     return {
       scope,
       api: createForumApi(basePath),
-      isDemoMode,
+      isDemoMode: false,
     };
   }, [location.pathname]);
 

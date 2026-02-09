@@ -72,12 +72,12 @@ const mockOfficerData = {
 // Quick Menu items (kkpa.kr 참조 - 6열 그리드)
 // WO-KPA-SOCIETY-BRANCH-DEMO-MAIN-UI-REFERENCE-V1
 const quickMenuItems = [
-  { icon: '📢', label: '공지사항', href: '/demo/news/notice', color: '#1e40af' },
-  { icon: '📅', label: '분회일정', href: '/demo/calendar', color: '#1e40af' },
-  { icon: '📁', label: '자료실', href: '/demo/docs', color: '#1e40af' },
-  { icon: '📝', label: '회의록', href: '/demo/docs/minutes', color: '#1e40af' },
-  { icon: '💬', label: '게시판', href: '/demo/forum', color: '#1e40af' },
-  { icon: '📞', label: '문의', href: '/demo/contact', color: '#1e40af' },
+  { icon: '📢', label: '공지사항', href: '/news/notice', color: '#1e40af' },
+  { icon: '📅', label: '분회일정', href: '/calendar', color: '#1e40af' },
+  { icon: '📁', label: '자료실', href: '/docs', color: '#1e40af' },
+  { icon: '📝', label: '회의록', href: '/docs/minutes', color: '#1e40af' },
+  { icon: '💬', label: '게시판', href: '/forum', color: '#1e40af' },
+  { icon: '📞', label: '문의', href: '/contact', color: '#1e40af' },
 ];
 
 // 분회 일정 Mock 데이터
@@ -150,10 +150,10 @@ export function DashboardPage() {
             실제 지부/분회 서비스는 별도 도메인에서 운영됩니다.
           </p>
           <div style={styles.heroButtons}>
-            <a href="/demo/news/notice" style={styles.heroPrimaryButton}>
+            <a href="/news/notice" style={styles.heroPrimaryButton}>
               공지사항 확인
             </a>
-            <a href="/demo/organization" style={styles.heroSecondaryButton}>
+            <a href="/organization" style={styles.heroSecondaryButton}>
               조직 소개
             </a>
           </div>
@@ -275,11 +275,11 @@ export function DashboardPage() {
         <div style={styles.noticeCard}>
           <div style={styles.cardHeader}>
             <h3 style={styles.cardTitle}>📢 공지사항</h3>
-            <Link to="/demo/news/notice" style={styles.moreLink}>더보기 →</Link>
+            <Link to="/news/notice" style={styles.moreLink}>더보기 →</Link>
           </div>
           <div style={styles.noticeList}>
             {mockOrgNews.map((news) => (
-              <Link key={news.id} to={`/demo/news/notice/${news.id}`} style={styles.noticeListItem}>
+              <Link key={news.id} to={`/news/notice/${news.id}`} style={styles.noticeListItem}>
                 <span style={styles.noticeItemTitle}>{news.title}</span>
                 <span style={styles.noticeItemDate}>{news.date}</span>
               </Link>
@@ -291,7 +291,7 @@ export function DashboardPage() {
         <div style={styles.scheduleCard}>
           <div style={styles.cardHeader}>
             <h3 style={styles.cardTitle}>📅 분회 일정</h3>
-            <Link to="/demo/calendar" style={styles.moreLink}>전체보기 →</Link>
+            <Link to="/calendar" style={styles.moreLink}>전체보기 →</Link>
           </div>
           <div style={styles.scheduleList}>
             {mockSchedule.map((item) => (
@@ -316,21 +316,21 @@ export function DashboardPage() {
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>나의 활동</h2>
         <div style={styles.activityRow}>
-          <Link to="/demo/news/notice" style={styles.activityChip}>
+          <Link to="/news/notice" style={styles.activityChip}>
             <span style={styles.activityChipIcon}>📢</span>
             <span style={styles.activityChipLabel}>미확인 공지</span>
             <span style={styles.activityChipBadge}>{mockActivity.unreadNotices}</span>
           </Link>
-          <Link to="/demo/mypage/status-report" style={styles.activityChip}>
+          <Link to="/mypage/status-report" style={styles.activityChip}>
             <span style={styles.activityChipIcon}>📝</span>
             <span style={styles.activityChipLabel}>신상신고</span>
             <span style={styles.activityChipStatus}>제출 전</span>
           </Link>
-          <Link to="/demo/mypage/profile" style={styles.activityChip}>
+          <Link to="/mypage/profile" style={styles.activityChip}>
             <span style={styles.activityChipIcon}>👤</span>
             <span style={styles.activityChipLabel}>내 프로필</span>
           </Link>
-          <Link to="/demo/forum" style={styles.activityChip}>
+          <Link to="/forum" style={styles.activityChip}>
             <span style={styles.activityChipIcon}>💬</span>
             <span style={styles.activityChipLabel}>게시판</span>
           </Link>
@@ -341,11 +341,11 @@ export function DashboardPage() {
       <section style={styles.section}>
         <div style={styles.newsSectionHeader}>
           <h2 style={styles.sectionTitle}>전체 약사회 소식</h2>
-          <Link to="/demo/news/kpa-news" style={styles.moreLink}>더보기 →</Link>
+          <Link to="/news/kpa-news" style={styles.moreLink}>더보기 →</Link>
         </div>
         <div style={styles.kpaNewsList}>
           {mockKpaNews.map((news) => (
-            <Link key={news.id} to={`/demo/news/kpa-news/${news.id}`} style={styles.kpaNewsItem}>
+            <Link key={news.id} to={`/news/kpa-news/${news.id}`} style={styles.kpaNewsItem}>
               {news.isImportant && <span style={styles.importantBadge}>중요</span>}
               <span style={styles.kpaNewsTitle}>{news.title}</span>
               <span style={styles.kpaNewsDate}>{news.date}</span>

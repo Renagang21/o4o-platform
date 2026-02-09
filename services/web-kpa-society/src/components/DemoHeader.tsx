@@ -55,33 +55,33 @@ function getUserDisplayName(user: any): string {
 
 // Demo 전용 메뉴 구조 (커뮤니티 메뉴 제외)
 const demoMenuItems: MenuItem[] = [
-  { label: 'Demo 홈', href: '/demo' },
+  { label: '홈', href: '/' },
   {
     label: '공지/업무',
-    href: '/demo/news',
+    href: '/news',
     children: [
-      { label: '공지사항', href: '/demo/news' },
-      { label: '소식', href: '/demo/news/branch-news' },
-      { label: '자료실', href: '/demo/docs' },
+      { label: '공지사항', href: '/news' },
+      { label: '소식', href: '/news/branch-news' },
+      { label: '자료실', href: '/docs' },
     ],
   },
   {
     label: '조직/운영',
-    href: '/demo/organization',
+    href: '/organization',
     children: [
-      { label: '조직 소개', href: '/demo/organization' },
-      { label: '지부/분회', href: '/demo/organization/branches' },
-      { label: '임원 현황', href: '/demo/organization/officers' },
+      { label: '조직 소개', href: '/organization' },
+      { label: '지부/분회', href: '/organization/branches' },
+      { label: '임원 현황', href: '/organization/officers' },
     ],
   },
   {
-    label: '데모 기능',
-    href: '/demo/lms',
+    label: '서비스',
+    href: '/lms',
     children: [
-      { label: '교육 (LMS)', href: '/demo/lms' },
-      { label: '공동구매', href: '/demo/groupbuy' },
-      { label: '참여 (설문)', href: '/demo/participation' },
-      { label: '이벤트', href: '/demo/events' },
+      { label: '교육 (LMS)', href: '/lms' },
+      { label: '공동구매', href: '/groupbuy' },
+      { label: '참여 (설문)', href: '/participation' },
+      { label: '이벤트', href: '/events' },
     ],
   },
 ];
@@ -116,7 +116,7 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/demo');
+    navigate('/');
   };
 
   return (
@@ -125,7 +125,7 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
         <div style={styles.container}>
           {/* Logo + Service Badge */}
           <div style={styles.logoArea}>
-            <Link to="/demo" style={styles.logo}>
+            <Link to="/" style={styles.logo}>
               <span style={styles.logoIcon}>💊</span>
               <span style={styles.logoText}>{serviceName || 'KPA'}</span>
             </Link>
@@ -201,7 +201,7 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
                       </div>
                       <div style={styles.userDropdownDivider} />
                       <Link
-                        to="/demo/mypage"
+                        to="/mypage"
                         style={styles.userDropdownItem}
                         onClick={() => setShowUserDropdown(false)}
                       >
@@ -209,7 +209,7 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
                         대시보드
                       </Link>
                       <Link
-                        to="/demo/mypage/profile"
+                        to="/mypage/profile"
                         style={styles.userDropdownItem}
                         onClick={() => setShowUserDropdown(false)}
                       >
@@ -217,7 +217,7 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
                         프로필
                       </Link>
                       <Link
-                        to="/demo/mypage/settings"
+                        to="/mypage/settings"
                         style={styles.userDropdownItem}
                         onClick={() => setShowUserDropdown(false)}
                       >

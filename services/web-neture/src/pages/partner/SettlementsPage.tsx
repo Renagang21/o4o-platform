@@ -12,45 +12,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CreditCard, Calendar, CheckCircle, Clock, TrendingUp, Download } from 'lucide-react';
 
-// Mock 데이터: 정산 내역
-const settlements = [
-  {
-    id: '1',
-    month: '2025년 1월',
-    service: 'GlycoPharm',
-    amount: 850000,
-    status: 'completed',
-    paidDate: '2025-01-15',
-    commission: 8.5,
-  },
-  {
-    id: '2',
-    month: '2025년 1월',
-    service: 'K-Cosmetics',
-    amount: 420000,
-    status: 'pending',
-    paidDate: null,
-    commission: 7.0,
-  },
-  {
-    id: '3',
-    month: '2024년 12월',
-    service: 'GlycoPharm',
-    amount: 720000,
-    status: 'completed',
-    paidDate: '2025-01-05',
-    commission: 8.5,
-  },
-  {
-    id: '4',
-    month: '2024년 12월',
-    service: 'K-Cosmetics',
-    amount: 380000,
-    status: 'completed',
-    paidDate: '2025-01-05',
-    commission: 7.0,
-  },
-];
+// TODO: API 연동 필요 - 현재 빈 배열
+const settlements: {
+  id: string;
+  month: string;
+  service: string;
+  amount: number;
+  status: 'completed' | 'pending';
+  paidDate: string | null;
+  commission: number;
+}[] = [];
 
 export function SettlementsPage() {
   const totalAmount = settlements.reduce((sum, s) => sum + s.amount, 0);
@@ -110,6 +81,11 @@ export function SettlementsPage() {
       {/* Settlements List */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>정산 내역</h2>
+        {settlements.length === 0 ? (
+          <div style={styles.emptyState}>
+            <p style={styles.emptyStateText}>정산 내역이 없습니다.</p>
+          </div>
+        ) : (
         <div style={styles.list}>
           {settlements.map((settlement) => (
             <div key={settlement.id} style={styles.card}>
@@ -167,6 +143,7 @@ export function SettlementsPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Info Notice */}
@@ -374,5 +351,17 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: 0,
     lineHeight: 1.6,
+  },
+  emptyState: {
+    textAlign: 'center' as const,
+    padding: '40px 20px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+  },
+  emptyStateText: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0,
   },
 };

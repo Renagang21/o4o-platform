@@ -30,11 +30,8 @@ import type {
  * Note: client.ts already adds /api/v1/kpa prefix, so we don't add /kpa/ here
  */
 function getForumBasePath(): string {
-  if (typeof window !== 'undefined') {
-    const isDemoRoute = window.location.pathname.startsWith('/demo/');
-    return isDemoRoute ? '/demo-forum' : '/forum';
-  }
-  return '/forum'; // SSR fallback
+  // 항상 community scope 사용 (베타 테스트 - 하드코딩 제거)
+  return '/forum';
 }
 
 export const forumApi = {

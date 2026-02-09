@@ -53,7 +53,7 @@ export function LmsServicePage() {
       </div>
 
       <div style={styles.ctaSection}>
-        <a href="/demo/lms" style={styles.ctaPrimary}>
+        <a href="/lms" style={styles.ctaPrimary}>
           콘텐츠 서비스 이용하기
         </a>
       </div>

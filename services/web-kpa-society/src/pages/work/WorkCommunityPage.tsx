@@ -130,11 +130,11 @@ export function WorkCommunityPage() {
       <section style={styles.section}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>내 게시글</h2>
-          <Link to="/demo/forum" style={styles.viewAllLink}>전체 보기 →</Link>
+          <Link to="/forum" style={styles.viewAllLink}>전체 보기 →</Link>
         </div>
         <div style={styles.postList}>
           {data.myPosts.map(post => (
-            <Link key={post.id} to={`/demo/forum/post/${post.id}`} style={styles.postCard}>
+            <Link key={post.id} to={`/forum/post/${post.id}`} style={styles.postCard}>
               <div style={styles.postHeader}>
                 <span style={styles.postCategory}>{post.category}</span>
                 <span style={styles.postDate}>{post.date}</span>
@@ -168,7 +168,7 @@ export function WorkCommunityPage() {
 
       {/* 글쓰기 버튼 */}
       <div style={styles.writeSection}>
-        <Link to="/demo/forum/write" style={styles.writeButton}>
+        <Link to="/forum/write" style={styles.writeButton}>
           ✏️ 새 글 작성
         </Link>
       </div>

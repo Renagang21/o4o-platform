@@ -19,7 +19,7 @@ export function EventsHeader() {
       </div>
       <div style={styles.actions}>
         {isAuthenticated ? (
-          <Link to="/demo/participation" style={styles.myEventsBtn}>
+          <Link to="/participation" style={styles.myEventsBtn}>
             참여 중 이벤트
           </Link>
         ) : (

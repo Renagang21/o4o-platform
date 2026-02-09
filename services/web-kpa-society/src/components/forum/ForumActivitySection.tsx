@@ -15,10 +15,9 @@ import { forumApi } from '../../api';
 import type { ForumPost } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-// 현재 경로에 따라 포럼 베이스 경로 결정
+// 포럼 베이스 경로
 function useForumBasePath(): string {
-  const location = useLocation();
-  return location.pathname.startsWith('/demo/') ? '/demo/forum' : '/forum';
+  return '/forum';
 }
 
 function PostItem({ post, basePath }: { post: ForumPost; basePath: string }) {

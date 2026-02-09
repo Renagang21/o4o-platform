@@ -14,7 +14,7 @@ import { Link, useParams } from 'react-router-dom';
 import { AIInsightCard, AIInsightDetailPanel, AIInsightBadge } from '../../../components/ai-insight';
 import type { AIAnalysisResult, ParticipationContentType } from '../../../types';
 
-// Mock 콘텐츠 데이터
+// TODO: API 연동 필요
 interface SupplierContent {
   id: string;
   title: string;
@@ -25,39 +25,11 @@ interface SupplierContent {
   status: 'draft' | 'published' | 'closed';
 }
 
-const mockContent: SupplierContent = {
-  id: 'content-1',
-  title: '기초 보습 크림 제품 교육',
-  type: 'MIXED',
-  description: '기초 보습 크림의 성분, 효능, 사용법에 대한 교육 콘텐츠입니다. 교육 후 간단한 이해도 확인 퀴즈와 사용 경험 설문이 포함되어 있습니다.',
-  questionCount: 8,
-  createdAt: '2025-12-15',
-  status: 'published',
-};
+// 빈 콘텐츠 (API 연동 전)
+const mockContent: SupplierContent | null = null;
 
-// Mock AI 결과 (있을 수도 없을 수도 있음)
-const mockAIResult: AIAnalysisResult | null = {
-  id: 'ai-content-1',
-  type: 'INSIGHT',
-  title: '이 콘텐츠에 대한 사업자 반응',
-  scope: {
-    serviceId: 'neture',
-    productId: 'prod-1',
-    participantRoles: ['pharmacy', 'general'],
-    dateRange: { from: '2025-12-15', to: '2025-12-31' },
-  },
-  keyFindings: [
-    '참여한 약국의 대부분이 "교육 내용이 실무에 도움이 된다"고 응답했습니다.',
-    '제품 사용법 섹션에서 가장 많은 시간을 소요하는 경향이 있습니다.',
-    '추가 교육 희망 항목으로 "피부 타입별 추천"이 자주 언급되었습니다.',
-  ],
-  evidence: [
-    { type: 'pattern', description: '사용법 섹션 집중 경향' },
-    { type: 'trend', description: '추가 교육 수요 발견' },
-  ],
-  suggestion: '피부 타입별 제품 추천 가이드 콘텐츠를 추가로 제작해 보시는 것을 권장합니다.',
-  generatedAt: new Date().toISOString(),
-};
+// AI 결과 (API 연동 전)
+const mockAIResult: AIAnalysisResult | null = null;
 
 const CONTENT_TYPE_LABELS: Record<ParticipationContentType, string> = {
   COURSE: '교육',
@@ -79,8 +51,27 @@ export function SupplierContentDetailPage() {
   // TODO: contentId로 실제 콘텐츠 조회
   const content = contentId ? mockContent : mockContent;
   const aiResult = mockAIResult; // null일 수 있음
-  const hasInsight = aiResult !== null;
 
+  // 콘텐츠가 없을 때 빈 상태 표시
+  if (!content) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <Link to="/supplier/content" style={styles.backLink}>
+            ← 콘텐츠 목록
+          </Link>
+        </div>
+        <div style={styles.emptyState}>
+          <p style={styles.emptyText}>콘텐츠 정보가 없습니다.</p>
+          <p style={styles.emptySubText}>
+            API 연동 후 콘텐츠가 표시됩니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const hasInsight = aiResult !== null;
   const statusInfo = STATUS_LABELS[content.status];
 
   return (
@@ -258,5 +249,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: '#94a3b8',
     margin: 0,
+  },
+  emptyState: {
+    padding: '60px 20px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px dashed #e2e8f0',
+    textAlign: 'center',
   },
 };

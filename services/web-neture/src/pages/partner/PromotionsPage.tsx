@@ -12,49 +12,17 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Megaphone, Calendar, TrendingUp, Clock, CheckCircle, XCircle } from 'lucide-react';
 
-// Mock 데이터: 프로모션 목록
-const promotions = [
-  {
-    id: '1',
-    name: '신년 건강 캠페인',
-    service: 'GlycoPharm',
-    status: 'active',
-    startDate: '2025-01-01',
-    endDate: '2025-01-31',
-    targetCount: 5000,
-    currentCount: 3240,
-  },
-  {
-    id: '2',
-    name: 'K-Beauty 프로모션',
-    service: 'K-Cosmetics',
-    status: 'active',
-    startDate: '2025-01-10',
-    endDate: '2025-02-10',
-    targetCount: 10000,
-    currentCount: 2100,
-  },
-  {
-    id: '3',
-    name: '겨울철 건강 이벤트',
-    service: 'GlycoPharm',
-    status: 'scheduled',
-    startDate: '2025-02-01',
-    endDate: '2025-02-28',
-    targetCount: 8000,
-    currentCount: 0,
-  },
-  {
-    id: '4',
-    name: '연말 감사 캠페인',
-    service: 'K-Cosmetics',
-    status: 'ended',
-    startDate: '2024-12-01',
-    endDate: '2024-12-31',
-    targetCount: 6000,
-    currentCount: 5800,
-  },
-];
+// TODO: API 연동 필요 - 현재 빈 배열
+const promotions: {
+  id: string;
+  name: string;
+  service: string;
+  status: 'active' | 'scheduled' | 'ended';
+  startDate: string;
+  endDate: string;
+  targetCount: number;
+  currentCount: number;
+}[] = [];
 
 const getStatusInfo = (status: string) => {
   switch (status) {
@@ -122,6 +90,11 @@ export function PromotionsPage() {
       {/* Promotions List */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>캠페인 목록</h2>
+        {promotions.length === 0 ? (
+          <div style={styles.emptyState}>
+            <p style={styles.emptyStateText}>등록된 캠페인이 없습니다.</p>
+          </div>
+        ) : (
         <div style={styles.list}>
           {promotions.map((promo) => {
             const statusInfo = getStatusInfo(promo.status);
@@ -177,6 +150,7 @@ export function PromotionsPage() {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* Info Notice */}
@@ -363,5 +337,17 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: 0,
     lineHeight: 1.6,
+  },
+  emptyState: {
+    textAlign: 'center' as const,
+    padding: '40px 20px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+  },
+  emptyStateText: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0,
   },
 };

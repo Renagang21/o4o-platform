@@ -3,7 +3,7 @@
  * WO-CONTEXT-SWITCH-FOUNDATION-V1
  *
  * 특정 컨텍스트 유형이 필요한 라우트를 감싸서 보호한다.
- * - 미로그인 → /demo/login 리다이렉트
+ * - 미로그인 → /login 리다이렉트
  * - 컨텍스트 미설정 → fallbackPath 리다이렉트
  * - 컨텍스트 유형 불일치 → fallbackPath 리다이렉트
  */
@@ -31,7 +31,7 @@ export function ContextGuard({
 
   // 미로그인
   if (!user) {
-    return <Navigate to="/demo/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // 컨텍스트 미설정

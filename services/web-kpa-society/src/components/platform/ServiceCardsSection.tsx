@@ -37,7 +37,7 @@ const services: ServiceItem[] = [
     href: '/services/branch',
     badgeType: 'demo',
     ctas: [
-      { label: '지부 서비스 데모 보기', href: '/demo', primary: true },
+      { label: '지부 서비스 보기', href: '/', primary: true },
       { label: '도입 안내', href: '/join/branch' },
     ],
   },
@@ -87,7 +87,7 @@ const services: ServiceItem[] = [
       '콘텐츠 열람과 진행 이력을 관리할 수 있습니다.',
     href: '/services/lms',
     badgeType: 'none',
-    ctas: [{ label: '콘텐츠 서비스 보기', href: '/demo/lms', primary: true }],
+    ctas: [{ label: '콘텐츠 서비스 보기', href: '/lms', primary: true }],
   },
 ];
 
