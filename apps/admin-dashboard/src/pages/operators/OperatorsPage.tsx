@@ -157,17 +157,49 @@ const OperatorsPage: React.FC = () => {
     });
   }, [operators, serviceFilter, searchQuery]);
 
-  // Role display helper
+  // Service name mapping
+  const getServiceName = (role: string): string => {
+    if (role.startsWith('platform:')) return 'Platform';
+    if (role.startsWith('kpa-a:')) return 'KPA 커뮤니티';
+    if (role.startsWith('kpa-b:')) return 'KPA 데모';
+    if (role.startsWith('kpa-c:')) return 'KPA 분회서비스';
+    if (role.startsWith('kpa:')) return 'KPA';
+    if (role.startsWith('neture:')) return 'Neture';
+    if (role.startsWith('glycopharm:')) return 'GlycoPharm';
+    if (role.startsWith('cosmetics:')) return 'K-Cosmetics';
+    if (role.startsWith('glucoseview:')) return 'GlucoseView';
+    return '';
+  };
+
+  // Role display helper - shows service name + role label
   const getRoleDisplay = (role: string) => {
     const roleInfo = ALL_ROLES.find(r => r.value === role);
-    if (roleInfo) return roleInfo.label;
+    const serviceName = getServiceName(role);
 
-    // Parse role format
+    if (roleInfo) {
+      // 서비스명이 라벨에 이미 포함되어 있으면 그대로 사용
+      if (roleInfo.label.includes(serviceName) || !serviceName) {
+        return roleInfo.label;
+      }
+      return `${serviceName}: ${roleInfo.label}`;
+    }
+
+    // Parse role format for unknown roles
     const [service, roleName] = role.split(':');
-    return `${service.toUpperCase()} ${roleName?.replace(/_/g, ' ') || role}`;
+    const displayService = serviceName || service.toUpperCase();
+    return `${displayService}: ${roleName?.replace(/_/g, ' ') || role}`;
   };
 
   const getRoleColor = (role: string) => {
+    // Service-based colors
+    if (role.startsWith('platform:')) return 'bg-red-100 text-red-800';
+    if (role.startsWith('kpa')) return 'bg-blue-100 text-blue-800';
+    if (role.startsWith('neture:')) return 'bg-orange-100 text-orange-800';
+    if (role.startsWith('glycopharm:')) return 'bg-green-100 text-green-800';
+    if (role.startsWith('cosmetics:')) return 'bg-pink-100 text-pink-800';
+    if (role.startsWith('glucoseview:')) return 'bg-purple-100 text-purple-800';
+
+    // Role-based fallback
     if (role.includes('super_admin')) return 'bg-red-100 text-red-800';
     if (role.includes('admin')) return 'bg-orange-100 text-orange-800';
     if (role.includes('operator')) return 'bg-blue-100 text-blue-800';
@@ -319,6 +351,9 @@ const OperatorsPage: React.FC = () => {
     {
       key: 'roles',
       title: 'Roles',
+      sortable: true,
+      dataIndex: 'roles',
+      sorter: (a, b) => (a.roles[0] || '').localeCompare(b.roles[0] || ''),
       render: (_, record) => (
         <div className="flex flex-wrap gap-1">
           {record.roles.map(role => (
@@ -335,6 +370,7 @@ const OperatorsPage: React.FC = () => {
     {
       key: 'status',
       title: 'Status',
+      sortable: true,
       dataIndex: 'status',
       render: (val) => (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
@@ -348,8 +384,8 @@ const OperatorsPage: React.FC = () => {
     {
       key: 'createdAt',
       title: 'Created',
-      dataIndex: 'createdAt',
       sortable: true,
+      dataIndex: 'createdAt',
     },
     {
       key: 'actions',
