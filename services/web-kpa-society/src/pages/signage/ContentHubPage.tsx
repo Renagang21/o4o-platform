@@ -16,7 +16,7 @@ import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
 type ContentType = 'playlists' | 'media';
 
 export default function ContentHubPage() {
-  const [activeSource, setActiveSource] = useState<ContentSource>('hq');
+  const [activeSource, setActiveSource] = useState<ContentSource>('community');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
   // Data states
@@ -93,7 +93,7 @@ export default function ContentHubPage() {
       case 'hq':
         return '운영자 제공';
       case 'supplier':
-        return '파트너 제공';
+        return '공급자 제공';
       case 'community':
         return '커뮤니티 공유';
       default:
@@ -106,7 +106,7 @@ export default function ContentHubPage() {
       case 'hq':
         return '약사회 및 관련 기관에서 공식적으로 제공하는 안내·교육 자료';
       case 'supplier':
-        return '협력 기관 및 파트너가 등록한 안내 자료';
+        return '공급자가 등록한 안내 자료';
       case 'community':
         return '회원 간 공유된 유용한 안내 자료';
       default:
@@ -354,7 +354,7 @@ export default function ContentHubPage() {
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex">
-            {(['hq', 'supplier', 'community'] as ContentSource[]).map((source) => (
+            {(['community', 'supplier', 'hq'] as ContentSource[]).map((source) => (
               <button
                 key={source}
                 onClick={() => setActiveSource(source)}

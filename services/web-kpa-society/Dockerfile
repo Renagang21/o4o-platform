@@ -56,21 +56,16 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 WORKDIR /app/services/web-kpa-society
 RUN pnpm build
 
-# Production stage
-FROM node:20-alpine AS runner
+# Production stage - nginx for static files + API proxy
+FROM nginx:alpine AS runner
 
-WORKDIR /app
-
-# Install serve for static file serving
-RUN npm install -g serve
+# Copy nginx configuration
+COPY services/web-kpa-society/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built files
-COPY --from=builder /app/services/web-kpa-society/dist ./dist
+COPY --from=builder /app/services/web-kpa-society/dist /usr/share/nginx/html
 
-# Cloud Run uses PORT env variable
-ENV PORT=8080
-
+# Cloud Run uses PORT env variable (nginx.conf listens on 8080)
 EXPOSE 8080
 
-# Serve static files
-CMD ["serve", "-s", "dist", "-l", "8080"]
+CMD ["nginx", "-g", "daemon off;"]
