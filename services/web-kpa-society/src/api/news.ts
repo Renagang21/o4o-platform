@@ -11,7 +11,7 @@ import type {
 } from '../types';
 
 export const newsApi = {
-  // 공지사항/뉴스 (APP-CONTENT Phase 1: sort support)
+  // 공지사항/뉴스 (APP-CONTENT Phase 3A: sort + 추천/조회수)
   getNotices: (params?: {
     type?: string;
     page?: number;
@@ -23,6 +23,14 @@ export const newsApi = {
 
   getNotice: (id: string) =>
     apiClient.get<ApiResponse<Notice>>(`/news/${id}`),
+
+  // Phase 3A: 추천 토글 (추천/취소)
+  toggleRecommend: (id: string) =>
+    apiClient.post<ApiResponse<{ recommendCount: number; isRecommendedByMe: boolean }>>(`/news/${id}/recommend`),
+
+  // Phase 3A: 조회수 증가
+  trackView: (id: string) =>
+    apiClient.post<ApiResponse<void>>(`/news/${id}/view`),
 
   // 갤러리
   getGalleryItems: (params?: {

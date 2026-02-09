@@ -2,38 +2,53 @@
  * ContentListPage - 콘텐츠 목록 페이지
  *
  * APP-CONTENT Phase 2: @o4o/types/content 공유 상수, 정렬 토글, 출처 배지
- * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentPagination + ContentCardActions
+ * Phase 3A: 서버사이드 pagination, 추천/조회수, ContentMetaBar
+ * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1: "이미 사용 중" 표시
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, FileText, Bell } from 'lucide-react';
-import { cmsApi, type CmsContent } from '../../lib/api';
+import { cmsApi, contentAssetApi, type CmsContent } from '../../lib/api';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   CONTENT_TYPE_LABELS,
-  CONTENT_SORT_LABELS,
   CONTENT_SOURCE_COLORS,
   CONTENT_SOURCE_LABELS,
 } from '@o4o/types/content';
 import type { ContentSortType, ContentSourceType } from '@o4o/types/content';
-import { ContentPagination, ContentCardActions } from '@o4o/ui';
+import { ContentPagination, ContentCardActions, ContentMetaBar, ContentSortButtons } from '@o4o/ui';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 export default function ContentListPage() {
-  const [allContents, setAllContents] = useState<CmsContent[]>([]);
+  const { user } = useAuth();
+  const [contents, setContents] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<ContentSortType>('latest');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
+
+  // Phase 3: 이미 복사한 콘텐츠 ID 로드
+  useEffect(() => {
+    if (!user?.id) return;
+    contentAssetApi.getCopiedSourceIds(user.id)
+      .then(res => setCopiedIds(new Set(res.sourceIds || [])))
+      .catch(() => {});
+  }, [user?.id]);
 
   useEffect(() => {
     const fetchContents = async () => {
       try {
         setLoading(true);
-        const data = await cmsApi.getContents({ sort });
-        setAllContents(data);
-        setCurrentPage(1); // Reset page when sort changes
+        setError(null);
+        const result = await cmsApi.getContents({ sort, page: currentPage, limit: PAGE_SIZE });
+        setContents(result.data);
+        setTotalPages(result.pagination.totalPages);
+        setTotalItems(result.pagination.total);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -42,18 +57,33 @@ export default function ContentListPage() {
     };
 
     fetchContents();
-  }, [sort]);
-
-  const totalPages = Math.ceil(allContents.length / PAGE_SIZE);
-  const contents = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return allContents.slice(start, start + PAGE_SIZE);
-  }, [allContents, currentPage]);
+  }, [sort, currentPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handleSortChange = (newSort: ContentSortType) => {
+    setSort(newSort);
+    setCurrentPage(1);
+  };
+
+  // Phase 3A: 추천 토글 핸들러
+  const handleRecommend = useCallback(async (e: React.MouseEvent, contentId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const result = await cmsApi.toggleRecommend(contentId);
+      setContents(prev => prev.map(c =>
+        c.id === contentId
+          ? { ...c, recommendCount: result.recommendCount, isRecommendedByMe: result.isRecommendedByMe }
+          : c
+      ));
+    } catch (err) {
+      console.warn('Recommend failed:', err);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -94,19 +124,13 @@ export default function ContentListPage() {
         </p>
       </div>
 
-      {/* 정렬 토글 (APP-CONTENT Phase 2) */}
-      <div className="flex gap-2 mb-6">
-        {(['latest', 'featured', 'views'] as ContentSortType[]).map(s => (
-          <button
-            key={s}
-            className={sort === s
-              ? 'px-4 py-1.5 rounded-full text-sm bg-primary-600 text-white font-medium'
-              : 'px-4 py-1.5 rounded-full text-sm border border-gray-200 text-gray-600 hover:border-gray-300'}
-            onClick={() => setSort(s)}
-          >
-            {CONTENT_SORT_LABELS[s]}
-          </button>
-        ))}
+      {/* 정렬 토글 (Phase 3A: ContentSortButtons 컴포넌트 사용) */}
+      <div className="mb-6">
+        <ContentSortButtons
+          value={sort}
+          onChange={handleSortChange as (sort: 'latest' | 'featured' | 'views') => void}
+          options={['latest', 'featured', 'views'] as ('latest' | 'featured' | 'views')[]}
+        />
       </div>
 
       {/* Content List */}
@@ -140,7 +164,7 @@ export default function ContentListPage() {
                         중요
                       </span>
                     )}
-                    {/* 출처 배지 (APP-CONTENT Phase 2) */}
+                    {/* 출처 배지 */}
                     {content.metadata?.creatorType && CONTENT_SOURCE_LABELS[content.metadata.creatorType as ContentSourceType] && (
                       <span
                         className="inline-block px-2 py-1 text-xs text-white rounded font-medium"
@@ -161,19 +185,24 @@ export default function ContentListPage() {
                   {content.summary && (
                     <p className="text-sm text-gray-600 line-clamp-2">{content.summary}</p>
                   )}
+                  {/* Phase 3A: 메타 정보 + 추천 + 액션 */}
                   <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {content.metadata?.supplierName && (
-                        <span>{content.metadata.supplierName}</span>
-                      )}
-                      <span>
-                        {content.publishedAt
-                          ? new Date(content.publishedAt).toLocaleDateString('ko-KR')
-                          : new Date(content.createdAt).toLocaleDateString('ko-KR')}
-                      </span>
-                    </div>
+                    <ContentMetaBar
+                      viewCount={content.viewCount || 0}
+                      likeCount={content.recommendCount || 0}
+                      date={content.publishedAt || content.createdAt}
+                      isRecommended={content.isRecommendedByMe}
+                      onRecommendedClick={(e: any) => handleRecommend(e, content.id)}
+                      size="sm"
+                    />
                     <div className="flex items-center gap-2">
-                      <ContentCardActions showCopy isOwner={false} />
+                      {copiedIds.has(content.id) ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium">
+                          &#10003; 사용 중
+                        </span>
+                      ) : (
+                        <ContentCardActions showCopy isOwner={false} />
+                      )}
                       <span className="inline-flex items-center text-primary-600 text-sm font-medium">
                         자세히 보기
                         <ArrowRight className="ml-1 w-4 h-4" />
@@ -187,7 +216,7 @@ export default function ContentListPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Pagination (Phase 3A: 서버사이드) */}
       {totalPages > 1 && (
         <div className="mt-8">
           <ContentPagination
@@ -195,7 +224,8 @@ export default function ContentListPage() {
             totalPages={totalPages}
             onPageChange={handlePageChange}
             showItemRange
-            totalItems={allContents.length}
+            totalItems={totalItems}
+            pageSize={PAGE_SIZE}
           />
         </div>
       )}

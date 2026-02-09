@@ -57,6 +57,12 @@ export interface ContentItemResponse {
   metadata?: ContentMetadata | null;
   publishedAt?: string | null;
   createdAt: string;
+  /** Phase 3A: 조회수 */
+  viewCount?: number;
+  /** Phase 3A: 추천수 */
+  recommendCount?: number;
+  /** Phase 3A: 내가 추천했는지 여부 */
+  isRecommendedByMe?: boolean;
 }
 
 /** 페이지네이션 정보 */

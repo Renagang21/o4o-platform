@@ -32,6 +32,21 @@ export {
   type CustomerRequestStatus,
 } from './customer-request.entity.js';
 
+// Event (Phase 2-A: Event → Request Connection)
+export {
+  GlycopharmEvent,
+  type GlycopharmEventType,
+  type GlycopharmEventSourceType,
+  type GlycopharmEventPurpose,
+} from './glycopharm-event.entity.js';
+
+// Request Action Log (Phase 2-C: Post-Action)
+export {
+  GlycopharmRequestActionLog,
+  type RequestActionType,
+  type RequestActionStatus,
+} from './request-action-log.entity.js';
+
 // Orders - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // GlycopharmOrder, GlycopharmOrderItem entities removed
 // New orders will use E-commerce Core with OrderType.GLYCOPHARM

@@ -3,15 +3,23 @@
  *
  * WO-APP-DATA-HUB-COPY-PHASE2A-V1
  * WO-APP-DATA-HUB-COPY-PHASE2B-V1: 복사 옵션 추가
+ * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1: 자산 관리 (편집/공개/보관/삭제) + 중복 체크
+ * WO-APP-DASHBOARD-KPI-PHASE4A-V1: KPI 미니 대시보드 + 정렬 + 안내 메시지
  *
- * 통합 대시보드 자산 복사 API
+ * 통합 대시보드 자산 API
  * - 허브 콘텐츠를 내 대시보드 자산으로 복사
+ * - 복사된 자산 관리 (편집, 공개, 보관, 삭제)
  * - Content / Signage Media / Signage Playlist 지원
  *
  * 핵심 원칙:
  * - Hub = Read Only
  * - My Dashboard = Write / Edit / Delete
  * - 원본 데이터는 절대 수정되지 않음
+ *
+ * 상태 모델:
+ * - draft: isActive=false, dashboardStatus 미설정 또는 'draft'
+ * - active(published): isActive=true, dashboardStatus='published'
+ * - archived: isActive=false, dashboardStatus='archived'
  */
 
 import { Router, Response } from 'express';
@@ -62,6 +70,15 @@ interface CopyAssetResponse {
   status: 'draft';
   sourceType: DashboardAssetSourceType;
   sourceId: string;
+}
+
+/**
+ * Derive dashboard asset status from CmsMedia fields
+ */
+function deriveDashboardStatus(asset: { isActive: boolean; metadata?: any }): 'draft' | 'active' | 'archived' {
+  if (asset.metadata?.dashboardStatus === 'archived') return 'archived';
+  if (asset.isActive) return 'active';
+  return 'draft';
 }
 
 /**
@@ -198,7 +215,7 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
   router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const user = req.user;
-      const { dashboardId, sourceType, status } = req.query;
+      const { dashboardId, sourceType, status, sort } = req.query;
 
       if (!user) {
         res.status(401).json({
@@ -216,34 +233,98 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      // Query copied assets from cms_media where metadata contains sourceContentId
-      const mediaRepo = dataSource.getRepository(CmsMedia);
+      // Phase 4A: Use raw SQL for sort by views/recommend (JOIN with source content)
+      const validSorts = ['recent', 'views', 'recommend'];
+      const sortParam = validSorts.includes(sort as string) ? sort as string : 'recent';
 
-      const query = mediaRepo.createQueryBuilder('media')
-        .where('media."organizationId" = :dashboardId', { dashboardId })
-        .andWhere("media.metadata->>'sourceContentId' IS NOT NULL");
-
+      // Build WHERE clause
+      let statusFilter = '';
       if (status === 'draft') {
-        query.andWhere('media."isActive" = false');
+        statusFilter = `AND m."isActive" = false AND (m.metadata->>'dashboardStatus' IS NULL OR m.metadata->>'dashboardStatus' != 'archived')`;
       } else if (status === 'active') {
-        query.andWhere('media."isActive" = true');
+        statusFilter = `AND m."isActive" = true`;
+      } else if (status === 'archived') {
+        statusFilter = `AND m."isActive" = false AND m.metadata->>'dashboardStatus' = 'archived'`;
       }
 
-      const assets = await query
-        .orderBy('media."createdAt"', 'DESC')
-        .getMany();
+      // Build ORDER BY + JOINs based on sort
+      let joinClause = '';
+      let orderByClause = 'm."createdAt" DESC';
+      let extraSelectFields = '';
+
+      if (sortParam === 'views') {
+        joinClause = `LEFT JOIN cms_contents c ON c.id::text = m.metadata->>'sourceContentId'`;
+        extraSelectFields = `, COALESCE(c."viewCount", 0) AS "sourceViewCount"`;
+        orderByClause = '"sourceViewCount" DESC, m."createdAt" DESC';
+      } else if (sortParam === 'recommend') {
+        joinClause = `LEFT JOIN (
+          SELECT content_id, COUNT(*) AS rec_count
+          FROM cms_content_recommendations
+          GROUP BY content_id
+        ) rc ON rc.content_id::text = m.metadata->>'sourceContentId'`;
+        extraSelectFields = `, COALESCE(rc.rec_count, 0) AS "sourceRecommendCount"`;
+        orderByClause = '"sourceRecommendCount" DESC, m."createdAt" DESC';
+      }
+
+      const rows = await dataSource.query(`
+        SELECT m.id, m.title, m.description, m.type, m."isActive",
+               m.metadata, m."createdAt"${extraSelectFields}
+        FROM cms_media m
+        ${joinClause}
+        WHERE m."organizationId" = $1
+          AND m.metadata->>'sourceContentId' IS NOT NULL
+          ${statusFilter}
+        ORDER BY ${orderByClause}
+      `, [dashboardId]);
+
+      // Batch-fetch viewCount + recommendCount for all source content IDs
+      const sourceIds = rows
+        .map((r: any) => r.metadata?.sourceContentId)
+        .filter(Boolean);
+
+      let viewCountMap: Record<string, number> = {};
+      let recCountMap: Record<string, number> = {};
+
+      if (sourceIds.length > 0) {
+        try {
+          const viewRows = await dataSource.query(`
+            SELECT id::text AS id, "viewCount" FROM cms_contents WHERE id::text = ANY($1)
+          `, [sourceIds]);
+          for (const r of viewRows) {
+            viewCountMap[r.id] = parseInt(r.viewCount || '0', 10);
+          }
+        } catch { /* graceful fallback */ }
+
+        try {
+          const recRows = await dataSource.query(`
+            SELECT content_id::text AS "contentId", COUNT(*) AS "count"
+            FROM cms_content_recommendations
+            WHERE content_id::text = ANY($1)
+            GROUP BY content_id
+          `, [sourceIds]);
+          for (const r of recRows) {
+            recCountMap[r.contentId] = parseInt(r.count || '0', 10);
+          }
+        } catch { /* graceful fallback */ }
+      }
 
       res.json({
         success: true,
-        data: assets.map(asset => ({
-          id: asset.id,
-          title: asset.title,
-          type: asset.type,
-          status: asset.isActive ? 'active' : 'draft',
-          sourceContentId: asset.metadata?.sourceContentId,
-          copiedAt: asset.metadata?.copiedAt,
-          createdAt: asset.createdAt,
-        })),
+        data: rows.map((asset: any) => {
+          const srcId = asset.metadata?.sourceContentId;
+          return {
+            id: asset.id,
+            title: asset.title,
+            description: asset.description || null,
+            type: asset.type,
+            status: deriveDashboardStatus(asset),
+            sourceContentId: srcId,
+            copiedAt: asset.metadata?.copiedAt,
+            createdAt: asset.createdAt,
+            viewCount: srcId ? (viewCountMap[srcId] || 0) : 0,
+            recommendCount: srcId ? (recCountMap[srcId] || 0) : 0,
+          };
+        }),
       });
     } catch (error: any) {
       console.error('Failed to list dashboard assets:', error);
@@ -251,6 +332,324 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
         success: false,
         error: { code: 'INTERNAL_ERROR', message: error.message },
       });
+    }
+  });
+
+  /**
+   * GET /api/v1/dashboard/assets/copied-source-ids
+   *
+   * 사용자가 이미 복사한 원본 콘텐츠 ID 목록 (허브 목록에서 배치 체크용)
+   */
+  router.get('/copied-source-ids', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      const { dashboardId } = req.query;
+
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
+        return;
+      }
+
+      if (!dashboardId) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+        return;
+      }
+
+      const mediaRepo = dataSource.getRepository(CmsMedia);
+      const assets = await mediaRepo.createQueryBuilder('media')
+        .select("media.metadata->>'sourceContentId'", 'sourceContentId')
+        .where('media."organizationId" = :dashboardId', { dashboardId })
+        .andWhere("media.metadata->>'sourceContentId' IS NOT NULL")
+        .andWhere("(media.metadata->>'dashboardStatus' IS NULL OR media.metadata->>'dashboardStatus' != 'archived')")
+        .getRawMany();
+
+      const sourceIds = assets
+        .map((a: any) => a.sourceContentId)
+        .filter(Boolean);
+
+      res.json({ success: true, sourceIds });
+    } catch (error: any) {
+      console.error('Failed to get copied source IDs:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  });
+
+  /**
+   * GET /api/v1/dashboard/assets/kpi
+   *
+   * 대시보드 KPI 요약 (Phase 4A)
+   * - totalAssets: 전체 자산 수
+   * - activeAssets: 공개 자산 수
+   * - recentViewsSum: 최근 7일 내 복사한 콘텐츠의 원본 조회수 합계
+   * - topRecommended: 추천 많은 자산 (원본 기준)
+   */
+  router.get('/kpi', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      const { dashboardId } = req.query;
+
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
+        return;
+      }
+
+      if (!dashboardId) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+        return;
+      }
+
+      // 1. Total + Active counts
+      const countRows = await dataSource.query(`
+        SELECT
+          COUNT(*) AS "totalAssets",
+          COUNT(*) FILTER (WHERE m."isActive" = true) AS "activeAssets"
+        FROM cms_media m
+        WHERE m."organizationId" = $1
+          AND m.metadata->>'sourceContentId' IS NOT NULL
+          AND (m.metadata->>'dashboardStatus' IS NULL OR m.metadata->>'dashboardStatus' != 'archived')
+      `, [dashboardId]);
+
+      const totalAssets = parseInt(countRows[0]?.totalAssets || '0', 10);
+      const activeAssets = parseInt(countRows[0]?.activeAssets || '0', 10);
+
+      // 2. Recent 7-day views sum (sum of original content viewCount for assets copied in last 7 days)
+      let recentViewsSum = 0;
+      try {
+        const viewRows = await dataSource.query(`
+          SELECT COALESCE(SUM(c."viewCount"), 0) AS "viewsSum"
+          FROM cms_media m
+          INNER JOIN cms_contents c ON c.id::text = m.metadata->>'sourceContentId'
+          WHERE m."organizationId" = $1
+            AND m.metadata->>'sourceContentId' IS NOT NULL
+            AND (m.metadata->>'dashboardStatus' IS NULL OR m.metadata->>'dashboardStatus' != 'archived')
+            AND m."createdAt" >= NOW() - INTERVAL '7 days'
+        `, [dashboardId]);
+        recentViewsSum = parseInt(viewRows[0]?.viewsSum || '0', 10);
+      } catch {
+        // cms_contents may not have viewCount yet - graceful fallback
+      }
+
+      // 3. Top recommended asset (highest recommendation count from source content)
+      let topRecommended: { id: string; title: string; recommendCount: number } | null = null;
+      try {
+        const recRows = await dataSource.query(`
+          SELECT m.id, m.title, COUNT(r.id) AS "recommendCount"
+          FROM cms_media m
+          INNER JOIN cms_content_recommendations r ON r.content_id::text = m.metadata->>'sourceContentId'
+          WHERE m."organizationId" = $1
+            AND m.metadata->>'sourceContentId' IS NOT NULL
+            AND (m.metadata->>'dashboardStatus' IS NULL OR m.metadata->>'dashboardStatus' != 'archived')
+          GROUP BY m.id, m.title
+          ORDER BY "recommendCount" DESC
+          LIMIT 1
+        `, [dashboardId]);
+
+        if (recRows.length > 0) {
+          topRecommended = {
+            id: recRows[0].id,
+            title: recRows[0].title,
+            recommendCount: parseInt(recRows[0].recommendCount || '0', 10),
+          };
+        }
+      } catch {
+        // cms_content_recommendations may not exist yet - graceful fallback
+      }
+
+      res.json({
+        success: true,
+        data: {
+          totalAssets,
+          activeAssets,
+          recentViewsSum,
+          topRecommended,
+        },
+      });
+    } catch (error: any) {
+      console.error('Failed to get dashboard KPI:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  });
+
+  /**
+   * PATCH /api/v1/dashboard/assets/:id
+   *
+   * 대시보드 자산 제목/설명 편집
+   */
+  router.patch('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      const { id } = req.params;
+      const { title, description, dashboardId } = req.body;
+
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
+        return;
+      }
+
+      if (!dashboardId) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+        return;
+      }
+
+      const mediaRepo = dataSource.getRepository(CmsMedia);
+      const asset = await mediaRepo.findOne({
+        where: { id, organizationId: dashboardId },
+      });
+
+      if (!asset || !asset.metadata?.sourceContentId) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '대시보드 자산을 찾을 수 없습니다.' } });
+        return;
+      }
+
+      if (title !== undefined) asset.title = title;
+      if (description !== undefined) asset.description = description;
+      await mediaRepo.save(asset);
+
+      res.json({
+        success: true,
+        data: {
+          id: asset.id,
+          title: asset.title,
+          description: asset.description || null,
+          status: deriveDashboardStatus(asset),
+        },
+      });
+    } catch (error: any) {
+      console.error('Failed to update dashboard asset:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  });
+
+  /**
+   * POST /api/v1/dashboard/assets/:id/publish
+   *
+   * 대시보드 자산 공개 (draft/archived → active)
+   */
+  router.post('/:id/publish', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      const { id } = req.params;
+      const { dashboardId } = req.body;
+
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
+        return;
+      }
+
+      if (!dashboardId) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+        return;
+      }
+
+      const mediaRepo = dataSource.getRepository(CmsMedia);
+      const asset = await mediaRepo.findOne({
+        where: { id, organizationId: dashboardId },
+      });
+
+      if (!asset || !asset.metadata?.sourceContentId) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '대시보드 자산을 찾을 수 없습니다.' } });
+        return;
+      }
+
+      asset.isActive = true;
+      asset.metadata = { ...asset.metadata, dashboardStatus: 'published' };
+      await mediaRepo.save(asset);
+
+      res.json({
+        success: true,
+        data: { id: asset.id, status: 'active' as const },
+      });
+    } catch (error: any) {
+      console.error('Failed to publish dashboard asset:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  });
+
+  /**
+   * POST /api/v1/dashboard/assets/:id/archive
+   *
+   * 대시보드 자산 보관 (active/draft → archived)
+   */
+  router.post('/:id/archive', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      const { id } = req.params;
+      const { dashboardId } = req.body;
+
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
+        return;
+      }
+
+      if (!dashboardId) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+        return;
+      }
+
+      const mediaRepo = dataSource.getRepository(CmsMedia);
+      const asset = await mediaRepo.findOne({
+        where: { id, organizationId: dashboardId },
+      });
+
+      if (!asset || !asset.metadata?.sourceContentId) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '대시보드 자산을 찾을 수 없습니다.' } });
+        return;
+      }
+
+      asset.isActive = false;
+      asset.metadata = { ...asset.metadata, dashboardStatus: 'archived' };
+      await mediaRepo.save(asset);
+
+      res.json({
+        success: true,
+        data: { id: asset.id, status: 'archived' as const },
+      });
+    } catch (error: any) {
+      console.error('Failed to archive dashboard asset:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  });
+
+  /**
+   * DELETE /api/v1/dashboard/assets/:id
+   *
+   * 대시보드 자산 삭제 (소프트 삭제 = 보관 처리)
+   */
+  router.delete('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      const { id } = req.params;
+      const dashboardId = req.query.dashboardId as string;
+
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
+        return;
+      }
+
+      if (!dashboardId) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+        return;
+      }
+
+      const mediaRepo = dataSource.getRepository(CmsMedia);
+      const asset = await mediaRepo.findOne({
+        where: { id, organizationId: dashboardId },
+      });
+
+      if (!asset || !asset.metadata?.sourceContentId) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '대시보드 자산을 찾을 수 없습니다.' } });
+        return;
+      }
+
+      // Soft delete: mark as archived
+      asset.isActive = false;
+      asset.metadata = { ...asset.metadata, dashboardStatus: 'archived' };
+      await mediaRepo.save(asset);
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Failed to delete dashboard asset:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
     }
   });
 

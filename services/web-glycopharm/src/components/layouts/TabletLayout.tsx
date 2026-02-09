@@ -16,18 +16,97 @@ import {
   Search,
   Loader2,
   AlertCircle,
-  Settings,
+  Bell,
+  MessageCircle,
+  PackageIcon,
+  ShoppingBag,
+  CheckCircle,
+  X,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';
 import type { PharmacyStore } from '@/types/store';
 import { StoreModeProvider, useStoreMode } from '@/contexts/StoreModeContext';
 import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+
+type RequestPurpose = 'consultation' | 'sample' | 'order';
+type RequestDialogState = 'closed' | 'select' | 'confirm' | 'submitting' | 'done' | 'cooldown';
+
+const PURPOSE_OPTIONS: { purpose: RequestPurpose; label: string; icon: typeof MessageCircle }[] = [
+  { purpose: 'consultation', label: '상담', icon: MessageCircle },
+  { purpose: 'sample', label: '샘플', icon: PackageIcon },
+  { purpose: 'order', label: '주문', icon: ShoppingBag },
+];
+
+const PURPOSE_MESSAGES: Record<RequestPurpose, string> = {
+  consultation: '직원에게 상담을 요청하시겠습니까?',
+  sample: '샘플 신청은 직원 확인 후 진행됩니다.',
+  order: '주문 요청 단계이며, 결제는 이후 진행됩니다.',
+};
+
 // 태블릿 헤더 컴포넌트
 function TabletHeader({ store }: { store: PharmacyStore }) {
   const { getStorePath } = useStoreMode();
+  const { pharmacyId } = useParams<{ pharmacyId: string }>();
   const [cartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // 직원 요청 다이얼로그
+  const [dialogState, setDialogState] = useState<RequestDialogState>('closed');
+  const [selectedPurpose, setSelectedPurpose] = useState<RequestPurpose | null>(null);
+
+  const handlePurposeSelect = (purpose: RequestPurpose) => {
+    setSelectedPurpose(purpose);
+    setDialogState('confirm');
+  };
+
+  const handleSubmitRequest = async () => {
+    if (!selectedPurpose || !pharmacyId) return;
+    setDialogState('submitting');
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pharmacyId,
+          eventType: 'click',
+          sourceType: 'tablet',
+          purpose: selectedPurpose,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (data.data?.promoted) {
+          setDialogState('done');
+        } else {
+          setDialogState('cooldown');
+        }
+        // 3초 후 자동 닫힘
+        setTimeout(() => {
+          setDialogState('closed');
+          setSelectedPurpose(null);
+        }, 3000);
+      } else {
+        throw new Error(data.error || '요청 실패');
+      }
+    } catch (err) {
+      console.error('Request failed:', err);
+      setDialogState('done');
+      setTimeout(() => {
+        setDialogState('closed');
+        setSelectedPurpose(null);
+      }, 3000);
+    }
+  };
+
+  const closeDialog = () => {
+    setDialogState('closed');
+    setSelectedPurpose(null);
+  };
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -86,12 +165,13 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
               )}
             </NavLink>
 
-            {/* 직원 메뉴 */}
+            {/* 직원 요청 */}
             <button
-              className="p-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors"
-              title="직원 설정"
+              onClick={() => setDialogState('select')}
+              className="flex items-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-xl text-lg font-semibold hover:bg-amber-600 transition-colors"
             >
-              <Settings className="w-6 h-6" />
+              <Bell className="w-6 h-6" />
+              <span>직원 요청</span>
             </button>
           </div>
         </div>
@@ -147,6 +227,99 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
           </NavLink>
         </div>
       </nav>
+
+      {/* 직원 요청 다이얼로그 오버레이 */}
+      {dialogState !== 'closed' && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
+            {/* 선택 단계 */}
+            {dialogState === 'select' && (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-slate-800">어떤 도움이 필요하신가요?</h2>
+                  <button onClick={closeDialog} className="p-1 text-slate-400 hover:text-slate-600">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {PURPOSE_OPTIONS.map(({ purpose, label, icon: Icon }) => (
+                    <button
+                      key={purpose}
+                      onClick={() => handlePurposeSelect(purpose)}
+                      className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-slate-200 hover:border-primary-500 hover:bg-primary-50 transition-colors"
+                    >
+                      <Icon className="w-10 h-10 text-primary-600" />
+                      <span className="text-lg font-semibold text-slate-700">{label}</span>
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={closeDialog}
+                  className="w-full mt-6 py-3 text-slate-500 text-base hover:text-slate-700"
+                >
+                  닫기
+                </button>
+              </>
+            )}
+
+            {/* 확인 단계 */}
+            {dialogState === 'confirm' && selectedPurpose && (
+              <>
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mx-auto mb-4">
+                    {(() => {
+                      const opt = PURPOSE_OPTIONS.find(o => o.purpose === selectedPurpose);
+                      const Icon = opt?.icon || MessageCircle;
+                      return <Icon className="w-8 h-8 text-primary-600" />;
+                    })()}
+                  </div>
+                  <p className="text-lg text-slate-700">{PURPOSE_MESSAGES[selectedPurpose]}</p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setDialogState('select')}
+                    className="flex-1 py-3 rounded-xl border border-slate-300 text-slate-600 font-semibold hover:bg-slate-50"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleSubmitRequest}
+                    className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-semibold hover:bg-primary-700"
+                  >
+                    요청하기
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* 제출 중 */}
+            {dialogState === 'submitting' && (
+              <div className="text-center py-8">
+                <Loader2 className="w-12 h-12 text-primary-600 animate-spin mx-auto mb-4" />
+                <p className="text-lg text-slate-600">요청 중...</p>
+              </div>
+            )}
+
+            {/* 완료 */}
+            {dialogState === 'done' && (
+              <div className="text-center py-8">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-800 mb-2">요청이 접수되었습니다</h3>
+                <p className="text-slate-500">잠시만 기다려주세요.</p>
+              </div>
+            )}
+
+            {/* 쿨타임 */}
+            {dialogState === 'cooldown' && (
+              <div className="text-center py-8">
+                <CheckCircle className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-800 mb-2">이미 접수된 요청이 있습니다</h3>
+                <p className="text-slate-500">잠시 후 다시 시도해주세요.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

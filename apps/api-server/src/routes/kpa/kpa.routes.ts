@@ -335,16 +335,19 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // News Routes - /api/v1/kpa/news/*
   // WO-KPA-HOME-PHASE1-V1: Connected to cms_contents (was placeholder)
+  // Phase 3A: 추천/조회수/페이지네이션 추가
   // ============================================================================
   const newsRouter = Router();
 
-  // APP-CONTENT Phase 2: ContentQueryService
+  // APP-CONTENT Phase 3A: ContentQueryService + 추천 enrichment
   newsRouter.get('/', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const result = await contentService.listPublished({
+    const userId = (req as any).user?.id;
+    const result = await contentService.listPublishedWithRecommendations({
       type: req.query.type as string,
       sort: (req.query.sort as string) as any || 'latest',
       page: parseInt(req.query.page as string) || 1,
-      limit: parseInt(req.query.limit as string) || 20,
+      limit: parseInt(req.query.limit as string) || 12,
+      userId,
     });
     res.json({ success: true, ...result });
   }));
@@ -361,14 +364,32 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     });
   });
 
-  // APP-CONTENT Phase 2: ContentQueryService
+  // APP-CONTENT Phase 3A: 상세 조회 + 추천 정보
   newsRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const content = await contentService.getById(req.params.id);
+    const userId = (req as any).user?.id;
+    const content = await contentService.getByIdWithRecommendations(req.params.id, userId);
     if (!content) {
       res.status(404).json({ success: false, error: { message: 'News not found' } });
       return;
     }
     res.json({ success: true, data: content });
+  }));
+
+  // Phase 3A: 추천 토글 (POST = 추천/취소 토글)
+  newsRouter.post('/:id/recommend', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+      return;
+    }
+    const result = await contentService.toggleRecommendation(req.params.id, userId);
+    res.json({ success: true, data: result });
+  }));
+
+  // Phase 3A: 조회수 증가 (public)
+  newsRouter.post('/:id/view', asyncHandler(async (req: Request, res: Response) => {
+    await contentService.incrementViewCount(req.params.id);
+    res.json({ success: true });
   }));
 
   router.use('/news', newsRouter);

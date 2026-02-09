@@ -19,6 +19,9 @@ import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
+import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
+import { createFunnelController } from './controllers/funnel.controller.js'; // Phase 3-A: Funnel Visualization
+import { createReportController } from './controllers/report.controller.js'; // Phase 3-B: Billing Report
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
@@ -231,6 +234,36 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/', customerRequestController);
+
+  // ============================================================================
+  // Event Routes - Phase 2-A: Event → Request Connection
+  // /api/v1/glycopharm/events/*
+  // ============================================================================
+  const eventController = createEventController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', eventController);
+
+  // ============================================================================
+  // Funnel Routes - Phase 3-A: Funnel Visualization
+  // /api/v1/glycopharm/funnel/*
+  // ============================================================================
+  const funnelController = createFunnelController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', funnelController);
+
+  // ============================================================================
+  // Report Routes - Phase 3-B: Billing Basis Report
+  // /api/v1/glycopharm/reports/*
+  // ============================================================================
+  const reportController = createReportController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', reportController);
 
   // B2B products routes
   const b2bController = createB2BController(

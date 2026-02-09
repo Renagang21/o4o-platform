@@ -192,6 +192,10 @@ export interface Notice {
   viewCount?: number;
   views?: number;
   likeCount?: number;
+  /** Phase 3A: 추천수 */
+  recommendCount?: number;
+  /** Phase 3A: 내가 추천했는지 */
+  isRecommendedByMe?: boolean;
   imageUrl?: string | null;
   linkUrl?: string | null;
   linkText?: string | null;

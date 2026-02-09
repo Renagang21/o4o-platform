@@ -99,6 +99,7 @@ import PartnerInfoPage from './pages/PartnerInfoPage';
 import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
+import MyContentPage from './pages/dashboard/MyContentPage';
 
 // Neture 전용 Test Guide
 import {
@@ -397,6 +398,9 @@ function App() {
               <Route path="/workspace/content" element={<ContentListPage />} />
               <Route path="/workspace/content/:id" element={<ContentDetailPage />} />
 
+              {/* 내 콘텐츠 (WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1) */}
+              <Route path="/workspace/my-content" element={<MyContentPage />} />
+
               {/* 포럼 허브 + 글 목록/작성/상세 */}
               <Route path="/workspace/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/workspace/forum" />} />
               <Route path="/workspace/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
@@ -486,6 +490,7 @@ function App() {
             <Route path="/platform/principles" element={<Navigate to="/workspace/platform/principles" replace />} />
             <Route path="/content" element={<Navigate to="/workspace/content" replace />} />
             <Route path="/content/:id" element={<RedirectContentDetail />} />
+            <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
 
             {/* Supplier Dashboard 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/workspace/supplier/dashboard" replace />} />

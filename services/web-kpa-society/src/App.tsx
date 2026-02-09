@@ -97,7 +97,7 @@ import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommuni
 import { FunctionGatePage } from './pages/FunctionGatePage';
 
 // User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
-import { UserDashboardPage } from './pages/dashboard';
+import { UserDashboardPage, MyContentPage } from './pages/dashboard';
 
 // Debug Pages (CLAUDE.md Section 14)
 import { ApiDebugPage } from './pages/debug/ApiDebugPage';
@@ -342,6 +342,9 @@ function App() {
            * / 경로의 커뮤니티 홈에서 접근하는 서비스들
            * /demo/* 와 분리된 실제 라우트
            * ======================================== */}
+
+          {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
+          <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
           {/* News (공지/소식) - WO-FIX-NEWS-ROUTES: 모든 콘텐츠 타입 라우트 추가 */}
           <Route path="/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />

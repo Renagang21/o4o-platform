@@ -89,6 +89,7 @@ const OrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
 const InventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
 const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
 const AnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
+const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage')); // Phase 3-B: Billing Report
 const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 
@@ -118,6 +119,12 @@ const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 // Apply Pages (API 연동)
 const PharmacyApplyPage = lazy(() => import('@/pages/apply/PharmacyApplyPage'));
 const MyApplicationsPage = lazy(() => import('@/pages/apply/MyApplicationsPage'));
+
+// QR Landing (Phase 2-B: WO-O4O-REQUEST-UX-REFINEMENT-PHASE2B)
+const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
+
+// Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
+const FunnelPage = lazy(() => import('@/pages/pharmacy/FunnelPage'));
 
 // Test Guide Pages
 const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
@@ -280,6 +287,8 @@ function AppRoutes() {
         <Route path="settings" element={<PharmacySettings />} />
         {/* Customer Requests (Phase 1: Common Request) */}
         <Route path="requests" element={<CustomerRequestsPage />} />
+        {/* Funnel Visualization (Phase 3-A) */}
+        <Route path="funnel" element={<FunnelPage />} />
         {/* 약국 경영 */}
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
@@ -336,6 +345,8 @@ function AppRoutes() {
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="settlements" element={<SettlementsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        {/* Billing Report (Phase 3-B) */}
+        <Route path="reports" element={<ReportsPage />} />
         <Route path="marketing" element={<MarketingPage />} />
         {/* Forum */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
@@ -383,6 +394,9 @@ function AppRoutes() {
         <Route path="products/:productId" element={<StoreProductDetail />} />
         <Route path="cart" element={<StoreCart />} />
       </Route>
+
+      {/* QR Landing (Phase 2-B: standalone public page, no layout) */}
+      <Route path="qr/:pharmacyId" element={<QrLandingPage />} />
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />

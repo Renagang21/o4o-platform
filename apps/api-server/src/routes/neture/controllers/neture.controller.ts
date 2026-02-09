@@ -116,20 +116,22 @@ export function createNetureController(dataSource: DataSource): Router {
   });
 
   // ============================================================================
-  // CONTENT ENDPOINTS (APP-CONTENT Phase 2: ContentQueryService)
+  // CONTENT ENDPOINTS (APP-CONTENT Phase 2 → Phase 3A: 추천/조회수)
   // ============================================================================
 
   /**
    * GET /content
-   * List published content with sort/filter/pagination
+   * List published content with sort/filter/pagination + 추천 정보
    */
-  router.get('/content', async (req: Request, res: Response) => {
+  router.get('/content', optionalAuth, async (req: Request, res: Response) => {
     try {
-      const result = await contentService.listPublished({
+      const userId = (req as any).user?.id;
+      const result = await contentService.listPublishedWithRecommendations({
         type: req.query.type as string,
         sort: (req.query.sort as string) as any || 'latest',
         page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 20,
+        limit: parseInt(req.query.limit as string) || 12,
+        userId,
       });
       res.json({ success: true, ...result });
     } catch (error) {
@@ -140,11 +142,12 @@ export function createNetureController(dataSource: DataSource): Router {
 
   /**
    * GET /content/:id
-   * Get content detail by ID
+   * Get content detail + 추천 정보
    */
-  router.get('/content/:id', async (req: Request, res: Response) => {
+  router.get('/content/:id', optionalAuth, async (req: Request, res: Response) => {
     try {
-      const content = await contentService.getById(req.params.id);
+      const userId = (req as any).user?.id;
+      const content = await contentService.getByIdWithRecommendations(req.params.id, userId);
       if (!content) {
         return res.status(404).json({ success: false, error: { message: 'Content not found' } });
       }
@@ -152,6 +155,38 @@ export function createNetureController(dataSource: DataSource): Router {
     } catch (error) {
       logger.error('[Neture API] Error fetching content detail:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch content detail' });
+    }
+  });
+
+  /**
+   * POST /content/:id/recommend
+   * 추천 토글 (Phase 3A)
+   */
+  router.post('/content/:id/recommend', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+      }
+      const result = await contentService.toggleRecommendation(req.params.id, userId);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture API] Error toggling recommendation:', error);
+      res.status(500).json({ success: false, error: 'Failed to toggle recommendation' });
+    }
+  });
+
+  /**
+   * POST /content/:id/view
+   * 조회수 증가 (Phase 3A, public)
+   */
+  router.post('/content/:id/view', async (req: Request, res: Response) => {
+    try {
+      await contentService.incrementViewCount(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      logger.error('[Neture API] Error incrementing view count:', error);
+      res.status(500).json({ success: false, error: 'Failed to increment view count' });
     }
   });
 

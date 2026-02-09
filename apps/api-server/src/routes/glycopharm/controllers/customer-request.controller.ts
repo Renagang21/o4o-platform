@@ -20,6 +20,11 @@ import {
   type CustomerRequestStatus,
 } from '../entities/customer-request.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import {
+  RequestActionService,
+  VALID_REJECT_REASONS,
+  type RejectReason,
+} from '../services/request-action.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -55,6 +60,7 @@ export function createCustomerRequestController(
   const router = Router();
   const requestRepo = dataSource.getRepository(GlycopharmCustomerRequest);
   const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const requestActionService = new RequestActionService(dataSource);
 
   /**
    * POST /requests
@@ -406,12 +412,30 @@ export function createCustomerRequestController(
 
       const updated = await requestRepo.save(customerRequest);
 
+      // Phase 2-C: Create post-approval action
+      let actionResult = null;
+      try {
+        actionResult = await requestActionService.createPostApprovalAction(
+          updated,
+          userId,
+          note,
+        );
+      } catch (actionError: any) {
+        // Action creation failure should not fail the approval
+        console.error('Failed to create post-approval action:', actionError);
+      }
+
       res.json({
         success: true,
         data: {
           id: updated.id,
           status: updated.status,
           handledAt: updated.handledAt?.toISOString(),
+          action: actionResult ? {
+            actionLogId: actionResult.actionLogId,
+            actionType: actionResult.actionType,
+            status: actionResult.status,
+          } : null,
         },
       });
     } catch (error: any) {
@@ -434,13 +458,23 @@ export function createCustomerRequestController(
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id;
       const { id } = req.params;
-      const { note } = req.body;
+      const { note, rejectReason } = req.body;
 
       if (!userId) {
         res.status(401).json({
           success: false,
           error: 'Authentication required',
           code: 'UNAUTHORIZED',
+        });
+        return;
+      }
+
+      // Validate rejectReason if provided
+      if (rejectReason && !VALID_REJECT_REASONS.includes(rejectReason)) {
+        res.status(400).json({
+          success: false,
+          error: `Invalid rejectReason. Valid values: ${VALID_REJECT_REASONS.join(', ')}`,
+          code: 'INVALID_REJECT_REASON',
         });
         return;
       }
@@ -488,6 +522,14 @@ export function createCustomerRequestController(
       customerRequest.handledAt = new Date();
       customerRequest.handleNote = note;
 
+      // Phase 2-C: Store rejection reason in metadata
+      if (rejectReason) {
+        customerRequest.metadata = {
+          ...(customerRequest.metadata || {}),
+          rejectReason,
+        };
+      }
+
       const updated = await requestRepo.save(customerRequest);
 
       res.json({
@@ -496,6 +538,7 @@ export function createCustomerRequestController(
           id: updated.id,
           status: updated.status,
           handledAt: updated.handledAt?.toISOString(),
+          rejectReason: updated.metadata?.rejectReason || null,
         },
       });
     } catch (error: any) {

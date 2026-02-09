@@ -3,13 +3,16 @@
  *
  * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
  * WO-APP-DATA-HUB-COPY-PHASE2A-V1: Dashboard copy 연동
+ * Phase 3A: 추천/조회수/페이지네이션 실동작
+ * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1: "이미 사용 중" 표시
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { newsApi } from '../../api';
+import { newsApi, dashboardApi } from '../../api';
 import { useDashboardCopy } from '../../hooks/useDashboardCopy';
+import { useAuth } from '../../contexts/AuthContext';
 import { colors, typography } from '../../styles/theme';
 import {
   CONTENT_TYPE_LABELS,
@@ -26,11 +29,22 @@ const sortTypes: ContentSortType[] = ['latest', 'featured', 'views'];
 
 export function NewsListPage() {
   const location = useLocation();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [sort, setSort] = useState<ContentSortType>('latest');
+  const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
+
+  // Phase 3: 이미 복사한 콘텐츠 ID 로드
+  useEffect(() => {
+    if (!user?.id) return;
+    dashboardApi.getCopiedSourceIds(user.id)
+      .then(res => setCopiedIds(new Set(res.sourceIds || [])))
+      .catch(() => {}); // 실패 시 무시 (복사 버튼 그대로 표시)
+  }, [user?.id]);
 
   // Phase 2-B: Dashboard copy hook with modal support
   const {
@@ -41,12 +55,37 @@ export function NewsListPage() {
     executeCopy,
   } = useDashboardCopy({
     sourceType: 'content',
+    onSuccess: () => {
+      // Phase 3: 복사 완료 후 copiedIds 재로드
+      if (user?.id) {
+        dashboardApi.getCopiedSourceIds(user.id)
+          .then(res => setCopiedIds(new Set(res.sourceIds || [])))
+          .catch(() => {});
+      }
+    },
   });
 
   // Copy handler - opens modal for options selection
   const handleCopy = useCallback((noticeId: string, noticeTitle?: string) => {
     openCopyModal(noticeId, noticeTitle);
   }, [openCopyModal]);
+
+  // Phase 3A: 추천 토글 핸들러
+  const handleRecommend = useCallback(async (e: React.MouseEvent, noticeId: string) => {
+    e.preventDefault(); // Link 클릭 방지
+    e.stopPropagation();
+    try {
+      const result = await newsApi.toggleRecommend(noticeId);
+      const data = result.data || result;
+      setNotices(prev => prev.map(n =>
+        n.id === noticeId
+          ? { ...n, recommendCount: data.recommendCount, isRecommendedByMe: data.isRecommendedByMe }
+          : n
+      ));
+    } catch (err) {
+      console.warn('Recommend failed:', err);
+    }
+  }, []);
 
   const getTypeFromPath = (): ContentType | undefined => {
     const path = location.pathname;
@@ -71,16 +110,18 @@ export function NewsListPage() {
       const res = await newsApi.getNotices({
         type: currentType,
         page: currentPage,
-        limit: 20,
+        limit: 12,
         search: searchQuery || undefined,
         sort,
       });
       setNotices(res.data || []);
       setTotalPages(res.totalPages || 1);
+      setTotalItems(res.total || 0);
     } catch (err) {
       console.warn('News API not available:', err);
       setNotices([]);
       setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -167,21 +208,27 @@ export function NewsListPage() {
                         <span style={styles.categoryBadge}>{notice.metadata.category}</span>
                       )}
                     </div>
-                    <ContentCardActions
-                      showCopy
-                      onCopy={() => handleCopy(notice.id, notice.title)}
-                    />
+                    {copiedIds.has(notice.id) ? (
+                      <span style={styles.inUseBadge}>&#10003; 사용 중</span>
+                    ) : (
+                      <ContentCardActions
+                        showCopy
+                        onCopy={() => handleCopy(notice.id, notice.title)}
+                      />
+                    )}
                   </div>
                   <h3 style={styles.itemTitle}>{notice.title}</h3>
                   {(notice.summary || notice.excerpt) && (
                     <p style={styles.itemExcerpt}>{notice.summary || notice.excerpt}</p>
                   )}
-                  {/* 하단: 조회수, 좋아요, 날짜 */}
+                  {/* 하단: 조회수, 추천수, 날짜 + 추천 클릭 */}
                   <div style={{ marginTop: '12px' }}>
                     <ContentMetaBar
-                      viewCount={notice.viewCount || notice.views}
-                      likeCount={notice.likeCount}
+                      viewCount={notice.viewCount || notice.views || 0}
+                      likeCount={notice.recommendCount ?? notice.likeCount ?? 0}
                       date={notice.publishedAt || notice.createdAt}
+                      isRecommended={notice.isRecommendedByMe}
+                      onRecommendedClick={(e: any) => handleRecommend(e, notice.id)}
                     />
                   </div>
                 </Card>
@@ -193,6 +240,9 @@ export function NewsListPage() {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
+            showItemRange
+            totalItems={totalItems}
+            pageSize={12}
           />
         </>
       )}
@@ -300,5 +350,17 @@ const styles: Record<string, React.CSSProperties> = {
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
+  },
+  inUseBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px 10px',
+    backgroundColor: '#DCFCE7',
+    color: '#16A34A',
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 500,
+    whiteSpace: 'nowrap',
   },
 };

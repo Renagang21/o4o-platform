@@ -17,4 +17,4 @@ export { branchAdminApi } from './branchAdmin';
 export { cmsApi } from './cms';
 export { participationApi } from './participation';
 export { homeApi } from './home';
-export { dashboardApi, type DashboardAssetSourceType, type CopyAssetRequest, type CopyOptions } from './dashboard';
+export { dashboardApi, type DashboardAssetSourceType, type CopyAssetRequest, type CopyOptions, type DashboardAsset, type DashboardSortType, type DashboardKpi } from './dashboard';

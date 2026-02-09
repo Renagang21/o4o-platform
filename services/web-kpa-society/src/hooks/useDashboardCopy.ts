@@ -3,11 +3,13 @@
  *
  * WO-APP-DATA-HUB-COPY-PHASE2A-V1
  * WO-APP-DATA-HUB-COPY-PHASE2B-V1: 복사 옵션 모달 지원
+ * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1: 복사 후 대시보드 네비게이션
  *
  * 허브 콘텐츠를 내 대시보드로 복사하는 기능
  */
 
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { dashboardApi, type DashboardAssetSourceType, type CopyOptions } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -32,6 +34,7 @@ interface UseDashboardCopyOptions {
 
 export function useDashboardCopy(options: UseDashboardCopyOptions) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [state, setState] = useState<CopyState>({
     loading: false,
     error: null,
@@ -108,10 +111,13 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
           copiedAssetId: response.dashboardAssetId,
         });
 
-        // Show success toast
-        alert('내 대시보드에 복사되었습니다.\n대시보드에서 편집할 수 있습니다.');
-
         options.onSuccess?.(response.dashboardAssetId);
+
+        // Phase 3: 복사 후 대시보드 이동 제안
+        const goToDashboard = confirm('내 대시보드에 복사되었습니다.\n대시보드로 이동하시겠습니까?');
+        if (goToDashboard) {
+          navigate('/my-content');
+        }
       } else {
         throw new Error('복사에 실패했습니다.');
       }
@@ -127,7 +133,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
       alert(errorMsg);
       options.onError?.(errorMsg);
     }
-  }, [user, options, modalState.sourceId, closeCopyModal]);
+  }, [user, options, modalState.sourceId, closeCopyModal, navigate]);
 
   /**
    * Legacy: Direct copy without modal (Phase 2-A compatibility)
@@ -162,9 +168,13 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
           copiedAssetId: response.dashboardAssetId,
         });
 
-        alert('내 대시보드에 복사되었습니다.\n대시보드에서 편집할 수 있습니다.');
-
         options.onSuccess?.(response.dashboardAssetId);
+
+        // Phase 3: 복사 후 대시보드 이동 제안
+        const goToDashboard = confirm('내 대시보드에 복사되었습니다.\n대시보드로 이동하시겠습니까?');
+        if (goToDashboard) {
+          navigate('/my-content');
+        }
       } else {
         throw new Error('복사에 실패했습니다.');
       }
@@ -180,7 +190,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
       alert(errorMsg);
       options.onError?.(errorMsg);
     }
-  }, [user, options]);
+  }, [user, options, navigate]);
 
   const reset = useCallback(() => {
     setState({

@@ -464,18 +464,129 @@ export const partnerDashboardApi = {
   },
 };
 
-// CMS Content API (APP-CONTENT Phase 2: uses /api/v1/neture/content)
+// ==================== Content Asset Dashboard API (WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1) ====================
+
+export interface DashboardAsset {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: string;
+  status: 'draft' | 'active' | 'archived';
+  sourceContentId?: string;
+  copiedAt?: string;
+  createdAt: string;
+  viewCount?: number;
+  recommendCount?: number;
+}
+
+export type DashboardSortType = 'recent' | 'views' | 'recommend';
+
+export interface DashboardKpi {
+  totalAssets: number;
+  activeAssets: number;
+  recentViewsSum: number;
+  topRecommended: { id: string; title: string; recommendCount: number } | null;
+}
+
+export const contentAssetApi = {
+  async getCopiedSourceIds(dashboardId: string): Promise<{ success: boolean; sourceIds: string[] }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/dashboard/assets/copied-source-ids?dashboardId=${encodeURIComponent(dashboardId)}`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) return { success: false, sourceIds: [] };
+      return response.json();
+    } catch {
+      return { success: false, sourceIds: [] };
+    }
+  },
+
+  async listAssets(dashboardId: string, params?: {
+    status?: 'draft' | 'active' | 'archived';
+    sort?: DashboardSortType;
+  }): Promise<{ success: boolean; data: DashboardAsset[] }> {
+    try {
+      const queryParams = new URLSearchParams({ dashboardId });
+      if (params?.status) queryParams.set('status', params.status);
+      if (params?.sort) queryParams.set('sort', params.sort);
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/dashboard/assets?${queryParams.toString()}`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) return { success: false, data: [] };
+      return response.json();
+    } catch {
+      return { success: false, data: [] };
+    }
+  },
+
+  async getKpi(dashboardId: string): Promise<{ success: boolean; data: DashboardKpi }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/dashboard/assets/kpi?dashboardId=${encodeURIComponent(dashboardId)}`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) return { success: false, data: { totalAssets: 0, activeAssets: 0, recentViewsSum: 0, topRecommended: null } };
+      return response.json();
+    } catch {
+      return { success: false, data: { totalAssets: 0, activeAssets: 0, recentViewsSum: 0, topRecommended: null } };
+    }
+  },
+
+  async updateAsset(id: string, data: {
+    dashboardId: string;
+    title?: string;
+    description?: string;
+  }): Promise<{ success: boolean }> {
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/dashboard/assets/${id}`,
+      { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(data) }
+    );
+    if (!response.ok) throw new Error('Failed to update asset');
+    return response.json();
+  },
+
+  async publishAsset(id: string, dashboardId: string): Promise<{ success: boolean }> {
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/dashboard/assets/${id}/publish`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ dashboardId }) }
+    );
+    if (!response.ok) throw new Error('Failed to publish asset');
+    return response.json();
+  },
+
+  async archiveAsset(id: string, dashboardId: string): Promise<{ success: boolean }> {
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/dashboard/assets/${id}/archive`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ dashboardId }) }
+    );
+    if (!response.ok) throw new Error('Failed to archive asset');
+    return response.json();
+  },
+
+  async deleteAsset(id: string, dashboardId: string): Promise<{ success: boolean }> {
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/dashboard/assets/${id}?dashboardId=${encodeURIComponent(dashboardId)}`,
+      { method: 'DELETE', credentials: 'include' }
+    );
+    if (!response.ok) throw new Error('Failed to delete asset');
+    return response.json();
+  },
+};
+
+// CMS Content API (APP-CONTENT Phase 2 → Phase 3A: 추천/조회수/페이지네이션)
 export const cmsApi = {
   /**
    * GET /api/v1/neture/content
-   * APP-CONTENT Phase 2: standardized content API with sort/filter/pagination
+   * Phase 3A: 서버사이드 pagination + 추천 정보 포함
    */
   async getContents(params?: {
     type?: string;
     sort?: 'latest' | 'featured' | 'views';
     page?: number;
     limit?: number;
-  }): Promise<CmsContent[]> {
+  }): Promise<{ data: CmsContent[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     try {
       const searchParams = new URLSearchParams();
       if (params?.type) searchParams.append('type', params.type);
@@ -487,14 +598,17 @@ export const cmsApi = {
         `${API_BASE_URL}/api/v1/neture/content${qs ? `?${qs}` : ''}`
       );
       if (!response.ok) {
-        console.warn('[CMS API] Contents API not available, returning empty array');
-        return [];
+        console.warn('[CMS API] Contents API not available, returning empty');
+        return { data: [], pagination: { page: 1, limit: 12, total: 0, totalPages: 0 } };
       }
       const result = await response.json();
-      return result.data || [];
+      return {
+        data: result.data || [],
+        pagination: result.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
+      };
     } catch (error) {
       console.warn('[CMS API] Failed to fetch contents:', error);
-      return [];
+      return { data: [], pagination: { page: 1, limit: 12, total: 0, totalPages: 0 } };
     }
   },
 
@@ -508,6 +622,34 @@ export const cmsApi = {
     }
     const result = await response.json();
     return result.data;
+  },
+
+  /**
+   * POST /api/v1/neture/content/:id/recommend
+   * Phase 3A: 추천 토글
+   */
+  async toggleRecommend(id: string): Promise<{ recommendCount: number; isRecommendedByMe: boolean }> {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/content/${id}/recommend`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to toggle recommendation');
+    }
+    const result = await response.json();
+    return result.data;
+  },
+
+  /**
+   * POST /api/v1/neture/content/:id/view
+   * Phase 3A: 조회수 증가
+   */
+  async trackView(id: string): Promise<void> {
+    try {
+      await fetch(`${API_BASE_URL}/api/v1/neture/content/${id}/view`, { method: 'POST' });
+    } catch {
+      // 조회수 실패는 무시
+    }
   },
 };
 
@@ -527,6 +669,10 @@ interface CmsContent {
   sortOrder: number;
   metadata?: Record<string, any> | null;
   createdAt: string;
+  /** Phase 3A */
+  viewCount?: number;
+  recommendCount?: number;
+  isRecommendedByMe?: boolean;
 }
 
 // ==================== Supplier Request API (WO-NETURE-SUPPLIER-REQUEST-API-V1) ====================
