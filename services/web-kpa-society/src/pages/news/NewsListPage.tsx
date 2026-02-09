@@ -6,17 +6,17 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { newsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 import {
   CONTENT_TYPE_LABELS,
-  CONTENT_SORT_LABELS,
   CONTENT_SOURCE_COLORS,
   CONTENT_SOURCE_LABELS,
 } from '@o4o/types/content';
 import type { ContentType, ContentSortType } from '@o4o/types/content';
 import type { Notice } from '../../types';
+import { ContentSortButtons, ContentPagination, ContentMetaBar } from '@o4o/ui';
 
 // Page-level filter types (subset of all content types shown in list)
 const filterTypes: ContentType[] = ['notice', 'hero', 'promo', 'news'];
@@ -110,16 +110,12 @@ export function NewsListPage() {
       )}
 
       {/* 정렬 토글 */}
-      <div style={styles.sortBar}>
-        {sortTypes.map(s => (
-          <button
-            key={s}
-            style={sort === s ? styles.sortBtnActive : styles.sortBtn}
-            onClick={() => handleSortChange(s)}
-          >
-            {CONTENT_SORT_LABELS[s]}
-          </button>
-        ))}
+      <div style={{ marginBottom: '24px' }}>
+        <ContentSortButtons
+          value={sort}
+          onChange={handleSortChange as (sort: 'latest' | 'featured' | 'views') => void}
+          options={sortTypes as ('latest' | 'featured' | 'views')[]}
+        />
       </div>
 
       {notices.length === 0 ? (
@@ -155,17 +151,15 @@ export function NewsListPage() {
                   {(notice.summary || notice.excerpt) && (
                     <p style={styles.itemExcerpt}>{notice.summary || notice.excerpt}</p>
                   )}
-                  <div style={styles.itemMeta}>
-                    {notice.metadata?.supplierName && <span>{notice.metadata.supplierName}</span>}
-                    {notice.metadata?.pharmacyName && <span>{notice.metadata.pharmacyName}</span>}
-                    <span>{new Date(notice.publishedAt || notice.createdAt).toLocaleDateString()}</span>
+                  <div style={{ marginTop: '12px' }}>
+                    <ContentMetaBar date={notice.publishedAt || notice.createdAt} />
                   </div>
                 </Card>
               </Link>
             ))}
           </div>
 
-          <Pagination
+          <ContentPagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
@@ -195,30 +189,6 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     borderRadius: '6px',
     fontSize: '14px',
-  },
-  sortBar: {
-    display: 'flex',
-    gap: '4px',
-    marginBottom: '24px',
-  },
-  sortBtn: {
-    padding: '6px 16px',
-    border: `1px solid ${colors.neutral200}`,
-    backgroundColor: colors.white,
-    color: colors.neutral600,
-    borderRadius: '20px',
-    fontSize: '13px',
-    cursor: 'pointer',
-  },
-  sortBtnActive: {
-    padding: '6px 16px',
-    border: `1px solid ${colors.primary}`,
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderRadius: '20px',
-    fontSize: '13px',
-    cursor: 'pointer',
-    fontWeight: 500,
   },
   list: {
     display: 'flex',
@@ -286,12 +256,5 @@ const styles: Record<string, React.CSSProperties> = {
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
-  },
-  itemMeta: {
-    display: 'flex',
-    gap: '8px',
-    marginTop: '12px',
-    ...typography.bodyS,
-    color: colors.neutral500,
   },
 };
