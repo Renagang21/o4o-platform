@@ -78,6 +78,8 @@ const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
 const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
 const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
+// Operators Management (admin.neture.co.kr)
+const OperatorsPage = lazy(() => import('@/pages/operators'));
 // P0 RBAC: Enrollment Management
 const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
 // P4-Admin: Role Applications Management
@@ -708,6 +710,15 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <ActiveUsers />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* 운영자 관리 (관리자/서비스 운영자) */}
+                    <Route path="/operators" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'platform:super_admin', 'platform:admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OperatorsPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

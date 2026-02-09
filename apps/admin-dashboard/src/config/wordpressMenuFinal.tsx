@@ -103,6 +103,13 @@ export const wordpressMenuItems: MenuItem[] = [
         icon: <Users className="w-4 h-4" />,
         path: '/users',
       },
+      // Operators (관리자/서비스 운영자 관리)
+      {
+        id: 'core-operators',
+        label: 'Operators',
+        icon: <Shield className="w-4 h-4" />,
+        path: '/operators',
+      },
       // Membership (플랫폼 범용 Core로 통합)
       {
         id: 'core-membership',
