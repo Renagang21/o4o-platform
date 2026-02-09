@@ -34,9 +34,9 @@ interface ApiResponse<T> {
 type PaginatedResponse<T> = SignagePaginatedResponse<T>;
 
 // Signage routes are mounted at /api/signage/ (NOT under /api/v1/).
-const SIGNAGE_ORIGIN = import.meta.env.VITE_API_BASE_URL || '';
+// Use relative URLs - the production proxy forwards /api/* to the API server.
 const getBaseUrl = (serviceKey: string = 'kpa-society') =>
-  `${SIGNAGE_ORIGIN}/api/signage/${serviceKey}`;
+  `/api/signage/${serviceKey}`;
 
 /**
  * Public Content API - 인증 불필요
