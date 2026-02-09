@@ -21,6 +21,7 @@ COPY tsconfig.packages.json ./
 # Copy workspace packages needed for this service
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/types/package.json ./packages/types/
+COPY packages/ui/package.json ./packages/ui/
 
 # Copy service package.json
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
@@ -31,13 +32,15 @@ RUN pnpm install --filter @o4o/web-k-cosmetics...
 # Copy workspace package source
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/types/ ./packages/types/
+COPY packages/ui/ ./packages/ui/
 
 # Copy service source
 COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/
 
 # Build workspace dependencies first
-RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-client build
+RUN pnpm --filter @o4o/ui build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

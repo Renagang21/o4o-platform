@@ -22,6 +22,7 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/utils/package.json ./packages/utils/
+COPY packages/ui/package.json ./packages/ui/
 
 # Copy service package.json
 COPY services/web-glycopharm/package.json ./services/web-glycopharm/
@@ -33,6 +34,7 @@ RUN pnpm install --filter glycopharm-web...
 COPY packages/types/ ./packages/types/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/utils/ ./packages/utils/
+COPY packages/ui/ ./packages/ui/
 
 # Copy service source
 COPY services/web-glycopharm/ ./services/web-glycopharm/
@@ -40,6 +42,7 @@ COPY services/web-glycopharm/ ./services/web-glycopharm/
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
+RUN pnpm --filter @o4o/ui build
 RUN pnpm --filter @o4o/utils build
 
 # Build-time environment variable for Vite
