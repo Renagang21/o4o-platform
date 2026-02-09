@@ -32,11 +32,10 @@ const SERVICE_ROLES = {
     { value: 'platform:operator', label: 'Platform Operator', description: 'Platform operator' },
   ],
   kpa: [
-    { value: 'kpa:admin', label: 'KPA Admin', description: 'KPA service administrator' },
-    { value: 'kpa:operator', label: 'KPA Operator', description: 'KPA service operator' },
-    { value: 'kpa:district_admin', label: 'District Admin', description: 'District-level administrator' },
-    { value: 'kpa:branch_admin', label: 'Branch Admin', description: 'Branch-level administrator' },
-    { value: 'kpa:branch_operator', label: 'Branch Operator', description: 'Branch-level operator' },
+    { value: 'kpa-a:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
+    { value: 'kpa-b:district', label: '데모서비스 지부 운영자', description: '지부/분회 데모 서비스 지부 운영자 (/demo)' },
+    { value: 'kpa-b:branch', label: '데모서비스 분회 운영자', description: '지부/분회 데모 서비스 분회 운영자 (/demo)' },
+    { value: 'kpa-c:operator', label: '분회서비스 운영자', description: '분회 서비스 운영자 (/branch-services)' },
   ],
   neture: [
     { value: 'neture:admin', label: 'Neture Admin', description: 'Neture administrator' },
