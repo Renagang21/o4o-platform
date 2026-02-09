@@ -9,6 +9,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
+import { GlycopharmCustomerRequest } from '../entities/customer-request.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import type { AuthRequest } from '../../../types/auth.js';
 
@@ -36,6 +37,7 @@ interface TodayActions {
   todayOrders: number;
   pendingOrders: number;
   pendingReceiveOrders: number;
+  pendingRequests: number; // Phase 1: Common Request
   operatorNotices: number;
   applicationAlerts: number;
 }
@@ -197,6 +199,7 @@ export function createCockpitController(
             todayOrders: 0,
             pendingOrders: 0,
             pendingReceiveOrders: 0,
+            pendingRequests: 0,
             operatorNotices: 0,
             applicationAlerts: 0,
           };
@@ -218,10 +221,20 @@ export function createCockpitController(
           .andWhere('app.status IN (:...statuses)', { statuses: ['supplementing', 'rejected'] })
           .getCount();
 
+        // Count pending customer requests (Phase 1: Common Request)
+        const customerRequestRepo = dataSource.getRepository(GlycopharmCustomerRequest);
+        const pendingRequests = await customerRequestRepo.count({
+          where: {
+            pharmacyId: pharmacy.id,
+            status: 'pending',
+          },
+        });
+
         const response: TodayActions = {
           todayOrders,
           pendingOrders,
           pendingReceiveOrders,
+          pendingRequests,
           operatorNotices: 0, // Placeholder - would need a notices table
           applicationAlerts,
         };

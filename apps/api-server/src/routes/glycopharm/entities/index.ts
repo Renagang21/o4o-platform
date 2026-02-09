@@ -24,6 +24,14 @@ export { DisplaySchedule } from './display-schedule.entity.js';
 // Forum Category Request (GlycoPharm legacy - renamed to avoid collision with forum-core)
 export { GlycopharmForumCategoryRequest, type GlycopharmCategoryRequestStatus } from './forum-category-request.entity.js';
 
+// Customer Request (Phase 1: Common Request Implementation)
+export {
+  GlycopharmCustomerRequest,
+  type CustomerRequestPurpose,
+  type CustomerRequestSourceType,
+  type CustomerRequestStatus,
+} from './customer-request.entity.js';
+
 // Orders - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // GlycopharmOrder, GlycopharmOrderItem entities removed
 // New orders will use E-commerce Core with OrderType.GLYCOPHARM

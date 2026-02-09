@@ -18,6 +18,7 @@ import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
+import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
@@ -220,6 +221,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/pharmacy', pharmacyController);
+
+  // ============================================================================
+  // Customer Request Routes - Phase 1: Common Request Implementation
+  // /api/v1/glycopharm/requests/*
+  // ============================================================================
+  const customerRequestController = createCustomerRequestController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', customerRequestController);
 
   // B2B products routes
   const b2bController = createB2BController(

@@ -43,6 +43,7 @@ import {
   Inbox,
   LogIn,
   ArrowLeft,
+  Users,
 } from 'lucide-react';
 import { AiSummaryButton } from '@/components/ai';
 import {
@@ -349,7 +350,7 @@ export default function PharmacyDashboard() {
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">오늘의 운영</h2>
         {/* UX Trust Rules v1: 카드 배경 white, 아이콘 gray-500, border로 구분 */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
           {/* 오늘 주문 */}
           <NavLink
             to="/pharmacy/orders?filter=today"
@@ -433,6 +434,23 @@ export default function PharmacyDashboard() {
             </div>
             <p className="text-2xl font-bold text-slate-800">{todayActions?.applicationAlerts || 0}</p>
             <p className="text-sm text-slate-500">신청 알림</p>
+          </NavLink>
+
+          {/* 고객 요청 (Phase 1: Common Request) */}
+          <NavLink
+            to="/pharmacy/requests"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Users className="w-6 h-6 text-slate-500" />
+              {(todayActions?.pendingRequests || 0) > 0 && (
+                <span className="w-6 h-6 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {todayActions?.pendingRequests}
+                </span>
+              )}
+            </div>
+            <p className="text-2xl font-bold text-slate-800">{todayActions?.pendingRequests || 0}</p>
+            <p className="text-sm text-slate-500">고객 요청</p>
           </NavLink>
         </div>
       </div>

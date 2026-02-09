@@ -48,6 +48,7 @@ export interface TodayActions {
   todayOrders: number;
   pendingOrders: number;
   pendingReceiveOrders: number; // 접수 대기 주문 (RECEIVED 처리 필요)
+  pendingRequests: number; // 대기 중인 고객 요청 (Phase 1: Common Request)
   operatorNotices: number;
   applicationAlerts: number;
 }
