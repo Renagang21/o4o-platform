@@ -3,18 +3,28 @@
  *
  * ActivitySection 패턴: 최근 글 + 인기 글 2열 그리드
  * 로그인 전: 공개 글만 / 로그인 후: 개인화 (향후)
+ *
+ * WO-FIX-FORUM-LINKS: 현재 경로에 따라 링크 동적 생성
+ * - /forum/* → /forum/* (커뮤니티)
+ * - /demo/forum/* → /demo/forum/* (데모)
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { forumApi } from '../../api';
 import type { ForumPost } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-function PostItem({ post }: { post: ForumPost }) {
+// 현재 경로에 따라 포럼 베이스 경로 결정
+function useForumBasePath(): string {
+  const location = useLocation();
+  return location.pathname.startsWith('/demo/') ? '/demo/forum' : '/forum';
+}
+
+function PostItem({ post, basePath }: { post: ForumPost; basePath: string }) {
   return (
     <li style={styles.listItem}>
-      <Link to={`/demo/forum/post/${post.id}`} style={styles.postLink}>
+      <Link to={`${basePath}/post/${post.id}`} style={styles.postLink}>
         {post.isPinned && <span style={styles.pinnedBadge}>공지</span>}
         <span style={styles.categoryBadge}>{post.categoryName}</span>
         <span style={styles.postTitle}>{post.title}</span>
@@ -37,6 +47,7 @@ function PostItem({ post }: { post: ForumPost }) {
 }
 
 export function ForumActivitySection() {
+  const basePath = useForumBasePath();
   const [recentPosts, setRecentPosts] = useState<ForumPost[]>([]);
   const [popularPosts, setPopularPosts] = useState<ForumPost[]>([]);
 
@@ -65,14 +76,14 @@ export function ForumActivitySection() {
         <div style={styles.feedCard}>
           <div style={styles.cardHeader}>
             <h3 style={styles.cardTitle}>최근 글</h3>
-            <Link to="/demo/forum?view=all" style={styles.moreLink}>더보기</Link>
+            <Link to={`${basePath}?view=all`} style={styles.moreLink}>더보기</Link>
           </div>
           {recentPosts.length === 0 ? (
             <p style={styles.empty}>자료가 없습니다</p>
           ) : (
             <ul style={styles.list}>
               {recentPosts.map((post) => (
-                <PostItem key={post.id} post={post} />
+                <PostItem key={post.id} post={post} basePath={basePath} />
               ))}
             </ul>
           )}
@@ -82,14 +93,14 @@ export function ForumActivitySection() {
         <div style={styles.feedCard}>
           <div style={styles.cardHeader}>
             <h3 style={styles.cardTitle}>인기 글</h3>
-            <Link to="/demo/forum?sort=popular" style={styles.moreLink}>더보기</Link>
+            <Link to={`${basePath}?sort=popular`} style={styles.moreLink}>더보기</Link>
           </div>
           {popularPosts.length === 0 ? (
             <p style={styles.empty}>자료가 없습니다</p>
           ) : (
             <ul style={styles.list}>
               {popularPosts.map((post) => (
-                <PostItem key={`popular-${post.id}`} post={post} />
+                <PostItem key={`popular-${post.id}`} post={post} basePath={basePath} />
               ))}
             </ul>
           )}

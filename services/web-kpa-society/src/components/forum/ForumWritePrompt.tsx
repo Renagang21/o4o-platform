@@ -3,13 +3,22 @@
  *
  * OrganizationDemoSection 패턴: 단일 카드 + CTA
  * 로그인 전: 로그인 유도 / 로그인 후: 글쓰기 바로가기
+ *
+ * WO-FIX-FORUM-LINKS: 현재 경로에 따라 링크 동적 생성
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
+// 현재 경로에 따라 포럼 베이스 경로 결정
+function useForumBasePath(): string {
+  const location = useLocation();
+  return location.pathname.startsWith('/demo/') ? '/demo/forum' : '/forum';
+}
+
 export function ForumWritePrompt() {
+  const basePath = useForumBasePath();
   const { isAuthenticated } = useAuth();
 
   return (
@@ -29,7 +38,7 @@ export function ForumWritePrompt() {
           </div>
         </div>
         {isAuthenticated ? (
-          <Link to="/demo/forum/write" style={styles.ctaPrimary}>
+          <Link to={`${basePath}/write`} style={styles.ctaPrimary}>
             글쓰기
           </Link>
         ) : (

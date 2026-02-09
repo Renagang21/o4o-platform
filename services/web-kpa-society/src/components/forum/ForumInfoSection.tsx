@@ -2,12 +2,26 @@
  * ForumInfoSection - 포럼 하단 유틸리티/안내 영역
  *
  * UtilitySection 패턴: 포럼 이용안내 + 규칙 링크
+ *
+ * WO-FIX-FORUM-LINKS: 현재 경로에 따라 링크 동적 생성
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { colors, spacing, typography } from '../../styles/theme';
 
+// 현재 경로에 따라 베이스 경로 결정
+function useBasePath(): { forum: string; mypage: string; policy: string } {
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith('/demo/');
+  return {
+    forum: isDemo ? '/demo/forum' : '/forum',
+    mypage: isDemo ? '/demo/mypage' : '/mypage',
+    policy: isDemo ? '/demo/policy' : '/policy',
+  };
+}
+
 export function ForumInfoSection() {
+  const basePath = useBasePath();
   return (
     <section style={styles.container}>
       <div style={styles.infoGrid}>
@@ -22,10 +36,10 @@ export function ForumInfoSection() {
         <div style={styles.infoCard}>
           <h4 style={styles.infoTitle}>바로가기</h4>
           <div style={styles.linkList}>
-            <Link to="/demo/forum/write" style={styles.link}>글쓰기</Link>
-            <Link to="/demo/mypage" style={styles.link}>내 활동</Link>
-            <Link to="/demo/policy" style={styles.link}>이용약관</Link>
-            <Link to="/demo/help" style={styles.link}>도움말</Link>
+            <Link to={`${basePath.forum}/write`} style={styles.link}>글쓰기</Link>
+            <Link to={basePath.mypage} style={styles.link}>내 활동</Link>
+            <Link to={basePath.policy} style={styles.link}>이용약관</Link>
+            <Link to="/help" style={styles.link}>도움말</Link>
           </div>
         </div>
       </div>

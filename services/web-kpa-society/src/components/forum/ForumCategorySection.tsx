@@ -8,10 +8,12 @@
  * - 최근 활동 배지 (오늘 글 있음 / 최근 활동)
  * - 최근 글 미리보기 (1줄)
  * - 주간 활동 수치 (이번 주 글 N · 댓글 M)
+ *
+ * WO-FIX-FORUM-LINKS: 현재 경로에 따라 링크 동적 생성
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { forumApi } from '../../api';
 import type { ForumCategory, ForumPost } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
@@ -84,12 +86,18 @@ function buildActivityMap(posts: ForumPost[]): Record<string, CategoryActivity> 
   return map;
 }
 
-function CategoryCard({ category, activity }: { category: ForumCategory; activity?: CategoryActivity }) {
+// 현재 경로에 따라 포럼 베이스 경로 결정
+function useForumBasePath(): string {
+  const location = useLocation();
+  return location.pathname.startsWith('/demo/') ? '/demo/forum' : '/forum';
+}
+
+function CategoryCard({ category, activity, basePath }: { category: ForumCategory; activity?: CategoryActivity; basePath: string }) {
   const icon = categoryIcons[category.name] || DEFAULT_ICON;
   const badge = getActivityBadge(activity);
 
   return (
-    <Link to={`/demo/forum/category/${category.id}`} style={styles.card}>
+    <Link to={`${basePath}/category/${category.id}`} style={styles.card}>
       <div style={styles.cardIcon}>{icon}</div>
       <div style={styles.cardBody}>
         <div style={styles.cardTitleRow}>
@@ -122,6 +130,7 @@ function CategoryCard({ category, activity }: { category: ForumCategory; activit
 }
 
 export function ForumCategorySection() {
+  const basePath = useForumBasePath();
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [activityMap, setActivityMap] = useState<Record<string, CategoryActivity>>({});
 
@@ -158,7 +167,7 @@ export function ForumCategorySection() {
           {categories.map((cat, idx) => (
             <div key={cat.id}>
               {idx > 0 && <div style={styles.divider} />}
-              <CategoryCard category={cat} activity={activityMap[cat.id]} />
+              <CategoryCard category={cat} activity={activityMap[cat.id]} basePath={basePath} />
             </div>
           ))}
         </div>
