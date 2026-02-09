@@ -10,11 +10,37 @@ import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeMedia, HomePlaylist } from '../../api/home';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
+import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
+
+// CSS for hover effects (inline styles don't support :hover)
+const hoverStyles = `
+  .signage-media-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .signage-media-card:hover .signage-play-overlay {
+    opacity: 1 !important;
+  }
+  .signage-playlist-item:hover {
+    background-color: ${colors.neutral50};
+  }
+`;
 
 export function SignageSection() {
   const [media, setMedia] = useState<HomeMedia[]>([]);
   const [playlists, setPlaylists] = useState<HomePlaylist[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Inject hover styles
+  useEffect(() => {
+    const styleId = 'signage-section-hover-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = hoverStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   useEffect(() => {
     homeApi.getSignage(3, 2)
@@ -50,25 +76,36 @@ export function SignageSection() {
               <div>
                 <h3 style={styles.subTitle}>최신 미디어</h3>
                 <div style={styles.mediaGrid}>
-                  {media.map((item) => (
-                    <a
-                      key={item.id}
-                      href={item.url ?? undefined}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={styles.mediaCard}
-                    >
-                      <div style={styles.mediaThumbnail}>
-                        <MediaThumbnail url={item.thumbnailUrl} name={item.name} mediaType={item.mediaType} />
-                        {item.duration != null && item.duration > 0 && (
-                          <span style={styles.duration}>
-                            {formatDuration(item.duration)}
-                          </span>
-                        )}
-                      </div>
-                      <p style={styles.mediaName}>{item.name}</p>
-                    </a>
-                  ))}
+                  {media.map((item) => {
+                    const playUrl = getMediaPlayUrl(item);
+                    const thumbnailUrl = getMediaThumbnailUrl(item);
+                    return (
+                      <a
+                        key={item.id}
+                        href={playUrl ?? undefined}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.mediaCard}
+                        className="signage-media-card"
+                      >
+                        <div style={styles.mediaThumbnail}>
+                          <MediaThumbnail url={thumbnailUrl} name={item.name} mediaType={item.mediaType} />
+                          {item.duration != null && item.duration > 0 && (
+                            <span style={styles.duration}>
+                              {formatDuration(item.duration)}
+                            </span>
+                          )}
+                          {/* Play overlay - pointer-events: none */}
+                          <div style={styles.playOverlay} className="signage-play-overlay">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" opacity={0.9}>
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                          </div>
+                        </div>
+                        <p style={styles.mediaName}>{item.name}</p>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -79,7 +116,11 @@ export function SignageSection() {
                 <ul style={styles.playlistList}>
                   {playlists.map((pl) => (
                     <li key={pl.id}>
-                      <Link to="/signage" style={styles.playlistItem}>
+                      <Link
+                        to="/signage"
+                        style={styles.playlistItem}
+                        className="signage-playlist-item"
+                      >
                         <div style={styles.playlistIcon}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="8" y1="6" x2="21" y2="6" />
@@ -97,6 +138,10 @@ export function SignageSection() {
                             {pl.totalDuration > 0 && ` · ${formatDuration(pl.totalDuration)}`}
                           </span>
                         </div>
+                        {/* Arrow indicator */}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.neutral400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
                       </Link>
                     </li>
                   ))}
@@ -200,6 +245,9 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     color: 'inherit',
     cursor: 'pointer',
+    display: 'block',
+    borderRadius: borderRadius.md,
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   },
   mediaThumbnail: {
     position: 'relative',
@@ -237,6 +285,21 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: 'rgba(0,0,0,0.7)',
     color: colors.white,
     fontSize: '0.7rem',
+    pointerEvents: 'none',
+  },
+  playOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    opacity: 0,
+    transition: 'opacity 0.2s ease',
+    pointerEvents: 'none',
   },
   mediaName: {
     margin: `${spacing.xs} 0 0`,
@@ -255,11 +318,14 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: spacing.sm,
-    padding: `${spacing.sm} 0`,
-    borderBottom: `1px solid ${colors.neutral100}`,
+    padding: spacing.sm,
+    marginLeft: `-${spacing.sm}`,
+    marginRight: `-${spacing.sm}`,
+    borderRadius: borderRadius.md,
     textDecoration: 'none',
     color: 'inherit',
     cursor: 'pointer',
+    transition: 'background-color 0.15s ease',
   },
   playlistIcon: {
     flexShrink: 0,

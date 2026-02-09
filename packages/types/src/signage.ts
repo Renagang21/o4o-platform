@@ -163,3 +163,85 @@ export const SIGNAGE_SOURCE_LABELS: Record<ContentSource, string> = {
   community: '커뮤니티',
   store: '매장',
 };
+
+// =============================================================================
+// Interaction Utilities (APP-SIGNAGE 인터랙션 기준선 V1)
+// =============================================================================
+
+/**
+ * YouTube URL에서 Video ID 추출
+ * 지원 형식:
+ * - https://www.youtube.com/watch?v=VIDEO_ID
+ * - https://youtu.be/VIDEO_ID
+ * - https://www.youtube.com/embed/VIDEO_ID
+ */
+export function extractYouTubeVideoId(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/, // Just the ID
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+
+  return null;
+}
+
+/**
+ * YouTube 썸네일 URL 생성
+ * @param url YouTube 영상 URL 또는 Video ID
+ * @param quality 썸네일 품질 (default: hqdefault)
+ */
+export function getYouTubeThumbnail(
+  url: string | null | undefined,
+  quality: 'default' | 'mqdefault' | 'hqdefault' | 'sddefault' | 'maxresdefault' = 'hqdefault'
+): string | null {
+  const videoId = extractYouTubeVideoId(url);
+  if (!videoId) return null;
+  return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+}
+
+/**
+ * 미디어 썸네일 URL 결정 (YouTube 자동 생성 포함)
+ * - thumbnailUrl이 있으면 우선 사용
+ * - YouTube 타입이고 url이 있으면 자동 생성
+ * - 그 외에는 null 반환
+ */
+export function getMediaThumbnailUrl(media: {
+  thumbnailUrl?: string | null;
+  url?: string | null;
+  mediaType: string;
+}): string | null {
+  // 1. 명시적 썸네일이 있으면 사용
+  if (media.thumbnailUrl) return media.thumbnailUrl;
+
+  // 2. YouTube면 자동 생성
+  if (media.mediaType === 'youtube' && media.url) {
+    return getYouTubeThumbnail(media.url);
+  }
+
+  return null;
+}
+
+/**
+ * 미디어 재생 URL 결정 (새 창 열기용)
+ * - YouTube: 원본 URL 또는 embed URL로 변환
+ * - 기타: url 그대로 반환
+ */
+export function getMediaPlayUrl(media: {
+  url?: string | null;
+  mediaType: string;
+}): string | null {
+  if (!media.url) return null;
+
+  // YouTube는 원본 URL 그대로 사용 (새 창에서 열림)
+  if (media.mediaType === 'youtube') {
+    return media.url;
+  }
+
+  return media.url;
+}

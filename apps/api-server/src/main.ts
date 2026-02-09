@@ -492,7 +492,8 @@ import { createCmsContentRoutes } from './routes/cms-content/cms-content.routes.
 import { createContentAssetsRoutes } from './routes/content/content-assets.routes.js';
 
 // Signage Routes (Phase 2 Production Build - Sprint 2-2)
-import { createSignageRoutes } from './routes/signage/index.js';
+// WO-APP-SIGNAGE-PUBLIC-API-PHASE1-V1: Public + Authenticated routes
+import { createSignageRoutes, createSignagePublicRoutes } from './routes/signage/index.js';
 
 // Channel Routes (WO-P4-CHANNEL-IMPLEMENT-P0)
 import { createChannelRoutes } from './routes/channels/channels.routes.js';
@@ -922,7 +923,17 @@ const startServer = async () => {
       logger.error('Failed to register Channel routes:', channelError);
     }
 
-    // 33-b. Register Signage routes (Phase 2 Production Build - Sprint 2-2)
+    // 33-b-1. Register Signage PUBLIC routes (WO-APP-SIGNAGE-PUBLIC-API-PHASE1-V1)
+    // Public routes MUST be registered BEFORE authenticated routes
+    try {
+      const signagePublicRoutes = createSignagePublicRoutes(AppDataSource);
+      app.use('/api/signage/:serviceKey/public', signagePublicRoutes);
+      logger.info('✅ Signage PUBLIC routes registered at /api/signage/:serviceKey/public');
+    } catch (signagePublicError) {
+      logger.error('Failed to register Signage PUBLIC routes:', signagePublicError);
+    }
+
+    // 33-b-2. Register Signage routes (Phase 2 Production Build - Sprint 2-2)
     try {
       const signageRoutes = createSignageRoutes(AppDataSource);
       app.use('/api/signage/:serviceKey', signageRoutes);

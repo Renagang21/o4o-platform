@@ -8,8 +8,9 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
-import { globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { Download, Video as VideoIcon, List, AlertCircle, ExternalLink, Play } from 'lucide-react';
+import { publicContentApi, globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
 
 type ContentType = 'playlists' | 'media';
 
@@ -34,15 +35,16 @@ export default function SignageContentHubPage() {
     setError(null);
 
     try {
+      // WO-APP-SIGNAGE-PUBLIC-API-PHASE1-V1: Use public API for reading (no auth required)
       if (contentType === 'playlists') {
-        const result = await globalContentApi.listPlaylists(activeSource, 'neture', { page: 1, limit: 50 });
+        const result = await publicContentApi.listPlaylists(activeSource, 'neture', { page: 1, limit: 50 });
         if (result.success && result.data) {
           setPlaylists(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load playlists');
         }
       } else {
-        const result = await globalContentApi.listMedia(activeSource, 'neture', { page: 1, limit: 50 });
+        const result = await publicContentApi.listMedia(activeSource, 'neture', { page: 1, limit: 50 });
         if (result.success && result.data) {
           setMedia(result.data.items || []);
         } else {
@@ -111,100 +113,177 @@ export default function SignageContentHubPage() {
     }
   };
 
-  const renderPlaylistCard = (playlist: SignagePlaylist) => (
-    <div key={playlist.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-      <div className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-              <List className="h-5 w-5 text-blue-600" />
-              {playlist.name}
-            </h3>
-            {playlist.description && (
-              <p className="text-sm text-slate-500 mt-2">{playlist.description}</p>
+  const renderPlaylistCard = (playlist: SignagePlaylist) => {
+    // Get first item's media URL if available for preview
+    const firstItem = playlist.items?.[0];
+    const previewUrl = firstItem?.media ? getMediaPlayUrl(firstItem.media) : null;
+    const previewThumbnail = firstItem?.media ? getMediaThumbnailUrl(firstItem.media) : null;
+
+    return (
+      <div key={playlist.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all hover:-translate-y-0.5">
+        {/* Playlist header */}
+        <div className="p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                <List className="h-5 w-5 text-blue-600" />
+                {playlist.name}
+              </h3>
+              {playlist.description && (
+                <p className="text-sm text-slate-500 mt-2">{playlist.description}</p>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Preview thumbnail if available */}
+        {previewThumbnail && previewUrl && (
+          <a
+            href={previewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-4 relative group cursor-pointer"
+          >
+            <div className="relative">
+              <img
+                src={previewThumbnail}
+                alt={`${playlist.name} 미리보기`}
+                className="w-full h-32 object-cover rounded-md"
+              />
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md pointer-events-none">
+                <Play className="h-10 w-10 text-white" fill="white" />
+              </div>
+              <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded pointer-events-none">
+                {playlist.itemCount}개 항목
+              </span>
+            </div>
+          </a>
+        )}
+        <div className="p-4">
+          <div className="space-y-2 text-sm text-slate-600">
+            <div className="flex items-center justify-between">
+              <span>항목 수:</span>
+              <span className="font-medium">{playlist.itemCount || 0}개</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>총 재생 시간:</span>
+              <span className="font-medium">{Math.floor(playlist.totalDuration / 60)}분 {playlist.totalDuration % 60}초</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>등록일:</span>
+              <span className="font-medium">{new Date(playlist.createdAt).toLocaleDateString()}</span>
+            </div>
+          </div>
+        </div>
+        <div className="px-4 pb-4 flex gap-2">
+          {previewUrl && (
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              보기
+            </a>
+          )}
+          <button
+            onClick={() => handleClonePlaylist(playlist.id, playlist.name)}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            가져오기
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMediaCard = (item: SignageMedia) => {
+    const playUrl = getMediaPlayUrl(item);
+    const thumbnailUrl = getMediaThumbnailUrl(item);
+
+    return (
+      <div key={item.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all hover:-translate-y-0.5">
+        {/* Clickable thumbnail area */}
+        <a
+          href={playUrl ?? undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block cursor-pointer group"
+        >
+          <div className="p-4 pb-0">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-slate-800 flex items-center gap-2 group-hover:text-primary-700 transition-colors">
+                  {item.mediaType === 'video' || item.mediaType === 'youtube' || item.mediaType === 'vimeo' ? (
+                    <VideoIcon className="h-5 w-5 text-purple-600" />
+                  ) : (
+                    <VideoIcon className="h-5 w-5 text-green-600" />
+                  )}
+                  {item.name}
+                </h3>
+              </div>
+              <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">{item.mediaType}</span>
+            </div>
+          </div>
+          {/* Thumbnail with play overlay */}
+          <div className="px-4 pt-3 relative">
+            {thumbnailUrl ? (
+              <div className="relative">
+                <img
+                  src={thumbnailUrl}
+                  alt={item.name}
+                  className="w-full h-40 object-cover rounded-md"
+                />
+                {/* Play overlay - pointer-events: none */}
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md pointer-events-none">
+                  <Play className="h-12 w-12 text-white" fill="white" />
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-40 bg-slate-100 rounded-md flex items-center justify-center">
+                <VideoIcon className="h-12 w-12 text-slate-300" />
+              </div>
             )}
           </div>
-        </div>
-      </div>
-      <div className="px-4 pb-4">
-        <div className="space-y-2 text-sm text-slate-600">
-          <div className="flex items-center justify-between">
-            <span>항목 수:</span>
-            <span className="font-medium">{playlist.itemCount || 0}개</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>총 재생 시간:</span>
-            <span className="font-medium">{Math.floor(playlist.totalDuration / 60)}분 {playlist.totalDuration % 60}초</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>등록일:</span>
-            <span className="font-medium">{new Date(playlist.createdAt).toLocaleDateString()}</span>
-          </div>
-        </div>
-      </div>
-      <div className="px-4 pb-4 flex gap-2">
-        <button
-          onClick={() => handleClonePlaylist(playlist.id, playlist.name)}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
-        >
-          <Download className="h-4 w-4" />
-          내 대시보드에 가져오기
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderMediaCard = (item: SignageMedia) => (
-    <div key={item.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-      <div className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-              {item.mediaType === 'video' || item.mediaType === 'youtube' || item.mediaType === 'vimeo' ? (
-                <VideoIcon className="h-5 w-5 text-purple-600" />
-              ) : (
-                <VideoIcon className="h-5 w-5 text-green-600" />
-              )}
-              {item.name}
-            </h3>
-          </div>
-          <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">{item.mediaType}</span>
-        </div>
-      </div>
-      {item.thumbnailUrl && (
-        <div className="px-4">
-          <img
-            src={item.thumbnailUrl}
-            alt={item.name}
-            className="w-full h-40 object-cover rounded-md"
-          />
-        </div>
-      )}
-      <div className="p-4">
-        <div className="space-y-2 text-sm text-slate-600">
-          {item.duration && (
+        </a>
+        <div className="p-4">
+          <div className="space-y-2 text-sm text-slate-600">
+            {item.duration && (
+              <div className="flex items-center justify-between">
+                <span>재생 시간:</span>
+                <span className="font-medium">{item.duration}초</span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
-              <span>재생 시간:</span>
-              <span className="font-medium">{item.duration}초</span>
+              <span>등록일:</span>
+              <span className="font-medium">{new Date(item.createdAt).toLocaleDateString()}</span>
             </div>
-          )}
-          <div className="flex items-center justify-between">
-            <span>등록일:</span>
-            <span className="font-medium">{new Date(item.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
+        <div className="px-4 pb-4 flex gap-2">
+          {playUrl && (
+            <a
+              href={playUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              보기
+            </a>
+          )}
+          <button
+            onClick={() => handleCloneMedia(item.id, item.name)}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            가져오기
+          </button>
+        </div>
       </div>
-      <div className="px-4 pb-4 flex gap-2">
-        <button
-          onClick={() => handleCloneMedia(item.id, item.name)}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
-        >
-          <Download className="h-4 w-4" />
-          내 대시보드에 가져오기
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderContent = () => {
     if (loading) {
