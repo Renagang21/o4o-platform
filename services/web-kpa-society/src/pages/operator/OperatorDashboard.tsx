@@ -169,7 +169,7 @@ export default function OperatorDashboard() {
                 <h2 className="text-lg font-semibold text-slate-800">최근 콘텐츠</h2>
               </div>
               <Link
-                to="/operator/signage/content"
+                to="signage/content"
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
               >
                 콘텐츠 허브 <ChevronRight className="w-4 h-4" />
@@ -213,7 +213,7 @@ export default function OperatorDashboard() {
                 <h2 className="text-lg font-semibold text-slate-800">최근 포럼 게시글</h2>
               </div>
               <Link
-                to="/operator/forum-management"
+                to="forum-management"
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
               >
                 포럼 관리 <ChevronRight className="w-4 h-4" />
@@ -257,7 +257,7 @@ export default function OperatorDashboard() {
               <h2 className="text-lg font-semibold text-slate-800">사이니지 미디어 & 플레이리스트</h2>
             </div>
             <Link
-              to="/operator/signage/content"
+              to="signage/content"
               className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
             >
               콘텐츠 허브 <ChevronRight className="w-4 h-4" />
@@ -325,10 +325,10 @@ export default function OperatorDashboard() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: '콘텐츠 허브', href: '/operator/signage/content', icon: Monitor, color: 'purple' },
-            { label: '포럼 관리', href: '/operator/forum-management', icon: MessageSquarePlus, color: 'amber' },
-            { label: 'AI 리포트', href: '/operator/ai-report', icon: TrendingUp, color: 'blue' },
-            { label: '약관 관리', href: '/operator/legal', icon: FileText, color: 'slate' },
+            { label: '콘텐츠 허브', href: 'signage/content', icon: Monitor, color: 'purple' },
+            { label: '포럼 관리', href: 'forum-management', icon: MessageSquarePlus, color: 'amber' },
+            { label: 'AI 리포트', href: 'ai-report', icon: TrendingUp, color: 'blue' },
+            { label: '약관 관리', href: 'legal', icon: FileText, color: 'slate' },
           ].map((action) => (
             <Link
               key={action.label}

@@ -113,14 +113,20 @@ export function ForumCategorySection() {
                     <span>{post.authorName}</span>
                     <span style={styles.dot}>·</span>
                     <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                    {post.likeCount > 0 && (
-                      <>
-                        <span style={styles.dot}>·</span>
-                        <span>좋아요 {post.likeCount}</span>
-                      </>
-                    )}
                     <span style={styles.dot}>·</span>
-                    <span>조회 {post.viewCount}</span>
+                    <span style={styles.metaStat}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-1px' }}>
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" /><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                      </svg>
+                      {' '}{post.likeCount ?? 0}
+                    </span>
+                    <span style={styles.dot}>·</span>
+                    <span style={styles.metaStat}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-1px' }}>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {' '}{post.viewCount ?? 0}
+                    </span>
                   </div>
                 </li>
               ))}
@@ -254,6 +260,11 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: '4px',
     fontSize: '0.75rem',
     color: colors.neutral400,
+  },
+  metaStat: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '2px',
   },
   dot: {
     color: colors.neutral300,

@@ -54,6 +54,9 @@ import { BranchRoutes } from './routes/BranchRoutes';
 // Branch Admin Routes (분회 관리자)
 import { BranchAdminRoutes } from './routes/BranchAdminRoutes';
 
+// Branch Operator Routes (분회 운영자) WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1
+import { BranchOperatorRoutes } from './routes/BranchOperatorRoutes';
+
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
 
@@ -213,6 +216,8 @@ function App() {
            * 이 구조는 /demo/* (Service B)와 완전히 분리됨
            * ========================================================= */}
           <Route path="/branch-services" element={<BranchServicesPage />} />
+          {/* SVC-C: 분회 Operator 대시보드 (WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1) */}
+          <Route path="/branch-services/:branchId/operator/*" element={<BranchOperatorRoutes />} />
           <Route path="/branch-services/:branchId/*" element={<BranchRoutes />} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
