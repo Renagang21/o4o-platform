@@ -14,9 +14,6 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { icon: '📊', label: '대시보드', path: '' },
-  { icon: '👥', label: '회원 관리', path: '/members' },
-  { icon: '📝', label: '신상신고', path: '/annual-report', badge: 3 },
-  { icon: '💰', label: '연회비 관리', path: '/membership-fee', badge: 5 },
   { icon: '📢', label: '공지사항', path: '/news' },
   { icon: '💬', label: '게시판 관리', path: '/forum' },
   { icon: '📁', label: '자료실', path: '/docs' },
@@ -27,7 +24,7 @@ const menuItems: MenuItem[] = [
 export function AdminSidebar() {
   const location = useLocation();
   const { branchId } = useParams();
-  const basePath = `/branch/${branchId}/admin`;
+  const basePath = `/branch-services/${branchId}/admin`;
 
   const isActive = (path: string) => {
     const fullPath = basePath + path;
@@ -73,11 +70,8 @@ export function AdminSidebar() {
 
       {/* 하단 링크 */}
       <div style={styles.footer}>
-        <Link to={`/branch/${branchId}`} style={styles.footerLink}>
+        <Link to={`/branch-services/${branchId}`} style={styles.footerLink}>
           ← 분회 사이트로 이동
-        </Link>
-        <Link to="/admin" style={styles.footerLink}>
-          ← 지부 관리자로 이동
         </Link>
       </div>
     </aside>

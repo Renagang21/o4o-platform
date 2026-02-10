@@ -1,52 +1,39 @@
 /**
  * NewsManagementPage - 공지사항 관리 페이지
+ *
+ * WO-KPA-C-BRANCH-ADMIN-IMPLEMENTATION-V1: mock → API
  */
 
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
-
-interface Notice {
-  id: string;
-  title: string;
-  category: 'notice' | 'event' | 'urgent';
-  author: string;
-  createdAt: string;
-  viewCount: number;
-  isPinned: boolean;
-  isPublished: boolean;
-}
+import { branchAdminApi } from '../../api/branchAdmin';
+import type { BranchNews } from '../../api/branchAdmin';
 
 export function NewsManagementPage() {
-  const { branchId } = useParams();
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [notices, setNotices] = useState<BranchNews[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 샘플 데이터 (테스트용 최소 데이터)
-  const [notices] = useState<Notice[]>([
-    {
-      id: '1',
-      title: '2025년 정기총회 개최 안내',
-      category: 'notice',
-      author: '관리자',
-      createdAt: '2025-01-04',
-      viewCount: 45,
-      isPinned: true,
-      isPublished: true,
-    },
-    {
-      id: '2',
-      title: '샘플 공지사항',
-      category: 'notice',
-      author: '관리자',
-      createdAt: '2025-01-01',
-      viewCount: 12,
-      isPinned: false,
-      isPublished: true,
-    },
-  ]);
+  const fetchNews = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const params = filterCategory !== 'all' ? { category: filterCategory } : undefined;
+      const res = await branchAdminApi.getNews(params);
+      setNotices(res.data?.items || []);
+    } catch (err: any) {
+      setError(err.message || '공지사항을 불러오지 못했습니다');
+    } finally {
+      setLoading(false);
+    }
+  }, [filterCategory]);
 
-  const getCategoryBadge = (category: Notice['category']) => {
+  useEffect(() => { fetchNews(); }, [fetchNews]);
+
+  const getCategoryBadge = (category: string) => {
     const styles: Record<string, React.CSSProperties> = {
       notice: { backgroundColor: colors.primary, color: colors.white },
       event: { backgroundColor: colors.accentGreen, color: colors.white },
@@ -60,17 +47,31 @@ export function NewsManagementPage() {
     return <span style={{ ...badgeStyle, ...styles[category] }}>{labels[category]}</span>;
   };
 
-  const handleTogglePin = (id: string) => {
-    alert(`공지 #${id} 고정 상태 변경`);
+  const handleTogglePin = async (id: string, currentPinned: boolean) => {
+    try {
+      await branchAdminApi.updateNews(id, { is_pinned: !currentPinned });
+      fetchNews();
+    } catch (err: any) {
+      alert('고정 상태 변경에 실패했습니다: ' + (err.message || ''));
+    }
   };
 
-  const handleTogglePublish = (id: string) => {
-    alert(`공지 #${id} 게시 상태 변경`);
+  const handleTogglePublish = async (id: string, currentPublished: boolean) => {
+    try {
+      await branchAdminApi.updateNews(id, { is_published: !currentPublished });
+      fetchNews();
+    } catch (err: any) {
+      alert('게시 상태 변경에 실패했습니다: ' + (err.message || ''));
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('정말 삭제하시겠습니까?')) {
-      alert(`공지 #${id} 삭제`);
+  const handleDelete = async (id: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await branchAdminApi.deleteNews(id);
+      fetchNews();
+    } catch (err: any) {
+      alert('삭제에 실패했습니다: ' + (err.message || ''));
     }
   };
 
@@ -104,7 +105,7 @@ export function NewsManagementPage() {
             ))}
           </div>
 
-          <Link to={`/branch/${branchId}/admin/news/new`} style={pageStyles.createButton}>
+          <Link to="new" style={pageStyles.createButton}>
             + 새 공지 작성
           </Link>
         </div>
@@ -125,17 +126,22 @@ export function NewsManagementPage() {
               </tr>
             </thead>
             <tbody>
-              {notices
-                .filter((n) => filterCategory === 'all' || n.category === filterCategory)
-                .map((notice) => (
+              {loading ? (
+                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>불러오는 중...</td></tr>
+              ) : error ? (
+                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center', color: colors.accentRed }}>{error}</td></tr>
+              ) : notices.length === 0 ? (
+                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>공지사항이 없습니다</td></tr>
+              ) : (
+                notices.map((notice) => (
                   <tr key={notice.id} style={pageStyles.tr}>
                     <td style={pageStyles.td}>
                       <button
                         style={{
                           ...pageStyles.pinButton,
-                          ...(notice.isPinned ? pageStyles.pinButtonActive : {}),
+                          ...(notice.is_pinned ? pageStyles.pinButtonActive : {}),
                         }}
-                        onClick={() => handleTogglePin(notice.id)}
+                        onClick={() => handleTogglePin(notice.id, notice.is_pinned)}
                       >
                         📌
                       </button>
@@ -143,38 +149,38 @@ export function NewsManagementPage() {
                     <td style={pageStyles.td}>{getCategoryBadge(notice.category)}</td>
                     <td style={pageStyles.td}>
                       <Link
-                        to={`/branch/${branchId}/admin/news/${notice.id}`}
+                        to={notice.id}
                         style={pageStyles.titleLink}
                       >
                         {notice.title}
                       </Link>
                     </td>
                     <td style={pageStyles.td}>{notice.author}</td>
-                    <td style={pageStyles.td}>{notice.createdAt}</td>
-                    <td style={pageStyles.td}>{notice.viewCount.toLocaleString()}</td>
+                    <td style={pageStyles.td}>{notice.created_at?.slice(0, 10)}</td>
+                    <td style={pageStyles.td}>{notice.view_count.toLocaleString()}</td>
                     <td style={pageStyles.td}>
                       <span
                         style={{
                           ...pageStyles.statusBadge,
-                          backgroundColor: notice.isPublished ? colors.accentGreen : colors.neutral400,
+                          backgroundColor: notice.is_published ? colors.accentGreen : colors.neutral400,
                         }}
                       >
-                        {notice.isPublished ? '게시중' : '임시저장'}
+                        {notice.is_published ? '게시중' : '임시저장'}
                       </span>
                     </td>
                     <td style={pageStyles.td}>
                       <div style={pageStyles.actions}>
                         <Link
-                          to={`/branch/${branchId}/admin/news/${notice.id}/edit`}
+                          to={`${notice.id}/edit`}
                           style={pageStyles.actionButton}
                         >
                           수정
                         </Link>
                         <button
                           style={pageStyles.actionButton}
-                          onClick={() => handleTogglePublish(notice.id)}
+                          onClick={() => handleTogglePublish(notice.id, notice.is_published)}
                         >
-                          {notice.isPublished ? '숨김' : '게시'}
+                          {notice.is_published ? '숨김' : '게시'}
                         </button>
                         <button
                           style={{ ...pageStyles.actionButton, color: colors.accentRed }}
@@ -185,7 +191,8 @@ export function NewsManagementPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>

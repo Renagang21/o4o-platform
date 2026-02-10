@@ -1,75 +1,36 @@
 /**
  * OfficersPage - 임원 관리 페이지
+ *
+ * WO-KPA-C-BRANCH-ADMIN-IMPLEMENTATION-V1: mock → API
  */
 
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
-
-interface Officer {
-  id: string;
-  name: string;
-  position: string;
-  role: 'president' | 'vice_president' | 'secretary' | 'treasurer' | 'director' | 'auditor';
-  pharmacyName: string;
-  phone: string;
-  email: string;
-  termStart: string;
-  termEnd: string;
-  isActive: boolean;
-  order: number;
-}
+import { branchAdminApi } from '../../api/branchAdmin';
+import type { BranchOfficer } from '../../api/branchAdmin';
 
 export function OfficersPage() {
-  const { branchId: _branchId } = useParams();
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingOfficer, setEditingOfficer] = useState<Officer | null>(null);
+  const [editingOfficer, setEditingOfficer] = useState<BranchOfficer | null>(null);
+  const [officers, setOfficers] = useState<BranchOfficer[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 샘플 데이터 (테스트용 최소 데이터 - 3명)
-  const [officers] = useState<Officer[]>([
-    {
-      id: '1',
-      name: '홍분회장',
-      position: '분회장',
-      role: 'president',
-      pharmacyName: '샘플약국',
-      phone: '010-1111-2222',
-      email: 'president@sample.com',
-      termStart: '2024-01-01',
-      termEnd: '2025-12-31',
-      isActive: true,
-      order: 1,
-    },
-    {
-      id: '2',
-      name: '김총무',
-      position: '총무',
-      role: 'secretary',
-      pharmacyName: '테스트약국',
-      phone: '010-2222-3333',
-      email: 'secretary@sample.com',
-      termStart: '2024-01-01',
-      termEnd: '2025-12-31',
-      isActive: true,
-      order: 2,
-    },
-    {
-      id: '3',
-      name: '박감사',
-      position: '감사',
-      role: 'auditor',
-      pharmacyName: '확인약국',
-      phone: '010-3333-4444',
-      email: 'auditor@sample.com',
-      termStart: '2024-01-01',
-      termEnd: '2025-12-31',
-      isActive: true,
-      order: 3,
-    },
-  ]);
+  const fetchOfficers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await branchAdminApi.getOfficers();
+      setOfficers(res.data || []);
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const handleEdit = (officer: Officer) => {
+  useEffect(() => { fetchOfficers(); }, [fetchOfficers]);
+
+  const handleEdit = (officer: BranchOfficer) => {
     setEditingOfficer(officer);
     setShowFormModal(true);
   };
@@ -79,13 +40,48 @@ export function OfficersPage() {
     setShowFormModal(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('정말 이 임원을 삭제하시겠습니까?')) {
-      alert(`임원 #${id} 삭제`);
+  const handleDelete = async (id: string) => {
+    if (!confirm('정말 이 임원을 삭제하시겠습니까?')) return;
+    try {
+      await branchAdminApi.deleteOfficer(id);
+      fetchOfficers();
+    } catch (err: any) {
+      alert('삭제에 실패했습니다: ' + (err.message || ''));
     }
   };
 
-  const calculateRemainingDays = (termEnd: string) => {
+  const handleSaveOfficer = async (form: HTMLFormElement) => {
+    const fd = new FormData(form);
+    const data = {
+      name: fd.get('name') as string,
+      position: ROLE_LABELS[fd.get('role') as string] || fd.get('role') as string,
+      role: fd.get('role') as string,
+      pharmacy_name: fd.get('pharmacy_name') as string || undefined,
+      phone: fd.get('phone') as string || undefined,
+      email: fd.get('email') as string || undefined,
+      term_start: fd.get('term_start') as string || undefined,
+      term_end: fd.get('term_end') as string || undefined,
+    };
+    try {
+      if (editingOfficer) {
+        await branchAdminApi.updateOfficer(editingOfficer.id, data);
+      } else {
+        await branchAdminApi.createOfficer(data);
+      }
+      setShowFormModal(false);
+      fetchOfficers();
+    } catch (err: any) {
+      alert('저장에 실패했습니다: ' + (err.message || ''));
+    }
+  };
+
+  const ROLE_LABELS: Record<string, string> = {
+    president: '분회장', vice_president: '부회장', secretary: '총무',
+    treasurer: '재무', director: '이사', auditor: '감사',
+  };
+
+  const calculateRemainingDays = (termEnd: string | null) => {
+    if (!termEnd) return 999;
     const end = new Date(termEnd);
     const now = new Date();
     const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
@@ -100,8 +96,9 @@ export function OfficersPage() {
       />
 
       <div style={pageStyles.content}>
+        {loading && <div style={{ padding: '40px', textAlign: 'center', color: colors.neutral500 }}>불러오는 중...</div>}
         {/* 임기 알림 */}
-        {officers.some((o) => calculateRemainingDays(o.termEnd) < 90) && (
+        {officers.some((o) => calculateRemainingDays(o.term_end) < 90) && (
           <div style={pageStyles.termAlert}>
             <span style={pageStyles.alertIcon}>📢</span>
             <span>
@@ -113,7 +110,7 @@ export function OfficersPage() {
         {/* 상단 액션 */}
         <div style={pageStyles.toolbar}>
           <div style={pageStyles.summary}>
-            <span>현재 임원: <strong>{officers.filter((o) => o.isActive).length}명</strong></span>
+            <span>현재 임원: <strong>{officers.filter((o) => o.is_active).length}명</strong></span>
             <span style={pageStyles.divider}>|</span>
             <span>임기: 2024.01 ~ 2025.12</span>
           </div>
@@ -131,10 +128,10 @@ export function OfficersPage() {
         {/* 임원 카드 그리드 */}
         <div style={pageStyles.officerGrid}>
           {officers
-            .filter((o) => o.isActive)
-            .sort((a, b) => a.order - b.order)
+            .filter((o) => o.is_active)
+            .sort((a, b) => a.sort_order - b.sort_order)
             .map((officer) => {
-              const remainingDays = calculateRemainingDays(officer.termEnd);
+              const remainingDays = calculateRemainingDays(officer.term_end);
               return (
                 <div key={officer.id} style={pageStyles.officerCard}>
                   <div style={pageStyles.cardHeader}>
@@ -158,15 +155,15 @@ export function OfficersPage() {
                   <div style={pageStyles.cardBody}>
                     <div style={pageStyles.infoRow}>
                       <span style={pageStyles.infoLabel}>약국</span>
-                      <span style={pageStyles.infoValue}>{officer.pharmacyName}</span>
+                      <span style={pageStyles.infoValue}>{officer.pharmacy_name || '-'}</span>
                     </div>
                     <div style={pageStyles.infoRow}>
                       <span style={pageStyles.infoLabel}>연락처</span>
-                      <span style={pageStyles.infoValue}>{officer.phone}</span>
+                      <span style={pageStyles.infoValue}>{officer.phone || '-'}</span>
                     </div>
                     <div style={pageStyles.infoRow}>
                       <span style={pageStyles.infoLabel}>이메일</span>
-                      <span style={pageStyles.infoValue}>{officer.email}</span>
+                      <span style={pageStyles.infoValue}>{officer.email || '-'}</span>
                     </div>
                   </div>
 
@@ -174,7 +171,7 @@ export function OfficersPage() {
                     <div style={pageStyles.termInfo}>
                       <span style={pageStyles.termLabel}>임기</span>
                       <span style={pageStyles.termValue}>
-                        {officer.termStart} ~ {officer.termEnd}
+                        {officer.term_start || '-'} ~ {officer.term_end || '-'}
                       </span>
                     </div>
                     {remainingDays < 90 && (
@@ -225,20 +222,23 @@ export function OfficersPage() {
                 ×
               </button>
             </div>
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveOfficer(e.currentTarget); }}>
             <div style={pageStyles.modalBody}>
               <div style={pageStyles.formRow}>
                 <div style={pageStyles.formGroup}>
                   <label style={pageStyles.label}>이름</label>
                   <input
                     type="text"
+                    name="name"
                     style={pageStyles.input}
                     defaultValue={editingOfficer?.name}
                     placeholder="이름"
+                    required
                   />
                 </div>
                 <div style={pageStyles.formGroup}>
                   <label style={pageStyles.label}>직책</label>
-                  <select style={pageStyles.select} defaultValue={editingOfficer?.role}>
+                  <select name="role" style={pageStyles.select} defaultValue={editingOfficer?.role || 'president'}>
                     <option value="president">분회장</option>
                     <option value="vice_president">부회장</option>
                     <option value="secretary">총무</option>
@@ -252,8 +252,9 @@ export function OfficersPage() {
                 <label style={pageStyles.label}>약국명</label>
                 <input
                   type="text"
+                  name="pharmacy_name"
                   style={pageStyles.input}
-                  defaultValue={editingOfficer?.pharmacyName}
+                  defaultValue={editingOfficer?.pharmacy_name || ''}
                   placeholder="소속 약국명"
                 />
               </div>
@@ -262,8 +263,9 @@ export function OfficersPage() {
                   <label style={pageStyles.label}>연락처</label>
                   <input
                     type="tel"
+                    name="phone"
                     style={pageStyles.input}
-                    defaultValue={editingOfficer?.phone}
+                    defaultValue={editingOfficer?.phone || ''}
                     placeholder="010-0000-0000"
                   />
                 </div>
@@ -271,8 +273,9 @@ export function OfficersPage() {
                   <label style={pageStyles.label}>이메일</label>
                   <input
                     type="email"
+                    name="email"
                     style={pageStyles.input}
-                    defaultValue={editingOfficer?.email}
+                    defaultValue={editingOfficer?.email || ''}
                     placeholder="email@example.com"
                   />
                 </div>
@@ -282,16 +285,18 @@ export function OfficersPage() {
                   <label style={pageStyles.label}>임기 시작</label>
                   <input
                     type="date"
+                    name="term_start"
                     style={pageStyles.input}
-                    defaultValue={editingOfficer?.termStart}
+                    defaultValue={editingOfficer?.term_start || ''}
                   />
                 </div>
                 <div style={pageStyles.formGroup}>
                   <label style={pageStyles.label}>임기 종료</label>
                   <input
                     type="date"
+                    name="term_end"
                     style={pageStyles.input}
-                    defaultValue={editingOfficer?.termEnd}
+                    defaultValue={editingOfficer?.term_end || ''}
                   />
                 </div>
               </div>
@@ -299,6 +304,7 @@ export function OfficersPage() {
             <div style={pageStyles.modalFooter}>
               {editingOfficer && (
                 <button
+                  type="button"
                   style={{ ...pageStyles.deleteButton }}
                   onClick={() => {
                     handleDelete(editingOfficer.id);
@@ -309,13 +315,14 @@ export function OfficersPage() {
                 </button>
               )}
               <div style={{ flex: 1 }} />
-              <button style={pageStyles.cancelButton} onClick={() => setShowFormModal(false)}>
+              <button type="button" style={pageStyles.cancelButton} onClick={() => setShowFormModal(false)}>
                 취소
               </button>
-              <button style={pageStyles.submitButton}>
+              <button type="submit" style={pageStyles.submitButton}>
                 {editingOfficer ? '저장' : '추가'}
               </button>
             </div>
+            </form>
           </div>
         </div>
       )}

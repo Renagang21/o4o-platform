@@ -1,106 +1,61 @@
 /**
  * DocsManagementPage - 자료실 관리 페이지
+ *
+ * WO-KPA-C-BRANCH-ADMIN-IMPLEMENTATION-V1: mock → API
  */
 
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
-
-interface Document {
-  id: string;
-  title: string;
-  category: 'form' | 'guideline' | 'policy' | 'manual' | 'etc';
-  fileName: string;
-  fileSize: string;
-  uploadedBy: string;
-  uploadedAt: string;
-  downloadCount: number;
-  isPublished: boolean;
-}
+import { branchAdminApi } from '../../api/branchAdmin';
+import type { BranchDoc } from '../../api/branchAdmin';
 
 export function DocsManagementPage() {
-  const { branchId: _branchId } = useParams();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [documents, setDocuments] = useState<BranchDoc[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [documents] = useState<Document[]>([
-    {
-      id: '1',
-      title: '2025년 신상신고서 양식',
-      category: 'form',
-      fileName: 'annual_report_form_2025.pdf',
-      fileSize: '245KB',
-      uploadedBy: '관리자',
-      uploadedAt: '2025-01-01',
-      downloadCount: 156,
-      isPublished: true,
-    },
-    {
-      id: '2',
-      title: '약국 운영 가이드라인',
-      category: 'guideline',
-      fileName: 'pharmacy_operation_guide.pdf',
-      fileSize: '1.2MB',
-      uploadedBy: '관리자',
-      uploadedAt: '2024-12-15',
-      downloadCount: 342,
-      isPublished: true,
-    },
-    {
-      id: '3',
-      title: '분회 정관',
-      category: 'policy',
-      fileName: 'branch_charter.pdf',
-      fileSize: '890KB',
-      uploadedBy: '관리자',
-      uploadedAt: '2024-11-01',
-      downloadCount: 89,
-      isPublished: true,
-    },
-    {
-      id: '4',
-      title: '회원 가입 신청서',
-      category: 'form',
-      fileName: 'member_application.docx',
-      fileSize: '125KB',
-      uploadedBy: '관리자',
-      uploadedAt: '2024-10-15',
-      downloadCount: 234,
-      isPublished: true,
-    },
-    {
-      id: '5',
-      title: '보수교육 이수 증명서 양식 (임시)',
-      category: 'form',
-      fileName: 'education_cert_form.pdf',
-      fileSize: '180KB',
-      uploadedBy: '관리자',
-      uploadedAt: '2024-12-30',
-      downloadCount: 0,
-      isPublished: false,
-    },
-  ]);
+  const fetchDocs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = filterCategory !== 'all' ? { category: filterCategory } : undefined;
+      const res = await branchAdminApi.getDocs(params);
+      setDocuments(res.data?.items || []);
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, [filterCategory]);
 
-  const getCategoryBadge = (category: Document['category']) => {
+  useEffect(() => { fetchDocs(); }, [fetchDocs]);
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0B';
+    if (bytes < 1024) return bytes + 'B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + 'KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+  };
+
+  const getCategoryBadge = (category: string) => {
     const styles: Record<string, React.CSSProperties> = {
       form: { backgroundColor: colors.primary, color: colors.white },
-      guideline: { backgroundColor: colors.accentGreen, color: colors.white },
-      policy: { backgroundColor: colors.accentYellow, color: colors.white },
-      manual: { backgroundColor: colors.neutral600, color: colors.white },
-      etc: { backgroundColor: colors.neutral400, color: colors.white },
+      general: { backgroundColor: colors.neutral600, color: colors.white },
+      regulation: { backgroundColor: colors.accentYellow, color: colors.white },
+      guide: { backgroundColor: colors.accentGreen, color: colors.white },
     };
     const labels: Record<string, string> = {
       form: '서식/양식',
-      guideline: '가이드라인',
-      policy: '규정/정관',
-      manual: '매뉴얼',
-      etc: '기타',
+      general: '일반',
+      regulation: '규정/정관',
+      guide: '가이드',
     };
-    return <span style={{ ...badgeStyle, ...styles[category] }}>{labels[category]}</span>;
+    return <span style={{ ...badgeStyle, ...(styles[category] || styles.general) }}>{labels[category] || category}</span>;
   };
 
-  const getFileIcon = (fileName: string) => {
+  const getFileIcon = (fileName: string | null) => {
+    if (!fileName) return '📎';
     if (fileName.endsWith('.pdf')) return '📄';
     if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) return '📝';
     if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) return '📊';
@@ -109,14 +64,37 @@ export function DocsManagementPage() {
     return '📎';
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('정말 삭제하시겠습니까?')) {
-      alert(`문서 #${id} 삭제`);
+  const handleDelete = async (id: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await branchAdminApi.deleteDoc(id);
+      fetchDocs();
+    } catch (err: any) {
+      alert('삭제에 실패했습니다: ' + (err.message || ''));
     }
   };
 
-  const handleTogglePublish = (id: string) => {
-    alert(`문서 #${id} 게시 상태 변경`);
+  const handleTogglePublish = async (id: string, currentPublic: boolean) => {
+    try {
+      await branchAdminApi.updateDoc(id, { is_public: !currentPublic });
+      fetchDocs();
+    } catch (err: any) {
+      alert('상태 변경에 실패했습니다: ' + (err.message || ''));
+    }
+  };
+
+  const handleUpload = async (form: HTMLFormElement) => {
+    const fd = new FormData(form);
+    try {
+      await branchAdminApi.createDoc({
+        title: fd.get('title') as string,
+        category: fd.get('category') as string || 'general',
+      });
+      setShowUploadModal(false);
+      fetchDocs();
+    } catch (err: any) {
+      alert('업로드에 실패했습니다: ' + (err.message || ''));
+    }
   };
 
   return (
@@ -132,10 +110,10 @@ export function DocsManagementPage() {
           <div style={pageStyles.tabs}>
             {[
               { value: 'all', label: '전체' },
+              { value: 'general', label: '일반' },
+              { value: 'regulation', label: '규정/정관' },
               { value: 'form', label: '서식/양식' },
-              { value: 'guideline', label: '가이드라인' },
-              { value: 'policy', label: '규정/정관' },
-              { value: 'manual', label: '매뉴얼' },
+              { value: 'guide', label: '가이드' },
             ].map((tab) => (
               <button
                 key={tab.value}
@@ -174,9 +152,12 @@ export function DocsManagementPage() {
               </tr>
             </thead>
             <tbody>
-              {documents
-                .filter((d) => filterCategory === 'all' || d.category === filterCategory)
-                .map((doc) => (
+              {loading ? (
+                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>불러오는 중...</td></tr>
+              ) : documents.length === 0 ? (
+                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>자료가 없습니다</td></tr>
+              ) : (
+                documents.map((doc) => (
                   <tr key={doc.id} style={pageStyles.tr}>
                     <td style={pageStyles.td}>{getCategoryBadge(doc.category)}</td>
                     <td style={pageStyles.td}>
@@ -184,33 +165,35 @@ export function DocsManagementPage() {
                     </td>
                     <td style={pageStyles.td}>
                       <div style={pageStyles.fileName}>
-                        <span style={pageStyles.fileIcon}>{getFileIcon(doc.fileName)}</span>
-                        <span>{doc.fileName}</span>
+                        <span style={pageStyles.fileIcon}>{getFileIcon(doc.file_name)}</span>
+                        <span>{doc.file_name || '-'}</span>
                       </div>
                     </td>
-                    <td style={pageStyles.td}>{doc.fileSize}</td>
-                    <td style={pageStyles.td}>{doc.uploadedAt}</td>
-                    <td style={pageStyles.td}>{doc.downloadCount.toLocaleString()}</td>
+                    <td style={pageStyles.td}>{formatFileSize(doc.file_size)}</td>
+                    <td style={pageStyles.td}>{doc.created_at?.slice(0, 10)}</td>
+                    <td style={pageStyles.td}>{doc.download_count.toLocaleString()}</td>
                     <td style={pageStyles.td}>
                       <span
                         style={{
                           ...pageStyles.statusBadge,
-                          backgroundColor: doc.isPublished ? colors.accentGreen : colors.neutral400,
+                          backgroundColor: doc.is_public ? colors.accentGreen : colors.neutral400,
                         }}
                       >
-                        {doc.isPublished ? '게시중' : '비공개'}
+                        {doc.is_public ? '게시중' : '비공개'}
                       </span>
                     </td>
                     <td style={pageStyles.td}>
                       <div style={pageStyles.actions}>
-                        <a href="#" style={pageStyles.actionButton}>
-                          📥 다운로드
-                        </a>
+                        {doc.file_url && (
+                          <a href={doc.file_url} style={pageStyles.actionButton} target="_blank" rel="noopener noreferrer">
+                            📥 다운로드
+                          </a>
+                        )}
                         <button
                           style={pageStyles.actionButton}
-                          onClick={() => handleTogglePublish(doc.id)}
+                          onClick={() => handleTogglePublish(doc.id, doc.is_public)}
                         >
-                          {doc.isPublished ? '숨김' : '게시'}
+                          {doc.is_public ? '숨김' : '게시'}
                         </button>
                         <button
                           style={{ ...pageStyles.actionButton, color: colors.accentRed }}
@@ -221,7 +204,8 @@ export function DocsManagementPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -246,38 +230,39 @@ export function DocsManagementPage() {
                 ×
               </button>
             </div>
+            <form onSubmit={(e) => { e.preventDefault(); handleUpload(e.currentTarget); }}>
             <div style={pageStyles.modalBody}>
               <div style={pageStyles.formGroup}>
                 <label style={pageStyles.label}>제목</label>
-                <input type="text" style={pageStyles.input} placeholder="자료 제목을 입력하세요" />
+                <input type="text" name="title" style={pageStyles.input} placeholder="자료 제목을 입력하세요" required />
               </div>
               <div style={pageStyles.formGroup}>
                 <label style={pageStyles.label}>분류</label>
-                <select style={pageStyles.select}>
+                <select name="category" style={pageStyles.select}>
+                  <option value="general">일반</option>
+                  <option value="regulation">규정/정관</option>
                   <option value="form">서식/양식</option>
-                  <option value="guideline">가이드라인</option>
-                  <option value="policy">규정/정관</option>
-                  <option value="manual">매뉴얼</option>
-                  <option value="etc">기타</option>
+                  <option value="guide">가이드</option>
                 </select>
               </div>
               <div style={pageStyles.formGroup}>
                 <label style={pageStyles.label}>파일</label>
                 <div style={pageStyles.dropZone}>
                   <span style={pageStyles.dropIcon}>📤</span>
-                  <p>클릭하거나 파일을 드래그하여 업로드</p>
-                  <p style={pageStyles.dropHint}>PDF, DOC, XLS, PPT, ZIP (최대 50MB)</p>
+                  <p>파일 업로드는 추후 지원 예정입니다</p>
+                  <p style={pageStyles.dropHint}>현재는 자료 정보만 등록됩니다</p>
                 </div>
               </div>
             </div>
             <div style={pageStyles.modalFooter}>
-              <button style={pageStyles.cancelButton} onClick={() => setShowUploadModal(false)}>
+              <button type="button" style={pageStyles.cancelButton} onClick={() => setShowUploadModal(false)}>
                 취소
               </button>
-              <button style={pageStyles.submitButton}>
-                업로드
+              <button type="submit" style={pageStyles.submitButton}>
+                등록
               </button>
             </div>
+            </form>
           </div>
         </div>
       )}

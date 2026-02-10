@@ -91,7 +91,7 @@ export function BranchAdminAuthGuard({ children }: BranchAdminAuthGuardProps) {
             ) : (
               <button
                 style={styles.backButton}
-                onClick={() => navigate(`/branch/${branchId}`)}
+                onClick={() => navigate(`/branch-services/${branchId}`)}
               >
                 분회 홈으로 돌아가기
               </button>
@@ -140,6 +140,7 @@ function checkBranchAdminRole(user: User, _branchId: string): boolean {
     'kpa:district_admin',
     'kpa:branch_admin',
     'kpa:branch_operator',
+    'kpa-c:branch_admin',
   ];
 
   const allowedRoles = [...legacyRoles, ...prefixedRoles];

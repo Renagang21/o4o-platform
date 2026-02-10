@@ -1,17 +1,11 @@
 /**
  * SettingsPage - 분회 설정 페이지
  *
- * WO-KPA-FEE-BY-FUNCTION-V1: 직능별 연회비 설정 기능 추가
+ * WO-KPA-C-BRANCH-ADMIN-IMPLEMENTATION-V1: mock → API
  * WO-KPA-FEE-CATEGORY-2025-V1: 2025년 약사회비 체계 반영
- * - 대한약사회 회비 내역 리스트 기준 7개 분류
- * - 면허사용자(갑): 약국 개설자, 제약·도매·관리약사
- * - 면허사용자(을): 약국 근무약사, 제약근무·생산업체
- * - 면허사용자(병): 의료기관 근무약사, 행정·교육·연구
- * - 면허사용자(정): 회비면제자·미취업자
  */
 
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 import {
@@ -19,6 +13,7 @@ import {
   FEE_CATEGORY_LABELS,
   FEE_CATEGORY_GROUPS,
 } from '../../types';
+import { branchAdminApi } from '../../api/branchAdmin';
 
 // 정렬된 회비 분류 목록
 const ORDERED_CATEGORIES: PharmacistFeeCategory[] = [
@@ -32,23 +27,60 @@ const ORDERED_CATEGORIES: PharmacistFeeCategory[] = [
 ];
 
 export function SettingsPage() {
-  const { branchId: _branchId } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [orgName, setOrgName] = useState('');
+  const [orgCode, setOrgCode] = useState('');
 
   const [settings, setSettings] = useState({
-    name: '강남분회',
-    code: 'GANGNAM',
-    address: '서울시 강남구 역삼동 123-45',
-    phone: '02-1234-5678',
-    fax: '02-1234-5679',
-    email: 'gangnam@kpa.or.kr',
-    workingHours: '평일 09:00 - 18:00',
-    description: '강남분회는 강남구 지역 약사들의 권익 보호와 직능 발전을 위해 활동하고 있습니다.',
-    membershipFeeDeadline: '03-31',
-    annualReportDeadline: '01-31',
+    name: '',
+    code: '',
+    address: '',
+    phone: '',
+    fax: '',
+    email: '',
+    workingHours: '',
+    description: '',
+    membershipFeeDeadline: '',
+    annualReportDeadline: '',
   });
 
+  const fetchSettings = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await branchAdminApi.getSettings();
+      const { settings: s, organization: org } = res.data || {};
+      if (org) {
+        setOrgName(org.name || '');
+        setOrgCode(org.code || '');
+      }
+      if (s) {
+        setSettings({
+          name: org?.name || '',
+          code: org?.code || '',
+          address: s.address || '',
+          phone: s.phone || '',
+          fax: s.fax || '',
+          email: s.email || '',
+          workingHours: s.working_hours || '',
+          description: s.description || '',
+          membershipFeeDeadline: s.membership_fee_deadline || '',
+          annualReportDeadline: s.annual_report_deadline || '',
+        });
+        if (s.fee_settings) {
+          setFeeSettings(prev => ({ ...prev, ...s.fee_settings }));
+        }
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+
   // WO-KPA-FEE-CATEGORY-2025-V1: 2025년 회비 체계 기반 설정
-  // 회비 분류별 금액 CRUD 가능
   const [selectedYear, setSelectedYear] = useState(2025);
 
   // 회비 설정 상태 (입력/수정/삭제 가능)
@@ -99,8 +131,36 @@ export function SettingsPage() {
     return FEE_CATEGORY_GROUPS[category].group !== FEE_CATEGORY_GROUPS[prevCategory].group;
   };
 
-  const handleSave = () => {
-    alert(`${selectedYear}년도 회비 설정이 저장되었습니다.`);
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await branchAdminApi.updateSettings({
+        address: settings.address,
+        phone: settings.phone,
+        fax: settings.fax,
+        email: settings.email,
+        working_hours: settings.workingHours,
+        description: settings.description,
+        membership_fee_deadline: settings.membershipFeeDeadline,
+        annual_report_deadline: settings.annualReportDeadline,
+        fee_settings: feeSettings as any,
+      });
+      alert('설정이 저장되었습니다.');
+    } catch (err: any) {
+      alert('저장에 실패했습니다: ' + (err.message || ''));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeactivate = async () => {
+    if (!confirm('정말 분회를 비활성화하시겠습니까? 회원들이 더 이상 접근할 수 없게 됩니다.')) return;
+    try {
+      await branchAdminApi.updateStatus({ is_active: false });
+      alert('분회가 비활성화되었습니다.');
+    } catch (err: any) {
+      alert('비활성화에 실패했습니다: ' + (err.message || ''));
+    }
   };
 
   return (
@@ -111,6 +171,7 @@ export function SettingsPage() {
       />
 
       <div style={pageStyles.content}>
+        {loading && <div style={{ padding: '40px', textAlign: 'center', color: colors.neutral500 }}>불러오는 중...</div>}
         {/* 기본 정보 */}
         <div style={pageStyles.section}>
           <h3 style={pageStyles.sectionTitle}>기본 정보</h3>
@@ -119,17 +180,18 @@ export function SettingsPage() {
               <label style={pageStyles.label}>분회명</label>
               <input
                 type="text"
-                style={pageStyles.input}
-                value={settings.name}
-                onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                style={{ ...pageStyles.input, backgroundColor: colors.neutral100 }}
+                value={orgName}
+                disabled
               />
+              <span style={pageStyles.inputHint}>분회명은 조직 설정에서 변경합니다</span>
             </div>
             <div style={pageStyles.formGroup}>
               <label style={pageStyles.label}>분회 코드</label>
               <input
                 type="text"
                 style={{ ...pageStyles.input, backgroundColor: colors.neutral100 }}
-                value={settings.code}
+                value={orgCode}
                 disabled
               />
               <span style={pageStyles.inputHint}>분회 코드는 변경할 수 없습니다</span>
@@ -344,7 +406,7 @@ export function SettingsPage() {
                 분회를 비활성화하면 회원들이 더 이상 이 분회에 접근할 수 없습니다.
               </div>
             </div>
-            <button style={pageStyles.dangerButton}>
+            <button style={pageStyles.dangerButton} onClick={handleDeactivate}>
               비활성화
             </button>
           </div>
@@ -353,8 +415,8 @@ export function SettingsPage() {
         {/* 저장 버튼 */}
         <div style={pageStyles.footer}>
           <button style={pageStyles.cancelButton}>취소</button>
-          <button style={pageStyles.saveButton} onClick={handleSave}>
-            변경사항 저장
+          <button style={pageStyles.saveButton} onClick={handleSave} disabled={saving}>
+            {saving ? '저장 중...' : '변경사항 저장'}
           </button>
         </div>
       </div>

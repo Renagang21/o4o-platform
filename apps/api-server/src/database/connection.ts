@@ -190,6 +190,10 @@ import {
   KpaApplication,
   KpaJoinInquiry,
   KpaOrganizationJoinRequest,
+  KpaBranchNews,
+  KpaBranchOfficer,
+  KpaBranchDoc,
+  KpaBranchSettings,
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -540,6 +544,10 @@ export const AppDataSource = new DataSource({
     KpaApplication,
     KpaJoinInquiry,
     KpaOrganizationJoinRequest,
+    KpaBranchNews,
+    KpaBranchOfficer,
+    KpaBranchDoc,
+    KpaBranchSettings,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
