@@ -29,7 +29,7 @@ export function GroupbuyListPage() {
       const res = await groupbuyApi.getGroupbuys({
         status: currentStatus,
         page: currentPage,
-        limit: 12,
+        limit: 10,
       });
 
       setGroupbuys(res.data || []);

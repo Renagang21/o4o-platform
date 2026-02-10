@@ -49,7 +49,7 @@ export function ResourcesListPage() {
       const res = await resourcesApi.getResources({
         category: currentCategory,
         page: currentPage,
-        limit: 20,
+        limit: 10,
         search: searchQuery || undefined,
       });
 

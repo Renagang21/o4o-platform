@@ -36,7 +36,7 @@ export function ParticipationListPage() {
       const response = await participationApi.getParticipationSets({
         status: currentStatus || undefined,
         page: currentPage,
-        limit: 20,
+        limit: 10,
         search: searchQuery || undefined,
       });
 

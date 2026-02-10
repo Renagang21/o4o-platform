@@ -114,7 +114,7 @@ export function NewsListPage() {
       const res = await newsApi.getNotices({
         type: getApiType(currentType),
         page: currentPage,
-        limit: 12,
+        limit: 10,
         search: searchQuery || undefined,
         sort,
       });
@@ -246,7 +246,7 @@ export function NewsListPage() {
             onPageChange={handlePageChange}
             showItemRange
             totalItems={totalItems}
-            pageSize={12}
+            pageSize={10}
           />
         </>
       )}

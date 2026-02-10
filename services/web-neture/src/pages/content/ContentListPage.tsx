@@ -19,7 +19,7 @@ import {
 import type { ContentSortType, ContentSourceType } from '@o4o/types/content';
 import { ContentPagination, ContentCardActions, ContentMetaBar, ContentSortButtons } from '@o4o/ui';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 10;
 
 export default function ContentListPage() {
   const { user } = useAuth();

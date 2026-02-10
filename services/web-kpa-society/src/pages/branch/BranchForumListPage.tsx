@@ -28,7 +28,7 @@ export function BranchForumListPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await branchApi.getForumPosts(branchId!, { page, limit: 15 });
+      const res = await branchApi.getForumPosts(branchId!, { page, limit: 10 });
       setPosts(res.data.items);
       setTotalPages(res.data.totalPages);
     } catch (err) {

@@ -14,7 +14,7 @@ import { forumApi } from '../../api';
 import { colors } from '../../styles/theme';
 import type { ForumPost, ForumCategory } from '../../types';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
