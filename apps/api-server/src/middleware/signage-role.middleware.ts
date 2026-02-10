@@ -424,7 +424,7 @@ export const validateServiceKey = (
   }
 
   // Add validation for allowed service keys if needed
-  const validServiceKeys = ['pharmacy', 'cosmetics', 'tourism', 'common'];
+  const validServiceKeys = ['pharmacy', 'cosmetics', 'tourism', 'common', 'kpa-society', 'neture', 'glycopharm'];
   if (!validServiceKeys.includes(serviceKey) && serviceKey !== 'test') {
     // Log warning but don't block - allow for future services
     console.warn(`[Signage] Unrecognized service key: ${serviceKey}`);

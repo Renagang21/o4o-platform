@@ -65,7 +65,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const media = await dataSource.query(`
         SELECT
           id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl",
-          duration, width, height, "ownerType", tags, metadata,
+          duration, tags, metadata,
           "createdAt", "updatedAt"
         FROM signage_media
         WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
@@ -131,8 +131,13 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const playlists = await dataSource.query(`
         SELECT
-          id, name, description, "defaultDuration", "defaultTransition",
-          "totalDuration", "itemCount", "isActive", "isLoop", tags, metadata,
+          id, name, description,
+          "defaultItemDuration" as "defaultDuration",
+          "transitionType" as "defaultTransition",
+          "totalDuration", "itemCount",
+          (status = 'active') as "isActive",
+          "loopEnabled" as "isLoop",
+          tags, metadata,
           "createdAt", "updatedAt"
         FROM signage_playlists
         WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
@@ -176,7 +181,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const media = await dataSource.query(`
         SELECT
           id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl",
-          duration, width, height, "ownerType", tags, metadata,
+          duration, tags, metadata,
           "createdAt", "updatedAt"
         FROM signage_media
         WHERE id = $1 AND "serviceKey" = $2
@@ -207,8 +212,13 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const playlists = await dataSource.query(`
         SELECT
-          id, name, description, "defaultDuration", "defaultTransition",
-          "totalDuration", "itemCount", "isActive", "isLoop", tags, metadata,
+          id, name, description,
+          "defaultItemDuration" as "defaultDuration",
+          "transitionType" as "defaultTransition",
+          "totalDuration", "itemCount",
+          (status = 'active') as "isActive",
+          "loopEnabled" as "isLoop",
+          tags, metadata,
           "createdAt", "updatedAt"
         FROM signage_playlists
         WHERE id = $1 AND "serviceKey" = $2
@@ -224,14 +234,16 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       // Fetch playlist items with media
       const items = await dataSource.query(`
         SELECT
-          pi.id, pi."displayOrder", pi."displayDuration", pi."transitionEffect",
+          pi.id, pi."sortOrder" as "displayOrder",
+          pi."duration" as "displayDuration",
+          pi."transitionType" as "transitionEffect",
           m.id as "mediaId", m.name as "mediaName", m."mediaType",
           m."sourceUrl" as "mediaUrl", m."thumbnailUrl" as "mediaThumbnailUrl",
           m.duration as "mediaDuration"
         FROM signage_playlist_items pi
         LEFT JOIN signage_media m ON pi."mediaId" = m.id
         WHERE pi."playlistId" = $1 AND pi."isActive" = true
-        ORDER BY pi."displayOrder" ASC
+        ORDER BY pi."sortOrder" ASC
       `, [id]);
 
       res.json({
