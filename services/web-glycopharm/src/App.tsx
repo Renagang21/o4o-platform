@@ -90,6 +90,8 @@ const InventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
 const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
 const AnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage')); // Phase 3-B: Billing Report
+const BillingPreviewPage = lazy(() => import('@/pages/operator/BillingPreviewPage')); // Phase 3-C: Billing Preview
+const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage')); // Phase 3-D: Invoice Finalization
 const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 
@@ -347,6 +349,10 @@ function AppRoutes() {
         <Route path="analytics" element={<AnalyticsPage />} />
         {/* Billing Report (Phase 3-B) */}
         <Route path="reports" element={<ReportsPage />} />
+        {/* Billing Preview (Phase 3-C) */}
+        <Route path="billing-preview" element={<BillingPreviewPage />} />
+        {/* Invoices (Phase 3-D) */}
+        <Route path="invoices" element={<InvoicesPage />} />
         <Route path="marketing" element={<MarketingPage />} />
         {/* Forum */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />

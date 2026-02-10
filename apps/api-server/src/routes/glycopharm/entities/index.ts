@@ -47,6 +47,16 @@ export {
   type RequestActionStatus,
 } from './request-action-log.entity.js';
 
+// Billing Invoice (Phase 3-D: Invoice Finalization, Phase 3-E: Dispatch)
+export {
+  GlycopharmBillingInvoice,
+  type InvoiceStatus,
+  type BillingUnit,
+  type InvoiceLineSnapshot,
+  type DispatchStatus,
+  type DispatchLogEntry,
+} from './billing-invoice.entity.js';
+
 // Orders - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // GlycopharmOrder, GlycopharmOrderItem entities removed
 // New orders will use E-commerce Core with OrderType.GLYCOPHARM

@@ -145,6 +145,7 @@ import {
   GlycopharmCustomerRequest,
   GlycopharmEvent,
   GlycopharmRequestActionLog,
+  GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
   // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 } from '../routes/glycopharm/entities/index.js';
 
@@ -504,6 +505,7 @@ export const AppDataSource = new DataSource({
     GlycopharmCustomerRequest,
     GlycopharmEvent,
     GlycopharmRequestActionLog,
+    GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================

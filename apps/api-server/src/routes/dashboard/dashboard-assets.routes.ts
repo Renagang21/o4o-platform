@@ -82,6 +82,31 @@ function deriveDashboardStatus(asset: { isActive: boolean; metadata?: any }): 'd
 }
 
 /**
+ * Phase 5: Compute exposure locations for a dashboard asset
+ * 읽기 전용 계산 — DB 조회 없음
+ */
+type ExposureLocation = 'home' | 'signage' | 'promo';
+
+function computeExposure(asset: { type: string; isActive: boolean; metadata?: any }): ExposureLocation[] {
+  if (deriveDashboardStatus(asset) !== 'active') return [];
+
+  const sourceType = asset.metadata?.sourceType;
+
+  // 사이니지 자산 → 디지털 사이니지
+  if (sourceType === 'signage_media' || sourceType === 'signage_playlist') {
+    return ['signage'];
+  }
+
+  // 콘텐츠 자산 — type 기반 판단
+  const contentType = asset.type;
+  if (contentType === 'hero' || contentType === 'promo') {
+    return ['home', 'promo'];
+  }
+  // notice, news, featured, event 등 → 매장 홈
+  return ['home'];
+}
+
+/**
  * Create Dashboard Assets routes
  */
 export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
@@ -323,6 +348,7 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
             createdAt: asset.createdAt,
             viewCount: srcId ? (viewCountMap[srcId] || 0) : 0,
             recommendCount: srcId ? (recCountMap[srcId] || 0) : 0,
+            exposure: computeExposure(asset),
           };
         }),
       });

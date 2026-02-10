@@ -477,6 +477,7 @@ export interface DashboardAsset {
   createdAt: string;
   viewCount?: number;
   recommendCount?: number;
+  exposure?: string[];
 }
 
 export type DashboardSortType = 'recent' | 'views' | 'recommend';

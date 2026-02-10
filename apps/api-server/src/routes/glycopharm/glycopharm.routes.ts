@@ -22,6 +22,9 @@ import { createCustomerRequestController } from './controllers/customer-request.
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
 import { createFunnelController } from './controllers/funnel.controller.js'; // Phase 3-A: Funnel Visualization
 import { createReportController } from './controllers/report.controller.js'; // Phase 3-B: Billing Report
+import { createBillingPreviewController } from './controllers/billing-preview.controller.js'; // Phase 3-C: Billing Preview
+import { createInvoiceController } from './controllers/invoice.controller.js'; // Phase 3-D: Invoice Finalization
+import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
@@ -264,6 +267,36 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/', reportController);
+
+  // ============================================================================
+  // Billing Preview Routes - Phase 3-C: Billing Automation (Preview Only)
+  // /api/v1/glycopharm/billing/preview/*
+  // ============================================================================
+  const billingPreviewController = createBillingPreviewController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', billingPreviewController);
+
+  // ============================================================================
+  // Invoice Routes - Phase 3-D: Invoice Finalization (Snapshot & Confirm)
+  // /api/v1/glycopharm/invoices/*
+  // ============================================================================
+  const invoiceController = createInvoiceController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', invoiceController);
+
+  // ============================================================================
+  // Invoice Dispatch Routes - Phase 3-E: Invoice Dispatch (Send/Receive)
+  // /api/v1/glycopharm/invoices/:id/send, /received, /dispatch-log
+  // ============================================================================
+  const invoiceDispatchController = createInvoiceDispatchController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/', invoiceDispatchController);
 
   // B2B products routes
   const b2bController = createB2BController(

@@ -4,29 +4,34 @@
  * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1
  * WO-APP-DASHBOARD-KPI-PHASE4A-V1: KPI 카드 + 정렬 + 안내 메시지
  * WO-APP-DASHBOARD-KPI-PHASE4B-V1: 제안 액션 버튼 (운영 보조)
+ * WO-APP-DASHBOARD-EXPOSURE-PHASE5-V1: 노출 위치 배지
+ * WO-APP-DASHBOARD-BULK-MANAGE-PHASE6-V1: 일괄 정리/관리
  *
  * 허브에서 복사한 콘텐츠를 관리하는 대시보드 페이지
  * - KPI 미니 대시보드 (전체/공개/조회수/추천)
  * - 정렬: 최근순 / 조회순 / 추천순
- * - 상태 필터: 전체 / 임시저장 / 공개 / 보관
+ * - 상태 필터: 전체 / 임시저장 / 공개 / 보관 / 조회0 / 30일+
+ * - 다중 선택 + 일괄 공개/보관/삭제 (Phase 6)
  * - 액션: 편집(제목/설명) / 공개 / 보관 / 삭제
  * - 카드별 제안 액션 (Phase 4B)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { dashboardApi, type DashboardAsset, type DashboardSortType, type DashboardKpi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, typography } from '../../styles/theme';
 
-type StatusFilter = 'all' | 'draft' | 'active' | 'archived';
+type StatusFilter = 'all' | 'draft' | 'active' | 'archived' | 'zero_views' | 'inactive_30d';
 
 const STATUS_LABELS: Record<StatusFilter, string> = {
   all: '전체',
   draft: '임시저장',
   active: '공개',
   archived: '보관',
+  zero_views: '조회 0',
+  inactive_30d: '30일+ 미사용',
 };
 
 const STATUS_BADGE_STYLES: Record<'draft' | 'active' | 'archived', React.CSSProperties> = {
@@ -39,6 +44,12 @@ const STATUS_BADGE_LABELS: Record<'draft' | 'active' | 'archived', string> = {
   draft: '임시저장',
   active: '공개',
   archived: '보관',
+};
+
+const EXPOSURE_BADGE_CONFIG: Record<string, { label: string; bg: string; color: string }> = {
+  home: { label: '매장 홈', bg: '#EFF6FF', color: '#2563EB' },
+  signage: { label: '사이니지', bg: '#F0FDF4', color: '#16A34A' },
+  promo: { label: '프로모션', bg: '#FFF7ED', color: '#EA580C' },
 };
 
 const SORT_LABELS: Record<DashboardSortType, string> = {
@@ -87,6 +98,10 @@ export function MyContentPage() {
   const [editDescription, setEditDescription] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Phase 6: 다중 선택 + 일괄 액션
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
   const dashboardId = user?.id;
 
   // KPI 로드
@@ -97,12 +112,12 @@ export function MyContentPage() {
       .catch(() => {});
   }, [dashboardId]);
 
+  // Phase 6: 항상 전체 조회, 클라이언트 필터링
   const loadAssets = useCallback(async () => {
     if (!dashboardId) return;
     try {
       setLoading(true);
-      const statusParam = filter === 'all' ? undefined : filter;
-      const res = await dashboardApi.listAssets(dashboardId, { status: statusParam, sort });
+      const res = await dashboardApi.listAssets(dashboardId, { sort });
       setAssets(res.data || []);
     } catch (err) {
       console.warn('Failed to load dashboard assets:', err);
@@ -110,11 +125,85 @@ export function MyContentPage() {
     } finally {
       setLoading(false);
     }
-  }, [dashboardId, filter, sort]);
+  }, [dashboardId, sort]);
 
   useEffect(() => {
     loadAssets();
   }, [loadAssets]);
+
+  // Phase 6: 필터/정렬 변경 시 선택 해제
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [filter, sort]);
+
+  // Phase 6: 클라이언트 필터링
+  const filteredAssets = useMemo(() => {
+    if (filter === 'all') return assets;
+    if (filter === 'draft' || filter === 'active' || filter === 'archived') {
+      return assets.filter(a => a.status === filter);
+    }
+    if (filter === 'zero_views') {
+      return assets.filter(a => a.status === 'active' && (a.viewCount || 0) === 0);
+    }
+    if (filter === 'inactive_30d') {
+      return assets.filter(a => {
+        const copied = a.copiedAt ? new Date(a.copiedAt) : null;
+        const days = copied ? (Date.now() - copied.getTime()) / (1000 * 60 * 60 * 24) : 0;
+        return days >= 30;
+      });
+    }
+    return assets;
+  }, [assets, filter]);
+
+  // Phase 6: 선택 토글
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredAssets.length && filteredAssets.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredAssets.map(a => a.id)));
+    }
+  };
+
+  // Phase 6: 일괄 액션
+  const handleBulkAction = async (action: 'publish' | 'archive' | 'delete') => {
+    if (bulkLoading || !dashboardId) return;
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+
+    if (action !== 'publish') {
+      const label = action === 'archive' ? '보관' : '삭제';
+      if (!confirm(`선택한 ${ids.length}개를 ${label}하시겠습니까?`)) return;
+    }
+
+    setBulkLoading(true);
+    let success = 0;
+    let fail = 0;
+
+    for (const id of ids) {
+      try {
+        if (action === 'publish') await dashboardApi.publishAsset(id, dashboardId);
+        else if (action === 'archive') await dashboardApi.archiveAsset(id, dashboardId);
+        else await dashboardApi.deleteAsset(id, dashboardId);
+        success++;
+      } catch {
+        fail++;
+      }
+    }
+
+    alert(`${ids.length}개 중 ${success}개 처리 완료${fail > 0 ? ` (${fail}개 실패)` : ''}`);
+    setSelectedIds(new Set());
+    setBulkLoading(false);
+    loadAssets();
+  };
 
   const startEdit = (asset: DashboardAsset) => {
     setEditingId(asset.id);
@@ -271,7 +360,7 @@ export function MyContentPage() {
         </div>
       )}
 
-      {/* 정렬 + 상태 필터 */}
+      {/* 정렬 + 상태 필터 + 전체 선택 */}
       <div style={styles.controlBar}>
         <div style={styles.filterTabs}>
           {(Object.keys(STATUS_LABELS) as StatusFilter[]).map(key => (
@@ -287,36 +376,53 @@ export function MyContentPage() {
             </button>
           ))}
         </div>
-        <div style={styles.sortDropdown}>
-          <select
-            value={sort}
-            onChange={e => setSort(e.target.value as DashboardSortType)}
-            style={styles.sortSelect}
-          >
-            {(Object.keys(SORT_LABELS) as DashboardSortType[]).map(key => (
-              <option key={key} value={key}>{SORT_LABELS[key]}</option>
-            ))}
-          </select>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Phase 6: 전체 선택 */}
+          {filteredAssets.length > 0 && (
+            <label style={styles.selectAllLabel}>
+              <input
+                type="checkbox"
+                checked={selectedIds.size === filteredAssets.length && filteredAssets.length > 0}
+                onChange={toggleSelectAll}
+                style={{ marginRight: '4px' }}
+              />
+              전체 선택
+            </label>
+          )}
+          <div style={styles.sortDropdown}>
+            <select
+              value={sort}
+              onChange={e => setSort(e.target.value as DashboardSortType)}
+              style={styles.sortSelect}
+            >
+              {(Object.keys(SORT_LABELS) as DashboardSortType[]).map(key => (
+                <option key={key} value={key}>{SORT_LABELS[key]}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      {assets.length === 0 ? (
+      {filteredAssets.length === 0 ? (
         <div>
           <EmptyState
             icon="📦"
-            title="아직 가져온 콘텐츠가 없습니다"
-            description="콘텐츠 허브에서 콘텐츠를 가져오세요."
+            title={assets.length === 0 ? '아직 가져온 콘텐츠가 없습니다' : '해당 조건에 맞는 콘텐츠가 없습니다'}
+            description={assets.length === 0 ? '콘텐츠 허브에서 콘텐츠를 가져오세요.' : '다른 필터를 선택해보세요.'}
           />
-          <div style={{ textAlign: 'center', marginTop: '-16px', paddingBottom: '24px' }}>
-            <Link to="/news" style={styles.hubLink}>
-              콘텐츠 허브로 이동 →
-            </Link>
-          </div>
+          {assets.length === 0 && (
+            <div style={{ textAlign: 'center', marginTop: '-16px', paddingBottom: '24px' }}>
+              <Link to="/news" style={styles.hubLink}>
+                콘텐츠 허브로 이동 →
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <div style={styles.list}>
-          {assets.map(asset => {
+          {filteredAssets.map(asset => {
             const suggested = getSuggestedAction(asset);
+            const isSelected = selectedIds.has(asset.id);
             return (
               <Card key={asset.id} padding="medium">
                 {editingId === asset.id ? (
@@ -351,90 +457,149 @@ export function MyContentPage() {
                   </div>
                 ) : (
                   /* 보기 모드 */
-                  <>
-                    <div style={styles.cardHeader}>
-                      <span style={{
-                        ...styles.statusBadge,
-                        ...STATUS_BADGE_STYLES[asset.status],
-                      }}>
-                        {STATUS_BADGE_LABELS[asset.status]}
-                      </span>
-                      <div style={styles.cardMeta}>
-                        {(asset.viewCount || 0) > 0 && (
-                          <span style={styles.metaItem}>조회 {asset.viewCount}</span>
-                        )}
-                        {(asset.recommendCount || 0) > 0 && (
-                          <span style={styles.metaItem}>추천 {asset.recommendCount}</span>
-                        )}
-                        {asset.copiedAt && (
-                          <span style={styles.copiedAt}>
-                            {new Date(asset.copiedAt).toLocaleDateString('ko-KR')} 복사
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    {/* Phase 6: 체크박스 */}
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(asset.id)}
+                      style={styles.cardCheckbox}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={styles.cardHeader}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span style={{
+                            ...styles.statusBadge,
+                            ...STATUS_BADGE_STYLES[asset.status],
+                          }}>
+                            {STATUS_BADGE_LABELS[asset.status]}
                           </span>
-                        )}
+                          {/* Phase 5: 노출 위치 배지 */}
+                          {asset.status === 'active' && asset.exposure && asset.exposure.length > 0 && asset.exposure.map(loc => {
+                            const cfg = EXPOSURE_BADGE_CONFIG[loc];
+                            if (!cfg) return null;
+                            return (
+                              <span key={loc} style={{
+                                padding: '2px 8px', borderRadius: '4px', fontSize: '11px',
+                                fontWeight: 500, backgroundColor: cfg.bg, color: cfg.color,
+                              }}>
+                                {cfg.label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                        <div style={styles.cardMeta}>
+                          {(asset.viewCount || 0) > 0 && (
+                            <span style={styles.metaItem}>조회 {asset.viewCount}</span>
+                          )}
+                          {(asset.recommendCount || 0) > 0 && (
+                            <span style={styles.metaItem}>추천 {asset.recommendCount}</span>
+                          )}
+                          {asset.copiedAt && (
+                            <span style={styles.copiedAt}>
+                              {new Date(asset.copiedAt).toLocaleDateString('ko-KR')} 복사
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <h3 style={styles.assetTitle}>{asset.title}</h3>
-                    {asset.description && (
-                      <p style={styles.assetDescription}>{asset.description}</p>
-                    )}
-                    {/* Phase 4B: 제안 액션 바 */}
-                    {suggested && (
-                      <div style={styles.suggestedBar}>
-                        <span style={styles.suggestedMessage}>{suggested.message}</span>
-                        {suggested.actionLabel && suggested.actionType && (
-                          <button
-                            disabled={actionLoading === asset.id}
-                            style={styles.suggestedButton}
-                            onClick={() => {
-                              if (suggested.actionType === 'publish') handleQuickPublish(asset.id);
-                              else if (suggested.actionType === 'archive') handleArchive(asset.id);
-                              else if (suggested.actionType === 'edit') startEdit(asset);
-                            }}
-                          >
-                            {actionLoading === asset.id ? '처리 중...' : suggested.actionLabel}
-                          </button>
-                        )}
-                      </div>
-                    )}
-                    <div style={styles.cardActions}>
-                      <button
-                        onClick={() => startEdit(asset)}
-                        disabled={actionLoading === asset.id}
-                        style={styles.actionButton}
-                      >
-                        ✏️ 편집
-                      </button>
-                      {asset.status !== 'active' && (
-                        <button
-                          onClick={() => handlePublish(asset.id)}
-                          disabled={actionLoading === asset.id}
-                          style={{ ...styles.actionButton, ...styles.publishButton }}
-                        >
-                          🌐 공개
-                        </button>
+                      <h3 style={styles.assetTitle}>{asset.title}</h3>
+                      {asset.description && (
+                        <p style={styles.assetDescription}>{asset.description}</p>
                       )}
-                      {asset.status !== 'archived' && (
+                      {/* Phase 4B: 제안 액션 바 */}
+                      {suggested && (
+                        <div style={styles.suggestedBar}>
+                          <span style={styles.suggestedMessage}>{suggested.message}</span>
+                          {suggested.actionLabel && suggested.actionType && (
+                            <button
+                              disabled={actionLoading === asset.id}
+                              style={styles.suggestedButton}
+                              onClick={() => {
+                                if (suggested.actionType === 'publish') handleQuickPublish(asset.id);
+                                else if (suggested.actionType === 'archive') handleArchive(asset.id);
+                                else if (suggested.actionType === 'edit') startEdit(asset);
+                              }}
+                            >
+                              {actionLoading === asset.id ? '처리 중...' : suggested.actionLabel}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      <div style={styles.cardActions}>
                         <button
-                          onClick={() => handleArchive(asset.id)}
+                          onClick={() => startEdit(asset)}
                           disabled={actionLoading === asset.id}
                           style={styles.actionButton}
                         >
-                          📦 보관
+                          ✏️ 편집
                         </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(asset.id)}
-                        disabled={actionLoading === asset.id}
-                        style={{ ...styles.actionButton, ...styles.deleteButton }}
-                      >
-                        🗑 삭제
-                      </button>
+                        {asset.status !== 'active' && (
+                          <button
+                            onClick={() => handlePublish(asset.id)}
+                            disabled={actionLoading === asset.id}
+                            style={{ ...styles.actionButton, ...styles.publishButton }}
+                          >
+                            🌐 공개
+                          </button>
+                        )}
+                        {asset.status !== 'archived' && (
+                          <button
+                            onClick={() => handleArchive(asset.id)}
+                            disabled={actionLoading === asset.id}
+                            style={styles.actionButton}
+                          >
+                            📦 보관
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(asset.id)}
+                          disabled={actionLoading === asset.id}
+                          style={{ ...styles.actionButton, ...styles.deleteButton }}
+                        >
+                          🗑 삭제
+                        </button>
+                      </div>
                     </div>
-                  </>
+                  </div>
                 )}
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Phase 6: 일괄 액션 바 */}
+      {selectedIds.size > 0 && (
+        <div style={styles.bulkBar}>
+          <span style={styles.bulkCount}>{selectedIds.size}개 선택</span>
+          <button
+            onClick={() => handleBulkAction('publish')}
+            disabled={bulkLoading}
+            style={styles.bulkButton}
+          >
+            {bulkLoading ? '처리 중...' : '공개하기'}
+          </button>
+          <button
+            onClick={() => handleBulkAction('archive')}
+            disabled={bulkLoading}
+            style={styles.bulkButton}
+          >
+            {bulkLoading ? '처리 중...' : '보관하기'}
+          </button>
+          <button
+            onClick={() => handleBulkAction('delete')}
+            disabled={bulkLoading}
+            style={{ ...styles.bulkButton, ...styles.bulkDeleteButton }}
+          >
+            {bulkLoading ? '처리 중...' : '삭제하기'}
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            disabled={bulkLoading}
+            style={styles.bulkCancelButton}
+          >
+            선택 해제
+          </button>
         </div>
       )}
     </div>
@@ -487,22 +652,31 @@ const styles: Record<string, React.CSSProperties> = {
   },
   filterTabs: {
     display: 'flex',
-    gap: '8px',
+    gap: '6px',
     flexWrap: 'wrap',
   },
   filterTab: {
-    padding: '8px 16px',
+    padding: '6px 14px',
     backgroundColor: colors.neutral100,
     color: colors.neutral600,
     border: '1px solid transparent',
     borderRadius: '6px',
-    fontSize: '14px',
+    fontSize: '13px',
     cursor: 'pointer',
     fontWeight: 500,
   },
   filterTabActive: {
     backgroundColor: colors.primary,
     color: colors.white,
+  },
+  selectAllLabel: {
+    fontSize: '13px',
+    color: colors.neutral600,
+    fontWeight: 500,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    whiteSpace: 'nowrap' as const,
   },
   sortDropdown: {
     flexShrink: 0,
@@ -521,6 +695,14 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
+  },
+  cardCheckbox: {
+    marginTop: '4px',
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+    flexShrink: 0,
+    accentColor: colors.primary,
   },
   cardHeader: {
     display: 'flex',
@@ -675,5 +857,50 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '6px',
     fontSize: '13px',
     cursor: 'pointer',
+  },
+  // Phase 6: 일괄 액션 바
+  bulkBar: {
+    position: 'sticky' as const,
+    bottom: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '12px 20px',
+    backgroundColor: '#1E293B',
+    color: '#fff',
+    borderRadius: '10px',
+    marginTop: '16px',
+    boxShadow: '0 -2px 10px rgba(0,0,0,0.15)',
+    flexWrap: 'wrap',
+  },
+  bulkCount: {
+    fontSize: '14px',
+    fontWeight: 600,
+    marginRight: '4px',
+  },
+  bulkButton: {
+    padding: '6px 16px',
+    fontSize: '13px',
+    fontWeight: 500,
+    borderRadius: '6px',
+    border: '1px solid rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: '#fff',
+    cursor: 'pointer',
+  },
+  bulkDeleteButton: {
+    borderColor: '#FCA5A5',
+    color: '#FCA5A5',
+  },
+  bulkCancelButton: {
+    padding: '6px 14px',
+    fontSize: '12px',
+    fontWeight: 500,
+    borderRadius: '6px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: 'rgba(255,255,255,0.6)',
+    cursor: 'pointer',
+    marginLeft: 'auto',
   },
 };

@@ -100,6 +100,8 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/operator/settlements', label: '정산 관리', icon: CreditCard },
       { path: '/operator/analytics', label: '분석/리포트', icon: BarChart3 },
       { path: '/operator/reports', label: '청구 리포트', icon: FileText },
+      { path: '/operator/billing-preview', label: '청구 미리보기', icon: Briefcase },
+      { path: '/operator/invoices', label: '인보이스', icon: CreditCard },
       { path: '/operator/marketing', label: '마케팅', icon: Megaphone },
       { path: '/operator/forum-requests', label: '포럼 신청', icon: MessageSquare },
       { path: '/operator/forum-management', label: '포럼 관리', icon: FileText },
