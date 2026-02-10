@@ -574,6 +574,19 @@ export const contentAssetApi = {
     if (!response.ok) throw new Error('Failed to delete asset');
     return response.json();
   },
+
+  async getSupplierSignal(): Promise<{ success: boolean; hasApprovedSupplier: boolean }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/dashboard/assets/supplier-signal`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) return { success: false, hasApprovedSupplier: false };
+      return response.json();
+    } catch {
+      return { success: false, hasApprovedSupplier: false };
+    }
+  },
 };
 
 // CMS Content API (APP-CONTENT Phase 2 → Phase 3A: 추천/조회수/페이지네이션)

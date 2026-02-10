@@ -497,6 +497,42 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
   });
 
   /**
+   * GET /api/v1/dashboard/assets/supplier-signal
+   *
+   * 판매자 행동 신호: 승인된 공급자 파트너십 존재 여부 (Boolean)
+   * - 세션 당 1회 조회 용도
+   * - 실패 시 조용히 false 반환
+   */
+  router.get('/supplier-signal', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      if (!user) {
+        res.json({ success: true, hasApprovedSupplier: false });
+        return;
+      }
+
+      let hasApprovedSupplier = false;
+      try {
+        const rows = await dataSource.query(
+          `SELECT EXISTS(
+            SELECT 1 FROM neture_supplier_requests
+            WHERE seller_id = $1 AND status = 'approved'
+            LIMIT 1
+          ) AS "exists"`,
+          [user.id],
+        );
+        hasApprovedSupplier = rows[0]?.exists === true;
+      } catch {
+        // Table may not exist — silent fallback
+      }
+
+      res.json({ success: true, hasApprovedSupplier });
+    } catch {
+      res.json({ success: true, hasApprovedSupplier: false });
+    }
+  });
+
+  /**
    * PATCH /api/v1/dashboard/assets/:id
    *
    * 대시보드 자산 제목/설명 편집

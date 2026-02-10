@@ -187,4 +187,13 @@ export const dashboardApi = {
       { method: 'DELETE' }
     );
   },
+
+  /**
+   * 판매자 행동 신호: 승인된 공급자 파트너십 존재 여부
+   */
+  async getSupplierSignal(): Promise<{ success: boolean; hasApprovedSupplier: boolean }> {
+    return dashboardApiRequest<{ success: boolean; hasApprovedSupplier: boolean }>(
+      '/dashboard/assets/supplier-signal'
+    );
+  },
 };

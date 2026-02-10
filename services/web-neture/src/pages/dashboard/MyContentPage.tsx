@@ -99,6 +99,9 @@ export default function MyContentPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
+  // 판매자 행동 신호
+  const [supplierSignal, setSupplierSignal] = useState(false);
+
   const dashboardId = user?.id;
 
   // KPI 로드
@@ -108,6 +111,14 @@ export default function MyContentPage() {
       .then(res => setKpi(res.data))
       .catch(() => {});
   }, [dashboardId]);
+
+  // 판매자 행동 신호: 세션 1회 조회
+  useEffect(() => {
+    if (sessionStorage.getItem('supplier_signal_dismissed')) return;
+    contentAssetApi.getSupplierSignal()
+      .then(res => { if (res.hasApprovedSupplier) setSupplierSignal(true); })
+      .catch(() => {});
+  }, []);
 
   // Phase 6: 항상 전체 조회, 클라이언트 필터링
   const loadAssets = useCallback(async () => {
@@ -234,6 +245,14 @@ export default function MyContentPage() {
     }
   };
 
+  // 판매자 행동 신호 숨기기 (자산 배치/공개 등 행동 시)
+  const dismissSupplierSignal = () => {
+    if (supplierSignal) {
+      setSupplierSignal(false);
+      sessionStorage.setItem('supplier_signal_dismissed', '1');
+    }
+  };
+
   // Phase 4B: CTA에서 호출 (confirm 생략)
   const handleQuickPublish = async (id: string) => {
     if (!dashboardId) return;
@@ -243,6 +262,7 @@ export default function MyContentPage() {
       setAssets(prev => prev.map(a =>
         a.id === id ? { ...a, status: 'active' as const } : a
       ));
+      dismissSupplierSignal();
     } catch (err) {
       alert('공개에 실패했습니다.');
     } finally {
@@ -259,6 +279,7 @@ export default function MyContentPage() {
       setAssets(prev => prev.map(a =>
         a.id === id ? { ...a, status: 'active' as const } : a
       ));
+      dismissSupplierSignal();
     } catch (err) {
       alert('공개에 실패했습니다.');
     } finally {
@@ -352,6 +373,13 @@ export default function MyContentPage() {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* 판매자 행동 신호 */}
+      {supplierSignal && (
+        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700 font-medium mb-4">
+          승인된 공급자와 연결된 자산이 있습니다.
         </div>
       )}
 
