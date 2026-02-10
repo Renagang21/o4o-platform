@@ -151,7 +151,6 @@ export default function InvoicesPage() {
 
   // Detail modal
   const [detailInvoice, setDetailInvoice] = useState<Invoice | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
 
   // Send modal (Phase 3-E)
   const [sendInvoiceId, setSendInvoiceId] = useState<string | null>(null);
@@ -161,7 +160,6 @@ export default function InvoicesPage() {
 
   // Dispatch log modal (Phase 3-E)
   const [dispatchLogInvoice, setDispatchLogInvoice] = useState<{ invoiceId: string; log: DispatchLogEntry[]; dispatchStatus: string } | null>(null);
-  const [dispatchLogLoading, setDispatchLogLoading] = useState(false);
 
   function getDefaultFrom(): string {
     const d = new Date();
@@ -278,7 +276,6 @@ export default function InvoicesPage() {
 
   // View detail
   const handleViewDetail = async (invoiceId: string) => {
-    setDetailLoading(true);
     try {
       const accessToken = getAccessToken();
       const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${invoiceId}`, {
@@ -290,8 +287,6 @@ export default function InvoicesPage() {
       setDetailInvoice(json.data);
     } catch (err: any) {
       alert(err.message);
-    } finally {
-      setDetailLoading(false);
     }
   };
 
@@ -345,7 +340,6 @@ export default function InvoicesPage() {
 
   // View dispatch log (Phase 3-E)
   const handleViewDispatchLog = async (invoiceId: string) => {
-    setDispatchLogLoading(true);
     try {
       const accessToken = getAccessToken();
       const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${invoiceId}/dispatch-log`, {
@@ -361,8 +355,6 @@ export default function InvoicesPage() {
       });
     } catch (err: any) {
       alert(err.message);
-    } finally {
-      setDispatchLogLoading(false);
     }
   };
 
