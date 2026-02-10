@@ -47,6 +47,7 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
     color: 'primary',
     menuItems: [
       { path: '/pharmacy', label: '대시보드', icon: LayoutDashboard },
+      { path: '/pharmacy/store-main', label: '매장 메인', icon: Store },
       { path: '/pharmacy/b2b-order', label: 'B2B 주문', icon: ShoppingCart },
       { path: '/pharmacy/products', label: '상품 관리', icon: Package },
       { path: '/pharmacy/orders', label: '주문 내역', icon: ShoppingCart },

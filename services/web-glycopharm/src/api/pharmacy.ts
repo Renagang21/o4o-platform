@@ -8,6 +8,7 @@ import type {
   StoreApiResponse,
   StorePaginatedResponse,
 } from '@/types/store';
+import type { StoreMainData } from '@/types/store-main';
 
 import { getAccessToken } from '@/contexts/AuthContext';
 
@@ -265,6 +266,13 @@ class PharmacyApiClient {
    */
   async getContentWorkspace(): Promise<StoreApiResponse<ContentWorkspace>> {
     return this.request('/api/v1/glycopharm/pharmacy/cockpit/content-workspace');
+  }
+
+  /**
+   * 매장 메인 데이터 조회 (WO-STORE-MAIN-PAGE-PHASE1-V1)
+   */
+  async getStoreMain(): Promise<StoreApiResponse<StoreMainData>> {
+    return this.request('/api/v1/glycopharm/pharmacy/cockpit/store-main');
   }
 
   // ============================================================================

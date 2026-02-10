@@ -32,6 +32,7 @@ const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
 // Pharmacy Dashboard
 const PharmacyDashboard = lazy(() => import('@/pages/pharmacy/PharmacyDashboard'));
+const StoreMainPage = lazy(() => import('@/pages/pharmacy/StoreMainPage'));
 const PharmacyProducts = lazy(() => import('@/pages/pharmacy/PharmacyProducts'));
 const PharmacyOrders = lazy(() => import('@/pages/pharmacy/PharmacyOrders'));
 const PharmacyPatients = lazy(() => import('@/pages/pharmacy/PharmacyPatients'));
@@ -267,6 +268,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<PharmacyDashboard />} />
+        <Route path="store-main" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
         <Route path="orders" element={<PharmacyOrders />} />
         <Route path="patients" element={<PharmacyPatients />} />
