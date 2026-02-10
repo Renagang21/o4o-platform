@@ -2,7 +2,7 @@
  * NoticeSection - 공지사항 섹션
  *
  * WO-KPA-HOME-PHASE1-V1: 메인 페이지 공지 요약
- * homeApi.getNotices() → cms_contents(type=notice) 표시
+ * Performance: prefetchedNotices가 있으면 자체 API 호출 건너뜀
  */
 
 import { useState, useEffect } from 'react';
@@ -11,18 +11,31 @@ import { homeApi } from '../../api/home';
 import type { HomeNotice } from '../../api/home';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-export function NoticeSection() {
+interface Props {
+  prefetchedNotices?: HomeNotice[];
+  loading?: boolean;
+}
+
+export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Props) {
   const [notices, setNotices] = useState<HomeNotice[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (prefetchedNotices) {
+      setNotices(prefetchedNotices);
+      setLoading(false);
+      return;
+    }
+    // Fallback: 독립 사용 시 자체 호출
     homeApi.getNotices(3)
       .then((res) => {
         if (res.data) setNotices(res.data);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [prefetchedNotices]);
+
+  const isLoading = parentLoading ?? loading;
 
   return (
     <section style={styles.container}>
@@ -31,7 +44,7 @@ export function NoticeSection() {
         <Link to="/news" style={styles.moreLink}>공지 전체 보기 →</Link>
       </div>
       <div style={styles.card}>
-        {loading ? (
+        {isLoading ? (
           <p style={styles.empty}>불러오는 중...</p>
         ) : notices.length === 0 ? (
           <div style={styles.emptyWrap}>

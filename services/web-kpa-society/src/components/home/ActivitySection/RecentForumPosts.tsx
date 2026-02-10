@@ -2,24 +2,47 @@
  * RecentForumPosts - 최근 포럼 글 목록
  *
  * ActivitySection 하위 컴포넌트
+ * Performance: prefetchedPosts가 있으면 자체 API 호출 건너뜀
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { forumApi } from '../../../api';
-import type { ForumPost } from '../../../types';
 import { colors, spacing, borderRadius, typography } from '../../../styles/theme';
 
-export function RecentForumPosts() {
-  const [posts, setPosts] = useState<ForumPost[]>([]);
+interface PostLike {
+  id: string;
+  title: string;
+  authorName: string | null;
+  createdAt: string;
+  categoryName: string | null;
+}
+
+interface Props {
+  prefetchedPosts?: PostLike[];
+  loading?: boolean;
+}
+
+export function RecentForumPosts({ prefetchedPosts, loading: parentLoading }: Props) {
+  const [posts, setPosts] = useState<PostLike[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (prefetchedPosts) {
+      setPosts(prefetchedPosts);
+      setLoading(false);
+      return;
+    }
+    // Fallback: 독립 사용 시 자체 호출
     forumApi.getPosts({ limit: 3 })
       .then((res) => {
-        if (res.data) setPosts(res.data);
+        if (res.data) setPosts(res.data as unknown as PostLike[]);
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [prefetchedPosts]);
+
+  const isLoading = parentLoading ?? loading;
 
   return (
     <div>
@@ -27,7 +50,9 @@ export function RecentForumPosts() {
         <h3 style={styles.title}>최근 글</h3>
         <Link to="/forum" style={styles.moreLink}>포럼에서 소통하기 →</Link>
       </div>
-      {posts.length === 0 ? (
+      {isLoading ? (
+        <p style={styles.empty}>불러오는 중...</p>
+      ) : posts.length === 0 ? (
         <div style={styles.emptyWrap}>
           <p style={styles.empty}>아직 글이 없습니다.</p>
           <p style={styles.emptyHint}>커뮤니티에서 첫 글을 작성해보세요.</p>

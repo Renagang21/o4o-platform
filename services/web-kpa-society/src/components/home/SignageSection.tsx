@@ -26,7 +26,13 @@ const hoverStyles = `
   }
 `;
 
-export function SignageSection() {
+interface Props {
+  prefetchedMedia?: HomeMedia[];
+  prefetchedPlaylists?: HomePlaylist[];
+  loading?: boolean;
+}
+
+export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: parentLoading }: Props) {
   const [media, setMedia] = useState<HomeMedia[]>([]);
   const [playlists, setPlaylists] = useState<HomePlaylist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,6 +49,13 @@ export function SignageSection() {
   }, []);
 
   useEffect(() => {
+    if (prefetchedMedia && prefetchedPlaylists) {
+      setMedia(prefetchedMedia);
+      setPlaylists(prefetchedPlaylists);
+      setLoading(false);
+      return;
+    }
+    // Fallback: 독립 사용 시 자체 호출
     homeApi.getSignage(3, 2)
       .then((res) => {
         if (res.data) {
@@ -52,8 +65,9 @@ export function SignageSection() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [prefetchedMedia, prefetchedPlaylists]);
 
+  const isLoading = parentLoading ?? loading;
   const hasContent = media.length > 0 || playlists.length > 0;
 
   return (
@@ -63,7 +77,7 @@ export function SignageSection() {
         <Link to="/signage" style={styles.moreLink}>사이니지 콘텐츠 보기 →</Link>
       </div>
       <div style={styles.card}>
-        {loading ? (
+        {isLoading ? (
           <p style={styles.empty}>불러오는 중...</p>
         ) : !hasContent ? (
           <div style={styles.emptyWrap}>

@@ -2,6 +2,7 @@
  * CommunityHomePage - KPA Society 커뮤니티 홈 페이지
  *
  * WO-KPA-HOME-PHASE1-V1: 플랫폼 요약 허브로 전환
+ * Performance fix: 4개 순차 API 호출 → prefetchAll() 병렬 1회 호출
  *
  * 섹션 구조:
  * ├─ HeroSection              - 커뮤니티 소개 Hero
@@ -12,11 +13,14 @@
  * └─ UtilitySection            - 유틸리티 (로그인 패널 + 링크)
  */
 
+import { useState, useEffect } from 'react';
 import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
 import { NoticeSection } from '../components/home/NoticeSection';
 import { SignageSection } from '../components/home/SignageSection';
 import { CommunityServiceSection } from '../components/home/CommunityServiceSection';
 import { UtilitySection } from '../components/home/UtilitySection';
+import { homeApi } from '../api/home';
+import type { HomePageData } from '../api/home';
 import { colors, spacing, typography, borderRadius } from '../styles/theme';
 
 function HeroSection() {
@@ -37,13 +41,31 @@ function HeroSection() {
 }
 
 export function CommunityHomePage() {
+  const [data, setData] = useState<HomePageData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    homeApi.prefetchAll()
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div style={styles.page}>
       <HeroSection />
       <div style={styles.content}>
-        <NoticeSection />
-        <ActivitySection />
-        <SignageSection />
+        <NoticeSection prefetchedNotices={data?.notices} loading={loading} />
+        <ActivitySection
+          prefetchedPosts={data?.community.posts}
+          prefetchedFeatured={data?.community.featured}
+          loading={loading}
+        />
+        <SignageSection
+          prefetchedMedia={data?.signage.media}
+          prefetchedPlaylists={data?.signage.playlists}
+          loading={loading}
+        />
         <CommunityServiceSection />
         <UtilitySection />
       </div>

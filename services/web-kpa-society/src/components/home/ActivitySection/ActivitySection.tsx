@@ -3,18 +3,24 @@
  *
  * 하위 컴포넌트:
  * - RecentForumPosts: 최근 포럼 글 3~5개
- * - ImportantNotices: 공지사항
+ * - ImportantNotices: 추천 콘텐츠
  *
- * 로그인 전: 공개 데이터만
- * 로그인 후: 개인화 데이터 (향후 API 연동)
+ * Performance: prefetched 데이터를 하위 컴포넌트에 전달
  */
 
 import { useAuth } from '../../../contexts/AuthContext';
 import { RecentForumPosts } from './RecentForumPosts';
 import { ImportantNotices } from './ImportantNotices';
 import { colors, spacing, borderRadius, shadows, typography } from '../../../styles/theme';
+import type { HomeForumPost, HomeFeatured } from '../../../api/home';
 
-export function ActivitySection() {
+interface Props {
+  prefetchedPosts?: HomeForumPost[];
+  prefetchedFeatured?: HomeFeatured[];
+  loading?: boolean;
+}
+
+export function ActivitySection({ prefetchedPosts, prefetchedFeatured, loading }: Props) {
   const { isAuthenticated } = useAuth();
 
   return (
@@ -23,12 +29,12 @@ export function ActivitySection() {
       <div style={styles.grid}>
         {/* 최근 글 (2/3 영역) */}
         <div style={styles.feedCard}>
-          <RecentForumPosts />
+          <RecentForumPosts prefetchedPosts={prefetchedPosts} loading={loading} />
         </div>
 
-        {/* 공지사항 (1/3 영역) */}
+        {/* 추천 콘텐츠 (1/3 영역) */}
         <div style={styles.feedCard}>
-          <ImportantNotices />
+          <ImportantNotices prefetchedFeatured={prefetchedFeatured} loading={loading} />
           {isAuthenticated && (
             <div style={styles.personalNote}>
               내 알림과 참여 현황은 마이페이지에서 확인하세요.

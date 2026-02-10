@@ -3,7 +3,7 @@
  *
  * WO-KPA-HOME-PHASE1-V1: 공지사항은 NoticeSection으로 이동.
  * ActivitySection 우측에는 추천 콘텐츠(featured) 표시.
- * 데이터 소스: homeApi.getCommunity() → featured
+ * Performance: prefetchedFeatured가 있으면 자체 API 호출 건너뜀
  */
 
 import { useState, useEffect } from 'react';
@@ -12,16 +12,31 @@ import { homeApi } from '../../../api/home';
 import type { HomeFeatured } from '../../../api/home';
 import { colors, spacing, typography } from '../../../styles/theme';
 
-export function ImportantNotices() {
+interface Props {
+  prefetchedFeatured?: HomeFeatured[];
+  loading?: boolean;
+}
+
+export function ImportantNotices({ prefetchedFeatured, loading: parentLoading }: Props) {
   const [featured, setFeatured] = useState<HomeFeatured[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (prefetchedFeatured) {
+      setFeatured(prefetchedFeatured);
+      setLoading(false);
+      return;
+    }
+    // Fallback: 독립 사용 시 자체 호출
     homeApi.getCommunity(0, 3)
       .then((res) => {
         if (res.data?.featured) setFeatured(res.data.featured);
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [prefetchedFeatured]);
+
+  const isLoading = parentLoading ?? loading;
 
   return (
     <div>
@@ -29,7 +44,9 @@ export function ImportantNotices() {
         <h3 style={styles.title}>추천 콘텐츠</h3>
         <Link to="/news" style={styles.moreLink}>추천 콘텐츠 보기 →</Link>
       </div>
-      {featured.length === 0 ? (
+      {isLoading ? (
+        <p style={styles.empty}>불러오는 중...</p>
+      ) : featured.length === 0 ? (
         <p style={styles.empty}>추천 콘텐츠가 준비 중입니다.</p>
       ) : (
         <ul style={styles.list}>

@@ -62,7 +62,7 @@ class ApiClient {
       });
 
       if (response.status === 404 && attempt < maxRetries) {
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 500));
         continue;
       }
 

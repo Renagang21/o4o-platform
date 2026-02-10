@@ -59,6 +59,12 @@ interface SignageResponse {
   };
 }
 
+export interface HomePageData {
+  notices: HomeNotice[];
+  community: { posts: HomeForumPost[]; featured: HomeFeatured[] };
+  signage: { media: HomeMedia[]; playlists: HomePlaylist[] };
+}
+
 export const homeApi = {
   getNotices: (limit = 5) =>
     apiClient.get<NoticesResponse>('/home/notices', { limit }),
@@ -68,6 +74,28 @@ export const homeApi = {
 
   getSignage: (mediaLimit = 6, playlistLimit = 4) =>
     apiClient.get<SignageResponse>('/home/signage', { mediaLimit, playlistLimit }),
+
+  /**
+   * 홈 페이지 전체 데이터를 병렬로 가져오기
+   * 개별 useEffect 순차 호출 → Promise.allSettled 병렬 호출로 전환
+   */
+  async prefetchAll(): Promise<HomePageData> {
+    const [noticesRes, communityRes, signageRes] = await Promise.allSettled([
+      apiClient.get<NoticesResponse>('/home/notices', { limit: 3 }),
+      apiClient.get<CommunityResponse>('/home/community', { postLimit: 3, featuredLimit: 3 }),
+      apiClient.get<SignageResponse>('/home/signage', { mediaLimit: 3, playlistLimit: 2 }),
+    ]);
+
+    return {
+      notices: noticesRes.status === 'fulfilled' ? noticesRes.value.data ?? [] : [],
+      community: communityRes.status === 'fulfilled'
+        ? { posts: communityRes.value.data?.posts ?? [], featured: communityRes.value.data?.featured ?? [] }
+        : { posts: [], featured: [] },
+      signage: signageRes.status === 'fulfilled'
+        ? { media: signageRes.value.data?.media ?? [], playlists: signageRes.value.data?.playlists ?? [] }
+        : { media: [], playlists: [] },
+    };
+  },
 };
 
 export type { HomeNotice, HomeForumPost, HomeFeatured, HomeMedia, HomePlaylist };
