@@ -94,6 +94,12 @@ export function NewsListPage() {
     return undefined;
   };
 
+  // 공지사항(notice) = notice + hero (메인 페이지 /home/notices와 동일 기준)
+  const getApiType = (uiType: ContentType | undefined): string | undefined => {
+    if (uiType === 'notice') return 'notice,hero';
+    return uiType;
+  };
+
   const currentPage = parseInt(searchParams.get('page') || '1');
   const currentType = getTypeFromPath();
   const searchQuery = searchParams.get('search') || '';
@@ -106,7 +112,7 @@ export function NewsListPage() {
     try {
       setLoading(true);
       const res = await newsApi.getNotices({
-        type: currentType,
+        type: getApiType(currentType),
         page: currentPage,
         limit: 12,
         search: searchQuery || undefined,

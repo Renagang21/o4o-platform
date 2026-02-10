@@ -1,72 +1,109 @@
 /**
- * NoticeSection - 공지사항 섹션
+ * NoticeSection - 공지사항 + 뉴스 탭 섹션
  *
- * WO-KPA-HOME-PHASE1-V1: 메인 페이지 공지 요약
- * Performance: prefetchedNotices가 있으면 자체 API 호출 건너뜀
+ * WO-KPA-HOME-PHASE1-V1: 메인 페이지 공지/뉴스 요약
+ * Performance: prefetchedNotices/prefetchedNews가 있으면 자체 API 호출 건너뜀
+ *
+ * 탭 구조:
+ * [공지사항] [뉴스]
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeNotice } from '../../api/home';
-import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
+import { newsApi } from '../../api/news';
+import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
+
+type Tab = 'notice' | 'news';
 
 interface Props {
   prefetchedNotices?: HomeNotice[];
+  prefetchedNews?: HomeNotice[];
   loading?: boolean;
 }
 
-export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Props) {
+export function NoticeSection({ prefetchedNotices, prefetchedNews, loading: parentLoading }: Props) {
+  const [activeTab, setActiveTab] = useState<Tab>('notice');
   const [notices, setNotices] = useState<HomeNotice[]>([]);
+  const [news, setNews] = useState<HomeNotice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newsLoading, setNewsLoading] = useState(true);
 
   useEffect(() => {
     if (prefetchedNotices) {
       setNotices(prefetchedNotices);
       setLoading(false);
-      return;
+    } else {
+      homeApi.getNotices(3)
+        .then((res) => { if (res.data) setNotices(res.data); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
     }
-    // Fallback: 독립 사용 시 자체 호출
-    homeApi.getNotices(3)
-      .then((res) => {
-        if (res.data) setNotices(res.data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
   }, [prefetchedNotices]);
 
-  const isLoading = parentLoading ?? loading;
+  useEffect(() => {
+    if (prefetchedNews) {
+      setNews(prefetchedNews);
+      setNewsLoading(false);
+    } else {
+      newsApi.getNotices({ type: 'news', limit: 3, sort: 'latest' })
+        .then((res) => { if (res.data) setNews(res.data as unknown as HomeNotice[]); })
+        .catch(() => {})
+        .finally(() => setNewsLoading(false));
+    }
+  }, [prefetchedNews]);
+
+  const isLoading = parentLoading ?? (activeTab === 'notice' ? loading : newsLoading);
+  const items = activeTab === 'notice' ? notices : news;
+  const moreLink = activeTab === 'notice' ? '/news/notice' : '/news/news';
+  const moreLinkText = activeTab === 'notice' ? '공지 전체 보기 →' : '뉴스 전체 보기 →';
+  const emptyText = activeTab === 'notice' ? '아직 등록된 공지가 없습니다.' : '아직 등록된 뉴스가 없습니다.';
+  const emptyHintText = activeTab === 'notice' ? '새 소식이 등록되면 여기에 표시됩니다.' : '뉴스가 등록되면 여기에 표시됩니다.';
 
   return (
     <section style={styles.container}>
       <div style={styles.header}>
-        <h2 style={styles.sectionTitle}>공지사항</h2>
-        <Link to="/news" style={styles.moreLink}>공지 전체 보기 →</Link>
+        <div style={styles.tabs}>
+          <button
+            style={{ ...styles.tab, ...(activeTab === 'notice' ? styles.tabActive : {}) }}
+            onClick={() => setActiveTab('notice')}
+          >
+            공지사항
+          </button>
+          <button
+            style={{ ...styles.tab, ...(activeTab === 'news' ? styles.tabActive : {}) }}
+            onClick={() => setActiveTab('news')}
+          >
+            뉴스
+          </button>
+        </div>
+        <Link to={moreLink} style={styles.moreLink}>{moreLinkText}</Link>
       </div>
       <div style={styles.card}>
         {isLoading ? (
           <p style={styles.empty}>불러오는 중...</p>
-        ) : notices.length === 0 ? (
+        ) : items.length === 0 ? (
           <div style={styles.emptyWrap}>
-            <p style={styles.empty}>아직 등록된 공지가 없습니다.</p>
-            <p style={styles.emptyHint}>새 소식이 등록되면 여기에 표시됩니다.</p>
+            <p style={styles.empty}>{emptyText}</p>
+            <p style={styles.emptyHint}>{emptyHintText}</p>
           </div>
         ) : (
           <ul style={styles.list}>
-            {notices.map((notice) => (
-              <li key={notice.id} style={styles.listItem}>
-                <Link to={`/news/${notice.id}`} style={styles.postLink}>
-                  {notice.isPinned && (
+            {items.map((item) => (
+              <li key={item.id} style={styles.listItem}>
+                <Link to={`/news/${item.id}`} style={styles.postLink}>
+                  {activeTab === 'notice' && item.isPinned && (
                     <span style={styles.pinnedBadge}>고정</span>
                   )}
-                  <span style={styles.postTitle}>{notice.title}</span>
+                  <span style={styles.postTitle}>{item.title}</span>
                 </Link>
-                {notice.summary && (
-                  <p style={styles.summary}>{notice.summary}</p>
+                {item.summary && (
+                  <p style={styles.summary}>{item.summary}</p>
                 )}
                 <div style={styles.meta}>
                   <span>
-                    {new Date(notice.publishedAt || notice.createdAt).toLocaleDateString()}
+                    {new Date(item.publishedAt || item.createdAt).toLocaleDateString()}
                   </span>
                 </div>
               </li>
@@ -88,10 +125,24 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     marginBottom: spacing.md,
   },
-  sectionTitle: {
-    ...typography.headingM,
-    color: colors.neutral900,
-    margin: 0,
+  tabs: {
+    display: 'flex',
+    gap: '4px',
+  },
+  tab: {
+    padding: '6px 16px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    border: 'none',
+    borderRadius: borderRadius.md,
+    backgroundColor: 'transparent',
+    color: colors.neutral500,
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  },
+  tabActive: {
+    backgroundColor: colors.primary,
+    color: colors.white,
   },
   moreLink: {
     fontSize: '0.875rem',

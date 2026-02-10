@@ -189,6 +189,12 @@ export class ForumController {
         return;
       }
 
+      // Increment view count (fire-and-forget, non-blocking)
+      this.postRepository
+        .update(post.id, { viewCount: () => '"viewCount" + 1' })
+        .catch((err) => logger.warn('Failed to increment view count:', err));
+      post.viewCount = (post.viewCount || 0) + 1;
+
       res.json({
         success: true,
         data: post,

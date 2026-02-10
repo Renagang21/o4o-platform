@@ -206,6 +206,7 @@ export function ForumListPage() {
                   <th style={s.th}>제목</th>
                   <th style={{ ...s.th, width: '100px' }}>작성자</th>
                   <th style={{ ...s.th, width: '100px' }}>작성일</th>
+                  <th style={{ ...s.th, width: '50px' }}>좋아요</th>
                   <th style={{ ...s.th, width: '50px' }}>조회</th>
                   <th style={{ ...s.th, width: '50px' }}>댓글</th>
                 </tr>

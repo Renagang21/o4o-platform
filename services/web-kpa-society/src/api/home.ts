@@ -59,8 +59,16 @@ interface SignageResponse {
   };
 }
 
+interface NewsListResponse {
+  success: boolean;
+  data: HomeNotice[];
+  total: number;
+  totalPages: number;
+}
+
 export interface HomePageData {
   notices: HomeNotice[];
+  news: HomeNotice[];
   community: { posts: HomeForumPost[]; featured: HomeFeatured[] };
   signage: { media: HomeMedia[]; playlists: HomePlaylist[] };
 }
@@ -80,14 +88,16 @@ export const homeApi = {
    * 개별 useEffect 순차 호출 → Promise.allSettled 병렬 호출로 전환
    */
   async prefetchAll(): Promise<HomePageData> {
-    const [noticesRes, communityRes, signageRes] = await Promise.allSettled([
+    const [noticesRes, newsRes, communityRes, signageRes] = await Promise.allSettled([
       apiClient.get<NoticesResponse>('/home/notices', { limit: 3 }),
+      apiClient.get<NewsListResponse>('/news', { type: 'news', limit: 3, sort: 'latest' }),
       apiClient.get<CommunityResponse>('/home/community', { postLimit: 3, featuredLimit: 3 }),
       apiClient.get<SignageResponse>('/home/signage', { mediaLimit: 3, playlistLimit: 2 }),
     ]);
 
     return {
       notices: noticesRes.status === 'fulfilled' ? noticesRes.value.data ?? [] : [],
+      news: newsRes.status === 'fulfilled' ? newsRes.value.data ?? [] : [],
       community: communityRes.status === 'fulfilled'
         ? { posts: communityRes.value.data?.posts ?? [], featured: communityRes.value.data?.featured ?? [] }
         : { posts: [], featured: [] },

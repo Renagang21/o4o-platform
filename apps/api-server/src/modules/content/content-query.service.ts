@@ -47,7 +47,8 @@ export class ContentQueryService {
     };
 
     if (type) {
-      where.type = type;
+      // Support comma-separated types (e.g. "notice,hero")
+      where.type = type.includes(',') ? In(type.split(',')) : type;
     } else if (this.config.defaultTypes?.length) {
       where.type = In(this.config.defaultTypes);
     }
