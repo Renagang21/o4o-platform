@@ -137,7 +137,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           "totalDuration", "itemCount",
           (status = 'active') as "isActive",
           "loopEnabled" as "isLoop",
-          tags, metadata,
+          metadata,
           "createdAt", "updatedAt"
         FROM signage_playlists
         WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
@@ -218,7 +218,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           "totalDuration", "itemCount",
           (status = 'active') as "isActive",
           "loopEnabled" as "isLoop",
-          tags, metadata,
+          metadata,
           "createdAt", "updatedAt"
         FROM signage_playlists
         WHERE id = $1 AND "serviceKey" = $2

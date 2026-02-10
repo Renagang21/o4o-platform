@@ -16,7 +16,7 @@ import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
 type ContentType = 'playlists' | 'media';
 
 export default function ContentHubPage() {
-  const [activeSource, setActiveSource] = useState<ContentSource>('community');
+  const [activeSource, setActiveSource] = useState<ContentSource>('hq');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
   // Data states
@@ -354,7 +354,7 @@ export default function ContentHubPage() {
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex">
-            {(['community', 'supplier', 'hq'] as ContentSource[]).map((source) => (
+            {(['hq', 'supplier', 'community'] as ContentSource[]).map((source) => (
               <button
                 key={source}
                 onClick={() => setActiveSource(source)}
