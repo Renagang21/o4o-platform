@@ -191,7 +191,6 @@ function App() {
            * ======================================== */}
           <Route path="/forum" element={<Layout serviceName={SERVICE_NAME}><ForumHomePage /></Layout>} />
           <Route path="/forum/all" element={<Layout serviceName={SERVICE_NAME}><ForumListPage /></Layout>} />
-          <Route path="/forum/category/:id" element={<Layout serviceName={SERVICE_NAME}><ForumListPage /></Layout>} />
           <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
@@ -442,7 +441,6 @@ function DemoLayoutRoutes() {
         {/* Forum (포럼) - WO-KPA-COMMUNITY-HOME-V1 */}
         <Route path="/forum" element={<ForumHomePage />} />
         <Route path="/forum/all" element={<ForumListPage />} />
-        <Route path="/forum/category/:id" element={<ForumListPage />} />
         <Route path="/forum/post/:id" element={<ForumDetailPage />} />
         <Route path="/forum/write" element={<ForumWritePage />} />
         <Route path="/forum/edit/:id" element={<ForumWritePage />} />

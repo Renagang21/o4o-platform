@@ -1,13 +1,10 @@
 /**
- * ForumHomePage - 포럼 메인 홈 페이지 (다음카페 스타일)
+ * ForumHomePage - 포럼 메인 홈 페이지
  *
- * 핵심 정책: Forum Hub의 1차 주체는 '글'이 아니라 '포럼(카테고리)'
- * 카테고리 카드가 Hero 영역, 글 목록은 보조 영역
- *
- * ForumHomePage
+ * 레이아웃:
  * ├─ HeroHeader             - 흰색 배경 + 하단 보더
- * ├─ ForumCategorySection   - 카테고리 카드 (Hero)
- * ├─ ForumActivitySection   - 최근 글 + 인기 글 (Secondary)
+ * ├─ ForumActivitySection   - 최근 글 + 인기 글 (2열)
+ * ├─ ForumCategorySection   - 카테고리 탭 + 글 목록
  * ├─ ForumWritePrompt       - 글쓰기 유도
  * └─ ForumInfoSection       - 이용안내 + 바로가기
  */
@@ -32,12 +29,8 @@ export function ForumHomePage() {
       </div>
 
       <div style={styles.content}>
-        {/* 카테고리 = Hero 영역 */}
-        <ForumCategorySection />
-
-        {/* 최근 활동 = Secondary 영역 */}
         <ForumActivitySection />
-
+        <ForumCategorySection />
         <ForumWritePrompt />
         <ForumInfoSection />
       </div>
