@@ -102,8 +102,11 @@ export function MyContentPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
-  // 판매자 행동 신호
+  // 판매자 행동 신호 + 선택적 제안
   const [supplierSignal, setSupplierSignal] = useState(false);
+  const [suggestionShown, setSuggestionShown] = useState(
+    () => !sessionStorage.getItem('supplier_suggestion_dismissed')
+  );
 
   const dashboardId = user?.id;
 
@@ -381,10 +384,34 @@ export function MyContentPage() {
         </div>
       )}
 
-      {/* 판매자 행동 신호 */}
+      {/* 판매자 행동 신호 + 선택적 제안 */}
       {supplierSignal && (
         <div style={styles.supplierSignal}>
           승인된 공급자와 연결된 자산이 있습니다.
+          {suggestionShown && (
+            <div style={styles.suggestionRow}>
+              <Link
+                to="/news"
+                style={styles.suggestionLink}
+                onClick={() => {
+                  setSuggestionShown(false);
+                  sessionStorage.setItem('supplier_suggestion_dismissed', '1');
+                }}
+              >
+                연결된 공급자의 지원 자료를 확인할 수 있습니다.
+              </Link>
+              <button
+                style={styles.suggestionDismiss}
+                onClick={() => {
+                  setSuggestionShown(false);
+                  sessionStorage.setItem('supplier_suggestion_dismissed', '1');
+                }}
+                aria-label="닫기"
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -886,7 +913,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     cursor: 'pointer',
   },
-  // 판매자 행동 신호
+  // 판매자 행동 신호 + 선택적 제안
   supplierSignal: {
     backgroundColor: '#F0FDF4',
     border: '1px solid #BBF7D0',
@@ -896,6 +923,27 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#15803D',
     fontWeight: 500,
     marginBottom: '16px',
+  },
+  suggestionRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '6px',
+  },
+  suggestionLink: {
+    fontSize: '12px',
+    color: '#166534',
+    textDecoration: 'underline',
+    textUnderlineOffset: '2px',
+  },
+  suggestionDismiss: {
+    background: 'none',
+    border: 'none',
+    color: '#86EFAC',
+    fontSize: '12px',
+    cursor: 'pointer',
+    padding: '0 2px',
+    lineHeight: 1,
   },
   // Phase 6: 일괄 액션 바
   bulkBar: {

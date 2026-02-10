@@ -240,6 +240,12 @@ export default function SupplierDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
+  // 공급자 행동 신호 + 선택적 제안
+  const [sellerSignal, setSellerSignal] = useState(false);
+  const [suggestionShown, setSuggestionShown] = useState(
+    () => !sessionStorage.getItem('seller_suggestion_dismissed')
+  );
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -261,6 +267,22 @@ export default function SupplierDashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // 공급자 행동 신호: 세션 1회 조회
+  useEffect(() => {
+    if (sessionStorage.getItem('seller_signal_dismissed')) return;
+    dashboardApi.getSellerSignal()
+      .then(res => { if (res.hasApprovedSeller) setSellerSignal(true); })
+      .catch(() => {});
+  }, []);
+
+  // 공급자 행동 신호 숨기기 (새로고침/링크 클릭 등 행동 시)
+  const dismissSellerSignal = useCallback(() => {
+    if (sellerSignal) {
+      setSellerSignal(false);
+      sessionStorage.setItem('seller_signal_dismissed', '1');
+    }
+  }, [sellerSignal]);
 
   // API 데이터를 컴포넌트 props 형식으로 변환
   const summaryData = transformSummaryData(summary);
@@ -284,7 +306,7 @@ export default function SupplierDashboardPage() {
             현재 운영 상황을 확인하고 필요한 서비스로 이동하세요.
           </p>
         </div>
-        <button onClick={fetchData} style={styles.refreshButton} disabled={loading}>
+        <button onClick={() => { dismissSellerSignal(); fetchData(); }} style={styles.refreshButton} disabled={loading}>
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           새로고침
         </button>
@@ -293,6 +315,29 @@ export default function SupplierDashboardPage() {
       {/* Profile Completeness (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1) */}
       {!loading && completeness && (
         <ProfileCompletenessCard data={completeness} />
+      )}
+
+      {/* 공급자 행동 신호 + 선택적 제안 */}
+      {sellerSignal && (
+        <div style={styles.sellerSignal}>
+          활동 가능한 판매자가 있습니다.
+          {suggestionShown && (
+            <div style={styles.suggestionRow}>
+              <Link
+                to="/supplier/requests"
+                style={styles.suggestionLink}
+                onClick={() => { setSuggestionShown(false); sessionStorage.setItem('seller_suggestion_dismissed', '1'); }}
+              >
+                원하시면 판매자 지원 캠페인을 준비할 수 있습니다.
+              </Link>
+              <button
+                style={styles.suggestionDismiss}
+                onClick={() => { setSuggestionShown(false); sessionStorage.setItem('seller_suggestion_dismissed', '1'); }}
+                aria-label="닫기"
+              >✕</button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* P2: 운영 요약 카드 */}
@@ -575,6 +620,37 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: '#3b82f6',
     margin: 0,
+  },
+  sellerSignal: {
+    backgroundColor: '#F0FDF4',
+    border: '1px solid #BBF7D0',
+    borderRadius: '10px',
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: '#15803D',
+    fontWeight: 500,
+    marginBottom: '24px',
+  },
+  suggestionRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '6px',
+  },
+  suggestionLink: {
+    fontSize: '12px',
+    color: '#16A34A',
+    textDecoration: 'underline',
+    textUnderlineOffset: '2px',
+  },
+  suggestionDismiss: {
+    background: 'none',
+    border: 'none',
+    color: '#86EFAC',
+    cursor: 'pointer',
+    fontSize: '12px',
+    lineHeight: 1,
+    padding: 0,
   },
   completenessCard: {
     backgroundColor: '#fff',

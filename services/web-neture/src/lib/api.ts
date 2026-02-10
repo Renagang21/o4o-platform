@@ -1376,6 +1376,22 @@ export const dashboardApi = {
    * GET /api/v1/neture/partner/dashboard/summary
    * 파트너 대시보드 통계 요약
    */
+  /**
+   * 공급자 행동 신호: 승인된 판매자 파트너십 존재 여부
+   */
+  async getSellerSignal(): Promise<{ success: boolean; hasApprovedSeller: boolean }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/dashboard/assets/seller-signal`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) return { success: false, hasApprovedSeller: false };
+      return response.json();
+    } catch {
+      return { success: false, hasApprovedSeller: false };
+    }
+  },
+
   async getPartnerDashboardSummary(): Promise<PartnerDashboardSummary | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/partner/dashboard/summary`, {

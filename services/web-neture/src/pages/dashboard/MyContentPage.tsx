@@ -99,8 +99,11 @@ export default function MyContentPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
-  // 판매자 행동 신호
+  // 판매자 행동 신호 + 선택적 제안
   const [supplierSignal, setSupplierSignal] = useState(false);
+  const [suggestionShown, setSuggestionShown] = useState(
+    () => !sessionStorage.getItem('supplier_suggestion_dismissed')
+  );
 
   const dashboardId = user?.id;
 
@@ -376,10 +379,26 @@ export default function MyContentPage() {
         </div>
       )}
 
-      {/* 판매자 행동 신호 */}
+      {/* 판매자 행동 신호 + 선택적 제안 */}
       {supplierSignal && (
         <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700 font-medium mb-4">
           승인된 공급자와 연결된 자산이 있습니다.
+          {suggestionShown && (
+            <div className="flex items-center gap-2 mt-1.5">
+              <Link
+                to="/content"
+                className="text-green-600 underline underline-offset-2 text-xs"
+                onClick={() => { setSuggestionShown(false); sessionStorage.setItem('supplier_suggestion_dismissed', '1'); }}
+              >
+                연결된 공급자의 지원 자료를 확인할 수 있습니다.
+              </Link>
+              <button
+                className="text-green-400 hover:text-green-600 text-xs leading-none"
+                onClick={() => { setSuggestionShown(false); sessionStorage.setItem('supplier_suggestion_dismissed', '1'); }}
+                aria-label="닫기"
+              >✕</button>
+            </div>
+          )}
         </div>
       )}
 
