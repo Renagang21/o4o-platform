@@ -19,28 +19,76 @@ import { KpaMember } from '../entities/kpa-member.entity.js';
 // UUID v4 regex for detecting direct ID lookups
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Known branch slug → display name map (matches frontend BRANCH_NAMES)
+const BRANCH_DISPLAY_NAMES: Record<string, string> = {
+  demo: '데모',
+  gangnam: '강남',
+  gangbuk: '강북',
+  gangdong: '강동',
+  gangseo: '강서',
+  gwanak: '관악',
+  dongjak: '동작',
+  mapo: '마포',
+  seodaemun: '서대문',
+  seongbuk: '성북',
+  yeongdeungpo: '영등포',
+  yongsan: '용산',
+  eunpyeong: '은평',
+  jongno: '종로',
+  junggu: '중구',
+};
+
+/** Resolved branch — either a real DB org or a virtual placeholder */
+interface ResolvedBranch {
+  id: string;        // UUID or slug
+  name: string;
+  type: string;
+  description: string | null;
+  address: string | null;
+  phone: string | null;
+  isVirtual: boolean; // true → no DB record, data queries return empty
+}
+
 /**
- * Resolve branchId param → KpaOrganization row.
- * Tries UUID first, then case-insensitive name match on branch-type orgs.
+ * Resolve branchId param → branch info.
+ * Tries UUID first, then case-insensitive name match.
+ * Falls back to a virtual branch so pages render with empty data instead of 404.
  */
 async function resolveBranch(
   dataSource: DataSource,
   branchId: string,
-): Promise<KpaOrganization | null> {
+): Promise<ResolvedBranch> {
   const repo = dataSource.getRepository(KpaOrganization);
 
+  // Try UUID lookup
   if (UUID_RE.test(branchId)) {
-    return repo.findOne({ where: { id: branchId, is_active: true } });
+    const org = await repo.findOne({ where: { id: branchId, is_active: true } });
+    if (org) {
+      return { id: org.id, name: org.name, type: org.type, description: org.description, address: org.address, phone: org.phone, isVirtual: false };
+    }
+  } else {
+    // Slug / name lookup – match name ignoring case
+    const org = await repo
+      .createQueryBuilder('o')
+      .where('o.is_active = true')
+      .andWhere('LOWER(o.name) = LOWER(:name)', { name: branchId })
+      .getOne();
+    if (org) {
+      return { id: org.id, name: org.name, type: org.type, description: org.description, address: org.address, phone: org.phone, isVirtual: false };
+    }
   }
 
-  // Slug / name lookup – match name ignoring case
-  const result = await repo
-    .createQueryBuilder('o')
-    .where('o.is_active = true')
-    .andWhere('LOWER(o.name) = LOWER(:name)', { name: branchId })
-    .getOne();
-
-  return result;
+  // No DB record — return virtual branch so pages render with empty data
+  const displayName = BRANCH_DISPLAY_NAMES[branchId.toLowerCase()] || branchId;
+  return {
+    id: branchId,
+    name: displayName,
+    type: 'branch',
+    description: null,
+    address: null,
+    phone: null,
+    isVirtual: true,
+  };
 }
 
 export function createBranchPublicController(dataSource: DataSource): Router {
@@ -54,12 +102,27 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
+
+        if (branch.isVirtual) {
+          res.json({
+            success: true,
+            data: {
+              id: branch.id,
+              name: branch.name,
+              type: branch.type,
+              description: null,
+              address: null,
+              phone: null,
+              email: null,
+              memberCount: 0,
+              establishedDate: null,
+              region: branch.name,
+            },
+          });
           return;
         }
 
-        // Optionally enrich with settings & member count
+        // Enrich with settings & member count for real branches
         const settings = await dataSource.getRepository(KpaBranchSettings)
           .findOne({ where: { organization_id: branch.id } });
 
@@ -77,7 +140,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
             phone: settings?.phone || branch.phone || null,
             email: settings?.email || null,
             memberCount,
-            establishedDate: branch.created_at?.toISOString().slice(0, 10) || null,
+            establishedDate: null,
             region: branch.name,
           },
         });
@@ -96,14 +159,15 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
-          return;
-        }
 
         const page = Math.max(1, parseInt(req.query.page as string) || 1);
         const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
         const category = req.query.category as string | undefined;
+
+        if (branch.isVirtual) {
+          res.json({ success: true, data: { items: [], total: 0, page, totalPages: 0 } });
+          return;
+        }
 
         const qb = dataSource.getRepository(KpaBranchNews)
           .createQueryBuilder('n')
@@ -144,8 +208,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
+        if (branch.isVirtual) {
+          res.status(404).json({ success: false, error: { message: 'News not found' } });
           return;
         }
 
@@ -178,8 +242,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
+        if (branch.isVirtual) {
+          res.json({ success: true, data: [] });
           return;
         }
 
@@ -204,14 +268,15 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
-          return;
-        }
 
         const page = Math.max(1, parseInt(req.query.page as string) || 1);
         const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
         const category = req.query.category as string | undefined;
+
+        if (branch.isVirtual) {
+          res.json({ success: true, data: { items: [], total: 0, page, totalPages: 0 } });
+          return;
+        }
 
         const qb = dataSource.getRepository(KpaBranchDoc)
           .createQueryBuilder('d')
@@ -251,8 +316,18 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
+
+        if (branch.isVirtual) {
+          res.json({
+            success: true,
+            data: {
+              address: null,
+              phone: null,
+              fax: null,
+              email: null,
+              workingHours: '평일 09:00 - 18:00',
+            },
+          });
           return;
         }
 
@@ -285,12 +360,6 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     '/:branchId/forum/posts',
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const branch = await resolveBranch(dataSource, req.params.branchId);
-        if (!branch) {
-          res.status(404).json({ success: false, error: { message: 'Branch not found' } });
-          return;
-        }
-
         // Forum posts are managed by the platform Forum module.
         // Returning empty paginated result until branch-forum integration.
         res.json({
@@ -306,6 +375,30 @@ export function createBranchPublicController(dataSource: DataSource): Router {
         console.error('Failed to get branch forum posts:', error);
         res.status(500).json({ success: false, error: { message: error.message } });
       }
+    },
+  );
+
+  // ──────────────────────────────────────────────────────
+  // GET /branches/:branchId/groupbuys — groupbuys (stub)
+  // ──────────────────────────────────────────────────────
+  router.get(
+    '/:branchId/groupbuys',
+    async (_req: Request, res: Response): Promise<void> => {
+      res.json({ success: true, data: { items: [], total: 0, page: 1, totalPages: 0 } });
+    },
+  );
+
+  router.get(
+    '/:branchId/groupbuys/history',
+    async (_req: Request, res: Response): Promise<void> => {
+      res.json({ success: true, data: { items: [], total: 0, page: 1, totalPages: 0 } });
+    },
+  );
+
+  router.get(
+    '/:branchId/groupbuys/:id',
+    async (_req: Request, res: Response): Promise<void> => {
+      res.status(404).json({ success: false, error: { message: 'Groupbuy not found' } });
     },
   );
 
