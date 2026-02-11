@@ -52,6 +52,8 @@ export interface SignageMediaResponse {
   height?: number;
   fileSize?: number;
   ownerType: MediaOwnerType;
+  source?: ContentSource;
+  creatorName?: string;
   tags: string[];
   metadata: Record<string, unknown>;
   isActive: boolean;
@@ -91,6 +93,8 @@ export interface SignagePlaylistResponse {
   isActive: boolean;
   isLoop: boolean;
   items?: SignagePlaylistItemResponse[];
+  source?: ContentSource;
+  creatorName?: string;
   tags: string[];
   metadata: Record<string, unknown>;
   createdByUserId?: string;

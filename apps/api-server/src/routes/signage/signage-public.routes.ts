@@ -64,12 +64,15 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const media = await dataSource.query(`
         SELECT
-          id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl",
-          duration, tags, metadata,
-          "createdAt", "updatedAt"
-        FROM signage_media
-        WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
-        ORDER BY "createdAt" DESC
+          m.id, m.name, m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
+          m.duration, m.tags, m.metadata, m.source,
+          m."createdAt", m."updatedAt",
+          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+        FROM signage_media m
+        LEFT JOIN organizations o ON m."organizationId" = o.id
+        LEFT JOIN users u ON m."createdByUserId" = u.id
+        WHERE m."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
+        ORDER BY m."createdAt" DESC
         LIMIT $${limitIndex} OFFSET $${offsetIndex}
       `, params);
 
@@ -77,8 +80,8 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const countParams = params.slice(0, -2); // Remove limit/offset
       const countResult = await dataSource.query(`
         SELECT COUNT(*) as total
-        FROM signage_media
-        WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
+        FROM signage_media m
+        WHERE m."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
       `, countParams);
 
       const total = parseInt(countResult[0]?.total || '0', 10);
@@ -131,17 +134,20 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const playlists = await dataSource.query(`
         SELECT
-          id, name, description,
-          "defaultItemDuration" as "defaultDuration",
-          "transitionType" as "defaultTransition",
-          "totalDuration", "itemCount",
-          (status = 'active') as "isActive",
-          "loopEnabled" as "isLoop",
-          metadata,
-          "createdAt", "updatedAt"
-        FROM signage_playlists
-        WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
-        ORDER BY "createdAt" DESC
+          p.id, p.name, p.description,
+          p."defaultItemDuration" as "defaultDuration",
+          p."transitionType" as "defaultTransition",
+          p."totalDuration", p."itemCount",
+          (p.status = 'active') as "isActive",
+          p."loopEnabled" as "isLoop",
+          p.metadata, p.source,
+          p."createdAt", p."updatedAt",
+          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+        FROM signage_playlists p
+        LEFT JOIN organizations o ON p."organizationId" = o.id
+        LEFT JOIN users u ON p."createdByUserId" = u.id
+        WHERE p."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'p.source')} AND p.status = 'active'
+        ORDER BY p."createdAt" DESC
         LIMIT $${limitIndex} OFFSET $${offsetIndex}
       `, params);
 
@@ -149,8 +155,8 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const countParams = params.slice(0, -2);
       const countResult = await dataSource.query(`
         SELECT COUNT(*) as total
-        FROM signage_playlists
-        WHERE "serviceKey" = $1 ${sourceFilter} AND status = 'active'
+        FROM signage_playlists p
+        WHERE p."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'p.source')} AND p.status = 'active'
       `, countParams);
 
       const total = parseInt(countResult[0]?.total || '0', 10);
@@ -180,13 +186,16 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const media = await dataSource.query(`
         SELECT
-          id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl",
-          duration, tags, metadata,
-          "createdAt", "updatedAt"
-        FROM signage_media
-        WHERE id = $1 AND "serviceKey" = $2
-          AND source IN ('hq', 'supplier', 'community')
-          AND status = 'active'
+          m.id, m.name, m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
+          m.duration, m.tags, m.metadata, m.source,
+          m."createdAt", m."updatedAt",
+          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+        FROM signage_media m
+        LEFT JOIN organizations o ON m."organizationId" = o.id
+        LEFT JOIN users u ON m."createdByUserId" = u.id
+        WHERE m.id = $1 AND m."serviceKey" = $2
+          AND m.source IN ('hq', 'supplier', 'community')
+          AND m.status = 'active'
       `, [id, serviceKey]);
 
       if (!media.length) {
@@ -212,18 +221,21 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const playlists = await dataSource.query(`
         SELECT
-          id, name, description,
-          "defaultItemDuration" as "defaultDuration",
-          "transitionType" as "defaultTransition",
-          "totalDuration", "itemCount",
-          (status = 'active') as "isActive",
-          "loopEnabled" as "isLoop",
-          metadata,
-          "createdAt", "updatedAt"
-        FROM signage_playlists
-        WHERE id = $1 AND "serviceKey" = $2
-          AND source IN ('hq', 'supplier', 'community')
-          AND status = 'active'
+          p.id, p.name, p.description,
+          p."defaultItemDuration" as "defaultDuration",
+          p."transitionType" as "defaultTransition",
+          p."totalDuration", p."itemCount",
+          (p.status = 'active') as "isActive",
+          p."loopEnabled" as "isLoop",
+          p.metadata, p.source,
+          p."createdAt", p."updatedAt",
+          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+        FROM signage_playlists p
+        LEFT JOIN organizations o ON p."organizationId" = o.id
+        LEFT JOIN users u ON p."createdByUserId" = u.id
+        WHERE p.id = $1 AND p."serviceKey" = $2
+          AND p.source IN ('hq', 'supplier', 'community')
+          AND p.status = 'active'
       `, [id, serviceKey]);
 
       if (!playlists.length) {

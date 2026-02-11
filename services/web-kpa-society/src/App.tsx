@@ -35,6 +35,8 @@ import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 
 // Signage pages
 import ContentHubPage from './pages/signage/ContentHubPage';
+import PlaylistDetailPage from './pages/signage/PlaylistDetailPage';
+import MediaDetailPage from './pages/signage/MediaDetailPage';
 
 // Resources pages
 import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
@@ -369,6 +371,8 @@ function App() {
 
           {/* Signage (디지털 사이니지) */}
           <Route path="/signage" element={<Layout serviceName={SERVICE_NAME}><ContentHubPage /></Layout>} />
+          <Route path="/signage/playlist/:id" element={<Layout serviceName={SERVICE_NAME}><PlaylistDetailPage /></Layout>} />
+          <Route path="/signage/media/:id" element={<Layout serviceName={SERVICE_NAME}><MediaDetailPage /></Layout>} />
 
           {/* Events (이벤트) */}
           <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />

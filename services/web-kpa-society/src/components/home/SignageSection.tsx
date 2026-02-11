@@ -10,16 +10,13 @@ import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeMedia, HomePlaylist } from '../../api/home';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
-import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
+import { getMediaThumbnailUrl } from '@o4o/types/signage';
+import { PlaceholderImage } from '../common';
 
 // CSS for hover effects (inline styles don't support :hover)
 const hoverStyles = `
-  .signage-media-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .signage-media-card:hover .signage-play-overlay {
-    opacity: 1 !important;
+  .signage-media-item:hover {
+    background-color: ${colors.neutral50};
   }
   .signage-playlist-item:hover {
     background-color: ${colors.neutral50};
@@ -88,39 +85,34 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
           <div>
             {media.length > 0 && (
               <div>
-                <h3 style={styles.subTitle}>최신 미디어</h3>
-                <div style={styles.mediaGrid}>
+                <h3 style={styles.subTitle}>동영상</h3>
+                <ul style={styles.mediaList}>
                   {media.map((item) => {
-                    const playUrl = getMediaPlayUrl(item);
                     const thumbnailUrl = getMediaThumbnailUrl(item);
                     return (
-                      <a
-                        key={item.id}
-                        href={playUrl ?? undefined}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.mediaCard}
-                        className="signage-media-card"
-                      >
-                        <div style={styles.mediaThumbnail}>
-                          <MediaThumbnail url={thumbnailUrl} name={item.name} mediaType={item.mediaType} />
-                          {item.duration != null && item.duration > 0 && (
-                            <span style={styles.duration}>
-                              {formatDuration(item.duration)}
-                            </span>
-                          )}
-                          {/* Play overlay - pointer-events: none */}
-                          <div style={styles.playOverlay} className="signage-play-overlay">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" opacity={0.9}>
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
+                      <li key={item.id}>
+                        <Link
+                          to={`/signage/media/${item.id}`}
+                          style={styles.mediaItem}
+                          className="signage-media-item"
+                        >
+                          <div style={styles.mediaThumbSmall}>
+                            <MediaThumbnail url={thumbnailUrl} name={item.name} mediaType={item.mediaType} />
                           </div>
-                        </div>
-                        <p style={styles.mediaName}>{item.name}</p>
-                      </a>
+                          <div style={styles.mediaInfo}>
+                            <span style={styles.mediaItemName}>{item.name}</span>
+                            {item.duration != null && item.duration > 0 && (
+                              <span style={styles.mediaDuration}>{formatDuration(item.duration)}</span>
+                            )}
+                          </div>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.neutral400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </Link>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               </div>
             )}
 
@@ -131,7 +123,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
                   {playlists.map((pl) => (
                     <li key={pl.id}>
                       <Link
-                        to="/signage"
+                        to={`/signage/playlist/${pl.id}`}
                         style={styles.playlistItem}
                         className="signage-playlist-item"
                       >
@@ -171,11 +163,12 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
 
 function MediaThumbnail({ url, name, mediaType }: { url: string | null; name: string; mediaType: string }) {
   const [failed, setFailed] = useState(false);
+  const variant = (mediaType === 'youtube' || mediaType === 'video') ? 'video' : 'photo';
 
   if (!url || failed) {
     return (
       <div style={styles.thumbnailPlaceholder}>
-        <MediaIcon type={mediaType} />
+        <PlaceholderImage variant={variant} style={{ borderRadius: 0 }} />
       </div>
     );
   }
@@ -187,28 +180,6 @@ function MediaThumbnail({ url, name, mediaType }: { url: string | null; name: st
       style={styles.thumbnailImg}
       onError={() => setFailed(true)}
     />
-  );
-}
-
-function MediaIcon({ type }: { type: string }) {
-  if (type === 'youtube' || type === 'video') {
-    return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="5 3 19 12 5 21 5 3" />
-      </svg>
-    );
-  }
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
-      <line x1="7" y1="2" x2="7" y2="22" />
-      <line x1="17" y1="2" x2="17" y2="22" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <line x1="2" y1="7" x2="7" y2="7" />
-      <line x1="2" y1="17" x2="7" y2="17" />
-      <line x1="17" y1="7" x2="22" y2="7" />
-      <line x1="17" y1="17" x2="22" y2="17" />
-    </svg>
   );
 }
 
@@ -249,27 +220,32 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral800,
     margin: `0 0 ${spacing.sm}`,
   },
-  mediaGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: spacing.md,
+  mediaList: {
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
   },
-  mediaCard: {
-    overflow: 'hidden',
+  mediaItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.sm,
+    marginLeft: `-${spacing.sm}`,
+    marginRight: `-${spacing.sm}`,
+    borderRadius: borderRadius.md,
     textDecoration: 'none',
     color: 'inherit',
     cursor: 'pointer',
-    display: 'block',
-    borderRadius: borderRadius.md,
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    transition: 'background-color 0.15s ease',
   },
-  mediaThumbnail: {
-    position: 'relative',
-    width: '100%',
-    paddingTop: '56.25%', // 16:9
-    backgroundColor: colors.neutral100,
-    borderRadius: borderRadius.md,
+  mediaThumbSmall: {
+    flexShrink: 0,
+    width: '48px',
+    height: '32px',
+    borderRadius: borderRadius.sm,
     overflow: 'hidden',
+    backgroundColor: colors.neutral100,
+    position: 'relative',
   },
   thumbnailImg: {
     position: 'absolute',
@@ -290,38 +266,25 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     color: colors.neutral400,
   },
-  duration: {
-    position: 'absolute',
-    bottom: '4px',
-    right: '4px',
-    padding: '1px 6px',
-    borderRadius: borderRadius.sm,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    color: colors.white,
-    fontSize: '0.7rem',
-    pointerEvents: 'none',
-  },
-  playOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
+  mediaInfo: {
+    flex: 1,
+    minWidth: 0,
     display: 'flex',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    opacity: 0,
-    transition: 'opacity 0.2s ease',
-    pointerEvents: 'none',
   },
-  mediaName: {
-    margin: `${spacing.xs} 0 0`,
-    fontSize: '0.813rem',
-    color: colors.neutral700,
+  mediaItemName: {
+    fontSize: '0.875rem',
+    color: colors.neutral800,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  mediaDuration: {
+    fontSize: '0.75rem',
+    color: colors.neutral400,
+    whiteSpace: 'nowrap',
+    marginLeft: spacing.sm,
   },
   playlistList: {
     listStyle: 'none',

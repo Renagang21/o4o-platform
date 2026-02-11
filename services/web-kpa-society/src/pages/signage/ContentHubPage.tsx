@@ -12,9 +12,25 @@
  */
 
 import { useEffect, useState, useMemo } from 'react';
-import { Download, Video as VideoIcon, List, AlertCircle, ExternalLink, Play, Clock, Film } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff } from 'lucide-react';
 import { publicContentApi, globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
-import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
+import { getMediaThumbnailUrl } from '@o4o/types/signage';
+
+/** Image with onError fallback — shows placeholder icon when image fails to load */
+function SafeImg({ src, alt, className }: { src: string; alt: string; className: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <div className={`${className} bg-slate-100 flex items-center justify-center`} style={{ objectFit: undefined }}>
+        <ImageOff className="h-8 w-8 text-slate-300" />
+      </div>
+    );
+  }
+
+  return <img src={src} alt={alt} className={className} onError={() => setFailed(true)} />;
+}
 
 const SOURCE_TABS: { key: ContentSource; label: string; desc: string }[] = [
   { key: 'community', label: '커뮤니티 공유', desc: '회원 간 공유된 유용한 안내 자료' },
@@ -31,17 +47,19 @@ function formatDuration(seconds: number): string {
 // ── Compact list-row components ──
 
 function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone: (id: string, name: string) => void }) {
-  const firstItem = playlist.items?.[0];
-  const previewUrl = firstItem?.media ? getMediaPlayUrl(firstItem.media) : null;
+  const navigate = useNavigate();
 
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group">
+    <div
+      onClick={() => navigate(`/signage/playlist/${playlist.id}`)}
+      className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group cursor-pointer hover:bg-slate-50 transition-colors"
+    >
       <div className="flex-shrink-0 w-8 text-center">
         <List className="h-5 w-5 text-blue-600 mx-auto" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-slate-800 truncate">{playlist.name}</span>
+          <span className="font-medium text-slate-800 truncate group-hover:text-blue-600">{playlist.name}</span>
           {playlist.itemCount > 0 && (
             <span className="text-xs text-slate-400 flex-shrink-0">{playlist.itemCount}개 항목</span>
           )}
@@ -58,19 +76,8 @@ function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone
         {new Date(playlist.createdAt).toLocaleDateString()}
       </div>
       <div className="flex gap-1 flex-shrink-0">
-        {previewUrl && (
-          <a
-            href={previewUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
-            title="보기"
-          >
-            <ExternalLink className="h-4 w-4" />
-          </a>
-        )}
         <button
-          onClick={() => onClone(playlist.id, playlist.name)}
+          onClick={(e) => { e.stopPropagation(); onClone(playlist.id, playlist.name); }}
           className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
           title="가져오기"
         >
@@ -82,19 +89,22 @@ function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone
 }
 
 function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string, name: string) => void }) {
-  const playUrl = getMediaPlayUrl(item);
+  const navigate = useNavigate();
   const thumbnailUrl = getMediaThumbnailUrl(item);
 
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group">
+    <div
+      onClick={() => navigate(`/signage/media/${item.id}`)}
+      className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group cursor-pointer hover:bg-slate-50 transition-colors"
+    >
       <div className="flex-shrink-0 w-16 h-10 rounded overflow-hidden bg-slate-100">
         {thumbnailUrl ? (
-          <a href={playUrl ?? undefined} target="_blank" rel="noopener noreferrer" className="block relative group/thumb">
-            <img src={thumbnailUrl} alt={item.name} className="w-full h-full object-cover" />
+          <div className="block relative group/thumb">
+            <SafeImg src={thumbnailUrl} alt={item.name} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
               <Play className="h-4 w-4 text-white" fill="white" />
             </div>
-          </a>
+          </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <VideoIcon className="h-4 w-4 text-slate-300" />
@@ -103,7 +113,7 @@ function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string,
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-slate-800 truncate">{item.name}</span>
+          <span className="font-medium text-slate-800 truncate group-hover:text-blue-600">{item.name}</span>
           <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded flex-shrink-0">{item.mediaType}</span>
         </div>
       </div>
@@ -117,19 +127,8 @@ function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string,
         {new Date(item.createdAt).toLocaleDateString()}
       </div>
       <div className="flex gap-1 flex-shrink-0">
-        {playUrl && (
-          <a
-            href={playUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
-            title="보기"
-          >
-            <ExternalLink className="h-4 w-4" />
-          </a>
-        )}
         <button
-          onClick={() => onClone(item.id, item.name)}
+          onClick={(e) => { e.stopPropagation(); onClone(item.id, item.name); }}
           className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
           title="가져오기"
         >
@@ -143,22 +142,25 @@ function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string,
 // ── Highlight card (for top section) ──
 
 function HighlightPlaylistCard({ playlist }: { playlist: SignagePlaylist }) {
+  const navigate = useNavigate();
   const firstItem = playlist.items?.[0];
-  const previewUrl = firstItem?.media ? getMediaPlayUrl(firstItem.media) : null;
   const previewThumbnail = firstItem?.media ? getMediaThumbnailUrl(firstItem.media) : null;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div
+      onClick={() => navigate(`/signage/playlist/${playlist.id}`)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+    >
       {previewThumbnail ? (
-        <a href={previewUrl ?? undefined} target="_blank" rel="noopener noreferrer" className="block relative group">
-          <img src={previewThumbnail} alt={playlist.name} className="w-full h-32 object-cover" />
+        <div className="block relative group">
+          <SafeImg src={previewThumbnail} alt={playlist.name} className="w-full h-32 object-cover" />
           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Play className="h-8 w-8 text-white" fill="white" />
           </div>
           <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
             {playlist.itemCount}개 항목
           </span>
-        </a>
+        </div>
       ) : (
         <div className="w-full h-32 bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center">
           <List className="h-8 w-8 text-blue-300" />
@@ -176,18 +178,21 @@ function HighlightPlaylistCard({ playlist }: { playlist: SignagePlaylist }) {
 }
 
 function HighlightMediaCard({ item }: { item: SignageMedia }) {
-  const playUrl = getMediaPlayUrl(item);
+  const navigate = useNavigate();
   const thumbnailUrl = getMediaThumbnailUrl(item);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div
+      onClick={() => navigate(`/signage/media/${item.id}`)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+    >
       {thumbnailUrl ? (
-        <a href={playUrl ?? undefined} target="_blank" rel="noopener noreferrer" className="block relative group">
-          <img src={thumbnailUrl} alt={item.name} className="w-full h-32 object-cover" />
+        <div className="block relative group">
+          <SafeImg src={thumbnailUrl} alt={item.name} className="w-full h-32 object-cover" />
           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Play className="h-8 w-8 text-white" fill="white" />
           </div>
-        </a>
+        </div>
       ) : (
         <div className="w-full h-32 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
           <VideoIcon className="h-8 w-8 text-purple-300" />
