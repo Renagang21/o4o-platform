@@ -334,12 +334,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data });
   }));
 
-  // GET /home/forum-hub - 포럼 카테고리 허브 요약 (APP-FORUM Phase 2: ForumQueryService)
-  // ?sort=default|recent|popular  ?q=검색어
+  // GET /home/forum-hub - 포럼 카테고리 허브 요약 (APP-FORUM Phase 2+4: ForumQueryService)
+  // ?sort=default|recent|popular|joined  ?q=검색어
   homeRouter.get('/forum-hub', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const sort = (req.query.sort as string) || 'default';
     const keyword = (req.query.q as string) || '';
-    const data = await forumService.listForumHub({ sort, keyword });
+    const userId = sort === 'joined' ? (req as any).user?.id : undefined;
+    const data = await forumService.listForumHub({ sort, keyword, userId });
     res.json({ success: true, data });
   }));
 

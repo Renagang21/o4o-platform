@@ -11,6 +11,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
+import { useAuth } from '../../contexts/AuthContext';
 import type { ForumHubItem } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
@@ -50,11 +51,13 @@ const gridStyles = `
   }
 `;
 
-const SORT_TABS = [
+const BASE_SORT_TABS = [
   { key: 'default', label: '전체' },
   { key: 'recent', label: '최근 활동' },
   { key: 'popular', label: '인기' },
-] as const;
+];
+
+const JOINED_TAB = { key: 'joined', label: '내가 참여한' };
 
 interface Props {
   prefetchedForums?: ForumHubItem[];
@@ -62,9 +65,11 @@ interface Props {
 }
 
 export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Props) {
+  const { isAuthenticated } = useAuth();
   const [forums, setForums] = useState<ForumHubItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<string>('default');
+  const sortTabs = isAuthenticated ? [...BASE_SORT_TABS, JOINED_TAB] : BASE_SORT_TABS;
   const [searchInput, setSearchInput] = useState('');
   const [appliedQuery, setAppliedQuery] = useState('');
   const initialLoaded = useRef(false);
@@ -93,6 +98,13 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       initialLoaded.current = true;
     }
   }, [prefetchedForums]);
+
+  // Reset to default tab if logged out while on joined tab
+  useEffect(() => {
+    if (!isAuthenticated && sort === 'joined') {
+      setSort('default');
+    }
+  }, [isAuthenticated, sort]);
 
   // Re-fetch when sort changes (after initial load)
   useEffect(() => {
@@ -149,7 +161,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       {/* Sort tabs + Search */}
       <div style={styles.toolbar}>
         <div style={styles.sortTabs}>
-          {SORT_TABS.map((tab) => (
+          {sortTabs.map((tab) => (
             <button
               key={tab.key}
               className={`forum-hub-sort-tab${sort === tab.key ? ' active' : ''}`}
@@ -202,7 +214,9 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       ) : forums.length === 0 ? (
         <div style={styles.emptyCard}>
           <p style={styles.empty}>
-            {appliedQuery ? '검색 결과가 없습니다.' : '아직 개설된 포럼이 없습니다.'}
+            {appliedQuery ? '검색 결과가 없습니다.'
+              : sort === 'joined' ? '참여한 포럼이 없습니다. 글이나 댓글을 작성하면 여기에 표시됩니다.'
+              : '아직 개설된 포럼이 없습니다.'}
           </p>
         </div>
       ) : (
