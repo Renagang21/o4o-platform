@@ -2,10 +2,11 @@
  * OperatorRoutes - 서비스 운영자 라우트 설정
  * WO-AI-SERVICE-OPERATOR-REPORT-V1: 운영자 AI 리포트 추가
  * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
+ * WO-KPA-A-OPERATOR-DASHBOARD-UX-V1: Signal 기반 대시보드 도입
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage } from '../pages/operator';
+import { KpaOperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage } from '../pages/operator';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 
 // 간단한 Operator Layout
@@ -60,8 +61,8 @@ export function OperatorRoutes() {
   return (
     <OperatorLayout>
       <Routes>
-        {/* 기본 경로 → 대시보드 */}
-        <Route index element={<OperatorDashboard />} />
+        {/* 기본 경로 → Signal 기반 대시보드 (WO-KPA-A-OPERATOR-DASHBOARD-UX-V1) */}
+        <Route index element={<KpaOperatorDashboard />} />
 
         {/* AI 리포트 */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />

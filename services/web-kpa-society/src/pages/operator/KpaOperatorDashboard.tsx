@@ -1,11 +1,11 @@
 /**
- * BranchOperatorDashboard - 분회 운영자 대시보드
+ * KpaOperatorDashboard - KPA-a 커뮤니티 운영자 대시보드
  *
- * WO-KPA-C-BRANCH-OPERATOR-DASHBOARD-UX-V1
- * WO-KPA-C-OPERATOR-DASHBOARD-UX-REFINE-V1: KPA-a 패턴 정렬
+ * WO-KPA-A-OPERATOR-DASHBOARD-UX-V1
+ * KPA-c BranchOperatorDashboard 패턴 재사용
  *
  * 구조:
- *  [ Hero Summary ]     — 분회 상태 배지 + 서브 메시지
+ *  [ Hero Summary ]     — 커뮤니티 상태 배지 (3초 판단)
  *  [ Action Signals ]   — 행동 유도 카드 3장
  *  [ Recent Activity ]  — 최근 운영 활동 5건
  */
@@ -83,6 +83,10 @@ function getContentSignal(
     status: 'good',
     message: `콘텐츠 ${totalContent}개 · 미디어 ${totalMedia}개 · 재생목록 ${totalPlaylists}개`,
   };
+}
+
+function getOperatorSignal(): Signal {
+  return { status: 'good', message: '운영자 계정 관리' };
 }
 
 // ─── Status config ───
@@ -231,7 +235,7 @@ function ActionSignalCard({
 
 // ─── Main component ───
 
-export function BranchOperatorDashboard() {
+export default function KpaOperatorDashboard() {
   const [summary, setSummary] = useState<OperatorSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -260,6 +264,7 @@ export function BranchOperatorDashboard() {
   const overall = summary ? getOverallStatus(content, signage, forum) : 'alert';
   const forumSignal = getForumSignal(forum);
   const contentSignal = getContentSignal(content, signage);
+  const operatorSignal = getOperatorSignal();
   const feed = summary ? buildActivityFeed(summary) : [];
 
   const HeroConfig = STATUS_CONFIG[overall];
@@ -270,7 +275,7 @@ export function BranchOperatorDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">운영자 대시보드</h1>
-          <p className="text-slate-500 mt-1">분회 운영 현황을 한눈에 확인하세요</p>
+          <p className="text-slate-500 mt-1">커뮤니티 운영 현황을 한눈에 확인하세요</p>
         </div>
         <button
           onClick={fetchData}
@@ -289,7 +294,7 @@ export function BranchOperatorDashboard() {
         </div>
       )}
 
-      {/* ═══ Hero Summary ═══ */}
+      {/* Hero Summary */}
       {loading && (
         <div className="rounded-2xl border border-slate-200 p-5 bg-slate-50 animate-pulse">
           <div className="h-6 bg-slate-200 rounded w-48 mb-2" />
@@ -303,7 +308,7 @@ export function BranchOperatorDashboard() {
             <HeroConfig.Icon className={`w-6 h-6 ${HeroConfig.color}`} />
             <div>
               <span className={`text-lg font-semibold ${HeroConfig.color}`}>
-                분회 운영 상태: {HeroConfig.label}
+                커뮤니티 운영 상태: {HeroConfig.label}
               </span>
               <p className={`text-sm mt-0.5 ${HeroConfig.color} opacity-80`}>{HeroConfig.subtitle}</p>
               <div className="flex gap-4 mt-1 text-sm">
@@ -319,7 +324,7 @@ export function BranchOperatorDashboard() {
         </div>
       )}
 
-      {/* ═══ Action Signal Cards ═══ */}
+      {/* Action Signal Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <ActionSignalCard
           icon={MessageSquarePlus}
@@ -346,14 +351,14 @@ export function BranchOperatorDashboard() {
           iconBg="bg-blue-100"
           iconColor="text-blue-600"
           title="운영자 상태"
-          signal={{ status: 'good', message: '운영자 계정 관리' }}
+          signal={operatorSignal}
           actionLabel="운영자 관리"
           actionHref="operators"
           loading={loading}
         />
       </div>
 
-      {/* ═══ Recent Activity ═══ */}
+      {/* Recent Activity */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
         <div className="p-5 border-b border-slate-100">
           <h2 className="text-lg font-semibold text-slate-800">최근 운영 활동</h2>
