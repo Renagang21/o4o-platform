@@ -1,9 +1,9 @@
 /**
  * Store AI Summary - Rule-based Stub
  *
- * WO-STORE-MAIN-PAGE-PHASE1-V1
+ * WO-STORE-MAIN-PAGE-PHASE1-V1 + PHASE2-A
  * Phase 1: 규칙 기반 매장 요약 생성
- * 실제 AI 모델 연동 없이 데이터 기반 텍스트 생성
+ * Phase 2-A: 승인 상태 인식 추가
  */
 
 import type { StoreMainData, AiSummaryResult } from '@/types/store-main';
@@ -40,17 +40,39 @@ export function generateStoreSummary(data: StoreMainData): AiSummaryResult {
     ? parts.join('. ') + '.'
     : '매장 현황을 확인하세요.';
 
-  // 승인 대기 알림
+  // Phase 2-A: 승인 대기 알림 (정확한 수치)
   if (summary.pendingApprovals > 0) {
     suggestions.push(`승인 대기 ${summary.pendingApprovals}건 확인`);
   }
 
+  // Phase 2-A: 반려된 항목 알림
+  const rejectedItems = expandable.filter((item) => item.approvalStatus === 'rejected');
+  if (rejectedItems.length > 0) {
+    suggestions.push(`반려된 신청 ${rejectedItems.length}건 재검토`);
+  }
+
+  // Phase 2-A: 승인 완료되어 바로 이용 가능으로 이동한 항목 알림
+  const approvedRequestItems = readyToUse.filter(
+    (item) => item.policy === 'REQUEST_REQUIRED' && item.approvalStatus === 'approved'
+  );
+  if (approvedRequestItems.length > 0) {
+    message += ` 최근 ${approvedRequestItems.length}개의 신청 상품이 승인되어 이용 가능합니다.`;
+  }
+
   // 확장 가능 상품 추천
-  if (expandable.length > 0) {
-    const requestable = expandable.filter((item) => item.policy === 'REQUEST_REQUIRED');
-    if (requestable.length > 0) {
-      suggestions.push(`신청 가능한 상품 ${requestable.length}개 확인`);
-    }
+  const requestable = expandable.filter(
+    (item) => item.policy === 'REQUEST_REQUIRED' && item.approvalStatus !== 'pending'
+  );
+  if (requestable.length > 0) {
+    suggestions.push(`신청 가능한 상품 ${requestable.length}개 확인`);
+  }
+
+  // Phase 2-A: LIMITED 조건 있는 상품 안내
+  const limitedWithConditions = expandable.filter(
+    (item) => item.policy === 'LIMITED' && item.limitedConditions && item.limitedConditions.length > 0
+  );
+  if (limitedWithConditions.length > 0) {
+    suggestions.push('한정 상품 조건 확인하기');
   }
 
   // 진열 전용 상품 활용 제안

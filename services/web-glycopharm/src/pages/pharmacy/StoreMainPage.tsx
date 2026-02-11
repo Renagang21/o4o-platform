@@ -1,17 +1,24 @@
 /**
  * StoreMainPage - 매장 메인 페이지
  *
- * WO-STORE-MAIN-PAGE-PHASE1-V1
+ * WO-STORE-MAIN-PAGE-PHASE1-V1 + PHASE2-A
  *
  * 5-block Cockpit 구조:
  * 1. 매장 현황 요약 (Status Summary)
- * 2. 바로 이용 가능 (Ready to Use: OPEN + DISPLAY_ONLY)
- * 3. 확장 가능 (Expand: REQUEST_REQUIRED + LIMITED)
+ * 2. 바로 이용 가능 (Ready to Use: OPEN + DISPLAY_ONLY + approved REQUEST_REQUIRED)
+ * 3. 확장 가능 (Expand: pending/rejected REQUEST_REQUIRED + LIMITED)
  * 4. 빠른 액션 (Quick Actions)
  * 5. AI 요약 (Rule-based Stub)
+ *
+ * Phase 2-A:
+ * - Approval status badges on REQUEST_REQUIRED items
+ * - Approved items auto-move to "바로 이용 가능"
+ * - LIMITED conditions tooltip
+ * - Refetch on window focus for real-time sync
+ * - Rejection reason display
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Store,
@@ -31,10 +38,13 @@ import {
   Tag,
   Eye,
   Lock,
+  Info,
+  XCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import { AiSummaryButton } from '@/components/ai';
-import { PRODUCT_POLICY_CONFIG } from '@/config/store-catalog';
+import { PRODUCT_POLICY_CONFIG, APPROVAL_STATUS_CONFIG } from '@/config/store-catalog';
 import { generateStoreSummary } from '@/utils/store-ai-summary';
 import type { StoreMainData, StoreCatalogItem, AiSummaryResult } from '@/types/store-main';
 
@@ -43,37 +53,55 @@ export default function StoreMainPage() {
   const [data, setData] = useState<StoreMainData | null>(null);
   const [aiSummary, setAiSummary] = useState<AiSummaryResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requiresLogin, setRequiresLogin] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
       setLoading(true);
-      setError(null);
+    }
+    setError(null);
 
-      try {
-        const res = await pharmacyApi.getStoreMain();
-        if (res.success && res.data) {
-          setData(res.data);
-          setAiSummary(generateStoreSummary(res.data));
-        }
-      } catch (err: any) {
-        console.error('Store main load error:', err);
-        if (err.status === 401) {
-          setRequiresLogin(true);
-        } else {
-          const errorMessage = typeof err.message === 'string'
-            ? err.message
-            : (err.message?.message || '데이터를 불러오는데 실패했습니다.');
-          setError(errorMessage);
-        }
-      } finally {
-        setLoading(false);
+    try {
+      const res = await pharmacyApi.getStoreMain();
+      if (res.success && res.data) {
+        setData(res.data);
+        setAiSummary(generateStoreSummary(res.data));
+      }
+    } catch (err: any) {
+      console.error('Store main load error:', err);
+      if (err.status === 401) {
+        setRequiresLogin(true);
+      } else {
+        const errorMessage = typeof err.message === 'string'
+          ? err.message
+          : (err.message?.message || '데이터를 불러오는데 실패했습니다.');
+        setError(errorMessage);
+      }
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Phase 2-A: Refetch on window focus for real-time sync
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && data) {
+        fetchData(true);
       }
     };
-
-    loadData();
-  }, []);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [fetchData, data]);
 
   if (loading) {
     return (
@@ -140,7 +168,18 @@ export default function StoreMainPage() {
             </div>
             <h2 className="text-lg font-semibold text-slate-800">매장 현황</h2>
           </div>
-          <AiSummaryButton contextLabel="매장 현황" size="sm" />
+          <div className="flex items-center gap-2">
+            {refreshing && <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />}
+            <button
+              onClick={() => fetchData(true)}
+              disabled={refreshing}
+              className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
+              title="새로고침"
+            >
+              <RefreshCw className="w-4 h-4 text-slate-400" />
+            </button>
+            <AiSummaryButton contextLabel="매장 현황" size="sm" />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -160,7 +199,10 @@ export default function StoreMainPage() {
             <p className="text-sm text-slate-500">주문 가능 상품</p>
           </div>
 
-          <div className="p-4 bg-white border border-slate-200 rounded-xl">
+          <NavLink
+            to="/pharmacy/store-apply"
+            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all"
+          >
             <div className="flex items-center justify-between mb-2">
               <Clock className="w-6 h-6 text-slate-500" />
               {summary.pendingApprovals > 0 && (
@@ -171,7 +213,7 @@ export default function StoreMainPage() {
             </div>
             <p className="text-2xl font-bold text-slate-800">{summary.pendingApprovals}</p>
             <p className="text-sm text-slate-500">승인 대기</p>
-          </div>
+          </NavLink>
 
           <div className="p-4 bg-white border border-slate-200 rounded-xl">
             <div className="flex items-center justify-between mb-2">
@@ -303,9 +345,13 @@ export default function StoreMainPage() {
   );
 }
 
-/** 카탈로그 상품 행 컴포넌트 */
+/** 카탈로그 상품 행 컴포넌트 (Phase 2-A enhanced) */
 function CatalogItemRow({ item, showAction }: { item: StoreCatalogItem; showAction?: boolean }) {
+  const [showConditions, setShowConditions] = useState(false);
   const policyConfig = PRODUCT_POLICY_CONFIG[item.policy];
+  const approvalConfig = item.approvalStatus && item.approvalStatus !== 'none'
+    ? APPROVAL_STATUS_CONFIG[item.approvalStatus]
+    : null;
 
   const PolicyIcon = item.policy === 'OPEN' ? CheckCircle
     : item.policy === 'DISPLAY_ONLY' ? Eye
@@ -313,46 +359,101 @@ function CatalogItemRow({ item, showAction }: { item: StoreCatalogItem; showActi
     : Lock;
 
   return (
-    <div className="flex items-center justify-between py-3">
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        {/* Policy badge */}
-        <span className={`inline-flex items-center gap-1 px-2 py-1 ${policyConfig.badgeColor} ${policyConfig.textColor} text-xs font-medium rounded-full whitespace-nowrap flex-shrink-0`}>
-          <PolicyIcon className="w-3 h-3" />
-          {policyConfig.label}
-        </span>
+    <div className="py-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {/* Policy badge */}
+          <span className={`inline-flex items-center gap-1 px-2 py-1 ${policyConfig.badgeColor} ${policyConfig.textColor} text-xs font-medium rounded-full whitespace-nowrap flex-shrink-0`}>
+            <PolicyIcon className="w-3 h-3" />
+            {policyConfig.label}
+          </span>
 
-        {/* Product info */}
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-slate-800 truncate">{item.name}</p>
-          <p className="text-xs text-slate-400">{item.categoryName}</p>
+          {/* Phase 2-A: Approval status badge */}
+          {approvalConfig && (
+            <span className={`inline-flex items-center gap-1 px-2 py-1 ${approvalConfig.badgeColor} ${approvalConfig.textColor} text-xs font-medium rounded-full whitespace-nowrap flex-shrink-0`}>
+              {item.approvalStatus === 'pending' && <Clock className="w-3 h-3" />}
+              {item.approvalStatus === 'approved' && <CheckCircle className="w-3 h-3" />}
+              {item.approvalStatus === 'rejected' && <XCircle className="w-3 h-3" />}
+              {approvalConfig.label}
+            </span>
+          )}
+
+          {/* Product info */}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-slate-800 truncate">{item.name}</p>
+            <p className="text-xs text-slate-400">{item.categoryName}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Price */}
+          {item.price != null && (
+            <span className="text-sm font-medium text-slate-700">
+              {item.price.toLocaleString()}원
+            </span>
+          )}
+
+          {/* Phase 2-A: LIMITED conditions button */}
+          {item.policy === 'LIMITED' && item.limitedConditions && item.limitedConditions.length > 0 && (
+            <button
+              onClick={() => setShowConditions(!showConditions)}
+              className="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-600 text-xs font-medium rounded-full hover:bg-purple-100 transition-colors"
+              title="조건 보기"
+            >
+              <Info className="w-3 h-3" />
+              조건 있음
+            </button>
+          )}
+
+          {/* LIMITED badge (no conditions) */}
+          {item.policy === 'LIMITED' && (!item.limitedConditions || item.limitedConditions.length === 0) && (
+            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+              한정
+            </span>
+          )}
+
+          {/* Action button for REQUEST_REQUIRED (pending or none) */}
+          {showAction && item.policy === 'REQUEST_REQUIRED' && item.approvalStatus !== 'approved' && item.approvalStatus !== 'pending' && (
+            <NavLink
+              to="/pharmacy/store-apply"
+              className="px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              신청하기
+            </NavLink>
+          )}
+
+          {/* Pending status: show waiting indicator instead of action */}
+          {showAction && item.policy === 'REQUEST_REQUIRED' && item.approvalStatus === 'pending' && (
+            <span className="px-3 py-1.5 bg-amber-50 text-amber-600 text-xs font-medium rounded-lg">
+              심사 중
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {/* Price */}
-        {item.price != null && (
-          <span className="text-sm font-medium text-slate-700">
-            {item.price.toLocaleString()}원
-          </span>
-        )}
+      {/* Phase 2-A: Rejection reason */}
+      {item.approvalStatus === 'rejected' && item.rejectionReason && (
+        <div className="mt-2 ml-[4.5rem] p-2 bg-red-50 border border-red-100 rounded-lg">
+          <p className="text-xs text-red-600">
+            <span className="font-medium">반려 사유:</span> {item.rejectionReason}
+          </p>
+        </div>
+      )}
 
-        {/* Action button for REQUEST_REQUIRED */}
-        {showAction && item.policy === 'REQUEST_REQUIRED' && (
-          <NavLink
-            to="/pharmacy/store-apply"
-            className="px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            신청하기
-          </NavLink>
-        )}
-
-        {/* Limited badge */}
-        {item.policy === 'LIMITED' && (
-          <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-            한정
-          </span>
-        )}
-      </div>
+      {/* Phase 2-A: LIMITED conditions detail (toggle) */}
+      {showConditions && item.limitedConditions && (
+        <div className="mt-2 ml-[4.5rem] p-3 bg-purple-50 border border-purple-100 rounded-lg">
+          <p className="text-xs font-medium text-purple-700 mb-2">판매 조건</p>
+          <ul className="space-y-1">
+            {item.limitedConditions.map((cond, idx) => (
+              <li key={idx} className="text-xs text-purple-600 flex items-start gap-1.5">
+                <span className="mt-0.5 w-1 h-1 bg-purple-400 rounded-full flex-shrink-0" />
+                <span><span className="font-medium">{cond.label}:</span> {cond.description}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

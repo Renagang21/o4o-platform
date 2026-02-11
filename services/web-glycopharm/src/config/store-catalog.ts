@@ -1,12 +1,11 @@
 /**
  * Store Catalog Config
  *
- * WO-STORE-MAIN-PAGE-PHASE1-V1
- * Phase 1: 프론트엔드 하드코딩 카탈로그 (DB 테이블 없음)
- * 상품 카테고리별 Product Policy 매핑
+ * WO-STORE-MAIN-PAGE-PHASE1-V1 + PHASE2-A
+ * Product Policy 설정 및 승인 상태 표시 설정
  */
 
-import type { ProductPolicy, ProductPolicyConfig, StoreCatalogItem } from '@/types/store-main';
+import type { ProductPolicy, ProductPolicyConfig, ApprovalStatus } from '@/types/store-main';
 
 /** Product Policy 설정 맵 */
 export const PRODUCT_POLICY_CONFIG: Record<ProductPolicy, ProductPolicyConfig> = {
@@ -40,89 +39,14 @@ export const PRODUCT_POLICY_CONFIG: Record<ProductPolicy, ProductPolicyConfig> =
   },
 };
 
-/**
- * Phase 1 기본 카탈로그 상품 목록
- * 실제 운영 시 API 응답으로 대체됨
- */
-export const DEFAULT_CATALOG: StoreCatalogItem[] = [
-  // OPEN - 자유 판매
-  {
-    id: 'cat-001',
-    name: '혈당측정지 (일반)',
-    categoryName: '당뇨 소모품',
-    policy: 'OPEN',
-    price: 15000,
-    status: 'available',
-  },
-  {
-    id: 'cat-002',
-    name: '인슐린 주사바늘',
-    categoryName: '당뇨 소모품',
-    policy: 'OPEN',
-    price: 12000,
-    status: 'available',
-  },
-  {
-    id: 'cat-003',
-    name: '건강기능식품 A',
-    categoryName: '건강기능식품',
-    policy: 'OPEN',
-    price: 35000,
-    status: 'available',
-  },
-  // DISPLAY_ONLY - 진열 전용
-  {
-    id: 'cat-004',
-    name: '브랜드 홍보 키트',
-    categoryName: '홍보물',
-    policy: 'DISPLAY_ONLY',
-    status: 'display_only',
-  },
-  {
-    id: 'cat-005',
-    name: '신제품 샘플 세트',
-    categoryName: '샘플',
-    policy: 'DISPLAY_ONLY',
-    status: 'display_only',
-  },
-  // REQUEST_REQUIRED - 신청 필요
-  {
-    id: 'cat-006',
-    name: '처방연계 혈당관리 프로그램',
-    categoryName: '처방 연계',
-    policy: 'REQUEST_REQUIRED',
-    price: 89000,
-    status: 'request_needed',
-  },
-  {
-    id: 'cat-007',
-    name: 'B2B 전용 도매 상품',
-    categoryName: 'B2B',
-    policy: 'REQUEST_REQUIRED',
-    price: 250000,
-    status: 'request_needed',
-  },
-  // LIMITED - 한정 판매
-  {
-    id: 'cat-008',
-    name: '신규 런칭 프로모션 세트',
-    categoryName: '프로모션',
-    policy: 'LIMITED',
-    price: 49000,
-    status: 'limited',
-  },
-];
-
-/** Ready to Use 카탈로그 (OPEN + DISPLAY_ONLY) */
-export function getReadyToUseCatalog(): StoreCatalogItem[] {
-  return DEFAULT_CATALOG.filter(
-    (item) => item.policy === 'OPEN' || item.policy === 'DISPLAY_ONLY'
-  );
-}
-
-/** Expandable 카탈로그 (REQUEST_REQUIRED + LIMITED) */
-export function getExpandableCatalog(): StoreCatalogItem[] {
-  return DEFAULT_CATALOG.filter(
-    (item) => item.policy === 'REQUEST_REQUIRED' || item.policy === 'LIMITED'
-  );
-}
+/** Phase 2-A: 승인 상태 표시 설정 */
+export const APPROVAL_STATUS_CONFIG: Record<ApprovalStatus, {
+  label: string;
+  badgeColor: string;
+  textColor: string;
+}> = {
+  none: { label: '', badgeColor: '', textColor: '' },
+  pending: { label: '승인 대기', badgeColor: 'bg-amber-50', textColor: 'text-amber-600' },
+  approved: { label: '승인 완료', badgeColor: 'bg-green-50', textColor: 'text-green-600' },
+  rejected: { label: '반려', badgeColor: 'bg-red-50', textColor: 'text-red-600' },
+};

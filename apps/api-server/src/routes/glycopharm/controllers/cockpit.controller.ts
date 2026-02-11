@@ -352,7 +352,12 @@ export function createCockpitController(
   /**
    * GET /pharmacy/cockpit/store-main
    * Store main page data (summary + catalog by product policy)
-   * WO-STORE-MAIN-PAGE-PHASE1-V1
+   * WO-STORE-MAIN-PAGE-PHASE1-V1 + PHASE2-A
+   *
+   * Phase 2-A changes:
+   * - Approval status on REQUEST_REQUIRED items (approved → readyToUse, pending/rejected → expandable)
+   * - LIMITED conditions attached to LIMITED items
+   * - Accurate summary counts based on approval state
    */
   router.get(
     '/store-main',
@@ -385,30 +390,81 @@ export function createCockpitController(
           activeChannels = 1; // web always on
         }
 
-        // Count pending applications
+        // Count pending applications (accurate count for summary)
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
         const pendingApprovals = await applicationRepo
           .createQueryBuilder('app')
           .where('app.userId = :userId', { userId })
-          .andWhere('app.status IN (:...statuses)', { statuses: ['submitted', 'reviewing'] })
+          .andWhere('app.status = :status', { status: 'submitted' })
           .getCount();
 
-        // Product policy catalog (Phase 1: hard-coded)
-        const readyToUse = [
-          { id: 'cat-001', name: '혈당측정지 (일반)', categoryName: '당뇨 소모품', policy: 'OPEN', price: 15000, status: 'available' },
-          { id: 'cat-002', name: '인슐린 주사바늘', categoryName: '당뇨 소모품', policy: 'OPEN', price: 12000, status: 'available' },
-          { id: 'cat-003', name: '건강기능식품 A', categoryName: '건강기능식품', policy: 'OPEN', price: 35000, status: 'available' },
-          { id: 'cat-004', name: '브랜드 홍보 키트', categoryName: '홍보물', policy: 'DISPLAY_ONLY', status: 'display_only' },
-          { id: 'cat-005', name: '신제품 샘플 세트', categoryName: '샘플', policy: 'DISPLAY_ONLY', status: 'display_only' },
+        // Get latest application to determine approval state for REQUEST_REQUIRED items
+        const latestApplication = await applicationRepo.findOne({
+          where: { userId },
+          order: { createdAt: 'DESC' },
+        });
+        const appStatus = latestApplication?.status || 'none';
+        const rejectionReason = latestApplication?.rejectionReason || undefined;
+
+        // Phase 2-A: Determine approval status for REQUEST_REQUIRED items
+        type ApprovalStatus = 'none' | 'pending' | 'approved' | 'rejected';
+        let requestApproval: ApprovalStatus = 'none';
+        if (appStatus === 'submitted') requestApproval = 'pending';
+        else if (appStatus === 'approved') requestApproval = 'approved';
+        else if (appStatus === 'rejected') requestApproval = 'rejected';
+
+        // Base catalog items with approval status
+        const openItems = [
+          { id: 'cat-001', name: '혈당측정지 (일반)', categoryName: '당뇨 소모품', policy: 'OPEN', price: 15000, status: 'available', approvalStatus: 'none' as ApprovalStatus },
+          { id: 'cat-002', name: '인슐린 주사바늘', categoryName: '당뇨 소모품', policy: 'OPEN', price: 12000, status: 'available', approvalStatus: 'none' as ApprovalStatus },
+          { id: 'cat-003', name: '건강기능식품 A', categoryName: '건강기능식품', policy: 'OPEN', price: 35000, status: 'available', approvalStatus: 'none' as ApprovalStatus },
         ];
 
-        const expandable = [
-          { id: 'cat-006', name: '처방연계 혈당관리 프로그램', categoryName: '처방 연계', policy: 'REQUEST_REQUIRED', price: 89000, status: 'request_needed' },
-          { id: 'cat-007', name: 'B2B 전용 도매 상품', categoryName: 'B2B', policy: 'REQUEST_REQUIRED', price: 250000, status: 'request_needed' },
-          { id: 'cat-008', name: '신규 런칭 프로모션 세트', categoryName: '프로모션', policy: 'LIMITED', price: 49000, status: 'limited' },
+        const displayItems = [
+          { id: 'cat-004', name: '브랜드 홍보 키트', categoryName: '홍보물', policy: 'DISPLAY_ONLY', status: 'display_only', approvalStatus: 'none' as ApprovalStatus },
+          { id: 'cat-005', name: '신제품 샘플 세트', categoryName: '샘플', policy: 'DISPLAY_ONLY', status: 'display_only', approvalStatus: 'none' as ApprovalStatus },
         ];
 
-        const orderableProducts = readyToUse.filter((p) => p.policy === 'OPEN').length;
+        const requestItems = [
+          {
+            id: 'cat-006', name: '처방연계 혈당관리 프로그램', categoryName: '처방 연계',
+            policy: 'REQUEST_REQUIRED', price: 89000,
+            status: requestApproval === 'approved' ? 'available' : 'request_needed',
+            approvalStatus: requestApproval,
+            ...(requestApproval === 'rejected' && rejectionReason ? { rejectionReason } : {}),
+          },
+          {
+            id: 'cat-007', name: 'B2B 전용 도매 상품', categoryName: 'B2B',
+            policy: 'REQUEST_REQUIRED', price: 250000,
+            status: requestApproval === 'approved' ? 'available' : 'request_needed',
+            approvalStatus: requestApproval,
+            ...(requestApproval === 'rejected' && rejectionReason ? { rejectionReason } : {}),
+          },
+        ];
+
+        const limitedItems = [
+          {
+            id: 'cat-008', name: '신규 런칭 프로모션 세트', categoryName: '프로모션',
+            policy: 'LIMITED', price: 49000, status: 'limited',
+            approvalStatus: 'none' as ApprovalStatus,
+            limitedConditions: [
+              { type: 'period', label: '기간 제한', description: '2026년 3월 31일까지 판매' },
+              { type: 'quantity', label: '수량 제한', description: '약국당 최대 50세트' },
+            ],
+          },
+        ];
+
+        // Phase 2-A: Route items based on approval status
+        // approved REQUEST_REQUIRED → readyToUse
+        // pending/rejected/none REQUEST_REQUIRED → expandable
+        const approvedRequestItems = requestItems.filter((i) => i.approvalStatus === 'approved');
+        const pendingRequestItems = requestItems.filter((i) => i.approvalStatus !== 'approved');
+
+        const readyToUse = [...openItems, ...displayItems, ...approvedRequestItems];
+        const expandable = [...pendingRequestItems, ...limitedItems];
+
+        // Accurate counts: orderable = OPEN items + approved REQUEST_REQUIRED
+        const orderableProducts = openItems.length + approvedRequestItems.length;
 
         res.json({
           success: true,
