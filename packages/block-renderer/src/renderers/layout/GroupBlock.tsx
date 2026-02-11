@@ -88,7 +88,7 @@ export const GroupBlock: React.FC<BlockRendererProps> = ({ block }) => {
     }
   }
 
-  const Tag = tagName as keyof JSX.IntrinsicElements;
+  const Tag = tagName as React.ElementType;
 
   return (
     <Tag className={groupClasses} style={style}>
