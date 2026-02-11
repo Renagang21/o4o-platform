@@ -139,6 +139,11 @@ export interface Course {
   level: 'beginner' | 'intermediate' | 'advanced';
   status: 'draft' | 'published' | 'archived';
   createdAt: string;
+  isPaid?: boolean;
+  price?: number;
+  credits?: number;
+  tags?: string[];
+  instructor?: { id: string; name: string; avatar?: string };
 }
 
 export interface Lesson {
@@ -151,6 +156,8 @@ export interface Lesson {
   videoUrl?: string;
   content?: string;
   isPreview: boolean;
+  isFree?: boolean;
+  type?: 'video' | 'article' | 'quiz' | 'assignment' | 'live';
 }
 
 export interface Enrollment {
@@ -162,6 +169,7 @@ export interface Enrollment {
   completedLessons: string[];
   startedAt: string;
   completedAt?: string;
+  status?: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'cancelled' | 'expired';
 }
 
 export interface Certificate {

@@ -13,6 +13,9 @@ import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from '.
 // LMS pages
 import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
 
+// Course pages (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO
+import { CourseHubPage, CourseIntroPage } from './pages/courses';
+
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
 
@@ -361,6 +364,10 @@ function App() {
           <Route path="/news/promo" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
+
+          {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}
+          <Route path="/courses" element={<Layout serviceName={SERVICE_NAME}><CourseHubPage /></Layout>} />
+          <Route path="/courses/:courseId" element={<Layout serviceName={SERVICE_NAME}><CourseIntroPage /></Layout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />
