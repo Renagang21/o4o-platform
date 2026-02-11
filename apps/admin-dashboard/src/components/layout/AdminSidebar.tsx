@@ -44,7 +44,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   }
 
   // Recursive menu item renderer with depth tracking
-  const renderMenuItem = (item: MenuItem, depth: number = 0): JSX.Element | null => {
+  const renderMenuItem = (item: MenuItem, depth: number = 0): React.JSX.Element | null => {
     if (item.separator) {
       return <div key={item.id} className="my-2 border-t border-[#444]" />
     }

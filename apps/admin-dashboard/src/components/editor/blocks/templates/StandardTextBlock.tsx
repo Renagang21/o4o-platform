@@ -56,9 +56,9 @@ export interface StandardTextBlockProps {
   /** Block type */
   blockType: 'paragraph' | 'heading' | 'quote' | 'list' | 'code';
   /** Custom element renderer */
-  renderElement: (props: RenderElementProps) => JSX.Element;
+  renderElement: (props: RenderElementProps) => React.JSX.Element;
   /** Custom leaf renderer (optional, defaults to DefaultLeafRenderer) */
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element;
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element;
   /** Placeholder text */
   placeholder?: string;
   /** Additional CSS class */
@@ -190,8 +190,8 @@ interface MemoizedSlateEditorProps {
   editor: any;
   initialValue: Descendant[];
   handleChange: (newValue: Descendant[]) => void;
-  renderElement: (props: RenderElementProps) => JSX.Element;
-  renderLeaf: (props: RenderLeafProps) => JSX.Element;
+  renderElement: (props: RenderElementProps) => React.JSX.Element;
+  renderLeaf: (props: RenderLeafProps) => React.JSX.Element;
   handleKeyDown: (event: React.KeyboardEvent) => void;
   placeholder?: string;
 }

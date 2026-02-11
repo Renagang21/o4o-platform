@@ -118,7 +118,7 @@ const GroupBlock: React.FC<GroupBlockProps> = ({
   }, [onInnerBlocksChange]);
 
   // Create element based on tagName
-  const TagName = tagName as keyof JSX.IntrinsicElements;
+  const TagName = tagName as React.ElementType;
 
   // Extract required props for EnhancedBlockWrapper
   const {

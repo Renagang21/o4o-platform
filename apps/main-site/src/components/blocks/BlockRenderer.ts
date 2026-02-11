@@ -18,4 +18,4 @@ export interface BlockRendererProps {
   children?: ReactNode;
 }
 
-export type BlockRenderer = (props: BlockRendererProps) => JSX.Element | null;
+export type BlockRenderer = (props: BlockRendererProps) => React.JSX.Element | null;

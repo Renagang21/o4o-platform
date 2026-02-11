@@ -19,7 +19,7 @@ export default function Heading({
   color = '#000000',
   className = '',
 }: HeadingProps) {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level}` as React.ElementType;
 
   const sizeClasses = {
     1: 'text-4xl font-bold',

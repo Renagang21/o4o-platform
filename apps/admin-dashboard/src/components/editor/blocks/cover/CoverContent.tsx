@@ -325,7 +325,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
 
     switch (block.type) {
       case 'o4o/heading':
-        const HeadingTag = `h${attributes.level || 2}` as keyof JSX.IntrinsicElements;
+        const HeadingTag = `h${attributes.level || 2}` as React.ElementType;
         return (
           <div key={block.id} className="relative group" onClick={handleBlockClick}>
             <HeadingTag

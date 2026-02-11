@@ -93,7 +93,7 @@ const renderBlock = (block: Block, index: number) => {
       );
     case 'heading':
       const level = (block.attributes?.level as number) || 2;
-      const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
+      const HeadingTag = `h${level}` as React.ElementType;
       const headingClasses: Record<number, string> = {
         1: 'text-3xl font-bold',
         2: 'text-2xl font-semibold',

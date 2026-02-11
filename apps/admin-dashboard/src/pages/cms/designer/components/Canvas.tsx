@@ -229,7 +229,7 @@ function CanvasNode({ node }: { node: DesignerNode }) {
         );
 
       case 'Heading':
-        const HeadingTag = `h${node.props.level || 2}` as keyof JSX.IntrinsicElements;
+        const HeadingTag = `h${node.props.level || 2}` as React.ElementType;
         return (
           <HeadingTag className={node.props.className || 'text-2xl font-bold'}>
             {node.props.content || 'Heading'}

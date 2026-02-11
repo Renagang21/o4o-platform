@@ -46,7 +46,7 @@ const HeadingBlock: React.FC<{ block: Block }> = ({ block }) => {
     ? block.attributes.level
     : 2) as 1 | 2 | 3 | 4 | 5 | 6;
 
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level}` as React.ElementType;
   const sizeClasses: Record<1 | 2 | 3 | 4 | 5 | 6, string> = {
     1: 'text-3xl font-bold',
     2: 'text-2xl font-semibold',

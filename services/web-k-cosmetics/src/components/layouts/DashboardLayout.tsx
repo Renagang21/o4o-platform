@@ -140,7 +140,7 @@ const icons = {
   ),
 };
 
-type IconType = (props: { className?: string }) => JSX.Element;
+type IconType = (props: { className?: string }) => React.JSX.Element;
 
 interface MenuItem {
   path: string;

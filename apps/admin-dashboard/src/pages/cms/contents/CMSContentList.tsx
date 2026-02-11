@@ -139,7 +139,7 @@ export default function CMSContentList() {
   };
 
   const getTypeBadge = (type: ContentType) => {
-    const badges: Record<ContentType, { bg: string; icon: JSX.Element }> = {
+    const badges: Record<ContentType, { bg: string; icon: React.JSX.Element }> = {
       hero: { bg: 'bg-blue-100 text-blue-800', icon: <Layout className="w-3 h-3" /> },
       notice: { bg: 'bg-purple-100 text-purple-800', icon: <FileText className="w-3 h-3" /> },
       news: { bg: 'bg-cyan-100 text-cyan-800', icon: <FileText className="w-3 h-3" /> },

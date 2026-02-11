@@ -39,7 +39,7 @@ const REPORT_TYPE_LABELS: Record<string, string> = {
   AFFILIATION_CHANGE: '소속 변경',
 };
 
-export function YaksaReportListPage(): JSX.Element {
+export function YaksaReportListPage(): React.JSX.Element {
   const [reports, setReports] = useState<YaksaReport[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);

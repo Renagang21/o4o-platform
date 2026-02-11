@@ -407,7 +407,7 @@ function ContentRenderer({ content }: { content: any[] }) {
               </p>
             );
           case 'heading':
-            const HeadingTag = `h${block.attrs?.level || 2}` as keyof JSX.IntrinsicElements;
+            const HeadingTag = `h${block.attrs?.level || 2}` as React.ElementType;
             return (
               <HeadingTag
                 key={index}

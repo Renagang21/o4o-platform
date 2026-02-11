@@ -295,7 +295,7 @@ interface MemoizedSlateEditorProps {
   editor: any;
   initialValue: Descendant[];
   handleChange: (newValue: Descendant[]) => void;
-  renderElement: (props: RenderElementProps) => JSX.Element;
+  renderElement: (props: RenderElementProps) => React.JSX.Element;
   handleKeyDown: (event: React.KeyboardEvent) => void;
   placeholder: string;
 }

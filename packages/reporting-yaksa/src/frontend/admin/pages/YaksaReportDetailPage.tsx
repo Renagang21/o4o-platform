@@ -86,7 +86,7 @@ interface YaksaReportDetailPageProps {
   reportId: string;
 }
 
-export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps): JSX.Element {
+export function YaksaReportDetailPage({ reportId }: YaksaReportDetailPageProps): React.JSX.Element {
   const [report, setReport] = useState<YaksaReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

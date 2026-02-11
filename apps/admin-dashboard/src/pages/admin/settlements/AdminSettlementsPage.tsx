@@ -117,7 +117,7 @@ export const AdminSettlementsPage: React.FC = () => {
   const getStatusBadge = (status: SettlementStatus) => {
     const normalizedStatus = status.toLowerCase();
 
-    const badges: Record<string, JSX.Element> = {
+    const badges: Record<string, React.JSX.Element> = {
       pending: <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">정산 준비중</span>,
       open: <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">정산 준비중</span>,
       processing: <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">지급 진행중</span>,
@@ -132,7 +132,7 @@ export const AdminSettlementsPage: React.FC = () => {
 
   // PartyType badge
   const getPartyTypeBadge = (partyType: SettlementPartyType) => {
-    const badges: Record<SettlementPartyType, JSX.Element> = {
+    const badges: Record<SettlementPartyType, React.JSX.Element> = {
       seller: <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">판매자</span>,
       supplier: <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">공급사</span>,
       platform: <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">플랫폼</span>,

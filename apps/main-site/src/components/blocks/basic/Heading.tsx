@@ -21,7 +21,7 @@ const sizeClasses = {
 
 export const HeadingBlock = ({ node }: BlockRendererProps) => {
   const { text = 'Heading', level = 2, align = 'left', color } = node.props;
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level}` as React.ElementType;
 
   return (
     <Tag
