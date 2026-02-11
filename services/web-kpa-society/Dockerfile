@@ -25,6 +25,7 @@ COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/ui/package.json ./packages/ui/
+COPY packages/operator-core/package.json ./packages/operator-core/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -39,6 +40,7 @@ COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/ui/ ./packages/ui/
+COPY packages/operator-core/ ./packages/operator-core/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
