@@ -24,13 +24,6 @@
     "tsup": "^8.0.1",
     "typescript": "5.4.5"
   },
-  "peerDependencies": {
-    "@wordpress/block-editor": "*",
-    "@wordpress/blocks": "*",
-    "@wordpress/components": "*",
-    "@wordpress/element": "*",
-    "@wordpress/i18n": "*"
-  },
   "files": [
     "dist",
     "types"
