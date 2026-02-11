@@ -75,7 +75,6 @@ const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
 
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
-const OperatorDashboard = lazy(() => import('@/pages/operator/OperatorDashboard'));
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDetailPage'));
@@ -348,8 +347,6 @@ function AppRoutes() {
       >
         {/* Signal 기반 대시보드 (WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1) */}
         <Route index element={<GlycoPharmOperatorDashboard />} />
-        {/* Legacy Cockpit — 상세 관제 */}
-        <Route path="cockpit" element={<OperatorDashboard />} />
         {/* Semi-Franchise Management */}
         <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="applications" element={<ApplicationsPage />} />

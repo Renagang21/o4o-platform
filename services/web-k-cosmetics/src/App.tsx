@@ -65,7 +65,6 @@ const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPag
 
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
-const OperatorIndex = lazy(() => import('@/pages/operator/index'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
 const OperatorApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
@@ -206,8 +205,6 @@ function AppRoutes() {
       >
         {/* Signal 기반 대시보드 (WO-K-COSMETICS-OPERATOR-DASHBOARD-UX-V1) */}
         <Route index element={<KCosmeticsOperatorDashboard />} />
-        {/* Legacy 대시보드 — 상세 현황 */}
-        <Route path="overview" element={<OperatorIndex />} />
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="products" element={<OperatorProductsPage />} />
