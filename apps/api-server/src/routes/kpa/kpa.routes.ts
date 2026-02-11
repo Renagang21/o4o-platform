@@ -30,6 +30,7 @@ import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createBranchAdminDashboardController } from './controllers/branch-admin-dashboard.controller.js';
+import { createBranchPublicController } from './controllers/branch-public.controller.js';
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
@@ -170,6 +171,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
   router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
+
+  // Branch Public routes — read-only endpoints for /branch-services/:branchId pages
+  router.use('/branches', createBranchPublicController(dataSource));
 
   // Operator Summary routes (운영자 실사용 화면 1단계)
   router.use('/operator', createOperatorSummaryController(dataSource, {

@@ -31,6 +31,7 @@ import {
 
 // 분회 목록 (실제로는 API에서 가져옴)
 const BRANCH_NAMES: Record<string, string> = {
+  'demo': '데모',
   'gangnam': '강남',
   'gangbuk': '강북',
   'gangdong': '강동',

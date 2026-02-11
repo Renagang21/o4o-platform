@@ -13,19 +13,41 @@
  * NOTE: /demo/* 링크 금지. basePath는 BranchContext에서 가져옴.
  */
 
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useBranchContext } from '../../contexts/BranchContext';
+import { branchApi } from '../../api/branch';
 
-// Mock data (실제로는 API에서 가져옴)
-const mockBranchNews = [
-  { id: 1, title: '12월 정기 모임 안내', date: '2024-12-18' },
-  { id: 2, title: '송년회 일정 공지', date: '2024-12-15' },
-  { id: 3, title: '분회장 인사말씀', date: '2024-12-10' },
-];
+interface NewsItem {
+  id: string;
+  title: string;
+  date: string;
+}
 
 export function BranchDashboardPage() {
+  const { branchId } = useParams<{ branchId: string }>();
   const { branchName, basePath } = useBranchContext();
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!branchId) return;
+    setNewsLoading(true);
+    branchApi.getNews(branchId, { limit: 3 })
+      .then((res) => {
+        const items = (res.data?.items || []).map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          date: (item.created_at || item.createdAt || '').slice(0, 10),
+        }));
+        setNews(items);
+      })
+      .catch(() => {
+        setNews([]);
+      })
+      .finally(() => setNewsLoading(false));
+  }, [branchId]);
 
   // 빠른 이동 카드 (WO T6-1 표준: 소식, 자료실, 커뮤니티, 문의)
   const shortcuts = [
@@ -65,12 +87,16 @@ export function BranchDashboardPage() {
           <h2 style={styles.sectionTitle}>최근 공지</h2>
           <Link to={`${basePath}/news`} style={styles.moreLink}>더보기 →</Link>
         </div>
-        {mockBranchNews.length > 0 ? (
+        {newsLoading ? (
           <div style={styles.newsCard}>
-            {mockBranchNews.map((news) => (
-              <Link key={news.id} to={`${basePath}/news/${news.id}`} style={styles.newsItem}>
-                <span style={styles.newsTitle}>{news.title}</span>
-                <span style={styles.newsDate}>{news.date}</span>
+            <div style={{ padding: '16px 0', color: colors.neutral400, fontSize: '14px' }}>불러오는 중...</div>
+          </div>
+        ) : news.length > 0 ? (
+          <div style={styles.newsCard}>
+            {news.map((item) => (
+              <Link key={item.id} to={`${basePath}/news/${item.id}`} style={styles.newsItem}>
+                <span style={styles.newsTitle}>{item.title}</span>
+                <span style={styles.newsDate}>{item.date}</span>
               </Link>
             ))}
           </div>
