@@ -63,16 +63,17 @@ export class ForumQueryService {
       return this.listForumHubJoined(userId, keyword);
     }
 
+    // Pinned categories always come first, then pinnedOrder, then sort-specific order
     let orderBy: string;
     switch (sort) {
       case 'recent':
-        orderBy = 'MAX(p.created_at) DESC NULLS LAST, c."isPinned" DESC';
+        orderBy = 'c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST, MAX(p.created_at) DESC NULLS LAST';
         break;
       case 'popular':
-        orderBy = 'c."postCount" DESC, c."isPinned" DESC';
+        orderBy = 'c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST, c."postCount" DESC';
         break;
       default:
-        orderBy = 'c."isPinned" DESC, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST';
+        orderBy = 'c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST';
     }
 
     if (this.config.scope === 'community') {
@@ -96,7 +97,7 @@ export class ForumQueryService {
         FROM forum_category c
         LEFT JOIN forum_post p ON p."categoryId" = c.id
           AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c.organization_id IS NULL ${keywordFilter}
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id IS NULL ${keywordFilter}
         GROUP BY c.id
         ORDER BY ${orderBy}
       `, params);
@@ -123,7 +124,7 @@ export class ForumQueryService {
       FROM forum_category c
       LEFT JOIN forum_post p ON p."categoryId" = c.id
         AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c.organization_id = $1 ${keywordFilter}
+      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id = $1 ${keywordFilter}
       GROUP BY c.id
       ORDER BY ${orderBy}
     `, params);
@@ -166,7 +167,7 @@ export class ForumQueryService {
         INNER JOIN my_categories mc ON mc.id = c.id
         LEFT JOIN forum_post p ON p."categoryId" = c.id
           AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c.organization_id IS NULL ${keywordFilter}
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id IS NULL ${keywordFilter}
         GROUP BY c.id
         ORDER BY MAX(p.created_at) DESC NULLS LAST
       `, params);
@@ -204,7 +205,7 @@ export class ForumQueryService {
       INNER JOIN my_categories mc ON mc.id = c.id
       LEFT JOIN forum_post p ON p."categoryId" = c.id
         AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c.organization_id = $1 ${keywordFilter}
+      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id = $1 ${keywordFilter}
       GROUP BY c.id
       ORDER BY MAX(p.created_at) DESC NULLS LAST
     `, params);
@@ -260,7 +261,7 @@ export class ForumQueryService {
           LIMIT $1
         ) lp
         LEFT JOIN users u ON lp.author_id = u.id
-        WHERE c."isActive" = true AND c.organization_id IS NULL
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id IS NULL
         ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
                  c."sortOrder" ASC, c.name ASC
       `, [limit]);
@@ -297,7 +298,7 @@ export class ForumQueryService {
         LIMIT $1
       ) lp
       LEFT JOIN users u ON lp.author_id = u.id
-      WHERE c."isActive" = true AND c.organization_id = $2
+      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id = $2
       ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
                c."sortOrder" ASC, c.name ASC
     `, [limit, this.config.organizationId]);

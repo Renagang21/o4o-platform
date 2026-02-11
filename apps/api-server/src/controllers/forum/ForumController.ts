@@ -411,9 +411,21 @@ export class ForumController {
         return;
       }
 
+      // Only decrement postCount if post was previously published
+      const wasPuslished = post.status === PostStatus.PUBLISHED;
+
       // Archive instead of hard delete
       post.status = PostStatus.ARCHIVED;
       await this.postRepository.save(post);
+
+      // Decrement category postCount
+      if (wasPuslished && post.categoryId) {
+        const category = await this.categoryRepository.findOne({ where: { id: post.categoryId } });
+        if (category) {
+          category.decrementPostCount();
+          await this.categoryRepository.save(category);
+        }
+      }
 
       res.json({
         success: true,
