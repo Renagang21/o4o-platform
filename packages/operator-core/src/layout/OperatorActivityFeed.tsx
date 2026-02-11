@@ -2,13 +2,15 @@
  * OperatorActivityFeed - 최근 운영 활동 피드
  */
 
-import { AlertCircle, FileText, MessageSquarePlus } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquarePlus, Package, ClipboardList } from 'lucide-react';
 import type { OperatorActivityItem } from '../types';
 import { timeAgo } from '../utils';
 
 const TYPE_ICON: Record<string, { bg: string; Icon: typeof FileText; color: string }> = {
   content: { bg: 'bg-blue-50', Icon: FileText, color: 'text-blue-500' },
   forum: { bg: 'bg-amber-50', Icon: MessageSquarePlus, color: 'text-amber-500' },
+  order: { bg: 'bg-pink-50', Icon: Package, color: 'text-pink-500' },
+  application: { bg: 'bg-orange-50', Icon: ClipboardList, color: 'text-orange-500' },
 };
 
 export function OperatorActivityFeed({

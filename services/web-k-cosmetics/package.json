@@ -11,16 +11,17 @@
   },
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
+    "@o4o/operator-core": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*",
     "lucide-react": "^0.344.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",

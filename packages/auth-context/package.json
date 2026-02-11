@@ -24,18 +24,18 @@
   "dependencies": {
     "@o4o/auth-client": "file:../auth-client",
     "@o4o/types": "file:../types",
-    "react": "18.2.0",
+    "react": "^19.2.0",
     "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
-    "@types/react": "^18.2.79",
+    "@types/react": "^19.2.0",
     "@types/socket.io-client": "^1.4.36",
     "typescript": "5.4.5"
   },
   "peerDependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "^7.6.0"
   },
   "engines": {

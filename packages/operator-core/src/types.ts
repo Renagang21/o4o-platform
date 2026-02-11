@@ -5,6 +5,8 @@
  * 서비스별 데이터 구조는 각 서비스의 operatorConfig에서 이 타입으로 변환한다.
  */
 
+import type React from 'react';
+
 export type SignalStatus = 'good' | 'warning' | 'alert';
 
 /** Signal 파생 결과 (Hero, Card 내부에서 사용) */
@@ -23,7 +25,8 @@ export interface OperatorHeroConfig {
 
 /** Signal Card 1장 설정 */
 export interface OperatorSignalCardConfig {
-  icon: React.ComponentType<{ className?: string }>;
+  /** lucide-react 아이콘 등 React 컴포넌트 */
+  icon: React.ComponentType<{ className?: string; size?: number }>;
   iconBg: string;
   iconColor: string;
   title: string;
@@ -47,5 +50,6 @@ export interface OperatorDashboardConfig {
   pageSubtitle: string;
   hero: OperatorHeroConfig;
   signalCards: OperatorSignalCardConfig[];
-  activityFeed: OperatorActivityItem[];
+  /** undefined이면 Activity Feed 섹션 자체를 렌더링하지 않음 (GlycoPharm 등) */
+  activityFeed?: OperatorActivityItem[];
 }

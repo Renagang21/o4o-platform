@@ -75,11 +75,19 @@ export function OperatorLayout({
         loading={loading}
       />
 
-      {/* Activity Feed */}
-      <OperatorActivityFeed
-        items={config?.activityFeed || []}
-        loading={loading}
-      />
+      {/* Activity Feed (서비스가 activityFeed를 제공할 때만 렌더) */}
+      {config?.activityFeed !== undefined && (
+        <OperatorActivityFeed
+          items={config.activityFeed}
+          loading={loading}
+        />
+      )}
+      {!config && loading && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-pulse">
+          <div className="h-5 bg-slate-200 rounded w-32 mb-4" />
+          <div className="h-4 bg-slate-200 rounded w-48" />
+        </div>
+      )}
 
       {/* Service-specific extensions */}
       {children}

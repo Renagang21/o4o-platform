@@ -3,6 +3,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "../../packages/operator-core/src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {

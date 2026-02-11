@@ -42,17 +42,17 @@
     "@o4o/auth-client": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "typescript": "5.4.5"
   },
   "peerDependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "engines": {
     "node": ">=20.0.0",
