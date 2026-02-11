@@ -10,7 +10,7 @@
     "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
-    "lucide-react": "^0.468.0",
+    "lucide-react": "^0.523.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
