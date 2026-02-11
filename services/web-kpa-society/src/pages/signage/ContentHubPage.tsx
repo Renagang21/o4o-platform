@@ -17,9 +17,9 @@ import { publicContentApi, globalContentApi, SignagePlaylist, SignageMedia, type
 import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
 
 const SOURCE_TABS: { key: ContentSource; label: string; desc: string }[] = [
+  { key: 'community', label: '커뮤니티 공유', desc: '회원 간 공유된 유용한 안내 자료' },
   { key: 'hq', label: '운영자 제공', desc: '약사회 및 관련 기관에서 공식적으로 제공하는 안내·교육 자료' },
   { key: 'supplier', label: '공급자 제공', desc: '공급자가 등록한 안내 자료' },
-  { key: 'community', label: '커뮤니티 공유', desc: '회원 간 공유된 유용한 안내 자료' },
 ];
 
 function formatDuration(seconds: number): string {
@@ -209,7 +209,8 @@ function HighlightMediaCard({ item }: { item: SignageMedia }) {
 // ── Main Component ──
 
 export default function ContentHubPage() {
-  const [activeSource, setActiveSource] = useState<ContentSource>('hq');
+  const [playlistSource, setPlaylistSource] = useState<ContentSource>('community');
+  const [mediaSource, setMediaSource] = useState<ContentSource>('community');
   const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
   const [allMedia, setAllMedia] = useState<SignageMedia[]>([]);
   const [loading, setLoading] = useState(true);
@@ -265,16 +266,15 @@ export default function ContentHubPage() {
     [allMedia],
   );
 
-  // Filter by source for tab section
+  // Filter by source for tab sections (independent tabs for playlists and media)
   // NOTE: public API returns source field but type doesn't declare it.
-  // We filter by checking the raw data.
   const filteredPlaylists = useMemo(
-    () => allPlaylists.filter((p) => (p as any).source === activeSource || activeSource === 'hq'),
-    [allPlaylists, activeSource],
+    () => allPlaylists.filter((p) => (p as any).source === playlistSource),
+    [allPlaylists, playlistSource],
   );
   const filteredMedia = useMemo(
-    () => allMedia.filter((m) => (m as any).source === activeSource || activeSource === 'hq'),
-    [allMedia, activeSource],
+    () => allMedia.filter((m) => (m as any).source === mediaSource),
+    [allMedia, mediaSource],
   );
 
   // Clone handlers
@@ -391,16 +391,15 @@ export default function ContentHubPage() {
         </section>
       </div>
 
-      {/* ══════ 카테고리 탭 ══════ */}
+      {/* ══════ 플레이리스트 섹션 ══════ */}
       <section>
-        {/* Tabs */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-3">
           {SOURCE_TABS.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveSource(tab.key)}
+              onClick={() => setPlaylistSource(tab.key)}
               className={`px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
-                activeSource === tab.key
+                playlistSource === tab.key
                   ? 'bg-blue-600 border-blue-600 text-white'
                   : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
               }`}
@@ -409,14 +408,11 @@ export default function ContentHubPage() {
             </button>
           ))}
         </div>
-
-        {/* Tab Description */}
         <p className="text-sm text-slate-500 mb-4">
-          {SOURCE_TABS.find((t) => t.key === activeSource)?.desc}
+          {SOURCE_TABS.find((t) => t.key === playlistSource)?.desc}
         </p>
 
-        {/* Playlists Section */}
-        <div className="bg-white rounded-xl border border-slate-200 mb-4">
+        <div className="bg-white rounded-xl border border-slate-200">
           <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
             <h3 className="font-semibold text-slate-800 flex items-center gap-2">
               <List className="h-4 w-4 text-blue-600" />
@@ -434,8 +430,29 @@ export default function ContentHubPage() {
             )}
           </div>
         </div>
+      </section>
 
-        {/* Media Section */}
+      {/* ══════ 동영상 섹션 ══════ */}
+      <section>
+        <div className="flex gap-2 mb-3">
+          {SOURCE_TABS.map((tab) => (
+            <button
+              key={`media-${tab.key}`}
+              onClick={() => setMediaSource(tab.key)}
+              className={`px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
+                mediaSource === tab.key
+                  ? 'bg-blue-600 border-blue-600 text-white'
+                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-slate-500 mb-4">
+          {SOURCE_TABS.find((t) => t.key === mediaSource)?.desc}
+        </p>
+
         <div className="bg-white rounded-xl border border-slate-200">
           <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
             <h3 className="font-semibold text-slate-800 flex items-center gap-2">

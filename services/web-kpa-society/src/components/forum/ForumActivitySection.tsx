@@ -75,16 +75,32 @@ function sortPosts(posts: ForumPost[], mode: SortMode): ForumPost[] {
   }
 }
 
-export function ForumActivitySection() {
+interface ForumActivitySectionProps {
+  categories?: ForumCategory[];
+  allPosts?: ForumPost[];
+  loading?: boolean;
+}
+
+export function ForumActivitySection({
+  categories: propCategories,
+  allPosts: propPosts,
+  loading: propLoading,
+}: ForumActivitySectionProps) {
   const basePath = '/forum';
   const [sortMode, setSortMode] = useState<SortMode>('recent');
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [allPosts, setAllPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Use props if provided, otherwise fetch independently (standalone usage)
   useEffect(() => {
-    setLoading(true);
+    if (propCategories && propPosts) {
+      setCategories(propCategories);
+      setAllPosts(propPosts);
+      return;
+    }
 
+    setLoading(true);
     Promise.all([
       forumApi.getCategories(),
       forumApi.getPosts({ limit: 30 }),
@@ -95,7 +111,9 @@ export function ForumActivitySection() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [propCategories, propPosts]);
+
+  const isLoading = propLoading ?? loading;
 
   // Group posts by category
   const groupedPosts = useMemo(() => {
@@ -144,7 +162,7 @@ export function ForumActivitySection() {
       </div>
 
       {/* Forum-grouped Post Lists */}
-      {loading ? (
+      {isLoading ? (
         <div style={styles.feedCard}>
           <p style={styles.empty}>불러오는 중...</p>
         </div>

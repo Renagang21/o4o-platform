@@ -17,7 +17,7 @@ type ContentType = 'playlists' | 'media';
 const PAGE_SIZE = 9;
 
 export default function ContentHubPage() {
-  const [activeSource, setActiveSource] = useState<ContentSource>('hq');
+  const [activeSource, setActiveSource] = useState<ContentSource>('community');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
   // Data states
@@ -307,7 +307,7 @@ export default function ContentHubPage() {
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex">
-            {(['hq', 'supplier', 'community'] as ContentSource[]).map((source) => (
+            {(['community', 'hq', 'supplier'] as ContentSource[]).map((source) => (
               <button
                 key={source}
                 onClick={() => setActiveSource(source)}

@@ -11,20 +11,53 @@ import { forumApi } from '../../api';
 import type { ForumCategory, ForumPost } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-export function ForumCategorySection() {
+interface ForumCategorySectionProps {
+  prefetchedCategories?: ForumCategory[];
+  prefetchedPosts?: ForumPost[];
+  parentLoading?: boolean;
+}
+
+export function ForumCategorySection({
+  prefetchedCategories,
+  prefetchedPosts,
+  parentLoading,
+}: ForumCategorySectionProps) {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [initialized, setInitialized] = useState(false);
 
+  // Use prefetched categories if available
   useEffect(() => {
+    if (prefetchedCategories && prefetchedCategories.length > 0) {
+      setCategories(prefetchedCategories);
+      return;
+    }
+    // Fallback: fetch independently
     forumApi.getCategories()
       .then((res) => {
         if (res.data) setCategories(res.data);
       })
       .catch(() => {});
-  }, []);
+  }, [prefetchedCategories]);
+
+  // Use prefetched posts for initial "전체" tab
+  useEffect(() => {
+    if (initialized) return;
+    if (prefetchedPosts && prefetchedPosts.length > 0 && selectedCategoryId === '') {
+      setPosts(prefetchedPosts.slice(0, 10));
+      setTotalCount(prefetchedPosts.length);
+      setInitialized(true);
+      return;
+    }
+    if (!parentLoading && !prefetchedPosts) {
+      // No prefetched data, fetch independently
+      loadPosts('');
+      setInitialized(true);
+    }
+  }, [prefetchedPosts, parentLoading, initialized, selectedCategoryId]);
 
   const loadPosts = useCallback(async (categoryId: string) => {
     try {
@@ -42,13 +75,19 @@ export function ForumCategorySection() {
     }
   }, []);
 
-  useEffect(() => {
-    loadPosts(selectedCategoryId);
-  }, [selectedCategoryId, loadPosts]);
-
   const handleTabClick = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
+    // Always fetch when user changes tab (except initial load handled by prefetch)
+    if (categoryId !== '' || !prefetchedPosts) {
+      loadPosts(categoryId);
+    } else {
+      // Back to "전체" tab with prefetched data
+      setPosts((prefetchedPosts || []).slice(0, 10));
+      setTotalCount(prefetchedPosts?.length || 0);
+    }
   };
+
+  const isLoading = (parentLoading && !initialized) || loading;
 
   const allLink = selectedCategoryId
     ? `/forum/all?category=${selectedCategoryId}`
@@ -88,7 +127,7 @@ export function ForumCategorySection() {
 
       {/* Post List */}
       <div style={styles.listCard}>
-        {loading ? (
+        {isLoading ? (
           <div style={styles.emptyWrap}>
             <p style={styles.emptyText}>불러오는 중...</p>
           </div>

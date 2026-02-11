@@ -7,15 +7,40 @@
  * ├─ ForumCategorySection   - 카테고리 탭 + 글 목록
  * ├─ ForumWritePrompt       - 글쓰기 유도
  * └─ ForumInfoSection       - 이용안내 + 바로가기
+ *
+ * 데이터 로딩:
+ * - categories + posts 를 한 번만 fetch → 하위 섹션에 props 전달
+ * - ForumCategorySection 은 탭 전환 시에만 추가 fetch
  */
 
+import { useState, useEffect } from 'react';
 import { ForumActivitySection } from '../../components/forum/ForumActivitySection';
 import { ForumCategorySection } from '../../components/forum/ForumCategorySection';
 import { ForumWritePrompt } from '../../components/forum/ForumWritePrompt';
 import { ForumInfoSection } from '../../components/forum/ForumInfoSection';
+import { forumApi } from '../../api';
+import type { ForumCategory, ForumPost } from '../../types';
 import { colors, spacing, typography } from '../../styles/theme';
 
 export function ForumHomePage() {
+  const [categories, setCategories] = useState<ForumCategory[]>([]);
+  const [allPosts, setAllPosts] = useState<ForumPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      forumApi.getCategories(),
+      forumApi.getPosts({ limit: 30 }),
+    ])
+      .then(([catRes, postRes]) => {
+        if (catRes.data) setCategories(catRes.data);
+        if (postRes.data) setAllPosts(postRes.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div style={styles.page}>
       {/* Hero Header */}
@@ -29,8 +54,16 @@ export function ForumHomePage() {
       </div>
 
       <div style={styles.content}>
-        <ForumActivitySection />
-        <ForumCategorySection />
+        <ForumActivitySection
+          categories={categories}
+          allPosts={allPosts}
+          loading={loading}
+        />
+        <ForumCategorySection
+          prefetchedCategories={categories}
+          prefetchedPosts={allPosts}
+          parentLoading={loading}
+        />
         <ForumWritePrompt />
         <ForumInfoSection />
       </div>
