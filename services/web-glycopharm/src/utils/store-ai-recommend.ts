@@ -1,12 +1,14 @@
 /**
  * Store AI Recommend - Copy Option Advisor
  *
- * WO-APP-DATA-HUB-PHASE3-A-AI-RECOMMENDATION-V1
+ * WO-APP-DATA-HUB-PHASE3-A + PHASE3-B
  *
  * Rule-based 추천 로직 (Non-blocking advisor)
  * - AI는 제안만 한다. 선택·적용은 항상 사람이다.
  * - 입력: StoreCatalogItem (policy, approvalStatus, limitedConditions)
  * - 출력: 추천 템플릿 + 노출 방식 + 근거 문장
+ *
+ * Phase 3-B: shouldAutoApply — 보수적 기준으로 자동 기본값 적용 여부 판정
  */
 
 import type { StoreCatalogItem, CopyTemplateType, CopyVisibility } from '@/types/store-main';
@@ -71,4 +73,20 @@ export function generateCopyRecommendation(item: StoreCatalogItem): CopyRecommen
   }
 
   return { recommendedTemplate, recommendedVisibility, reasons };
+}
+
+/**
+ * Phase 3-B: 자동 기본값 적용 여부 판정
+ *
+ * 보수적 기준 — "문제가 생길 수 있는 케이스"만 자동 기본값 허용:
+ * - LIMITED (조건 있음)
+ * - REQUEST_REQUIRED (승인 완료)
+ *
+ * OPEN / DISPLAY_ONLY 같은 단순 상품은 추천 표시만 하고
+ * 자동 기본값은 적용하지 않는다.
+ */
+export function shouldAutoApply(item: StoreCatalogItem): boolean {
+  if (item.policy === 'LIMITED') return true;
+  if (item.policy === 'REQUEST_REQUIRED' && item.approvalStatus === 'approved') return true;
+  return false;
 }
