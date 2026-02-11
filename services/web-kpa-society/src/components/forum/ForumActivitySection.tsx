@@ -1,16 +1,16 @@
 /**
  * ForumActivitySection - 포럼별 글 목록 + 정렬
  *
- * 구조:
- * - 정렬 탭: 최근 / 인기 / 추천
- * - 포럼(카테고리)별로 그룹핑된 글 목록
- * - 각 글에 포럼 이름 표시
+ * Phase 3: 서버 집계 기반 구조
+ * - 서버가 카테고리별 top-N 게시글을 집계하여 반환
+ * - 정렬 탭: 최근 / 인기 / 추천 (서버 측 정렬)
+ * - 클라이언트 그룹핑/정렬 로직 제거
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { forumApi } from '../../api';
-import type { ForumPost, ForumCategory } from '../../types';
+import { homeApi } from '../../api/home';
+import type { ForumActivityCategory, ForumActivityPost } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 type SortMode = 'recent' | 'popular' | 'recommended';
@@ -37,19 +37,23 @@ function EyeIcon() {
   );
 }
 
-function PostItem({ post, basePath }: { post: ForumPost; basePath: string }) {
+function PostItem({ post, categoryName, basePath }: {
+  post: ForumActivityPost;
+  categoryName: string;
+  basePath: string;
+}) {
   return (
     <li style={styles.listItem}>
       <Link to={`${basePath}/post/${post.id}`} style={styles.postLink}>
         {post.isPinned && <span style={styles.pinnedBadge}>공지</span>}
-        <span style={styles.forumBadge}>{post.categoryName}</span>
+        <span style={styles.forumBadge}>{categoryName}</span>
         <span style={styles.postTitle}>{post.title}</span>
         {(post.commentCount ?? 0) > 0 && (
           <span style={styles.commentCount}>[{post.commentCount}]</span>
         )}
       </Link>
       <div style={styles.meta}>
-        <span>{post.authorName}</span>
+        <span>{post.authorName ?? '익명'}</span>
         <span style={styles.dot}>·</span>
         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
         <span style={styles.dot}>·</span>
@@ -63,81 +67,21 @@ function PostItem({ post, basePath }: { post: ForumPost; basePath: string }) {
   );
 }
 
-function sortPosts(posts: ForumPost[], mode: SortMode): ForumPost[] {
-  const sorted = [...posts];
-  switch (mode) {
-    case 'popular':
-      return sorted.sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
-    case 'recommended':
-      return sorted.sort((a, b) => (b.likeCount ?? 0) - (a.likeCount ?? 0));
-    default:
-      return sorted; // createdAt from API
-  }
-}
-
-interface ForumActivitySectionProps {
-  categories?: ForumCategory[];
-  allPosts?: ForumPost[];
-  loading?: boolean;
-}
-
-export function ForumActivitySection({
-  categories: propCategories,
-  allPosts: propPosts,
-  loading: propLoading,
-}: ForumActivitySectionProps) {
+export function ForumActivitySection() {
   const basePath = '/forum';
   const [sortMode, setSortMode] = useState<SortMode>('recent');
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [allPosts, setAllPosts] = useState<ForumPost[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<ForumActivityCategory[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Use props if provided, otherwise fetch independently (standalone usage)
   useEffect(() => {
-    if (propCategories && propPosts) {
-      setCategories(propCategories);
-      setAllPosts(propPosts);
-      return;
-    }
-
     setLoading(true);
-    Promise.all([
-      forumApi.getCategories(),
-      forumApi.getPosts({ limit: 30 }),
-    ])
-      .then(([catRes, postRes]) => {
-        if (catRes.data) setCategories(catRes.data);
-        if (postRes.data) setAllPosts(postRes.data);
+    homeApi.getForumActivity({ sort: sortMode })
+      .then((res) => {
+        if (res.data) setCategories(res.data);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [propCategories, propPosts]);
-
-  const isLoading = propLoading ?? loading;
-
-  // Group posts by category
-  const groupedPosts = useMemo(() => {
-    const groups: { category: ForumCategory; posts: ForumPost[] }[] = [];
-
-    for (const cat of categories) {
-      const catPosts = allPosts.filter((p) => p.categoryId === cat.id);
-      if (catPosts.length > 0) {
-        groups.push({ category: cat, posts: sortPosts(catPosts, sortMode).slice(0, 5) });
-      }
-    }
-
-    // Posts with unknown category
-    const knownCatIds = new Set(categories.map((c) => c.id));
-    const uncategorized = allPosts.filter((p) => !knownCatIds.has(p.categoryId));
-    if (uncategorized.length > 0) {
-      groups.push({
-        category: { id: '', name: '기타', slug: 'etc', postCount: uncategorized.length },
-        posts: sortPosts(uncategorized, sortMode).slice(0, 5),
-      });
-    }
-
-    return groups;
-  }, [allPosts, categories, sortMode]);
+  }, [sortMode]);
 
   return (
     <section style={styles.container}>
@@ -162,30 +106,35 @@ export function ForumActivitySection({
       </div>
 
       {/* Forum-grouped Post Lists */}
-      {isLoading ? (
+      {loading ? (
         <div style={styles.feedCard}>
           <p style={styles.empty}>불러오는 중...</p>
         </div>
-      ) : groupedPosts.length === 0 ? (
+      ) : categories.length === 0 ? (
         <div style={styles.feedCard}>
           <p style={styles.empty}>자료가 없습니다</p>
         </div>
       ) : (
         <div style={styles.forumGrid}>
-          {groupedPosts.map(({ category, posts }) => (
-            <div key={category.id} style={styles.feedCard}>
+          {categories.map((cat) => (
+            <div key={cat.id} style={styles.feedCard}>
               <div style={styles.cardHeader}>
-                <h3 style={styles.cardTitle}>{category.name}</h3>
+                <h3 style={styles.cardTitle}>{cat.name}</h3>
                 <Link
-                  to={`${basePath}/all?category=${category.id}`}
+                  to={`${basePath}/all?category=${cat.id}`}
                   style={styles.cardMoreLink}
                 >
                   더보기
                 </Link>
               </div>
               <ul style={styles.list}>
-                {posts.map((post) => (
-                  <PostItem key={`${sortMode}-${post.id}`} post={post} basePath={basePath} />
+                {cat.recentPosts.map((post) => (
+                  <PostItem
+                    key={`${sortMode}-${post.id}`}
+                    post={post}
+                    categoryName={cat.name}
+                    basePath={basePath}
+                  />
                 ))}
               </ul>
             </div>

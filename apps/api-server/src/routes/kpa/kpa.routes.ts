@@ -343,6 +343,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data });
   }));
 
+  // GET /home/forum-activity - 포럼 카테고리별 최근 활동 (APP-FORUM Phase 3: ForumQueryService)
+  // ?sort=recent|popular|recommended  ?limit=5
+  homeRouter.get('/forum-activity', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const sort = (req.query.sort as string) || 'recent';
+    const limit = Math.min(parseInt(req.query.limit as string) || 5, 10);
+    const data = await forumService.listForumActivity({ sort, limit });
+    res.json({ success: true, data });
+  }));
+
   router.use('/home', homeRouter);
 
   // ============================================================================

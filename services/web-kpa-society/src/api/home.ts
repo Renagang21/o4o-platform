@@ -7,7 +7,7 @@
 import { apiClient } from './client';
 import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
 import type { ForumHomePost } from '@o4o/types/forum';
-import type { ForumHubItem } from '../types';
+import type { ForumHubItem, ForumActivityCategory } from '../types';
 
 interface HomeNotice {
   id: string;
@@ -72,6 +72,11 @@ interface ForumHubResponse {
   data: ForumHubItem[];
 }
 
+interface ForumActivityResponse {
+  success: boolean;
+  data: ForumActivityCategory[];
+}
+
 export interface HomePageData {
   notices: HomeNotice[];
   news: HomeNotice[];
@@ -96,6 +101,9 @@ export const homeApi = {
    */
   getForumHub: (params?: { sort?: string; q?: string }) =>
     apiClient.get<ForumHubResponse>('/home/forum-hub', params),
+
+  getForumActivity: (params?: { sort?: string; limit?: number }) =>
+    apiClient.get<ForumActivityResponse>('/home/forum-activity', params),
 
   /**
    * 홈 페이지 전체 데이터를 병렬로 가져오기

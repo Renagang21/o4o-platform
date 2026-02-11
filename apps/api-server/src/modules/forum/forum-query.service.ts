@@ -124,6 +124,129 @@ export class ForumQueryService {
   }
 
   /**
+   * 포럼 활동 섹션 — 카테고리별 최근 게시글 (서버 집계)
+   * Phase 3: LATERAL JOIN으로 카테고리별 top-N 게시글 집계
+   * sort: recent(default) / popular(viewCount) / recommended(likeCount)
+   */
+  async listForumActivity(options?: { sort?: string; limit?: number }) {
+    const sort = options?.sort || 'recent';
+    const limit = options?.limit || 5;
+
+    let postOrderBy: string;
+    switch (sort) {
+      case 'popular':
+        postOrderBy = 'p."isPinned" DESC, p."viewCount" DESC, p.created_at DESC';
+        break;
+      case 'recommended':
+        postOrderBy = 'p."isPinned" DESC, p."likeCount" DESC, p.created_at DESC';
+        break;
+      default:
+        postOrderBy = 'p."isPinned" DESC, p.created_at DESC';
+    }
+
+    if (this.config.scope === 'community') {
+      const rows: any[] = await this.dataSource.query(`
+        SELECT
+          c.id AS "categoryId", c.name AS "categoryName", c.slug AS "categorySlug",
+          c.color AS "categoryColor", c."iconEmoji" AS "categoryIconEmoji",
+          c."postCount" AS "categoryPostCount",
+          lp.post_id AS "postId", lp.post_title AS "postTitle",
+          lp.post_is_pinned AS "postIsPinned",
+          lp.post_view_count AS "postViewCount",
+          lp.post_comment_count AS "postCommentCount",
+          lp.post_like_count AS "postLikeCount",
+          lp.post_created_at AS "postCreatedAt",
+          COALESCE(u.nickname, u.name) AS "postAuthorName"
+        FROM forum_category c
+        CROSS JOIN LATERAL (
+          SELECT p.id as post_id, p.title as post_title,
+                 p."isPinned" as post_is_pinned,
+                 p."viewCount" as post_view_count,
+                 p."commentCount" as post_comment_count,
+                 p."likeCount" as post_like_count,
+                 p.created_at as post_created_at,
+                 p.author_id
+          FROM forum_post p
+          WHERE p."categoryId" = c.id
+            AND p.status = 'publish' AND p.organization_id IS NULL
+          ORDER BY ${postOrderBy}
+          LIMIT $1
+        ) lp
+        LEFT JOIN users u ON lp.author_id = u.id
+        WHERE c."isActive" = true AND c.organization_id IS NULL
+        ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
+                 c."sortOrder" ASC, c.name ASC
+      `, [limit]);
+
+      return this.groupActivityRows(rows);
+    }
+
+    // organization scope
+    const rows: any[] = await this.dataSource.query(`
+      SELECT
+        c.id AS "categoryId", c.name AS "categoryName", c.slug AS "categorySlug",
+        c.color AS "categoryColor", c."iconEmoji" AS "categoryIconEmoji",
+        c."postCount" AS "categoryPostCount",
+        lp.post_id AS "postId", lp.post_title AS "postTitle",
+        lp.post_is_pinned AS "postIsPinned",
+        lp.post_view_count AS "postViewCount",
+        lp.post_comment_count AS "postCommentCount",
+        lp.post_like_count AS "postLikeCount",
+        lp.post_created_at AS "postCreatedAt",
+        COALESCE(u.nickname, u.name) AS "postAuthorName"
+      FROM forum_category c
+      CROSS JOIN LATERAL (
+        SELECT p.id as post_id, p.title as post_title,
+               p."isPinned" as post_is_pinned,
+               p."viewCount" as post_view_count,
+               p."commentCount" as post_comment_count,
+               p."likeCount" as post_like_count,
+               p.created_at as post_created_at,
+               p.author_id
+        FROM forum_post p
+        WHERE p."categoryId" = c.id
+          AND p.status = 'publish' AND p.organization_id = $2
+        ORDER BY ${postOrderBy}
+        LIMIT $1
+      ) lp
+      LEFT JOIN users u ON lp.author_id = u.id
+      WHERE c."isActive" = true AND c.organization_id = $2
+      ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
+               c."sortOrder" ASC, c.name ASC
+    `, [limit, this.config.organizationId]);
+
+    return this.groupActivityRows(rows);
+  }
+
+  private groupActivityRows(rows: any[]) {
+    const categoryMap = new Map<string, any>();
+    for (const row of rows) {
+      if (!categoryMap.has(row.categoryId)) {
+        categoryMap.set(row.categoryId, {
+          id: row.categoryId,
+          name: row.categoryName,
+          slug: row.categorySlug,
+          color: row.categoryColor,
+          iconEmoji: row.categoryIconEmoji,
+          postCount: row.categoryPostCount,
+          recentPosts: [],
+        });
+      }
+      categoryMap.get(row.categoryId)!.recentPosts.push({
+        id: row.postId,
+        title: row.postTitle,
+        isPinned: row.postIsPinned,
+        viewCount: row.postViewCount,
+        commentCount: row.postCommentCount,
+        likeCount: row.postLikeCount,
+        createdAt: row.postCreatedAt,
+        authorName: row.postAuthorName,
+      });
+    }
+    return Array.from(categoryMap.values());
+  }
+
+  /**
    * 홈 페이지용 고정(pinned) 게시글
    */
   async listPinnedPosts(limit = 3) {

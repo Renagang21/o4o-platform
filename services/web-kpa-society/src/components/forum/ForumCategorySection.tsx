@@ -13,13 +13,11 @@ import { colors, spacing, borderRadius, shadows, typography } from '../../styles
 
 interface ForumCategorySectionProps {
   prefetchedCategories?: ForumCategory[];
-  prefetchedPosts?: ForumPost[];
   parentLoading?: boolean;
 }
 
 export function ForumCategorySection({
   prefetchedCategories,
-  prefetchedPosts,
   parentLoading,
 }: ForumCategorySectionProps) {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
@@ -43,21 +41,14 @@ export function ForumCategorySection({
       .catch(() => {});
   }, [prefetchedCategories]);
 
-  // Use prefetched posts for initial "전체" tab
+  // Initial load for "전체" tab
   useEffect(() => {
     if (initialized) return;
-    if (prefetchedPosts && prefetchedPosts.length > 0 && selectedCategoryId === '') {
-      setPosts(prefetchedPosts.slice(0, 10));
-      setTotalCount(prefetchedPosts.length);
-      setInitialized(true);
-      return;
-    }
-    if (!parentLoading && !prefetchedPosts) {
-      // No prefetched data, fetch independently
+    if (!parentLoading) {
       loadPosts('');
       setInitialized(true);
     }
-  }, [prefetchedPosts, parentLoading, initialized, selectedCategoryId]);
+  }, [parentLoading, initialized]);
 
   const loadPosts = useCallback(async (categoryId: string) => {
     try {
@@ -77,14 +68,7 @@ export function ForumCategorySection({
 
   const handleTabClick = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
-    // Always fetch when user changes tab (except initial load handled by prefetch)
-    if (categoryId !== '' || !prefetchedPosts) {
-      loadPosts(categoryId);
-    } else {
-      // Back to "전체" tab with prefetched data
-      setPosts((prefetchedPosts || []).slice(0, 10));
-      setTotalCount(prefetchedPosts?.length || 0);
-    }
+    loadPosts(categoryId);
   };
 
   const isLoading = (parentLoading && !initialized) || loading;

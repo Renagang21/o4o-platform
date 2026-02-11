@@ -3,14 +3,15 @@
  *
  * 레이아웃:
  * ├─ HeroHeader             - 흰색 배경 + 하단 보더
- * ├─ ForumActivitySection   - 최근 글 + 인기 글 (2열)
+ * ├─ ForumHubSection        - 포럼 허브 카드 (서버 집계)
+ * ├─ ForumActivitySection   - 카테고리별 최근 활동 (서버 집계)
  * ├─ ForumCategorySection   - 카테고리 탭 + 글 목록
  * ├─ ForumWritePrompt       - 글쓰기 유도
  * └─ ForumInfoSection       - 이용안내 + 바로가기
  *
  * 데이터 로딩:
- * - categories + posts 를 한 번만 fetch → 하위 섹션에 props 전달
- * - ForumCategorySection 은 탭 전환 시에만 추가 fetch
+ * - categories 만 fetch → ForumCategorySection 탭 표시용
+ * - ForumHubSection, ForumActivitySection 은 각각 독립 fetch
  */
 
 import { useState, useEffect } from 'react';
@@ -20,23 +21,18 @@ import { ForumCategorySection } from '../../components/forum/ForumCategorySectio
 import { ForumWritePrompt } from '../../components/forum/ForumWritePrompt';
 import { ForumInfoSection } from '../../components/forum/ForumInfoSection';
 import { forumApi } from '../../api';
-import type { ForumCategory, ForumPost } from '../../types';
+import type { ForumCategory } from '../../types';
 import { colors, spacing, typography } from '../../styles/theme';
 
 export function ForumHomePage() {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [allPosts, setAllPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      forumApi.getCategories(),
-      forumApi.getPosts({ limit: 30 }),
-    ])
-      .then(([catRes, postRes]) => {
-        if (catRes.data) setCategories(catRes.data);
-        if (postRes.data) setAllPosts(postRes.data);
+    forumApi.getCategories()
+      .then((res) => {
+        if (res.data) setCategories(res.data);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -56,14 +52,9 @@ export function ForumHomePage() {
 
       <div style={styles.content}>
         <ForumHubSection />
-        <ForumActivitySection
-          categories={categories}
-          allPosts={allPosts}
-          loading={loading}
-        />
+        <ForumActivitySection />
         <ForumCategorySection
           prefetchedCategories={categories}
-          prefetchedPosts={allPosts}
           parentLoading={loading}
         />
         <ForumWritePrompt />

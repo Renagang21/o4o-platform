@@ -97,6 +97,28 @@ export interface ForumHubItem {
   lastPostTitle: string | null;
 }
 
+// 포럼 활동 섹션 (WO-KPA-FORUM-HUB-V2-PHASE3)
+export interface ForumActivityPost {
+  id: string;
+  title: string;
+  isPinned: boolean;
+  viewCount: number;
+  commentCount: number;
+  likeCount: number;
+  createdAt: string;
+  authorName: string | null;
+}
+
+export interface ForumActivityCategory {
+  id: string;
+  name: string;
+  slug: string;
+  color: string | null;
+  iconEmoji: string | null;
+  postCount: number;
+  recentPosts: ForumActivityPost[];
+}
+
 export interface CreatePostRequest {
   title: string;
   content: string | any[]; // Block[] or string for backward compatibility
