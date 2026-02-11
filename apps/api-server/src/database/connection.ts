@@ -278,6 +278,8 @@ import {
   Survey,
   SurveyQuestion,
   SurveyResponse,
+  // Instructor Application (WO-LMS-INSTRUCTOR-ROLE-V1)
+  InstructorApplication,
 } from '@o4o/lms-core/entities';
 
 // ============================================================================
@@ -599,6 +601,8 @@ export const AppDataSource = new DataSource({
     Survey,
     SurveyQuestion,
     SurveyResponse,
+    // Instructor Application (WO-LMS-INSTRUCTOR-ROLE-V1)
+    InstructorApplication,
     // ============================================================================
     // LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
     // Core ID reference pattern - NOT entity duplication

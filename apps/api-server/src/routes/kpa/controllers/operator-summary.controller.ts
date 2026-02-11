@@ -116,5 +116,26 @@ export function createOperatorSummaryController(
     });
   }));
 
+  /**
+   * GET /operator/forum-analytics
+   * 포럼 운영 통계: KPI 4개 + Top 5 활성 포럼 + 무활동 포럼
+   */
+  router.get('/forum-analytics', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.id || 'unknown';
+    const userRoles = authReq.user?.roles || [];
+
+    if (!isKpaOperator(userRoles, userId)) {
+      res.status(403).json({
+        success: false,
+        error: 'KPA operator role required',
+      });
+      return;
+    }
+
+    const data = await forumService.getForumAnalytics();
+    res.json({ success: true, data });
+  }));
+
   return router;
 }

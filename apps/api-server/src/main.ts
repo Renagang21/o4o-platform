@@ -401,8 +401,8 @@ import serviceAuthRoutes from './modules/auth/routes/service-auth.routes.js';
 import guestAuthRoutes from './modules/auth/routes/guest-auth.routes.js';
 // CMS routes - REMOVED (Phase R1: Domain separation)
 // import cmsRoutes from './modules/cms/routes/cms.routes.js';
-// LMS routes - REMOVED (Phase R1: Domain separation)
-// import lmsRoutes from './modules/lms/routes/lms.routes.js';
+// LMS routes - RE-ENABLED (WO-LMS-PAID-COURSE-V1)
+import lmsRoutes from './modules/lms/routes/lms.routes.js';
 import usersRoutes from './routes/users.routes.js';
 import cptRoutes from './routes/cpt.js';
 import healthRoutes from './routes/health.js';
@@ -520,9 +520,10 @@ app.use('/api/auth', authRoutes);  // Legacy path for backward compatibility
 app.use('/api/v1/auth/service', serviceAuthRoutes);
 // Phase 3: Guest 인증 (WO-AUTH-SERVICE-IDENTITY-PHASE3-QR-GUEST-DEVICE)
 app.use('/api/v1/auth/guest', guestAuthRoutes);
-// CMS/LMS/Forum routes - REMOVED (Phase R1: Domain separation)
+// CMS routes - REMOVED (Phase R1: Domain separation)
 // app.use('/api/v1/cms', cmsRoutes);
-// app.use('/api/v1/lms', lmsRoutes);
+// LMS routes - RE-ENABLED (WO-LMS-PAID-COURSE-V1)
+app.use('/api/v1/lms', lmsRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);
 app.use('/api/health', healthRoutes);
@@ -829,6 +830,17 @@ const startServer = async () => {
       logger.info('✅ KCosmeticsPaymentEventHandler initialized');
     } catch (cosmeticsError) {
       logger.error('Failed to register Cosmetics routes:', cosmeticsError);
+    }
+
+    // LMS Payment Handler (Dormant — v1 Freeze)
+    // Initialized but no checkout flow exists. serviceKey='lms' orders are never created.
+    // See: docs/platform/lms/LMS-INSTRUCTOR-ROLE-V1-FREEZE.md §2.5
+    try {
+      const { initializeLmsPaymentHandler } = await import('./modules/lms/services/LmsPaymentEventHandler.js');
+      initializeLmsPaymentHandler(AppDataSource);
+      logger.info('✅ LmsPaymentEventHandler initialized (dormant)');
+    } catch (lmsPaymentError) {
+      logger.error('Failed to initialize LmsPaymentEventHandler:', lmsPaymentError);
     }
 
     // 26. Register Yaksa routes (Phase A-1)

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { ProgressService } from '../services/ProgressService.js';
+import { AppDataSource } from '../../../database/connection.js';
+import { Enrollment } from '@o4o/lms-core';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -12,6 +14,19 @@ export class ProgressController extends BaseController {
   static async recordProgress(req: Request, res: Response): Promise<any> {
     try {
       const data = req.body;
+      const userId = (req as any).user?.id;
+
+      // WO-LMS-PAID-COURSE-V1: enrollmentId 소유권 검증
+      if (data.enrollmentId && userId) {
+        const enrollment = await AppDataSource.getRepository(Enrollment).findOne({
+          where: { id: data.enrollmentId },
+          select: ['id', 'userId'],
+        });
+        if (enrollment && enrollment.userId !== userId) {
+          return BaseController.forbidden(res, '본인의 수강 정보만 진도를 기록할 수 있습니다');
+        }
+      }
+
       const service = ProgressService.getInstance();
 
       const progress = await service.recordProgress(data);

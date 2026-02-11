@@ -19,6 +19,8 @@ import { Course } from './Course.js';
 
 export enum EnrollmentStatus {
   PENDING = 'pending',
+  APPROVED = 'approved',      // WO-LMS-INSTRUCTOR-ROLE-V1: 강사 승인됨
+  REJECTED = 'rejected',      // WO-LMS-INSTRUCTOR-ROLE-V1: 강사 거절됨
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',

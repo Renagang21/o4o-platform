@@ -58,6 +58,8 @@ export enum OrderType {
   SUBSCRIPTION = 'subscription',
   /** GlycoPharm - 약국 O4O 서비스 (Phase 4-B) */
   GLYCOPHARM = 'glycopharm',
+  /** LMS 유료 강의 (WO-LMS-PAID-COURSE-V1) */
+  LMS = 'lms',
 }
 
 /**

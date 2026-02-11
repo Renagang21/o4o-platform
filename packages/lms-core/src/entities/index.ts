@@ -8,6 +8,9 @@ export { Attendance, AttendanceStatus } from './Attendance.js';
 export { ContentBundle, ContentBundleType } from './ContentBundle.js';
 export type { ContentItem } from './ContentBundle.js';
 
+// Instructor Application (WO-LMS-INSTRUCTOR-ROLE-V1)
+export { InstructorApplication } from './InstructorApplication.js';
+
 // Quiz Core Entities (Phase 1 Refoundation)
 export { Quiz } from './Quiz.js';
 export type { QuizQuestion } from './Quiz.js';

@@ -13,8 +13,12 @@ import { SurveyController } from '../controllers/SurveyController.js';
 import { ProductContentController } from '../controllers/ProductContentController.js';
 import { QuizCampaignController } from '../controllers/QuizCampaignController.js';
 import { SurveyCampaignController } from '../controllers/SurveyCampaignController.js';
+// WO-LMS-INSTRUCTOR-ROLE-V1
+import { InstructorController } from '../controllers/InstructorController.js';
 import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { requireEnrollment } from '../middleware/requireEnrollment.js';
+import { requireInstructor } from '../middleware/requireInstructor.js';
 
 const router: Router = Router();
 
@@ -54,10 +58,10 @@ router.post('/courses/:id/archive', requireAuth, asyncHandler(CourseController.a
 router.post('/courses/:courseId/lessons', requireAuth, asyncHandler(LessonController.createLesson));
 
 // GET /api/v1/lms/courses/:courseId/lessons - List Lessons for Course
-router.get('/courses/:courseId/lessons', requireAuth, asyncHandler(LessonController.listLessonsByCourse));
+router.get('/courses/:courseId/lessons', requireAuth, requireEnrollment(), asyncHandler(LessonController.listLessonsByCourse));
 
 // GET /api/v1/lms/lessons/:id - Get Lesson by ID
-router.get('/lessons/:id', requireAuth, asyncHandler(LessonController.getLesson));
+router.get('/lessons/:id', requireAuth, requireEnrollment({ checkLesson: true }), asyncHandler(LessonController.getLesson));
 
 // PATCH /api/v1/lms/lessons/:id - Update Lesson
 router.patch('/lessons/:id', requireAuth, asyncHandler(LessonController.updateLesson));
@@ -443,5 +447,33 @@ router.post('/marketing/survey-campaigns/:id/response', requireAuth, asyncHandle
 
 // POST /api/v1/lms/marketing/survey-campaigns/:id/completed - Record Completed
 router.post('/marketing/survey-campaigns/:id/completed', requireAuth, asyncHandler(SurveyCampaignController.recordCompleted));
+
+// ========================================
+// INSTRUCTOR ROUTES (WO-LMS-INSTRUCTOR-ROLE-V1)
+// ========================================
+
+// POST /api/v1/lms/instructor/apply - Apply for Instructor Role
+router.post('/instructor/apply', requireAuth, asyncHandler(InstructorController.apply));
+
+// GET /api/v1/lms/instructor/applications - List Instructor Applications (Admin)
+router.get('/instructor/applications', requireAdmin, asyncHandler(InstructorController.listApplications));
+
+// POST /api/v1/lms/instructor/applications/:id/approve - Approve Application (Admin)
+router.post('/instructor/applications/:id/approve', requireAdmin, asyncHandler(InstructorController.approveApplication));
+
+// POST /api/v1/lms/instructor/applications/:id/reject - Reject Application (Admin)
+router.post('/instructor/applications/:id/reject', requireAdmin, asyncHandler(InstructorController.rejectApplication));
+
+// GET /api/v1/lms/instructor/courses - My Courses (Instructor)
+router.get('/instructor/courses', requireAuth, requireInstructor, asyncHandler(InstructorController.myCourses));
+
+// GET /api/v1/lms/instructor/enrollments - Pending Enrollments for My Courses (Instructor)
+router.get('/instructor/enrollments', requireAuth, requireInstructor, asyncHandler(InstructorController.pendingEnrollments));
+
+// POST /api/v1/lms/instructor/enrollments/:id/approve - Approve Enrollment (Instructor)
+router.post('/instructor/enrollments/:id/approve', requireAuth, requireInstructor, asyncHandler(InstructorController.approveEnrollment));
+
+// POST /api/v1/lms/instructor/enrollments/:id/reject - Reject Enrollment (Instructor)
+router.post('/instructor/enrollments/:id/reject', requireAuth, requireInstructor, asyncHandler(InstructorController.rejectEnrollment));
 
 export default router;

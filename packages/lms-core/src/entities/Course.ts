@@ -103,6 +103,13 @@ export class Course {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   credits!: number; // 연수 평점
 
+  // Paid Course (WO-LMS-PAID-COURSE-V1)
+  @Column({ type: 'boolean', default: false })
+  isPaid!: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price?: number;
+
   // Additional Information
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;

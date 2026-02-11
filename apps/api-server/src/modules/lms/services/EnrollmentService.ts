@@ -9,6 +9,8 @@ export interface EnrollCourseRequest {
   courseId: string;
   userId: string;
   organizationId?: string;
+  /** 결제 핸들러에서만 true — 유료 과정 직접 등록 차단용 (WO-LMS-PAID-COURSE-V1) */
+  __fromPayment?: boolean;
 }
 
 export interface UpdateEnrollmentRequest {
@@ -74,6 +76,12 @@ export class EnrollmentService extends BaseService<Enrollment> {
 
     if (!course.canEnroll()) {
       throw new Error('Course enrollment is not available');
+    }
+
+    // WO-LMS-PAID-COURSE-V1 + WO-LMS-INSTRUCTOR-ROLE-V1:
+    // 유료 과정은 결제 핸들러를 통해서만 등록 가능 (단, 강사 승인 모델은 직접 등록 허용)
+    if (course.isPaid && !data.__fromPayment && !course.requiresApproval) {
+      throw new Error('유료 과정은 결제를 통해서만 등록할 수 있습니다');
     }
 
     // Get lesson count for this course

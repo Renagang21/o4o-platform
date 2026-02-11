@@ -246,6 +246,9 @@ const CGMAlertsPage = lazy(() =>
 // LMS-Yaksa Pages
 const LmsYaksaRouter = lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter'));
 
+// LMS-Instructor Pages (WO-LMS-INSTRUCTOR-DASHBOARD-UX-REFINEMENT-V1)
+const LmsInstructorRouter = lazy(() => import('@/pages/lms-instructor/LmsInstructorRouter'));
+
 // LMS-Marketing Pages (Phase R10 & R11)
 const MarketingPublisherRouter = lazy(() => import('@/pages/marketing/publisher/MarketingPublisherRouter'));
 const OnboardingHome = lazy(() => import('@/pages/marketing/onboarding/OnboardingHome'));
@@ -1671,6 +1674,13 @@ function App() {
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>
+                    } />
+
+                    {/* LMS-Instructor Dashboard (WO-LMS-INSTRUCTOR-DASHBOARD-UX-REFINEMENT-V1) */}
+                    <Route path="/admin/lms-instructor/*" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <LmsInstructorRouter />
+                      </Suspense>
                     } />
 
                     {/* Yaksa Admin Hub - Integrated Dashboard (Phase 19-D) */}

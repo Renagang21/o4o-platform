@@ -6,7 +6,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { KpaOperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage } from '../pages/operator';
+import { KpaOperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard } from '../pages/operator';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 
 // 간단한 Operator Layout
@@ -32,6 +32,9 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
             </a>
             <a href="/operator/forum-management" className="text-sm text-slate-600 hover:text-blue-600">
               포럼 관리
+            </a>
+            <a href="/operator/forum-analytics" className="text-sm text-slate-600 hover:text-blue-600">
+              포럼 통계
             </a>
             <a href="/operator/signage/content" className="text-sm text-slate-600 hover:text-blue-600">
               콘텐츠 허브
@@ -69,6 +72,9 @@ export function OperatorRoutes() {
 
         {/* 포럼 관리 */}
         <Route path="forum-management" element={<ForumManagementPage />} />
+
+        {/* 포럼 통계 */}
+        <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
 
         {/* 사이니지 콘텐츠 허브 */}
         <Route path="signage/content" element={<ContentHubPage />} />

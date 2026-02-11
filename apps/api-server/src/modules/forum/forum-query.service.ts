@@ -335,6 +335,107 @@ export class ForumQueryService {
   }
 
   /**
+   * 운영자용 포럼 통계 — KPI 4개 + Top 5 활성 + 무활동 포럼
+   * 3개 병렬 쿼리로 집계
+   */
+  async getForumAnalytics() {
+    const scopeFilter = this.config.scope === 'community'
+      ? 'p.organization_id IS NULL'
+      : `p.organization_id = '${this.config.organizationId}'`;
+    const catScopeFilter = this.config.scope === 'community'
+      ? 'c.organization_id IS NULL'
+      : `c.organization_id = '${this.config.organizationId}'`;
+    const commentScopeFilter = this.config.scope === 'community'
+      ? 'p.organization_id IS NULL'
+      : `p.organization_id = '${this.config.organizationId}'`;
+
+    const [kpiRows, topRows, inactiveRows] = await Promise.all([
+      // Query 1: KPI 4개
+      this.dataSource.query(`
+        SELECT
+          (SELECT COUNT(*)::int FROM forum_category c
+           WHERE c."isActive" = true AND c."accessLevel" = 'all' AND ${catScopeFilter}
+          ) AS "totalForums",
+          (SELECT COUNT(DISTINCT p."categoryId")::int FROM forum_post p
+           WHERE p.status = 'publish' AND ${scopeFilter}
+             AND p.created_at >= NOW() - INTERVAL '7 days'
+          ) AS "activeForumsByPost7d",
+          (SELECT COUNT(DISTINCT p."categoryId")::int
+           FROM forum_comment fc
+           JOIN forum_post p ON fc."postId" = p.id
+           WHERE ${commentScopeFilter}
+             AND fc.created_at >= NOW() - INTERVAL '7 days'
+          ) AS "activeForumsByComment7d",
+          (SELECT COUNT(*)::int FROM forum_post p
+           WHERE p.status = 'publish' AND ${scopeFilter}
+             AND p.created_at >= NOW() - INTERVAL '7 days'
+          ) AS "posts7d",
+          (SELECT COUNT(*)::int
+           FROM forum_comment fc
+           JOIN forum_post p ON fc."postId" = p.id
+           WHERE ${commentScopeFilter}
+             AND fc.created_at >= NOW() - INTERVAL '7 days'
+          ) AS "comments7d"
+      `),
+      // Query 2: Top 5 활성 포럼 (30일)
+      this.dataSource.query(`
+        SELECT
+          c.id, c.name, c."iconEmoji",
+          COUNT(DISTINCT CASE WHEN p.created_at >= NOW() - INTERVAL '30 days' THEN p.id END)::int AS "posts30d",
+          COUNT(DISTINCT CASE WHEN fc.created_at >= NOW() - INTERVAL '30 days' THEN fc.id END)::int AS "comments30d"
+        FROM forum_category c
+        LEFT JOIN forum_post p ON p."categoryId" = c.id AND p.status = 'publish' AND ${scopeFilter}
+        LEFT JOIN forum_comment fc ON fc."postId" = p.id
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND ${catScopeFilter}
+        GROUP BY c.id
+        HAVING COUNT(DISTINCT CASE WHEN p.created_at >= NOW() - INTERVAL '30 days' THEN p.id END) > 0
+            OR COUNT(DISTINCT CASE WHEN fc.created_at >= NOW() - INTERVAL '30 days' THEN fc.id END) > 0
+        ORDER BY (
+          COUNT(DISTINCT CASE WHEN p.created_at >= NOW() - INTERVAL '30 days' THEN p.id END)
+          + COUNT(DISTINCT CASE WHEN fc.created_at >= NOW() - INTERVAL '30 days' THEN fc.id END)
+        ) DESC
+        LIMIT 5
+      `),
+      // Query 3: 30일 무활동 포럼
+      this.dataSource.query(`
+        SELECT c.id, c.name, c."iconEmoji",
+          MAX(p.created_at) AS "lastActivityAt"
+        FROM forum_category c
+        LEFT JOIN forum_post p ON p."categoryId" = c.id AND p.status = 'publish' AND ${scopeFilter}
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND ${catScopeFilter}
+        GROUP BY c.id
+        HAVING MAX(p.created_at) IS NULL
+            OR MAX(p.created_at) < NOW() - INTERVAL '30 days'
+        ORDER BY MAX(p.created_at) ASC NULLS FIRST
+      `),
+    ]);
+
+    const kpi = kpiRows[0] || {};
+    const activeForums7d = Math.max(kpi.activeForumsByPost7d || 0, kpi.activeForumsByComment7d || 0);
+
+    return {
+      totalForums: kpi.totalForums || 0,
+      activeForums7d,
+      posts7d: kpi.posts7d || 0,
+      comments7d: kpi.comments7d || 0,
+      topForums: topRows.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        iconEmoji: r.iconEmoji,
+        posts30d: r.posts30d,
+        comments30d: r.comments30d,
+        activityScore: r.posts30d + r.comments30d,
+      })),
+      inactiveForums30d: inactiveRows.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        iconEmoji: r.iconEmoji,
+        lastActivityAt: r.lastActivityAt,
+      })),
+    };
+  }
+
+  /**
    * 홈 페이지용 고정(pinned) 게시글
    */
   async listPinnedPosts(limit = 3) {

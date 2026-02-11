@@ -9,3 +9,4 @@ export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
 export { LegalManagementPage } from './LegalManagementPage';
 export { default as OperatorManagementPage } from './OperatorManagementPage';
+export { default as ForumAnalyticsDashboard } from './ForumAnalyticsDashboard';

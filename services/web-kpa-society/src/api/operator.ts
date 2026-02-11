@@ -69,9 +69,43 @@ interface OperatorSummaryResponse {
   data: OperatorSummary;
 }
 
+// Forum analytics types
+export interface ForumAnalyticsTopForum {
+  id: string;
+  name: string;
+  iconEmoji: string | null;
+  posts30d: number;
+  comments30d: number;
+  activityScore: number;
+}
+
+export interface ForumAnalyticsInactiveForum {
+  id: string;
+  name: string;
+  iconEmoji: string | null;
+  lastActivityAt: string | null;
+}
+
+export interface ForumAnalytics {
+  totalForums: number;
+  activeForums7d: number;
+  posts7d: number;
+  comments7d: number;
+  topForums: ForumAnalyticsTopForum[];
+  inactiveForums30d: ForumAnalyticsInactiveForum[];
+}
+
+interface ForumAnalyticsResponse {
+  success: boolean;
+  data: ForumAnalytics;
+}
+
 export const operatorApi = {
   getSummary: () =>
     apiClient.get<OperatorSummaryResponse>('/operator/summary'),
+
+  getForumAnalytics: () =>
+    apiClient.get<ForumAnalyticsResponse>('/operator/forum-analytics'),
 };
 
 export type { ContentItem, MediaItem, PlaylistItem, ForumPostItem };

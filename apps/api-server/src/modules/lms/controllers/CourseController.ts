@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
+import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -12,6 +13,20 @@ export class CourseController extends BaseController {
   static async createCourse(req: Request, res: Response): Promise<any> {
     try {
       const data = req.body;
+      const userId = (req as any).user?.id;
+
+      // WO-LMS-INSTRUCTOR-ROLE-V1: 유료 과정은 강사만 생성 가능
+      if (data.isPaid && userId) {
+        const hasInstructorRole = await roleAssignmentService.hasAnyRole(userId, [
+          'lms:instructor',
+          'platform:admin',
+          'platform:super_admin',
+        ]);
+        if (!hasInstructorRole) {
+          return BaseController.forbidden(res, '유료 과정은 강사만 생성할 수 있습니다');
+        }
+      }
+
       const service = CourseService.getInstance();
 
       const course = await service.createCourse(data);

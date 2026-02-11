@@ -21,6 +21,9 @@ export interface CreateCourseRequest {
   credits?: number;
   metadata?: Record<string, any>;
   tags?: string[];
+  // Paid Course (WO-LMS-PAID-COURSE-V1)
+  isPaid?: boolean;
+  price?: number;
 }
 
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
@@ -58,6 +61,20 @@ export class CourseService extends BaseService<Course> {
 
   // CRUD Operations
   async createCourse(data: CreateCourseRequest): Promise<Course> {
+    // WO-LMS-PAID-COURSE-V1 + WO-LMS-INSTRUCTOR-ROLE-V1: 제약 검증
+    if (data.isPaid) {
+      if (data.organizationId) {
+        throw new Error('v1: 유료 과정은 플랫폼 전체(organizationId=null)만 가능합니다');
+      }
+      if (data.maxEnrollments) {
+        throw new Error('v1: 유료 과정은 인원 제한을 사용할 수 없습니다');
+      }
+      // requiresApproval 허용 (강사 승인 모델)
+      if (!data.requiresApproval && (!data.price || Number(data.price) <= 0)) {
+        throw new Error('유료 과정은 가격이 필수입니다 (강사 승인 모델 제외)');
+      }
+    }
+
     const course = this.courseRepository.create({
       ...data,
       status: CourseStatus.DRAFT,
@@ -144,6 +161,26 @@ export class CourseService extends BaseService<Course> {
     const course = await this.getCourse(id);
     if (!course) {
       throw new Error(`Course not found: ${id}`);
+    }
+
+    // WO-LMS-PAID-COURSE-V1 + WO-LMS-INSTRUCTOR-ROLE-V1: 제약 검증 (변경 후 상태 기준)
+    const willBePaid = data.isPaid ?? course.isPaid;
+    if (willBePaid) {
+      const orgId = data.organizationId ?? course.organizationId;
+      const willRequireApproval = data.requiresApproval ?? course.requiresApproval;
+      const maxEnroll = data.maxEnrollments ?? course.maxEnrollments;
+      const price = data.price ?? course.price;
+
+      if (orgId) {
+        throw new Error('v1: 유료 과정은 플랫폼 전체(organizationId=null)만 가능합니다');
+      }
+      if (maxEnroll) {
+        throw new Error('v1: 유료 과정은 인원 제한을 사용할 수 없습니다');
+      }
+      // requiresApproval 허용 (강사 승인 모델)
+      if (!willRequireApproval && (!price || Number(price) <= 0)) {
+        throw new Error('유료 과정은 가격이 필수입니다 (강사 승인 모델 제외)');
+      }
     }
 
     // Update fields
