@@ -535,7 +535,7 @@ export function createCockpitController(
         // Phase 2-B stub: Log the copy action and return success
         // Full copy logic (creating actual store items) will be implemented
         // when the product management system is integrated
-        console.log(`[Store Copy] pharmacy=${pharmacy.id} item=${itemId} template=${templateType} visibility=${visibility} category=${categoryOverride || 'original'}`);
+        // Store copy action logged for debugging (Phase 2-B stub)
 
         res.json({
           success: true,
