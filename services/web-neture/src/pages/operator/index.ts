@@ -4,6 +4,7 @@
  */
 
 export { default as OperatorDashboard } from './OperatorDashboard';
+export { default as NetureOperatorDashboard } from './NetureOperatorDashboard';
 export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
 export { default as SupplyDashboardPage } from './SupplyDashboardPage';

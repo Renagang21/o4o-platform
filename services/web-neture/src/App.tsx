@@ -211,6 +211,9 @@ const EmailSettingsPage = lazy(() =>
 );
 
 // Operator Dashboard
+const NetureOperatorDashboard = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.NetureOperatorDashboard }))
+);
 const OperatorDashboard = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorDashboard }))
 );
@@ -470,7 +473,10 @@ function App() {
                 Operator Dashboard (/workspace/operator/*)
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
-              <Route path="/workspace/operator" element={<OperatorDashboard />} />
+              {/* Signal 기반 대시보드 (WO-NETURE-OPERATOR-DASHBOARD-UX-V1) */}
+              <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
+              {/* Legacy 대시보드 — 상세 현황 */}
+              <Route path="/workspace/operator/overview" element={<OperatorDashboard />} />
               <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
               <Route path="/workspace/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
               <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />
