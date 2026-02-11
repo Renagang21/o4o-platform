@@ -3742,6 +3742,9 @@ importers:
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
+      '@o4o/operator-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
