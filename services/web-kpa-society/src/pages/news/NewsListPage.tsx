@@ -2,16 +2,20 @@
  * NewsListPage - 콘텐츠 목록 페이지
  *
  * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
- * WO-APP-DATA-HUB-COPY-PHASE2A-V1: Dashboard copy 연동
  * Phase 3A: 추천/조회수/페이지네이션 실동작
  * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1: "이미 사용 중" 표시
+ *
+ * UX 원칙:
+ * - 리스트: 추천/조회는 숫자 표시만 (액션 없음)
+ * - 리스트: 가져오기(Copy) 버튼 제거 → 상세 페이지에서만 가능
+ * - 리스트: "사용 중" 상태 표시는 유지
+ * - 상세 페이지에서 추천/가져오기 액션 수행
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { newsApi, dashboardApi } from '../../api';
-import { useDashboardCopy } from '../../hooks/useDashboardCopy';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, typography } from '../../styles/theme';
 import {
@@ -21,7 +25,7 @@ import {
 } from '@o4o/types/content';
 import type { ContentType, ContentSortType } from '@o4o/types/content';
 import type { Notice } from '../../types';
-import { ContentSortButtons, ContentPagination, ContentMetaBar, ContentCardActions, CopyOptionsModal } from '@o4o/ui';
+import { ContentSortButtons, ContentPagination, ContentMetaBar } from '@o4o/ui';
 
 // Page-level filter types (subset of all content types shown in list)
 const filterTypes: ContentType[] = ['notice', 'hero', 'promo', 'news'];
@@ -45,45 +49,6 @@ export function NewsListPage() {
       .then(res => setCopiedIds(new Set(res.sourceIds || [])))
       .catch(() => {}); // 실패 시 무시 (복사 버튼 그대로 표시)
   }, [user?.id]);
-
-  // Phase 2-B: Dashboard copy hook with modal support
-  const {
-    loading: copyLoading,
-    modalState,
-    openCopyModal,
-    closeCopyModal,
-    executeCopy,
-  } = useDashboardCopy({
-    sourceType: 'content',
-    onSuccess: () => {
-      // Phase 3: 복사 완료 후 copiedIds 재로드
-      if (user?.id) {
-        dashboardApi.getCopiedSourceIds(user.id)
-          .then(res => setCopiedIds(new Set(res.sourceIds || [])))
-          .catch(() => {});
-      }
-    },
-  });
-
-  // Copy handler - opens modal for options selection
-  const handleCopy = useCallback((noticeId: string, noticeTitle?: string) => {
-    openCopyModal(noticeId, noticeTitle);
-  }, [openCopyModal]);
-
-  // Phase 3A: 추천 토글 핸들러
-  const handleRecommend = useCallback(async (noticeId: string) => {
-    try {
-      const result = await newsApi.toggleRecommend(noticeId);
-      const data = result.data || result;
-      setNotices(prev => prev.map(n =>
-        n.id === noticeId
-          ? { ...n, recommendCount: data.recommendCount, isRecommendedByMe: data.isRecommendedByMe }
-          : n
-      ));
-    } catch (err) {
-      console.warn('Recommend failed:', err);
-    }
-  }, []);
 
   const getTypeFromPath = (): ContentType | undefined => {
     const path = location.pathname;
@@ -193,7 +158,7 @@ export function NewsListPage() {
             {notices.map(notice => (
               <Link key={notice.id} to={`/news/${notice.id}`} style={styles.itemLink}>
                 <Card hover padding="medium">
-                  {/* 상단: 배지 + 액션 버튼 */}
+                  {/* 상단: 배지 + 사용 중 표시 */}
                   <div style={styles.cardTop}>
                     <div style={styles.badgeGroup}>
                       {notice.isPinned && <span style={styles.pinnedBadge}>중요</span>}
@@ -212,27 +177,20 @@ export function NewsListPage() {
                         <span style={styles.categoryBadge}>{notice.metadata.category}</span>
                       )}
                     </div>
-                    {copiedIds.has(notice.id) ? (
+                    {copiedIds.has(notice.id) && (
                       <span style={styles.inUseBadge}>&#10003; 사용 중</span>
-                    ) : (
-                      <ContentCardActions
-                        showCopy
-                        onCopy={() => handleCopy(notice.id, notice.title)}
-                      />
                     )}
                   </div>
                   <h3 style={styles.itemTitle}>{notice.title}</h3>
                   {(notice.summary || notice.excerpt) && (
                     <p style={styles.itemExcerpt}>{notice.summary || notice.excerpt}</p>
                   )}
-                  {/* 하단: 조회수, 추천수, 날짜 + 추천 클릭 */}
+                  {/* 하단: 조회수, 추천수, 날짜 (표시만, 액션은 상세 페이지에서) */}
                   <div style={{ marginTop: '12px' }}>
                     <ContentMetaBar
                       viewCount={notice.viewCount || notice.views || 0}
                       likeCount={notice.recommendCount ?? notice.likeCount ?? 0}
                       date={notice.publishedAt || notice.createdAt}
-                      isRecommended={notice.isRecommendedByMe}
-                      onRecommendedClick={() => handleRecommend(notice.id)}
                     />
                   </div>
                 </Card>
@@ -251,14 +209,6 @@ export function NewsListPage() {
         </>
       )}
 
-      {/* Phase 2-B: Copy Options Modal */}
-      <CopyOptionsModal
-        isOpen={modalState.isOpen}
-        onClose={closeCopyModal}
-        onConfirm={executeCopy}
-        originalTitle={modalState.sourceTitle || ''}
-        loading={copyLoading}
-      />
     </div>
   );
 }

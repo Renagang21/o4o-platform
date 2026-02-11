@@ -2,12 +2,13 @@
  * 행사/교육 페이지
  * Phase H8-FE: KPA Society Frontend
  * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentMetaBar + ContentPagination
- * WO-APP-DATA-HUB-COPY-PHASE2B-V1: 복사 옵션 모달
+ *
+ * UX 원칙:
+ * - 리스트: 가져오기(Copy) 버튼 제거 → 상세 페이지에서만 가능
  */
 
-import { useState, useMemo, useCallback } from 'react';
-import { ContentMetaBar, ContentPagination, ContentCardActions, CopyOptionsModal } from '@o4o/ui';
-import { useDashboardCopy } from '../hooks/useDashboardCopy';
+import { useState, useMemo } from 'react';
+import { ContentMetaBar, ContentPagination } from '@o4o/ui';
 
 const PAGE_SIZE = 6;
 
@@ -37,22 +38,6 @@ export function EventsPage() {
   const [selectedType, setSelectedType] = useState<string>('전체');
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Phase 2-B: Dashboard copy hook with modal support
-  const {
-    loading: copyLoading,
-    modalState,
-    openCopyModal,
-    closeCopyModal,
-    executeCopy,
-  } = useDashboardCopy({
-    sourceType: 'content',
-  });
-
-  // Copy handler - opens modal for options selection
-  const handleCopy = useCallback((eventId: number, eventTitle: string) => {
-    openCopyModal(String(eventId), eventTitle);
-  }, [openCopyModal]);
 
   const types = ['전체', '행사', '교육'];
   const statuses = ['전체', '예정', '진행중', '마감'];
@@ -183,11 +168,6 @@ export function EventsPage() {
                 <span style={styles.typeTag}>{getTypeText(event.type)}</span>
                 <span style={getStatusStyle(event.status)}>{getStatusText(event.status)}</span>
               </div>
-              {/* Data Hub Actions - Phase 2-B: 복사 버튼 */}
-              <ContentCardActions
-                showCopy
-                onCopy={() => handleCopy(event.id, event.title)}
-              />
             </div>
             <h3 style={styles.eventTitle}>
               <a href={`/events/${event.id}`} style={styles.link}>
@@ -250,14 +230,6 @@ export function EventsPage() {
         />
       )}
 
-      {/* Phase 2-B: Copy Options Modal */}
-      <CopyOptionsModal
-        isOpen={modalState.isOpen}
-        onClose={closeCopyModal}
-        onConfirm={executeCopy}
-        originalTitle={modalState.sourceTitle || ''}
-        loading={copyLoading}
-      />
     </div>
   );
 }

@@ -2,12 +2,19 @@
  * NewsDetailPage - 콘텐츠 상세 페이지
  *
  * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
+ *
+ * UX 원칙:
+ * - 본문 읽은 후 추천/가져오기 액션 수행
+ * - 조회수/추천수 메타 정보 표시
+ * - 조회수는 상세 진입 시 자동 증가 (trackView)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { newsApi } from '../../api';
+import { newsApi, dashboardApi } from '../../api';
+import { useDashboardCopy } from '../../hooks/useDashboardCopy';
+import { useAuth } from '../../contexts/AuthContext';
 import { colors, typography } from '../../styles/theme';
 import {
   CONTENT_TYPE_LABELS,
@@ -16,17 +23,41 @@ import {
 } from '@o4o/types/content';
 import type { ContentType } from '@o4o/types/content';
 import type { Notice } from '../../types';
+import { ContentMetaBar, CopyOptionsModal } from '@o4o/ui';
 
 export function NewsDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [notice, setNotice] = useState<Notice | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [recommending, setRecommending] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  // Dashboard copy hook
+  const {
+    loading: copyLoading,
+    modalState,
+    openCopyModal,
+    closeCopyModal,
+    executeCopy,
+  } = useDashboardCopy({
+    sourceType: 'content',
+    onSuccess: () => setIsCopied(true),
+  });
 
   useEffect(() => {
     if (id) loadData();
   }, [id]);
+
+  // Check if already copied
+  useEffect(() => {
+    if (!user?.id || !id) return;
+    dashboardApi.getCopiedSourceIds(user.id)
+      .then(res => setIsCopied(new Set(res.sourceIds || []).has(id)))
+      .catch(() => {});
+  }, [user?.id, id]);
 
   const loadData = async () => {
     try {
@@ -35,12 +66,38 @@ export function NewsDetailPage() {
 
       const res = await newsApi.getNotice(id!);
       setNotice(res.data);
+
+      // 조회수 증가 (상세 진입 시 자동)
+      newsApi.trackView(id!).catch(() => {});
     } catch (err) {
       setError(err instanceof Error ? err.message : '게시글을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleRecommend = useCallback(async () => {
+    if (!id || recommending) return;
+    setRecommending(true);
+    try {
+      const result = await newsApi.toggleRecommend(id);
+      const data = result.data || result;
+      setNotice(prev => prev ? {
+        ...prev,
+        recommendCount: data.recommendCount,
+        isRecommendedByMe: data.isRecommendedByMe,
+      } : prev);
+    } catch (err) {
+      console.warn('Recommend failed:', err);
+    } finally {
+      setRecommending(false);
+    }
+  }, [id, recommending]);
+
+  const handleCopy = useCallback(() => {
+    if (!notice) return;
+    openCopyModal(notice.id, notice.title);
+  }, [notice, openCopyModal]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + ' B';
@@ -64,6 +121,9 @@ export function NewsDetailPage() {
       </div>
     );
   }
+
+  const recommendCount = notice.recommendCount ?? notice.likeCount ?? 0;
+  const viewCount = notice.viewCount || notice.views || 0;
 
   return (
     <div style={styles.container}>
@@ -136,6 +196,43 @@ export function NewsDetailPage() {
             </div>
           </div>
         )}
+
+        {/* 메타 정보 + 액션 버튼 */}
+        <div style={styles.actionArea}>
+          <ContentMetaBar
+            viewCount={viewCount}
+            likeCount={recommendCount}
+            date={notice.publishedAt || notice.createdAt}
+          />
+
+          <div style={styles.actionButtons}>
+            <button
+              onClick={handleRecommend}
+              disabled={recommending}
+              style={{
+                ...styles.recommendButton,
+                ...(notice.isRecommendedByMe ? styles.recommendButtonActive : {}),
+              }}
+            >
+              <span>{notice.isRecommendedByMe ? '👍' : '👍'}</span>
+              <span>{notice.isRecommendedByMe ? '추천 취소' : '추천하기'}</span>
+              {recommendCount > 0 && <span style={styles.recommendCount}>{recommendCount}</span>}
+            </button>
+
+            {isCopied ? (
+              <span style={styles.inUseBadge}>✓ 사용 중</span>
+            ) : (
+              <button
+                onClick={handleCopy}
+                disabled={copyLoading}
+                style={styles.copyButton}
+              >
+                <span>📥</span>
+                <span>가져오기</span>
+              </button>
+            )}
+          </div>
+        </div>
       </Card>
 
       {/* 다음 행동 안내 */}
@@ -151,6 +248,15 @@ export function NewsDetailPage() {
           전체 콘텐츠 보기 →
         </Link>
       </div>
+
+      {/* Copy Options Modal */}
+      <CopyOptionsModal
+        isOpen={modalState.isOpen}
+        onClose={closeCopyModal}
+        onConfirm={executeCopy}
+        originalTitle={modalState.sourceTitle || ''}
+        loading={copyLoading}
+      />
     </div>
   );
 }
@@ -269,6 +375,68 @@ const styles: Record<string, React.CSSProperties> = {
   attachmentSize: {
     ...typography.bodyS,
     color: colors.neutral500,
+  },
+  actionArea: {
+    marginTop: '40px',
+    paddingTop: '24px',
+    borderTop: `1px solid ${colors.neutral200}`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
+  actionButtons: {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center',
+  },
+  recommendButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 500,
+    borderRadius: '8px',
+    border: `1px solid ${colors.neutral200}`,
+    backgroundColor: colors.white,
+    color: colors.neutral700,
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  },
+  recommendButtonActive: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+    color: '#2563EB',
+  },
+  recommendCount: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: 'inherit',
+  },
+  copyButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 500,
+    borderRadius: '8px',
+    border: `1px solid ${colors.neutral200}`,
+    backgroundColor: colors.white,
+    color: colors.neutral700,
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  },
+  inUseBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '10px 20px',
+    backgroundColor: '#DCFCE7',
+    color: '#16A34A',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
   },
   nextAction: {
     marginTop: '24px',
