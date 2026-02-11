@@ -13,13 +13,23 @@ import { colors, spacing, borderRadius, shadows, typography } from '../../styles
 import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { PlaceholderImage } from '../common';
 
-// CSS for hover effects (inline styles don't support :hover)
+// CSS for hover effects + responsive grid (inline styles don't support :hover / @media)
 const hoverStyles = `
   .signage-media-item:hover {
     background-color: ${colors.neutral50};
   }
   .signage-playlist-item:hover {
     background-color: ${colors.neutral50};
+  }
+  .signage-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: ${spacing.lg};
+  }
+  @media (min-width: 768px) {
+    .signage-grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 `;
 
@@ -82,7 +92,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
             <p style={styles.emptyHint}>디지털 사이니지로 약국을 꾸며보세요.</p>
           </div>
         ) : (
-          <div>
+          <div className="signage-grid">
             {media.length > 0 && (
               <div>
                 <h3 style={styles.subTitle}>동영상</h3>
@@ -117,7 +127,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
             )}
 
             {playlists.length > 0 && (
-              <div style={media.length > 0 ? { marginTop: spacing.lg } : undefined}>
+              <div>
                 <h3 style={styles.subTitle}>플레이리스트</h3>
                 <ul style={styles.playlistList}>
                   {playlists.map((pl) => (
