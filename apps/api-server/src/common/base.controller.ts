@@ -182,6 +182,25 @@ export abstract class BaseController {
   }
 
   /**
+   * Bad request response
+   * @param res - Express Response object
+   * @param message - Custom bad request message (default: 'Bad request')
+   * @param code - Machine-readable error code (default: 'BAD_REQUEST')
+   * @returns JSON response with 400 status
+   */
+  protected static badRequest(
+    res: Response,
+    message: string = 'Bad request',
+    code: ErrorCode = 'BAD_REQUEST'
+  ): Response {
+    return res.status(400).json({
+      success: false,
+      error: message,
+      code,
+    });
+  }
+
+  /**
    * Created response (for POST requests)
    * @param res - Express Response object
    * @param data - Created resource data
