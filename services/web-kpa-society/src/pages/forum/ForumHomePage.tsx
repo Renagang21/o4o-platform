@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { ForumHubSection } from '../../components/forum/ForumHubSection';
 import { ForumActivitySection } from '../../components/forum/ForumActivitySection';
 import { ForumCategorySection } from '../../components/forum/ForumCategorySection';
 import { ForumWritePrompt } from '../../components/forum/ForumWritePrompt';
@@ -54,6 +55,7 @@ export function ForumHomePage() {
       </div>
 
       <div style={styles.content}>
+        <ForumHubSection />
         <ForumActivitySection
           categories={categories}
           allPosts={allPosts}

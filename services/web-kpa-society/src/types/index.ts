@@ -83,6 +83,20 @@ export interface ForumComment {
 // Alias for ForumComment
 export type Comment = ForumComment;
 
+// 포럼 허브 카테고리 요약 (WO-KPA-FORUM-HUB-V2-PHASE1)
+export interface ForumHubItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string | null;
+  iconEmoji: string | null;
+  postCount: number;
+  memberCount: number;
+  lastActivityAt: string | null;
+  lastPostTitle: string | null;
+}
+
 export interface CreatePostRequest {
   title: string;
   content: string | any[]; // Block[] or string for backward compatibility

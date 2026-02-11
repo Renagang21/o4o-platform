@@ -50,6 +50,50 @@ export class ForumQueryService {
   }
 
   /**
+   * 포럼 허브 — 카테고리별 요약 (멤버 수, 최근 활동, 최근 글 제목)
+   */
+  async listForumHub() {
+    if (this.config.scope === 'community') {
+      return this.dataSource.query(`
+        SELECT
+          c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
+          c."postCount", c."sortOrder", c."isPinned",
+          COUNT(DISTINCT p.author_id)::int as "memberCount",
+          MAX(p.created_at) as "lastActivityAt",
+          (SELECT p2.title FROM forum_post p2
+           WHERE p2."categoryId" = c.id AND p2.status = 'publish'
+             AND p2.organization_id IS NULL
+           ORDER BY p2.created_at DESC LIMIT 1) as "lastPostTitle"
+        FROM forum_category c
+        LEFT JOIN forum_post p ON p."categoryId" = c.id
+          AND p.status = 'publish' AND p.organization_id IS NULL
+        WHERE c."isActive" = true AND c.organization_id IS NULL
+        GROUP BY c.id
+        ORDER BY c."isPinned" DESC, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST
+      `);
+    }
+
+    // organization scope
+    return this.dataSource.query(`
+      SELECT
+        c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
+        c."postCount", c."sortOrder", c."isPinned",
+        COUNT(DISTINCT p.author_id)::int as "memberCount",
+        MAX(p.created_at) as "lastActivityAt",
+        (SELECT p2.title FROM forum_post p2
+         WHERE p2."categoryId" = c.id AND p2.status = 'publish'
+           AND p2.organization_id = $1
+         ORDER BY p2.created_at DESC LIMIT 1) as "lastPostTitle"
+      FROM forum_category c
+      LEFT JOIN forum_post p ON p."categoryId" = c.id
+        AND p.status = 'publish' AND p.organization_id = $1
+      WHERE c."isActive" = true AND c.organization_id = $1
+      GROUP BY c.id
+      ORDER BY c."isPinned" DESC, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST
+    `, [this.config.organizationId]);
+  }
+
+  /**
    * 홈 페이지용 고정(pinned) 게시글
    */
   async listPinnedPosts(limit = 3) {

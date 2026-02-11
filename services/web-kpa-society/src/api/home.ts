@@ -7,6 +7,7 @@
 import { apiClient } from './client';
 import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
 import type { ForumHomePost } from '@o4o/types/forum';
+import type { ForumHubItem } from '../types';
 
 interface HomeNotice {
   id: string;
@@ -66,11 +67,17 @@ interface NewsListResponse {
   totalPages: number;
 }
 
+interface ForumHubResponse {
+  success: boolean;
+  data: ForumHubItem[];
+}
+
 export interface HomePageData {
   notices: HomeNotice[];
   news: HomeNotice[];
   community: { posts: HomeForumPost[]; featured: HomeFeatured[] };
   signage: { media: HomeMedia[]; playlists: HomePlaylist[] };
+  forumHub: ForumHubItem[];
 }
 
 export const homeApi = {
@@ -87,12 +94,20 @@ export const homeApi = {
    * 홈 페이지 전체 데이터를 병렬로 가져오기
    * 개별 useEffect 순차 호출 → Promise.allSettled 병렬 호출로 전환
    */
+  getForumHub: () =>
+    apiClient.get<ForumHubResponse>('/home/forum-hub'),
+
+  /**
+   * 홈 페이지 전체 데이터를 병렬로 가져오기
+   * 개별 useEffect 순차 호출 → Promise.allSettled 병렬 호출로 전환
+   */
   async prefetchAll(): Promise<HomePageData> {
-    const [noticesRes, newsRes, communityRes, signageRes] = await Promise.allSettled([
+    const [noticesRes, newsRes, communityRes, signageRes, forumHubRes] = await Promise.allSettled([
       apiClient.get<NoticesResponse>('/home/notices', { limit: 3 }),
       apiClient.get<NewsListResponse>('/news', { type: 'news', limit: 3, sort: 'latest' }),
       apiClient.get<CommunityResponse>('/home/community', { postLimit: 3, featuredLimit: 3 }),
       apiClient.get<SignageResponse>('/home/signage', { mediaLimit: 3, playlistLimit: 2 }),
+      apiClient.get<ForumHubResponse>('/home/forum-hub'),
     ]);
 
     return {
@@ -104,6 +119,7 @@ export const homeApi = {
       signage: signageRes.status === 'fulfilled'
         ? { media: signageRes.value.data?.media ?? [], playlists: signageRes.value.data?.playlists ?? [] }
         : { media: [], playlists: [] },
+      forumHub: forumHubRes.status === 'fulfilled' ? forumHubRes.value.data ?? [] : [],
     };
   },
 };

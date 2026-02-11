@@ -334,6 +334,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data });
   }));
 
+  // GET /home/forum-hub - 포럼 카테고리 허브 요약 (APP-FORUM Phase 2: ForumQueryService)
+  homeRouter.get('/forum-hub', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const data = await forumService.listForumHub();
+    res.json({ success: true, data });
+  }));
+
   router.use('/home', homeRouter);
 
   // ============================================================================
