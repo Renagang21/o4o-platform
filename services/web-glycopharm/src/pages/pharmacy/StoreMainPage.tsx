@@ -1,7 +1,7 @@
 /**
  * StoreMainPage - 매장 메인 페이지
  *
- * WO-STORE-MAIN-PAGE-PHASE1-V1 + PHASE2-A
+ * WO-STORE-MAIN-PAGE-PHASE1-V1 + PHASE2-A + PHASE2-B
  *
  * 5-block Cockpit 구조:
  * 1. 매장 현황 요약 (Status Summary)
@@ -10,15 +10,19 @@
  * 4. 빠른 액션 (Quick Actions)
  * 5. AI 요약 (Rule-based Stub)
  *
- * Phase 2-A:
- * - Approval status badges on REQUEST_REQUIRED items
- * - Approved items auto-move to "바로 이용 가능"
- * - LIMITED conditions tooltip
- * - Refetch on window focus for real-time sync
- * - Rejection reason display
+ * Phase 2-B:
+ * - Quick Actions: actionKey 구조화, 클릭 로그 수집, 정렬 가능 구조
+ * - 현황 요약 카드: 보조 설명, empty state, 클릭 이동
+ * - 승인 대기/반려 메시지 톤 정리
+ * - 행동 로그 수집 연동
+ *
+ * Phase 2-C:
+ * - Quick Actions 자동 정렬 (행동 로그 기반 가중치)
+ * - 자동 정렬 ON/OFF 토글 + 기본 순서 초기화
+ * - 히스테리시스: 상위 2개만 교체, 임계값 이상 차이일 때만
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Store,
@@ -41,12 +45,78 @@ import {
   Info,
   XCircle,
   RefreshCw,
+  FileText,
+  Copy,
+  RotateCcw,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import { AiSummaryButton } from '@/components/ai';
+import HubCopyModal from '@/components/store/HubCopyModal';
 import { PRODUCT_POLICY_CONFIG, APPROVAL_STATUS_CONFIG } from '@/config/store-catalog';
 import { generateStoreSummary } from '@/utils/store-ai-summary';
-import type { StoreMainData, StoreCatalogItem, AiSummaryResult } from '@/types/store-main';
+import { logStoreAction } from '@/utils/store-action-log';
+import { sortQuickActions, isAutoSortEnabled, setAutoSortEnabled } from '@/utils/store-action-sort';
+import type { StoreMainData, StoreCatalogItem, AiSummaryResult, CopyOptions } from '@/types/store-main';
+
+// ─── Phase 2-B: Quick Action 정의 ───────────────────────────────
+interface QuickActionItem {
+  actionKey: string;
+  label: string;
+  icon: typeof Package;
+  path: string;
+}
+
+const QUICK_ACTIONS: QuickActionItem[] = [
+  { actionKey: 'manage_products', label: '상품 관리', icon: Package, path: '/pharmacy/products' },
+  { actionKey: 'view_orders', label: '주문 확인', icon: ShoppingCart, path: '/pharmacy/orders' },
+  { actionKey: 'manage_content', label: '콘텐츠 관리', icon: Tv, path: '/pharmacy/signage/content' },
+  { actionKey: 'store_settings', label: '매장 설정', icon: Settings, path: '/pharmacy/settings' },
+  { actionKey: 'check_approvals', label: '승인 현황', icon: FileText, path: '/pharmacy/store-apply' },
+  { actionKey: 'b2b_order', label: 'B2B 주문', icon: ShoppingCart, path: '/pharmacy/b2b-order' },
+];
+
+// ─── Phase 2-B: 현황 카드 정의 ──────────────────────────────────
+interface SummaryCardConfig {
+  key: string;
+  icon: typeof Package;
+  label: string;
+  description: string;
+  emptyText: string;
+  linkTo?: string;
+}
+
+const SUMMARY_CARDS: SummaryCardConfig[] = [
+  {
+    key: 'activeServices',
+    icon: Tv,
+    label: '활성 서비스',
+    description: '현재 이용 중인 서비스',
+    emptyText: '아직 활성화된 서비스가 없습니다',
+  },
+  {
+    key: 'orderableProducts',
+    icon: Package,
+    label: '주문 가능 상품',
+    description: '지금 주문 가능한 상품',
+    emptyText: '주문 가능한 상품이 없습니다',
+    linkTo: '/pharmacy/products',
+  },
+  {
+    key: 'pendingApprovals',
+    icon: Clock,
+    label: '승인 대기',
+    description: '승인 처리가 필요한 항목',
+    emptyText: '대기 중인 승인 요청이 없습니다',
+    linkTo: '/pharmacy/store-apply',
+  },
+  {
+    key: 'activeChannels',
+    icon: Monitor,
+    label: '활성 채널',
+    description: '운영 중인 판매 채널',
+    emptyText: '활성화된 판매 채널이 없습니다',
+  },
+];
 
 export default function StoreMainPage() {
   const navigate = useNavigate();
@@ -56,6 +126,11 @@ export default function StoreMainPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requiresLogin, setRequiresLogin] = useState(false);
+  // Phase 2-B: Copy modal state
+  const [copyTarget, setCopyTarget] = useState<StoreCatalogItem | null>(null);
+  const [copyLoading, setCopyLoading] = useState(false);
+  // Phase 2-C: Auto-sort state
+  const [autoSort, setAutoSort] = useState(isAutoSortEnabled);
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
@@ -91,6 +166,23 @@ export default function StoreMainPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Phase 2-B: Copy handler
+  const handleCopy = useCallback(async (options: CopyOptions) => {
+    if (!copyTarget) return;
+    setCopyLoading(true);
+    try {
+      await pharmacyApi.copyStoreItem(copyTarget.id, options);
+      logStoreAction('copy_store_item');
+      setCopyTarget(null);
+      fetchData(true);
+    } catch (err: any) {
+      console.error('Copy failed:', err);
+      alert(err.message || '복사에 실패했습니다.');
+    } finally {
+      setCopyLoading(false);
+    }
+  }, [copyTarget, fetchData]);
 
   // Phase 2-A: Refetch on window focus for real-time sync
   useEffect(() => {
@@ -182,46 +274,57 @@ export default function StoreMainPage() {
           </div>
         </div>
 
+        {/* Phase 2-B: 구조화된 현황 카드 */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 bg-white border border-slate-200 rounded-xl">
-            <div className="flex items-center justify-between mb-2">
-              <Tv className="w-6 h-6 text-slate-500" />
-            </div>
-            <p className="text-2xl font-bold text-slate-800">{summary.activeServices}</p>
-            <p className="text-sm text-slate-500">활성 서비스</p>
-          </div>
+          {SUMMARY_CARDS.map((card) => {
+            const value = summary[card.key as keyof typeof summary];
+            const CardIcon = card.icon;
+            const isClickable = !!card.linkTo;
+            const isEmpty = value === 0;
 
-          <div className="p-4 bg-white border border-slate-200 rounded-xl">
-            <div className="flex items-center justify-between mb-2">
-              <Package className="w-6 h-6 text-slate-500" />
-            </div>
-            <p className="text-2xl font-bold text-slate-800">{summary.orderableProducts}</p>
-            <p className="text-sm text-slate-500">주문 가능 상품</p>
-          </div>
+            const cardContent = (
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <CardIcon className="w-6 h-6 text-slate-500" />
+                  {card.key === 'pendingApprovals' && value > 0 && (
+                    <span className="w-6 h-6 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {value}
+                    </span>
+                  )}
+                  {isClickable && (
+                    <ArrowRight className="w-4 h-4 text-slate-300" />
+                  )}
+                </div>
+                <p className="text-2xl font-bold text-slate-800">{value}</p>
+                <p className="text-sm text-slate-500">{card.label}</p>
+                {/* Phase 2-B: 보조 설명 */}
+                {isEmpty ? (
+                  <p className="text-xs text-slate-400 mt-1">{card.emptyText}</p>
+                ) : (
+                  <p className="text-xs text-slate-400 mt-1">{card.description}</p>
+                )}
+              </>
+            );
 
-          <NavLink
-            to="/pharmacy/store-apply"
-            className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <Clock className="w-6 h-6 text-slate-500" />
-              {summary.pendingApprovals > 0 && (
-                <span className="w-6 h-6 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                  {summary.pendingApprovals}
-                </span>
-              )}
-            </div>
-            <p className="text-2xl font-bold text-slate-800">{summary.pendingApprovals}</p>
-            <p className="text-sm text-slate-500">승인 대기</p>
-          </NavLink>
+            if (isClickable) {
+              return (
+                <NavLink
+                  key={card.key}
+                  to={card.linkTo!}
+                  onClick={() => logStoreAction(`summary_${card.key}`)}
+                  className="p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all"
+                >
+                  {cardContent}
+                </NavLink>
+              );
+            }
 
-          <div className="p-4 bg-white border border-slate-200 rounded-xl">
-            <div className="flex items-center justify-between mb-2">
-              <Monitor className="w-6 h-6 text-slate-500" />
-            </div>
-            <p className="text-2xl font-bold text-slate-800">{summary.activeChannels}</p>
-            <p className="text-sm text-slate-500">활성 채널</p>
-          </div>
+            return (
+              <div key={card.key} className="p-4 bg-white border border-slate-200 rounded-xl">
+                {cardContent}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -242,7 +345,7 @@ export default function StoreMainPage() {
         {readyToUse.length > 0 ? (
           <div className="divide-y divide-slate-100">
             {readyToUse.map((item) => (
-              <CatalogItemRow key={item.id} item={item} />
+              <CatalogItemRow key={item.id} item={item} onCopy={() => setCopyTarget(item)} />
             ))}
           </div>
         ) : (
@@ -265,7 +368,7 @@ export default function StoreMainPage() {
         {expandable.length > 0 ? (
           <div className="divide-y divide-slate-100">
             {expandable.map((item) => (
-              <CatalogItemRow key={item.id} item={item} showAction />
+              <CatalogItemRow key={item.id} item={item} showAction onCopy={() => setCopyTarget(item)} />
             ))}
           </div>
         ) : (
@@ -278,40 +381,18 @@ export default function StoreMainPage() {
 
       {/* ========================================= */}
       {/* Block 4: 빠른 액션 (Quick Actions)        */}
+      {/* Phase 2-C: 자동 정렬 + 토글/리셋          */}
       {/* ========================================= */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">빠른 이동</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <NavLink
-            to="/pharmacy/products"
-            className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group"
-          >
-            <Package className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">상품 관리</span>
-          </NavLink>
-          <NavLink
-            to="/pharmacy/orders"
-            className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group"
-          >
-            <ShoppingCart className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">주문 확인</span>
-          </NavLink>
-          <NavLink
-            to="/pharmacy/signage/content"
-            className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group"
-          >
-            <Tv className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">콘텐츠 관리</span>
-          </NavLink>
-          <NavLink
-            to="/pharmacy/settings"
-            className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group"
-          >
-            <Settings className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
-            <span className="text-sm font-medium">매장 설정</span>
-          </NavLink>
-        </div>
-      </div>
+      <QuickActionsBlock autoSort={autoSort} onToggleSort={setAutoSort} />
+
+      {/* Phase 2-B: Copy Modal */}
+      <HubCopyModal
+        isOpen={!!copyTarget}
+        item={copyTarget}
+        loading={copyLoading}
+        onClose={() => setCopyTarget(null)}
+        onConfirm={handleCopy}
+      />
 
       {/* ========================================= */}
       {/* Block 5: AI 요약 (Rule-based Stub)        */}
@@ -345,8 +426,8 @@ export default function StoreMainPage() {
   );
 }
 
-/** 카탈로그 상품 행 컴포넌트 (Phase 2-A enhanced) */
-function CatalogItemRow({ item, showAction }: { item: StoreCatalogItem; showAction?: boolean }) {
+/** 카탈로그 상품 행 컴포넌트 (Phase 2-A + Phase 2-B enhanced) */
+function CatalogItemRow({ item, showAction, onCopy }: { item: StoreCatalogItem; showAction?: boolean; onCopy?: () => void }) {
   const [showConditions, setShowConditions] = useState(false);
   const policyConfig = PRODUCT_POLICY_CONFIG[item.policy];
   const approvalConfig = item.approvalStatus && item.approvalStatus !== 'none'
@@ -368,7 +449,7 @@ function CatalogItemRow({ item, showAction }: { item: StoreCatalogItem; showActi
             {policyConfig.label}
           </span>
 
-          {/* Phase 2-A: Approval status badge */}
+          {/* Phase 2-A: Approval status badge + Phase 2-B: 톤 정리 */}
           {approvalConfig && (
             <span className={`inline-flex items-center gap-1 px-2 py-1 ${approvalConfig.badgeColor} ${approvalConfig.textColor} text-xs font-medium rounded-full whitespace-nowrap flex-shrink-0`}>
               {item.approvalStatus === 'pending' && <Clock className="w-3 h-3" />}
@@ -412,30 +493,45 @@ function CatalogItemRow({ item, showAction }: { item: StoreCatalogItem; showActi
             </span>
           )}
 
-          {/* Action button for REQUEST_REQUIRED (pending or none) */}
+          {/* Phase 2-B: Copy button */}
+          {onCopy && (
+            <button
+              onClick={() => { logStoreAction('open_copy_modal'); onCopy(); }}
+              className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-medium rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors"
+            >
+              <Copy className="w-3 h-3 inline mr-1" />
+              추가
+            </button>
+          )}
+
+          {/* Action button for REQUEST_REQUIRED (none or rejected) */}
           {showAction && item.policy === 'REQUEST_REQUIRED' && item.approvalStatus !== 'approved' && item.approvalStatus !== 'pending' && (
             <NavLink
               to="/pharmacy/store-apply"
+              onClick={() => logStoreAction('apply_request')}
               className="px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors"
             >
               신청하기
             </NavLink>
           )}
 
-          {/* Pending status: show waiting indicator instead of action */}
+          {/* Phase 2-B: Pending status — 안내 톤 */}
           {showAction && item.policy === 'REQUEST_REQUIRED' && item.approvalStatus === 'pending' && (
             <span className="px-3 py-1.5 bg-amber-50 text-amber-600 text-xs font-medium rounded-lg">
-              심사 중
+              승인 검토 중입니다
             </span>
           )}
         </div>
       </div>
 
-      {/* Phase 2-A: Rejection reason */}
+      {/* Phase 2-B: Rejection reason — 안내/절차 톤 */}
       {item.approvalStatus === 'rejected' && item.rejectionReason && (
         <div className="mt-2 ml-[4.5rem] p-2 bg-red-50 border border-red-100 rounded-lg">
           <p className="text-xs text-red-600">
-            <span className="font-medium">반려 사유:</span> {item.rejectionReason}
+            <span className="font-medium">반려 안내:</span> {item.rejectionReason}
+          </p>
+          <p className="text-xs text-red-500 mt-1">
+            내용을 수정하여 다시 신청할 수 있습니다.
           </p>
         </div>
       )}
@@ -454,6 +550,77 @@ function CatalogItemRow({ item, showAction }: { item: StoreCatalogItem; showActi
           </ul>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Phase 2-C: Quick Actions 블록 (자동 정렬 포함) */
+function QuickActionsBlock({ autoSort, onToggleSort }: { autoSort: boolean; onToggleSort: (v: boolean) => void }) {
+  const DEFAULT_ORDER = QUICK_ACTIONS.map((a) => a.actionKey);
+
+  const sortedActions = useMemo(() => {
+    const sortedKeys = sortQuickActions(DEFAULT_ORDER);
+    return sortedKeys
+      .map((key) => QUICK_ACTIONS.find((a) => a.actionKey === key))
+      .filter((a): a is QuickActionItem => !!a);
+  }, [autoSort]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleToggle = () => {
+    const next = !autoSort;
+    setAutoSortEnabled(next);
+    onToggleSort(next);
+  };
+
+  const handleReset = () => {
+    setAutoSortEnabled(false);
+    onToggleSort(false);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-slate-800">빠른 이동</h2>
+        <div className="flex items-center gap-2">
+          {autoSort && (
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              title="기본 순서로 초기화"
+            >
+              <RotateCcw className="w-3 h-3" />
+              초기화
+            </button>
+          )}
+          <button
+            onClick={handleToggle}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
+              autoSort
+                ? 'bg-primary-50 text-primary-700'
+                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+            }`}
+            title={autoSort ? '자동 정렬 끄기' : '자동 정렬 켜기'}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${autoSort ? 'bg-primary-500' : 'bg-slate-400'}`} />
+            자동 정렬
+          </button>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {sortedActions.map((action) => {
+          const ActionIcon = action.icon;
+          return (
+            <NavLink
+              key={action.actionKey}
+              to={action.path}
+              onClick={() => logStoreAction(action.actionKey)}
+              className="p-4 bg-slate-50 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-colors text-center group"
+            >
+              <ActionIcon className="w-6 h-6 mx-auto mb-2 text-slate-400 group-hover:text-primary-600" />
+              <span className="text-sm font-medium">{action.label}</span>
+            </NavLink>
+          );
+        })}
+      </div>
     </div>
   );
 }

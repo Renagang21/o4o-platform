@@ -59,6 +59,19 @@ export interface StoreMainData {
   expandable: StoreCatalogItem[];
 }
 
+/** Phase 2-B: 복사 템플릿 타입 */
+export type CopyTemplateType = 'default' | 'empty';
+
+/** Phase 2-B: 복사 노출 방식 */
+export type CopyVisibility = 'public' | 'private';
+
+/** Phase 2-B: 복사 옵션 */
+export interface CopyOptions {
+  templateType: CopyTemplateType;
+  visibility: CopyVisibility;
+  categoryOverride?: string;
+}
+
 /** AI 요약 결과 (rule-based stub) */
 export interface AiSummaryResult {
   message: string;

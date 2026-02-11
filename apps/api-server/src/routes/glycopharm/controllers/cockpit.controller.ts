@@ -488,5 +488,70 @@ export function createCockpitController(
     }
   );
 
+  /**
+   * POST /pharmacy/cockpit/store-main/:itemId/copy
+   * Copy a hub catalog item to pharmacy's store
+   * WO-APP-DATA-HUB-PHASE2-B
+   */
+  router.post(
+    '/store-main/:itemId/copy',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          });
+          return;
+        }
+
+        const { itemId } = req.params;
+        const { templateType, visibility, categoryOverride } = req.body || {};
+
+        // Validate required fields
+        if (!templateType || !visibility) {
+          res.status(400).json({
+            error: { code: 'INVALID_INPUT', message: 'templateType and visibility are required' },
+          });
+          return;
+        }
+
+        // Verify pharmacy exists
+        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacy = await pharmacyRepo.findOne({
+          where: { created_by_user_id: userId },
+        });
+
+        if (!pharmacy) {
+          res.status(404).json({
+            error: { code: 'PHARMACY_NOT_FOUND', message: '등록된 약국이 없습니다' },
+          });
+          return;
+        }
+
+        // Phase 2-B stub: Log the copy action and return success
+        // Full copy logic (creating actual store items) will be implemented
+        // when the product management system is integrated
+        console.log(`[Store Copy] pharmacy=${pharmacy.id} item=${itemId} template=${templateType} visibility=${visibility} category=${categoryOverride || 'original'}`);
+
+        res.json({
+          success: true,
+          data: {
+            id: `copy-${itemId}-${Date.now()}`,
+            message: '내 매장에 추가되었습니다',
+          },
+        });
+      } catch (error: any) {
+        console.error('Failed to copy store item:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
   return router;
 }

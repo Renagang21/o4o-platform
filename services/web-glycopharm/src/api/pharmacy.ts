@@ -8,7 +8,7 @@ import type {
   StoreApiResponse,
   StorePaginatedResponse,
 } from '@/types/store';
-import type { StoreMainData } from '@/types/store-main';
+import type { StoreMainData, CopyOptions } from '@/types/store-main';
 
 import { getAccessToken } from '@/contexts/AuthContext';
 
@@ -273,6 +273,19 @@ class PharmacyApiClient {
    */
   async getStoreMain(): Promise<StoreApiResponse<StoreMainData>> {
     return this.request('/api/v1/glycopharm/pharmacy/cockpit/store-main');
+  }
+
+  /**
+   * 허브 상품 복사 (WO-APP-DATA-HUB-PHASE2-B)
+   */
+  async copyStoreItem(
+    itemId: string,
+    options: CopyOptions
+  ): Promise<StoreApiResponse<{ id: string; message: string }>> {
+    return this.request(`/api/v1/glycopharm/pharmacy/cockpit/store-main/${itemId}/copy`, {
+      method: 'POST',
+      body: JSON.stringify(options),
+    });
   }
 
   // ============================================================================
