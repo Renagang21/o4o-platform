@@ -335,8 +335,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   // GET /home/forum-hub - 포럼 카테고리 허브 요약 (APP-FORUM Phase 2: ForumQueryService)
+  // ?sort=default|recent|popular  ?q=검색어
   homeRouter.get('/forum-hub', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const data = await forumService.listForumHub();
+    const sort = (req.query.sort as string) || 'default';
+    const keyword = (req.query.q as string) || '';
+    const data = await forumService.listForumHub({ sort, keyword });
     res.json({ success: true, data });
   }));
 

@@ -94,8 +94,8 @@ export const homeApi = {
    * 홈 페이지 전체 데이터를 병렬로 가져오기
    * 개별 useEffect 순차 호출 → Promise.allSettled 병렬 호출로 전환
    */
-  getForumHub: () =>
-    apiClient.get<ForumHubResponse>('/home/forum-hub'),
+  getForumHub: (params?: { sort?: string; q?: string }) =>
+    apiClient.get<ForumHubResponse>('/home/forum-hub', params),
 
   /**
    * 홈 페이지 전체 데이터를 병렬로 가져오기

@@ -51,9 +51,32 @@ export class ForumQueryService {
 
   /**
    * 포럼 허브 — 카테고리별 요약 (멤버 수, 최근 활동, 최근 글 제목)
+   * Phase 2: sort(default|recent|popular) + keyword 검색
    */
-  async listForumHub() {
+  async listForumHub(options?: { sort?: string; keyword?: string }) {
+    const sort = options?.sort || 'default';
+    const keyword = options?.keyword?.trim() || '';
+
+    let orderBy: string;
+    switch (sort) {
+      case 'recent':
+        orderBy = 'MAX(p.created_at) DESC NULLS LAST, c."isPinned" DESC';
+        break;
+      case 'popular':
+        orderBy = 'c."postCount" DESC, c."isPinned" DESC';
+        break;
+      default:
+        orderBy = 'c."isPinned" DESC, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST';
+    }
+
     if (this.config.scope === 'community') {
+      const params: any[] = [];
+      let keywordFilter = '';
+      if (keyword) {
+        params.push(`%${keyword}%`);
+        keywordFilter = `AND c.name ILIKE $${params.length}`;
+      }
+
       return this.dataSource.query(`
         SELECT
           c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
@@ -67,13 +90,20 @@ export class ForumQueryService {
         FROM forum_category c
         LEFT JOIN forum_post p ON p."categoryId" = c.id
           AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c.organization_id IS NULL
+        WHERE c."isActive" = true AND c.organization_id IS NULL ${keywordFilter}
         GROUP BY c.id
-        ORDER BY c."isPinned" DESC, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST
-      `);
+        ORDER BY ${orderBy}
+      `, params);
     }
 
     // organization scope
+    const params: any[] = [this.config.organizationId];
+    let keywordFilter = '';
+    if (keyword) {
+      params.push(`%${keyword}%`);
+      keywordFilter = `AND c.name ILIKE $${params.length}`;
+    }
+
     return this.dataSource.query(`
       SELECT
         c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
@@ -87,10 +117,10 @@ export class ForumQueryService {
       FROM forum_category c
       LEFT JOIN forum_post p ON p."categoryId" = c.id
         AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c.organization_id = $1
+      WHERE c."isActive" = true AND c.organization_id = $1 ${keywordFilter}
       GROUP BY c.id
-      ORDER BY c."isPinned" DESC, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST
-    `, [this.config.organizationId]);
+      ORDER BY ${orderBy}
+    `, params);
   }
 
   /**
