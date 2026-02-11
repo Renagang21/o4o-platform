@@ -60,6 +60,8 @@ const PartnerStatusPage = lazy(() => import('@/pages/partner/StatusPage'));
 
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
 const SignageContentHubPage = lazy(() => import('@/pages/signage/ContentHubPage'));
+const SignagePlaylistDetailPage = lazy(() => import('@/pages/signage/PlaylistDetailPage'));
+const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPage'));
 
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
@@ -187,6 +189,8 @@ function AppRoutes() {
         <Route path="targets" element={<PartnerTargetsPage />} />
         <Route path="content" element={<PartnerContentPage />} />
         <Route path="signage/content" element={<SignageContentHubPage />} />
+              <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+              <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="events" element={<PartnerEventsPage />} />
         <Route path="status" element={<PartnerStatusPage />} />
       </Route>
@@ -213,6 +217,8 @@ function AppRoutes() {
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
         <Route path="marketing" element={<OperatorMarketingPage />} />
         <Route path="signage/content" element={<SignageContentHubPage />} />
+              <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+              <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="support" element={<OperatorSupportPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />

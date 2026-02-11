@@ -24,6 +24,8 @@ export interface SignageMedia {
   height?: number;
   fileSize?: number;
   ownerType: MediaOwnerType;
+  source?: ContentSource;
+  creatorName?: string;
   tags: string[];
   metadata: Record<string, unknown>;
   isActive: boolean;
@@ -33,6 +35,22 @@ export interface SignageMedia {
 }
 
 export type TransitionEffect = 'none' | 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom';
+
+export interface SignagePlaylistItem {
+  id: string;
+  playlistId: string;
+  mediaId: string;
+  media?: SignageMedia;
+  displayOrder: number;
+  displayDuration?: number;
+  transitionEffect?: TransitionEffect;
+  transitionDuration?: number;
+  isForced: boolean;
+  settings: Record<string, unknown>;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface SignagePlaylist {
   id: string;
@@ -46,6 +64,9 @@ export interface SignagePlaylist {
   itemCount: number;
   isActive: boolean;
   isLoop: boolean;
+  items?: SignagePlaylistItem[];
+  source?: ContentSource;
+  creatorName?: string;
   tags: string[];
   metadata: Record<string, unknown>;
   createdByUserId?: string;
@@ -74,6 +95,27 @@ export type ContentSource = 'hq' | 'supplier' | 'community';
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const getBaseUrl = (serviceKey: string = 'k-cosmetics') =>
   `${API_BASE}/api/signage/${serviceKey}`;
+
+/** Public Content API — 인증 불필요 (공개 조회용) */
+export const publicContentApi = {
+  async getMedia(id: string, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
+    try {
+      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/public/media/${id}`);
+      return { success: true, data: response.data?.data || response.data };
+    } catch {
+      return { success: false, error: 'Failed to get media' };
+    }
+  },
+
+  async getPlaylist(id: string, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
+    try {
+      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/public/playlists/${id}`);
+      return { success: true, data: response.data?.data || response.data };
+    } catch {
+      return { success: false, error: 'Failed to get playlist' };
+    }
+  },
+};
 
 export const globalContentApi = {
   async listPlaylists(source: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignagePlaylist>>> {

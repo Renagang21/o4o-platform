@@ -53,6 +53,8 @@ const ContentLibraryPage = lazy(() => import('@/pages/pharmacy/signage').then(m 
 const ContentHubPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentHubPage })));
 const MySignagePage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MySignagePage })));
 const SignagePreviewPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.SignagePreviewPage })));
+const SignagePlaylistDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.PlaylistDetailPage })));
+const SignageMediaDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MediaDetailPage })));
 
 // Market Trial Extension
 const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
@@ -281,6 +283,8 @@ function AppRoutes() {
         {/* Signage Extension (New) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/content" element={<ContentHubPage />} />
+        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         {/* Market Trial Extension */}
@@ -327,6 +331,8 @@ function AppRoutes() {
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/content" element={<ContentHubPage />} />
+        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
@@ -379,6 +385,8 @@ function AppRoutes() {
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/content" element={<ContentHubPage />} />
+        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>

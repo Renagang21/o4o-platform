@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
 import { globalContentApi, type SignagePlaylist, type SignageMedia, type ContentSource } from '@/lib/api/signageV2';
 import { ContentPagination } from '@o4o/ui';
@@ -17,6 +18,7 @@ type ContentType = 'playlists' | 'media';
 const PAGE_SIZE = 9;
 
 export default function ContentHubPage() {
+  const navigate = useNavigate();
   const [activeSource, setActiveSource] = useState<ContentSource>('community');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
@@ -132,7 +134,11 @@ export default function ContentHubPage() {
   };
 
   const renderPlaylistCard = (playlist: SignagePlaylist) => (
-    <div key={playlist.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div
+      key={playlist.id}
+      onClick={() => navigate(`signage/playlist/${playlist.id}`)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+    >
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -164,7 +170,7 @@ export default function ContentHubPage() {
       </div>
       <div className="px-4 pb-4 flex gap-2">
         <button
-          onClick={() => handleClonePlaylist(playlist.id, playlist.name)}
+          onClick={(e) => { e.stopPropagation(); handleClonePlaylist(playlist.id, playlist.name); }}
           className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
         >
           <Download className="h-4 w-4" />
@@ -175,7 +181,11 @@ export default function ContentHubPage() {
   );
 
   const renderMediaCard = (item: SignageMedia) => (
-    <div key={item.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div
+      key={item.id}
+      onClick={() => navigate(`signage/media/${item.id}`)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+    >
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -216,7 +226,7 @@ export default function ContentHubPage() {
       </div>
       <div className="px-4 pb-4 flex gap-2">
         <button
-          onClick={() => handleCloneMedia(item.id, item.name)}
+          onClick={(e) => { e.stopPropagation(); handleCloneMedia(item.id, item.name); }}
           className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
         >
           <Download className="h-4 w-4" />

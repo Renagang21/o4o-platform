@@ -92,7 +92,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
             <p style={styles.emptyHint}>디지털 사이니지로 약국을 꾸며보세요.</p>
           </div>
         ) : (
-          <div className="signage-grid">
+          <div>
             {media.length > 0 && (
               <div>
                 <h3 style={styles.subTitle}>동영상</h3>
@@ -101,11 +101,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
                     const thumbnailUrl = getMediaThumbnailUrl(item);
                     return (
                       <li key={item.id}>
-                        <Link
-                          to={`/signage/media/${item.id}`}
-                          style={styles.mediaItem}
-                          className="signage-media-item"
-                        >
+                        <div style={styles.mediaItem}>
                           <div style={styles.mediaThumbSmall}>
                             <MediaThumbnail url={thumbnailUrl} name={item.name} mediaType={item.mediaType} />
                           </div>
@@ -115,10 +111,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
                               <span style={styles.mediaDuration}>{formatDuration(item.duration)}</span>
                             )}
                           </div>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.neutral400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="9 18 15 12 9 6" />
-                          </svg>
-                        </Link>
+                        </div>
                       </li>
                     );
                   })}
@@ -127,16 +120,12 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
             )}
 
             {playlists.length > 0 && (
-              <div>
+              <div style={media.length > 0 ? { marginTop: spacing.lg } : undefined}>
                 <h3 style={styles.subTitle}>플레이리스트</h3>
                 <ul style={styles.playlistList}>
                   {playlists.map((pl) => (
                     <li key={pl.id}>
-                      <Link
-                        to={`/signage/playlist/${pl.id}`}
-                        style={styles.playlistItem}
-                        className="signage-playlist-item"
-                      >
+                      <div style={styles.playlistItem}>
                         <div style={styles.playlistIcon}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="8" y1="6" x2="21" y2="6" />
@@ -154,11 +143,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
                             {pl.totalDuration > 0 && ` · ${formatDuration(pl.totalDuration)}`}
                           </span>
                         </div>
-                        {/* Arrow indicator */}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.neutral400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
-                      </Link>
+                      </div>
                     </li>
                   ))}
                 </ul>

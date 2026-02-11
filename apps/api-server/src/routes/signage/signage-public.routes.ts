@@ -67,7 +67,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           m.id, m.name, m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
           m.duration, m.tags, m.metadata, m.source,
           m."createdAt", m."updatedAt",
-          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+          COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_media m
         LEFT JOIN organizations o ON m."organizationId" = o.id
         LEFT JOIN users u ON m."createdByUserId" = u.id
@@ -142,7 +142,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           p."loopEnabled" as "isLoop",
           p.metadata, p.source,
           p."createdAt", p."updatedAt",
-          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+          COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_playlists p
         LEFT JOIN organizations o ON p."organizationId" = o.id
         LEFT JOIN users u ON p."createdByUserId" = u.id
@@ -189,7 +189,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           m.id, m.name, m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
           m.duration, m.tags, m.metadata, m.source,
           m."createdAt", m."updatedAt",
-          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+          COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_media m
         LEFT JOIN organizations o ON m."organizationId" = o.id
         LEFT JOIN users u ON m."createdByUserId" = u.id
@@ -229,7 +229,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           p."loopEnabled" as "isLoop",
           p.metadata, p.source,
           p."createdAt", p."updatedAt",
-          COALESCE(o.name, u."displayName", u.email) as "creatorName"
+          COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_playlists p
         LEFT JOIN organizations o ON p."organizationId" = o.id
         LEFT JOIN users u ON p."createdByUserId" = u.id
