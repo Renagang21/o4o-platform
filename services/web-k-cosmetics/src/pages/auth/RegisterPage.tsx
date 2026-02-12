@@ -77,6 +77,9 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
+        }
         throw new Error(data.error || '회원가입에 실패했습니다.');
       }
 
