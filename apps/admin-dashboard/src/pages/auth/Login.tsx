@@ -72,21 +72,27 @@ const Login: FC = () => {
       
       toast.success('관리자 로그인 성공!');
     } catch (error: any) {
-    // Error logging - use proper error handler
-      
-      // 구체적인 에러 메시지 표시
-      let errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
-      
-      if (errorMessage.includes('Invalid credentials')) {
-        errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.';
-      } else if (errorMessage.includes('Account not active')) {
+      // 에러 코드 기반 한국어 메시지 표시
+      let errorMessage = '로그인에 실패했습니다.';
+      const errorCode = error?.response?.data?.code;
+      const serverMessage = error?.response?.data?.error;
+
+      if (errorCode === 'INVALID_USER') {
+        errorMessage = '등록되지 않은 이메일입니다.';
+      } else if (errorCode === 'INVALID_CREDENTIALS') {
+        errorMessage = '비밀번호가 올바르지 않습니다.';
+      } else if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
         errorMessage = '계정이 비활성화되었습니다. 관리자에게 문의하세요.';
-      } else if (errorMessage.includes('insufficient_role')) {
-        errorMessage = '관리자 권한이 없습니다.';
-      } else if (errorMessage.includes('Account is temporarily locked')) {
+      } else if (errorCode === 'ACCOUNT_LOCKED') {
         errorMessage = '계정이 임시로 잠겼습니다. 잠시 후 다시 시도하세요.';
+      } else if (error?.response?.status === 429) {
+        errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+      } else if (serverMessage) {
+        errorMessage = serverMessage;
+      } else if (error instanceof Error && error.message !== 'Request failed with status code 401') {
+        errorMessage = error.message;
       }
-      
+
       toast.error(errorMessage);
     }
   };

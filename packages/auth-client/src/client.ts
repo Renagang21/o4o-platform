@@ -75,6 +75,14 @@ export class AuthClient {
 
         // Check if error is 401 and not already retried
         if (error.response?.status === 401 && !originalRequest._retry) {
+          // Skip refresh for auth endpoints - 401 from login/register/refresh is expected
+          const requestUrl = originalRequest?.url || '';
+          if (requestUrl.includes('/auth/login') ||
+              requestUrl.includes('/auth/register') ||
+              requestUrl.includes('/auth/refresh')) {
+            return Promise.reject(error);
+          }
+
           // For localStorage strategy, skip refresh if no refresh token exists
           // This prevents unnecessary refresh attempts when user is not logged in
           if (this.strategy === 'localStorage') {
