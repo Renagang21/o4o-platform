@@ -146,6 +146,39 @@ export interface Course {
   instructor?: { id: string; name: string; avatar?: string };
 }
 
+// Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
+export interface InstructorCourseItem {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string | null;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  duration: number;
+  isPaid: boolean;
+  price: number | null;
+  credits: number;
+  tags: string[];
+  currentEnrollments: number;
+  createdAt: string;
+  publishedAt: string | null;
+}
+
+export interface InstructorPublicProfile {
+  instructor: {
+    id: string;
+    name: string;
+    nickname: string | null;
+    avatar: string | null;
+  };
+  stats: {
+    courseCount: number;
+    totalStudents: number;
+    freeCourses: number;
+    paidCourses: number;
+  };
+  courses: InstructorCourseItem[];
+}
+
 export interface Lesson {
   id: string;
   courseId: string;

@@ -305,9 +305,15 @@ export function CourseIntroPage() {
               ) : (
                 <div style={styles.instructorAvatarPlaceholder}>👤</div>
               )}
-              <span style={styles.instructorName}>
-                {course.instructorName || course.instructor?.name || '강사 미정'}
-              </span>
+              {course.instructor?.id ? (
+                <Link to={`/instructors/${course.instructor.id}`} style={{ ...styles.instructorName, textDecoration: 'none' }}>
+                  {course.instructorName || course.instructor?.name || '강사 미정'}
+                </Link>
+              ) : (
+                <span style={styles.instructorName}>
+                  {course.instructorName || '강사 미정'}
+                </span>
+              )}
             </div>
           </Card>
         </div>

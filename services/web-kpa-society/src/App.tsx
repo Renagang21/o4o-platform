@@ -16,6 +16,9 @@ import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsC
 // Course pages (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO
 import { CourseHubPage, CourseIntroPage } from './pages/courses';
 
+// Instructor pages - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
+import { InstructorProfilePage } from './pages/instructors/InstructorProfilePage';
+
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
 
@@ -368,6 +371,9 @@ function App() {
           {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}
           <Route path="/courses" element={<Layout serviceName={SERVICE_NAME}><CourseHubPage /></Layout>} />
           <Route path="/courses/:courseId" element={<Layout serviceName={SERVICE_NAME}><CourseIntroPage /></Layout>} />
+
+          {/* Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1 */}
+          <Route path="/instructors/:userId" element={<Layout serviceName={SERVICE_NAME}><InstructorProfilePage /></Layout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />

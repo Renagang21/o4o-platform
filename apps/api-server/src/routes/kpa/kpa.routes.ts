@@ -49,6 +49,7 @@ import { CourseController } from '../../modules/lms/controllers/CourseController
 import { LessonController } from '../../modules/lms/controllers/LessonController.js';
 import { EnrollmentController } from '../../modules/lms/controllers/EnrollmentController.js';
 import { CertificateController } from '../../modules/lms/controllers/CertificateController.js';
+import { InstructorPublicController } from '../../modules/lms/controllers/InstructorPublicController.js';
 
 /**
  * Scope verification middleware factory for KPA
@@ -296,6 +297,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Certificates
   lmsRouter.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
   lmsRouter.get('/certificates/:id', authenticate, asyncHandler(CertificateController.getCertificate));
+
+  // Instructor Public Profile (no auth) - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
+  lmsRouter.get('/instructors/:userId/public-profile', asyncHandler(InstructorPublicController.getPublicProfile));
 
   router.use('/lms', lmsRouter);
 

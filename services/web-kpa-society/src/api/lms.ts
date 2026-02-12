@@ -11,6 +11,7 @@ import type {
   Lesson,
   Enrollment,
   Certificate,
+  InstructorPublicProfile,
   PaginatedResponse,
   ApiResponse,
 } from '../types';
@@ -61,4 +62,8 @@ export const lmsApi = {
 
   downloadCertificate: (id: string) =>
     apiClient.get<Blob>(`/lms/certificates/${id}/download`),
+
+  // 강사 공개 프로필 - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
+  getInstructorProfile: (userId: string) =>
+    apiClient.get<ApiResponse<InstructorPublicProfile>>(`/lms/instructors/${userId}/public-profile`),
 };
