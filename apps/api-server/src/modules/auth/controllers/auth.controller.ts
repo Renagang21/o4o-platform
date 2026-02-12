@@ -146,12 +146,12 @@ export class AuthController extends BaseController {
         stack: error.stack?.split('\n').slice(0, 3).join(' | '),
       });
 
-      // Handle specific auth errors
+      // Handle specific auth errors with specific error codes
       if (error.code === 'INVALID_CREDENTIALS' || error.code === 'INVALID_USER') {
-        return BaseController.unauthorized(res, error.message);
+        return BaseController.unauthorized(res, error.message, error.code);
       }
       if (error.code === 'ACCOUNT_NOT_ACTIVE' || error.code === 'ACCOUNT_LOCKED') {
-        return BaseController.forbidden(res, error.message);
+        return BaseController.forbidden(res, error.message, error.code);
       }
       if (error.code === 'TOO_MANY_ATTEMPTS') {
         return BaseController.error(res, error.message, 429);

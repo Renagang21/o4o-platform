@@ -113,7 +113,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
-        return { success: false, message: data.message || data.error || '이메일 또는 비밀번호가 올바르지 않습니다.' };
+        const code = data.code;
+        let errorMsg = data.message || data.error || '이메일 또는 비밀번호가 올바르지 않습니다.';
+        if (code === 'INVALID_USER') errorMsg = '등록되지 않은 이메일입니다.';
+        else if (code === 'INVALID_CREDENTIALS') errorMsg = '비밀번호가 올바르지 않습니다.';
+        else if (code === 'ACCOUNT_NOT_ACTIVE') errorMsg = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
+        else if (code === 'ACCOUNT_LOCKED') errorMsg = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
+        else if (response.status === 429) errorMsg = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+        return { success: false, message: errorMsg };
       }
 
       // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }

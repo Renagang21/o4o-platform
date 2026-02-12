@@ -115,11 +115,17 @@ export default function LoginModal() {
         const errorCode = err.response.data?.code;
 
         // 에러 코드/메시지별 한글화
-        if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
+        if (errorCode === 'INVALID_USER') {
+          errorMessage = '등록되지 않은 이메일입니다.';
+        } else if (errorCode === 'INVALID_CREDENTIALS') {
+          errorMessage = '비밀번호가 올바르지 않습니다.';
+        } else if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
           errorMessage = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
           setIsPendingError(true);
-        } else if (errorCode === 'AUTH_REQUIRED' || serverError === 'Invalid credentials') {
-          errorMessage = '비밀번호가 다릅니다.';
+        } else if (errorCode === 'ACCOUNT_LOCKED') {
+          errorMessage = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
+        } else if (err.response.status === 429) {
+          errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
         } else {
           errorMessage = serverError || `서버 오류 (${err.response.status})`;
         }

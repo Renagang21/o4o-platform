@@ -105,11 +105,41 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // 실제로는 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          name: form.realName,
+          phone: normalizedPhone,
+          role: 'pharmacist',
+          service: 'glucoseview',
+          licenseNumber: form.licenseNumber || undefined,
+          displayName: form.displayName || undefined,
+          pharmacyName: form.pharmacyName || undefined,
+          branchId: form.branchId || undefined,
+          chapterId: form.chapterId || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          const msg = (data.error || '').toLowerCase();
+          if (msg.includes('license') || msg.includes('면허')) {
+            throw new Error('이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.');
+          }
+          throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
+        }
+        throw new Error(data.error || '회원가입에 실패했습니다.');
+      }
+
       setSuccess(true);
-    } catch {
-      setError('회원가입 중 오류가 발생했습니다.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '회원가입 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }

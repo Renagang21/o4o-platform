@@ -32,6 +32,8 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -68,12 +70,43 @@ export default function RegisterPage() {
     setStep(2);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const normalizedPhone = formData.phone.replace(/\D/g, '');
-    // TODO: Implement registration API call with normalizedPhone
-    console.log('Submit with phone:', normalizedPhone);
-    navigate('/login');
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          phone: formData.phone.replace(/\D/g, ''),
+          role: selectedRole,
+          service: 'glycopharm',
+          businessName: formData.businessName || undefined,
+          businessNumber: formData.businessNumber || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
+        }
+        throw new Error(data.error || '회원가입에 실패했습니다.');
+      }
+
+      navigate('/login', { state: { registered: true } });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isFormValid = () => {
@@ -169,6 +202,11 @@ export default function RegisterPage() {
           {/* Step 2: Registration Form */}
           {step === 2 && (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => setStep(1)}
@@ -392,11 +430,11 @@ export default function RegisterPage() {
 
               <button
                 type="submit"
-                disabled={!isFormValid()}
+                disabled={!isFormValid() || isLoading}
                 className="w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-600/25 flex items-center justify-center gap-2"
               >
-                가입하기
-                <ArrowRight className="w-4 h-4" />
+                {isLoading ? '가입 신청 중...' : '가입하기'}
+                {!isLoading && <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
           )}

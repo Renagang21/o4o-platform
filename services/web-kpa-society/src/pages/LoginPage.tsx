@@ -56,8 +56,21 @@ export function LoginPage() {
         // Phase 4: 대시보드로 이동
         navigate('/dashboard');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+    } catch (err: any) {
+      let errorMessage = '로그인에 실패했습니다.';
+      if (err?.response?.data?.code) {
+        const code = err.response.data.code;
+        if (code === 'INVALID_USER') errorMessage = '등록되지 않은 이메일입니다.';
+        else if (code === 'INVALID_CREDENTIALS') errorMessage = '비밀번호가 올바르지 않습니다.';
+        else if (code === 'ACCOUNT_NOT_ACTIVE') errorMessage = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
+        else if (code === 'ACCOUNT_LOCKED') errorMessage = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
+        else errorMessage = err.response.data.error || errorMessage;
+      } else if (err?.response?.status === 429) {
+        errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
