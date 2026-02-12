@@ -158,11 +158,20 @@ export default function RegisterPage() {
     }
   };
 
+  const passwordChecks = {
+    length: formData.password.length >= 8,
+    lowercase: /[a-z]/.test(formData.password),
+    uppercase: /[A-Z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    special: /[@$!%*?&]/.test(formData.password),
+  };
+  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+
   const isFormValid = () => {
     const baseValid =
       formData.email &&
       formData.password &&
-      formData.password.length >= 8 &&
+      isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
       formData.lastName &&
       formData.firstName &&
@@ -229,7 +238,7 @@ export default function RegisterPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="8자 이상"
+                    placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                     style={styles.input}
                     required
                   />
@@ -241,10 +250,24 @@ export default function RegisterPage() {
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
-                {formData.password && formData.password.length > 0 && formData.password.length < 8 && (
-                  <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
-                    비밀번호는 8자 이상이어야 합니다
-                  </p>
+                {formData.password.length > 0 && !isPasswordStrong && (
+                  <div style={{ fontSize: '12px', margin: '4px 0 0 0', lineHeight: '1.6' }}>
+                    <span style={{ color: passwordChecks.length ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.length ? '\u2713' : '\u2717'} 8자 이상
+                    </span><br />
+                    <span style={{ color: passwordChecks.uppercase ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.uppercase ? '\u2713' : '\u2717'} 영문 대문자
+                    </span><br />
+                    <span style={{ color: passwordChecks.lowercase ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.lowercase ? '\u2713' : '\u2717'} 영문 소문자
+                    </span><br />
+                    <span style={{ color: passwordChecks.number ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.number ? '\u2713' : '\u2717'} 숫자
+                    </span><br />
+                    <span style={{ color: passwordChecks.special ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자(@$!%*?&)
+                    </span>
+                  </div>
                 )}
               </div>
               <div style={styles.inputGroup}>
