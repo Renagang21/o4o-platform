@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from '../components/LoginModal';
+import { useLoginModal } from '../contexts/LoginModalContext';
 import { ServiceOnboardingBanner } from '../components/onboarding/ServiceOnboardingBanner';
 
 // 슬라이드 배너 타입
@@ -136,7 +137,7 @@ const loadPartners = (): Partner[] => {
 export default function HomePage() {
   const { isAuthenticated, isApproved, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { openLoginModal } = useLoginModal();
 
   // 슬라이드 배너 상태 - useMemo로 한번만 계산
   const banners = useMemo(() => loadBanners().filter(b => b.isActive).sort((a, b) => a.order - b.order), []);
@@ -163,7 +164,7 @@ export default function HomePage() {
   // 보호된 기능 클릭 핸들러
   const handleProtectedClick = (path: string) => {
     if (!isAuthenticated) {
-      setShowLoginModal(true);
+      openLoginModal();
     } else if (!isApproved) {
       navigate('/pending');
     } else {
@@ -444,10 +445,7 @@ export default function HomePage() {
       </section>
 
       {/* Login Modal */}
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
+      <LoginModal />
     </div>
   );
 }
