@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
+import { getDefaultRouteByRole } from '../lib/auth-utils';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -45,16 +46,18 @@ export function LoginPage() {
 
       // 모든 로그인 후 홈 화면(/)으로 이동
       // 관리자도 대시보드가 아닌 홈으로 이동하도록 변경
+      // WO-KPA-A-ROLE-BASED-REDIRECT-V1: 역할 기반 기본 경로
+      const defaultRoute = getDefaultRouteByRole(loggedInUser.roles);
+
       if (!isAdmin && !isStudent && (!loggedInUser.pharmacistFunction || !loggedInUser.pharmacistRole)) {
         // 직능/직역 미선택 시 대시보드로 이동 + 모달 표시
-        navigate('/dashboard');
+        navigate(defaultRoute);
         openFunctionGateModal();
       } else if (returnTo) {
         // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: returnTo 지원
         navigate(returnTo);
       } else {
-        // Phase 4: 대시보드로 이동
-        navigate('/dashboard');
+        navigate(defaultRoute);
       }
     } catch (err: any) {
       let errorMessage = '로그인에 실패했습니다.';

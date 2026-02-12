@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useEffect } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
+import { useAuth } from './contexts/AuthContext';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
@@ -111,6 +112,9 @@ import FunctionGateModal from './components/FunctionGateModal';
 // User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
 import { UserDashboardPage, MyContentPage } from './pages/dashboard';
 
+// WO-KPA-A-ROLE-BASED-REDIRECT-V1
+import { getDefaultRouteByRole } from './lib/auth-utils';
+
 // Debug Pages (CLAUDE.md Section 14)
 import { ApiDebugPage } from './pages/debug/ApiDebugPage';
 
@@ -166,6 +170,27 @@ function RegisterRedirect() {
  * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
  * (페이지 → 모달 전환 후 하위호환용)
  */
+/**
+ * WO-KPA-A-ROLE-BASED-REDIRECT-V1
+ * / 접근 시 로그인된 admin/operator는 해당 대시보드로 자동 리다이렉트
+ * 일반 사용자/비로그인은 커뮤니티 홈 표시
+ */
+function RoleBasedHome() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.roles) {
+      const target = getDefaultRouteByRole(user.roles);
+      if (target !== '/dashboard') {
+        navigate(target, { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
+}
+
 function FunctionGateRedirect() {
   const navigate = useNavigate();
   const { openFunctionGateModal } = useAuthModal();
@@ -208,7 +233,7 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route path="/" element={<Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>} />
+          <Route path="/" element={<RoleBasedHome />} />
           <Route path="/dashboard" element={<Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>} />
 
           {/* ========================================

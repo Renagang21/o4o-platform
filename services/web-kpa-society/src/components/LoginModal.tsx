@@ -23,6 +23,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
+import { getDefaultRouteByRole } from '../lib/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
 
@@ -84,7 +85,7 @@ export default function LoginModal() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const loggedInUser = await login(email, password);
 
       // 이메일 저장 처리
       if (rememberEmail) {
@@ -96,9 +97,9 @@ export default function LoginModal() {
       // 로그인 성공: 모달 닫고 현재 화면 유지
       closeModal();
 
-      // 홈(/) 또는 /login에서 로그인한 경우 대시보드로 이동
+      // WO-KPA-A-ROLE-BASED-REDIRECT-V1: 홈(/) 또는 /login에서 로그인한 경우 역할 기반 이동
       if (location.pathname === '/' || location.pathname === '/login') {
-        navigate('/dashboard');
+        navigate(getDefaultRouteByRole(loggedInUser.roles));
       }
 
       // 선택적 콜백 실행 (예: 글 작성 재시도)
