@@ -97,7 +97,7 @@ export class ForumQueryService {
         FROM forum_category c
         LEFT JOIN forum_post p ON p."categoryId" = c.id
           AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id IS NULL ${keywordFilter}
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL ${keywordFilter}
         GROUP BY c.id
         ORDER BY ${orderBy}
       `, params);
@@ -124,7 +124,7 @@ export class ForumQueryService {
       FROM forum_category c
       LEFT JOIN forum_post p ON p."categoryId" = c.id
         AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id = $1 ${keywordFilter}
+      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $1 ${keywordFilter}
       GROUP BY c.id
       ORDER BY ${orderBy}
     `, params);
@@ -167,7 +167,7 @@ export class ForumQueryService {
         INNER JOIN my_categories mc ON mc.id = c.id
         LEFT JOIN forum_post p ON p."categoryId" = c.id
           AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id IS NULL ${keywordFilter}
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL ${keywordFilter}
         GROUP BY c.id
         ORDER BY MAX(p.created_at) DESC NULLS LAST
       `, params);
@@ -205,7 +205,7 @@ export class ForumQueryService {
       INNER JOIN my_categories mc ON mc.id = c.id
       LEFT JOIN forum_post p ON p."categoryId" = c.id
         AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id = $1 ${keywordFilter}
+      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $1 ${keywordFilter}
       GROUP BY c.id
       ORDER BY MAX(p.created_at) DESC NULLS LAST
     `, params);
@@ -261,7 +261,7 @@ export class ForumQueryService {
           LIMIT $1
         ) lp
         LEFT JOIN users u ON lp.author_id = u.id
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id IS NULL
+        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL
         ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
                  c."sortOrder" ASC, c.name ASC
       `, [limit]);
@@ -298,7 +298,7 @@ export class ForumQueryService {
         LIMIT $1
       ) lp
       LEFT JOIN users u ON lp.author_id = u.id
-      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c.organization_id = $2
+      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $2
       ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
                c."sortOrder" ASC, c.name ASC
     `, [limit, this.config.organizationId]);
@@ -343,8 +343,8 @@ export class ForumQueryService {
       ? 'p.organization_id IS NULL'
       : `p.organization_id = '${this.config.organizationId}'`;
     const catScopeFilter = this.config.scope === 'community'
-      ? 'c.organization_id IS NULL'
-      : `c.organization_id = '${this.config.organizationId}'`;
+      ? 'c."organizationId" IS NULL'
+      : `c."organizationId" = '${this.config.organizationId}'`;
     const commentScopeFilter = this.config.scope === 'community'
       ? 'p.organization_id IS NULL'
       : `p.organization_id = '${this.config.organizationId}'`;
