@@ -48,12 +48,16 @@ export default function FunctionGateModal() {
     if (isOpen) setSelectedKey(null);
   }, [isOpen]);
 
-  // Close if already set
+  // Admin/operator should never see function selection
+  const NON_PHARMACIST_ROLES = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
+  const isAdminOrOperator = user?.role ? NON_PHARMACIST_ROLES.includes(user.role) : false;
+
+  // Close if admin/operator or already set
   useEffect(() => {
-    if (isOpen && user?.pharmacistFunction && user?.pharmacistRole) {
+    if (isOpen && (isAdminOrOperator || (user?.pharmacistFunction && user?.pharmacistRole))) {
       closeModal();
     }
-  }, [isOpen, user, closeModal]);
+  }, [isOpen, user, isAdminOrOperator, closeModal]);
 
   // ESC + scroll lock
   useEffect(() => {

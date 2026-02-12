@@ -37,7 +37,9 @@ export function LoginPage() {
       // 직능/직역 미선택 시 게이트로 이동, 그 외에는 홈으로 이동
       const isAdmin = loggedInUser.role === 'district_admin' ||
                       loggedInUser.role === 'branch_admin' ||
-                      loggedInUser.role === 'super_admin';
+                      loggedInUser.role === 'super_admin' ||
+                      loggedInUser.role === 'admin' ||
+                      loggedInUser.role === 'operator';
       // Phase 3: 약대생은 직능/직역 선택 불필요
       const isStudent = loggedInUser.role === 'student' || loggedInUser.membershipType === 'student';
 
