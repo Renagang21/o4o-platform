@@ -62,6 +62,10 @@ export class RegisterRequestDto {
   @Max(6)
   studentYear?: number;
 
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
+
   @IsBoolean()
   tos: boolean;
 

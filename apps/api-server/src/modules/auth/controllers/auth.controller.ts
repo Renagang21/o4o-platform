@@ -232,6 +232,27 @@ export class AuthController extends BaseController {
 
       await assignmentRepository.save(assignment);
 
+      // KPA Society: auto-create KPA member with organization
+      if (data.service === 'kpa-society' && data.organizationId) {
+        try {
+          await AppDataSource.query(`
+            INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status)
+            VALUES ($1, $2, $3, $4, $5, 'member', 'pending')
+          `, [
+            user.id,
+            data.organizationId,
+            data.membershipType || 'pharmacist',
+            data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null,
+            data.membershipType === 'student' ? (data.universityName || null) : null,
+          ]);
+        } catch (memberError: any) {
+          logger.warn('[AuthController.register] KPA member auto-creation failed', {
+            error: memberError.message,
+            userId: user.id,
+          });
+        }
+      }
+
       // Send email verification (optional - don't fail if email fails)
       try {
         await PasswordResetService.requestEmailVerification(user.id);

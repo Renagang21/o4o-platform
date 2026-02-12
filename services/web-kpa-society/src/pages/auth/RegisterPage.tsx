@@ -4,8 +4,53 @@
  * 승인 후 로그인 시 직능 분류(activity_type) 미설정이면 추가 입력 유도
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+
+const PHARMACY_SCHOOLS = [
+  '가천대학교 약학대학',
+  '가톨릭대학교 약학대학',
+  '강원대학교 약학대학',
+  '경북대학교 약학대학',
+  '경상국립대학교 약학대학',
+  '경성대학교 약학대학',
+  '경희대학교 약학대학',
+  '고려대학교 약학대학',
+  '단국대학교 약학대학',
+  '대구가톨릭대학교 약학대학',
+  '덕성여자대학교 약학대학',
+  '동국대학교 약학대학',
+  '동아대학교 약학대학',
+  '목포대학교 약학대학',
+  '부산대학교 약학대학',
+  '삼육대학교 약학대학',
+  '서울대학교 약학대학',
+  '성균관대학교 약학대학',
+  '숙명여자대학교 약학대학',
+  '순천대학교 약학대학',
+  '아주대학교 약학대학',
+  '연세대학교 약학대학',
+  '영남대학교 약학대학',
+  '우석대학교 약학대학',
+  '원광대학교 약학대학',
+  '이화여자대학교 약학대학',
+  '인제대학교 약학대학',
+  '전남대학교 약학대학',
+  '전북대학교 약학대학',
+  '제주대학교 약학대학',
+  '조선대학교 약학대학',
+  '중앙대학교 약학대학',
+  '차의과학대학교 약학대학',
+  '충남대학교 약학대학',
+  '충북대학교 약학대학',
+  '한양대학교 약학대학',
+];
+
+const PHARMACY_DEPARTMENTS = [
+  '약학과',
+  '한약학과',
+  '제약학과',
+];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -23,15 +68,49 @@ export default function RegisterPage() {
     membershipType: 'pharmacist' as 'pharmacist' | 'student',
     licenseNumber: '',
     universityName: '',
+    department: '',
+    branchId: '',
+    groupId: '',
     agreeTerms: false,
     agreePrivacy: false,
   });
+
+  const [branches, setBranches] = useState<Array<{id: string, name: string}>>([]);
+  const [groups, setGroups] = useState<Array<{id: string, name: string}>>([]);
+
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+    fetch(`${baseUrl}/kpa/organizations?type=branch&active_only=true`)
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(res => setBranches(res.data || []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!formData.branchId) {
+      setGroups([]);
+      return;
+    }
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+    fetch(`${baseUrl}/kpa/organizations?type=group&parent_id=${formData.branchId}&active_only=true`)
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(res => setGroups(res.data || []))
+      .catch(() => {});
+  }, [formData.branchId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
     const { name, value } = target;
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
+    if (name === 'phone') {
+      setFormData(prev => ({ ...prev, phone: value.replace(/\D/g, '') }));
+      return;
+    }
+    if (name === 'branchId') {
+      setFormData(prev => ({ ...prev, branchId: value, groupId: '' }));
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -51,14 +130,19 @@ export default function RegisterPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          passwordConfirm: formData.passwordConfirm,
           lastName: formData.lastName,
           firstName: formData.firstName,
           nickname: formData.nickname,
-          phone: formData.phone.replace(/\D/g, ''),
+          phone: formData.phone,
           membershipType: formData.membershipType,
           licenseNumber: formData.membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
-          universityName: formData.membershipType === 'student' ? formData.universityName : undefined,
+          universityName: formData.membershipType === 'student'
+            ? `${formData.universityName} ${formData.department}`.trim()
+            : undefined,
+          organizationId: formData.groupId || undefined,
           service: 'kpa-society',
+          tos: true,
         }),
       });
 
@@ -75,7 +159,6 @@ export default function RegisterPage() {
   };
 
   const isFormValid = () => {
-    const normalizedPhone = formData.phone.replace(/\D/g, '');
     const baseValid =
       formData.email &&
       formData.password &&
@@ -84,7 +167,8 @@ export default function RegisterPage() {
       formData.lastName &&
       formData.firstName &&
       formData.nickname &&
-      normalizedPhone.length >= 10 && normalizedPhone.length <= 11 &&
+      formData.phone.length >= 10 && formData.phone.length <= 11 &&
+      formData.groupId &&
       formData.agreeTerms &&
       formData.agreePrivacy;
 
@@ -93,7 +177,10 @@ export default function RegisterPage() {
     if (formData.membershipType === 'pharmacist') {
       return !!formData.licenseNumber;
     }
-    return true; // 약대생은 면허번호 불필요
+    if (formData.membershipType === 'student') {
+      return !!formData.universityName && !!formData.department;
+    }
+    return true;
   };
 
   return (
@@ -226,21 +313,21 @@ export default function RegisterPage() {
             </div>
 
             <div style={styles.inputGroup}>
-              <label style={styles.label}>연락처 *</label>
+              <label style={styles.label}>핸드폰 번호 *</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                placeholder="01012345678"
+                placeholder="하이픈(-) 없이 숫자만 입력"
                 style={styles.input}
                 required
               />
-              <p style={styles.helpText}>하이픈(-) 포함 입력 가능</p>
-              {formData.phone && formData.phone.replace(/\D/g, '').length > 0 &&
-                (formData.phone.replace(/\D/g, '').length < 10 || formData.phone.replace(/\D/g, '').length > 11) && (
+              <p style={styles.helpText}>숫자만 입력 (예: 01012345678)</p>
+              {formData.phone.length > 0 &&
+                (formData.phone.length < 10 || formData.phone.length > 11) && (
                 <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
-                  전화번호는 10~11자리 숫자여야 합니다
+                  핸드폰 번호는 10~11자리 숫자여야 합니다
                 </p>
               )}
             </div>
@@ -280,18 +367,79 @@ export default function RegisterPage() {
             )}
 
             {formData.membershipType === 'student' && (
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>재학 대학명</label>
-                <input
-                  type="text"
-                  name="universityName"
-                  value={formData.universityName}
-                  onChange={handleInputChange}
-                  placeholder="OO대학교 약학대학"
-                  style={styles.input}
-                />
-              </div>
+              <>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>재학 약대 *</label>
+                  <select
+                    name="universityName"
+                    value={formData.universityName}
+                    onChange={handleInputChange}
+                    style={styles.select}
+                  >
+                    <option value="">약대를 선택하세요</option>
+                    {PHARMACY_SCHOOLS.map(school => (
+                      <option key={school} value={school}>{school}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>학과 *</label>
+                  <select
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    style={styles.select}
+                  >
+                    <option value="">학과를 선택하세요</option>
+                    {PHARMACY_DEPARTMENTS.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
             )}
+          </div>
+
+          {/* 소속 분회 */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>소속 분회</h3>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>지부 (시/도) *</label>
+              <select
+                name="branchId"
+                value={formData.branchId}
+                onChange={handleInputChange}
+                style={styles.select}
+              >
+                <option value="">지부를 선택하세요</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>분회 (시/군/구) *</label>
+              <select
+                name="groupId"
+                value={formData.groupId}
+                onChange={handleInputChange}
+                style={{
+                  ...styles.select,
+                  opacity: formData.branchId ? 1 : 0.5,
+                  cursor: formData.branchId ? 'pointer' : 'not-allowed',
+                }}
+                disabled={!formData.branchId}
+              >
+                <option value="">
+                  {formData.branchId ? '분회를 선택하세요' : '지부를 먼저 선택하세요'}
+                </option>
+                {groups.map(g => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* 약관 동의 */}
