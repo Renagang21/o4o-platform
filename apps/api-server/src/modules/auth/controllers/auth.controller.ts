@@ -193,80 +193,59 @@ export class AuthController extends BaseController {
       // Hash password
       const hashedPassword = await bcrypt.hash(data.password, env.getNumber('BCRYPT_ROUNDS', 12));
 
-      // Create new user
-      const user = new User();
-      user.email = data.email;
-      user.password = hashedPassword;
-      // P1-T1: Use lastName/firstName instead of single name field
-      user.lastName = data.lastName;
-      user.firstName = data.firstName;
-      user.name = `${data.lastName}${data.firstName}`; // Keep name for backward compatibility
-      // P1-T2: Nickname for public/forum display
-      user.nickname = data.nickname;
       // Phase 3: membershipType에 따라 role 분기
-      // student인 경우 별도 처리, 그 외 기존 로직 유지
       const effectiveRole = data.membershipType === 'student'
         ? 'student'
         : (data.role || 'customer');
-      user.role = effectiveRole as UserRole;
-      // P0-T1: Status defaults to PENDING (requires operator approval)
-      // user.status will be set to default PENDING from entity definition
-      // P0-T2: Service key for data isolation
-      user.serviceKey = data.service || 'platform'; // Default to 'platform' if not specified
 
-      // Normalize phone number (digits only) before saving
-      if (data.phone) {
-        user.phone = data.phone.replace(/\D/g, '');
-      }
+      // 트랜잭션: User + RoleAssignment + KPA Member 원자적 생성
+      const user = await AppDataSource.transaction(async (manager) => {
+        const txUserRepo = manager.getRepository(User);
+        const txAssignRepo = manager.getRepository(RoleAssignment);
 
-      await userRepository.save(user);
+        // Create new user
+        const newUser = new User();
+        newUser.email = data.email;
+        newUser.password = hashedPassword;
+        newUser.lastName = data.lastName;
+        newUser.firstName = data.firstName;
+        newUser.name = `${data.lastName}${data.firstName}`;
+        newUser.nickname = data.nickname;
+        newUser.role = effectiveRole as UserRole;
+        newUser.serviceKey = data.service || 'platform';
+        if (data.phone) {
+          newUser.phone = data.phone.replace(/\D/g, '');
+        }
 
-      // Create RoleAssignment for the new user
-      const assignmentRepository = AppDataSource.getRepository(RoleAssignment);
-      const assignment = new RoleAssignment();
-      assignment.userId = user.id;
-      assignment.role = effectiveRole;
-      assignment.isActive = true;
-      assignment.validFrom = new Date();
-      assignment.assignedAt = new Date();
+        await txUserRepo.save(newUser);
 
-      await assignmentRepository.save(assignment);
+        // Create RoleAssignment
+        const assignment = new RoleAssignment();
+        assignment.userId = newUser.id;
+        assignment.role = effectiveRole;
+        assignment.isActive = true;
+        assignment.validFrom = new Date();
+        assignment.assignedAt = new Date();
+        await txAssignRepo.save(assignment);
 
-      // KPA Society: auto-create KPA member with organization
-      if (data.service === 'kpa-society' && data.organizationId) {
-        try {
+        // KPA Society: auto-create KPA member with organization
+        if (data.service === 'kpa-society' && data.organizationId) {
           const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
 
-          // 면허번호 중복 체크 (상태 무관 절대 유일)
-          if (licenseNum) {
-            const dupLicense = await AppDataSource.query(
-              `SELECT id FROM kpa_members WHERE license_number = $1 LIMIT 1`,
-              [licenseNum],
-            );
-            if (dupLicense.length > 0) {
-              logger.warn('[AuthController.register] Duplicate license_number', { licenseNumber: licenseNum, userId: user.id });
-              // 계정은 이미 생성됨 — member만 생성 안 함, 에러로 알림
-              throw new Error('이미 등록된 면허번호입니다.');
-            }
-          }
-
-          await AppDataSource.query(`
+          await manager.query(`
             INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status)
             VALUES ($1, $2, $3, $4, $5, 'member', 'pending')
           `, [
-            user.id,
+            newUser.id,
             data.organizationId,
             data.membershipType || 'pharmacist',
             licenseNum,
             data.membershipType === 'student' ? (data.universityName || null) : null,
           ]);
-        } catch (memberError: any) {
-          logger.warn('[AuthController.register] KPA member auto-creation failed', {
-            error: memberError.message,
-            userId: user.id,
-          });
         }
-      }
+
+        return newUser;
+      });
 
       // Send email verification (optional - don't fail if email fails)
       try {
@@ -279,7 +258,6 @@ export class AuthController extends BaseController {
       }
 
       // P0-T1: No auto-login after registration (status = PENDING)
-      // User must wait for operator approval before login
       return BaseController.created(res, {
         message: 'Registration submitted. Please wait for operator approval.',
         user: {
@@ -296,6 +274,18 @@ export class AuthController extends BaseController {
         code: error.code,
         email: data.email,
       });
+
+      // UNIQUE violation → 409
+      if (error.code === '23505' || error.driverError?.code === '23505') {
+        const detail = error.detail || error.driverError?.detail || '';
+        if (detail.includes('license_number')) {
+          return BaseController.error(res, '이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.', 409);
+        }
+        if (detail.includes('user_id')) {
+          return BaseController.error(res, '이미 가입된 회원입니다.', 409);
+        }
+        return BaseController.error(res, 'Registration conflict', 409);
+      }
 
       return BaseController.error(res, 'Registration failed');
     }

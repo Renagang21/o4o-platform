@@ -160,7 +160,23 @@ export function createMemberController(
         res.status(201).json({ data: saved });
       } catch (error: any) {
         console.error('Failed to apply for membership:', error);
-        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+
+        // UNIQUE violation → 409 (race condition 방어)
+        if (error.code === '23505' || error.driverError?.code === '23505') {
+          const detail = error.detail || error.driverError?.detail || '';
+          if (detail.includes('license_number')) {
+            res.status(409).json({ error: { code: 'LICENSE_DUPLICATE', message: '이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.' } });
+            return;
+          }
+          if (detail.includes('user_id')) {
+            res.status(409).json({ error: { code: 'ALREADY_MEMBER', message: '이미 가입된 회원입니다.' } });
+            return;
+          }
+          res.status(409).json({ error: { code: 'DUPLICATE', message: 'Duplicate entry' } });
+          return;
+        }
+
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to apply for membership' } });
       }
     }
   );

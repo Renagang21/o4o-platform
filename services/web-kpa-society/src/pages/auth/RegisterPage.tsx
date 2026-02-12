@@ -419,7 +419,7 @@ export default function RegisterPage() {
                 )}
                 {licenseStatus === 'duplicate' && (
                   <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
-                    이미 등록된 면허번호입니다.
+                    이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.
                   </p>
                 )}
                 {licenseStatus === 'available' && (
