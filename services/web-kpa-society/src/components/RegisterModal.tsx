@@ -30,7 +30,6 @@ export default function RegisterModal() {
     nickname: '',
     phone: '',
     licenseNumber: '',
-    pharmacistFunctionKey: '',  // 직능 선택 key
     university: '',
     department: '',
     studentYear: '',
@@ -74,7 +73,6 @@ export default function RegisterModal() {
         nickname: '',
         phone: '',
         licenseNumber: '',
-        pharmacistFunctionKey: '',
         university: '',
         department: '',
         studentYear: '',
@@ -166,16 +164,6 @@ export default function RegisterModal() {
 
   const selectedUniDepts = PHARMACY_SCHOOLS.find(s => s.university === formData.university)?.departments || [];
 
-  // 약사 직능 선택지 (단일 단계: pharmacistFunction + pharmacistRole 동시 결정)
-  const PHARMACIST_FUNCTIONS = [
-    { key: 'pharmacy_worker', label: '근무 약사', desc: '약국 근무', fn: 'pharmacy', role: 'general' },
-    { key: 'pharmacy_owner', label: '개설 약사', desc: '약국 경영', fn: 'pharmacy', role: 'pharmacy_owner' },
-    { key: 'hospital', label: '병원 약사', desc: '의료기관 근무', fn: 'hospital', role: 'hospital' },
-    { key: 'industry', label: '산업 약사', desc: '제약/바이오 등', fn: 'industry', role: 'general' },
-    { key: 'other', label: '기타 약사', desc: '', fn: 'other', role: 'other' },
-  ] as const;
-  const selectedFn = PHARMACIST_FUNCTIONS.find(f => f.key === formData.pharmacistFunctionKey);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
     const { name, value } = target;
@@ -229,8 +217,6 @@ export default function RegisterModal() {
           service: 'kpa-society',
           membershipType: membershipType,
           licenseNumber: membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
-          pharmacistFunction: membershipType === 'pharmacist' ? selectedFn?.fn : undefined,
-          pharmacistRole: membershipType === 'pharmacist' ? selectedFn?.role : undefined,
           universityName: membershipType === 'student' ? `${formData.university} ${formData.department}`.trim() : undefined,
           studentYear: membershipType === 'student' ? parseInt(formData.studentYear) || undefined : undefined,
           organizationId: membershipType === 'pharmacist' ? (formData.groupId || undefined) : undefined,
@@ -278,7 +264,7 @@ export default function RegisterModal() {
     if (!commonValid) return false;
 
     if (membershipType === 'pharmacist') {
-      return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId && !!formData.pharmacistFunctionKey;
+      return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId;
     }
 
     if (membershipType === 'student') {
@@ -686,32 +672,6 @@ export default function RegisterModal() {
                           </option>
                         ))}
                       </select>
-                    </div>
-                  </div>
-                )}
-
-                {/* 약사 직능 선택 (약사 전용) */}
-                {membershipType === 'pharmacist' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                      약사 직능 <span className="text-red-500">*</span>
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {PHARMACIST_FUNCTIONS.map(opt => (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, pharmacistFunctionKey: opt.key }))}
-                          className={`text-left px-3 py-2.5 text-sm border-2 rounded-lg transition-colors ${
-                            formData.pharmacistFunctionKey === opt.key
-                              ? 'border-blue-500 bg-blue-50 text-blue-900'
-                              : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                          }`}
-                        >
-                          <span className="font-medium">{opt.label}</span>
-                          {opt.desc && <span className="block text-xs text-gray-500 mt-0.5">{opt.desc}</span>}
-                        </button>
-                      ))}
                     </div>
                   </div>
                 )}
