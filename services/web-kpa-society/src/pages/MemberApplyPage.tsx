@@ -28,7 +28,12 @@ export function MemberApplyPage() {
     setErrorMessage(null);
 
     try {
-      await kpaApi.applyForRole(formData);
+      await kpaApi.applyForRole({
+        ...formData,
+        businessNumber: formData.businessNumber
+          ? formData.businessNumber.replace(/\D/g, '')
+          : '',
+      });
       setStatus('success');
     } catch (err: any) {
       setStatus('error');
@@ -150,6 +155,7 @@ export function MemberApplyPage() {
             placeholder="예: 123-45-67890"
             style={styles.input}
           />
+          <p style={{ fontSize: 12, color: '#999', marginTop: 4 }}>하이픈(-) 포함 입력 가능, 저장 시 자동 제거</p>
         </div>
 
         <div style={styles.formGroup}>

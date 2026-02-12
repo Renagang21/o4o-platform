@@ -88,6 +88,9 @@ import {
 // User Role Routes
 import userRoleRoutes from './routes/user-role.routes.js';
 
+// Role Application Routes (v2) — WO-KPA-PHARMACY-APPLICATION-STABILIZATION-V1
+import { createRoleApplicationController } from './routes/v2/role-application.controller.js';
+
 // Organization Routes (Phase R3.5: Organization Core Absorption)
 import organizationRoutes from './routes/organization.routes.js';
 
@@ -906,6 +909,11 @@ const startServer = async () => {
       const kpaJoinPublicRoutes = createKpaJoinPublicRoutes(AppDataSource);
       app.use('/api/v1/join', kpaJoinPublicRoutes);
       logger.info('✅ KPA Join public routes registered at /api/v1/join');
+
+      // 31-c. Register Role Application v2 routes (WO-KPA-PHARMACY-APPLICATION-STABILIZATION-V1)
+      const roleApplicationRoutes = createRoleApplicationController(AppDataSource);
+      app.use('/api/v2/roles', roleApplicationRoutes);
+      logger.info('✅ Role Application v2 routes registered at /api/v2/roles');
     } catch (kpaError) {
       logger.error('Failed to register KPA routes:', kpaError);
     }

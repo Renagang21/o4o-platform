@@ -77,6 +77,18 @@ export const isValidPhone = (phone: string): boolean => {
   return phoneRegex.test(phone);
 };
 
+/** Strip non-digit characters from phone number (for DB storage) */
+export const normalizePhone = (phone: string): string => phone.replace(/\D/g, '');
+
+/** Strip non-digit characters from business registration number (for DB storage) */
+export const normalizeBusinessNumber = (bn: string): string => bn.replace(/\D/g, '');
+
+/** Validate Korean business registration number (10 digits) */
+export const isValidBusinessNumber = (bn: string): boolean => {
+  const normalized = bn.replace(/\D/g, '');
+  return /^\d{10}$/.test(normalized);
+};
+
 export const generateId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };

@@ -35,7 +35,8 @@ export {
   formatPercentage,
   // formatRelativeTime,  // Removed - may cause issues
   formatDateFromNow,  // Re-exported for consumers expecting it
-  formatPhoneNumber
+  formatPhoneNumber,
+  formatBusinessNumber
 } from './format.js';
 
 // Export cn utility

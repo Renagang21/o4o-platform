@@ -51,6 +51,7 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          phone: formData.phone.replace(/\D/g, ''),
           role: 'pharmacist',
           service: 'kpa-society',
         }),
@@ -167,6 +168,11 @@ export default function RegisterPage() {
                   style={styles.input}
                   required
                 />
+                {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                  <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
+                    비밀번호가 일치하지 않습니다
+                  </p>
+                )}
               </div>
             </div>
 
@@ -222,6 +228,7 @@ export default function RegisterPage() {
                 style={styles.input}
                 required
               />
+              <p style={styles.helpText}>하이픈(-) 포함 입력 가능</p>
             </div>
           </div>
 

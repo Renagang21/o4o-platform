@@ -262,3 +262,14 @@ export function formatPhoneNumber(phoneNumber: string): string {
   // Return original if no pattern matches
   return phoneNumber;
 }
+
+/**
+ * Format business registration number for display (XXX-XX-XXXXX)
+ * @param bn Business number string (digits only or with hyphens)
+ * @returns Formatted business number
+ */
+export function formatBusinessNumber(bn: string): string {
+  const cleaned = bn.replace(/\D/g, '');
+  if (cleaned.length !== 10) return bn;
+  return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5)}`;
+}

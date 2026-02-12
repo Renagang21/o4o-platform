@@ -214,6 +214,11 @@ export class AuthController extends BaseController {
       // P0-T2: Service key for data isolation
       user.serviceKey = data.service || 'platform'; // Default to 'platform' if not specified
 
+      // Normalize phone number (digits only) before saving
+      if (data.phone) {
+        user.phone = data.phone.replace(/\D/g, '');
+      }
+
       await userRepository.save(user);
 
       // Create RoleAssignment for the new user
