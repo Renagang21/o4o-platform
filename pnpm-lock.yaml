@@ -201,6 +201,9 @@ importers:
       jest:
         specifier: 29.7.0
         version: 29.7.0(@types/node@24.10.1)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.4.5))
+      pnpm:
+        specifier: 10.25.0
+        version: 10.25.0
       postcss:
         specifier: ~8.4.31
         version: 8.4.49
@@ -11544,6 +11547,11 @@ packages:
 
   png-js@1.0.0:
     resolution: {integrity: sha512-k+YsbhpA9e+EFfKjTCH3VW6aoKlyNYI6NYdTfDL4CIvFnvsuO84ttonmZE7rc+v23SLTH8XX+5w/Ak9v0xGY4g==}
+
+  pnpm@10.25.0:
+    resolution: {integrity: sha512-XoJjkCevN8+DIGG8xtY5whljRIjg8rrr54UCink957Ul/80/f/V09emGBlTgmP6FK6isXdXO/hdn0joCCpL1AQ==}
+    engines: {node: '>=18.12'}
+    hasBin: true
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -23202,6 +23210,8 @@ snapshots:
   pluralize@8.0.0: {}
 
   png-js@1.0.0: {}
+
+  pnpm@10.25.0: {}
 
   possible-typed-array-names@1.1.0: {}
 
