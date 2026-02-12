@@ -30,7 +30,8 @@ export default function RegisterModal() {
     nickname: '',
     phone: '',
     licenseNumber: '',
-    universityName: '',
+    university: '',
+    department: '',
     studentYear: '',
     branchId: '',
     groupId: '',
@@ -72,7 +73,8 @@ export default function RegisterModal() {
         nickname: '',
         phone: '',
         licenseNumber: '',
-        universityName: '',
+        university: '',
+        department: '',
         studentYear: '',
         branchId: '',
         groupId: '',
@@ -120,6 +122,48 @@ export default function RegisterModal() {
     } catch { setLicenseStatus('idle'); }
   };
 
+  // 약학대학 목록 (가나다순)
+  const PHARMACY_SCHOOLS: Array<{ university: string; departments: string[] }> = [
+    { university: '가천대학교', departments: ['약학대학'] },
+    { university: '가톨릭대학교', departments: ['약학대학'] },
+    { university: '강원대학교', departments: ['약학대학'] },
+    { university: '경북대학교', departments: ['약학대학'] },
+    { university: '경상국립대학교', departments: ['약학대학'] },
+    { university: '경희대학교', departments: ['약학대학'] },
+    { university: '계명대학교', departments: ['약학대학'] },
+    { university: '고려대학교', departments: ['약학대학'] },
+    { university: '단국대학교', departments: ['약학대학'] },
+    { university: '대구가톨릭대학교', departments: ['약학대학'] },
+    { university: '덕성여자대학교', departments: ['약학대학'] },
+    { university: '동국대학교', departments: ['약학대학'] },
+    { university: '동덕여자대학교', departments: ['약학대학'] },
+    { university: '목원대학교', departments: ['약학대학'] },
+    { university: '부산대학교', departments: ['약학대학'] },
+    { university: '삼육대학교', departments: ['약학대학'] },
+    { university: '서울대학교', departments: ['약학대학'] },
+    { university: '성균관대학교', departments: ['약학대학'] },
+    { university: '숙명여자대학교', departments: ['약학대학'] },
+    { university: '순천대학교', departments: ['약학과'] },
+    { university: '아주대학교', departments: ['약학대학'] },
+    { university: '연세대학교', departments: ['약학대학'] },
+    { university: '영남대학교', departments: ['약학대학'] },
+    { university: '우석대학교', departments: ['약학대학'] },
+    { university: '원광대학교', departments: ['약학대학'] },
+    { university: '이화여자대학교', departments: ['약학대학'] },
+    { university: '인제대학교', departments: ['약학대학'] },
+    { university: '전남대학교', departments: ['약학대학'] },
+    { university: '전북대학교', departments: ['약학대학'] },
+    { university: '제주대학교', departments: ['약학대학'] },
+    { university: '조선대학교', departments: ['약학대학'] },
+    { university: '중앙대학교', departments: ['약학대학'] },
+    { university: '차의과학대학교', departments: ['약학대학'] },
+    { university: '충남대학교', departments: ['약학대학'] },
+    { university: '충북대학교', departments: ['약학대학'] },
+    { university: '한양대학교', departments: ['약학과'] },
+  ];
+
+  const selectedUniDepts = PHARMACY_SCHOOLS.find(s => s.university === formData.university)?.departments || [];
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
     const { name, value } = target;
@@ -132,6 +176,11 @@ export default function RegisterModal() {
     }
     if (name === 'branchId') {
       setFormData(prev => ({ ...prev, branchId: value, groupId: '' }));
+      return;
+    }
+    if (name === 'university') {
+      const depts = PHARMACY_SCHOOLS.find(s => s.university === value)?.departments || [];
+      setFormData(prev => ({ ...prev, university: value, department: depts.length === 1 ? depts[0] : '' }));
       return;
     }
 
@@ -168,9 +217,9 @@ export default function RegisterModal() {
           service: 'kpa-society',
           membershipType: membershipType,
           licenseNumber: membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
-          universityName: membershipType === 'student' ? formData.universityName : undefined,
+          universityName: membershipType === 'student' ? `${formData.university} ${formData.department}`.trim() : undefined,
           studentYear: membershipType === 'student' ? parseInt(formData.studentYear) || undefined : undefined,
-          organizationId: formData.groupId || undefined,
+          organizationId: membershipType === 'pharmacist' ? (formData.groupId || undefined) : undefined,
           tos: formData.agreeTerms,
           privacyAccepted: formData.agreePrivacy,
         }),
@@ -209,18 +258,17 @@ export default function RegisterModal() {
       formData.firstName &&
       formData.nickname &&
       formData.phone.length >= 10 && formData.phone.length <= 11 &&
-      formData.groupId &&
       formData.agreeTerms &&
       formData.agreePrivacy;
 
     if (!commonValid) return false;
 
     if (membershipType === 'pharmacist') {
-      return !!formData.licenseNumber && licenseStatus !== 'duplicate';
+      return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId;
     }
 
     if (membershipType === 'student') {
-      return !!formData.universityName && !!formData.studentYear;
+      return !!formData.university && !!formData.department && !!formData.studentYear;
     }
 
     return false;
@@ -572,83 +620,107 @@ export default function RegisterModal() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          재학 대학명 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="universityName"
-                          value={formData.universityName}
-                          onChange={handleInputChange}
-                          placeholder="OO대학교 약학대학"
-                          required
-                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          학년 <span className="text-red-500">*</span>
+                          대학교 <span className="text-red-500">*</span>
                         </label>
                         <select
-                          name="studentYear"
-                          value={formData.studentYear}
+                          name="university"
+                          value={formData.university}
                           onChange={handleInputChange}
                           required
                           className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                         >
-                          {studentYearOptions.map(option => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
+                          <option value="">대학교 선택</option>
+                          {PHARMACY_SCHOOLS.map(s => (
+                            <option key={s.university} value={s.university}>{s.university}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          학과 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="department"
+                          value={formData.department}
+                          onChange={handleInputChange}
+                          disabled={!formData.university}
+                          required
+                          className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.university ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <option value="">{formData.university ? '학과 선택' : '대학교를 먼저 선택'}</option>
+                          {selectedUniDepts.map(d => (
+                            <option key={d} value={d}>{d}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        학년 <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="studentYear"
+                        value={formData.studentYear}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      >
+                        {studentYearOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* 소속 분회 (약사 전용 - 약대생은 분회 소속 아님) */}
+                {membershipType === 'pharmacist' && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
+                      소속 분회 <span className="text-red-500">*</span>
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          지부 (시/도)
+                        </label>
+                        <select
+                          name="branchId"
+                          value={formData.branchId}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        >
+                          <option value="">지부 선택</option>
+                          {branches.map(b => (
+                            <option key={b.id} value={b.id}>{b.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          분회 (시/군/구)
+                        </label>
+                        <select
+                          name="groupId"
+                          value={formData.groupId}
+                          onChange={handleInputChange}
+                          disabled={!formData.branchId}
+                          className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.branchId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <option value="">
+                            {formData.branchId ? '분회 선택' : '지부를 먼저 선택'}
+                          </option>
+                          {groups.map(g => (
+                            <option key={g.id} value={g.id}>{g.name}</option>
                           ))}
                         </select>
                       </div>
                     </div>
                   </div>
                 )}
-
-                {/* 소속 분회 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                    소속 분회 <span className="text-red-500">*</span>
-                  </h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        지부 (시/도)
-                      </label>
-                      <select
-                        name="branchId"
-                        value={formData.branchId}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      >
-                        <option value="">지부 선택</option>
-                        {branches.map(b => (
-                          <option key={b.id} value={b.id}>{b.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        분회 (시/군/구)
-                      </label>
-                      <select
-                        name="groupId"
-                        value={formData.groupId}
-                        onChange={handleInputChange}
-                        disabled={!formData.branchId}
-                        className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.branchId ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        <option value="">
-                          {formData.branchId ? '분회 선택' : '지부를 먼저 선택'}
-                        </option>
-                        {groups.map(g => (
-                          <option key={g.id} value={g.id}>{g.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
 
                 {/* 약관 동의 */}
                 <div className="space-y-3 pt-4 border-t border-gray-100">
