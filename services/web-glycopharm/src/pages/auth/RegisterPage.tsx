@@ -10,6 +10,8 @@ import {
   EyeOff,
   Building2,
   Check,
+  CheckCircle2,
+  Circle,
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react';
@@ -47,9 +49,19 @@ export default function RegisterPage() {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : name === 'phone' ? value.replace(/\D/g, '') : value,
     }));
   };
+
+  const passwordChecks = {
+    length: formData.password.length >= 8,
+    lowercase: /[a-z]/.test(formData.password),
+    uppercase: /[A-Z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    special: /[@$!%*?&]/.test(formData.password),
+  };
+  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+  const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
@@ -58,17 +70,19 @@ export default function RegisterPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration API call
+    const normalizedPhone = formData.phone.replace(/\D/g, '');
+    // TODO: Implement registration API call with normalizedPhone
+    console.log('Submit with phone:', normalizedPhone);
     navigate('/login');
   };
 
   const isFormValid = () => {
     return (
       formData.email &&
-      formData.password &&
+      isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
       formData.name &&
-      formData.phone &&
+      isPhoneValid &&
       formData.agreeTerms &&
       formData.agreePrivacy
     );
@@ -205,7 +219,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div>
+                <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -215,7 +229,7 @@ export default function RegisterPage() {
                       value={formData.password}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="8자 이상"
+                      placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                       required
                     />
                     <button
@@ -226,9 +240,31 @@ export default function RegisterPage() {
                       {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
                     </button>
                   </div>
+                  {formData.password && (
+                    <div className="mt-2 space-y-1">
+                      {[
+                        { key: 'length' as const, label: '8자 이상' },
+                        { key: 'lowercase' as const, label: '영문 소문자 포함' },
+                        { key: 'uppercase' as const, label: '영문 대문자 포함' },
+                        { key: 'number' as const, label: '숫자 포함' },
+                        { key: 'special' as const, label: '특수문자 포함 (@$!%*?&)' },
+                      ].map(({ key, label }) => (
+                        <div key={key} className="flex items-center gap-1.5">
+                          {passwordChecks[key] ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                          ) : (
+                            <Circle className="w-3.5 h-3.5 text-slate-300" />
+                          )}
+                          <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>
+                            {label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div>
+                <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 확인</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -242,6 +278,9 @@ export default function RegisterPage() {
                       required
                     />
                   </div>
+                  {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                    <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                  )}
                 </div>
 
                 <div>
@@ -261,7 +300,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">연락처</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">핸드폰 번호</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
@@ -270,10 +309,14 @@ export default function RegisterPage() {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="010-1234-5678"
+                      placeholder="하이픈(-) 없이 숫자만 입력"
                       required
                     />
                   </div>
+                  <p className="text-xs text-slate-400 mt-1">숫자만 입력 (예: 01012345678)</p>
+                  {formData.phone && !isPhoneValid && (
+                    <p className="text-xs text-red-500 mt-1">핸드폰 번호는 10~11자리 숫자여야 합니다</p>
+                  )}
                 </div>
               </div>
 

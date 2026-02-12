@@ -46,9 +46,15 @@ export function RegisterPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
-    const { name, value } = target;
+    const { name } = target;
+    let { value } = target;
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
+
+    // 핸드폰 번호: 숫자만 허용
+    if (name === 'phone') {
+      value = value.replace(/\D/g, '');
+    }
 
     setFormData(prev => ({
       ...prev,
@@ -73,6 +79,7 @@ export function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          phone: formData.phone.replace(/\D/g, ''),
           role: selectedRole,
           service: 'neture',
         }),
@@ -93,14 +100,25 @@ export function RegisterPage() {
     }
   };
 
+  const passwordChecks = {
+    length: formData.password.length >= 8,
+    lowercase: /[a-z]/.test(formData.password),
+    uppercase: /[A-Z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    special: /[@$!%*?&]/.test(formData.password),
+  };
+  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+
   const isFormValid = () => {
     return (
       formData.email &&
       formData.password &&
-      formData.password.length >= 8 &&
+      isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
       formData.name &&
       formData.phone &&
+      formData.phone.length >= 10 &&
+      formData.phone.length <= 11 &&
       formData.companyName &&
       formData.agreeTerms &&
       formData.agreePrivacy
@@ -192,7 +210,7 @@ export function RegisterPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="8자 이상"
+                    placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                     style={styles.input}
                     required
                   />
@@ -204,6 +222,25 @@ export function RegisterPage() {
                     {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
+                {formData.password.length > 0 && !isPasswordStrong && (
+                  <div style={{ fontSize: '12px', margin: '4px 0 0 0', lineHeight: '1.6' }}>
+                    <span style={{ color: passwordChecks.length ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.length ? '\u2713' : '\u2717'} 8자 이상
+                    </span><br />
+                    <span style={{ color: passwordChecks.uppercase ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.uppercase ? '\u2713' : '\u2717'} 영문 대문자
+                    </span><br />
+                    <span style={{ color: passwordChecks.lowercase ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.lowercase ? '\u2713' : '\u2717'} 영문 소문자
+                    </span><br />
+                    <span style={{ color: passwordChecks.number ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.number ? '\u2713' : '\u2717'} 숫자
+                    </span><br />
+                    <span style={{ color: passwordChecks.special ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자(@$!%*?&)
+                    </span>
+                  </div>
+                )}
               </div>
               <div style={styles.inputGroup}>
                 <label style={styles.label}>비밀번호 확인 *</label>
@@ -216,6 +253,11 @@ export function RegisterPage() {
                   style={styles.input}
                   required
                 />
+                {formData.passwordConfirm.length > 0 && formData.password !== formData.passwordConfirm && (
+                  <span style={{ fontSize: '12px', color: '#dc2626', marginTop: '2px' }}>
+                    비밀번호가 일치하지 않습니다
+                  </span>
+                )}
               </div>
             </div>
 
@@ -233,16 +275,24 @@ export function RegisterPage() {
                 />
               </div>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>연락처 *</label>
+                <label style={styles.label}>핸드폰 번호 *</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  placeholder="010-1234-5678"
+                  placeholder="하이픈(-) 없이 숫자만 입력"
                   style={styles.input}
                   required
                 />
+                <span style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                  숫자만 입력 (예: 01012345678)
+                </span>
+                {formData.phone.length > 0 && (formData.phone.length < 10 || formData.phone.length > 11) && (
+                  <span style={{ fontSize: '12px', color: '#dc2626', marginTop: '2px' }}>
+                    핸드폰 번호는 10~11자리 숫자여야 합니다
+                  </span>
+                )}
               </div>
             </div>
 

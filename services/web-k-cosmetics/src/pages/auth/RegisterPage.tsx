@@ -47,7 +47,7 @@ export default function RegisterPage() {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : name === 'phone' ? value.replace(/\D/g, '') : value,
     }));
   };
 
@@ -68,6 +68,7 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          phone: formData.phone.replace(/\D/g, ''),
           role: selectedRole,
           service: 'k-cosmetics',
         }),
@@ -94,14 +95,25 @@ export default function RegisterPage() {
     }
   };
 
+  const passwordChecks = {
+    length: formData.password.length >= 8,
+    lowercase: /[a-z]/.test(formData.password),
+    uppercase: /[A-Z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    special: /[@$!%*?&]/.test(formData.password),
+  };
+  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+
+  const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
+
   const isFormValid = () => {
     return (
       formData.email &&
-      formData.password &&
-      formData.password.length >= 8 &&
+      isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
       formData.name &&
       formData.phone &&
+      isPhoneValid &&
       formData.agreeTerms &&
       formData.agreePrivacy
     );
@@ -192,7 +204,7 @@ export default function RegisterPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="8자 이상"
+                    placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                     style={styles.input}
                     required
                   />
@@ -204,6 +216,15 @@ export default function RegisterPage() {
                     {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
+                {formData.password && (
+                  <ul style={styles.passwordChecklist}>
+                    <li style={passwordChecks.length ? styles.checkPass : styles.checkFail}>8자 이상</li>
+                    <li style={passwordChecks.lowercase ? styles.checkPass : styles.checkFail}>영문 소문자 포함</li>
+                    <li style={passwordChecks.uppercase ? styles.checkPass : styles.checkFail}>영문 대문자 포함</li>
+                    <li style={passwordChecks.number ? styles.checkPass : styles.checkFail}>숫자 포함</li>
+                    <li style={passwordChecks.special ? styles.checkPass : styles.checkFail}>특수문자(@$!%*?&) 포함</li>
+                  </ul>
+                )}
               </div>
               <div style={styles.inputGroup}>
                 <label style={styles.label}>비밀번호 확인 *</label>
@@ -216,6 +237,9 @@ export default function RegisterPage() {
                   style={styles.input}
                   required
                 />
+                {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                  <span style={styles.fieldError}>비밀번호가 일치하지 않습니다</span>
+                )}
               </div>
             </div>
 
@@ -233,16 +257,20 @@ export default function RegisterPage() {
                 />
               </div>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>연락처 *</label>
+                <label style={styles.label}>핸드폰 번호 *</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  placeholder="010-1234-5678"
+                  placeholder="하이픈(-) 없이 숫자만 입력"
                   style={styles.input}
                   required
                 />
+                <span style={styles.helpText}>숫자만 입력 (예: 01012345678)</span>
+                {formData.phone && !isPhoneValid && (
+                  <span style={styles.fieldError}>핸드폰 번호는 10~11자리 숫자여야 합니다</span>
+                )}
               </div>
             </div>
 
@@ -558,5 +586,30 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     fontWeight: 600,
     marginTop: '8px',
+  },
+  helpText: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    marginTop: '2px',
+  },
+  fieldError: {
+    fontSize: '12px',
+    color: '#dc2626',
+    marginTop: '2px',
+  },
+  passwordChecklist: {
+    listStyle: 'none',
+    padding: 0,
+    margin: '4px 0 0 0',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+    fontSize: '12px',
+  },
+  checkPass: {
+    color: '#16a34a',
+  },
+  checkFail: {
+    color: '#94a3b8',
   },
 };

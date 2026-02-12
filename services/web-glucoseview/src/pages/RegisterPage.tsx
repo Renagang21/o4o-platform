@@ -75,13 +75,30 @@ export default function RegisterPage() {
       return;
     }
 
-    if (form.password !== form.passwordConfirm) {
-      setError('비밀번호가 일치하지 않습니다.');
+    // 핸드폰 번호 검증
+    const normalizedPhone = form.phone.replace(/\D/g, '');
+    if (!/^\d{10,11}$/.test(normalizedPhone)) {
+      setError('핸드폰 번호는 10~11자리 숫자여야 합니다.');
       return;
     }
 
-    if (form.password.length < 8) {
-      setError('비밀번호는 8자 이상이어야 합니다.');
+    // 비밀번호 강도 검증
+    const passwordChecks = {
+      length: form.password.length >= 8,
+      lowercase: /[a-z]/.test(form.password),
+      uppercase: /[A-Z]/.test(form.password),
+      number: /\d/.test(form.password),
+      special: /[@$!%*?&]/.test(form.password),
+    };
+    const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+
+    if (!isPasswordStrong) {
+      setError('비밀번호는 8자 이상, 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.');
+      return;
+    }
+
+    if (form.password !== form.passwordConfirm) {
+      setError('비밀번호가 일치하지 않습니다.');
       return;
     }
 
@@ -190,18 +207,26 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* 연락처 */}
+            {/* 핸드폰 번호 */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                전화번호 <span className="text-red-500">*</span>
+                핸드폰 번호 <span className="text-red-500">*</span>
               </label>
               <input
                 type="tel"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="010-0000-0000"
+                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+                placeholder="하이픈(-) 없이 숫자만 입력"
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <p className="text-xs text-slate-400 mt-1">
+                숫자만 입력 (예: 01012345678)
+              </p>
+              {form.phone && !/^\d{10,11}$/.test(form.phone) && (
+                <p className="text-xs text-red-500 mt-1">
+                  핸드폰 번호는 10~11자리 숫자여야 합니다
+                </p>
+              )}
             </div>
 
             {/* 이메일 */}
@@ -219,31 +244,56 @@ export default function RegisterPage() {
             </div>
 
             {/* 비밀번호 */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  비밀번호 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder="8자 이상"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  비밀번호 확인 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  value={form.passwordConfirm}
-                  onChange={(e) => setForm({ ...form, passwordConfirm: e.target.value })}
-                  placeholder="비밀번호 재입력"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                비밀번호 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {form.password && (
+                <ul className="mt-2 space-y-1">
+                  {[
+                    { check: form.password.length >= 8, label: '8자 이상' },
+                    { check: /[a-z]/.test(form.password), label: '영문 소문자 포함' },
+                    { check: /[A-Z]/.test(form.password), label: '영문 대문자 포함' },
+                    { check: /\d/.test(form.password), label: '숫자 포함' },
+                    { check: /[@$!%*?&]/.test(form.password), label: '특수문자(@$!%*?&) 포함' },
+                  ].map(({ check, label }) => (
+                    <li key={label} className={`flex items-center gap-1.5 text-xs ${check ? 'text-green-600' : 'text-slate-400'}`}>
+                      {check ? (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth={2} /></svg>
+                      )}
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* 비밀번호 확인 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                비밀번호 확인 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                value={form.passwordConfirm}
+                onChange={(e) => setForm({ ...form, passwordConfirm: e.target.value })}
+                placeholder="비밀번호 재입력"
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {form.passwordConfirm && form.password !== form.passwordConfirm && (
+                <p className="text-xs text-red-500 mt-1">
+                  비밀번호가 일치하지 않습니다
+                </p>
+              )}
             </div>
 
             {/* 지부/분회 */}

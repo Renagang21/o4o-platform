@@ -89,6 +89,27 @@ export const isValidBusinessNumber = (bn: string): boolean => {
   return /^\d{10}$/.test(normalized);
 };
 
+/** Password strength checks matching backend @Matches regex */
+export const PASSWORD_CHECKS = {
+  length: (pw: string) => pw.length >= 8,
+  lowercase: (pw: string) => /[a-z]/.test(pw),
+  uppercase: (pw: string) => /[A-Z]/.test(pw),
+  number: (pw: string) => /\d/.test(pw),
+  special: (pw: string) => /[@$!%*?&]/.test(pw),
+};
+
+/** Validate password meets platform security policy */
+export const validatePassword = (password: string): { valid: boolean; checks: Record<string, boolean> } => {
+  const checks = {
+    length: PASSWORD_CHECKS.length(password),
+    lowercase: PASSWORD_CHECKS.lowercase(password),
+    uppercase: PASSWORD_CHECKS.uppercase(password),
+    number: PASSWORD_CHECKS.number(password),
+    special: PASSWORD_CHECKS.special(password),
+  };
+  return { valid: Object.values(checks).every(Boolean), checks };
+};
+
 export const generateId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };

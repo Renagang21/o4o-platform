@@ -82,9 +82,11 @@ export default function RegisterModal() {
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
 
+    const finalValue = name === 'phone' ? value.replace(/\D/g, '') : value;
+
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : finalValue,
     }));
   };
 
@@ -136,11 +138,20 @@ export default function RegisterModal() {
     }
   };
 
+  const passwordChecks = {
+    length: formData.password.length >= 8,
+    lowercase: /[a-z]/.test(formData.password),
+    uppercase: /[A-Z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    special: /[@$!%*?&]/.test(formData.password),
+  };
+  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+
   const isFormValid = () => {
     const commonValid =
       formData.email &&
       formData.password &&
-      formData.password.length >= 8 &&
+      isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
       formData.name &&
       formData.phone &&
@@ -344,7 +355,7 @@ export default function RegisterModal() {
                           autoComplete="new-password"
                           value={formData.password}
                           onChange={handleInputChange}
-                          placeholder="8자 이상"
+                          placeholder="영문 대/소문자, 숫자, 특수문자 포함"
                           required
                           className="w-full px-4 py-3 pr-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
@@ -356,6 +367,25 @@ export default function RegisterModal() {
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
+                      {formData.password.length > 0 && !isPasswordStrong && (
+                        <div style={{ fontSize: '12px', margin: '4px 0 0 0', lineHeight: '1.6' }}>
+                          <span style={{ color: passwordChecks.length ? '#16a34a' : '#dc2626' }}>
+                            {passwordChecks.length ? '\u2713' : '\u2717'} 8자 이상
+                          </span><br />
+                          <span style={{ color: passwordChecks.uppercase ? '#16a34a' : '#dc2626' }}>
+                            {passwordChecks.uppercase ? '\u2713' : '\u2717'} 영문 대문자
+                          </span><br />
+                          <span style={{ color: passwordChecks.lowercase ? '#16a34a' : '#dc2626' }}>
+                            {passwordChecks.lowercase ? '\u2713' : '\u2717'} 영문 소문자
+                          </span><br />
+                          <span style={{ color: passwordChecks.number ? '#16a34a' : '#dc2626' }}>
+                            {passwordChecks.number ? '\u2713' : '\u2717'} 숫자
+                          </span><br />
+                          <span style={{ color: passwordChecks.special ? '#16a34a' : '#dc2626' }}>
+                            {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자(@$!%*?&)
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -371,6 +401,9 @@ export default function RegisterModal() {
                         required
                         className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
+                      {formData.passwordConfirm.length > 0 && formData.password !== formData.passwordConfirm && (
+                        <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                      )}
                     </div>
                   </div>
 
@@ -392,7 +425,7 @@ export default function RegisterModal() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        연락처 <span className="text-red-500">*</span>
+                        핸드폰 번호 <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="tel"
@@ -400,10 +433,14 @@ export default function RegisterModal() {
                         autoComplete="tel"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        placeholder="010-1234-5678"
+                        placeholder="하이픈(-) 없이 숫자만 입력"
                         required
                         className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
+                      <p className="text-xs text-gray-500 mt-1">숫자만 입력 (예: 01012345678)</p>
+                      {formData.phone.length > 0 && (formData.phone.length < 10 || formData.phone.length > 11) && (
+                        <p className="text-xs text-red-500 mt-1">핸드폰 번호는 10~11자리 숫자여야 합니다</p>
+                      )}
                     </div>
                   </div>
                 </div>
