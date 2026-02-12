@@ -37,10 +37,6 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: true })
   nickname?: string;
 
-  // P1-T2: Nickname for forum/public display (separate from real name)
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  nickname?: string;
-
   @Column({ type: 'varchar', length: 500, nullable: true })
   avatar?: string;
 
