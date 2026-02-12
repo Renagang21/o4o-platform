@@ -235,6 +235,21 @@ export class AuthController extends BaseController {
       // KPA Society: auto-create KPA member with organization
       if (data.service === 'kpa-society' && data.organizationId) {
         try {
+          const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
+
+          // 면허번호 중복 체크 (상태 무관 절대 유일)
+          if (licenseNum) {
+            const dupLicense = await AppDataSource.query(
+              `SELECT id FROM kpa_members WHERE license_number = $1 LIMIT 1`,
+              [licenseNum],
+            );
+            if (dupLicense.length > 0) {
+              logger.warn('[AuthController.register] Duplicate license_number', { licenseNumber: licenseNum, userId: user.id });
+              // 계정은 이미 생성됨 — member만 생성 안 함, 에러로 알림
+              throw new Error('이미 등록된 면허번호입니다.');
+            }
+          }
+
           await AppDataSource.query(`
             INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status)
             VALUES ($1, $2, $3, $4, $5, 'member', 'pending')
@@ -242,7 +257,7 @@ export class AuthController extends BaseController {
             user.id,
             data.organizationId,
             data.membershipType || 'pharmacist',
-            data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null,
+            licenseNum,
             data.membershipType === 'student' ? (data.universityName || null) : null,
           ]);
         } catch (memberError: any) {

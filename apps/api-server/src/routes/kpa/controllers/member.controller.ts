@@ -56,6 +56,30 @@ export function createMemberController(
   });
 
   /**
+   * GET /kpa/members/check-license?license_number=xxx
+   * 면허번호 중복 확인 (가입 전 실시간 검증용)
+   */
+  router.get(
+    '/check-license',
+    [
+      query('license_number').isString().notEmpty().trim(),
+      handleValidationErrors,
+    ],
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const licenseNumber = (req.query.license_number as string).trim();
+        const existing = await memberRepo.findOne({
+          where: { license_number: licenseNumber },
+        });
+        res.json({ available: !existing });
+      } catch (error: any) {
+        console.error('Failed to check license:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  /**
    * POST /kpa/members/apply
    * 회원 가입 신청
    */
@@ -102,6 +126,20 @@ export function createMemberController(
         }
 
         const membershipType = req.body.membership_type || 'pharmacist';
+        const licenseNumber = membershipType === 'pharmacist' ? (req.body.license_number || null) : null;
+
+        // 면허번호 중복 체크 (상태 무관 절대 유일)
+        if (licenseNumber) {
+          const dupLicense = await memberRepo.findOne({
+            where: { license_number: licenseNumber },
+          });
+          if (dupLicense) {
+            res.status(409).json({
+              error: { code: 'LICENSE_DUPLICATE', message: '이미 등록된 면허번호입니다.' },
+            });
+            return;
+          }
+        }
 
         const member = memberRepo.create({
           user_id: req.user!.id,
@@ -109,7 +147,7 @@ export function createMemberController(
           membership_type: membershipType,
           role: 'member',
           status: 'pending',
-          license_number: membershipType === 'pharmacist' ? (req.body.license_number || null) : null,
+          license_number: licenseNumber,
           university_name: membershipType === 'student' ? (req.body.university_name || null) : null,
           student_year: membershipType === 'student' ? (req.body.student_year || null) : null,
           pharmacy_name: req.body.pharmacy_name || null,

@@ -77,6 +77,7 @@ export default function RegisterPage() {
 
   const [branches, setBranches] = useState<Array<{id: string, name: string}>>([]);
   const [groups, setGroups] = useState<Array<{id: string, name: string}>>([]);
+  const [licenseStatus, setLicenseStatus] = useState<'idle' | 'checking' | 'available' | 'duplicate'>('idle');
 
   useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -97,6 +98,26 @@ export default function RegisterPage() {
       .then(res => setGroups(res.data || []))
       .catch(() => {});
   }, [formData.branchId]);
+
+  const checkLicenseDuplicate = async (licenseNumber: string) => {
+    if (!licenseNumber.trim()) {
+      setLicenseStatus('idle');
+      return;
+    }
+    setLicenseStatus('checking');
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const res = await fetch(`${baseUrl}/kpa/members/check-license?license_number=${encodeURIComponent(licenseNumber.trim())}`);
+      if (res.ok) {
+        const data = await res.json();
+        setLicenseStatus(data.available ? 'available' : 'duplicate');
+      } else {
+        setLicenseStatus('idle');
+      }
+    } catch {
+      setLicenseStatus('idle');
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
@@ -184,7 +205,7 @@ export default function RegisterPage() {
     if (!baseValid) return false;
 
     if (formData.membershipType === 'pharmacist') {
-      return !!formData.licenseNumber;
+      return !!formData.licenseNumber && licenseStatus !== 'duplicate';
     }
     if (formData.membershipType === 'student') {
       return !!formData.universityName && !!formData.department;
@@ -381,11 +402,31 @@ export default function RegisterPage() {
                   name="licenseNumber"
                   value={formData.licenseNumber}
                   onChange={handleInputChange}
+                  onBlur={() => checkLicenseDuplicate(formData.licenseNumber)}
                   placeholder="00000"
-                  style={styles.input}
+                  style={{
+                    ...styles.input,
+                    ...(licenseStatus === 'duplicate' ? { borderColor: '#dc2626' } : {}),
+                    ...(licenseStatus === 'available' ? { borderColor: '#16a34a' } : {}),
+                  }}
                   required
                 />
                 <p style={styles.helpText}>약사면허증에 기재된 면허번호</p>
+                {licenseStatus === 'checking' && (
+                  <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>
+                    면허번호 확인 중...
+                  </p>
+                )}
+                {licenseStatus === 'duplicate' && (
+                  <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
+                    이미 등록된 면허번호입니다.
+                  </p>
+                )}
+                {licenseStatus === 'available' && (
+                  <p style={{ fontSize: '12px', color: '#16a34a', margin: '4px 0 0 0' }}>
+                    사용 가능한 면허번호입니다.
+                  </p>
+                )}
               </div>
             )}
 
