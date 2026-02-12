@@ -66,6 +66,14 @@ export class RegisterRequestDto {
   @IsString()
   organizationId?: string;
 
+  @IsOptional()
+  @IsString()
+  pharmacistFunction?: string;
+
+  @IsOptional()
+  @IsString()
+  pharmacistRole?: string;
+
   @IsBoolean()
   tos: boolean;
 

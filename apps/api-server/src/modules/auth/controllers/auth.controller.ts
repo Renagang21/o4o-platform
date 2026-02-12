@@ -216,6 +216,12 @@ export class AuthController extends BaseController {
         if (data.phone) {
           newUser.phone = data.phone.replace(/\D/g, '');
         }
+        if (data.pharmacistFunction) {
+          newUser.pharmacistFunction = data.pharmacistFunction;
+        }
+        if (data.pharmacistRole) {
+          newUser.pharmacistRole = data.pharmacistRole;
+        }
 
         await txUserRepo.save(newUser);
 
