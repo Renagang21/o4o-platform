@@ -41,7 +41,7 @@ interface Vendor {
   avatar?: string;
 }
 
-const VendorsWordPress = () => {
+const VendorsAdmin = () => {
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState<VendorTab>(() => {
@@ -1075,4 +1075,4 @@ const VendorsWordPress = () => {
   );
 };
 
-export default VendorsWordPress;
+export default VendorsAdmin;

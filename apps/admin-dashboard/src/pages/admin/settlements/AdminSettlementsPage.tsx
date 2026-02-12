@@ -364,7 +364,7 @@ export const AdminSettlementsPage: React.FC = () => {
                 setPartyTypeFilter(e.target.value as any);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-wordpress-blue focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-o4o-blue focus:border-transparent"
             >
               <option value="ALL">전체</option>
               <option value="seller">판매자</option>
@@ -381,7 +381,7 @@ export const AdminSettlementsPage: React.FC = () => {
                 setStatusFilter(e.target.value as any);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-wordpress-blue focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-o4o-blue focus:border-transparent"
             >
               <option value="ALL">전체</option>
               <option value="pending">정산 준비중</option>
@@ -399,7 +399,7 @@ export const AdminSettlementsPage: React.FC = () => {
                 setDateFilter(e.target.value as any);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-wordpress-blue focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-o4o-blue focus:border-transparent"
             >
               <option value="thisMonth">이번 달</option>
               <option value="lastMonth">지난 달</option>
@@ -417,7 +417,7 @@ export const AdminSettlementsPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="대상 이름/ID 검색"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-wordpress-blue focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-o4o-blue focus:border-transparent"
             />
           </div>
         </div>

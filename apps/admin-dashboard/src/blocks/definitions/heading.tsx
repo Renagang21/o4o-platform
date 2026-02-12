@@ -7,7 +7,7 @@
 import React from 'react';
 import { Heading as HeadingIcon } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import { GutenbergHeadingBlock } from '@/components/editor/blocks/gutenberg/GutenbergHeadingBlock';
+import { HeadingBlock } from '@/components/editor/blocks/gutenberg/HeadingBlock';
 import { BlockComponent } from '../registry/types';
 
 export const headingBlockDefinition: BlockDefinition = {
@@ -17,7 +17,7 @@ export const headingBlockDefinition: BlockDefinition = {
   icon: <HeadingIcon className="w-5 h-5" />,
   description: 'Introduce new sections with formatted text and links.',
   keywords: ['title', 'subtitle', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-  component: GutenbergHeadingBlock as unknown as BlockComponent,
+  component: HeadingBlock as unknown as BlockComponent,
   attributes: {
     content: {
       type: 'string',

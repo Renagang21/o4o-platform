@@ -263,7 +263,7 @@ const RoleApplicationsAdminPage: FC = () => {
   ], [activeTab, actionLoading]);
 
   return (
-    <div className="wordpress-admin-page">
+    <div className="o4o-admin-page">
       <PageHeader
         title="역할 신청 관리"
         subtitle="사용자의 역할 신청을 검토하고 승인/거부할 수 있습니다."

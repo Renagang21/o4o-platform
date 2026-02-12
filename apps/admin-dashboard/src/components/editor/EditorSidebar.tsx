@@ -74,7 +74,7 @@ interface BlockSettings {
   attributes: any;
 }
 
-interface GutenbergSidebarProps {
+interface EditorSidebarProps {
   activeTab?: 'document' | 'block';
   postSettings: PostSettings;
   blockSettings?: BlockSettings;
@@ -110,7 +110,7 @@ const Panel: FC<{
   );
 };
 
-const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
+const EditorSidebar: FC<EditorSidebarProps> = ({
   activeTab = 'document',
   postSettings,
   blockSettings,
@@ -583,4 +583,4 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   );
 };
 
-export default GutenbergSidebar;
+export default EditorSidebar;

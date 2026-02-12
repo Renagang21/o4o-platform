@@ -241,7 +241,7 @@ const ErpTransmissionHistory: React.FC = () => {
           <button
             onClick={() => handleRetry(record.id)}
             disabled={retrying === record.id}
-            className="p-1 text-wordpress-blue hover:bg-blue-50 rounded transition disabled:opacity-50"
+            className="p-1 text-o4o-blue hover:bg-blue-50 rounded transition disabled:opacity-50"
             title="재시도"
           >
             <RotateCcw className={`w-4 h-4 ${retrying === record.id ? 'animate-spin' : ''}`} />

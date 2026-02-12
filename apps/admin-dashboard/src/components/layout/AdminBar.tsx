@@ -12,7 +12,7 @@ const AdminBar: FC<AdminBarProps> = ({ onLogout }) => {
   const { user } = useAuth();
 
   return (
-    <div className="wordpress-admin-bar fixed top-0 left-0 right-0 h-[46px] text-[13px] z-[99999] bg-[#23282d] text-[#ccc]">
+    <div className="o4o-admin-bar fixed top-0 left-0 right-0 h-[46px] text-[13px] z-[99999] bg-[#23282d] text-[#ccc]">
       <div className="h-full flex items-center justify-between px-4">
         {/* Left side */}
         <div className="flex items-center gap-4 flex-1">

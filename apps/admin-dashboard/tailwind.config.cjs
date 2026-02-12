@@ -55,6 +55,10 @@ module.exports = {
           900: 'var(--wp-color-secondary-900)',
         },
 
+        // O4O brand colors
+        'o4o-blue': '#2271b1',
+        'o4o-blue-hover': '#135e96',
+
         // Admin UI colors
         admin: {
           blue: 'var(--wp-admin-blue)',

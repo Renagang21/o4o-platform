@@ -234,7 +234,7 @@ const Settlements: React.FC = () => {
               {selectedSettlement.meta_data.settlement_status === 'pending' && (
                 <button
                   onClick={() => processSettlement(selectedSettlement.id)}
-                  className="w-full px-4 py-2 bg-wordpress-blue text-white rounded hover:bg-wordpress-blue-hover"
+                  className="w-full px-4 py-2 bg-o4o-blue text-white rounded hover:bg-o4o-blue-hover"
                 >
                   정산 처리하기
                 </button>

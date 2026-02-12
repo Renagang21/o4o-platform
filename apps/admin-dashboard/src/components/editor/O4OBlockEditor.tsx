@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/editor.css';
 import '../../styles/inspector-sidebar.css';
 import { Block } from '@/types/post.types';
-import { GutenbergBlockEditorProps, PostSettings } from './types/editor';
+import { O4OBlockEditorProps, PostSettings } from './types/editor';
 import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
 import { useGutenbergEditor } from './hooks/useGutenbergEditor';
@@ -28,10 +28,10 @@ import { useAIHandlers } from './hooks/useAIHandlers';
 import { useBlockCallbacks } from './hooks/useBlockCallbacks';
 import { EditorShell } from './editor-shell/EditorShell';
 import { EditorModals } from './EditorModals';
-import { initializeWordPress } from '@/utils/wordpress-initializer';
+import { initializeWordPress } from '@/utils/editor-runtime';
 import { registerAllBlocks } from '@/blocks';
 
-const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
+const O4OBlockEditor: React.FC<O4OBlockEditorProps> = ({
   documentTitle: propDocumentTitle = '',
   initialBlocks = [],
   onChange,
@@ -400,4 +400,4 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   );
 };
 
-export default GutenbergBlockEditor;
+export default O4OBlockEditor;

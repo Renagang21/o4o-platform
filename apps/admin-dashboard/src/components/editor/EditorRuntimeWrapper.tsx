@@ -1,16 +1,16 @@
 /**
- * WordPress Editor Wrapper
- * Ensures WordPress is initialized before rendering any WordPress components
+ * Editor Runtime Wrapper
+ * Ensures editor runtime is initialized before rendering any editor components
  */
 
 import { useEffect, useState } from 'react';
-import { initializeWordPress } from '@/utils/wordpress-initializer';
+import { initializeWordPress } from '@/utils/editor-runtime';
 // Using inline spinner as ui/spinner doesn't exist
 const Spinner = ({ className }: { className?: string }) => (
   <div className={`border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin ${className || 'w-8 h-8'}`} />
 );
 
-interface WordPressEditorWrapperProps {
+interface EditorRuntimeWrapperProps {
   children?: React.ReactNode;
   // Optional props expected by callers; currently not used internally
   initialContent?: string;
@@ -18,7 +18,7 @@ interface WordPressEditorWrapperProps {
   showReusableBlocks?: boolean;
 }
 
-export default function WordPressEditorWrapper({ children }: WordPressEditorWrapperProps) {
+export default function EditorRuntimeWrapper({ children }: EditorRuntimeWrapperProps) {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

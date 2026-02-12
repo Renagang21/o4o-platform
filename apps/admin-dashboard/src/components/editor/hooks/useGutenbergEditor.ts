@@ -12,7 +12,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Block } from '@/types/post.types';
-import { PostSettings, GutenbergBlockEditorProps } from '../types/editor';
+import { PostSettings, O4OBlockEditorProps } from '../types/editor';
 import { useBlockHistory } from './useBlockHistory';
 import { useBlockManagement } from './useBlockManagement';
 import { postApi } from '@/services/api/postApi';

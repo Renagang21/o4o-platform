@@ -4,10 +4,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { Post } from '@/types/post.types';
 import { cn } from '@/lib/utils';
 import { EditorHeader } from '@/components/editor/header/EditorHeader';
-import { initializeWordPress } from '@/utils/wordpress-initializer';
+import { initializeWordPress } from '@/utils/editor-runtime';
 import { clearEditorSession } from '@/utils/history-manager';
-import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
-import MediaListWordPress from '@/pages/media/MediaListWordPress';
+import O4OBlockEditor from '@/components/editor/O4OBlockEditor';
+import MediaLibraryAdmin from '@/pages/media/MediaLibraryAdmin';
 import ContentTemplates from '@/components/editor/ContentTemplates';
 import { SimpleAIModal } from '@/components/ai/SimpleAIModal';
 import {
@@ -802,7 +802,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               transition: 'width 0.3s ease-out'
             } : undefined}
           >
-            <GutenbergBlockEditor
+            <O4OBlockEditor
               documentTitle={postTitle || ''}
               initialBlocks={blocks}
               slug={postSettings.slug || ''}
@@ -850,7 +850,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       {/* Media Library Modal */}
       <Dialog open={showMediaLibrary} onOpenChange={setShowMediaLibrary}>
         <DialogContent className="max-w-6xl h-[80vh] p-0">
-          <MediaListWordPress />
+          <MediaLibraryAdmin />
         </DialogContent>
       </Dialog>
       

@@ -1,4 +1,4 @@
-import { wordpressMenuItems, MenuItem } from '@/config/wordpressMenuFinal';
+import { adminMenuStatic, MenuItem } from '@/admin/menu/admin-menu.static';
 import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 
 /**
@@ -9,7 +9,7 @@ export const useDynamicMenu = () => {
   const cptMenu = useDynamicCPTMenu();
 
   // CPT 메뉴 항목 주입
-  const menuItemsWithCPT = injectCPTMenuItems(wordpressMenuItems, cptMenu.cptMenuItems);
+  const menuItemsWithCPT = injectCPTMenuItems(adminMenuStatic, cptMenu.cptMenuItems);
 
   return {
     menuItems: menuItemsWithCPT,

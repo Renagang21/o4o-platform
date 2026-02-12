@@ -13,18 +13,18 @@
 }
 
 /* Global fullscreen mode when Customizer is active */
-body.customizer-fullscreen .wordpress-admin-bar {
+body.customizer-fullscreen .o4o-admin-bar {
   display: none !important;
 }
 body.customizer-fullscreen .admin-sidebar,
 body.customizer-fullscreen .admin-sidebar-backdrop {
   display: none !important;
 }
-body.customizer-fullscreen .wordpress-admin-content {
+body.customizer-fullscreen .o4o-admin-content {
   margin: 0 !important;
   width: 100% !important;
 }
-body.customizer-fullscreen .wordpress-admin-content main {
+body.customizer-fullscreen .o4o-admin-content main {
   padding: 0 !important;
 }
 

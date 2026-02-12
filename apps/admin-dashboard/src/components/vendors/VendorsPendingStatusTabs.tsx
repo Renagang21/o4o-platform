@@ -26,7 +26,7 @@ export const VendorsPendingStatusTabs: React.FC<VendorsPendingStatusTabsProps> =
   ];
 
   return (
-    <ul className="wordpress-tabs">
+    <ul className="o4o-tabs">
       {tabs.map(tab => (
         <li key={tab.key} className={activeTab === tab.key ? 'active' : ''}>
           <a

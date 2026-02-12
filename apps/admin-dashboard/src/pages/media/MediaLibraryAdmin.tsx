@@ -20,7 +20,7 @@ interface MediaItem {
   isImage?: boolean;
 }
 
-const MediaListWordPress: React.FC = () => {
+const MediaLibraryAdmin: React.FC = () => {
   const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
   const [media, setMedia] = useState<MediaItem[]>([]);
@@ -525,4 +525,4 @@ const MediaListWordPress: React.FC = () => {
   );
 };
 
-export default MediaListWordPress;
+export default MediaLibraryAdmin;

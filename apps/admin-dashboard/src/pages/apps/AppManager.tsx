@@ -187,7 +187,7 @@ const pluginsList: Plugin[] = [
   }
 ];
 
-const WordPressPluginManager: FC = () => {
+const AppManager: FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPlugins, setSelectedPlugins] = useState<string[]>([]);
@@ -653,4 +653,4 @@ const WordPressPluginManager: FC = () => {
   );
 };
 
-export default WordPressPluginManager;
+export default AppManager;

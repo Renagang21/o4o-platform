@@ -59,70 +59,70 @@
 }
 
 /* Apply WordPress theme to admin dashboard */
-.wordpress-admin {
+.o4o-admin {
   background-color: var(--wp-admin-bg);
   color: var(--wp-admin-text);
 }
 
 /* WordPress Sidebar Styles */
-.wordpress-sidebar {
+.o4o-sidebar {
   background-color: var(--wp-admin-sidebar-bg);
   color: var(--wp-admin-sidebar-text);
 }
 
-.wordpress-sidebar a {
+.o4o-sidebar a {
   color: var(--wp-admin-sidebar-text);
 }
 
-.wordpress-sidebar a:hover {
+.o4o-sidebar a:hover {
   color: var(--wp-admin-sidebar-text-hover);
 }
 
-.wordpress-sidebar .submenu {
+.o4o-sidebar .submenu {
   background-color: var(--wp-admin-sidebar-submenu-bg);
 }
 
-.wordpress-sidebar .current-menu-item {
+.o4o-sidebar .current-menu-item {
   background-color: var(--wp-admin-sidebar-current-bg);
   color: var(--wp-admin-sidebar-current-text);
 }
 
 /* WordPress Admin Bar Styles */
-.wordpress-admin-bar {
+.o4o-admin-bar {
   background-color: var(--wp-admin-bar-bg);
   color: var(--wp-admin-bar-text);
 }
 
-.wordpress-admin-bar a {
+.o4o-admin-bar a {
   color: var(--wp-admin-bar-text);
 }
 
-.wordpress-admin-bar a:hover {
+.o4o-admin-bar a:hover {
   color: var(--wp-admin-bar-hover);
 }
 
-/* WordPress Content Area */
-.wordpress-content {
+/* O4O Content Area */
+.o4o-content {
   background-color: var(--wp-admin-bg);
 }
 
-.wordpress-content .card,
-.wordpress-content .panel {
+.o4o-content .card,
+.o4o-content .panel {
   background-color: var(--wp-admin-box-bg);
   border: 1px solid var(--wp-admin-border);
   box-shadow: var(--wp-admin-box-shadow);
 }
 
-/* WordPress Links */
-.wordpress-content a {
+/* O4O Links */
+.o4o-content a {
   color: var(--wp-admin-link);
 }
 
-.wordpress-content a:hover {
+.o4o-content a:hover {
   color: var(--wp-admin-link-hover);
 }
 
-.wordpress-content a:focus {
+.o4o-content a:focus {
   color: var(--wp-admin-link-focus);
   outline: 1px dotted var(--wp-admin-link-focus);
 }

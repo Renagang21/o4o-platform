@@ -1,5 +1,5 @@
 /**
- * GutenbergColumnBlock
+ * ColumnBlock
  *
  * Individual column within Gutenberg Columns block.
  * Clean structure: CleanBlockWrapper + InnerBlocks pattern
@@ -18,7 +18,7 @@ import EnhancedBlockWrapper from '../EnhancedBlockWrapper';
 import { BlockToolbar } from './BlockToolbar';
 import { AlignStartVertical, AlignCenterVertical, AlignEndVertical } from 'lucide-react';
 
-interface GutenbergColumnBlockProps extends BlockProps {
+interface ColumnBlockProps extends BlockProps {
   attributes?: {
     width?: number; // Percentage
     verticalAlignment?: 'top' | 'center' | 'bottom';
@@ -27,7 +27,7 @@ interface GutenbergColumnBlockProps extends BlockProps {
   onInnerBlocksChange?: (blocks: Block[]) => void;
 }
 
-export const GutenbergColumnBlock: React.FC<GutenbergColumnBlockProps> = ({
+export const ColumnBlock: React.FC<ColumnBlockProps> = ({
   id,
   attributes = {},
   innerBlocks = [],
@@ -164,4 +164,4 @@ export const GutenbergColumnBlock: React.FC<GutenbergColumnBlockProps> = ({
   );
 };
 
-export default GutenbergColumnBlock;
+export default ColumnBlock;

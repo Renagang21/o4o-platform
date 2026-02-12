@@ -32,13 +32,13 @@ interface Category {
   icon?: any;
 }
 
-interface GutenbergBlockInserterProps {
+interface BlockInserterProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (blockName: string) => void;
 }
 
-const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
+const BlockInserter: React.FC<BlockInserterProps> = ({
   isOpen,
   onClose,
   onSelect
@@ -317,4 +317,4 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
   );
 };
 
-export default GutenbergBlockInserter;
+export default BlockInserter;

@@ -7,7 +7,7 @@ import {
   ChevronLeft
 } from 'lucide-react'
 import { clsx } from 'clsx'
-import { MenuItem } from '@/config/wordpressMenuFinal'
+import { MenuItem } from '@/admin/menu/admin-menu.static'
 import { useAdminMenu } from '@/hooks/useAdminMenu'
 
 interface AdminSidebarProps {

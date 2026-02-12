@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { AdminTable, AdminTableColumn, AdminTableRow } from '@/components/common/AdminTable';
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { formatDate } from '@/lib/utils';
@@ -102,7 +102,7 @@ const TagList: FC = () => {
   };
 
   // Define table columns - only show visible ones
-  const allColumns: WordPressTableColumn[] = [
+  const allColumns: AdminTableColumn[] = [
     { id: 'name', label: 'Name', sortable: true },
     { id: 'description', label: 'Description' },
     { id: 'slug', label: 'Slug' },
@@ -113,7 +113,7 @@ const TagList: FC = () => {
   const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform tags to table rows
-  const rows: WordPressTableRow[] = tags.map((tag: Tag) => ({
+  const rows: AdminTableRow[] = tags.map((tag: Tag) => ({
     id: tag.id,
     data: {
       name: (
@@ -221,8 +221,8 @@ const TagList: FC = () => {
         </Button>
       </p>
 
-      {/* WordPress Table */}
-      <WordPressTable
+      {/* Admin Table */}
+      <AdminTable
         columns={columns}
         rows={rows}
         selectable={true}

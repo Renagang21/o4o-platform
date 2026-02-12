@@ -1,12 +1,11 @@
 /**
- * Admin Menu Structure v2.0
+ * Admin Menu Static Config
  *
- * WO-ADMIN-ARCHITECTURE-RESTRUCTURE-V1
- * Goal State Aligned: Core / Services / Insights
+ * WO-ADMIN-MENU-FALLBACK-STATIC-V1
+ * Static fallback menu for when Navigation API is unavailable.
  *
- * @deprecated Phase P0 Task A: This file is deprecated.
- * Navigation should be defined in app manifests.
- * This file is kept as a FALLBACK during the transition period.
+ * Structure: Overview / Core / Content / Services / Insights
+ * This file replaces the deprecated wordpressMenuFinal.tsx
  *
  * @see docs/architecture/admin-goal-state-definition.md
  */
@@ -34,13 +33,11 @@ import {
   Calendar,
   PlayCircle,
   LayoutGrid,
-  Clock,
-  AlertTriangle,
+  TrendingUp,
   Brain,
   MessageSquare,
   Layers,
   Shield,
-  TrendingUp,
   Briefcase,
 } from 'lucide-react';
 
@@ -51,33 +48,27 @@ export interface MenuItem {
   path?: string;
   separator?: boolean;
   children?: MenuItem[];
-  roles?: string[]; // Required roles to see this menu
+  roles?: string[];
 }
 
 /**
- * Admin Menu Structure v2.0 (Goal State Aligned)
+ * Static fallback menu items
  *
  * Structure:
- * ├─ Overview (Dashboard)
- * ├─ Core (플랫폼 핵심 기능)
- * │  ├─ Users & Roles
- * │  ├─ Membership
- * │  ├─ CMS
- * │  └─ AppStore
- * ├─ Services (서비스별 관리)
- * │  ├─ Yaksa (KPA Society)
- * │  ├─ Glycopharm
- * │  ├─ GlucoseView
- * │  ├─ K-Cosmetics
- * │  ├─ Neture
- * │  └─ Digital Signage
- * └─ Insights (의사결정 지원)
- *    ├─ Service Health
- *    └─ Reporting
+ * +-- Overview (Dashboard)
+ * +-- Core (Users, Operators, Membership, Settings)
+ * +-- Content
+ * +-- Participation
+ * +-- Learning (Flow)
+ * +-- CMS
+ * +-- AppStore
+ * +-- Forum
+ * +-- Services (Yaksa, Glycopharm, GlucoseView, K-Cosmetics, Neture, Signage)
+ * +-- Insights (Ops Metrics, Content Manager, Reports)
  */
-export const wordpressMenuItems: MenuItem[] = [
+export const adminMenuStatic: MenuItem[] = [
   // ============================================
-  // OVERVIEW - 운영자 진입점
+  // OVERVIEW
   // ============================================
   {
     id: 'dashboard',
@@ -88,7 +79,7 @@ export const wordpressMenuItems: MenuItem[] = [
   },
 
   // ============================================
-  // CORE - 플랫폼 핵심 기능
+  // CORE
   // ============================================
   {
     id: 'core',
@@ -96,21 +87,18 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <Shield className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
     children: [
-      // Users & Roles
       {
         id: 'core-users',
         label: 'Users & Roles',
         icon: <Users className="w-4 h-4" />,
         path: '/users',
       },
-      // Operators (관리자/서비스 운영자 관리)
       {
         id: 'core-operators',
         label: 'Operators',
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
       },
-      // Membership (플랫폼 범용 Core로 통합)
       {
         id: 'core-membership',
         label: 'Membership',
@@ -129,7 +117,6 @@ export const wordpressMenuItems: MenuItem[] = [
         icon: <UserCheck className="w-4 h-4" />,
         path: '/admin/membership/verifications',
       },
-      // Platform Settings
       {
         id: 'core-settings',
         label: 'Platform Settings',
@@ -139,8 +126,7 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // Content (콘텐츠 단일 진실 원천 - Core 메뉴)
-  // WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1
+  // Content
   {
     id: 'content',
     label: 'Content',
@@ -180,7 +166,7 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // Participation (응답 수집/결과 - WO-ADMIN-NETURE-LMS-REFACTOR-V1)
+  // Participation
   {
     id: 'participation',
     label: 'Participation',
@@ -208,8 +194,7 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // Learning (순서/흐름 관리 - WO-ADMIN-NETURE-LMS-REFACTOR-V1)
-  // ⚠️ 교육/평가가 아닌 콘텐츠 순서 안내 도구
+  // Learning (Flow)
   {
     id: 'learning',
     label: 'Learning (Flow)',
@@ -237,7 +222,7 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // CMS (플랫폼 콘텐츠 관리 - Core 하위)
+  // CMS
   {
     id: 'cms',
     label: 'CMS',
@@ -295,7 +280,7 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // AppStore (플랫폼 확장 관리 - Core 하위)
+  // AppStore
   {
     id: 'appstore',
     label: 'AppStore',
@@ -317,7 +302,7 @@ export const wordpressMenuItems: MenuItem[] = [
     ],
   },
 
-  // Forum (플랫폼 포럼 관리 - Core 하위)
+  // Forum
   {
     id: 'forum',
     label: 'Forum',
@@ -346,7 +331,7 @@ export const wordpressMenuItems: MenuItem[] = [
   },
 
   // ============================================
-  // SERVICES - 서비스별 관리
+  // SERVICES
   // ============================================
   {
     id: 'services-separator',
@@ -356,7 +341,7 @@ export const wordpressMenuItems: MenuItem[] = [
     roles: ['admin', 'super_admin'],
   },
 
-  // Yaksa (KPA Society) - 서비스 관리 도구
+  // Yaksa (KPA)
   {
     id: 'yaksa',
     label: 'Yaksa (KPA)',
@@ -549,7 +534,7 @@ export const wordpressMenuItems: MenuItem[] = [
   },
 
   // ============================================
-  // INSIGHTS - 의사결정 지원
+  // INSIGHTS
   // ============================================
   {
     id: 'insights-separator',
@@ -559,7 +544,6 @@ export const wordpressMenuItems: MenuItem[] = [
     roles: ['admin', 'super_admin'],
   },
 
-  // Ops Metrics (WO-NEXT-OPS-METRICS-P0)
   {
     id: 'ops-metrics',
     label: 'Ops Metrics',
@@ -568,7 +552,6 @@ export const wordpressMenuItems: MenuItem[] = [
     roles: ['admin', 'super_admin'],
   },
 
-  // Service Content Manager (통합 콘텐츠 관리)
   {
     id: 'service-content-manager',
     label: 'Content Manager',
@@ -577,7 +560,6 @@ export const wordpressMenuItems: MenuItem[] = [
     roles: ['admin', 'super_admin', 'platform_admin'],
   },
 
-  // Reporting (의사결정 요약 도구)
   {
     id: 'reporting',
     label: 'Reports',

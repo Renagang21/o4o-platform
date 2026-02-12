@@ -66,7 +66,7 @@ export const VendorsPendingRow: React.FC<VendorsPendingRowProps> = ({
   return (
     <>
       <tr 
-        className={`wordpress-list-row ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
+        className={`o4o-list-row ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -250,19 +250,19 @@ export const VendorsPendingRow: React.FC<VendorsPendingRowProps> = ({
               
               <div className="detail-actions">
                 <button 
-                  className="wordpress-button button-primary"
+                  className="o4o-button button-primary"
                   onClick={() => onApprove(vendor.id)}
                 >
                   승인
                 </button>
                 <button 
-                  className="wordpress-button button-secondary"
+                  className="o4o-button button-secondary"
                   onClick={() => onReject(vendor.id)}
                 >
                   거부
                 </button>
                 <button 
-                  className="wordpress-button"
+                  className="o4o-button"
                   onClick={() => onRequestDocuments(vendor.id)}
                 >
                   서류 요청

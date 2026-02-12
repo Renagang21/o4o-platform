@@ -1,23 +1,23 @@
 /**
- * WordPress Page Wrapper
- * 
- * This wrapper ensures WordPress modules are loaded before rendering
- * any page that requires WordPress functionality.
+ * Module Runtime Wrapper
+ *
+ * This wrapper ensures editor modules are loaded before rendering
+ * any page that requires editor functionality.
  */
 
 import { useState, useEffect, ReactNode } from 'react';
-import { initializeWordPress } from '@/utils/wordpress-initializer';
+import { initializeWordPress } from '@/utils/editor-runtime';
 // Using inline spinner as ui/spinner doesn't exist
 
-interface WordPressPageWrapperProps {
+interface ModuleRuntimeWrapperProps {
   children: ReactNode;
   fallback?: ReactNode;
 }
 
-export default function WordPressPageWrapper({ 
-  children, 
-  fallback 
-}: WordPressPageWrapperProps) {
+export default function ModuleRuntimeWrapper({
+  children,
+  fallback
+}: ModuleRuntimeWrapperProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 

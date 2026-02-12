@@ -31,7 +31,7 @@ export const VendorsPendingScreenOptions: React.FC<VendorsPendingScreenOptionsPr
   return (
     <>
       <button 
-        className="wordpress-screen-options-toggle"
+        className="o4o-screen-options-toggle"
         onClick={() => setShowScreenOptions(!showScreenOptions)}
       >
         <Settings className="w-4 h-4" />
@@ -39,7 +39,7 @@ export const VendorsPendingScreenOptions: React.FC<VendorsPendingScreenOptionsPr
       </button>
       
       {showScreenOptions && (
-        <div className="wordpress-screen-options">
+        <div className="o4o-screen-options">
           <div className="screen-options-wrap">
             <fieldset className="columns-group">
               <legend>열</legend>
@@ -74,7 +74,7 @@ export const VendorsPendingScreenOptions: React.FC<VendorsPendingScreenOptionsPr
             </fieldset>
           </div>
           <button 
-            className="wordpress-button"
+            className="o4o-button"
             onClick={() => setShowScreenOptions(false)}
           >
             적용

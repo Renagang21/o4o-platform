@@ -196,7 +196,7 @@ export const VendorsPendingDetailModal: React.FC<VendorsPendingDetailModalProps>
         
         <div className="modal-footer">
           <button 
-            className="wordpress-button button-primary"
+            className="o4o-button button-primary"
             onClick={() => {
               onApprove(vendor.id);
               onClose();
@@ -205,7 +205,7 @@ export const VendorsPendingDetailModal: React.FC<VendorsPendingDetailModalProps>
             승인
           </button>
           <button 
-            className="wordpress-button button-danger"
+            className="o4o-button button-danger"
             onClick={() => {
               onReject(vendor.id);
               onClose();
@@ -214,7 +214,7 @@ export const VendorsPendingDetailModal: React.FC<VendorsPendingDetailModalProps>
             거부
           </button>
           <button 
-            className="wordpress-button"
+            className="o4o-button"
             onClick={() => {
               onRequestDocuments(vendor.id);
               onClose();
@@ -223,7 +223,7 @@ export const VendorsPendingDetailModal: React.FC<VendorsPendingDetailModalProps>
             서류 요청
           </button>
           <button 
-            className="wordpress-button button-secondary"
+            className="o4o-button button-secondary"
             onClick={onClose}
           >
             닫기

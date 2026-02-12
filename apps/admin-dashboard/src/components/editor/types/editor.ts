@@ -23,7 +23,7 @@ export interface PostSettings {
   format: 'standard' | 'aside' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio' | 'chat';
 }
 
-export interface GutenbergBlockEditorProps {
+export interface O4OBlockEditorProps {
   documentTitle?: string;
   initialBlocks?: Block[];
   onChange?: (blocks: Block[]) => void;

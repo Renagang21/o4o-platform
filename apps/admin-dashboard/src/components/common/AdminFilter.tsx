@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { clsx } from 'clsx';
 
-export interface WordPressFilterProps {
+export interface AdminFilterProps {
   children: ReactNode;
   className?: string;
 }
@@ -11,7 +11,7 @@ export interface WordPressFilterProps {
  * Standardized filter container to prevent duplicate rendering issues
  * and ensure consistent styling across all list pages
  */
-export const WordPressFilter: FC<WordPressFilterProps> = ({ 
+export const AdminFilter: FC<AdminFilterProps> = ({ 
   children, 
   className 
 }) => {
@@ -24,4 +24,4 @@ export const WordPressFilter: FC<WordPressFilterProps> = ({
   );
 };
 
-export default WordPressFilter;
+export default AdminFilter;

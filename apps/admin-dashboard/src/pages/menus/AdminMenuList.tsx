@@ -32,7 +32,7 @@ interface MenuData {
   updatedAt: string;
 }
 
-const WordPressMenuList: FC = () => {
+const AdminMenuList: FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
@@ -524,4 +524,4 @@ const WordPressMenuList: FC = () => {
   );
 };
 
-export default WordPressMenuList;
+export default AdminMenuList;

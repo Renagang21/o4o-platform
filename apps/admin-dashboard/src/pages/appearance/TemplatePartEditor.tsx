@@ -19,7 +19,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import WordPressEditorWrapper from '@/components/editor/WordPressEditorWrapper';
+import EditorRuntimeWrapper from '@/components/editor/EditorRuntimeWrapper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -346,7 +346,7 @@ export default function TemplatePartEditor() {
               <h2 className="text-lg font-medium">콘텐츠 편집</h2>
             </div>
             <div className="o4o-card-body">
-              <WordPressEditorWrapper
+              <EditorRuntimeWrapper
                 initialContent=""
                 onChange={handleBlocksChange}
                 showReusableBlocks={true}

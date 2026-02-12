@@ -1,5 +1,5 @@
 /**
- * GutenbergHeadingBlock
+ * HeadingBlock
  *
  * Complete rewrite based on WordPress Gutenberg architecture.
  * Clean structure: CleanBlockWrapper + BlockToolbar + Slate editor
@@ -22,7 +22,7 @@ import { createBlockEnterHandler } from '../../utils/handleBlockEnter';
 import { createBlockBackspaceHandler } from '../../utils/handleBlockBackspace';
 import type { HeadingElement, CustomText } from '../../slate/types/slate-types';
 
-interface GutenbergHeadingBlockProps {
+interface HeadingBlockProps {
   id: string;
   content?: string | object;
   onChange: (content: string, attributes?: any) => void;
@@ -42,7 +42,7 @@ interface GutenbergHeadingBlockProps {
   };
 }
 
-export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
+export const HeadingBlock: React.FC<HeadingBlockProps> = ({
   id,
   content,
   onChange,
@@ -333,4 +333,4 @@ const MemoizedSlateEditor = memo<MemoizedSlateEditorProps>(({
 
 MemoizedSlateEditor.displayName = 'MemoizedSlateEditor';
 
-export default GutenbergHeadingBlock;
+export default HeadingBlock;

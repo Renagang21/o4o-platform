@@ -13,7 +13,7 @@ import React, {
 } from 'react';
 import ReactDOM, { createPortal, render, unmountComponentAtNode } from 'react-dom';
 import { getBlockManager } from '@/utils/block-manager';
-import '../styles/wordpress-dashboard.css';
+import '../styles/o4o-admin-dashboard.css';
 
 // Initialize WordPress polyfills only when needed
 export async function initializeWordPress() {

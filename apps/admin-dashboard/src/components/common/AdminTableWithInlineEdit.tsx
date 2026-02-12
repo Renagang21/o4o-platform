@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RowActions, RowAction, useRowActions } from './RowActions';
 
-export interface WordPressTableColumn {
+export interface AdminTableColumn {
   id: string;
   label: string;
   width?: string;
@@ -11,7 +11,7 @@ export interface WordPressTableColumn {
   sortable?: boolean;
 }
 
-export interface WordPressTableRow {
+export interface AdminTableRow {
   id: string;
   data: Record<string, ReactNode>;
   actions?: RowAction[];
@@ -22,9 +22,9 @@ interface InlineEditProps {
   renderEdit: () => ReactNode;
 }
 
-interface WordPressTableWithInlineEditProps {
-  columns: WordPressTableColumn[];
-  rows: WordPressTableRow[];
+interface AdminTableWithInlineEditProps {
+  columns: AdminTableColumn[];
+  rows: AdminTableRow[];
   selectable?: boolean;
   selectedRows?: string[];
   onSelectRow?: (rowId: string, selected: boolean) => void;
@@ -39,7 +39,7 @@ interface WordPressTableWithInlineEditProps {
 /**
  * WordPress-style Table Component with Inline Edit Support
  */
-export const WordPressTableWithInlineEdit: FC<WordPressTableWithInlineEditProps> = ({
+export const AdminTableWithInlineEdit: FC<AdminTableWithInlineEditProps> = ({
   columns,
   rows,
   selectable = false,

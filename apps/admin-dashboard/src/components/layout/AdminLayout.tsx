@@ -4,7 +4,6 @@ import AdminHeader from './AdminHeader'
 import { AdminNotices } from '../notices/AdminNotices'
 import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
-import { WordPressRouter } from '@/components/routing/WordPressRouter'
 import { useLocation } from 'react-router-dom'
 import { useAdminFullscreen } from '@/hooks/useAdminFullscreen'
 import FloatingAiButton from '@/components/ai/FloatingAiButton'
@@ -66,10 +65,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="wordpress-admin">
-      {/* WordPress Router - only loads when admin is authenticated */}
-      <WordPressRouter />
-
+    <div className="o4o-admin">
       {/* Sidebar */}
       {!isFullscreenMode && (
         <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
@@ -78,7 +74,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       )}
       
       {/* Main content wrapper with proper positioning */}
-      <div className={`wordpress-admin-content ${!isMobile && !isFullscreenMode ? 'with-sidebar' : ''}`}>
+      <div className={`o4o-admin-content ${!isMobile && !isFullscreenMode ? 'with-sidebar' : ''}`}>
         {/* Header - show on both mobile and desktop (hidden in fullscreen customizer) */}
         {!isFullscreenMode && (
           <AdminHeader onMenuClick={isMobile ? () => setSidebarOpen(!sidebarOpen) : undefined} />

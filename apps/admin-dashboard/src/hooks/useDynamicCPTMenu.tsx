@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { MenuItem } from '@/config/wordpressMenuFinal';
+import { MenuItem } from '@/admin/menu/admin-menu.static';
 import { FileText, Package, FileCode, Database, Layout } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 

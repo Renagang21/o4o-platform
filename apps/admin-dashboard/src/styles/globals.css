@@ -1515,7 +1515,7 @@
   }
 
   /* Main content area positioning */
-  .wordpress-admin-content {
+  .o4o-admin-content {
     margin-left: 160px;
     margin-top: 32px; /* Height of admin bar */
     min-height: calc(100vh - 32px);
@@ -1523,13 +1523,13 @@
   }
 
   /* When sidebar is collapsed */
-  body[data-sidebar-collapsed="true"] .wordpress-admin-content {
+  body[data-sidebar-collapsed="true"] .o4o-admin-content {
     margin-left: 36px;
   }
 
   /* Responsive adjustments */
   @media (max-width: 1024px) {
-    .wordpress-admin-content {
+    .o4o-admin-content {
       margin-left: 0;
     }
   }

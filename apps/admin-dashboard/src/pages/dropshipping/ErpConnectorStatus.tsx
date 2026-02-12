@@ -139,7 +139,7 @@ const ErpConnectorStatusPage: React.FC = () => {
         <div className="mt-6 text-center">
           <Link
             to="/dropshipping/erp-transmissions"
-            className="inline-flex items-center text-wordpress-blue hover:underline"
+            className="inline-flex items-center text-o4o-blue hover:underline"
           >
             <List className="w-4 h-4 mr-1" />
             전송 내역 보기

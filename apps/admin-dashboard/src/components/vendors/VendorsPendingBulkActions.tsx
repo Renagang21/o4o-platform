@@ -16,11 +16,11 @@ export const VendorsPendingBulkActions: React.FC<VendorsPendingBulkActionsProps>
   onClearSelection
 }) => {
   return (
-    <div className="wordpress-bulk-actions">
+    <div className="o4o-bulk-actions">
       <select 
         value={selectedAction}
         onChange={(e) => setSelectedAction(e.target.value)}
-        className="wordpress-select"
+        className="o4o-select"
       >
         <option value="">일괄 작업</option>
         <option value="approve">일괄 승인</option>
@@ -28,7 +28,7 @@ export const VendorsPendingBulkActions: React.FC<VendorsPendingBulkActionsProps>
         <option value="message">메시지 발송</option>
       </select>
       <button 
-        className="wordpress-button"
+        className="o4o-button"
         onClick={onApply}
       >
         적용

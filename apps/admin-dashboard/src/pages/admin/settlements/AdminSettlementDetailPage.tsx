@@ -162,7 +162,7 @@ export const AdminSettlementDetailPage: React.FC = () => {
         <p className="text-gray-600 mb-4">요청하신 정산 데이터가 존재하지 않습니다.</p>
         <button
           onClick={() => navigate('/admin/settlements')}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-wordpress-blue text-white rounded hover:bg-wordpress-blue-hover transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-o4o-blue text-white rounded hover:bg-o4o-blue-hover transition-colors"
         >
           정산 목록으로 돌아가기
         </button>
@@ -434,7 +434,7 @@ export const AdminSettlementDetailPage: React.FC = () => {
             {!editingMemo && (
               <button
                 onClick={() => setEditingMemo(true)}
-                className="text-sm text-wordpress-blue hover:text-wordpress-blue-hover"
+                className="text-sm text-o4o-blue hover:text-o4o-blue-hover"
               >
                 편집
               </button>
@@ -446,14 +446,14 @@ export const AdminSettlementDetailPage: React.FC = () => {
                 value={memoText}
                 onChange={(e) => setMemoText(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-wordpress-blue focus:border-transparent resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-o4o-blue focus:border-transparent resize-none"
                 placeholder="정산 관련 메모를 입력하세요."
               />
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={handleSaveMemo}
                   disabled={savingMemo}
-                  className="flex items-center gap-2 px-4 py-2 bg-wordpress-blue text-white rounded hover:bg-wordpress-blue-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-o4o-blue text-white rounded hover:bg-o4o-blue-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-4 h-4" />
                   {savingMemo ? '저장 중...' : '메모 저장'}

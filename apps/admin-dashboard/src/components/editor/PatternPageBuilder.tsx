@@ -16,7 +16,7 @@ import {
   Loader2
 } from 'lucide-react';
 import BlockPatternsBrowser from './BlockPatternsBrowser';
-import GutenbergBlockEditor from './GutenbergBlockEditor';
+import O4OBlockEditor from './O4OBlockEditor';
 import useBlockPatterns from '../../hooks/useBlockPatterns';
 
 interface PageTemplate {
@@ -219,7 +219,7 @@ const PatternPageBuilder: React.FC<PatternPageBuilderProps> = ({
 
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
-        <GutenbergBlockEditor
+        <O4OBlockEditor
           initialBlocks={editorBlocks}
           onChange={(blocks) => handleEditorChange(JSON.stringify(blocks), blocks)}
           documentTitle=""

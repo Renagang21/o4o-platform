@@ -43,7 +43,7 @@ interface CommissionRecord {
   notes?: string;
 }
 
-const VendorsCommissionWordPress = () => {
+const VendorsCommissionAdmin = () => {
   const [activeTab, setActiveTab] = useState<CommissionStatus>(() => {
     const saved = sessionStorage.getItem('commission-active-tab');
     return (saved as CommissionStatus) || 'all';
@@ -349,14 +349,14 @@ const VendorsCommissionWordPress = () => {
 
   if (loading) {
     return (
-      <div className="wordpress-admin-container">
+      <div className="o4o-admin-container">
         <div className="loading-spinner">로딩 중...</div>
       </div>
     );
   }
 
   return (
-    <div className="wordpress-admin-container">
+    <div className="o4o-admin-container">
       <AdminBreadcrumb
         items={[
           { label: '판매자/공급자', path: '/admin/vendors' },
@@ -364,7 +364,7 @@ const VendorsCommissionWordPress = () => {
         ]} 
       />
       
-      <div className="wordpress-page-header">
+      <div className="o4o-page-header">
         <h1 className="o4o-heading-inline">수수료 관리</h1>
         <a href="#" className="page-title-action" onClick={(e) => {
           e.preventDefault();
@@ -374,7 +374,7 @@ const VendorsCommissionWordPress = () => {
           내역 다운로드
         </a>
         <button 
-          className="wordpress-screen-options-toggle"
+          className="o4o-screen-options-toggle"
           onClick={() => setShowScreenOptions(!showScreenOptions)}
         >
           <Settings className="w-4 h-4" />
@@ -384,7 +384,7 @@ const VendorsCommissionWordPress = () => {
 
       {/* Screen Options */}
       {showScreenOptions && (
-        <div className="wordpress-screen-options">
+        <div className="o4o-screen-options">
           <div className="screen-options-wrap">
             <fieldset className="columns-group">
               <legend>열</legend>
@@ -465,7 +465,7 @@ const VendorsCommissionWordPress = () => {
             </fieldset>
           </div>
           <button 
-            className="wordpress-button"
+            className="o4o-button"
             onClick={() => setShowScreenOptions(false)}
           >
             적용
@@ -474,7 +474,7 @@ const VendorsCommissionWordPress = () => {
       )}
 
       {/* Summary Cards */}
-      <div className="wordpress-stats-cards">
+      <div className="o4o-stats-cards">
         <div className="stats-card">
           <div className="stats-icon bg-blue-100">
             <DollarSign className="w-6 h-6 text-blue-600" />
@@ -514,7 +514,7 @@ const VendorsCommissionWordPress = () => {
       </div>
 
       {/* Status Tabs */}
-      <ul className="wordpress-tabs">
+      <ul className="o4o-tabs">
         <li className={activeTab === 'all' ? 'active' : ''}>
           <a
             href="#"
@@ -573,12 +573,12 @@ const VendorsCommissionWordPress = () => {
       </ul>
 
       {/* Controls */}
-      <div className="wordpress-list-controls">
-        <div className="wordpress-bulk-actions">
+      <div className="o4o-list-controls">
+        <div className="o4o-bulk-actions">
           <select 
             value={selectedAction}
             onChange={(e) => setSelectedAction(e.target.value)}
-            className="wordpress-select"
+            className="o4o-select"
           >
             <option value="">일괄 작업</option>
             <option value="pay">일괄 지급</option>
@@ -586,7 +586,7 @@ const VendorsCommissionWordPress = () => {
             <option value="recalculate">재계산</option>
           </select>
           <button 
-            className="wordpress-button"
+            className="o4o-button"
             onClick={handleBulkAction}
           >
             적용
@@ -595,7 +595,7 @@ const VendorsCommissionWordPress = () => {
           <select 
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="wordpress-select"
+            className="o4o-select"
             style={{ marginLeft: '10px' }}
           >
             <option value={getCurrentPeriod()}>{getCurrentPeriod()} (이번달)</option>
@@ -606,7 +606,7 @@ const VendorsCommissionWordPress = () => {
           </select>
         </div>
         
-        <div className="wordpress-search-box">
+        <div className="o4o-search-box">
           <input 
             ref={searchInputRef}
             type="search" 
@@ -619,7 +619,7 @@ const VendorsCommissionWordPress = () => {
               }
             }}
           />
-          <button className="wordpress-button">
+          <button className="o4o-button">
             <Search className="w-4 h-4" />
           </button>
         </div>
@@ -627,11 +627,11 @@ const VendorsCommissionWordPress = () => {
 
       {/* Table */}
       {filteredCommissions.length === 0 ? (
-        <div className="wordpress-no-items">
+        <div className="o4o-no-items">
           {selectedPeriod} 수수료 내역이 없습니다.
         </div>
       ) : (
-        <table className="wordpress-list-table widefat fixed striped">
+        <table className="o4o-list-table widefat fixed striped">
           <thead>
             <tr>
               <td className="check-column">
@@ -739,7 +739,7 @@ const VendorsCommissionWordPress = () => {
               
               return (
                 <React.Fragment key={commission.id}>
-                  <tr className={`wordpress-list-row ${isSelected ? 'selected' : ''}`}>
+                  <tr className={`o4o-list-row ${isSelected ? 'selected' : ''}`}>
                     <td className="check-column">
                       <input 
                         type="checkbox" 
@@ -806,13 +806,13 @@ const VendorsCommissionWordPress = () => {
                             />
                             <span>%</span>
                             <button 
-                              className="wordpress-button button-primary button-small"
+                              className="o4o-button button-primary button-small"
                               onClick={() => handleQuickEditRate(commission.id, editingRates.get(commission.id) || commission.commissionRate)}
                             >
                               저장
                             </button>
                             <button 
-                              className="wordpress-button button-secondary button-small"
+                              className="o4o-button button-secondary button-small"
                               onClick={() => setEditingRates(new Map())}
                             >
                               취소
@@ -927,19 +927,19 @@ const VendorsCommissionWordPress = () => {
                           <div className="detail-actions">
                             {commission.status === 'pending' && (
                               <button 
-                                className="wordpress-button button-primary"
+                                className="o4o-button button-primary"
                                 onClick={() => handlePayCommission(commission.id)}
                               >
                                 지급 처리
                               </button>
                             )}
-                            <button className="wordpress-button">
+                            <button className="o4o-button">
                               정산서 발송
                             </button>
-                            <button className="wordpress-button">
+                            <button className="o4o-button">
                               세금계산서 발행
                             </button>
-                            <button className="wordpress-button button-secondary">
+                            <button className="o4o-button button-secondary">
                               수정
                             </button>
                           </div>
@@ -961,7 +961,7 @@ const VendorsCommissionWordPress = () => {
       </div>
 
       <style>{`
-        .wordpress-stats-cards {
+        .o4o-stats-cards {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
           gap: 20px;
@@ -1159,4 +1159,4 @@ const VendorsCommissionWordPress = () => {
   );
 };
 
-export default VendorsCommissionWordPress;
+export default VendorsCommissionAdmin;

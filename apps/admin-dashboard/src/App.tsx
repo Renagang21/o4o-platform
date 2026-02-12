@@ -8,8 +8,8 @@ import { EnvBadge } from '@/components/EnvBadge';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { useAuthStore } from '@/stores/authStore';
-import '@/styles/wordpress-theme.css';
-import '@/styles/wordpress-sidebar.css';
+import '@/styles/o4o-admin-theme.css';
+import '@/styles/o4o-admin-sidebar.css';
 import '@/styles/admin-layout-fixed.css';
 import '@/styles/block-toolbar.css';
 import '@/styles/block-selection.css';
@@ -67,7 +67,7 @@ const Login = lazy(() => import('@/pages/auth/Login'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
-const WordPressDashboard = lazy(() => import('@/pages/WordPressDashboard'));
+const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 // Legacy DashboardSimple removed - use UnifiedDashboard
 // Legacy Widget-based Dashboard removed - use UnifiedDashboard
 // Unified Dashboard v1 - Context-based single dashboard
@@ -617,10 +617,10 @@ function App() {
                       </Suspense>
                     } />
 
-                    {/* WordPress 스타일 메인 대시보드 */}
+                    {/* 관리자 메인 대시보드 */}
                     <Route path="/admin" element={
                       <Suspense fallback={<PageLoader />}>
-                        <WordPressDashboard />
+                        <AdminDashboard />
                       </Suspense>
                     } />
                     

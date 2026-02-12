@@ -306,7 +306,7 @@ const CommissionPolicyForm: React.FC<{ policy: CommissionPolicy | null; onClose:
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-wordpress-blue focus:outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-o4o-blue focus:outline-none"
             />
           </div>
 
@@ -318,7 +318,7 @@ const CommissionPolicyForm: React.FC<{ policy: CommissionPolicy | null; onClose:
               type="number"
               value={formData.commissionRate}
               onChange={(e) => setFormData({ ...formData, commissionRate: Number(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-wordpress-blue focus:outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-o4o-blue focus:outline-none"
               min="0"
               max="100"
             />
@@ -332,7 +332,7 @@ const CommissionPolicyForm: React.FC<{ policy: CommissionPolicy | null; onClose:
               type="date"
               value={formData.startDate}
               onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-wordpress-blue focus:outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-o4o-blue focus:outline-none"
             />
           </div>
 
@@ -344,7 +344,7 @@ const CommissionPolicyForm: React.FC<{ policy: CommissionPolicy | null; onClose:
               type="date"
               value={formData.endDate}
               onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-wordpress-blue focus:outline-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-o4o-blue focus:outline-none"
             />
           </div>
         </div>
@@ -358,7 +358,7 @@ const CommissionPolicyForm: React.FC<{ policy: CommissionPolicy | null; onClose:
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-wordpress-blue text-white rounded hover:bg-wordpress-blue-hover"
+            className="px-4 py-2 bg-o4o-blue text-white rounded hover:bg-o4o-blue-hover"
           >
             {policy ? '업데이트' : '정책 생성'}
           </button>

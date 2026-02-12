@@ -102,7 +102,7 @@ const SystemSetup: React.FC = () => {
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center min-h-screen">
-        <Loader className="h-8 w-8 animate-spin text-wordpress-blue" />
+        <Loader className="h-8 w-8 animate-spin text-o4o-blue" />
       </div>
     );
   }
@@ -129,7 +129,7 @@ const SystemSetup: React.FC = () => {
           </h2>
           <button
             onClick={checkSystemStatus}
-            className="p-2 text-wordpress-blue hover:bg-blue-50 rounded transition"
+            className="p-2 text-o4o-blue hover:bg-blue-50 rounded transition"
           >
             <RefreshCw className="h-5 w-5" />
           </button>
@@ -212,7 +212,7 @@ const SystemSetup: React.FC = () => {
         {/* Initialize System */}
         <div className="bg-white border border-gray-300 rounded-lg p-6">
           <div className="mb-4">
-            <Zap className="h-8 w-8 text-wordpress-blue mb-2" />
+            <Zap className="h-8 w-8 text-o4o-blue mb-2" />
             <h3 className="font-semibold text-lg">시스템 초기화</h3>
             <p className="text-sm text-gray-600 mt-1">
               CPT와 ACF 필드를 생성하여 시스템을 초기화합니다
@@ -224,7 +224,7 @@ const SystemSetup: React.FC = () => {
             className={`w-full py-2 px-4 rounded font-medium transition ${
               status?.systemReady 
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-wordpress-blue text-white hover:bg-wordpress-blue-hover'
+                : 'bg-o4o-blue text-white hover:bg-o4o-blue-hover'
             }`}
           >
             {initializing ? (

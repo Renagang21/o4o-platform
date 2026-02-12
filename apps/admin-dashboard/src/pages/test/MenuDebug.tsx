@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@o4o/auth-context';
 import { useAdminMenu } from '@/hooks/useAdminMenu';
-import { wordpressMenuItems } from '@/config/wordpressMenuFinal';
+import { adminMenuStatic } from '@/admin/menu/admin-menu.static';
 import { menuPermissions, hasMenuPermission } from '@/config/rolePermissions';
 
 export default function MenuDebug() {
@@ -9,7 +9,7 @@ export default function MenuDebug() {
   const { menuItems, userRoles, userPermissions, isLoading } = useAdminMenu();
 
   // Test tools menu specifically
-  const toolsMenuItem = wordpressMenuItems.find(m => m.id === 'tools');
+  const toolsMenuItem = adminMenuStatic.find(m => m.id === 'tools');
   const toolsPermission = menuPermissions.find(m => m.menuId === 'tools');
   const hasToolsAccess = hasMenuPermission(userRoles, userPermissions, 'tools');
 

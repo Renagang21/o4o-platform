@@ -28,7 +28,7 @@ import {
   Calendar as CalendarIcon,
   BarChart2 as BarChart2Icon,
 } from 'lucide-react';
-import { wordpressMenuItems, MenuItem } from '@/config/wordpressMenuFinal';
+import { adminMenuStatic, MenuItem } from '@/admin/menu/admin-menu.static';
 import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
 import { hasMenuPermission } from '@/config/rolePermissions';
@@ -130,7 +130,7 @@ export const useAdminMenu = () => {
   }, [user?.id]);
 
   // Determine base menu items - API or fallback
-  const baseMenuItems = dynamicMenuItems || [...wordpressMenuItems];
+  const baseMenuItems = dynamicMenuItems || [...adminMenuStatic];
 
   // Inject CPT menus into base menu
   const allMenuItems = injectCPTMenuItems(baseMenuItems, cptMenuItems);

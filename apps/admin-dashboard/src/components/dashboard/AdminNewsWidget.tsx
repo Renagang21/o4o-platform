@@ -21,7 +21,7 @@ interface Event {
 /**
  * WordPress Events and News Widget
  */
-const WordPressNewsWidget: FC = () => {
+const AdminNewsWidget: FC = () => {
   const [activeTab, setActiveTab] = useState<'events' | 'news'>('events');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,8 +99,8 @@ const WordPressNewsWidget: FC = () => {
   };
 
   return (
-    <div id="dashboard_primary" className="wordpress-news-widget">
-      <div className="wordpress-news-tabs">
+    <div id="dashboard_primary" className="o4o-news-widget">
+      <div className="o4o-news-tabs">
         <button
           className={activeTab === 'events' ? 'active' : ''}
           onClick={() => setActiveTab('events')}
@@ -115,7 +115,7 @@ const WordPressNewsWidget: FC = () => {
         </button>
       </div>
 
-      <div className="wordpress-news-content">
+      <div className="o4o-news-content">
         {isLoading ? (
           <div className="loading-spinner">
             <p>Loading...</p>
@@ -194,7 +194,7 @@ const WordPressNewsWidget: FC = () => {
                   ))}
                 </ul>
 
-                <p className="wordpress-blog-link">
+                <p className="o4o-blog-link">
                   <a href="https://wordpress.org/news/" 
                      target="_blank" 
                      rel="noopener noreferrer"
@@ -211,4 +211,4 @@ const WordPressNewsWidget: FC = () => {
   );
 };
 
-export default WordPressNewsWidget;
+export default AdminNewsWidget;

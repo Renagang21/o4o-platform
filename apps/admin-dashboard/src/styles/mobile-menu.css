@@ -65,7 +65,7 @@
 }
 
 /* Content area adjustments */
-.wordpress-admin-content {
+.o4o-admin-content {
   position: relative;
   margin-top: 46px;
   min-height: calc(100vh - 46px);
@@ -74,7 +74,7 @@
 
 /* Desktop: content area with sidebar margin */
 @media (min-width: 1024px) {
-  .wordpress-admin-content.with-sidebar {
+  .o4o-admin-content.with-sidebar {
     margin-left: 240px;
     width: calc(100% - 240px);
   }
@@ -82,7 +82,7 @@
 
 /* Mobile: content area full width */
 @media (max-width: 1023px) {
-  .wordpress-admin-content {
+  .o4o-admin-content {
     margin-left: 0;
     width: 100%;
   }

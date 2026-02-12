@@ -7,14 +7,14 @@ import { globalRegistry } from '@o4o/shortcodes'
 import App from './App'
 import './styles/globals.css'
 // WordPress styles will be loaded only when needed
-// import './styles/wordpress-dashboard.css'
+// import './styles/o4o-admin-dashboard.css'
 import './styles/dashboard-simple.css'
 import './styles/bulk-actions.css'
 import './styles/quick-edit.css'
 import './styles/help-tab.css'
 import './styles/media-upload.css'
 // import './styles/ui-improvements.css' // Temporarily disabled to fix sidebar conflict
-import './styles/wordpress-table-fix.css'
+import './styles/o4o-table-fix.css'
 // Toolset UI styles for CPT Engine
 import './styles/toolset-ui.css'
 

@@ -22,7 +22,7 @@ interface BulkAction {
   variant?: 'default' | 'destructive';
 }
 
-interface WordPressListLayoutProps {
+interface AdminListLayoutProps {
   title: string;
   subtitle?: string;
   addNewLabel?: string;
@@ -69,7 +69,7 @@ interface WordPressListLayoutProps {
  * Standardized WordPress-style list layout component
  * Eliminates duplicate filters and improves text readability
  */
-export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
+export const AdminListLayout: FC<AdminListLayoutProps> = ({
   title,
   subtitle,
   addNewLabel = 'Add New',
@@ -249,4 +249,4 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
   );
 };
 
-export default WordPressListLayout;
+export default AdminListLayout;

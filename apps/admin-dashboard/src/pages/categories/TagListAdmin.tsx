@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { AdminTable, AdminTableColumn, AdminTableRow } from '@/components/common/AdminTable';
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { formatDate } from '@/lib/utils';
@@ -18,7 +18,7 @@ import { authClient } from '@o4o/auth-client';
 import type { Tag } from '@o4o/types';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 
-const TagListWordPress: FC = () => {
+const TagListAdmin: FC = () => {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,7 +103,7 @@ const TagListWordPress: FC = () => {
   };
 
   // Define table columns - only show visible ones
-  const allColumns: WordPressTableColumn[] = [
+  const allColumns: AdminTableColumn[] = [
     { id: 'name', label: 'Name', sortable: true },
     { id: 'description', label: 'Description' },
     { id: 'slug', label: 'Slug' },
@@ -114,7 +114,7 @@ const TagListWordPress: FC = () => {
   const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform tags to table rows
-  const rows: WordPressTableRow[] = tags.map((tag: Tag) => ({
+  const rows: AdminTableRow[] = tags.map((tag: Tag) => ({
     id: tag.id,
     data: {
       name: (
@@ -223,7 +223,7 @@ const TagListWordPress: FC = () => {
       </p>
 
       {/* WordPress Table */}
-      <WordPressTable
+      <AdminTable
         columns={columns}
         rows={rows}
         selectable={true}
@@ -265,4 +265,4 @@ const TagListWordPress: FC = () => {
   );
 };
 
-export default TagListWordPress;
+export default TagListAdmin;

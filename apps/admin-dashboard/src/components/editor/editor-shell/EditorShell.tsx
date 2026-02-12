@@ -9,8 +9,8 @@ import { PostSettings } from '../types/editor';
 import { EditorToolbar } from './EditorToolbar';
 import { BlockListSidebar } from './BlockListSidebar';
 import { EditorCanvas } from './EditorCanvas';
-import GutenbergBlockInserter from '../GutenbergBlockInserter';
-import GutenbergSidebar from '../GutenbergSidebar';
+import BlockInserter from '../BlockInserter';
+import EditorSidebar from '../EditorSidebar';
 import { cn } from '@/lib/utils';
 
 interface EditorShellProps {
@@ -156,7 +156,7 @@ export const EditorShell: React.FC<EditorShellProps> = ({
         )}
 
         {/* Block Inserter */}
-        <GutenbergBlockInserter
+        <BlockInserter
           isOpen={isBlockInserterOpen}
           onClose={() => setIsBlockInserterOpen(false)}
           onSelect={onInsertBlock}
@@ -221,7 +221,7 @@ export const EditorShell: React.FC<EditorShellProps> = ({
               width: '280px'
             }}
           >
-            <GutenbergSidebar
+            <EditorSidebar
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlockId ? {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { AdminTable, AdminTableColumn, AdminTableRow } from '@/components/common/AdminTable';
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
@@ -157,7 +157,7 @@ export default function CommentsListEnhanced() {
   };
 
   // Define table columns
-  const allColumns: WordPressTableColumn[] = [
+  const allColumns: AdminTableColumn[] = [
     { id: 'author', label: 'Author', width: '20%' },
     { id: 'comment', label: 'Comment', width: '50%' },
     { id: 'response', label: 'In response to', width: '15%' },
@@ -168,7 +168,7 @@ export default function CommentsListEnhanced() {
 
   // Transform comments to table rows
   const comments = data?.comments || [];
-  const rows: WordPressTableRow[] = comments.map((comment: Comment) => ({
+  const rows: AdminTableRow[] = comments.map((comment: Comment) => ({
     id: comment.id,
     data: {
       author: (
@@ -360,7 +360,7 @@ export default function CommentsListEnhanced() {
       </div>
 
       {/* Comments Table */}
-      <WordPressTable
+      <AdminTable
         columns={columns}
         rows={rows}
         selectable={true}

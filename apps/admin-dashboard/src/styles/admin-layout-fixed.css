@@ -9,7 +9,7 @@
 }
 
 /* Main container */
-.wordpress-admin {
+.o4o-admin {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -18,7 +18,7 @@
 }
 
 /* Admin Bar (Top Bar) - Fixed at top */
-.wordpress-admin-bar {
+.o4o-admin-bar {
   position: fixed;
   top: 0;
   left: 0;
@@ -36,7 +36,7 @@
 /* Sidebar styles moved to mobile-menu.css to avoid conflicts */
 
 /* Main Content Area */
-.wordpress-admin-content {
+.o4o-admin-content {
   position: relative;
   margin-top: 46px;
   min-height: calc(100vh - 46px);
@@ -46,7 +46,7 @@
 }
 
 /* Main content padding */
-.wordpress-admin-content main {
+.o4o-admin-content main {
   padding: 20px;
   max-width: 100%;
   position: relative;
@@ -56,7 +56,7 @@
 /* Backdrop styles moved to mobile-menu.css to avoid conflicts */
 
 /* Emergency Layout Fixes */
-.wordpress-admin-content {
+.o4o-admin-content {
   position: relative;
   margin-top: 46px;
   min-height: calc(100vh - 46px);
@@ -68,7 +68,7 @@
 }
 
 /* Force proper content display */
-.wordpress-admin-content main {
+.o4o-admin-content main {
   padding: 20px;
   max-width: 100%;
   position: relative;
@@ -94,7 +94,7 @@
 
 /* Desktop sidebar margin fix */
 @media (min-width: 1024px) {
-  .wordpress-admin-content.with-sidebar {
+  .o4o-admin-content.with-sidebar {
     margin-left: 240px;
     width: calc(100% - 240px);
   }
@@ -171,21 +171,21 @@
 }
 
 /* Ensure content is visible */
-.wordpress-admin-content > * {
+.o4o-admin-content > * {
   position: relative;
   z-index: 1;
 }
 
 /* Admin Bar User Menu Fixes */
-.wordpress-admin-bar .group:hover .group-hover\:visible {
+.o4o-admin-bar .group:hover .group-hover\:visible {
   visibility: visible !important;
 }
 
-.wordpress-admin-bar .group:hover .group-hover\:opacity-100 {
+.o4o-admin-bar .group:hover .group-hover\:opacity-100 {
   opacity: 1 !important;
 }
 
-.wordpress-admin-bar .absolute {
+.o4o-admin-bar .absolute {
   z-index: 100000 !important;
 }
 

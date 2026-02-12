@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RowActions, RowAction, useRowActions } from './RowActions';
 
-export interface WordPressTableColumn {
+export interface AdminTableColumn {
   id: string;
   label: string;
   width?: string;
@@ -13,17 +13,17 @@ export interface WordPressTableColumn {
   render?: (item: any) => ReactNode;
 }
 
-export interface WordPressTableRow {
+export interface AdminTableRow {
   id: string;
   data: Record<string, ReactNode>;
   actions?: RowAction[];
 }
 
-interface WordPressTableProps {
-  columns: WordPressTableColumn[];
+interface AdminTableProps {
+  columns: AdminTableColumn[];
   // Two usage modes:
   // 1) row-based (existing)
-  rows?: WordPressTableRow[];
+  rows?: AdminTableRow[];
   // 2) data-based with column.render
   data?: any[];
   selectable?: boolean;
@@ -47,7 +47,7 @@ interface WordPressTableProps {
 /**
  * WordPress-style Table Component with Row Actions
  */
-export const WordPressTable: FC<WordPressTableProps> = ({
+export const AdminTable: FC<AdminTableProps> = ({
   columns,
   rows,
   data,
@@ -83,7 +83,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
   };
 
   // Normalize into row objects when using data + renderers
-  const normalizedRows: WordPressTableRow[] = ((): WordPressTableRow[] => {
+  const normalizedRows: AdminTableRow[] = ((): AdminTableRow[] => {
     if (rows && rows.length > 0) return rows;
     if (!data) return [];
     return data.map((item: any) => {
@@ -239,4 +239,4 @@ export const WordPressTable: FC<WordPressTableProps> = ({
   );
 };
 
-export default WordPressTable;
+export default AdminTable;

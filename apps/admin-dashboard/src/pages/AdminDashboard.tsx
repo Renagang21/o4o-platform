@@ -14,10 +14,9 @@ import { VERSION_DISPLAY } from '@/config/version';
 import PendingApplicationsWidget from '@/components/widgets/PendingApplicationsWidget';
 
 /**
- * WordPress 스타일 메인 대시보드
- * WordPress.com의 wp-admin 대시보드와 유사한 구조
+ * 관리자 메인 대시보드
  */
-const WordPressDashboard: FC = () => {
+const AdminDashboard: FC = () => {
   // 빠른 통계
   const stats = {
     posts: 24,
@@ -27,7 +26,7 @@ const WordPressDashboard: FC = () => {
   };
 
   return (
-    <div className="wordpress-dashboard">
+    <div className="o4o-dashboard">
       {/* 배포 테스트 배너 - 매우 눈에 띄게! */}
       <div className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 text-white p-8 rounded-2xl shadow-2xl mb-6 animate-pulse">
         <h1 className="text-4xl font-bold mb-3">🎊 배포 성공 {VERSION_DISPLAY}! 🎊</h1>
@@ -297,4 +296,4 @@ const WordPressDashboard: FC = () => {
   );
 };
 
-export default WordPressDashboard;
+export default AdminDashboard;

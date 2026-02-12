@@ -11,7 +11,7 @@ import { VendorsPendingScreenOptions } from '@/components/vendors/VendorsPending
 import { VendorsPendingDetailModal } from '@/components/vendors/VendorsPendingDetailModal';
 import type { VendorStatus, SortField, SortOrder, PendingVendor } from '@/hooks/vendors/useVendorsPendingData';
 
-const VendorsPendingWordPress = () => {
+const VendorsPendingAdmin = () => {
   const navigate = useNavigate();
   
   // State management
@@ -123,7 +123,7 @@ const VendorsPendingWordPress = () => {
   // Render loading state
   if (loading) {
     return (
-      <div className="wordpress-admin-container">
+      <div className="o4o-admin-container">
         <div className="loading-spinner">로딩 중...</div>
       </div>
     );
@@ -132,14 +132,14 @@ const VendorsPendingWordPress = () => {
   // Render error state
   if (error) {
     return (
-      <div className="wordpress-admin-container">
+      <div className="o4o-admin-container">
         <div className="error-message">오류: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="wordpress-admin-container">
+    <div className="o4o-admin-container">
       <AdminBreadcrumb 
         items={[
           { label: '판매자/공급자', path: '/admin/vendors' },
@@ -147,7 +147,7 @@ const VendorsPendingWordPress = () => {
         ]} 
       />
       
-      <div className="wordpress-page-header">
+      <div className="o4o-page-header">
         <h1 className="o4o-heading-inline">승인 대기 판매자</h1>
         <VendorsPendingScreenOptions
           showScreenOptions={showScreenOptions}
@@ -165,7 +165,7 @@ const VendorsPendingWordPress = () => {
         counts={counts}
       />
 
-      <div className="wordpress-list-controls">
+      <div className="o4o-list-controls">
         <VendorsPendingBulkActions
           selectedAction={selectedAction}
           setSelectedAction={setSelectedAction}
@@ -174,7 +174,7 @@ const VendorsPendingWordPress = () => {
           onClearSelection={() => setSelectedIds(new Set())}
         />
         
-        <div className="wordpress-search-box">
+        <div className="o4o-search-box">
           <input 
             ref={searchInputRef}
             type="search" 
@@ -187,18 +187,18 @@ const VendorsPendingWordPress = () => {
               }
             }}
           />
-          <button className="wordpress-button">
+          <button className="o4o-button">
             <Search className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {filteredVendors.length === 0 ? (
-        <div className="wordpress-no-items">
+        <div className="o4o-no-items">
           승인 대기 중인 판매자가 없습니다.
         </div>
       ) : (
-        <table className="wordpress-list-table widefat fixed striped">
+        <table className="o4o-list-table widefat fixed striped">
           <thead>
             <tr>
               <td className="check-column">
@@ -638,4 +638,4 @@ const VendorsPendingWordPress = () => {
   );
 };
 
-export default VendorsPendingWordPress;
+export default VendorsPendingAdmin;
