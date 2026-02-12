@@ -194,6 +194,7 @@ import {
   KpaBranchOfficer,
   KpaBranchDoc,
   KpaBranchSettings,
+  KpaMemberService,
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -550,6 +551,7 @@ export const AppDataSource = new DataSource({
     KpaBranchOfficer,
     KpaBranchDoc,
     KpaBranchSettings,
+    KpaMemberService,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================

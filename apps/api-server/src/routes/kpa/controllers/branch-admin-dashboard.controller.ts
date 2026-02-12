@@ -238,7 +238,7 @@ export function createBranchAdminDashboardController(
           type: 'member_join' as const,
           title: `${member.pharmacy_name || member.license_number || '신규 회원'} - 가입`,
           date: member.created_at?.toISOString() || new Date().toISOString(),
-          status: member.status === 'active' ? 'completed' : 'pending',
+          status: (member.status === 'active' || member.identity_status === 'active') ? 'completed' : 'pending',
         }));
 
         res.json({ success: true, data: activities });

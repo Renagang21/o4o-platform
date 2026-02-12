@@ -16,6 +16,7 @@ import type { KpaOrganization } from './kpa-organization.entity.js';
 
 export type KpaMemberRole = 'member' | 'operator' | 'admin';
 export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'withdrawn';
+export type KpaIdentityStatus = 'active' | 'suspended' | 'withdrawn';
 export type KpaMemberType = 'pharmacist' | 'student';
 
 // Phase 5: 직능 분류 (프론트엔드 ActivityType 매핑)
@@ -58,6 +59,9 @@ export class KpaMember {
 
   @Column({ type: 'varchar', length: 50, default: 'pending' })
   status: KpaMemberStatus;
+
+  @Column({ type: 'varchar', length: 50, default: 'active' })
+  identity_status: KpaIdentityStatus;
 
   @Column({ type: 'varchar', length: 50, default: 'pharmacist' })
   membership_type: KpaMemberType;

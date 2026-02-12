@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaMember, KpaOrganization } from '../entities/index.js';
+import { KpaMember, KpaOrganization, KpaMemberService } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -31,6 +31,7 @@ export function createMemberController(
   const router = Router();
   const memberRepo = dataSource.getRepository(KpaMember);
   const orgRepo = dataSource.getRepository(KpaOrganization);
+  const serviceRepo = dataSource.getRepository(KpaMemberService);
 
   /**
    * GET /kpa/members/me
@@ -147,6 +148,7 @@ export function createMemberController(
           membership_type: membershipType,
           role: 'member',
           status: 'pending',
+          identity_status: 'active',
           license_number: licenseNumber,
           university_name: membershipType === 'student' ? (req.body.university_name || null) : null,
           student_year: membershipType === 'student' ? (req.body.student_year || null) : null,
@@ -157,6 +159,15 @@ export function createMemberController(
         });
 
         const saved = await memberRepo.save(member);
+
+        // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
+        const svcRecord = serviceRepo.create({
+          member_id: saved.id,
+          service_key: 'kpa-a',
+          status: 'pending',
+        });
+        await serviceRepo.save(svcRecord);
+
         res.status(201).json({ data: saved });
       } catch (error: any) {
         console.error('Failed to apply for membership:', error);
@@ -253,14 +264,55 @@ export function createMemberController(
         }
 
         const oldStatus = member.status;
-        member.status = req.body.status;
+        const newStatus = req.body.status;
+        member.status = newStatus;
+
+        // identity_status 동기화
+        if (newStatus === 'suspended') {
+          member.identity_status = 'suspended';
+        } else if (newStatus === 'withdrawn') {
+          member.identity_status = 'withdrawn';
+        } else if (newStatus === 'active' || newStatus === 'pending') {
+          member.identity_status = 'active';
+        }
 
         // 가입 승인 시 joined_at 설정
-        if (oldStatus === 'pending' && req.body.status === 'active') {
+        if (oldStatus === 'pending' && newStatus === 'active') {
           member.joined_at = new Date();
         }
 
         const saved = await memberRepo.save(member);
+
+        // 서비스 레코드 동기화 (kpa-a)
+        const svcRecord = await serviceRepo.findOne({
+          where: { member_id: member.id, service_key: 'kpa-a' },
+        });
+        if (svcRecord) {
+          if (newStatus === 'active') {
+            svcRecord.status = 'approved';
+            svcRecord.approved_by = req.user!.id;
+            svcRecord.approved_at = new Date();
+          } else if (newStatus === 'suspended') {
+            svcRecord.status = 'suspended';
+          } else if (newStatus === 'pending') {
+            svcRecord.status = 'pending';
+          }
+          // withdrawn: 서비스 레코드 유지하되 상태 변경하지 않음
+          if (newStatus !== 'withdrawn') {
+            await serviceRepo.save(svcRecord);
+          }
+        } else if (newStatus !== 'withdrawn') {
+          // 서비스 레코드가 없으면 생성 (마이그레이션 이전 회원 대응)
+          const newSvc = serviceRepo.create({
+            member_id: member.id,
+            service_key: 'kpa-a',
+            status: newStatus === 'active' ? 'approved' : 'pending',
+            approved_by: newStatus === 'active' ? req.user!.id : null,
+            approved_at: newStatus === 'active' ? new Date() : null,
+          });
+          await serviceRepo.save(newSvc);
+        }
+
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to update member status:', error);

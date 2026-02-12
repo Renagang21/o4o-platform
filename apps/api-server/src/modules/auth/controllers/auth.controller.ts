@@ -232,9 +232,10 @@ export class AuthController extends BaseController {
         if (data.service === 'kpa-society' && data.organizationId) {
           const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
 
-          await manager.query(`
-            INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status)
-            VALUES ($1, $2, $3, $4, $5, 'member', 'pending')
+          const memberResult = await manager.query(`
+            INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status, identity_status)
+            VALUES ($1, $2, $3, $4, $5, 'member', 'pending', 'active')
+            RETURNING id
           `, [
             newUser.id,
             data.organizationId,
@@ -242,6 +243,14 @@ export class AuthController extends BaseController {
             licenseNum,
             data.membershipType === 'student' ? (data.universityName || null) : null,
           ]);
+
+          // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
+          if (memberResult[0]?.id) {
+            await manager.query(`
+              INSERT INTO kpa_member_services (member_id, service_key, status)
+              VALUES ($1, 'kpa-a', 'pending')
+            `, [memberResult[0].id]);
+          }
         }
 
         return newUser;
