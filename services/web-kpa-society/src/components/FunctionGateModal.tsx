@@ -1,5 +1,5 @@
 /**
- * FunctionGatePage - 약사 직능 선택 게이트 (단일 단계)
+ * FunctionGateModal - 약사 직능 선택 모달 (단일 단계)
  *
  * WO-KPA-FUNCTION-GATE-V1: 직능 선택 (최초 1회)
  *
@@ -12,12 +12,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 import {
   useAuth,
   type PharmacistFunction,
   type PharmacistRole,
 } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/AuthModalContext';
 
 interface FunctionOption {
   key: string;
@@ -35,31 +36,59 @@ const options: FunctionOption[] = [
   { key: 'other', label: '기타 약사', description: '', pharmacistFunction: 'other', pharmacistRole: 'other' },
 ];
 
-export function FunctionGatePage() {
-  const navigate = useNavigate();
+export default function FunctionGateModal() {
   const { user, setPharmacistFunction, setPharmacistRole } = useAuth();
+  const { activeModal, closeModal } = useAuthModal();
+
+  const isOpen = activeModal === 'functionGate';
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-  // Already set → go to dashboard
+  // Reset on open
   useEffect(() => {
-    if (user?.pharmacistFunction && user?.pharmacistRole) {
-      navigate('/dashboard');
+    if (isOpen) setSelectedKey(null);
+  }, [isOpen]);
+
+  // Close if already set
+  useEffect(() => {
+    if (isOpen && user?.pharmacistFunction && user?.pharmacistRole) {
+      closeModal();
     }
-  }, [user, navigate]);
+  }, [isOpen, user, closeModal]);
+
+  // ESC + scroll lock
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, closeModal]);
+
+  if (!isOpen) return null;
 
   const handleConfirm = () => {
     const selected = options.find(o => o.key === selectedKey);
     if (selected) {
       setPharmacistFunction(selected.pharmacistFunction);
       setPharmacistRole(selected.pharmacistRole);
-      navigate('/dashboard');
+      closeModal();
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>본인의 약사 직능을 선택해 주세요</h1>
+    <div style={styles.overlay} onClick={closeModal}>
+      <div style={styles.card} onClick={(e) => e.stopPropagation()}>
+        <button style={styles.closeBtn} onClick={closeModal} aria-label="닫기">
+          <X size={20} />
+        </button>
+
+        <h2 style={styles.title}>본인의 약사 직능을 선택해 주세요</h2>
         <p style={styles.subtitle}>맞춤 서비스 안내에 사용됩니다.</p>
 
         <div style={styles.options}>
@@ -97,22 +126,38 @@ export function FunctionGatePage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    minHeight: '100vh',
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8fafc',
+    zIndex: 10000,
     padding: '24px',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   },
   card: {
+    position: 'relative',
     backgroundColor: '#fff',
     borderRadius: '12px',
     padding: '40px',
     width: '100%',
     maxWidth: '420px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    background: 'none',
+    border: 'none',
+    color: '#94a3b8',
+    cursor: 'pointer',
+    padding: '4px',
+    borderRadius: '4px',
   },
   title: {
     fontSize: '1.25rem',
@@ -169,7 +214,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     fontSize: '1rem',
     fontWeight: 600,
+    cursor: 'pointer',
   },
 };
-
-export default FunctionGatePage;

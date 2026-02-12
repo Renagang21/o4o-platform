@@ -106,6 +106,7 @@ import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommuni
 
 // Function Gate (WO-KPA-FUNCTION-GATE-V1)
 import { FunctionGatePage } from './pages/FunctionGatePage';
+import FunctionGateModal from './components/FunctionGateModal';
 
 // User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
 import { UserDashboardPage, MyContentPage } from './pages/dashboard';
@@ -161,6 +162,22 @@ function RegisterRedirect() {
   return null;
 }
 
+/**
+ * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
+ * (페이지 → 모달 전환 후 하위호환용)
+ */
+function FunctionGateRedirect() {
+  const navigate = useNavigate();
+  const { openFunctionGateModal } = useAuthModal();
+
+  useEffect(() => {
+    navigate('/dashboard', { replace: true });
+    openFunctionGateModal();
+  }, [navigate, openFunctionGateModal]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -170,6 +187,7 @@ function App() {
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
         <RegisterModal />
+        <FunctionGateModal />
         <Routes>
           {/* =========================================================
            * SVC-A: 커뮤니티 서비스 (Community Service)
@@ -416,8 +434,8 @@ function App() {
           <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><GroupbuyListPage /></Layout>} />
           <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><GroupbuyDetailPage /></Layout>} />
 
-          {/* Function Gate - SVC-A: 커뮤니티 직능/직역 선택 (WO-KPA-FUNCTION-GATE-V1) */}
-          <Route path="/select-function" element={<FunctionGatePage />} />
+          {/* Function Gate - SVC-A: 직능/직역 선택 모달로 전환 (WO-KPA-FUNCTION-GATE-V1) */}
+          <Route path="/select-function" element={<FunctionGateRedirect />} />
 
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />

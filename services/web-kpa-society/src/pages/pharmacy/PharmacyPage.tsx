@@ -7,19 +7,36 @@
  *
  * 분기 로직:
  * 1. 미로그인 → "로그인 필요" + 로그인 링크
- * 2. 로그인 + 직역 미설정 → FunctionGatePage로 리다이렉트
- * 3. 로그인 + 직역 != pharmacy_owner → "개설자만 이용 가능" + 돌아가기
- * 4. 로그인 + pharmacy_owner + 승인 없음 → PharmacyApprovalGatePage로 리다이렉트
- * 5. 로그인 + pharmacy_owner + 승인 완료 → /pharmacy/dashboard로 리다이렉트
+ * 2. 관리자/운영자 → "접근 불가" (직능 선택 불필요)
+ * 3. 직역 미설정 → FunctionGateModal 표시
+ * 4. 직역 != pharmacy_owner → "개설자만 이용 가능" + 돌아가기
+ * 5. pharmacy_owner + 승인 없음 → PharmacyApprovalGatePage로 리다이렉트
+ * 6. pharmacy_owner + 승인 완료 → /pharmacy/dashboard로 리다이렉트
  */
 
+import { useEffect } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAuthModal } from '../../contexts/AuthModalContext';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
+
+/** Admin/operator roles that should NOT see pharmacist function selection */
+const NON_PHARMACIST_ROLES = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
 
 export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { openFunctionGateModal } = useAuthModal();
+
+  const isAdminOrOperator = user?.role ? NON_PHARMACIST_ROLES.includes(user.role) : false;
+  const needsFunctionSelection = !!user && !isAdminOrOperator && !user.pharmacistRole;
+
+  // 직역 미설정 시 모달 자동 표시
+  useEffect(() => {
+    if (needsFunctionSelection) {
+      openFunctionGateModal();
+    }
+  }, [needsFunctionSelection, openFunctionGateModal]);
 
   // 1. 미로그인
   if (!user) {
@@ -53,12 +70,56 @@ export function PharmacyPage() {
     );
   }
 
-  // 2. 직역 미설정 → FunctionGatePage
-  if (!user.pharmacistRole) {
-    return <Navigate to="/select-function" replace />;
+  // 2. 관리자/운영자 → 약사 직능 선택 불필요, 접근 불가 표시
+  if (isAdminOrOperator) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>🔒</span>
+            </div>
+            <h1 style={styles.title}>약국 개설자만 이용 가능합니다</h1>
+            <p style={styles.desc}>
+              이 서비스는 약국 개설자를 위한 경영지원 서비스입니다.<br />
+              관리자/운영자 계정으로는 이용할 수 없습니다.
+            </p>
+            <div style={styles.actions}>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={styles.backBtn}
+              >
+                돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // 3. 직역 != pharmacy_owner → 접근 불가
+  // 3. 직역 미설정 → 직능/직역 선택 모달 표시 (useEffect에서 모달 오픈)
+  if (!user.pharmacistRole) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>💊</span>
+            </div>
+            <h1 style={styles.title}>직능/직역을 먼저 선택해 주세요</h1>
+            <p style={styles.desc}>
+              약국경영 서비스를 이용하려면<br />
+              약사 직능과 직역을 먼저 선택해야 합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 4. 직역 != pharmacy_owner → 접근 불가
   if (user.pharmacistRole !== 'pharmacy_owner') {
     return (
       <div style={styles.page}>
