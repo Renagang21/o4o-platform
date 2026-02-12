@@ -70,6 +70,7 @@ export class GlycopharmService {
 
     const pharmacy = await this.repository.createPharmacy({
       ...dto,
+      phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
       status: 'active',
       created_by_user_id: userId,
       created_by_user_name: userName,
@@ -93,7 +94,10 @@ export class GlycopharmService {
       }
     }
 
-    const pharmacy = await this.repository.updatePharmacy(id, dto);
+    const normalizedDto = dto.phone !== undefined
+      ? { ...dto, phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone }
+      : dto;
+    const pharmacy = await this.repository.updatePharmacy(id, normalizedDto);
     if (!pharmacy) return null;
 
     const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);

@@ -392,7 +392,7 @@ export class NetureService {
       if (!supplier) return null;
 
       if (data.contactEmail !== undefined) supplier.contactEmail = data.contactEmail || '';
-      if (data.contactPhone !== undefined) supplier.contactPhone = data.contactPhone || '';
+      if (data.contactPhone !== undefined) supplier.contactPhone = data.contactPhone ? data.contactPhone.replace(/\D/g, '') : '';
       if (data.contactWebsite !== undefined) supplier.contactWebsite = data.contactWebsite || '';
       if (data.contactKakao !== undefined) supplier.contactKakao = data.contactKakao || '';
       if (data.contactEmailVisibility !== undefined) supplier.contactEmailVisibility = data.contactEmailVisibility;
@@ -648,7 +648,7 @@ export class NetureService {
         promotionBanner: data.promotionBanner || false,
         promotionOther: data.promotionOther || '',
         contactEmail: data.contactEmail || '',
-        contactPhone: data.contactPhone || '',
+        contactPhone: data.contactPhone ? data.contactPhone.replace(/\D/g, '') : '',
         contactKakao: data.contactKakao || '',
       });
 
@@ -1191,7 +1191,7 @@ export class NetureService {
         sellerId: data.sellerId,
         sellerName: data.sellerName,
         sellerEmail: data.sellerEmail || '',
-        sellerPhone: data.sellerPhone || '',
+        sellerPhone: data.sellerPhone ? data.sellerPhone.replace(/\D/g, '') : '',
         sellerStoreUrl: data.sellerStoreUrl || '',
         serviceId: data.serviceId,
         serviceName: data.serviceName,

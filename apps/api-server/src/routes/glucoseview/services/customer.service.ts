@@ -106,7 +106,7 @@ export class CustomerService {
     const customer = this.customerRepository.create({
       pharmacist_id: pharmacistId,
       name: dto.name,
-      phone: dto.phone,
+      phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
       email: dto.email,
       birth_year: dto.birth_year,
       gender: dto.gender,
@@ -143,7 +143,7 @@ export class CustomerService {
 
     // Update only provided fields
     if (dto.name !== undefined) customer.name = dto.name;
-    if (dto.phone !== undefined) customer.phone = dto.phone;
+    if (dto.phone !== undefined) customer.phone = dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone;
     if (dto.email !== undefined) customer.email = dto.email;
     if (dto.birth_year !== undefined) customer.birth_year = dto.birth_year;
     if (dto.gender !== undefined) customer.gender = dto.gender;

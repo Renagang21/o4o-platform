@@ -157,7 +157,7 @@ export class AdminSupplierController {
         userId,
         contactPerson,
         contactEmail,
-        contactPhone,
+        contactPhone: contactPhone ? contactPhone.replace(/\D/g, '') : contactPhone,
         companyDescription,
         specialties,
         certifications,
@@ -238,7 +238,7 @@ export class AdminSupplierController {
       if (userId !== undefined) supplier.userId = userId;
       if (contactPerson !== undefined) supplier.contactPerson = contactPerson;
       if (contactEmail !== undefined) supplier.contactEmail = contactEmail;
-      if (contactPhone !== undefined) supplier.contactPhone = contactPhone;
+      if (contactPhone !== undefined) supplier.contactPhone = contactPhone ? contactPhone.replace(/\D/g, '') : contactPhone;
       if (companyDescription !== undefined) supplier.companyDescription = companyDescription;
       if (specialties !== undefined) supplier.specialties = specialties;
       if (certifications !== undefined) supplier.certifications = certifications;

@@ -230,7 +230,7 @@ export class SupplierEntityController {
         bankAccount,
         accountHolder,
         contactPerson,
-        contactPhone,
+        contactPhone: contactPhone ? contactPhone.replace(/\D/g, '') : contactPhone,
         contactEmail,
         operatingHours: Array.isArray(operatingHours) ? operatingHours : undefined,
         timezone,
@@ -358,7 +358,7 @@ export class SupplierEntityController {
       if (bankAccount !== undefined) supplier.bankAccount = bankAccount;
       if (accountHolder !== undefined) supplier.accountHolder = accountHolder;
       if (contactPerson !== undefined) supplier.contactPerson = contactPerson;
-      if (contactPhone !== undefined) supplier.contactPhone = contactPhone;
+      if (contactPhone !== undefined) supplier.contactPhone = contactPhone ? contactPhone.replace(/\D/g, '') : contactPhone;
       if (contactEmail !== undefined) supplier.contactEmail = contactEmail;
       if (operatingHours !== undefined) supplier.operatingHours = Array.isArray(operatingHours) ? operatingHours : undefined;
       if (timezone !== undefined) supplier.timezone = timezone;

@@ -84,7 +84,7 @@ export class PharmacistService {
       license_number: data.license_number,
       real_name: data.real_name,
       display_name: data.display_name,
-      phone: data.phone,
+      phone: data.phone ? data.phone.replace(/\D/g, '') : data.phone,
       email: data.email,
       chapter_id: data.chapter_id,
       pharmacy_name: data.pharmacy_name,
@@ -246,7 +246,7 @@ export class PharmacistService {
     }
 
     if (data.display_name) pharmacist.display_name = data.display_name;
-    if (data.phone) pharmacist.phone = data.phone;
+    if (data.phone) pharmacist.phone = data.phone.replace(/\D/g, '');
     if (data.pharmacy_name) pharmacist.pharmacy_name = data.pharmacy_name;
 
     const saved = await this.pharmacistRepository.save(pharmacist);

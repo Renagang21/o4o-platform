@@ -134,7 +134,7 @@ class CheckoutService {
       totalAmount,
       status: CheckoutOrderStatus.CREATED,
       paymentStatus: CheckoutPaymentStatus.PENDING,
-      shippingAddress: dto.shippingAddress,
+      shippingAddress: dto.shippingAddress ? { ...dto.shippingAddress, phone: dto.shippingAddress.phone?.replace(/\D/g, '') || dto.shippingAddress.phone } : dto.shippingAddress,
       metadata: dto.metadata,
     });
 

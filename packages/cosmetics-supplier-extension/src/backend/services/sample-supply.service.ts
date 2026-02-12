@@ -72,6 +72,7 @@ export class SampleSupplyService {
 
     const sample = this.repository.create({
       ...dto,
+      recipientPhone: dto.recipientPhone ? dto.recipientPhone.replace(/\D/g, '') : dto.recipientPhone,
       sampleType: dto.sampleType || 'trial',
       unitCost: dto.unitCost || 0,
       totalCost,

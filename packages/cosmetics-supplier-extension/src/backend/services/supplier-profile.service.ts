@@ -64,6 +64,7 @@ export class SupplierProfileService {
 
     const profile = this.repository.create({
       ...dto,
+      contactPhone: dto.contactPhone ? dto.contactPhone.replace(/\D/g, '') : dto.contactPhone,
       status: 'pending',
       tier: 'basic',
       commissionRate: 10,
@@ -102,7 +103,10 @@ export class SupplierProfileService {
       return null;
     }
 
-    Object.assign(profile, dto);
+    const normalizedDto = dto.contactPhone !== undefined
+      ? { ...dto, contactPhone: dto.contactPhone ? dto.contactPhone.replace(/\D/g, '') : dto.contactPhone }
+      : dto;
+    Object.assign(profile, normalizedDto);
     return this.repository.save(profile);
   }
 

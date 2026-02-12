@@ -2,35 +2,31 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
  * WO-PLATFORM-PHONE-NORMALIZATION-PHASE7-V1
- * Core(User) + KPA 전화번호 정규화: 숫자만 저장
+ * 플랫폼 전체 전화번호 정규화: 숫자만 저장
  * 기존 데이터에서 하이픈, 공백, 괄호 등 비숫자 문자 제거
  */
 export class NormalizePhoneNumbers1739700000000 implements MigrationInterface {
   name = 'NormalizePhoneNumbers1739700000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Core: users.phone
+    // === Core ===
     await queryRunner.query(`
       UPDATE "users"
       SET phone = regexp_replace(phone, '\\D', '', 'g')
       WHERE phone IS NOT NULL AND phone ~ '\\D'
     `);
 
-    // KPA: kpa_organizations.phone
+    // === KPA ===
     await queryRunner.query(`
       UPDATE "kpa_organizations"
       SET phone = regexp_replace(phone, '\\D', '', 'g')
       WHERE phone IS NOT NULL AND phone ~ '\\D'
     `);
-
-    // KPA: kpa_branch_officers.phone
     await queryRunner.query(`
       UPDATE "kpa_branch_officers"
       SET phone = regexp_replace(phone, '\\D', '', 'g')
       WHERE phone IS NOT NULL AND phone ~ '\\D'
     `);
-
-    // KPA: kpa_branch_settings.phone + fax
     await queryRunner.query(`
       UPDATE "kpa_branch_settings"
       SET phone = regexp_replace(phone, '\\D', '', 'g')
@@ -40,6 +36,107 @@ export class NormalizePhoneNumbers1739700000000 implements MigrationInterface {
       UPDATE "kpa_branch_settings"
       SET fax = regexp_replace(fax, '\\D', '', 'g')
       WHERE fax IS NOT NULL AND fax ~ '\\D'
+    `);
+
+    // === Neture ===
+    await queryRunner.query(`
+      UPDATE "neture_orders"
+      SET orderer_phone = regexp_replace(orderer_phone, '\\D', '', 'g')
+      WHERE orderer_phone IS NOT NULL AND orderer_phone ~ '\\D'
+    `);
+    await queryRunner.query(`
+      UPDATE "neture_suppliers"
+      SET contact_phone = regexp_replace(contact_phone, '\\D', '', 'g')
+      WHERE contact_phone IS NOT NULL AND contact_phone ~ '\\D'
+    `);
+    await queryRunner.query(`
+      UPDATE "neture_partnership_requests"
+      SET contact_phone = regexp_replace(contact_phone, '\\D', '', 'g')
+      WHERE contact_phone IS NOT NULL AND contact_phone ~ '\\D'
+    `);
+    await queryRunner.query(`
+      UPDATE "neture_supplier_requests"
+      SET seller_phone = regexp_replace(seller_phone, '\\D', '', 'g')
+      WHERE seller_phone IS NOT NULL AND seller_phone ~ '\\D'
+    `);
+
+    // === GlycoPharm ===
+    await queryRunner.query(`
+      UPDATE "glycopharm_pharmacies"
+      SET phone = regexp_replace(phone, '\\D', '', 'g')
+      WHERE phone IS NOT NULL AND phone ~ '\\D'
+    `);
+
+    // === GlucoseView ===
+    await queryRunner.query(`
+      UPDATE "glucoseview_pharmacists"
+      SET phone = regexp_replace(phone, '\\D', '', 'g')
+      WHERE phone IS NOT NULL AND phone ~ '\\D'
+    `);
+    await queryRunner.query(`
+      UPDATE "glucoseview_customers"
+      SET phone = regexp_replace(phone, '\\D', '', 'g')
+      WHERE phone IS NOT NULL AND phone ~ '\\D'
+    `);
+
+    // === Supplier (core) ===
+    await queryRunner.query(`
+      UPDATE "suppliers"
+      SET contact_phone = regexp_replace(contact_phone, '\\D', '', 'g')
+      WHERE contact_phone IS NOT NULL AND contact_phone ~ '\\D'
+    `);
+
+    // === Cosmetics ===
+    await queryRunner.query(`
+      UPDATE "cosmetics_supplier_profiles"
+      SET contact_phone = regexp_replace(contact_phone, '\\D', '', 'g')
+      WHERE contact_phone IS NOT NULL AND contact_phone ~ '\\D'
+    `);
+    await queryRunner.query(`
+      UPDATE "cosmetics_sample_supply"
+      SET recipient_phone = regexp_replace(recipient_phone, '\\D', '', 'g')
+      WHERE recipient_phone IS NOT NULL AND recipient_phone ~ '\\D'
+    `);
+
+    // === JSONB phone fields ===
+    // Neture orders: shipping->phone
+    await queryRunner.query(`
+      UPDATE "neture_orders"
+      SET shipping = jsonb_set(shipping, '{phone}',
+        to_jsonb(regexp_replace(shipping->>'phone', '\\D', '', 'g')))
+      WHERE shipping IS NOT NULL
+        AND shipping->>'phone' IS NOT NULL
+        AND shipping->>'phone' ~ '\\D'
+    `);
+
+    // Neture partners: contact->phone
+    await queryRunner.query(`
+      UPDATE "neture_partners"
+      SET contact = jsonb_set(contact, '{phone}',
+        to_jsonb(regexp_replace(contact->>'phone', '\\D', '', 'g')))
+      WHERE contact IS NOT NULL
+        AND contact->>'phone' IS NOT NULL
+        AND contact->>'phone' ~ '\\D'
+    `);
+
+    // E-commerce orders: shipping_address->phone
+    await queryRunner.query(`
+      UPDATE "checkout_orders"
+      SET shipping_address = jsonb_set(shipping_address, '{phone}',
+        to_jsonb(regexp_replace(shipping_address->>'phone', '\\D', '', 'g')))
+      WHERE shipping_address IS NOT NULL
+        AND shipping_address->>'phone' IS NOT NULL
+        AND shipping_address->>'phone' ~ '\\D'
+    `);
+
+    // Ecommerce orders: shipping_address->phone
+    await queryRunner.query(`
+      UPDATE "ecommerce_orders"
+      SET shipping_address = jsonb_set(shipping_address, '{phone}',
+        to_jsonb(regexp_replace(shipping_address->>'phone', '\\D', '', 'g')))
+      WHERE shipping_address IS NOT NULL
+        AND shipping_address->>'phone' IS NOT NULL
+        AND shipping_address->>'phone' ~ '\\D'
     `);
   }
 
