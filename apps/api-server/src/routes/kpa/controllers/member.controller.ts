@@ -70,6 +70,14 @@ export function createMemberController(
       body('student_year').optional().isInt({ min: 1, max: 6 }),
       body('pharmacy_name').optional().isString().isLength({ max: 200 }),
       body('pharmacy_address').optional().isString().isLength({ max: 300 }),
+      body('activity_type').optional().isString().isIn([
+        'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
+        'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
+      ]),
+      body('fee_category').optional().isString().isIn([
+        'A1_pharmacy_owner', 'A2_pharma_manager', 'B1_pharmacy_employee',
+        'B2_pharma_company_employee', 'C1_hospital', 'C2_admin_edu_research', 'D_fee_exempted',
+      ]),
       handleValidationErrors,
     ],
     async (req: AuthRequest, res: Response): Promise<void> => {
@@ -106,6 +114,8 @@ export function createMemberController(
           student_year: membershipType === 'student' ? (req.body.student_year || null) : null,
           pharmacy_name: req.body.pharmacy_name || null,
           pharmacy_address: req.body.pharmacy_address || null,
+          activity_type: req.body.activity_type || null,
+          fee_category: req.body.fee_category || null,
         });
 
         const saved = await memberRepo.save(member);
@@ -200,6 +210,48 @@ export function createMemberController(
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to update member status:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  /**
+   * PATCH /kpa/members/me/profession
+   * 내 직능 정보 업데이트 (Phase 5: 신고서 기반)
+   */
+  router.patch(
+    '/me/profession',
+    requireAuth,
+    [
+      body('activity_type').optional().isString().isIn([
+        'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
+        'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
+      ]),
+      body('fee_category').optional().isString().isIn([
+        'A1_pharmacy_owner', 'A2_pharma_manager', 'B1_pharmacy_employee',
+        'B2_pharma_company_employee', 'C1_hospital', 'C2_admin_edu_research', 'D_fee_exempted',
+      ]),
+      body('pharmacy_name').optional().isString().isLength({ max: 200 }),
+      body('pharmacy_address').optional().isString().isLength({ max: 300 }),
+      handleValidationErrors,
+    ],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        const member = await memberRepo.findOne({ where: { user_id: req.user!.id } });
+        if (!member) {
+          res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
+          return;
+        }
+
+        if (req.body.activity_type !== undefined) member.activity_type = req.body.activity_type;
+        if (req.body.fee_category !== undefined) member.fee_category = req.body.fee_category;
+        if (req.body.pharmacy_name !== undefined) member.pharmacy_name = req.body.pharmacy_name || null;
+        if (req.body.pharmacy_address !== undefined) member.pharmacy_address = req.body.pharmacy_address || null;
+
+        const saved = await memberRepo.save(member);
+        res.json({ data: saved });
+      } catch (error: any) {
+        console.error('Failed to update profession info:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
     }

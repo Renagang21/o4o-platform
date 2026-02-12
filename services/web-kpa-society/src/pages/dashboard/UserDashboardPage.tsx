@@ -17,6 +17,7 @@ import { useAuth, type PharmacistRole } from '../../contexts/AuthContext';
 import { colors, spacing, borderRadius, typography } from '../../styles/theme';
 import { CommunityDashboardTab } from './CommunityDashboardTab';
 import { PharmacyDashboardTab } from './PharmacyDashboardTab';
+import { ActivityTypePrompt } from '../../components/ActivityTypePrompt';
 
 type TabKey = 'community' | 'pharmacy';
 
@@ -72,6 +73,9 @@ export function UserDashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* 직능 분류 미설정 시 안내 배너 (Phase 6) */}
+      {!isStudent && <ActivityTypePrompt />}
 
       {/* 탭 바 */}
       <nav style={styles.tabBar}>

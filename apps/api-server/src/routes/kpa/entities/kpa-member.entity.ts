@@ -18,6 +18,30 @@ export type KpaMemberRole = 'member' | 'operator' | 'admin';
 export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'withdrawn';
 export type KpaMemberType = 'pharmacist' | 'student';
 
+// Phase 5: 직능 분류 (프론트엔드 ActivityType 매핑)
+export type KpaActivityType =
+  | 'pharmacy_owner'      // 약국 개설약사
+  | 'pharmacy_employee'   // 약국 근무약사
+  | 'hospital'            // 의료기관
+  | 'manufacturer'        // 의약품 제조
+  | 'importer'            // 의약품 수입
+  | 'wholesaler'          // 의약품 도매
+  | 'other_industry'      // 기타 산업
+  | 'government'          // 공공기관
+  | 'school'              // 학교
+  | 'other'               // 기타
+  | 'inactive';           // 미활동
+
+// Phase 5: 회비 분류 (2025 체계)
+export type KpaFeeCategory =
+  | 'A1_pharmacy_owner'
+  | 'A2_pharma_manager'
+  | 'B1_pharmacy_employee'
+  | 'B2_pharma_company_employee'
+  | 'C1_hospital'
+  | 'C2_admin_edu_research'
+  | 'D_fee_exempted';
+
 @Entity('kpa_members')
 export class KpaMember {
   @PrimaryGeneratedColumn('uuid')
@@ -52,6 +76,13 @@ export class KpaMember {
 
   @Column({ type: 'varchar', length: 300, nullable: true })
   pharmacy_address: string | null;
+
+  // Phase 5: 직능 구조 분리
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  activity_type: KpaActivityType | null;  // 취업 활동 유형
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  fee_category: KpaFeeCategory | null;  // 회비 분류
 
   @Column({ type: 'date', nullable: true })
   joined_at: Date | null;  // 가입 승인일

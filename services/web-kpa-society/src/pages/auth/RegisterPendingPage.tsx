@@ -1,11 +1,9 @@
 /**
  * RegisterPendingPage - 가입 신청 완료 / 승인 대기 안내
- *
- * 가입 신청 후 운영자 승인 대기 상태 안내
  */
 
 import { Link } from 'react-router-dom';
-import { Clock, Mail, CheckCircle } from 'lucide-react';
+import { Clock, CheckCircle, Mail } from 'lucide-react';
 
 export default function RegisterPendingPage() {
   return (
@@ -28,26 +26,14 @@ export default function RegisterPendingPage() {
               <span>가입 신청서가 접수되었습니다</span>
             </li>
             <li style={styles.infoItem}>
-              <Clock style={styles.checkIconPending} />
-              <span>운영자가 약사면허를 확인합니다</span>
+              <Clock style={styles.pendingIcon} />
+              <span>운영자가 자격을 확인합니다</span>
             </li>
             <li style={styles.infoItem}>
-              <Clock style={styles.checkIconPending} />
+              <Mail style={styles.pendingIcon} />
               <span>승인 완료 시 이메일로 안내드립니다</span>
             </li>
           </ul>
-        </div>
-
-        <div style={styles.emailNotice}>
-          <Mail style={styles.emailIcon} />
-          <div>
-            <p style={styles.emailText}>
-              승인 결과는 가입 시 입력하신 이메일로 발송됩니다.
-            </p>
-            <p style={styles.emailSubtext}>
-              일반적으로 1~2 영업일 내에 처리됩니다.
-            </p>
-          </div>
         </div>
 
         <div style={styles.actions}>
@@ -60,7 +46,7 @@ export default function RegisterPendingPage() {
         </div>
 
         <p style={styles.helpText}>
-          문의사항이 있으시면 운영자에게 연락해주세요.
+          일반적으로 1~2 영업일 내에 처리됩니다.
         </p>
       </div>
     </div>
@@ -146,39 +132,11 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#16a34a',
     flexShrink: 0,
   },
-  checkIconPending: {
+  pendingIcon: {
     width: '20px',
     height: '20px',
     color: '#94a3b8',
     flexShrink: 0,
-  },
-  emailNotice: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-    padding: '16px',
-    backgroundColor: '#fef3c7',
-    borderRadius: '12px',
-    marginBottom: '32px',
-    textAlign: 'left',
-  },
-  emailIcon: {
-    width: '24px',
-    height: '24px',
-    color: '#d97706',
-    flexShrink: 0,
-    marginTop: '2px',
-  },
-  emailText: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#92400e',
-    margin: '0 0 4px 0',
-  },
-  emailSubtext: {
-    fontSize: '13px',
-    color: '#a16207',
-    margin: 0,
   },
   actions: {
     display: 'flex',

@@ -1,6 +1,7 @@
 /**
  * RegisterPage - KPA Society 회원가입
- * 약사회원 가입 (자격여부는 운영자가 판단)
+ * Phase 6: 가입 시 약사/약대생만 구분
+ * 승인 후 로그인 시 직능 분류(activity_type) 미설정이면 추가 입력 유도
  */
 
 import { useState } from 'react';
@@ -15,14 +16,13 @@ export default function RegisterPage() {
     email: '',
     password: '',
     passwordConfirm: '',
-    lastName: '', // P1-T1: Split name into lastName/firstName
+    lastName: '',
     firstName: '',
-    nickname: '', // P1-T2: Nickname for forum/public display
+    nickname: '',
     phone: '',
+    membershipType: 'pharmacist' as 'pharmacist' | 'student',
     licenseNumber: '',
-    pharmacyName: '',
-    pharmacyAddress: '',
-    branch: '',
+    universityName: '',
     agreeTerms: false,
     agreePrivacy: false,
   });
@@ -32,7 +32,6 @@ export default function RegisterPage() {
     const { name, value } = target;
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
-
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -50,59 +49,58 @@ export default function RegisterPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          email: formData.email,
+          password: formData.password,
+          lastName: formData.lastName,
+          firstName: formData.firstName,
+          nickname: formData.nickname,
           phone: formData.phone.replace(/\D/g, ''),
-          role: 'pharmacist',
+          membershipType: formData.membershipType,
+          licenseNumber: formData.membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
+          universityName: formData.membershipType === 'student' ? formData.universityName : undefined,
           service: 'kpa-society',
         }),
       });
 
       const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || '회원가입 신청에 실패했습니다.');
+        throw new Error(data.error || '회원가입에 실패했습니다.');
       }
-
-      // 가입 신청 후 승인 대기 안내 페이지로 이동
       navigate('/register/pending');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입 신청에 실패했습니다.');
+      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
   const isFormValid = () => {
-    return (
+    const normalizedPhone = formData.phone.replace(/\D/g, '');
+    const baseValid =
       formData.email &&
       formData.password &&
       formData.password.length >= 8 &&
       formData.password === formData.passwordConfirm &&
-      formData.lastName && // P1-T1: Check lastName/firstName
+      formData.lastName &&
       formData.firstName &&
-      formData.nickname && // P1-T2: Check nickname
-      formData.phone &&
-      formData.licenseNumber &&
+      formData.nickname &&
+      normalizedPhone.length >= 10 && normalizedPhone.length <= 11 &&
       formData.agreeTerms &&
-      formData.agreePrivacy
-    );
-  };
+      formData.agreePrivacy;
 
-  // 분회 목록 (예시)
-  const branchOptions = [
-    { value: '', label: '분회 선택' },
-    { value: 'branch-1', label: '제1분회' },
-    { value: 'branch-2', label: '제2분회' },
-    { value: 'branch-3', label: '제3분회' },
-    { value: 'branch-4', label: '제4분회' },
-    { value: 'branch-5', label: '제5분회' },
-  ];
+    if (!baseValid) return false;
+
+    if (formData.membershipType === 'pharmacist') {
+      return !!formData.licenseNumber;
+    }
+    return true; // 약대생은 면허번호 불필요
+  };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={styles.logo}>KPA</div>
-        <h1 style={styles.title}>회원가입 신청</h1>
+        <h1 style={styles.title}>회원가입</h1>
         <p style={styles.subtitle}>KPA-Society 회원가입을 신청합니다</p>
 
         <div style={styles.notice}>
@@ -110,7 +108,7 @@ export default function RegisterPage() {
           <div>
             <strong>승인제 가입 안내</strong>
             <p style={styles.noticeText}>
-              약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.
+              가입 신청 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.
             </p>
           </div>
         </div>
@@ -118,9 +116,9 @@ export default function RegisterPage() {
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {/* 기본 정보 */}
+          {/* 계정 정보 */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>기본 정보</h3>
+            <h3 style={styles.sectionTitle}>계정 정보</h3>
 
             <div style={styles.inputGroup}>
               <label style={styles.label}>이메일 *</label>
@@ -156,6 +154,11 @@ export default function RegisterPage() {
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
+                {formData.password && formData.password.length > 0 && formData.password.length < 8 && (
+                  <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
+                    비밀번호는 8자 이상이어야 합니다
+                  </p>
+                )}
               </div>
               <div style={styles.inputGroup}>
                 <label style={styles.label}>비밀번호 확인 *</label>
@@ -175,6 +178,11 @@ export default function RegisterPage() {
                 )}
               </div>
             </div>
+          </div>
+
+          {/* 개인 정보 */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>개인 정보</h3>
 
             <div style={styles.inputRow}>
               <div style={styles.inputGroup}>
@@ -224,76 +232,66 @@ export default function RegisterPage() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                placeholder="010-1234-5678"
+                placeholder="01012345678"
                 style={styles.input}
                 required
               />
               <p style={styles.helpText}>하이픈(-) 포함 입력 가능</p>
+              {formData.phone && formData.phone.replace(/\D/g, '').length > 0 &&
+                (formData.phone.replace(/\D/g, '').length < 10 || formData.phone.replace(/\D/g, '').length > 11) && (
+                <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
+                  전화번호는 10~11자리 숫자여야 합니다
+                </p>
+              )}
             </div>
           </div>
 
-          {/* 약사 정보 */}
+          {/* 회원 구분 */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>약사 정보</h3>
+            <h3 style={styles.sectionTitle}>회원 구분</h3>
 
             <div style={styles.inputGroup}>
-              <label style={styles.label}>약사면허번호 *</label>
-              <input
-                type="text"
-                name="licenseNumber"
-                value={formData.licenseNumber}
-                onChange={handleInputChange}
-                placeholder="00000"
-                style={styles.input}
-                required
-              />
-              <p style={styles.helpText}>약사면허증에 기재된 면허번호를 입력하세요</p>
-            </div>
-
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>소속 분회</label>
+              <label style={styles.label}>가입 유형 *</label>
               <select
-                name="branch"
-                value={formData.branch}
+                name="membershipType"
+                value={formData.membershipType}
                 onChange={handleInputChange}
                 style={styles.select}
               >
-                {branchOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                <option value="pharmacist">약사</option>
+                <option value="student">약대생</option>
               </select>
             </div>
-          </div>
 
-          {/* 약국 정보 */}
-          <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>약국 정보 (선택)</h3>
+            {formData.membershipType === 'pharmacist' && (
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>약사면허번호 *</label>
+                <input
+                  type="text"
+                  name="licenseNumber"
+                  value={formData.licenseNumber}
+                  onChange={handleInputChange}
+                  placeholder="00000"
+                  style={styles.input}
+                  required
+                />
+                <p style={styles.helpText}>약사면허증에 기재된 면허번호</p>
+              </div>
+            )}
 
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>약국명</label>
-              <input
-                type="text"
-                name="pharmacyName"
-                value={formData.pharmacyName}
-                onChange={handleInputChange}
-                placeholder="OO약국"
-                style={styles.input}
-              />
-            </div>
-
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>약국 주소</label>
-              <input
-                type="text"
-                name="pharmacyAddress"
-                value={formData.pharmacyAddress}
-                onChange={handleInputChange}
-                placeholder="청명시 OO구 OO로 123"
-                style={styles.input}
-              />
-            </div>
+            {formData.membershipType === 'student' && (
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>재학 대학명</label>
+                <input
+                  type="text"
+                  name="universityName"
+                  value={formData.universityName}
+                  onChange={handleInputChange}
+                  placeholder="OO대학교 약학대학"
+                  style={styles.input}
+                />
+              </div>
+            )}
           </div>
 
           {/* 약관 동의 */}
