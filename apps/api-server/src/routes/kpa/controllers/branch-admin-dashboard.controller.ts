@@ -526,7 +526,7 @@ export function createBranchAdminDashboardController(
           organization_id: organizationId,
           name, position, role,
           pharmacy_name: pharmacy_name || null,
-          phone: phone || null,
+          phone: phone ? phone.replace(/\D/g, '') : null,
           email: email || null,
           term_start: term_start || null,
           term_end: term_end || null,
@@ -565,6 +565,8 @@ export function createBranchAdminDashboardController(
         for (const f of fields) {
           if (req.body[f] !== undefined) (existing as any)[f] = req.body[f];
         }
+        // Normalize phone (digits only)
+        if (existing.phone) existing.phone = existing.phone.replace(/\D/g, '');
 
         const saved = await repo.save(existing);
         res.json({ success: true, data: saved });
@@ -808,6 +810,9 @@ export function createBranchAdminDashboardController(
         for (const f of fields) {
           if (req.body[f] !== undefined) (settings as any)[f] = req.body[f];
         }
+        // Normalize phone/fax (digits only)
+        if (settings.phone) settings.phone = settings.phone.replace(/\D/g, '');
+        if (settings.fax) settings.fax = settings.fax.replace(/\D/g, '');
 
         const saved = await repo.save(settings);
         res.json({ success: true, data: saved });

@@ -130,7 +130,7 @@ export function createOrganizationController(
           parent_id: req.body.parent_id || null,
           description: req.body.description || null,
           address: req.body.address || null,
-          phone: req.body.phone || null,
+          phone: req.body.phone ? req.body.phone.replace(/\D/g, '') : null,
         });
 
         const saved = await orgRepo.save(org);
@@ -170,7 +170,7 @@ export function createOrganizationController(
         if (req.body.name !== undefined) org.name = req.body.name;
         if (req.body.description !== undefined) org.description = req.body.description;
         if (req.body.address !== undefined) org.address = req.body.address;
-        if (req.body.phone !== undefined) org.phone = req.body.phone;
+        if (req.body.phone !== undefined) org.phone = req.body.phone ? req.body.phone.replace(/\D/g, '') : req.body.phone;
         if (req.body.is_active !== undefined) org.is_active = req.body.is_active;
 
         const saved = await orgRepo.save(org);

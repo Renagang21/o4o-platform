@@ -593,7 +593,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     if (name !== undefined) updateData.name = name;
     if (lastName !== undefined) updateData.lastName = lastName;
     if (firstName !== undefined) updateData.firstName = firstName;
-    if (phone !== undefined) updateData.phone = phone;
+    if (phone !== undefined) updateData.phone = phone ? phone.replace(/\D/g, '') : phone;
 
     // If lastName and firstName provided, auto-generate name
     if (lastName !== undefined || firstName !== undefined) {
