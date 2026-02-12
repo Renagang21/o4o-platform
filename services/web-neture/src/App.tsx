@@ -16,7 +16,7 @@
 
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
-import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
+import { AuthProvider, LoginModalProvider, useLoginModal, useAuth } from './contexts';
 import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
@@ -282,6 +282,31 @@ function LoginRedirect() {
 }
 
 
+/**
+ * ProtectedRoute - 역할 기반 접근 제어
+ *
+ * WO-OPERATOR-GUARD-UNIFICATION-P0:
+ * GlycoPharm/K-Cosmetics Reference Implementation 패턴 적용
+ */
+function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    return <PageLoading />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
+  }
+
+  if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -468,8 +493,13 @@ function App() {
 
             {/* ================================================================
                 Operator Dashboard (/workspace/operator/*)
+                WO-OPERATOR-GUARD-UNIFICATION-P0: ProtectedRoute 가드 적용
             ================================================================ */}
-            <Route element={<SupplierOpsLayout />}>
+            <Route element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <SupplierOpsLayout />
+              </ProtectedRoute>
+            }>
               {/* Signal 기반 대시보드 (WO-NETURE-OPERATOR-DASHBOARD-UX-V1) */}
               <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
               <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
