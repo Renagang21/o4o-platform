@@ -90,7 +90,7 @@ export default function RegisterModal() {
   useEffect(() => {
     if (!isOpen) return;
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-    fetch(`${baseUrl}/kpa/organizations?type=branch&active_only=true`)
+    fetch(`${baseUrl}/api/v1/kpa/organizations?type=branch&active_only=true`)
       .then(r => r.ok ? r.json() : { data: [] })
       .then(res => setBranches(res.data || []))
       .catch(() => {});
@@ -103,7 +103,7 @@ export default function RegisterModal() {
       return;
     }
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-    fetch(`${baseUrl}/kpa/organizations?type=group&parent_id=${formData.branchId}&active_only=true`)
+    fetch(`${baseUrl}/api/v1/kpa/organizations?type=group&parent_id=${formData.branchId}&active_only=true`)
       .then(r => r.ok ? r.json() : { data: [] })
       .then(res => setGroups(res.data || []))
       .catch(() => {});
@@ -114,7 +114,7 @@ export default function RegisterModal() {
     setLicenseStatus('checking');
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const res = await fetch(`${baseUrl}/kpa/members/check-license?license_number=${encodeURIComponent(licenseNumber.trim())}`);
+      const res = await fetch(`${baseUrl}/api/v1/kpa/members/check-license?license_number=${encodeURIComponent(licenseNumber.trim())}`);
       if (res.ok) {
         const data = await res.json();
         setLicenseStatus(data.available ? 'available' : 'duplicate');
