@@ -288,6 +288,7 @@ const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 // Debug Pages
 const AuthBootstrapDebug = lazy(() => import('@/pages/__debug__/AuthBootstrapDebug'));
 const AuthStateJsonDebug = lazy(() => import('@/pages/__debug__/AuthStateJsonDebug'));
+const LoginDiagnostic = lazy(() => import('@/pages/__debug__/LoginDiagnostic'));
 
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
@@ -521,6 +522,13 @@ function App() {
             <Route path="/debug/auth" element={
               <Suspense fallback={<PageLoader />}>
                 <AuthStateJsonDebug />
+              </Suspense>
+            } />
+
+            {/* Login Diagnostic - CORS/API connectivity debug */}
+            <Route path="/__debug__/login" element={
+              <Suspense fallback={<PageLoader />}>
+                <LoginDiagnostic />
               </Suspense>
             } />
 
