@@ -15,20 +15,15 @@ RUN npm install -g pnpm
 # Copy workspace configuration
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 
-# Copy workspace packages needed for this service
-COPY packages/operator-core/package.json ./packages/operator-core/
+# Copy all workspace packages (pnpm reads lockfile and expects all
+# packages/* entries to exist for workspace graph resolution)
+COPY packages/ ./packages/
 
-# Copy service package.json
-COPY services/web-glucoseview/package.json ./services/web-glucoseview/
+# Copy service
+COPY services/web-glucoseview/ ./services/web-glucoseview/
 
 # Install dependencies
 RUN pnpm install --filter glucoseview-web...
-
-# Copy workspace package source (operator-core exports TS source directly, no build needed)
-COPY packages/operator-core/ ./packages/operator-core/
-
-# Copy service source
-COPY services/web-glucoseview/ ./services/web-glucoseview/
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
