@@ -12,6 +12,7 @@ import { DataSource } from 'typeorm';
 import { createCosmeticsController } from './controllers/cosmetics.controller.js';
 import { createCosmeticsOrderController } from './controllers/cosmetics-order.controller.js';
 import { createCosmeticsPaymentController } from './controllers/cosmetics-payment.controller.js';
+import { createCosmeticsStoreController } from './controllers/cosmetics-store.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
@@ -121,10 +122,18 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
 
+  // Create store controller (WO-KCOS-STORES-PHASE1-V1)
+  const storeController = createCosmeticsStoreController(
+    dataSource,
+    coreRequireAuth as any,
+    requireCosmeticsScope
+  );
+
   // Mount controllers
   router.use('/', cosmeticsController);
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
   router.use('/payments', paymentController); // Payment EventHub 연결
+  router.use('/stores', storeController); // WO-KCOS-STORES-PHASE1-V1: 매장 관리
 
   return router;
 }

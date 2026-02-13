@@ -122,6 +122,10 @@ import {
   CosmeticsPricePolicy,
   CosmeticsProductLog,
   CosmeticsPriceLog,
+  CosmeticsStore,
+  CosmeticsStoreApplication,
+  CosmeticsStoreMember,
+  CosmeticsStoreListing,
 } from '../routes/cosmetics/entities/index.js';
 
 // ============================================================================
@@ -494,6 +498,11 @@ export const AppDataSource = new DataSource({
     CosmeticsPricePolicy,
     CosmeticsProductLog,
     CosmeticsPriceLog,
+    // COSMETICS STORE ENTITIES (WO-KCOS-STORES-PHASE1-V1)
+    CosmeticsStore,
+    CosmeticsStoreApplication,
+    CosmeticsStoreMember,
+    CosmeticsStoreListing,
     // ============================================================================
     // YAKSA ENTITIES (Phase A-1: Yaksa API Implementation)
     // ============================================================================

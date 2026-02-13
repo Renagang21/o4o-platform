@@ -254,6 +254,31 @@ export class EcommerceOrder {
   })
   status!: OrderStatus;
 
+  // ===== 매장 귀속 (Store Attribution) =====
+
+  /**
+   * 매장 ID (WO-KCOS-STORES-PHASE2)
+   * 주문이 발생한 매장. KPI 집계의 기준 키.
+   */
+  @Index()
+  @Column({ type: 'uuid', nullable: true })
+  storeId?: string;
+
+  /**
+   * 주문 소스
+   * online, in-store, kiosk 등
+   */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  orderSource?: string;
+
+  /**
+   * 비즈니스 채널
+   * local, travel 등 (서비스별 채널 구분)
+   */
+  @Index()
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  channel?: string;
+
   // ===== 배송 정보 =====
 
   /**

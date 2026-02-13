@@ -77,6 +77,7 @@ const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
+const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -243,6 +244,8 @@ function AppRoutes() {
         <Route path="settings" element={<OperatorSettingsPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
+        {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
+        <Route path="store-cockpit" element={<StoreCockpitPage />} />
       </Route>
 
       {/* 404 */}

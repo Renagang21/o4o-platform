@@ -35,6 +35,12 @@ export interface CreateOrderDto {
   discount?: number;
   currency?: string;
   metadata?: Record<string, any>;
+  /** 매장 ID (WO-KCOS-STORES-PHASE2) */
+  storeId?: string;
+  /** 주문 소스: online, in-store, kiosk */
+  orderSource?: string;
+  /** 비즈니스 채널: local, travel */
+  channel?: string;
 }
 
 export interface CreateOrderItemDto {
@@ -101,6 +107,9 @@ export class EcommerceOrderService {
       status: OrderStatus.CREATED,
       shippingAddress: dto.shippingAddress,
       metadata: dto.metadata,
+      storeId: dto.storeId,
+      orderSource: dto.orderSource,
+      channel: dto.channel,
     });
 
     const savedOrder = await this.orderRepository.save(order);

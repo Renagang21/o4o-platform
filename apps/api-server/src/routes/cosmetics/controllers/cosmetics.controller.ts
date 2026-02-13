@@ -9,6 +9,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, query, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { CosmeticsService } from '../services/cosmetics.service.js';
+import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
 import { CosmeticsProductStatus } from '../entities/index.js';
 import {
   ErrorResponseDto,
@@ -64,6 +65,7 @@ export function createCosmeticsController(
 ): Router {
   const router = Router();
   const service = new CosmeticsService(dataSource);
+  const storeSummaryService = new CosmeticsStoreSummaryService(dataSource);
 
   // ============================================================================
   // PUBLIC ENDPOINTS (No Auth Required)
@@ -517,6 +519,8 @@ export function createCosmeticsController(
   /**
    * GET /cosmetics/admin/dashboard/summary
    * Get operator dashboard summary
+   *
+   * WO-KCOS-STORES-PHASE2: Real store/order data from DB
    */
   router.get(
     '/admin/dashboard/summary',
@@ -524,7 +528,32 @@ export function createCosmeticsController(
     requireScope('cosmetics:admin'),
     async (_req: Request, res: Response) => {
       try {
-        const result = await service.getOperatorDashboardSummary();
+        // Get real store/order data from summary service
+        const adminSummary = await storeSummaryService.getAdminSummary();
+
+        // Get catalog stats from existing service
+        const catalogStats = await service.getOperatorDashboardSummary();
+
+        // Merge: real store/order data + catalog data
+        const result = {
+          stats: {
+            totalStores: adminSummary.totalStores,
+            activeOrders: adminSummary.activeOrders,
+            monthlyRevenue: adminSummary.monthlyRevenue > 0
+              ? `₩${adminSummary.monthlyRevenue.toLocaleString()}`
+              : '₩0',
+            newSignups: catalogStats.stats.newSignups,
+          },
+          recentOrders: adminSummary.recentOrders.map((o) => ({
+            id: o.id,
+            store: o.channel || 'N/A',
+            amount: `₩${o.totalAmount.toLocaleString()}`,
+            status: o.status,
+            time: o.createdAt,
+          })),
+          recentApplications: catalogStats.recentApplications,
+        };
+
         res.json({ success: true, data: result });
       } catch (error: any) {
         console.error('[Cosmetics] Get dashboard summary error:', error);

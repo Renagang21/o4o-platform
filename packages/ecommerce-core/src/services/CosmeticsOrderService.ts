@@ -355,6 +355,9 @@ export class CosmeticsOrderService {
       currency: 'KRW',
       metadata: dto.metadata as Record<string, any>,
       items: dto.items.map((item) => this.mapToOrderItemDto(item)),
+      // WO-KCOS-STORES-PHASE2: Store attribution (first-class columns)
+      storeId: dto.metadata.storeId,
+      channel: dto.metadata.channel,
     };
   }
 

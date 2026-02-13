@@ -32,3 +32,11 @@ export * from './cosmetics-product.entity.js';
 export * from './cosmetics-price-policy.entity.js';
 export * from './cosmetics-product-log.entity.js';
 export * from './cosmetics-price-log.entity.js';
+
+// ============================================================================
+// STORE ENTITIES (WO-KCOS-STORES-PHASE1-V1: K-Cosmetics Store Core)
+// ============================================================================
+export * from './cosmetics-store.entity.js';
+export * from './cosmetics-store-application.entity.js';
+export * from './cosmetics-store-member.entity.js';
+export * from './cosmetics-store-listing.entity.js';

@@ -527,12 +527,9 @@ export class CosmeticsService {
       status: string;
     }>;
   }> {
-    // Query database for statistics
-    const totalProducts = await this.repository.countAllProducts();
-    const visibleProducts = await this.repository.countProductsByStatus(CosmeticsProductStatus.VISIBLE);
+    // Catalog stats (store/order stats now handled by CosmeticsStoreSummaryService)
     const brands = await this.repository.findAllBrands({});
 
-    // Return empty state data - actual store/order data would come from O4O Store
     return {
       stats: {
         totalStores: brands.length,

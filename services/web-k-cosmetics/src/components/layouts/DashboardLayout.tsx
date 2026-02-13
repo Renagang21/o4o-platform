@@ -176,6 +176,7 @@ const roleConfig: Record<string, RoleConfig> = {
     color: 'pink',
     menuItems: [
       { path: '/operator', label: '대시보드', icon: icons.LayoutDashboard },
+      { path: '/operator/store-cockpit', label: '내 매장', icon: icons.Home },
       { path: '/operator/stores', label: '매장 네트워크', icon: icons.Store },
       { path: '/operator/applications', label: '신청 관리', icon: icons.FileCheck },
       { path: '/operator/products', label: '상품 관리', icon: icons.Package },
