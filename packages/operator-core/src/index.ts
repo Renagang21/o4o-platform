@@ -39,3 +39,8 @@ export {
   computeContentSignageSignal,
   sortAndLimitActivity,
 } from './signal';
+
+// AI Action Layer (WO-OPERATOR-AI-ACTION-LAYER-V1)
+export type { OperatorActionSuggestion } from './action';
+export { generateOperatorActions } from './action';
+export { OperatorActionPanel } from './layout/OperatorActionPanel';

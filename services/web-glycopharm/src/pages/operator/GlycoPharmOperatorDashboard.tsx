@@ -3,16 +3,18 @@
  *
  * WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1
  * WO-OPERATOR-CORE-PHASE3-GLYCOPHARM: Core Shell + GlycoPharm Config 전환
+ * WO-OPERATOR-AI-ACTION-LAYER-V1: AI 행동 제안 패널 추가
  *
  * 구조:
  *  [ Hero Summary ]     — 서비스 상태 배지 (3초 판단)
+ *  [ Action Panel ]     — AI 행동 제안 (alert/warning 기반)
  *  [ Action Signals ]   — 행동 유도 카드 3장
  *  [ Status Feed ]      — 주요 운영 지표 5건 (children)
  *  [ Analytics Link ]   — 상세 분석 링크 (children)
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ShoppingBag,
   MessageSquare,
@@ -21,7 +23,7 @@ import {
   FileText,
   AlertCircle,
 } from 'lucide-react';
-import { OperatorLayout } from '@o4o/operator-core';
+import { OperatorLayout, generateOperatorActions } from '@o4o/operator-core';
 import { glycopharmApi, type OperatorDashboardData } from '@/api/glycopharm';
 import { buildGlycoPharmOperatorConfig } from './operatorConfig';
 
@@ -84,6 +86,7 @@ function buildStatusFeed(data: OperatorDashboardData): StatusItem[] {
 // ─── Main component ───
 
 export default function GlycoPharmOperatorDashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState<OperatorDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +112,10 @@ export default function GlycoPharmOperatorDashboard() {
 
   const config = buildGlycoPharmOperatorConfig(data);
   const feed = data ? buildStatusFeed(data) : [];
+  const actions = useMemo(
+    () => (config ? generateOperatorActions(config.signalCards) : []),
+    [config],
+  );
 
   return (
     <OperatorLayout
@@ -116,6 +123,8 @@ export default function GlycoPharmOperatorDashboard() {
       loading={loading}
       error={error}
       onRefresh={fetchData}
+      actions={actions}
+      onActionNavigate={(route) => navigate(route)}
     >
       {/* Status Feed — GlycoPharm 고유 KPI 지표 */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100">

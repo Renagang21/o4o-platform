@@ -12,6 +12,7 @@ import { DataSource } from 'typeorm';
 import { CosmeticsStoreService } from '../services/cosmetics-store.service.js';
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
 import { CosmeticsStorePlaylistService } from '../services/cosmetics-store-playlist.service.js';
+import { CosmeticsStoreInsightsService } from '../services/cosmetics-store-insights.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 function errorResponse(
@@ -46,6 +47,7 @@ export function createCosmeticsStoreController(
   const service = new CosmeticsStoreService(dataSource);
   const summaryService = new CosmeticsStoreSummaryService(dataSource);
   const playlistService = new CosmeticsStorePlaylistService(dataSource);
+  const insightsService = new CosmeticsStoreInsightsService(dataSource);
 
   // ============================================================================
   // ADMIN ENDPOINTS (cosmetics:admin scope required)
@@ -551,6 +553,43 @@ export function createCosmeticsStoreController(
         if (error.message === 'PLAYLIST_NOT_FOUND') {
           return errorResponse(res, 404, 'STORE_017', 'Playlist not found');
         }
+        if (error.message === 'STORE_MEMBER_NOT_FOUND') {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+        errorResponse(res, 500, 'STORE_500', 'Internal server error');
+      }
+    },
+  );
+
+  // ============================================================================
+  // INSIGHTS ENDPOINT (WO-KCOS-STORES-PHASE5-AI-INSIGHTS-V1)
+  // ============================================================================
+
+  /**
+   * GET /cosmetics/stores/:storeId/insights
+   * Get AI insights for store (member only)
+   */
+  router.get(
+    '/:storeId/insights',
+    requireAuth,
+    [param('storeId').isUUID()],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || authReq.authUser?.id || '';
+
+        // Verify membership
+        const storeDetail = await service.getStoreDetail(req.params.storeId, userId);
+        if (!storeDetail) {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+
+        const insights = await insightsService.generateInsights(req.params.storeId);
+        res.json({ data: insights });
+      } catch (error: any) {
+        console.error('[CosmeticsStore] Get insights error:', error);
         if (error.message === 'STORE_MEMBER_NOT_FOUND') {
           return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
         }

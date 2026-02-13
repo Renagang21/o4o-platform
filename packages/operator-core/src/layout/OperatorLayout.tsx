@@ -5,6 +5,7 @@
  *   [ Page Header + 새로고침 ]
  *   [ Error Banner ]
  *   [ Hero Summary ]
+ *   [ Action Panel (AI 행동 제안) ]
  *   [ Signal Cards ]
  *   [ Activity Feed ]
  *   [ children (서비스별 추가 섹션) ]
@@ -12,7 +13,9 @@
 
 import { RefreshCw } from 'lucide-react';
 import type { OperatorDashboardConfig } from '../types';
+import type { OperatorActionSuggestion } from '../action';
 import { OperatorHero } from './OperatorHero';
+import { OperatorActionPanel } from './OperatorActionPanel';
 import { OperatorSignalCards } from './OperatorSignalCards';
 import { OperatorActivityFeed } from './OperatorActivityFeed';
 
@@ -21,12 +24,18 @@ export function OperatorLayout({
   loading,
   error,
   onRefresh,
+  actions,
+  onActionNavigate,
   children,
 }: {
   config: OperatorDashboardConfig | null;
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
+  /** AI 행동 제안 목록 (없으면 패널 미표시) */
+  actions?: OperatorActionSuggestion[];
+  /** 행동 제안 클릭 시 라우팅 핸들러 */
+  onActionNavigate?: (route: string) => void;
   children?: React.ReactNode;
 }) {
   return (
@@ -67,6 +76,11 @@ export function OperatorLayout({
           <div className="h-6 bg-slate-200 rounded w-48 mb-2" />
           <div className="h-4 bg-slate-200 rounded w-64" />
         </div>
+      )}
+
+      {/* Action Panel — Hero 아래, Signal Cards 위 */}
+      {actions && actions.length > 0 && (
+        <OperatorActionPanel actions={actions} onNavigate={onActionNavigate} />
       )}
 
       {/* Signal Cards */}

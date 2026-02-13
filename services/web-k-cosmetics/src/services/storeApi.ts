@@ -94,6 +94,17 @@ export interface StorePlaylist {
   items: StorePlaylistItem[];
 }
 
+export interface StoreInsight {
+  level: 'info' | 'warning' | 'positive';
+  message: string;
+}
+
+export interface StoreInsightsResult {
+  level: 'info' | 'warning' | 'positive';
+  messages: string[];
+  insights: StoreInsight[];
+}
+
 // ============================================================================
 // Auth Helper
 // ============================================================================
@@ -259,5 +270,14 @@ export const storeApi = {
   async togglePlaylistActive(storeId: string, playlistId: string): Promise<boolean> {
     const result = await mutateWithAuth(`/${storeId}/playlists/${playlistId}/activate`, 'PATCH');
     return result !== null;
+  },
+
+  // ==========================================================================
+  // Insights API (WO-KCOS-STORES-PHASE5-AI-INSIGHTS-V1)
+  // ==========================================================================
+
+  /** 매장 AI 인사이트 */
+  async getStoreInsights(storeId: string): Promise<StoreInsightsResult | null> {
+    return fetchWithAuth<StoreInsightsResult>(`/${storeId}/insights`);
   },
 };

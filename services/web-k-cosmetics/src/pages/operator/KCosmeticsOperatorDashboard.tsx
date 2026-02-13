@@ -3,19 +3,23 @@
  *
  * WO-K-COSMETICS-OPERATOR-DASHBOARD-UX-V1
  * WO-OPERATOR-CORE-PHASE4-KCOSMETICS: Core Shell + K-Cosmetics Config 전환
+ * WO-OPERATOR-AI-ACTION-LAYER-V1: AI 행동 제안 패널 추가
  *
  * 구조:
  *  [ Hero Summary ]     — 매장 운영 상태 배지 (3초 판단)
+ *  [ Action Panel ]     — AI 행동 제안 (alert/warning 기반)
  *  [ Action Signals ]   — 행동 유도 카드 3장
  *  [ Recent Activity ]  — 최근 운영 활동 5건
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { OperatorLayout } from '@o4o/operator-core';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { OperatorLayout, generateOperatorActions } from '@o4o/operator-core';
 import { operatorApi, type OperatorDashboardSummary } from '@/services/operatorApi';
 import { buildKCosmeticsOperatorConfig } from './operatorConfig';
 
 export default function KCosmeticsOperatorDashboard() {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState<OperatorDashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +42,10 @@ export default function KCosmeticsOperatorDashboard() {
   }, [fetchData]);
 
   const config = buildKCosmeticsOperatorConfig(summary);
+  const actions = useMemo(
+    () => (config ? generateOperatorActions(config.signalCards) : []),
+    [config],
+  );
 
   return (
     <OperatorLayout
@@ -45,6 +53,8 @@ export default function KCosmeticsOperatorDashboard() {
       loading={loading}
       error={error}
       onRefresh={fetchData}
+      actions={actions}
+      onActionNavigate={(route) => navigate(route)}
     />
   );
 }

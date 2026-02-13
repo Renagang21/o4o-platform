@@ -19,6 +19,7 @@ import {
   type StoreSummary,
   type StoreListing,
   type StorePlaylist,
+  type StoreInsightsResult,
 } from '@/services/storeApi';
 
 // ============================================================================
@@ -80,6 +81,7 @@ export default function StoreCockpitPage() {
   const [listingTotal, setListingTotal] = useState(0);
   const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
   const [playlistLoading, setPlaylistLoading] = useState(false);
+  const [insights, setInsights] = useState<StoreInsightsResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,10 +106,11 @@ export default function StoreCockpitPage() {
       setSelectedStore(store);
 
       // Load store data in parallel
-      const [summaryData, listingsData, playlistData] = await Promise.all([
+      const [summaryData, listingsData, playlistData, insightsData] = await Promise.all([
         storeApi.getStoreSummary(store.id),
         storeApi.getStoreListings(store.id, { limit: 5 }),
         storeApi.getStorePlaylists(store.id),
+        storeApi.getStoreInsights(store.id),
       ]);
 
       setSummary(summaryData);
@@ -116,6 +119,7 @@ export default function StoreCockpitPage() {
         setListingTotal(listingsData.meta.total);
       }
       if (playlistData) setPlaylists(playlistData);
+      setInsights(insightsData);
     } catch (err) {
       setError('매장 정보를 불러오는 중 오류가 발생했습니다.');
       console.error('[StoreCockpit] Load error:', err);
@@ -137,10 +141,11 @@ export default function StoreCockpitPage() {
     setLoading(true);
 
     try {
-      const [summaryData, listingsData, playlistData] = await Promise.all([
+      const [summaryData, listingsData, playlistData, insightsData] = await Promise.all([
         storeApi.getStoreSummary(store.id),
         storeApi.getStoreListings(store.id, { limit: 5 }),
         storeApi.getStorePlaylists(store.id),
+        storeApi.getStoreInsights(store.id),
       ]);
 
       setSummary(summaryData);
@@ -149,6 +154,7 @@ export default function StoreCockpitPage() {
         setListingTotal(listingsData.meta.total);
       }
       if (playlistData) setPlaylists(playlistData);
+      setInsights(insightsData);
     } catch {
       setError('매장 데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
@@ -508,22 +514,70 @@ export default function StoreCockpitPage() {
         </div>
 
         {/* ================================================================== */}
-        {/* Block 5: AI 슬롯 (비활성) */}
+        {/* Block 5: AI 인사이트 (WO-KCOS-STORES-PHASE5) */}
         {/* ================================================================== */}
         <div className="bg-white rounded-xl p-6 border border-slate-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-800">AI 분석</h2>
-            <span className="text-xs px-2 py-1 bg-slate-100 text-slate-500 rounded-full">준비중</span>
+            <h2 className="text-lg font-bold text-slate-800">AI 인사이트</h2>
+            {insights && (
+              <span className={`text-xs px-2 py-1 rounded-full ${
+                insights.level === 'positive' ? 'bg-green-100 text-green-700' :
+                insights.level === 'warning' ? 'bg-amber-100 text-amber-700' :
+                'bg-blue-100 text-blue-700'
+              }`}>
+                {insights.level === 'positive' ? '긍정' : insights.level === 'warning' ? '주의' : '정보'}
+              </span>
+            )}
           </div>
-          <div className="text-center py-8 bg-gradient-to-br from-slate-50 to-pink-50 rounded-xl">
-            <svg className="w-12 h-12 text-pink-200 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-            </svg>
-            <p className="text-slate-600 text-sm font-medium">AI 분석 (곧 제공 예정)</p>
-            <p className="text-slate-400 text-xs mt-1 max-w-xs mx-auto">
-              이번 달 매출 분석 및 상품 추천 기능이 준비 중입니다.
-            </p>
-          </div>
+
+          {insights && insights.insights.length > 0 ? (
+            <div className="space-y-2.5">
+              {insights.insights.map((item, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-start gap-3 p-3 rounded-lg ${
+                    item.level === 'positive' ? 'bg-green-50' :
+                    item.level === 'warning' ? 'bg-amber-50' :
+                    'bg-blue-50'
+                  }`}
+                >
+                  <div className="flex-shrink-0 mt-0.5">
+                    {item.level === 'positive' ? (
+                      <svg className="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    ) : item.level === 'warning' ? (
+                      <svg className="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+                      </svg>
+                    )}
+                  </div>
+                  <p className={`text-sm ${
+                    item.level === 'positive' ? 'text-green-800' :
+                    item.level === 'warning' ? 'text-amber-800' :
+                    'text-blue-800'
+                  }`}>
+                    {item.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gradient-to-br from-slate-50 to-pink-50 rounded-xl">
+              <svg className="w-12 h-12 text-pink-200 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+              </svg>
+              <p className="text-slate-500 text-sm font-medium">충분한 데이터가 없습니다</p>
+              <p className="text-slate-400 text-xs mt-1 max-w-xs mx-auto">
+                주문 데이터가 쌓이면 자동으로 인사이트가 표시됩니다.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
