@@ -63,6 +63,10 @@ const SignageContentHubPage = lazy(() => import('@/pages/signage/ContentHubPage'
 const SignagePlaylistDetailPage = lazy(() => import('@/pages/signage/PlaylistDetailPage'));
 const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPage'));
 
+// Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
+import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/operator-core';
+const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
+
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
@@ -139,6 +143,20 @@ function RoleBasedHome() {
   }, [user, navigate]);
 
   return <HomePage />;
+}
+
+/** Store Dashboard Layout Wrapper - connects auth context to shared layout */
+function StoreLayoutWrapper() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <StoreDashboardLayout
+      config={COSMETICS_STORE_CONFIG}
+      userName={user?.name || user?.email || ''}
+      homeLink="/"
+      onLogout={() => { logout(); navigate('/'); }}
+    />
+  );
 }
 
 // App Routes
@@ -246,6 +264,25 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
         <Route path="store-cockpit" element={<StoreCockpitPage />} />
+      </Route>
+
+      {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
+      <Route
+        path="store"
+        element={
+          <ProtectedRoute allowedRoles={['operator']}>
+            <StoreLayoutWrapper />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<StoreOverviewPage />} />
+        <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
+        <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
+        <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
+        <Route path="settlement" element={<StorePlaceholderPage title="정산" />} />
+        <Route path="content" element={<StorePlaceholderPage title="콘텐츠/사이니지" />} />
+        <Route path="services" element={<StorePlaceholderPage title="서비스 관리" />} />
+        <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 
       {/* 404 */}

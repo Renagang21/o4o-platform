@@ -9,6 +9,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * 선행 조건: Phase 2-A (20260214000001) 완료 후 실행
  *
  * 안전 장치:
+ * - 테이블이 존재하지 않으면 SKIP
  * - NULL이 존재하면 NOT NULL 적용 스킵 (로그 경고)
  * - 중복이 존재하면 UNIQUE 적용 스킵 (로그 경고)
  */
@@ -16,12 +17,8 @@ export class AddBusinessNumberConstraints1708300000002 implements MigrationInter
   name = 'AddBusinessNumberConstraints1708300000002';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // ── glycopharm_pharmacies ──
     await this.addConstraints(queryRunner, 'glycopharm_pharmacies', 'idx_glycopharm_business_number');
-
-    // ── glucoseview_pharmacies ──
     await this.addConstraints(queryRunner, 'glucoseview_pharmacies', 'idx_glucoseview_business_number');
-
     console.log('[BN-Constraints] Phase 2-B complete.');
   }
 
@@ -30,6 +27,12 @@ export class AddBusinessNumberConstraints1708300000002 implements MigrationInter
     tableName: string,
     indexName: string,
   ): Promise<void> {
+    // 테이블 존재 여부 확인
+    if (!(await this.tableExists(queryRunner, tableName))) {
+      console.log(`[BN-Constraints] SKIP: ${tableName} does not exist yet`);
+      return;
+    }
+
     // NULL 검사
     const nullCheck = await queryRunner.query(`
       SELECT COUNT(*) AS cnt FROM ${tableName} WHERE business_number IS NULL
@@ -73,18 +76,30 @@ export class AddBusinessNumberConstraints1708300000002 implements MigrationInter
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // 인덱스 제거
     await queryRunner.query(`DROP INDEX IF EXISTS idx_glycopharm_business_number`);
     await queryRunner.query(`DROP INDEX IF EXISTS idx_glucoseview_business_number`);
 
-    // NOT NULL 해제
-    await queryRunner.query(`
-      ALTER TABLE glycopharm_pharmacies
-      ALTER COLUMN business_number DROP NOT NULL
-    `);
-    await queryRunner.query(`
-      ALTER TABLE glucoseview_pharmacies
-      ALTER COLUMN business_number DROP NOT NULL
-    `);
+    if (await this.tableExists(queryRunner, 'glycopharm_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glycopharm_pharmacies
+        ALTER COLUMN business_number DROP NOT NULL
+      `);
+    }
+    if (await this.tableExists(queryRunner, 'glucoseview_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glucoseview_pharmacies
+        ALTER COLUMN business_number DROP NOT NULL
+      `);
+    }
+  }
+
+  private async tableExists(queryRunner: QueryRunner, tableName: string): Promise<boolean> {
+    const result = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = $1
+      ) AS exists
+    `, [tableName]);
+    return result[0].exists;
   }
 }

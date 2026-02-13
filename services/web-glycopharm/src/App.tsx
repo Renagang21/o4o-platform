@@ -99,6 +99,10 @@ const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage')); // Pha
 const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 
+// Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
+import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } from '@o4o/operator-core';
+const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
+
 // Pharmacy Store Apply
 const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
 
@@ -218,6 +222,20 @@ function RoleBasedHome() {
   }, [user, navigate]);
 
   return <HomePage />;
+}
+
+/** Store Dashboard Layout Wrapper - connects auth context to shared layout */
+function StoreLayoutWrapper() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <StoreDashboardLayout
+      config={GLYCOPHARM_STORE_CONFIG}
+      userName={user?.name || user?.email || ''}
+      homeLink="/"
+      onLogout={() => { logout(); navigate('/'); }}
+    />
+  );
 }
 
 // App Routes
@@ -435,6 +453,24 @@ function AppRoutes() {
 
       {/* QR Landing (Phase 2-B: standalone public page, no layout) */}
       <Route path="qr/:pharmacyId" element={<QrLandingPage />} />
+
+      {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
+      <Route
+        path="store"
+        element={
+          <ProtectedRoute allowedRoles={['pharmacy']}>
+            <StoreLayoutWrapper />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<StoreOverviewPage />} />
+        <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
+        <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
+        <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
+        <Route path="content" element={<StorePlaceholderPage title="콘텐츠/사이니지" />} />
+        <Route path="services" element={<StorePlaceholderPage title="서비스 관리" />} />
+        <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
+      </Route>
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />

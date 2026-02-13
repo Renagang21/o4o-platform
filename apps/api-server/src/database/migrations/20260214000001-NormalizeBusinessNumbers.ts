@@ -6,100 +6,89 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * 사업자번호 정규화 (하이픈 제거 + 컬럼 길이 통일)
  * 대상: glycopharm_pharmacies, glucoseview_pharmacies
  *
- * 이 마이그레이션은 데이터를 정규화만 하고 제약조건은 추가하지 않음.
- * 제약조건은 Phase 2-B (20260214000002) 에서 처리.
+ * 테이블이 존재하지 않으면 SKIP (glucoseview_pharmacies는 아직 미생성 가능)
  */
 export class NormalizeBusinessNumbers1708300000001 implements MigrationInterface {
   name = 'NormalizeBusinessNumbers1708300000001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // ── Step 1: 현재 상태 로깅 ──
-    const glycopharmStats = await queryRunner.query(`
+    await this.normalizeTable(queryRunner, 'glycopharm_pharmacies');
+    await this.normalizeTable(queryRunner, 'glucoseview_pharmacies');
+    console.log('[BN-Normalize] Phase 2-A complete.');
+  }
+
+  private async normalizeTable(
+    queryRunner: QueryRunner,
+    tableName: string,
+  ): Promise<void> {
+    // 테이블 존재 여부 확인
+    if (!(await this.tableExists(queryRunner, tableName))) {
+      console.log(`[BN-Normalize] SKIP: ${tableName} does not exist yet`);
+      return;
+    }
+
+    // Step 1: 현재 상태 로깅
+    const stats = await queryRunner.query(`
       SELECT
         COUNT(*) AS total,
         COUNT(*) FILTER (WHERE business_number IS NULL) AS null_count,
         COUNT(*) FILTER (WHERE business_number IS NOT NULL
           AND regexp_replace(business_number, '[^0-9]', '', 'g') != business_number) AS needs_normalize
-      FROM glycopharm_pharmacies
+      FROM ${tableName}
     `);
-    console.log('[BN-Normalize] glycopharm_pharmacies stats:', glycopharmStats[0]);
+    console.log(`[BN-Normalize] ${tableName} stats:`, stats[0]);
 
-    const glucoseviewStats = await queryRunner.query(`
-      SELECT
-        COUNT(*) AS total,
-        COUNT(*) FILTER (WHERE business_number IS NULL) AS null_count,
-        COUNT(*) FILTER (WHERE business_number IS NOT NULL
-          AND regexp_replace(business_number, '[^0-9]', '', 'g') != business_number) AS needs_normalize
-      FROM glucoseview_pharmacies
-    `);
-    console.log('[BN-Normalize] glucoseview_pharmacies stats:', glucoseviewStats[0]);
-
-    // ── Step 2: 하이픈/공백 제거 (숫자만 남김) ──
+    // Step 2: 하이픈/공백 제거 (숫자만 남김)
     await queryRunner.query(`
-      UPDATE glycopharm_pharmacies
+      UPDATE ${tableName}
       SET business_number = regexp_replace(business_number, '[^0-9]', '', 'g')
       WHERE business_number IS NOT NULL
         AND regexp_replace(business_number, '[^0-9]', '', 'g') != business_number
     `);
 
+    // Step 3: 컬럼 타입 통일 (varchar(20))
     await queryRunner.query(`
-      UPDATE glucoseview_pharmacies
-      SET business_number = regexp_replace(business_number, '[^0-9]', '', 'g')
-      WHERE business_number IS NOT NULL
-        AND regexp_replace(business_number, '[^0-9]', '', 'g') != business_number
-    `);
-
-    // ── Step 3: 컬럼 타입 통일 (varchar(20)) ──
-    await queryRunner.query(`
-      ALTER TABLE glycopharm_pharmacies
+      ALTER TABLE ${tableName}
       ALTER COLUMN business_number TYPE varchar(20)
     `);
 
-    await queryRunner.query(`
-      ALTER TABLE glucoseview_pharmacies
-      ALTER COLUMN business_number TYPE varchar(20)
-    `);
-
-    // ── Step 4: 정규화 후 중복 검사 (로깅만) ──
-    const glycopharmDups = await queryRunner.query(`
+    // Step 4: 정규화 후 중복 검사 (로깅만)
+    const dups = await queryRunner.query(`
       SELECT business_number, COUNT(*) AS cnt
-      FROM glycopharm_pharmacies
+      FROM ${tableName}
       WHERE business_number IS NOT NULL
       GROUP BY business_number
       HAVING COUNT(*) > 1
     `);
-    if (glycopharmDups.length > 0) {
-      console.warn('[BN-Normalize] WARNING: glycopharm_pharmacies has duplicates:', glycopharmDups);
+    if (dups.length > 0) {
+      console.warn(`[BN-Normalize] WARNING: ${tableName} has duplicates:`, dups);
     } else {
-      console.log('[BN-Normalize] glycopharm_pharmacies: no duplicates found');
+      console.log(`[BN-Normalize] ${tableName}: no duplicates found`);
     }
-
-    const glucoseviewDups = await queryRunner.query(`
-      SELECT business_number, COUNT(*) AS cnt
-      FROM glucoseview_pharmacies
-      WHERE business_number IS NOT NULL
-      GROUP BY business_number
-      HAVING COUNT(*) > 1
-    `);
-    if (glucoseviewDups.length > 0) {
-      console.warn('[BN-Normalize] WARNING: glucoseview_pharmacies has duplicates:', glucoseviewDups);
-    } else {
-      console.log('[BN-Normalize] glucoseview_pharmacies: no duplicates found');
-    }
-
-    console.log('[BN-Normalize] Phase 2-A complete. Data normalized to digits-only varchar(20).');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // 롤백: 컬럼 길이만 원래대로. 하이픈은 복원 불가.
-    await queryRunner.query(`
-      ALTER TABLE glycopharm_pharmacies
-      ALTER COLUMN business_number TYPE varchar(50)
-    `);
+    if (await this.tableExists(queryRunner, 'glycopharm_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glycopharm_pharmacies
+        ALTER COLUMN business_number TYPE varchar(50)
+      `);
+    }
+    if (await this.tableExists(queryRunner, 'glucoseview_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glucoseview_pharmacies
+        ALTER COLUMN business_number TYPE varchar(100)
+      `);
+    }
+  }
 
-    await queryRunner.query(`
-      ALTER TABLE glucoseview_pharmacies
-      ALTER COLUMN business_number TYPE varchar(100)
-    `);
+  private async tableExists(queryRunner: QueryRunner, tableName: string): Promise<boolean> {
+    const result = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = $1
+      ) AS exists
+    `, [tableName]);
+    return result[0].exists;
   }
 }

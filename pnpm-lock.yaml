@@ -3458,6 +3458,9 @@ importers:
 
   services/web-glucoseview:
     dependencies:
+      '@o4o/operator-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-core
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)

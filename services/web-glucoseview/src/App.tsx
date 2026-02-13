@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginModalProvider } from './contexts/LoginModalContext';
 import Layout from './components/Layout';
@@ -35,6 +35,10 @@ import PartnerApplyPage from './pages/partners/ApplyPage';
 
 // Operator Layout
 import OperatorLayout from './components/layouts/OperatorLayout';
+
+// Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
+import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } from '@o4o/operator-core';
+import StoreOverviewPage from './pages/store/StoreOverviewPage';
 
 import './index.css';
 
@@ -92,6 +96,20 @@ function RoleProtectedRoute({ children, allowedRoles }: { children: React.ReactN
   }
 
   return <>{children}</>;
+}
+
+/** Store Dashboard Layout Wrapper - connects auth context to shared layout */
+function StoreLayoutWrapper() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <StoreDashboardLayout
+      config={GLUCOSEVIEW_STORE_CONFIG}
+      userName={user?.displayName || user?.name || ''}
+      homeLink="/"
+      onLogout={() => { logout(); navigate('/'); }}
+    />
+  );
 }
 
 function AppRoutes() {
@@ -159,6 +177,21 @@ function AppRoutes() {
         <Route path="content" element={<PartnerContentPage />} />
         <Route path="events" element={<PartnerEventsPage />} />
         <Route path="status" element={<PartnerStatusPage />} />
+      </Route>
+
+      {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
+      <Route
+        path="/store"
+        element={
+          <ProtectedRoute>
+            <StoreLayoutWrapper />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<StoreOverviewPage />} />
+        <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
+        <Route path="services" element={<StorePlaceholderPage title="서비스 관리" />} />
+        <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 
       {/* 메인 레이아웃 (홈은 공개, 나머지는 보호) */}

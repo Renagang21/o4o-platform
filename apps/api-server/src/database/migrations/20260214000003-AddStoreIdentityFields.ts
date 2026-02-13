@@ -10,58 +10,65 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * - hero_image: varchar(2000) nullable
  *
  * 대상: glycopharm_pharmacies, glucoseview_pharmacies, cosmetics.cosmetics_stores
- * PhysicalStore 제외 (link hub 역할 유지)
- *
- * 비파괴적: 모든 컬럼 nullable, 기존 데이터/기능 영향 없음
+ * 테이블이 존재하지 않으면 SKIP
  */
 export class AddStoreIdentityFields1708300000003 implements MigrationInterface {
   name = 'AddStoreIdentityFields1708300000003';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // ── GlycopharmPharmacy ──
-    await queryRunner.query(`
-      ALTER TABLE glycopharm_pharmacies
-      ADD COLUMN IF NOT EXISTS slug varchar(120),
-      ADD COLUMN IF NOT EXISTS description text,
-      ADD COLUMN IF NOT EXISTS logo varchar(2000),
-      ADD COLUMN IF NOT EXISTS hero_image varchar(2000)
-    `);
-    await queryRunner.query(`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_glycopharm_slug
-      ON glycopharm_pharmacies (slug) WHERE slug IS NOT NULL
-    `);
+    if (await this.tableExists(queryRunner, 'glycopharm_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glycopharm_pharmacies
+        ADD COLUMN IF NOT EXISTS slug varchar(120),
+        ADD COLUMN IF NOT EXISTS description text,
+        ADD COLUMN IF NOT EXISTS logo varchar(2000),
+        ADD COLUMN IF NOT EXISTS hero_image varchar(2000)
+      `);
+      await queryRunner.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_glycopharm_slug
+        ON glycopharm_pharmacies (slug) WHERE slug IS NOT NULL
+      `);
+      await this.backfillSlugs(queryRunner, 'glycopharm_pharmacies', 'name');
+    } else {
+      console.log('[StoreIdentity] SKIP: glycopharm_pharmacies does not exist yet');
+    }
 
     // ── GlucoseViewPharmacy ──
-    await queryRunner.query(`
-      ALTER TABLE glucoseview_pharmacies
-      ADD COLUMN IF NOT EXISTS slug varchar(120),
-      ADD COLUMN IF NOT EXISTS description text,
-      ADD COLUMN IF NOT EXISTS logo varchar(2000),
-      ADD COLUMN IF NOT EXISTS hero_image varchar(2000)
-    `);
-    await queryRunner.query(`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_glucoseview_slug
-      ON glucoseview_pharmacies (slug) WHERE slug IS NOT NULL
-    `);
+    if (await this.tableExists(queryRunner, 'glucoseview_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glucoseview_pharmacies
+        ADD COLUMN IF NOT EXISTS slug varchar(120),
+        ADD COLUMN IF NOT EXISTS description text,
+        ADD COLUMN IF NOT EXISTS logo varchar(2000),
+        ADD COLUMN IF NOT EXISTS hero_image varchar(2000)
+      `);
+      await queryRunner.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_glucoseview_slug
+        ON glucoseview_pharmacies (slug) WHERE slug IS NOT NULL
+      `);
+      await this.backfillSlugs(queryRunner, 'glucoseview_pharmacies', 'name');
+    } else {
+      console.log('[StoreIdentity] SKIP: glucoseview_pharmacies does not exist yet');
+    }
 
     // ── CosmeticsStore (cosmetics schema) ──
-    await queryRunner.query(`
-      ALTER TABLE cosmetics.cosmetics_stores
-      ADD COLUMN IF NOT EXISTS slug varchar(120),
-      ADD COLUMN IF NOT EXISTS description text,
-      ADD COLUMN IF NOT EXISTS logo varchar(2000),
-      ADD COLUMN IF NOT EXISTS hero_image varchar(2000)
-    `);
-    await queryRunner.query(`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_cosmetics_store_slug
-      ON cosmetics.cosmetics_stores (slug) WHERE slug IS NOT NULL
-    `);
-
-    // ── Phase 3: 기존 데이터 백필 (name → slug) ──
-    // 한글/영문 모두 처리: 공백→하이픈, 특수문자 제거, 소문자화
-    await this.backfillSlugs(queryRunner, 'glycopharm_pharmacies', 'name');
-    await this.backfillSlugs(queryRunner, 'glucoseview_pharmacies', 'name');
-    await this.backfillSlugs(queryRunner, 'cosmetics.cosmetics_stores', 'name');
+    if (await this.tableExists(queryRunner, 'cosmetics_stores', 'cosmetics')) {
+      await queryRunner.query(`
+        ALTER TABLE cosmetics.cosmetics_stores
+        ADD COLUMN IF NOT EXISTS slug varchar(120),
+        ADD COLUMN IF NOT EXISTS description text,
+        ADD COLUMN IF NOT EXISTS logo varchar(2000),
+        ADD COLUMN IF NOT EXISTS hero_image varchar(2000)
+      `);
+      await queryRunner.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_cosmetics_store_slug
+        ON cosmetics.cosmetics_stores (slug) WHERE slug IS NOT NULL
+      `);
+      await this.backfillSlugs(queryRunner, 'cosmetics.cosmetics_stores', 'name');
+    } else {
+      console.log('[StoreIdentity] SKIP: cosmetics.cosmetics_stores does not exist yet');
+    }
 
     console.log('[StoreIdentity] Identity fields added and slugs backfilled.');
   }
@@ -71,7 +78,6 @@ export class AddStoreIdentityFields1708300000003 implements MigrationInterface {
     tableName: string,
     nameColumn: string,
   ): Promise<void> {
-    // slug가 NULL인 레코드만 백필
     const rows = await queryRunner.query(`
       SELECT id, ${nameColumn} AS store_name
       FROM ${tableName}
@@ -85,7 +91,6 @@ export class AddStoreIdentityFields1708300000003 implements MigrationInterface {
 
     const usedSlugs = new Set<string>();
 
-    // 이미 존재하는 slug 수집
     const existing = await queryRunner.query(`
       SELECT slug FROM ${tableName} WHERE slug IS NOT NULL
     `);
@@ -96,7 +101,7 @@ export class AddStoreIdentityFields1708300000003 implements MigrationInterface {
     for (const row of rows) {
       let baseSlug = this.slugify(row.store_name);
       if (!baseSlug) {
-        baseSlug = row.id.slice(0, 8); // fallback to UUID prefix
+        baseSlug = row.id.slice(0, 8);
       }
 
       let slug = baseSlug;
@@ -129,34 +134,52 @@ export class AddStoreIdentityFields1708300000003 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // 인덱스 제거
     await queryRunner.query(`DROP INDEX IF EXISTS idx_glycopharm_slug`);
     await queryRunner.query(`DROP INDEX IF EXISTS idx_glucoseview_slug`);
     await queryRunner.query(`DROP INDEX IF EXISTS idx_cosmetics_store_slug`);
 
-    // 컬럼 제거
-    await queryRunner.query(`
-      ALTER TABLE glycopharm_pharmacies
-      DROP COLUMN IF EXISTS slug,
-      DROP COLUMN IF EXISTS description,
-      DROP COLUMN IF EXISTS logo,
-      DROP COLUMN IF EXISTS hero_image
-    `);
+    if (await this.tableExists(queryRunner, 'glycopharm_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glycopharm_pharmacies
+        DROP COLUMN IF EXISTS slug,
+        DROP COLUMN IF EXISTS description,
+        DROP COLUMN IF EXISTS logo,
+        DROP COLUMN IF EXISTS hero_image
+      `);
+    }
 
-    await queryRunner.query(`
-      ALTER TABLE glucoseview_pharmacies
-      DROP COLUMN IF EXISTS slug,
-      DROP COLUMN IF EXISTS description,
-      DROP COLUMN IF EXISTS logo,
-      DROP COLUMN IF EXISTS hero_image
-    `);
+    if (await this.tableExists(queryRunner, 'glucoseview_pharmacies')) {
+      await queryRunner.query(`
+        ALTER TABLE glucoseview_pharmacies
+        DROP COLUMN IF EXISTS slug,
+        DROP COLUMN IF EXISTS description,
+        DROP COLUMN IF EXISTS logo,
+        DROP COLUMN IF EXISTS hero_image
+      `);
+    }
 
-    await queryRunner.query(`
-      ALTER TABLE cosmetics.cosmetics_stores
-      DROP COLUMN IF EXISTS slug,
-      DROP COLUMN IF EXISTS description,
-      DROP COLUMN IF EXISTS logo,
-      DROP COLUMN IF EXISTS hero_image
-    `);
+    if (await this.tableExists(queryRunner, 'cosmetics_stores', 'cosmetics')) {
+      await queryRunner.query(`
+        ALTER TABLE cosmetics.cosmetics_stores
+        DROP COLUMN IF EXISTS slug,
+        DROP COLUMN IF EXISTS description,
+        DROP COLUMN IF EXISTS logo,
+        DROP COLUMN IF EXISTS hero_image
+      `);
+    }
+  }
+
+  private async tableExists(
+    queryRunner: QueryRunner,
+    tableName: string,
+    schema = 'public',
+  ): Promise<boolean> {
+    const result = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = $1 AND table_name = $2
+      ) AS exists
+    `, [schema, tableName]);
+    return result[0].exists;
   }
 }
