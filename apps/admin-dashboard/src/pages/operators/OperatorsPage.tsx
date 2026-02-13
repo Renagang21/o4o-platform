@@ -98,17 +98,21 @@ const OperatorsPage: React.FC = () => {
       const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
 
       if (Array.isArray(userData)) {
-        // 모든 사용자 표시 (레거시 역할 정리 가능하도록)
+        const OPERATOR_ROLE_KEYWORDS = ['admin', 'operator', 'super_admin', 'district', 'branch'];
+        const isOperatorRole = (role: string) =>
+          OPERATOR_ROLE_KEYWORDS.some(kw => role.toLowerCase().includes(kw));
+
         const operatorUsers = userData
           .map((user: any) => ({
             id: user.id || user._id,
             name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown',
             email: user.email || '',
             roles: user.roles || [user.role].filter(Boolean),
-            status: user.isActive === false ? 'inactive' : 'active',
+            status: (user.isActive === false ? 'inactive' : 'active') as 'active' | 'inactive',
             createdAt: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : '',
             lastLogin: user.lastLoginAt ? new Date(user.lastLoginAt).toISOString().split('T')[0] : undefined,
-          }));
+          }))
+          .filter((user: any) => user.roles.some((r: string) => isOperatorRole(r)));
 
         setOperators(operatorUsers);
       }
