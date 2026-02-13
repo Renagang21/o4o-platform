@@ -27,3 +27,11 @@ export { StatusDot } from './components/StatusDot';
 
 // Utils
 export { timeAgo } from './utils';
+
+// Signal Engine (WO-OPERATOR-SIGNAL-CORE-V1)
+export {
+  computeOverallSignal,
+  computeForumSignal,
+  computeContentSignageSignal,
+  sortAndLimitActivity,
+} from './signal';

@@ -2,71 +2,23 @@
  * KPA Operator Config
  *
  * OperatorSummary → OperatorDashboardConfig 변환.
- * 기존 KpaOperatorDashboard / BranchOperatorDashboard의
- * signal derivation 로직을 통합.
+ * WO-OPERATOR-SIGNAL-CORE-V1: 공통 signal 엔진 사용.
  */
 
 import { MessageSquarePlus, Monitor, Users } from 'lucide-react';
 import type {
-  SignalStatus,
-  OperatorSignal,
   OperatorHeroConfig,
   OperatorSignalCardConfig,
   OperatorActivityItem,
   OperatorDashboardConfig,
 } from '@o4o/operator-core';
+import {
+  computeOverallSignal,
+  computeForumSignal,
+  computeContentSignageSignal,
+  sortAndLimitActivity,
+} from '@o4o/operator-core';
 import type { OperatorSummary } from '../../api/operator';
-
-// ─── Signal derivation (pure functions) ───
-
-function getOverallStatus(
-  content: OperatorSummary['content'] | undefined,
-  signage: OperatorSummary['signage'] | undefined,
-  forum: OperatorSummary['forum'] | undefined,
-): SignalStatus {
-  const areas = [
-    (content?.totalPublished || 0) > 0,
-    (signage?.totalMedia || 0) > 0 || (signage?.totalPlaylists || 0) > 0,
-    (forum?.totalPosts || 0) > 0,
-  ];
-  const active = areas.filter(Boolean).length;
-  if (active === 3) return 'good';
-  if (active >= 1) return 'warning';
-  return 'alert';
-}
-
-function getForumSignal(forum: OperatorSummary['forum'] | undefined): OperatorSignal {
-  if (!forum || forum.totalPosts === 0) {
-    return { status: 'alert', message: '포럼 게시글 없음 — 초기 상태' };
-  }
-  if (!forum.recentPosts || forum.recentPosts.length === 0) {
-    return { status: 'warning', message: `게시글 ${forum.totalPosts}개 · 최근 활동 없음` };
-  }
-  return { status: 'good', message: `게시글 ${forum.totalPosts}개 활성` };
-}
-
-function getContentSignal(
-  content: OperatorSummary['content'] | undefined,
-  signage: OperatorSummary['signage'] | undefined,
-): OperatorSignal {
-  const totalContent = content?.totalPublished || 0;
-  const totalMedia = signage?.totalMedia || 0;
-  const totalPlaylists = signage?.totalPlaylists || 0;
-
-  if (totalContent === 0 && totalMedia === 0) {
-    return { status: 'alert', message: '등록된 콘텐츠 없음' };
-  }
-  if (totalContent === 0) {
-    return { status: 'warning', message: `미디어 ${totalMedia}개 · 공지/뉴스 없음` };
-  }
-  if (totalPlaylists === 0 && totalMedia > 0) {
-    return { status: 'warning', message: `콘텐츠 ${totalContent}개 · 플레이리스트 미설정` };
-  }
-  return {
-    status: 'good',
-    message: `콘텐츠 ${totalContent}개 · 미디어 ${totalMedia}개 · 재생목록 ${totalPlaylists}개`,
-  };
-}
 
 // ─── Activity feed builder ───
 
@@ -92,8 +44,7 @@ function buildActivityFeed(s: OperatorSummary): OperatorActivityItem[] {
     });
   }
 
-  items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  return items.slice(0, 5);
+  return sortAndLimitActivity(items);
 }
 
 // ─── Config builders ───
@@ -103,9 +54,21 @@ export function buildKpaOperatorConfig(summary: OperatorSummary | null): Operato
   if (!summary) return null;
 
   const { content, signage, forum } = summary;
-  const forumSignal = getForumSignal(forum);
-  const contentSignal = getContentSignal(content, signage);
-  const overall = getOverallStatus(content, signage, forum);
+
+  const forumSignal = computeForumSignal(
+    forum?.totalPosts || 0,
+    forum?.recentPosts?.length || 0,
+  );
+  const contentSignal = computeContentSignageSignal(
+    content?.totalPublished || 0,
+    signage?.totalMedia || 0,
+    signage?.totalPlaylists || 0,
+  );
+  const overall = computeOverallSignal([
+    (content?.totalPublished || 0) > 0,
+    (signage?.totalMedia || 0) > 0 || (signage?.totalPlaylists || 0) > 0,
+    (forum?.totalPosts || 0) > 0,
+  ]);
 
   const hero: OperatorHeroConfig = {
     status: overall,
@@ -162,9 +125,21 @@ export function buildBranchOperatorConfig(summary: OperatorSummary | null): Oper
   if (!summary) return null;
 
   const { content, signage, forum } = summary;
-  const forumSignal = getForumSignal(forum);
-  const contentSignal = getContentSignal(content, signage);
-  const overall = getOverallStatus(content, signage, forum);
+
+  const forumSignal = computeForumSignal(
+    forum?.totalPosts || 0,
+    forum?.recentPosts?.length || 0,
+  );
+  const contentSignal = computeContentSignageSignal(
+    content?.totalPublished || 0,
+    signage?.totalMedia || 0,
+    signage?.totalPlaylists || 0,
+  );
+  const overall = computeOverallSignal([
+    (content?.totalPublished || 0) > 0,
+    (signage?.totalMedia || 0) > 0 || (signage?.totalPlaylists || 0) > 0,
+    (forum?.totalPosts || 0) > 0,
+  ]);
 
   const hero: OperatorHeroConfig = {
     status: overall,

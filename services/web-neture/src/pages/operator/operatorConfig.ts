@@ -2,54 +2,26 @@
  * Neture Operator Config
  *
  * AdminDashboardSummary → OperatorDashboardConfig 변환.
- * 기존 NetureOperatorDashboard의 signal derivation 로직을 통합.
+ * WO-OPERATOR-SIGNAL-CORE-V1: 공통 signal 엔진 사용.
  */
 
 import { Monitor, Building2, MessageSquarePlus } from 'lucide-react';
 import type {
-  SignalStatus,
   OperatorSignal,
   OperatorHeroConfig,
   OperatorSignalCardConfig,
   OperatorActivityItem,
   OperatorDashboardConfig,
 } from '@o4o/operator-core';
+import {
+  computeOverallSignal,
+  computeForumSignal,
+  computeContentSignageSignal,
+  sortAndLimitActivity,
+} from '@o4o/operator-core';
 import type { AdminDashboardSummary } from '../../lib/api';
 
-// ─── Signal derivation (pure functions) ───
-
-function getOverallStatus(data: AdminDashboardSummary): SignalStatus {
-  const areas = [
-    (data.content?.totalPublished || 0) > 0 ||
-      (data.signage?.totalMedia || 0) > 0,
-    data.stats.activeSuppliers > 0,
-    (data.forum?.totalPosts || 0) > 0,
-  ];
-  const active = areas.filter(Boolean).length;
-  if (active === 3) return 'good';
-  if (active >= 1) return 'warning';
-  return 'alert';
-}
-
-function getContentSignal(data: AdminDashboardSummary): OperatorSignal {
-  const totalContent = data.content?.totalPublished || 0;
-  const totalMedia = data.signage?.totalMedia || 0;
-  const totalPlaylists = data.signage?.totalPlaylists || 0;
-
-  if (totalContent === 0 && totalMedia === 0) {
-    return { status: 'alert', message: '등록된 콘텐츠 없음' };
-  }
-  if (totalContent === 0) {
-    return { status: 'warning', message: `미디어 ${totalMedia}개 · 공지/뉴스 없음` };
-  }
-  if (totalPlaylists === 0 && totalMedia > 0) {
-    return { status: 'warning', message: `콘텐츠 ${totalContent}개 · 플레이리스트 미설정` };
-  }
-  return {
-    status: 'good',
-    message: `콘텐츠 ${totalContent}개 · 미디어 ${totalMedia}개 · 재생목록 ${totalPlaylists}개`,
-  };
-}
+// ─── Neture-specific signal (파트너) ───
 
 function getPartnerSignal(data: AdminDashboardSummary): OperatorSignal {
   const { stats } = data;
@@ -68,19 +40,6 @@ function getPartnerSignal(data: AdminDashboardSummary): OperatorSignal {
     status: 'good',
     message: `공급자 ${stats.activeSuppliers}개 활성`,
   };
-}
-
-function getForumSignal(data: AdminDashboardSummary): OperatorSignal {
-  const totalPosts = data.forum?.totalPosts || 0;
-  const recentPosts = data.forum?.recentPosts || [];
-
-  if (totalPosts === 0) {
-    return { status: 'alert', message: '포럼 게시글 없음 — 초기 상태' };
-  }
-  if (recentPosts.length === 0) {
-    return { status: 'warning', message: `게시글 ${totalPosts}개 · 최근 활동 없음` };
-  }
-  return { status: 'good', message: `게시글 ${totalPosts}개 활성` };
 }
 
 // ─── Activity feed builder ───
@@ -116,8 +75,7 @@ function buildActivityFeed(data: AdminDashboardSummary): OperatorActivityItem[] 
     });
   }
 
-  items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  return items.slice(0, 5);
+  return sortAndLimitActivity(items);
 }
 
 // ─── Config builder ───
@@ -128,10 +86,22 @@ export function buildNetureOperatorConfig(
 ): OperatorDashboardConfig | null {
   if (!summary) return null;
 
-  const contentSignal = getContentSignal(summary);
+  const contentSignal = computeContentSignageSignal(
+    summary.content?.totalPublished || 0,
+    summary.signage?.totalMedia || 0,
+    summary.signage?.totalPlaylists || 0,
+  );
   const partnerSignal = getPartnerSignal(summary);
-  const forumSignal = getForumSignal(summary);
-  const overall = getOverallStatus(summary);
+  const forumSignal = computeForumSignal(
+    summary.forum?.totalPosts || 0,
+    summary.forum?.recentPosts?.length || 0,
+  );
+  const overall = computeOverallSignal([
+    (summary.content?.totalPublished || 0) > 0 ||
+      (summary.signage?.totalMedia || 0) > 0,
+    summary.stats.activeSuppliers > 0,
+    (summary.forum?.totalPosts || 0) > 0,
+  ]);
 
   const hero: OperatorHeroConfig = {
     status: overall,

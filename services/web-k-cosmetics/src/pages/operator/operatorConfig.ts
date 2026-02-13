@@ -2,35 +2,23 @@
  * K-Cosmetics Operator Config
  *
  * OperatorDashboardSummary → OperatorDashboardConfig 변환.
- * 기존 KCosmeticsOperatorDashboard의 signal derivation 로직을 통합.
+ * WO-OPERATOR-SIGNAL-CORE-V1: 공통 signal 엔진 사용.
  *
  * WO-OPERATOR-CORE-PHASE4-KCOSMETICS
  */
 
 import { Store, ShoppingCart, Users } from 'lucide-react';
 import type {
-  SignalStatus,
   OperatorSignal,
   OperatorHeroConfig,
   OperatorSignalCardConfig,
   OperatorActivityItem,
   OperatorDashboardConfig,
 } from '@o4o/operator-core';
+import { computeOverallSignal, sortAndLimitActivity } from '@o4o/operator-core';
 import type { OperatorDashboardSummary } from '@/services/operatorApi';
 
-// ─── Signal derivation (pure functions) ───
-
-function getOverallStatus(data: OperatorDashboardSummary): SignalStatus {
-  const areas = [
-    data.stats.totalStores > 0,
-    data.stats.activeOrders > 0 || (data.recentOrders?.length || 0) > 0,
-    data.stats.newSignups > 0 || data.stats.totalStores > 0,
-  ];
-  const active = areas.filter(Boolean).length;
-  if (active === 3) return 'good';
-  if (active >= 1) return 'warning';
-  return 'alert';
-}
+// ─── K-Cosmetics-specific signals ───
 
 function getStoreSignal(data: OperatorDashboardSummary): OperatorSignal {
   const { totalStores } = data.stats;
@@ -88,8 +76,7 @@ function buildActivityFeed(data: OperatorDashboardSummary): OperatorActivityItem
     });
   }
 
-  items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  return items.slice(0, 5);
+  return sortAndLimitActivity(items);
 }
 
 // ─── Config builder ───
@@ -103,7 +90,11 @@ export function buildKCosmeticsOperatorConfig(
   const storeSignal = getStoreSignal(summary);
   const orderSignal = getOrderSignal(summary);
   const operatorSignal = getOperatorSignal();
-  const overall = getOverallStatus(summary);
+  const overall = computeOverallSignal([
+    summary.stats.totalStores > 0,
+    summary.stats.activeOrders > 0 || (summary.recentOrders?.length || 0) > 0,
+    summary.stats.newSignups > 0 || summary.stats.totalStores > 0,
+  ]);
 
   const hero: OperatorHeroConfig = {
     status: overall,

@@ -2,7 +2,7 @@
  * GlycoPharm Operator Config
  *
  * OperatorDashboardData → OperatorDashboardConfig 변환.
- * 기존 GlycoPharmOperatorDashboard의 signal derivation 로직을 통합.
+ * WO-OPERATOR-SIGNAL-CORE-V1: 공통 signal 엔진 사용.
  *
  * 특이사항:
  *  - activityFeed 미사용 (GlycoPharm은 Status Feed = KPI 지표 목록 사용)
@@ -11,27 +11,15 @@
 
 import { ShoppingBag, MessageSquare, Monitor } from 'lucide-react';
 import type {
-  SignalStatus,
   OperatorSignal,
   OperatorHeroConfig,
   OperatorSignalCardConfig,
   OperatorDashboardConfig,
 } from '@o4o/operator-core';
+import { computeOverallSignal } from '@o4o/operator-core';
 import type { OperatorDashboardData } from '@/api/glycopharm';
 
-// ─── Signal derivation (pure functions) ───
-
-function getOverallStatus(data: OperatorDashboardData): SignalStatus {
-  const areas = [
-    data.serviceStatus.activePharmacies > 0,
-    data.forumStatus.totalPosts > 0,
-    data.contentStatus.hero.total > 0 || data.contentStatus.featured.total > 0,
-  ];
-  const active = areas.filter(Boolean).length;
-  if (active === 3) return 'good';
-  if (active >= 1) return 'warning';
-  return 'alert';
-}
+// ─── GlycoPharm-specific signals ───
 
 function getStoreSignal(data: OperatorDashboardData): OperatorSignal {
   const { storeStatus, serviceStatus } = data;
@@ -92,7 +80,11 @@ export function buildGlycoPharmOperatorConfig(
   const storeSignal = getStoreSignal(data);
   const forumSignal = getForumSignal(data);
   const contentSignal = getContentSignal(data);
-  const overall = getOverallStatus(data);
+  const overall = computeOverallSignal([
+    data.serviceStatus.activePharmacies > 0,
+    data.forumStatus.totalPosts > 0,
+    data.contentStatus.hero.total > 0 || data.contentStatus.featured.total > 0,
+  ]);
 
   const hero: OperatorHeroConfig = {
     status: overall,
