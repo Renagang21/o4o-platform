@@ -10,7 +10,7 @@
 
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateCosmeticsStorePlaylistTables1739900000000 implements MigrationInterface {
+export class CreateCosmeticsStorePlaylistTables20260212000003 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Ensure schema exists
     await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS cosmetics`);

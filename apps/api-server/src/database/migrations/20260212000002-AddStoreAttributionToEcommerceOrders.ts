@@ -14,7 +14,7 @@
 
 import { type MigrationInterface, type QueryRunner } from 'typeorm';
 
-export class AddStoreAttributionToEcommerceOrders1739800000000 implements MigrationInterface {
+export class AddStoreAttributionToEcommerceOrders20260212000002 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Add store_id column (nullable - existing orders don't have one)
     await queryRunner.query(`
