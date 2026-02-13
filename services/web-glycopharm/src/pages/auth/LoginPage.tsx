@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { getDefaultRouteByRole } from '@/lib/auth-utils';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const returnUrl = (location.state as any)?.from || '/';
+  const returnUrl = (location.state as any)?.from;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,9 +21,9 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      // 로그인 성공 시 이전 페이지로 이동
-      navigate(returnUrl);
+      const loggedInUser = await login(email, password);
+      // WO-GLYCOPHARM-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
+      navigate(returnUrl || getDefaultRouteByRole(loggedInUser.role));
     } catch {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
       setIsSubmitting(false);

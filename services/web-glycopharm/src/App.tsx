@@ -1,6 +1,7 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { getDefaultRouteByRole } from '@/lib/auth-utils';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 
@@ -199,13 +200,33 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
   return <>{children}</>;
 }
 
+/**
+ * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1
+ * / 접근 시 로그인된 사용자는 역할 기반 대시보드로 자동 리다이렉트
+ */
+function RoleBasedHome() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.role) {
+      const target = getDefaultRouteByRole(user.role);
+      if (target !== '/') {
+        navigate(target, { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  return <HomePage />;
+}
+
 // App Routes
 function AppRoutes() {
   return (
     <Routes>
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        <Route index element={<HomePage />} />
+        <Route index element={<RoleBasedHome />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />

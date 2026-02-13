@@ -17,14 +17,17 @@
  */
 
 import { useState, useEffect, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
+import { getDefaultRouteByRole } from '@/lib/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
 
 export default function LoginModal() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
 
@@ -52,7 +55,7 @@ export default function LoginModal() {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
+      const loggedInUser = await login(email, password);
 
       // 이메일 저장 처리
       if (rememberEmail) {
@@ -65,6 +68,12 @@ export default function LoginModal() {
       setEmail('');
       setPassword('');
       closeLoginModal();
+
+      // WO-GLYCOPHARM-ROLE-BASED-LANDING-V1: 홈(/) 또는 /login에서 로그인한 경우 역할 기반 이동
+      if (location.pathname === '/' || location.pathname === '/login') {
+        navigate(getDefaultRouteByRole(loggedInUser.role));
+      }
+
       onLoginSuccess?.();
     } catch (err: any) {
       setError(err.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
