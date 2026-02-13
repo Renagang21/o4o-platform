@@ -77,6 +77,12 @@ import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from
 import { createPlatformServicesRoutes } from './routes/platform-services/platform-services.routes.js';
 import { createAdminPlatformServicesRoutes } from './routes/platform-services/admin-platform-services.routes.js';
 
+// Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
+import { createStoreNetworkRoutes } from './routes/platform/store-network.routes.js';
+
+// Physical Store Linking (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+import { createPhysicalStoreRoutes } from './routes/platform/physical-store.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -730,6 +736,14 @@ const startServer = async () => {
     app.use('/api/v1/platform-services', createPlatformServicesRoutes(AppDataSource));
     app.use('/api/v1/admin/platform-services', createAdminPlatformServicesRoutes(AppDataSource));
     logger.info('✅ Platform Service Catalog routes registered at /api/v1/platform-services');
+
+    // 8.8. Register Store Network Dashboard routes (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
+    app.use('/api/v1/admin/store-network', createStoreNetworkRoutes(AppDataSource));
+    logger.info('✅ Store Network Dashboard routes registered at /api/v1/admin/store-network');
+
+    // 8.9. Register Physical Store Linking routes (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+    app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(AppDataSource));
+    logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

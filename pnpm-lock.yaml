@@ -734,6 +734,9 @@ importers:
       '@o4o/reporting-yaksa':
         specifier: workspace:*
         version: link:../../packages/reporting-yaksa
+      '@o4o/store-core':
+        specifier: workspace:*
+        version: link:../../packages/store-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -3132,6 +3135,8 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
+
+  packages/store-core: {}
 
   packages/supplier-connector:
     dependencies:

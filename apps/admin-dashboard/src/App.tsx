@@ -337,6 +337,12 @@ const ChannelOpsDashboard = lazy(() => import('@/pages/channels/ops/ChannelOpsDa
 // Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0)
 const OpsMetricsDashboard = lazy(() => import('@/pages/ops/OpsMetricsDashboard'));
 
+// Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
+const StoreNetworkPage = lazy(() => import('@/pages/platform/StoreNetworkPage'));
+
+// Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+const PhysicalStoresPage = lazy(() => import('@/pages/platform/PhysicalStoresPage'));
+
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
@@ -1143,6 +1149,24 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <OpsMetricsDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1) */}
+                    <Route path="/admin/store-network" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <StoreNetworkPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1) */}
+                    <Route path="/admin/physical-stores" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <PhysicalStoresPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

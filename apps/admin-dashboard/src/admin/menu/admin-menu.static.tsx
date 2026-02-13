@@ -39,6 +39,7 @@ import {
   Layers,
   Shield,
   Briefcase,
+  Store,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -549,6 +550,22 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Ops Metrics',
     icon: <Activity className="w-5 h-5" />,
     path: '/admin/ops/metrics',
+    roles: ['admin', 'super_admin'],
+  },
+
+  {
+    id: 'store-network',
+    label: 'Store Network',
+    icon: <Store className="w-5 h-5" />,
+    path: '/admin/store-network',
+    roles: ['admin', 'super_admin'],
+  },
+
+  {
+    id: 'physical-stores',
+    label: 'Physical Stores',
+    icon: <Link2 className="w-5 h-5" />,
+    path: '/admin/physical-stores',
     roles: ['admin', 'super_admin'],
   },
 

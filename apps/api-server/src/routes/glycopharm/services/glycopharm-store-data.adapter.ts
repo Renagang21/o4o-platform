@@ -1,36 +1,24 @@
 /**
- * Cosmetics Store Summary Service
+ * GlycoPharm Store Data Adapter
  *
- * WO-KCOS-STORES-PHASE2-ORDER-ATTRIBUTION-V1
- * WO-O4O-STORE-TEMPLATE-V1_1-EXTRACTION (refactored to use store-core)
+ * WO-O4O-STORE-TEMPLATE-V1_1-EXTRACTION
  *
- * KPI aggregation for store dashboards.
- * Uses StoreSummaryEngine from @o4o/store-core with a Cosmetics-specific adapter.
+ * Implements StoreDataAdapter for GlycoPharm pharmacies.
+ * Queries ecommerce_orders by pharmacy store_id.
+ *
+ * This adapter provides the data foundation for future GlycoPharm
+ * cockpit KPI and insights endpoints (separate WO).
  */
 
 import { DataSource } from 'typeorm';
-import {
-  StoreSummaryEngine,
-  type StoreDataAdapter,
-  type ChannelBreakdown,
-  type TopProduct,
-  type RecentOrder,
-} from '@o4o/store-core';
-
-// Re-export types for backward compatibility
-export type {
-  StoreSummaryStats,
+import type {
+  StoreDataAdapter,
   ChannelBreakdown,
   TopProduct,
   RecentOrder,
-  StoreSummary,
 } from '@o4o/store-core';
 
-// ============================================================================
-// Cosmetics Adapter — implements StoreDataAdapter with ecommerce_orders SQL
-// ============================================================================
-
-export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
+export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
   constructor(private dataSource: DataSource) {}
 
   async getOrderStats(
@@ -152,88 +140,5 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
     );
 
     return Number(result[0]?.revenue || 0);
-  }
-}
-
-// ============================================================================
-// Service (maintains backward-compatible API)
-// ============================================================================
-
-export class CosmeticsStoreSummaryService {
-  private adapter: CosmeticsStoreDataAdapter;
-  private engine: StoreSummaryEngine;
-
-  constructor(private dataSource: DataSource) {
-    this.adapter = new CosmeticsStoreDataAdapter(dataSource);
-    this.engine = new StoreSummaryEngine(this.adapter);
-  }
-
-  async getStoreSummary(storeId: string) {
-    return this.engine.getSummary(storeId);
-  }
-
-  async getTopProducts(storeId: string, limit = 5) {
-    return this.engine.getTopProducts(storeId, limit);
-  }
-
-  /**
-   * Aggregate summary across all stores (for admin dashboard).
-   * Cosmetics-specific — queries cosmetics_stores directly.
-   */
-  async getAdminSummary(): Promise<{
-    totalStores: number;
-    activeOrders: number;
-    monthlyRevenue: number;
-    recentOrders: RecentOrder[];
-  }> {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    const storeResult = await this.dataSource.query(
-      `SELECT COUNT(*)::int as count
-       FROM cosmetics.cosmetics_stores
-       WHERE status = 'approved'`,
-    );
-
-    const activeResult = await this.dataSource.query(
-      `SELECT COUNT(*)::int as count
-       FROM ecommerce_orders
-       WHERE store_id IS NOT NULL
-         AND store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-         AND status IN ('created', 'pending_payment', 'paid', 'confirmed', 'processing', 'shipped')`,
-    );
-
-    const revenueResult = await this.dataSource.query(
-      `SELECT COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id IS NOT NULL
-         AND store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-         AND "createdAt" >= $1
-         AND status != 'cancelled'`,
-      [monthStart.toISOString()],
-    );
-
-    const recentRows = await this.dataSource.query(
-      `SELECT o.id, o."orderNumber", o."totalAmount", o.status, o.channel, o."createdAt"
-       FROM ecommerce_orders o
-       WHERE o.store_id IS NOT NULL
-         AND o.store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-       ORDER BY o."createdAt" DESC
-       LIMIT 5`,
-    );
-
-    return {
-      totalStores: storeResult[0]?.count || 0,
-      activeOrders: activeResult[0]?.count || 0,
-      monthlyRevenue: Number(revenueResult[0]?.revenue || 0),
-      recentOrders: recentRows.map((row: any) => ({
-        id: row.id,
-        orderNumber: row.orderNumber,
-        totalAmount: Number(row.totalAmount),
-        status: row.status,
-        channel: row.channel,
-        createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : row.createdAt,
-      })),
-    };
   }
 }

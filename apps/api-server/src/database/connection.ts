@@ -223,6 +223,14 @@ import {
 } from '../routes/siteguide/entities/index.js';
 
 // ============================================================================
+// PLATFORM PHYSICAL STORE ENTITIES (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+// ============================================================================
+import {
+  PhysicalStore,
+  PhysicalStoreLink,
+} from '../routes/platform/entities/index.js';
+
+// ============================================================================
 // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
 // ============================================================================
 import { PlatformInquiry } from '../entities/PlatformInquiry.js';
@@ -647,6 +655,11 @@ export const AppDataSource = new DataSource({
     AffiliationChangeLog,
     MemberAuditLog,
     LicenseVerificationRequest,
+    // ============================================================================
+    // PLATFORM PHYSICAL STORE ENTITIES (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+    // ============================================================================
+    PhysicalStore,
+    PhysicalStoreLink,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

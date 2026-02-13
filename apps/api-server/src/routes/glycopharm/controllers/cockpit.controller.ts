@@ -2,7 +2,12 @@
  * Glycopharm Cockpit Controller
  *
  * Pharmacy Dashboard 2.0 - Cockpit API endpoints
- * Provides pharmacy status, today's actions, franchise services, and content workspace
+ * Provides pharmacy status, today's actions, franchise services, content workspace,
+ * store KPI summary, and AI insights.
+ *
+ * WO-O4O-STORE-TEMPLATE-V1_2-GLYCOPHARM-MIGRATION:
+ * - store-kpi and store-insights endpoints via @o4o/store-core engines
+ * - today-actions uses real ecommerce_orders data via adapter
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -10,7 +15,8 @@ import { DataSource } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmCustomerRequest } from '../entities/customer-request.entity.js';
-// GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
+import { StoreSummaryEngine, StoreInsightsEngine, DEFAULT_INSIGHT_RULES } from '@o4o/store-core';
+import { GlycopharmStoreDataAdapter } from '../services/glycopharm-store-data.adapter.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -76,6 +82,9 @@ export function createCockpitController(
   requireScope: ScopeMiddleware
 ): Router {
   const router = Router();
+  const storeAdapter = new GlycopharmStoreDataAdapter(dataSource);
+  const summaryEngine = new StoreSummaryEngine(storeAdapter);
+  const insightsEngine = new StoreInsightsEngine(DEFAULT_INSIGHT_RULES);
 
   /**
    * GET /pharmacy/cockpit/status
@@ -207,10 +216,12 @@ export function createCockpitController(
           return;
         }
 
-        // Phase 4-A: Legacy Order System removed
-        // Order counts will be available via E-commerce Core after integration
-        const todayOrders = 0;
-        const pendingOrders = 0;
+        // WO-O4O-STORE-TEMPLATE-V1_2: Real order data via store-core adapter
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayStats = await storeAdapter.getOrderStats(pharmacy.id, todayStart);
+        const todayOrders = todayStats.count;
+        const pendingOrders = 0;  // TODO: pending status filter when order flow is active
         const pendingReceiveOrders = 0;
 
         // Check for application alerts
@@ -342,6 +353,99 @@ export function createCockpitController(
         res.json({ success: true, data: response });
       } catch (error: any) {
         console.error('Failed to get content workspace:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  // ==========================================================================
+  // Store KPI & Insights (WO-O4O-STORE-TEMPLATE-V1_2-GLYCOPHARM-MIGRATION)
+  // ==========================================================================
+
+  /**
+   * GET /pharmacy/cockpit/store-kpi
+   * Store KPI summary via @o4o/store-core SummaryEngine
+   */
+  router.get(
+    '/store-kpi',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          });
+          return;
+        }
+
+        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacy = await pharmacyRepo.findOne({
+          where: { created_by_user_id: userId },
+        });
+
+        if (!pharmacy) {
+          res.status(404).json({
+            error: { code: 'PHARMACY_NOT_FOUND', message: '등록된 약국이 없습니다' },
+          });
+          return;
+        }
+
+        const summary = await summaryEngine.getSummary(pharmacy.id);
+        res.json({ success: true, data: summary });
+      } catch (error: any) {
+        console.error('Failed to get store KPI:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /pharmacy/cockpit/store-insights
+   * Store AI insights via @o4o/store-core InsightsEngine
+   */
+  router.get(
+    '/store-insights',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          });
+          return;
+        }
+
+        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacy = await pharmacyRepo.findOne({
+          where: { created_by_user_id: userId },
+        });
+
+        if (!pharmacy) {
+          res.status(404).json({
+            error: { code: 'PHARMACY_NOT_FOUND', message: '등록된 약국이 없습니다' },
+          });
+          return;
+        }
+
+        const [summary, lastMonthRevenue] = await Promise.all([
+          summaryEngine.getSummary(pharmacy.id),
+          summaryEngine.getLastMonthRevenue(pharmacy.id),
+        ]);
+
+        const insights = insightsEngine.generate({ summary, lastMonthRevenue });
+        res.json({ success: true, data: insights });
+      } catch (error: any) {
+        console.error('Failed to get store insights:', error);
         res.status(500).json({
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });

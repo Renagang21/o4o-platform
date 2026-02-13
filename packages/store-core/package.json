@@ -1,0 +1,20 @@
+{
+  "name": "@o4o/store-core",
+  "version": "1.0.0",
+  "description": "O4O Store Template Core - KPI Summary & Insights engines",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist"
+  },
+  "sideEffects": false,
+  "private": true
+}
