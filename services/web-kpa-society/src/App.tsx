@@ -359,8 +359,8 @@ function App() {
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/demo/admin/*" element={<AdminRoutes />} />
 
-          {/* Operator Routes (서비스 운영자 - 별도 레이아웃) */}
-          <Route path="/demo/operator/*" element={<OperatorRoutes />} />
+          {/* Operator Routes — /demo/operator → /operator 리다이렉트 (WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1) */}
+          <Route path="/demo/operator/*" element={<Navigate to="/operator" replace />} />
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
@@ -387,7 +387,8 @@ function App() {
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
-          <Route path="/operator/*" element={<Navigate to="/demo/operator" replace />} />
+          {/* Operator Routes (서비스 운영자 - 독립 마운트, WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1) */}
+          <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
           <Route path="/test-guide/*" element={<Navigate to="/demo/test-guide" replace />} />

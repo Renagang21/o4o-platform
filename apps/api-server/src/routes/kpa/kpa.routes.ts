@@ -36,6 +36,8 @@ import { createGroupbuyOperatorController } from './controllers/groupbuy-operato
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { createStewardController } from './controllers/steward.controller.js';
+import { CmsContent } from '@o4o-apps/cms-core';
+import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { hasAnyServiceRole, hasRoleCompat, logLegacyRoleUsage } from '../../utils/role.utils.js';
@@ -229,16 +231,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
 
-  // Categories
+  // Categories (읽기: 공개, 쓰기: operator scope — WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1)
   forumRouter.get('/categories', forumController.listCategories.bind(forumController));
   forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
-  forumRouter.post('/categories', authenticate, forumController.createCategory.bind(forumController));
-  forumRouter.put('/categories/:id', authenticate, forumController.updateCategory.bind(forumController));
-  forumRouter.delete('/categories/:id', authenticate, forumController.deleteCategory.bind(forumController));
+  forumRouter.post('/categories', authenticate, requireKpaScope('kpa:operator'), forumController.createCategory.bind(forumController));
+  forumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:operator'), forumController.updateCategory.bind(forumController));
+  forumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:operator'), forumController.deleteCategory.bind(forumController));
 
-  // Moderation
-  forumRouter.get('/moderation', authenticate, forumController.getModerationQueue.bind(forumController));
-  forumRouter.post('/moderation/:type/:id', authenticate, forumController.moderateContent.bind(forumController));
+  // Moderation (operator scope — WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1)
+  forumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), forumController.getModerationQueue.bind(forumController));
+  forumRouter.post('/moderation/:type/:id', authenticate, requireKpaScope('kpa:operator'), forumController.moderateContent.bind(forumController));
 
   router.use('/forum', forumRouter);
 
@@ -419,7 +421,173 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true });
   }));
 
+  // ─── WO-KPA-A-CONTENT-CMS-PHASE1-V1: Operator CRUD ──────────────────
+  const contentRepo = dataSource.getRepository(CmsContent);
+  const auditRepo = dataSource.getRepository(KpaAuditLog);
+  const KPA_SERVICE_KEY = 'kpa';
+  const ALLOWED_TYPES = ['notice', 'news'];
+
+  // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: helper
+  async function writeAuditLog(
+    user: any,
+    actionType: string,
+    targetType: 'member' | 'application' | 'content',
+    targetId: string,
+    metadata: Record<string, unknown> = {},
+  ) {
+    try {
+      const log = auditRepo.create({
+        operator_id: user?.id,
+        operator_role: (user?.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+        action_type: actionType as any,
+        target_type: targetType,
+        target_id: targetId,
+        metadata,
+      });
+      await auditRepo.save(log);
+    } catch (e) {
+      console.error('[KPA AuditLog] Failed to write:', e);
+    }
+  }
+
+  // GET /news/admin/list — operator용 전체 목록 (draft/published/archived 포함)
+  newsRouter.get('/admin/list', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const type = req.query.type as string;
+    const status = req.query.status as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+
+    const qb = contentRepo.createQueryBuilder('c')
+      .where('c.serviceKey = :sk', { sk: KPA_SERVICE_KEY });
+
+    if (type && ALLOWED_TYPES.includes(type)) {
+      qb.andWhere('c.type = :type', { type });
+    } else {
+      qb.andWhere('c.type IN (:...types)', { types: ALLOWED_TYPES });
+    }
+    if (status && ['draft', 'published', 'archived'].includes(status)) {
+      qb.andWhere('c.status = :status', { status });
+    }
+
+    qb.orderBy('c.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+    res.json({ success: true, data, total, page, limit, totalPages: Math.ceil(total / limit) });
+  }));
+
+  // POST /news — 새 콘텐츠 생성
+  newsRouter.post('/', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const { title, content, type, status: reqStatus, summary } = req.body;
+    if (!title || !type) {
+      res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title and type are required' } });
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(type)) {
+      res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: `type must be one of: ${ALLOWED_TYPES.join(', ')}` } });
+      return;
+    }
+    const validStatus = reqStatus === 'published' ? 'published' : 'draft';
+    const userId = (req as any).user?.id;
+
+    const entity = contentRepo.create({
+      serviceKey: KPA_SERVICE_KEY,
+      type,
+      title,
+      summary: summary || null,
+      body: content || null,
+      status: validStatus,
+      publishedAt: validStatus === 'published' ? new Date() : null,
+      createdBy: userId,
+    });
+
+    const saved = await contentRepo.save(entity);
+    await writeAuditLog((req as any).user, 'CONTENT_CREATED', 'content', saved.id, { type, title, status: validStatus });
+    res.status(201).json({ success: true, data: saved });
+  }));
+
+  // PUT /news/:id — 콘텐츠 수정
+  newsRouter.put('/:id', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const existing = await contentRepo.findOne({
+      where: { id: req.params.id, serviceKey: KPA_SERVICE_KEY },
+    });
+    if (!existing) {
+      res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
+      return;
+    }
+
+    const { title, content, type, status: reqStatus, summary } = req.body;
+    if (title !== undefined) existing.title = title;
+    if (summary !== undefined) existing.summary = summary;
+    if (content !== undefined) existing.body = content;
+    if (type !== undefined && ALLOWED_TYPES.includes(type)) existing.type = type;
+    if (reqStatus !== undefined && ['draft', 'published', 'archived'].includes(reqStatus)) {
+      if (reqStatus === 'published' && existing.status !== 'published') {
+        existing.publishedAt = new Date();
+      }
+      existing.status = reqStatus;
+    }
+
+    const updated = await contentRepo.save(existing);
+    await writeAuditLog((req as any).user, 'CONTENT_UPDATED', 'content', updated.id, { title: updated.title, status: updated.status });
+    res.json({ success: true, data: updated });
+  }));
+
+  // DELETE /news/:id — Soft delete (status → archived)
+  newsRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const existing = await contentRepo.findOne({
+      where: { id: req.params.id, serviceKey: KPA_SERVICE_KEY },
+    });
+    if (!existing) {
+      res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
+      return;
+    }
+
+    existing.status = 'archived';
+    const updated = await contentRepo.save(existing);
+    await writeAuditLog((req as any).user, 'CONTENT_DELETED', 'content', updated.id, { title: updated.title });
+    res.json({ success: true, data: updated });
+  }));
+
   router.use('/news', newsRouter);
+
+  // ============================================================================
+  // Operator Audit Log Routes - /api/v1/kpa/operator/audit-logs
+  // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1
+  // ============================================================================
+  router.get('/operator/audit-logs', authenticate, requireKpaScope('kpa:admin'), asyncHandler(async (req: Request, res: Response) => {
+    const { action_type, target_type, operator_id, page = '1', limit = '20' } = req.query;
+
+    const qb = auditRepo.createQueryBuilder('log')
+      .orderBy('log.created_at', 'DESC');
+
+    if (action_type) {
+      qb.andWhere('log.action_type = :action_type', { action_type });
+    }
+    if (target_type) {
+      qb.andWhere('log.target_type = :target_type', { target_type });
+    }
+    if (operator_id) {
+      qb.andWhere('log.operator_id = :operator_id', { operator_id });
+    }
+
+    const pageNum = parseInt(page as string) || 1;
+    const limitNum = Math.min(parseInt(limit as string) || 20, 100);
+
+    qb.skip((pageNum - 1) * limitNum).take(limitNum);
+
+    const [logs, total] = await qb.getManyAndCount();
+
+    res.json({
+      success: true,
+      data: logs,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum),
+    });
+  }));
 
   // ============================================================================
   // Resources Routes - /api/v1/kpa/resources/*

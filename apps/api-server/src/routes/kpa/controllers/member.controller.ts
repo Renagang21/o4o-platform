@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaMember, KpaOrganization, KpaMemberService } from '../entities/index.js';
+import { KpaMember, KpaOrganization, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -32,6 +32,7 @@ export function createMemberController(
   const memberRepo = dataSource.getRepository(KpaMember);
   const orgRepo = dataSource.getRepository(KpaOrganization);
   const serviceRepo = dataSource.getRepository(KpaMemberService);
+  const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   /**
    * GET /kpa/members/me
@@ -313,6 +314,18 @@ export function createMemberController(
           await serviceRepo.save(newSvc);
         }
 
+        // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: Record audit log
+        try {
+          await auditRepo.save(auditRepo.create({
+            operator_id: req.user!.id,
+            operator_role: (req.user!.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+            action_type: 'MEMBER_STATUS_CHANGED' as any,
+            target_type: 'member',
+            target_id: member.id,
+            metadata: { previousStatus: oldStatus, newStatus },
+          }));
+        } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to update member status:', error);
@@ -384,8 +397,22 @@ export function createMemberController(
           return;
         }
 
+        const oldRole = member.role;
         member.role = req.body.role;
         const saved = await memberRepo.save(member);
+
+        // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: Record audit log
+        try {
+          await auditRepo.save(auditRepo.create({
+            operator_id: req.user!.id,
+            operator_role: (req.user!.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+            action_type: 'MEMBER_ROLE_CHANGED' as any,
+            target_type: 'member',
+            target_id: member.id,
+            metadata: { previousRole: oldRole, newRole: req.body.role },
+          }));
+        } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to update member role:', error);

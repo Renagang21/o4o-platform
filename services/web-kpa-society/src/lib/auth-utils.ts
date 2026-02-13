@@ -8,7 +8,7 @@ export function getDefaultRouteByRole(userRoles?: string[]): string {
   if (!userRoles || userRoles.length === 0) return '/dashboard';
 
   if (userRoles.includes('kpa:admin')) return '/demo/admin';
-  if (userRoles.includes('kpa:operator')) return '/demo/operator';
+  if (userRoles.includes('kpa:operator')) return '/operator';
 
   return '/dashboard';
 }

@@ -14,3 +14,4 @@ export * from './kpa-branch-officer.entity.js';
 export * from './kpa-branch-doc.entity.js';
 export * from './kpa-branch-settings.entity.js';
 export * from './kpa-member-service.entity.js';
+export * from './kpa-audit-log.entity.js';

@@ -4,10 +4,11 @@
  * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
  * WO-KPA-A-OPERATOR-DASHBOARD-UX-V1: Signal 기반 대시보드 도입
  * WO-OPERATOR-GUARD-UNIFICATION-P0: 운영자 접근 권한 가드 추가
+ * WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1: 보안 정렬
  */
 
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { KpaOperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard } from '../pages/operator';
+import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
+import { KpaOperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, MemberManagementPage, ContentManagementPage, AuditLogPage } from '../pages/operator';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
@@ -22,37 +23,46 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/" className="text-xl font-bold text-blue-600">
+            <Link to="/" className="text-xl font-bold text-blue-600">
               KPA Society
-            </a>
+            </Link>
             <span className="text-slate-300">|</span>
             <span className="text-slate-600 font-medium">운영자</span>
           </div>
           <nav className="flex items-center gap-6">
-            <a href="/operator" className="text-sm text-slate-600 hover:text-blue-600">
+            <Link to="/operator" className="text-sm text-slate-600 hover:text-blue-600">
               대시보드
-            </a>
-            <a href="/operator/ai-report" className="text-sm text-slate-600 hover:text-blue-600">
+            </Link>
+            <Link to="/operator/ai-report" className="text-sm text-slate-600 hover:text-blue-600">
               AI 리포트
-            </a>
-            <a href="/operator/forum-management" className="text-sm text-slate-600 hover:text-blue-600">
+            </Link>
+            <Link to="/operator/forum-management" className="text-sm text-slate-600 hover:text-blue-600">
               포럼 관리
-            </a>
-            <a href="/operator/forum-analytics" className="text-sm text-slate-600 hover:text-blue-600">
+            </Link>
+            <Link to="/operator/forum-analytics" className="text-sm text-slate-600 hover:text-blue-600">
               포럼 통계
-            </a>
-            <a href="/operator/signage/content" className="text-sm text-slate-600 hover:text-blue-600">
+            </Link>
+            <Link to="/operator/members" className="text-sm text-slate-600 hover:text-blue-600">
+              회원 관리
+            </Link>
+            <Link to="/operator/content" className="text-sm text-slate-600 hover:text-blue-600">
+              콘텐츠 관리
+            </Link>
+            <Link to="/operator/signage/content" className="text-sm text-slate-600 hover:text-blue-600">
               콘텐츠 허브
-            </a>
-            <a href="/operator/legal" className="text-sm text-slate-600 hover:text-blue-600">
+            </Link>
+            <Link to="/operator/legal" className="text-sm text-slate-600 hover:text-blue-600">
               약관 관리
-            </a>
-            <a href="/operator/operators" className="text-sm text-slate-600 hover:text-blue-600">
+            </Link>
+            <Link to="/operator/audit-logs" className="text-sm text-slate-600 hover:text-blue-600">
+              감사 로그
+            </Link>
+            <Link to="/operator/operators" className="text-sm text-slate-600 hover:text-blue-600">
               운영자 관리
-            </a>
-            <a href="/" className="text-sm text-slate-500 hover:text-slate-700">
+            </Link>
+            <Link to="/" className="text-sm text-slate-500 hover:text-slate-700">
               메인으로
-            </a>
+            </Link>
           </nav>
         </div>
       </header>
@@ -72,21 +82,12 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
  * Backend isKpaOperator()와 동일한 역할 목록 (kpa.routes.ts 참조)
  */
 function checkKpaOperatorRole(user: User): boolean {
-  // Legacy unprefixed roles
-  const legacyRoles = [
-    'admin',
-    'super_admin',
-  ];
-
-  // Phase 4 prefixed roles (matches backend isKpaOperator)
-  const prefixedRoles = [
+  // KPA-specific prefixed roles ONLY (matches backend requireKpaScope + isKpaOperator)
+  // platform:* roles are explicitly denied by backend — do not allow in frontend
+  const allowedRoles = [
     'kpa:admin',
     'kpa:operator',
-    'platform:admin',
-    'platform:super_admin',
   ];
-
-  const allowedRoles = [...legacyRoles, ...prefixedRoles];
 
   if (user.role && allowedRoles.includes(user.role)) {
     return true;
@@ -158,11 +159,20 @@ export function OperatorRoutes() {
         {/* 포럼 통계 */}
         <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
 
+        {/* 회원 관리 (WO-KPA-A-MEMBER-APPROVAL-UI-PHASE1-V1) */}
+        <Route path="members" element={<MemberManagementPage />} />
+
+        {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
+        <Route path="content" element={<ContentManagementPage />} />
+
         {/* 사이니지 콘텐츠 허브 */}
         <Route path="signage/content" element={<ContentHubPage />} />
 
         {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
         <Route path="legal" element={<LegalManagementPage />} />
+
+        {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
+        <Route path="audit-logs" element={<AuditLogPage />} />
 
         {/* 운영자 관리 */}
         <Route path="operators" element={<OperatorManagementPage />} />

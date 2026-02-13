@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaApplication, KpaOrganization, KpaApplicationType } from '../entities/index.js';
+import { KpaApplication, KpaOrganization, KpaApplicationType, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import { emailService } from '../../../services/email.service.js';
@@ -35,6 +35,7 @@ export function createApplicationController(
   const router = Router();
   const appRepo = dataSource.getRepository(KpaApplication);
   const orgRepo = dataSource.getRepository(KpaOrganization);
+  const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   /**
    * POST /kpa/applications
@@ -381,6 +382,18 @@ export function createApplicationController(
         } catch (emailError) {
           logger.error('[KPA] Failed to send result notification email:', emailError);
         }
+
+        // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: Record audit log
+        try {
+          await auditRepo.save(auditRepo.create({
+            operator_id: req.user!.id,
+            operator_role: (req.user!.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+            action_type: 'APPLICATION_REVIEWED' as any,
+            target_type: 'application',
+            target_id: application.id,
+            metadata: { decision: req.body.status, reviewComment: req.body.review_comment || null },
+          }));
+        } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 
         res.json({ data: saved });
       } catch (error: any) {
