@@ -49,6 +49,9 @@ export class KpaBranchNews {
   @Column({ type: 'int', default: 0 })
   view_count: number;
 
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

@@ -17,6 +17,7 @@ import { KpaBranchNews } from '../entities/kpa-branch-news.entity.js';
 import { KpaBranchOfficer } from '../entities/kpa-branch-officer.entity.js';
 import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
 import { KpaBranchSettings } from '../entities/kpa-branch-settings.entity.js';
+import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { hasAnyServiceRole, hasRoleCompat, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
@@ -110,6 +111,25 @@ export function createBranchAdminDashboardController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
+  const auditRepo = dataSource.getRepository(KpaAuditLog);
+
+  // WO-KPA-C-BRANCH-CMS-HARDENING-V1: audit log helper
+  async function writeAuditLog(
+    user: any, actionType: string,
+    targetType: 'branch_news' | 'branch_officer' | 'branch_doc',
+    targetId: string, metadata: Record<string, unknown> = {},
+  ) {
+    try {
+      await auditRepo.save(auditRepo.create({
+        operator_id: user?.id,
+        operator_role: (user?.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
+        action_type: actionType as any,
+        target_type: targetType as any,
+        target_id: targetId,
+        metadata,
+      }));
+    } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+  }
 
   /**
    * GET /branch-admin/dashboard/stats
@@ -355,6 +375,7 @@ export function createBranchAdminDashboardController(
 
         const qb = repo.createQueryBuilder('n')
           .where('n.organization_id = :organizationId', { organizationId })
+          .andWhere('n.is_deleted = false')
           .orderBy('n.is_pinned', 'DESC')
           .addOrderBy('n.created_at', 'DESC')
           .skip((page - 1) * limit)
@@ -401,6 +422,7 @@ export function createBranchAdminDashboardController(
           is_published: is_published ?? true,
         });
         const saved = await repo.save(news);
+        await writeAuditLog(authReq.user, 'CONTENT_CREATED', 'branch_news', saved.id, { title, organizationId });
         res.status(201).json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to create branch news:', error);
@@ -425,7 +447,7 @@ export function createBranchAdminDashboardController(
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
         const repo = dataSource.getRepository(KpaBranchNews);
-        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId } });
+        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
         if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'News not found' } }); return; }
 
         const { title, content, category, is_pinned, is_published } = req.body;
@@ -436,6 +458,7 @@ export function createBranchAdminDashboardController(
         if (is_published !== undefined) existing.is_published = is_published;
 
         const saved = await repo.save(existing);
+        await writeAuditLog(authReq.user, 'CONTENT_UPDATED', 'branch_news', saved.id, { title: saved.title, organizationId });
         res.json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to update branch news:', error);
@@ -460,9 +483,12 @@ export function createBranchAdminDashboardController(
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
         const repo = dataSource.getRepository(KpaBranchNews);
-        const result = await repo.delete({ id: req.params.id, organization_id: organizationId });
-        if (result.affected === 0) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'News not found' } }); return; }
+        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
+        if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'News not found' } }); return; }
 
+        existing.is_deleted = true;
+        await repo.save(existing);
+        await writeAuditLog(authReq.user, 'CONTENT_DELETED', 'branch_news', existing.id, { title: existing.title, organizationId });
         res.json({ success: true, data: { deleted: true } });
       } catch (error: any) {
         console.error('Failed to delete branch news:', error);
@@ -492,7 +518,7 @@ export function createBranchAdminDashboardController(
 
         const repo = dataSource.getRepository(KpaBranchOfficer);
         const items = await repo.find({
-          where: { organization_id: organizationId },
+          where: { organization_id: organizationId, is_deleted: false },
           order: { sort_order: 'ASC', created_at: 'ASC' },
         });
         res.json({ success: true, data: items });
@@ -534,6 +560,7 @@ export function createBranchAdminDashboardController(
           sort_order: sort_order ?? 0,
         });
         const saved = await repo.save(officer);
+        await writeAuditLog(authReq.user, 'OFFICER_CREATED', 'branch_officer', saved.id, { name, position, organizationId });
         res.status(201).json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to create branch officer:', error);
@@ -558,7 +585,7 @@ export function createBranchAdminDashboardController(
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
         const repo = dataSource.getRepository(KpaBranchOfficer);
-        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId } });
+        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
         if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Officer not found' } }); return; }
 
         const fields = ['name', 'position', 'role', 'pharmacy_name', 'phone', 'email', 'term_start', 'term_end', 'is_active', 'sort_order'] as const;
@@ -569,6 +596,7 @@ export function createBranchAdminDashboardController(
         if (existing.phone) existing.phone = existing.phone.replace(/\D/g, '');
 
         const saved = await repo.save(existing);
+        await writeAuditLog(authReq.user, 'OFFICER_UPDATED', 'branch_officer', saved.id, { name: saved.name, organizationId });
         res.json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to update branch officer:', error);
@@ -593,9 +621,12 @@ export function createBranchAdminDashboardController(
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
         const repo = dataSource.getRepository(KpaBranchOfficer);
-        const result = await repo.delete({ id: req.params.id, organization_id: organizationId });
-        if (result.affected === 0) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Officer not found' } }); return; }
+        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
+        if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Officer not found' } }); return; }
 
+        existing.is_deleted = true;
+        await repo.save(existing);
+        await writeAuditLog(authReq.user, 'OFFICER_DELETED', 'branch_officer', existing.id, { name: existing.name, organizationId });
         res.json({ success: true, data: { deleted: true } });
       } catch (error: any) {
         console.error('Failed to delete branch officer:', error);
@@ -630,6 +661,7 @@ export function createBranchAdminDashboardController(
 
         const qb = repo.createQueryBuilder('d')
           .where('d.organization_id = :organizationId', { organizationId })
+          .andWhere('d.is_deleted = false')
           .orderBy('d.created_at', 'DESC')
           .skip((page - 1) * limit)
           .take(limit);
@@ -676,6 +708,7 @@ export function createBranchAdminDashboardController(
           uploaded_by: userId,
         });
         const saved = await repo.save(doc);
+        await writeAuditLog(authReq.user, 'DOC_CREATED', 'branch_doc', saved.id, { title, organizationId });
         res.status(201).json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to create branch doc:', error);
@@ -700,7 +733,7 @@ export function createBranchAdminDashboardController(
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
         const repo = dataSource.getRepository(KpaBranchDoc);
-        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId } });
+        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
         if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Doc not found' } }); return; }
 
         const fields = ['title', 'description', 'category', 'file_url', 'file_name', 'file_size', 'is_public'] as const;
@@ -709,6 +742,7 @@ export function createBranchAdminDashboardController(
         }
 
         const saved = await repo.save(existing);
+        await writeAuditLog(authReq.user, 'DOC_UPDATED', 'branch_doc', saved.id, { title: saved.title, organizationId });
         res.json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to update branch doc:', error);
@@ -733,9 +767,12 @@ export function createBranchAdminDashboardController(
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
         const repo = dataSource.getRepository(KpaBranchDoc);
-        const result = await repo.delete({ id: req.params.id, organization_id: organizationId });
-        if (result.affected === 0) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Doc not found' } }); return; }
+        const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
+        if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Doc not found' } }); return; }
 
+        existing.is_deleted = true;
+        await repo.save(existing);
+        await writeAuditLog(authReq.user, 'DOC_DELETED', 'branch_doc', existing.id, { title: existing.title, organizationId });
         res.json({ success: true, data: { deleted: true } });
       } catch (error: any) {
         console.error('Failed to delete branch doc:', error);

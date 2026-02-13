@@ -173,6 +173,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           .createQueryBuilder('n')
           .where('n.organization_id = :orgId', { orgId: branch.id })
           .andWhere('n.is_published = true')
+          .andWhere('n.is_deleted = false')
           .orderBy('n.is_pinned', 'DESC')
           .addOrderBy('n.created_at', 'DESC')
           .skip((page - 1) * limit)
@@ -214,7 +215,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
         }
 
         const news = await dataSource.getRepository(KpaBranchNews).findOne({
-          where: { id: req.params.id, organization_id: branch.id, is_published: true },
+          where: { id: req.params.id, organization_id: branch.id, is_published: true, is_deleted: false },
         });
         if (!news) {
           res.status(404).json({ success: false, error: { message: 'News not found' } });
@@ -248,7 +249,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
         }
 
         const officers = await dataSource.getRepository(KpaBranchOfficer).find({
-          where: { organization_id: branch.id, is_active: true },
+          where: { organization_id: branch.id, is_active: true, is_deleted: false },
           order: { sort_order: 'ASC', created_at: 'ASC' },
         });
 
@@ -282,6 +283,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           .createQueryBuilder('d')
           .where('d.organization_id = :orgId', { orgId: branch.id })
           .andWhere('d.is_public = true')
+          .andWhere('d.is_deleted = false')
           .orderBy('d.created_at', 'DESC')
           .skip((page - 1) * limit)
           .take(limit);

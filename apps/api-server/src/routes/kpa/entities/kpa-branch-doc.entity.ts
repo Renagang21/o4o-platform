@@ -49,6 +49,9 @@ export class KpaBranchDoc {
   @Column({ type: 'int', default: 0 })
   download_count: number;
 
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
+
   @Column({ type: 'uuid', nullable: true })
   uploaded_by: string | null;
 

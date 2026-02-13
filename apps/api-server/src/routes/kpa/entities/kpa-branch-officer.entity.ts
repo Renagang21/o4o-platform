@@ -55,6 +55,9 @@ export class KpaBranchOfficer {
   @Column({ type: 'int', default: 0 })
   sort_order: number;
 
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 
