@@ -56,6 +56,19 @@ export class CosmeticsStore {
   @Index()
   region?: string | null;
 
+  @Column({ type: 'varchar', length: 120, nullable: true, unique: true })
+  @Index()
+  slug?: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string | null;
+
+  @Column({ type: 'varchar', length: 2000, nullable: true })
+  logo?: string | null;
+
+  @Column({ name: 'hero_image', type: 'varchar', length: 2000, nullable: true })
+  heroImage?: string | null;
+
   @Column({
     type: 'varchar',
     length: 20,

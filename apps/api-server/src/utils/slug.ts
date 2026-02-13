@@ -11,6 +11,24 @@ export function generateSlug(text: string): string {
 }
 
 /**
+ * Generate a store slug from a name (한글 허용)
+ * "강남약국" → "강남약국"
+ * "ABC Pharmacy" → "abc-pharmacy"
+ * "서울 강남 약국" → "서울-강남-약국"
+ */
+export function generateStoreSlug(name: string): string {
+  return name
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\u3131-\u318E\u3200-\u321E\uAC00-\uD7AF\s-]/g, '') // keep alphanumeric, Korean, spaces, hyphens
+    .replace(/[\s]+/g, '-')  // spaces → hyphens
+    .replace(/-+/g, '-')     // collapse multiple hyphens
+    .replace(/^-+|-+$/g, '') // trim leading/trailing hyphens
+    .slice(0, 120);          // max 120 chars
+}
+
+/**
  * Validate if a string is a valid slug
  */
 export function isValidSlug(slug: string): boolean {

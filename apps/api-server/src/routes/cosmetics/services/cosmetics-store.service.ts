@@ -7,6 +7,7 @@
 
 import { DataSource } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
+import { generateStoreSlug } from '../../../utils/slug.js';
 import { CosmeticsStoreRepository } from '../repositories/cosmetics-store.repository.js';
 import {
   CosmeticsStoreStatus,
@@ -109,9 +110,17 @@ export class CosmeticsStoreService {
 
         // Create store
         const storeCode = this.generateStoreCode();
+        let slug = generateStoreSlug(application.storeName);
+        // slug 중복 확인
+        const existingSlugStore = await queryRunner.manager.findOne('CosmeticsStore', { where: { slug } });
+        if (existingSlugStore) {
+          slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
+        }
+
         const store = queryRunner.manager.create('CosmeticsStore', {
           name: application.storeName,
           code: storeCode,
+          slug,
           businessNumber: application.businessNumber,
           ownerName: application.ownerName,
           contactPhone: application.contactPhone,

@@ -9,6 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
+import { generateStoreSlug } from '../../../utils/slug.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
@@ -295,9 +296,16 @@ export function createAdminController(
             pharmacy.name = application.organizationName;
             pharmacy.code = generatePharmacyCode();
             pharmacy.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
+            pharmacy.slug = generateStoreSlug(application.organizationName);
             pharmacy.status = 'active';
             pharmacy.created_by_user_id = application.userId;
             pharmacy.enabled_services = application.serviceTypes;
+
+            // slug 중복 시 suffix 추가
+            const existingSlug = await pharmacyRepo.findOne({ where: { slug: pharmacy.slug } });
+            if (existingSlug) {
+              pharmacy.slug = `${pharmacy.slug}-${Date.now().toString(36).slice(-4)}`;
+            }
 
             await pharmacyRepo.save(pharmacy);
 

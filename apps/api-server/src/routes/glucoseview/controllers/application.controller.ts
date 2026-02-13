@@ -9,6 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
+import { generateStoreSlug } from '../../../utils/slug.js';
 import { GlucoseViewApplication } from '../entities/glucoseview-application.entity.js';
 import { GlucoseViewPharmacy } from '../entities/glucoseview-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -568,9 +569,16 @@ export function createGlucoseViewApplicationController(
             pharmacy.userId = application.userId;
             pharmacy.name = application.pharmacyName;
             pharmacy.businessNumber = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
+            pharmacy.slug = generateStoreSlug(application.pharmacyName);
             pharmacy.glycopharmPharmacyId = application.pharmacyId;
             pharmacy.status = 'active';
             pharmacy.enabledServices = ['cgm_view'];
+
+            // slug 중복 시 suffix 추가
+            const existingSlug = await pharmacyRepo.findOne({ where: { slug: pharmacy.slug } });
+            if (existingSlug) {
+              pharmacy.slug = `${pharmacy.slug}-${Date.now().toString(36).slice(-4)}`;
+            }
 
             await pharmacyRepo.save(pharmacy);
 
