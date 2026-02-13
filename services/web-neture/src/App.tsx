@@ -15,8 +15,8 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
-import { AuthProvider, LoginModalProvider, useLoginModal, useAuth } from './contexts';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, ROLE_DASHBOARDS } from './contexts';
 import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
@@ -307,6 +307,28 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   return <>{children}</>;
 }
 
+/**
+ * RoleBasedWorkspaceHome - WO-NETURE-ROLE-BASED-LANDING-V1
+ * /workspace 접근 시 역할 기반 자동 리다이렉트
+ * admin → /workspace/admin, supplier → /workspace/supplier/dashboard, partner → /workspace/partner
+ * user → /workspace (HomePage 유지)
+ */
+function RoleBasedWorkspaceHome() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.currentRole && user.currentRole !== 'user') {
+      const target = ROLE_DASHBOARDS[user.currentRole];
+      if (target && target !== '/') {
+        navigate(target, { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  return <HomePage />;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -402,8 +424,8 @@ function App() {
                 Neture 고유 기능 (/workspace) - SupplierOpsLayout
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
-              {/* Neture 홈 */}
-              <Route path="/workspace" element={<HomePage />} />
+              {/* Neture 홈 - WO-NETURE-ROLE-BASED-LANDING-V1: 역할 기반 자동 리다이렉트 */}
+              <Route path="/workspace" element={<RoleBasedWorkspaceHome />} />
 
               {/* 공급자 */}
               <Route path="/workspace/suppliers" element={<SupplierListPage />} />

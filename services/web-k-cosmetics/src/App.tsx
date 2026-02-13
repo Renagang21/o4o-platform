@@ -3,9 +3,9 @@
  * Based on GlycoPharm App structure
  */
 
-import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { AuthProvider, useAuth, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 
@@ -119,13 +119,35 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   return <>{children}</>;
 }
 
+/**
+ * RoleBasedHome - WO-K-COSMETICS-ROLE-BASED-LANDING-V1
+ * / 접근 시 역할 기반 자동 리다이렉트
+ * operator → /operator, partner → /partner, 기타 → / (HomePage 유지)
+ */
+function RoleBasedHome() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.currentRole) {
+      const target = ROLE_DASHBOARDS[user.currentRole];
+      if (target && target !== '/') {
+        navigate(target, { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  return <HomePage />;
+}
+
 // App Routes
 function AppRoutes() {
   return (
     <Routes>
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        <Route index element={<HomePage />} />
+        {/* WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 자동 리다이렉트 */}
+        <Route index element={<RoleBasedHome />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="contact" element={<ContactPage />} />

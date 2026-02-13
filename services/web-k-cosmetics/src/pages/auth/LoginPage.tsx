@@ -5,13 +5,13 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const returnUrl = (location.state as any)?.from || '/';
+  const returnUrl = (location.state as any)?.from;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +28,8 @@ export default function LoginPage() {
       if (!result.success) {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
-      navigate(returnUrl);
+      // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
+      navigate(returnUrl || (result.role ? ROLE_DASHBOARDS[result.role] : '/'));
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {

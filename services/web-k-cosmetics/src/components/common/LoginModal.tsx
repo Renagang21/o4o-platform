@@ -17,13 +17,15 @@
  */
 
 import { useState, useEffect, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
 const REMEMBER_EMAIL_KEY = 'kcosmetics_remember_email';
 
 export default function LoginModal() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
 
@@ -51,7 +53,12 @@ export default function LoginModal() {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
+      const result = await login(email, password);
+
+      if (!result.success) {
+        setError(result.error || '이메일 또는 비밀번호가 올바르지 않습니다.');
+        return;
+      }
 
       // 이메일 저장 처리
       if (rememberEmail) {
@@ -64,6 +71,15 @@ export default function LoginModal() {
       setEmail('');
       setPassword('');
       closeLoginModal();
+
+      // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 홈(/) 또는 /login에서 로그인한 경우 역할 기반 이동
+      if (location.pathname === '/' || location.pathname === '/login') {
+        const dashboardPath = result.role ? ROLE_DASHBOARDS[result.role] : '/';
+        if (dashboardPath !== '/') {
+          navigate(dashboardPath);
+        }
+      }
+
       onLoginSuccess?.();
     } catch (err: any) {
       setError(err.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
