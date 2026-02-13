@@ -43,6 +43,26 @@ const queryClient = new QueryClient({
 // Initialize version checking
 initVersionCheck();
 
+// Handle stale chunk errors from dynamic imports (배포 후 캐시 불일치 자동 새로고침)
+window.addEventListener('unhandledrejection', (event) => {
+  const message = event.reason?.message || '';
+  if (
+    message.includes('Failed to fetch dynamically imported module') ||
+    message.includes('Loading chunk') ||
+    message.includes('ChunkLoadError')
+  ) {
+    const reloadKey = 'chunk-error-reload';
+    const lastReload = sessionStorage.getItem(reloadKey);
+    const now = Date.now();
+
+    if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+      sessionStorage.setItem(reloadKey, String(now));
+      console.warn('Stale chunk detected (unhandledrejection), reloading...');
+      window.location.reload();
+    }
+  }
+});
+
 // Debug: Expose globalRegistry to window (development only)
 if (import.meta.env.DEV) {
   (window as any).__shortcodeRegistry = globalRegistry;

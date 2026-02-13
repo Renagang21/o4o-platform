@@ -26,6 +26,26 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error);
     console.error('Component stack:', errorInfo.componentStack);
 
+    // Stale chunk 에러 감지 → 자동 새로고침 (배포 후 캐시 불일치)
+    const isChunkError = error.message?.includes('Failed to fetch dynamically imported module') ||
+      error.message?.includes('Loading chunk') ||
+      error.message?.includes('ChunkLoadError') ||
+      error.name === 'ChunkLoadError';
+
+    if (isChunkError) {
+      const reloadKey = 'chunk-error-reload';
+      const lastReload = sessionStorage.getItem(reloadKey);
+      const now = Date.now();
+
+      // 무한 리로드 방지: 10초 내 재시도 차단
+      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem(reloadKey, String(now));
+        console.warn('Stale chunk detected, reloading page...');
+        window.location.reload();
+        return;
+      }
+    }
+
     this.setState({
       error,
       errorInfo

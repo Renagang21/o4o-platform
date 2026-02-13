@@ -94,6 +94,8 @@ const Login: FC = () => {
       }
 
       toast.error(errorMessage);
+      // AuthProvider가 원시 Axios 메시지를 error state에 저장하므로 정리
+      clearError();
     }
   };
 
