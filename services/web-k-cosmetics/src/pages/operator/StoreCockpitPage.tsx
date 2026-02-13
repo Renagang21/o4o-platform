@@ -18,6 +18,7 @@ import {
   type StoreInfo,
   type StoreSummary,
   type StoreListing,
+  type StorePlaylist,
 } from '@/services/storeApi';
 
 // ============================================================================
@@ -77,6 +78,8 @@ export default function StoreCockpitPage() {
   const [summary, setSummary] = useState<StoreSummary | null>(null);
   const [listings, setListings] = useState<StoreListing[]>([]);
   const [listingTotal, setListingTotal] = useState(0);
+  const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
+  const [playlistLoading, setPlaylistLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,9 +104,10 @@ export default function StoreCockpitPage() {
       setSelectedStore(store);
 
       // Load store data in parallel
-      const [summaryData, listingsData] = await Promise.all([
+      const [summaryData, listingsData, playlistData] = await Promise.all([
         storeApi.getStoreSummary(store.id),
         storeApi.getStoreListings(store.id, { limit: 5 }),
+        storeApi.getStorePlaylists(store.id),
       ]);
 
       setSummary(summaryData);
@@ -111,6 +115,7 @@ export default function StoreCockpitPage() {
         setListings(listingsData.listings);
         setListingTotal(listingsData.meta.total);
       }
+      if (playlistData) setPlaylists(playlistData);
     } catch (err) {
       setError('매장 정보를 불러오는 중 오류가 발생했습니다.');
       console.error('[StoreCockpit] Load error:', err);
@@ -132,9 +137,10 @@ export default function StoreCockpitPage() {
     setLoading(true);
 
     try {
-      const [summaryData, listingsData] = await Promise.all([
+      const [summaryData, listingsData, playlistData] = await Promise.all([
         storeApi.getStoreSummary(store.id),
         storeApi.getStoreListings(store.id, { limit: 5 }),
+        storeApi.getStorePlaylists(store.id),
       ]);
 
       setSummary(summaryData);
@@ -142,12 +148,30 @@ export default function StoreCockpitPage() {
         setListings(listingsData.listings);
         setListingTotal(listingsData.meta.total);
       }
+      if (playlistData) setPlaylists(playlistData);
     } catch {
       setError('매장 데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   }, [stores]);
+
+  // Generate default playlist from top products
+  const handleGenerateDefault = useCallback(async () => {
+    if (!selectedStore) return;
+    setPlaylistLoading(true);
+    try {
+      const result = await storeApi.generateDefaultPlaylist(selectedStore.id);
+      if (result) {
+        const fresh = await storeApi.getStorePlaylists(selectedStore.id);
+        if (fresh) setPlaylists(fresh);
+      }
+    } catch (err) {
+      console.error('[StoreCockpit] Generate playlist error:', err);
+    } finally {
+      setPlaylistLoading(false);
+    }
+  }, [selectedStore]);
 
   // ============================================================================
   // Loading State
@@ -423,30 +447,64 @@ export default function StoreCockpitPage() {
       {/* Bottom row: 2 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ================================================================== */}
-        {/* Block 4: 콘텐츠/사이니지 (Placeholder) */}
+        {/* Block 4: 콘텐츠/사이니지 (WO-KCOS-STORES-PHASE4) */}
         {/* ================================================================== */}
         <div className="bg-white rounded-xl p-6 border border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-800">콘텐츠 / 사이니지</h2>
+            {playlists.length > 0 && (
+              <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                활성 {playlists.filter(p => p.isActive).length}개
+              </span>
+            )}
           </div>
-          <div className="text-center py-8 bg-slate-50 rounded-xl">
-            <svg className="w-12 h-12 text-slate-200 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <rect width="20" height="14" x="2" y="3" rx="2" />
-              <line x1="8" x2="16" y1="21" y2="21" />
-              <line x1="12" x2="12" y1="17" y2="21" />
-            </svg>
-            <p className="text-slate-500 text-sm font-medium">곧 제공 예정</p>
-            <p className="text-slate-400 text-xs mt-1">디지털 사이니지 콘텐츠를 관리하세요</p>
-            <NavLink
-              to="/operator/signage/content"
-              className="inline-flex items-center mt-3 text-sm text-pink-600 hover:text-pink-700"
-            >
-              사이니지 관리
-              <svg className="w-3.5 h-3.5 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+
+          {playlists.length > 0 ? (
+            <div className="space-y-2">
+              {playlists.map(pl => (
+                <div key={pl.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${pl.isActive ? 'bg-green-500' : 'bg-slate-300'}`} />
+                    <span className="text-sm text-slate-700 truncate">{pl.name}</span>
+                    <span className="text-xs text-slate-400 flex-shrink-0">{pl.items?.length || 0}개 항목</span>
+                  </div>
+                  <span className="text-xs text-slate-400 flex-shrink-0 ml-2">{formatDate(pl.updatedAt)}</span>
+                </div>
+              ))}
+              <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
+                <button
+                  onClick={handleGenerateDefault}
+                  disabled={playlistLoading}
+                  className="text-sm text-pink-600 hover:text-pink-700 font-medium disabled:opacity-50"
+                >
+                  {playlistLoading ? '생성중...' : '자동 편성'}
+                </button>
+                <NavLink
+                  to="/operator/signage/content"
+                  className="text-sm text-slate-500 hover:text-slate-700"
+                >
+                  사이니지 콘텐츠 →
+                </NavLink>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-slate-50 rounded-xl">
+              <svg className="w-12 h-12 text-slate-200 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect width="20" height="14" x="2" y="3" rx="2" />
+                <line x1="8" x2="16" y1="21" y2="21" />
+                <line x1="12" x2="12" y1="17" y2="21" />
               </svg>
-            </NavLink>
-          </div>
+              <p className="text-slate-500 text-sm font-medium">아직 플레이리스트가 없습니다</p>
+              <p className="text-slate-400 text-xs mt-1">인기 상품으로 자동 편성하거나 직접 만들어보세요</p>
+              <button
+                onClick={handleGenerateDefault}
+                disabled={playlistLoading}
+                className="inline-flex items-center mt-3 px-4 py-2 bg-pink-600 text-white text-sm rounded-lg hover:bg-pink-700 transition disabled:opacity-50"
+              >
+                {playlistLoading ? '생성중...' : '인기 상품 자동 편성'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ================================================================== */}

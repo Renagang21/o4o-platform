@@ -76,6 +76,24 @@ export interface StoreListing {
   createdAt: string;
 }
 
+export interface StorePlaylistItem {
+  id: string;
+  assetType: string;
+  referenceId: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface StorePlaylist {
+  id: string;
+  storeId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  items: StorePlaylistItem[];
+}
+
 // ============================================================================
 // Auth Helper
 // ============================================================================
@@ -117,6 +135,36 @@ async function fetchWithAuth<T>(endpoint: string): Promise<T | null> {
     return json.data || null;
   } catch (error) {
     console.error(`[StoreAPI] ${endpoint} error:`, error);
+    return null;
+  }
+}
+
+async function mutateWithAuth<T>(endpoint: string, method: string, body?: any): Promise<T | null> {
+  try {
+    const token = await getAuthToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/cosmetics/stores${endpoint}`, {
+      method,
+      headers,
+      credentials: 'include',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (!response.ok) {
+      console.error(`[StoreAPI] ${method} ${endpoint} failed:`, response.status);
+      return null;
+    }
+
+    const json = await response.json();
+    return json.data || null;
+  } catch (error) {
+    console.error(`[StoreAPI] ${method} ${endpoint} error:`, error);
     return null;
   }
 }
@@ -183,5 +231,33 @@ export const storeApi = {
     createdAt: string;
   }> | null> {
     return fetchWithAuth(`/${storeId}/members`);
+  },
+
+  // ==========================================================================
+  // Playlist API (WO-KCOS-STORES-PHASE4-SIGNAGE-INTEGRATION-V1)
+  // ==========================================================================
+
+  /** 매장 플레이리스트 목록 */
+  async getStorePlaylists(storeId: string): Promise<StorePlaylist[] | null> {
+    return fetchWithAuth<StorePlaylist[]>(`/${storeId}/playlists`);
+  },
+
+  /** 플레이리스트 생성 */
+  async createStorePlaylist(storeId: string, data: {
+    name: string;
+    items: Array<{ asset_type: string; reference_id: string; sort_order?: number }>;
+  }): Promise<StorePlaylist | null> {
+    return mutateWithAuth<StorePlaylist>(`/${storeId}/playlists`, 'POST', data);
+  },
+
+  /** 인기 상품 자동 편성 */
+  async generateDefaultPlaylist(storeId: string): Promise<StorePlaylist | null> {
+    return mutateWithAuth<StorePlaylist>(`/${storeId}/playlists/generate-default`, 'POST');
+  },
+
+  /** 플레이리스트 활성/비활성 토글 */
+  async togglePlaylistActive(storeId: string, playlistId: string): Promise<boolean> {
+    const result = await mutateWithAuth(`/${storeId}/playlists/${playlistId}/activate`, 'PATCH');
+    return result !== null;
   },
 };

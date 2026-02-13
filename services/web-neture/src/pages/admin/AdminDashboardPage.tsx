@@ -230,11 +230,11 @@ export default function AdminDashboardPage() {
               <span className="text-sm font-medium text-gray-700">서비스 관리</span>
             </Link>
             <Link
-              to="/admin/users"
+              to="/workspace/admin/operators"
               className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <span className="text-2xl mb-2">👥</span>
-              <span className="text-sm font-medium text-gray-700">사용자 관리</span>
+              <span className="text-sm font-medium text-gray-700">운영자 관리</span>
             </Link>
           </div>
         </div>

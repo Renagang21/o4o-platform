@@ -16,6 +16,7 @@ import {
 } from 'typeorm';
 import type { CosmeticsStoreMember } from './cosmetics-store-member.entity.js';
 import type { CosmeticsStoreListing } from './cosmetics-store-listing.entity.js';
+import type { CosmeticsStorePlaylist } from './cosmetics-store-playlist.entity.js';
 
 export enum CosmeticsStoreStatus {
   DRAFT = 'draft',
@@ -75,4 +76,7 @@ export class CosmeticsStore {
 
   @OneToMany('CosmeticsStoreListing', 'store')
   listings?: CosmeticsStoreListing[];
+
+  @OneToMany('CosmeticsStorePlaylist', 'store')
+  playlists?: CosmeticsStorePlaylist[];
 }

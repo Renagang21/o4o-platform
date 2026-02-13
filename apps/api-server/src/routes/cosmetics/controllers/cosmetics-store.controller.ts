@@ -11,6 +11,7 @@ import { body, query, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { CosmeticsStoreService } from '../services/cosmetics-store.service.js';
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
+import { CosmeticsStorePlaylistService } from '../services/cosmetics-store-playlist.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 function errorResponse(
@@ -44,6 +45,7 @@ export function createCosmeticsStoreController(
   const router = Router();
   const service = new CosmeticsStoreService(dataSource);
   const summaryService = new CosmeticsStoreSummaryService(dataSource);
+  const playlistService = new CosmeticsStorePlaylistService(dataSource);
 
   // ============================================================================
   // ADMIN ENDPOINTS (cosmetics:admin scope required)
@@ -395,6 +397,171 @@ export function createCosmeticsStoreController(
       }
     },
   );
+
+  // ============================================================================
+  // PLAYLIST ENDPOINTS (WO-KCOS-STORES-PHASE4-SIGNAGE-INTEGRATION-V1)
+  // ============================================================================
+
+  /**
+   * GET /cosmetics/stores/:storeId/playlists
+   * Get store playlists (member only)
+   */
+  router.get(
+    '/:storeId/playlists',
+    requireAuth,
+    [param('storeId').isUUID()],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || authReq.authUser?.id || '';
+
+        // Verify membership
+        const storeDetail = await service.getStoreDetail(req.params.storeId, userId);
+        if (!storeDetail) {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+
+        const playlists = await playlistService.getPlaylistsByStoreId(req.params.storeId);
+        res.json({ data: playlists });
+      } catch (error: any) {
+        console.error('[CosmeticsStore] Get playlists error:', error);
+        if (error.message === 'STORE_MEMBER_NOT_FOUND') {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+        errorResponse(res, 500, 'STORE_500', 'Internal server error');
+      }
+    },
+  );
+
+  /**
+   * POST /cosmetics/stores/:storeId/playlists/generate-default
+   * Auto-generate playlist from top products (member only)
+   * NOTE: Must be registered BEFORE /:storeId/playlists/:id/activate
+   */
+  router.post(
+    '/:storeId/playlists/generate-default',
+    requireAuth,
+    [param('storeId').isUUID()],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || authReq.authUser?.id || '';
+
+        // Verify membership
+        const storeDetail = await service.getStoreDetail(req.params.storeId, userId);
+        if (!storeDetail) {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+
+        const playlist = await playlistService.generateDefaultPlaylist(req.params.storeId);
+        res.status(201).json({ data: playlist });
+      } catch (error: any) {
+        console.error('[CosmeticsStore] Generate default playlist error:', error);
+        if (error.message === 'STORE_MEMBER_NOT_FOUND') {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+        errorResponse(res, 500, 'STORE_500', 'Internal server error');
+      }
+    },
+  );
+
+  /**
+   * POST /cosmetics/stores/:storeId/playlists
+   * Create a new playlist (member only)
+   */
+  router.post(
+    '/:storeId/playlists',
+    requireAuth,
+    [
+      param('storeId').isUUID(),
+      body('name').notEmpty().isString().isLength({ min: 1, max: 200 }),
+      body('items').isArray(),
+      body('items.*.asset_type').isString().isIn(['product', 'campaign', 'image']),
+      body('items.*.reference_id').isUUID(),
+      body('items.*.sort_order').optional().isInt({ min: 0 }),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || authReq.authUser?.id || '';
+
+        // Verify membership
+        const storeDetail = await service.getStoreDetail(req.params.storeId, userId);
+        if (!storeDetail) {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+
+        const playlist = await playlistService.createPlaylist(req.params.storeId, {
+          name: req.body.name,
+          items: (req.body.items || []).map((item: any) => ({
+            assetType: item.asset_type,
+            referenceId: item.reference_id,
+            sortOrder: item.sort_order,
+          })),
+        });
+
+        res.status(201).json({ data: playlist });
+      } catch (error: any) {
+        console.error('[CosmeticsStore] Create playlist error:', error);
+        if (error.message === 'STORE_MEMBER_NOT_FOUND') {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+        errorResponse(res, 500, 'STORE_500', 'Internal server error');
+      }
+    },
+  );
+
+  /**
+   * PATCH /cosmetics/stores/:storeId/playlists/:id/activate
+   * Toggle playlist active status (owner/manager only — staff excluded)
+   */
+  router.patch(
+    '/:storeId/playlists/:id/activate',
+    requireAuth,
+    [
+      param('storeId').isUUID(),
+      param('id').isUUID(),
+    ],
+    async (req: Request, res: Response) => {
+      try {
+        if (handleValidationErrors(req, res)) return;
+
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id || authReq.authUser?.id || '';
+
+        // Verify membership and check role
+        const storeDetail = await service.getStoreDetail(req.params.storeId, userId);
+        if (!storeDetail) {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+        if (storeDetail.data?.myRole === 'staff') {
+          return errorResponse(res, 403, 'STORE_018', 'Staff cannot toggle playlist status');
+        }
+
+        const result = await playlistService.togglePlaylistActive(req.params.id, req.params.storeId);
+        res.json({ data: result });
+      } catch (error: any) {
+        console.error('[CosmeticsStore] Toggle playlist active error:', error);
+        if (error.message === 'PLAYLIST_NOT_FOUND') {
+          return errorResponse(res, 404, 'STORE_017', 'Playlist not found');
+        }
+        if (error.message === 'STORE_MEMBER_NOT_FOUND') {
+          return errorResponse(res, 403, 'STORE_003', 'You are not a member of this store');
+        }
+        errorResponse(res, 500, 'STORE_500', 'Internal server error');
+      }
+    },
+  );
+
+  // ============================================================================
+  // STORE DETAIL & LISTING ENDPOINTS
+  // ============================================================================
 
   /**
    * GET /cosmetics/stores/:storeId

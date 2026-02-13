@@ -133,7 +133,7 @@ export class CosmeticsStoreSummaryService {
     }));
   }
 
-  private async getTopProducts(storeId: string, limit = 5): Promise<TopProduct[]> {
+  async getTopProducts(storeId: string, limit = 5): Promise<TopProduct[]> {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 

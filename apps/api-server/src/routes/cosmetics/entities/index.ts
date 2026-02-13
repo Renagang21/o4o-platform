@@ -40,3 +40,9 @@ export * from './cosmetics-store.entity.js';
 export * from './cosmetics-store-application.entity.js';
 export * from './cosmetics-store-member.entity.js';
 export * from './cosmetics-store-listing.entity.js';
+
+// ============================================================================
+// STORE PLAYLIST ENTITIES (WO-KCOS-STORES-PHASE4-SIGNAGE-INTEGRATION-V1)
+// ============================================================================
+export * from './cosmetics-store-playlist.entity.js';
+export * from './cosmetics-store-playlist-item.entity.js';

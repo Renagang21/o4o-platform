@@ -1083,6 +1083,62 @@ export const sellerApi = {
   },
 };
 
+// ==================== Admin Operator API (WO-NETURE-OPERATOR-UI-REALIZATION-V1) ====================
+
+export interface NetureOperatorInfo {
+  id: string;
+  name: string;
+  email: string;
+  roles: string[];
+  isActive: boolean;
+  createdAt: string;
+}
+
+export const adminOperatorApi = {
+  async getOperators(includeInactive = false): Promise<NetureOperatorInfo[]> {
+    try {
+      const qs = includeInactive ? '?includeInactive=true' : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/operators${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) {
+        console.warn('[Admin API] Operators API not available');
+        return [];
+      }
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch operators:', error);
+      return [];
+    }
+  },
+
+  async deactivateOperator(userId: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/operators/${userId}/deactivate`,
+        { method: 'PATCH', credentials: 'include' },
+      );
+      return response.ok;
+    } catch {
+      return false;
+    }
+  },
+
+  async reactivateOperator(userId: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/operators/${userId}/reactivate`,
+        { method: 'PATCH', credentials: 'include' },
+      );
+      return response.ok;
+    } catch {
+      return false;
+    }
+  },
+};
+
 // ==================== Additional Types ====================
 
 export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';

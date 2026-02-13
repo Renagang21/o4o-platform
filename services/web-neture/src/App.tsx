@@ -210,6 +210,9 @@ const EmailSettingsPage = lazy(() =>
   import('./pages/admin/settings').then((m) => ({ default: m.EmailSettingsPage }))
 );
 
+// Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1)
+const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
+
 // Operator Dashboard
 const NetureOperatorDashboard = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.NetureOperatorDashboard }))
@@ -511,6 +514,8 @@ function App() {
               <Route path="/workspace/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
               {/* Admin Settings */}
               <Route path="/workspace/admin/settings/email" element={<EmailSettingsPage />} />
+              {/* Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1) */}
+              <Route path="/workspace/admin/operators" element={<OperatorsPage />} />
             </Route>
 
             {/* ================================================================

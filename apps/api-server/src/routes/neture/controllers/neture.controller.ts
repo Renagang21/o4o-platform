@@ -530,6 +530,142 @@ export function createNetureController(dataSource: DataSource): Router {
     }
   });
 
+  // ============================================================================
+  // ADMIN: OPERATOR MANAGEMENT (WO-NETURE-OPERATOR-UI-REALIZATION-V1)
+  // ============================================================================
+
+  /**
+   * GET /admin/operators
+   * Neture 역할 보유 사용자 목록 (neture:admin, neture:operator)
+   */
+  router.get('/admin/operators', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+      }
+      const userRoles: string[] = user.roles || [];
+      if (!isServiceAdmin(userRoles, 'neture')) {
+        return res.status(403).json({ success: false, error: 'Neture admin role required' });
+      }
+
+      const includeInactive = req.query.includeInactive === 'true';
+
+      const whereClause = includeInactive
+        ? `WHERE u.roles && ARRAY['neture:admin', 'neture:operator']::text[]`
+        : `WHERE u.roles && ARRAY['neture:admin', 'neture:operator']::text[] AND u."isActive" = true`;
+
+      const operators = await dataSource.query(
+        `SELECT u.id, u.name, u.email, u.roles, u."isActive", u."createdAt", u."updatedAt"
+         FROM "user" u
+         ${whereClause}
+         ORDER BY u."createdAt" DESC`
+      );
+
+      res.json({
+        success: true,
+        data: operators.map((op: any) => ({
+          id: op.id,
+          name: op.name || '-',
+          email: op.email || '-',
+          roles: (op.roles || []).filter((r: string) => r.startsWith('neture:')),
+          isActive: op.isActive,
+          createdAt: op.createdAt,
+        })),
+      });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching operators:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch operators' });
+    }
+  });
+
+  /**
+   * PATCH /admin/operators/:id/deactivate
+   * 사용자 비활성화 (isActive = false)
+   */
+  router.patch('/admin/operators/:id/deactivate', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+      }
+      const userRoles: string[] = user.roles || [];
+      if (!isServiceAdmin(userRoles, 'neture')) {
+        return res.status(403).json({ success: false, error: 'Neture admin role required' });
+      }
+
+      const targetId = req.params.id;
+
+      // Prevent self-deactivation
+      if (targetId === user.id) {
+        return res.status(400).json({ success: false, error: 'Cannot deactivate yourself' });
+      }
+
+      const [target] = await dataSource.query(
+        `SELECT id, "isActive", roles FROM "user" WHERE id = $1`,
+        [targetId]
+      );
+
+      if (!target) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+      if (!target.isActive) {
+        return res.status(400).json({ success: false, error: 'User already inactive' });
+      }
+
+      await dataSource.query(
+        `UPDATE "user" SET "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+        [targetId]
+      );
+
+      res.json({ success: true, data: { id: targetId, deactivated: true } });
+    } catch (error) {
+      logger.error('[Neture API] Error deactivating operator:', error);
+      res.status(500).json({ success: false, error: 'Failed to deactivate operator' });
+    }
+  });
+
+  /**
+   * PATCH /admin/operators/:id/reactivate
+   * 사용자 재활성화 (isActive = true)
+   */
+  router.patch('/admin/operators/:id/reactivate', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+      }
+      const userRoles: string[] = user.roles || [];
+      if (!isServiceAdmin(userRoles, 'neture')) {
+        return res.status(403).json({ success: false, error: 'Neture admin role required' });
+      }
+
+      const targetId = req.params.id;
+
+      const [target] = await dataSource.query(
+        `SELECT id, "isActive" FROM "user" WHERE id = $1`,
+        [targetId]
+      );
+
+      if (!target) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+      if (target.isActive) {
+        return res.status(400).json({ success: false, error: 'User already active' });
+      }
+
+      await dataSource.query(
+        `UPDATE "user" SET "isActive" = true, "updatedAt" = NOW() WHERE id = $1`,
+        [targetId]
+      );
+
+      res.json({ success: true, data: { id: targetId, reactivated: true } });
+    } catch (error) {
+      logger.error('[Neture API] Error reactivating operator:', error);
+      res.status(500).json({ success: false, error: 'Failed to reactivate operator' });
+    }
+  });
+
   return router;
 }
 
