@@ -4,19 +4,37 @@
  * WO-K-COSMETICS-OPERATOR-DASHBOARD-UX-V1
  * WO-OPERATOR-CORE-PHASE4-KCOSMETICS: Core Shell + K-Cosmetics Config 전환
  * WO-OPERATOR-AI-ACTION-LAYER-V1: AI 행동 제안 패널 추가
+ * WO-OPERATOR-ACTION-TRIGGER-V1: 즉시 실행 트리거 추가
  *
  * 구조:
  *  [ Hero Summary ]     — 매장 운영 상태 배지 (3초 판단)
- *  [ Action Panel ]     — AI 행동 제안 (alert/warning 기반)
+ *  [ Action Panel ]     — AI 행동 제안 + 즉시 실행 트리거
  *  [ Action Signals ]   — 행동 유도 카드 3장
  *  [ Recent Activity ]  — 최근 운영 활동 5건
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { OperatorLayout, generateOperatorActions } from '@o4o/operator-core';
+import {
+  OperatorLayout,
+  generateOperatorActions,
+  type OperatorActionSuggestion,
+} from '@o4o/operator-core';
 import { operatorApi, type OperatorDashboardSummary } from '@/services/operatorApi';
 import { buildKCosmeticsOperatorConfig } from './operatorConfig';
+
+// ─── Trigger Definitions ───
+
+const TRIGGER_ACTIONS: OperatorActionSuggestion[] = [
+  {
+    id: 'trigger-refreshSummary',
+    priority: 'low',
+    title: '대시보드 데이터 새로고침',
+    description: '최신 운영 현황을 다시 불러옵니다',
+    actionType: 'trigger',
+    trigger: { key: 'refreshSummary' },
+  },
+];
 
 export default function KCosmeticsOperatorDashboard() {
   const navigate = useNavigate();
@@ -43,9 +61,19 @@ export default function KCosmeticsOperatorDashboard() {
 
   const config = buildKCosmeticsOperatorConfig(summary);
   const actions = useMemo(
-    () => (config ? generateOperatorActions(config.signalCards) : []),
+    () => config
+      ? [...generateOperatorActions(config.signalCards), ...TRIGGER_ACTIONS]
+      : [],
     [config],
   );
+
+  const handleTrigger = useCallback(async (key: string) => {
+    switch (key) {
+      case 'refreshSummary':
+        await fetchData();
+        break;
+    }
+  }, [fetchData]);
 
   return (
     <OperatorLayout
@@ -55,6 +83,7 @@ export default function KCosmeticsOperatorDashboard() {
       onRefresh={fetchData}
       actions={actions}
       onActionNavigate={(route) => navigate(route)}
+      onActionTrigger={handleTrigger}
     />
   );
 }

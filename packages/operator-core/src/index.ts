@@ -40,7 +40,7 @@ export {
   sortAndLimitActivity,
 } from './signal';
 
-// AI Action Layer (WO-OPERATOR-AI-ACTION-LAYER-V1)
-export type { OperatorActionSuggestion } from './action';
+// AI Action Layer (WO-OPERATOR-AI-ACTION-LAYER-V1, WO-OPERATOR-ACTION-TRIGGER-V1)
+export type { OperatorActionSuggestion, OperatorActionTrigger } from './action';
 export { generateOperatorActions } from './action';
 export { OperatorActionPanel } from './layout/OperatorActionPanel';

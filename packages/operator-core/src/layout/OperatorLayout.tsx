@@ -26,6 +26,7 @@ export function OperatorLayout({
   onRefresh,
   actions,
   onActionNavigate,
+  onActionTrigger,
   children,
 }: {
   config: OperatorDashboardConfig | null;
@@ -36,6 +37,8 @@ export function OperatorLayout({
   actions?: OperatorActionSuggestion[];
   /** 행동 제안 클릭 시 라우팅 핸들러 */
   onActionNavigate?: (route: string) => void;
+  /** 트리거 실행 핸들러 (actionType === 'trigger') */
+  onActionTrigger?: (key: string) => void | Promise<void>;
   children?: React.ReactNode;
 }) {
   return (
@@ -80,7 +83,7 @@ export function OperatorLayout({
 
       {/* Action Panel — Hero 아래, Signal Cards 위 */}
       {actions && actions.length > 0 && (
-        <OperatorActionPanel actions={actions} onNavigate={onActionNavigate} />
+        <OperatorActionPanel actions={actions} onNavigate={onActionNavigate} onTrigger={onActionTrigger} />
       )}
 
       {/* Signal Cards */}

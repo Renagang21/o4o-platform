@@ -4,10 +4,11 @@
  * WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1
  * WO-OPERATOR-CORE-PHASE3-GLYCOPHARM: Core Shell + GlycoPharm Config 전환
  * WO-OPERATOR-AI-ACTION-LAYER-V1: AI 행동 제안 패널 추가
+ * WO-OPERATOR-ACTION-TRIGGER-V1: 즉시 실행 트리거 추가
  *
  * 구조:
  *  [ Hero Summary ]     — 서비스 상태 배지 (3초 판단)
- *  [ Action Panel ]     — AI 행동 제안 (alert/warning 기반)
+ *  [ Action Panel ]     — AI 행동 제안 + 즉시 실행 트리거
  *  [ Action Signals ]   — 행동 유도 카드 3장
  *  [ Status Feed ]      — 주요 운영 지표 5건 (children)
  *  [ Analytics Link ]   — 상세 분석 링크 (children)
@@ -23,9 +24,26 @@ import {
   FileText,
   AlertCircle,
 } from 'lucide-react';
-import { OperatorLayout, generateOperatorActions } from '@o4o/operator-core';
+import {
+  OperatorLayout,
+  generateOperatorActions,
+  type OperatorActionSuggestion,
+} from '@o4o/operator-core';
 import { glycopharmApi, type OperatorDashboardData } from '@/api/glycopharm';
 import { buildGlycoPharmOperatorConfig } from './operatorConfig';
+
+// ─── Trigger Definitions ───
+
+const TRIGGER_ACTIONS: OperatorActionSuggestion[] = [
+  {
+    id: 'trigger-refreshSummary',
+    priority: 'low',
+    title: '대시보드 데이터 새로고침',
+    description: '최신 운영 현황을 다시 불러옵니다',
+    actionType: 'trigger',
+    trigger: { key: 'refreshSummary' },
+  },
+];
 
 // ─── Status Feed (GlycoPharm 고유 — KPI 지표 목록) ───
 
@@ -113,9 +131,19 @@ export default function GlycoPharmOperatorDashboard() {
   const config = buildGlycoPharmOperatorConfig(data);
   const feed = data ? buildStatusFeed(data) : [];
   const actions = useMemo(
-    () => (config ? generateOperatorActions(config.signalCards) : []),
+    () => config
+      ? [...generateOperatorActions(config.signalCards), ...TRIGGER_ACTIONS]
+      : [],
     [config],
   );
+
+  const handleTrigger = useCallback(async (key: string) => {
+    switch (key) {
+      case 'refreshSummary':
+        await fetchData();
+        break;
+    }
+  }, [fetchData]);
 
   return (
     <OperatorLayout
@@ -125,6 +153,7 @@ export default function GlycoPharmOperatorDashboard() {
       onRefresh={fetchData}
       actions={actions}
       onActionNavigate={(route) => navigate(route)}
+      onActionTrigger={handleTrigger}
     >
       {/* Status Feed — GlycoPharm 고유 KPI 지표 */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
