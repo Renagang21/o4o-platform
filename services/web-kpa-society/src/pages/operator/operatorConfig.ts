@@ -3,6 +3,7 @@
  *
  * OperatorSummary → OperatorDashboardConfig 변환.
  * WO-OPERATOR-SIGNAL-CORE-V1: 공통 signal 엔진 사용.
+ * WO-OPERATOR-SIGNAL-THRESHOLD-CONFIG-V1: Threshold 기반 판정.
  */
 
 import { MessageSquarePlus, Monitor, Users } from 'lucide-react';
@@ -11,6 +12,7 @@ import type {
   OperatorSignalCardConfig,
   OperatorActivityItem,
   OperatorDashboardConfig,
+  OperatorThresholdConfig,
 } from '@o4o/operator-core';
 import {
   computeOverallSignal,
@@ -19,6 +21,13 @@ import {
   sortAndLimitActivity,
 } from '@o4o/operator-core';
 import type { OperatorSummary } from '../../api/operator';
+
+// ─── KPA Threshold Config ───
+
+const KPA_THRESHOLDS: OperatorThresholdConfig = {
+  forum: { warning: 0, alert: 0 },
+  content: { warning: 0, alert: 0 },
+};
 
 // ─── Activity feed builder ───
 
@@ -58,11 +67,13 @@ export function buildKpaOperatorConfig(summary: OperatorSummary | null): Operato
   const forumSignal = computeForumSignal(
     forum?.totalPosts || 0,
     forum?.recentPosts?.length || 0,
+    KPA_THRESHOLDS.forum,
   );
   const contentSignal = computeContentSignageSignal(
     content?.totalPublished || 0,
     signage?.totalMedia || 0,
     signage?.totalPlaylists || 0,
+    KPA_THRESHOLDS.content,
   );
   const overall = computeOverallSignal([
     (content?.totalPublished || 0) > 0,
@@ -129,11 +140,13 @@ export function buildBranchOperatorConfig(summary: OperatorSummary | null): Oper
   const forumSignal = computeForumSignal(
     forum?.totalPosts || 0,
     forum?.recentPosts?.length || 0,
+    KPA_THRESHOLDS.forum,
   );
   const contentSignal = computeContentSignageSignal(
     content?.totalPublished || 0,
     signage?.totalMedia || 0,
     signage?.totalPlaylists || 0,
+    KPA_THRESHOLDS.content,
   );
   const overall = computeOverallSignal([
     (content?.totalPublished || 0) > 0,

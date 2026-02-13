@@ -3,6 +3,7 @@
  *
  * AdminDashboardSummary → OperatorDashboardConfig 변환.
  * WO-OPERATOR-SIGNAL-CORE-V1: 공통 signal 엔진 사용.
+ * WO-OPERATOR-SIGNAL-THRESHOLD-CONFIG-V1: Threshold 기반 판정.
  */
 
 import { Monitor, Building2, MessageSquarePlus } from 'lucide-react';
@@ -12,6 +13,7 @@ import type {
   OperatorSignalCardConfig,
   OperatorActivityItem,
   OperatorDashboardConfig,
+  OperatorThresholdConfig,
 } from '@o4o/operator-core';
 import {
   computeOverallSignal,
@@ -20,6 +22,13 @@ import {
   sortAndLimitActivity,
 } from '@o4o/operator-core';
 import type { AdminDashboardSummary } from '../../lib/api';
+
+// ─── Neture Threshold Config ───
+
+const NETURE_THRESHOLDS: OperatorThresholdConfig = {
+  forum: { warning: 0, alert: 0 },
+  content: { warning: 0, alert: 0 },
+};
 
 // ─── Neture-specific signal (파트너) ───
 
@@ -90,11 +99,13 @@ export function buildNetureOperatorConfig(
     summary.content?.totalPublished || 0,
     summary.signage?.totalMedia || 0,
     summary.signage?.totalPlaylists || 0,
+    NETURE_THRESHOLDS.content,
   );
   const partnerSignal = getPartnerSignal(summary);
   const forumSignal = computeForumSignal(
     summary.forum?.totalPosts || 0,
     summary.forum?.recentPosts?.length || 0,
+    NETURE_THRESHOLDS.forum,
   );
   const overall = computeOverallSignal([
     (summary.content?.totalPublished || 0) > 0 ||

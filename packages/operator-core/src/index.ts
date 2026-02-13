@@ -28,6 +28,10 @@ export { StatusDot } from './components/StatusDot';
 // Utils
 export { timeAgo } from './utils';
 
+// Threshold Config (WO-OPERATOR-SIGNAL-THRESHOLD-CONFIG-V1)
+export type { ThresholdRule, OperatorThresholdConfig } from './threshold';
+export { DEFAULT_THRESHOLD } from './threshold';
+
 // Signal Engine (WO-OPERATOR-SIGNAL-CORE-V1)
 export {
   computeOverallSignal,
