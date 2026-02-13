@@ -8,6 +8,7 @@
 import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
+import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -110,7 +111,7 @@ export function createApplicationController(
         application.userId = userId;
         application.organizationType = organizationType;
         application.organizationName = organizationName;
-        application.businessNumber = businessNumber;
+        application.businessNumber = businessNumber ? normalizeBusinessNumber(businessNumber) : undefined;
         application.serviceTypes = serviceTypes;
         application.note = note;
         application.status = 'submitted';

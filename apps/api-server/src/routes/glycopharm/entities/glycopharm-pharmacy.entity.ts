@@ -12,6 +12,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
@@ -41,8 +42,9 @@ export class GlycopharmPharmacy {
   @Column({ type: 'varchar', length: 100, nullable: true })
   owner_name?: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  business_number?: string;
+  @Column({ type: 'varchar', length: 20, unique: true })
+  @Index()
+  business_number!: string;
 
   @Column({ type: 'varchar', length: 20, default: 'active' })
   status!: GlycopharmPharmacyStatus;

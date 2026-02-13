@@ -8,6 +8,7 @@
 import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
+import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { GlucoseViewApplication } from '../entities/glucoseview-application.entity.js';
 import { GlucoseViewPharmacy } from '../entities/glucoseview-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -156,7 +157,7 @@ export function createGlucoseViewApplicationController(
         const application = new GlucoseViewApplication();
         application.userId = userId;
         application.pharmacyName = pharmacyName;
-        application.businessNumber = businessNumber;
+        application.businessNumber = businessNumber ? normalizeBusinessNumber(businessNumber) : undefined;
         application.pharmacyId = pharmacyId;
         application.serviceTypes = ['cgm_view'];
         application.note = note;
@@ -566,7 +567,7 @@ export function createGlucoseViewApplicationController(
             pharmacy = new GlucoseViewPharmacy();
             pharmacy.userId = application.userId;
             pharmacy.name = application.pharmacyName;
-            pharmacy.businessNumber = application.businessNumber;
+            pharmacy.businessNumber = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
             pharmacy.glycopharmPharmacyId = application.pharmacyId;
             pharmacy.status = 'active';
             pharmacy.enabledServices = ['cgm_view'];

@@ -8,6 +8,7 @@
 import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
+import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
@@ -293,7 +294,7 @@ export function createAdminController(
             pharmacy = new GlycopharmPharmacy();
             pharmacy.name = application.organizationName;
             pharmacy.code = generatePharmacyCode();
-            pharmacy.business_number = application.businessNumber;
+            pharmacy.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
             pharmacy.status = 'active';
             pharmacy.created_by_user_id = application.userId;
             pharmacy.enabled_services = application.serviceTypes;

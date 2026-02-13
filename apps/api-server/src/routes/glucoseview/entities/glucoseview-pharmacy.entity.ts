@@ -12,6 +12,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import type { GlucoseViewServiceType } from './glucoseview-application.entity.js';
 
@@ -43,8 +44,9 @@ export class GlucoseViewPharmacy {
   /**
    * 사업자번호
    */
-  @Column({ name: 'business_number', type: 'varchar', length: 100, nullable: true })
-  businessNumber?: string;
+  @Column({ name: 'business_number', type: 'varchar', length: 20, unique: true })
+  @Index()
+  businessNumber!: string;
 
   /**
    * 상태

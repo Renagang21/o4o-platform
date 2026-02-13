@@ -6,6 +6,7 @@
  */
 
 import { DataSource } from 'typeorm';
+import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 import { GlycopharmPharmacy, GlycopharmPharmacyStatus } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct, GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
@@ -71,6 +72,7 @@ export class GlycopharmService {
     const pharmacy = await this.repository.createPharmacy({
       ...dto,
       phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
+      business_number: dto.business_number ? normalizeBusinessNumber(dto.business_number) : dto.business_number,
       status: 'active',
       created_by_user_id: userId,
       created_by_user_name: userName,

@@ -8,6 +8,7 @@
  */
 
 import { DataSource } from 'typeorm';
+import { normalizeBusinessNumber } from '../../utils/business-number.js';
 
 // ==================== Types ====================
 
@@ -333,8 +334,4 @@ export class PhysicalStoreService {
   }
 }
 
-// ---- Helpers ----
-
-function normalizeBusinessNumber(bn: string): string {
-  return bn.replace(/\D/g, '');
-}
+// normalizeBusinessNumber imported from utils/business-number.ts

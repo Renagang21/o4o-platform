@@ -6,6 +6,7 @@
  */
 
 import { DataSource } from 'typeorm';
+import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { CosmeticsStoreRepository } from '../repositories/cosmetics-store.repository.js';
 import {
   CosmeticsStoreStatus,
@@ -34,7 +35,7 @@ export class CosmeticsStoreService {
     region?: string;
     note?: string;
   }, userId: string) {
-    const normalizedBN = this.normalizeBusinessNumber(dto.businessNumber);
+    const normalizedBN = normalizeBusinessNumber(dto.businessNumber);
 
     // Check for existing pending application
     const pending = await this.repository.findPendingApplicationByUserId(userId);
@@ -470,11 +471,5 @@ export class CosmeticsStoreService {
     return `CS-${timestamp}-${random}`;
   }
 
-  /**
-   * Normalize business number: remove hyphens, spaces, dots
-   * "123-45-67890" → "1234567890"
-   */
-  private normalizeBusinessNumber(raw: string): string {
-    return raw.replace(/[\s\-\.]/g, '');
-  }
+  // normalizeBusinessNumber imported from utils/business-number.ts
 }
