@@ -291,8 +291,10 @@ function App() {
            * WO-KPA-PHARMACY-DEPTH-V1: 깊이 화면 추가
            * ======================================== */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
-          {/* WO-PHARMACY-CONTEXT-MVP-V1: 약국경영 대시보드 (Context 기반 보호) */}
-          <Route path="/pharmacy/dashboard" element={<Layout serviceName={SERVICE_NAME}><PharmacyDashboardPage /></Layout>} />
+          {/* WO-PHARMACY-HUB-REALIGN-PHASEH1-V1: 약국 운영 허브 (dashboard → hub 개념 전환) */}
+          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyDashboardPage /></Layout>} />
+          {/* 기존 /pharmacy/dashboard 하위호환 리다이렉트 */}
+          <Route path="/pharmacy/dashboard" element={<Navigate to="/pharmacy/hub" replace />} />
           <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyB2BPage /></Layout>} />
           <Route path="/pharmacy/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><SupplierListPage /></Layout>} />
           <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><SupplierDetailPage /></Layout>} />

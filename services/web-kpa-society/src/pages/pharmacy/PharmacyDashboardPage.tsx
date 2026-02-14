@@ -1,9 +1,9 @@
 /**
- * PharmacyDashboardPage - 약국경영 대시보드
+ * PharmacyDashboardPage - 약국 운영 허브
  *
- * WO-PHARMACY-DASHBOARD-REALIGN-PHASEA1-V1
+ * WO-PHARMACY-HUB-REALIGN-PHASEH1-V1
  *
- * 약국 Context 진입 후 매장 운영 허브 중심 대시보드.
+ * 약국 Context 진입 후 매장 운영 허브.
  * - ContextGuard로 pharmacy Context 필수
  * - StoreOverview: 매장 현황 요약 (최상단)
  * - StoreManagement: 매장 관리 링크 그룹
@@ -33,10 +33,10 @@ function PharmacyDashboardContent() {
         borderBottom: '2px solid #e2e8f0',
       }}>
         <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: '#0f172a' }}>
-          약국경영
+          약국 운영 허브
         </h1>
         <p style={{ margin: '8px 0 0', fontSize: '15px', color: '#64748b' }}>
-          {currentOrganization.name} — 약국 경영 지원 대시보드
+          {currentOrganization.name} — 약국 경영 지원
         </p>
       </div>
 

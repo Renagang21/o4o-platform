@@ -42,6 +42,9 @@ export class KpaOrganization {
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
+  @Column({ type: 'jsonb', default: '{}' })
+  storefront_config: Record<string, any>;
+
   @CreateDateColumn()
   created_at: Date;
 

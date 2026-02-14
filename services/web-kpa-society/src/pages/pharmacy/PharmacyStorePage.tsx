@@ -15,11 +15,12 @@
  * 유료 커스텀: 템플릿 구조 변경, 신규 컴포넌트, 레이아웃 재배치
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
+import { getStoreConfig, saveStoreConfig } from '../../api/pharmacyStoreConfig';
 
 // 템플릿 정의
 const templates = [
@@ -82,8 +83,8 @@ const devices = [
   { id: 'kiosk', name: '키오스크', icon: '🖥️', description: '무인 주문/안내 키오스크' },
 ];
 
-// Mock 현재 설정
-const mockCurrentSettings = {
+// 기본 설정값
+const defaultSettings = {
   template: 'standard',
   theme: 'default',
   components: {
@@ -96,17 +97,9 @@ const mockCurrentSettings = {
     'health-info': false,
     'pharmacy-info': true,
   },
-  deviceSettings: {
-    mall: { template: 'standard', theme: 'default' },
-    tablet: { template: 'compact', theme: 'default' },
-    kiosk: { template: 'visual', theme: 'warm' },
-  },
 };
 
-// Mock 약국 정보
-const mockPharmacy = {
-  name: '강남중앙약국',
-};
+type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export function PharmacyStorePage() {
   const { user } = useAuth();
@@ -118,10 +111,58 @@ export function PharmacyStorePage() {
   const roleLabel = isOwner ? '개설약사' : '근무약사';
 
   // 상태 관리
-  const [selectedTemplate, setSelectedTemplate] = useState(mockCurrentSettings.template);
-  const [selectedTheme, setSelectedTheme] = useState(mockCurrentSettings.theme);
-  const [componentStates, setComponentStates] = useState(mockCurrentSettings.components);
+  const [selectedTemplate, setSelectedTemplate] = useState(defaultSettings.template);
+  const [selectedTheme, setSelectedTheme] = useState(defaultSettings.theme);
+  const [componentStates, setComponentStates] = useState(defaultSettings.components);
   const [previewDevice, setPreviewDevice] = useState<'mall' | 'tablet' | 'kiosk'>('mall');
+  const [pharmacyName, setPharmacyName] = useState('내 약국');
+  const [, setConfigLoaded] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+
+  // 서버에서 설정 로드
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getStoreConfig();
+        if (cancelled) return;
+        const cfg = data.storefrontConfig || {};
+        if (cfg.template) setSelectedTemplate(cfg.template as string);
+        if (cfg.theme) setSelectedTheme(cfg.theme as string);
+        if (cfg.components) setComponentStates(prev => ({ ...prev, ...(cfg.components as Record<string, boolean>) }));
+        if (data.organizationName) setPharmacyName(data.organizationName);
+        setConfigLoaded(true);
+      } catch {
+        // 서버 연결 실패 시 기본값 사용
+        setConfigLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // 서버에 설정 저장
+  const handleSave = useCallback(async () => {
+    setSaveState('saving');
+    try {
+      await saveStoreConfig({
+        template: selectedTemplate,
+        theme: selectedTheme,
+        components: componentStates,
+      });
+      setSaveState('saved');
+      setTimeout(() => setSaveState('idle'), 2000);
+    } catch {
+      setSaveState('error');
+      setTimeout(() => setSaveState('idle'), 3000);
+    }
+  }, [selectedTemplate, selectedTheme, componentStates]);
+
+  // 기본값으로 초기화
+  const handleReset = useCallback(() => {
+    setSelectedTemplate(defaultSettings.template);
+    setSelectedTheme(defaultSettings.theme);
+    setComponentStates(defaultSettings.components);
+  }, []);
 
   // 컴포넌트 토글
   const toggleComponent = (componentId: string) => {
@@ -165,7 +206,7 @@ export function PharmacyStorePage() {
           <Link to="/pharmacy" style={styles.backLink}>← 돌아가기</Link>
           <div style={styles.headerMain}>
             <div style={styles.pharmacyInfo}>
-              <h1 style={styles.pharmacyName}>{mockPharmacy.name}</h1>
+              <h1 style={styles.pharmacyName}>{pharmacyName}</h1>
               <span style={styles.subLabel}>· 매장 UI-UX 관리</span>
             </div>
             <div style={styles.roleInfo}>
@@ -322,7 +363,7 @@ export function PharmacyStorePage() {
                   ...styles.mockHeader,
                   backgroundColor: themes.find(t => t.id === selectedTheme)?.primaryColor,
                 }}>
-                  <span style={styles.mockLogo}>💊 {mockPharmacy.name}</span>
+                  <span style={styles.mockLogo}>💊 {pharmacyName}</span>
                 </div>
                 <div style={styles.mockBody}>
                   {componentStates.banner && (
@@ -367,10 +408,20 @@ export function PharmacyStorePage() {
 
           {/* 저장 버튼 */}
           <div style={styles.actionButtons}>
-            <button style={styles.saveButton}>
-              변경사항 저장
+            <button
+              style={{
+                ...styles.saveButton,
+                opacity: saveState === 'saving' ? 0.7 : 1,
+              }}
+              onClick={handleSave}
+              disabled={saveState === 'saving'}
+            >
+              {saveState === 'saving' ? '저장 중...' :
+               saveState === 'saved' ? '저장 완료' :
+               saveState === 'error' ? '저장 실패 — 다시 시도' :
+               '변경사항 저장'}
             </button>
-            <button style={styles.resetButton}>
+            <button style={styles.resetButton} onClick={handleReset}>
               기본값으로 초기화
             </button>
           </div>
