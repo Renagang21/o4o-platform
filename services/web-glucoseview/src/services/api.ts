@@ -27,6 +27,54 @@ interface ApiError {
   };
 }
 
+// Care Analysis types
+export interface CareInsightDto {
+  patientId: string;
+  tir: number;
+  cv: number;
+  riskLevel: 'low' | 'moderate' | 'high';
+  insights: string[];
+}
+
+export interface KpiComparisonDto {
+  latestTir: number | null;
+  previousTir: number | null;
+  tirChange: number | null;
+  latestCv: number | null;
+  previousCv: number | null;
+  cvChange: number | null;
+  riskTrend: 'improving' | 'stable' | 'worsening' | null;
+}
+
+export interface CareDashboardDto {
+  totalPatients: number;
+  highRiskCount: number;
+  moderateRiskCount: number;
+  lowRiskCount: number;
+  recentCoachingCount: number;
+  improvingCount: number;
+  recentSnapshots: Array<{ patientId: string; riskLevel: string; createdAt: string }>;
+  recentSessions: Array<{ patientId: string; summary: string; createdAt: string }>;
+}
+
+export interface CoachingSession {
+  id: string;
+  patientId: string;
+  pharmacistId: string;
+  snapshotId: string | null;
+  summary: string;
+  actionPlan: string;
+  createdAt: string;
+}
+
+export interface CreateCoachingSessionRequest {
+  patientId: string;
+  pharmacistId: string;
+  snapshotId?: string;
+  summary: string;
+  actionPlan: string;
+}
+
 // Customer types
 export interface Customer {
   id: string;
@@ -217,6 +265,33 @@ class ApiService {
     }
 
     return response.json();
+  }
+
+  // Care Analysis endpoints (WO-CARE-ANALYSIS-PROVIDER-V1)
+  async getCareAnalysis(patientId: string): Promise<CareInsightDto> {
+    return this.request<CareInsightDto>(`/api/v1/care/analysis/${patientId}`);
+  }
+
+  // Care KPI endpoints (WO-CARE-KPI-SNAPSHOT-V1)
+  async getCareKpi(patientId: string): Promise<KpiComparisonDto> {
+    return this.request<KpiComparisonDto>(`/api/v1/care/kpi/${patientId}`);
+  }
+
+  // Care Coaching endpoints (WO-CARE-COACHING-ENGINE-V1)
+  async createCoachingSession(data: CreateCoachingSessionRequest): Promise<CoachingSession> {
+    return this.request<CoachingSession>('/api/v1/care/coaching', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getCoachingSessions(patientId: string): Promise<CoachingSession[]> {
+    return this.request<CoachingSession[]>(`/api/v1/care/coaching/${patientId}`);
+  }
+
+  // Care Dashboard endpoint (WO-CARE-DASHBOARD-INTEGRATION-V1)
+  async getCareDashboard(): Promise<CareDashboardDto> {
+    return this.request<CareDashboardDto>('/api/v1/care/dashboard');
   }
 
   // Customer endpoints

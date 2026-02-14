@@ -3,9 +3,6 @@
  *
  * Phase C-1: GlucoseView API Implementation
  * API endpoints for vendors, view profiles, and connections
- *
- * IMPORTANT: This controller does NOT handle raw CGM data.
- * It only manages metadata about vendors, display configurations, and connection status.
  */
 
 import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
@@ -84,73 +81,6 @@ export function createGlucoseViewController(
       });
     }
   });
-
-  // ============================================================================
-  // PATIENT ROUTES (CGM Summary Data - Read Only)
-  // ============================================================================
-
-  /**
-   * GET /patients - List all patients with summaries (public for pharmacist app)
-   *
-   * Returns patient list with:
-   * - alias (masked name)
-   * - status (normal/warning/risk)
-   * - periodDays
-   * - trend (improving/worsening/stable)
-   * - lastUpdated
-   *
-   * Does NOT return raw CGM data.
-   */
-  router.get('/patients', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const queryDto = {
-        page: req.query.page ? Number(req.query.page) : 1,
-        limit: req.query.limit ? Number(req.query.limit) : 20,
-      };
-
-      const result = await service.listPatients(queryDto);
-      res.json(result);
-    } catch (error: any) {
-      console.error('Failed to list patients:', error);
-      res.status(500).json({
-        error: { code: 'INTERNAL_ERROR', message: error.message },
-      });
-    }
-  });
-
-  /**
-   * GET /patients/:id - Get patient detail (public for pharmacist app)
-   *
-   * Returns patient detail with:
-   * - alias, registeredAt
-   * - currentSummary (period, status, summaryText)
-   * - previousSummary (optional)
-   * - insights (max 3)
-   * - comparison (trend, description)
-   *
-   * Does NOT return raw CGM data.
-   */
-  router.get(
-    '/patients/:id',
-    [param('id').isUUID(), handleValidationErrors],
-    async (req: Request, res: Response): Promise<void> => {
-      try {
-        const patient = await service.getPatientById(req.params.id);
-        if (!patient) {
-          res.status(404).json({
-            error: { code: 'NOT_FOUND', message: 'Patient not found' },
-          });
-          return;
-        }
-        res.json({ data: patient });
-      } catch (error: any) {
-        console.error('Failed to get patient:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
-      }
-    }
-  );
 
   // ============================================================================
   // ADMIN ROUTES - Vendors

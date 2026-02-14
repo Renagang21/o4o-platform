@@ -13,6 +13,7 @@ const navItems = [
   { path: '/', label: 'Home', protected: false },
   { path: '/patients', label: 'Patients', protected: true },
   { path: '/insights', label: 'Insights', protected: true },
+  { path: '/care/dashboard', label: 'Dashboard', protected: true },
   { path: '/about', label: 'About', protected: false },
 ];
 

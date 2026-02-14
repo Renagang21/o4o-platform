@@ -13,6 +13,7 @@ import PendingPage from './pages/PendingPage';
 import AdminPage from './pages/AdminPage';
 import MyPage from './pages/MyPage';
 import DashboardPage from './pages/DashboardPage';
+import CareDashboardPage from './pages/CareDashboardPage';
 import ApplyPage from './pages/apply/ApplyPage';
 import MyApplicationsPage from './pages/apply/MyApplicationsPage';
 import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
@@ -189,7 +190,6 @@ function AppRoutes() {
         }
       >
         <Route index element={<StoreOverviewPage />} />
-        <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
         <Route path="services" element={<StorePlaceholderPage title="서비스 관리" />} />
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
@@ -205,6 +205,11 @@ function AppRoutes() {
         <Route path="insights" element={
           <ProtectedRoute>
             <InsightsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="care/dashboard" element={
+          <ProtectedRoute>
+            <CareDashboardPage />
           </ProtectedRoute>
         } />
         <Route path="settings" element={

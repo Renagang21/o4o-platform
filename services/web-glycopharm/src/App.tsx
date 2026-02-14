@@ -100,7 +100,7 @@ const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } from '@o4o/operator-core';
+import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG } from '@o4o/operator-core';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 
 // Pharmacy Store Apply
@@ -464,12 +464,12 @@ function AppRoutes() {
         }
       >
         <Route index element={<StoreOverviewPage />} />
-        <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
-        <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
-        <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
-        <Route path="content" element={<StorePlaceholderPage title="콘텐츠/사이니지" />} />
-        <Route path="services" element={<StorePlaceholderPage title="서비스 관리" />} />
-        <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
+        <Route path="identity" element={<StoreMainPage />} />
+        <Route path="products" element={<PharmacyProducts />} />
+        <Route path="orders" element={<PharmacyOrders />} />
+        <Route path="content" element={<ContentHubPage />} />
+        <Route path="services" element={<PharmacyPatients />} />
+        <Route path="settings" element={<PharmacySettings />} />
       </Route>
 
       {/* 404 */}

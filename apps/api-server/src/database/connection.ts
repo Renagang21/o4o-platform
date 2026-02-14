@@ -170,6 +170,10 @@ import {
   GlucoseViewPharmacy,
 } from '../routes/glucoseview/entities/index.js';
 
+// CARE MODULE ENTITIES (WO-CARE-KPI-SNAPSHOT-V1, WO-CARE-COACHING-ENGINE-V1)
+import { CareKpiSnapshot } from '../modules/care/entities/care-kpi-snapshot.entity.js';
+import { CareCoachingSession } from '../modules/care/entities/care-coaching-session.entity.js';
+
 // ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
 // ============================================================================
@@ -548,6 +552,11 @@ export const AppDataSource = new DataSource({
     GlucoseViewPharmacist,
     GlucoseViewApplication,
     GlucoseViewPharmacy,
+    // ============================================================================
+    // CARE MODULE ENTITIES (WO-CARE-KPI-SNAPSHOT-V1, WO-CARE-COACHING-ENGINE-V1)
+    // ============================================================================
+    CareKpiSnapshot,
+    CareCoachingSession,
     // ============================================================================
     // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================

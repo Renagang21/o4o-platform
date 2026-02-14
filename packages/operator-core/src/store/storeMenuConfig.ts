@@ -69,5 +69,5 @@ export const GLUCOSEVIEW_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'glucoseview',
   serviceName: 'GlucoseView',
   basePath: '/store',
-  enabledMenus: ['overview', 'identity', 'services', 'settings'],
+  enabledMenus: ['overview', 'services', 'settings'],
 };

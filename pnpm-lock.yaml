@@ -731,6 +731,9 @@ importers:
       '@o4o/organization-core':
         specifier: workspace:*
         version: link:../../packages/organization-core
+      '@o4o/pharmacy-ai-insight':
+        specifier: workspace:*
+        version: link:../../packages/pharmacy-ai-insight
       '@o4o/reporting-yaksa':
         specifier: workspace:*
         version: link:../../packages/reporting-yaksa

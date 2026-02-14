@@ -489,6 +489,28 @@ class PharmacyApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  // ============================================================================
+  // Care Dashboard API (read-only bridge to GlucoseView Care module)
+  // ============================================================================
+
+  /**
+   * Care 대시보드 요약 조회 (GlucoseView Care 모듈 read-only 연동)
+   * Returns raw CareDashboardSummary (not wrapped in StoreApiResponse)
+   */
+  async getCareDashboardSummary(): Promise<CareDashboardSummary> {
+    return this.request('/api/v1/care/dashboard');
+  }
+}
+
+// Care Dashboard Summary (read-only from GlucoseView Care module)
+export interface CareDashboardSummary {
+  totalPatients: number;
+  highRiskCount: number;
+  moderateRiskCount: number;
+  lowRiskCount: number;
+  recentCoachingCount: number;
+  improvingCount: number;
 }
 
 // Export singleton instance

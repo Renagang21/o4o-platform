@@ -457,9 +457,10 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | **Navigation** | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | **Extension** | `docs/platform/extensions/` |
 | **KPA Society 구조** | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| **KPA 권한 매트릭스** | `docs/_platform/KPA-ROLE-MATRIX-V1.md` |
 
 ---
 
-*Updated: 2026-02-08*
-*Version: 4.4*
+*Updated: 2026-02-14*
+*Version: 4.5*
 *Status: Active Constitution*

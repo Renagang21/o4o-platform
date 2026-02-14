@@ -887,6 +887,33 @@ const startServer = async () => {
       logger.error('Failed to register GlucoseView routes:', glucoseviewError);
     }
 
+    // 28b. Register Care Analysis routes (WO-CARE-KPI-SNAPSHOT-V1)
+    try {
+      const { createCareAnalysisRouter } = await import('./modules/care/care-analysis.controller.js');
+      app.use('/api/v1/care', createCareAnalysisRouter(AppDataSource));
+      logger.info('✅ Care Analysis routes registered at /api/v1/care');
+    } catch (careError) {
+      logger.error('Failed to register Care Analysis routes:', careError);
+    }
+
+    // 28c. Register Care Coaching routes (WO-CARE-COACHING-ENGINE-V1)
+    try {
+      const { createCareCoachingRouter } = await import('./modules/care/care-coaching.controller.js');
+      app.use('/api/v1/care', createCareCoachingRouter(AppDataSource));
+      logger.info('✅ Care Coaching routes registered at /api/v1/care/coaching');
+    } catch (coachingError) {
+      logger.error('Failed to register Care Coaching routes:', coachingError);
+    }
+
+    // 28d. Register Care Dashboard routes (WO-CARE-DASHBOARD-INTEGRATION-V1)
+    try {
+      const { createCareDashboardRouter } = await import('./modules/care/care-dashboard.controller.js');
+      app.use('/api/v1/care', createCareDashboardRouter(AppDataSource));
+      logger.info('✅ Care Dashboard routes registered at /api/v1/care/dashboard');
+    } catch (dashboardError) {
+      logger.error('Failed to register Care Dashboard routes:', dashboardError);
+    }
+
     // 29. Register Neture routes (Phase D-1)
     try {
       const netureRoutes = createNetureRoutes(AppDataSource);

@@ -44,6 +44,8 @@ import {
   LogIn,
   ArrowLeft,
   Users,
+  Activity,
+  Heart,
 } from 'lucide-react';
 import { AiSummaryButton } from '@/components/ai';
 import {
@@ -52,6 +54,7 @@ import {
   type TodayActions,
   type FranchiseServices,
   type ContentWorkspace,
+  type CareDashboardSummary,
 } from '@/api/pharmacy';
 
 // 스토어 상태 설정
@@ -95,6 +98,7 @@ export default function PharmacyDashboard() {
   const [todayActions, setTodayActions] = useState<TodayActions | null>(null);
   const [franchiseServices, setFranchiseServices] = useState<FranchiseServices | null>(null);
   const [contentWorkspace, setContentWorkspace] = useState<ContentWorkspace | null>(null);
+  const [careSummary, setCareSummary] = useState<CareDashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [requiresLogin, setRequiresLogin] = useState(false);
@@ -124,6 +128,11 @@ export default function PharmacyDashboard() {
         if (workspaceRes.success && workspaceRes.data) {
           setContentWorkspace(workspaceRes.data);
         }
+
+        // Care summary — non-blocking, fail-silent
+        pharmacyApi.getCareDashboardSummary()
+          .then((data) => setCareSummary(data))
+          .catch(() => { /* Care data unavailable — skip silently */ });
       } catch (err: any) {
         console.error('Cockpit load error:', err);
         // 401 에러 시 로그인 필요 상태로 설정
@@ -625,7 +634,56 @@ export default function PharmacyDashboard() {
       </div>
 
       {/* ========================================= */}
-      {/* Block 5: 즉시 이동 (Quick Control) */}
+      {/* Block 5: Care 환자 관리 요약 (GlucoseView 연동) */}
+      {/* ========================================= */}
+      {careSummary && (
+        <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-800">Care 환자 관리</h2>
+            <a
+              href={`${import.meta.env.VITE_GLUCOSEVIEW_URL || 'https://glucoseview.neture.co.kr'}/care/dashboard`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+            >
+              상세 보기 <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-white border border-slate-200 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <Users className="w-6 h-6 text-slate-500" />
+              </div>
+              <p className="text-2xl font-bold text-slate-800">{careSummary.totalPatients}</p>
+              <p className="text-sm text-slate-500">관리 환자</p>
+            </div>
+            <div className="p-4 bg-white border border-red-200 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <AlertCircle className="w-6 h-6 text-red-400" />
+              </div>
+              <p className="text-2xl font-bold text-red-600">{careSummary.highRiskCount}</p>
+              <p className="text-sm text-red-500">고위험 환자</p>
+            </div>
+            <div className="p-4 bg-white border border-slate-200 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <Activity className="w-6 h-6 text-slate-500" />
+              </div>
+              <p className="text-2xl font-bold text-slate-800">{careSummary.recentCoachingCount}</p>
+              <p className="text-sm text-slate-500">최근 7일 상담</p>
+            </div>
+            <div className="p-4 bg-white border border-green-200 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <Heart className="w-6 h-6 text-green-500" />
+              </div>
+              <p className="text-2xl font-bold text-green-600">{careSummary.improvingCount}</p>
+              <p className="text-sm text-green-600">개선 환자</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================= */}
+      {/* Block 6: 즉시 이동 (Quick Control) */}
       {/* ========================================= */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">빠른 이동</h2>

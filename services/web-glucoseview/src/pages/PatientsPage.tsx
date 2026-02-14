@@ -3,90 +3,56 @@ import { useSearchParams } from 'react-router-dom';
 import PlaceholderChart from '../components/PlaceholderChart';
 import { useAuth } from '../contexts/AuthContext';
 import { GlucoseTable } from '../components/common/GlucoseTable';
-
-// 고객 타입 정의
-interface Customer {
-  id: number;
-  name: string;
-  lastVisit: Date;
-  visitCount: number;
-  lastSync: string;
-  birthYear?: number;
-  gender?: 'male' | 'female';
-  kakaoId?: string;
-  phone?: string;
-  email?: string;
-}
+import { api } from '../services/api';
+import type { Customer, CreateCustomerRequest, UpdateCustomerRequest } from '../services/api';
 
 type SortType = 'recent' | 'frequent';
-
-// localStorage 키 생성 (사용자별 분리)
-const getStorageKey = (userId: string) => `glucoseview_customers_${userId}`;
-
-// localStorage에서 고객 데이터 로드
-const loadCustomers = (userId: string): Customer[] => {
-  try {
-    const data = localStorage.getItem(getStorageKey(userId));
-    if (data) {
-      const parsed = JSON.parse(data);
-      // Date 객체 복원
-      return parsed.map((c: Customer) => ({
-        ...c,
-        lastVisit: new Date(c.lastVisit),
-      }));
-    }
-  } catch {
-    console.error('Failed to load customers from localStorage');
-  }
-  return [];
-};
-
-// localStorage에 고객 데이터 저장
-const saveCustomers = (userId: string, customers: Customer[]) => {
-  try {
-    localStorage.setItem(getStorageKey(userId), JSON.stringify(customers));
-  } catch {
-    console.error('Failed to save customers to localStorage');
-  }
-};
 
 export default function PatientsPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [members, setMembers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  // 사용자별 고객 데이터 로드
+  // API에서 고객 목록 로드
+  const loadCustomers = useCallback(async () => {
+    try {
+      setError(null);
+      const result = await api.listCustomers({ limit: 200 });
+      setMembers(result.data);
+    } catch (err: any) {
+      if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+        setError('로그인이 필요합니다.');
+      } else {
+        setError('고객 목록을 불러오는데 실패했습니다.');
+      }
+      console.error('Failed to load customers:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 초기 로드
   useEffect(() => {
     if (user?.id) {
-      const loaded = loadCustomers(user.id);
-      setMembers(loaded);
+      loadCustomers();
+    } else {
+      setLoading(false);
     }
-  }, [user?.id]);
-
-  // 고객 데이터 변경 시 저장
-  const updateMembers = useCallback((updater: (prev: Customer[]) => Customer[]) => {
-    setMembers(prev => {
-      const updated = updater(prev);
-      if (user?.id) {
-        saveCustomers(user.id, updated);
-      }
-      return updated;
-    });
-  }, [user?.id]);
+  }, [user?.id, loadCustomers]);
 
   // URL에서 선택된 고객 ID 읽기
   useEffect(() => {
     const selectedId = searchParams.get('selected');
-    if (selectedId) {
-      const id = parseInt(selectedId, 10);
-      if (!isNaN(id) && members.some(m => m.id === id)) {
-        setSelectedPatient(id);
-        // URL에서 파라미터 제거 (깔끔한 URL 유지)
-        setSearchParams({});
-      }
+    if (selectedId && members.some(m => m.id === selectedId)) {
+      setSelectedPatient(selectedId);
+      setSearchParams({});
     }
   }, [searchParams, setSearchParams, members]);
+
   const [aiQuestion, setAiQuestion] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -99,57 +65,52 @@ export default function PatientsPage() {
   // 신규 고객 등록 폼 상태
   const [newCustomer, setNewCustomer] = useState({
     name: '',
-    birthYear: '',
+    age: '',
     gender: '' as '' | 'male' | 'female',
-    kakaoId: '',
+    kakao_id: '',
     phone: '',
     email: '',
   });
 
   // 고객 수정 폼 상태
   const [editCustomer, setEditCustomer] = useState({
-    id: 0,
+    id: '',
     name: '',
-    birthYear: '',
+    age: '',
     gender: '' as '' | 'male' | 'female',
-    kakaoId: '',
+    kakao_id: '',
     phone: '',
     email: '',
   });
 
-  const handleRegisterCustomer = () => {
+  const handleRegisterCustomer = async () => {
     if (!newCustomer.name.trim()) {
       alert('이름을 입력해주세요.');
       return;
     }
 
-    // 새 고객 생성
-    const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
-    const newMember: Customer = {
-      id: newId,
-      name: newCustomer.name.trim(),
-      lastVisit: new Date(), // 오늘 날짜
-      visitCount: 1,
-      lastSync: '대기중',
-      birthYear: newCustomer.birthYear ? parseInt(newCustomer.birthYear, 10) : undefined,
-      gender: newCustomer.gender || undefined,
-      kakaoId: newCustomer.kakaoId || undefined,
-      phone: newCustomer.phone || undefined,
-      email: newCustomer.email || undefined,
-    };
+    setSaving(true);
+    try {
+      const dto: CreateCustomerRequest = {
+        name: newCustomer.name.trim(),
+        age: newCustomer.age ? parseInt(newCustomer.age, 10) : undefined,
+        gender: newCustomer.gender || undefined,
+        kakao_id: newCustomer.kakao_id || undefined,
+        phone: newCustomer.phone || undefined,
+        email: newCustomer.email || undefined,
+      };
 
-    // 목록에 추가 (사용자별 저장)
-    updateMembers(prev => [newMember, ...prev]);
-
-    // 새로 등록한 고객 선택
-    setSelectedPatient(newId);
-
-    // 폼 초기화 및 모달 닫기
-    setNewCustomer({ name: '', birthYear: '', gender: '', kakaoId: '', phone: '', email: '' });
-    setShowRegisterModal(false);
-
-    // 첫 페이지로 이동 (새 고객이 맨 위에 있으므로)
-    setCurrentPage(1);
+      const result = await api.createCustomer(dto);
+      setSelectedPatient(result.data.id);
+      setNewCustomer({ name: '', age: '', gender: '', kakao_id: '', phone: '', email: '' });
+      setShowRegisterModal(false);
+      setCurrentPage(1);
+      await loadCustomers();
+    } catch (err: any) {
+      alert(err.message || '고객 등록에 실패했습니다.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // 고객 수정 모달 열기
@@ -157,9 +118,9 @@ export default function PatientsPage() {
     setEditCustomer({
       id: member.id,
       name: member.name,
-      birthYear: member.birthYear?.toString() || '',
+      age: member.age?.toString() || '',
       gender: member.gender || '',
-      kakaoId: member.kakaoId || '',
+      kakao_id: member.kakao_id || '',
       phone: member.phone || '',
       email: member.email || '',
     });
@@ -167,28 +128,31 @@ export default function PatientsPage() {
   };
 
   // 고객 정보 수정 저장
-  const handleSaveEditCustomer = () => {
+  const handleSaveEditCustomer = async () => {
     if (!editCustomer.name.trim()) {
       alert('이름을 입력해주세요.');
       return;
     }
 
-    updateMembers(prev => prev.map(m => {
-      if (m.id === editCustomer.id) {
-        return {
-          ...m,
-          name: editCustomer.name.trim(),
-          birthYear: editCustomer.birthYear ? parseInt(editCustomer.birthYear, 10) : undefined,
-          gender: editCustomer.gender || undefined,
-          kakaoId: editCustomer.kakaoId || undefined,
-          phone: editCustomer.phone || undefined,
-          email: editCustomer.email || undefined,
-        };
-      }
-      return m;
-    }));
+    setSaving(true);
+    try {
+      const dto: UpdateCustomerRequest = {
+        name: editCustomer.name.trim(),
+        age: editCustomer.age ? parseInt(editCustomer.age, 10) : undefined,
+        gender: editCustomer.gender || undefined,
+        kakao_id: editCustomer.kakao_id || undefined,
+        phone: editCustomer.phone || undefined,
+        email: editCustomer.email || undefined,
+      };
 
-    setShowEditModal(false);
+      await api.updateCustomer(editCustomer.id, dto);
+      setShowEditModal(false);
+      await loadCustomers();
+    } catch (err: any) {
+      alert(err.message || '고객 정보 수정에 실패했습니다.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // 검색 및 정렬된 목록
@@ -198,9 +162,13 @@ export default function PatientsPage() {
     );
 
     if (sortType === 'recent') {
-      result.sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
+      result.sort((a, b) => {
+        const dateA = a.last_visit ? new Date(a.last_visit).getTime() : 0;
+        const dateB = b.last_visit ? new Date(b.last_visit).getTime() : 0;
+        return dateB - dateA;
+      });
     } else {
-      result.sort((a, b) => b.visitCount - a.visitCount);
+      result.sort((a, b) => b.visit_count - a.visit_count);
     }
 
     return result;
@@ -214,7 +182,9 @@ export default function PatientsPage() {
   );
 
   // 날짜 포맷
-  const formatDate = (date: Date) => {
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '없음';
+    const date = new Date(dateStr);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -223,6 +193,15 @@ export default function PatientsPage() {
     if (days === 1) return '어제';
     if (days < 7) return `${days}일 전`;
     return `${Math.floor(days / 7)}주 전`;
+  };
+
+  const syncStatusLabel = (status: Customer['sync_status']) => {
+    switch (status) {
+      case 'synced': return '동기화됨';
+      case 'pending': return '대기중';
+      case 'error': return '오류';
+      default: return '대기중';
+    }
   };
 
   const handlePrint = () => {
@@ -234,28 +213,20 @@ export default function PatientsPage() {
     const shareTitle = '혈당 관리 현황 리포트';
     const shareText = '약국에서 전달드리는 혈당 관리 현황 리포트입니다.';
 
-    // Web Share API 지원 여부 확인 (모바일에서 주로 지원)
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: shareTitle,
-          text: shareText,
-          url: shareUrl,
-        });
+        await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
       } catch (err) {
-        // 사용자가 공유 취소한 경우 무시
         if ((err as Error).name !== 'AbortError') {
           console.error('공유 실패:', err);
         }
       }
     } else {
-      // Web Share API 미지원 시 클립보드 복사
       const fullText = `${shareTitle}\n\n${shareText}\n\n${shareUrl}`;
       try {
         await navigator.clipboard.writeText(fullText);
         alert('링크가 클립보드에 복사되었습니다.\n카카오톡이나 메시지 앱에 붙여넣기 하세요.');
       } catch {
-        // 클립보드도 안 되면 prompt로 보여주기
         prompt('아래 내용을 복사하세요:', fullText);
       }
     }
@@ -279,6 +250,38 @@ export default function PatientsPage() {
     alert(`AI 질문: "${aiQuestion}"\n\n(실제 연동 시 AI 응답이 표시됩니다)`);
     setAiQuestion('');
   };
+
+  if (loading) {
+    return (
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">고객 목록을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl border border-red-200 p-8 max-w-md w-full text-center">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p className="text-slate-700 mb-4">{error}</p>
+          <button
+            onClick={() => { setLoading(true); setError(null); loadCustomers(); }}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -369,11 +372,15 @@ export default function PatientsPage() {
               <div className="px-4 py-2 border-b border-slate-100 bg-slate-50">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-500">
-                    {filteredAndSortedMembers.length}명 중 {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, filteredAndSortedMembers.length)}
+                    {filteredAndSortedMembers.length > 0
+                      ? `${filteredAndSortedMembers.length}명 중 ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredAndSortedMembers.length)}`
+                      : '0명'}
                   </span>
-                  <span className="text-xs text-slate-400">
-                    {currentPage}/{totalPages} 페이지
-                  </span>
+                  {totalPages > 0 && (
+                    <span className="text-xs text-slate-400">
+                      {currentPage}/{totalPages} 페이지
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -386,7 +393,7 @@ export default function PatientsPage() {
                     { id: 'status', label: '상태', width: '25%', align: 'center' },
                   ]}
                   rows={paginatedMembers.map((member) => ({
-                    id: member.id.toString(),
+                    id: member.id,
                     data: {
                       patient: (
                         <div className="flex items-center gap-3">
@@ -400,24 +407,26 @@ export default function PatientsPage() {
                       ),
                       visit: (
                         <div className="text-sm text-slate-600">
-                          <p>{formatDate(member.lastVisit)}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{member.visitCount}회 방문</p>
+                          <p>{formatDate(member.last_visit)}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{member.visit_count}회 방문</p>
                         </div>
                       ),
                       status: (
                         <span className={`inline-block text-xs px-2 py-1 rounded ${
-                          member.lastSync === '동기화됨'
+                          member.sync_status === 'synced'
                             ? 'bg-green-100 text-green-700'
+                            : member.sync_status === 'error'
+                            ? 'bg-red-100 text-red-700'
                             : 'bg-slate-100 text-slate-600'
                         }`}>
-                          {member.lastSync}
+                          {syncStatusLabel(member.sync_status)}
                         </span>
                       ),
                     },
                     onClick: () => setSelectedPatient(member.id),
                     isSelected: selectedPatient === member.id,
                   }))}
-                  emptyMessage="검색 결과가 없습니다"
+                  emptyMessage="등록된 고객이 없습니다"
                 />
               </div>
 
@@ -486,13 +495,13 @@ export default function PatientsPage() {
                         <div className="flex-1">
                           <h2 className="text-lg font-semibold text-slate-900">{member.name}</h2>
                           <div className="flex items-center gap-3 text-sm text-slate-500">
-                            <span>마지막 방문: {formatDate(member.lastVisit)}</span>
+                            <span>마지막 방문: {formatDate(member.last_visit)}</span>
                             <span className="text-slate-300">•</span>
-                            <span>총 {member.visitCount}회 방문</span>
-                            {member.birthYear && (
+                            <span>총 {member.visit_count}회 방문</span>
+                            {member.age && (
                               <>
                                 <span className="text-slate-300">•</span>
-                                <span>{member.birthYear}년생 {member.gender === 'male' ? '남' : member.gender === 'female' ? '여' : ''}</span>
+                                <span>{member.age}세 {member.gender === 'male' ? '남' : member.gender === 'female' ? '여' : ''}</span>
                               </>
                             )}
                           </div>
@@ -507,11 +516,13 @@ export default function PatientsPage() {
                           수정
                         </button>
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          member.lastSync === '동기화됨'
+                          member.sync_status === 'synced'
                             ? 'bg-green-100 text-green-700'
+                            : member.sync_status === 'error'
+                            ? 'bg-red-100 text-red-700'
                             : 'bg-slate-100 text-slate-600'
                         }`}>
-                          {member.lastSync}
+                          {syncStatusLabel(member.sync_status)}
                         </span>
                       </div>
                     ) : null;
@@ -630,7 +641,6 @@ export default function PatientsPage() {
                   </p>
 
                   <div className="grid grid-cols-3 gap-2">
-                    {/* 공유 */}
                     <button
                       onClick={handleShare}
                       className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
@@ -640,8 +650,6 @@ export default function PatientsPage() {
                       </svg>
                       공유
                     </button>
-
-                    {/* 인쇄 */}
                     <button
                       onClick={handlePrint}
                       className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors"
@@ -651,8 +659,6 @@ export default function PatientsPage() {
                       </svg>
                       인쇄
                     </button>
-
-                    {/* 메일 */}
                     <button
                       onClick={handleEmail}
                       className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors"
@@ -703,7 +709,6 @@ export default function PatientsPage() {
             </div>
 
             <div className="space-y-3">
-              {/* LibreView */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -716,7 +721,6 @@ export default function PatientsPage() {
                 </div>
               </button>
 
-              {/* Dexcom */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -729,7 +733,6 @@ export default function PatientsPage() {
                 </div>
               </button>
 
-              {/* File Upload */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -744,7 +747,6 @@ export default function PatientsPage() {
                 </div>
               </button>
 
-              {/* 고객 조제데이터 연동 */}
               <button className="w-full p-4 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors text-left">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -788,7 +790,6 @@ export default function PatientsPage() {
             </div>
 
             <div className="space-y-4">
-              {/* 이름 (필수) */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   이름 <span className="text-red-500">*</span>
@@ -802,17 +803,16 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 출생연도 & 성별 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">출생연도</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">나이</label>
                   <input
                     type="number"
-                    value={newCustomer.birthYear}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, birthYear: e.target.value })}
-                    placeholder="예: 1970"
-                    min="1900"
-                    max={new Date().getFullYear()}
+                    value={newCustomer.age}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, age: e.target.value })}
+                    placeholder="예: 58"
+                    min="1"
+                    max="150"
                     className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -845,7 +845,6 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* 카카오톡 ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">카카오톡 ID</label>
                 <div className="relative">
@@ -854,15 +853,14 @@ export default function PatientsPage() {
                   </svg>
                   <input
                     type="text"
-                    value={newCustomer.kakaoId}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, kakaoId: e.target.value })}
+                    value={newCustomer.kakao_id}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, kakao_id: e.target.value })}
                     placeholder="카카오톡 ID"
                     className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
 
-              {/* 전화번호 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">전화번호</label>
                 <input
@@ -874,7 +872,6 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 이메일 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
                 <input
@@ -886,7 +883,6 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 조제 데이터 연동 안내 */}
               <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="flex items-start gap-2">
                   <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -902,15 +898,17 @@ export default function PatientsPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowRegisterModal(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                disabled={saving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
               >
                 취소
               </button>
               <button
                 onClick={handleRegisterCustomer}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={saving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                등록하기
+                {saving ? '등록 중...' : '등록하기'}
               </button>
             </div>
           </div>
@@ -934,7 +932,6 @@ export default function PatientsPage() {
             </div>
 
             <div className="space-y-4">
-              {/* 이름 (필수) */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   이름 <span className="text-red-500">*</span>
@@ -948,17 +945,16 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 출생연도 & 성별 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">출생연도</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">나이</label>
                   <input
                     type="number"
-                    value={editCustomer.birthYear}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, birthYear: e.target.value })}
-                    placeholder="예: 1970"
-                    min="1900"
-                    max={new Date().getFullYear()}
+                    value={editCustomer.age}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, age: e.target.value })}
+                    placeholder="예: 58"
+                    min="1"
+                    max="150"
                     className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -991,7 +987,6 @@ export default function PatientsPage() {
                 </div>
               </div>
 
-              {/* 카카오톡 ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">카카오톡 ID</label>
                 <div className="relative">
@@ -1000,15 +995,14 @@ export default function PatientsPage() {
                   </svg>
                   <input
                     type="text"
-                    value={editCustomer.kakaoId}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, kakaoId: e.target.value })}
+                    value={editCustomer.kakao_id}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, kakao_id: e.target.value })}
                     placeholder="카카오톡 ID"
                     className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
 
-              {/* 전화번호 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">전화번호</label>
                 <input
@@ -1020,7 +1014,6 @@ export default function PatientsPage() {
                 />
               </div>
 
-              {/* 이메일 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
                 <input
@@ -1036,15 +1029,17 @@ export default function PatientsPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                disabled={saving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
               >
                 취소
               </button>
               <button
                 onClick={handleSaveEditCustomer}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={saving}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                저장하기
+                {saving ? '저장 중...' : '저장하기'}
               </button>
             </div>
           </div>

@@ -65,7 +65,6 @@ const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPag
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/operator-core';
-const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
@@ -275,7 +274,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<StoreOverviewPage />} />
+        <Route index element={<StoreCockpitPage />} />
         <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
         <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
