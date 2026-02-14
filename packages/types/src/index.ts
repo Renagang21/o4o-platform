@@ -97,3 +97,6 @@ export type {
 // Re-export with different names to avoid conflicts
 export type { PriceCalculation as VendorPriceCalculation } from './vendor-management.js';
 export type { SupplierStats as VendorSupplierStats } from './vendor-management.js';
+
+// Export storefront config types (WO-O4O-STOREFRONT-STABILIZATION-V1)
+export * from './storefront-config.js';

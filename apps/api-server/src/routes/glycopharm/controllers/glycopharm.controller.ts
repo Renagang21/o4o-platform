@@ -300,6 +300,16 @@ export function createGlycopharmController(
         res.json({ data: pharmacy });
       } catch (error: any) {
         console.error('Failed to update pharmacy status:', error);
+        // Status transition guard (WO-STOREFRONT-STABILIZATION Phase 3)
+        if (error.message?.startsWith('INVALID_STATUS_TRANSITION')) {
+          res.status(409).json({
+            error: {
+              code: 'INVALID_STATUS_TRANSITION',
+              message: error.message.replace('INVALID_STATUS_TRANSITION: ', ''),
+            },
+          });
+          return;
+        }
         res.status(500).json({
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });

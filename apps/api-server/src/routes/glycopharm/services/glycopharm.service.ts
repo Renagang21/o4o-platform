@@ -7,7 +7,7 @@
 
 import { DataSource } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateStoreSlug } from '../../../utils/slug.js';
+import { generateUniqueStoreSlug } from '../../../utils/slug.js';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 import { GlycopharmPharmacy, GlycopharmPharmacyStatus } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct, GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
@@ -59,6 +59,18 @@ export class GlycopharmService {
     return this.toPharmacyResponse(pharmacy, productCount);
   }
 
+  async getActivePharmacyBySlug(slug: string): Promise<PharmacyResponseDto | null> {
+    const pharmacy = await this.repository.findActivePharmacyBySlug(slug);
+    if (!pharmacy) return null;
+
+    const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);
+    return this.toPharmacyResponse(pharmacy, productCount);
+  }
+
+  async getPharmacyEntityBySlug(slug: string): Promise<GlycopharmPharmacy | null> {
+    return this.repository.findActivePharmacyBySlug(slug);
+  }
+
   async createPharmacy(
     dto: CreatePharmacyRequestDto,
     userId?: string,
@@ -70,11 +82,17 @@ export class GlycopharmService {
       throw new Error('Pharmacy code already exists');
     }
 
+    // Generate collision-safe slug (WO-STOREFRONT-STABILIZATION Phase 4)
+    const slug = await generateUniqueStoreSlug(dto.name, async (candidate) => {
+      const found = await this.repository.findPharmacyBySlug(candidate);
+      return !!found;
+    });
+
     const pharmacy = await this.repository.createPharmacy({
       ...dto,
       phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
       business_number: dto.business_number ? normalizeBusinessNumber(dto.business_number) : dto.business_number,
-      slug: generateStoreSlug(dto.name),
+      slug,
       status: 'active',
       created_by_user_id: userId,
       created_by_user_name: userName,
@@ -108,12 +126,28 @@ export class GlycopharmService {
     return this.toPharmacyResponse(pharmacy, productCount);
   }
 
+  // Allowed pharmacy status transitions (WO-STOREFRONT-STABILIZATION Phase 3)
+  private static readonly PHARMACY_STATUS_TRANSITIONS: Record<GlycopharmPharmacyStatus, GlycopharmPharmacyStatus[]> = {
+    active: ['inactive', 'suspended'],
+    inactive: ['active'],
+    suspended: ['active'],
+  };
+
   async updatePharmacyStatus(
     id: string,
     status: GlycopharmPharmacyStatus
   ): Promise<PharmacyResponseDto | null> {
     const existing = await this.repository.findPharmacyById(id);
     if (!existing) return null;
+
+    // Validate status transition
+    const allowed = GlycopharmService.PHARMACY_STATUS_TRANSITIONS[existing.status];
+    if (!allowed || !allowed.includes(status)) {
+      throw new Error(
+        `INVALID_STATUS_TRANSITION: Cannot transition from '${existing.status}' to '${status}'. ` +
+        `Allowed: ${allowed?.join(', ') || 'none'}`
+      );
+    }
 
     const pharmacy = await this.repository.updatePharmacy(id, { status });
     if (!pharmacy) return null;
@@ -332,14 +366,19 @@ export class GlycopharmService {
       id: pharmacy.id,
       name: pharmacy.name,
       code: pharmacy.code,
+      slug: pharmacy.slug,
       address: pharmacy.address,
       phone: pharmacy.phone,
       email: pharmacy.email,
       owner_name: pharmacy.owner_name,
       business_number: pharmacy.business_number,
+      description: pharmacy.description,
+      logo: pharmacy.logo,
+      hero_image: pharmacy.hero_image,
       status: pharmacy.status,
       sort_order: pharmacy.sort_order,
       product_count: productCount,
+      storefront_config: pharmacy.storefront_config,
       created_at: pharmacy.created_at.toISOString(),
       updated_at: pharmacy.updated_at.toISOString(),
     };

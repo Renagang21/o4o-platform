@@ -1,23 +1,25 @@
 /**
  * PharmacyDashboardPage - 약국경영 대시보드
  *
- * WO-PHARMACY-DASHBOARD-FRAME-V1
+ * WO-PHARMACY-DASHBOARD-REALIGN-PHASEA1-V1
  *
- * 약국 Context 진입 후 공통 대시보드 프레임.
+ * 약국 Context 진입 후 매장 운영 허브 중심 대시보드.
  * - ContextGuard로 pharmacy Context 필수
- * - 현재 약국 정보 헤더
- * - ActiveServicesSection: 이용 중인 서비스
- * - ProgramsSection: 참여 프로그램
- * - QuickActionsSection: 빠른 실행 링크
+ * - StoreOverview: 매장 현황 요약 (최상단)
+ * - StoreManagement: 매장 관리 링크 그룹
+ * - ActiveServices: 이용 중인 외부 서비스
+ * - QuickActions + MyRequests: 신청/상태
+ * - RecommendedServices: 하단 추천
  */
 
 import { useOrganization } from '../../contexts';
 import { ContextGuard } from '../../components/common/ContextGuard';
+import { StoreOverviewSection } from './sections/StoreOverviewSection';
+import { StoreManagementSection } from './sections/StoreManagementSection';
 import { ActiveServicesSection } from './sections/ActiveServicesSection';
-import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
-import { ProgramsSection } from './sections/ProgramsSection';
 import { QuickActionsSection } from './sections/QuickActionsSection';
 import { MyRequestsSection } from './sections/MyRequestsSection';
+import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
 
 function PharmacyDashboardContent() {
   const { currentOrganization } = useOrganization();
@@ -38,12 +40,21 @@ function PharmacyDashboardContent() {
         </p>
       </div>
 
-      {/* Sections */}
+      {/* 1. Store Overview — 매장 현황 요약 (최상단) */}
+      <StoreOverviewSection />
+
+      {/* 2. Store Management — 매장 운영 링크 */}
+      <StoreManagementSection />
+
+      {/* 3. Connected Services — 이용 중인 서비스 */}
       <ActiveServicesSection />
-      <RecommendedServicesSection />
-      <ProgramsSection />
+
+      {/* 4. Requests & Status */}
       <QuickActionsSection />
       <MyRequestsSection />
+
+      {/* 5. Recommended — 하단 */}
+      <RecommendedServicesSection />
     </div>
   );
 }

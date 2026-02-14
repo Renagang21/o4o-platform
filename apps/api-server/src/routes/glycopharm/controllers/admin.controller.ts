@@ -9,7 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateStoreSlug } from '../../../utils/slug.js';
+import { generateUniqueStoreSlug } from '../../../utils/slug.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
@@ -296,16 +296,14 @@ export function createAdminController(
             pharmacy.name = application.organizationName;
             pharmacy.code = generatePharmacyCode();
             pharmacy.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
-            pharmacy.slug = generateStoreSlug(application.organizationName);
+            // Generate collision-safe slug with sequential suffix (WO-STOREFRONT-STABILIZATION Phase 4)
+            pharmacy.slug = await generateUniqueStoreSlug(application.organizationName, async (candidate) => {
+              const existing = await pharmacyRepo.findOne({ where: { slug: candidate } });
+              return !!existing;
+            });
             pharmacy.status = 'active';
             pharmacy.created_by_user_id = application.userId;
             pharmacy.enabled_services = application.serviceTypes;
-
-            // slug 중복 시 suffix 추가
-            const existingSlug = await pharmacyRepo.findOne({ where: { slug: pharmacy.slug } });
-            if (existingSlug) {
-              pharmacy.slug = `${pharmacy.slug}-${Date.now().toString(36).slice(-4)}`;
-            }
 
             await pharmacyRepo.save(pharmacy);
 
@@ -329,6 +327,19 @@ export function createAdminController(
             } else {
               logger.info(
                 `[Glycopharm Admin] Pharmacy already exists: ${existingPharmacy.id} for user ${application.userId}`
+              );
+            }
+          }
+
+          // Auto-assign glycopharm:store_owner role (WO-STOREFRONT-STABILIZATION Phase 2)
+          if (pharmacy) {
+            const userRepo = dataSource.getRepository(User);
+            const applicantUser = await userRepo.findOne({ where: { id: application.userId } });
+            if (applicantUser && !applicantUser.roles.includes('glycopharm:store_owner')) {
+              applicantUser.roles = [...applicantUser.roles, 'glycopharm:store_owner'];
+              await userRepo.save(applicantUser);
+              logger.info(
+                `[Glycopharm Admin] Role 'glycopharm:store_owner' assigned to user ${application.userId}`
               );
             }
           }

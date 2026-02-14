@@ -17,6 +17,7 @@ import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
+import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
@@ -341,6 +342,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/operator', operatorController);
+
+  // ============================================================================
+  // Store Routes (Public StoreFront API, slug 기반)
+  // WO-O4O-STOREFRONT-ACTIVATION-V1 Phase 1
+  // ============================================================================
+  const storeController = createStoreController(dataSource);
+  router.use('/stores', storeController);
 
   // ============================================================================
   // Public Routes (인증 불필요, 공개 페이지용)

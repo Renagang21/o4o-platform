@@ -36,6 +36,7 @@ import { createGroupbuyOperatorController } from './controllers/groupbuy-operato
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { createStewardController } from './controllers/steward.controller.js';
+import { createStoreHubController } from './controllers/store-hub.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -196,6 +197,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
   router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Store Hub routes (WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1)
+  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

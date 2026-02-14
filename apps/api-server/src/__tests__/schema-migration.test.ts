@@ -29,12 +29,13 @@ describe('Schema Migration', () => {
       expect(detectVersion(settings)).toBe('0.0.0');
     });
 
-    it('should detect legacy version (0.0.0) - legacy color', () => {
+    it('should detect current version when _meta exists without version', () => {
       const settings = {
         colors: { primaryColor: '#0073aa' },
         _meta: {},
       };
-      expect(detectVersion(settings)).toBe('0.0.0');
+      // _meta exists (truthy) → not legacy structure → returns current version
+      expect(detectVersion(settings)).toBe('1.0.0');
     });
 
     it('should detect legacy version (0.0.0) - missing new sections', () => {

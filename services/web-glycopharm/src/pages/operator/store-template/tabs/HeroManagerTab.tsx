@@ -2,13 +2,15 @@
  * Hero Manager Tab
  *
  * 운영자 Hero 콘텐츠 관리
- * - Hero 목록 조회
+ * - Hero 목록 조회 (API 연동)
  * - 신규 Hero 등록
  * - 활성/비활성 토글
  * - 순서 조정 (up/down)
+ *
+ * WO-O4O-STOREFRONT-ACTIVATION-V1 Phase 2
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Plus,
   ChevronUp,
@@ -20,45 +22,10 @@ import {
   ExternalLink,
   Image,
   X,
+  Loader2,
 } from 'lucide-react';
 import type { HeroContent } from '@/types/store';
-
-// Mock 데이터 (실제로는 API에서 가져옴)
-const MOCK_HERO_CONTENTS: HeroContent[] = [
-  {
-    id: 'hero-1',
-    source: 'operator',
-    title: '신규 CGM 제품 출시!',
-    subtitle: '최신 연속혈당측정기를 만나보세요',
-    imageUrl: '/images/hero-cgm.jpg',
-    ctaText: '자세히 보기',
-    ctaLink: '/store/demo/products?category=cgm',
-    isActive: true,
-    priority: 1,
-  },
-  {
-    id: 'hero-2',
-    source: 'operator',
-    title: '특별 할인 이벤트',
-    subtitle: '혈당측정기 30% 할인',
-    imageUrl: '/images/hero-sale.jpg',
-    ctaText: '할인 상품 보기',
-    ctaLink: '/store/demo/products?sale=true',
-    isActive: true,
-    priority: 2,
-  },
-  {
-    id: 'hero-3',
-    source: 'operator',
-    title: '무료배송 이벤트',
-    subtitle: '3만원 이상 구매 시 무료배송',
-    imageUrl: '',
-    ctaText: '쇼핑하기',
-    ctaLink: '/store/demo/products',
-    isActive: false,
-    priority: 3,
-  },
-];
+import { storeApi } from '@/api/store';
 
 interface HeroFormData {
   title: string;
@@ -76,44 +43,79 @@ const INITIAL_FORM: HeroFormData = {
   ctaLink: '',
 };
 
-export function HeroManagerTab() {
-  const [heroContents, setHeroContents] = useState<HeroContent[]>(MOCK_HERO_CONTENTS);
+interface HeroManagerTabProps {
+  pharmacySlug?: string;
+}
+
+export function HeroManagerTab({ pharmacySlug }: HeroManagerTabProps) {
+  const [heroContents, setHeroContents] = useState<HeroContent[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<HeroFormData>(INITIAL_FORM);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Load hero contents from API
+  useEffect(() => {
+    if (!pharmacySlug) return;
+    setLoading(true);
+    storeApi.getStoreHero(pharmacySlug)
+      .then((res) => {
+        if (res.success && res.data) {
+          setHeroContents(res.data);
+        }
+      })
+      .catch((err) => console.error('Failed to load hero contents:', err))
+      .finally(() => setLoading(false));
+  }, [pharmacySlug]);
+
+  // Save hero contents to API
+  const saveToApi = useCallback(async (contents: HeroContent[]) => {
+    if (!pharmacySlug) return;
+    setSaving(true);
+    try {
+      await storeApi.updateStoreHero(pharmacySlug, contents);
+    } catch (err) {
+      console.error('Failed to save hero contents:', err);
+    } finally {
+      setSaving(false);
+    }
+  }, [pharmacySlug]);
 
   // 순서 변경
   const moveUp = (index: number) => {
     if (index === 0) return;
     const newContents = [...heroContents];
     [newContents[index - 1], newContents[index]] = [newContents[index], newContents[index - 1]];
-    // priority 재정렬
     newContents.forEach((item, i) => (item.priority = i + 1));
     setHeroContents(newContents);
+    saveToApi(newContents);
   };
 
   const moveDown = (index: number) => {
     if (index === heroContents.length - 1) return;
     const newContents = [...heroContents];
     [newContents[index], newContents[index + 1]] = [newContents[index + 1], newContents[index]];
-    // priority 재정렬
     newContents.forEach((item, i) => (item.priority = i + 1));
     setHeroContents(newContents);
+    saveToApi(newContents);
   };
 
   // 활성화 토글
   const toggleActive = (id: string) => {
-    setHeroContents((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isActive: !item.isActive } : item
-      )
+    const newContents = heroContents.map((item) =>
+      item.id === id ? { ...item, isActive: !item.isActive } : item
     );
+    setHeroContents(newContents);
+    saveToApi(newContents);
   };
 
   // 삭제
   const deleteHero = (id: string) => {
     if (confirm('이 Hero를 삭제하시겠습니까?')) {
-      setHeroContents((prev) => prev.filter((item) => item.id !== id));
+      const newContents = heroContents.filter((item) => item.id !== id);
+      setHeroContents(newContents);
+      saveToApi(newContents);
     }
   };
 
@@ -144,24 +146,22 @@ export function HeroManagerTab() {
       return;
     }
 
+    let newContents: HeroContent[];
+
     if (editingId) {
-      // 수정
-      setHeroContents((prev) =>
-        prev.map((item) =>
-          item.id === editingId
-            ? {
-                ...item,
-                title: form.title,
-                subtitle: form.subtitle || undefined,
-                imageUrl: form.imageUrl || undefined,
-                ctaText: form.ctaText || undefined,
-                ctaLink: form.ctaLink || undefined,
-              }
-            : item
-        )
+      newContents = heroContents.map((item) =>
+        item.id === editingId
+          ? {
+              ...item,
+              title: form.title,
+              subtitle: form.subtitle || undefined,
+              imageUrl: form.imageUrl || undefined,
+              ctaText: form.ctaText || undefined,
+              ctaLink: form.ctaLink || undefined,
+            }
+          : item
       );
     } else {
-      // 신규 등록
       const newHero: HeroContent = {
         id: `hero-${Date.now()}`,
         source: 'operator',
@@ -173,13 +173,23 @@ export function HeroManagerTab() {
         isActive: true,
         priority: heroContents.length + 1,
       };
-      setHeroContents((prev) => [...prev, newHero]);
+      newContents = [...heroContents, newHero];
     }
 
+    setHeroContents(newContents);
+    saveToApi(newContents);
     setIsModalOpen(false);
     setForm(INITIAL_FORM);
     setEditingId(null);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-6 h-6 text-primary-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -187,6 +197,7 @@ export function HeroManagerTab() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-600">
           총 <strong>{heroContents.length}</strong>개의 Hero 콘텐츠
+          {saving && <span className="ml-2 text-xs text-slate-400">저장 중...</span>}
         </p>
         <button
           onClick={openCreateModal}

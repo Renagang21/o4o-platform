@@ -5,7 +5,7 @@
  * 섹션 순서 고정, 섹션 단위 ON/OFF 허용
  */
 
-import type { PharmacyStore, StoreProduct, StoreCategory, TemplateSectionConfig } from '@/types/store';
+import type { PharmacyStore, StoreProduct, StoreCategory, TemplateSectionConfig, HeroContent } from '@/types/store';
 import { DEFAULT_FRANCHISE_STANDARD_SECTIONS } from '@/types/store';
 import {
   HeroSection,
@@ -21,6 +21,7 @@ interface FranchiseStandardTemplateProps {
   products: StoreProduct[];
   categories: StoreCategory[];
   sectionConfig?: TemplateSectionConfig[];
+  heroContents?: HeroContent[];
 }
 
 export function FranchiseStandardTemplate({
@@ -29,6 +30,7 @@ export function FranchiseStandardTemplate({
   products,
   categories,
   sectionConfig = DEFAULT_FRANCHISE_STANDARD_SECTIONS,
+  heroContents,
 }: FranchiseStandardTemplateProps) {
   // 섹션 활성화 여부 확인
   const isSectionEnabled = (type: string): boolean => {
@@ -40,7 +42,7 @@ export function FranchiseStandardTemplate({
     <div style={{ backgroundColor: 'var(--store-color-background)' }}>
       {/* 1. Hero Section */}
       {isSectionEnabled('hero') && (
-        <HeroSection store={store} storeSlug={storeSlug} />
+        <HeroSection store={store} storeSlug={storeSlug} heroContents={heroContents} />
       )}
 
       {/* 2. Featured Products */}

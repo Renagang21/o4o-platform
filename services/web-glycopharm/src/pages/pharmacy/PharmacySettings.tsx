@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Store,
   Bell,
@@ -16,24 +16,60 @@ import {
   AlertCircle,
   Palette,
   Layout,
+  Loader2,
 } from 'lucide-react';
 import type { StoreTemplate, StoreTheme } from '@/types/store';
 import { DEFAULT_STORE_TEMPLATE, DEFAULT_STORE_THEME, THEME_METAS } from '@/types/store';
+import { storeApi } from '@/api/store';
+import { pharmacyApi } from '@/api/pharmacy';
 
 export default function PharmacySettings() {
   const [activeTab, setActiveTab] = useState('store');
+  const [saving, setSaving] = useState(false);
   const [storeSettings, setStoreSettings] = useState({
-    storeName: '건강약국',
-    storeSlug: 'pharmacy-1',
-    description: '혈당관리 전문 약국입니다. 당뇨 관련 모든 제품을 만나보세요.',
-    phone: '02-1234-5678',
-    address: '서울시 강남구 테헤란로 123',
-    businessNumber: '123-45-67890',
+    storeName: '',
+    storeSlug: '',
+    description: '',
+    phone: '',
+    address: '',
+    businessNumber: '',
     isStoreActive: true,
     // Template & Theme 설정
     template: DEFAULT_STORE_TEMPLATE as StoreTemplate,
     theme: DEFAULT_STORE_THEME as StoreTheme,
   });
+
+  // Load pharmacy and storefront config on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const statusRes = await pharmacyApi.getPharmacyStatus();
+        if (statusRes.success && statusRes.data) {
+          const slug = statusRes.data.storeSlug || '';
+          setStoreSettings(prev => ({
+            ...prev,
+            storeName: statusRes.data!.pharmacyName || '',
+            storeSlug: slug,
+          }));
+
+          // Load storefront config if slug available
+          if (slug) {
+            const configRes = await storeApi.getStorefrontConfig(slug);
+            if (configRes.success && configRes.data) {
+              setStoreSettings(prev => ({
+                ...prev,
+                theme: (configRes.data?.theme as StoreTheme) || DEFAULT_STORE_THEME,
+                template: (configRes.data?.template as StoreTemplate) || DEFAULT_STORE_TEMPLATE,
+              }));
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load pharmacy settings:', err);
+      }
+    };
+    loadSettings();
+  }, []);
 
   // 채널 신청·승인 상태
   // 'none' | 'requested' | 'approved' | 'rejected'
@@ -72,9 +108,24 @@ export default function PharmacySettings() {
   const kioskUrl = `${baseUrl}/store/${storeSettings.storeSlug}/kiosk`;
   const tabletUrl = `${baseUrl}/store/${storeSettings.storeSlug}/tablet`;
 
-  const handleSave = () => {
-    // TODO: Implement save API
-    alert('설정이 저장되었습니다.');
+  const handleSave = async () => {
+    if (!storeSettings.storeSlug) {
+      alert('매장 정보를 불러올 수 없습니다.');
+      return;
+    }
+    setSaving(true);
+    try {
+      await storeApi.updateStorefrontConfig(storeSettings.storeSlug, {
+        theme: storeSettings.theme,
+        template: storeSettings.template,
+      });
+      alert('설정이 저장되었습니다.');
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+      alert('설정 저장에 실패했습니다.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // 키오스크 신청
@@ -410,10 +461,11 @@ export default function PharmacySettings() {
 
                 <button
                   onClick={handleSave}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
+                  disabled={saving}
+                  className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
                 >
-                  <Save className="w-5 h-5" />
-                  저장하기
+                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                  {saving ? '저장 중...' : '저장하기'}
                 </button>
               </div>
             )}

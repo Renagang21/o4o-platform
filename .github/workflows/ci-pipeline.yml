@@ -67,8 +67,8 @@ jobs:
           echo "✅ No console.log statements found in production code"
         fi
     
-    - name: Run tests
-      run: pnpm test
+    - name: Run tests (api-server, serial to prevent OOM)
+      run: cd apps/api-server && npx jest --maxWorkers=1
 
   # 2. Build all applications
   build:

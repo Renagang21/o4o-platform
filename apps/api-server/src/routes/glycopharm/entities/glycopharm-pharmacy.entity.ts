@@ -74,6 +74,9 @@ export class GlycopharmPharmacy {
   @Column({ name: 'enabled_services', type: 'jsonb', default: '[]' })
   enabled_services!: GlycopharmServiceType[];
 
+  @Column({ name: 'storefront_config', type: 'jsonb', nullable: true })
+  storefront_config?: Record<string, any>;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 

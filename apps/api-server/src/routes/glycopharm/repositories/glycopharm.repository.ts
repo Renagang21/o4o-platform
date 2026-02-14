@@ -71,6 +71,14 @@ export class GlycopharmRepository {
     return this.pharmacyRepo.findOne({ where: { code } });
   }
 
+  async findPharmacyBySlug(slug: string): Promise<GlycopharmPharmacy | null> {
+    return this.pharmacyRepo.findOne({ where: { slug } });
+  }
+
+  async findActivePharmacyBySlug(slug: string): Promise<GlycopharmPharmacy | null> {
+    return this.pharmacyRepo.findOne({ where: { slug, status: 'active' } });
+  }
+
   async createPharmacy(data: Partial<GlycopharmPharmacy>): Promise<GlycopharmPharmacy> {
     const pharmacy = this.pharmacyRepo.create(data);
     return this.pharmacyRepo.save(pharmacy);

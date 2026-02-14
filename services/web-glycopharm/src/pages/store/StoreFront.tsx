@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ArrowRight, Star, Package, Truck, Shield, AlertCircle, Loader2 } from 'lucide-react';
 import { storeApi } from '@/api/store';
-import type { PharmacyStore, StoreProduct, StoreCategory, StoreTemplate } from '@/types/store';
+import type { PharmacyStore, StoreProduct, StoreCategory, StoreTemplate, HeroContent } from '@/types/store';
 import { DEFAULT_STORE_TEMPLATE } from '@/types/store';
 import { FranchiseStandardTemplate } from '@/components/store/template';
 
@@ -32,6 +32,7 @@ export default function StoreFront({
   const [store, setStore] = useState<PharmacyStore | null>(null);
   const [categories, setCategories] = useState<StoreCategory[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<StoreProduct[]>([]);
+  const [heroContents, setHeroContents] = useState<HeroContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,11 +44,12 @@ export default function StoreFront({
       setError(null);
 
       try {
-        // 병렬로 데이터 로드
-        const [storeRes, categoriesRes, productsRes] = await Promise.all([
+        // 병렬로 데이터 로드 (hero 포함 — WO-STOREFRONT-STABILIZATION Phase 5)
+        const [storeRes, categoriesRes, productsRes, heroRes] = await Promise.all([
           storeApi.getStoreBySlug(storeSlug),
           storeApi.getStoreCategories(storeSlug),
           storeApi.getFeaturedProducts(storeSlug, 4),
+          storeApi.getStoreHero(storeSlug),
         ]);
 
         if (storeRes.success && storeRes.data) {
@@ -62,6 +64,10 @@ export default function StoreFront({
 
         if (productsRes.success && productsRes.data) {
           setFeaturedProducts(productsRes.data);
+        }
+
+        if (heroRes.success && heroRes.data) {
+          setHeroContents(heroRes.data);
         }
       } catch (err: any) {
         console.error('Store load error:', err);
@@ -106,38 +112,61 @@ export default function StoreFront({
         storeSlug={storeSlug}
         products={featuredProducts}
         categories={categories}
+        heroContents={heroContents}
       />
     );
   }
 
+  // Hero: storefront_config.heroContents가 단일 소스, hero_image는 fallback (Phase 5)
+  const activeHero = heroContents.find((h) => h.isActive);
+  const heroBackground = activeHero?.imageUrl || (store as any).hero_image;
+
   // 기존 UI (하위 호환)
   return (
     <div className="space-y-8">
-      {/* Hero Banner */}
-      <div className="relative bg-gradient-to-r from-primary-600 to-accent-600 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-        </div>
-        <div className="relative px-8 py-12 md:py-16">
-          <h1 className="text-2xl md:text-4xl font-bold text-white mb-4">
-            {store.name}에 오신 것을
-            <br />환영합니다
-          </h1>
-          <p className="text-white/80 mb-6 max-w-lg">
-            {store.description || 'CGM, 혈당측정기, 건강기능식품까지 다양한 혈당관리 제품을 만나보세요.'}
-          </p>
-          {store.franchiseName && (
-            <p className="text-white/60 text-sm mb-4">
-              {store.franchiseName} 소속
-            </p>
+      {/* Hero Banner — single source: storefront_config.heroContents */}
+      <div
+        className="relative bg-gradient-to-r from-primary-600 to-accent-600 rounded-3xl overflow-hidden"
+        style={heroBackground ? {
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url(${heroBackground})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        } : undefined}
+      >
+        {!heroBackground && (
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+          </div>
+        )}
+        <div className="relative px-8 py-12 md:py-16 flex items-start gap-6">
+          {(store as any).logo && (
+            <img
+              src={(store as any).logo}
+              alt={store.name}
+              className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover bg-white/20 hidden sm:block flex-shrink-0"
+            />
           )}
-          <NavLink
-            to={`/store/${storeSlug}/products`}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 font-medium rounded-xl hover:bg-primary-50 transition-colors"
-          >
-            상품 둘러보기
-            <ArrowRight className="w-4 h-4" />
-          </NavLink>
+          <div>
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-4">
+              {store.name}에 오신 것을
+              <br />환영합니다
+            </h1>
+            <p className="text-white/80 mb-6 max-w-lg">
+              {store.description || 'CGM, 혈당측정기, 건강기능식품까지 다양한 혈당관리 제품을 만나보세요.'}
+            </p>
+            {store.franchiseName && (
+              <p className="text-white/60 text-sm mb-4">
+                {store.franchiseName} 소속
+              </p>
+            )}
+            <NavLink
+              to={`/store/${storeSlug}/products`}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 font-medium rounded-xl hover:bg-primary-50 transition-colors"
+            >
+              상품 둘러보기
+              <ArrowRight className="w-4 h-4" />
+            </NavLink>
+          </div>
         </div>
       </div>
 

@@ -15,3 +15,6 @@ export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
 
 // WO-PHARMACY-CONTEXT-MVP-V1: 약국경영 대시보드 (Context 기반)
 export { PharmacyDashboardPage } from './PharmacyDashboardPage';
+
+// WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1: 통합 매장 허브
+export { StoreHubPage } from './StoreHubPage';

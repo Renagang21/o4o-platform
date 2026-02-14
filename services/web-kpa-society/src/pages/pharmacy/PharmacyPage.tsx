@@ -119,7 +119,7 @@ export function PharmacyPage() {
     );
   }
 
-  // 4. 직역 != pharmacy_owner → 접근 불가
+  // 4. 직역 != pharmacy_owner → 개설자 전용 안내
   if (user.pharmacistRole !== 'pharmacy_owner') {
     return (
       <div style={styles.page}>
@@ -128,12 +128,22 @@ export function PharmacyPage() {
             <div style={styles.iconWrap}>
               <span style={styles.icon}>🔒</span>
             </div>
-            <h1 style={styles.title}>약국 개설자만 이용 가능합니다</h1>
+            <h1 style={styles.title}>약국 개설자 전용 서비스입니다</h1>
             <p style={styles.desc}>
-              이 서비스는 약국 개설자를 위한 경영지원 서비스입니다.<br />
-              직역 변경이 필요한 경우 마이페이지에서 수정할 수 있습니다.
+              이 서비스는 약국을 개설하여 운영하는 회원만 이용할 수 있습니다.<br />
+              약국 개설자로 전환하려면 승인 신청이 필요합니다.
             </p>
+            <div style={styles.infoBox}>
+              <p style={styles.infoText}>
+                <strong>약국 개설자 서비스란?</strong><br />
+                사이버 매장 관리, B2B 구매, 사이니지 콘텐츠 관리 등<br />
+                약국 운영에 필요한 경영지원 기능을 제공합니다.
+              </p>
+            </div>
             <div style={styles.actions}>
+              <Link to="/pharmacy/approval" style={styles.joinBtn}>
+                약국 개설자 신청하기
+              </Link>
               <button
                 type="button"
                 onClick={() => navigate(-1)}
@@ -221,5 +231,19 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: borderRadius.md,
     cursor: 'pointer',
     minWidth: '120px',
+  },
+  infoBox: {
+    margin: `0 0 ${spacing.xl}`,
+    padding: `${spacing.md}`,
+    background: colors.neutral50,
+    borderRadius: borderRadius.md,
+    border: `1px solid ${colors.neutral200}`,
+    textAlign: 'left' as const,
+  },
+  infoText: {
+    margin: 0,
+    fontSize: '0.813rem',
+    color: colors.neutral600,
+    lineHeight: 1.6,
   },
 };

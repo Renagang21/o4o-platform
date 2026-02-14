@@ -122,7 +122,7 @@ export default function StoreTemplateManagerPage() {
 
         {/* 탭 콘텐츠 */}
         <div className="p-6">
-          {activeTab === 'hero' && <HeroManagerTab />}
+          {activeTab === 'hero' && <HeroManagerTab pharmacySlug="demo" />}
           {activeTab === 'featured' && <FeaturedProductsTab />}
           {activeTab === 'event-notice' && <EventNoticeTab />}
         </div>

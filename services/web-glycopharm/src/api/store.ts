@@ -14,6 +14,7 @@ import type {
   StoreApiResponse,
   StorePaginatedResponse,
   ServiceContext,
+  HeroContent,
 } from '@/types/store';
 import { DEFAULT_SERVICE_CONTEXT } from '@/types/store';
 import { getAccessToken } from '@/contexts/AuthContext';
@@ -132,6 +133,54 @@ class StoreApiClient {
    */
   async getProductDetail(storeSlug: string, productId: string): Promise<StoreApiResponse<StoreProduct>> {
     return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products/${productId}`);
+  }
+
+  // ============================================================================
+  // Storefront Config API (WO-O4O-STOREFRONT-ACTIVATION-V1 Phase 3)
+  // ============================================================================
+
+  /**
+   * 스토어 설정 조회 (theme, template)
+   */
+  async getStorefrontConfig(storeSlug: string): Promise<StoreApiResponse<Record<string, any>>> {
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/storefront-config`);
+  }
+
+  /**
+   * 스토어 설정 저장 (theme, template)
+   */
+  async updateStorefrontConfig(
+    storeSlug: string,
+    config: { theme?: string; template?: string }
+  ): Promise<StoreApiResponse<Record<string, any>>> {
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/storefront-config`, {
+      method: 'PUT',
+      body: JSON.stringify(config),
+    });
+  }
+
+  // ============================================================================
+  // Hero Content API (WO-O4O-STOREFRONT-ACTIVATION-V1 Phase 2)
+  // ============================================================================
+
+  /**
+   * Hero 콘텐츠 조회
+   */
+  async getStoreHero(storeSlug: string): Promise<StoreApiResponse<HeroContent[]>> {
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/hero`);
+  }
+
+  /**
+   * Hero 콘텐츠 저장
+   */
+  async updateStoreHero(
+    storeSlug: string,
+    heroContents: HeroContent[]
+  ): Promise<StoreApiResponse<HeroContent[]>> {
+    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/hero`, {
+      method: 'PUT',
+      body: JSON.stringify({ heroContents }),
+    });
   }
 
   // ============================================================================

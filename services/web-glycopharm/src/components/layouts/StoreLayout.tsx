@@ -14,7 +14,8 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';
-import type { PharmacyStore, StoreTheme } from '@/types/store';
+import type { PharmacyStore } from '@/types/store';
+import type { StoreTheme } from '@/types/store';
 import { DEFAULT_STORE_THEME } from '@/types/store';
 import { StoreModeProvider } from '@/contexts/StoreModeContext';
 import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
@@ -296,8 +297,19 @@ function StoreLayoutContent() {
 // Provider로 감싸서 export
 export default function StoreLayout() {
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
-  // TODO: 실제로는 스토어 설정에서 테마를 가져와야 함
-  const [storeTheme] = useState<StoreTheme>(DEFAULT_STORE_THEME);
+  const [storeTheme, setStoreTheme] = useState<StoreTheme>(DEFAULT_STORE_THEME);
+
+  // Load theme from storefront config
+  useEffect(() => {
+    if (!storeSlug) return;
+    storeApi.getStorefrontConfig(storeSlug)
+      .then((res) => {
+        if (res.success && res.data?.theme) {
+          setStoreTheme(res.data.theme as StoreTheme);
+        }
+      })
+      .catch(() => { /* use default theme */ });
+  }, [storeSlug]);
 
   if (!storeSlug) {
     return (

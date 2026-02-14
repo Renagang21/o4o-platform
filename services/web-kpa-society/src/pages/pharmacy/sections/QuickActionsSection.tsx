@@ -4,20 +4,17 @@
  * WO-PHARMACY-OPERATOR-ACTIONS-V1
  *
  * 약국경영 대시보드에서 운영자가 실행 가능한 액션:
- * - 약국 정보 확인 (단순 이동)
  * - 서비스 신청 (JoinRequest pharmacy_join)
  * - 운영자 권한 관리 (JoinRequest pharmacy_operator)
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useOrganization } from '../../../contexts';
 import { joinRequestApi } from '../../../api/joinRequestApi';
 
 type ActionState = 'idle' | 'confirm' | 'submitting' | 'success' | 'error' | 'duplicate';
 
 export function QuickActionsSection() {
-  const navigate = useNavigate();
   const { currentOrganization } = useOrganization();
 
   const [serviceApplyState, setServiceApplyState] = useState<ActionState>('idle');
@@ -195,38 +192,6 @@ export function QuickActionsSection() {
         gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
         gap: '12px',
       }}>
-        {/* 약국 정보 확인 — 단순 이동 */}
-        <button
-          onClick={() => navigate('/pharmacy')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '16px',
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            textAlign: 'left',
-            transition: 'background 0.15s',
-            width: '100%',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#f8fafc';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#ffffff';
-          }}
-        >
-          <span style={{ fontSize: '24px', flexShrink: 0 }}>🏥</span>
-          <div>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>약국 정보 확인</div>
-            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
-              현재 약국의 기본 정보를 확인합니다
-            </div>
-          </div>
-        </button>
-
         {/* 서비스 신청 — JoinRequest pharmacy_join */}
         {renderActionButton(
           'service-apply',

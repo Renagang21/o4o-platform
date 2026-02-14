@@ -76,14 +76,19 @@ export interface PharmacyResponseDto {
   id: string;
   name: string;
   code: string;
+  slug?: string;
   address?: string;
   phone?: string;
   email?: string;
   owner_name?: string;
   business_number?: string;
+  description?: string;
+  logo?: string;
+  hero_image?: string;
   status: GlycopharmPharmacyStatus;
   sort_order: number;
   product_count?: number;
+  storefront_config?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }

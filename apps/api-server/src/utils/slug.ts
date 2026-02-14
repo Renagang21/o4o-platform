@@ -44,11 +44,39 @@ export async function generateUniqueSlug(
 ): Promise<string> {
   let slug = generateSlug(baseSlug);
   let counter = 1;
-  
+
   while (await checkExists(slug)) {
     slug = `${generateSlug(baseSlug)}-${counter}`;
     counter++;
   }
-  
+
   return slug;
+}
+
+/**
+ * Generate a unique store slug with sequential -1/-2/-3 suffix (한글 보존)
+ * WO-O4O-STOREFRONT-STABILIZATION-V1 Phase 4
+ *
+ * "강남약국" → "강남약국" (first) or "강남약국-1" (collision)
+ */
+export async function generateUniqueStoreSlug(
+  name: string,
+  checkExists: (slug: string) => Promise<boolean>
+): Promise<string> {
+  const baseSlug = generateStoreSlug(name);
+
+  if (!(await checkExists(baseSlug))) {
+    return baseSlug;
+  }
+
+  let counter = 1;
+  while (counter <= 100) {
+    const candidate = `${baseSlug}-${counter}`;
+    if (!(await checkExists(candidate))) {
+      return candidate;
+    }
+    counter++;
+  }
+
+  throw new Error(`Unable to generate unique slug for: ${name}`);
 }
