@@ -38,6 +38,7 @@ import { createOrganizationJoinRequestRoutes } from './controllers/organization-
 import { createStewardController } from './controllers/steward.controller.js';
 import { createStoreHubController } from './controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from './controllers/pharmacy-store-config.controller.js';
+import { createPharmacyProductsController } from './controllers/pharmacy-products.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -204,6 +205,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
+
+  // Pharmacy Products routes (WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1)
+  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

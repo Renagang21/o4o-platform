@@ -18,3 +18,6 @@ export { PharmacyDashboardPage } from './PharmacyDashboardPage';
 
 // WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1: 통합 매장 허브
 export { StoreHubPage } from './StoreHubPage';
+
+// WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리
+export { PharmacySellPage } from './PharmacySellPage';
