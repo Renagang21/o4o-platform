@@ -36,11 +36,10 @@ export function LoginPage() {
 
       // WO-KPA-FUNCTION-GATE-V1: 직능 선택 로직
       // 직능/직역 미선택 시 게이트로 이동, 그 외에는 홈으로 이동
-      const isAdmin = loggedInUser.role === 'district_admin' ||
-                      loggedInUser.role === 'branch_admin' ||
-                      loggedInUser.role === 'super_admin' ||
-                      loggedInUser.role === 'admin' ||
-                      loggedInUser.role === 'operator';
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
+      const adminRoles = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator'];
+      const isAdmin = (loggedInUser.role && adminRoles.includes(loggedInUser.role)) ||
+                      (loggedInUser.roles && loggedInUser.roles.some((r: string) => adminRoles.includes(r)));
       // Phase 3: 약대생은 직능/직역 선택 불필요
       const isStudent = loggedInUser.role === 'student' || loggedInUser.membershipType === 'student';
 

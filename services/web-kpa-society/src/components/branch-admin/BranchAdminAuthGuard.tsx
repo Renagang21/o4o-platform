@@ -107,73 +107,24 @@ export function BranchAdminAuthGuard({ children }: BranchAdminAuthGuardProps) {
 }
 
 /**
- * 사용자의 분회 관리자 권한 확인
- *
- * P2-T2 (WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1):
- * Phase 4 prefixed roles + Legacy roles 모두 지원
- *
- * Backward Compatibility:
- * - Legacy roles 체크 유지 (기존 사용자 영향 없음)
- * - Additive change only (확장만, 파괴 없음)
- *
- * @param user - 현재 로그인한 사용자
- * @param _branchId - 확인할 분회 ID (향후 분회별 권한 체크에 사용)
- * @returns 해당 분회의 관리자 권한 여부
+ * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
+ * Legacy roles removed, platform roles removed
  */
 function checkBranchAdminRole(user: User, _branchId: string): boolean {
-  // Legacy unprefixed roles (backward compatibility)
-  const legacyRoles = [
-    'admin',
-    'super_admin',
-    'membership_super_admin',
-    'district_admin',
-    'membership_district_admin',
-    'branch_admin',
-    'membership_branch_admin',
-  ];
-
-  // Phase 4 prefixed roles
-  const prefixedRoles = [
-    'platform:admin',
-    'platform:super_admin',
+  const allowedRoles = [
     'kpa:admin',
     'kpa:district_admin',
     'kpa:branch_admin',
-    'kpa:branch_operator',
     'kpa-c:branch_admin',
   ];
 
-  const allowedRoles = [...legacyRoles, ...prefixedRoles];
-
-  // Check user.role (single string, backward compatibility)
   if (user.role && allowedRoles.includes(user.role)) {
-    // TODO: 향후 분회별 권한 세분화 (branchId 매칭)
     return true;
   }
 
-  // P2-T2: Check user.roles array (Phase 4 support)
   if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
-    // TODO: 향후 분회별 권한 세분화 (branchId 매칭)
     return true;
   }
-
-  // ============================================
-  // P2-T4: Super Operator 확장 지점
-  // WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
-  // ============================================
-  // 향후 Super Operator 개념 도입 시:
-  // if (user.isSuperOperator) {
-  //   if (user.operatorLevel === 'platform') {
-  //     return true;  // 플랫폼 운영자: 모든 분회 접근
-  //   }
-  //   if (user.operatorScopes?.includes(`kpa:branch:${_branchId}`)) {
-  //     return true;  // 분회별 운영자: 특정 분회만 접근
-  //   }
-  // }
-  //
-  // 서비스별 운영자 권한 체크 위치
-  // 구현 없음 (확장 지점만 표시)
-  // ============================================
 
   return false;
 }

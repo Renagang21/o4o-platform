@@ -91,62 +91,25 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
  * - Legacy roles 체크 유지 (기존 사용자 영향 없음)
  * - Additive change only (확장만, 파괴 없음)
  */
+/**
+ * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
+ * DEV bypass removed, legacy roles removed, platform roles removed
+ */
 function checkBranchAdminRole(user: User): boolean {
-  // Legacy unprefixed roles (backward compatibility)
-  const legacyRoles = [
-    'admin',
-    'super_admin',
-    'membership_super_admin',
-    'membership_branch_admin',
-    'membership_branch_operator',
-    'membership_district_admin',
-  ];
-
-  // Phase 4 prefixed roles
-  const prefixedRoles = [
-    'platform:admin',
-    'platform:super_admin',
+  const allowedRoles = [
     'kpa:admin',
     'kpa:branch_admin',
     'kpa:branch_operator',
     'kpa:district_admin',
   ];
 
-  const allowedRoles = [...legacyRoles, ...prefixedRoles];
-
-  // Check user.role (single string, backward compatibility)
   if (user.role && allowedRoles.includes(user.role)) {
     return true;
   }
 
-  // P2-T2: Check user.roles array (Phase 4 support)
   if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
     return true;
   }
-
-  // P2-T2 TODO: Review DEV mode bypass for security
-  // 개발 환경에서는 임시 허용 (보안 검토 필요)
-  if (import.meta.env.DEV) {
-    console.warn('[DEV MODE] Branch admin access allowed for testing - SECURITY REVIEW NEEDED');
-    return true;
-  }
-
-  // ============================================
-  // P2-T4: Super Operator 확장 지점
-  // WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
-  // ============================================
-  // 향후 Super Operator 개념 도입 시:
-  // if (user.isSuperOperator && user.operatorScopes?.includes('kpa')) {
-  //   console.log('[SUPER OPERATOR] KPA service access granted');
-  //   return true;
-  // }
-  //
-  // 운영자 우회 로직 위치:
-  // - 플랫폼 운영자: 모든 서비스 접근
-  // - 서비스 운영자: 특정 서비스만 접근
-  // - DEV 모드 bypass 대체 가능성
-  // 구현 없음 (확장 지점만 표시)
-  // ============================================
 
   return false;
 }

@@ -89,6 +89,21 @@ export class UserRoleController extends BaseController {
    * Assign a role to a user (admin only)
    */
   static async assignRole(req: AuthRequest, res: Response): Promise<any> {
+    // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin-only guard
+    const currentUser = req.user;
+    if (!currentUser) {
+      return BaseController.error(res, 'Authentication required', 401);
+    }
+    const currentRoles: string[] = (currentUser as any).roles || [];
+    const isAdmin = currentRoles.includes('platform:admin') || currentRoles.includes('platform:super_admin') || currentRoles.includes('kpa:admin');
+    if (!isAdmin) {
+      logger.warn('[UserRoleController.assignRole] Non-admin role assignment attempt', {
+        userId: (currentUser as any).id,
+        path: req.path,
+      });
+      return BaseController.error(res, 'Admin role required for role assignment', 403);
+    }
+
     const { userId } = req.params;
     const data = req.body as AssignRoleDto;
 
@@ -157,6 +172,21 @@ export class UserRoleController extends BaseController {
    * Remove a role from a user (admin only)
    */
   static async removeRole(req: Request, res: Response): Promise<any> {
+    // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin-only guard
+    const currentUser = (req as any).user;
+    if (!currentUser) {
+      return BaseController.error(res, 'Authentication required', 401);
+    }
+    const currentRoles: string[] = currentUser.roles || [];
+    const isAdmin = currentRoles.includes('platform:admin') || currentRoles.includes('platform:super_admin') || currentRoles.includes('kpa:admin');
+    if (!isAdmin) {
+      logger.warn('[UserRoleController.removeRole] Non-admin role removal attempt', {
+        userId: currentUser.id,
+        path: req.path,
+      });
+      return BaseController.error(res, 'Admin role required for role removal', 403);
+    }
+
     const { userId, roleId } = req.params;
 
     try {

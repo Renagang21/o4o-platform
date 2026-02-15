@@ -64,10 +64,22 @@ export class VerificationController {
    */
   async approve(req: Request, res: Response) {
     try {
-      const { verifierId, notes } = req.body;
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require auth + admin role
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ error: 'Authentication required' });
+        return;
+      }
+      const userRoles: string[] = user.roles || [];
+      if (!userRoles.includes('kpa:admin')) {
+        res.status(403).json({ error: 'KPA admin role required for verification approval' });
+        return;
+      }
+
+      const { notes } = req.body;
       const verification = await this.verificationService.approve(
         req.params.id,
-        verifierId,
+        user.id,
         notes
       );
       res.json(verification);
@@ -81,10 +93,22 @@ export class VerificationController {
    */
   async reject(req: Request, res: Response) {
     try {
-      const { verifierId, reason } = req.body;
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require auth + admin role
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ error: 'Authentication required' });
+        return;
+      }
+      const userRoles: string[] = user.roles || [];
+      if (!userRoles.includes('kpa:admin')) {
+        res.status(403).json({ error: 'KPA admin role required for verification rejection' });
+        return;
+      }
+
+      const { reason } = req.body;
       const verification = await this.verificationService.reject(
         req.params.id,
-        verifierId,
+        user.id,
         reason
       );
       res.json(verification);

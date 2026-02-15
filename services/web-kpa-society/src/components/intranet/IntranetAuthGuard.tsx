@@ -11,10 +11,7 @@ interface IntranetAuthGuardProps {
 }
 
 export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  // DEV 모드에서는 인증 우회
-  const isDev = import.meta.env.DEV;
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,7 +22,7 @@ export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
     );
   }
 
-  if (!isAuthenticated && !isDev) {
+  if (!isAuthenticated || !user) {
     return (
       <div style={styles.accessDenied}>
         <div style={styles.icon}>🔒</div>
@@ -35,6 +32,32 @@ export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
         </p>
         <a href="/login" style={styles.loginButton}>
           로그인
+        </a>
+      </div>
+    );
+  }
+
+  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require KPA organization role
+  const allowedRoles = [
+    'kpa:admin',
+    'kpa:operator',
+    'kpa:district_admin',
+    'kpa:branch_admin',
+    'kpa:branch_operator',
+  ];
+  const userRoles = user.roles || [];
+  const hasRole = userRoles.some((r: string) => allowedRoles.includes(r));
+
+  if (!hasRole) {
+    return (
+      <div style={styles.accessDenied}>
+        <div style={styles.icon}>🚫</div>
+        <h2 style={styles.title}>접근 권한이 없습니다</h2>
+        <p style={styles.description}>
+          인트라넷은 조직 관리자만 접근할 수 있습니다.
+        </p>
+        <a href="/" style={styles.loginButton}>
+          메인으로 돌아가기
         </a>
       </div>
     );

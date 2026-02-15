@@ -36,9 +36,11 @@ export function useAccessibleDashboards(): DashboardItem[] {
     items.push({ label: '약국경영', icon: '💊', path: '/pharmacy' });
   }
 
-  // 관리자 역할: 운영자 대시보드
-  const adminRoles = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
-  if (user.role && adminRoles.includes(user.role)) {
+  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
+  const adminRoles = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator'];
+  const hasAdminRole = (user.role && adminRoles.includes(user.role)) ||
+    (user.roles && user.roles.some((r: string) => adminRoles.includes(r)));
+  if (hasAdminRole) {
     items.push({ label: '운영자 대시보드', icon: '🖥️', path: '/admin/kpa-dashboard' });
   }
 

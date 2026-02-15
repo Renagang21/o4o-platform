@@ -174,8 +174,12 @@ export function OperatorRoutes() {
         {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
         <Route path="audit-logs" element={<AuditLogPage />} />
 
-        {/* 운영자 관리 */}
-        <Route path="operators" element={<OperatorManagementPage />} />
+        {/* 운영자 관리 - WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin only */}
+        <Route path="operators" element={
+          (user?.roles || []).includes('kpa:admin')
+            ? <OperatorManagementPage />
+            : <Navigate to="" replace />
+        } />
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="" replace />} />

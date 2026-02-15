@@ -27,7 +27,7 @@ import { User } from '../../../modules/auth/entities/User.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
 import logger from '../../../utils/logger.js';
-import { isServiceOperator, hasRoleCompat, logLegacyRoleUsage } from '../../../utils/role.utils.js';
+import { isServiceOperator, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator', 'pharmacy_join', 'pharmacy_operator'];
 const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator'];
@@ -35,17 +35,17 @@ const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator']
 /**
  * RBAC 검사: admin 또는 kpa operator 여부
  *
- * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 1
- * - 우선순위: prefixed role (kpa:admin, kpa:operator, platform:admin, platform:super_admin)
- * - Fallback: legacy role (admin, super_admin) via hasRoleCompat
- * - Scope 기반: :admin, :operator 패턴 유지
+ * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1:
+ * - KPA prefixed roles ONLY (kpa:admin, kpa:operator)
+ * - Legacy role backward compatibility 제거
+ * - Cross-service roles (platform:*) 거부
  */
 function isAdminOrOperator(user: any): boolean {
   const userId = user.id || 'unknown';
   const userRoles: string[] = user.roles || [];
   const userScopes: string[] = user.scopes || [];
 
-  // Check prefixed roles first (Priority 1)
+  // Check KPA prefixed roles ONLY
   const hasKpaOperatorRole = isServiceOperator(userRoles, 'kpa');
   if (hasKpaOperatorRole) {
     return true;
@@ -59,19 +59,13 @@ function isAdminOrOperator(user: any): boolean {
     return true;
   }
 
-  // Backward compatibility: Check legacy roles with monitoring
-  const hasLegacyAdmin = hasRoleCompat(userRoles, 'admin', 'kpa:admin') ||
-                         hasRoleCompat(userRoles, 'super_admin', 'platform:super_admin');
-
-  if (hasLegacyAdmin) {
-    // Log legacy role usage for monitoring
-    if (userRoles.includes('admin')) {
-      logLegacyRoleUsage(userId, 'admin', 'organization-join-request.controller');
-    }
-    if (userRoles.includes('super_admin')) {
-      logLegacyRoleUsage(userId, 'super_admin', 'organization-join-request.controller');
-    }
-    return true;
+  // Detect and DENY legacy roles
+  const legacyRoles = ['admin', 'super_admin', 'operator'];
+  const detectedLegacyRoles = userRoles.filter(r => legacyRoles.includes(r));
+  if (detectedLegacyRoles.length > 0) {
+    detectedLegacyRoles.forEach(role => {
+      logLegacyRoleUsage(userId, role, 'organization-join-request.controller');
+    });
   }
 
   return false;

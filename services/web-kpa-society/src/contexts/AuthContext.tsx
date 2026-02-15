@@ -142,13 +142,15 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     id: 'test-district-admin-001',
     email: 'district-admin@kpa-test.kr',
     name: '김지부 (지부운영자)',
-    role: 'district_admin',
+    role: 'kpa:district_admin',
+    roles: ['kpa:district_admin'],
   },
   branch_admin: {
     id: 'test-branch-admin-001',
     email: 'branch-admin@kpa-test.kr',
     name: '이분회 (분회운영자)',
-    role: 'branch_admin',
+    role: 'kpa:branch_admin',
+    roles: ['kpa:branch_admin'],
   },
   district_officer: {
     id: 'test-district-officer-001',

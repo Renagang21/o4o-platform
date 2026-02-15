@@ -24,10 +24,11 @@ const router: Router = Router();
 
 // ========================================
 // COURSE ROUTES
+// WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Write ops require instructor/admin
 // ========================================
 
 // POST /api/v1/lms/courses - Create Course
-router.post('/courses', requireAuth, asyncHandler(CourseController.createCourse));
+router.post('/courses', requireAuth, requireInstructor, asyncHandler(CourseController.createCourse));
 
 // GET /api/v1/lms/courses - List Courses
 router.get('/courses', requireAuth, asyncHandler(CourseController.listCourses));
@@ -36,26 +37,26 @@ router.get('/courses', requireAuth, asyncHandler(CourseController.listCourses));
 router.get('/courses/:id', requireAuth, asyncHandler(CourseController.getCourse));
 
 // PATCH /api/v1/lms/courses/:id - Update Course
-router.patch('/courses/:id', requireAuth, asyncHandler(CourseController.updateCourse));
+router.patch('/courses/:id', requireAuth, requireInstructor, asyncHandler(CourseController.updateCourse));
 
 // DELETE /api/v1/lms/courses/:id - Archive Course
-router.delete('/courses/:id', requireAuth, asyncHandler(CourseController.deleteCourse));
+router.delete('/courses/:id', requireAuth, requireInstructor, asyncHandler(CourseController.deleteCourse));
 
 // POST /api/v1/lms/courses/:id/publish - Publish Course
-router.post('/courses/:id/publish', requireAuth, asyncHandler(CourseController.publishCourse));
+router.post('/courses/:id/publish', requireAuth, requireInstructor, asyncHandler(CourseController.publishCourse));
 
 // POST /api/v1/lms/courses/:id/unpublish - Unpublish Course
-router.post('/courses/:id/unpublish', requireAuth, asyncHandler(CourseController.unpublishCourse));
+router.post('/courses/:id/unpublish', requireAuth, requireInstructor, asyncHandler(CourseController.unpublishCourse));
 
 // POST /api/v1/lms/courses/:id/archive - Archive Course
-router.post('/courses/:id/archive', requireAuth, asyncHandler(CourseController.archiveCourse));
+router.post('/courses/:id/archive', requireAuth, requireInstructor, asyncHandler(CourseController.archiveCourse));
 
 // ========================================
 // LESSON ROUTES
 // ========================================
 
 // POST /api/v1/lms/courses/:courseId/lessons - Create Lesson
-router.post('/courses/:courseId/lessons', requireAuth, asyncHandler(LessonController.createLesson));
+router.post('/courses/:courseId/lessons', requireAuth, requireInstructor, asyncHandler(LessonController.createLesson));
 
 // GET /api/v1/lms/courses/:courseId/lessons - List Lessons for Course
 router.get('/courses/:courseId/lessons', requireAuth, requireEnrollment(), asyncHandler(LessonController.listLessonsByCourse));
@@ -64,13 +65,13 @@ router.get('/courses/:courseId/lessons', requireAuth, requireEnrollment(), async
 router.get('/lessons/:id', requireAuth, requireEnrollment({ checkLesson: true }), asyncHandler(LessonController.getLesson));
 
 // PATCH /api/v1/lms/lessons/:id - Update Lesson
-router.patch('/lessons/:id', requireAuth, asyncHandler(LessonController.updateLesson));
+router.patch('/lessons/:id', requireAuth, requireInstructor, asyncHandler(LessonController.updateLesson));
 
 // DELETE /api/v1/lms/lessons/:id - Delete Lesson
-router.delete('/lessons/:id', requireAuth, asyncHandler(LessonController.deleteLesson));
+router.delete('/lessons/:id', requireAuth, requireInstructor, asyncHandler(LessonController.deleteLesson));
 
 // POST /api/v1/lms/courses/:courseId/lessons/reorder - Reorder Lessons
-router.post('/courses/:courseId/lessons/reorder', requireAuth, asyncHandler(LessonController.reorderLessons));
+router.post('/courses/:courseId/lessons/reorder', requireAuth, requireInstructor, asyncHandler(LessonController.reorderLessons));
 
 // ========================================
 // ENROLLMENT ROUTES
@@ -130,7 +131,7 @@ router.post('/progress/:id/submit-quiz', requireAuth, asyncHandler(ProgressContr
 // ========================================
 
 // POST /api/v1/lms/certificates/issue - Issue Certificate
-router.post('/certificates/issue', requireAuth, asyncHandler(CertificateController.issueCertificate));
+router.post('/certificates/issue', requireAuth, requireAdmin, asyncHandler(CertificateController.issueCertificate));
 
 // GET /api/v1/lms/certificates - List Certificates
 router.get('/certificates', requireAuth, asyncHandler(CertificateController.listCertificates));
@@ -148,20 +149,20 @@ router.get('/certificates/number/:certificateNumber', requireAuth, asyncHandler(
 router.get('/certificates/:id', requireAuth, asyncHandler(CertificateController.getCertificate));
 
 // PATCH /api/v1/lms/certificates/:id - Update Certificate
-router.patch('/certificates/:id', requireAuth, asyncHandler(CertificateController.updateCertificate));
+router.patch('/certificates/:id', requireAuth, requireAdmin, asyncHandler(CertificateController.updateCertificate));
 
 // POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
-router.post('/certificates/:id/revoke', requireAuth, asyncHandler(CertificateController.revokeCertificate));
+router.post('/certificates/:id/revoke', requireAuth, requireAdmin, asyncHandler(CertificateController.revokeCertificate));
 
 // POST /api/v1/lms/certificates/:id/renew - Renew Certificate
-router.post('/certificates/:id/renew', requireAuth, asyncHandler(CertificateController.renewCertificate));
+router.post('/certificates/:id/renew', requireAuth, requireAdmin, asyncHandler(CertificateController.renewCertificate));
 
 // ========================================
 // EVENTS ROUTES
 // ========================================
 
 // POST /api/v1/lms/events - Create Event
-router.post('/events', requireAuth, asyncHandler(EventController.createEvent));
+router.post('/events', requireAuth, requireInstructor, asyncHandler(EventController.createEvent));
 
 // GET /api/v1/lms/events - List Events
 router.get('/events', requireAuth, asyncHandler(EventController.listEvents));
@@ -170,19 +171,19 @@ router.get('/events', requireAuth, asyncHandler(EventController.listEvents));
 router.get('/events/:id', requireAuth, asyncHandler(EventController.getEvent));
 
 // PATCH /api/v1/lms/events/:id - Update Event
-router.patch('/events/:id', requireAuth, asyncHandler(EventController.updateEvent));
+router.patch('/events/:id', requireAuth, requireInstructor, asyncHandler(EventController.updateEvent));
 
 // DELETE /api/v1/lms/events/:id - Delete Event
-router.delete('/events/:id', requireAuth, asyncHandler(EventController.deleteEvent));
+router.delete('/events/:id', requireAuth, requireInstructor, asyncHandler(EventController.deleteEvent));
 
 // POST /api/v1/lms/events/:id/start - Start Event
-router.post('/events/:id/start', requireAuth, asyncHandler(EventController.startEvent));
+router.post('/events/:id/start', requireAuth, requireInstructor, asyncHandler(EventController.startEvent));
 
 // POST /api/v1/lms/events/:id/complete - Complete Event
-router.post('/events/:id/complete', requireAuth, asyncHandler(EventController.completeEvent));
+router.post('/events/:id/complete', requireAuth, requireInstructor, asyncHandler(EventController.completeEvent));
 
 // POST /api/v1/lms/events/:id/cancel - Cancel Event
-router.post('/events/:id/cancel', requireAuth, asyncHandler(EventController.cancelEvent));
+router.post('/events/:id/cancel', requireAuth, requireInstructor, asyncHandler(EventController.cancelEvent));
 
 // ========================================
 // ATTENDANCE ROUTES
@@ -211,7 +212,7 @@ router.patch('/attendance/:id', requireAuth, asyncHandler(AttendanceController.u
 // ========================================
 
 // POST /api/v1/lms/quizzes - Create Quiz
-router.post('/quizzes', requireAuth, asyncHandler(QuizController.createQuiz));
+router.post('/quizzes', requireAuth, requireInstructor, asyncHandler(QuizController.createQuiz));
 
 // GET /api/v1/lms/quizzes - List Quizzes
 router.get('/quizzes', requireAuth, asyncHandler(QuizController.listQuizzes));
@@ -220,25 +221,25 @@ router.get('/quizzes', requireAuth, asyncHandler(QuizController.listQuizzes));
 router.get('/quizzes/:id', requireAuth, asyncHandler(QuizController.getQuiz));
 
 // PATCH /api/v1/lms/quizzes/:id - Update Quiz
-router.patch('/quizzes/:id', requireAuth, asyncHandler(QuizController.updateQuiz));
+router.patch('/quizzes/:id', requireAuth, requireInstructor, asyncHandler(QuizController.updateQuiz));
 
 // DELETE /api/v1/lms/quizzes/:id - Delete Quiz
-router.delete('/quizzes/:id', requireAuth, asyncHandler(QuizController.deleteQuiz));
+router.delete('/quizzes/:id', requireAuth, requireInstructor, asyncHandler(QuizController.deleteQuiz));
 
 // POST /api/v1/lms/quizzes/:id/publish - Publish Quiz
-router.post('/quizzes/:id/publish', requireAuth, asyncHandler(QuizController.publishQuiz));
+router.post('/quizzes/:id/publish', requireAuth, requireInstructor, asyncHandler(QuizController.publishQuiz));
 
 // POST /api/v1/lms/quizzes/:id/unpublish - Unpublish Quiz
-router.post('/quizzes/:id/unpublish', requireAuth, asyncHandler(QuizController.unpublishQuiz));
+router.post('/quizzes/:id/unpublish', requireAuth, requireInstructor, asyncHandler(QuizController.unpublishQuiz));
 
 // POST /api/v1/lms/quizzes/:id/questions - Add Question
-router.post('/quizzes/:id/questions', requireAuth, asyncHandler(QuizController.addQuestion));
+router.post('/quizzes/:id/questions', requireAuth, requireInstructor, asyncHandler(QuizController.addQuestion));
 
 // DELETE /api/v1/lms/quizzes/:id/questions/:questionId - Remove Question
-router.delete('/quizzes/:id/questions/:questionId', requireAuth, asyncHandler(QuizController.removeQuestion));
+router.delete('/quizzes/:id/questions/:questionId', requireAuth, requireInstructor, asyncHandler(QuizController.removeQuestion));
 
 // POST /api/v1/lms/quizzes/:id/questions/reorder - Reorder Questions
-router.post('/quizzes/:id/questions/reorder', requireAuth, asyncHandler(QuizController.reorderQuestions));
+router.post('/quizzes/:id/questions/reorder', requireAuth, requireInstructor, asyncHandler(QuizController.reorderQuestions));
 
 // POST /api/v1/lms/quizzes/:id/attempts - Start Attempt
 router.post('/quizzes/:id/attempts', requireAuth, asyncHandler(QuizController.startAttempt));
@@ -269,7 +270,7 @@ router.get('/quizzes/:id/attempts/me', requireAuth, asyncHandler(QuizController.
 // ========================================
 
 // POST /api/v1/lms/surveys - Create Survey
-router.post('/surveys', requireAuth, asyncHandler(SurveyController.createSurvey));
+router.post('/surveys', requireAuth, requireInstructor, asyncHandler(SurveyController.createSurvey));
 
 // GET /api/v1/lms/surveys - List Surveys
 router.get('/surveys', requireAuth, asyncHandler(SurveyController.listSurveys));
@@ -278,34 +279,34 @@ router.get('/surveys', requireAuth, asyncHandler(SurveyController.listSurveys));
 router.get('/surveys/:id', requireAuth, asyncHandler(SurveyController.getSurvey));
 
 // PATCH /api/v1/lms/surveys/:id - Update Survey
-router.patch('/surveys/:id', requireAuth, asyncHandler(SurveyController.updateSurvey));
+router.patch('/surveys/:id', requireAuth, requireInstructor, asyncHandler(SurveyController.updateSurvey));
 
 // DELETE /api/v1/lms/surveys/:id - Delete Survey
-router.delete('/surveys/:id', requireAuth, asyncHandler(SurveyController.deleteSurvey));
+router.delete('/surveys/:id', requireAuth, requireInstructor, asyncHandler(SurveyController.deleteSurvey));
 
 // POST /api/v1/lms/surveys/:id/publish - Publish Survey
-router.post('/surveys/:id/publish', requireAuth, asyncHandler(SurveyController.publishSurvey));
+router.post('/surveys/:id/publish', requireAuth, requireInstructor, asyncHandler(SurveyController.publishSurvey));
 
 // POST /api/v1/lms/surveys/:id/close - Close Survey
-router.post('/surveys/:id/close', requireAuth, asyncHandler(SurveyController.closeSurvey));
+router.post('/surveys/:id/close', requireAuth, requireInstructor, asyncHandler(SurveyController.closeSurvey));
 
 // POST /api/v1/lms/surveys/:id/archive - Archive Survey
-router.post('/surveys/:id/archive', requireAuth, asyncHandler(SurveyController.archiveSurvey));
+router.post('/surveys/:id/archive', requireAuth, requireInstructor, asyncHandler(SurveyController.archiveSurvey));
 
 // GET /api/v1/lms/surveys/:id/questions - Get Questions
 router.get('/surveys/:id/questions', requireAuth, asyncHandler(SurveyController.getQuestions));
 
 // POST /api/v1/lms/surveys/:id/questions - Add Question
-router.post('/surveys/:id/questions', requireAuth, asyncHandler(SurveyController.addQuestion));
+router.post('/surveys/:id/questions', requireAuth, requireInstructor, asyncHandler(SurveyController.addQuestion));
 
 // PATCH /api/v1/lms/surveys/questions/:questionId - Update Question
-router.patch('/surveys/questions/:questionId', requireAuth, asyncHandler(SurveyController.updateQuestion));
+router.patch('/surveys/questions/:questionId', requireAuth, requireInstructor, asyncHandler(SurveyController.updateQuestion));
 
 // DELETE /api/v1/lms/surveys/questions/:questionId - Delete Question
-router.delete('/surveys/questions/:questionId', requireAuth, asyncHandler(SurveyController.deleteQuestion));
+router.delete('/surveys/questions/:questionId', requireAuth, requireInstructor, asyncHandler(SurveyController.deleteQuestion));
 
 // POST /api/v1/lms/surveys/:id/questions/reorder - Reorder Questions
-router.post('/surveys/:id/questions/reorder', requireAuth, asyncHandler(SurveyController.reorderQuestions));
+router.post('/surveys/:id/questions/reorder', requireAuth, requireInstructor, asyncHandler(SurveyController.reorderQuestions));
 
 // POST /api/v1/lms/surveys/:id/responses - Start Response
 router.post('/surveys/:id/responses', requireAuth, asyncHandler(SurveyController.startResponse));
@@ -339,7 +340,7 @@ router.get('/surveys/:id/responses/check', requireAuth, asyncHandler(SurveyContr
 // ========================================
 
 // POST /api/v1/lms/marketing/products - Create ProductContent
-router.post('/marketing/products', requireAuth, asyncHandler(ProductContentController.createProductContent));
+router.post('/marketing/products', requireAuth, requireInstructor, asyncHandler(ProductContentController.createProductContent));
 
 // GET /api/v1/lms/marketing/products - List ProductContents
 router.get('/marketing/products', requireAuth, asyncHandler(ProductContentController.listProductContents));
@@ -354,26 +355,26 @@ router.get('/marketing/products/supplier/:supplierId', requireAuth, asyncHandler
 router.get('/marketing/products/:id', requireAuth, asyncHandler(ProductContentController.getProductContent));
 
 // PATCH /api/v1/lms/marketing/products/:id - Update ProductContent
-router.patch('/marketing/products/:id', requireAuth, asyncHandler(ProductContentController.updateProductContent));
+router.patch('/marketing/products/:id', requireAuth, requireInstructor, asyncHandler(ProductContentController.updateProductContent));
 
 // DELETE /api/v1/lms/marketing/products/:id - Delete ProductContent
-router.delete('/marketing/products/:id', requireAuth, asyncHandler(ProductContentController.deleteProductContent));
+router.delete('/marketing/products/:id', requireAuth, requireInstructor, asyncHandler(ProductContentController.deleteProductContent));
 
 // POST /api/v1/lms/marketing/products/:id/publish - Publish ProductContent
-router.post('/marketing/products/:id/publish', requireAuth, asyncHandler(ProductContentController.publishProductContent));
+router.post('/marketing/products/:id/publish', requireAuth, requireInstructor, asyncHandler(ProductContentController.publishProductContent));
 
 // POST /api/v1/lms/marketing/products/:id/pause - Pause ProductContent
-router.post('/marketing/products/:id/pause', requireAuth, asyncHandler(ProductContentController.pauseProductContent));
+router.post('/marketing/products/:id/pause', requireAuth, requireInstructor, asyncHandler(ProductContentController.pauseProductContent));
 
 // POST /api/v1/lms/marketing/products/:id/archive - Archive ProductContent
-router.post('/marketing/products/:id/archive', requireAuth, asyncHandler(ProductContentController.archiveProductContent));
+router.post('/marketing/products/:id/archive', requireAuth, requireInstructor, asyncHandler(ProductContentController.archiveProductContent));
 
 // ========================================
 // MARKETING: QUIZ CAMPAIGN ROUTES (Phase 2 Refoundation)
 // ========================================
 
 // POST /api/v1/lms/marketing/quiz-campaigns - Create QuizCampaign
-router.post('/marketing/quiz-campaigns', requireAuth, asyncHandler(QuizCampaignController.createCampaign));
+router.post('/marketing/quiz-campaigns', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.createCampaign));
 
 // GET /api/v1/lms/marketing/quiz-campaigns - List QuizCampaigns
 router.get('/marketing/quiz-campaigns', requireAuth, asyncHandler(QuizCampaignController.listCampaigns));
@@ -385,22 +386,22 @@ router.get('/marketing/quiz-campaigns/active', requireAuth, asyncHandler(QuizCam
 router.get('/marketing/quiz-campaigns/:id', requireAuth, asyncHandler(QuizCampaignController.getCampaign));
 
 // PATCH /api/v1/lms/marketing/quiz-campaigns/:id - Update QuizCampaign
-router.patch('/marketing/quiz-campaigns/:id', requireAuth, asyncHandler(QuizCampaignController.updateCampaign));
+router.patch('/marketing/quiz-campaigns/:id', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.updateCampaign));
 
 // DELETE /api/v1/lms/marketing/quiz-campaigns/:id - Delete QuizCampaign
-router.delete('/marketing/quiz-campaigns/:id', requireAuth, asyncHandler(QuizCampaignController.deleteCampaign));
+router.delete('/marketing/quiz-campaigns/:id', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.deleteCampaign));
 
 // POST /api/v1/lms/marketing/quiz-campaigns/:id/activate - Activate QuizCampaign
-router.post('/marketing/quiz-campaigns/:id/activate', requireAuth, asyncHandler(QuizCampaignController.activateCampaign));
+router.post('/marketing/quiz-campaigns/:id/activate', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.activateCampaign));
 
 // POST /api/v1/lms/marketing/quiz-campaigns/:id/pause - Pause QuizCampaign
-router.post('/marketing/quiz-campaigns/:id/pause', requireAuth, asyncHandler(QuizCampaignController.pauseCampaign));
+router.post('/marketing/quiz-campaigns/:id/pause', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.pauseCampaign));
 
 // POST /api/v1/lms/marketing/quiz-campaigns/:id/complete - Complete QuizCampaign
-router.post('/marketing/quiz-campaigns/:id/complete', requireAuth, asyncHandler(QuizCampaignController.completeCampaign));
+router.post('/marketing/quiz-campaigns/:id/complete', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.completeCampaign));
 
 // POST /api/v1/lms/marketing/quiz-campaigns/:id/archive - Archive QuizCampaign
-router.post('/marketing/quiz-campaigns/:id/archive', requireAuth, asyncHandler(QuizCampaignController.archiveCampaign));
+router.post('/marketing/quiz-campaigns/:id/archive', requireAuth, requireInstructor, asyncHandler(QuizCampaignController.archiveCampaign));
 
 // POST /api/v1/lms/marketing/quiz-campaigns/:id/participation - Record Participation
 router.post('/marketing/quiz-campaigns/:id/participation', requireAuth, asyncHandler(QuizCampaignController.recordParticipation));
@@ -413,7 +414,7 @@ router.post('/marketing/quiz-campaigns/:id/completion', requireAuth, asyncHandle
 // ========================================
 
 // POST /api/v1/lms/marketing/survey-campaigns - Create SurveyCampaign
-router.post('/marketing/survey-campaigns', requireAuth, asyncHandler(SurveyCampaignController.createCampaign));
+router.post('/marketing/survey-campaigns', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.createCampaign));
 
 // GET /api/v1/lms/marketing/survey-campaigns - List SurveyCampaigns
 router.get('/marketing/survey-campaigns', requireAuth, asyncHandler(SurveyCampaignController.listCampaigns));
@@ -425,22 +426,22 @@ router.get('/marketing/survey-campaigns/active', requireAuth, asyncHandler(Surve
 router.get('/marketing/survey-campaigns/:id', requireAuth, asyncHandler(SurveyCampaignController.getCampaign));
 
 // PATCH /api/v1/lms/marketing/survey-campaigns/:id - Update SurveyCampaign
-router.patch('/marketing/survey-campaigns/:id', requireAuth, asyncHandler(SurveyCampaignController.updateCampaign));
+router.patch('/marketing/survey-campaigns/:id', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.updateCampaign));
 
 // DELETE /api/v1/lms/marketing/survey-campaigns/:id - Delete SurveyCampaign
-router.delete('/marketing/survey-campaigns/:id', requireAuth, asyncHandler(SurveyCampaignController.deleteCampaign));
+router.delete('/marketing/survey-campaigns/:id', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.deleteCampaign));
 
 // POST /api/v1/lms/marketing/survey-campaigns/:id/activate - Activate SurveyCampaign
-router.post('/marketing/survey-campaigns/:id/activate', requireAuth, asyncHandler(SurveyCampaignController.activateCampaign));
+router.post('/marketing/survey-campaigns/:id/activate', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.activateCampaign));
 
 // POST /api/v1/lms/marketing/survey-campaigns/:id/pause - Pause SurveyCampaign
-router.post('/marketing/survey-campaigns/:id/pause', requireAuth, asyncHandler(SurveyCampaignController.pauseCampaign));
+router.post('/marketing/survey-campaigns/:id/pause', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.pauseCampaign));
 
 // POST /api/v1/lms/marketing/survey-campaigns/:id/complete - Complete SurveyCampaign
-router.post('/marketing/survey-campaigns/:id/complete', requireAuth, asyncHandler(SurveyCampaignController.completeCampaign));
+router.post('/marketing/survey-campaigns/:id/complete', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.completeCampaign));
 
 // POST /api/v1/lms/marketing/survey-campaigns/:id/archive - Archive SurveyCampaign
-router.post('/marketing/survey-campaigns/:id/archive', requireAuth, asyncHandler(SurveyCampaignController.archiveCampaign));
+router.post('/marketing/survey-campaigns/:id/archive', requireAuth, requireInstructor, asyncHandler(SurveyCampaignController.archiveCampaign));
 
 // POST /api/v1/lms/marketing/survey-campaigns/:id/response - Record Response
 router.post('/marketing/survey-campaigns/:id/response', requireAuth, asyncHandler(SurveyCampaignController.recordResponse));

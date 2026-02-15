@@ -71,7 +71,7 @@ export function FeedbackListPage() {
   const [filterType, setFilterType] = useState<FeedbackType | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<FeedbackStatus | 'all'>('all');
 
-  const canWrite = canWriteFeedback(user?.role);
+  const canWrite = canWriteFeedback(user?.role, user?.roles);
 
   // 필터링된 게시글
   const filteredPosts = posts.filter((post) => {

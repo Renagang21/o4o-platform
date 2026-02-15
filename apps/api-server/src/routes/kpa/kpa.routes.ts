@@ -2,22 +2,54 @@
  * KPA Routes
  * 약사회 SaaS API 라우트 설정
  *
- * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 1: KPA Migration)
+ * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1 Phase 2: Route Manifest
  *
  * API Namespace: /api/v1/kpa
  *
- * Domain routes for KPA Society service:
- * - /api/v1/kpa/organizations - 조직 관리
- * - /api/v1/kpa/members - 회원 관리
- * - /api/v1/kpa/applications - 신청서 처리
- * - /api/v1/kpa/forum - 포럼/커뮤니티
- * - /api/v1/kpa/lms - 학습관리시스템
- * - /api/v1/kpa/news - 공지사항/뉴스
- * - /api/v1/kpa/resources - 자료실
- * - /api/v1/kpa/groupbuy - 공동구매
- * - /api/v1/kpa/mypage - 마이페이지
- * - /api/v1/kpa/organization - 조직정보 (공개)
- * - /api/v1/kpa/join-inquiries - 참여 문의 관리 (관리자)
+ * ┌─────────────────────────────────────────────────────────────────────┐
+ * │ ROUTE MANIFEST — Admin / Operator / Public 분류                      │
+ * ├─────────────────────────────────────────────────────────────────────┤
+ * │ ADMIN (kpa:admin scope required)                                    │
+ * │  /admin             - 관리자 대시보드                                   │
+ * │  /organizations     - 조직 관리 (CRUD)                                │
+ * │  /members           - 회원 관리 (승인/거절)                             │
+ * │  /applications      - 신청서 처리                                     │
+ * │  /join-inquiries    - 참여 문의 관리                                   │
+ * │  /organization-join-requests - 조직 가입 요청 관리                      │
+ * │  /stewards          - 간사 관리                                       │
+ * │  /forum/categories  - 포럼 카테고리 생성/수정/삭제 (구조 변경)             │
+ * │  /operator/audit-logs - 감사 로그 조회                                 │
+ * ├─────────────────────────────────────────────────────────────────────┤
+ * │ OPERATOR (kpa:operator scope required)                              │
+ * │  /operator          - 운영자 요약 대시보드                              │
+ * │  /groupbuy-admin    - 공동구매 운영                                    │
+ * │  /news (POST/PUT/DELETE) - 콘텐츠 CRUD                               │
+ * │  /news/admin/list   - 콘텐츠 전체 목록                                 │
+ * │  /forum/moderation  - 포럼 중재                                       │
+ * ├─────────────────────────────────────────────────────────────────────┤
+ * │ BRANCH ADMIN (coreRequireAuth + branch-level guard)                │
+ * │  /branch-admin      - 분회 관리자 대시보드                              │
+ * ├─────────────────────────────────────────────────────────────────────┤
+ * │ AUTHENTICATED (requireAuth only)                                    │
+ * │  /mypage            - 마이페이지                                       │
+ * │  /lms/enrollments   - 수강 관리                                       │
+ * │  /lms/certificates  - 수료증 조회                                      │
+ * │  /pharmacy/store    - 약국 스토어 설정                                  │
+ * │  /pharmacy/products - 약국 상품 관리                                    │
+ * │  /store-hub         - 스토어 허브                                      │
+ * ├─────────────────────────────────────────────────────────────────────┤
+ * │ PUBLIC (no auth / optionalAuth)                                     │
+ * │  /branches          - 분회 공개 정보                                    │
+ * │  /forum (GET)       - 포럼 조회                                        │
+ * │  /demo-forum        - 데모 포럼                                        │
+ * │  /lms/courses (GET) - 강좌 목록                                        │
+ * │  /home              - 홈 페이지 데이터                                  │
+ * │  /news (GET)        - 공지사항/뉴스 조회                                │
+ * │  /resources         - 자료실 (placeholder)                             │
+ * │  /groupbuy (GET)    - 공동구매 조회 (placeholder)                       │
+ * │  /organization      - 조직 공개 정보                                    │
+ * │  /health            - 헬스체크                                          │
+ * └─────────────────────────────────────────────────────────────────────┘
  */
 
 import { Router, RequestHandler, Request, Response } from 'express';
@@ -167,7 +199,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     scope: 'community',
   });
 
-  // Mount controllers with auth middleware
+  // ============================================================================
+  // ADMIN ROUTES — requireKpaScope('kpa:admin') enforced in sub-controllers
+  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Structure/Role/Policy → Admin only
+  // ============================================================================
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/members', createMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/applications', createApplicationController(dataSource, coreRequireAuth as any, requireKpaScope));
@@ -180,6 +215,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Branch Public routes — read-only endpoints for /branch-services/:branchId pages
   router.use('/branches', createBranchPublicController(dataSource));
+
+  // ============================================================================
+  // OPERATOR ROUTES — requireKpaScope('kpa:operator') enforced
+  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Operations/Content → Operator
+  // ============================================================================
 
   // Operator Summary routes (운영자 실사용 화면 1단계)
   router.use('/operator', createOperatorSummaryController(dataSource, {
@@ -200,6 +240,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
   router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));
 
+  // ============================================================================
+  // AUTHENTICATED USER ROUTES — requireAuth only (no admin/operator scope)
+  // ============================================================================
+
   // Store Hub routes (WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1)
   router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
 
@@ -210,7 +254,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
+  // PUBLIC / MIXED ROUTES — optionalAuth or mixed auth levels
+  // ============================================================================
+
+  // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*
+  // Mixed: Public reads / Admin writes / Operator moderation
   // ============================================================================
   const forumRouter = Router();
   const forumController = new ForumController();
@@ -243,12 +292,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
 
-  // Categories (읽기: 공개, 쓰기: operator scope — WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1)
+  // Categories (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
   forumRouter.get('/categories', forumController.listCategories.bind(forumController));
   forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
-  forumRouter.post('/categories', authenticate, requireKpaScope('kpa:operator'), forumController.createCategory.bind(forumController));
-  forumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:operator'), forumController.updateCategory.bind(forumController));
-  forumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:operator'), forumController.deleteCategory.bind(forumController));
+  // Structure creation/modification/deletion → Admin only
+  forumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), forumController.createCategory.bind(forumController));
+  forumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.updateCategory.bind(forumController));
+  forumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.deleteCategory.bind(forumController));
 
   // Moderation (operator scope — WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1)
   forumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), forumController.getModerationQueue.bind(forumController));
@@ -285,11 +335,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   demoForumRouter.post('/comments', authenticate, demoForumController.createComment.bind(demoForumController));
   demoForumRouter.get('/categories', demoForumController.listCategories.bind(demoForumController));
   demoForumRouter.get('/categories/:id', demoForumController.getCategory.bind(demoForumController));
-  demoForumRouter.post('/categories', authenticate, demoForumController.createCategory.bind(demoForumController));
-  demoForumRouter.put('/categories/:id', authenticate, demoForumController.updateCategory.bind(demoForumController));
-  demoForumRouter.delete('/categories/:id', authenticate, demoForumController.deleteCategory.bind(demoForumController));
-  demoForumRouter.get('/moderation', authenticate, demoForumController.getModerationQueue.bind(demoForumController));
-  demoForumRouter.post('/moderation/:type/:id', authenticate, demoForumController.moderateContent.bind(demoForumController));
+  demoForumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), demoForumController.createCategory.bind(demoForumController));
+  demoForumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:admin'), demoForumController.updateCategory.bind(demoForumController));
+  demoForumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:admin'), demoForumController.deleteCategory.bind(demoForumController));
+  demoForumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), demoForumController.getModerationQueue.bind(demoForumController));
+  demoForumRouter.post('/moderation/:type/:id', authenticate, requireKpaScope('kpa:operator'), demoForumController.moderateContent.bind(demoForumController));
 
   router.use('/demo-forum', demoForumRouter);
 
@@ -706,8 +756,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     // Determine user type based on roles
     const roles: string[] = fullUser?.roles || [];
+    // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA roles only
     const isSuperOperator = roles.some((r: string) =>
-      ['platform:operator', 'platform:admin', 'super_operator'].includes(r)
+      ['kpa:admin', 'kpa:operator'].includes(r)
     );
     const isPharmacyOwner = kpaMember?.pharmacy_name ? true : false;
     const isOfficer = organizationMemberships.some((m: any) =>

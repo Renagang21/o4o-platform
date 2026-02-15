@@ -186,6 +186,14 @@ export class ForumRecommendationController {
    */
   async getConfig(req: Request, res: Response): Promise<void> {
     try {
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Policy config → Admin only
+      const user = (req as any).user;
+      const userRoles: string[] = user?.roles || [];
+      if (!userRoles.includes('kpa:admin')) {
+        res.status(403).json({ success: false, error: 'KPA admin role required' });
+        return;
+      }
+
       const weights = forumRecommendationService.getWeights();
 
       res.json({
@@ -209,6 +217,14 @@ export class ForumRecommendationController {
    */
   async updateConfig(req: Request, res: Response): Promise<void> {
     try {
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Policy config → Admin only
+      const user = (req as any).user;
+      const userRoles: string[] = user?.roles || [];
+      if (!userRoles.includes('kpa:admin')) {
+        res.status(403).json({ success: false, error: 'KPA admin role required' });
+        return;
+      }
+
       const { weights } = req.body;
 
       if (weights) {

@@ -52,6 +52,19 @@ export class ForumAIController {
   async processPost(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const user = (req as any).user;
+
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require auth + operator role
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+      const userRoles: string[] = user.roles || [];
+      if (!userRoles.includes('kpa:admin') && !userRoles.includes('kpa:operator')) {
+        res.status(403).json({ success: false, error: 'KPA operator role required' });
+        return;
+      }
+
       const { regenerate } = req.body;
 
       // Start processing (this could be moved to a job queue in production)
@@ -89,7 +102,12 @@ export class ForumAIController {
         return;
       }
 
-      // TODO: Add authorization check (author or moderator)
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require operator+ role
+      const userRoles: string[] = user.roles || [];
+      if (!userRoles.includes('kpa:admin') && !userRoles.includes('kpa:operator')) {
+        res.status(403).json({ success: false, error: 'KPA operator role required' });
+        return;
+      }
 
       const result = await forumAIService.processPost(id, { regenerate: true });
 
@@ -126,9 +144,12 @@ export class ForumAIController {
         return;
       }
 
-      // TODO: Add authorization check
-      // - cosmetics: author can approve
-      // - yaksa: operator+ only
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require operator+ role
+      const userRoles: string[] = user.roles || [];
+      if (!userRoles.includes('kpa:admin') && !userRoles.includes('kpa:operator')) {
+        res.status(403).json({ success: false, error: 'KPA operator role required' });
+        return;
+      }
 
       await forumAIService.applyTags(id, user.id, tags);
 

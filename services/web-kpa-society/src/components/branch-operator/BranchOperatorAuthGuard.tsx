@@ -98,36 +98,24 @@ export function BranchOperatorAuthGuard({ children }: BranchOperatorAuthGuardPro
 }
 
 /**
- * 사용자의 분회 운영자 권한 확인
- *
- * WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1:
- * kpa-c:operator + 상위 역할 허용
+ * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
+ * Legacy roles removed, platform roles removed
  */
 function checkBranchOperatorRole(user: User, _branchId: string): boolean {
-  const legacyRoles = [
-    'admin',
-    'super_admin',
-    'district_admin',
-  ];
-
-  const prefixedRoles = [
+  const allowedRoles = [
     'kpa-c:operator',
     'kpa-c:branch_admin',
     'kpa:admin',
     'kpa:district_admin',
-    'platform:admin',
-    'platform:super_admin',
+    'kpa:branch_admin',
+    'kpa:branch_operator',
   ];
 
-  const allowedRoles = [...legacyRoles, ...prefixedRoles];
-
   if (user.role && allowedRoles.includes(user.role)) {
-    // TODO: 향후 분회별 권한 세분화 (branchId 매칭)
     return true;
   }
 
   if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
-    // TODO: 향후 분회별 권한 세분화 (branchId 매칭)
     return true;
   }
 

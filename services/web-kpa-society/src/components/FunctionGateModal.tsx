@@ -48,9 +48,10 @@ export default function FunctionGateModal() {
     if (isOpen) setSelectedKey(null);
   }, [isOpen]);
 
-  // Admin/operator should never see function selection
-  const NON_PHARMACIST_ROLES = ['admin', 'super_admin', 'district_admin', 'branch_admin', 'operator'];
-  const isAdminOrOperator = user?.role ? NON_PHARMACIST_ROLES.includes(user.role) : false;
+  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
+  const NON_PHARMACIST_ROLES = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator'];
+  const isAdminOrOperator = (user?.role && NON_PHARMACIST_ROLES.includes(user.role)) ||
+    (user?.roles && user.roles.some((r: string) => NON_PHARMACIST_ROLES.includes(r))) || false;
 
   // Close if admin/operator or already set
   useEffect(() => {

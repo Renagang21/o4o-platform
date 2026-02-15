@@ -200,11 +200,12 @@ export function createApplicationController(
         }
 
         // 본인 또는 관리자만 조회 가능
+        // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
         const isOwner = application.user_id === req.user!.id;
-        const isAdmin = req.user!.roles?.includes('admin') || req.user!.roles?.includes('super_admin');
-        const isKpaOperator = req.user!.scopes?.includes('kpa:operator') || req.user!.scopes?.includes('kpa:admin');
+        const userRoles: string[] = req.user!.roles || [];
+        const isKpaOperator = userRoles.includes('kpa:admin') || userRoles.includes('kpa:operator');
 
-        if (!isOwner && !isAdmin && !isKpaOperator) {
+        if (!isOwner && !isKpaOperator) {
           res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Access denied' } });
           return;
         }

@@ -136,16 +136,12 @@ export function createForumCategoryRequestRoutes(): Router {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 20;
 
-        // 관리자/운영자 권한 체크
+        // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
         const userRoles: string[] = user.roles || [];
-        const userScopes: string[] = user.scopes || [];
-        const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin');
-        const isOperator = userScopes.some((s: string) =>
-          s.includes(':admin') || s.includes(':operator') || s.includes(':forum')
-        );
+        const isKpaOperator = userRoles.includes('kpa:admin') || userRoles.includes('kpa:operator');
 
-        if (!isAdmin && !isOperator) {
-          res.status(403).json({ success: false, error: 'Operator or admin access required' });
+        if (!isKpaOperator) {
+          res.status(403).json({ success: false, error: 'KPA operator role required' });
           return;
         }
 
@@ -214,6 +210,14 @@ export function createForumCategoryRequestRoutes(): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const user = (req as any).user;
+
+        // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Structure creation → Admin only
+        const userRoles: string[] = user?.roles || [];
+        if (!userRoles.includes('kpa:admin')) {
+          res.status(403).json({ success: false, error: 'KPA admin role required for category approval' });
+          return;
+        }
+
         const requestRepo = getRequestRepo();
         const categoryRepo = getCategoryRepo();
         const request = await requestRepo.findOne({ where: { id: req.params.id } });
@@ -268,6 +272,14 @@ export function createForumCategoryRequestRoutes(): Router {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const user = (req as any).user;
+
+        // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin only
+        const userRoles: string[] = user?.roles || [];
+        if (!userRoles.includes('kpa:admin')) {
+          res.status(403).json({ success: false, error: 'KPA admin role required for category rejection' });
+          return;
+        }
+
         const requestRepo = getRequestRepo();
         const request = await requestRepo.findOne({ where: { id: req.params.id } });
 

@@ -22,7 +22,7 @@ export function FeedbackNewPage() {
   const [type, setType] = useState<FeedbackType>('improvement');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canWrite = canWriteFeedback(user?.role);
+  const canWrite = canWriteFeedback(user?.role, user?.roles);
 
   if (!canWrite) {
     return (
@@ -139,7 +139,7 @@ export function FeedbackNewPage() {
           <span style={styles.authorLabel}>작성자:</span>
           <span style={styles.authorName}>{user?.name || '알 수 없음'}</span>
           <span style={styles.authorRole}>
-            ({user?.role === 'district_admin' ? '지부 운영자' : '분회 운영자'})
+            ({user?.role === 'kpa:district_admin' ? '지부 운영자' : '분회 운영자'})
           </span>
         </div>
 

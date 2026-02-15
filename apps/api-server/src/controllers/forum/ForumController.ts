@@ -1285,11 +1285,12 @@ export class ForumController {
         return;
       }
 
-      // Only admin/manager can moderate
-      if (!['admin', 'manager'].includes(userRole)) {
+      // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
+      const userRoles: string[] = (req as any).user?.roles || [];
+      if (!userRoles.includes('kpa:admin') && !userRoles.includes('kpa:operator')) {
         res.status(403).json({
           success: false,
-          error: 'Permission denied: only admins can moderate content',
+          error: 'KPA operator role required for content moderation',
         });
         return;
       }

@@ -79,9 +79,10 @@ export function FeedbackDetailPage() {
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canWrite = canWriteFeedback(user?.role);
-  const canManage = canManageFeedback(user?.role);
-  const isOperator = user?.role === 'platform_admin' || user?.role === 'district_admin';
+  const canWrite = canWriteFeedback(user?.role, user?.roles);
+  const canManage = canManageFeedback(user?.role, user?.roles);
+  const userRoles = user?.roles || [];
+  const isOperator = userRoles.includes('kpa:admin') || userRoles.includes('kpa:operator') || userRoles.includes('kpa:district_admin');
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
