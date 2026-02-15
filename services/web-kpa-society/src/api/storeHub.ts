@@ -56,6 +56,8 @@ export interface ChannelOverview {
   approvedAt: string | null;
   createdAt: string;
   visibleProductCount: number;
+  totalProductCount: number;
+  salesLimitConfiguredCount: number;
 }
 
 export async function fetchChannelOverview(): Promise<ChannelOverview[]> {

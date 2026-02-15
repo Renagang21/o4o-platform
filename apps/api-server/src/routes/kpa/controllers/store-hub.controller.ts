@@ -229,8 +229,9 @@ export function createStoreHubController(
    * GET /store-hub/channels
    *
    * WO-PHARMACY-HUB-CHANNEL-LAYER-UI-V1
+   * WO-PHARMACY-CHANNEL-KPI-STABILIZATION-V1 (KPI fields)
    *
-   * Returns channel ownership overview for the user's organization.
+   * Returns channel ownership overview with KPI metrics.
    * Read-only — no status changes, no order creation.
    */
   router.get(
@@ -264,7 +265,7 @@ export function createStoreHubController(
           return;
         }
 
-        // Fetch channels with product count per channel
+        // Fetch channels with KPI metrics per channel
         const channels = await dataSource.query(
           `SELECT
              oc.id,
@@ -272,14 +273,19 @@ export function createStoreHubController(
              oc.status,
              oc.approved_at AS "approvedAt",
              oc.created_at AS "createdAt",
-             COALESCE(pc.product_count, 0)::int AS "visibleProductCount"
+             COALESCE(stats.visible_count, 0)::int AS "visibleProductCount",
+             COALESCE(stats.total_count, 0)::int AS "totalProductCount",
+             COALESCE(stats.limit_count, 0)::int AS "salesLimitConfiguredCount"
            FROM organization_channels oc
            LEFT JOIN (
-             SELECT channel_id, COUNT(*) AS product_count
+             SELECT
+               channel_id,
+               COUNT(*) AS total_count,
+               COUNT(*) FILTER (WHERE is_active = true) AS visible_count,
+               COUNT(*) FILTER (WHERE sales_limit IS NOT NULL) AS limit_count
              FROM organization_product_channels
-             WHERE is_active = true
              GROUP BY channel_id
-           ) pc ON pc.channel_id = oc.id
+           ) stats ON stats.channel_id = oc.id
            WHERE oc.organization_id = $1
            ORDER BY oc.created_at ASC`,
           [organizationId]
