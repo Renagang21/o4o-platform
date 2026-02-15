@@ -2,6 +2,7 @@
  * Store Hub Controller — Unified Storefront Rendering API
  *
  * WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1
+ * WO-PHARMACY-HUB-CHANNEL-LAYER-UI-V1 (channels endpoint)
  *
  * Aggregates Products / Contents / Signage summaries from multiple services
  * into a single response for the pharmacy owner's "cyber store" dashboard.
@@ -215,6 +216,76 @@ export function createStoreHubController(
         };
 
         res.json({ success: true, data: overview });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /store-hub/channels
+   *
+   * WO-PHARMACY-HUB-CHANNEL-LAYER-UI-V1
+   *
+   * Returns channel ownership overview for the user's organization.
+   * Read-only — no status changes, no order creation.
+   */
+  router.get(
+    '/channels',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles = authReq.user?.roles || [];
+
+        if (!userId) {
+          res.status(401).json({
+            success: false,
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+          });
+          return;
+        }
+
+        if (!isPharmacyOwnerRole(userRoles)) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
+          });
+          return;
+        }
+
+        const organizationId = await getUserOrganizationId(dataSource, userId);
+        if (!organizationId) {
+          res.json({ success: true, data: [] });
+          return;
+        }
+
+        // Fetch channels with product count per channel
+        const channels = await dataSource.query(
+          `SELECT
+             oc.id,
+             oc.channel_type AS "channelType",
+             oc.status,
+             oc.approved_at AS "approvedAt",
+             oc.created_at AS "createdAt",
+             COALESCE(pc.product_count, 0)::int AS "visibleProductCount"
+           FROM organization_channels oc
+           LEFT JOIN (
+             SELECT channel_id, COUNT(*) AS product_count
+             FROM organization_product_channels
+             WHERE is_active = true
+             GROUP BY channel_id
+           ) pc ON pc.channel_id = oc.id
+           WHERE oc.organization_id = $1
+           ORDER BY oc.created_at ASC`,
+          [organizationId]
+        );
+
+        res.json({ success: true, data: channels });
       } catch (error: any) {
         res.status(500).json({
           success: false,

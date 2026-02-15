@@ -41,3 +41,26 @@ export async function fetchStoreHubOverview(): Promise<StoreHubOverview | null> 
   );
   return response.data;
 }
+
+// ─────────────────────────────────────────────────────
+// Channel Layer (WO-PHARMACY-HUB-CHANNEL-LAYER-UI-V1)
+// ─────────────────────────────────────────────────────
+
+export type ChannelType = 'B2C' | 'KIOSK' | 'TABLET' | 'SIGNAGE';
+export type ChannelStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'EXPIRED' | 'TERMINATED';
+
+export interface ChannelOverview {
+  id: string;
+  channelType: ChannelType;
+  status: ChannelStatus;
+  approvedAt: string | null;
+  createdAt: string;
+  visibleProductCount: number;
+}
+
+export async function fetchChannelOverview(): Promise<ChannelOverview[]> {
+  const response = await apiClient.get<{ success: boolean; data: ChannelOverview[] }>(
+    '/store-hub/channels'
+  );
+  return response.data ?? [];
+}

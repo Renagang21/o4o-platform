@@ -14,6 +14,7 @@
 
 import { useOrganization } from '../../contexts';
 import { ContextGuard } from '../../components/common/ContextGuard';
+import { ChannelLayerSection } from './sections/ChannelLayerSection';
 import { StoreOverviewSection } from './sections/StoreOverviewSection';
 import { StoreManagementSection } from './sections/StoreManagementSection';
 import { ActiveServicesSection } from './sections/ActiveServicesSection';
@@ -40,7 +41,10 @@ function PharmacyDashboardContent() {
         </p>
       </div>
 
-      {/* 1. Store Overview — 매장 현황 요약 (최상단) */}
+      {/* 0. Channel Layer — 채널 소유형 상태 (최상단) */}
+      <ChannelLayerSection />
+
+      {/* 1. Store Overview — 매장 현황 요약 */}
       <StoreOverviewSection />
 
       {/* 2. Store Management — 매장 운영 링크 */}
