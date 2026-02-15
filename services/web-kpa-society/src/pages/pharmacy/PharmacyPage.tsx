@@ -14,10 +14,11 @@
  * 6. pharmacy_owner + 승인 완료 → /pharmacy/hub로 리다이렉트
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
+import { joinRequestApi } from '../../api/joinRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 /** Admin/operator roles that should NOT see pharmacist function selection */
@@ -27,8 +28,10 @@ export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { openFunctionGateModal } = useAuthModal();
+  const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none'>('loading');
 
   const isAdminOrOperator = user?.role ? NON_PHARMACIST_ROLES.includes(user.role) : false;
+  const isPharmacyOwner = !!user && !isAdminOrOperator && user.pharmacistRole === 'pharmacy_owner';
   const needsFunctionSelection = !!user && !isAdminOrOperator && !user.pharmacistRole;
 
   // 직역 미설정 시 모달 자동 표시
@@ -37,6 +40,35 @@ export function PharmacyPage() {
       openFunctionGateModal();
     }
   }, [needsFunctionSelection, openFunctionGateModal]);
+
+  // pharmacy_owner의 승인 상태 확인
+  useEffect(() => {
+    if (!isPharmacyOwner) {
+      setApprovalStatus('none');
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await joinRequestApi.getMyRequests();
+        if (cancelled) return;
+        const requests = res?.data || [];
+        const pharmacyRequest = requests.find(
+          (r: any) => r.requestType === 'pharmacy_join'
+        );
+        if (pharmacyRequest?.status === 'approved') {
+          setApprovalStatus('approved');
+        } else if (pharmacyRequest) {
+          setApprovalStatus('pending');
+        } else {
+          setApprovalStatus('none');
+        }
+      } catch {
+        if (!cancelled) setApprovalStatus('none');
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isPharmacyOwner]);
 
   // 1. 미로그인
   if (!user) {
@@ -158,9 +190,25 @@ export function PharmacyPage() {
     );
   }
 
-  // 4. pharmacy_owner → 약국 신청 게이트로 이동
-  // 승인 여부는 PharmacyApprovalGatePage에서 판단
-  // (현재 Phase에서는 항상 신청 게이트로 이동)
+  // 5. pharmacy_owner — 승인 상태에 따라 분기
+  if (approvalStatus === 'loading') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <p style={styles.desc}>승인 상태 확인 중...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 6. 승인 완료 → 허브로 이동
+  if (approvalStatus === 'approved') {
+    return <Navigate to="/pharmacy/hub" replace />;
+  }
+
+  // 7. 미승인/미신청 → 신청 게이트로 이동
   return <Navigate to="/pharmacy/approval" replace />;
 }
 

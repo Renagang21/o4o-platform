@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   applyProduct,
   getApplications,
@@ -44,9 +45,9 @@ export function PharmacySellPage() {
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 16px' }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <a href="/pharmacy/hub" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
+        <Link to="/pharmacy/hub" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
           &larr; 약국 운영 허브
-        </a>
+        </Link>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: '8px 0 4px' }}>
           상품 판매 관리
         </h1>
@@ -308,11 +309,23 @@ function ApplicationsTab() {
  * Tab 2: 내 매장 진열 상품
  */
 function ListingsTab() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialChannel = (searchParams.get('channel') as ChannelType | null) || 'ALL';
+
   const [listings, setListings] = useState<ProductListing[]>([]);
   const [channels, setChannels] = useState<ChannelOverview[]>([]);
   const [loading, setLoading] = useState(true);
-  const [channelFilter, setChannelFilter] = useState<ChannelType | 'ALL'>('ALL');
+  const [channelFilter, setChannelFilter] = useState<ChannelType | 'ALL'>(initialChannel);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const updateChannelFilter = useCallback((value: ChannelType | 'ALL') => {
+    setChannelFilter(value);
+    if (value === 'ALL') {
+      setSearchParams(prev => { prev.delete('channel'); return prev; }, { replace: true });
+    } else {
+      setSearchParams(prev => { prev.set('channel', value); return prev; }, { replace: true });
+    }
+  }, [setSearchParams]);
 
   const loadData = useCallback(async () => {
     try {
@@ -353,14 +366,14 @@ function ListingsTab() {
           <FilterChip
             label="전체"
             active={channelFilter === 'ALL'}
-            onClick={() => setChannelFilter('ALL')}
+            onClick={() => updateChannelFilter('ALL')}
           />
           {channels.map(ch => (
             <FilterChip
               key={ch.id}
               label={CHANNEL_LABELS[ch.channelType] || ch.channelType}
               active={channelFilter === ch.channelType}
-              onClick={() => setChannelFilter(ch.channelType)}
+              onClick={() => updateChannelFilter(ch.channelType)}
               disabled={ch.status !== 'APPROVED'}
             />
           ))}
@@ -733,7 +746,8 @@ function FilterChip({
 }) {
   return (
     <button
-      onClick={disabled ? undefined : onClick}
+      onClick={onClick}
+      disabled={disabled}
       style={{
         padding: '6px 14px',
         fontSize: '0.8rem',

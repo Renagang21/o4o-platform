@@ -279,12 +279,13 @@ export function createStoreHubController(
            FROM organization_channels oc
            LEFT JOIN (
              SELECT
-               channel_id,
+               opc.channel_id,
                COUNT(*) AS total_count,
-               COUNT(*) FILTER (WHERE is_active = true) AS visible_count,
-               COUNT(*) FILTER (WHERE sales_limit IS NOT NULL) AS limit_count
-             FROM organization_product_channels
-             GROUP BY channel_id
+               COUNT(*) FILTER (WHERE opc.is_active = true AND opl.is_active = true) AS visible_count,
+               COUNT(*) FILTER (WHERE opc.sales_limit IS NOT NULL) AS limit_count
+             FROM organization_product_channels opc
+             JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
+             GROUP BY opc.channel_id
            ) stats ON stats.channel_id = oc.id
            WHERE oc.organization_id = $1
            ORDER BY oc.created_at ASC`,
