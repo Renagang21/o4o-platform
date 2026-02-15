@@ -355,8 +355,8 @@ router.post('/supplier/requests', requireAuth, async (req: AuthenticatedRequest,
       });
     }
 
-    // 인증된 사용자 정보를 기본값으로 사용
-    const sellerId = data.sellerId || userId;
+    // WO-NETURE-OWNERSHIP-GUARD-PHASE3-V1: Force authenticated user as seller (no client override)
+    const sellerId = userId;
     const sellerName = data.sellerName || req.user?.name || '';
 
     // 필수 필드 검증
