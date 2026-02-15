@@ -12,7 +12,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import type { KpaOrganization } from './kpa-organization.entity.js';
 
 @Entity('organization_product_listings')
 @Index('IDX_org_product_listing_org_id', ['organization_id'])
@@ -23,6 +26,10 @@ export class OrganizationProductListing {
 
   @Column({ type: 'uuid' })
   organization_id: string;
+
+  @ManyToOne('KpaOrganization')
+  @JoinColumn({ name: 'organization_id' })
+  organization?: KpaOrganization;
 
   @Column({ type: 'varchar', length: 50, default: 'kpa' })
   service_key: string;

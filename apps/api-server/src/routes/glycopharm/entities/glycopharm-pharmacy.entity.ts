@@ -12,10 +12,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
   Index,
 } from 'typeorm';
 import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
+import type { KpaOrganization } from '../../kpa/entities/kpa-organization.entity.js';
 
 export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
 
@@ -82,6 +85,14 @@ export class GlycopharmPharmacy {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
+
+  /**
+   * PK 공유 관계: pharmacy.id ≡ kpa_organization.id
+   * WO-PHARMACY-TREE-PHYSICAL-INTEGRITY-FIX-V1 Phase 2
+   */
+  @OneToOne('KpaOrganization')
+  @JoinColumn({ name: 'id' })
+  organization?: KpaOrganization;
 
   @OneToMany('GlycopharmProduct', 'pharmacy')
   products?: GlycopharmProduct[];
