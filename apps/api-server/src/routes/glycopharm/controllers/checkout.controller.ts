@@ -1,25 +1,27 @@
 /**
  * GlycoPharm Checkout Controller
  *
- * Phase 4-B: E-commerce Core Integration
+ * WO-ORDER-TYPE-NORMALIZATION-V1
  *
  * ## 설계 원칙
- * - OrderType = GLYCOPHARM (E-commerce Core 표준)
- * - checkoutService.createOrder() 패턴 준수
- * - pharmacyId 필수 (판매자 = 약국)
- * - glycopharm_products 기준 상품 조회
+ * - OrderType = RETAIL (거래 모델 구분자) + metadata.serviceKey = 'glycopharm'
+ * - Core 위임 패턴: EcommerceOrderService.create() 동일 로직
+ * - 채널 승인 검증 필수 (organization_channels)
+ * - 상품-채널 매핑 검증 (organization_product_channels)
+ * - sales_limit 검증
+ * - Order.channel = null 유지, 채널 구분은 metadata.channelType
  *
- * @since Phase 4-B (2025-01-XX)
+ * ## 기존 주문 호환
+ * - GET 엔드포인트: GLYCOPHARM(레거시) + RETAIL+serviceKey(신규) 모두 조회
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
-import { DataSource, In } from 'typeorm';
+import { DataSource, In, Brackets, type Repository } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
-// E-commerce Core entities via official subpath export
 import {
   EcommerceOrder,
   EcommerceOrderItem,
@@ -35,21 +37,14 @@ import {
 // Type Definitions
 // ============================================================================
 
-/**
- * GlycoPharm 주문 메타데이터
- */
 interface GlycopharmOrderMetadata {
-  /** 서비스 식별자 */
   serviceKey: 'glycopharm';
-  /** 약국 ID */
   pharmacyId: string;
-  /** 약국명 */
   pharmacyName?: string;
-  /** 약국 코드 */
   pharmacyCode?: string;
-  /** 배송 방법 */
+  channelType: string;
+  channelId: string;
   deliveryMethod?: 'pickup' | 'delivery';
-  /** 처방전 정보 (선택) */
   prescriptionInfo?: {
     required: boolean;
     verified?: boolean;
@@ -57,19 +52,12 @@ interface GlycopharmOrderMetadata {
   };
 }
 
-/**
- * 주문 아이템 요청 DTO
- */
 interface CheckoutItemDto {
   productId: string;
   quantity: number;
-  /** 선택: 클라이언트에서 전달하는 가격 (서버에서 검증) */
   unitPrice?: number;
 }
 
-/**
- * Checkout 요청 DTO
- */
 interface CheckoutRequestDto {
   pharmacyId: string;
   items: CheckoutItemDto[];
@@ -82,7 +70,7 @@ interface CheckoutRequestDto {
 }
 
 // ============================================================================
-// Validation Errors
+// Constants & Helpers
 // ============================================================================
 
 const VALIDATION_ERRORS = {
@@ -93,26 +81,22 @@ const VALIDATION_ERRORS = {
   ITEMS_REQUIRED: 'At least one order item is required',
   PHARMACY_REQUIRED: 'pharmacyId is required',
   INVALID_QUANTITY: 'Quantity must be at least 1',
-  PRICE_MISMATCH: 'Price mismatch detected',
+  CHANNEL_NOT_APPROVED: '채널이 승인되지 않았습니다',
+  PRODUCT_NOT_IN_CHANNEL: '채널에 노출되지 않은 상품입니다',
+  SALES_LIMIT_EXCEEDED: '판매 한도를 초과했습니다',
 } as const;
 
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
 /**
- * 주문 번호 생성
+ * Core-standard order number generation (ORD-YYYYMMDD-XXXX)
+ * Matches EcommerceOrderService.generateOrderNumber()
  */
 function generateOrderNumber(): string {
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
   const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-  return `GP-${dateStr}-${random}`;
+  return `ORD-${dateStr}-${random}`;
 }
 
-/**
- * Error response helper
- */
 function errorResponse(
   res: Response,
   statusCode: number,
@@ -125,9 +109,6 @@ function errorResponse(
   });
 }
 
-/**
- * Validation error helper
- */
 function handleValidationErrors(req: Request, res: Response): boolean {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -140,22 +121,104 @@ function handleValidationErrors(req: Request, res: Response): boolean {
 }
 
 // ============================================================================
-// Controller Implementation
+// Core Order Creation (Express-compatible delegation)
 // ============================================================================
 
 /**
- * Create GlycoPharm checkout controller
+ * Create order via E-commerce Core standard pattern.
  *
- * @param dataSource TypeORM DataSource
- * @param requireAuth Authentication middleware
+ * Mirrors EcommerceOrderService.create() logic for Express context.
+ * Same orderNumber format (ORD-), same amount calculation, same structure.
  */
+async function createCoreOrder(
+  orderRepo: Repository<EcommerceOrder>,
+  orderItemRepo: Repository<EcommerceOrderItem>,
+  dto: {
+    buyerId: string;
+    sellerId: string;
+    orderType: OrderType;
+    items: Array<{
+      productId?: string;
+      productName: string;
+      sku?: string;
+      quantity: number;
+      unitPrice: number;
+      discount?: number;
+      metadata?: Record<string, unknown>;
+    }>;
+    shippingAddress?: ShippingAddress;
+    shippingFee?: number;
+    discount?: number;
+    metadata?: Record<string, unknown>;
+    orderSource?: string;
+  }
+): Promise<EcommerceOrder> {
+  const subtotal = dto.items.reduce((sum, item) => {
+    return sum + (item.quantity * item.unitPrice - (item.discount || 0));
+  }, 0);
+
+  const shippingFee = dto.shippingFee || 0;
+  const discount = dto.discount || 0;
+  const totalAmount = subtotal + shippingFee - discount;
+
+  const order = orderRepo.create({
+    orderNumber: generateOrderNumber(),
+    buyerId: dto.buyerId,
+    buyerType: BuyerType.USER,
+    sellerId: dto.sellerId,
+    sellerType: SellerType.ORGANIZATION,
+    orderType: dto.orderType,
+    subtotal,
+    shippingFee,
+    discount,
+    totalAmount,
+    currency: 'KRW',
+    paymentStatus: PaymentStatus.PENDING,
+    status: OrderStatus.CREATED,
+    shippingAddress: dto.shippingAddress,
+    metadata: dto.metadata,
+    orderSource: dto.orderSource,
+  });
+
+  const savedOrder = await orderRepo.save(order);
+
+  const items = dto.items.map((itemDto) =>
+    orderItemRepo.create({
+      orderId: savedOrder.id,
+      productId: itemDto.productId,
+      productName: itemDto.productName,
+      sku: itemDto.sku,
+      quantity: itemDto.quantity,
+      unitPrice: itemDto.unitPrice,
+      discount: itemDto.discount || 0,
+      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
+      metadata: itemDto.metadata,
+    })
+  );
+
+  await orderItemRepo.save(items);
+
+  logger.info('[EcommerceCore] Order created:', {
+    orderId: savedOrder.id,
+    orderNumber: savedOrder.orderNumber,
+    orderType: savedOrder.orderType,
+    sellerId: savedOrder.sellerId,
+    totalAmount: savedOrder.totalAmount,
+  });
+
+  return savedOrder;
+}
+
+// ============================================================================
+// Controller Implementation
+// ============================================================================
+
 export function createCheckoutController(
   dataSource: DataSource,
   requireAuth: (req: Request, res: Response, next: NextFunction) => void
 ): Router {
   const router = Router();
 
-  // Repositories
   const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
   const orderRepo = dataSource.getRepository(EcommerceOrder);
@@ -163,13 +226,7 @@ export function createCheckoutController(
 
   /**
    * POST /checkout
-   * Create a new GlycoPharm order via E-commerce Core
-   *
-   * Phase 4-B 핵심 엔드포인트:
-   * - pharmacyId 필수 검증
-   * - 상품 유효성 검증 (활성 상태, 재고)
-   * - E-commerce Core 표준 주문 생성
-   * - OrderType = GLYCOPHARM
+   * Create a new order via E-commerce Core (OrderType = RETAIL)
    */
   router.post(
     '/',
@@ -190,7 +247,6 @@ export function createCheckoutController(
     ],
     async (req: Request, res: Response) => {
       try {
-        // Express-validator 검증
         if (handleValidationErrors(req, res)) return;
 
         const authReq = req as AuthRequest;
@@ -214,14 +270,30 @@ export function createCheckoutController(
         }
 
         // ================================================================
-        // 2. 상품 검증 및 조회
+        // 2. 채널 승인 검증 (Phase C)
+        // ================================================================
+        const b2cChannels: Array<{ id: string }> = await dataSource.query(
+          `SELECT id FROM organization_channels
+           WHERE organization_id = $1
+             AND channel_type = 'B2C'
+             AND status = 'APPROVED'`,
+          [pharmacy.id]
+        );
+
+        if (!b2cChannels || b2cChannels.length === 0) {
+          return errorResponse(res, 403, 'CHANNEL_NOT_APPROVED', VALIDATION_ERRORS.CHANNEL_NOT_APPROVED);
+        }
+
+        const b2cChannelId = b2cChannels[0].id;
+
+        // ================================================================
+        // 3. 상품 검증 및 조회
         // ================================================================
         const productIds = dto.items.map((item) => item.productId);
         const products = await productRepo.find({
           where: { id: In(productIds) },
         });
 
-        // 모든 상품이 존재하는지 확인
         if (products.length !== productIds.length) {
           const foundIds = new Set(products.map((p) => p.id));
           const missingIds = productIds.filter((id) => !foundIds.has(id));
@@ -230,7 +302,6 @@ export function createCheckoutController(
           });
         }
 
-        // 상품 상태 검증 (활성 상태인지)
         const inactiveProducts = products.filter((p) => p.status !== 'active');
         if (inactiveProducts.length > 0) {
           return errorResponse(res, 400, 'PRODUCT_INACTIVE', VALIDATION_ERRORS.PRODUCT_INACTIVE, {
@@ -238,7 +309,6 @@ export function createCheckoutController(
           });
         }
 
-        // 재고 검증
         const productMap = new Map(products.map((p) => [p.id, p]));
         const outOfStockItems: string[] = [];
 
@@ -256,10 +326,75 @@ export function createCheckoutController(
         }
 
         // ================================================================
-        // 3. 금액 계산
+        // 4. 상품-채널 매핑 검증 (Phase D)
         // ================================================================
-        let subtotal = 0;
-        const orderItems: {
+        const channelMappings: Array<{
+          product_listing_id: string;
+          external_product_id: string;
+          sales_limit: number | null;
+        }> = await dataSource.query(
+          `SELECT opl.id AS product_listing_id,
+                  opl.external_product_id,
+                  opc.sales_limit
+           FROM organization_product_channels opc
+           JOIN organization_product_listings opl
+             ON opl.id = opc.product_listing_id
+           WHERE opc.channel_id = $1
+             AND opl.organization_id = $2
+             AND opl.service_key = 'kpa'
+             AND opc.is_active = true`,
+          [b2cChannelId, pharmacy.id]
+        );
+
+        // Soft check: only enforce if mappings exist for this channel
+        if (channelMappings.length > 0) {
+          const mappedProductIds = new Set(channelMappings.map((m) => m.external_product_id));
+
+          const unmappedProducts = productIds.filter((pid) => !mappedProductIds.has(pid));
+          if (unmappedProducts.length > 0) {
+            return errorResponse(res, 400, 'PRODUCT_NOT_IN_CHANNEL', VALIDATION_ERRORS.PRODUCT_NOT_IN_CHANNEL, {
+              unmappedProductIds: unmappedProducts,
+            });
+          }
+
+          // ================================================================
+          // 5. 판매 한도 검증 (Phase E)
+          // ================================================================
+          const productsWithLimit = channelMappings.filter((m) => m.sales_limit !== null);
+
+          if (productsWithLimit.length > 0) {
+            for (const mapping of productsWithLimit) {
+              const requestedItem = dto.items.find((i) => i.productId === mapping.external_product_id);
+              if (!requestedItem) continue;
+
+              // Count existing sales for this product from this pharmacy
+              const soldResult: Array<{ sold: number }> = await dataSource.query(
+                `SELECT COALESCE(SUM(oi.quantity), 0)::int AS sold
+                 FROM ecommerce_order_items oi
+                 JOIN ecommerce_orders o ON o.id = oi."orderId"
+                 WHERE oi."productId" = $1
+                   AND o."sellerId" = $2
+                   AND o.status NOT IN ('cancelled', 'refunded')`,
+                [mapping.external_product_id, pharmacy.id]
+              );
+
+              const currentSold = soldResult[0]?.sold || 0;
+              if (currentSold + requestedItem.quantity > mapping.sales_limit!) {
+                return errorResponse(res, 400, 'SALES_LIMIT_EXCEEDED', VALIDATION_ERRORS.SALES_LIMIT_EXCEEDED, {
+                  productId: mapping.external_product_id,
+                  salesLimit: mapping.sales_limit,
+                  currentSold,
+                  requestedQuantity: requestedItem.quantity,
+                });
+              }
+            }
+          }
+        }
+
+        // ================================================================
+        // 6. 금액 계산
+        // ================================================================
+        const orderItems: Array<{
           productId: string;
           productName: string;
           sku: string;
@@ -268,13 +403,12 @@ export function createCheckoutController(
           discount: number;
           subtotal: number;
           metadata: Record<string, unknown>;
-        }[] = [];
+        }> = [];
 
         for (const item of dto.items) {
           const product = productMap.get(item.productId)!;
           const unitPrice = Number(product.sale_price ?? product.price);
           const itemSubtotal = item.quantity * unitPrice;
-          subtotal += itemSubtotal;
 
           orderItems.push({
             productId: product.id,
@@ -292,73 +426,54 @@ export function createCheckoutController(
           });
         }
 
-        const shippingFee = dto.deliveryMethod === 'delivery' ? 3000 : 0; // 배송비 (픽업은 무료)
+        const shippingFee = dto.deliveryMethod === 'delivery' ? 3000 : 0;
         const discount = 0;
-        const totalAmount = subtotal + shippingFee - discount;
 
         // ================================================================
-        // 4. 주문 생성 (E-commerce Core 표준)
+        // 7. Core 위임 주문 생성 (Phase B)
+        //    OrderType.RETAIL + metadata.serviceKey (Phase A)
+        //    Order.channel = null, metadata.channelType 사용 (Phase F)
         // ================================================================
-        const orderNumber = generateOrderNumber();
-
         const metadata: GlycopharmOrderMetadata = {
           serviceKey: 'glycopharm',
           pharmacyId: pharmacy.id,
           pharmacyName: pharmacy.name,
           pharmacyCode: pharmacy.code,
+          channelType: 'B2C',
+          channelId: b2cChannelId,
           deliveryMethod: dto.deliveryMethod || 'pickup',
           prescriptionInfo: dto.prescriptionInfo,
         };
 
-        // EcommerceOrder 생성
-        const order = orderRepo.create({
-          orderNumber,
+        const savedOrder = await createCoreOrder(orderRepo, orderItemRepo, {
           buyerId,
-          buyerType: BuyerType.USER,
           sellerId: pharmacy.id,
-          sellerType: SellerType.ORGANIZATION,
-          orderType: OrderType.GLYCOPHARM,
-          subtotal,
+          orderType: OrderType.RETAIL,
+          items: orderItems,
+          shippingAddress: dto.shippingAddress
+            ? {
+                ...dto.shippingAddress,
+                phone: dto.shippingAddress.phone?.replace(/\D/g, '') || dto.shippingAddress.phone,
+              }
+            : undefined,
           shippingFee,
           discount,
-          totalAmount,
-          currency: 'KRW',
-          paymentStatus: PaymentStatus.PENDING,
-          status: OrderStatus.CREATED,
-          shippingAddress: dto.shippingAddress ? { ...dto.shippingAddress, phone: dto.shippingAddress.phone?.replace(/\D/g, '') || dto.shippingAddress.phone } : dto.shippingAddress,
-          metadata,
+          metadata: metadata as unknown as Record<string, unknown>,
+          orderSource: 'online',
         });
 
-        const savedOrder = await orderRepo.save(order);
-
-        // EcommerceOrderItem 생성
-        const items = orderItems.map((itemData) =>
-          orderItemRepo.create({
-            orderId: savedOrder.id,
-            productId: itemData.productId,
-            productName: itemData.productName,
-            sku: itemData.sku,
-            quantity: itemData.quantity,
-            unitPrice: itemData.unitPrice,
-            discount: itemData.discount,
-            subtotal: itemData.subtotal,
-            metadata: itemData.metadata,
-          })
-        );
-
-        await orderItemRepo.save(items);
-
         // ================================================================
-        // 5. 응답 반환
+        // 8. 응답
         // ================================================================
         logger.info('[GlycoPharm Checkout] Order created:', {
           orderId: savedOrder.id,
           orderNumber: savedOrder.orderNumber,
+          orderType: savedOrder.orderType,
           buyerId,
           pharmacyId: pharmacy.id,
-          pharmacyName: pharmacy.name,
-          totalAmount,
-          itemCount: items.length,
+          channelId: b2cChannelId,
+          totalAmount: savedOrder.totalAmount,
+          itemCount: orderItems.length,
         });
 
         res.status(201).json({
@@ -379,8 +494,7 @@ export function createCheckoutController(
               name: pharmacy.name,
               code: pharmacy.code,
             },
-            items: items.map((item) => ({
-              id: item.id,
+            items: orderItems.map((item) => ({
               productId: item.productId,
               productName: item.productName,
               quantity: item.quantity,
@@ -389,7 +503,7 @@ export function createCheckoutController(
             })),
             createdAt: savedOrder.createdAt,
           },
-          message: 'GlycoPharm order created successfully',
+          message: 'Order created successfully',
         });
       } catch (error: unknown) {
         const err = error as Error;
@@ -404,6 +518,8 @@ export function createCheckoutController(
   /**
    * GET /checkout/orders
    * Get current user's GlycoPharm orders
+   *
+   * 호환성: GLYCOPHARM(레거시) + RETAIL+serviceKey='glycopharm'(신규) 모두 조회
    */
   router.get(
     '/orders',
@@ -421,17 +537,23 @@ export function createCheckoutController(
         const limit = Math.min(Number(req.query.limit) || 20, 100);
         const offset = (page - 1) * limit;
 
-        // GlycoPharm 주문만 조회
-        const [orders, total] = await orderRepo.findAndCount({
-          where: {
-            buyerId,
-            orderType: OrderType.GLYCOPHARM,
-          },
-          relations: ['items'],
-          order: { createdAt: 'DESC' },
-          take: limit,
-          skip: offset,
-        });
+        const [orders, total] = await orderRepo
+          .createQueryBuilder('order')
+          .leftJoinAndSelect('order.items', 'items')
+          .where('order.buyerId = :buyerId', { buyerId })
+          .andWhere(
+            new Brackets((qb) => {
+              qb.where('order.orderType = :glycopharm', { glycopharm: OrderType.GLYCOPHARM })
+                .orWhere(
+                  "order.orderType = :retail AND order.metadata->>'serviceKey' = :serviceKey",
+                  { retail: OrderType.RETAIL, serviceKey: 'glycopharm' }
+                );
+            })
+          )
+          .orderBy('order.createdAt', 'DESC')
+          .take(limit)
+          .skip(offset)
+          .getManyAndCount();
 
         res.json({
           success: true,
@@ -466,6 +588,8 @@ export function createCheckoutController(
   /**
    * GET /checkout/orders/:orderId
    * Get single order by ID
+   *
+   * 호환성: GLYCOPHARM(레거시) + RETAIL+serviceKey(신규) 모두 허용
    */
   router.get(
     '/orders/:orderId',
@@ -480,14 +604,21 @@ export function createCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        const order = await orderRepo.findOne({
-          where: {
-            id: orderId,
-            buyerId,
-            orderType: OrderType.GLYCOPHARM,
-          },
-          relations: ['items'],
-        });
+        const order = await orderRepo
+          .createQueryBuilder('order')
+          .leftJoinAndSelect('order.items', 'items')
+          .where('order.id = :orderId', { orderId })
+          .andWhere('order.buyerId = :buyerId', { buyerId })
+          .andWhere(
+            new Brackets((qb) => {
+              qb.where('order.orderType = :glycopharm', { glycopharm: OrderType.GLYCOPHARM })
+                .orWhere(
+                  "order.orderType = :retail AND order.metadata->>'serviceKey' = :serviceKey",
+                  { retail: OrderType.RETAIL, serviceKey: 'glycopharm' }
+                );
+            })
+          )
+          .getOne();
 
         if (!order) {
           return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');

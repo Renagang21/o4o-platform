@@ -56,7 +56,11 @@ export enum OrderType {
   B2B = 'b2b',
   /** 정기 구독 - 반복 주문, 자동 갱신 */
   SUBSCRIPTION = 'subscription',
-  /** GlycoPharm - 약국 O4O 서비스 (Phase 4-B) */
+  /**
+   * @deprecated WO-ORDER-TYPE-NORMALIZATION-V1
+   * 신규 주문은 OrderType.RETAIL + metadata.serviceKey='glycopharm' 사용.
+   * 기존 주문 호환을 위해 enum 값 유지. 삭제 금지.
+   */
   GLYCOPHARM = 'glycopharm',
   /** LMS 유료 강의 (WO-LMS-PAID-COURSE-V1) */
   LMS = 'lms',
