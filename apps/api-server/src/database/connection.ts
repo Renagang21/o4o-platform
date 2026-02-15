@@ -208,6 +208,8 @@ import {
   KpaAuditLog,
   OrganizationProductApplication,
   OrganizationProductListing,
+  OrganizationChannel,
+  OrganizationProductChannel,
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -589,6 +591,8 @@ export const AppDataSource = new DataSource({
     KpaAuditLog,
     OrganizationProductApplication,
     OrganizationProductListing,
+    OrganizationChannel,
+    OrganizationProductChannel,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
