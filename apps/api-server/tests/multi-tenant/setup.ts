@@ -8,8 +8,8 @@
 
 import { DataSource } from 'typeorm';
 import { TenantFactory, SimulatedTenant } from './tenant-factory.js';
-import { NavigationRegistry, navigationRegistry } from '@o4o-apps/cms-core';
-import { ViewRegistry, viewRegistry } from '@o4o-apps/cms-core';
+import { NavigationRegistry, navigationRegistry } from '../../../../packages/cms-core/src/view-system/navigation-registry.js';
+import { ViewRegistry, viewRegistry } from '../../../../packages/cms-core/src/view-system/view-registry.js';
 import { filterByServiceGroup, APPS_CATALOG, type ServiceGroup, type AppCatalogItem } from '../../src/app-manifests/appsCatalog.js';
 
 export interface MultiTenantTestContext {
