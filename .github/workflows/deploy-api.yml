@@ -61,65 +61,35 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Build all packages for api-server
+    - name: Build shared packages (unified with CI)
       run: |
-        echo "🔨 Building workspace packages required by api-server..."
+        echo "🔨 Phase 1: Building shared packages (same as CI pipeline)..."
         echo "============================================================"
-        echo "Build order: foundational → infra → core → extensions → apps"
+        pnpm run build:packages
+        echo "✅ Shared packages built (unified with CI)"
+
+    - name: Build API-specific packages
+      run: |
+        echo "🔨 Phase 2: Building API-server-specific packages..."
         echo "============================================================"
-
-        # ============================================================
-        # Layer 1: Foundational (no dependencies)
-        # ============================================================
+        echo "(These packages are only needed by api-server, not frontend)"
         echo ""
-        echo "📦 Layer 1: Foundational packages..."
-        pnpm --filter '@o4o/types' run build
-        pnpm --filter '@o4o/utils' run build
 
-        # ============================================================
-        # Layer 2: Infrastructure Core (depends on types/utils only)
-        # ============================================================
-        echo ""
-        echo "📦 Layer 2: Infrastructure Core packages..."
+        # Infrastructure (depends on types/utils — already built in Phase 1)
+        echo "📦 Infrastructure..."
         pnpm --filter '@o4o/cpt-registry' run build
-        pnpm --filter '@o4o/shortcodes' run build
-        pnpm --filter '@o4o/auth-client' run build
-        pnpm --filter '@o4o/block-renderer' run build
-        pnpm --filter '@o4o/ui' run build
         pnpm --filter '@o4o/ai-core' run build
         pnpm --filter '@o4o/store-core' run build
 
-        # ============================================================
-        # Layer 3: Domain Core (depends on Layer 1-2)
-        # ============================================================
-        echo ""
-        echo "📦 Layer 3: Domain Core packages..."
-        pnpm --filter '@o4o/organization-core' run build
+        # Domain Core (depends on infrastructure)
+        echo "📦 Domain Core..."
         pnpm --filter '@o4o/ecommerce-core' run build
         pnpm --filter '@o4o-apps/cms-core' run build
-        pnpm --filter '@o4o/forum-core' run build
         pnpm --filter '@o4o/lms-core' run build
-
-        # ============================================================
-        # Layer 3.5: Dropshipping Core (depends on organization-core)
-        # ============================================================
-        echo ""
-        echo "📦 Layer 3.5: Dropshipping Core..."
         pnpm --filter '@o4o/dropshipping-core' run build
 
-        # ============================================================
-        # Layer 4: Scheduler & Shared Services
-        # ============================================================
-        echo ""
-        echo "📦 Layer 4: Scheduler & Shared Services..."
-        pnpm --filter '@o4o/pharmacy-ai-insight' run build
-        pnpm --filter '@o4o/yaksa-scheduler' run build
-
-        # ============================================================
-        # Layer 5: Extensions & Features (depends on Core)
-        # ============================================================
-        echo ""
-        echo "📦 Layer 5: Extensions & Features..."
+        # Extensions & Features (depends on Domain Core)
+        echo "📦 Extensions & Features..."
         pnpm --filter '@o4o-apps/digital-signage-core' run build
         pnpm --filter '@o4o-apps/signage' run build
         pnpm --filter '@o4o-extensions/organization-forum' run build
@@ -132,18 +102,14 @@ jobs:
         pnpm --filter '@o4o-apps/forum-yaksa' run build || true
         pnpm --filter '@o4o/market-trial' run build
 
-        # ============================================================
-        # Layer 6: Cosmetics Extensions
-        # ============================================================
-        echo ""
-        echo "📦 Layer 6: Cosmetics Extensions..."
+        # Cosmetics Extensions
+        echo "📦 Cosmetics Extensions..."
         pnpm --filter '@o4o/cosmetics-seller-extension' run build
         pnpm --filter '@o4o/cosmetics-supplier-extension' run build
         pnpm --filter '@o4o/cosmetics-sample-display-extension' run build
-        # Note: dropshipping-cosmetics is compiled by api-server (no independent build)
 
         echo ""
-        echo "✅ All required packages built successfully!"
+        echo "✅ All API-specific packages built successfully!"
 
     - name: Build API server (bundled with tsup)
       run: |
