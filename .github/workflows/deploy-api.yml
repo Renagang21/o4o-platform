@@ -112,6 +112,7 @@ jobs:
         # ============================================================
         echo ""
         echo "📦 Layer 4: Scheduler & Shared Services..."
+        pnpm --filter '@o4o/pharmacy-ai-insight' run build
         pnpm --filter '@o4o/yaksa-scheduler' run build
 
         # ============================================================
