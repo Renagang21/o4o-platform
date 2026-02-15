@@ -28,12 +28,13 @@ function requireDropshippingScope(requiredScope: string) {
     const userRoles = authReq.user?.roles || [];
 
     // Check if user has the required scope or admin scope
+    // WO-NETURE-GUARD-REALIGNMENT-V1: Legacy unprefixed roles removed
     if (
       userScopes.includes(requiredScope) ||
       userScopes.includes('dropshipping:admin') ||
-      userScopes.includes('admin') ||
-      userRoles.includes('admin') ||
-      userRoles.includes('super_admin')
+      userRoles.includes('neture:admin') ||
+      userRoles.includes('platform:admin') ||
+      userRoles.includes('platform:super_admin')
     ) {
       return next();
     }

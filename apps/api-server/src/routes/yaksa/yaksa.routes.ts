@@ -23,11 +23,12 @@ function requireYaksaScope(requiredScope: string) {
     const userScopes = authReq.user?.scopes || [];
 
     // Check if user has the required scope or admin scope
+    // WO-NETURE-GUARD-REALIGNMENT-V1: Legacy unprefixed roles removed
     if (
       userScopes.includes(requiredScope) ||
       userScopes.includes('yaksa:admin') ||
-      userScopes.includes('admin') ||
-      authReq.user?.roles?.includes('admin')
+      authReq.user?.roles?.includes('platform:admin') ||
+      authReq.user?.roles?.includes('platform:super_admin')
     ) {
       return next();
     }

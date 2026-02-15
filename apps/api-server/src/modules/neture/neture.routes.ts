@@ -3,7 +3,8 @@ import type { Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
 import { SupplierStatus, PartnershipStatus, SupplierRequestStatus, RecruitmentStatus } from './entities/index.js';
 import logger from '../../utils/logger.js';
-import { requireAuth, requireAdmin, requireRole } from '../../middleware/auth.middleware.js';
+import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
+import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glycopharm.repository.js';
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
@@ -875,7 +876,7 @@ router.get('/operator/supply-products', requireAuth, async (req: AuthenticatedRe
  * Security Fix: Changed from requireAuth to requireAdmin
  * - Enforces platform:admin or platform:super_admin (via Phase 2 middleware update)
  */
-router.get('/admin/dashboard/summary', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/admin/dashboard/summary', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const summary = await netureService.getAdminDashboardSummary();
 
@@ -1727,7 +1728,7 @@ router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest,
  * GET /api/v1/neture/admin/requests
  * Admin: 전체 취급 요청 목록 조회 (cross-supplier)
  */
-router.get('/admin/requests', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/admin/requests', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, supplierId, serviceId } = req.query;
     const filters: { status?: string; supplierId?: string; serviceId?: string } = {};
@@ -1752,7 +1753,7 @@ router.get('/admin/requests', requireAdmin, async (req: AuthenticatedRequest, re
  * POST /api/v1/neture/admin/requests/:id/approve
  * Admin override: 소유권 무관 승인
  */
-router.post('/admin/requests/:id/approve', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/admin/requests/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const actorId = req.user?.id || '';
@@ -1780,7 +1781,7 @@ router.post('/admin/requests/:id/approve', requireAdmin, async (req: Authenticat
  * POST /api/v1/neture/admin/requests/:id/reject
  * Admin override: 소유권 무관 거절
  */
-router.post('/admin/requests/:id/reject', requireAdmin, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;

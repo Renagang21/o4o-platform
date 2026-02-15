@@ -22,8 +22,8 @@ import { SignageQueryService } from '../../../modules/signage/index.js';
 import { ForumQueryService } from '../../../modules/forum/index.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
+import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import logger from '../../../utils/logger.js';
-import { isServiceAdmin, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 /**
  * Create Neture Controller (P1 - GET Only)
@@ -376,44 +376,8 @@ export function createNetureController(dataSource: DataSource): Router {
    * - Requires neture:admin OR platform:admin/super_admin
    * - Legacy roles (admin, super_admin) are logged and denied
    */
-  router.patch('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
+  router.patch('/partnership/requests/:id', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
-      // Check if user is logged in and is admin
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED',
-        });
-      }
-
-      const userId = user.id || 'unknown';
-      const userRoles: string[] = user.roles || [];
-
-      // Check if user is admin (Priority-based checking)
-      // Checks for: neture:admin, platform:admin, platform:super_admin
-      if (isServiceAdmin(userRoles, 'neture')) {
-        // Access granted - continue to business logic
-      } else {
-        // Fallback: Check for legacy roles and log/deny
-        if (user.role === 'admin' || user.role === 'super_admin') {
-          logLegacyRoleUsage(userId, user.role, 'neture.controller:PATCH/partnership/requests/:id');
-          return res.status(403).json({
-            success: false,
-            error: 'Admin access required (neture:admin or platform:admin)',
-            code: 'FORBIDDEN',
-          });
-        }
-
-        // No valid role found
-        return res.status(403).json({
-          success: false,
-          error: 'Admin access required (neture:admin or platform:admin)',
-          code: 'FORBIDDEN',
-        });
-      }
-
       const { id } = req.params;
       const { status } = req.body;
 
@@ -459,18 +423,8 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /admin/dashboard/summary
    * 운영자 대시보드 통합 요약: Stats + APP-CONTENT + APP-SIGNAGE + APP-FORUM
    */
-  router.get('/admin/dashboard/summary', requireAuth, async (req: Request, res: Response) => {
+  router.get('/admin/dashboard/summary', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ success: false, error: 'Authentication required' });
-      }
-
-      const userRoles: string[] = user.roles || [];
-      if (!isServiceAdmin(userRoles, 'neture')) {
-        return res.status(403).json({ success: false, error: 'Neture admin role required' });
-      }
-
       // Parallel fetch: Neture stats + APP summaries
       const [
         supplierCount,
@@ -538,17 +492,8 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /admin/operators
    * Neture 역할 보유 사용자 목록 (neture:admin, neture:operator)
    */
-  router.get('/admin/operators', requireAuth, async (req: Request, res: Response) => {
+  router.get('/admin/operators', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ success: false, error: 'Authentication required' });
-      }
-      const userRoles: string[] = user.roles || [];
-      if (!isServiceAdmin(userRoles, 'neture')) {
-        return res.status(403).json({ success: false, error: 'Neture admin role required' });
-      }
-
       const includeInactive = req.query.includeInactive === 'true';
 
       const whereClause = includeInactive
@@ -583,17 +528,9 @@ export function createNetureController(dataSource: DataSource): Router {
    * PATCH /admin/operators/:id/deactivate
    * 사용자 비활성화 (isActive = false)
    */
-  router.patch('/admin/operators/:id/deactivate', requireAuth, async (req: Request, res: Response) => {
+  router.patch('/admin/operators/:id/deactivate', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
       const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ success: false, error: 'Authentication required' });
-      }
-      const userRoles: string[] = user.roles || [];
-      if (!isServiceAdmin(userRoles, 'neture')) {
-        return res.status(403).json({ success: false, error: 'Neture admin role required' });
-      }
-
       const targetId = req.params.id;
 
       // Prevent self-deactivation
@@ -629,17 +566,8 @@ export function createNetureController(dataSource: DataSource): Router {
    * PATCH /admin/operators/:id/reactivate
    * 사용자 재활성화 (isActive = true)
    */
-  router.patch('/admin/operators/:id/reactivate', requireAuth, async (req: Request, res: Response) => {
+  router.patch('/admin/operators/:id/reactivate', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ success: false, error: 'Authentication required' });
-      }
-      const userRoles: string[] = user.roles || [];
-      if (!isServiceAdmin(userRoles, 'neture')) {
-        return res.status(403).json({ success: false, error: 'Neture admin role required' });
-      }
-
       const targetId = req.params.id;
 
       const [target] = await dataSource.query(
