@@ -102,7 +102,7 @@ jobs:
         echo "🔍 Verifying critical dist directories..."
         MISSING_DIST=0
 
-        for pkg in appearance-system auth-client ui types shortcodes block-renderer slide-app; do
+        for pkg in appearance-system auth-client ui types shortcodes block-renderer slide-app pharmacy-ai-insight; do
           if [ ! -d "packages/$pkg/dist" ]; then
             echo "❌ packages/$pkg/dist not found!"
             MISSING_DIST=1
