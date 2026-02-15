@@ -16,6 +16,12 @@ export async function requireInstructor(req: Request, res: Response, next: NextF
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
 
+  // WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1: kpa:admin bypass
+  const userRoles: string[] = (req as any).user?.roles || [];
+  if (userRoles.includes('kpa:admin')) {
+    return next();
+  }
+
   const hasRole = await roleAssignmentService.hasAnyRole(userId, [
     'lms:instructor',
     'platform:admin',

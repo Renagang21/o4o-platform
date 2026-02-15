@@ -1,14 +1,34 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { AttendanceService } from '../services/AttendanceService.js';
+import { EventService } from '../services/EventService.js';
+import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 
 /**
  * AttendanceController
  * LMS Module - Attendance Management
- * Handles event attendance tracking and check-in
+ *
+ * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
+ * - markAttendance/updateAttendance verify event ownership
+ * - checkIn is user-initiated (no ownership check)
+ * - kpa:admin bypasses ownership check
  */
 export class AttendanceController extends BaseController {
+  private static async checkEventOwnership(eventId: string, userId: string, userRoles: string[]): Promise<boolean> {
+    if (userRoles.includes('kpa:admin')) return true;
+    const eventService = EventService.getInstance();
+    const event = await eventService.getEvent(eventId);
+    if (!event) return false;
+    if (event.instructorId && event.instructorId === userId) return true;
+    if (event.courseId) {
+      const courseService = CourseService.getInstance();
+      const course = await courseService.getCourse(event.courseId);
+      if (course && course.instructorId === userId) return true;
+    }
+    return false;
+  }
+
   static async checkIn(req: Request, res: Response): Promise<any> {
     try {
       const userId = (req as any).user?.id;
@@ -42,6 +62,13 @@ export class AttendanceController extends BaseController {
     try {
       const { eventId } = req.params;
       const markedBy = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const allowed = await AttendanceController.checkEventOwnership(eventId, markedBy, userRoles);
+      if (!allowed) {
+        return BaseController.forbidden(res, 'You can only mark attendance for your own events');
+      }
+
       const data = { ...req.body, eventId, markedBy };
       const service = AttendanceService.getInstance();
 
@@ -115,7 +142,19 @@ export class AttendanceController extends BaseController {
     try {
       const { id } = req.params;
       const data = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = AttendanceService.getInstance();
+
+      const existing = await service.getAttendance(id);
+      if (!existing) {
+        return BaseController.notFound(res, 'Attendance record not found');
+      }
+
+      const allowed = await AttendanceController.checkEventOwnership(existing.eventId, userId, userRoles);
+      if (!allowed) {
+        return BaseController.forbidden(res, 'You can only update attendance for your own events');
+      }
 
       const attendance = await service.updateAttendance(id, data);
 

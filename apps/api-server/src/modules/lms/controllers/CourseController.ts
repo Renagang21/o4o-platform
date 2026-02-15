@@ -8,8 +8,17 @@ import logger from '../../../utils/logger.js';
  * CourseController
  * LMS Module - Course Management
  * Handles Course CRUD and publishing operations
+ *
+ * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
+ * - All write operations verify course.instructorId === userId
+ * - kpa:admin bypasses ownership check
  */
 export class CourseController extends BaseController {
+  private static isOwnerOrAdmin(userId: string, courseInstructorId: string, userRoles: string[]): boolean {
+    if (userRoles.includes('kpa:admin')) return true;
+    return courseInstructorId === userId;
+  }
+
   static async createCourse(req: Request, res: Response): Promise<any> {
     try {
       const data = req.body;
@@ -27,8 +36,12 @@ export class CourseController extends BaseController {
         }
       }
 
-      const service = CourseService.getInstance();
+      // Set instructorId to current user if not specified
+      if (!data.instructorId && userId) {
+        data.instructorId = userId;
+      }
 
+      const service = CourseService.getInstance();
       const course = await service.createCourse(data);
 
       return BaseController.created(res, { course });
@@ -89,11 +102,21 @@ export class CourseController extends BaseController {
     try {
       const { id } = req.params;
       const data = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = CourseService.getInstance();
 
-      const course = await service.updateCourse(id, data);
+      const course = await service.getCourse(id);
+      if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+      if (!CourseController.isOwnerOrAdmin(userId, course.instructorId, userRoles)) {
+        return BaseController.forbidden(res, 'You can only modify your own courses');
+      }
 
-      return BaseController.ok(res, { course });
+      const updated = await service.updateCourse(id, data);
+
+      return BaseController.ok(res, { course: updated });
     } catch (error: any) {
       logger.error('[CourseController.updateCourse] Error', { error: error.message });
 
@@ -108,7 +131,17 @@ export class CourseController extends BaseController {
   static async deleteCourse(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = CourseService.getInstance();
+
+      const course = await service.getCourse(id);
+      if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+      if (!CourseController.isOwnerOrAdmin(userId, course.instructorId, userRoles)) {
+        return BaseController.forbidden(res, 'You can only delete your own courses');
+      }
 
       await service.deleteCourse(id);
 
@@ -127,11 +160,21 @@ export class CourseController extends BaseController {
   static async publishCourse(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = CourseService.getInstance();
 
-      const course = await service.publishCourse(id);
+      const course = await service.getCourse(id);
+      if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+      if (!CourseController.isOwnerOrAdmin(userId, course.instructorId, userRoles)) {
+        return BaseController.forbidden(res, 'You can only publish your own courses');
+      }
 
-      return BaseController.ok(res, { course, message: 'Course published successfully' });
+      const updated = await service.publishCourse(id);
+
+      return BaseController.ok(res, { course: updated, message: 'Course published successfully' });
     } catch (error: any) {
       logger.error('[CourseController.publishCourse] Error', { error: error.message });
 
@@ -146,11 +189,21 @@ export class CourseController extends BaseController {
   static async unpublishCourse(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = CourseService.getInstance();
 
-      const course = await service.unpublishCourse(id);
+      const course = await service.getCourse(id);
+      if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+      if (!CourseController.isOwnerOrAdmin(userId, course.instructorId, userRoles)) {
+        return BaseController.forbidden(res, 'You can only unpublish your own courses');
+      }
 
-      return BaseController.ok(res, { course, message: 'Course unpublished successfully' });
+      const updated = await service.unpublishCourse(id);
+
+      return BaseController.ok(res, { course: updated, message: 'Course unpublished successfully' });
     } catch (error: any) {
       logger.error('[CourseController.unpublishCourse] Error', { error: error.message });
 
@@ -165,11 +218,21 @@ export class CourseController extends BaseController {
   static async archiveCourse(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = CourseService.getInstance();
 
-      const course = await service.archiveCourse(id);
+      const course = await service.getCourse(id);
+      if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+      if (!CourseController.isOwnerOrAdmin(userId, course.instructorId, userRoles)) {
+        return BaseController.forbidden(res, 'You can only archive your own courses');
+      }
 
-      return BaseController.ok(res, { course, message: 'Course archived successfully' });
+      const updated = await service.archiveCourse(id);
+
+      return BaseController.ok(res, { course: updated, message: 'Course archived successfully' });
     } catch (error: any) {
       logger.error('[CourseController.archiveCourse] Error', { error: error.message });
 

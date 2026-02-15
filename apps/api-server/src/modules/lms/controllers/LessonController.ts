@@ -1,20 +1,39 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { LessonService } from '../services/LessonService.js';
+import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 
 /**
  * LessonController
  * LMS Module - Lesson Management
  * Handles Lesson CRUD and reordering operations
+ *
+ * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
+ * - All write operations verify parent course.instructorId === userId
+ * - kpa:admin bypasses ownership check
  */
 export class LessonController extends BaseController {
+  private static async checkCourseOwnership(courseId: string, userId: string, userRoles: string[]): Promise<{ allowed: boolean; notFound: boolean }> {
+    if (userRoles.includes('kpa:admin')) return { allowed: true, notFound: false };
+    const courseService = CourseService.getInstance();
+    const course = await courseService.getCourse(courseId);
+    if (!course) return { allowed: false, notFound: true };
+    return { allowed: course.instructorId === userId, notFound: false };
+  }
+
   static async createLesson(req: Request, res: Response): Promise<any> {
     try {
       const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await LessonController.checkCourseOwnership(courseId, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Course not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only add lessons to your own courses');
+
       const data = { ...req.body, courseId };
       const service = LessonService.getInstance();
-
       const lesson = await service.createLesson(data);
 
       return BaseController.created(res, { lesson });
@@ -66,11 +85,20 @@ export class LessonController extends BaseController {
     try {
       const { id } = req.params;
       const data = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = LessonService.getInstance();
 
-      const lesson = await service.updateLesson(id, data);
+      // Load lesson to get courseId, then check course ownership
+      const lesson = await service.getLesson(id);
+      if (!lesson) return BaseController.notFound(res, 'Lesson not found');
 
-      return BaseController.ok(res, { lesson });
+      const ownership = await LessonController.checkCourseOwnership(lesson.courseId, userId, userRoles);
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only modify lessons in your own courses');
+
+      const updated = await service.updateLesson(id, data);
+
+      return BaseController.ok(res, { lesson: updated });
     } catch (error: any) {
       logger.error('[LessonController.updateLesson] Error', { error: error.message });
 
@@ -85,7 +113,15 @@ export class LessonController extends BaseController {
   static async deleteLesson(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
       const service = LessonService.getInstance();
+
+      const lesson = await service.getLesson(id);
+      if (!lesson) return BaseController.notFound(res, 'Lesson not found');
+
+      const ownership = await LessonController.checkCourseOwnership(lesson.courseId, userId, userRoles);
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only delete lessons in your own courses');
 
       await service.deleteLesson(id);
 
@@ -105,8 +141,14 @@ export class LessonController extends BaseController {
     try {
       const { courseId } = req.params;
       const { lessonIds } = req.body;
-      const service = LessonService.getInstance();
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
 
+      const ownership = await LessonController.checkCourseOwnership(courseId, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Course not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only reorder lessons in your own courses');
+
+      const service = LessonService.getInstance();
       await service.reorderLessons(courseId, lessonIds);
 
       return BaseController.ok(res, { message: 'Lessons reordered successfully' });

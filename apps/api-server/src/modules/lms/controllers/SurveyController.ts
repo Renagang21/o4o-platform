@@ -7,10 +7,19 @@ import logger from '../../../utils/logger.js';
  * SurveyController
  * LMS Module - Survey Management (Phase 1 Refoundation)
  *
- * REST API for Survey Core Engine
- * Base path: /api/v1/lms/surveys
+ * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
+ * - Instructor write ops verify survey.createdBy === userId
+ * - kpa:admin bypasses ownership check
  */
 export class SurveyController extends BaseController {
+  private static async checkSurveyOwnership(surveyId: string, userId: string, userRoles: string[]): Promise<{ allowed: boolean; notFound: boolean }> {
+    if (userRoles.includes('kpa:admin')) return { allowed: true, notFound: false };
+    const service = SurveyService.getInstance();
+    const survey = await service.getSurvey(surveyId);
+    if (!survey) return { allowed: false, notFound: true };
+    return { allowed: survey.createdBy === userId, notFound: false };
+  }
+
   // ============================================
   // Survey CRUD
   // ============================================
@@ -18,8 +27,13 @@ export class SurveyController extends BaseController {
   static async createSurvey(req: Request, res: Response): Promise<any> {
     try {
       const data = req.body;
-      const service = SurveyService.getInstance();
+      const userId = (req as any).user?.id;
 
+      if (!data.createdBy && userId) {
+        data.createdBy = userId;
+      }
+
+      const service = SurveyService.getInstance();
       const survey = await service.createSurvey(data);
 
       return BaseController.created(res, { survey });
@@ -61,7 +75,6 @@ export class SurveyController extends BaseController {
         totalPages: Math.ceil(total / (Number(filters.limit) || 20))
       });
     } catch (error: any) {
-      // Graceful fallback: return empty data if table doesn't exist
       if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
         logger.warn('[SurveyController.listSurveys] Survey tables not found - returning empty');
         return BaseController.okPaginated(res, [], {
@@ -80,13 +93,15 @@ export class SurveyController extends BaseController {
     try {
       const { id } = req.params;
       const data = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only modify your own surveys');
+
       const service = SurveyService.getInstance();
-
       const survey = await service.updateSurvey(id, data);
-
-      if (!survey) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
 
       return BaseController.ok(res, { survey });
     } catch (error: any) {
@@ -98,13 +113,15 @@ export class SurveyController extends BaseController {
   static async deleteSurvey(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only delete your own surveys');
+
       const service = SurveyService.getInstance();
-
-      const deleted = await service.deleteSurvey(id);
-
-      if (!deleted) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
+      await service.deleteSurvey(id);
 
       return BaseController.noContent(res);
     } catch (error: any) {
@@ -120,13 +137,15 @@ export class SurveyController extends BaseController {
   static async publishSurvey(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only publish your own surveys');
+
       const service = SurveyService.getInstance();
-
       const survey = await service.publishSurvey(id);
-
-      if (!survey) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
 
       return BaseController.ok(res, { survey });
     } catch (error: any) {
@@ -138,13 +157,15 @@ export class SurveyController extends BaseController {
   static async closeSurvey(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only close your own surveys');
+
       const service = SurveyService.getInstance();
-
       const survey = await service.closeSurvey(id);
-
-      if (!survey) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
 
       return BaseController.ok(res, { survey });
     } catch (error: any) {
@@ -156,13 +177,15 @@ export class SurveyController extends BaseController {
   static async archiveSurvey(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only archive your own surveys');
+
       const service = SurveyService.getInstance();
-
       const survey = await service.archiveSurvey(id);
-
-      if (!survey) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
 
       return BaseController.ok(res, { survey });
     } catch (error: any) {
@@ -198,13 +221,15 @@ export class SurveyController extends BaseController {
     try {
       const { id } = req.params;
       const questionData = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only add questions to your own surveys');
+
       const service = SurveyService.getInstance();
-
       const question = await service.addQuestion(id, questionData);
-
-      if (!question) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
 
       return BaseController.created(res, { question });
     } catch (error: any) {
@@ -219,6 +244,7 @@ export class SurveyController extends BaseController {
       const questionData = req.body;
       const service = SurveyService.getInstance();
 
+      // Note: questionId-only route; requireInstructor at route level guards access
       const question = await service.updateQuestion(questionId, questionData);
 
       if (!question) {
@@ -237,6 +263,7 @@ export class SurveyController extends BaseController {
       const { questionId } = req.params;
       const service = SurveyService.getInstance();
 
+      // Note: questionId-only route; requireInstructor at route level guards access
       const deleted = await service.deleteQuestion(questionId);
 
       if (!deleted) {
@@ -254,13 +281,14 @@ export class SurveyController extends BaseController {
     try {
       const { id } = req.params;
       const { questionIds } = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await SurveyController.checkSurveyOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Survey not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only reorder questions in your own surveys');
+
       const service = SurveyService.getInstance();
-
-      const survey = await service.getSurvey(id);
-      if (!survey) {
-        return BaseController.notFound(res, 'Survey not found');
-      }
-
       await service.reorderQuestions(id, questionIds);
 
       return BaseController.ok(res, { success: true });
@@ -271,7 +299,7 @@ export class SurveyController extends BaseController {
   }
 
   // ============================================
-  // Responses
+  // Responses (user-initiated, no ownership check)
   // ============================================
 
   static async startResponse(req: Request, res: Response): Promise<any> {
@@ -395,7 +423,6 @@ export class SurveyController extends BaseController {
 
       return BaseController.ok(res, { surveys, total });
     } catch (error: any) {
-      // Graceful fallback: return empty data if table doesn't exist
       if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
         logger.warn('[SurveyController.getSurveysByBundle] Survey tables not found - returning empty');
         return BaseController.ok(res, { surveys: [], total: 0 });
@@ -420,7 +447,6 @@ export class SurveyController extends BaseController {
         limit: 1,
       });
 
-      // Check if any response belongs to the current user
       const hasResponded = responses.some(r => r.userId === userId);
 
       return BaseController.ok(res, { hasResponded });

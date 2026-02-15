@@ -1,16 +1,32 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { QuizService } from '../services/QuizService.js';
+import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
 
 /**
  * QuizController
  * LMS Module - Quiz Management (Phase 1 Refoundation)
  *
- * REST API for Quiz Core Engine
- * Base path: /api/v1/lms/quizzes
+ * WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1:
+ * - Instructor write ops verify quiz.createdBy === userId OR quiz.course.instructorId === userId
+ * - kpa:admin bypasses ownership check
  */
 export class QuizController extends BaseController {
+  private static async checkQuizOwnership(quizId: string, userId: string, userRoles: string[]): Promise<{ allowed: boolean; notFound: boolean }> {
+    if (userRoles.includes('kpa:admin')) return { allowed: true, notFound: false };
+    const service = QuizService.getInstance();
+    const quiz = await service.getQuiz(quizId);
+    if (!quiz) return { allowed: false, notFound: true };
+    if (quiz.createdBy === userId) return { allowed: true, notFound: false };
+    if (quiz.courseId) {
+      const courseService = CourseService.getInstance();
+      const course = await courseService.getCourse(quiz.courseId);
+      if (course && course.instructorId === userId) return { allowed: true, notFound: false };
+    }
+    return { allowed: false, notFound: false };
+  }
+
   // ============================================
   // Quiz CRUD
   // ============================================
@@ -18,8 +34,14 @@ export class QuizController extends BaseController {
   static async createQuiz(req: Request, res: Response): Promise<any> {
     try {
       const data = req.body;
-      const service = QuizService.getInstance();
+      const userId = (req as any).user?.id;
 
+      // Set createdBy to current user
+      if (!data.createdBy && userId) {
+        data.createdBy = userId;
+      }
+
+      const service = QuizService.getInstance();
       const quiz = await service.createQuiz(data);
 
       return BaseController.created(res, { quiz });
@@ -80,13 +102,15 @@ export class QuizController extends BaseController {
     try {
       const { id } = req.params;
       const data = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only modify your own quizzes');
+
       const service = QuizService.getInstance();
-
       const quiz = await service.updateQuiz(id, data);
-
-      if (!quiz) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
 
       return BaseController.ok(res, { quiz });
     } catch (error: any) {
@@ -98,13 +122,15 @@ export class QuizController extends BaseController {
   static async deleteQuiz(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only delete your own quizzes');
+
       const service = QuizService.getInstance();
-
-      const deleted = await service.deleteQuiz(id);
-
-      if (!deleted) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
+      await service.deleteQuiz(id);
 
       return BaseController.noContent(res);
     } catch (error: any) {
@@ -120,13 +146,15 @@ export class QuizController extends BaseController {
   static async publishQuiz(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only publish your own quizzes');
+
       const service = QuizService.getInstance();
-
       const quiz = await service.publishQuiz(id);
-
-      if (!quiz) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
 
       return BaseController.ok(res, { quiz });
     } catch (error: any) {
@@ -138,13 +166,15 @@ export class QuizController extends BaseController {
   static async unpublishQuiz(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only unpublish your own quizzes');
+
       const service = QuizService.getInstance();
-
       const quiz = await service.unpublishQuiz(id);
-
-      if (!quiz) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
 
       return BaseController.ok(res, { quiz });
     } catch (error: any) {
@@ -161,13 +191,15 @@ export class QuizController extends BaseController {
     try {
       const { id } = req.params;
       const question = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only add questions to your own quizzes');
+
       const service = QuizService.getInstance();
-
       const quiz = await service.addQuestion(id, question);
-
-      if (!quiz) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
 
       return BaseController.ok(res, { quiz });
     } catch (error: any) {
@@ -179,13 +211,15 @@ export class QuizController extends BaseController {
   static async removeQuestion(req: Request, res: Response): Promise<any> {
     try {
       const { id, questionId } = req.params;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only remove questions from your own quizzes');
+
       const service = QuizService.getInstance();
-
       const quiz = await service.removeQuestion(id, questionId);
-
-      if (!quiz) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
 
       return BaseController.ok(res, { quiz });
     } catch (error: any) {
@@ -198,13 +232,15 @@ export class QuizController extends BaseController {
     try {
       const { id } = req.params;
       const { questionIds } = req.body;
+      const userId = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+
+      const ownership = await QuizController.checkQuizOwnership(id, userId, userRoles);
+      if (ownership.notFound) return BaseController.notFound(res, 'Quiz not found');
+      if (!ownership.allowed) return BaseController.forbidden(res, 'You can only reorder questions in your own quizzes');
+
       const service = QuizService.getInstance();
-
       const quiz = await service.reorderQuestions(id, questionIds);
-
-      if (!quiz) {
-        return BaseController.notFound(res, 'Quiz not found');
-      }
 
       return BaseController.ok(res, { quiz });
     } catch (error: any) {
@@ -214,7 +250,7 @@ export class QuizController extends BaseController {
   }
 
   // ============================================
-  // Attempts
+  // Attempts (user-initiated, no ownership check)
   // ============================================
 
   static async startAttempt(req: Request, res: Response): Promise<any> {
