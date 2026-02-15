@@ -101,3 +101,41 @@ export async function updateListing(
 ): Promise<{ success: boolean; data: ProductListing }> {
   return apiClient.put(`/pharmacy/products/listings/${id}`, params);
 }
+
+// ─────────────────────────────────────────────────────
+// Channel Settings (WO-PHARMACY-PRODUCT-CHANNEL-MANAGEMENT-V1)
+// ─────────────────────────────────────────────────────
+
+export interface ListingChannelSetting {
+  channelId: string;
+  channelType: 'B2C' | 'KIOSK' | 'TABLET' | 'SIGNAGE';
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'EXPIRED' | 'TERMINATED';
+  productChannelId: string | null;
+  isVisible: boolean;
+  salesLimit: number | null;
+  displayOrder: number | null;
+}
+
+/**
+ * 상품의 채널별 설정 조회
+ */
+export async function getListingChannels(
+  listingId: string
+): Promise<{ success: boolean; data: ListingChannelSetting[] }> {
+  return apiClient.get(`/pharmacy/products/listings/${listingId}/channels`);
+}
+
+/**
+ * 상품의 채널별 설정 저장
+ */
+export async function updateListingChannels(
+  listingId: string,
+  channels: Array<{
+    channelId: string;
+    isVisible: boolean;
+    salesLimit?: number | null;
+    displayOrder?: number;
+  }>
+): Promise<{ success: boolean; data: { updated: number } }> {
+  return apiClient.put(`/pharmacy/products/listings/${listingId}/channels`, { channels });
+}

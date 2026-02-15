@@ -17,6 +17,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationProductApplication } from '../entities/organization-product-application.entity.js';
 import { OrganizationProductListing } from '../entities/organization-product-listing.entity.js';
+import { OrganizationProductChannel } from '../entities/organization-product-channel.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
@@ -282,6 +283,130 @@ export function createPharmacyProductsController(
     }
 
     res.json({ success: true, data: updated });
+  }));
+
+  // ─── GET /listings/:id/channels — 상품의 채널별 설정 조회 ──────────
+  router.get('/listings/:id/channels', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = (req as any).organizationId;
+    const { id } = req.params;
+
+    // Verify listing belongs to this organization
+    const listing = await listingRepo.findOne({
+      where: { id, organization_id: organizationId, service_key: 'kpa' },
+    });
+    if (!listing) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Listing not found' },
+      });
+      return;
+    }
+
+    // Fetch all channels for this organization with product channel mapping
+    const channels = await dataSource.query(
+      `SELECT
+         oc.id AS "channelId",
+         oc.channel_type AS "channelType",
+         oc.status,
+         opc.id AS "productChannelId",
+         COALESCE(opc.is_active, false) AS "isVisible",
+         opc.sales_limit AS "salesLimit",
+         opc.display_order AS "displayOrder"
+       FROM organization_channels oc
+       LEFT JOIN organization_product_channels opc
+         ON opc.channel_id = oc.id AND opc.product_listing_id = $1
+       WHERE oc.organization_id = $2
+       ORDER BY oc.created_at ASC`,
+      [id, organizationId]
+    );
+
+    res.json({ success: true, data: channels });
+  }));
+
+  // ─── PUT /listings/:id/channels — 상품의 채널별 설정 저장 ──────────
+  router.put('/listings/:id/channels', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const organizationId = (req as any).organizationId;
+    const { id } = req.params;
+    const channelSettings: Array<{
+      channelId: string;
+      isVisible: boolean;
+      salesLimit?: number | null;
+      displayOrder?: number;
+    }> = req.body.channels;
+
+    if (!Array.isArray(channelSettings)) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'channels array is required' },
+      });
+      return;
+    }
+
+    // Verify listing
+    const listing = await listingRepo.findOne({
+      where: { id, organization_id: organizationId, service_key: 'kpa' },
+    });
+    if (!listing) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Listing not found' },
+      });
+      return;
+    }
+
+    const pcRepo = dataSource.getRepository(OrganizationProductChannel);
+
+    for (const setting of channelSettings) {
+      // Validate sales_limit: reject 0
+      if (setting.salesLimit !== undefined && setting.salesLimit !== null && setting.salesLimit <= 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'salesLimit must be greater than 0 or null' },
+        });
+        return;
+      }
+
+      // Find existing mapping
+      let pc = await pcRepo.findOne({
+        where: { channel_id: setting.channelId, product_listing_id: id },
+      });
+
+      if (pc) {
+        // Update existing
+        pc.is_active = setting.isVisible;
+        if (setting.salesLimit !== undefined) pc.sales_limit = setting.salesLimit;
+        if (setting.displayOrder !== undefined) pc.display_order = setting.displayOrder;
+        await pcRepo.save(pc);
+      } else if (setting.isVisible) {
+        // Create new mapping only if making visible
+        pc = pcRepo.create({
+          channel_id: setting.channelId,
+          product_listing_id: id,
+          is_active: true,
+          sales_limit: setting.salesLimit ?? null,
+          display_order: setting.displayOrder ?? 0,
+        });
+        await pcRepo.save(pc);
+      }
+    }
+
+    // Audit log
+    try {
+      const log = auditRepo.create({
+        operator_id: user.id,
+        operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'pharmacy_owner',
+        action_type: 'CONTENT_UPDATED' as any,
+        target_type: 'content' as any,
+        target_id: id,
+        metadata: { action: 'channel_settings_updated', channelCount: channelSettings.length },
+      });
+      await auditRepo.save(log);
+    } catch (e) {
+      console.error('[KPA AuditLog] Failed to write channel settings audit:', e);
+    }
+
+    res.json({ success: true, data: { updated: channelSettings.length } });
   }));
 
   return router;
