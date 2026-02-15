@@ -7,8 +7,8 @@
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddKpaStorefrontConfig1708000010 implements MigrationInterface {
-  name = 'AddKpaStorefrontConfig1708000010';
+export class AddKpaStorefrontConfig20260215000010 implements MigrationInterface {
+  name = 'AddKpaStorefrontConfig20260215000010';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Guard: check if column already exists

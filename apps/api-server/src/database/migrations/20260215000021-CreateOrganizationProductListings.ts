@@ -10,8 +10,8 @@
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateOrganizationProductListings1708000021 implements MigrationInterface {
-  name = 'CreateOrganizationProductListings1708000021';
+export class CreateOrganizationProductListings20260215000021 implements MigrationInterface {
+  name = 'CreateOrganizationProductListings20260215000021';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Guard: check if table already exists
