@@ -90,9 +90,9 @@ describe('Sticky Header Feature', () => {
       const currentScrollY = 200;
       const lastScrollY = 250;
       const isScrollingUp = currentScrollY < lastScrollY;
-      
+
       const shouldShow = hideOnScrollDown && isScrollingUp;
-      expect(shouldShow).toBe(false); // Because we're scrolling up
+      expect(shouldShow).toBe(true); // Scrolling up → show header
     });
   });
 
@@ -145,10 +145,10 @@ describe('Sticky Header Feature', () => {
 
   describe('Performance', () => {
     it('should throttle scroll events', () => {
-      const throttleDelay = 16; // ~60fps
+      const throttleDelay = 16; // ~60fps (actually 62.5fps)
       const eventFrequency = 1000 / throttleDelay;
-      
-      expect(eventFrequency).toBeCloseTo(60, 0);
+
+      expect(eventFrequency).toBeCloseTo(62.5, 0);
     });
 
     it('should use CSS transforms for animations', () => {

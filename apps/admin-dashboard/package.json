@@ -14,7 +14,7 @@
     "type-check": "bash -c 'tsc --noEmit'",
     "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true",
     "lint:fix": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --fix",
-    "test": "npx vitest run --passWithNoTests --reporter=verbose || true",
+    "test": "npx vitest run --passWithNoTests --reporter=verbose",
     "test:coverage": "npx vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",

@@ -46,12 +46,14 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const catalog = getAppsCatalogForServiceGroup('cosmetics');
             const appIds = catalog.map(app => app.appId);
 
-            // Expected apps (core apps + cosmetics-specific)
-            expect(appIds).toContain('cms-core');
-            expect(appIds).toContain('dropshipping-core');
+            // Expected apps (cosmetics-specific + global)
             expect(appIds).toContain('dropshipping-cosmetics');
-            expect(appIds).toContain('sellerops'); // Also has cosmetics serviceGroup
-            expect(appIds).toContain('supplierops'); // Also has cosmetics serviceGroup
+            expect(appIds).toContain('sellerops');
+            expect(appIds).toContain('supplierops');
+            expect(appIds).toContain('cosmetics-partner-extension');
+
+            // Global apps available to all
+            expect(appIds).toContain('organization-forum');
 
             // NOT expected (yaksa-specific apps)
             expect(appIds).not.toContain('membership-yaksa');
@@ -68,12 +70,15 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const catalog = getAppsCatalogForServiceGroup('yaksa');
             const appIds = catalog.map(app => app.appId);
 
-            // Expected apps (core apps + yaksa-specific)
-            expect(appIds).toContain('cms-core');
-            expect(appIds).toContain('organization-core');
+            // Expected apps (yaksa-specific + global)
             expect(appIds).toContain('membership-yaksa');
             expect(appIds).toContain('forum-yaksa');
             expect(appIds).toContain('reporting-yaksa');
+            expect(appIds).toContain('pharmaceutical-core');
+            expect(appIds).toContain('lms-yaksa');
+
+            // Global apps available to all
+            expect(appIds).toContain('organization-forum');
 
             // NOT expected (cosmetics-specific)
             expect(appIds).not.toContain('dropshipping-cosmetics');
@@ -88,9 +93,8 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const catalog = getAppsCatalogForServiceGroup('tourist');
             const appIds = catalog.map(app => app.appId);
 
-            // Core apps should be available
-            expect(appIds).toContain('cms-core');
-            expect(appIds).toContain('forum-core');
+            // Global apps should be available
+            expect(appIds).toContain('organization-forum');
 
             // Service-specific apps should NOT be available
             expect(appIds).not.toContain('dropshipping-cosmetics');
@@ -108,7 +112,7 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Expected apps
             expect(appIds).toContain('sellerops');
-            expect(appIds).toContain('dropshipping-core');
+            expect(appIds).toContain('cosmetics-seller-extension');
 
             // NOT expected (yaksa-specific)
             expect(appIds).not.toContain('membership-yaksa');
@@ -125,7 +129,7 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Expected apps
             expect(appIds).toContain('supplierops');
-            expect(appIds).toContain('dropshipping-core');
+            expect(appIds).toContain('cosmetics-supplier-extension');
 
             // NOT expected (yaksa-specific)
             expect(appIds).not.toContain('membership-yaksa');
@@ -306,8 +310,8 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const result = canInstallApp('dropshipping-cosmetics', 'cosmetics');
             expect(result.canInstall).toBe(true);
 
-            // Install core app - should succeed
-            const result2 = canInstallApp('cms-core', 'cosmetics');
+            // Install global app - should succeed
+            const result2 = canInstallApp('organization-forum', 'cosmetics');
             expect(result2.canInstall).toBe(true);
 
             expect(cosmetics.serviceGroup).toBe('cosmetics');
@@ -327,48 +331,46 @@ describe('Multi-Tenant AppStore Filtering', () => {
         });
     });
 
-    describe('APP-MULTI-005: Core Apps Availability', () => {
-        test('Core apps available to all service groups', async () => {
+    describe('APP-MULTI-005: Global and Platform-Core Apps', () => {
+        test('Global apps available to all service groups', async () => {
             const serviceGroups: ServiceGroup[] = ['cosmetics', 'yaksa', 'tourist', 'sellerops', 'supplierops'];
 
-            // Core apps that should be available everywhere
-            const coreAppIds = APPS_CATALOG
-                .filter(app => app.type === 'core')
+            // Global apps should be available everywhere via filterByServiceGroup
+            const globalAppIds = APPS_CATALOG
+                .filter(app => app.serviceGroups?.includes('global'))
                 .map(app => app.appId);
 
-            expect(coreAppIds.length).toBeGreaterThan(0);
+            expect(globalAppIds.length).toBeGreaterThan(0);
 
             for (const sg of serviceGroups) {
                 const catalog = filterByServiceGroup(sg);
                 const availableAppIds = catalog.map(app => app.appId);
 
-                // All core apps should be available in each service group
-                for (const coreAppId of coreAppIds) {
-                    expect(availableAppIds).toContain(coreAppId);
+                for (const globalId of globalAppIds) {
+                    expect(availableAppIds).toContain(globalId);
                 }
             }
 
             expect(context.tenants.length).toBe(15);
         });
 
-        test('Core apps have no serviceGroup restriction', async () => {
+        test('Platform-core apps have explicit serviceGroup', async () => {
             const coreApps = APPS_CATALOG.filter(app => app.type === 'core');
 
             for (const app of coreApps) {
-                // Core apps should have no serviceGroups or empty array
-                expect(
-                    !app.serviceGroups || app.serviceGroups.length === 0
-                ).toBe(true);
+                // Core apps should have serviceGroups defined
+                expect(app.serviceGroups).toBeDefined();
+                expect(app.serviceGroups!.length).toBeGreaterThan(0);
             }
         });
 
-        test('cms-core available in all catalogs', async () => {
+        test('organization-forum available in all catalogs', async () => {
             const serviceGroups: ServiceGroup[] = ['cosmetics', 'yaksa', 'tourist', 'sellerops', 'supplierops'];
 
             for (const sg of serviceGroups) {
                 const catalog = filterByServiceGroup(sg);
                 const appIds = catalog.map(app => app.appId);
-                expect(appIds).toContain('cms-core');
+                expect(appIds).toContain('organization-forum');
             }
         });
     });
@@ -385,12 +387,12 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const yaksaIds = yaksaAppsWithDeps.map(app => app.appId);
 
             // dropshipping-cosmetics depends on dropshipping-core
-            // Both should be in cosmetics catalog
+            // Both should be in cosmetics catalog (via dependency resolution)
             expect(cosmeticsIds).toContain('dropshipping-cosmetics');
             expect(cosmeticsIds).toContain('dropshipping-core');
 
             // membership-yaksa depends on organization-core
-            // Both should be in yaksa catalog
+            // Both should be in yaksa catalog (via dependency resolution)
             expect(yaksaIds).toContain('membership-yaksa');
             expect(yaksaIds).toContain('organization-core');
 
@@ -456,7 +458,7 @@ describe('Multi-Tenant AppStore Filtering', () => {
                 counts[sg] = catalog.length;
             }
 
-            // All catalogs should have at least the core apps
+            // All catalogs should have at least the global apps
             for (const sg of serviceGroups) {
                 expect(counts[sg]).toBeGreaterThan(0);
             }

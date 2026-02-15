@@ -67,8 +67,17 @@ jobs:
           echo "✅ No console.log statements found in production code"
         fi
     
-    - name: Run tests (api-server, serial to prevent OOM)
+    - name: Run tests (api-server Jest, serial to prevent OOM)
       run: cd apps/api-server && npx jest --maxWorkers=1
+
+    - name: Run tests (admin-dashboard Vitest, serial to prevent OOM)
+      run: cd apps/admin-dashboard && npx vitest run --passWithNoTests --pool=forks --poolOptions.forks.maxForks=1
+
+    - name: Run tests (api-gateway Vitest)
+      run: cd apps/api-gateway && npx vitest run --passWithNoTests
+
+    - name: Run tests (multi-tenant Vitest)
+      run: cd apps/api-server/tests/multi-tenant && npx vitest run --passWithNoTests
 
   # 2. Build all applications
   build:

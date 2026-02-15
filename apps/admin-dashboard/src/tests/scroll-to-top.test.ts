@@ -3,7 +3,14 @@
  * Verifies the configuration and rendering of the scroll-to-top button
  */
 
-import { ScrollToTopSettings } from '../pages/appearance/astra-customizer/types/customizer-types';
+interface ScrollToTopSettings {
+  enabled: boolean;
+  displayType: 'desktop' | 'mobile' | 'both';
+  threshold: number;
+  backgroundColor: string;
+  iconColor: string;
+  position: 'left' | 'right';
+}
 
 describe('Scroll to Top Feature', () => {
   describe('Settings Configuration', () => {
@@ -26,14 +33,14 @@ describe('Scroll to Top Feature', () => {
     it('should validate display type options', () => {
       const validDisplayTypes = ['desktop', 'mobile', 'both'];
       const testDisplayType = 'both';
-      
+
       expect(validDisplayTypes).toContain(testDisplayType);
     });
 
     it('should validate position options', () => {
       const validPositions = ['left', 'right'];
       const testPosition = 'right';
-      
+
       expect(validPositions).toContain(testPosition);
     });
   });
@@ -50,16 +57,16 @@ describe('Scroll to Top Feature', () => {
       };
 
       // Mock save function
-      const saveSettings = jest.fn().mockResolvedValue(true);
+      const saveSettings = vi.fn().mockResolvedValue(true);
       const saved = await saveSettings(settings);
-      
+
       expect(saveSettings).toHaveBeenCalledWith(settings);
       expect(saved).toBe(true);
     });
 
     it('should load scroll to top settings', async () => {
       // Mock load function
-      const loadSettings = jest.fn().mockResolvedValue({
+      const loadSettings = vi.fn().mockResolvedValue({
         enabled: true,
         displayType: 'mobile',
         threshold: 400,
@@ -69,7 +76,7 @@ describe('Scroll to Top Feature', () => {
       });
 
       const loaded = await loadSettings();
-      
+
       expect(loadSettings).toHaveBeenCalled();
       expect(loaded.enabled).toBe(true);
       expect(loaded.displayType).toBe('mobile');
@@ -81,14 +88,14 @@ describe('Scroll to Top Feature', () => {
     it('should show button after scrolling past threshold', () => {
       const threshold = 300;
       const scrollY = 350;
-      
+
       expect(scrollY > threshold).toBe(true);
     });
 
     it('should hide button when scrolling above threshold', () => {
       const threshold = 300;
       const scrollY = 250;
-      
+
       expect(scrollY > threshold).toBe(false);
     });
 
@@ -119,7 +126,7 @@ describe('Scroll to Top Feature', () => {
     it('should have proper ARIA labels', () => {
       const ariaLabel = 'Scroll to top';
       const title = 'Scroll to top';
-      
+
       expect(ariaLabel).toBe('Scroll to top');
       expect(title).toBe('Scroll to top');
     });
