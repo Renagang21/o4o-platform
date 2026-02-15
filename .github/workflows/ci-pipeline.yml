@@ -99,10 +99,11 @@ jobs:
 
     - name: Verify package builds
       run: |
-        echo "🔍 Verifying critical dist directories..."
+        echo "🔍 Verifying all build:packages dist directories..."
         MISSING_DIST=0
 
-        for pkg in appearance-system auth-client ui types shortcodes block-renderer slide-app pharmacy-ai-insight; do
+        # All packages built by build:packages (must stay in sync)
+        for pkg in types appearance-system auth-client utils ui auth-context shortcodes block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight yaksa-scheduler; do
           if [ ! -d "packages/$pkg/dist" ]; then
             echo "❌ packages/$pkg/dist not found!"
             MISSING_DIST=1
@@ -116,7 +117,7 @@ jobs:
           exit 1
         fi
 
-        echo "✅ All critical packages verified"
+        echo "✅ All build:packages outputs verified ($(echo types appearance-system auth-client utils ui auth-context shortcodes block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight yaksa-scheduler | wc -w) packages)"
 
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
