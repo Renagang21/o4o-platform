@@ -874,6 +874,11 @@ const startServer = async () => {
       const glycopharmRoutes = createGlycopharmRoutes(AppDataSource);
       app.use('/api/v1/glycopharm', glycopharmRoutes);
       logger.info('✅ Glycopharm routes registered at /api/v1/glycopharm');
+
+      // WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1: 결제 이벤트 핸들러 초기화
+      const { initializeGlycopharmPaymentHandler } = await import('./services/glycopharm/GlycopharmPaymentEventHandler.js');
+      initializeGlycopharmPaymentHandler(AppDataSource);
+      logger.info('✅ GlycopharmPaymentEventHandler initialized');
     } catch (glycopharmError) {
       logger.error('Failed to register Glycopharm routes:', glycopharmError);
     }
@@ -1050,6 +1055,16 @@ const startServer = async () => {
       logger.info('✅ Admin Ops Metrics routes registered at /api/v1/admin/ops');
     } catch (opsMetricsError) {
       logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
+    }
+
+    // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
+    try {
+      const { createPlatformHubController } = await import('./modules/platform/platform-hub.controller.js');
+      const platformHubRoutes = createPlatformHubController(AppDataSource);
+      app.use('/api/v1/platform/hub', platformHubRoutes);
+      logger.info('✅ Platform Hub routes registered at /api/v1/platform/hub');
+    } catch (platformHubError) {
+      logger.error('Failed to register Platform Hub routes:', platformHubError);
     }
 
     // 6. Core routes now registered via dynamic module loader

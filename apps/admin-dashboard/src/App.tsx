@@ -343,6 +343,9 @@ const StoreNetworkPage = lazy(() => import('@/pages/platform/StoreNetworkPage'))
 // Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
 const PhysicalStoresPage = lazy(() => import('@/pages/platform/PhysicalStoresPage'));
 
+// Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
+const PlatformHubPage = lazy(() => import('@/pages/platform/PlatformHubPage'));
+
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
@@ -1167,6 +1170,15 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <PhysicalStoresPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1) */}
+                    <Route path="/admin/platform/hub" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <PlatformHubPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

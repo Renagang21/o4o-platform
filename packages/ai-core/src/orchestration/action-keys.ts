@@ -41,6 +41,9 @@ export const ACTION_KEYS = {
   GLYCOPHARM_REVIEW_REQUESTS: 'glycopharm.trigger.review_requests',
   GLYCOPHARM_SYNC_SIGNAGE: 'glycopharm.trigger.sync_signage',
   GLYCOPHARM_APPROVE_PHARMACY: 'glycopharm.trigger.approve_pharmacy',
+
+  // Platform Hub Operations (WO-PLATFORM-GLOBAL-HUB-V1)
+  PLATFORM_CROSS_SERVICE_TRIGGER: 'platform.trigger.execute_cross_service',
 } as const;
 
 export type ActionKey = (typeof ACTION_KEYS)[keyof typeof ACTION_KEYS];
