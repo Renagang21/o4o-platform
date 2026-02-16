@@ -17,6 +17,7 @@ import type { DataSource } from 'typeorm';
 import logger from '../../utils/logger.js';
 import { isPlatformAdmin } from '../../utils/role.utils.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
+import { ActionLogService } from '@o4o/action-log-core';
 
 type AuthenticatedRequest = Request & {
   user?: {
@@ -225,6 +226,7 @@ const SERVICE_TRIGGER_PATHS: Record<string, string> = {
 
 export function createPlatformHubController(dataSource: DataSource): ExpressRouter {
   const router: ExpressRouter = Router();
+  const actionLogService = new ActionLogService(dataSource);
 
   /**
    * GET /api/v1/platform/hub/summary
@@ -322,6 +324,9 @@ export function createPlatformHubController(dataSource: DataSource): ExpressRout
    * Body: { service: string, actionKey: string }
    */
   router.post('/trigger', requireAuth, requirePlatformAdmin, async (req: Request, res: Response) => {
+    const start = Date.now();
+    const userId = (req as AuthenticatedRequest).user?.id;
+
     try {
       const { service, actionKey } = req.body;
 
@@ -369,12 +374,34 @@ export function createPlatformHubController(dataSource: DataSource): ExpressRout
       });
 
       const result = await proxyRes.json();
+      const durationMs = Date.now() - start;
+      const isSuccess = proxyRes.status >= 200 && proxyRes.status < 400;
+
+      // Log the cross-service trigger execution
+      if (userId) {
+        if (isSuccess) {
+          actionLogService.logSuccess('platform', userId, actionKey, {
+            source: 'platform', durationMs,
+            meta: { service, endpoint, proxyStatus: proxyRes.status },
+          }).catch(() => {});
+        } else {
+          actionLogService.logFailure('platform', userId, actionKey, `Proxy returned ${proxyRes.status}`, {
+            source: 'platform', durationMs,
+            meta: { service, endpoint, proxyStatus: proxyRes.status },
+          }).catch(() => {});
+        }
+      }
 
       res.status(proxyRes.status).json({
         ...result,
         _proxy: { service, actionKey, endpoint },
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (userId) {
+        actionLogService.logFailure('platform', userId, req.body?.actionKey || 'unknown', error.message, {
+          source: 'platform', durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Platform Hub] Trigger proxy error:', error);
       res.status(500).json({ success: false, message: 'Trigger proxy failed' });
     }

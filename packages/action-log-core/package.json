@@ -1,0 +1,28 @@
+{
+  "name": "@o4o/action-log-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Action Log Core — Hub Trigger 실행 이력 기록/조회 표준",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  }
+}

@@ -2,6 +2,7 @@
  * Neture Hub Trigger Controller
  *
  * WO-NETURE-HUB-ACTION-TRIGGER-EXPANSION-V1
+ * WO-PLATFORM-ACTION-LOG-CORE-V1 (ActionLog integration)
  *
  * Hub QuickAction에서 호출하는 트리거 API.
  * 각 엔드포인트는 인증 + 공급자 소유권을 검증한 후 실행한다.
@@ -17,6 +18,7 @@ import { Router } from 'express';
 import type { Request, Response, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 
 type AuthenticatedRequest = Request & {
   user?: {
@@ -33,11 +35,17 @@ interface TriggerDeps {
   requireNetureScope: (scope: string) => any;
   getSupplierIdFromUser: (req: AuthenticatedRequest) => Promise<string | null>;
   netureService: any;
+  actionLogService?: ActionLogService;
 }
 
 export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRouter {
   const router: ExpressRouter = Router();
-  const { requireAuth, requireNetureScope, getSupplierIdFromUser, netureService, dataSource } = deps;
+  const { requireAuth, requireNetureScope, getSupplierIdFromUser, netureService, actionLogService } = deps;
+
+  // Helper: extract userId from req
+  function getUserId(req: Request): string | undefined {
+    return (req as AuthenticatedRequest).user?.id;
+  }
 
   // ============================================================================
   // Supplier Triggers (authenticated supplier only)
@@ -48,6 +56,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 대기 중인 요청을 일괄 검토 — 현황 요약 반환
    */
   router.post('/review-pending', requireAuth, async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const authReq = req as AuthenticatedRequest;
       const supplierId = await getSupplierIdFromUser(authReq);
@@ -56,9 +65,16 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         return;
       }
 
-      // Fetch pending requests for this supplier
       const pendingRequests = await netureService.getSupplierRequests(supplierId, { status: 'pending' });
       const count = pendingRequests?.length ?? 0;
+
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.review_pending', {
+          organizationId: supplierId, durationMs: Date.now() - start,
+          meta: { pendingCount: count },
+        }).catch(() => {});
+      }
 
       if (count === 0) {
         res.json({ success: true, message: '대기 중인 요청이 없습니다.' });
@@ -70,7 +86,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `대기 중인 요청 ${count}건이 있습니다. 요청 관리 페이지에서 검토하세요.`,
         data: { pendingCount: count },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.review_pending', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] review-pending error:', error);
       res.status(500).json({ success: false, message: '요청 검토 실패' });
     }
@@ -81,6 +103,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 비활성 상품 자동 활성화 제안
    */
   router.post('/auto-product', requireAuth, async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const authReq = req as AuthenticatedRequest;
       const supplierId = await getSupplierIdFromUser(authReq);
@@ -93,11 +116,17 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
       const inactive = (products || []).filter((p: any) => !p.isActive);
 
       if (inactive.length === 0) {
+        const userId = getUserId(req);
+        if (userId) {
+          actionLogService?.logSuccess('neture', userId, 'neture.trigger.auto_product', {
+            organizationId: supplierId, durationMs: Date.now() - start,
+            meta: { activated: 0 },
+          }).catch(() => {});
+        }
         res.json({ success: true, message: '모든 상품이 활성 상태입니다.' });
         return;
       }
 
-      // Auto-activate up to 5 inactive products
       let activated = 0;
       for (const product of inactive.slice(0, 5)) {
         try {
@@ -108,12 +137,26 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         }
       }
 
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.auto_product', {
+          organizationId: supplierId, durationMs: Date.now() - start,
+          meta: { activated, remaining: Math.max(0, inactive.length - 5) },
+        }).catch(() => {});
+      }
+
       res.json({
         success: true,
         message: `${activated}개 상품을 활성화했습니다.${inactive.length > 5 ? ` (${inactive.length - 5}개 추가 비활성 상품 존재)` : ''}`,
         data: { activated, remaining: Math.max(0, inactive.length - 5) },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.auto_product', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] auto-product error:', error);
       res.status(500).json({ success: false, message: '상품 자동 활성화 실패' });
     }
@@ -124,6 +167,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 우수 콘텐츠 복제 제안 — 발행 가능한 초안 목록 반환
    */
   router.post('/copy-best-content', requireAuth, async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const authReq = req as AuthenticatedRequest;
       const supplierId = await getSupplierIdFromUser(authReq);
@@ -134,6 +178,14 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
 
       const contents = await netureService.getSupplierContents(supplierId, { status: 'draft' });
       const drafts = contents || [];
+
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.copy_best_content', {
+          organizationId: supplierId, durationMs: Date.now() - start,
+          meta: { draftCount: drafts.length },
+        }).catch(() => {});
+      }
 
       if (drafts.length === 0) {
         res.json({
@@ -148,7 +200,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `발행 가능한 초안 ${drafts.length}건이 있습니다. 콘텐츠 관리에서 발행하세요.`,
         data: { draftCount: drafts.length },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.copy_best_content', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] copy-best-content error:', error);
       res.status(500).json({ success: false, message: '콘텐츠 분석 실패' });
     }
@@ -159,6 +217,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 정산 데이터 갱신 — 연결 서비스 현황 반환
    */
   router.post('/refresh-settlement', requireAuth, async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const authReq = req as AuthenticatedRequest;
       const supplierId = await getSupplierIdFromUser(authReq);
@@ -170,6 +229,14 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
       const summary = await netureService.getSupplierOrdersSummary(supplierId);
       const services = summary?.services || [];
 
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.refresh_settlement', {
+          organizationId: supplierId, durationMs: Date.now() - start,
+          meta: { serviceCount: services.length },
+        }).catch(() => {});
+      }
+
       res.json({
         success: true,
         message: `${services.length}개 연결 서비스의 정산 현황을 갱신했습니다.`,
@@ -178,7 +245,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
           totalApprovedSellers: summary?.totalApprovedSellers || 0,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.refresh_settlement', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] refresh-settlement error:', error);
       res.status(500).json({ success: false, message: '정산 갱신 실패' });
     }
@@ -189,6 +262,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * AI 인사이트 재실행 — runAIInsight 호출
    */
   router.post('/ai-refresh', requireAuth, async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const authReq = req as AuthenticatedRequest;
       const supplierId = await getSupplierIdFromUser(authReq);
@@ -197,7 +271,6 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         return;
       }
 
-      // Collect context for AI
       const dashboardSummary = await netureService.getSupplierDashboardSummary(supplierId);
       const stats = dashboardSummary.stats;
 
@@ -243,6 +316,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         },
       });
 
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.refresh_ai', {
+          organizationId: supplierId, durationMs: Date.now() - start, source: 'ai',
+        }).catch(() => {});
+      }
+
       if (aiResult.success && aiResult.insight) {
         res.json({
           success: true,
@@ -255,7 +335,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
           message: 'AI 분석을 완료했습니다 (규칙 기반 결과).',
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.refresh_ai', error.message, {
+          durationMs: Date.now() - start, source: 'ai',
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] ai-refresh error:', error);
       res.status(500).json({ success: false, message: 'AI 인사이트 갱신 실패' });
     }
@@ -270,9 +356,18 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 관리자: 대기 중 공급자 요청 일괄 검토 현황
    */
   router.post('/approve-supplier', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const allRequests = await netureService.getAllSupplierRequests({ status: 'pending' });
       const count = allRequests?.length ?? 0;
+
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.approve_supplier', {
+          durationMs: Date.now() - start,
+          meta: { pendingCount: count },
+        }).catch(() => {});
+      }
 
       if (count === 0) {
         res.json({ success: true, message: '대기 중인 공급자 요청이 없습니다.' });
@@ -284,7 +379,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `대기 중인 공급자 요청 ${count}건. 관리자 페이지에서 검토하세요.`,
         data: { pendingCount: count },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.approve_supplier', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] approve-supplier error:', error);
       res.status(500).json({ success: false, message: '공급자 요청 조회 실패' });
     }
@@ -295,9 +396,18 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 관리자: 제휴 요청 현황 확인
    */
   router.post('/manage-partnership', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const openRequests = await netureService.getPartnershipRequests({ status: 'OPEN' });
       const count = openRequests?.length ?? 0;
+
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.manage_partnership', {
+          durationMs: Date.now() - start,
+          meta: { openCount: count },
+        }).catch(() => {});
+      }
 
       if (count === 0) {
         res.json({ success: true, message: '대기 중인 제휴 요청이 없습니다.' });
@@ -309,7 +419,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `열린 제휴 요청 ${count}건. 파트너십 관리에서 확인하세요.`,
         data: { openCount: count },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.manage_partnership', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] manage-partnership error:', error);
       res.status(500).json({ success: false, message: '제휴 요청 조회 실패' });
     }
@@ -320,9 +436,18 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
    * 관리자: 감사 로그 요약 생성
    */
   router.post('/audit-review', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    const start = Date.now();
     try {
       const adminSummary = await netureService.getAdminDashboardSummary();
       const stats = adminSummary?.stats;
+
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logSuccess('neture', userId, 'neture.trigger.audit_review', {
+          durationMs: Date.now() - start,
+          meta: { totalSuppliers: stats?.totalSuppliers || 0 },
+        }).catch(() => {});
+      }
 
       res.json({
         success: true,
@@ -334,7 +459,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
           pendingRequests: stats?.pendingRequests || 0,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const userId = getUserId(req);
+      if (userId) {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.audit_review', error.message, {
+          durationMs: Date.now() - start,
+        }).catch(() => {});
+      }
       logger.error('[Neture Hub Trigger] audit-review error:', error);
       res.status(500).json({ success: false, message: '감사 요약 생성 실패' });
     }

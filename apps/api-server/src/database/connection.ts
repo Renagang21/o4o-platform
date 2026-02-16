@@ -177,6 +177,9 @@ import { CareCoachingSession } from '../modules/care/entities/care-coaching-sess
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
+// ACTION LOG ENTITY (WO-PLATFORM-ACTION-LOG-CORE-V1)
+import { ActionLog } from '@o4o/action-log-core';
+
 // ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
 // ============================================================================
@@ -252,6 +255,11 @@ import { PlatformInquiry } from '../entities/PlatformInquiry.js';
 // ============================================================================
 import { PlatformService } from '../entities/PlatformService.js';
 import { UserServiceEnrollment } from '../entities/UserServiceEnrollment.js';
+
+// ============================================================================
+// PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
+// ============================================================================
+import { PlatformPayment } from '../entities/payment/PlatformPayment.entity.js';
 
 // ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
@@ -569,6 +577,10 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     AssetSnapshot,
     // ============================================================================
+    // ACTION LOG ENTITY (WO-PLATFORM-ACTION-LOG-CORE-V1)
+    // ============================================================================
+    ActionLog,
+    // ============================================================================
     // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================
     NetureSupplier,
@@ -622,6 +634,10 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     PlatformService,
     UserServiceEnrollment,
+    // ============================================================================
+    // PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
+    // ============================================================================
+    PlatformPayment,
     // ============================================================================
     // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
     // ============================================================================

@@ -2,6 +2,7 @@
  * GlycoPharm Hub Trigger Controller
  *
  * WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
+ * WO-PLATFORM-ACTION-LOG-CORE-V1 (ActionLog integration)
  *
  * QuickAction 실행 엔드포인트.
  * Hub 카드의 액션 버튼 → 이 컨트롤러 → Care/Store API 실행.
@@ -17,6 +18,7 @@ import { DataSource } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { runAIInsight } from '@o4o/ai-core';
 import type { AuthRequest } from '../../../types/auth.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 
 type AuthMiddleware = RequestHandler;
 
@@ -31,6 +33,7 @@ async function resolvePharmacy(dataSource: DataSource, userId: string) {
 export function createHubTriggerController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
 
@@ -42,6 +45,7 @@ export function createHubTriggerController(
     '/trigger/care-review',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
+      const start = Date.now();
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
@@ -71,6 +75,11 @@ export function createHubTriggerController(
 
         const highRiskCount = result[0]?.count ?? 0;
 
+        actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.care_review', {
+          organizationId: pharmacy.id, durationMs: Date.now() - start,
+          meta: { highRiskCount },
+        }).catch(() => {});
+
         res.json({
           success: true,
           data: {
@@ -82,6 +91,12 @@ export function createHubTriggerController(
           },
         });
       } catch (error: any) {
+        const userId = (req as AuthRequest).user?.id;
+        if (userId) {
+          actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.care_review', error.message, {
+            durationMs: Date.now() - start,
+          }).catch(() => {});
+        }
         console.error('Hub trigger care-review failed:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -96,6 +111,7 @@ export function createHubTriggerController(
     '/trigger/coaching-auto-create',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
+      const start = Date.now();
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
@@ -131,6 +147,11 @@ export function createHubTriggerController(
         `, [pharmacy.id]);
 
         if (patients.length === 0) {
+          actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
+            organizationId: pharmacy.id, durationMs: Date.now() - start,
+            meta: { createdCount: 0 },
+          }).catch(() => {});
+
           res.json({
             success: true,
             data: { message: '코칭이 필요한 고위험 환자가 없습니다', createdCount: 0 },
@@ -154,6 +175,11 @@ export function createHubTriggerController(
           createdCount++;
         }
 
+        actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
+          organizationId: pharmacy.id, durationMs: Date.now() - start,
+          meta: { createdCount },
+        }).catch(() => {});
+
         res.json({
           success: true,
           data: {
@@ -162,6 +188,12 @@ export function createHubTriggerController(
           },
         });
       } catch (error: any) {
+        const userId = (req as AuthRequest).user?.id;
+        if (userId) {
+          actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.create_session', error.message, {
+            durationMs: Date.now() - start,
+          }).catch(() => {});
+        }
         console.error('Hub trigger coaching-auto-create failed:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -176,6 +208,7 @@ export function createHubTriggerController(
     '/trigger/ai-refresh',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
+      const start = Date.now();
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
@@ -230,6 +263,11 @@ export function createHubTriggerController(
           user: { id: userId, role: userRoles[0] || 'glycopharm:operator' },
         });
 
+        actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.refresh_ai', {
+          organizationId: pharmacy.id, durationMs: Date.now() - start, source: 'ai',
+          meta: { totalPatients, highRiskCount },
+        }).catch(() => {});
+
         if (aiResult.success && aiResult.insight) {
           res.json({
             success: true,
@@ -253,6 +291,12 @@ export function createHubTriggerController(
           });
         }
       } catch (error: any) {
+        const userId = (req as AuthRequest).user?.id;
+        if (userId) {
+          actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.refresh_ai', error.message, {
+            durationMs: Date.now() - start, source: 'ai',
+          }).catch(() => {});
+        }
         console.error('Hub trigger ai-refresh failed:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }

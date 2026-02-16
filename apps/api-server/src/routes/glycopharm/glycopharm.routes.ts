@@ -31,6 +31,7 @@ import { createInvoiceDispatchController } from './controllers/invoice-dispatch.
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { createServiceScopeGuard, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
+import { ActionLogService } from '@o4o/action-log-core';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -163,9 +164,11 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // Hub Trigger Routes — QuickAction execution endpoints
   // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
   // ============================================================================
+  const actionLogService = new ActionLogService(dataSource);
   const hubTriggerController = createHubTriggerController(
     dataSource,
     coreRequireAuth as any,
+    actionLogService,
   );
   router.use('/pharmacy/hub', hubTriggerController);
 

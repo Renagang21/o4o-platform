@@ -12,6 +12,7 @@ import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashb
 import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
+import { ActionLogService } from '@o4o/action-log-core';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -1927,12 +1928,14 @@ router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('netur
 });
 
 // Hub Trigger routes (WO-NETURE-HUB-ACTION-TRIGGER-EXPANSION-V1)
+const netureActionLogService = new ActionLogService(AppDataSource);
 const hubTriggerController = createNetureHubTriggerController({
   dataSource: AppDataSource,
   requireAuth,
   requireNetureScope,
   getSupplierIdFromUser,
   netureService,
+  actionLogService: netureActionLogService,
 });
 router.use('/hub/trigger', hubTriggerController);
 
