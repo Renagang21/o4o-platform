@@ -32,6 +32,7 @@ const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
 // Pharmacy Dashboard
+const PharmacyHubPage = lazy(() => import('@/pages/pharmacy/hub/HubPage')); // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
 const PharmacyDashboard = lazy(() => import('@/pages/pharmacy/PharmacyDashboard'));
 const StoreMainPage = lazy(() => import('@/pages/pharmacy/StoreMainPage'));
 const PharmacyProducts = lazy(() => import('@/pages/pharmacy/PharmacyProducts'));
@@ -309,6 +310,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<PharmacyDashboard />} />
+        <Route path="hub" element={<PharmacyHubPage />} />
         <Route path="store-main" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
         <Route path="orders" element={<PharmacyOrders />} />

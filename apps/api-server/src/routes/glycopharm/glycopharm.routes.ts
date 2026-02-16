@@ -13,7 +13,9 @@ import { createForumRequestController } from './controllers/forum-request.contro
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
 import { createCheckoutController } from './controllers/checkout.controller.js'; // Phase 4-B: E-commerce Core Integration
+import { createGlycopharmPaymentController } from './controllers/glycopharm-payment.controller.js'; // WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
 import { createCockpitController } from './controllers/cockpit.controller.js';
+import { createHubTriggerController } from './controllers/hub-trigger.controller.js'; // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
 import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
@@ -100,6 +102,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/checkout', checkoutController);
 
   // ============================================================================
+  // Payment Routes - WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
+  // PaymentCoreService를 통한 결제 흐름 (prepare → confirm → query)
+  // ============================================================================
+  const paymentController = createGlycopharmPaymentController(
+    dataSource,
+    coreRequireAuth as any
+  );
+  router.use('/payments', paymentController);
+
+  // ============================================================================
   // Forum Routes - /api/v1/glycopharm/forum/*
   // ============================================================================
   const forumRouter = Router();
@@ -146,6 +158,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requireGlycopharmScope
   );
   router.use('/pharmacy/cockpit', cockpitController);
+
+  // ============================================================================
+  // Hub Trigger Routes — QuickAction execution endpoints
+  // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
+  // ============================================================================
+  const hubTriggerController = createHubTriggerController(
+    dataSource,
+    coreRequireAuth as any,
+  );
+  router.use('/pharmacy/hub', hubTriggerController);
 
   // Pharmacy-specific routes (products, orders, customers, categories)
   const pharmacyController = createPharmacyController(

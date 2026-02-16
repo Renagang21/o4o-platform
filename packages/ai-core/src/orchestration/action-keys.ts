@@ -21,6 +21,16 @@ export const ACTION_KEYS = {
   // Neture Operations
   NETURE_CAMPAIGN_SUGGEST: 'neture.suggest.campaign',
   NETURE_STOCK_ALERT: 'neture.alert.low_stock',
+
+  // GlycoPharm Care Operations
+  GLYCOPHARM_CARE_REVIEW: 'glycopharm.trigger.care_review',
+  GLYCOPHARM_CREATE_SESSION: 'glycopharm.trigger.create_session',
+  GLYCOPHARM_REFRESH_ANALYSIS: 'glycopharm.trigger.refresh_analysis',
+  GLYCOPHARM_REFRESH_AI: 'glycopharm.trigger.refresh_ai',
+  GLYCOPHARM_REFRESH_REVENUE: 'glycopharm.trigger.refresh_revenue',
+  GLYCOPHARM_REVIEW_REQUESTS: 'glycopharm.trigger.review_requests',
+  GLYCOPHARM_SYNC_SIGNAGE: 'glycopharm.trigger.sync_signage',
+  GLYCOPHARM_APPROVE_PHARMACY: 'glycopharm.trigger.approve_pharmacy',
 } as const;
 
 export type ActionKey = (typeof ACTION_KEYS)[keyof typeof ACTION_KEYS];

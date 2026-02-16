@@ -734,6 +734,9 @@ importers:
       '@o4o/organization-core':
         specifier: workspace:*
         version: link:../../packages/organization-core
+      '@o4o/payment-core':
+        specifier: workspace:*
+        version: link:../../packages/payment-core
       '@o4o/pharmacy-ai-insight':
         specifier: workspace:*
         version: link:../../packages/pharmacy-ai-insight
@@ -3588,6 +3591,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/hub-core':
+        specifier: workspace:*
+        version: link:../../packages/hub-core
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
