@@ -2,9 +2,10 @@
  * requireInstructor Middleware
  *
  * WO-LMS-INSTRUCTOR-ROLE-V1
+ * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: platform:* bypass 제거
  *
  * RoleAssignment 테이블에서 'lms:instructor' 역할 확인.
- * platform:admin / platform:super_admin도 통과.
+ * kpa:admin은 bypass (WO-KPA-A-LMS-COURSE-OWNERSHIP-GUARD-V1).
  */
 
 import type { Request, Response, NextFunction } from 'express';
@@ -24,8 +25,6 @@ export async function requireInstructor(req: Request, res: Response, next: NextF
 
   const hasRole = await roleAssignmentService.hasAnyRole(userId, [
     'lms:instructor',
-    'platform:admin',
-    'platform:super_admin',
   ]);
 
   if (!hasRole) {

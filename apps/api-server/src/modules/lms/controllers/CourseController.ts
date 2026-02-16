@@ -25,11 +25,11 @@ export class CourseController extends BaseController {
       const userId = (req as any).user?.id;
 
       // WO-LMS-INSTRUCTOR-ROLE-V1: 유료 과정은 강사만 생성 가능
+      // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: platform:* → kpa:admin
       if (data.isPaid && userId) {
         const hasInstructorRole = await roleAssignmentService.hasAnyRole(userId, [
           'lms:instructor',
-          'platform:admin',
-          'platform:super_admin',
+          'kpa:admin',
         ]);
         if (!hasInstructorRole) {
           return BaseController.forbidden(res, '유료 과정은 강사만 생성할 수 있습니다');

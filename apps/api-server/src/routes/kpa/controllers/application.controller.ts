@@ -260,12 +260,13 @@ export function createApplicationController(
 
   /**
    * GET /kpa/applications/admin
-   * 전체 신청 목록 조회 (관리자/운영자 전용)
+   * 전체 신청 목록 조회 (관리자 전용)
+   * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: kpa:operator → kpa:admin (route manifest 정렬)
    */
   router.get(
     '/admin/all',
     requireAuth,
-    requireScope('kpa:operator'),
+    requireScope('kpa:admin'),
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
         const { organization_id, type, status, page = '1', limit = '20' } = req.query;
@@ -310,12 +311,13 @@ export function createApplicationController(
 
   /**
    * PATCH /kpa/applications/:id/review
-   * 신청 검토 (승인/거절) - 관리자/운영자 전용
+   * 신청 검토 (승인/거절) - 관리자 전용
+   * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: kpa:operator → kpa:admin (route manifest 정렬)
    */
   router.patch(
     '/:id/review',
     requireAuth,
-    requireScope('kpa:operator'),
+    requireScope('kpa:admin'),
     [
       param('id').isUUID(),
       body('status').isIn(['approved', 'rejected']),
@@ -406,12 +408,13 @@ export function createApplicationController(
 
   /**
    * GET /kpa/applications/admin/stats
-   * 신청 통계 (관리자/운영자 전용)
+   * 신청 통계 (관리자 전용)
+   * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: kpa:operator → kpa:admin (route manifest 정렬)
    */
   router.get(
     '/admin/stats',
     requireAuth,
-    requireScope('kpa:operator'),
+    requireScope('kpa:admin'),
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
         const { organization_id } = req.query;

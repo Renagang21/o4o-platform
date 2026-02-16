@@ -3,17 +3,20 @@
  *
  * 운영자 실사용 화면 1단계: APP-CONTENT / APP-SIGNAGE / APP-FORUM 요약 API
  * 기존 동결 QueryService 3개를 조합하여 단일 요약 응답을 반환.
+ *
+ * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: requireKpaScope('kpa:operator') 표준화
+ * - inline isKpaOperator() 제거
+ * - Scope guard는 kpa.routes.ts에서 주입받아 라우터 레벨 적용
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { ContentQueryService } from '../../../modules/content/index.js';
 import type { SignageQueryService } from '../../../modules/signage/index.js';
 import type { ForumQueryService } from '../../../modules/forum/index.js';
-import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
 
 interface OperatorSummaryServices {
   contentService: ContentQueryService;
@@ -21,23 +24,7 @@ interface OperatorSummaryServices {
   forumService: ForumQueryService;
 }
 
-function isKpaOperator(roles: string[] = [], userId: string = 'unknown'): boolean {
-  const hasKpaRole = hasAnyServiceRole(roles, [
-    'kpa:admin',
-    'kpa:operator',
-  ]);
-  if (hasKpaRole) return true;
-
-  // Detect and log legacy roles — DENY
-  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-  const detected = roles.filter(r => legacyRoles.includes(r));
-  if (detected.length > 0) {
-    detected.forEach(role => {
-      logLegacyRoleUsage(userId, role, 'operator-summary.controller:isKpaOperator');
-    });
-  }
-  return false;
-}
+const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
 
 export function createOperatorSummaryController(
   dataSource: DataSource,
@@ -46,23 +33,15 @@ export function createOperatorSummaryController(
   const router = Router();
   const { contentService, signageService, forumService } = services;
 
+  // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: Operator scope enforced at router level
+  router.use(authenticate);
+  router.use(requireKpaScope('kpa:operator'));
+
   /**
    * GET /operator/summary
    * 운영자 대시보드 통합 요약: Content + Signage + Forum
    */
-  router.get('/summary', authenticate, asyncHandler(async (req: Request, res: Response) => {
-    const authReq = req as AuthRequest;
-    const userId = authReq.user?.id || 'unknown';
-    const userRoles = authReq.user?.roles || [];
-
-    if (!isKpaOperator(userRoles, userId)) {
-      res.status(403).json({
-        success: false,
-        error: 'KPA operator role required',
-      });
-      return;
-    }
-
+  router.get('/summary', asyncHandler(async (req: Request, res: Response) => {
     // Parallel fetch: counts + recent items using existing QueryServices
     const [
       recentContent,
@@ -120,19 +99,7 @@ export function createOperatorSummaryController(
    * GET /operator/forum-analytics
    * 포럼 운영 통계: KPI 4개 + Top 5 활성 포럼 + 무활동 포럼
    */
-  router.get('/forum-analytics', authenticate, asyncHandler(async (req: Request, res: Response) => {
-    const authReq = req as AuthRequest;
-    const userId = authReq.user?.id || 'unknown';
-    const userRoles = authReq.user?.roles || [];
-
-    if (!isKpaOperator(userRoles, userId)) {
-      res.status(403).json({
-        success: false,
-        error: 'KPA operator role required',
-      });
-      return;
-    }
-
+  router.get('/forum-analytics', asyncHandler(async (req: Request, res: Response) => {
     const data = await forumService.getForumAnalytics();
     res.json({ success: true, data });
   }));

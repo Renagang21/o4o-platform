@@ -289,13 +289,12 @@ export class InstructorController extends BaseController {
       }
 
       // 강좌 소유권 확인
+      // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: platform:* → kpa:admin
       if (enrollment.course.instructorId !== userId) {
-        // platform:admin은 허용
-        const isPlatformAdmin = await roleAssignmentService.hasAnyRole(userId, [
-          'platform:admin',
-          'platform:super_admin',
+        const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, [
+          'kpa:admin',
         ]);
-        if (!isPlatformAdmin) {
+        if (!isKpaAdmin) {
           return BaseController.forbidden(res, '본인 강좌의 수강만 승인할 수 있습니다');
         }
       }
@@ -342,12 +341,12 @@ export class InstructorController extends BaseController {
       }
 
       // 강좌 소유권 확인
+      // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: platform:* → kpa:admin
       if (enrollment.course.instructorId !== userId) {
-        const isPlatformAdmin = await roleAssignmentService.hasAnyRole(userId, [
-          'platform:admin',
-          'platform:super_admin',
+        const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, [
+          'kpa:admin',
         ]);
-        if (!isPlatformAdmin) {
+        if (!isKpaAdmin) {
           return BaseController.forbidden(res, '본인 강좌의 수강만 거절할 수 있습니다');
         }
       }

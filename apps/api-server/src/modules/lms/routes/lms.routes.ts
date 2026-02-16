@@ -15,10 +15,13 @@ import { QuizCampaignController } from '../controllers/QuizCampaignController.js
 import { SurveyCampaignController } from '../controllers/SurveyCampaignController.js';
 // WO-LMS-INSTRUCTOR-ROLE-V1
 import { InstructorController } from '../controllers/InstructorController.js';
-import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
+import { requireAuth } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
+// WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: KPA scope guard replaces legacy requireKpaAdmin
+import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+const requireKpaAdmin = createServiceScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin');
 
 const router: Router = Router();
 
@@ -131,7 +134,7 @@ router.post('/progress/:id/submit-quiz', requireAuth, asyncHandler(ProgressContr
 // ========================================
 
 // POST /api/v1/lms/certificates/issue - Issue Certificate
-router.post('/certificates/issue', requireAuth, requireAdmin, asyncHandler(CertificateController.issueCertificate));
+router.post('/certificates/issue', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.issueCertificate));
 
 // GET /api/v1/lms/certificates - List Certificates
 router.get('/certificates', requireAuth, asyncHandler(CertificateController.listCertificates));
@@ -149,13 +152,13 @@ router.get('/certificates/number/:certificateNumber', requireAuth, asyncHandler(
 router.get('/certificates/:id', requireAuth, asyncHandler(CertificateController.getCertificate));
 
 // PATCH /api/v1/lms/certificates/:id - Update Certificate
-router.patch('/certificates/:id', requireAuth, requireAdmin, asyncHandler(CertificateController.updateCertificate));
+router.patch('/certificates/:id', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.updateCertificate));
 
 // POST /api/v1/lms/certificates/:id/revoke - Revoke Certificate
-router.post('/certificates/:id/revoke', requireAuth, requireAdmin, asyncHandler(CertificateController.revokeCertificate));
+router.post('/certificates/:id/revoke', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.revokeCertificate));
 
 // POST /api/v1/lms/certificates/:id/renew - Renew Certificate
-router.post('/certificates/:id/renew', requireAuth, requireAdmin, asyncHandler(CertificateController.renewCertificate));
+router.post('/certificates/:id/renew', requireAuth, requireKpaAdmin, asyncHandler(CertificateController.renewCertificate));
 
 // ========================================
 // EVENTS ROUTES
@@ -457,13 +460,13 @@ router.post('/marketing/survey-campaigns/:id/completed', requireAuth, asyncHandl
 router.post('/instructor/apply', requireAuth, asyncHandler(InstructorController.apply));
 
 // GET /api/v1/lms/instructor/applications - List Instructor Applications (Admin)
-router.get('/instructor/applications', requireAdmin, asyncHandler(InstructorController.listApplications));
+router.get('/instructor/applications', requireKpaAdmin, asyncHandler(InstructorController.listApplications));
 
 // POST /api/v1/lms/instructor/applications/:id/approve - Approve Application (Admin)
-router.post('/instructor/applications/:id/approve', requireAdmin, asyncHandler(InstructorController.approveApplication));
+router.post('/instructor/applications/:id/approve', requireKpaAdmin, asyncHandler(InstructorController.approveApplication));
 
 // POST /api/v1/lms/instructor/applications/:id/reject - Reject Application (Admin)
-router.post('/instructor/applications/:id/reject', requireAdmin, asyncHandler(InstructorController.rejectApplication));
+router.post('/instructor/applications/:id/reject', requireKpaAdmin, asyncHandler(InstructorController.rejectApplication));
 
 // GET /api/v1/lms/instructor/courses - My Courses (Instructor)
 router.get('/instructor/courses', requireAuth, requireInstructor, asyncHandler(InstructorController.myCourses));

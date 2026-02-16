@@ -72,6 +72,9 @@ import { AdminRoutes } from './routes/AdminRoutes';
 // Operator Routes (서비스 운영자)
 import { OperatorRoutes } from './routes/OperatorRoutes';
 
+// Hub Page (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
+import { HubPage } from './pages/hub';
+
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
 
@@ -189,6 +192,56 @@ function RoleBasedHome() {
   }, [user, navigate]);
 
   return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
+}
+
+/**
+ * WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1
+ * Hub Guard: kpa:operator 이상 역할 필요
+ */
+function HubGuard({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+        <p style={{ fontSize: '18px', color: '#0F172A', fontWeight: 600 }}>로그인이 필요합니다</p>
+        <p style={{ color: '#64748B', marginTop: '8px' }}>운영 허브에 접근하려면 로그인이 필요합니다.</p>
+        <button
+          style={{ marginTop: '20px', padding: '10px 24px', backgroundColor: '#2563EB', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
+          onClick={() => navigate('/login', { state: { from: '/hub' } })}
+        >
+          로그인하기
+        </button>
+      </div>
+    );
+  }
+
+  const hasAccess = user.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
+  if (!hasAccess) {
+    return (
+      <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+        <p style={{ fontSize: '18px', color: '#0F172A', fontWeight: 600 }}>접근 권한이 없습니다</p>
+        <p style={{ color: '#64748B', marginTop: '8px' }}>운영자 권한이 필요합니다.</p>
+        <button
+          style={{ marginTop: '20px', padding: '10px 24px', backgroundColor: '#E2E8F0', color: '#334155', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
+          onClick={() => navigate('/')}
+        >
+          홈으로 돌아가기
+        </button>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 }
 
 function FunctionGateRedirect() {
@@ -393,6 +446,8 @@ function App() {
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
+          {/* Hub (통합 운영 허브 - WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubPage /></HubGuard></Layout>} />
           {/* Operator Routes (서비스 운영자 - 독립 마운트, WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />

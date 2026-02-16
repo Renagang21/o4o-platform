@@ -2,16 +2,16 @@
  * Organization Join Request Controller
  *
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
- * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 1: KPA Migration)
+ * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: requireKpaScope 표준화
  *
  * 조직 가입 / 역할 승격 / 운영자 요청 API
  *
  * Endpoints:
  * - POST   /                 요청 생성 (인증 필수)
  * - GET    /my               내 요청 목록
- * - GET    /pending          운영자용 대기 목록
- * - PATCH  /:id/approve      승인
- * - PATCH  /:id/reject       반려
+ * - GET    /pending          운영자용 대기 목록 (kpa:admin)
+ * - PATCH  /:id/approve      승인 (kpa:admin)
+ * - PATCH  /:id/reject       반려 (kpa:admin)
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -27,49 +27,9 @@ import { User } from '../../../modules/auth/entities/User.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
 import logger from '../../../utils/logger.js';
-import { isServiceOperator, logLegacyRoleUsage } from '../../../utils/role.utils.js';
 
 const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator', 'pharmacy_join', 'pharmacy_operator'];
 const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator'];
-
-/**
- * RBAC 검사: admin 또는 kpa operator 여부
- *
- * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1:
- * - KPA prefixed roles ONLY (kpa:admin, kpa:operator)
- * - Legacy role backward compatibility 제거
- * - Cross-service roles (platform:*) 거부
- */
-function isAdminOrOperator(user: any): boolean {
-  const userId = user.id || 'unknown';
-  const userRoles: string[] = user.roles || [];
-  const userScopes: string[] = user.scopes || [];
-
-  // Check KPA prefixed roles ONLY
-  const hasKpaOperatorRole = isServiceOperator(userRoles, 'kpa');
-  if (hasKpaOperatorRole) {
-    return true;
-  }
-
-  // Check scopes (JWT-based, already service-specific)
-  const hasOperatorScope = userScopes.some(
-    (s: string) => s.includes(':admin') || s.includes(':operator')
-  );
-  if (hasOperatorScope) {
-    return true;
-  }
-
-  // Detect and DENY legacy roles
-  const legacyRoles = ['admin', 'super_admin', 'operator'];
-  const detectedLegacyRoles = userRoles.filter(r => legacyRoles.includes(r));
-  if (detectedLegacyRoles.length > 0) {
-    detectedLegacyRoles.forEach(role => {
-      logLegacyRoleUsage(userId, role, 'organization-join-request.controller');
-    });
-  }
-
-  return false;
-}
 
 /**
  * Create Organization Join Request Routes
@@ -288,20 +248,11 @@ export function createOrganizationJoinRequestRoutes(
   });
 
   // =========================================================================
-  // GET /pending — 운영자용 대기 목록
+  // GET /pending — 관리자용 대기 목록 (kpa:admin scope)
+  // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: inline guard → requireScope
   // =========================================================================
-  router.get('/pending', async (req: Request, res: Response) => {
+  router.get('/pending', requireScope('kpa:admin'), async (req: Request, res: Response) => {
     try {
-      const user = (req as any).user;
-
-      if (!isAdminOrOperator(user)) {
-        return res.status(403).json({
-          success: false,
-          error: '운영자 또는 관리자 권한이 필요합니다.',
-          code: 'FORBIDDEN',
-        });
-      }
-
       const { organizationId, page = '1', limit = '20' } = req.query;
       const pageNum = parseInt(page as string) || 1;
       const limitNum = Math.min(parseInt(limit as string) || 20, 100);
@@ -346,18 +297,9 @@ export function createOrganizationJoinRequestRoutes(
   // =========================================================================
   // PATCH /:id/approve — 승인
   // =========================================================================
-  router.patch('/:id/approve', async (req: Request, res: Response) => {
+  router.patch('/:id/approve', requireScope('kpa:admin'), async (req: Request, res: Response) => {
     try {
       const user = (req as any).user;
-
-      if (!isAdminOrOperator(user)) {
-        return res.status(403).json({
-          success: false,
-          error: '운영자 또는 관리자 권한이 필요합니다.',
-          code: 'FORBIDDEN',
-        });
-      }
-
       const { id } = req.params;
       const { reviewNote } = req.body;
 
@@ -476,18 +418,9 @@ export function createOrganizationJoinRequestRoutes(
   // =========================================================================
   // PATCH /:id/reject — 반려
   // =========================================================================
-  router.patch('/:id/reject', async (req: Request, res: Response) => {
+  router.patch('/:id/reject', requireScope('kpa:admin'), async (req: Request, res: Response) => {
     try {
       const user = (req as any).user;
-
-      if (!isAdminOrOperator(user)) {
-        return res.status(403).json({
-          success: false,
-          error: '운영자 또는 관리자 권한이 필요합니다.',
-          code: 'FORBIDDEN',
-        });
-      }
-
       const { id } = req.params;
       const { reviewNote } = req.body;
 

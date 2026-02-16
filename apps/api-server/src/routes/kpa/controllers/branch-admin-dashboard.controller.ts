@@ -2,7 +2,7 @@
  * KPA Branch Admin Dashboard Controller
  *
  * WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1: 분회 운영자용 대시보드 API
- * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 1: KPA Migration)
+ * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: requireKpaScope 표준화
  * - 분회 단위 통계 제공
  * - 소속 분회 범위 내 데이터만 조회
  * - "요약 → 이동" 패턴 지원
@@ -19,7 +19,7 @@ import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
 import { KpaBranchSettings } from '../entities/kpa-branch-settings.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole, hasRoleCompat, logLegacyRoleUsage } from '../../../utils/role.utils.js';
+import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
 
 type AuthMiddleware = RequestHandler;
 
@@ -41,56 +41,7 @@ interface RecentActivity {
   status: 'pending' | 'completed' | 'rejected';
 }
 
-/**
- * Check if user has branch admin/operator role
- *
- * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.1: KPA District/Branch)
- * - **KPA 조직 서비스는 오직 KPA role만 신뢰**
- * - Priority 1: KPA prefixed roles ONLY (kpa:branch_admin, kpa:branch_operator, kpa:admin, kpa:operator)
- * - Priority 2: Legacy role detection → Log + DENY
- * - platform:admin 자동 허용 제거 (KPA 조직 격리)
- */
-function isBranchOperator(roles: string[] = [], userId: string = 'unknown'): boolean {
-  // Priority 1: Check KPA-specific prefixed roles ONLY
-  const hasKpaRole = hasAnyServiceRole(roles, [
-    'kpa:branch_admin',
-    'kpa:branch_operator',
-    'kpa:admin',
-    'kpa:operator'
-  ]);
-
-  if (hasKpaRole) {
-    return true;
-  }
-
-  // Priority 2: Detect legacy roles and DENY access
-  const legacyRoles = ['branch_admin', 'branch_operator', 'admin', 'operator', 'super_admin'];
-  const detectedLegacyRoles = roles.filter(r => legacyRoles.includes(r));
-
-  if (detectedLegacyRoles.length > 0) {
-    // Log legacy role usage and deny access
-    detectedLegacyRoles.forEach(role => {
-      logLegacyRoleUsage(userId, role, 'branch-admin-dashboard.controller:isBranchOperator');
-    });
-    return false; // ❌ DENY - Legacy roles no longer grant access
-  }
-
-  // Detect platform/other service roles and deny
-  const hasOtherServiceRole = roles.some(r =>
-    r.startsWith('platform:') ||
-    r.startsWith('neture:') ||
-    r.startsWith('glycopharm:') ||
-    r.startsWith('cosmetics:') ||
-    r.startsWith('glucoseview:')
-  );
-
-  if (hasOtherServiceRole) {
-    // Platform/other service admins do NOT have KPA organization access
-    return false; // ❌ DENY - KPA organization requires kpa:* roles
-  }
-
-  return false;
-}
+const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
 
 /**
  * Get user's organization ID from membership
@@ -111,6 +62,11 @@ export function createBranchAdminDashboardController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
+
+  // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: Branch scope enforced at router level
+  router.use(requireAuth);
+  router.use(requireKpaScope('kpa:branch_admin'));
+
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   // WO-KPA-C-BRANCH-CMS-HARDENING-V1: audit log helper
@@ -138,12 +94,11 @@ export function createBranchAdminDashboardController(
    */
   router.get(
     '/dashboard/stats',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
 
         if (!userId) {
           res.status(401).json({
@@ -153,12 +108,7 @@ export function createBranchAdminDashboardController(
         }
 
         // Check branch operator permission
-        if (!isBranchOperator(userRoles, userId)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
-          });
-          return;
-        }
+
 
         // Get user's organization
         const organizationId = await getUserOrganizationId(dataSource, userId);
@@ -214,12 +164,11 @@ export function createBranchAdminDashboardController(
    */
   router.get(
     '/dashboard/activities',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
 
         if (!userId) {
           res.status(401).json({
@@ -228,12 +177,7 @@ export function createBranchAdminDashboardController(
           return;
         }
 
-        if (!isBranchOperator(userRoles, userId)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
-          });
-          return;
-        }
+
 
         // Get user's organization
         const organizationId = await getUserOrganizationId(dataSource, userId);
@@ -277,12 +221,11 @@ export function createBranchAdminDashboardController(
    */
   router.get(
     '/dashboard/members',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
 
         if (!userId) {
           res.status(401).json({
@@ -291,12 +234,7 @@ export function createBranchAdminDashboardController(
           return;
         }
 
-        if (!isBranchOperator(userRoles, userId)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Branch operator role required' },
-          });
-          return;
-        }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
 
@@ -356,14 +294,13 @@ export function createBranchAdminDashboardController(
   /** GET /branch-admin/news — list news for branch */
   router.get(
     '/news',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.json({ success: true, data: [] }); return; }
@@ -395,14 +332,13 @@ export function createBranchAdminDashboardController(
   /** POST /branch-admin/news — create news */
   router.post(
     '/news',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -434,14 +370,13 @@ export function createBranchAdminDashboardController(
   /** PATCH /branch-admin/news/:id — update news */
   router.patch(
     '/news/:id',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -470,14 +405,13 @@ export function createBranchAdminDashboardController(
   /** DELETE /branch-admin/news/:id — delete news */
   router.delete(
     '/news/:id',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -504,14 +438,13 @@ export function createBranchAdminDashboardController(
   /** GET /branch-admin/officers — list officers */
   router.get(
     '/officers',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.json({ success: true, data: [] }); return; }
@@ -532,14 +465,13 @@ export function createBranchAdminDashboardController(
   /** POST /branch-admin/officers — create officer */
   router.post(
     '/officers',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -572,14 +504,13 @@ export function createBranchAdminDashboardController(
   /** PATCH /branch-admin/officers/:id — update officer */
   router.patch(
     '/officers/:id',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -608,14 +539,13 @@ export function createBranchAdminDashboardController(
   /** DELETE /branch-admin/officers/:id — delete officer */
   router.delete(
     '/officers/:id',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -642,14 +572,13 @@ export function createBranchAdminDashboardController(
   /** GET /branch-admin/docs — list docs */
   router.get(
     '/docs',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.json({ success: true, data: [] }); return; }
@@ -680,14 +609,13 @@ export function createBranchAdminDashboardController(
   /** POST /branch-admin/docs — create doc */
   router.post(
     '/docs',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -720,14 +648,13 @@ export function createBranchAdminDashboardController(
   /** PATCH /branch-admin/docs/:id — update doc */
   router.patch(
     '/docs/:id',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -754,14 +681,13 @@ export function createBranchAdminDashboardController(
   /** DELETE /branch-admin/docs/:id — delete doc */
   router.delete(
     '/docs/:id',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -788,14 +714,13 @@ export function createBranchAdminDashboardController(
   /** GET /branch-admin/settings — get branch settings */
   router.get(
     '/settings',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -824,14 +749,13 @@ export function createBranchAdminDashboardController(
   /** PATCH /branch-admin/settings — update branch settings */
   router.patch(
     '/settings',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
@@ -863,14 +787,13 @@ export function createBranchAdminDashboardController(
   /** PATCH /branch-admin/settings/status — update branch active status */
   router.patch(
     '/settings/status',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
+
         if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
-        if (!isBranchOperator(userRoles, userId)) { res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Branch operator role required' } }); return; }
+
 
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }

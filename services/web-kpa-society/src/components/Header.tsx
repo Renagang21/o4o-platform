@@ -79,6 +79,7 @@ const menuItems: MenuItem[] = [
   { label: '약국경영', href: '/pharmacy' },
   { label: '분회 서비스', href: '/branch-services' },
   { label: '지부/분회 서비스 데모', href: '/demo' },
+  { label: '허브', href: '/hub' },  // WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1
 ];
 
 export function Header({ serviceName }: { serviceName: string }) {
@@ -94,9 +95,12 @@ export function Header({ serviceName }: { serviceName: string }) {
   const accessibleDashboards = useAccessibleDashboards();
 
   // 약국경영 메뉴: pharmacy context가 있을 때만 노출
+  // 허브 메뉴: kpa:operator 이상만 노출 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
   const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
+  const hasHubAccess = user?.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/pharmacy') return hasPharmacyContext;
+    if (item.href === '/hub') return hasHubAccess;
     return true;
   });
 
