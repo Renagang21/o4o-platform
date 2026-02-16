@@ -418,8 +418,13 @@ function App() {
             {/* ================================================================
                 Admin Vault (/admin-vault) - 설계 보호 구역
                 WO-O4O-ADMIN-VAULT-ACCESS-V1
+                WO-SECURITY-NETURE-GUARD-FIX-V1: admin 역할 보호 추가
             ================================================================ */}
-            <Route element={<AdminVaultLayout />}>
+            <Route element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminVaultLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/admin-vault" element={<VaultOverviewPage />} />
               <Route path="/admin-vault/docs" element={<VaultDocsPage />} />
               <Route path="/admin-vault/architecture" element={<VaultArchitecturePage />} />
@@ -502,8 +507,13 @@ function App() {
 
             {/* ================================================================
                 Admin Dashboard (/workspace/admin/*)
+                WO-SECURITY-NETURE-GUARD-FIX-V1: admin 역할 보호 추가
             ================================================================ */}
-            <Route element={<SupplierOpsLayout />}>
+            <Route element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <SupplierOpsLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/workspace/admin" element={<AdminDashboardPage />} />
               <Route path="/workspace/admin/ai-card-rules" element={<AiCardExplainPage />} />
               <Route path="/workspace/admin/ai-card-report" element={<AiCardReportPage />} />
@@ -528,9 +538,10 @@ function App() {
             {/* ================================================================
                 Operator Dashboard (/workspace/operator/*)
                 WO-OPERATOR-GUARD-UNIFICATION-P0: ProtectedRoute 가드 적용
+                WO-SECURITY-NETURE-GUARD-FIX-V1: admin + operator 허용
             ================================================================ */}
             <Route element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'operator']}>
                 <SupplierOpsLayout />
               </ProtectedRoute>
             }>
