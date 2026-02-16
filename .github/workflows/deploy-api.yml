@@ -79,6 +79,7 @@ jobs:
         echo "📦 Infrastructure..."
         pnpm --filter '@o4o/cpt-registry' run build
         pnpm --filter '@o4o/ai-core' run build
+        pnpm --filter '@o4o/security-core' run build
         pnpm --filter '@o4o/store-core' run build
 
         # Domain Core (depends on infrastructure)

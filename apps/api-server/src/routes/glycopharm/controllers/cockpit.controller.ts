@@ -753,8 +753,8 @@ export function createCockpitController(
             summaryEngine.getLastMonthRevenue(pharmacy.id),
           ]);
           storeKpi = {
-            orderCount: summary.totalOrders ?? 0,
-            revenue: summary.totalRevenue ?? 0,
+            orderCount: summary.stats.totalOrders ?? 0,
+            revenue: summary.stats.monthlyRevenue ?? 0,
             lastMonthRevenue: lastMonthRevenue ?? 0,
           };
         } catch { /* store KPI optional */ }

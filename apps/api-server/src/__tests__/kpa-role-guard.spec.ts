@@ -85,38 +85,33 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
     });
   });
 
-  // Verify the actual file contains the expected role list
-  it('kpa.routes.ts contains frozen requireKpaScope role list', () => {
+  // Verify kpa.routes.ts uses security-core guard with KPA_SCOPE_CONFIG
+  it('kpa.routes.ts uses createServiceScopeGuard(KPA_SCOPE_CONFIG)', () => {
     const filePath = path.resolve(__dirname, '../routes/kpa/kpa.routes.ts');
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // The exact pattern from the guard function
-    for (const role of KPA_SCOPE_ALLOWED_ROLES) {
-      expect(content).toContain(`'${role}'`);
-    }
-
-    // Verify platform:admin is NOT in the hasAnyServiceRole allowed list
-    // Extract the requireKpaScope function body (up to next top-level function)
-    const funcStart = content.indexOf('function requireKpaScope');
-    const funcEnd = content.indexOf('\nfunction ', funcStart + 1);
-    const scopeBlock = content.slice(funcStart, funcEnd > funcStart ? funcEnd : funcStart + 2000);
-
-    // The first hasAnyServiceRole call is the allowed-role list
-    const hasAnyCall = scopeBlock.match(
-      /hasAnyServiceRole\(userRoles,\s*\[([\s\S]*?)\]\)/
-    );
-    expect(hasAnyCall).not.toBeNull();
-    expect(hasAnyCall![1]).not.toContain('platform:');
+    // Must import from security-core
+    expect(content).toContain(`from '@o4o/security-core'`);
+    expect(content).toContain('createServiceScopeGuard');
+    expect(content).toContain('KPA_SCOPE_CONFIG');
   });
 
-  // Verify denied service prefixes are checked
-  it('kpa.routes.ts blocks other service prefixes', () => {
-    const filePath = path.resolve(__dirname, '../routes/kpa/kpa.routes.ts');
-    const content = fs.readFileSync(filePath, 'utf8');
+  // Verify KPA_SCOPE_CONFIG has correct allowed roles and platform bypass
+  it('KPA_SCOPE_CONFIG contains frozen role list and blocks platform bypass', () => {
+    const { KPA_SCOPE_CONFIG } = require('@o4o/security-core');
 
-    const blockedPrefixes = ['platform:', 'neture:', 'glycopharm:', 'cosmetics:', 'glucoseview:'];
-    for (const prefix of blockedPrefixes) {
-      expect(content).toContain(`r.startsWith('${prefix}')`);
+    // All expected roles must be in allowedRoles
+    for (const role of KPA_SCOPE_ALLOWED_ROLES) {
+      expect(KPA_SCOPE_CONFIG.allowedRoles).toContain(role);
+    }
+
+    // Platform bypass must be disabled (organizational isolation)
+    expect(KPA_SCOPE_CONFIG.platformBypass).toBe(false);
+
+    // Blocked service prefixes must include other services
+    const expectedBlocked = ['neture', 'glycopharm', 'cosmetics', 'glucoseview'];
+    for (const prefix of expectedBlocked) {
+      expect(KPA_SCOPE_CONFIG.blockedServicePrefixes).toContain(prefix);
     }
   });
 });
@@ -162,44 +157,27 @@ describe('isBranchOperator role matrix (KPA-c)', () => {
     });
   });
 
-  // Verify the actual file contains the expected role list
-  it('branch-admin-dashboard.controller.ts contains frozen isBranchOperator role list', () => {
+  // Verify branch-admin-dashboard uses security-core guard
+  it('branch-admin-dashboard.controller.ts uses createServiceScopeGuard(KPA_SCOPE_CONFIG)', () => {
     const filePath = path.resolve(
       __dirname,
       '../routes/kpa/controllers/branch-admin-dashboard.controller.ts'
     );
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // Find the isBranchOperator function's hasAnyServiceRole call
-    const funcBlock = content.slice(
-      content.indexOf('function isBranchOperator'),
-      content.indexOf('function isBranchOperator') + 600
-    );
-    const hasAnyCall = funcBlock.match(
-      /hasAnyServiceRole\(roles,\s*\[([\s\S]*?)\]\)/
-    );
-    expect(hasAnyCall).not.toBeNull();
-
-    // Verify all expected roles are present
-    for (const role of BRANCH_ALLOWED_ROLES) {
-      expect(hasAnyCall![1]).toContain(`'${role}'`);
-    }
-
-    // Verify platform:* is NOT in the allowed list
-    expect(hasAnyCall![1]).not.toContain('platform:');
+    // Must import from security-core
+    expect(content).toContain(`from '@o4o/security-core'`);
+    expect(content).toContain('createServiceScopeGuard');
+    expect(content).toContain('KPA_SCOPE_CONFIG');
   });
 
-  // Verify denied service prefixes are checked
-  it('branch-admin-dashboard.controller.ts blocks other service prefixes', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../routes/kpa/controllers/branch-admin-dashboard.controller.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
+  // Verify KPA_SCOPE_CONFIG blocks other service prefixes (shared with KPA-a)
+  it('KPA_SCOPE_CONFIG blocks other service prefixes', () => {
+    const { KPA_SCOPE_CONFIG } = require('@o4o/security-core');
 
-    const blockedPrefixes = ['platform:', 'neture:', 'glycopharm:', 'cosmetics:', 'glucoseview:'];
-    for (const prefix of blockedPrefixes) {
-      expect(content).toContain(`r.startsWith('${prefix}')`);
+    const expectedBlocked = ['neture', 'glycopharm', 'cosmetics', 'glucoseview'];
+    for (const prefix of expectedBlocked) {
+      expect(KPA_SCOPE_CONFIG.blockedServicePrefixes).toContain(prefix);
     }
   });
 });
