@@ -75,6 +75,8 @@ import { createPharmacyProductsController } from './controllers/pharmacy-product
 import { createAssetSnapshotController } from './controllers/asset-snapshot.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
+import { KpaMember } from './entities/kpa-member.entity.js';
+import { KpaOrganization } from './entities/kpa-organization.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
@@ -179,6 +181,42 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));
+
+  // ============================================================================
+  // Membership Query — /api/v1/kpa/me/membership
+  // WO-KPA-BRANCH-SCOPE-VALIDATION-V1: User's KPA membership info for branch scope validation
+  // ============================================================================
+  router.get('/me/membership', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+      return;
+    }
+
+    const memberRepo = dataSource.getRepository(KpaMember);
+    const member = await memberRepo.findOne({ where: { user_id: userId } });
+
+    if (!member) {
+      res.json({ success: true, data: null });
+      return;
+    }
+
+    const orgRepo = dataSource.getRepository(KpaOrganization);
+    const org = await orgRepo.findOne({ where: { id: member.organization_id } });
+
+    res.json({
+      success: true,
+      data: {
+        userId,
+        organizationId: member.organization_id,
+        organizationType: org?.type || null,
+        organizationName: org?.name || null,
+        parentId: org?.parent_id || null,
+        role: member.role,
+        status: member.status,
+      },
+    });
+  }));
 
   // ============================================================================
   // PUBLIC / MIXED ROUTES — optionalAuth or mixed auth levels
