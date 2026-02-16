@@ -130,8 +130,12 @@ function AppRoutes() {
         </PendingRoute>
       } />
 
-      {/* 관리자 페이지 */}
-      <Route path="/admin" element={<AdminPage />} />
+      {/* 관리자 페이지 — WO-SECURITY-GLUCOSEVIEW-GUARD-FIX-V1: admin 역할 보호 */}
+      <Route path="/admin" element={
+        <RoleProtectedRoute allowedRoles={['admin']}>
+          <AdminPage />
+        </RoleProtectedRoute>
+      } />
 
       {/* 서비스 신청 페이지 (Phase C-4) */}
       <Route path="/apply" element={<ApplyPage />} />
@@ -144,8 +148,12 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* 운영자 페이지 (Phase C-4) */}
-      <Route path="/operator/glucoseview" element={<OperatorLayout />}>
+      {/* 운영자 페이지 (Phase C-4) — WO-SECURITY-GLUCOSEVIEW-GUARD-FIX-V1: admin+operator 보호 */}
+      <Route path="/operator/glucoseview" element={
+        <RoleProtectedRoute allowedRoles={['admin', 'operator']}>
+          <OperatorLayout />
+        </RoleProtectedRoute>
+      }>
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="applications/:id" element={<OperatorApplicationDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
