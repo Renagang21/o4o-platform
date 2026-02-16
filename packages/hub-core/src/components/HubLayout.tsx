@@ -41,6 +41,7 @@ export function HubLayout({
   sections,
   userRoles,
   onCardClick,
+  onActionTrigger,
   signals,
   beforeSections,
   afterSections,
@@ -72,6 +73,7 @@ export function HubLayout({
           cards={section.cards}
           signals={signals}
           onCardClick={onCardClick}
+          onActionTrigger={onActionTrigger}
         />
       ))}
 

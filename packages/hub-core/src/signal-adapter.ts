@@ -10,7 +10,7 @@
  *   );
  */
 
-import type { HubSignal } from './types.js';
+import type { HubSignal, HubAction } from './types.js';
 
 /**
  * HubSignal 생성 헬퍼
@@ -24,6 +24,29 @@ export function createSignal(
     label: opts?.label,
     count: opts?.count,
     pulse: opts?.pulse,
+  };
+}
+
+/**
+ * QuickAction이 포함된 HubSignal 생성
+ *
+ * WO-PLATFORM-AI-HUB-ASSETCOPY-INTEGRATION-V1
+ */
+export function createActionSignal(
+  level: HubSignal['level'],
+  opts: {
+    label?: string;
+    count?: number;
+    pulse?: boolean;
+    action: HubAction;
+  },
+): HubSignal {
+  return {
+    level,
+    label: opts.label,
+    count: opts.count,
+    pulse: opts.pulse,
+    action: opts.action,
   };
 }
 

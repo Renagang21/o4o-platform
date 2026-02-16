@@ -15,6 +15,8 @@ export type {
   HubSectionDefinition,
   HubLayoutProps,
   HubSignal,
+  HubAction,
+  HubActionResult,
 } from './types.js';
 
 // Components
@@ -24,4 +26,4 @@ export { HubCard } from './components/HubCard.js';
 
 // Utilities
 export { filterCardsByRole, filterSectionsByRole } from './role-filter.js';
-export { createSignal, mergeSignals } from './signal-adapter.js';
+export { createSignal, createActionSignal, mergeSignals } from './signal-adapter.js';

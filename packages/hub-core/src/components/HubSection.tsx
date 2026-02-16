@@ -4,7 +4,7 @@
  * WO-PLATFORM-HUB-CORE-EXTRACTION-V1
  */
 
-import type { HubCardDefinition, HubSignal } from '../types.js';
+import type { HubCardDefinition, HubSignal, HubActionResult } from '../types.js';
 import { HubCard } from './HubCard.js';
 
 interface HubSectionProps {
@@ -13,9 +13,10 @@ interface HubSectionProps {
   cards: HubCardDefinition[];
   signals?: Record<string, HubSignal>;
   onCardClick?: (href: string) => void;
+  onActionTrigger?: (key: string, payload?: Record<string, unknown>) => Promise<HubActionResult>;
 }
 
-export function HubSection({ title, badge, cards, signals, onCardClick }: HubSectionProps) {
+export function HubSection({ title, badge, cards, signals, onCardClick, onActionTrigger }: HubSectionProps) {
   if (cards.length === 0) return null;
 
   return (
@@ -31,6 +32,7 @@ export function HubSection({ title, badge, cards, signals, onCardClick }: HubSec
             card={card}
             signal={card.signalKey ? signals?.[card.signalKey] : undefined}
             onClick={onCardClick}
+            onActionTrigger={onActionTrigger}
           />
         ))}
       </div>

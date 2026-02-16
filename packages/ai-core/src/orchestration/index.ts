@@ -35,6 +35,10 @@ export type {
   UsagePolicy,
 } from './types.js';
 
+// Action Keys (Hub ↔ AI ↔ Executor 통합 키)
+export { ACTION_KEYS } from './action-keys.js';
+export type { ActionKey } from './action-keys.js';
+
 // Building blocks (for advanced usage / testing)
 export { buildContext } from './context-builder.js';
 export { composePrompt } from './prompt-composer.js';

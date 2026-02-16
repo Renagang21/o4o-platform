@@ -28,6 +28,33 @@ export interface HubSignal {
   count?: number;
   /** 펄스 애니메이션 활성화 */
   pulse?: boolean;
+  /** QuickAction — 신호에 연결된 실행 가능 액션 */
+  action?: HubAction;
+}
+
+/**
+ * Hub QuickAction — 신호 기반 실행 가능 액션
+ *
+ * WO-PLATFORM-AI-HUB-ASSETCOPY-INTEGRATION-V1
+ *
+ * AI가 판단한 추천 행동을 Hub 카드에 버튼으로 표시한다.
+ * 실행 권한은 서버에서 검증 — Hub는 순수 UI.
+ */
+export interface HubAction {
+  /** 액션 키 — ACTION_KEYS 상수 사용 (예: 'asset.copy.cms') */
+  key: string;
+  /** 버튼 라벨 (예: "콘텐츠 복제") */
+  buttonLabel: string;
+  /** 실행에 필요한 추가 데이터 */
+  payload?: Record<string, unknown>;
+}
+
+/**
+ * QuickAction 실행 결과
+ */
+export interface HubActionResult {
+  success: boolean;
+  message?: string;
 }
 
 /**
@@ -86,6 +113,8 @@ export interface HubLayoutProps {
   userRoles: string[];
   /** 카드 클릭 핸들러 — 기본: window.location.href */
   onCardClick?: (href: string) => void;
+  /** QuickAction 트리거 핸들러 — 서비스별 HubPage에서 구현 */
+  onActionTrigger?: (key: string, payload?: Record<string, unknown>) => Promise<HubActionResult>;
   /** 카드별 신호 데이터 — card.signalKey로 매핑 */
   signals?: Record<string, HubSignal>;
   /** 섹션 전/후에 추가 렌더링 */
