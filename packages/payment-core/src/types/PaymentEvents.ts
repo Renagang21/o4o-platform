@@ -1,7 +1,7 @@
 /**
- * Payment Core v0.1 - Event Definitions
+ * Payment Core - Event Definitions
  *
- * WO-O4O-PAYMENT-CORE-V0.1
+ * WO-O4O-PAYMENT-CORE-SCAFFOLD-V1
  *
  * 결제 이벤트 타입 정의
  *
@@ -15,11 +15,6 @@
 // Event Types
 // =============================================================================
 
-/**
- * Payment Core 이벤트 타입
- *
- * v0.1 최소 집합: initiated, confirmed, completed, failed
- */
 export enum PaymentEventType {
   /** 결제 요청 생성됨 */
   PAYMENT_INITIATED = 'payment.initiated',
@@ -42,6 +37,9 @@ export enum PaymentEventType {
 
   /** 결제 취소 */
   PAYMENT_CANCELLED = 'payment.cancelled',
+
+  /** 환불 완료 */
+  PAYMENT_REFUNDED = 'payment.refunded',
 }
 
 // =============================================================================
@@ -58,12 +56,14 @@ export interface PaymentEventBase {
   paymentId: string;
   /** 트랜잭션 ID */
   transactionId: string;
-  /** 주문 ID */
+  /** 주문 참조 ID */
   orderId: string;
   /** 이벤트 발생 시각 */
   timestamp: Date;
+  /** 서비스 키 */
+  sourceService: string;
   /** 추가 메타데이터 */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -107,12 +107,6 @@ export interface PaymentConfirmedEvent extends PaymentEventBase {
  * 결제 완료 이벤트
  *
  * ⭐ 핵심 이벤트: Extension App이 구독하는 최종 이벤트
- *
- * 이 이벤트를 받으면 Extension App은 각자의 비즈니스 로직 수행:
- * - 재고 감소
- * - 배송 준비
- * - 알림 발송
- * - 정산 데이터 생성
  */
 export interface PaymentCompletedEvent extends PaymentEventBase {
   eventType: PaymentEventType.PAYMENT_COMPLETED;
@@ -158,6 +152,19 @@ export interface PaymentCancelledEvent extends PaymentEventBase {
   cancelledAt: Date;
 }
 
+/**
+ * 환불 완료 이벤트
+ */
+export interface PaymentRefundedEvent extends PaymentEventBase {
+  eventType: PaymentEventType.PAYMENT_REFUNDED;
+  /** 환불 금액 */
+  refundAmount: number;
+  /** 환불 사유 */
+  refundReason?: string;
+  /** 환불 일시 */
+  refundedAt: Date;
+}
+
 // =============================================================================
 // Union Type
 // =============================================================================
@@ -171,7 +178,8 @@ export type PaymentEvent =
   | PaymentConfirmedEvent
   | PaymentCompletedEvent
   | PaymentFailedEvent
-  | PaymentCancelledEvent;
+  | PaymentCancelledEvent
+  | PaymentRefundedEvent;
 
 // =============================================================================
 // Event Subscription Types
@@ -181,7 +189,7 @@ export type PaymentEvent =
  * 이벤트 핸들러 타입
  */
 export type PaymentEventHandler<T extends PaymentEvent = PaymentEvent> = (
-  event: T
+  event: T,
 ) => void | Promise<void>;
 
 /**
@@ -190,7 +198,7 @@ export type PaymentEventHandler<T extends PaymentEvent = PaymentEvent> = (
 export interface PaymentEventSubscriptionOptions {
   /** 이벤트 타입 필터 */
   eventTypes?: PaymentEventType[];
-  /** 주문 ID 필터 */
+  /** 주문 참조 ID 필터 */
   orderId?: string;
   /** 에러 핸들러 */
   onError?: (error: Error, event: PaymentEvent) => void;

@@ -252,6 +252,34 @@ import type { RelatedEntity } from './related.entity.js';
 
 ---
 
+## 13-A. Retail Stable Rule (FROZEN)
+
+> **O4O Retail Stable v1.0은 구조적으로 고정된 폐쇄 루프이다.**
+
+> 📄 상세: `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md`
+
+다음 요소는 변경 시 반드시 **설계 Work Order → IR → WO → 구현 → IR 재검증** 절차를 따른다:
+
+1. **Visibility Gate 4중 정의** (`opl.is_active`, `opc.is_active`, `oc.status='APPROVED'`, `p.status='active'`)
+2. **Sales Limit 계산 기준** (`status='PAID'` only)
+3. **Payment atomic transition 방식** (`transitionStatus()` + `internalOrderId`)
+4. **TTL orphan 정리 정책** (15분, CREATED→CANCELLED)
+5. **PaymentCore ↔ Service 계층 분리 구조**
+
+직접 코드 수정 금지. 구조 변경 시 전 구간 게이트 일관성 재검증 필수.
+
+### 고정 계층:
+
+| Layer | 역할 | 인증 |
+|-------|------|------|
+| Hub | 운영 KPI | requireAuth + pharmacy owner |
+| Storefront | 소비자 노출 | Public (GET) |
+| Checkout | 주문 생성 | requireAuth |
+| Payment | 상태 전이 | requireAuth + buyer ownership |
+| Event | 주문 반영 | Internal |
+
+---
+
 ## 14. 화면 디버깅 규칙 (Alpha 기준)
 
 ### 핵심 원칙
@@ -458,9 +486,11 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | **Extension** | `docs/platform/extensions/` |
 | **KPA Society 구조** | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
 | **KPA 권한 매트릭스** | `docs/_platform/KPA-ROLE-MATRIX-V1.md` |
+| **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
+| **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
 
 ---
 
-*Updated: 2026-02-14*
-*Version: 4.5*
+*Updated: 2026-02-16*
+*Version: 4.7*
 *Status: Active Constitution*

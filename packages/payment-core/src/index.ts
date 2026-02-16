@@ -1,20 +1,20 @@
 /**
  * @o4o/payment-core
  *
- * Payment Core v0.1 - O4O Platform Payment Infrastructure
+ * Payment Core v0.2 — Platform-level payment infrastructure
  *
- * WO-O4O-PAYMENT-CORE-V0.1
+ * WO-O4O-PAYMENT-CORE-SCAFFOLD-V1
  *
- * 핵심 책임:
- * - PG 통합 (Toss Payments)
- * - 결제 확인 (payment confirmation)
- * - payment.completed 이벤트 발행
+ * Core 책임:
+ * - PaymentStatus 상태 체계
+ * - PaymentStateMachine 전이 규칙
+ * - PaymentCoreService 결제 흐름 골격
+ * - PaymentEventPublisher 이벤트 발행 계약
  *
- * 명시적 제외 (Out of Scope):
- * - 정산/분배 (Settlement)
- * - 회계 연동 (Accounting)
- * - 환불 처리 (v0.2에서 추가)
- * - Event Store / CQRS
+ * Core가 정의하지 않는 것:
+ * - ❌ PG Provider 구현 (서비스 레벨)
+ * - ❌ DB 직접 접근 (서비스 레벨)
+ * - ❌ 이벤트 발행 구현 (서비스 레벨)
  *
  * @packageDocumentation
  */
@@ -22,14 +22,14 @@
 // Types
 export * from './types/index.js';
 
+// Interfaces
+export * from './interfaces/index.js';
+
 // Entities
 export * from './entities/index.js';
 
 // Services
 export * from './services/index.js';
 
-// Controllers
-export * from './controllers/index.js';
-
 // Version
-export const PAYMENT_CORE_VERSION = '0.1.0';
+export const PAYMENT_CORE_VERSION = '0.2.0';

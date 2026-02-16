@@ -26,6 +26,143 @@ import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { ListProductsQueryDto } from '../dto/index.js';
 
+// ============================================================================
+// WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1
+// 소비자 Storefront 상품 노출 이중 게이트
+//
+// 노출 필수 조건:
+// 1. organization_channels.status = 'APPROVED' AND channel_type = 'B2C'
+// 2. organization_product_listings.is_active = true AND service_key = 'kpa'
+// 3. organization_product_channels.is_active = true
+// 4. glycopharm_products.status = 'active'
+//
+// 허브 visibleProductCount 계산과 동일 게이트.
+// ============================================================================
+
+/**
+ * Visibility-gated 상품 목록 조회 (소비자 Storefront용)
+ *
+ * INNER JOIN으로 4중 게이트 적용:
+ * product → listing → product_channel → channel(B2C, APPROVED)
+ */
+async function queryVisibleProducts(
+  dataSource: DataSource,
+  pharmacyId: string,
+  options: {
+    category?: string;
+    q?: string;
+    sort?: string;
+    order?: string;
+    page?: number;
+    limit?: number;
+    isFeatured?: boolean;
+    productId?: string;
+  } = {},
+): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+  const page = options.page || 1;
+  const limit = options.limit || 20;
+  const offset = (page - 1) * limit;
+
+  const conditions: string[] = [];
+  const params: any[] = [pharmacyId];
+  let paramIdx = 2;
+
+  if (options.category) {
+    conditions.push(`p.category = $${paramIdx}`);
+    params.push(options.category);
+    paramIdx++;
+  }
+
+  if (options.q && options.q.length >= 2) {
+    conditions.push(`(p.name ILIKE $${paramIdx} OR p.sku ILIKE $${paramIdx} OR p.description ILIKE $${paramIdx})`);
+    params.push(`%${options.q}%`);
+    paramIdx++;
+  }
+
+  if (options.isFeatured !== undefined) {
+    conditions.push(`p.is_featured = $${paramIdx}`);
+    params.push(options.isFeatured);
+    paramIdx++;
+  }
+
+  if (options.productId) {
+    conditions.push(`p.id = $${paramIdx}`);
+    params.push(options.productId);
+    paramIdx++;
+  }
+
+  const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
+
+  // Sort mapping
+  const sortMap: Record<string, string> = {
+    created_at: 'p.created_at',
+    name: 'p.name',
+    price: 'p.price',
+    sort_order: 'p.sort_order',
+  };
+  const sortField = sortMap[options.sort || 'created_at'] || 'p.created_at';
+  const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+  // Count query
+  const countResult: Array<{ count: string }> = await dataSource.query(
+    `SELECT COUNT(DISTINCT p.id)::int AS count
+     FROM glycopharm_products p
+     INNER JOIN organization_product_listings opl
+       ON opl.external_product_id = p.id::text
+       AND opl.organization_id = $1
+       AND opl.service_key = 'kpa'
+       AND opl.is_active = true
+     INNER JOIN organization_product_channels opc
+       ON opc.product_listing_id = opl.id
+       AND opc.is_active = true
+     INNER JOIN organization_channels oc
+       ON oc.id = opc.channel_id
+       AND oc.channel_type = 'B2C'
+       AND oc.status = 'APPROVED'
+     WHERE p.pharmacy_id = $1
+       AND p.status = 'active'
+       ${whereExtra}`,
+    params
+  );
+  const total = Number(countResult[0]?.count || 0);
+
+  // Data query
+  const data = await dataSource.query(
+    `SELECT DISTINCT ON (p.id)
+       p.id, p.name, p.sku, p.category, p.price, p.sale_price,
+       p.stock_quantity, p.images, p.status, p.is_featured,
+       p.manufacturer, p.description, p.short_description,
+       p.sort_order, p.created_at, p.updated_at,
+       p.pharmacy_id,
+       opc.sales_limit,
+       opc.channel_price
+     FROM glycopharm_products p
+     INNER JOIN organization_product_listings opl
+       ON opl.external_product_id = p.id::text
+       AND opl.organization_id = $1
+       AND opl.service_key = 'kpa'
+       AND opl.is_active = true
+     INNER JOIN organization_product_channels opc
+       ON opc.product_listing_id = opl.id
+       AND opc.is_active = true
+     INNER JOIN organization_channels oc
+       ON oc.id = opc.channel_id
+       AND oc.channel_type = 'B2C'
+       AND oc.status = 'APPROVED'
+     WHERE p.pharmacy_id = $1
+       AND p.status = 'active'
+       ${whereExtra}
+     ORDER BY p.id, ${sortField} ${sortOrder}
+     LIMIT ${limit} OFFSET ${offset}`,
+    params
+  );
+
+  return {
+    data,
+    meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  };
+}
+
 export function createStoreController(dataSource: DataSource): Router {
   const router = Router();
   const service = new GlycopharmService(dataSource);
@@ -75,16 +212,28 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      // Get distinct categories from active products for this pharmacy
-      const categories = await productRepo
-        .createQueryBuilder('p')
-        .select('p.category', 'category')
-        .addSelect('COUNT(*)::int', 'productCount')
-        .where('p.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id })
-        .andWhere('p.status = :status', { status: 'active' })
-        .groupBy('p.category')
-        .orderBy('"productCount"', 'DESC')
-        .getRawMany();
+      // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1: 이중 게이트 적용 카테고리 조회
+      const categories: Array<{ category: string; productCount: number }> = await dataSource.query(
+        `SELECT p.category, COUNT(DISTINCT p.id)::int AS "productCount"
+         FROM glycopharm_products p
+         INNER JOIN organization_product_listings opl
+           ON opl.external_product_id = p.id::text
+           AND opl.organization_id = $1
+           AND opl.service_key = 'kpa'
+           AND opl.is_active = true
+         INNER JOIN organization_product_channels opc
+           ON opc.product_listing_id = opl.id
+           AND opc.is_active = true
+         INNER JOIN organization_channels oc
+           ON oc.id = opc.channel_id
+           AND oc.channel_type = 'B2C'
+           AND oc.status = 'APPROVED'
+         WHERE p.pharmacy_id = $1
+           AND p.status = 'active'
+         GROUP BY p.category
+         ORDER BY "productCount" DESC`,
+        [pharmacy.id]
+      );
 
       const data = categories.map((c: any, idx: number) => ({
         id: c.category,
@@ -122,33 +271,16 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      // Try curated featured products first
-      const featured = await featuredService.listFeaturedProducts('glycopharm', pharmacy.id);
-      if (featured.length > 0) {
-        const data = featured
-          .filter((f) => f.is_active && f.product)
-          .slice(0, limit)
-          .map((f) => ({
-            id: f.product!.id,
-            productId: f.product!.id,
-            name: f.product!.name,
-            price: Number(f.product!.price),
-            salePrice: f.product!.sale_price ? Number(f.product!.sale_price) : undefined,
-            thumbnailUrl: f.product!.images?.[0]?.url,
-            isFeatured: true,
-          }));
-        res.json({ success: true, data });
-        return;
-      }
-
-      // Fallback: products marked is_featured
-      const products = await productRepo.find({
-        where: { pharmacy_id: pharmacy.id, status: 'active', is_featured: true },
-        order: { sort_order: 'ASC', created_at: 'DESC' },
-        take: limit,
+      // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1: 이중 게이트 적용 추천 상품
+      const result = await queryVisibleProducts(dataSource, pharmacy.id, {
+        isFeatured: true,
+        sort: 'sort_order',
+        order: 'ASC',
+        limit,
+        page: 1,
       });
 
-      const data = products.map((p) => ({
+      const data = result.data.map((p: any) => ({
         id: p.id,
         productId: p.id,
         name: p.name,
@@ -184,18 +316,16 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      const queryDto: ListProductsQueryDto = {
-        pharmacy_id: pharmacy.id,
-        status: 'active',
+      // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1: 이중 게이트 적용 상품 목록
+      const result = await queryVisibleProducts(dataSource, pharmacy.id, {
         page: req.query.page ? Number(req.query.page) : 1,
         limit: req.query.limit ? Number(req.query.limit) : 20,
-        category: req.query.category as any,
-        sort: (req.query.sort as any) || 'created_at',
-        order: (req.query.order as any) || 'desc',
+        category: req.query.category as string | undefined,
+        sort: (req.query.sort as string) || 'created_at',
+        order: (req.query.order as string) || 'desc',
         q: req.query.q as string,
-      };
+      });
 
-      const result = await service.listProducts(queryDto);
       res.json({ success: true, ...result });
     } catch (error: any) {
       console.error('[StoreController] GET /:slug/products error:', error);
@@ -222,9 +352,14 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      const product = await service.getProductById(id);
+      // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1: 이중 게이트 적용 상품 상세
+      const result = await queryVisibleProducts(dataSource, pharmacy.id, {
+        productId: id,
+        limit: 1,
+        page: 1,
+      });
 
-      if (!product || product.pharmacy_id !== pharmacy.id) {
+      if (result.data.length === 0) {
         res.status(404).json({
           success: false,
           error: { code: 'PRODUCT_NOT_FOUND', message: 'Product not found in this store' },
@@ -232,7 +367,7 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      res.json({ success: true, data: product });
+      res.json({ success: true, data: result.data[0] });
     } catch (error: any) {
       console.error('[StoreController] GET /:slug/products/:id error:', error);
       res.status(500).json({

@@ -1,47 +1,15 @@
 /**
- * Payment Core v0.1 - Type Definitions
+ * Payment Core - Request/Response Type Definitions
  *
- * WO-O4O-PAYMENT-CORE-V0.1
+ * WO-O4O-PAYMENT-CORE-SCAFFOLD-V1
  *
- * 결제 핵심 타입 정의
- * - 결제 상태
- * - 요청/응답 DTO
- * - PG 통합 타입
+ * 결제 요청/응답 DTO 정의
+ *
+ * ❌ ecommerce-core import 금지
+ * ❌ Order 엔티티 참조 금지
  */
 
-// =============================================================================
-// Payment Status (재사용: ecommerce-core)
-// =============================================================================
-
-// Re-export from ecommerce-core for consistency
-export {
-  PaymentTransactionStatus,
-  PaymentMethod,
-} from '@o4o/ecommerce-core';
-
-// =============================================================================
-// Payment Core Status (v0.1)
-// =============================================================================
-
-/**
- * Payment Core 처리 상태
- *
- * v0.1에서는 최소 상태만 정의
- */
-export enum PaymentCoreStatus {
-  /** 결제 요청 생성됨 */
-  INITIATED = 'initiated',
-  /** PG 결제창 진입 */
-  PENDING = 'pending',
-  /** PG 승인 완료 (서버 검증 대기) */
-  AUTHORIZED = 'authorized',
-  /** 서버 검증 완료 (최종 확정) */
-  CONFIRMED = 'confirmed',
-  /** 결제 실패 */
-  FAILED = 'failed',
-  /** 결제 취소 */
-  CANCELLED = 'cancelled',
-}
+import type { PaymentStatus } from './PaymentStatus.js';
 
 // =============================================================================
 // Request DTOs
@@ -49,11 +17,9 @@ export enum PaymentCoreStatus {
 
 /**
  * 결제 준비 요청
- *
- * POST /api/payments/prepare
  */
 export interface PreparePaymentRequest {
-  /** 주문 ID */
+  /** 주문 참조 ID (문자열) */
   orderId: string;
   /** 주문명 (결제창 표시용) */
   orderName: string;
@@ -69,19 +35,19 @@ export interface PreparePaymentRequest {
   customerEmail?: string;
   /** 고객 이름 (선택) */
   customerName?: string;
+  /** 서비스 키 (결제를 요청한 서비스 식별) */
+  sourceService: string;
   /** 추가 메타데이터 */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
  * 결제 확인 요청
- *
- * POST /api/payments/{paymentId}/confirm
  */
 export interface ConfirmPaymentRequest {
   /** PG에서 발급한 결제 키 */
   paymentKey: string;
-  /** 주문 ID (검증용) */
+  /** 주문 참조 ID (검증용) */
   orderId: string;
   /** 결제 금액 (검증용) */
   amount: number;
@@ -89,13 +55,11 @@ export interface ConfirmPaymentRequest {
 
 /**
  * PG 콜백 요청
- *
- * POST /api/payments/pg/callback
  */
 export interface PGCallbackRequest {
   /** PG 결제 키 */
   paymentKey: string;
-  /** 주문 ID */
+  /** 주문 참조 ID */
   orderId: string;
   /** 결제 금액 */
   amount: number;
@@ -115,7 +79,7 @@ export interface PreparePaymentResponse {
   paymentId: string;
   /** 트랜잭션 ID */
   transactionId: string;
-  /** 주문 ID */
+  /** 주문 참조 ID */
   orderId: string;
   /** 결제 금액 */
   amount: number;
@@ -137,10 +101,10 @@ export interface ConfirmPaymentResponse {
   paymentId: string;
   /** 트랜잭션 ID */
   transactionId: string;
-  /** 주문 ID */
+  /** 주문 참조 ID */
   orderId: string;
   /** 결제 상태 */
-  status: PaymentCoreStatus;
+  status: PaymentStatus;
   /** 결제 금액 */
   paidAmount: number;
   /** 결제 수단 */
@@ -165,10 +129,10 @@ export interface PaymentStatusResponse {
   paymentId: string;
   /** 트랜잭션 ID */
   transactionId: string;
-  /** 주문 ID */
+  /** 주문 참조 ID */
   orderId: string;
   /** 결제 상태 */
-  status: PaymentCoreStatus;
+  status: PaymentStatus;
   /** 요청 금액 */
   requestedAmount: number;
   /** 결제 금액 */
@@ -200,7 +164,6 @@ export interface PaymentHealthResponse {
     provider: string;
     isConfigured: boolean;
     isTestMode: boolean;
-    baseUrl: string;
   };
   /** 타임스탬프 */
   timestamp: string;
@@ -213,7 +176,7 @@ export interface PaymentHealthResponse {
 /**
  * 표준 API 응답
  */
-export interface PaymentApiResponse<T = any> {
+export interface PaymentApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

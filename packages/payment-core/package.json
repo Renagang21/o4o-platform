@@ -1,32 +1,33 @@
 {
   "name": "@o4o/payment-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Payment Core v0.1 - O4O Platform Payment Infrastructure",
+  "description": "Payment Core - Platform-level payment state machine and event contracts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./types": "./dist/types/index.js",
-    "./entities": "./dist/entities/index.js",
-    "./services": "./dist/services/index.js"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./entities": {
+      "import": "./dist/entities/index.js",
+      "types": "./dist/entities/index.d.ts"
+    }
   },
   "files": ["dist", "src"],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/types": "workspace:*",
-    "@o4o/ecommerce-core": "workspace:*"
-  },
-  "peerDependencies": {
-    "typeorm": "^0.3.0",
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/typeorm": "^10.0.0",
-    "@nestjs/event-emitter": "^2.0.0"
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
