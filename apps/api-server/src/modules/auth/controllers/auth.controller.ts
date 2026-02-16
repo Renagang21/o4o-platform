@@ -11,6 +11,7 @@ import { LoginRequestDto, RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
+import { deriveRoles } from '../../../utils/token.utils.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -426,11 +427,13 @@ export class AuthController extends BaseController {
     }
 
     try {
-      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
-      // scopes 계산
+      // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: roles 도출
+      const roles = deriveRoles(req.user);
+
+      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 계산
       const scopes = deriveUserScopes({
         role: req.user.role,
-        roles: req.user.getRoleNames?.() || [],
+        roles,
       });
 
       const userData = req.user.toPublicData?.() || {
@@ -438,11 +441,13 @@ export class AuthController extends BaseController {
         email: req.user.email,
         name: req.user.name,
         role: req.user.role,
+        roles,  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
         status: req.user.status,
         scopes: [] as string[],
       };
 
-      // scopes 주입
+      // roles / scopes 주입 (toPublicData 이미 roles 포함하지만 일관성 보장)
+      userData.roles = roles;
       userData.scopes = scopes;
 
       return BaseController.ok(res, { user: userData });
@@ -495,11 +500,14 @@ export class AuthController extends BaseController {
 
     let userData = null;
     if (authenticated && req.user) {
-      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
       userData = req.user.toPublicData?.() || req.user;
+      // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: roles 주입
+      const roles = deriveRoles(req.user);
+      userData.roles = roles;
+      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
       const scopes = deriveUserScopes({
         role: req.user.role,
-        roles: req.user.getRoleNames?.() || [],
+        roles,
       });
       userData.scopes = scopes;
     }
