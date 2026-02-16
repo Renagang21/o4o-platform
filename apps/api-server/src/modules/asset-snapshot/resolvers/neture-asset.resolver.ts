@@ -1,24 +1,24 @@
 /**
  * Neture Asset Resolver
  *
- * WO-O4O-ASSET-COPY-NETURE-PILOT-V1 Phase 1
+ * WO-O4O-ASSET-COPY-CORE-EXTRACTION-V1
  *
  * Resolves Neture supplier content (CMS) and signage assets
- * into the standard ResolvedAsset format.
+ * into the standard ResolvedContent format.
  *
  * Source tables:
  * - CMS: neture_supplier_contents
- * - Signage: signage_media (shared platform table, filtered by context)
+ * - Signage: signage_media (shared platform table)
  */
 
 import { DataSource } from 'typeorm';
 import { NetureSupplierContent } from '../../neture/entities/NetureSupplierContent.entity.js';
-import type { AssetResolver, ResolvedAsset } from '../interfaces/asset-resolver.interface.js';
+import type { ContentResolver, ResolvedContent } from '@o4o/asset-copy-core';
 
-export class NetureAssetResolver implements AssetResolver {
+export class NetureAssetResolver implements ContentResolver {
   constructor(private dataSource: DataSource) {}
 
-  async resolve(sourceAssetId: string, assetType: 'cms' | 'signage'): Promise<ResolvedAsset | null> {
+  async resolve(sourceAssetId: string, assetType: string): Promise<ResolvedContent | null> {
     if (assetType === 'cms') {
       return this.resolveCms(sourceAssetId);
     }
@@ -28,7 +28,7 @@ export class NetureAssetResolver implements AssetResolver {
     return null;
   }
 
-  private async resolveCms(id: string): Promise<ResolvedAsset | null> {
+  private async resolveCms(id: string): Promise<ResolvedContent | null> {
     const repo = this.dataSource.getRepository(NetureSupplierContent);
     const content = await repo.findOne({ where: { id } });
     if (!content) return null;
@@ -50,8 +50,7 @@ export class NetureAssetResolver implements AssetResolver {
     };
   }
 
-  private async resolveSignage(id: string): Promise<ResolvedAsset | null> {
-    // Signage uses the shared platform signage_media table
+  private async resolveSignage(id: string): Promise<ResolvedContent | null> {
     const rows = await this.dataSource.query(
       `SELECT "id", "name", "description", "mediaType", "sourceType", "sourceUrl",
               "thumbnailUrl", "duration", "resolution", "content", "tags", "category", "metadata"

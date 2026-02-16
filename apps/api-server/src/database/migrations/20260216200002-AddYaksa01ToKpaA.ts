@@ -32,18 +32,19 @@ export class AddYaksa01ToKpaA20260216200002 implements MigrationInterface {
 
     const userId = users[0].id;
 
-    // Check if already a member of 대한약사회
+    // UQ_kpa_members_user_id: one user → one org only.
+    // If yaksa01 already has a kpa_member row (e.g. 종로구약사회), skip.
     const existing = await queryRunner.query(
-      `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2`,
-      [userId, kpaAOrgId],
+      `SELECT id, organization_id FROM kpa_members WHERE user_id = $1`,
+      [userId],
     );
 
     if (existing.length > 0) {
-      console.log(`[MIGRATION] ${email} already member of 대한약사회, skipping`);
+      console.log(`[MIGRATION] ${email} already has kpa_member (org: ${existing[0].organization_id}), skipping`);
       return;
     }
 
-    // Add kpa_member for 대한약사회
+    // Add kpa_member for 대한약사회 (ON CONFLICT safety)
     await queryRunner.query(
       `INSERT INTO kpa_members (
         id, user_id, organization_id, role, status, membership_type,
@@ -53,7 +54,8 @@ export class AddYaksa01ToKpaA20260216200002 implements MigrationInterface {
         gen_random_uuid(), $1, $2, 'member', 'active', 'pharmacist',
         'LIC-2024-01', '종로약국01', '서울시 종로구',
         CURRENT_DATE, NOW(), NOW()
-      )`,
+      )
+      ON CONFLICT (user_id) DO NOTHING`,
       [userId, kpaAOrgId],
     );
 

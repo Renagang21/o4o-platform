@@ -103,6 +103,7 @@
     "path-to-regexp": "^8.2.0",
     "eventemitter2": "^6.4.9",
     "@o4o/ai-core": "workspace:*",
+    "@o4o/asset-copy-core": "workspace:*",
     "@o4o-apps/cms-core": "workspace:*",
     "@o4o-apps/content-core": "workspace:*",
     "@o4o-apps/digital-signage-core": "workspace:*",
