@@ -118,6 +118,9 @@ import { UserDashboardPage, MyContentPage } from './pages/dashboard';
 // WO-KPA-A-ROLE-BASED-REDIRECT-V1
 import { getDefaultRouteByRole } from './lib/auth-utils';
 
+// WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
+import { RoleGuard } from './components/auth/RoleGuard';
+
 // Debug Pages (CLAUDE.md Section 14)
 import { ApiDebugPage } from './pages/debug/ApiDebugPage';
 
@@ -202,54 +205,14 @@ function RoleBasedHome() {
 }
 
 /**
- * WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1
- * Hub Guard: kpa:operator 이상 역할 필요
+ * HubGuard → RoleGuard alias
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
+ * 실제 로직은 components/auth/RoleGuard.tsx (user.roles[] 배열 체크)
+ * Hub 전용 allowedRoles: ['kpa:admin', 'kpa:operator'] — 라우트에서 지정
  */
-function HubGuard({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
-
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return (
-      <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-        <p style={{ fontSize: '18px', color: '#0F172A', fontWeight: 600 }}>로그인이 필요합니다</p>
-        <p style={{ color: '#64748B', marginTop: '8px' }}>운영 허브에 접근하려면 로그인이 필요합니다.</p>
-        <button
-          style={{ marginTop: '20px', padding: '10px 24px', backgroundColor: '#2563EB', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
-          onClick={() => navigate('/login', { state: { from: '/hub' } })}
-        >
-          로그인하기
-        </button>
-      </div>
-    );
-  }
-
-  const hasAccess = user.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
-  if (!hasAccess) {
-    return (
-      <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-        <p style={{ fontSize: '18px', color: '#0F172A', fontWeight: 600 }}>접근 권한이 없습니다</p>
-        <p style={{ color: '#64748B', marginTop: '8px' }}>운영자 권한이 필요합니다.</p>
-        <button
-          style={{ marginTop: '20px', padding: '10px 24px', backgroundColor: '#E2E8F0', color: '#334155', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
-          onClick={() => navigate('/')}
-        >
-          홈으로 돌아가기
-        </button>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-}
+const HubGuard = ({ children }: { children: React.ReactNode }) => (
+  <RoleGuard allowedRoles={['kpa:admin', 'kpa:operator']}>{children}</RoleGuard>
+);
 
 function FunctionGateRedirect() {
   const navigate = useNavigate();

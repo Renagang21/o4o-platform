@@ -41,6 +41,7 @@ import OperatorLayout from './components/layouts/OperatorLayout';
 import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } from '@o4o/operator-core';
 import StoreOverviewPage from './pages/store/StoreOverviewPage';
 
+import { RoleGuard } from './components/auth/RoleGuard';
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -75,29 +76,12 @@ function PendingRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// 역할 기반 보호 라우트
-function RoleProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles: string[] }) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/" state={{ from: location.pathname + location.search, requireLogin: true }} replace />;
-  }
-
-  if (user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-}
+/**
+ * RoleProtectedRoute → RoleGuard alias
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
+ * 실제 로직은 components/auth/RoleGuard.tsx
+ */
+const RoleProtectedRoute = RoleGuard;
 
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
 function StoreLayoutWrapper() {

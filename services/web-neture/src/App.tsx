@@ -22,6 +22,7 @@ import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
+import { RoleGuard } from './components/auth/RoleGuard';
 
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
@@ -290,29 +291,11 @@ function LoginRedirect() {
 
 
 /**
- * ProtectedRoute - 역할 기반 접근 제어
- *
- * WO-OPERATOR-GUARD-UNIFICATION-P0:
- * GlycoPharm/K-Cosmetics Reference Implementation 패턴 적용
+ * ProtectedRoute → RoleGuard alias
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
+ * 실제 로직은 components/auth/RoleGuard.tsx
  */
-function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return <PageLoading />;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-}
+const ProtectedRoute = RoleGuard;
 
 /**
  * RoleBasedWorkspaceHome - WO-NETURE-ROLE-BASED-LANDING-V1
