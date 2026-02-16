@@ -172,6 +172,24 @@ export function StoreHubPage() {
             />
           </div>
         </div>
+
+        {/* ── Card 4: Copied Assets (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1) ── */}
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <span style={styles.cardIcon}>&#128203;</span>
+            <h2 style={styles.cardTitle}>복사된 자산 (Assets)</h2>
+          </div>
+          <div style={styles.cardBody}>
+            <div style={styles.row}>
+              <div style={styles.rowLeft}>
+                <span style={styles.rowLabel}>커뮤니티에서 복사한 CMS/사이니지 자산</span>
+              </div>
+              <div style={styles.rowRight}>
+                <a href="/pharmacy/store-assets" style={styles.deepLink}>자산 목록 보기 &rarr;</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <p style={styles.footer}>

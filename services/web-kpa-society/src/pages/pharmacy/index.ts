@@ -21,3 +21,6 @@ export { StoreHubPage } from './StoreHubPage';
 
 // WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리
 export { PharmacySellPage } from './PharmacySellPage';
+
+// WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1: 매장 복사 자산 목록
+export { default as StoreAssetsPage } from './StoreAssetsPage';

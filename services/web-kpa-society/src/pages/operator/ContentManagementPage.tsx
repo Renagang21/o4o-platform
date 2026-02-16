@@ -22,8 +22,10 @@ import {
   AlertCircle,
   RefreshCw,
   X,
+  Copy,
 } from 'lucide-react';
 import { getAccessToken } from '../../contexts/AuthContext';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -247,6 +249,27 @@ function ContentList({
     }
   }
 
+  async function handleCopyToStore(item: CmsContent) {
+    if (!confirm(`"${item.title}"을(를) 매장으로 복사하시겠습니까?`)) return;
+    setActionLoading(item.id);
+    try {
+      await assetSnapshotApi.copy({
+        sourceService: 'kpa',
+        sourceAssetId: item.id,
+        assetType: 'cms',
+      });
+      alert('매장으로 복사되었습니다.');
+    } catch (e: any) {
+      if (e.message?.includes('DUPLICATE') || e.message?.includes('already')) {
+        alert('이미 매장에 복사된 콘텐츠입니다.');
+      } else {
+        alert(`복사 실패: ${e.message}`);
+      }
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-400">
@@ -329,6 +352,13 @@ function ContentList({
                         <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                       ) : item.status !== 'archived' ? (
                         <div className="flex gap-1">
+                          <button
+                            onClick={() => handleCopyToStore(item)}
+                            className="p-1 text-green-600 hover:bg-green-50 rounded"
+                            title="매장으로 복사"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => handleStatusToggle(item)}
                             className="p-1 text-slate-500 hover:bg-slate-100 rounded"

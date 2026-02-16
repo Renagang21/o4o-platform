@@ -174,6 +174,9 @@ import {
 import { CareKpiSnapshot } from '../modules/care/entities/care-kpi-snapshot.entity.js';
 import { CareCoachingSession } from '../modules/care/entities/care-coaching-session.entity.js';
 
+// ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
+import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
+
 // ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
 // ============================================================================
@@ -561,6 +564,10 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CareKpiSnapshot,
     CareCoachingSession,
+    // ============================================================================
+    // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
+    // ============================================================================
+    AssetSnapshot,
     // ============================================================================
     // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================
