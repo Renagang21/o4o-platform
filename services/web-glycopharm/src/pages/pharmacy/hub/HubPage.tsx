@@ -70,6 +70,13 @@ interface CockpitData {
     recentCoachingCount: number;
     improvingCount: number;
   } | null;
+  signageStats: {
+    enabled: boolean;
+    activeContents: number;
+  } | null;
+  productStats: {
+    total: number;
+  } | null;
 }
 
 // ─── Icon helper ───
@@ -152,6 +159,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         href: '/pharmacy/products',
         icon: <LucideIcon Icon={Package} color="#2563EB" />,
         iconBg: '#EFF6FF',
+        signalKey: 'glycopharm.products',
       },
       {
         id: 'signage',
@@ -177,6 +185,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         href: '/operator/applications',
         icon: <LucideIcon Icon={Building2} color="#DC2626" />,
         iconBg: '#FEF2F2',
+        signalKey: 'glycopharm.pharmacy_approval',
       },
       {
         id: 'policy',
@@ -223,11 +232,10 @@ function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
       signals['glycopharm.high_risk'] = createSignal('info', { label: '양호' });
     }
 
-    // 코칭 세션 신호
+    // 코칭 세션 신호 (pulse 제거 — UX Guidelines §4.4: pulse는 high_risk + AI critical만)
     if (recentCoachingCount === 0 && highRiskCount > 0) {
       signals['glycopharm.coaching'] = createActionSignal('critical', {
         label: '미실시',
-        pulse: true,
         action: {
           key: 'glycopharm.trigger.create_session',
           buttonLabel: '세션 생성',
@@ -249,12 +257,13 @@ function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
     }
   }
 
-  // AI Summary 신호
+  // AI Summary 신호 (pulse: critical일 때만 — UX Guidelines §4.4)
   if (aiSummary) {
     const { riskLevel } = aiSummary.insight;
     const level = riskLevel === 'high' ? 'critical' : riskLevel === 'medium' ? 'warning' : 'info';
     signals['glycopharm.ai_summary'] = createActionSignal(level, {
       label: riskLevel === 'high' ? '주의 필요' : riskLevel === 'medium' ? '관찰' : '정상',
+      pulse: riskLevel === 'high',
       action: {
         key: 'glycopharm.trigger.refresh_ai',
         buttonLabel: 'AI 재분석',
@@ -281,6 +290,42 @@ function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
           key: 'glycopharm.trigger.review_requests',
           buttonLabel: '처리하기',
         },
+      });
+    }
+
+    // 약국 승인 신호 (Admin 카드 — applicationAlerts 기반)
+    if (todayActions.applicationAlerts > 0) {
+      signals['glycopharm.pharmacy_approval'] = createSignal('warning', {
+        label: '심사 대기',
+        count: todayActions.applicationAlerts,
+      });
+    } else {
+      signals['glycopharm.pharmacy_approval'] = createSignal('info', { label: '정상' });
+    }
+  }
+
+  // 사이니지 신호 (franchise-services 데이터 기반)
+  if (data.signageStats) {
+    if (!data.signageStats.enabled) {
+      signals['glycopharm.signage'] = createSignal('info', { label: '미사용' });
+    } else if (data.signageStats.activeContents === 0) {
+      signals['glycopharm.signage'] = createSignal('warning', { label: '편성 없음' });
+    } else {
+      signals['glycopharm.signage'] = createSignal('info', {
+        label: '운영중',
+        count: data.signageStats.activeContents,
+      });
+    }
+  }
+
+  // 상품 관리 신호 (product count 기반)
+  if (data.productStats) {
+    if (data.productStats.total === 0) {
+      signals['glycopharm.products'] = createSignal('warning', { label: '미등록' });
+    } else {
+      signals['glycopharm.products'] = createSignal('info', {
+        label: '등록',
+        count: data.productStats.total,
       });
     }
   }
@@ -327,6 +372,8 @@ export default function HubPage() {
     aiSummary: null,
     todayActions: null,
     careDashboard: null,
+    signageStats: null,
+    productStats: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -344,16 +391,32 @@ export default function HubPage() {
     const api = authClient.api;
 
     try {
-      const [aiRes, actionsRes, careRes] = await Promise.allSettled([
+      const [aiRes, actionsRes, careRes, signageRes, productsRes] = await Promise.allSettled([
         api.get('/api/v1/glycopharm/pharmacy/cockpit/ai-summary'),
         api.get('/api/v1/glycopharm/pharmacy/cockpit/today-actions'),
         api.get('/api/v1/care/dashboard'),
+        api.get('/api/v1/glycopharm/pharmacy/cockpit/franchise-services'),
+        api.get('/api/v1/glycopharm/pharmacy/products?pageSize=1'),
       ]);
+
+      // Log individual failures for debugging
+      [aiRes, actionsRes, careRes, signageRes, productsRes].forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[GlycoPharm Hub] fetch[${i}] failed:`, r.reason);
+        }
+      });
+
+      // Extract signage stats from franchise-services response
+      const franchiseData = signageRes.status === 'fulfilled'
+        ? (signageRes.value.data as any)?.data : null;
 
       setCockpitData({
         aiSummary: aiRes.status === 'fulfilled' ? (aiRes.value.data as any)?.data : null,
         todayActions: actionsRes.status === 'fulfilled' ? (actionsRes.value.data as any)?.data : null,
         careDashboard: careRes.status === 'fulfilled' ? (careRes.value.data as any)?.data : null,
+        signageStats: franchiseData?.signage ?? null,
+        productStats: productsRes.status === 'fulfilled'
+          ? { total: (productsRes.value.data as any)?.data?.total ?? 0 } : null,
       });
     } catch {
       setError('운영 데이터를 불러오지 못했습니다.');

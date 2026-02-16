@@ -24,6 +24,7 @@ import { FeaturedProductsService } from '../services/featured-products.service.j
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
+import type { AuthRequest } from '../../../types/auth.js';
 import type { ListProductsQueryDto } from '../dto/index.js';
 
 // ============================================================================
@@ -409,12 +410,22 @@ export function createStoreController(dataSource: DataSource): Router {
   router.put('/:slug/storefront-config', authenticate, async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
+      const authReq = req as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
       const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
 
       if (!pharmacy) {
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
+        });
+        return;
+      }
+
+      if (!userId || pharmacy.created_by_user_id !== userId) {
+        res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Not the owner of this store' },
         });
         return;
       }
@@ -493,12 +504,22 @@ export function createStoreController(dataSource: DataSource): Router {
   router.put('/:slug/hero', authenticate, async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
+      const authReq = req as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
       const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
 
       if (!pharmacy) {
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
+        });
+        return;
+      }
+
+      if (!userId || pharmacy.created_by_user_id !== userId) {
+        res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Not the owner of this store' },
         });
         return;
       }

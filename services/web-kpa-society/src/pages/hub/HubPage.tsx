@@ -20,8 +20,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { operatorApi, type OperatorSummary } from '../../api/operator';
 import { colors, shadows, borderRadius, spacing } from '../../styles/theme';
-import { HubLayout, createSignal } from '@o4o/hub-core';
-import type { HubSectionDefinition, HubSignal } from '@o4o/hub-core';
+import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
+import type { HubSectionDefinition, HubSignal, HubActionResult } from '@o4o/hub-core';
+import { apiClient } from '../../api/client';
 import {
   Users,
   MessageSquare,
@@ -62,6 +63,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         href: '/operator/members',
         icon: <LucideIcon Icon={Users} color="#2563EB" />,
         iconBg: '#EFF6FF',
+        signalKey: 'kpa.members',
       },
       {
         id: 'forum',
@@ -121,6 +123,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         href: '/demo/admin/dashboard',
         icon: <LucideIcon Icon={Building2} color="#DC2626" />,
         iconBg: '#FEF2F2',
+        signalKey: 'kpa.organizations',
       },
       {
         id: 'role-mgmt',
@@ -166,26 +169,89 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
   },
 ];
 
+// ─── Hub Data ───
+
+interface KpaHubData {
+  summary: OperatorSummary | null;
+  pendingMembers: number | null;
+  groupbuyStats: { totalOrders: number; totalParticipants: number } | null;
+  adminStats: { totalBranches: number; pendingApprovals: number } | null;
+}
+
 // ─── Signal Mapper ───
 
-function buildKpaSignals(summary: OperatorSummary | null): Record<string, HubSignal> {
-  if (!summary) return {};
+function buildKpaSignals(data: KpaHubData): Record<string, HubSignal> {
   const signals: Record<string, HubSignal> = {};
+  const { summary, pendingMembers, groupbuyStats, adminStats } = data;
 
-  // 콘텐츠 신호
-  const contentCount = summary.content?.totalPublished ?? 0;
-  if (contentCount === 0) {
-    signals.content = createSignal('warning', { label: '게시물 없음' });
-  } else {
-    signals.content = createSignal('info', { label: '게시됨', count: contentCount });
+  if (summary) {
+    // 콘텐츠 신호
+    const contentCount = summary.content?.totalPublished ?? 0;
+    if (contentCount === 0) {
+      signals.content = createSignal('warning', { label: '게시물 없음' });
+    } else {
+      signals.content = createSignal('info', { label: '게시됨', count: contentCount });
+    }
+
+    // 포럼 신호
+    const forumCount = summary.forum?.totalPosts ?? 0;
+    if (forumCount === 0) {
+      signals.forum = createSignal('warning', { label: '게시글 없음' });
+    } else {
+      signals.forum = createSignal('info', { label: '게시글', count: forumCount });
+    }
   }
 
-  // 포럼 신호
-  const forumCount = summary.forum?.totalPosts ?? 0;
-  if (forumCount === 0) {
-    signals.forum = createSignal('warning', { label: '게시글 없음' });
-  } else {
-    signals.forum = createSignal('info', { label: '게시글', count: forumCount });
+  // 회원 승인 대기 신호
+  if (pendingMembers !== null) {
+    if (pendingMembers > 0) {
+      signals['kpa.members'] = createActionSignal('warning', {
+        label: '승인 대기',
+        count: pendingMembers,
+        action: {
+          key: 'kpa.navigate.members_pending',
+          buttonLabel: '확인하기',
+        },
+      });
+    } else {
+      signals['kpa.members'] = createSignal('info', { label: '정상' });
+    }
+  }
+
+  // 공동구매 신호
+  if (groupbuyStats) {
+    if (groupbuyStats.totalOrders > 0) {
+      signals.groupbuy = createSignal('info', {
+        label: '주문',
+        count: groupbuyStats.totalOrders,
+      });
+    } else if (groupbuyStats.totalParticipants > 0) {
+      signals.groupbuy = createSignal('info', {
+        label: '참여 약국',
+        count: groupbuyStats.totalParticipants,
+      });
+    } else {
+      signals.groupbuy = createSignal('warning', { label: '미운영' });
+    }
+  }
+
+  // 조직 관리 신호 (Admin 카드)
+  if (adminStats) {
+    if (adminStats.pendingApprovals > 0) {
+      signals['kpa.organizations'] = createActionSignal('warning', {
+        label: '가입 대기',
+        count: adminStats.pendingApprovals,
+        action: {
+          key: 'kpa.navigate.org_approvals',
+          buttonLabel: '심사하기',
+        },
+      });
+    } else {
+      signals['kpa.organizations'] = createSignal('info', {
+        label: '분회',
+        count: adminStats.totalBranches,
+      });
+    }
   }
 
   return signals;
@@ -196,28 +262,82 @@ function buildKpaSignals(summary: OperatorSummary | null): Record<string, HubSig
 export default function HubPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [summary, setSummary] = useState<OperatorSummary | null>(null);
+  const [hubData, setHubData] = useState<KpaHubData>({
+    summary: null,
+    pendingMembers: null,
+    groupbuyStats: null,
+    adminStats: null,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const userRoles = user?.roles ?? [];
-  const signals = useMemo(() => buildKpaSignals(summary), [summary]);
+  const isAdmin = userRoles.includes('kpa:admin');
+  const signals = useMemo(() => buildKpaSignals(hubData), [hubData]);
 
-  const fetchSummary = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const res = await operatorApi.getSummary();
-      setSummary(res.data);
+      // Promise.allSettled: 개별 실패로 전체 허브가 중단되지 않음 (UX Guidelines §6.1)
+      const promises: Promise<any>[] = [
+        operatorApi.getSummary(),
+        apiClient.get('/members', { status: 'pending', pageSize: 1 }),
+        apiClient.get('/groupbuy-admin/stats'),
+      ];
+
+      if (isAdmin) {
+        promises.push(apiClient.get('/admin/dashboard/stats'));
+      }
+
+      const results = await Promise.allSettled(promises);
+
+      // Log individual failures for debugging
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[KPA Hub] fetch[${i}] failed:`, r.reason);
+        }
+      });
+
+      const summaryRes = results[0].status === 'fulfilled' ? results[0].value : null;
+      const membersRes = results[1].status === 'fulfilled' ? results[1].value : null;
+      const groupbuyRes = results[2].status === 'fulfilled' ? results[2].value : null;
+      const adminRes = isAdmin && results[3]?.status === 'fulfilled' ? results[3].value : null;
+
+      setHubData({
+        summary: summaryRes?.data ?? null,
+        pendingMembers: membersRes?.total ?? membersRes?.data?.total ?? null,
+        groupbuyStats: groupbuyRes?.data ?? null,
+        adminStats: adminRes?.data ?? null,
+      });
     } catch {
       setError('운영 데이터를 불러오지 못했습니다.');
     }
+
     setLoading(false);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
-    fetchSummary();
-  }, [fetchSummary]);
+    fetchData();
+  }, [fetchData]);
+
+  // QuickAction handler — 경량 허브: navigate-only 액션
+  const handleActionTrigger = useCallback(
+    async (key: string): Promise<HubActionResult> => {
+      switch (key) {
+        case 'kpa.navigate.members_pending':
+          navigate('/operator/members');
+          return { success: true, message: '회원 승인 페이지로 이동' };
+        case 'kpa.navigate.org_approvals':
+          navigate('/demo/admin/dashboard');
+          return { success: true, message: '조직 관리 페이지로 이동' };
+        default:
+          return { success: false, message: '알 수 없는 액션' };
+      }
+    },
+    [navigate],
+  );
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: colors.neutral50 }}>
@@ -228,13 +348,14 @@ export default function HubPage() {
         userRoles={userRoles}
         signals={signals}
         onCardClick={(href) => navigate(href)}
+        onActionTrigger={handleActionTrigger}
         beforeSections={
           <>
             {/* 새로고침 버튼 */}
             <div style={styles.refreshRow}>
               <button
                 style={styles.refreshButton}
-                onClick={fetchSummary}
+                onClick={fetchData}
                 disabled={loading}
               >
                 <RefreshCw style={{ width: 16, height: 16, ...(loading ? { animation: 'spin 1s linear infinite' } : {}) }} />
@@ -259,21 +380,21 @@ export default function HubPage() {
                 <div style={styles.statusGrid}>
                   <StatusCard
                     label="콘텐츠"
-                    count={summary?.content?.totalPublished ?? 0}
+                    count={hubData.summary?.content?.totalPublished ?? 0}
                     unit="건 게시됨"
-                    status={summary?.content?.totalPublished ? 'good' : 'warning'}
+                    status={hubData.summary?.content?.totalPublished ? 'good' : 'warning'}
                   />
                   <StatusCard
                     label="포럼"
-                    count={summary?.forum?.totalPosts ?? 0}
+                    count={hubData.summary?.forum?.totalPosts ?? 0}
                     unit="건 게시글"
-                    status={summary?.forum?.totalPosts ? 'good' : 'warning'}
+                    status={hubData.summary?.forum?.totalPosts ? 'good' : 'warning'}
                   />
                   <StatusCard
                     label="사이니지"
-                    count={(summary?.signage?.totalMedia ?? 0) + (summary?.signage?.totalPlaylists ?? 0)}
+                    count={(hubData.summary?.signage?.totalMedia ?? 0) + (hubData.summary?.signage?.totalPlaylists ?? 0)}
                     unit="건 미디어"
-                    status={(summary?.signage?.totalMedia ?? 0) > 0 ? 'good' : 'warning'}
+                    status={(hubData.summary?.signage?.totalMedia ?? 0) > 0 ? 'good' : 'warning'}
                   />
                 </div>
               )}
@@ -283,10 +404,10 @@ export default function HubPage() {
         afterSections={
           <section style={styles.section}>
             <h2 style={styles.sectionTitle}>최근 활동</h2>
-            {!loading && summary && (
-              <RecentActivityList summary={summary} />
+            {!loading && hubData.summary && (
+              <RecentActivityList summary={hubData.summary} />
             )}
-            {!loading && !summary && !error && (
+            {!loading && !hubData.summary && !error && (
               <p style={{ color: colors.neutral500, fontSize: '14px' }}>활동 데이터가 없습니다.</p>
             )}
           </section>

@@ -415,7 +415,8 @@ export default function HubPage() {
       const isAdmin = user?.currentRole === 'admin';
 
       // Fetch base signals + dashboard summary + AI insight in parallel
-      const promises: Promise<any>[] = [
+      // Promise.allSettled: individual failures don't crash the entire hub
+      const basePromises: Promise<any>[] = [
         contentAssetApi.getSupplierSignal(),
         dashboardApi.getSellerSignal(),
         dashboardApi.getSupplierDashboardSummary(),
@@ -425,21 +426,40 @@ export default function HubPage() {
       ];
 
       if (isAdmin) {
-        promises.push(dashboardApi.getAdminDashboardSummary());
+        basePromises.push(dashboardApi.getAdminDashboardSummary());
       }
 
-      const results = await Promise.all(promises);
-      const [supplierRes, sellerRes, dashSummary, aiRes] = results;
-      const adminSummary = isAdmin ? results[4] : null;
+      const results = await Promise.allSettled(basePromises);
+
+      // Extract values with fallback on rejection
+      const supplierRes = results[0].status === 'fulfilled' ? results[0].value : null;
+      const sellerRes = results[1].status === 'fulfilled' ? results[1].value : null;
+      const dashSummary = results[2].status === 'fulfilled' ? results[2].value : null;
+      const aiRes = results[3].status === 'fulfilled' ? results[3].value : null;
+      const adminSummary = isAdmin && results[4]?.status === 'fulfilled' ? results[4].value : null;
+
+      // Log individual failures for debugging (non-blocking)
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[Neture Hub] fetch[${i}] failed:`, r.reason);
+        }
+      });
 
       const data: NetureSignalData = {
         hasApprovedSupplier: supplierRes?.hasApprovedSupplier ?? false,
         hasApprovedSeller: sellerRes?.hasApprovedSeller ?? false,
       };
 
-      // Dashboard stats
+      // Dashboard stats (with empty fallback)
       if (dashSummary?.stats) {
         data.dashboardStats = dashSummary.stats;
+      } else if (results[2].status === 'rejected') {
+        // Provide empty structure so hub renders without crash
+        data.dashboardStats = {
+          totalRequests: 0, pendingRequests: 0, approvedRequests: 0, rejectedRequests: 0,
+          totalProducts: 0, activeProducts: 0, totalContents: 0, publishedContents: 0,
+          connectedServices: 0,
+        };
       }
 
       // AI insight
