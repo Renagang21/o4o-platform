@@ -22,6 +22,16 @@ export const ACTION_KEYS = {
   NETURE_CAMPAIGN_SUGGEST: 'neture.suggest.campaign',
   NETURE_STOCK_ALERT: 'neture.alert.low_stock',
 
+  // Neture Hub Trigger Operations
+  NETURE_REVIEW_PENDING: 'neture.trigger.review_pending',
+  NETURE_AUTO_PRODUCT: 'neture.trigger.auto_product',
+  NETURE_COPY_BEST_CONTENT: 'neture.trigger.copy_best_content',
+  NETURE_REFRESH_SETTLEMENT: 'neture.trigger.refresh_settlement',
+  NETURE_REFRESH_AI: 'neture.trigger.refresh_ai',
+  NETURE_APPROVE_SUPPLIER: 'neture.trigger.approve_supplier',
+  NETURE_MANAGE_PARTNERSHIP: 'neture.trigger.manage_partnership',
+  NETURE_AUDIT_REVIEW: 'neture.trigger.audit_review',
+
   // GlycoPharm Care Operations
   GLYCOPHARM_CARE_REVIEW: 'glycopharm.trigger.care_review',
   GLYCOPHARM_CREATE_SESSION: 'glycopharm.trigger.create_session',

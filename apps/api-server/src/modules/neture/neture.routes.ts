@@ -11,6 +11,7 @@ import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardIte
 import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashboardItemContent.entity.js';
 import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
+import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -1924,6 +1925,16 @@ router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('netur
     });
   }
 });
+
+// Hub Trigger routes (WO-NETURE-HUB-ACTION-TRIGGER-EXPANSION-V1)
+const hubTriggerController = createNetureHubTriggerController({
+  dataSource: AppDataSource,
+  requireAuth,
+  requireNetureScope,
+  getSupplierIdFromUser,
+  netureService,
+});
+router.use('/hub/trigger', hubTriggerController);
 
 // Asset Snapshot routes (WO-O4O-ASSET-COPY-NETURE-PILOT-V1)
 router.use('/assets', createNetureAssetSnapshotController(AppDataSource, requireAuth as any));
