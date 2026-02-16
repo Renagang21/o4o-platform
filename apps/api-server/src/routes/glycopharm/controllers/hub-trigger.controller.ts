@@ -160,8 +160,22 @@ export function createHubTriggerController(
         }
 
         // 세션 생성 (pharmacistId = 현재 사용자, pharmacyId = 서버 강제)
+        // 중복 방지: 같은 날 동일 환자에게 이미 세션이 있으면 건너뜀
         let createdCount = 0;
+        let skippedCount = 0;
         for (const p of patients) {
+          const existing = await dataSource.query(`
+            SELECT 1 FROM care_coaching_sessions
+            WHERE pharmacy_id = $1 AND patient_id = $2
+              AND created_at >= CURRENT_DATE
+            LIMIT 1
+          `, [pharmacy.id, p.patient_id]);
+
+          if (existing.length > 0) {
+            skippedCount++;
+            continue;
+          }
+
           await dataSource.query(`
             INSERT INTO care_coaching_sessions (id, pharmacy_id, patient_id, pharmacist_id, summary, action_plan, created_at)
             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, NOW())
@@ -177,14 +191,19 @@ export function createHubTriggerController(
 
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
           organizationId: pharmacy.id, durationMs: Date.now() - start,
-          meta: { createdCount },
+          meta: { createdCount, skippedCount },
         }).catch(() => {});
+
+        const message = skippedCount > 0
+          ? `${createdCount}명 세션 생성 (${skippedCount}명 오늘 이미 생성됨)`
+          : `${createdCount}명의 고위험 환자 코칭 세션이 생성되었습니다`;
 
         res.json({
           success: true,
           data: {
-            message: `${createdCount}명의 고위험 환자 코칭 세션이 생성되었습니다`,
+            message,
             createdCount,
+            skippedCount,
           },
         });
       } catch (error: any) {
@@ -250,15 +269,38 @@ export function createHubTriggerController(
           `SELECT COUNT(*)::int AS count FROM care_coaching_sessions WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1`,
           [pharmacy.id],
         );
+        const recentCoachingCount = coachingResult[0]?.count ?? 0;
+
+        // Improving count (TIR trend) — same as cockpit ai-summary
+        const improvingResult = await dataSource.query(`
+          WITH ranked AS (
+            SELECT patient_id, tir,
+                   ROW_NUMBER() OVER (PARTITION BY patient_id ORDER BY created_at DESC) AS rn
+            FROM care_kpi_snapshots WHERE pharmacy_id = $1
+          )
+          SELECT COUNT(*)::int AS count FROM (
+            SELECT r1.patient_id FROM ranked r1
+            JOIN ranked r2 ON r1.patient_id = r2.patient_id AND r2.rn = 2
+            WHERE r1.rn = 1 AND r1.tir > r2.tir
+          ) improving
+        `, [pharmacy.id]);
+        const improvingCount = improvingResult[0]?.count ?? 0;
+
+        // Pending requests count
+        const requestResult = await dataSource.query(
+          `SELECT COUNT(*)::int AS count FROM glycopharm_customer_requests WHERE pharmacy_id = $1 AND status = 'pending'`,
+          [pharmacy.id],
+        );
+        const pendingRequests = requestResult[0]?.count ?? 0;
 
         const aiResult = await runAIInsight({
           service: 'glycopharm',
           insightType: 'store-summary',
           contextData: {
             pharmacyName: pharmacy.name,
-            kpi: { totalPatients, highRiskCount, moderateRiskCount, lowRiskCount, improvingCount: 0, recentCoachingCount: coachingResult[0]?.count ?? 0 },
+            kpi: { totalPatients, highRiskCount, moderateRiskCount, lowRiskCount, improvingCount, recentCoachingCount },
             revenue: { currentMonth: 0, lastMonth: 0, growthRate: 0 },
-            pendingRequests: 0,
+            pendingRequests,
           },
           user: { id: userId, role: userRoles[0] || 'glycopharm:operator' },
         });

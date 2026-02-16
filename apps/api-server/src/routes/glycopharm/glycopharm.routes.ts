@@ -152,11 +152,15 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   router.use('/forum', forumRouter);
 
+  // Shared ActionLogService (used by cockpit + hub-trigger)
+  const actionLogService = new ActionLogService(dataSource);
+
   // Cockpit routes (Pharmacy Dashboard 2.0)
   const cockpitController = createCockpitController(
     dataSource,
     coreRequireAuth as any,
-    requireGlycopharmScope
+    requireGlycopharmScope,
+    actionLogService,
   );
   router.use('/pharmacy/cockpit', cockpitController);
 
@@ -164,7 +168,6 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // Hub Trigger Routes — QuickAction execution endpoints
   // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
   // ============================================================================
-  const actionLogService = new ActionLogService(dataSource);
   const hubTriggerController = createHubTriggerController(
     dataSource,
     coreRequireAuth as any,

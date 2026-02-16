@@ -234,11 +234,18 @@ export function createPlatformHubController(dataSource: DataSource): ExpressRout
    */
   router.get('/summary', requireAuth, requirePlatformAdmin, async (_req: Request, res: Response) => {
     try {
-      const [kpa, neture, glycopharm] = await Promise.all([
+      const [kpaResult, netureResult, glycopharmResult] = await Promise.allSettled([
         getKpaSummary(dataSource),
         getNetureSummary(dataSource),
         getGlycopharmSummary(dataSource),
       ]);
+
+      const kpa = kpaResult.status === 'fulfilled' ? kpaResult.value
+        : { service: 'kpa', label: 'KPA (약사회)', error: 'unavailable', riskLevel: 'unknown' };
+      const neture = netureResult.status === 'fulfilled' ? netureResult.value
+        : { service: 'neture', label: 'Neture (공급자)', error: 'unavailable', riskLevel: 'unknown' };
+      const glycopharm = glycopharmResult.status === 'fulfilled' ? glycopharmResult.value
+        : { service: 'glycopharm', label: 'GlycoPharm (의료)', error: 'unavailable', riskLevel: 'unknown' };
 
       // Compute global risk level
       const riskLevels = [kpa.riskLevel, neture.riskLevel, glycopharm.riskLevel];

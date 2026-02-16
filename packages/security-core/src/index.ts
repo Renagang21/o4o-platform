@@ -20,6 +20,7 @@ export { createServiceScopeGuard } from './service-scope-guard.js';
 export {
   KPA_SCOPE_CONFIG,
   NETURE_SCOPE_CONFIG,
+  PLATFORM_SCOPE_CONFIG,
   GLYCOPHARM_SCOPE_CONFIG,
 } from './service-configs.js';
 

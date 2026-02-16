@@ -68,6 +68,27 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
 };
 
 /**
+ * Platform Service Configuration
+ *
+ * Platform-level admin scope guard.
+ * Only platform:admin and platform:super_admin have access.
+ * No platform bypass (self-referencing), no legacy roles accepted.
+ */
+export const PLATFORM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
+  serviceKey: 'platform',
+  allowedRoles: [
+    'platform:admin',
+    'platform:super_admin',
+  ],
+  platformBypass: false,
+  legacyRoles: [
+    'admin',
+    'super_admin',
+  ],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics', 'glucoseview'],
+};
+
+/**
  * GlycoPharm Service Configuration
  *
  * Platform bypass enabled: platform:admin can access.

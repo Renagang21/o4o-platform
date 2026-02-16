@@ -18,6 +18,7 @@ import { GlycopharmCustomerRequest } from '../entities/customer-request.entity.j
 import { StoreSummaryEngine, StoreInsightsEngine, DEFAULT_INSIGHT_RULES } from '@o4o/store-core';
 import { GlycopharmStoreDataAdapter } from '../services/glycopharm-store-data.adapter.js';
 import { runAIInsight } from '@o4o/ai-core';
+import type { ActionLogService } from '@o4o/action-log-core';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -80,7 +81,8 @@ interface ContentWorkspace {
 export function createCockpitController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
-  requireScope: ScopeMiddleware
+  requireScope: ScopeMiddleware,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
   const storeAdapter = new GlycopharmStoreDataAdapter(dataSource);
@@ -675,6 +677,7 @@ export function createCockpitController(
     '/ai-summary',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
+      const start = Date.now();
       try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
@@ -795,6 +798,11 @@ export function createCockpitController(
         });
 
         if (aiResult.success && aiResult.insight) {
+          actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.cockpit.ai_summary', {
+            organizationId: pharmacy.id, durationMs: Date.now() - start, source: 'ai',
+            meta: { totalPatients, highRiskCount, provider: aiResult.meta.provider },
+          }).catch(() => {});
+
           res.json({
             success: true,
             data: {
@@ -808,6 +816,11 @@ export function createCockpitController(
             },
           });
         } else {
+          actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.cockpit.ai_summary', {
+            organizationId: pharmacy.id, durationMs: Date.now() - start, source: 'manual',
+            meta: { totalPatients, highRiskCount, provider: 'fallback' },
+          }).catch(() => {});
+
           // Graceful fallback — return rule-based summary instead
           res.json({
             success: true,
@@ -820,6 +833,12 @@ export function createCockpitController(
           });
         }
       } catch (error: any) {
+        const authUserId = (req as AuthRequest).user?.id;
+        if (authUserId) {
+          actionLogService?.logFailure('glycopharm', authUserId, 'glycopharm.cockpit.ai_summary', error.message, {
+            durationMs: Date.now() - start, source: 'ai',
+          }).catch(() => {});
+        }
         console.error('Failed to generate AI summary:', error);
         res.status(500).json({
           error: { code: 'INTERNAL_ERROR', message: error.message },
