@@ -10,6 +10,7 @@ import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glyco
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
 import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashboardItemContent.entity.js';
 import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
+import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -746,6 +747,124 @@ router.get('/supplier/dashboard/summary', requireAuth, async (req: Authenticated
       success: false,
       error: 'INTERNAL_ERROR',
       message: 'Failed to fetch dashboard summary',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/dashboard/ai-insight
+ * AI-powered seller growth insight — aggregated supplier data → AI analysis.
+ *
+ * WO-PLATFORM-AI-ORCHESTRATION-LAYER-V1 Phase 4
+ *
+ * Principles:
+ * - Only authenticated supplier's own data (ownership enforced)
+ * - Aggregated stats only (no cross-supplier data)
+ * - AI failure → graceful fallback
+ */
+router.get('/supplier/dashboard/ai-insight', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    // Collect aggregated context from existing service
+    const dashboardSummary = await netureService.getSupplierDashboardSummary(supplierId);
+    const stats = dashboardSummary.stats;
+
+    // Product distribution analysis
+    const topProductShare = stats.totalProducts > 0
+      ? Math.round((stats.activeProducts / stats.totalProducts) * 100)
+      : 0;
+
+    // Call AI Orchestrator
+    const { runAIInsight } = await import('@o4o/ai-core');
+
+    const aiResult = await runAIInsight({
+      service: 'neture',
+      insightType: 'seller-growth',
+      contextData: {
+        requests: {
+          total: stats.totalRequests,
+          pending: stats.pendingRequests,
+          approved: stats.approvedRequests,
+          rejected: stats.rejectedRequests,
+          recentApprovals: stats.recentApprovals,
+          approvalRate: stats.totalRequests > 0
+            ? Math.round((stats.approvedRequests / stats.totalRequests) * 100)
+            : 0,
+        },
+        products: {
+          total: stats.totalProducts,
+          active: stats.activeProducts,
+          activeRatio: topProductShare,
+          skuCount: stats.totalProducts,
+        },
+        content: {
+          total: stats.totalContents,
+          published: stats.publishedContents,
+          publishRate: stats.totalContents > 0
+            ? Math.round((stats.publishedContents / stats.totalContents) * 100)
+            : 0,
+        },
+        connectedServices: stats.connectedServices,
+        recentActivityCount: dashboardSummary.recentActivity?.length ?? 0,
+      },
+      user: {
+        id: req.user?.id || '',
+        role: 'neture:supplier',
+      },
+    });
+
+    if (aiResult.success && aiResult.insight) {
+      res.json({
+        success: true,
+        data: {
+          insight: aiResult.insight,
+          meta: {
+            provider: aiResult.meta.provider,
+            model: aiResult.meta.model,
+            durationMs: aiResult.meta.durationMs,
+            confidenceScore: aiResult.insight.confidenceScore,
+          },
+        },
+      });
+    } else {
+      // Graceful fallback — rule-based
+      const actions: string[] = [];
+      if (stats.pendingRequests > 0) actions.push(`대기 중인 요청 ${stats.pendingRequests}건 확인 필요`);
+      if (stats.activeProducts === 0) actions.push('활성 상품이 없습니다 — 상품 등록을 시작하세요');
+      if (stats.publishedContents === 0) actions.push('발행된 콘텐츠가 없습니다 — 콘텐츠 작성을 권장합니다');
+      if (stats.recentApprovals > 0) actions.push(`최근 7일 ${stats.recentApprovals}건 승인 — 상품 업데이트 확인`);
+
+      const riskLevel = stats.rejectedRequests > stats.approvedRequests ? 'high'
+        : stats.pendingRequests > 3 ? 'medium' : 'low';
+
+      res.json({
+        success: true,
+        data: {
+          insight: {
+            summary: `총 요청 ${stats.totalRequests}건 (승인 ${stats.approvedRequests}건), 상품 ${stats.totalProducts}개, 콘텐츠 ${stats.totalContents}건.`,
+            riskLevel,
+            recommendedActions: actions,
+            confidenceScore: 1.0,
+          },
+          meta: { provider: 'fallback', model: 'rule-based', durationMs: 0, confidenceScore: 1.0 },
+        },
+      });
+    }
+  } catch (error) {
+    logger.error('[Neture API] Error generating AI insight:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to generate AI insight',
     });
   }
 });
@@ -1805,5 +1924,8 @@ router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('netur
     });
   }
 });
+
+// Asset Snapshot routes (WO-O4O-ASSET-COPY-NETURE-PILOT-V1)
+router.use('/assets', createNetureAssetSnapshotController(AppDataSource, requireAuth as any));
 
 export default router;

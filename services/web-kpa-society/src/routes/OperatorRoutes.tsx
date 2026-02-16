@@ -1,79 +1,19 @@
 /**
  * OperatorRoutes - 서비스 운영자 라우트 설정
- * WO-AI-SERVICE-OPERATOR-REPORT-V1: 운영자 AI 리포트 추가
- * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
- * WO-KPA-A-OPERATOR-DASHBOARD-UX-V1: Signal 기반 대시보드 도입
- * WO-OPERATOR-GUARD-UNIFICATION-P0: 운영자 접근 권한 가드 추가
- * WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1: 보안 정렬
+ *
+ * WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1:
+ * - OperatorLayout 제거 (중복 네비게이션 제거)
+ * - /operator 루트 → /hub 리다이렉트
+ * - 서브 페이지는 main Layout에서 렌더 (App.tsx에서 Layout 래핑)
  */
 
-import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
-import { KpaOperatorDashboard, OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, MemberManagementPage, ContentManagementPage, AuditLogPage } from '../pages/operator';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, MemberManagementPage, ContentManagementPage, AuditLogPage } from '../pages/operator';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/common';
 import { colors } from '../styles/theme';
-
-// 간단한 Operator Layout
-function OperatorLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="text-xl font-bold text-blue-600">
-              KPA Society
-            </Link>
-            <span className="text-slate-300">|</span>
-            <span className="text-slate-600 font-medium">운영자</span>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link to="/operator" className="text-sm text-slate-600 hover:text-blue-600">
-              대시보드
-            </Link>
-            <Link to="/operator/ai-report" className="text-sm text-slate-600 hover:text-blue-600">
-              AI 리포트
-            </Link>
-            <Link to="/operator/forum-management" className="text-sm text-slate-600 hover:text-blue-600">
-              포럼 관리
-            </Link>
-            <Link to="/operator/forum-analytics" className="text-sm text-slate-600 hover:text-blue-600">
-              포럼 통계
-            </Link>
-            <Link to="/operator/members" className="text-sm text-slate-600 hover:text-blue-600">
-              회원 관리
-            </Link>
-            <Link to="/operator/content" className="text-sm text-slate-600 hover:text-blue-600">
-              콘텐츠 관리
-            </Link>
-            <Link to="/operator/signage/content" className="text-sm text-slate-600 hover:text-blue-600">
-              콘텐츠 허브
-            </Link>
-            <Link to="/operator/legal" className="text-sm text-slate-600 hover:text-blue-600">
-              약관 관리
-            </Link>
-            <Link to="/operator/audit-logs" className="text-sm text-slate-600 hover:text-blue-600">
-              감사 로그
-            </Link>
-            <Link to="/operator/operators" className="text-sm text-slate-600 hover:text-blue-600">
-              운영자 관리
-            </Link>
-            <Link to="/" className="text-sm text-slate-500 hover:text-slate-700">
-              메인으로
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="pb-20">
-        {children}
-      </main>
-    </div>
-  );
-}
 
 /**
  * KPA-a 운영자 역할 확인
@@ -82,8 +22,6 @@ function OperatorLayout({ children }: { children: React.ReactNode }) {
  * Backend isKpaOperator()와 동일한 역할 목록 (kpa.routes.ts 참조)
  */
 function checkKpaOperatorRole(user: User): boolean {
-  // KPA-specific prefixed roles ONLY (matches backend requireKpaScope + isKpaOperator)
-  // platform:* roles are explicitly denied by backend — do not allow in frontend
   const allowedRoles = [
     'kpa:admin',
     'kpa:operator',
@@ -145,46 +83,44 @@ export function OperatorRoutes() {
   }
 
   return (
-    <OperatorLayout>
-      <Routes>
-        {/* 기본 경로 → Signal 기반 대시보드 (WO-KPA-A-OPERATOR-DASHBOARD-UX-V1) */}
-        <Route index element={<KpaOperatorDashboard />} />
+    <Routes>
+      {/* /operator → /hub 리다이렉트 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+      <Route index element={<Navigate to="/hub" replace />} />
 
-        {/* AI 리포트 */}
-        <Route path="ai-report" element={<OperatorAiReportPage />} />
+      {/* AI 리포트 */}
+      <Route path="ai-report" element={<OperatorAiReportPage />} />
 
-        {/* 포럼 관리 */}
-        <Route path="forum-management" element={<ForumManagementPage />} />
+      {/* 포럼 관리 */}
+      <Route path="forum-management" element={<ForumManagementPage />} />
 
-        {/* 포럼 통계 */}
-        <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
+      {/* 포럼 통계 */}
+      <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
 
-        {/* 회원 관리 (WO-KPA-A-MEMBER-APPROVAL-UI-PHASE1-V1) */}
-        <Route path="members" element={<MemberManagementPage />} />
+      {/* 회원 관리 (WO-KPA-A-MEMBER-APPROVAL-UI-PHASE1-V1) */}
+      <Route path="members" element={<MemberManagementPage />} />
 
-        {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
-        <Route path="content" element={<ContentManagementPage />} />
+      {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
+      <Route path="content" element={<ContentManagementPage />} />
 
-        {/* 사이니지 콘텐츠 허브 */}
-        <Route path="signage/content" element={<ContentHubPage />} />
+      {/* 사이니지 콘텐츠 허브 */}
+      <Route path="signage/content" element={<ContentHubPage />} />
 
-        {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
-        <Route path="legal" element={<LegalManagementPage />} />
+      {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
+      <Route path="legal" element={<LegalManagementPage />} />
 
-        {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
-        <Route path="audit-logs" element={<AuditLogPage />} />
+      {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
+      <Route path="audit-logs" element={<AuditLogPage />} />
 
-        {/* 운영자 관리 - WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin only */}
-        <Route path="operators" element={
-          (user?.roles || []).includes('kpa:admin')
-            ? <OperatorManagementPage />
-            : <Navigate to="" replace />
-        } />
+      {/* 운영자 관리 - WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin only */}
+      <Route path="operators" element={
+        (user?.roles || []).includes('kpa:admin')
+          ? <OperatorManagementPage />
+          : <Navigate to="/hub" replace />
+      } />
 
-        {/* 404 */}
-        <Route path="*" element={<Navigate to="" replace />} />
-      </Routes>
-    </OperatorLayout>
+      {/* 404 → /hub */}
+      <Route path="*" element={<Navigate to="/hub" replace />} />
+    </Routes>
   );
 }
 

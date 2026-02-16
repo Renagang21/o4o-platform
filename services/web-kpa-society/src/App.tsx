@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { useAuth } from './contexts/AuthContext';
@@ -147,12 +147,15 @@ const SERVICE_NAME = 'KPA-Society';
  */
 function LoginRedirect() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { openLoginModal } = useAuthModal();
 
   useEffect(() => {
-    navigate('/dashboard', { replace: true });
+    // state.from이 있으면 원래 페이지로 복귀, 없으면 홈
+    const from = (location.state as { from?: string })?.from || '/';
+    navigate(from, { replace: true });
     openLoginModal();
-  }, [navigate, openLoginModal]);
+  }, [navigate, openLoginModal, location.state]);
 
   return null;
 }
@@ -175,21 +178,25 @@ function RegisterRedirect() {
  */
 /**
  * WO-KPA-A-ROLE-BASED-REDIRECT-V1
- * / 접근 시 로그인된 admin/operator는 해당 대시보드로 자동 리다이렉트
- * 일반 사용자/비로그인은 커뮤니티 홈 표시
+ * / 접근 시 이미 로그인된 admin/operator는 /hub로 자동 리다이렉트
+ * 비로그인 상태에서 로그인해도 현재 페이지 유지 (1회 체크)
  */
 function RoleBasedHome() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    if (isLoading || checked) return;
+    setChecked(true);
+
     if (user?.roles) {
       const target = getDefaultRouteByRole(user.roles);
       if (target !== '/dashboard') {
         navigate(target, { replace: true });
       }
     }
-  }, [user, navigate]);
+  }, [user, isLoading, navigate, checked]);
 
   return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
 }
@@ -420,8 +427,8 @@ function App() {
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/demo/admin/*" element={<AdminRoutes />} />
 
-          {/* Operator Routes — /demo/operator → /operator 리다이렉트 (WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1) */}
-          <Route path="/demo/operator/*" element={<Navigate to="/operator" replace />} />
+          {/* Operator Routes — /demo/operator → /hub 리다이렉트 */}
+          <Route path="/demo/operator/*" element={<Navigate to="/hub" replace />} />
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
@@ -450,8 +457,8 @@ function App() {
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
           {/* Hub (통합 운영 허브 - WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
           <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubPage /></HubGuard></Layout>} />
-          {/* Operator Routes (서비스 운영자 - 독립 마운트, WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1) */}
-          <Route path="/operator/*" element={<OperatorRoutes />} />
+          {/* Operator Routes — /operator root → /hub 리다이렉트, 서브페이지는 Layout 래핑 */}
+          <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
           <Route path="/test-guide/*" element={<Navigate to="/demo/test-guide" replace />} />

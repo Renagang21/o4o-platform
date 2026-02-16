@@ -17,7 +17,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
-import { useAuth, useOrganization, type User as UserType } from '../contexts';
+import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
@@ -66,20 +66,21 @@ interface MenuItem {
 }
 
 /**
- * 메뉴 구조 (WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1)
+ * 메뉴 구조 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
  *
- * 서비스 진입점 중심 (기능 나열 금지)
- * - 홈: 커뮤니티 서비스 (Forum은 홈에서 접근)
- * - 약국경영: 독립 실서비스
- * - 분회 서비스: 실제 분회 운영 서비스
- * - 지부/분회 서비스 데모: 데모 서비스 (제거 예정)
+ * 사이트 기본 메뉴 + 허브
+ * - 홈: 커뮤니티 메인
+ * - 포럼: 커뮤니티 포럼
+ * - 강의: LMS 강좌
+ * - 콘텐츠: 공지/뉴스
+ * - 허브: 운영 허브 (operator 이상)
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
-  { label: '약국경영', href: '/pharmacy' },
-  { label: '분회 서비스', href: '/branch-services' },
-  { label: '지부/분회 서비스 데모', href: '/demo' },
-  { label: '허브', href: '/hub' },  // WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1
+  { label: '포럼', href: '/forum' },
+  { label: '강의', href: '/lms' },
+  { label: '콘텐츠', href: '/news' },
+  { label: '허브', href: '/hub' },
 ];
 
 export function Header({ serviceName }: { serviceName: string }) {
@@ -91,15 +92,11 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
-  const { accessibleOrganizations } = useOrganization();
   const accessibleDashboards = useAccessibleDashboards();
 
-  // 약국경영 메뉴: pharmacy context가 있을 때만 노출
   // 허브 메뉴: kpa:operator 이상만 노출 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
-  const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
   const hasHubAccess = user?.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
   const displayMenuItems = menuItems.filter(item => {
-    if (item.href === '/pharmacy') return hasPharmacyContext;
     if (item.href === '/hub') return hasHubAccess;
     return true;
   });

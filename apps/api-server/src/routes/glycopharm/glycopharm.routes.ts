@@ -28,6 +28,7 @@ import { createInvoiceController } from './controllers/invoice.controller.js'; /
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
+import { createServiceScopeGuard, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -35,88 +36,12 @@ import { forumContextMiddleware } from '../../middleware/forum-context.middlewar
 import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
 
 /**
- * Scope verification middleware factory for Glycopharm
+ * GlycoPharm Scope Guard — powered by @o4o/security-core
  *
- * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
- * - **GlycoPharm 서비스는 오직 glycopharm:* role만 신뢰**
- * - Priority 1: GlycoPharm prefixed roles ONLY (glycopharm:admin, glycopharm:operator)
- * - Priority 2: Legacy role detection → Log + DENY
- * - Scopes: glycopharm:* pattern (service-specific)
- * - platform:admin 허용 (플랫폼 감독)
+ * Replaces inline implementation with shared security-core guard factory.
+ * Behavior is identical: glycopharm roles, platform bypass, legacy detect+deny.
  */
-function requireGlycopharmScope(scope: string): RequestHandler {
-  return (req, res, next) => {
-    const user = (req as any).user;
-
-    if (!user) {
-      res.status(401).json({
-        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-      });
-      return;
-    }
-
-    const userId = user.id || 'unknown';
-    const userScopes: string[] = user.scopes || [];
-    const userRoles: string[] = user.roles || [];
-
-    // Check scopes (service-specific)
-    const hasScope = userScopes.includes(scope) || userScopes.includes('glycopharm:admin');
-
-    // Priority 1: Check GlycoPharm-specific prefixed roles
-    const hasGlycopharmRole = hasAnyServiceRole(userRoles, [
-      'glycopharm:admin',
-      'glycopharm:operator',
-      'platform:admin',
-      'platform:super_admin'
-    ]);
-
-    if (hasScope || hasGlycopharmRole) {
-      next();
-      return;
-    }
-
-    // Priority 2: Detect legacy roles and DENY access
-    const legacyRoles = ['admin', 'super_admin', 'operator'];
-    const detectedLegacyRoles = userRoles.filter(r => legacyRoles.includes(r));
-
-    if (detectedLegacyRoles.length > 0) {
-      // Log legacy role usage and deny access
-      detectedLegacyRoles.forEach(role => {
-        logLegacyRoleUsage(userId, role, `glycopharm.routes:requireGlycopharmScope(${scope})`);
-      });
-      res.status(403).json({
-        error: {
-          code: 'FORBIDDEN',
-          message: `Required scope: ${scope}. Legacy roles are no longer supported. Please use glycopharm:* prefixed roles.`
-        },
-      });
-      return;
-    }
-
-    // Detect other service roles
-    const hasOtherServiceRole = userRoles.some(r =>
-      r.startsWith('kpa:') ||
-      r.startsWith('neture:') ||
-      r.startsWith('cosmetics:') ||
-      r.startsWith('glucoseview:')
-    );
-
-    if (hasOtherServiceRole) {
-      res.status(403).json({
-        error: {
-          code: 'FORBIDDEN',
-          message: `Required scope: ${scope}. GlycoPharm requires glycopharm:* roles.`
-        },
-      });
-      return;
-    }
-
-    // Access denied - No valid role
-    res.status(403).json({
-      error: { code: 'FORBIDDEN', message: `Required scope: ${scope}` },
-    });
-  };
-}
+const requireGlycopharmScope = createServiceScopeGuard(GLYCOPHARM_SCOPE_CONFIG);
 
 /**
  * Create Glycopharm routes

@@ -2,6 +2,7 @@
  * SupplierOpsLayout - 공급자 운영 서비스 레이아웃
  *
  * Work Order: WO-SUPPLIER-OPS-ROUTE-REFACTOR-V1
+ * WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: 메뉴 재정렬 (홈/상품/콘텐츠/정산/허브)
  *
  * 목적:
  * - Neture 고유 기능(공급자 중심 운영/연결 서비스)을 위한 전용 레이아웃
@@ -16,13 +17,18 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import AccountMenu from '../AccountMenu';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function SupplierOpsLayout() {
   const location = useLocation();
+  const { user } = useAuth();
 
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
+
+  // 허브 접근 가능 역할: supplier, partner, admin
+  const hasHubAccess = user?.currentRole && ['admin', 'supplier', 'partner'].includes(user.currentRole);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,7 +55,7 @@ export default function SupplierOpsLayout() {
               </Link>
             </div>
 
-            {/* Navigation */}
+            {/* Navigation — WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: 홈/상품/콘텐츠/정산/허브 */}
             <nav className="flex items-center space-x-4">
               <Link
                 to="/workspace"
@@ -62,56 +68,47 @@ export default function SupplierOpsLayout() {
                 홈
               </Link>
               <Link
-                to="/workspace/suppliers"
+                to="/workspace/supplier/products"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/workspace/suppliers')
+                  isActive('/workspace/supplier/products')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
               >
-                공급자
-              </Link>
-              <Link
-                to="/workspace/partners/info"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/workspace/partners/info')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                참여 안내
-              </Link>
-              <Link
-                to="/workspace/partners/requests"
-                className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/workspace/partners/requests')
-                    ? 'text-primary-600'
-                    : 'text-gray-700 hover:text-primary-600'
-                }`}
-              >
-                제휴 요청
+                상품
               </Link>
               <Link
                 to="/workspace/content"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/workspace/content')
+                  isActive('/workspace/content') || isActive('/workspace/supplier/contents')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
               >
                 콘텐츠
               </Link>
-              <span className="text-gray-300">|</span>
               <Link
-                to="/workspace/forum"
+                to="/workspace/partner/settlements"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/workspace/forum')
+                  isActive('/workspace/partner/settlements')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}
               >
-                포럼
+                정산
               </Link>
+              {hasHubAccess && (
+                <Link
+                  to="/workspace/hub"
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive('/workspace/hub')
+                      ? 'text-primary-600'
+                      : 'text-gray-700 hover:text-primary-600'
+                  }`}
+                >
+                  허브
+                </Link>
+              )}
               {/* Account Menu */}
               <AccountMenu />
             </nav>

@@ -26,3 +26,6 @@ export * from './policies/index.js';
 export * from './ai-logs/index.js';
 export * from './cards/index.js';
 export * from './operations/index.js';
+
+// AI Orchestration Layer (WO-PLATFORM-AI-ORCHESTRATION-LAYER-V1)
+export * from './orchestration/index.js';

@@ -11,6 +11,10 @@ export class CareCoachingSession {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Column({ name: 'pharmacy_id', type: 'uuid' })
+  @Index()
+  pharmacyId!: string;
+
   @Column({ name: 'patient_id', type: 'uuid' })
   @Index()
   patientId!: string;

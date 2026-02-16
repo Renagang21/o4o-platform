@@ -2,22 +2,26 @@
  * HubPage - KPA-a 통합 운영 허브
  *
  * WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1
+ * WO-PLATFORM-HUB-CORE-EXTRACTION-V1: hub-core 기반 전환
+ * WO-PLATFORM-HUB-AI-SIGNAL-INTEGRATION-V1: AI 신호 연결
  *
  * 구조:
- *  1. 서비스 상태 요약 (공통)
- *  2. 실행 카드 영역 (Operator 기본)
- *  3. Admin 전용 카드 영역 (Admin만 노출)
- *  4. 최근 활동 로그 (공통)
+ *  1. 서비스 상태 요약 (beforeSections)
+ *  2. Operator 실행 카드 + 신호 배지 (hub-core HubLayout)
+ *  3. Admin 전용 카드 (hub-core HubLayout)
+ *  4. 최근 활동 로그 (afterSections)
  *
  * 권한: requireKpaScope('kpa:operator') 이상
  * Admin은 자동 포함 (KPA_SCOPE_CONFIG)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { operatorApi, type OperatorSummary } from '../../api/operator';
 import { colors, shadows, borderRadius, spacing } from '../../styles/theme';
+import { HubLayout, createSignal } from '@o4o/hub-core';
+import type { HubSectionDefinition, HubSignal } from '@o4o/hub-core';
 import {
   Users,
   MessageSquare,
@@ -38,134 +42,154 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-// ─── Types ───
+// ─── Icon helper ───
 
-interface HubCard {
-  id: string;
-  icon: React.ComponentType<{ style?: React.CSSProperties }>;
-  iconBg: string;
-  iconColor: string;
-  title: string;
-  description: string;
-  href: string;
-  badge?: string;
+function LucideIcon({ Icon, color }: { Icon: React.ComponentType<{ style?: React.CSSProperties }>; color: string }) {
+  return <Icon style={{ width: 22, height: 22, color }} />;
 }
 
-// ─── Card Definitions ───
+// ─── Section Definitions ───
 
-const OPERATOR_CARDS: HubCard[] = [
+const HUB_SECTIONS: HubSectionDefinition[] = [
   {
-    id: 'members',
-    icon: Users,
-    iconBg: '#EFF6FF',
-    iconColor: '#2563EB',
-    title: '회원 관리',
-    description: '회원 승인, 역할 관리',
-    href: '/operator/members',
+    id: 'operator',
+    title: '운영 관리',
+    cards: [
+      {
+        id: 'members',
+        title: '회원 관리',
+        description: '회원 승인, 역할 관리',
+        href: '/operator/members',
+        icon: <LucideIcon Icon={Users} color="#2563EB" />,
+        iconBg: '#EFF6FF',
+      },
+      {
+        id: 'forum',
+        title: '포럼 관리',
+        description: '게시글 관리, 중재',
+        href: '/operator/forum-management',
+        icon: <LucideIcon Icon={MessageSquare} color="#D97706" />,
+        iconBg: '#FEF3C7',
+        signalKey: 'forum',
+      },
+      {
+        id: 'content',
+        title: '콘텐츠 관리',
+        description: '공지, 뉴스 작성/관리',
+        href: '/operator/content',
+        icon: <LucideIcon Icon={FileText} color="#7C3AED" />,
+        iconBg: '#F3E8FF',
+        signalKey: 'content',
+      },
+      {
+        id: 'lms',
+        title: '강의 관리',
+        description: '강좌, 수강, 수료증',
+        href: '/lms/courses',
+        icon: <LucideIcon Icon={GraduationCap} color="#059669" />,
+        iconBg: '#ECFDF5',
+      },
+      {
+        id: 'groupbuy',
+        title: '공동구매 관리',
+        description: '공동구매 운영',
+        href: '/groupbuy',
+        icon: <LucideIcon Icon={ShoppingCart} color="#EA580C" />,
+        iconBg: '#FFF7ED',
+        signalKey: 'groupbuy',
+      },
+      {
+        id: 'ai-report',
+        title: 'AI 리포트',
+        description: 'AI 운영 분석 보고서',
+        href: '/operator/ai-report',
+        icon: <LucideIcon Icon={BrainCircuit} color="#0284C7" />,
+        iconBg: '#F0F9FF',
+      },
+    ],
   },
   {
-    id: 'forum',
-    icon: MessageSquare,
-    iconBg: '#FEF3C7',
-    iconColor: '#D97706',
-    title: '포럼 관리',
-    description: '게시글 관리, 중재',
-    href: '/operator/forum-management',
-  },
-  {
-    id: 'content',
-    icon: FileText,
-    iconBg: '#F3E8FF',
-    iconColor: '#7C3AED',
-    title: '콘텐츠 관리',
-    description: '공지, 뉴스 작성/관리',
-    href: '/operator/content',
-  },
-  {
-    id: 'lms',
-    icon: GraduationCap,
-    iconBg: '#ECFDF5',
-    iconColor: '#059669',
-    title: '강의 관리',
-    description: '강좌, 수강, 수료증',
-    href: '/lms/courses',
-  },
-  {
-    id: 'groupbuy',
-    icon: ShoppingCart,
-    iconBg: '#FFF7ED',
-    iconColor: '#EA580C',
-    title: '공동구매 관리',
-    description: '공동구매 운영',
-    href: '/groupbuy',
-  },
-  {
-    id: 'ai-report',
-    icon: BrainCircuit,
-    iconBg: '#F0F9FF',
-    iconColor: '#0284C7',
-    title: 'AI 리포트',
-    description: 'AI 운영 분석 보고서',
-    href: '/operator/ai-report',
+    id: 'admin',
+    title: '관리자 전용',
+    badge: 'Admin',
+    roles: ['kpa:admin'],
+    cards: [
+      {
+        id: 'organizations',
+        title: '조직 관리',
+        description: '조직 구조 관리',
+        href: '/demo/admin/dashboard',
+        icon: <LucideIcon Icon={Building2} color="#DC2626" />,
+        iconBg: '#FEF2F2',
+      },
+      {
+        id: 'role-mgmt',
+        title: 'Role 관리',
+        description: '역할 배정, 권한 설정',
+        href: '/operator/operators',
+        icon: <LucideIcon Icon={Shield} color="#A855F7" />,
+        iconBg: '#FDF4FF',
+      },
+      {
+        id: 'forum-structure',
+        title: '포럼 구조 관리',
+        description: '카테고리 생성/수정/삭제',
+        href: '/operator/forum-management',
+        icon: <LucideIcon Icon={LayoutGrid} color="#B45309" />,
+        iconBg: '#FFFBEB',
+      },
+      {
+        id: 'policy',
+        title: '정책 설정',
+        description: '약관, 정책 관리',
+        href: '/operator/legal',
+        icon: <LucideIcon Icon={Settings} color="#475569" />,
+        iconBg: '#F1F5F9',
+      },
+      {
+        id: 'stewards',
+        title: '간사 관리',
+        description: '간사 배정, 관리',
+        href: '/demo/admin/stewards',
+        icon: <LucideIcon Icon={UserCog} color="#047857" />,
+        iconBg: '#ECFDF5',
+      },
+      {
+        id: 'audit-logs',
+        title: '감사 로그',
+        description: '운영 활동 감사 기록',
+        href: '/operator/audit-logs',
+        icon: <LucideIcon Icon={ScrollText} color="#1D4ED8" />,
+        iconBg: '#EFF6FF',
+      },
+    ],
   },
 ];
 
-const ADMIN_CARDS: HubCard[] = [
-  {
-    id: 'organizations',
-    icon: Building2,
-    iconBg: '#FEF2F2',
-    iconColor: '#DC2626',
-    title: '조직 관리',
-    description: '조직 구조 관리',
-    href: '/demo/admin/dashboard',
-  },
-  {
-    id: 'role-mgmt',
-    icon: Shield,
-    iconBg: '#FDF4FF',
-    iconColor: '#A855F7',
-    title: 'Role 관리',
-    description: '역할 배정, 권한 설정',
-    href: '/operator/operators',
-  },
-  {
-    id: 'forum-structure',
-    icon: LayoutGrid,
-    iconBg: '#FFFBEB',
-    iconColor: '#B45309',
-    title: '포럼 구조 관리',
-    description: '카테고리 생성/수정/삭제',
-    href: '/operator/forum-management',
-  },
-  {
-    id: 'policy',
-    icon: Settings,
-    iconBg: '#F1F5F9',
-    iconColor: '#475569',
-    title: '정책 설정',
-    description: '약관, 정책 관리',
-    href: '/operator/legal',
-  },
-  {
-    id: 'stewards',
-    icon: UserCog,
-    iconBg: '#ECFDF5',
-    iconColor: '#047857',
-    title: '간사 관리',
-    description: '간사 배정, 관리',
-    href: '/demo/admin/stewards',
-  },
-  {
-    id: 'audit-logs',
-    icon: ScrollText,
-    iconBg: '#EFF6FF',
-    iconColor: '#1D4ED8',
-    title: '감사 로그',
-    description: '운영 활동 감사 기록',
-    href: '/operator/audit-logs',
-  },
-];
+// ─── Signal Mapper ───
+
+function buildKpaSignals(summary: OperatorSummary | null): Record<string, HubSignal> {
+  if (!summary) return {};
+  const signals: Record<string, HubSignal> = {};
+
+  // 콘텐츠 신호
+  const contentCount = summary.content?.totalPublished ?? 0;
+  if (contentCount === 0) {
+    signals.content = createSignal('warning', { label: '게시물 없음' });
+  } else {
+    signals.content = createSignal('info', { label: '게시됨', count: contentCount });
+  }
+
+  // 포럼 신호
+  const forumCount = summary.forum?.totalPosts ?? 0;
+  if (forumCount === 0) {
+    signals.forum = createSignal('warning', { label: '게시글 없음' });
+  } else {
+    signals.forum = createSignal('info', { label: '게시글', count: forumCount });
+  }
+
+  return signals;
+}
 
 // ─── Component ───
 
@@ -176,7 +200,8 @@ export default function HubPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const isAdmin = user?.roles?.includes('kpa:admin') ?? false;
+  const userRoles = user?.roles ?? [];
+  const signals = useMemo(() => buildKpaSignals(summary), [summary]);
 
   const fetchSummary = useCallback(async () => {
     setLoading(true);
@@ -195,97 +220,79 @@ export default function HubPage() {
   }, [fetchSummary]);
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <h1 style={styles.title}>운영 허브</h1>
-            <p style={styles.subtitle}>서비스 운영 현황을 한눈에 확인하고 관리하세요</p>
-          </div>
-          <button
-            style={styles.refreshButton}
-            onClick={fetchSummary}
-            disabled={loading}
-          >
-            <RefreshCw style={{ width: 16, height: 16, ...(loading ? { animation: 'spin 1s linear infinite' } : {}) }} />
-            새로고침
-          </button>
-        </div>
-
-        {/* 1. 서비스 상태 요약 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>서비스 상태</h2>
-          {loading ? (
-            <div style={styles.loadingBox}>
-              <Loader2 style={{ width: 24, height: 24, color: colors.primary, animation: 'spin 1s linear infinite' }} />
-              <span style={{ color: colors.neutral500, fontSize: '14px' }}>데이터 로딩 중...</span>
+    <div style={{ minHeight: '100vh', backgroundColor: colors.neutral50 }}>
+      <HubLayout
+        title="운영 허브"
+        subtitle="서비스 운영 현황을 한눈에 확인하고 관리하세요"
+        sections={HUB_SECTIONS}
+        userRoles={userRoles}
+        signals={signals}
+        onCardClick={(href) => navigate(href)}
+        beforeSections={
+          <>
+            {/* 새로고침 버튼 */}
+            <div style={styles.refreshRow}>
+              <button
+                style={styles.refreshButton}
+                onClick={fetchSummary}
+                disabled={loading}
+              >
+                <RefreshCw style={{ width: 16, height: 16, ...(loading ? { animation: 'spin 1s linear infinite' } : {}) }} />
+                새로고침
+              </button>
             </div>
-          ) : error ? (
-            <div style={styles.errorBox}>
-              <AlertCircle style={{ width: 20, height: 20, color: colors.error }} />
-              <span style={{ color: colors.error, fontSize: '14px' }}>{error}</span>
-            </div>
-          ) : (
-            <div style={styles.statusGrid}>
-              <StatusCard
-                label="콘텐츠"
-                count={summary?.content?.totalPublished ?? 0}
-                unit="건 게시됨"
-                status={summary?.content?.totalPublished ? 'good' : 'warning'}
-              />
-              <StatusCard
-                label="포럼"
-                count={summary?.forum?.totalPosts ?? 0}
-                unit="건 게시글"
-                status={summary?.forum?.totalPosts ? 'good' : 'warning'}
-              />
-              <StatusCard
-                label="사이니지"
-                count={(summary?.signage?.totalMedia ?? 0) + (summary?.signage?.totalPlaylists ?? 0)}
-                unit="건 미디어"
-                status={(summary?.signage?.totalMedia ?? 0) > 0 ? 'good' : 'warning'}
-              />
-            </div>
-          )}
-        </section>
 
-        {/* 2. Operator 실행 카드 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>운영 관리</h2>
-          <div style={styles.cardGrid}>
-            {OPERATOR_CARDS.map(card => (
-              <HubCardItem key={card.id} card={card} onClick={() => navigate(card.href)} />
-            ))}
-          </div>
-        </section>
-
-        {/* 3. Admin 전용 카드 */}
-        {isAdmin && (
+            {/* 서비스 상태 요약 */}
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}>서비스 상태</h2>
+              {loading ? (
+                <div style={styles.loadingBox}>
+                  <Loader2 style={{ width: 24, height: 24, color: colors.primary, animation: 'spin 1s linear infinite' }} />
+                  <span style={{ color: colors.neutral500, fontSize: '14px' }}>데이터 로딩 중...</span>
+                </div>
+              ) : error ? (
+                <div style={styles.errorBox}>
+                  <AlertCircle style={{ width: 20, height: 20, color: colors.error }} />
+                  <span style={{ color: colors.error, fontSize: '14px' }}>{error}</span>
+                </div>
+              ) : (
+                <div style={styles.statusGrid}>
+                  <StatusCard
+                    label="콘텐츠"
+                    count={summary?.content?.totalPublished ?? 0}
+                    unit="건 게시됨"
+                    status={summary?.content?.totalPublished ? 'good' : 'warning'}
+                  />
+                  <StatusCard
+                    label="포럼"
+                    count={summary?.forum?.totalPosts ?? 0}
+                    unit="건 게시글"
+                    status={summary?.forum?.totalPosts ? 'good' : 'warning'}
+                  />
+                  <StatusCard
+                    label="사이니지"
+                    count={(summary?.signage?.totalMedia ?? 0) + (summary?.signage?.totalPlaylists ?? 0)}
+                    unit="건 미디어"
+                    status={(summary?.signage?.totalMedia ?? 0) > 0 ? 'good' : 'warning'}
+                  />
+                </div>
+              )}
+            </section>
+          </>
+        }
+        afterSections={
           <section style={styles.section}>
-            <div style={styles.adminSectionHeader}>
-              <h2 style={styles.sectionTitle}>관리자 전용</h2>
-              <span style={styles.adminBadge}>Admin</span>
-            </div>
-            <div style={styles.cardGrid}>
-              {ADMIN_CARDS.map(card => (
-                <HubCardItem key={card.id} card={card} onClick={() => navigate(card.href)} />
-              ))}
-            </div>
+            <h2 style={styles.sectionTitle}>최근 활동</h2>
+            {!loading && summary && (
+              <RecentActivityList summary={summary} />
+            )}
+            {!loading && !summary && !error && (
+              <p style={{ color: colors.neutral500, fontSize: '14px' }}>활동 데이터가 없습니다.</p>
+            )}
           </section>
-        )}
-
-        {/* 4. 최근 활동 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>최근 활동</h2>
-          {!loading && summary && (
-            <RecentActivityList summary={summary} />
-          )}
-          {!loading && !summary && !error && (
-            <p style={{ color: colors.neutral500, fontSize: '14px' }}>활동 데이터가 없습니다.</p>
-          )}
-        </section>
-      </div>
+        }
+        footerNote="허브는 각 기능의 진입점입니다. 상세 작업은 각 페이지에서 진행해주세요."
+      />
     </div>
   );
 }
@@ -315,40 +322,14 @@ function StatusCard({ label, count, unit, status }: {
   );
 }
 
-function HubCardItem({ card, onClick }: { card: HubCard; onClick: () => void }) {
-  const [hovered, setHovered] = useState(false);
-  const Icon = card.icon;
-
-  return (
-    <button
-      style={{
-        ...styles.card,
-        ...(hovered ? styles.cardHover : {}),
-      }}
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div style={{ ...styles.cardIcon, backgroundColor: card.iconBg }}>
-        <Icon style={{ width: 22, height: 22, color: card.iconColor }} />
-      </div>
-      <div style={styles.cardContent}>
-        <span style={styles.cardTitle}>{card.title}</span>
-        <span style={styles.cardDescription}>{card.description}</span>
-      </div>
-    </button>
-  );
-}
-
 function RecentActivityList({ summary }: { summary: OperatorSummary }) {
-  const items: { id: string; type: string; title: string; detail: string; date: string }[] = [];
+  const items: { id: string; type: string; title: string; date: string }[] = [];
 
   for (const c of summary.content?.recentItems || []) {
     items.push({
       id: `c-${c.id}`,
       type: '콘텐츠',
       title: c.title,
-      detail: c.type || '',
       date: c.publishedAt || c.createdAt,
     });
   }
@@ -357,7 +338,6 @@ function RecentActivityList({ summary }: { summary: OperatorSummary }) {
       id: `f-${p.id}`,
       type: '포럼',
       title: p.title,
-      detail: p.authorName || '익명',
       date: p.createdAt,
     });
   }
@@ -403,31 +383,11 @@ function formatRelativeDate(dateStr: string): string {
 // ─── Styles ───
 
 const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    backgroundColor: colors.neutral50,
-  },
-  container: {
-    maxWidth: '1100px',
-    margin: '0 auto',
-    padding: `${spacing.xl} ${spacing.lg}`,
-  },
-  header: {
+  refreshRow: {
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.xl,
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: 700,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '15px',
-    color: colors.neutral500,
-    marginTop: '6px',
+    justifyContent: 'flex-end',
+    marginBottom: spacing.md,
+    marginTop: `-${spacing.md}`,
   },
   refreshButton: {
     display: 'flex',
@@ -449,20 +409,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     color: colors.neutral800,
     margin: `0 0 ${spacing.md} 0`,
-  },
-  adminSectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    marginBottom: spacing.md,
-  },
-  adminBadge: {
-    fontSize: '11px',
-    fontWeight: 600,
-    color: colors.error,
-    backgroundColor: '#FEF2F2',
-    padding: '2px 8px',
-    borderRadius: '10px',
   },
 
   // Status cards
@@ -504,55 +450,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
   },
 
-  // Hub cards
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: spacing.md,
-  },
-  card: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    border: `1px solid ${colors.neutral200}`,
-    boxShadow: shadows.sm,
-    cursor: 'pointer',
-    transition: 'box-shadow 0.2s, border-color 0.2s, transform 0.15s',
-    textAlign: 'left',
-    width: '100%',
-  },
-  cardHover: {
-    boxShadow: shadows.md,
-    borderColor: colors.primary,
-    transform: 'translateY(-1px)',
-  },
-  cardIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '48px',
-    height: '48px',
-    borderRadius: borderRadius.md,
-    flexShrink: 0,
-  },
-  cardContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-  },
-  cardTitle: {
-    fontSize: '15px',
-    fontWeight: 600,
-    color: colors.neutral900,
-  },
-  cardDescription: {
-    fontSize: '13px',
-    color: colors.neutral500,
-  },
-
   // Loading / Error
   loadingBox: {
     display: 'flex',
@@ -586,7 +483,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   activityContent: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     flex: 1,
     minWidth: 0,
   },

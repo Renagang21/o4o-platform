@@ -3,6 +3,7 @@
  *
  * Work Orders:
  * - WO-SUPPLIER-OPS-ROUTE-REFACTOR-V1: /workspace 기준 라우트 분리
+ * - WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: /workspace/hub 통합 허브
  *
  * 구조:
  * 1. o4o 공통 영역 (/, /o4o, /channel/*, /seller/overview/*, /partner/overview-info)
@@ -212,6 +213,9 @@ const EmailSettingsPage = lazy(() =>
 
 // Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1)
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
+
+// Hub (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1)
+const HubPage = lazy(() => import('./pages/hub/HubPage'));
 
 // Operator Dashboard
 const NetureOperatorDashboard = lazy(() =>
@@ -457,6 +461,9 @@ function App() {
               <Route path="/workspace/forum/write" element={<ForumWritePage />} />
               <Route path="/workspace/forum/post/:slug" element={<ForumPostPage />} />
 
+              {/* 통합 허브 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+              <Route path="/workspace/hub" element={<HubPage />} />
+
               {/* Neture 전용 테스트 가이드 */}
               <Route path="/workspace/manual/supplier" element={<SupplierManualPage />} />
               <Route path="/workspace/manual/partner" element={<PartnerManualPage />} />
@@ -550,13 +557,13 @@ function App() {
             <Route path="/content/:id" element={<RedirectContentDetail />} />
             <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
 
-            {/* Supplier Dashboard 리다이렉트 */}
-            <Route path="/supplier/dashboard" element={<Navigate to="/workspace/supplier/dashboard" replace />} />
+            {/* Supplier Dashboard 리다이렉트 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: → /workspace/hub) */}
+            <Route path="/supplier/dashboard" element={<Navigate to="/workspace/hub" replace />} />
             <Route path="/supplier/requests" element={<Navigate to="/workspace/supplier/requests" replace />} />
             <Route path="/supplier/products" element={<Navigate to="/workspace/supplier/products" replace />} />
             <Route path="/supplier/orders" element={<Navigate to="/workspace/supplier/orders" replace />} />
             <Route path="/supplier/contents" element={<Navigate to="/workspace/supplier/contents" replace />} />
-            <Route path="/supplier/*" element={<Navigate to="/workspace/supplier/dashboard" replace />} />
+            <Route path="/supplier/*" element={<Navigate to="/workspace/hub" replace />} />
 
             {/* Partner Dashboard 리다이렉트 */}
             <Route path="/partner" element={<Navigate to="/workspace/partner" replace />} />
@@ -564,11 +571,14 @@ function App() {
             <Route path="/partner/promotions" element={<Navigate to="/workspace/partner/promotions" replace />} />
             <Route path="/partner/settlements" element={<Navigate to="/workspace/partner/settlements" replace />} />
 
-            {/* Admin/Operator 리다이렉트 */}
-            <Route path="/admin" element={<Navigate to="/workspace/admin" replace />} />
-            <Route path="/admin/*" element={<Navigate to="/workspace/admin" replace />} />
-            <Route path="/operator" element={<Navigate to="/workspace/operator" replace />} />
-            <Route path="/operator/*" element={<Navigate to="/workspace/operator" replace />} />
+            {/* Hub 리다이렉트 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+            <Route path="/hub" element={<Navigate to="/workspace/hub" replace />} />
+
+            {/* Admin/Operator 리다이렉트 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+            <Route path="/admin" element={<Navigate to="/workspace/hub" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/workspace/hub" replace />} />
+            <Route path="/operator" element={<Navigate to="/workspace/hub" replace />} />
+            <Route path="/operator/*" element={<Navigate to="/workspace/hub" replace />} />
 
             {/* Test Guide 리다이렉트 (Neture 전용) */}
             <Route path="/test-guide/manual/supplier" element={<Navigate to="/workspace/manual/supplier" replace />} />

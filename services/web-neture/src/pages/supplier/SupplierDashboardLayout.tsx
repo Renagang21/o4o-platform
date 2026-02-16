@@ -2,6 +2,7 @@
  * SupplierDashboardLayout - 공급자 대시보드 레이아웃
  *
  * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0
+ * WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: 상단 메뉴 재정렬 (홈/상품/콘텐츠/정산/허브)
  *
  * 핵심 원칙:
  * - 공급자(supplier/partner) 역할만 접근 가능
@@ -95,7 +96,7 @@ export default function SupplierDashboardLayout() {
             </Link>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation — WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: 홈/상품/콘텐츠/정산/허브 */}
           <nav className="flex items-center space-x-4">
             <Link
               to="/workspace"
@@ -108,55 +109,44 @@ export default function SupplierDashboardLayout() {
               홈
             </Link>
             <Link
-              to="/workspace/suppliers"
+              to="/workspace/supplier/products"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/workspace/suppliers')
+                isNavActive('/workspace/supplier/products')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
             >
-              공급자
-            </Link>
-            <Link
-              to="/workspace/partners/info"
-              className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/workspace/partners/info')
-                  ? 'text-primary-600'
-                  : 'text-gray-700 hover:text-primary-600'
-              }`}
-            >
-              참여 안내
-            </Link>
-            <Link
-              to="/workspace/partners/requests"
-              className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/workspace/partners/requests')
-                  ? 'text-primary-600'
-                  : 'text-gray-700 hover:text-primary-600'
-              }`}
-            >
-              제휴 요청
+              상품
             </Link>
             <Link
               to="/workspace/content"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/workspace/content')
+                isNavActive('/workspace/content') || isNavActive('/workspace/supplier/contents')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
             >
               콘텐츠
             </Link>
-            <span className="text-gray-300">|</span>
             <Link
-              to="/workspace/forum"
+              to="/workspace/partner/settlements"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/workspace/forum')
+                isNavActive('/workspace/partner/settlements')
                   ? 'text-primary-600'
                   : 'text-gray-700 hover:text-primary-600'
               }`}
             >
-              포럼
+              정산
+            </Link>
+            <Link
+              to="/workspace/hub"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                isNavActive('/workspace/hub')
+                  ? 'text-primary-600'
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
+            >
+              허브
             </Link>
             <AccountMenu />
           </nav>

@@ -24,6 +24,8 @@ module.exports = {
     }],
   },
   moduleNameMapper: {
+    '^@o4o/security-core$': '<rootDir>/../../packages/security-core/src/index.ts',
+    '^@o4o/ai-core$': '<rootDir>/../../packages/ai-core/src/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
@@ -35,6 +37,10 @@ module.exports = {
     '!src/types/**/*',
     '!src/migrations/**/*',
   ],
+  // Prevent OOM on Windows — serialize test execution
+  maxWorkers: 1,
+  // Force exit after tests complete (prevents open handle hang)
+  forceExit: true,
   // Mock problematic ESM modules
   transformIgnorePatterns: [
     'node_modules/(?!(typeorm)/)', // Allow typeorm transformation

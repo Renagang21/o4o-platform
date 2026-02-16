@@ -3,6 +3,7 @@
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
  * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (pagination)
+ * WO-O4O-ASSET-COPY-NETURE-PILOT-V1 (sourceService column)
  *
  * 커뮤니티 CMS/Signage에서 "매장으로 복사"된 자산 스냅샷 목록 표시
  */
@@ -27,6 +28,11 @@ const PAGE_LIMIT = 20;
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('ko-KR');
 }
+
+const SERVICE_LABELS: Record<string, string> = {
+  kpa: 'KPA',
+  neture: 'Neture',
+};
 
 export default function StoreAssetsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
@@ -133,6 +139,7 @@ export default function StoreAssetsPage() {
               <thead>
                 <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
                   <th className="px-4 py-3 font-medium">유형</th>
+                  <th className="px-4 py-3 font-medium">출처</th>
                   <th className="px-4 py-3 font-medium">제목</th>
                   <th className="px-4 py-3 font-medium w-28">복사일</th>
                 </tr>
@@ -147,6 +154,11 @@ export default function StoreAssetsPage() {
                           : 'bg-purple-50 text-purple-700'
                       }`}>
                         {item.assetType === 'cms' ? 'CMS' : '사이니지'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                        {SERVICE_LABELS[item.sourceService] || item.sourceService}
                       </span>
                     </td>
                     <td className="px-4 py-3">

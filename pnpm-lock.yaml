@@ -2435,6 +2435,25 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/hub-core:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.2.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.0(react@19.2.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.0
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.2.0
+        version: 19.2.3(@types/react@19.2.7)
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/lms-core:
     dependencies:
       '@o4o/organization-core':
@@ -3687,6 +3706,9 @@ importers:
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
+      '@o4o/hub-core':
+        specifier: workspace:*
+        version: link:../../packages/hub-core
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
@@ -3751,6 +3773,9 @@ importers:
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
+      '@o4o/hub-core':
+        specifier: workspace:*
+        version: link:../../packages/hub-core
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core

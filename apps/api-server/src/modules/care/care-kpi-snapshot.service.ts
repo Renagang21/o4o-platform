@@ -1,4 +1,4 @@
-import type { DataSource, Repository } from 'typeorm';
+import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
 import { CareKpiSnapshot } from './entities/care-kpi-snapshot.entity.js';
 import type { CareInsightDto } from './dto.js';
 
@@ -19,9 +19,14 @@ export class CareKpiSnapshotService {
     this.repo = dataSource.getRepository(CareKpiSnapshot);
   }
 
-  /** Record a snapshot after analysis */
-  async recordSnapshot(patientId: string, analysis: CareInsightDto): Promise<CareKpiSnapshot> {
+  /** Record a snapshot after analysis (pharmacy-scoped) */
+  async recordSnapshot(
+    patientId: string,
+    analysis: CareInsightDto,
+    pharmacyId: string
+  ): Promise<CareKpiSnapshot> {
     const snapshot = this.repo.create({
+      pharmacyId,
       patientId,
       tir: analysis.tir,
       cv: analysis.cv,
@@ -30,10 +35,21 @@ export class CareKpiSnapshotService {
     return this.repo.save(snapshot);
   }
 
-  /** Compare latest 2 snapshots for KPI trend */
-  async getKpiComparison(patientId: string): Promise<KpiComparisonDto> {
+  /**
+   * Compare latest 2 snapshots for KPI trend (pharmacy-scoped)
+   * pharmacyId = null/undefined means admin (no filter)
+   */
+  async getKpiComparison(
+    patientId: string,
+    pharmacyId?: string | null
+  ): Promise<KpiComparisonDto> {
+    const where: FindOptionsWhere<CareKpiSnapshot> = { patientId };
+    if (pharmacyId) {
+      where.pharmacyId = pharmacyId;
+    }
+
     const snapshots = await this.repo.find({
-      where: { patientId },
+      where,
       order: { createdAt: 'DESC' },
       take: 2,
     });

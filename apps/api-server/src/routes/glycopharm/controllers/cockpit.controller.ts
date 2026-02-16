@@ -17,6 +17,7 @@ import { GlycopharmApplication } from '../entities/glycopharm-application.entity
 import { GlycopharmCustomerRequest } from '../entities/customer-request.entity.js';
 import { StoreSummaryEngine, StoreInsightsEngine, DEFAULT_INSIGHT_RULES } from '@o4o/store-core';
 import { GlycopharmStoreDataAdapter } from '../services/glycopharm-store-data.adapter.js';
+import { runAIInsight } from '@o4o/ai-core';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -657,5 +658,200 @@ export function createCockpitController(
     }
   );
 
+  // ==========================================================================
+  // AI Orchestration Summary (WO-PLATFORM-AI-ORCHESTRATION-LAYER-V1 Phase 3)
+  // ==========================================================================
+
+  /**
+   * GET /pharmacy/cockpit/ai-summary
+   * AI-powered pharmacy insight — aggregated KPI + care data → AI analysis.
+   *
+   * Principles:
+   * - Only aggregated data passed (no individual patient data)
+   * - Pharmacy-scoped queries (pharmacy_id isolation)
+   * - AI failure → graceful fallback (no error exposed to UI)
+   */
+  router.get(
+    '/ai-summary',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles: string[] = (authReq.user as any)?.roles || [];
+
+        if (!userId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+          });
+          return;
+        }
+
+        // Find pharmacy
+        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacy = await pharmacyRepo.findOne({
+          where: { created_by_user_id: userId },
+        });
+
+        if (!pharmacy) {
+          res.status(404).json({
+            error: { code: 'PHARMACY_NOT_FOUND', message: '등록된 약국이 없습니다' },
+          });
+          return;
+        }
+
+        // --- Collect aggregated context data (pharmacy-scoped) ---
+
+        // A. Care KPI: risk distribution (latest snapshot per patient)
+        const riskRows: Array<{ risk_level: string; count: number }> = await dataSource.query(`
+          SELECT s.risk_level, COUNT(*)::int AS count
+          FROM care_kpi_snapshots s
+          INNER JOIN (
+            SELECT patient_id, MAX(created_at) AS max_at
+            FROM care_kpi_snapshots WHERE pharmacy_id = $1
+            GROUP BY patient_id
+          ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
+          WHERE s.pharmacy_id = $1
+          GROUP BY s.risk_level
+        `, [pharmacy.id]);
+
+        let highRiskCount = 0, moderateRiskCount = 0, lowRiskCount = 0;
+        for (const row of riskRows) {
+          if (row.risk_level === 'high') highRiskCount = row.count;
+          else if (row.risk_level === 'moderate') moderateRiskCount = row.count;
+          else if (row.risk_level === 'low') lowRiskCount = row.count;
+        }
+        const totalPatients = highRiskCount + moderateRiskCount + lowRiskCount;
+
+        // B. Coaching count (last 7 days)
+        const coachingResult = await dataSource.query(`
+          SELECT COUNT(*)::int AS count FROM care_coaching_sessions
+          WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
+        `, [pharmacy.id]);
+        const recentCoachingCount = coachingResult[0]?.count ?? 0;
+
+        // C. Improving count (TIR trend)
+        const improvingResult = await dataSource.query(`
+          WITH ranked AS (
+            SELECT patient_id, tir,
+                   ROW_NUMBER() OVER (PARTITION BY patient_id ORDER BY created_at DESC) AS rn
+            FROM care_kpi_snapshots WHERE pharmacy_id = $1
+          )
+          SELECT COUNT(*)::int AS count FROM (
+            SELECT r1.patient_id FROM ranked r1
+            JOIN ranked r2 ON r1.patient_id = r2.patient_id AND r2.rn = 2
+            WHERE r1.rn = 1 AND r1.tir > r2.tir
+          ) improving
+        `, [pharmacy.id]);
+        const improvingCount = improvingResult[0]?.count ?? 0;
+
+        // D. Store KPI (orders, revenue)
+        let storeKpi = { orderCount: 0, revenue: 0, lastMonthRevenue: 0 };
+        try {
+          const [summary, lastMonthRevenue] = await Promise.all([
+            summaryEngine.getSummary(pharmacy.id),
+            summaryEngine.getLastMonthRevenue(pharmacy.id),
+          ]);
+          storeKpi = {
+            orderCount: summary.totalOrders ?? 0,
+            revenue: summary.totalRevenue ?? 0,
+            lastMonthRevenue: lastMonthRevenue ?? 0,
+          };
+        } catch { /* store KPI optional */ }
+
+        // E. Pending requests
+        const customerRequestRepo = dataSource.getRepository(GlycopharmCustomerRequest);
+        const pendingRequests = await customerRequestRepo.count({
+          where: { pharmacyId: pharmacy.id, status: 'pending' },
+        });
+
+        // --- Call AI Orchestrator ---
+        const aiResult = await runAIInsight({
+          service: 'glycopharm',
+          insightType: 'store-summary',
+          contextData: {
+            pharmacyName: pharmacy.name,
+            kpi: {
+              totalPatients,
+              highRiskCount,
+              moderateRiskCount,
+              lowRiskCount,
+              improvingCount,
+              recentCoachingCount,
+            },
+            revenue: {
+              currentMonth: storeKpi.revenue,
+              lastMonth: storeKpi.lastMonthRevenue,
+              growthRate: storeKpi.lastMonthRevenue > 0
+                ? ((storeKpi.revenue - storeKpi.lastMonthRevenue) / storeKpi.lastMonthRevenue * 100)
+                : 0,
+            },
+            pendingRequests,
+          },
+          user: {
+            id: userId,
+            role: userRoles[0] || 'glycopharm:operator',
+          },
+        });
+
+        if (aiResult.success && aiResult.insight) {
+          res.json({
+            success: true,
+            data: {
+              insight: aiResult.insight,
+              meta: {
+                provider: aiResult.meta.provider,
+                model: aiResult.meta.model,
+                durationMs: aiResult.meta.durationMs,
+                confidenceScore: aiResult.insight.confidenceScore,
+              },
+            },
+          });
+        } else {
+          // Graceful fallback — return rule-based summary instead
+          res.json({
+            success: true,
+            data: {
+              insight: buildFallbackInsight(
+                totalPatients, highRiskCount, recentCoachingCount, improvingCount
+              ),
+              meta: { provider: 'fallback', model: 'rule-based', durationMs: 0, confidenceScore: 1.0 },
+            },
+          });
+        }
+      } catch (error: any) {
+        console.error('Failed to generate AI summary:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
   return router;
+}
+
+/**
+ * Fallback insight when AI provider is unavailable.
+ * Pure rule-based — no external calls.
+ */
+function buildFallbackInsight(
+  totalPatients: number,
+  highRiskCount: number,
+  recentCoachingCount: number,
+  improvingCount: number,
+): { summary: string; riskLevel: 'low' | 'medium' | 'high'; recommendedActions: string[]; confidenceScore: number } {
+  const highRiskRatio = totalPatients > 0 ? highRiskCount / totalPatients : 0;
+  const riskLevel = highRiskRatio > 0.3 ? 'high' : highRiskRatio > 0.1 ? 'medium' : 'low';
+
+  const actions: string[] = [];
+  if (highRiskCount > 0) actions.push(`고위험 환자 ${highRiskCount}명 우선 상담 필요`);
+  if (recentCoachingCount === 0) actions.push('최근 7일간 코칭 미실시 — 코칭 세션 권장');
+  if (improvingCount > 0) actions.push(`${improvingCount}명의 환자가 개선 추세`);
+
+  const summary = totalPatients === 0
+    ? '등록된 환자 데이터가 없습니다.'
+    : `총 ${totalPatients}명 중 고위험 ${highRiskCount}명, 최근 코칭 ${recentCoachingCount}건.`;
+
+  return { summary, riskLevel, recommendedActions: actions, confidenceScore: 1.0 };
 }

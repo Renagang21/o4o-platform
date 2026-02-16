@@ -2,6 +2,7 @@
  * AssetSnapshot Service
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
+ * WO-O4O-ASSET-COPY-NETURE-PILOT-V1 (Resolver pattern)
  *
  * Handles:
  * - Copy CMS/Signage source asset → o4o_asset_snapshots
@@ -13,6 +14,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { AssetSnapshot } from './entities/asset-snapshot.entity.js';
 import { CmsContent } from '@o4o-apps/cms-core/entities';
+import type { AssetResolver } from './interfaces/asset-resolver.interface.js';
 
 export interface CopyAssetInput {
   sourceService: string;
@@ -20,6 +22,16 @@ export interface CopyAssetInput {
   assetType: 'cms' | 'signage';
   targetOrganizationId: string;
   createdBy: string;
+}
+
+export interface CopyResolvedAssetInput {
+  sourceService: string;
+  sourceAssetId: string;
+  assetType: 'cms' | 'signage';
+  targetOrganizationId: string;
+  createdBy: string;
+  title: string;
+  contentJson: Record<string, unknown>;
 }
 
 export interface CopyAssetResult {
@@ -92,6 +104,75 @@ export class AssetSnapshotService {
       return { snapshot: saved };
     } catch (err: any) {
       // DB unique constraint violation → treat as duplicate
+      if (err.code === '23505') {
+        throw new Error('DUPLICATE_SNAPSHOT');
+      }
+      throw err;
+    }
+  }
+
+  /**
+   * Copy using a service-specific Resolver (WO-O4O-ASSET-COPY-NETURE-PILOT-V1)
+   *
+   * The controller passes a resolver; this service calls it to get content,
+   * then stores the snapshot. The service never knows the source structure.
+   */
+  async copyWithResolver(
+    input: CopyAssetInput,
+    resolver: AssetResolver,
+  ): Promise<CopyAssetResult> {
+    const { sourceService, sourceAssetId, assetType, targetOrganizationId, createdBy } = input;
+
+    const resolved = await resolver.resolve(sourceAssetId, assetType);
+    if (!resolved) {
+      throw new Error('SOURCE_NOT_FOUND');
+    }
+
+    return this.copyResolved({
+      sourceService,
+      sourceAssetId,
+      assetType,
+      targetOrganizationId,
+      createdBy,
+      title: resolved.title,
+      contentJson: resolved.contentJson,
+    });
+  }
+
+  /**
+   * Store a pre-resolved asset as a snapshot.
+   * Used by copyWithResolver and available for direct use.
+   */
+  async copyResolved(input: CopyResolvedAssetInput): Promise<CopyAssetResult> {
+    const { sourceService, sourceAssetId, assetType, targetOrganizationId, createdBy, title, contentJson } = input;
+
+    // Check duplicate: same org + source + type
+    const existing = await this.snapshotRepo.findOne({
+      where: { organizationId: targetOrganizationId, sourceAssetId, assetType },
+    });
+    if (existing) {
+      throw new Error('DUPLICATE_SNAPSHOT');
+    }
+
+    // Validate content_json is a proper object
+    if (!contentJson || typeof contentJson !== 'object' || Array.isArray(contentJson)) {
+      throw new Error('INVALID_CONTENT');
+    }
+
+    const snapshot = this.snapshotRepo.create({
+      organizationId: targetOrganizationId,
+      sourceService,
+      sourceAssetId,
+      assetType,
+      title: title || 'Untitled',
+      contentJson,
+      createdBy,
+    });
+
+    try {
+      const saved = await this.snapshotRepo.save(snapshot);
+      return { snapshot: saved };
+    } catch (err: any) {
       if (err.code === '23505') {
         throw new Error('DUPLICATE_SNAPSHOT');
       }
