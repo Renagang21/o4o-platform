@@ -2,21 +2,27 @@
  * StoreAssetsPage — 매장 복사 자산 목록
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
+ * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (pagination)
  *
  * 커뮤니티 CMS/Signage에서 "매장으로 복사"된 자산 스냅샷 목록 표시
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   FileText,
   Monitor,
   Loader2,
   AlertCircle,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
 
 type TabKey = 'all' | 'cms' | 'signage';
+
+const PAGE_LIMIT = 20;
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('ko-KR');
@@ -25,24 +31,35 @@ function formatDate(dateStr: string): string {
 export default function StoreAssetsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [items, setItems] = useState<AssetSnapshotItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const assetType = activeTab === 'all' ? undefined : activeTab;
-      const res = await assetSnapshotApi.list(assetType);
-      setItems(res.data);
+      const res = await assetSnapshotApi.list({ type: assetType, page, limit: PAGE_LIMIT });
+      setItems(res.data.items || []);
+      setTotal(res.data.total || 0);
     } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, [activeTab]);
+  }, [activeTab, page]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  // 탭 변경 시 1페이지로 리셋
+  const handleTabChange = (tab: TabKey) => {
+    setActiveTab(tab);
+    setPage(1);
+  };
 
   const tabs: { key: TabKey; label: string; icon: typeof FileText }[] = [
     { key: 'all', label: '전체', icon: FileText },
@@ -56,7 +73,7 @@ export default function StoreAssetsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-sm text-slate-500 mb-1">
-            <a href="/pharmacy/store-hub" className="text-blue-600 hover:underline">&larr; 매장 허브</a>
+            <Link to="/pharmacy/store-hub" className="text-blue-600 hover:underline">&larr; 매장 허브</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">매장 자산</h1>
           <p className="text-sm text-slate-500 mt-1">커뮤니티에서 복사된 CMS/사이니지 자산 목록</p>
@@ -76,7 +93,7 @@ export default function StoreAssetsPage() {
           {tabs.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => handleTabChange(tab.key)}
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.key
                   ? 'border-blue-600 text-blue-600'
@@ -110,36 +127,63 @@ export default function StoreAssetsPage() {
           <p className="text-xs mt-1">커뮤니티 콘텐츠/사이니지 관리에서 "매장으로 복사" 버튼을 이용해주세요.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
-                <th className="px-4 py-3 font-medium">유형</th>
-                <th className="px-4 py-3 font-medium">제목</th>
-                <th className="px-4 py-3 font-medium w-28">복사일</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {items.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                      item.assetType === 'cms'
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'bg-purple-50 text-purple-700'
-                    }`}>
-                      {item.assetType === 'cms' ? 'CMS' : '사이니지'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
+        <>
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
+                  <th className="px-4 py-3 font-medium">유형</th>
+                  <th className="px-4 py-3 font-medium">제목</th>
+                  <th className="px-4 py-3 font-medium w-28">복사일</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {items.map(item => (
+                  <tr key={item.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                        item.assetType === 'cms'
+                          ? 'bg-blue-50 text-blue-700'
+                          : 'bg-purple-50 text-purple-700'
+                      }`}>
+                        {item.assetType === 'cms' ? 'CMS' : '사이니지'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 text-sm text-slate-500">
+              <span>총 {total}건 · {page}/{totalPages} 페이지</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="flex items-center gap-1 px-3 py-1.5 border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  이전
+                </button>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="flex items-center gap-1 px-3 py-1.5 border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  다음
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

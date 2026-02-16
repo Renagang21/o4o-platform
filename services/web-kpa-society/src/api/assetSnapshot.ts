@@ -2,6 +2,7 @@
  * Asset Snapshot API Client
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
+ * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (pagination)
  */
 
 import { apiClient } from './client';
@@ -29,9 +30,16 @@ interface CopyAssetResponse {
   data: AssetSnapshotItem;
 }
 
+export interface PaginatedAssets {
+  items: AssetSnapshotItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 interface ListAssetsResponse {
   success: boolean;
-  data: AssetSnapshotItem[];
+  data: PaginatedAssets;
 }
 
 export const assetSnapshotApi = {
@@ -42,8 +50,13 @@ export const assetSnapshotApi = {
     apiClient.post<CopyAssetResponse>('/assets/copy', body),
 
   /**
-   * List asset snapshots for the user's store
+   * List asset snapshots for the user's store (paginated)
    */
-  list: (assetType?: 'cms' | 'signage') =>
-    apiClient.get<ListAssetsResponse>('/assets', assetType ? { assetType } : undefined),
+  list: (params?: { type?: 'cms' | 'signage'; page?: number; limit?: number }) => {
+    const query: Record<string, string> = {};
+    if (params?.type) query.type = params.type;
+    if (params?.page) query.page = String(params.page);
+    if (params?.limit) query.limit = String(params.limit);
+    return apiClient.get<ListAssetsResponse>('/assets', Object.keys(query).length > 0 ? query : undefined);
+  },
 };

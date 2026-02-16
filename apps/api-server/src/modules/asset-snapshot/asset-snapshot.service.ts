@@ -26,6 +26,19 @@ export interface CopyAssetResult {
   snapshot: AssetSnapshot;
 }
 
+export interface ListOptions {
+  assetType?: 'cms' | 'signage';
+  page: number;
+  limit: number;
+}
+
+export interface PaginatedResult {
+  items: AssetSnapshot[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export class AssetSnapshotService {
   private snapshotRepo: Repository<AssetSnapshot>;
   private dataSource: DataSource;
@@ -59,6 +72,11 @@ export class AssetSnapshotService {
       throw new Error('DUPLICATE_SNAPSHOT');
     }
 
+    // Validate content_json is a proper object
+    if (!contentJson || typeof contentJson !== 'object' || Array.isArray(contentJson)) {
+      throw new Error('INVALID_CONTENT');
+    }
+
     const snapshot = this.snapshotRepo.create({
       organizationId: targetOrganizationId,
       sourceService,
@@ -69,25 +87,37 @@ export class AssetSnapshotService {
       createdBy,
     });
 
-    const saved = await this.snapshotRepo.save(snapshot);
-    return { snapshot: saved };
+    try {
+      const saved = await this.snapshotRepo.save(snapshot);
+      return { snapshot: saved };
+    } catch (err: any) {
+      // DB unique constraint violation → treat as duplicate
+      if (err.code === '23505') {
+        throw new Error('DUPLICATE_SNAPSHOT');
+      }
+      throw err;
+    }
   }
 
   /**
-   * List snapshots for an organization, optionally filtered by assetType
+   * List snapshots for an organization with pagination
    */
   async listByOrganization(
     organizationId: string,
-    assetType?: 'cms' | 'signage',
-  ): Promise<AssetSnapshot[]> {
+    options: ListOptions,
+  ): Promise<PaginatedResult> {
+    const { assetType, page, limit } = options;
     const where: any = { organizationId };
     if (assetType) {
       where.assetType = assetType;
     }
-    return this.snapshotRepo.find({
+    const [items, total] = await this.snapshotRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
+    return { items, total, page, limit };
   }
 
   /**

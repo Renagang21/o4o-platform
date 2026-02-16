@@ -2,11 +2,12 @@
  * Asset Snapshot Controller
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
+ * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (role guard + pagination)
  *
  * POST /assets/copy    — Copy source CMS/Signage asset → snapshot
- * GET  /assets         — List store's asset snapshots
+ * GET  /assets         — List store's asset snapshots (paginated)
  *
- * Auth: requireAuth + KPA membership check (pharmacist org context)
+ * Auth: requireAuth + operator role + KPA membership check
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -14,8 +15,12 @@ import { DataSource } from 'typeorm';
 import { AssetSnapshotService } from '../../../modules/asset-snapshot/asset-snapshot.service.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import type { KpaRole } from '../../../types/roles.js';
 
 type AuthMiddleware = RequestHandler;
+
+const OPERATOR_ROLES: KpaRole[] = ['kpa:admin', 'kpa:operator', 'kpa:branch_admin', 'kpa:branch_operator'];
 
 /**
  * Get user's organization ID from KPA membership
@@ -47,6 +52,16 @@ export function createAssetSnapshotController(
     const user = (req as any).user;
     if (!user?.id) {
       res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+      return;
+    }
+
+    // Role guard: kpa:operator 이상만 허용
+    const userRoles = user.roles || [];
+    if (!hasAnyServiceRole(userRoles, OPERATOR_ROLES)) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Operator or admin role required' },
+      });
       return;
     }
 
@@ -120,6 +135,16 @@ export function createAssetSnapshotController(
       return;
     }
 
+    // Role guard: kpa:operator 이상만 허용
+    const userRoles = user.roles || [];
+    if (!hasAnyServiceRole(userRoles, OPERATOR_ROLES)) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Operator or admin role required' },
+      });
+      return;
+    }
+
     const orgId = await getUserOrganizationId(dataSource, user.id);
     if (!orgId) {
       res.status(403).json({
@@ -129,17 +154,21 @@ export function createAssetSnapshotController(
       return;
     }
 
-    const assetType = req.query.assetType as 'cms' | 'signage' | undefined;
+    const assetType = req.query.type as 'cms' | 'signage' | undefined;
     if (assetType && !['cms', 'signage'].includes(assetType)) {
       res.status(400).json({
         success: false,
-        error: { code: 'INVALID_ASSET_TYPE', message: 'assetType must be cms or signage' },
+        error: { code: 'INVALID_ASSET_TYPE', message: 'type must be cms or signage' },
       });
       return;
     }
 
-    const snapshots = await service.listByOrganization(orgId, assetType);
-    res.json({ success: true, data: snapshots });
+    // Pagination
+    const page = Math.max(1, parseInt(req.query.page as string, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string, 10) || 20));
+
+    const result = await service.listByOrganization(orgId, { assetType, page, limit });
+    res.json({ success: true, data: result });
   }));
 
   return router;
