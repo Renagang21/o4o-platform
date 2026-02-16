@@ -1,4 +1,8 @@
 /**
+ * FROZEN CORE PACKAGE
+ * Baseline: o4o-operator-os-baseline-v1
+ * Structural changes require explicit Work Order.
+ *
  * @o4o/asset-copy-core
  *
  * Platform-level Asset Copy Engine.

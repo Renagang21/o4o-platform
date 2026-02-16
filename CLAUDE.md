@@ -466,6 +466,37 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 ---
 
+## 20. OPERATOR OS BASELINE (v1) — FROZEN
+
+> **Tag: `o4o-operator-os-baseline-v1` (2026-02-16)**
+> **상세: `docs/_platform/BASELINE-OPERATOR-OS-V1.md`**
+
+다음 Core 패키지는 **구조 동결(Frozen)** 상태이다:
+
+| 패키지 | 역할 | 상태 |
+|--------|------|------|
+| `@o4o/security-core` | 서비스 Scope Guard, 역할 검증 | Frozen |
+| `@o4o/hub-core` | Hub 레이아웃, Signal, QuickAction 체계 | Frozen |
+| `@o4o/ai-core` | AI Insight 오케스트레이터 | Frozen |
+| `@o4o/action-log-core` | 실행 이력 기록 | Frozen |
+| `@o4o/asset-copy-core` | CMS 콘텐츠 복제 | Frozen |
+
+### 허용되는 변경
+
+- 버그 수정 (Bug fix)
+- 성능 개선 (Performance improvement)
+- 문서 추가 (Documentation)
+- 테스트 추가 (Test addition)
+
+### 금지되는 변경
+
+- 타입/인터페이스 구조 변경
+- 새로운 export 추가
+- 의존성 변경
+- **위 금지 항목은 명시적 Work Order를 통해서만 승인**
+
+---
+
 ## 상세 규칙 문서 목록
 
 | 영역 | 문서 |
@@ -488,9 +519,10 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | **KPA 권한 매트릭스** | `docs/_platform/KPA-ROLE-MATRIX-V1.md` |
 | **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
 | **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
+| **Operator OS Baseline** | `docs/_platform/BASELINE-OPERATOR-OS-V1.md` |
 
 ---
 
 *Updated: 2026-02-16*
-*Version: 4.7*
+*Version: 4.8*
 *Status: Active Constitution*

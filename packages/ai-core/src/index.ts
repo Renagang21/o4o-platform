@@ -1,4 +1,8 @@
 /**
+ * FROZEN CORE PACKAGE
+ * Baseline: o4o-operator-os-baseline-v1
+ * Structural changes require explicit Work Order.
+ *
  * AI Core - Main Entry Point
  *
  * AI의 정책, 계약, 로그 기준을 정의하는 Core App입니다.
