@@ -8,13 +8,10 @@
 import { apiClient } from './client';
 
 // Types
+// WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 export interface BranchDashboardStats {
   totalMembers: number;
   activeMembers: number;
-  pendingAnnualReports: number;
-  pendingMembershipFees: number;
-  recentPosts: number;
-  upcomingEvents: number;
 }
 
 export interface RecentActivity {
