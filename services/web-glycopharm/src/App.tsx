@@ -75,6 +75,9 @@ const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-ma
 const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
 const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
 
+// Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block)
+const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdminDashboard'));
+
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
@@ -137,6 +140,10 @@ const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
 // Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
 const FunnelPage = lazy(() => import('@/pages/pharmacy/FunnelPage'));
 
+// Care Pages (WO-MENU-REALIGN-V1)
+const CareDashboardPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })));
+const PatientsPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientsPage })));
+
 // Test Guide Pages
 const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
 const PharmacyManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.PharmacyManualPage })));
@@ -189,8 +196,11 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
 }
 
 /**
- * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1
- * / 접근 시 로그인된 사용자는 역할 기반 대시보드로 자동 리다이렉트
+ * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1 + WO-MENU-REALIGN-V1
+ * / 접근 시:
+ * - pharmacy 역할: CareDashboardPage 표시 (Care 중심)
+ * - 기타 역할: 역할 기반 대시보드로 자동 리다이렉트
+ * - 비로그인: HomePage 표시
  */
 function RoleBasedHome() {
   const { user } = useAuth();
@@ -198,12 +208,22 @@ function RoleBasedHome() {
 
   useEffect(() => {
     if (user?.roles[0]) {
-      const target = getDefaultRouteByRole(user.roles[0]);
+      const role = user.roles[0];
+      // pharmacy 역할은 / 경로에서 CareDashboardPage를 표시하므로 리다이렉트하지 않음
+      if (role === 'pharmacy') {
+        return;
+      }
+      const target = getDefaultRouteByRole(role);
       if (target !== '/') {
         navigate(target, { replace: true });
       }
     }
   }, [user, navigate]);
+
+  // pharmacy 역할이면 CareDashboardPage, 아니면 HomePage
+  if (user?.roles[0] === 'pharmacy') {
+    return <CareDashboardPage />;
+  }
 
   return <HomePage />;
 }
@@ -265,6 +285,13 @@ function AppRoutes() {
             <MyPage />
           </ProtectedRoute>
         } />
+
+        {/* Care Routes (WO-MENU-REALIGN-V1) */}
+        <Route path="patients" element={
+          <ProtectedRoute allowedRoles={['pharmacy']}>
+            <PatientsPage />
+          </ProtectedRoute>
+        } />
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
@@ -320,7 +347,7 @@ function AppRoutes() {
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
-      {/* Admin Dashboard (WO-GLYCOPHARM-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
+      {/* Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block 구조) */}
       <Route
         path="admin"
         element={
@@ -329,7 +356,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<GlycoPharmOperatorDashboard />} />
+        <Route index element={<GlycoPharmAdminDashboard />} />
         <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="settings" element={<SettingsPage />} />

@@ -112,6 +112,7 @@ function mapApiRoleToWebRole(apiRole: string): UserRole {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
+  admin: '관리자',
   pharmacy: '약국',
   supplier: '공급자',
   partner: '파트너',
@@ -120,14 +121,16 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 export const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  pharmacy: '/pharmacy',
+  admin: '/admin',
+  pharmacy: '/',  // WO-MENU-REALIGN-V1: CareDashboard가 Home
   supplier: '/supplier',
   partner: '/partner',
   operator: '/operator',
-  consumer: '/consumer',
+  consumer: '/',
 };
 
 export const ROLE_ICONS: Record<UserRole, string> = {
+  admin: '👑',
   pharmacy: '💊',
   supplier: '📦',
   partner: '🤝',
