@@ -27,7 +27,7 @@ interface Notice {
 
 export function NoticeListPage() {
   const { user } = useAuth();
-  const userRole = user?.role || 'member';
+  const userRole = user?.roles[0] || 'member';
   const canWrite = ['officer', 'chair', 'admin', 'super_admin'].includes(userRole);
   const [currentPage, setCurrentPage] = useState(1);
 

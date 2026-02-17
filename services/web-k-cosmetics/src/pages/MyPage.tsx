@@ -32,8 +32,8 @@ export default function MyPage() {
     );
   }
 
-  const dashboardPath = ROLE_DASHBOARDS[user.currentRole];
-  const roleLabel = ROLE_LABELS[user.currentRole];
+  const dashboardPath = ROLE_DASHBOARDS[user.roles[0]];
+  const roleLabel = ROLE_LABELS[user.roles[0]];
 
   const handleSave = () => {
     // TODO: Implement save API

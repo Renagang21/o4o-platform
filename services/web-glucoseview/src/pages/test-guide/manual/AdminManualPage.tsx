@@ -11,7 +11,7 @@ export default function AdminManualPage() {
   const { user, isAuthenticated } = useAuth();
 
   // 권한 체크: admin만 접근 가능
-  if (!isAuthenticated || user?.role !== 'admin') {
+  if (!isAuthenticated || !user?.roles.includes('admin')) {
     return <Navigate to="/test-guide" replace />;
   }
 

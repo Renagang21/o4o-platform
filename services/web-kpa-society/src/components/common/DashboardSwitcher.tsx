@@ -38,8 +38,7 @@ export function useAccessibleDashboards(): DashboardItem[] {
 
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
   const adminRoles = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator'];
-  const hasAdminRole = (user.role && adminRoles.includes(user.role)) ||
-    (user.roles && user.roles.some((r: string) => adminRoles.includes(r)));
+  const hasAdminRole = user.roles.some((r: string) => adminRoles.includes(r));
   if (hasAdminRole) {
     items.push({ label: '운영자 대시보드', icon: '🖥️', path: '/admin/kpa-dashboard' });
   }

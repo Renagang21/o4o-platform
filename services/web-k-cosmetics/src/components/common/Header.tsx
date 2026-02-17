@@ -49,8 +49,8 @@ export default function Header() {
     setMobileMenuOpen(false);
   };
 
-  const dashboardPath = user?.currentRole ? ROLE_DASHBOARDS[user.currentRole] : '/';
-  const roleLabel = user?.currentRole ? ROLE_LABELS[user.currentRole] : '';
+  const dashboardPath = user?.roles[0] ? ROLE_DASHBOARDS[user.roles[0]] : '/';
+  const roleLabel = user?.roles[0] ? ROLE_LABELS[user.roles[0]] : '';
 
   return (
     <header style={styles.header}>

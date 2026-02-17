@@ -13,7 +13,7 @@ export default function OperatorManualPage() {
   const { user, isAuthenticated } = useAuth();
 
   // 권한 체크: operator만 접근 가능
-  if (!isAuthenticated || user?.role !== 'operator') {
+  if (!isAuthenticated || !user?.roles.includes('operator')) {
     return <Navigate to="/test-guide" replace />;
   }
 

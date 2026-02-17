@@ -51,8 +51,7 @@ export default function FunctionGateModal() {
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
   // 직능 선택 대상이 아닌 역할: 운영자/관리자 + 학생
   const EXEMPT_ROLES = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator', 'kpa:student'];
-  const isExempt = (user?.role && EXEMPT_ROLES.includes(user.role)) ||
-    (user?.roles && user.roles.some((r: string) => EXEMPT_ROLES.includes(r))) || false;
+  const isExempt = user?.roles.some((r: string) => EXEMPT_ROLES.includes(r)) || false;
 
   // Close if exempt role or already set
   useEffect(() => {

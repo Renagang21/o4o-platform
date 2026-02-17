@@ -33,7 +33,7 @@ export function RoleSwitcher() {
     <div style={styles.container}>
       <button style={styles.trigger} onClick={() => setIsOpen(!isOpen)}>
         <span style={styles.currentRole}>
-          {ROLE_ICONS[user.role]} {ROLE_LABELS[user.role]}
+          {ROLE_ICONS[user.roles[0]]} {ROLE_LABELS[user.roles[0]]}
         </span>
         <span style={styles.arrow}>{isOpen ? '▲' : '▼'}</span>
       </button>
@@ -48,13 +48,13 @@ export function RoleSwitcher() {
                 key={role}
                 style={{
                   ...styles.roleOption,
-                  ...(role === user.role ? styles.roleOptionActive : {}),
+                  ...(role === user.roles[0] ? styles.roleOptionActive : {}),
                 }}
                 onClick={() => handleRoleChange(role)}
               >
                 <span style={styles.roleIcon}>{ROLE_ICONS[role]}</span>
                 <span style={styles.roleLabel}>{ROLE_LABELS[role]}</span>
-                {role === user.role && <span style={styles.checkmark}>✓</span>}
+                {role === user.roles[0] && <span style={styles.checkmark}>✓</span>}
               </button>
             ))}
             {netureRoles.length > 0 && (

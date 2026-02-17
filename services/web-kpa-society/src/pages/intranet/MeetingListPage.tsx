@@ -23,7 +23,7 @@ interface Meeting {
 
 export function MeetingListPage() {
   const { user } = useAuth();
-  const userRole = user?.role || 'member';
+  const userRole = user?.roles[0] || 'member';
   const canCreate = ['officer', 'chair', 'admin', 'super_admin'].includes(userRole);
 
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'completed'>('all');

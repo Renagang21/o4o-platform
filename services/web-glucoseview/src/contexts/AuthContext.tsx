@@ -18,7 +18,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  roles: UserRole[];
+  role?: UserRole;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   approvalStatus: ApprovalStatus;
   pharmacyName?: string;
   pharmacyAddress?: string;
@@ -83,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               id: apiUser.id,
               name: apiUser.fullName || apiUser.email,
               email: apiUser.email,
-              role: mappedRole,
+              roles: [mappedRole],
               approvalStatus: apiUser.status === 'active' ? 'approved' : 'pending',
               displayName: apiUser.fullName || apiUser.email,
               phone: apiUser.phone,
@@ -139,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: apiUser.id,
           name: apiUser.fullName || apiUser.email,
           email: apiUser.email,
-          role: mappedRole,
+          roles: [mappedRole],
           approvalStatus,
           displayName: apiUser.fullName || apiUser.email,
           phone: apiUser.phone,
@@ -182,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isApproved = user?.approvalStatus === 'approved';
-  const isAdmin = user?.role === 'admin' && isApproved;
+  const isAdmin = user?.roles.includes('admin') && isApproved;
   const isPending = user?.approvalStatus === 'pending';
   const isRejected = user?.approvalStatus === 'rejected';
 

@@ -69,7 +69,8 @@ export interface User {
   email: string;
   name: string;
   phone?: string;
-  role: UserRole;
+  roles: UserRole[];
+  role?: UserRole;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   status: UserStatus;
   profileImage?: string;
   pharmacyId?: string;  // Associated pharmacy ID (for pharmacy role users)

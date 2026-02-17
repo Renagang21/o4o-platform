@@ -52,7 +52,7 @@ export default function SupplierDashboardLayout() {
 
   // 역할 확인 (supplier 또는 partner만 접근)
   const allowedRoles = ['supplier', 'partner'];
-  if (!allowedRoles.includes(user.currentRole)) {
+  if (!user.roles.some(r => allowedRoles.includes(r))) {
     return (
       <div style={styles.accessDenied}>
         <h1>접근 권한 없음</h1>

@@ -14,7 +14,6 @@ export interface User {
   email: string;
   name: string;
   roles: UserRole[];
-  currentRole: UserRole;
 }
 
 interface AuthContextType {
@@ -89,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: apiUser.email,
             name: apiUser.fullName || apiUser.email,
             roles: [mappedRole],
-            currentRole: mappedRole,
+
           };
           setUser(newUser);
         }
@@ -136,7 +135,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: apiUser.email,
           name: apiUser.fullName || apiUser.email,
           roles: [mappedRole],
-          currentRole: mappedRole,
         };
         setUser(newUser);
         setIsSessionChecked(true);
@@ -165,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const switchRole = (role: UserRole) => {
     if (user && user.roles.includes(role)) {
-      setUser({ ...user, currentRole: role });
+      setUser({ ...user, roles: [role, ...user.roles.filter(r => r !== role)] });
     }
   };
 

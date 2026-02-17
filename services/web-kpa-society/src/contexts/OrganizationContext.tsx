@@ -108,9 +108,9 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
 
   // Role 기반 접근 가능 조직
   const accessibleOrganizations = useMemo(
-    () => getAccessibleOrganizationsForRole(user?.role),
+    () => getAccessibleOrganizationsForRole(user?.roles?.[0]),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user?.role, refreshCounter]
+    [user?.roles, refreshCounter]
   );
 
   // 기본 역할: officer (Phase 1)
@@ -169,7 +169,7 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
     setRefreshCounter((c) => c + 1);
 
     // 현재 org가 refresh 후에도 접근 가능한지 검증
-    const refreshed = getAccessibleOrganizationsForRole(user?.role);
+    const refreshed = getAccessibleOrganizationsForRole(user?.roles?.[0]);
     const stillAccessible = refreshed.some((org) => org.id === currentOrganization.id);
     if (!stillAccessible && refreshed.length > 0) {
       const fallback = refreshed[0];
@@ -177,7 +177,7 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
       setOrganizationChain(getOrganizationChain(fallback.id));
       persistContext(fallback, currentRole);
     }
-  }, [user?.role, currentOrganization.id, currentRole]);
+  }, [user?.roles, currentOrganization.id, currentRole]);
 
   // WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1: 로그인/로그아웃 시 컨텍스트 초기화
   useEffect(() => {

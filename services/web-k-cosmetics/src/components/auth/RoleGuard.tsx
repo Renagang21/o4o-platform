@@ -41,7 +41,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: RoleG
     return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {
+  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
     return <Navigate to="/" replace />;
   }
 

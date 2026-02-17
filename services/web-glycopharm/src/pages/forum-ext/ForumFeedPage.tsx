@@ -131,8 +131,8 @@ export default function ForumFeedPage() {
     );
   }
 
-  const canWrite = forum.status === 'open' && user && forum.allowedRoles.includes(user.role);
-  const isOperator = user?.role === 'operator';
+  const canWrite = forum.status === 'open' && user && user.roles.some(r => forum.allowedRoles.includes(r));
+  const isOperator = user?.roles.includes('operator');
 
   // 공지 상단, 일반 글 최신순
   const pinnedPosts = posts.filter((p) => p.isPinned);

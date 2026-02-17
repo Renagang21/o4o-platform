@@ -3,7 +3,7 @@
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1
  * 기존 ProtectedRoute 로직을 그대로 유지하며 통일된 인터페이스 제공.
- * role 필드: user.currentRole
+ * WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: roles[] 배열 기반 전환
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
@@ -31,7 +31,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: RoleG
     return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {
+  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
     return <Navigate to="/" replace />;
   }
 

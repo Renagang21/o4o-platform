@@ -109,8 +109,8 @@ function RoleBasedHome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.currentRole) {
-      const target = ROLE_DASHBOARDS[user.currentRole];
+    if (user?.roles[0]) {
+      const target = ROLE_DASHBOARDS[user.roles[0]];
       if (target && target !== '/') {
         navigate(target, { replace: true });
       }

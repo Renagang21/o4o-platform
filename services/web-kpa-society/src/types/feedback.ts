@@ -91,10 +91,8 @@ export const FEEDBACK_STATUS_COLORS: Record<FeedbackStatus, string> = {
 /**
  * 피드백 작성 권한 확인
  */
-export function canWriteFeedback(userRole?: string, userRoles?: string[]): boolean {
-  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
+export function canWriteFeedback(userRoles?: string[]): boolean {
   const writeRoles = ['kpa:district_admin', 'kpa:branch_admin', 'kpa:admin'];
-  if (userRole && writeRoles.includes(userRole)) return true;
   if (userRoles && userRoles.some(r => writeRoles.includes(r))) return true;
   return false;
 }
@@ -102,10 +100,8 @@ export function canWriteFeedback(userRole?: string, userRoles?: string[]): boole
 /**
  * 피드백 관리 권한 확인 (상태 변경, 고정 등)
  */
-export function canManageFeedback(userRole?: string, userRoles?: string[]): boolean {
-  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
+export function canManageFeedback(userRoles?: string[]): boolean {
   const manageRoles = ['kpa:admin', 'kpa:district_admin'];
-  if (userRole && manageRoles.includes(userRole)) return true;
   if (userRoles && userRoles.some(r => manageRoles.includes(r))) return true;
   return false;
 }

@@ -150,11 +150,7 @@ function checkBranchOperatorRole(user: User): boolean {
     'kpa:branch_operator',
   ];
 
-  if (user.role && allowedRoles.includes(user.role)) {
-    return true;
-  }
-
-  if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
+  if (user.roles.some(r => allowedRoles.includes(r))) {
     return true;
   }
 
@@ -166,11 +162,7 @@ function checkBranchOperatorRole(user: User): boolean {
  * kpa:admin과 kpa:district_admin은 모든 분회에 접근 가능
  */
 function hasBypassRole(user: User): boolean {
-  if (user.role && BRANCH_BYPASS_ROLES.includes(user.role)) {
-    return true;
-  }
-
-  if (user.roles && user.roles.some(r => BRANCH_BYPASS_ROLES.includes(r))) {
+  if (user.roles.some(r => BRANCH_BYPASS_ROLES.includes(r))) {
     return true;
   }
 

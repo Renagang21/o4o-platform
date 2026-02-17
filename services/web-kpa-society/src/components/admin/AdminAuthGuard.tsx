@@ -103,11 +103,7 @@ function checkBranchAdminRole(user: User): boolean {
     'kpa:district_admin',
   ];
 
-  if (user.role && allowedRoles.includes(user.role)) {
-    return true;
-  }
-
-  if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
+  if (user.roles.some(r => allowedRoles.includes(r))) {
     return true;
   }
 

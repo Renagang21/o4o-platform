@@ -25,7 +25,7 @@ interface Attachment {
 export function NoticeDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
-  const userRole = user?.role || 'member';
+  const userRole = user?.roles[0] || 'member';
 
   // 샘플 공지 데이터
   const notice = {

@@ -201,14 +201,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const mappedRole = mapApiRoleToWebRole(apiUser.role);
             const userData: User = {
               ...apiUser,
-              role: mappedRole,
+              roles: [mappedRole],
               name: apiUser.fullName as string || apiUser.email as string,
               status: (apiUser.status as string) || 'approved',
               createdAt: apiUser.createdAt as string,
               updatedAt: apiUser.updatedAt as string,
             } as User;
             setUser(userData);
-            setAvailableRoles([userData.role]);
+            setAvailableRoles([mappedRole]);
           }
         } else if (response.status === 401) {
           // Token expired, try refresh
@@ -258,7 +258,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const mappedRole = mapApiRoleToWebRole(apiUser.role);
       const typedUser: User = {
         ...apiUser,
-        role: mappedRole,
+        roles: [mappedRole],
         name: apiUser.fullName as string || apiUser.email as string,
         status: (apiUser.status as string) || 'approved',
         createdAt: apiUser.createdAt as string,
@@ -266,7 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } as User;
 
       setUser(typedUser);
-      setAvailableRoles([typedUser.role]);
+      setAvailableRoles([mappedRole]);
       return typedUser;
     }
 
@@ -293,7 +293,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const selectRole = (role: UserRole) => {
     if (user && availableRoles.includes(role)) {
-      setUser({ ...user, role });
+      const reordered = [role, ...user.roles.filter(r => r !== role)];
+      setUser({ ...user, roles: reordered });
     }
   };
 

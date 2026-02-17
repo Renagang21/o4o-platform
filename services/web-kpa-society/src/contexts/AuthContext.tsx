@@ -94,8 +94,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role?: string;  // Legacy single role (backward compatibility)
-  roles?: string[];  // P2-T1: Phase 4 support - array of roles (legacy + prefixed)
+  role?: string;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
+  roles: string[];  // Primary role array
   membershipType?: MembershipType;  // Phase 3: 약사/약대생 구분
   pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
   pharmacistRole?: PharmacistRole;          // 직역 (최초 1회 선택, 프로필에서 수정 가능)
@@ -157,6 +157,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     email: 'district-officer@kpa-test.kr',
     name: '박임원 (지부임원)',
     role: 'pharmacist',  // 권한은 일반 회원
+    roles: ['pharmacist'],
     position: 'vice_president',  // 직책: 부회장
   },
   branch_officer: {
@@ -164,6 +165,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     email: 'branch-officer@kpa-test.kr',
     name: '최임원 (분회임원)',
     role: 'pharmacist',  // 권한은 일반 회원
+    roles: ['pharmacist'],
     position: 'director',  // 직책: 이사
   },
   pharmacist: {
@@ -171,6 +173,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     email: 'pharmacist@kpa-test.kr',
     name: '홍길동 (약사)',
     role: 'pharmacist',
+    roles: ['pharmacist'],
   },
 };
 

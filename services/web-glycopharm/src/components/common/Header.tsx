@@ -41,7 +41,7 @@ export default function Header() {
     setMobileMenuOpen(false);
   };
 
-  const roleNav = user?.role ? roleNavigation[user.role] : null;
+  const roleNav = user?.roles[0] ? roleNavigation[user.roles[0]] : null;
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/50">

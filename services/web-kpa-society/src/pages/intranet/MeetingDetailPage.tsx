@@ -26,7 +26,7 @@ interface Attachment {
 export function MeetingDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
-  const userRole = user?.role || 'member';
+  const userRole = user?.roles[0] || 'member';
   const canEdit = ['officer', 'chair', 'admin'].includes(userRole);
 
   // 샘플 회의 데이터

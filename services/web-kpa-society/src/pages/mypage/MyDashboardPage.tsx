@@ -67,7 +67,7 @@ export function MyDashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   // 임원 여부 확인 (officer 또는 admin)
-  const isOfficer = user?.role === 'officer' || user?.role === 'admin';
+  const isOfficer = user?.roles.some(r => ['officer', 'admin'].includes(r)) ?? false;
 
   // 임원용 회계 데이터 (단식부기) - Mock
   const [accountingEntries] = useState<AccountingEntry[]>([
@@ -162,7 +162,7 @@ export function MyDashboardPage() {
                 </span>
               )}
               <span style={styles.roleBadge}>
-                {user.role === 'admin' ? '관리자' : user.role === 'officer' ? '임원' : '회원'}
+                {user.roles.includes('admin') ? '관리자' : user.roles.includes('officer') ? '임원' : '회원'}
               </span>
             </div>
           </div>
@@ -201,7 +201,7 @@ export function MyDashboardPage() {
                 size="sm"
                 serviceId="kpa-society"
                 contextData={{
-                  role: user.role,
+                  role: user.roles[0],
                   summary: accountingSummary,
                   recentEntries: accountingEntries.slice(0, 3),
                   period: '2025년 1월',
