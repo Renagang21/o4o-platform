@@ -155,7 +155,23 @@ interface RoleConfig {
   menuItems: MenuItem[];
 }
 
+/**
+ * WO-K-COSMETICS-ADMIN-AREA-V1:
+ * - admin config 추가 (구조 관리: 매장 네트워크, 회원 관리, 설정)
+ * - operator에서 구조 기능 제거 (stores, users, settings → /admin)
+ */
 const roleConfig: Record<string, RoleConfig> = {
+  admin: {
+    title: '관리자',
+    icon: icons.Shield,
+    color: 'red',
+    menuItems: [
+      { path: '/admin', label: '대시보드', icon: icons.LayoutDashboard },
+      { path: '/admin/stores', label: '매장 네트워크', icon: icons.Store },
+      { path: '/admin/users', label: '회원 관리', icon: icons.Users },
+      { path: '/admin/settings', label: '설정', icon: icons.Settings },
+    ],
+  },
   partner: {
     title: '파트너 관리',
     icon: icons.Handshake,
@@ -177,7 +193,6 @@ const roleConfig: Record<string, RoleConfig> = {
     menuItems: [
       { path: '/operator', label: '대시보드', icon: icons.LayoutDashboard },
       { path: '/operator/store-cockpit', label: '내 매장', icon: icons.Home },
-      { path: '/operator/stores', label: '매장 네트워크', icon: icons.Store },
       { path: '/operator/applications', label: '신청 관리', icon: icons.FileCheck },
       { path: '/operator/products', label: '상품 관리', icon: icons.Package },
       { path: '/operator/orders', label: '주문 관리', icon: icons.ShoppingCart },
@@ -186,9 +201,8 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/operator/analytics', label: '분석/리포트', icon: icons.BarChart3 },
       { path: '/operator/marketing', label: '마케팅', icon: icons.Megaphone },
       { path: '/operator/signage/content', label: '사이니지 콘텐츠', icon: icons.Monitor },
-      { path: '/operator/users', label: '회원 관리', icon: icons.Users },
       { path: '/operator/support', label: '고객지원', icon: icons.HelpCircle },
-      { path: '/operator/settings', label: '설정', icon: icons.Settings },
+      { path: '/operator/ai-report', label: 'AI 리포트', icon: icons.BarChart3 },
     ],
   },
 };
@@ -211,6 +225,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
   };
 
   const colorClasses: Record<string, { bg: string; text: string; light: string; hover: string }> = {
+    red: { bg: 'bg-red-600', text: 'text-red-700', light: 'bg-red-100', hover: 'hover:bg-red-50' },
     pink: { bg: 'bg-pink-600', text: 'text-pink-700', light: 'bg-pink-100', hover: 'hover:bg-pink-50' },
     purple: { bg: 'bg-purple-600', text: 'text-purple-700', light: 'bg-purple-100', hover: 'hover:bg-purple-50' },
   };
