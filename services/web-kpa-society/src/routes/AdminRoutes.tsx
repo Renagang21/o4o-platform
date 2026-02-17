@@ -1,8 +1,10 @@
 /**
- * AdminRoutes - 지부 관리자 라우트 설정
- * WO-KPA-COMMITTEE-GOVERNANCE-V1: 위원회 관리 라우트 추가
- * WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브 추가
- * WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1: Steward 관리 추가
+ * AdminRoutes - 지부 관리자 라우트 설정 (구조 관리 전용)
+ *
+ * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
+ * - 콘텐츠 CRUD (news, docs, signage, forum) → OperatorRoutes 이동
+ * - 요청 관리 (organization-requests, service-enrollments) → OperatorRoutes 이동
+ * - Admin은 구조 관리만 담당: 분회, 회원, 위원회, 임원, 설정
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -14,18 +16,12 @@ import {
   MembersPage,
   AnnualReportPage,
   MembershipFeePage,
-  NewsPage,
-  DocsPage,
-  ForumPage,
   OfficersPage,
   SettingsPage,
 } from '../pages/admin-branch';
 import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
-import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import { KpaOperatorDashboardPage } from '../pages/admin/KpaOperatorDashboardPage';
-import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
 import { StewardManagementPage } from '../pages/admin/StewardManagementPage';
-import ContentHubPage from '../pages/signage/ContentHubPage';
 
 export function AdminRoutes() {
   return (
@@ -51,12 +47,6 @@ export function AdminRoutes() {
           {/* 위원회 관리 (요청 기반) */}
           <Route path="committee-requests" element={<CommitteeRequestsPage />} />
 
-          {/* 조직 가입/역할 요청 관리 (WO-CONTEXT-JOIN-REQUEST-MVP-V1) */}
-          <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
-
-          {/* 서비스 신청 관리 (WO-ADMIN-SERVICE-ENROLLMENT-APPROVAL-V1) */}
-          <Route path="service-enrollments" element={<ServiceEnrollmentManagementPage />} />
-
           {/* Steward 관리 (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1) */}
           <Route path="stewards" element={<StewardManagementPage />} />
 
@@ -65,18 +55,6 @@ export function AdminRoutes() {
 
           {/* 연회비 */}
           <Route path="fee" element={<MembershipFeePage />} />
-
-          {/* 공지사항 */}
-          <Route path="news" element={<NewsPage />} />
-
-          {/* 자료실 */}
-          <Route path="docs" element={<DocsPage />} />
-
-          {/* 안내 영상 · 자료 */}
-          <Route path="signage/content" element={<ContentHubPage />} />
-
-          {/* 게시판 */}
-          <Route path="forum" element={<ForumPage />} />
 
           {/* 임원 관리 */}
           <Route path="officers" element={<OfficersPage />} />

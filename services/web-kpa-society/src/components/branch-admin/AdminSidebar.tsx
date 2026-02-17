@@ -1,5 +1,9 @@
 /**
- * AdminSidebar - 분회 관리자 사이드바
+ * AdminSidebar - 분회 관리자 사이드바 (구조 관리 전용)
+ *
+ * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
+ * - 콘텐츠 CRUD (공지사항, 게시판, 자료실) → BranchOperator 이동
+ * - Admin은 구조 관리만: 대시보드, 임원 관리, 분회 설정
  */
 
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -14,9 +18,6 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { icon: '📊', label: '대시보드', path: '' },
-  { icon: '📢', label: '공지사항', path: '/news' },
-  { icon: '💬', label: '게시판 관리', path: '/forum' },
-  { icon: '📁', label: '자료실', path: '/docs' },
   { icon: '👔', label: '임원 관리', path: '/officers' },
   { icon: '⚙️', label: '분회 설정', path: '/settings' },
 ];

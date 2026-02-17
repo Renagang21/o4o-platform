@@ -41,6 +41,10 @@ import {
   CheckCircle2,
   Loader2,
   RefreshCw,
+  Megaphone,
+  FolderOpen,
+  UserPlus,
+  ClipboardList,
 } from 'lucide-react';
 
 // ─── Icon helper ───
@@ -51,20 +55,16 @@ function LucideIcon({ Icon, color }: { Icon: React.ComponentType<{ style?: React
 
 // ─── Section Definitions ───
 
+/**
+ * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
+ * - Operator 섹션: 콘텐츠 CRUD + 상태 관리 (운영 업무)
+ * - Admin 섹션: 구조 관리 (회원, 조직, 역할, 정책)
+ */
 const HUB_SECTIONS: HubSectionDefinition[] = [
   {
     id: 'operator',
     title: '운영 관리',
     cards: [
-      {
-        id: 'members',
-        title: '회원 관리',
-        description: '회원 승인, 역할 관리',
-        href: '/operator/members',
-        icon: <LucideIcon Icon={Users} color="#2563EB" />,
-        iconBg: '#EFF6FF',
-        signalKey: 'kpa.members',
-      },
       {
         id: 'forum',
         title: '포럼 관리',
@@ -82,6 +82,38 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         icon: <LucideIcon Icon={FileText} color="#7C3AED" />,
         iconBg: '#F3E8FF',
         signalKey: 'content',
+      },
+      {
+        id: 'news',
+        title: '공지사항',
+        description: '공지사항 작성/관리',
+        href: '/operator/news',
+        icon: <LucideIcon Icon={Megaphone} color="#0891B2" />,
+        iconBg: '#ECFEFF',
+      },
+      {
+        id: 'docs',
+        title: '자료실',
+        description: '자료 등록/관리',
+        href: '/operator/docs',
+        icon: <LucideIcon Icon={FolderOpen} color="#7C3AED" />,
+        iconBg: '#F5F3FF',
+      },
+      {
+        id: 'organization-requests',
+        title: '가입 요청 관리',
+        description: '조직 가입/역할 요청 심사',
+        href: '/operator/organization-requests',
+        icon: <LucideIcon Icon={UserPlus} color="#059669" />,
+        iconBg: '#ECFDF5',
+      },
+      {
+        id: 'service-enrollments',
+        title: '서비스 신청 관리',
+        description: '서비스 신청 승인/관리',
+        href: '/operator/service-enrollments',
+        icon: <LucideIcon Icon={ClipboardList} color="#D97706" />,
+        iconBg: '#FFFBEB',
       },
       {
         id: 'lms',
@@ -124,6 +156,15 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         icon: <LucideIcon Icon={Building2} color="#DC2626" />,
         iconBg: '#FEF2F2',
         signalKey: 'kpa.organizations',
+      },
+      {
+        id: 'members',
+        title: '회원 관리',
+        description: '회원 승인, 역할 관리',
+        href: '/demo/admin/members',
+        icon: <LucideIcon Icon={Users} color="#2563EB" />,
+        iconBg: '#EFF6FF',
+        signalKey: 'kpa.members',
       },
       {
         id: 'role-mgmt',
@@ -327,8 +368,8 @@ export default function HubPage() {
     async (key: string): Promise<HubActionResult> => {
       switch (key) {
         case 'kpa.navigate.members_pending':
-          navigate('/operator/members');
-          return { success: true, message: '회원 승인 페이지로 이동' };
+          navigate('/demo/admin/members');
+          return { success: true, message: '회원 관리 페이지로 이동' };
         case 'kpa.navigate.org_approvals':
           navigate('/demo/admin/dashboard');
           return { success: true, message: '조직 관리 페이지로 이동' };
