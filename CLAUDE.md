@@ -499,6 +499,34 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 ---
 
+## 21. KPA UX BASELINE (v1) — FROZEN
+
+> **Tag: `v1.00-kpa-ux-baseline` (2026-02-17)**
+> **상세: `docs/platform-core/KPA_UX_BASELINE_V1.md`**
+
+KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
+
+| 영역 | Operator (5-Block) | Admin (4-Block) | 특이사항 |
+|------|-------------------|-----------------|----------|
+| KPA-a (커뮤니티) | Frozen | - | Admin 대시보드 없음 |
+| KPA-b (분회 서비스) | Frozen | Frozen | 4-Block 외부 회계 섹션 |
+| KPA-c (조직관리 데모) | Frozen | Frozen | - |
+
+### 금지 사항
+
+- 커스텀 UI로 회귀
+- Block 구조 변경 (Core Freeze 위반)
+- 독자적 레이아웃 생성
+
+### 허용 사항
+
+- KPI/Quick Actions 항목 조정
+- AI Summary 규칙 추가
+- 4-Block 외부 서비스 고유 섹션 추가
+- 버그 수정, 성능 개선
+
+---
+
 ## 상세 규칙 문서 목록
 
 | 영역 | 문서 |
@@ -524,9 +552,10 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | **Operator OS Baseline** | `docs/_platform/BASELINE-OPERATOR-OS-V1.md` |
 | **Operator UX Core Freeze** | `docs/platform-core/OPERATOR_UX_CORE_FREEZE_V1.md` |
 | **Admin UX Core Freeze** | `docs/platform-core/ADMIN_UX_CORE_FREEZE_V1.md` |
+| **KPA UX Baseline** | `docs/platform-core/KPA_UX_BASELINE_V1.md` |
 
 ---
 
 *Updated: 2026-02-17*
-*Version: 5.0*
+*Version: 5.1*
 *Status: Active Constitution*

@@ -134,7 +134,9 @@ StructureActionBlock
 | Neture | 정책/AI 중심 | PASS | `7d5c9c5d0` | Frozen |
 | GlycoPharm | 네트워크/조직 구조 중심 | PASS | `5b3e9733a` | Frozen |
 | K-Cosmetics | - | - | - | 별도 WO |
-| KPA-a | - | - | - | 별도 WO |
+| KPA-a | - | - | - | Admin 대시보드 없음 |
+| KPA-b | 분회 조직 관리 | PASS | `7beb12e91` | Frozen |
+| KPA-c | 지부 구조 관리 | PASS | `dda8ccb5f` | Frozen |
 
 ---
 
