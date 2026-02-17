@@ -233,7 +233,7 @@ function NowRunningSection({ items, loading }: NowRunningSectionProps) {
           <p className="text-sm text-slate-500">지금 참여 가능한 프로그램</p>
         </div>
         <NavLink
-          to="/pharmacy/market-trial"
+          to="/store/market-trial"
           className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
         >
           전체보기

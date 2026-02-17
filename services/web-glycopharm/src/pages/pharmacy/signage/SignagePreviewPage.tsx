@@ -157,7 +157,7 @@ export default function SignagePreviewPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <NavLink
-            to="/pharmacy/signage/my"
+            to="/store/signage/my"
             className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-slate-600" />

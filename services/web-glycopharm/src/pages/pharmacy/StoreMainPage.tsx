@@ -67,12 +67,12 @@ interface QuickActionItem {
 }
 
 const QUICK_ACTIONS: QuickActionItem[] = [
-  { actionKey: 'manage_products', label: '상품 관리', icon: Package, path: '/pharmacy/products' },
-  { actionKey: 'view_orders', label: '주문 확인', icon: ShoppingCart, path: '/pharmacy/orders' },
-  { actionKey: 'manage_content', label: '콘텐츠 관리', icon: Tv, path: '/pharmacy/signage/content' },
-  { actionKey: 'store_settings', label: '매장 설정', icon: Settings, path: '/pharmacy/settings' },
-  { actionKey: 'check_approvals', label: '승인 현황', icon: FileText, path: '/pharmacy/store-apply' },
-  { actionKey: 'b2b_order', label: 'B2B 주문', icon: ShoppingCart, path: '/pharmacy/b2b-order' },
+  { actionKey: 'manage_products', label: '상품 관리', icon: Package, path: '/store/products' },
+  { actionKey: 'view_orders', label: '주문 확인', icon: ShoppingCart, path: '/store/orders' },
+  { actionKey: 'manage_content', label: '콘텐츠 관리', icon: Tv, path: '/store/content' },
+  { actionKey: 'store_settings', label: '매장 설정', icon: Settings, path: '/store/settings' },
+  { actionKey: 'check_approvals', label: '승인 현황', icon: FileText, path: '/store/apply' },
+  { actionKey: 'b2b_order', label: 'B2B 주문', icon: ShoppingCart, path: '/store/b2b-order' },
 ];
 
 // ─── Phase 2-B: 현황 카드 정의 ──────────────────────────────────
@@ -99,7 +99,7 @@ const SUMMARY_CARDS: SummaryCardConfig[] = [
     label: '주문 가능 상품',
     description: '지금 주문 가능한 상품',
     emptyText: '주문 가능한 상품이 없습니다',
-    linkTo: '/pharmacy/products',
+    linkTo: '/store/products',
   },
   {
     key: 'pendingApprovals',
@@ -107,7 +107,7 @@ const SUMMARY_CARDS: SummaryCardConfig[] = [
     label: '승인 대기',
     description: '승인 처리가 필요한 항목',
     emptyText: '대기 중인 승인 요청이 없습니다',
-    linkTo: '/pharmacy/store-apply',
+    linkTo: '/store/apply',
   },
   {
     key: 'activeChannels',
@@ -335,7 +335,7 @@ export default function StoreMainPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-slate-800">바로 이용 가능</h2>
           <NavLink
-            to="/pharmacy/products"
+            to="/store/products"
             className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
           >
             전체보기 <ArrowRight className="w-4 h-4" />
@@ -507,7 +507,7 @@ function CatalogItemRow({ item, showAction, onCopy }: { item: StoreCatalogItem; 
           {/* Action button for REQUEST_REQUIRED (none or rejected) */}
           {showAction && item.policy === 'REQUEST_REQUIRED' && item.approvalStatus !== 'approved' && item.approvalStatus !== 'pending' && (
             <NavLink
-              to="/pharmacy/store-apply"
+              to="/store/apply"
               onClick={() => logStoreAction('apply_request')}
               className="px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors"
             >

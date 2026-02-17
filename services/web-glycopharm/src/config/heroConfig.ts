@@ -67,7 +67,7 @@ export const heroSlides: HeroSlide[] = [
     bgGradient: 'from-green-600 via-green-700 to-emerald-800',
     cta: {
       label: 'Market Trial 보기',
-      link: '/pharmacy/market-trial',
+      link: '/store/market-trial',
       variant: 'primary',
     },
   },

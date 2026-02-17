@@ -37,7 +37,7 @@ const serviceCards: ServiceCard[] = [
     keywords: ['TV / 디지털 사이니지', '키오스크', '태블릿 / 웹 주문'],
     message: '매장 안과 밖에서 약국을 연결합니다',
     icon: Monitor,
-    link: '/pharmacy/signage/my',
+    link: '/store/signage/my',
   },
   {
     id: 'commerce',
@@ -45,7 +45,7 @@ const serviceCards: ServiceCard[] = [
     keywords: ['신제품', '추천 제품', 'Market Trial'],
     message: '검증된 제품을 약국 기준으로 판매',
     icon: Tag,
-    link: '/pharmacy/market-trial',
+    link: '/store/market-trial',
   },
   {
     id: 'community',

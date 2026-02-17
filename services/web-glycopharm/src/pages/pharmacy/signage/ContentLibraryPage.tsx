@@ -147,7 +147,7 @@ export default function ContentLibraryPage() {
             콘텐츠 등록
           </button>
           <NavLink
-            to="/pharmacy/signage/my"
+            to="/store/signage/my"
             className="flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
           >
             My Page

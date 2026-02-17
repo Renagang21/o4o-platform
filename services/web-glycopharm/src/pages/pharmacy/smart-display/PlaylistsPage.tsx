@@ -143,7 +143,7 @@ export default function PlaylistsPage() {
           </p>
         </div>
         <NavLink
-          to="/pharmacy/smart-display/playlists/new"
+          to="/store/display/playlists/new"
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -232,7 +232,7 @@ export default function PlaylistsPage() {
                         />
                         <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border py-1 z-50">
                           <NavLink
-                            to={`/pharmacy/smart-display/playlists/${playlist.id}/edit`}
+                            to={`/store/display/playlists/${playlist.id}/edit`}
                             className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function PlaylistsPage() {
                 {/* Actions */}
                 <div className="flex gap-2 mt-4">
                   <NavLink
-                    to={`/pharmacy/smart-display/playlists/${playlist.id}`}
+                    to={`/store/display/playlists/${playlist.id}`}
                     className="flex-1 px-3 py-2 text-center text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
                   >
                     상세보기
@@ -299,7 +299,7 @@ export default function PlaylistsPage() {
           <h3 className="mt-4 text-lg font-medium text-slate-800">플레이리스트가 없습니다</h3>
           <p className="mt-2 text-slate-500">새 플레이리스트를 만들어 영상을 관리하세요</p>
           <NavLink
-            to="/pharmacy/smart-display/playlists/new"
+            to="/store/display/playlists/new"
             className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
