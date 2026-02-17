@@ -22,7 +22,7 @@ import {
   ShippingAddress,
   ShippingRate,
   ShipmentTracking,
-} from '../types';
+} from '../types/index.js';
 
 interface CSVProduct {
   sku: string;

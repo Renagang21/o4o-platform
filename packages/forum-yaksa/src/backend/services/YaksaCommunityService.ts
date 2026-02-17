@@ -378,9 +378,11 @@ export class YaksaCommunityService {
       status: status as any,
       slug: this.generateSlug(data.title),
       metadata: {
-        yaksa: {
-          communityId: data.communityId,
-          isAnnouncement: data.isAnnouncement || false,
+        extensions: {
+          yaksa: {
+            communityId: data.communityId,
+            isAnnouncement: data.isAnnouncement || false,
+          },
         },
       },
       publishedAt: publishedAt as any,

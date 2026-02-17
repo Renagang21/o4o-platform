@@ -20,7 +20,7 @@ import {
   ShippingAddress,
   ShippingRate,
   ShipmentTracking,
-} from '../types';
+} from '../types/index.js';
 
 export class DomesticSupplierConnector extends BaseSupplierConnector {
   private client: AxiosInstance;
@@ -32,9 +32,9 @@ export class DomesticSupplierConnector extends BaseSupplierConnector {
       type: 'domestic',
       country: 'KR'
     };
-    
+
     super(config, supplierInfo);
-    
+
     this.client = axios.create({
       baseURL: config.credentials?.endpoint || 'https://api.supplier.co.kr',
       timeout: config.options?.timeout || 30000,

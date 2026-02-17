@@ -2,7 +2,8 @@
 export * from './types';
 
 // Services
-export { promptRegistry, PromptRegistry } from './services/PromptRegistry';
+export { promptRegistry } from './services/PromptRegistry';
+export { default as PromptRegistry } from './services/PromptRegistry';
 export { aiService, AIService } from './services/AIService';
 
 // Prompts

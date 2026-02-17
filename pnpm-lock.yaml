@@ -3109,6 +3109,9 @@ importers:
 
   packages/supplier-connector:
     dependencies:
+      axios:
+        specifier: ^1.7.0
+        version: 1.13.2
       csv-parse:
         specifier: 6.1.0
         version: 6.1.0

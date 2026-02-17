@@ -25,7 +25,7 @@ const DEFAULT_CONFIG: Partial<SiteGuideConfig> = {
 
 export class SiteGuideWidget {
   private config: SiteGuideConfig;
-  private api: SiteGuideAPI;
+  private api!: SiteGuideAPI;
   private container: HTMLDivElement | null = null;
   private panel: HTMLDivElement | null = null;
   private messagesContainer: HTMLDivElement | null = null;
@@ -33,7 +33,7 @@ export class SiteGuideWidget {
   private isOpen = false;
   private messages: Message[] = [];
   private isLoading = false;
-  private sessionId: string;
+  private sessionId!: string;
 
   constructor(config: SiteGuideConfig) {
     this.config = { ...DEFAULT_CONFIG, ...config };

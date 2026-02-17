@@ -3,13 +3,13 @@
  * Factory for creating and managing supplier connectors
  */
 
-export * from './types';
-export { DomesticSupplierConnector } from './connectors/DomesticSupplierConnector';
-export { CSVSupplierConnector } from './connectors/CSVSupplierConnector';
+export * from './types/index.js';
+export { DomesticSupplierConnector } from './connectors/DomesticSupplierConnector.js';
+export { CSVSupplierConnector } from './connectors/CSVSupplierConnector.js';
 
-import { SupplierConnector, SupplierConfig } from './types';
-import { DomesticSupplierConnector } from './connectors/DomesticSupplierConnector';
-import { CSVSupplierConnector } from './connectors/CSVSupplierConnector';
+import { SupplierConnector, SupplierConfig } from './types/index.js';
+import { DomesticSupplierConnector } from './connectors/DomesticSupplierConnector.js';
+import { CSVSupplierConnector } from './connectors/CSVSupplierConnector.js';
 
 /**
  * Supplier Connector Factory

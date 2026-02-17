@@ -4,11 +4,13 @@
   "description": "Supplier connector framework for dropshipping",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "license": "MIT",
   "scripts": {
     "build": "echo 'No build required for supplier-connector'"
   },
   "dependencies": {
+    "axios": "^1.7.0",
     "csv-parse": "6.1.0"
   }
 }
