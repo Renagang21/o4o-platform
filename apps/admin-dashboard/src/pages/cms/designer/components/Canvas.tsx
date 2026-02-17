@@ -52,7 +52,7 @@ export default function Canvas({ zoom = 1.0, showGrid = false }: CanvasProps) {
       {/* Canvas Container */}
       <div className="flex-1 p-8">
         <div
-          ref={drop}
+          ref={(node: HTMLDivElement | null) => { drop(node); }}
           className={`bg-white shadow-lg rounded-lg min-h-[600px] max-w-6xl mx-auto transition-all ${
             isOver ? 'ring-4 ring-blue-400 ring-opacity-50' : ''
           } ${showGrid ? 'bg-grid-pattern' : ''}`}

@@ -7,6 +7,7 @@ export interface Column<T> {
   dataIndex?: keyof T | string[];
   render?: (value: any, record: T, index: number) => ReactNode;
   sortable?: boolean;
+  sorter?: (a: T, b: T) => number;
   width?: string;
   align?: 'left' | 'center' | 'right';
 }
@@ -17,10 +18,10 @@ export interface DataTableProps<T> {
   rowKey: keyof T | ((record: T) => string);
   loading?: boolean;
   pagination?: {
-    current: number;
+    current?: number;
     pageSize: number;
     total: number;
-    onChange: (page: number, pageSize: number) => void;
+    onChange?: (page: number, pageSize: number) => void;
   };
   onRow?: (record: T) => {
     onClick?: () => void;

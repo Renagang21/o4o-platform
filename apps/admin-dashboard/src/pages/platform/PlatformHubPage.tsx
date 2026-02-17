@@ -156,7 +156,7 @@ export default function PlatformHubPage() {
   if (loading && !data) {
     return (
       <div className="p-6">
-        <PageHeader title="Platform Hub" description="플랫폼 통합 운영 허브" />
+        <PageHeader title="Platform Hub" subtitle="플랫폼 통합 운영 허브" />
         <div className="flex items-center justify-center py-20 text-gray-500">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
           데이터를 불러오는 중...
@@ -168,7 +168,7 @@ export default function PlatformHubPage() {
   if (error && !data) {
     return (
       <div className="p-6">
-        <PageHeader title="Platform Hub" description="플랫폼 통합 운영 허브" />
+        <PageHeader title="Platform Hub" subtitle="플랫폼 통합 운영 허브" />
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
           <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
           <p className="text-red-700">{error}</p>
@@ -228,7 +228,7 @@ export default function PlatformHubPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <PageHeader title="Platform Hub" description="플랫폼 통합 운영 허브 — 모든 서비스를 한눈에" />
+        <PageHeader title="Platform Hub" subtitle="플랫폼 통합 운영 허브 — 모든 서비스를 한눈에" />
         <button
           onClick={fetchData}
           disabled={loading}

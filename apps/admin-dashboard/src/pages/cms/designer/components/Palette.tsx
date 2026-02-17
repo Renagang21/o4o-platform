@@ -106,7 +106,7 @@ function PaletteItem({ component, onClick }: PaletteItemProps) {
 
   return (
     <button
-      ref={drag}
+      ref={(node: HTMLButtonElement | null) => { drag(node); }}
       onClick={onClick}
       className={`w-full flex items-center gap-3 p-3 rounded border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left group cursor-move ${
         isDragging ? 'opacity-50 scale-95' : 'opacity-100'
