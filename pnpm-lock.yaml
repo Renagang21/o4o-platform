@@ -3713,6 +3713,9 @@ importers:
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
+      '@o4o/operator-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-ux-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
