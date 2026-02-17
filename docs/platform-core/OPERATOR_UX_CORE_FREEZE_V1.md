@@ -147,8 +147,8 @@ QuickActionBlock
 | GlycoPharm | 운영 중심 | PASS | `b19ff8809` | Frozen |
 | K-Cosmetics | 이커머스 중심 | PASS | `3f321489a` | Frozen |
 | KPA-a | 콘텐츠 흐름 중심 | PASS | `bf41b174f` | Frozen |
-| KPA-b | 조직 계층 관리 | - | - | 별도 WO |
-| KPA-c | 경량 조직 운영 | - | - | 별도 WO |
+| KPA-b | 조직 계층 관리 | PASS | `7beb12e91` | Frozen |
+| KPA-c | 경량 조직 운영 | PASS | `dda8ccb5f` | Frozen |
 
 ---
 
@@ -279,13 +279,13 @@ Operator 라우트의 index에 Dashboard 컴포넌트를 배치한다.
 
 각 서비스는 동일 5-Block을 사용하되, 데이터 밀도와 강조도가 다르다:
 
-| Block | Neture | GlycoPharm | K-Cosmetics | KPA-a |
-|-------|--------|------------|-------------|-------|
-| KPI Grid | 중 | 높음 | 중 | 중 |
-| AI Summary | **높음** | 낮음 | 낮음 | 낮음 |
-| Action Queue | 중 | 중 | 중 | 중 |
-| Activity Log | 중 | 중 | 중 | **높음** |
-| Quick Actions | 중 | 중 | 중 | **높음** |
+| Block | Neture | GlycoPharm | K-Cosmetics | KPA-a | KPA-b | KPA-c |
+|-------|--------|------------|-------------|-------|-------|-------|
+| KPI Grid | 중 | 높음 | 중 | 중 | 중 | 높음 |
+| AI Summary | **높음** | 낮음 | 낮음 | 낮음 | 낮음 | 중 |
+| Action Queue | 중 | 중 | 중 | 중 | 낮음 | **높음** |
+| Activity Log | 중 | 중 | 중 | **높음** | **높음** | 중 |
+| Quick Actions | 중 | 중 | 중 | **높음** | **높음** | 중 |
 
 ---
 

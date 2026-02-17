@@ -134,7 +134,7 @@ export default function AdminDashboardPage() {
     setError(null);
     try {
       const data = await dashboardApi.getAdminDashboardSummary();
-      setConfig(buildAdminConfig(data));
+      if (data) setConfig(buildAdminConfig(data));
     } catch (err) {
       console.error('Failed to fetch admin dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');

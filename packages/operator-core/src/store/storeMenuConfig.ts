@@ -13,6 +13,7 @@ export type StoreMenuKey =
   | 'orders'
   | 'settlement'
   | 'content'
+  | 'display'
   | 'services'
   | 'settings';
 
@@ -38,6 +39,7 @@ export const ALL_STORE_MENUS: StoreMenuItemDef[] = [
   { key: 'orders', label: '주문 관리', subPath: '/orders' },
   { key: 'settlement', label: '정산', subPath: '/settlement' },
   { key: 'content', label: '콘텐츠/사이니지', subPath: '/content' },
+  { key: 'display', label: '디스플레이', subPath: '/display' },
   { key: 'services', label: '서비스 관리', subPath: '/services' },
   { key: 'settings', label: '설정', subPath: '/settings' },
 ];
@@ -60,7 +62,7 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   basePath: '/store',
   enabledMenus: [
     'overview', 'identity', 'products', 'orders',
-    'content', 'services', 'settings',
+    'content', 'display', 'services', 'settings',
   ],
 };
 

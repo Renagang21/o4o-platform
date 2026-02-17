@@ -204,7 +204,7 @@ export default function KpaOperatorDashboard() {
 
       const extData: KpaExtendedData = {
         summary: summaryRes?.data ?? null,
-        pendingMembers: membersRes?.total ?? membersRes?.data?.total ?? 0,
+        pendingMembers: (membersRes as any)?.total ?? (membersRes as any)?.data?.total ?? 0,
       };
 
       setConfig(buildDashboardConfig(extData));

@@ -1,14 +1,30 @@
 /**
- * AdminDashboardPage - 지부 관리자 대시보드
+ * AdminDashboardPage — 4-Block 통합 Admin 대시보드
+ *
+ * WO-O4O-OPERATOR-UX-KPA-C-PILOT-V1:
+ *   @o4o/admin-ux-core 기반 4-Block 구조로 전환.
+ *   기존 커스텀 UI(통계 카드 + 퀵 메뉴)를 교체.
+ *   기존 API(adminApi.getDashboardStats())를 그대로 활용.
+ *
+ * Block 구조:
+ *  [A] Structure Snapshot — 분회, 회원, 승인 대기, 공동구매
+ *  [B] Policy Overview   — 가입 승인 정책, 역할 부여 정책, 서비스 접근 정책
+ *  [C] Governance Alerts  — 미처리 승인, 구조 이상 경고
+ *  [D] Structure Actions  — 관리 페이지 진입점
  */
 
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, Card } from '../../components/common';
-import { AiSummaryButton } from '../../components/ai';
-import { useAuth } from '../../contexts';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  AdminDashboardLayout,
+  type AdminDashboardConfig,
+  type StructureMetric,
+  type PolicyItem,
+  type GovernanceAlert,
+  type StructureAction,
+} from '@o4o/admin-ux-core';
 import { adminApi } from '../../api/admin';
-import { colors } from '../../styles/theme';
+
+// ─── Types ───
 
 interface DashboardStats {
   totalBranches: number;
@@ -18,235 +34,142 @@ interface DashboardStats {
   recentPosts: number;
 }
 
-export function AdminDashboardPage() {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+// ─── Data Transformer ───
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+function buildAdminConfig(stats: DashboardStats): AdminDashboardConfig {
+  // Block A: Structure Snapshot
+  const structureMetrics: StructureMetric[] = [
+    {
+      key: 'branches',
+      label: '등록 분회',
+      value: stats.totalBranches,
+      status: stats.totalBranches === 0 ? 'attention' : 'stable',
+    },
+    {
+      key: 'members',
+      label: '전체 회원',
+      value: stats.totalMembers,
+      status: stats.totalMembers === 0 ? 'attention' : 'stable',
+    },
+    {
+      key: 'pending',
+      label: '승인 대기',
+      value: stats.pendingApprovals,
+      status: stats.pendingApprovals > 0 ? 'attention' : 'stable',
+    },
+    {
+      key: 'groupbuys',
+      label: '진행 공동구매',
+      value: stats.activeGroupbuys,
+    },
+  ];
 
-  const loadStats = async () => {
-    try {
-      setLoading(true);
-      const res = await adminApi.getDashboardStats();
-      setStats(res.data);
-    } catch (err) {
-      // WO-KPA-SOCIETY-DASHBOARD-P1-A: Empty state on API failure (no mock data)
-      console.error('Failed to load dashboard stats:', err);
-      setStats({
-        totalBranches: 0,
-        totalMembers: 0,
-        pendingApprovals: 0,
-        activeGroupbuys: 0,  // Entity 없음 - 항상 0
-        recentPosts: 0,      // Entity 없음 - 항상 0
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Block B: Policy Overview
+  const policies: PolicyItem[] = [
+    {
+      key: 'approval-policy',
+      label: '가입 승인 정책',
+      status: stats.pendingApprovals > 0 ? 'partial' : 'configured',
+      link: '/admin/organization-requests',
+    },
+    {
+      key: 'role-policy',
+      label: '역할 부여 정책',
+      status: 'configured',
+      link: '/admin/members',
+    },
+    {
+      key: 'service-policy',
+      label: '서비스 접근 정책',
+      status: 'configured',
+      link: '/admin/service-enrollments',
+    },
+  ];
 
-  if (loading) {
-    return <LoadingSpinner message="대시보드를 불러오는 중..." />;
+  // Block C: Governance Alerts
+  const governanceAlerts: GovernanceAlert[] = [];
+  if (stats.pendingApprovals > 0) {
+    governanceAlerts.push({
+      id: 'ga-pending',
+      message: `승인 대기 ${stats.pendingApprovals}건이 있습니다. 검토가 필요합니다.`,
+      level: stats.pendingApprovals > 5 ? 'warning' : 'info',
+      link: '/admin/organization-requests',
+    });
+  }
+  if (stats.totalBranches === 0) {
+    governanceAlerts.push({
+      id: 'ga-no-branches',
+      message: '등록된 분회가 없습니다. 조직 구조를 설정하세요.',
+      level: 'warning',
+      link: '/admin/divisions',
+    });
+  }
+  if (stats.totalMembers === 0) {
+    governanceAlerts.push({
+      id: 'ga-no-members',
+      message: '등록된 회원이 없습니다.',
+      level: 'warning',
+    });
   }
 
-  return (
-    <div style={styles.container}>
-      <div style={styles.headerRow}>
-        <PageHeader
-          title="지부 관리자"
-          description={`${user?.name || '관리자'}님, 환영합니다.`}
-          breadcrumb={[
-            { label: '홈', href: '/' },
-            { label: '관리자' },
-          ]}
-        />
-        <AiSummaryButton contextLabel="지부 관리 현황" serviceId="kpa-society" />
-      </div>
+  // Block D: Structure Actions
+  const structureActions: StructureAction[] = [
+    { id: 'sa-branches', label: '분회 관리', link: '/admin/divisions', icon: '🏢', description: '분회 생성, 수정, 삭제' },
+    { id: 'sa-members', label: '회원 관리', link: '/admin/members', icon: '👥', description: '회원 목록, 승인, 관리' },
+    { id: 'sa-officers', label: '임원 관리', link: '/admin/officers', icon: '👔', description: '임원진 등록 및 수정' },
+    { id: 'sa-requests', label: '조직 요청', link: '/admin/organization-requests', icon: '📋', description: '가입/역할 요청 처리' },
+    { id: 'sa-news', label: '공지 관리', link: '/admin/news', icon: '📰', description: '공지사항 작성 및 관리' },
+    { id: 'sa-settings', label: '설정', link: '/admin/settings', icon: '⚙️', description: '지부 설정' },
+  ];
 
-      {/* 통계 카드 */}
-      <div style={styles.statsGrid}>
-        <Card>
-          <div style={styles.statCard}>
-            <div style={styles.statIcon}>🏢</div>
-            <div style={styles.statContent}>
-              <div style={styles.statValue}>{stats?.totalBranches || 0}</div>
-              <div style={styles.statLabel}>등록된 분회</div>
-            </div>
-          </div>
-        </Card>
-        <Card>
-          <div style={styles.statCard}>
-            <div style={styles.statIcon}>👥</div>
-            <div style={styles.statContent}>
-              <div style={styles.statValue}>{stats?.totalMembers?.toLocaleString() || 0}</div>
-              <div style={styles.statLabel}>전체 회원</div>
-            </div>
-          </div>
-        </Card>
-        <Card>
-          <div style={styles.statCard}>
-            <div style={styles.statIcon}>📋</div>
-            <div style={styles.statContent}>
-              <div style={{ ...styles.statValue, color: colors.accentRed }}>
-                {stats?.pendingApprovals || 0}
-              </div>
-              <div style={styles.statLabel}>승인 대기</div>
-            </div>
-          </div>
-        </Card>
-        <Card>
-          <div style={styles.statCard}>
-            <div style={styles.statIcon}>🛒</div>
-            <div style={styles.statContent}>
-              <div style={styles.statValue}>{stats?.activeGroupbuys || 0}</div>
-              <div style={styles.statLabel}>진행중 공동구매</div>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* 퀵 메뉴 */}
-      <h2 style={styles.sectionTitle}>관리 메뉴</h2>
-      <div style={styles.menuGrid}>
-        <Link to="/admin/branches" style={styles.menuCard}>
-          <div style={styles.menuIcon}>🏢</div>
-          <div style={styles.menuContent}>
-            <h3 style={styles.menuTitle}>분회 관리</h3>
-            <p style={styles.menuDescription}>분회 생성, 수정, 삭제</p>
-          </div>
-          <div style={styles.menuArrow}>→</div>
-        </Link>
-
-        <Link to="/admin/members" style={styles.menuCard}>
-          <div style={styles.menuIcon}>👥</div>
-          <div style={styles.menuContent}>
-            <h3 style={styles.menuTitle}>회원 관리</h3>
-            <p style={styles.menuDescription}>회원 목록, 승인, 관리</p>
-          </div>
-          <div style={styles.menuArrow}>→</div>
-        </Link>
-
-        <Link to="/admin/officers" style={styles.menuCard}>
-          <div style={styles.menuIcon}>👔</div>
-          <div style={styles.menuContent}>
-            <h3 style={styles.menuTitle}>임원 관리</h3>
-            <p style={styles.menuDescription}>임원진 등록 및 수정</p>
-          </div>
-          <div style={styles.menuArrow}>→</div>
-        </Link>
-
-        <Link to="/admin/news" style={styles.menuCard}>
-          <div style={styles.menuIcon}>📰</div>
-          <div style={styles.menuContent}>
-            <h3 style={styles.menuTitle}>공지/소식 관리</h3>
-            <p style={styles.menuDescription}>공지사항 작성 및 관리</p>
-          </div>
-          <div style={styles.menuArrow}>→</div>
-        </Link>
-
-        <Link to="/admin/groupbuys" style={styles.menuCard}>
-          <div style={styles.menuIcon}>🛒</div>
-          <div style={styles.menuContent}>
-            <h3 style={styles.menuTitle}>공동구매 관리</h3>
-            <p style={styles.menuDescription}>공동구매 캠페인 관리</p>
-          </div>
-          <div style={styles.menuArrow}>→</div>
-        </Link>
-
-        <Link to="/admin/resources" style={styles.menuCard}>
-          <div style={styles.menuIcon}>📁</div>
-          <div style={styles.menuContent}>
-            <h3 style={styles.menuTitle}>자료실 관리</h3>
-            <p style={styles.menuDescription}>자료 업로드 및 관리</p>
-          </div>
-          <div style={styles.menuArrow}>→</div>
-        </Link>
-      </div>
-    </div>
-  );
+  return { structureMetrics, policies, governanceAlerts, structureActions };
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 20px 40px',
-  },
-  headerRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '24px',
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '16px',
-    marginBottom: '40px',
-  },
-  statCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    padding: '8px',
-  },
-  statIcon: {
-    fontSize: '36px',
-  },
-  statContent: {},
-  statValue: {
-    fontSize: '28px',
-    fontWeight: 700,
-    color: colors.primary,
-  },
-  statLabel: {
-    fontSize: '14px',
-    color: colors.neutral500,
-  },
-  sectionTitle: {
-    fontSize: '20px',
-    fontWeight: 600,
-    color: colors.neutral900,
-    marginBottom: '20px',
-  },
-  menuGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '16px',
-  },
-  menuCard: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '20px',
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '12px',
-    textDecoration: 'none',
-    gap: '16px',
-    transition: 'all 0.2s',
-  },
-  menuIcon: {
-    fontSize: '32px',
-    flexShrink: 0,
-  },
-  menuContent: {
-    flex: 1,
-  },
-  menuTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  menuDescription: {
-    fontSize: '13px',
-    color: colors.neutral500,
-    margin: '4px 0 0',
-  },
-  menuArrow: {
-    fontSize: '20px',
-    color: colors.neutral400,
-  },
-};
+// ─── Component ───
+
+export function AdminDashboardPage() {
+  const [config, setConfig] = useState<AdminDashboardConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminApi.getDashboardStats();
+      setConfig(buildAdminConfig(res.data));
+    } catch (err) {
+      console.error('Failed to fetch admin dashboard:', err);
+      setError('데이터를 불러오지 못했습니다.');
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+      </div>
+    );
+  }
+
+  if (error || !config) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-slate-500 mb-4">{error || '데이터를 불러올 수 없습니다.'}</p>
+        <button
+          onClick={fetchData}
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium text-slate-700 transition-colors"
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
+  return <AdminDashboardLayout config={config} />;
+}

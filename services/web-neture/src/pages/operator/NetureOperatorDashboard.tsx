@@ -156,7 +156,7 @@ export default function NetureOperatorDashboard() {
     setError(null);
     try {
       const data = await dashboardApi.getAdminDashboardSummary();
-      setConfig(buildDashboardConfig(data));
+      if (data) setConfig(buildDashboardConfig(data));
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');

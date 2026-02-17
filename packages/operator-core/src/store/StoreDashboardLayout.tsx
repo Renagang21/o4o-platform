@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   CreditCard,
   Monitor,
+  Tv,
   Layers,
   Settings,
   Menu,
@@ -37,6 +38,7 @@ const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
   orders: ShoppingCart,
   settlement: CreditCard,
   content: Monitor,
+  display: Tv,
   services: Layers,
   settings: Settings,
 };
@@ -47,6 +49,7 @@ interface StoreDashboardLayoutProps {
   userInitial?: string;
   homeLink?: string;
   onLogout?: () => void;
+  banner?: React.ReactNode;
 }
 
 export function StoreDashboardLayout({
@@ -55,6 +58,7 @@ export function StoreDashboardLayout({
   userInitial,
   homeLink = '/',
   onLogout,
+  banner,
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -212,6 +216,7 @@ export function StoreDashboardLayout({
 
         {/* Page Content */}
         <main className="p-4 md:p-6">
+          {banner}
           <Outlet />
         </main>
       </div>
