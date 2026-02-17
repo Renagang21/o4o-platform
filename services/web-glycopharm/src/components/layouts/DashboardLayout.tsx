@@ -40,26 +40,42 @@ interface DashboardLayoutProps {
   role: UserRole;
 }
 
+/**
+ * WO-GLYCOPHARM-ADMIN-AREA-V1:
+ * - admin config 추가 (구조 관리: 약국 네트워크, 회원 관리, 설정)
+ * - operator에서 구조 기능 제거 (pharmacies, users, settings → /admin)
+ */
 const roleConfig: Record<string, { title: string; icon: typeof Building2; color: string; menuItems: Array<{ path: string; label: string; icon: typeof LayoutDashboard }> }> = {
+  admin: {
+    title: '관리자',
+    icon: Shield,
+    color: 'red',
+    menuItems: [
+      { path: '/admin', label: '대시보드', icon: LayoutDashboard },
+      { path: '/admin/pharmacies', label: '약국 네트워크', icon: Store },
+      { path: '/admin/users', label: '회원 관리', icon: Users },
+      { path: '/admin/settings', label: '설정', icon: Settings },
+    ],
+  },
   pharmacy: {
     title: '약국 관리',
     icon: Building2,
     color: 'primary',
     menuItems: [
-      { path: '/pharmacy', label: '대시보드', icon: LayoutDashboard },
-      { path: '/pharmacy/store-main', label: '매장 메인', icon: Store },
-      { path: '/pharmacy/b2b-order', label: 'B2B 주문', icon: ShoppingCart },
-      { path: '/pharmacy/products', label: '상품 관리', icon: Package },
-      { path: '/pharmacy/orders', label: '주문 내역', icon: ShoppingCart },
-      { path: '/pharmacy/patients', label: '고객 관리', icon: Users },
-      { path: '/pharmacy/smart-display', label: '스마트 디스플레이', icon: Tv },
-      { path: '/pharmacy/signage/content', label: '콘텐츠 가져오기', icon: Monitor },
-      { path: '/pharmacy/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
-      { path: '/pharmacy/signage/my', label: '내 사이니지', icon: Tv },
-      { path: '/pharmacy/market-trial', label: 'Market Trial', icon: Tag },
-      { path: '/pharmacy/funnel', label: '전환 퍼널', icon: BarChart3 },
-      { path: '/pharmacy/management', label: '약국 경영', icon: Briefcase },
-      { path: '/pharmacy/settings', label: '설정', icon: Settings },
+      { path: '/store', label: '대시보드', icon: LayoutDashboard },
+      { path: '/store/identity', label: '매장 메인', icon: Store },
+      { path: '/store/b2b-order', label: 'B2B 주문', icon: ShoppingCart },
+      { path: '/store/products', label: '상품 관리', icon: Package },
+      { path: '/store/orders', label: '주문 내역', icon: ShoppingCart },
+      { path: '/store/services', label: '고객 관리', icon: Users },
+      { path: '/store/display', label: '스마트 디스플레이', icon: Tv },
+      { path: '/store/content', label: '콘텐츠 가져오기', icon: Monitor },
+      { path: '/store/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
+      { path: '/store/signage/my', label: '내 사이니지', icon: Tv },
+      { path: '/store/market-trial', label: 'Market Trial', icon: Tag },
+      { path: '/store/funnel', label: '전환 퍼널', icon: BarChart3 },
+      { path: '/store/management', label: '약국 경영', icon: Briefcase },
+      { path: '/store/settings', label: '설정', icon: Settings },
     ],
   },
   supplier: {
@@ -93,7 +109,6 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
     color: 'red',
     menuItems: [
       { path: '/operator', label: '대시보드', icon: LayoutDashboard },
-      { path: '/operator/pharmacies', label: '약국 네트워크', icon: Store },
       { path: '/operator/applications', label: '신청 관리', icon: FileCheck },
       { path: '/operator/products', label: '상품 관리', icon: Package },
       { path: '/operator/orders', label: '주문 관리', icon: ShoppingCart },
@@ -110,9 +125,8 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/operator/signage/content', label: '콘텐츠 허브', icon: Monitor },
       { path: '/operator/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
       { path: '/operator/signage/my', label: '내 사이니지', icon: Tv },
-      { path: '/operator/users', label: '회원 관리', icon: Users },
       { path: '/operator/support', label: '고객지원', icon: HelpCircle },
-      { path: '/operator/settings', label: '설정', icon: Settings },
+      { path: '/operator/ai-report', label: 'AI 리포트', icon: BarChart3 },
     ],
   },
 };

@@ -58,7 +58,7 @@ export {
 } from './store';
 
 // User Roles
-export type UserRole = 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';
+export type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';
 
 // User status
 export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended';

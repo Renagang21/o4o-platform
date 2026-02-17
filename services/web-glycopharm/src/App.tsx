@@ -320,6 +320,21 @@ function AppRoutes() {
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
+      {/* Admin Dashboard (WO-GLYCOPHARM-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
+      <Route
+        path="admin"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <DashboardLayout role="admin" />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<GlycoPharmOperatorDashboard />} />
+        <Route path="pharmacies" element={<PharmaciesPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+
       {/* Operator Dashboard */}
       <Route
         path="operator"
@@ -332,7 +347,6 @@ function AppRoutes() {
         {/* Signal 기반 대시보드 (WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1) */}
         <Route index element={<GlycoPharmOperatorDashboard />} />
         {/* Semi-Franchise Management */}
-        <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
         <Route path="products" element={<ProductsPage />} />
@@ -357,10 +371,8 @@ function AppRoutes() {
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         {/* Store Template Manager */}
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
-        {/* Users & Support & Settings */}
-        <Route path="users" element={<UsersPage />} />
+        {/* Support */}
         <Route path="support" element={<SupportPage />} />
-        <Route path="settings" element={<SettingsPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<AiReportPage />} />
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
