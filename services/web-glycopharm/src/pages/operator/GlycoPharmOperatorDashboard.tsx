@@ -1,111 +1,181 @@
 /**
- * GlycoPharmOperatorDashboard - Signal 기반 운영자 대시보드
+ * GlycoPharmOperatorDashboard — 5-Block 통합 Operator 대시보드
  *
- * WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1
- * WO-OPERATOR-CORE-PHASE3-GLYCOPHARM: Core Shell + GlycoPharm Config 전환
- * WO-OPERATOR-AI-ACTION-LAYER-V1: AI 행동 제안 패널 추가
- * WO-OPERATOR-ACTION-TRIGGER-V1: 즉시 실행 트리거 추가
+ * WO-O4O-OPERATOR-UX-GLYCOPHARM-PILOT-V1:
+ *   @o4o/operator-ux-core 기반 5-Block 구조로 전환.
+ *   기존 API(glycopharmApi.getOperatorDashboard())를 그대로 활용.
  *
- * 구조:
- *  [ Hero Summary ]     — 서비스 상태 배지 (3초 판단)
- *  [ Action Panel ]     — AI 행동 제안 + 즉시 실행 트리거
- *  [ Action Signals ]   — 행동 유도 카드 3장
- *  [ Status Feed ]      — 주요 운영 지표 5건 (children)
- *  [ Analytics Link ]   — 상세 분석 링크 (children)
+ * Block 구조:
+ *  [1] KPI Grid       — 약국, 스토어, 상품, 주문, 매출, 포럼
+ *  [2] AI Summary     — 운영 상태 기반 인사이트 (AI 의존도 낮음)
+ *  [3] Action Queue   — 승인 대기, 보완 요청, 상품 발행 대기
+ *  [4] Activity Log   — 운영 현황 요약
+ *  [5] Quick Actions  — 주요 업무 바로가기
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  ShoppingBag,
-  MessageSquare,
-  Store,
-  Package,
-  FileText,
-  AlertCircle,
-} from 'lucide-react';
-import {
-  OperatorLayout,
-  generateOperatorActions,
-  type OperatorActionSuggestion,
-} from '@o4o/operator-core';
+  OperatorDashboardLayout,
+  type OperatorDashboardConfig,
+  type KpiItem,
+  type AiSummaryItem,
+  type ActionItem,
+  type ActivityItem,
+  type QuickActionItem,
+} from '@o4o/operator-ux-core';
 import { glycopharmApi, type OperatorDashboardData } from '@/api/glycopharm';
-import { buildGlycoPharmOperatorConfig } from './operatorConfig';
 
-// ─── Trigger Definitions ───
+// ─── Data Transformer ───
 
-const TRIGGER_ACTIONS: OperatorActionSuggestion[] = [
-  {
-    id: 'trigger-refreshSummary',
-    priority: 'low',
-    title: '대시보드 데이터 새로고침',
-    description: '최신 운영 현황을 다시 불러옵니다',
-    actionType: 'trigger',
-    trigger: { key: 'refreshSummary' },
-  },
-];
+function buildDashboardConfig(
+  data: OperatorDashboardData,
+): OperatorDashboardConfig {
+  const { serviceStatus, storeStatus, productStats, orderStats, forumStatus, contentStatus } = data;
 
-// ─── Status Feed (GlycoPharm 고유 — KPI 지표 목록) ───
-
-interface StatusItem {
-  id: string;
-  icon: typeof Store;
-  iconBg: string;
-  iconColor: string;
-  label: string;
-  value: string;
-}
-
-function buildStatusFeed(data: OperatorDashboardData): StatusItem[] {
-  return [
+  // Block 1: KPI Grid
+  const kpis: KpiItem[] = [
     {
-      id: 'pharmacies',
-      icon: Store,
-      iconBg: 'bg-emerald-50',
-      iconColor: 'text-emerald-500',
+      key: 'pharmacies',
       label: '활성 약국',
-      value: `${data.serviceStatus.activePharmacies}개`,
+      value: serviceStatus.activePharmacies,
+      status: serviceStatus.activePharmacies === 0 ? 'critical' : 'neutral',
     },
     {
-      id: 'stores',
-      icon: ShoppingBag,
-      iconBg: 'bg-blue-50',
-      iconColor: 'text-blue-500',
-      label: '운영 중 스토어',
-      value: `${data.storeStatus.activeStores}개`,
+      key: 'stores',
+      label: '운영 스토어',
+      value: storeStatus.activeStores,
+      status: storeStatus.activeStores === 0 ? 'warning' : 'neutral',
     },
     {
-      id: 'products',
-      icon: Package,
-      iconBg: 'bg-purple-50',
-      iconColor: 'text-purple-500',
-      label: '등록 상품',
-      value: `${data.productStats.total}개 (활성 ${data.productStats.active}개)`,
+      key: 'products',
+      label: '활성 상품',
+      value: `${productStats.active}/${productStats.total}`,
     },
     {
-      id: 'orders',
-      icon: FileText,
-      iconBg: 'bg-amber-50',
-      iconColor: 'text-amber-500',
+      key: 'orders',
       label: '총 주문',
-      value: `${data.orderStats.totalOrders}건`,
+      value: orderStats.totalOrders,
     },
     {
-      id: 'forums',
-      icon: MessageSquare,
-      iconBg: 'bg-rose-50',
-      iconColor: 'text-rose-500',
-      label: '포럼 게시물',
-      value: `${data.forumStatus.totalPosts}개`,
+      key: 'revenue',
+      label: '총 매출',
+      value: `₩${orderStats.totalRevenue.toLocaleString()}`,
+    },
+    {
+      key: 'forum',
+      label: '포럼 게시글',
+      value: forumStatus.totalPosts,
     },
   ];
+
+  // Block 2: AI Summary (운영 상태 기반 — AI 의존도 낮음)
+  const aiSummary: AiSummaryItem[] = [];
+  if (storeStatus.pendingApprovals > 0) {
+    aiSummary.push({
+      id: 'ai-pending',
+      message: `스토어 승인 대기 ${storeStatus.pendingApprovals}건이 있습니다. 빠른 처리를 권장합니다.`,
+      level: 'warning',
+      link: '/operator/applications',
+    });
+  }
+  if (storeStatus.supplementRequests > 0) {
+    aiSummary.push({
+      id: 'ai-supplement',
+      message: `보완 요청 ${storeStatus.supplementRequests}건이 미처리 상태입니다.`,
+      level: 'warning',
+    });
+  }
+  if (productStats.draft > 0) {
+    aiSummary.push({
+      id: 'ai-draft',
+      message: `임시저장 상품 ${productStats.draft}건이 발행 대기 중입니다.`,
+      level: 'info',
+      link: '/operator/products',
+    });
+  }
+  const totalContent = contentStatus.hero.total + contentStatus.featured.total + contentStatus.eventNotice.total;
+  if (totalContent === 0) {
+    aiSummary.push({
+      id: 'ai-content',
+      message: '등록된 콘텐츠가 없습니다. 스토어 콘텐츠를 구성하세요.',
+      level: 'warning',
+    });
+  }
+
+  // Block 3: Action Queue
+  const actionQueue: ActionItem[] = [];
+  if (storeStatus.pendingApprovals > 0) {
+    actionQueue.push({
+      id: 'aq-approvals',
+      label: '스토어 승인 대기',
+      count: storeStatus.pendingApprovals,
+      link: '/operator/applications',
+    });
+  }
+  if (storeStatus.supplementRequests > 0) {
+    actionQueue.push({
+      id: 'aq-supplement',
+      label: '보완 요청 처리',
+      count: storeStatus.supplementRequests,
+      link: '/operator/applications',
+    });
+  }
+  if (productStats.draft > 0) {
+    actionQueue.push({
+      id: 'aq-draft',
+      label: '상품 발행 대기',
+      count: productStats.draft,
+      link: '/operator/products',
+    });
+  }
+
+  // Block 4: Activity Log (운영 현황 요약 — 실시간 활동 API 없음)
+  const now = new Date().toISOString();
+  const activityLog: ActivityItem[] = [
+    {
+      id: 'al-pharmacies',
+      message: `활성 약국 ${serviceStatus.activePharmacies}개 운영 중`,
+      timestamp: serviceStatus.lastUpdated || now,
+    },
+    {
+      id: 'al-stores',
+      message: `스토어 ${storeStatus.activeStores}개 활성, ${storeStatus.inactiveStores}개 비활성`,
+      timestamp: now,
+    },
+    {
+      id: 'al-products',
+      message: `상품 ${productStats.total}개 등록 (활성 ${productStats.active}개)`,
+      timestamp: now,
+    },
+    {
+      id: 'al-orders',
+      message: `주문 ${orderStats.totalOrders}건, 결제완료 ${orderStats.paidOrders}건`,
+      timestamp: now,
+    },
+    {
+      id: 'al-forum',
+      message: `포럼 ${forumStatus.open}개 공개, 게시글 ${forumStatus.totalPosts}개`,
+      timestamp: now,
+    },
+  ];
+
+  // Block 5: Quick Actions
+  const quickActions: QuickActionItem[] = [
+    { id: 'qa-applications', label: '신청 관리', link: '/operator/applications', icon: '📋' },
+    { id: 'qa-products', label: '상품 관리', link: '/operator/products', icon: '📦' },
+    { id: 'qa-orders', label: '주문 관리', link: '/operator/orders', icon: '🛒' },
+    { id: 'qa-analytics', label: '분석 보기', link: '/operator/analytics', icon: '📊' },
+    { id: 'qa-settlements', label: '정산 관리', link: '/operator/settlements', icon: '💰' },
+    { id: 'qa-marketing', label: '마케팅', link: '/operator/marketing', icon: '📢' },
+  ];
+
+  return { kpis, aiSummary, actionQueue, activityLog, quickActions };
 }
 
-// ─── Main component ───
+// ─── Component ───
 
 export default function GlycoPharmOperatorDashboard() {
-  const navigate = useNavigate();
-  const [data, setData] = useState<OperatorDashboardData | null>(null);
+  const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,7 +185,7 @@ export default function GlycoPharmOperatorDashboard() {
     try {
       const res = await glycopharmApi.getOperatorDashboard();
       if (res.success && res.data) {
-        setData(res.data);
+        setConfig(buildDashboardConfig(res.data));
       }
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
@@ -128,77 +198,27 @@ export default function GlycoPharmOperatorDashboard() {
     fetchData();
   }, [fetchData]);
 
-  const config = buildGlycoPharmOperatorConfig(data);
-  const feed = data ? buildStatusFeed(data) : [];
-  const actions = useMemo(
-    () => config
-      ? [...generateOperatorActions(config.signalCards), ...TRIGGER_ACTIONS]
-      : [],
-    [config],
-  );
-
-  const handleTrigger = useCallback(async (key: string) => {
-    switch (key) {
-      case 'refreshSummary':
-        await fetchData();
-        break;
-    }
-  }, [fetchData]);
-
-  return (
-    <OperatorLayout
-      config={config}
-      loading={loading}
-      error={error}
-      onRefresh={fetchData}
-      actions={actions}
-      onActionNavigate={(route) => navigate(route)}
-      onActionTrigger={handleTrigger}
-    >
-      {/* Status Feed — GlycoPharm 고유 KPI 지표 */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
-        <div className="p-5 border-b border-slate-100">
-          <h2 className="text-lg font-semibold text-slate-800">주요 운영 지표</h2>
-        </div>
-
-        {loading ? (
-          <div className="p-6 text-center text-slate-500">로딩 중...</div>
-        ) : feed.length === 0 ? (
-          <div className="text-center py-10">
-            <AlertCircle size={40} className="mx-auto mb-4 text-slate-300" />
-            <p className="text-slate-400 text-sm">운영 데이터가 없습니다</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-100">
-            {feed.map((item) => {
-              const ItemIcon = item.icon;
-              return (
-                <div key={item.id} className="p-4 flex items-center gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.iconBg}`}
-                  >
-                    <ItemIcon className={`w-4 h-4 ${item.iconColor}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-700">{item.label}</p>
-                  </div>
-                  <span className="text-sm font-semibold text-slate-600 flex-shrink-0">{item.value}</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
       </div>
+    );
+  }
 
-      {/* Link to detailed cockpit */}
-      <div className="text-center">
-        <Link
-          to="/operator/analytics"
-          className="text-sm text-slate-500 hover:text-primary-600 transition-colors"
+  if (error || !config) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-slate-500 mb-4">{error || '데이터를 불러올 수 없습니다.'}</p>
+        <button
+          onClick={fetchData}
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium text-slate-700 transition-colors"
         >
-          상세 분석 보기 →
-        </Link>
+          다시 시도
+        </button>
       </div>
-    </OperatorLayout>
-  );
+    );
+  }
+
+  return <OperatorDashboardLayout config={config} />;
 }

@@ -13,6 +13,7 @@
     "@o4o/auth-client": "workspace:*",
     "@o4o/hub-core": "workspace:*",
     "@o4o/operator-core": "workspace:*",
+    "@o4o/operator-ux-core": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*",
     "@o4o/utils": "workspace:*",
