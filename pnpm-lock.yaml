@@ -3659,6 +3659,9 @@ importers:
 
   services/web-kpa-society:
     dependencies:
+      '@o4o/admin-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/admin-ux-core
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -18441,7 +18444,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
+      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
