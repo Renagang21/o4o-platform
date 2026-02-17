@@ -6,8 +6,9 @@
  * - 요청 관리 (organization-requests, service-enrollments) AdminRoutes에서 이동
  * - members 제거 (Admin 구조 관리 영역)
  *
- * WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1:
- * - /operator 루트 → /hub 리다이렉트
+ * WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1:
+ * - /operator 루트 → 5-Block 대시보드 렌더 (Hub 기능 흡수)
+ * - Hub는 /hub에서 유지 (접근 가능)
  * - 서브 페이지는 main Layout에서 렌더 (App.tsx에서 Layout 래핑)
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1:
@@ -16,6 +17,7 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage } from '../pages/operator';
+import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
@@ -26,8 +28,8 @@ export function OperatorRoutes() {
   return (
     <RoleGuard allowedRoles={['kpa:admin', 'kpa:operator']}>
       <Routes>
-        {/* /operator → /hub 리다이렉트 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
-        <Route index element={<Navigate to="/hub" replace />} />
+        {/* /operator → 5-Block 대시보드 (WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1) */}
+        <Route index element={<KpaOperatorDashboard />} />
 
         {/* AI 리포트 */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
