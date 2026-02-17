@@ -28,6 +28,8 @@ COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
 COPY packages/hub-core/package.json ./packages/hub-core/
+COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
+COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 
 # Copy service package.json
 COPY services/web-neture/package.json ./services/web-neture/
@@ -44,6 +46,8 @@ COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
 COPY packages/hub-core/ ./packages/hub-core/
+COPY packages/operator-ux-core/ ./packages/operator-ux-core/
+COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/

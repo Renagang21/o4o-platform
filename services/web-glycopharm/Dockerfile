@@ -24,6 +24,9 @@ COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
+COPY packages/hub-core/package.json ./packages/hub-core/
+COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
+COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 
 # Copy service package.json
 COPY services/web-glycopharm/package.json ./services/web-glycopharm/
@@ -37,6 +40,9 @@ COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/utils/ ./packages/utils/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
+COPY packages/hub-core/ ./packages/hub-core/
+COPY packages/operator-ux-core/ ./packages/operator-ux-core/
+COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 
 # Copy service source
 COPY services/web-glycopharm/ ./services/web-glycopharm/
