@@ -75,6 +75,9 @@ const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-ma
 const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
 const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
 
+// Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block)
+const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdminDashboard'));
+
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
@@ -344,7 +347,7 @@ function AppRoutes() {
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
-      {/* Admin Dashboard (WO-GLYCOPHARM-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
+      {/* Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block 구조) */}
       <Route
         path="admin"
         element={
@@ -353,7 +356,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<GlycoPharmOperatorDashboard />} />
+        <Route index element={<GlycoPharmAdminDashboard />} />
         <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="settings" element={<SettingsPage />} />

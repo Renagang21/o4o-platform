@@ -3507,6 +3507,9 @@ importers:
 
   services/web-glycopharm:
     dependencies:
+      '@o4o/admin-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/admin-ux-core
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
