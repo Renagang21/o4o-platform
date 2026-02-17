@@ -13,6 +13,7 @@ import LoginModal from '@/components/common/LoginModal';
 import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
 import { HomePage, NotFoundPage } from '@/pages';
@@ -91,37 +92,12 @@ function PageLoading() {
   );
 }
 
-// Protected Route Component - triggers auth check only when entering
-function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
-  const { isAuthenticated, user, isLoading, isSessionChecked, checkSession } = useAuth();
-  const location = useLocation();
-
-  // Trigger session check when entering protected route
-  React.useEffect(() => {
-    if (!isSessionChecked) {
-      checkSession();
-    }
-  }, [isSessionChecked, checkSession]);
-
-  // Wait for session check to complete
-  if (!isSessionChecked || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-}
+/**
+ * ProtectedRoute → RoleGuard alias
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
+ * 실제 로직은 components/auth/RoleGuard.tsx (isSessionChecked + checkSession 포함)
+ */
+const ProtectedRoute = RoleGuard;
 
 /**
  * RoleBasedHome - WO-K-COSMETICS-ROLE-BASED-LANDING-V1
@@ -133,8 +109,8 @@ function RoleBasedHome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.currentRole) {
-      const target = ROLE_DASHBOARDS[user.currentRole];
+    if (user?.roles[0]) {
+      const target = ROLE_DASHBOARDS[user.roles[0]];
       if (target && target !== '/') {
         navigate(target, { replace: true });
       }
@@ -200,7 +176,6 @@ function AppRoutes() {
 
         {/* Role Not Available - these roles use Neture platform */}
         <Route path="supplier/*" element={<RoleNotAvailablePage role="supplier" />} />
-        <Route path="admin/*" element={<RoleNotAvailablePage role="admin" />} />
         <Route path="seller/*" element={<RoleNotAvailablePage role="seller" />} />
 
         {/* Platform Routes */}
@@ -234,6 +209,21 @@ function AppRoutes() {
         <Route path="status" element={<PartnerStatusPage />} />
       </Route>
 
+      {/* Admin Dashboard (WO-K-COSMETICS-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
+      <Route
+        path="admin"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <DashboardLayout role="admin" />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<KCosmeticsOperatorDashboard />} />
+        <Route path="stores" element={<OperatorStoresPage />} />
+        <Route path="users" element={<OperatorUsersPage />} />
+        <Route path="settings" element={<OperatorSettingsPage />} />
+      </Route>
+
       {/* Operator Dashboard */}
       <Route
         path="operator"
@@ -245,7 +235,6 @@ function AppRoutes() {
       >
         {/* Signal 기반 대시보드 (WO-K-COSMETICS-OPERATOR-DASHBOARD-UX-V1) */}
         <Route index element={<KCosmeticsOperatorDashboard />} />
-        <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="products" element={<OperatorProductsPage />} />
         <Route path="orders" element={<OperatorOrdersPage />} />
@@ -256,9 +245,7 @@ function AppRoutes() {
         <Route path="signage/content" element={<SignageContentHubPage />} />
               <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
               <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="users" element={<OperatorUsersPage />} />
         <Route path="support" element={<OperatorSupportPage />} />
-        <Route path="settings" element={<OperatorSettingsPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}

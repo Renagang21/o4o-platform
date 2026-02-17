@@ -12,11 +12,13 @@ import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/auth/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import RedirectNoticeBanner from '@/components/common/RedirectNoticeBanner';
 
 // Phase 2: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
 const ServiceLoginPage = lazy(() => import('@/pages/auth/ServiceLoginPage'));
@@ -31,9 +33,7 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
-// Pharmacy Dashboard
-const PharmacyHubPage = lazy(() => import('@/pages/pharmacy/hub/HubPage')); // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
-const PharmacyDashboard = lazy(() => import('@/pages/pharmacy/PharmacyDashboard'));
+// Store pages (files under pages/pharmacy/ — reused by /store routes)
 const StoreMainPage = lazy(() => import('@/pages/pharmacy/StoreMainPage'));
 const PharmacyProducts = lazy(() => import('@/pages/pharmacy/PharmacyProducts'));
 const PharmacyOrders = lazy(() => import('@/pages/pharmacy/PharmacyOrders'));
@@ -161,29 +161,12 @@ function PageLoading() {
   );
 }
 
-// Protected Route Component (Platform User)
-function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-}
+/**
+ * ProtectedRoute → RoleGuard alias
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
+ * 실제 로직은 components/auth/RoleGuard.tsx
+ */
+const ProtectedRoute = RoleGuard;
 
 // Service User Protected Route (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
 function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -214,8 +197,8 @@ function RoleBasedHome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.role) {
-      const target = getDefaultRouteByRole(user.role);
+    if (user?.roles[0]) {
+      const target = getDefaultRouteByRole(user.roles[0]);
       if (target !== '/') {
         navigate(target, { replace: true });
       }
@@ -235,6 +218,7 @@ function StoreLayoutWrapper() {
       userName={user?.name || user?.email || ''}
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}
+      banner={<RedirectNoticeBanner />}
     />
   );
 }
@@ -300,48 +284,7 @@ function AppRoutes() {
         <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
 
-      {/* Pharmacy Dashboard */}
-      <Route
-        path="pharmacy"
-        element={
-          <ProtectedRoute allowedRoles={['pharmacy']}>
-            <DashboardLayout role="pharmacy" />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<PharmacyDashboard />} />
-        <Route path="hub" element={<PharmacyHubPage />} />
-        <Route path="store-main" element={<StoreMainPage />} />
-        <Route path="products" element={<PharmacyProducts />} />
-        <Route path="orders" element={<PharmacyOrders />} />
-        <Route path="patients" element={<PharmacyPatients />} />
-        <Route path="smart-display" element={<SmartDisplayPage />} />
-        <Route path="smart-display/playlists" element={<PlaylistsPage />} />
-        <Route path="smart-display/schedules" element={<SchedulesPage />} />
-        <Route path="smart-display/media" element={<MediaLibraryPage />} />
-        <Route path="smart-display/forum" element={<PlaylistForumPage />} />
-        {/* Signage Extension (New) */}
-        <Route path="signage/library" element={<ContentLibraryPage />} />
-        <Route path="signage/content" element={<ContentHubPage />} />
-        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
-        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="signage/my" element={<MySignagePage />} />
-        <Route path="signage/preview" element={<SignagePreviewPage />} />
-        {/* Market Trial Extension */}
-        <Route path="market-trial" element={<MarketTrialListPage />} />
-        {/* B2B Order */}
-        <Route path="b2b-order" element={<B2BOrderPage />} />
-        {/* Store Apply */}
-        <Route path="store-apply" element={<StoreApplyPage />} />
-        <Route path="settings" element={<PharmacySettings />} />
-        {/* Customer Requests (Phase 1: Common Request) */}
-        <Route path="requests" element={<CustomerRequestsPage />} />
-        {/* Funnel Visualization (Phase 3-A) */}
-        <Route path="funnel" element={<FunnelPage />} />
-        {/* 약국 경영 */}
-        <Route path="management" element={<PharmacyManagement />} />
-        <Route path="management/b2b" element={<PharmacyB2BProducts />} />
-      </Route>
+      {/* /pharmacy removed — WO-PHARMACY-FULL-REMOVAL-V1 */}
 
       {/* Supplier Dashboard - Neture에서 관리 */}
       <Route
@@ -377,6 +320,21 @@ function AppRoutes() {
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
+      {/* Admin Dashboard (WO-GLYCOPHARM-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
+      <Route
+        path="admin"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <DashboardLayout role="admin" />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<GlycoPharmOperatorDashboard />} />
+        <Route path="pharmacies" element={<PharmaciesPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+
       {/* Operator Dashboard */}
       <Route
         path="operator"
@@ -389,7 +347,6 @@ function AppRoutes() {
         {/* Signal 기반 대시보드 (WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1) */}
         <Route index element={<GlycoPharmOperatorDashboard />} />
         {/* Semi-Franchise Management */}
-        <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
         <Route path="products" element={<ProductsPage />} />
@@ -414,10 +371,8 @@ function AppRoutes() {
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         {/* Store Template Manager */}
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
-        {/* Users & Support & Settings */}
-        <Route path="users" element={<UsersPage />} />
+        {/* Support */}
         <Route path="support" element={<SupportPage />} />
-        <Route path="settings" element={<SettingsPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<AiReportPage />} />
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
@@ -472,6 +427,26 @@ function AppRoutes() {
         <Route path="content" element={<ContentHubPage />} />
         <Route path="services" element={<PharmacyPatients />} />
         <Route path="settings" element={<PharmacySettings />} />
+        <Route path="apply" element={<StoreApplyPage />} />
+        {/* Smart Display (moved from /pharmacy/smart-display) */}
+        <Route path="display" element={<SmartDisplayPage />} />
+        <Route path="display/playlists" element={<PlaylistsPage />} />
+        <Route path="display/schedules" element={<SchedulesPage />} />
+        <Route path="display/media" element={<MediaLibraryPage />} />
+        <Route path="display/forum" element={<PlaylistForumPage />} />
+        {/* Signage Extension */}
+        <Route path="signage/library" element={<ContentLibraryPage />} />
+        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
+        <Route path="signage/my" element={<MySignagePage />} />
+        <Route path="signage/preview" element={<SignagePreviewPage />} />
+        {/* Extensions */}
+        <Route path="market-trial" element={<MarketTrialListPage />} />
+        <Route path="b2b-order" element={<B2BOrderPage />} />
+        <Route path="requests" element={<CustomerRequestsPage />} />
+        <Route path="funnel" element={<FunnelPage />} />
+        <Route path="management" element={<PharmacyManagement />} />
+        <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>
 
       {/* 404 */}

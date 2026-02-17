@@ -28,7 +28,7 @@ export default function SupplierOpsLayout() {
   };
 
   // 허브 접근 가능 역할: supplier, partner, admin
-  const hasHubAccess = user?.currentRole && ['admin', 'supplier', 'partner'].includes(user.currentRole);
+  const hasHubAccess = user?.roles.some(r => ['admin', 'supplier', 'partner'].includes(r));
 
   return (
     <div className="min-h-screen bg-gray-50">

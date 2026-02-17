@@ -480,6 +480,7 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | `@o4o/ai-core` | AI Insight 오케스트레이터 | Frozen |
 | `@o4o/action-log-core` | 실행 이력 기록 | Frozen |
 | `@o4o/asset-copy-core` | CMS 콘텐츠 복제 | Frozen |
+| `@o4o/operator-ux-core` | 5-Block Operator 대시보드 표준 | Frozen |
 
 ### 허용되는 변경
 
@@ -520,9 +521,10 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
 | **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
 | **Operator OS Baseline** | `docs/_platform/BASELINE-OPERATOR-OS-V1.md` |
+| **Operator UX Core Freeze** | `docs/platform-core/OPERATOR_UX_CORE_FREEZE_V1.md` |
 
 ---
 
-*Updated: 2026-02-16*
-*Version: 4.8*
+*Updated: 2026-02-17*
+*Version: 4.9*
 *Status: Active Constitution*

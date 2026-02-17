@@ -2,10 +2,9 @@
  * BranchOperatorLayout - 분회 운영자 레이아웃
  *
  * WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1
- * KPA-c 분회 운영자 대시보드의 헤더 네비게이션 + Outlet 레이아웃.
- * 4개 메뉴: 대시보드, 포럼 관리, 콘텐츠 허브, 운영자 관리
- *
- * 참조: routes/OperatorRoutes.tsx 내 인라인 OperatorLayout
+ * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
+ * - 콘텐츠 CRUD (공지사항, 게시판, 자료실) BranchAdmin에서 이동 추가
+ * - 7개 메뉴: 대시보드, 공지사항, 게시판, 자료실, 포럼 관리, 콘텐츠 허브, 운영자 관리
  */
 
 import { Link, Outlet, useParams, useLocation } from 'react-router-dom';
@@ -17,6 +16,9 @@ export function BranchOperatorLayout() {
 
   const navItems = [
     { label: '대시보드', path: basePath },
+    { label: '공지사항', path: `${basePath}/news` },
+    { label: '게시판', path: `${basePath}/forum` },
+    { label: '자료실', path: `${basePath}/docs` },
     { label: '포럼 관리', path: `${basePath}/forum-management` },
     { label: '콘텐츠 허브', path: `${basePath}/signage/content` },
     { label: '운영자 관리', path: `${basePath}/operators` },

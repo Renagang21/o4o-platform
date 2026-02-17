@@ -1,180 +1,84 @@
 /**
- * OperatorRoutes - 서비스 운영자 라우트 설정
+ * OperatorRoutes - 서비스 운영자 라우트 설정 (상태 관리 + 콘텐츠 CRUD)
  *
- * WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1:
- * - OperatorLayout 제거 (중복 네비게이션 제거)
- * - /operator 루트 → /hub 리다이렉트
+ * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
+ * - 콘텐츠 CRUD (news, docs, forum) AdminRoutes에서 이동
+ * - 요청 관리 (organization-requests, service-enrollments) AdminRoutes에서 이동
+ * - members 제거 (Admin 구조 관리 영역)
+ *
+ * WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1:
+ * - /operator 루트 → 5-Block 대시보드 렌더 (Hub 기능 흡수)
+ * - Hub는 /hub에서 유지 (접근 가능)
  * - 서브 페이지는 main Layout에서 렌더 (App.tsx에서 Layout 래핑)
- */
-
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, MemberManagementPage, ContentManagementPage, AuditLogPage } from '../pages/operator';
-import ContentHubPage from '../pages/signage/ContentHubPage';
-import { useAuth } from '../contexts';
-import type { User } from '../contexts/AuthContext';
-import { LoadingSpinner } from '../components/common';
-import { colors } from '../styles/theme';
-
-/**
- * KPA-a 운영자 역할 확인
  *
- * WO-OPERATOR-GUARD-UNIFICATION-P0:
- * Backend isKpaOperator()와 동일한 역할 목록 (kpa.routes.ts 참조)
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1:
+ * - 인라인 Guard → RoleGuard 통일
  */
-function checkKpaOperatorRole(user: User): boolean {
-  const allowedRoles = [
-    'kpa:admin',
-    'kpa:operator',
-  ];
 
-  if (user.role && allowedRoles.includes(user.role)) {
-    return true;
-  }
-
-  if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
-    return true;
-  }
-
-  return false;
-}
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage } from '../pages/operator';
+import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
+import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
+import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
+import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
+import ContentHubPage from '../pages/signage/ContentHubPage';
+import { RoleGuard } from '../components/auth/RoleGuard';
 
 export function OperatorRoutes() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <LoadingSpinner message="권한을 확인하는 중..." />;
-  }
-
-  if (!isAuthenticated || !user) {
-    return (
-      <div style={guardStyles.container}>
-        <div style={guardStyles.card}>
-          <div style={guardStyles.icon}>🔒</div>
-          <h2 style={guardStyles.title}>로그인이 필요합니다</h2>
-          <p style={guardStyles.message}>운영자 페이지에 접근하려면 로그인이 필요합니다.</p>
-          <button
-            style={guardStyles.loginButton}
-            onClick={() => navigate('/login', { state: { from: window.location.pathname } })}
-          >
-            로그인하기
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!checkKpaOperatorRole(user)) {
-    return (
-      <div style={guardStyles.container}>
-        <div style={guardStyles.card}>
-          <div style={guardStyles.icon}>🚫</div>
-          <h2 style={guardStyles.title}>접근 권한이 없습니다</h2>
-          <p style={guardStyles.message}>운영자 권한이 필요합니다.</p>
-          <button
-            style={guardStyles.backButton}
-            onClick={() => navigate('/')}
-          >
-            메인으로 돌아가기
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <Routes>
-      {/* /operator → /hub 리다이렉트 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
-      <Route index element={<Navigate to="/hub" replace />} />
+    <RoleGuard allowedRoles={['kpa:admin', 'kpa:operator']}>
+      <Routes>
+        {/* /operator → 5-Block 대시보드 (WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1) */}
+        <Route index element={<KpaOperatorDashboard />} />
 
-      {/* AI 리포트 */}
-      <Route path="ai-report" element={<OperatorAiReportPage />} />
+        {/* AI 리포트 */}
+        <Route path="ai-report" element={<OperatorAiReportPage />} />
 
-      {/* 포럼 관리 */}
-      <Route path="forum-management" element={<ForumManagementPage />} />
+        {/* 포럼 관리 */}
+        <Route path="forum-management" element={<ForumManagementPage />} />
 
-      {/* 포럼 통계 */}
-      <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
+        {/* 포럼 통계 */}
+        <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
 
-      {/* 회원 관리 (WO-KPA-A-MEMBER-APPROVAL-UI-PHASE1-V1) */}
-      <Route path="members" element={<MemberManagementPage />} />
+        {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
+        <Route path="content" element={<ContentManagementPage />} />
 
-      {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
-      <Route path="content" element={<ContentManagementPage />} />
+        {/* 사이니지 콘텐츠 허브 */}
+        <Route path="signage/content" element={<ContentHubPage />} />
 
-      {/* 사이니지 콘텐츠 허브 */}
-      <Route path="signage/content" element={<ContentHubPage />} />
+        {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
+        <Route path="legal" element={<LegalManagementPage />} />
 
-      {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
-      <Route path="legal" element={<LegalManagementPage />} />
+        {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
+        <Route path="audit-logs" element={<AuditLogPage />} />
 
-      {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
-      <Route path="audit-logs" element={<AuditLogPage />} />
+        {/* ── 콘텐츠 CRUD (WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Admin에서 이동) ── */}
 
-      {/* 운영자 관리 - WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin only */}
-      <Route path="operators" element={
-        (user?.roles || []).includes('kpa:admin')
-          ? <OperatorManagementPage />
-          : <Navigate to="/hub" replace />
-      } />
+        {/* 공지사항 */}
+        <Route path="news" element={<NewsPage />} />
 
-      {/* 404 → /hub */}
-      <Route path="*" element={<Navigate to="/hub" replace />} />
-    </Routes>
+        {/* 자료실 */}
+        <Route path="docs" element={<DocsPage />} />
+
+        {/* 게시판 */}
+        <Route path="forum" element={<ForumPage />} />
+
+        {/* 조직 가입/역할 요청 관리 */}
+        <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
+
+        {/* 서비스 신청 관리 */}
+        <Route path="service-enrollments" element={<ServiceEnrollmentManagementPage />} />
+
+        {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
+        <Route path="operators" element={
+          <RoleGuard allowedRoles={['kpa:admin']}>
+            <OperatorManagementPage />
+          </RoleGuard>
+        } />
+
+        {/* 404 → /hub */}
+        <Route path="*" element={<Navigate to="/hub" replace />} />
+      </Routes>
+    </RoleGuard>
   );
 }
-
-const guardStyles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    backgroundColor: colors.neutral100,
-    padding: '20px',
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: '16px',
-    padding: '48px',
-    textAlign: 'center',
-    maxWidth: '400px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-  },
-  icon: {
-    fontSize: '48px',
-    marginBottom: '20px',
-  },
-  title: {
-    fontSize: '20px',
-    fontWeight: 600,
-    color: colors.neutral900,
-    marginBottom: '12px',
-  },
-  message: {
-    fontSize: '14px',
-    color: colors.neutral600,
-    marginBottom: '24px',
-    lineHeight: 1.6,
-  },
-  loginButton: {
-    padding: '12px 24px',
-    backgroundColor: colors.primary,
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  backButton: {
-    padding: '12px 24px',
-    backgroundColor: colors.neutral200,
-    color: colors.neutral700,
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-};

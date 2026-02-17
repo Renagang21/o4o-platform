@@ -136,6 +136,8 @@ export interface AccessTokenPayload {
   status?: UserStatus | string;
   businessInfo?: BusinessInfo;
   permissions?: string[];
+  /** 다중 역할 배열 (WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1) */
+  roles?: string[];
   /** 서비스 스코프 목록 (WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1) */
   scopes?: string[];
   domain?: string;

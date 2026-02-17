@@ -5,6 +5,7 @@
 import type { UserRole } from '@/types';
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
+  admin: '/admin',
   pharmacy: '/pharmacy',
   supplier: '/supplier',
   partner: '/partner',

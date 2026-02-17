@@ -1,5 +1,9 @@
 /**
- * AdminSidebar - 지부 관리자 사이드바
+ * AdminSidebar - 지부 관리자 사이드바 (구조 관리 전용)
+ *
+ * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
+ * - 콘텐츠 CRUD (공지사항, 자료실, 안내영상, 게시판) → Operator Hub 이동
+ * - Admin은 구조 관리만: 분회, 회원, 위원회, 임원, 설정
  */
 
 import { Link, useLocation } from 'react-router-dom';
@@ -24,10 +28,6 @@ export function AdminSidebar() {
     { path: '/committee-requests', label: '위원회 관리', icon: '👥' },
     { path: '/annual-report', label: '신상신고', icon: '📝', badge: 3 },
     { path: '/membership-fee', label: '연회비', icon: '💰', badge: 2 },
-    { path: '/news', label: '공지사항', icon: '📢' },
-    { path: '/docs', label: '자료실', icon: '📁' },
-    { path: '/signage/content', label: '안내 영상 · 자료', icon: '📹' },
-    { path: '/forum', label: '게시판', icon: '💬' },
     { path: '/officers', label: '임원 관리', icon: '👔' },
     { path: '/settings', label: '설정', icon: '⚙️' },
   ];

@@ -25,7 +25,7 @@ interface Document {
 
 export function DocumentListPage() {
   const { user } = useAuth();
-  const userRole = user?.role || 'member';
+  const userRole = user?.roles[0] || 'member';
   const canUpload = ['officer', 'chair', 'admin', 'super_admin'].includes(userRole);
 
   const [searchQuery, setSearchQuery] = useState('');

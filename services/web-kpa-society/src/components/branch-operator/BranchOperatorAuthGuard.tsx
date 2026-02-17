@@ -2,9 +2,14 @@
  * BranchOperatorAuthGuard - 분회 운영자 권한 체크 컴포넌트
  *
  * WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1
+ * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: 2단계 검증
+ * 1단계: 역할 체크 (로컬, 빠름)
+ * 2단계: 조직 소유권 검증 (API 호출, 정확함)
+ *
  * 분회 운영자 페이지에 접근하기 전에 권한을 확인합니다.
  * - 로그인 여부 확인
  * - 해당 분회의 운영자 권한 확인
+ * - branchId 소유권 검증 (API)
  *
  * 참조: components/branch-admin/BranchAdminAuthGuard.tsx (동일 패턴)
  */
@@ -12,8 +17,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../../contexts/AuthContext';
+import { apiClient } from '../../api/client';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
+
+/** Roles that can access any branch without ownership check */
+const BRANCH_BYPASS_ROLES = ['kpa:admin', 'kpa:district_admin'];
+
+interface MembershipResponse {
+  success: boolean;
+  data: {
+    userId: string;
+    organizationId: string;
+    organizationType: string | null;
+    organizationName: string | null;
+    parentId: string | null;
+    role: string;
+    status: string;
+  } | null;
+}
 
 interface BranchOperatorAuthGuardProps {
   children: React.ReactNode;
@@ -43,14 +65,31 @@ export function BranchOperatorAuthGuard({ children }: BranchOperatorAuthGuardPro
       }
 
       try {
-        const hasOperatorRole = checkBranchOperatorRole(user, branchId);
+        // 1차: 역할 체크 (로컬, 빠름)
+        const hasOperatorRole = checkBranchOperatorRole(user);
 
-        if (hasOperatorRole) {
-          setIsAuthorized(true);
-        } else {
+        if (!hasOperatorRole) {
           setError('이 분회의 운영자 권한이 없습니다.');
           setIsAuthorized(false);
+          return;
         }
+
+        // Super admin / district admin → 모든 분회 접근 허용
+        if (hasBypassRole(user)) {
+          setIsAuthorized(true);
+          return;
+        }
+
+        // 2차: 조직 소유권 검증 (API 호출)
+        const response = await apiClient.get<MembershipResponse>('/me/membership');
+
+        if (!response.data || response.data.organizationId !== branchId) {
+          setError('이 분회에 대한 접근 권한이 없습니다. 소속 분회가 아닙니다.');
+          setIsAuthorized(false);
+          return;
+        }
+
+        setIsAuthorized(true);
       } catch (err) {
         console.error('Authorization check failed:', err);
         setError('권한 확인 중 오류가 발생했습니다.');
@@ -99,9 +138,9 @@ export function BranchOperatorAuthGuard({ children }: BranchOperatorAuthGuardPro
 
 /**
  * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
- * Legacy roles removed, platform roles removed
+ * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: branchId 검증 분리 — 역할만 확인
  */
-function checkBranchOperatorRole(user: User, _branchId: string): boolean {
+function checkBranchOperatorRole(user: User): boolean {
   const allowedRoles = [
     'kpa-c:operator',
     'kpa-c:branch_admin',
@@ -111,11 +150,19 @@ function checkBranchOperatorRole(user: User, _branchId: string): boolean {
     'kpa:branch_operator',
   ];
 
-  if (user.role && allowedRoles.includes(user.role)) {
+  if (user.roles.some(r => allowedRoles.includes(r))) {
     return true;
   }
 
-  if (user.roles && user.roles.some(r => allowedRoles.includes(r))) {
+  return false;
+}
+
+/**
+ * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: Super admin bypass check
+ * kpa:admin과 kpa:district_admin은 모든 분회에 접근 가능
+ */
+function hasBypassRole(user: User): boolean {
+  if (user.roles.some(r => BRANCH_BYPASS_ROLES.includes(r))) {
     return true;
   }
 

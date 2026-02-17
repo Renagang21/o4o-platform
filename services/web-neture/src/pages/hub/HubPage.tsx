@@ -412,7 +412,7 @@ export default function HubPage() {
 
   const fetchSignals = useCallback(async () => {
     try {
-      const isAdmin = user?.currentRole === 'admin';
+      const isAdmin = user?.roles.includes('admin');
 
       // Fetch base signals + dashboard summary + AI insight in parallel
       // Promise.allSettled: individual failures don't crash the entire hub
@@ -481,7 +481,7 @@ export default function HubPage() {
     } catch {
       // Signal fetch failure is non-blocking
     }
-  }, [user?.currentRole]);
+  }, [user?.roles]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -541,8 +541,8 @@ export default function HubPage() {
     );
   }
 
-  const role = user.currentRole;
-  const userRoles = [role];
+  const role = user.roles[0];
+  const userRoles = user.roles;
 
   // user 역할은 허브 접근 불가
   if (!['admin', 'supplier', 'partner'].includes(role)) {

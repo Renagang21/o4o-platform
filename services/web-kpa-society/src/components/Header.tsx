@@ -30,8 +30,7 @@ function isSuperOperator(user: UserType | null): boolean {
   if (!user) return false;
   if ((user as any).isSuperOperator) return true;
   const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
-  if (user.roles?.some(r => operatorRoles.includes(r))) return true;
-  if (user.role && operatorRoles.includes(user.role)) return true;
+  if (user.roles.some(r => operatorRoles.includes(r))) return true;
   return false;
 }
 
@@ -95,7 +94,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   const accessibleDashboards = useAccessibleDashboards();
 
   // 허브 메뉴: kpa:operator 이상만 노출 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
-  const hasHubAccess = user?.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
+  const hasHubAccess = user?.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/hub') return hasHubAccess;
     return true;

@@ -14,7 +14,6 @@ export interface User {
   email: string;
   name: string;
   roles: UserRole[];
-  currentRole: UserRole;
 }
 
 interface AuthContextType {
@@ -76,14 +75,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (userData) {
             const apiUser = userData;
             const mappedRole = mapApiRole(apiUser.role);
-            const newUser: User = {
+            setUser({
               id: apiUser.id,
               email: apiUser.email,
               name: apiUser.fullName || apiUser.email,
               roles: [mappedRole],
-              currentRole: mappedRole,
-            };
-            setUser(newUser);
+            });
           }
         }
       } catch {
@@ -124,14 +121,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userData) {
         const apiUser = userData;
         const mappedRole = mapApiRole(apiUser.role);
-        const newUser: User = {
+        setUser({
           id: apiUser.id,
           email: apiUser.email,
           name: apiUser.fullName || apiUser.email,
           roles: [mappedRole],
-          currentRole: mappedRole,
-        };
-        setUser(newUser);
+        });
         return { success: true, role: mappedRole };
       }
 
@@ -162,7 +157,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const switchRole = (role: UserRole) => {
     if (user && user.roles.includes(role)) {
-      setUser({ ...user, currentRole: role });
+      const reordered = [role, ...user.roles.filter(r => r !== role)];
+      setUser({ ...user, roles: reordered });
     }
   };
 

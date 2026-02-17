@@ -75,14 +75,14 @@ export function OperatorManagementPage() {
         // KPA 역할을 가진 사용자만 필터링
         const kpaOperators = userData
           .filter((user: any) => {
-            const userRoles = user.roles || [user.role];
+            const userRoles = user.roles || [];
             return userRoles.some((role: string) => role?.startsWith('kpa'));
           })
           .map((user: any): Operator => ({
             id: user.id || user._id,
             name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || '이름없음',
             email: user.email || '',
-            roles: (user.roles || [user.role]).filter((r: string) => r?.startsWith('kpa')),
+            roles: (user.roles || []).filter((r: string) => r?.startsWith('kpa')),
             status: (user.isActive === false ? 'inactive' : 'active') as 'active' | 'inactive',
             createdAt: user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '',
             lastLogin: user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString('ko-KR') : undefined,

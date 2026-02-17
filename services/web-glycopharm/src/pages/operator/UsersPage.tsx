@@ -132,7 +132,7 @@ export default function UsersPage() {
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.pharmacyName?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = !roleFilter || user.role === roleFilter;
+    const matchesRole = !roleFilter || user.roles?.includes(roleFilter) || user.role === roleFilter;
     const matchesStatus = !statusFilter || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -327,7 +327,7 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {paginatedUsers.map((user) => {
-                const roleConfig = ROLE_CONFIG[user.role];
+                const roleConfig = ROLE_CONFIG[user.role ?? user.roles?.[0] ?? 'consumer'];
                 const statusConfig = STATUS_CONFIG[user.status];
                 const RoleIcon = roleConfig.icon;
                 const StatusIcon = statusConfig.icon;

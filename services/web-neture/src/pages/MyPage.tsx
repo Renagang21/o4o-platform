@@ -58,8 +58,9 @@ export default function MyPage() {
     );
   }
 
-  const dashboardPath = ROLE_DASHBOARDS[user.currentRole];
-  const roleLabel = ROLE_LABELS[user.currentRole];
+  const activeRole = user.roles[0];
+  const dashboardPath = ROLE_DASHBOARDS[activeRole];
+  const roleLabel = ROLE_LABELS[activeRole];
 
   const handleSave = () => {
     // TODO: Implement save API
@@ -193,7 +194,7 @@ export default function MyPage() {
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">빠른 이동</h3>
         <div className="space-y-3">
-          {user.currentRole !== 'user' && (
+          {activeRole !== 'user' && (
             <Link
               to={dashboardPath}
               className="flex items-center gap-3 w-full p-4 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-colors"

@@ -15,7 +15,7 @@ export function BusinessOnboardingBanner() {
 
   // Guard: 로그인 + operator/partner가 아닌 사용자에게만 노출
   if (!isAuthenticated || !user) return null;
-  if (['operator', 'partner'].includes(user.currentRole)) return null;
+  if (user.roles.some(r => ['operator', 'partner'].includes(r))) return null;
 
   return (
     <div style={styles.banner}>

@@ -14,7 +14,7 @@ export default function AdminManualPage() {
 
   // 권한 체크: admin 역할만 접근 가능
   const adminRoles = ['admin', 'district_admin', 'branch_admin'];
-  if (!isAuthenticated || !user?.role || !adminRoles.includes(user.role)) {
+  if (!isAuthenticated || !user?.roles.some(r => adminRoles.includes(r))) {
     return <Navigate to="/test-guide" replace />;
   }
 

@@ -30,7 +30,7 @@ export function PharmacyPage() {
   const { openFunctionGateModal } = useAuthModal();
   const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none'>('loading');
 
-  const isAdminOrOperator = user?.role ? NON_PHARMACIST_ROLES.includes(user.role) : false;
+  const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
   const isPharmacyOwner = !!user && !isAdminOrOperator && user.pharmacistRole === 'pharmacy_owner';
   const needsFunctionSelection = !!user && !isAdminOrOperator && !user.pharmacistRole;
 

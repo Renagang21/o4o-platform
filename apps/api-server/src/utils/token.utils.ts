@@ -27,6 +27,25 @@ const ACCESS_TOKEN_EXPIRES_IN = 15 * 60; // 15 minutes in seconds
 const REFRESH_TOKEN_EXPIRES_IN = 7 * 24 * 60 * 60; // 7 days in seconds
 
 /**
+ * Derive roles array from user data
+ *
+ * WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1:
+ * 하위 호환 유지하며 roles[] 배열 도출.
+ * - user.getRoleNames()가 있으면 우선 사용
+ * - user.roles 배열이 있으면 사용
+ * - 그 외 user.role 단일값을 배열로 래핑
+ */
+export function deriveRoles(user: { role?: string; roles?: string[]; getRoleNames?: () => string[] }): string[] {
+  if (user.getRoleNames) {
+    const names = user.getRoleNames();
+    if (names.length > 0) return names;
+  }
+  if (Array.isArray(user.roles) && user.roles.length > 0) return user.roles;
+  if (user.role) return [user.role];
+  return [];
+}
+
+/**
  * Get JWT configuration from environment
  *
  * issuer/audience are used to isolate tokens between servers
@@ -75,10 +94,13 @@ function getJwtSecrets() {
 export function generateAccessToken(user: User, domain: string = 'neture.co.kr'): string {
   const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
+  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: 다중 역할 배열 도출
+  const userRoles = deriveRoles(user);
+
   // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: 역할 기반 스코프 도출
   const userScopes = deriveUserScopes({
     role: user.role,
-    roles: user.getRoleNames?.() || [],
+    roles: userRoles,
   });
 
   const payload: AccessTokenPayload = {
@@ -86,6 +108,7 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
     sub: user.id,
     email: user.email,
     role: user.role,
+    roles: userRoles, // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
     permissions: user.permissions || [],
     scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     domain,

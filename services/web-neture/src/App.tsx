@@ -22,6 +22,7 @@ import LoginModal from './components/LoginModal';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
+import { RoleGuard } from './components/auth/RoleGuard';
 
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
@@ -290,29 +291,11 @@ function LoginRedirect() {
 
 
 /**
- * ProtectedRoute - 역할 기반 접근 제어
- *
- * WO-OPERATOR-GUARD-UNIFICATION-P0:
- * GlycoPharm/K-Cosmetics Reference Implementation 패턴 적용
+ * ProtectedRoute → RoleGuard alias
+ * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
+ * 실제 로직은 components/auth/RoleGuard.tsx
  */
-function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return <PageLoading />;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (allowedRoles && user && !allowedRoles.includes(user.currentRole)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-}
+const ProtectedRoute = RoleGuard;
 
 /**
  * RoleBasedWorkspaceHome - WO-NETURE-ROLE-BASED-LANDING-V1
@@ -325,8 +308,8 @@ function RoleBasedWorkspaceHome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.currentRole && user.currentRole !== 'user') {
-      const target = ROLE_DASHBOARDS[user.currentRole];
+    if (user?.roles[0] && user.roles[0] !== 'user') {
+      const target = ROLE_DASHBOARDS[user.roles[0]];
       if (target && target !== '/') {
         navigate(target, { replace: true });
       }
@@ -418,8 +401,13 @@ function App() {
             {/* ================================================================
                 Admin Vault (/admin-vault) - 설계 보호 구역
                 WO-O4O-ADMIN-VAULT-ACCESS-V1
+                WO-SECURITY-NETURE-GUARD-FIX-V1: admin 역할 보호 추가
             ================================================================ */}
-            <Route element={<AdminVaultLayout />}>
+            <Route element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminVaultLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/admin-vault" element={<VaultOverviewPage />} />
               <Route path="/admin-vault/docs" element={<VaultDocsPage />} />
               <Route path="/admin-vault/architecture" element={<VaultArchitecturePage />} />
@@ -502,18 +490,20 @@ function App() {
 
             {/* ================================================================
                 Admin Dashboard (/workspace/admin/*)
+                WO-SECURITY-NETURE-GUARD-FIX-V1: admin 역할 보호 추가
             ================================================================ */}
-            <Route element={<SupplierOpsLayout />}>
+            <Route element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <SupplierOpsLayout />
+              </ProtectedRoute>
+            }>
               <Route path="/workspace/admin" element={<AdminDashboardPage />} />
               <Route path="/workspace/admin/ai-card-rules" element={<AiCardExplainPage />} />
-              <Route path="/workspace/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/workspace/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-              <Route path="/workspace/admin/ai-operations" element={<AiOperationsPage />} />
               {/* AI Admin Control Plane */}
               <Route path="/workspace/admin/ai" element={<AiAdminDashboardPage />} />
               <Route path="/workspace/admin/ai/engines" element={<AiEnginesPage />} />
               <Route path="/workspace/admin/ai/policy" element={<AiPolicyPage />} />
-              <Route path="/workspace/admin/ai/asset-quality" element={<AssetQualityPage />} />
               <Route path="/workspace/admin/ai/cost" element={<AiCostPage />} />
               <Route path="/workspace/admin/ai/context-assets" element={<ContextAssetListPage />} />
               <Route path="/workspace/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
@@ -528,9 +518,10 @@ function App() {
             {/* ================================================================
                 Operator Dashboard (/workspace/operator/*)
                 WO-OPERATOR-GUARD-UNIFICATION-P0: ProtectedRoute 가드 적용
+                WO-SECURITY-NETURE-GUARD-FIX-V1: admin + operator 허용
             ================================================================ */}
             <Route element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'operator']}>
                 <SupplierOpsLayout />
               </ProtectedRoute>
             }>
@@ -541,6 +532,10 @@ function App() {
               <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />
               <Route path="/workspace/operator/forum-management" element={<ForumManagementPage />} />
               <Route path="/workspace/operator/supply" element={<SupplyDashboardPage />} />
+              {/* WO-NETURE-OPERATOR-EXPANSION-V1: Admin에서 운영 기능 이동 */}
+              <Route path="/workspace/operator/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/workspace/operator/ai-operations" element={<AiOperationsPage />} />
+              <Route path="/workspace/operator/ai/asset-quality" element={<AssetQualityPage />} />
             </Route>
 
             {/* ================================================================

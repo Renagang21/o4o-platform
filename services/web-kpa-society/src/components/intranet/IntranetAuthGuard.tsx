@@ -45,7 +45,7 @@ export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
     'kpa:branch_admin',
     'kpa:branch_operator',
   ];
-  const userRoles = user.roles || [];
+  const userRoles = user.roles;
   const hasRole = userRoles.some((r: string) => allowedRoles.includes(r));
 
   if (!hasRole) {

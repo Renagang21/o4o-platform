@@ -81,7 +81,7 @@ export default function MyPage() {
               <div>
                 <h2 className="text-xl font-bold text-slate-800">{user.name}</h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-slate-500">{roleLabels[user.role]}</span>
+                  <span className="text-sm text-slate-500">{roleLabels[user.roles[0]]}</span>
                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${status.color}-100 text-${status.color}-700`}>
                     {status.label}
                   </span>
@@ -173,7 +173,7 @@ export default function MyPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-slate-400">역할</p>
-                  <p className="text-sm font-medium text-slate-800">{roleLabels[user.role]}</p>
+                  <p className="text-sm font-medium text-slate-800">{roleLabels[user.roles[0]]}</p>
                 </div>
               </div>
 

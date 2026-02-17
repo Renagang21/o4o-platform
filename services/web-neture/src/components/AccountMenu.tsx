@@ -32,7 +32,7 @@ function isSuperOperator(user: UserType | null): boolean {
   // 역할 기반 판단
   const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
   if (user.roles?.some(r => operatorRoles.includes(r))) return true;
-  if (user.currentRole && operatorRoles.includes(user.currentRole)) return true;
+  if (user.roles?.some(r => operatorRoles.includes(r))) return true;
 
   return false;
 }
@@ -90,8 +90,9 @@ export default function AccountMenu() {
   }
 
   // 현재 역할에 따른 대시보드 경로
-  const dashboardPath = ROLE_DASHBOARDS[user.currentRole] || '/';
-  const roleLabel = ROLE_LABELS[user.currentRole] || '사용자';
+  const activeRole = user.roles[0];
+  const dashboardPath = ROLE_DASHBOARDS[activeRole] || '/';
+  const roleLabel = ROLE_LABELS[activeRole] || '사용자';
   const isOperator = isSuperOperator(user);
 
   // 표시 이름: lastName + firstName > name > '운영자' 우선순위
@@ -169,7 +170,7 @@ export default function AccountMenu() {
                 </Link>
 
                 {/* 내 대시보드 - user 역할이 아닌 경우에만 표시 */}
-                {user.currentRole !== 'user' && (
+                {activeRole !== 'user' && (
                   <Link
                     to={dashboardPath}
                     onClick={() => setIsOpen(false)}
