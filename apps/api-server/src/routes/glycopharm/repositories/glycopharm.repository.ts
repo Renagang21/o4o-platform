@@ -5,7 +5,7 @@
  * Data access layer for pharmacies and products
  */
 
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmProductLog } from '../entities/glycopharm-product-log.entity.js';
@@ -82,6 +82,19 @@ export class GlycopharmRepository {
   async createPharmacy(data: Partial<GlycopharmPharmacy>): Promise<GlycopharmPharmacy> {
     const pharmacy = this.pharmacyRepo.create(data);
     return this.pharmacyRepo.save(pharmacy);
+  }
+
+  /**
+   * Create pharmacy using a specific EntityManager (for transaction support)
+   * WO-CORE-STORE-SLUG-TRANSACTION-HARDENING-V1
+   */
+  async createPharmacyWithManager(
+    manager: EntityManager,
+    data: Partial<GlycopharmPharmacy>
+  ): Promise<GlycopharmPharmacy> {
+    const repo = manager.getRepository(GlycopharmPharmacy);
+    const pharmacy = repo.create(data);
+    return repo.save(pharmacy);
   }
 
   async updatePharmacy(id: string, data: Partial<GlycopharmPharmacy>): Promise<GlycopharmPharmacy | null> {

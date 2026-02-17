@@ -9,6 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
+import { StoreSlugService, normalizeSlug } from '@o4o/platform-core/store-identity';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -51,6 +52,7 @@ export function createApplicationController(
     body('serviceTypes').isArray({ min: 1 }).withMessage('At least one service type is required'),
     body('serviceTypes.*').isIn(['dropshipping', 'sample_sales', 'digital_signage']).withMessage('Invalid service type'),
     body('note').optional().isString().isLength({ max: 2000 }),
+    body('requestedSlug').optional().isString().isLength({ min: 3, max: 120 }).withMessage('Slug must be 3-120 characters'),
     (async (req, res) => {
       try {
         const errors = validationResult(req);
@@ -70,9 +72,28 @@ export function createApplicationController(
           return;
         }
 
-        const { organizationType, organizationName, businessNumber, serviceTypes, note } = req.body;
+        const { organizationType, organizationName, businessNumber, serviceTypes, note, requestedSlug } = req.body;
 
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
+
+        // WO-CORE-STORE-REQUESTED-SLUG-V1: Validate requestedSlug if provided
+        let validatedSlug: string | undefined;
+        if (requestedSlug) {
+          const normalized = normalizeSlug(requestedSlug);
+          const slugService = new StoreSlugService(dataSource);
+          const availability = await slugService.checkAvailability(normalized);
+
+          if (!availability.available) {
+            res.status(400).json({
+              error: 'Slug not available',
+              code: 'SLUG_NOT_AVAILABLE',
+              reason: availability.reason,
+              validationError: availability.validationError,
+            });
+            return;
+          }
+          validatedSlug = normalized;
+        }
 
         // Check if there's already a pending application
         const pendingApplication = await applicationRepo.findOne({
@@ -114,6 +135,7 @@ export function createApplicationController(
         application.businessNumber = businessNumber ? normalizeBusinessNumber(businessNumber) : undefined;
         application.serviceTypes = serviceTypes;
         application.note = note;
+        application.requestedSlug = validatedSlug; // WO-CORE-STORE-REQUESTED-SLUG-V1
         application.status = 'submitted';
         application.submittedAt = new Date();
 

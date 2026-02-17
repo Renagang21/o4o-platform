@@ -9,7 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateUniqueStoreSlug } from '../../../utils/slug.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
@@ -291,25 +291,57 @@ export function createAdminController(
           });
 
           if (!existingPharmacy) {
-            // Create new pharmacy with enabled services from application
-            pharmacy = new GlycopharmPharmacy();
-            pharmacy.name = application.organizationName;
-            pharmacy.code = generatePharmacyCode();
-            pharmacy.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
-            // Generate collision-safe slug with sequential suffix (WO-STOREFRONT-STABILIZATION Phase 4)
-            pharmacy.slug = await generateUniqueStoreSlug(application.organizationName, async (candidate) => {
-              const existing = await pharmacyRepo.findOne({ where: { slug: candidate } });
-              return !!existing;
-            });
-            pharmacy.status = 'active';
-            pharmacy.created_by_user_id = application.userId;
-            pharmacy.enabled_services = application.serviceTypes;
+            // WO-CORE-STORE-SLUG-TRANSACTION-HARDENING-V1: Atomic pharmacy + slug creation
+            const queryRunner = dataSource.createQueryRunner();
+            await queryRunner.connect();
+            await queryRunner.startTransaction();
 
-            await pharmacyRepo.save(pharmacy);
+            try {
+              // Create new pharmacy with enabled services from application
+              pharmacy = new GlycopharmPharmacy();
+              pharmacy.name = application.organizationName;
+              pharmacy.code = generatePharmacyCode();
+              pharmacy.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
 
-            logger.info(
-              `[Glycopharm Admin] Pharmacy created: ${pharmacy.id} for user ${application.userId}`
-            );
+              // Use StoreSlugService with EntityManager for transaction support
+              const slugService = new StoreSlugService(queryRunner.manager);
+
+              // WO-CORE-STORE-REQUESTED-SLUG-V1: Use requestedSlug if available
+              if (application.requestedSlug) {
+                const availability = await slugService.checkAvailability(application.requestedSlug);
+                if (!availability.available) {
+                  throw new Error(`Requested slug '${application.requestedSlug}' is no longer available: ${availability.reason}`);
+                }
+                pharmacy.slug = application.requestedSlug;
+              } else {
+                pharmacy.slug = await slugService.generateUniqueSlug(application.organizationName);
+              }
+
+              pharmacy.status = 'active';
+              pharmacy.created_by_user_id = application.userId;
+              pharmacy.enabled_services = application.serviceTypes;
+
+              // Save pharmacy within transaction
+              pharmacy = await queryRunner.manager.save(GlycopharmPharmacy, pharmacy);
+
+              // Register slug in platform-wide registry (same transaction)
+              await slugService.reserveSlug({
+                storeId: pharmacy.id,
+                serviceKey: 'glycopharm',
+                slug: pharmacy.slug,
+              });
+
+              await queryRunner.commitTransaction();
+
+              logger.info(
+                `[Glycopharm Admin] Pharmacy created: ${pharmacy.id} for user ${application.userId}`
+              );
+            } catch (txError) {
+              await queryRunner.rollbackTransaction();
+              throw txError;
+            } finally {
+              await queryRunner.release();
+            }
           } else {
             // Pharmacy already exists - merge new services with existing
             pharmacy = existingPharmacy;

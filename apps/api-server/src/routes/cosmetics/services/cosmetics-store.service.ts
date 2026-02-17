@@ -7,7 +7,7 @@
 
 import { DataSource } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateStoreSlug } from '../../../utils/slug.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { CosmeticsStoreRepository } from '../repositories/cosmetics-store.repository.js';
 import {
   CosmeticsStoreStatus,
@@ -35,6 +35,7 @@ export class CosmeticsStoreService {
     address?: string;
     region?: string;
     note?: string;
+    requestedSlug?: string; // WO-CORE-STORE-REQUESTED-SLUG-V1
   }, userId: string) {
     const normalizedBN = normalizeBusinessNumber(dto.businessNumber);
 
@@ -50,6 +51,20 @@ export class CosmeticsStoreService {
       throw new Error('BUSINESS_NUMBER_ALREADY_REGISTERED');
     }
 
+    // WO-CORE-STORE-REQUESTED-SLUG-V1: Validate requestedSlug if provided
+    let validatedSlug: string | undefined;
+    if (dto.requestedSlug) {
+      const { normalizeSlug } = await import('@o4o/platform-core/store-identity');
+      const normalized = normalizeSlug(dto.requestedSlug);
+      const slugService = new StoreSlugService(this.dataSource);
+      const availability = await slugService.checkAvailability(normalized);
+
+      if (!availability.available) {
+        throw new Error(`SLUG_NOT_AVAILABLE:${availability.reason}`);
+      }
+      validatedSlug = normalized;
+    }
+
     const application = await this.repository.createApplication({
       applicantUserId: userId,
       storeName: dto.storeName,
@@ -59,6 +74,7 @@ export class CosmeticsStoreService {
       address: dto.address,
       region: dto.region,
       note: dto.note,
+      requestedSlug: validatedSlug,
       status: CosmeticsStoreApplicationStatus.SUBMITTED,
     });
 
@@ -110,11 +126,20 @@ export class CosmeticsStoreService {
 
         // Create store
         const storeCode = this.generateStoreCode();
-        let slug = generateStoreSlug(application.storeName);
-        // slug 중복 확인
-        const existingSlugStore = await queryRunner.manager.findOne('CosmeticsStore', { where: { slug } });
-        if (existingSlugStore) {
-          slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
+
+        // WO-CORE-STORE-SLUG-INTEGRATION-V1 + TRANSACTION-HARDENING: Use Core StoreSlugService with manager
+        const slugService = new StoreSlugService(queryRunner.manager);
+
+        // WO-CORE-STORE-REQUESTED-SLUG-V1: Use requestedSlug if available
+        let slug: string;
+        if (application.requestedSlug) {
+          const availability = await slugService.checkAvailability(application.requestedSlug);
+          if (!availability.available) {
+            throw new Error(`Requested slug '${application.requestedSlug}' is no longer available: ${availability.reason}`);
+          }
+          slug = application.requestedSlug;
+        } else {
+          slug = await slugService.generateUniqueSlug(application.storeName);
         }
 
         const store = queryRunner.manager.create('CosmeticsStore', {
@@ -129,6 +154,13 @@ export class CosmeticsStoreService {
           status: CosmeticsStoreStatus.APPROVED,
         });
         const savedStore = await queryRunner.manager.save('CosmeticsStore', store);
+
+        // Register slug in platform-wide registry
+        await slugService.reserveSlug({
+          storeId: (savedStore as any).id,
+          serviceKey: 'cosmetics',
+          slug,
+        });
 
         // Create owner member
         const member = queryRunner.manager.create('CosmeticsStoreMember', {

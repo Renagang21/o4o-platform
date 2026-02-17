@@ -40,6 +40,15 @@ export interface SubmitApplicationRequest {
   businessNumber?: string;
   serviceTypes: ServiceType[];
   note?: string;
+  requestedSlug?: string; // WO-CORE-STORE-REQUESTED-SLUG-V1
+}
+
+// WO-CORE-STORE-REQUESTED-SLUG-V1: Slug availability check response
+export interface SlugCheckResponse {
+  available: boolean;
+  normalizedValue?: string;
+  reason?: 'taken' | 'reserved' | 'invalid';
+  validationError?: string;
 }
 
 export interface SubmitApplicationResponse {
@@ -627,6 +636,20 @@ class GlycopharmApiClient {
     return this.request(endpoint, {
       method: 'DELETE',
     });
+  }
+
+  // ========================================================================
+  // Platform Slug API (WO-CORE-STORE-REQUESTED-SLUG-V1)
+  // ========================================================================
+
+  /**
+   * Slug 사용 가능 여부 확인
+   */
+  async checkSlugAvailability(value: string): Promise<SlugCheckResponse> {
+    const searchParams = new URLSearchParams();
+    searchParams.set('value', value);
+    const endpoint = `/api/v1/platform/slug/check?${searchParams.toString()}`;
+    return this.request(endpoint);
   }
 }
 

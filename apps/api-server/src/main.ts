@@ -83,6 +83,9 @@ import { createStoreNetworkRoutes } from './routes/platform/store-network.routes
 // Physical Store Linking (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
 import { createPhysicalStoreRoutes } from './routes/platform/physical-store.routes.js';
 
+// Platform Slug Check (WO-CORE-STORE-REQUESTED-SLUG-V1)
+import { createSlugRoutes } from './routes/platform/slug.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -744,6 +747,10 @@ const startServer = async () => {
     // 8.9. Register Physical Store Linking routes (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
     app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(AppDataSource));
     logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
+
+    // 8.10. Register Platform Slug Check routes (WO-CORE-STORE-REQUESTED-SLUG-V1)
+    app.use('/api/v1/platform/slug', createSlugRoutes(AppDataSource));
+    logger.info('✅ Platform Slug routes registered at /api/v1/platform/slug');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

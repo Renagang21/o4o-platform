@@ -751,6 +751,9 @@ importers:
       '@o4o/pharmacy-ai-insight':
         specifier: workspace:*
         version: link:../../packages/pharmacy-ai-insight
+      '@o4o/platform-core':
+        specifier: workspace:*
+        version: link:../../packages/platform-core
       '@o4o/reporting-yaksa':
         specifier: workspace:*
         version: link:../../packages/reporting-yaksa

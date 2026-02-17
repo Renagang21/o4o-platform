@@ -7,7 +7,7 @@
 
 import { DataSource } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateUniqueStoreSlug } from '../../../utils/slug.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 import { GlycopharmPharmacy, GlycopharmPharmacyStatus } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProduct, GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
@@ -26,8 +26,10 @@ import {
 
 export class GlycopharmService {
   private repository: GlycopharmRepository;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.repository = new GlycopharmRepository(dataSource);
   }
 
@@ -82,23 +84,45 @@ export class GlycopharmService {
       throw new Error('Pharmacy code already exists');
     }
 
-    // Generate collision-safe slug (WO-STOREFRONT-STABILIZATION Phase 4)
-    const slug = await generateUniqueStoreSlug(dto.name, async (candidate) => {
-      const found = await this.repository.findPharmacyBySlug(candidate);
-      return !!found;
-    });
+    // WO-CORE-STORE-SLUG-TRANSACTION-HARDENING-V1: Atomic pharmacy + slug creation
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const pharmacy = await this.repository.createPharmacy({
-      ...dto,
-      phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
-      business_number: dto.business_number ? normalizeBusinessNumber(dto.business_number) : dto.business_number,
-      slug,
-      status: 'active',
-      created_by_user_id: userId,
-      created_by_user_name: userName,
-    });
+    try {
+      // Use StoreSlugService with EntityManager for transaction support
+      const slugService = new StoreSlugService(queryRunner.manager);
+      const slug = await slugService.generateUniqueSlug(dto.name);
 
-    return this.toPharmacyResponse(pharmacy, 0);
+      const pharmacy = await this.repository.createPharmacyWithManager(
+        queryRunner.manager,
+        {
+          ...dto,
+          phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
+          business_number: dto.business_number ? normalizeBusinessNumber(dto.business_number) : dto.business_number,
+          slug,
+          status: 'active',
+          created_by_user_id: userId,
+          created_by_user_name: userName,
+        }
+      );
+
+      // Register slug in platform-wide registry (same transaction)
+      await slugService.reserveSlug({
+        storeId: pharmacy.id,
+        serviceKey: 'glycopharm',
+        slug,
+      });
+
+      await queryRunner.commitTransaction();
+
+      return this.toPharmacyResponse(pharmacy, 0);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async updatePharmacy(

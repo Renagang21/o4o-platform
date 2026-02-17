@@ -120,6 +120,7 @@
     "@o4o/lms-yaksa": "workspace:*",
     "@o4o/organization-core": "workspace:*",
     "@o4o/payment-core": "workspace:*",
+    "@o4o/platform-core": "workspace:*",
     "@o4o/membership-yaksa": "workspace:*",
     "@o4o/reporting-yaksa": "workspace:*",
     "@o4o/dropshipping-cosmetics": "workspace:*",
