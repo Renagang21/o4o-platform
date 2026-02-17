@@ -499,14 +499,11 @@ function App() {
             }>
               <Route path="/workspace/admin" element={<AdminDashboardPage />} />
               <Route path="/workspace/admin/ai-card-rules" element={<AiCardExplainPage />} />
-              <Route path="/workspace/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/workspace/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-              <Route path="/workspace/admin/ai-operations" element={<AiOperationsPage />} />
               {/* AI Admin Control Plane */}
               <Route path="/workspace/admin/ai" element={<AiAdminDashboardPage />} />
               <Route path="/workspace/admin/ai/engines" element={<AiEnginesPage />} />
               <Route path="/workspace/admin/ai/policy" element={<AiPolicyPage />} />
-              <Route path="/workspace/admin/ai/asset-quality" element={<AssetQualityPage />} />
               <Route path="/workspace/admin/ai/cost" element={<AiCostPage />} />
               <Route path="/workspace/admin/ai/context-assets" element={<ContextAssetListPage />} />
               <Route path="/workspace/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
@@ -535,6 +532,10 @@ function App() {
               <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />
               <Route path="/workspace/operator/forum-management" element={<ForumManagementPage />} />
               <Route path="/workspace/operator/supply" element={<SupplyDashboardPage />} />
+              {/* WO-NETURE-OPERATOR-EXPANSION-V1: Admin에서 운영 기능 이동 */}
+              <Route path="/workspace/operator/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/workspace/operator/ai-operations" element={<AiOperationsPage />} />
+              <Route path="/workspace/operator/ai/asset-quality" element={<AssetQualityPage />} />
             </Route>
 
             {/* ================================================================
