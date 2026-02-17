@@ -2616,6 +2616,22 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
+  packages/operator-ux-core:
+    dependencies:
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/organization-core:
     dependencies:
       '@nestjs/common':
@@ -18385,7 +18401,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
+      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
