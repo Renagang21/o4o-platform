@@ -38,12 +38,12 @@ export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
   }
 
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require KPA organization role
+  // WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
   const allowedRoles = [
     'kpa:admin',
     'kpa:operator',
-    'kpa:district_admin',
-    'kpa:branch_admin',
-    'kpa:branch_operator',
+    'kpa-c:branch_admin',
+    'kpa-c:operator',
   ];
   const userRoles = user.roles;
   const hasRole = userRoles.some((r: string) => allowedRoles.includes(r));
