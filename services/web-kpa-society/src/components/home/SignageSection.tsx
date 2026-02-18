@@ -10,8 +10,6 @@ import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeMedia, HomePlaylist } from '../../api/home';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
-import { getMediaThumbnailUrl } from '@o4o/types/signage';
-import { PlaceholderImage } from '../common';
 
 // CSS for hover effects + responsive grid (inline styles don't support :hover / @media)
 const hoverStyles = `
@@ -97,13 +95,13 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
               <div>
                 <h3 style={styles.subTitle}>동영상</h3>
                 <ul style={styles.mediaList}>
-                  {media.map((item) => {
-                    const thumbnailUrl = getMediaThumbnailUrl(item);
-                    return (
+                  {media.map((item) => (
                       <li key={item.id}>
                         <div style={styles.mediaItem}>
-                          <div style={styles.mediaThumbSmall}>
-                            <MediaThumbnail url={thumbnailUrl} name={item.name} mediaType={item.mediaType} />
+                          <div style={styles.mediaIcon}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
                           </div>
                           <div style={styles.mediaInfo}>
                             <span style={styles.mediaItemName}>{item.name}</span>
@@ -113,8 +111,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
                           </div>
                         </div>
                       </li>
-                    );
-                  })}
+                    ))}
                 </ul>
               </div>
             )}
@@ -153,28 +150,6 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
         )}
       </div>
     </section>
-  );
-}
-
-function MediaThumbnail({ url, name, mediaType }: { url: string | null; name: string; mediaType: string }) {
-  const [failed, setFailed] = useState(false);
-  const variant = (mediaType === 'youtube' || mediaType === 'video') ? 'video' : 'photo';
-
-  if (!url || failed) {
-    return (
-      <div style={styles.thumbnailPlaceholder}>
-        <PlaceholderImage variant={variant} style={{ borderRadius: 0 }} />
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={url}
-      alt={name}
-      style={styles.thumbnailImg}
-      onError={() => setFailed(true)}
-    />
   );
 }
 
@@ -233,33 +208,11 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     transition: 'background-color 0.15s ease',
   },
-  mediaThumbSmall: {
+  mediaIcon: {
     flexShrink: 0,
-    width: '48px',
-    height: '32px',
-    borderRadius: borderRadius.sm,
-    overflow: 'hidden',
-    backgroundColor: colors.neutral100,
-    position: 'relative',
-  },
-  thumbnailImg: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-  thumbnailPlaceholder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
+    color: colors.neutral400,
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    color: colors.neutral400,
   },
   mediaInfo: {
     flex: 1,

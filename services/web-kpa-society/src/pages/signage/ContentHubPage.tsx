@@ -90,26 +90,14 @@ function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone
 
 function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string, name: string) => void }) {
   const navigate = useNavigate();
-  const thumbnailUrl = getMediaThumbnailUrl(item);
 
   return (
     <div
       onClick={() => navigate(`/signage/media/${item.id}`)}
       className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group cursor-pointer hover:bg-slate-50 transition-colors"
     >
-      <div className="flex-shrink-0 w-16 h-10 rounded overflow-hidden bg-slate-100">
-        {thumbnailUrl ? (
-          <div className="block relative group/thumb">
-            <SafeImg src={thumbnailUrl} alt={item.name} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-              <Play className="h-4 w-4 text-white" fill="white" />
-            </div>
-          </div>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <VideoIcon className="h-4 w-4 text-slate-300" />
-          </div>
-        )}
+      <div className="flex-shrink-0 w-8 text-center">
+        <VideoIcon className="h-5 w-5 text-purple-600 mx-auto" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
@@ -179,25 +167,15 @@ function HighlightPlaylistCard({ playlist }: { playlist: SignagePlaylist }) {
 
 function HighlightMediaCard({ item }: { item: SignageMedia }) {
   const navigate = useNavigate();
-  const thumbnailUrl = getMediaThumbnailUrl(item);
 
   return (
     <div
       onClick={() => navigate(`/signage/media/${item.id}`)}
       className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
     >
-      {thumbnailUrl ? (
-        <div className="block relative group">
-          <SafeImg src={thumbnailUrl} alt={item.name} className="w-full h-32 object-cover" />
-          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Play className="h-8 w-8 text-white" fill="white" />
-          </div>
-        </div>
-      ) : (
-        <div className="w-full h-32 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
-          <VideoIcon className="h-8 w-8 text-purple-300" />
-        </div>
-      )}
+      <div className="w-full h-32 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
+        <VideoIcon className="h-8 w-8 text-purple-300" />
+      </div>
       <div className="p-3">
         <h4 className="font-semibold text-sm text-slate-800 truncate">{item.name}</h4>
         <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
