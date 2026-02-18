@@ -72,8 +72,6 @@ import { AdminRoutes } from './routes/AdminRoutes';
 // Operator Routes (서비스 운영자)
 import { OperatorRoutes } from './routes/OperatorRoutes';
 
-// Hub Page (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
-import { HubPage } from './pages/hub';
 
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
@@ -239,38 +237,6 @@ function DashboardRoute() {
   }
 
   return <Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>;
-}
-
-/**
- * HubGuard — Hub 접근 권한 가드
- * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
- * WO-STORE-ADMIN-CONSOLIDATION-V1: pharmacy_owner도 Hub 접근 허용
- *
- * 허용: kpa:admin, kpa:operator (roles[]), pharmacy_owner (pharmacistRole)
- */
-function HubGuard({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  const hasRole = user.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r));
-  const isPharmacyOwner = user.pharmacistRole === 'pharmacy_owner';
-
-  if (!hasRole && !isPharmacyOwner) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
 }
 
 function FunctionGateRedirect() {
@@ -518,9 +484,9 @@ function App() {
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
-          {/* Hub (통합 운영 허브 - WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
-          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubPage /></HubGuard></Layout>} />
-          {/* Operator Routes — /operator root → /hub 리다이렉트, 서브페이지는 Layout 래핑 */}
+          {/* Hub → Operator 리다이렉트 (WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1) */}
+          <Route path="/hub" element={<Navigate to="/operator" replace />} />
+          {/* Operator Routes — 5-Block 대시보드 + 서브페이지 */}
           <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />

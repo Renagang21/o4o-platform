@@ -72,7 +72,7 @@ interface MenuItem {
  * - 강의: LMS 강좌
  * - 콘텐츠: 공지/뉴스
  * - 내 매장관리: 매장 대시보드 (pharmacy_owner)
- * - 허브: 운영 허브 (operator 이상)
+ * - 운영 대시보드: admin/operator → /operator (5-Block)
  * - 테스트 센터: 오른쪽 끝 배치
  */
 const menuItems: MenuItem[] = [
@@ -81,7 +81,7 @@ const menuItems: MenuItem[] = [
   { label: '강의', href: '/lms' },
   { label: '콘텐츠', href: '/news' },
   { label: '내 매장관리', href: '/pharmacy/dashboard' },
-  { label: '허브', href: '/hub' },
+  { label: '운영 대시보드', href: '/operator' },
   { label: '테스트 센터', href: '/test' },
 ];
 
@@ -96,12 +96,12 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const accessibleDashboards = useAccessibleDashboards();
 
-  // 허브 메뉴: kpa:operator 이상 또는 pharmacy_owner 노출 (WO-STORE-ADMIN-CONSOLIDATION-V1)
-  const hasHubAccess = (user?.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) || user?.pharmacistRole === 'pharmacy_owner') ?? false;
+  // 운영 대시보드: kpa:admin 또는 kpa:operator만 노출
+  const isOperatorOrAdmin = user?.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
   // 내 매장관리: pharmacy_owner만 노출 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
   const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
   const displayMenuItems = menuItems.filter(item => {
-    if (item.href === '/hub') return hasHubAccess;
+    if (item.href === '/operator') return isOperatorOrAdmin;
     if (item.href === '/pharmacy/dashboard') return isPharmacyOwner;
     return true;
   });
