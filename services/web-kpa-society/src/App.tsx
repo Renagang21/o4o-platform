@@ -123,7 +123,6 @@ import { UserDashboardPage, MyContentPage } from './pages/dashboard';
 import { getDefaultRouteByRole } from './lib/auth-utils';
 
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
-import { RoleGuard } from './components/auth/RoleGuard';
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
 
 // Debug Pages (CLAUDE.md Section 14)
@@ -243,14 +242,36 @@ function DashboardRoute() {
 }
 
 /**
- * HubGuard → RoleGuard alias
+ * HubGuard — Hub 접근 권한 가드
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
- * 실제 로직은 components/auth/RoleGuard.tsx (user.roles[] 배열 체크)
- * Hub 전용 allowedRoles: ['kpa:admin', 'kpa:operator'] — 라우트에서 지정
+ * WO-STORE-ADMIN-CONSOLIDATION-V1: pharmacy_owner도 Hub 접근 허용
+ *
+ * 허용: kpa:admin, kpa:operator (roles[]), pharmacy_owner (pharmacistRole)
  */
-const HubGuard = ({ children }: { children: React.ReactNode }) => (
-  <RoleGuard allowedRoles={['kpa:admin', 'kpa:operator']}>{children}</RoleGuard>
-);
+function HubGuard({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const hasRole = user.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r));
+  const isPharmacyOwner = user.pharmacistRole === 'pharmacy_owner';
+
+  if (!hasRole && !isPharmacyOwner) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 function FunctionGateRedirect() {
   const navigate = useNavigate();

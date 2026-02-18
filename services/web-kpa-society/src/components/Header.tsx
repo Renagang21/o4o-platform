@@ -96,8 +96,8 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const accessibleDashboards = useAccessibleDashboards();
 
-  // 허브 메뉴: kpa:operator 이상만 노출 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
-  const hasHubAccess = user?.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
+  // 허브 메뉴: kpa:operator 이상 또는 pharmacy_owner 노출 (WO-STORE-ADMIN-CONSOLIDATION-V1)
+  const hasHubAccess = (user?.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) || user?.pharmacistRole === 'pharmacy_owner') ?? false;
   // 내 매장관리: pharmacy_owner만 노출 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
   const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
   const displayMenuItems = menuItems.filter(item => {
@@ -108,7 +108,7 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/demo');
+    navigate('/');
   };
 
   return (

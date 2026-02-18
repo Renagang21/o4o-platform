@@ -510,7 +510,7 @@ export default function TestHubPage() {
           </div>
           <button
             className="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
-            onClick={() => alert('테스트 결과 작성 기능은 준비 중입니다.')}
+            onClick={() => window.open('https://neture.co.kr/forum/test-feedback', '_blank')}
           >
             테스트 결과 작성하기
           </button>
@@ -603,7 +603,7 @@ export default function TestHubPage() {
             </p>
             <button
               className="px-6 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
-              onClick={() => alert('테스트 결과 작성 기능은 준비 중입니다.')}
+              onClick={() => window.open('https://neture.co.kr/forum/test-feedback', '_blank')}
             >
               테스트 결과 작성하기
             </button>
