@@ -1,5 +1,9 @@
 /**
- * TestCenterPage - 서비스 테스트 & 개선 참여 센터
+ * TestCenterPage - KPA-a 테스트 센터 메인 페이지
+ *
+ * 2단계 구조화된 테스트 흐름:
+ * - 1단계: 준비된 계정으로 체험 테스트
+ * - 2단계: 실제 가입 → 승인 → 운영 체험
  *
  * Work Order: WO-TEST-CENTER-SEPARATION-V1
  */
@@ -18,7 +22,7 @@ export function TestCenterPage() {
           <div style={styles.titleWrapper}>
             <div style={styles.iconWrapper}>🧪</div>
             <div>
-              <h1 style={styles.title}>테스트 센터</h1>
+              <h1 style={styles.title}>KPA-a 테스트 센터</h1>
               <p style={styles.subtitle}>서비스 테스트 & 개선 참여</p>
             </div>
           </div>
@@ -31,37 +35,56 @@ export function TestCenterPage() {
 
       {/* Content */}
       <div style={styles.content}>
-        {/* 테스트 안내 */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>테스트 참여 안내</h2>
+        {/* 안내 영역 */}
+        <section style={styles.introSection}>
+          <div style={styles.introBox}>
+            <p style={styles.introText}>
+              본 서비스는 시범 운영 단계입니다.
+            </p>
+            <p style={styles.introText}>
+              실제 약국 운영자의 사용성을 점검하기 위해 체험 테스트를 진행합니다.
+            </p>
+            <p style={styles.introText}>
+              테스트는 <strong>2단계</strong>로 구성되어 있습니다.
+            </p>
+            <p style={styles.introMeta}>
+              소요 시간: 약 30~40분
+            </p>
+          </div>
+        </section>
+
+        {/* 카드 영역 */}
+        <section style={styles.cardSection}>
           <div style={styles.cardGrid}>
+            {/* 카드 1 — 1단계 체험 테스트 */}
             <div style={styles.card}>
-              <div style={styles.cardIcon}>🎯</div>
-              <h3 style={styles.cardTitle}>테스트 목적</h3>
-              <p style={styles.cardDesc}>
-                실제 사용 환경에서 서비스 안정성과 사용성을 검증합니다.
-              </p>
+              <div style={styles.cardStepBadge}>1단계</div>
+              <div style={styles.cardIconLarge}>🔵</div>
+              <h2 style={styles.cardTitle}>체험 테스트</h2>
+              <ul style={styles.cardList}>
+                <li>준비된 계정으로 즉시 체험</li>
+                <li>로그인 후 주요 메뉴 흐름 확인</li>
+                <li>UX 중심 점검</li>
+              </ul>
+              <Link to="/demo/test-guide" style={styles.cardButton}>
+                1단계 테스트 시작
+              </Link>
             </div>
-            <div style={styles.card}>
-              <div style={styles.cardIcon}>✋</div>
-              <h3 style={styles.cardTitle}>참여 방법</h3>
-              <p style={styles.cardDesc}>
-                서비스를 자유롭게 사용하시고, 불편한 점이나 개선 아이디어를 공유해주세요.
-              </p>
-            </div>
-            <div style={styles.card}>
-              <div style={styles.cardIcon}>💬</div>
-              <h3 style={styles.cardTitle}>의견 남기기</h3>
-              <p style={styles.cardDesc}>
-                버그 리포트, 기능 제안, 사용성 개선 등 모든 의견을 환영합니다.
-              </p>
-            </div>
-            <div style={styles.card}>
-              <div style={styles.cardIcon}>🔄</div>
-              <h3 style={styles.cardTitle}>반영 방식</h3>
-              <p style={styles.cardDesc}>
-                수집된 의견은 우선순위에 따라 검토되며, 주요 개선사항은 공지됩니다.
-              </p>
+
+            {/* 카드 2 — 2단계 실제 가입 테스트 */}
+            <div style={{ ...styles.card, ...styles.cardHighlight }}>
+              <div style={{ ...styles.cardStepBadge, ...styles.cardStepBadgeGreen }}>2단계</div>
+              <div style={styles.cardIconLarge}>🟢</div>
+              <h2 style={styles.cardTitle}>실제 가입 테스트</h2>
+              <ul style={styles.cardList}>
+                <li>직접 가입</li>
+                <li>승인 요청 → 승인 완료</li>
+                <li>실제 운영 체험</li>
+                <li>자신의 약국을 운영한다고 가정하고 진행</li>
+              </ul>
+              <Link to="/test/step2" style={{ ...styles.cardButton, ...styles.cardButtonGreen }}>
+                2단계 테스트 시작
+              </Link>
             </div>
           </div>
         </section>
@@ -168,42 +191,102 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     padding: '32px 24px',
   },
-  section: {
+  introSection: {
     marginBottom: '32px',
   },
-  sectionTitle: {
-    fontSize: '20px',
-    fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: '20px',
-  },
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '16px',
-  },
-  card: {
+  introBox: {
     backgroundColor: '#fff',
     borderRadius: '12px',
     padding: '24px',
     border: '1px solid #e2e8f0',
-    textAlign: 'center',
   },
-  cardIcon: {
-    fontSize: '32px',
-    marginBottom: '12px',
+  introText: {
+    fontSize: '15px',
+    color: '#475569',
+    lineHeight: 1.8,
+    margin: '0 0 4px 0',
+  },
+  introMeta: {
+    fontSize: '14px',
+    color: '#94a3b8',
+    marginTop: '12px',
+    margin: '12px 0 0 0',
+  },
+  cardSection: {
+    marginBottom: '32px',
+  },
+  cardGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '24px',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: '16px',
+    padding: '32px',
+    border: '1px solid #e2e8f0',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    position: 'relative',
+  },
+  cardHighlight: {
+    borderColor: '#86efac',
+    backgroundColor: '#f0fdf4',
+  },
+  cardStepBadge: {
+    position: 'absolute',
+    top: '16px',
+    left: '16px',
+    padding: '4px 12px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    borderRadius: '12px',
+    fontSize: '12px',
+    fontWeight: 600,
+  },
+  cardStepBadgeGreen: {
+    backgroundColor: '#059669',
+  },
+  cardIconLarge: {
+    fontSize: '48px',
+    marginBottom: '16px',
+    marginTop: '8px',
   },
   cardTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
+    fontSize: '20px',
+    fontWeight: 700,
     color: '#1e293b',
-    margin: '0 0 8px',
+    margin: '0 0 16px 0',
   },
-  cardDesc: {
+  cardList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: '0 0 24px 0',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
     fontSize: '14px',
     color: '#64748b',
     lineHeight: 1.6,
-    margin: 0,
+  },
+  cardButton: {
+    display: 'inline-block',
+    padding: '12px 32px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    textDecoration: 'none',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 600,
+    marginTop: 'auto',
+  },
+  cardButtonGreen: {
+    backgroundColor: '#059669',
+  },
+  section: {
+    marginBottom: '32px',
   },
   warningBox: {
     backgroundColor: '#fef3c7',

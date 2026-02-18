@@ -65,21 +65,27 @@ interface MenuItem {
 }
 
 /**
- * 메뉴 구조 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
+ * 메뉴 구조 (WO-KPA-A-MENU-SPLIT-V1)
  *
- * 사이트 기본 메뉴 + 허브
+ * 사이트 기본 메뉴 + Hub/Store 분리
  * - 홈: 커뮤니티 메인
  * - 포럼: 커뮤니티 포럼
  * - 강의: LMS 강좌
  * - 콘텐츠: 공지/뉴스
+ * - 약국 HUB: 약국 공동 자원 (pharmacy_owner)
+ * - 내 매장관리: 개별 매장 실행 (pharmacy_owner)
  * - 허브: 운영 허브 (operator 이상)
+ * - 테스트 센터: 오른쪽 끝 배치
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '콘텐츠', href: '/news' },
+  { label: '약국 HUB', href: '/pharmacy/hub' },
+  { label: '내 매장관리', href: '/pharmacy/dashboard' },
   { label: '허브', href: '/hub' },
+  { label: '테스트 센터', href: '/test' },
 ];
 
 export function Header({ serviceName }: { serviceName: string }) {
@@ -95,8 +101,12 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   // 허브 메뉴: kpa:operator 이상만 노출 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
   const hasHubAccess = user?.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
+  // 약국 HUB / 내 매장관리: pharmacy_owner만 노출 (WO-KPA-A-MENU-SPLIT-V1)
+  const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/hub') return hasHubAccess;
+    if (item.href === '/pharmacy/hub') return isPharmacyOwner;
+    if (item.href === '/pharmacy/dashboard') return isPharmacyOwner;
     return true;
   });
 

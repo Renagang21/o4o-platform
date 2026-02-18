@@ -88,6 +88,7 @@ import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchO
 // Platform Home (WO-KPA-HOME-FOUNDATION-V1) - legacy, kept for reference
 // import { HomePage } from './pages/platform';
 import TestCenterPage from './pages/TestCenterPage';
+import { TestCenterStep2Page } from './pages/test-center';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -102,7 +103,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, StoreHubPage, PharmacySellPage, StoreAssetsPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyHubPage, PharmacyDashboardPage, StoreHubPage, PharmacySellPage, StoreAssetsPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -297,7 +298,9 @@ function App() {
           <Route path="/__debug__/api" element={<ApiDebugPage />} />
 
           {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
-          <Route path="/test-center" element={<TestCenterPage />} />
+          <Route path="/test" element={<TestCenterPage />} />
+          <Route path="/test/step2" element={<TestCenterStep2Page />} />
+          <Route path="/test-center" element={<Navigate to="/test" replace />} />
 
           {/* =========================================================
            * Service C - 분회 서비스 (Branch Services)
@@ -331,21 +334,22 @@ function App() {
 
           {/* ========================================
            * 약국 경영지원 (실 서비스 경로)
-           * WO-KPA-PHARMACY-LOCATION-V1: /pharmacy를 단일 기준 경로로
-           * WO-KPA-PHARMACY-DEPTH-V1: 깊이 화면 추가
-           * WO-KPA-A-PHARMACY-ROUTE-GUARD-HARDENING-V1: PharmacyGuard 적용
+           * WO-KPA-A-STORE-ROUTE-REALIGN-V1: Hub/Store/Assets IA 정렬
            * ======================================== */}
+          {/* 게이트: 인증/승인 분기 → 승인 완료 시 /pharmacy/dashboard */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyPage /></PharmacyGuard></Layout>} />
-          {/* WO-PHARMACY-HUB-REALIGN-PHASEH1-V1: 약국 운영 허브 (dashboard → hub 개념 전환) */}
-          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyDashboardPage /></PharmacyGuard></Layout>} />
-          {/* 기존 /pharmacy/dashboard 하위호환 리다이렉트 */}
-          <Route path="/pharmacy/dashboard" element={<Navigate to="/pharmacy/hub" replace />} />
+          {/* 약국 HUB: 공동 자원 탐색 (WO-KPA-A-PAGE-ROLE-CLEANUP-V1) */}
+          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubPage /></PharmacyGuard></Layout>} />
+          {/* 내 매장관리: 매장 실행 요약 화면 */}
+          <Route path="/pharmacy/dashboard" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyDashboardPage /></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyB2BPage /></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierListPage /></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierDetailPage /></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyStorePage /></PharmacyGuard></Layout>} />
-          {/* WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1: 통합 매장 허브 */}
-          <Route path="/pharmacy/store-hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreHubPage /></PharmacyGuard></Layout>} />
+          {/* 자산: 통합 자산 뷰 (기존 store-hub) */}
+          <Route path="/pharmacy/assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreHubPage /></PharmacyGuard></Layout>} />
+          {/* 하위호환: /pharmacy/store-hub → /pharmacy/assets */}
+          <Route path="/pharmacy/store-hub" element={<Navigate to="/pharmacy/assets" replace />} />
           {/* WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1: 매장 복사 자산 목록 */}
           <Route path="/pharmacy/store-assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyServicesPage /></PharmacyGuard></Layout>} />
@@ -358,7 +362,7 @@ function App() {
            * - Service User 로그인 제거, Platform User 단일 인증
            * - 약국 승인 미완료 시 신청 폼 표시
            * ======================================== */}
-          <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyApprovalGatePage /></Layout>} />
+          <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyApprovalGatePage /></PharmacyGuard></Layout>} />
 
           {/* ========================================
            * 근무약사 업무 화면 (개인 기준)

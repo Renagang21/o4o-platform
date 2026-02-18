@@ -43,7 +43,7 @@ export function StoreHubPage() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <a href="/pharmacy/hub" style={styles.backLink}>&larr; 대시보드</a>
+          <a href="/pharmacy/dashboard" style={styles.backLink}>&larr; 대시보드</a>
           <h1 style={styles.title}>사이버 매장 허브</h1>
         </div>
         <div style={styles.messageBox}>
@@ -59,7 +59,7 @@ export function StoreHubPage() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <a href="/pharmacy/hub" style={styles.backLink}>&larr; 대시보드</a>
+          <a href="/pharmacy/dashboard" style={styles.backLink}>&larr; 대시보드</a>
           <h1 style={styles.title}>사이버 매장 허브</h1>
         </div>
         <p style={{ color: colors.neutral500, textAlign: 'center', padding: spacing.xl }}>
@@ -74,7 +74,7 @@ export function StoreHubPage() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <a href="/pharmacy/hub" style={styles.backLink}>&larr; 대시보드</a>
+          <a href="/pharmacy/dashboard" style={styles.backLink}>&larr; 대시보드</a>
           <h1 style={styles.title}>사이버 매장 허브</h1>
         </div>
         <div style={styles.messageBox}>
@@ -89,7 +89,7 @@ export function StoreHubPage() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <a href="/pharmacy/hub" style={styles.backLink}>&larr; 대시보드</a>
+          <a href="/pharmacy/dashboard" style={styles.backLink}>&larr; 대시보드</a>
           <h1 style={styles.title}>사이버 매장 허브</h1>
         </div>
         <div style={styles.messageBox}>
@@ -103,7 +103,7 @@ export function StoreHubPage() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <a href="/pharmacy/hub" style={styles.backLink}>&larr; 대시보드</a>
+        <a href="/pharmacy/dashboard" style={styles.backLink}>&larr; 대시보드</a>
         <h1 style={styles.title}>사이버 매장 허브</h1>
         {overview.organizationName && (
           <p style={styles.orgName}>{overview.organizationName}</p>

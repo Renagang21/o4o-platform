@@ -2,7 +2,8 @@
  * PharmacyGuard — 약국 경영지원 접근 제어
  *
  * WO-KPA-A-PHARMACY-ROUTE-GUARD-HARDENING-V1
- * /pharmacy/* 라우트 보호 (예외: /pharmacy/approval)
+ * WO-PHARMACY-GUARD-HARDENING-V1: /pharmacy/approval 포함 전체 보호
+ * /pharmacy/* 라우트 전체 보호
  *
  * 정책:
  * - 미인증 → /login

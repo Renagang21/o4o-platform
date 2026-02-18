@@ -84,6 +84,14 @@ export class CheckoutOrder {
   supplierId!: string;
 
   /**
+   * 판매 조직 ID (WO-CHECKOUT-ORG-BOUNDARY-FIX-V1)
+   * 매장 단위 주문 추적용. 기존 sellerId(VARCHAR)와 별개로 조직 UUID 참조.
+   */
+  @Index('IDX_checkout_orders_seller_org_id')
+  @Column({ type: 'uuid', nullable: true })
+  sellerOrganizationId?: string;
+
+  /**
    * 파트너 ID (Attribution)
    */
   @Index()

@@ -79,7 +79,7 @@ export default function StoreAssetsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-sm text-slate-500 mb-1">
-            <Link to="/pharmacy/store-hub" className="text-blue-600 hover:underline">&larr; 매장 허브</Link>
+            <Link to="/pharmacy/assets" className="text-blue-600 hover:underline">&larr; 자산</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">매장 자산</h1>
           <p className="text-sm text-slate-500 mt-1">커뮤니티에서 복사된 CMS/사이니지 자산 목록</p>

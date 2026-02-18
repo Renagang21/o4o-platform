@@ -41,6 +41,7 @@ export interface CreateOrderDto {
   sellerId: string;
   supplierId: string;
   partnerId?: string;
+  sellerOrganizationId?: string; // WO-CHECKOUT-ORG-BOUNDARY-FIX-V1
   items: OrderItem[];
   shippingAddress?: ShippingAddress;
   metadata?: Record<string, any>;
@@ -127,6 +128,7 @@ class CheckoutService {
       sellerId: dto.sellerId,
       supplierId: dto.supplierId,
       partnerId: dto.partnerId,
+      sellerOrganizationId: dto.sellerOrganizationId,
       items: dto.items,
       subtotal,
       shippingFee,

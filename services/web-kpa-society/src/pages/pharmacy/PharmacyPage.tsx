@@ -203,9 +203,9 @@ export function PharmacyPage() {
     );
   }
 
-  // 6. 승인 완료 → 허브로 이동
+  // 6. 승인 완료 → 내 매장관리로 이동 (WO-KPA-A-STORE-ROUTE-REALIGN-V1)
   if (approvalStatus === 'approved') {
-    return <Navigate to="/pharmacy/hub" replace />;
+    return <Navigate to="/pharmacy/dashboard" replace />;
   }
 
   // 7. 미승인/미신청 → 신청 게이트로 이동

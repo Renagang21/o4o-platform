@@ -47,7 +47,7 @@ export class CheckoutController {
         });
       }
 
-      const { items, shippingAddress, partnerId, successUrl, failUrl } =
+      const { items, shippingAddress, partnerId, sellerOrganizationId, successUrl, failUrl } =
         req.body;
 
       // Validation
@@ -63,6 +63,17 @@ export class CheckoutController {
           success: false,
           message: 'Shipping address is required',
         });
+      }
+
+      // WO-CHECKOUT-ORG-BOUNDARY-FIX-V1: sellerOrganizationId UUID 검증
+      if (sellerOrganizationId) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(sellerOrganizationId)) {
+          return res.status(400).json({
+            success: false,
+            message: 'sellerOrganizationId must be a valid UUID',
+          });
+        }
       }
 
       // Phase N-1: 상품 개수 제한
@@ -101,6 +112,7 @@ export class CheckoutController {
         sellerId: PHASE_N1_CONFIG.PLATFORM_SELLER_ID,
         supplierId: PHASE_N1_CONFIG.SUPPLIER_ID,
         partnerId: partnerId || undefined,
+        sellerOrganizationId: sellerOrganizationId || undefined,
         items: orderItems,
         shippingAddress,
       });
