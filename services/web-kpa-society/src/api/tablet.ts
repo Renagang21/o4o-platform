@@ -2,15 +2,15 @@
  * Tablet API Client — Public (no auth)
  *
  * WO-STORE-TABLET-REQUEST-CHANNEL-V1
- * WO-KPA-STORE-CHANNEL-INTEGRATION-V1: service parameter for KPA reuse
+ * WO-STORE-SLUG-UNIFICATION-V1: unified /api/v1/stores namespace
  *
- * Calls /api/v1/{service}/stores/:slug/tablet/* endpoints directly.
+ * Calls /api/v1/stores/:slug/tablet/* endpoints directly.
  * No authentication required for tablet kiosk mode.
  */
 
-function getApiBase(service: string = 'glycopharm'): string {
+function getApiBase(): string {
   const base = import.meta.env.VITE_API_BASE_URL || '';
-  return `${base}/api/v1/${service}`;
+  return `${base}/api/v1/stores`;
 }
 
 export interface TabletProduct {
@@ -47,7 +47,6 @@ export interface TabletRequestDetail {
 export async function fetchTabletProducts(
   slug: string,
   params?: { page?: number; limit?: number; category?: string; q?: string },
-  service?: string,
 ): Promise<{ data: TabletProduct[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
   const query = new URLSearchParams();
   if (params?.page) query.set('page', String(params.page));
@@ -56,7 +55,7 @@ export async function fetchTabletProducts(
   if (params?.q) query.set('q', params.q);
 
   const qs = query.toString();
-  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/tablet/products${qs ? `?${qs}` : ''}`;
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/products${qs ? `?${qs}` : ''}`;
   const res = await fetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch products');
@@ -66,9 +65,8 @@ export async function fetchTabletProducts(
 export async function submitTabletRequest(
   slug: string,
   body: { items: Array<{ productId: string; quantity: number }>; note?: string; customerName?: string },
-  service?: string,
 ): Promise<TabletRequestResult> {
-  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/tablet/requests`;
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/requests`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -82,9 +80,8 @@ export async function submitTabletRequest(
 export async function checkTabletRequestStatus(
   slug: string,
   requestId: string,
-  service?: string,
 ): Promise<TabletRequestDetail> {
-  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/tablet/requests/${requestId}`;
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/requests/${requestId}`;
   const res = await fetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || '요청 조회에 실패했습니다.');

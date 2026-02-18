@@ -17,10 +17,10 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-/** WO-KPA-STORE-CHANNEL-INTEGRATION-V1: service prop for KPA reuse */
-export function StoreBlogPostPage({ service }: { service?: string }) {
+/** WO-STORE-SLUG-UNIFICATION-V1: unified URL */
+export function StoreBlogPostPage() {
   const { slug, postSlug } = useParams<{ slug: string; postSlug: string }>();
-  const storePrefix = service === 'kpa' ? '/kpa/store' : '/store';
+  const storePrefix = '/store';
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export function StoreBlogPostPage({ service }: { service?: string }) {
   useEffect(() => {
     if (!slug || !postSlug) return;
     setLoading(true);
-    fetchBlogPost(slug, postSlug, service)
+    fetchBlogPost(slug, postSlug)
       .then((data) => {
         setPost(data);
         setError(null);

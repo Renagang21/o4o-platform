@@ -27,7 +27,7 @@ const VALID_BLOCK_TYPES: StoreBlockType[] = [
 
 const BLOCK_DEFAULT_CONFIGS: Record<StoreBlockType, Record<string, any>> = {
   HERO: {},
-  PRODUCT_GRID: { limit: 4 },
+  PRODUCT_GRID: { limit: 4, mode: 'single' },
   BLOG_LIST: { limit: 3 },
   TABLET_PROMO: {},
   SIGNAGE_PROMO: {},
@@ -37,7 +37,21 @@ const BLOCK_DEFAULT_CONFIGS: Record<StoreBlockType, Record<string, any>> = {
 // ── Block Config Validators ─────────────────────────────────────────────────
 
 const BLOCK_CONFIG_VALIDATORS: Partial<Record<StoreBlockType, (config: Record<string, any>) => boolean>> = {
-  PRODUCT_GRID: (c) => typeof c.limit === 'number' && c.limit >= 1 && c.limit <= 12,
+  PRODUCT_GRID: (c) => {
+    // limit validation
+    if (typeof c.limit !== 'number' || c.limit < 1 || c.limit > 12) return false;
+    // mode validation (optional, defaults to 'single')
+    if (c.mode !== undefined && c.mode !== 'single' && c.mode !== 'multi') return false;
+    // services validation (required for multi mode)
+    if (c.mode === 'multi') {
+      const ALLOWED = ['glycopharm', 'kpa', 'cosmetics'];
+      if (!Array.isArray(c.services) || c.services.length === 0) return false;
+      if (!c.services.every((s: any) => typeof s === 'string' && ALLOWED.includes(s))) return false;
+    }
+    // services must not exist in single mode
+    if (c.mode === 'single' && c.services !== undefined) return false;
+    return true;
+  },
   BLOG_LIST: (c) => typeof c.limit === 'number' && c.limit >= 1 && c.limit <= 12,
 };
 

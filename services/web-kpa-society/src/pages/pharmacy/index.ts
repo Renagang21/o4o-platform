@@ -36,3 +36,7 @@ export { PharmacyTemplatePage } from './PharmacyTemplatePage';
 
 // WO-STORE-BLOCK-ENGINE-V1: 스토어 블록 레이아웃 빌더
 export { LayoutBuilderPage } from './LayoutBuilderPage';
+
+// WO-STORE-ADMIN-CONSOLIDATION-V1: 매장 관리 통합
+export { StoreOverviewPage } from './StoreOverviewPage';
+export { StoreChannelsPage } from './StoreChannelsPage';

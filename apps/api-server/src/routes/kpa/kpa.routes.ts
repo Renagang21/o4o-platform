@@ -205,7 +205,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Tablet/Blog/Template 채널을 KPA 네임스페이스에서 제공
   // /api/v1/kpa/stores/:slug/tablet|blog|template
   // ============================================================================
-  const kpaTabletController = createTabletController(dataSource, coreRequireAuth as any);
+  const kpaTabletController = createTabletController(dataSource, coreRequireAuth as any, 'kpa');
   router.use('/stores', kpaTabletController);
 
   const kpaBlogController = createBlogController(dataSource, coreRequireAuth as any, 'kpa');

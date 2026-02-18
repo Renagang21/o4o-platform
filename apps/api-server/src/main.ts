@@ -89,6 +89,9 @@ import { createSlugRoutes } from './routes/platform/slug.routes.js';
 // Platform Store Policy (WO-CORE-STORE-POLICY-SYSTEM-V1)
 import { createStorePolicyRoutes } from './routes/platform/store-policy.routes.js';
 
+// Unified Public Store routes (WO-STORE-SLUG-UNIFICATION-V1)
+import { createUnifiedStorePublicRoutes } from './routes/platform/unified-store-public.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -755,7 +758,11 @@ const startServer = async () => {
     app.use('/api/v1/platform/slug', createSlugRoutes(AppDataSource));
     logger.info('✅ Platform Slug routes registered at /api/v1/platform/slug');
 
-    // 8.11. Register Platform Store Policy routes (WO-CORE-STORE-POLICY-SYSTEM-V1)
+    // 8.11a. Register Unified Public Store routes (WO-STORE-SLUG-UNIFICATION-V1)
+    app.use('/api/v1/stores', createUnifiedStorePublicRoutes(AppDataSource));
+    logger.info('✅ Unified Public Store routes registered at /api/v1/stores/:slug');
+
+    // 8.11b. Register Platform Store Policy routes (WO-CORE-STORE-POLICY-SYSTEM-V1)
     app.use('/api/v1/stores', createStorePolicyRoutes(AppDataSource));
     logger.info('✅ Platform Store Policy routes registered at /api/v1/stores/:slug/policies');
 

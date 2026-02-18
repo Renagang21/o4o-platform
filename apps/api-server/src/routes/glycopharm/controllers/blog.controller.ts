@@ -2,6 +2,7 @@
  * Blog Controller — Store Blog Channel
  *
  * WO-STORE-BLOG-CHANNEL-V1
+ * WO-KPA-STORE-ENGINE-IDENTICAL-MODE-V1: serviceKey 필터 일관성
  *
  * Public (인증 불필요):
  * - GET  /stores/:slug/blog              — 발행된 게시글 목록
@@ -82,6 +83,7 @@ export function createBlogController(
       const [posts, total] = await blogRepo.findAndCount({
         where: {
           storeId: pharmacy.id,
+          serviceKey,
           status: 'published' as StoreBlogPostStatus,
           publishedAt: LessThanOrEqual(new Date()),
         },
@@ -122,6 +124,7 @@ export function createBlogController(
       const post = await blogRepo.findOne({
         where: {
           storeId: pharmacy.id,
+          serviceKey,
           slug: postSlug,
           status: 'published' as StoreBlogPostStatus,
           publishedAt: LessThanOrEqual(new Date()),
@@ -163,7 +166,7 @@ export function createBlogController(
         return;
       }
 
-      const where: any = { storeId: pharmacy.id };
+      const where: any = { storeId: pharmacy.id, serviceKey };
       if (statusFilter && ['draft', 'published', 'archived'].includes(statusFilter)) {
         where.status = statusFilter;
       }

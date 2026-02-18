@@ -2,6 +2,7 @@
  * Tablet Controller — In-Store Tablet Request Channel
  *
  * WO-STORE-TABLET-REQUEST-CHANNEL-V1
+ * WO-KPA-STORE-ENGINE-IDENTICAL-MODE-V1: serviceKey 파라미터화
  *
  * Public (인증 불필요):
  * - GET  /stores/:slug/tablet/products       — TABLET 채널 상품 목록
@@ -30,6 +31,7 @@ import type { AuthRequest } from '../../../types/auth.js';
 async function queryTabletVisibleProducts(
   dataSource: DataSource,
   pharmacyId: string,
+  serviceKey: string,
   options: {
     category?: string;
     q?: string;
@@ -44,8 +46,8 @@ async function queryTabletVisibleProducts(
   const offset = (page - 1) * limit;
 
   const conditions: string[] = [];
-  const params: any[] = [pharmacyId];
-  let paramIdx = 2;
+  const params: any[] = [pharmacyId, serviceKey];
+  let paramIdx = 3;
 
   if (options.category) {
     conditions.push(`p.category = $${paramIdx}`);
@@ -76,7 +78,7 @@ async function queryTabletVisibleProducts(
      INNER JOIN organization_product_listings opl
        ON opl.external_product_id = p.id::text
        AND opl.organization_id = $1
-       AND opl.service_key = 'kpa'
+       AND opl.service_key = $2
        AND opl.is_active = true
      INNER JOIN organization_product_channels opc
        ON opc.product_listing_id = opl.id
@@ -104,7 +106,7 @@ async function queryTabletVisibleProducts(
      INNER JOIN organization_product_listings opl
        ON opl.external_product_id = p.id::text
        AND opl.organization_id = $1
-       AND opl.service_key = 'kpa'
+       AND opl.service_key = $2
        AND opl.is_active = true
      INNER JOIN organization_product_channels opc
        ON opc.product_listing_id = opl.id
@@ -157,6 +159,7 @@ const VALID_TRANSITIONS: Record<string, TabletServiceRequestStatus[]> = {
 export function createTabletController(
   dataSource: DataSource,
   requireAuth: RequestHandler,
+  serviceKey: string = 'glycopharm',
 ): Router {
   const router = Router();
   const service = new GlycopharmService(dataSource);
@@ -180,7 +183,7 @@ export function createTabletController(
         return;
       }
 
-      const result = await queryTabletVisibleProducts(dataSource, pharmacy.id, {
+      const result = await queryTabletVisibleProducts(dataSource, pharmacy.id, serviceKey, {
         page: req.query.page ? Number(req.query.page) : 1,
         limit: req.query.limit ? Number(req.query.limit) : 20,
         category: req.query.category as string | undefined,

@@ -4,6 +4,7 @@
  * WO-STORE-BLOCK-ENGINE-V1
  * WO-STORE-BLOCK-REGISTRY-V1: Registry 기반 렌더링
  * WO-STORE-ENGINE-HARDENING-V1: channels 가시성 제어
+ * WO-STORE-SLUG-UNIFICATION-V1: unified /api/v1/stores namespace
  *
  * 경로: /store/:slug
  * 공개 페이지 — 인증 불필요
@@ -29,10 +30,9 @@ import {
 // API Helpers
 // ============================================================================
 
-/** WO-KPA-STORE-CHANNEL-INTEGRATION-V1: service parameter for KPA reuse */
-function getApiBase(service: string = 'glycopharm'): string {
+function getApiBase(): string {
   const base = import.meta.env.VITE_API_BASE_URL || '';
-  return `${base}/api/v1/${service}`;
+  return `${base}/api/v1/stores`;
 }
 
 async function fetchJson(url: string) {
@@ -40,19 +40,6 @@ async function fetchJson(url: string) {
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Request failed');
   return json;
-}
-
-/** Prefix for internal links (/store or /kpa/store) */
-function getStorePrefix(service: string = 'glycopharm'): string {
-  return service === 'kpa' ? '/kpa/store' : '/store';
-}
-
-function getTabletPrefix(service: string = 'glycopharm'): string {
-  return service === 'kpa' ? '/kpa/tablet' : '/tablet';
-}
-
-function getSignagePrefix(service: string = 'glycopharm'): string {
-  return service === 'kpa' ? '/signage' : '/signage';
 }
 
 /** 블록 배열에서 특정 타입이 enabled인지 확인 */
@@ -69,12 +56,9 @@ function getBlockConfig(blocks: StoreBlock[], type: StoreBlockType): Record<stri
 // Main Page Component
 // ============================================================================
 
-export function StorefrontHomePage({ service }: { service?: string }) {
+export function StorefrontHomePage() {
   const { slug } = useParams<{ slug: string }>();
-  const apiBase = getApiBase(service);
-  const storePrefix = getStorePrefix(service);
-  const tabletPfx = getTabletPrefix(service);
-  const signagePfx = getSignagePrefix(service);
+  const apiBase = getApiBase();
   const [store, setStore] = useState<StoreData | null>(null);
   const [blocks, setBlocks] = useState<StoreBlock[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -91,8 +75,8 @@ export function StorefrontHomePage({ service }: { service?: string }) {
       try {
         // Fetch store info + layout in parallel
         const [storeRes, layoutRes] = await Promise.all([
-          fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}`),
-          fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/layout`).catch(() => ({
+          fetchJson(`${apiBase}/${encodeURIComponent(slug)}`),
+          fetchJson(`${apiBase}/${encodeURIComponent(slug)}/layout`).catch(() => ({
             data: { blocks: [{ type: 'HERO', enabled: true }, { type: 'PRODUCT_GRID', enabled: true, config: { limit: 4 } }] },
           })),
         ]);
@@ -115,8 +99,14 @@ export function StorefrontHomePage({ service }: { service?: string }) {
         const promises: Promise<void>[] = [];
 
         if (isBlockEnabled(layoutBlocks, 'PRODUCT_GRID')) {
+          const gridConfig = getBlockConfig(layoutBlocks, 'PRODUCT_GRID');
+          let featuredUrl = `${apiBase}/${encodeURIComponent(slug)}/products/featured`;
+          // WO-STORE-MULTI-SERVICE-GRID-V1: multi-service product query
+          if (gridConfig.mode === 'multi' && Array.isArray(gridConfig.services) && gridConfig.services.length > 0) {
+            featuredUrl += `?services=${gridConfig.services.join(',')}`;
+          }
           promises.push(
-            fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/products/featured`)
+            fetchJson(featuredUrl)
               .then((res) => setProducts(res.data || []))
               .catch(() => setProducts([])),
           );
@@ -126,7 +116,7 @@ export function StorefrontHomePage({ service }: { service?: string }) {
           const blogConfig = getBlockConfig(layoutBlocks, 'BLOG_LIST');
           const blogLimit = blogConfig.limit || 3;
           promises.push(
-            fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/blog?limit=${blogLimit}`)
+            fetchJson(`${apiBase}/${encodeURIComponent(slug)}/blog?limit=${blogLimit}`)
               .then((res) => setBlogPosts(res.data || []))
               .catch(() => setBlogPosts([])),
           );
@@ -169,10 +159,9 @@ export function StorefrontHomePage({ service }: { service?: string }) {
     slug: slug!,
     products,
     blogPosts,
-    storePrefix,
-    tabletPrefix: tabletPfx,
-    signagePrefix: signagePfx,
-    service: service || 'glycopharm',
+    storePrefix: '/store',
+    tabletPrefix: '/tablet',
+    signagePrefix: '/signage',
     storeId,
     channels,
   };

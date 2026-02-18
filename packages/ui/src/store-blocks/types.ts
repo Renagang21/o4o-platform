@@ -2,7 +2,7 @@
  * Store Block Engine — Types
  *
  * WO-STORE-BLOCK-REGISTRY-V1
- * WO-STORE-ENGINE-HARDENING-V1: service, channels, visibilityGuard
+ * WO-STORE-ENGINE-HARDENING-V1: channels, visibilityGuard
  *
  * Registry 기반 블록 엔진의 공용 타입 정의.
  * StoreBlockType / StoreBlock은 API entity와 동일 구조.
@@ -71,8 +71,6 @@ export interface BlockRenderContext {
   storePrefix: string;
   tabletPrefix: string;
   signagePrefix: string;
-  /** WO-STORE-ENGINE-HARDENING-V1 */
-  service: string;
   storeId: string;
   channels: StoreChannels;
 }

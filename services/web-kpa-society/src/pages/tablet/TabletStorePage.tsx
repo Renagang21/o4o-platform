@@ -36,7 +36,7 @@ function formatPrice(price: number): string {
   return price.toLocaleString('ko-KR') + '원';
 }
 
-export function TabletStorePage({ service }: { service?: string }) {
+export function TabletStorePage() {
   const { slug } = useParams<{ slug: string }>();
   const [viewMode, setViewMode] = useState<ViewMode>('browse');
   const [products, setProducts] = useState<TabletProduct[]>([]);
@@ -57,7 +57,7 @@ export function TabletStorePage({ service }: { service?: string }) {
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
-    fetchTabletProducts(slug, { limit: 50 }, service)
+    fetchTabletProducts(slug, { limit: 50 })
       .then((res) => setProducts(res.data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -100,7 +100,7 @@ export function TabletStorePage({ service }: { service?: string }) {
         items: cart.map((c) => ({ productId: c.product.id, quantity: c.quantity })),
         note: note.trim() || undefined,
         customerName: customerName.trim() || undefined,
-      }, service);
+      });
       setRequestId(result.requestId);
       setViewMode('submitted');
       setCart([]);
@@ -118,7 +118,7 @@ export function TabletStorePage({ service }: { service?: string }) {
     if (viewMode !== 'submitted' || !slug || !requestId) return;
 
     const poll = () => {
-      checkTabletRequestStatus(slug, requestId, service)
+      checkTabletRequestStatus(slug, requestId)
         .then(setRequestStatus)
         .catch(() => {});
     };
