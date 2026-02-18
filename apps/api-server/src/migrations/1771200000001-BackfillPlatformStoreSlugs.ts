@@ -52,17 +52,6 @@ export class BackfillPlatformStoreSlugs1771200000001 implements MigrationInterfa
       ON CONFLICT (slug) DO NOTHING
     `);
 
-    // Log backfill results
-    const glycopharmCount = await queryRunner.query(`
-      SELECT COUNT(*) as count FROM platform_store_slugs WHERE service_key = 'glycopharm'
-    `);
-    const cosmeticsCount = await queryRunner.query(`
-      SELECT COUNT(*) as count FROM platform_store_slugs WHERE service_key = 'cosmetics'
-    `);
-
-    console.log(`[BackfillPlatformStoreSlugs] Backfilled slugs:`);
-    console.log(`  - glycopharm: ${glycopharmCount[0]?.count || 0}`);
-    console.log(`  - cosmetics: ${cosmeticsCount[0]?.count || 0}`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
