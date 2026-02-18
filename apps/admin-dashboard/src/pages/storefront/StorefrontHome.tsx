@@ -22,6 +22,7 @@ import {
   AGStorefrontProductCard,
   AGStorefrontRoutineCard,
   StorefrontPartner,
+  StorefrontPolicies,
 } from '@o4o/ui';
 import { AGButton } from '@o4o/ui';
 
@@ -58,6 +59,7 @@ export default function StorefrontHome() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<StorefrontData | null>(null);
+  const [policies, setPolicies] = useState<StorefrontPolicies | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,15 +70,34 @@ export default function StorefrontHome() {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get(`/api/v1/storefront/${slug}`);
+      const [response, policyResponse] = await Promise.all([
+        authClient.api.get(`/api/v1/storefront/${slug}`),
+        authClient.api.get(`/api/v1/stores/${slug}/policies`).catch(() => null),
+      ]);
 
       if (response.data?.success) {
         setData(response.data.data);
       } else {
         throw new Error('Failed to load storefront');
       }
+
+      if (policyResponse?.data?.success) {
+        setPolicies(policyResponse.data.data);
+      }
     } catch (err: any) {
       console.error('Error loading storefront:', err);
+
+      // Check if this is an old slug that should redirect
+      try {
+        const resolveRes = await authClient.api.get(`/api/v1/stores/resolve/${slug}`);
+        if (resolveRes.data?.data?.redirect && resolveRes.data?.data?.newSlug) {
+          navigate(`/storefront/${resolveRes.data.data.newSlug}`, { replace: true });
+          return;
+        }
+      } catch {
+        // resolve endpoint also failed — fall through to demo data
+      }
+
       // Demo data for development
       setData({
         partner: {
@@ -205,7 +226,7 @@ export default function StorefrontHome() {
   }
 
   return (
-    <AGStorefrontLayout partner={data.partner}>
+    <AGStorefrontLayout partner={data.partner} policies={policies}>
       {/* Hero Section */}
       <AGStorefrontHero
         title={data.heroTitle || `${data.partner.name}의 스킨케어 스토어`}

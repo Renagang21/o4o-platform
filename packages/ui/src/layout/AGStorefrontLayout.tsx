@@ -13,7 +13,7 @@
  * - Optional footer
  */
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 export interface StorefrontPartner {
   name: string;
@@ -22,12 +22,68 @@ export interface StorefrontPartner {
   tagline?: string;
 }
 
+export interface StorefrontPolicies {
+  termsOfService?: string | null;
+  privacyPolicy?: string | null;
+  refundPolicy?: string | null;
+  shippingPolicy?: string | null;
+}
+
 export interface AGStorefrontLayoutProps {
   partner: StorefrontPartner;
   children: ReactNode;
   showBackButton?: boolean;
   onBack?: () => void;
   className?: string;
+  policies?: StorefrontPolicies | null;
+}
+
+const POLICY_LABELS: Record<string, string> = {
+  termsOfService: '이용약관',
+  privacyPolicy: '개인정보처리방침',
+  refundPolicy: '환불정책',
+  shippingPolicy: '배송정책',
+};
+
+function PolicyModal({
+  title,
+  content,
+  onClose,
+}: {
+  title: string;
+  content: string;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/40" />
+      <div
+        className="relative bg-white w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[80vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="닫기"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        {/* Body */}
+        <div className="px-5 py-4 overflow-y-auto text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+          {content}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function AGStorefrontLayout({
@@ -36,7 +92,16 @@ export function AGStorefrontLayout({
   showBackButton = false,
   onBack,
   className = '',
+  policies,
 }: AGStorefrontLayoutProps) {
+  const [openPolicy, setOpenPolicy] = useState<{ title: string; content: string } | null>(null);
+
+  const policyEntries = policies
+    ? (Object.entries(POLICY_LABELS) as [keyof StorefrontPolicies, string][]).filter(
+        ([key]) => policies[key],
+      )
+    : [];
+
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
       {/* Header */}
@@ -103,6 +168,24 @@ export function AGStorefrontLayout({
       {/* Footer */}
       <footer className="mt-12 py-8 border-t border-gray-200 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
+          {/* Policy Links */}
+          {policyEntries.length > 0 && (
+            <div className="flex items-center justify-center gap-1 flex-wrap mb-3">
+              {policyEntries.map(([key, label], idx) => (
+                <React.Fragment key={key}>
+                  {idx > 0 && <span className="text-gray-300 text-xs">|</span>}
+                  <button
+                    onClick={() =>
+                      setOpenPolicy({ title: label, content: policies![key]! })
+                    }
+                    className="text-xs text-gray-500 hover:text-gray-700 hover:underline transition-colors"
+                  >
+                    {label}
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
           <p className="text-sm text-gray-500">
             {partner.name}의 스토어프론트
           </p>
@@ -111,6 +194,15 @@ export function AGStorefrontLayout({
           </p>
         </div>
       </footer>
+
+      {/* Policy Modal */}
+      {openPolicy && (
+        <PolicyModal
+          title={openPolicy.title}
+          content={openPolicy.content}
+          onClose={() => setOpenPolicy(null)}
+        />
+      )}
     </div>
   );
 }
