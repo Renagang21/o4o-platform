@@ -47,6 +47,7 @@ function buildAdminConfig(
   basePath: string,
 ): AdminDashboardConfig {
   // Block A: Structure Snapshot
+  // WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder KPI 제거
   const structureMetrics: StructureMetric[] = [
     {
       key: 'total-members',
@@ -59,18 +60,6 @@ function buildAdminConfig(
       label: '활성 회원',
       value: stats.activeMembers,
       status: stats.activeMembers === 0 ? 'attention' : 'stable',
-    },
-    {
-      key: 'pending-reports',
-      label: '신상신고 대기',
-      value: stats.pendingAnnualReports,
-      status: stats.pendingAnnualReports > 0 ? 'attention' : 'stable',
-    },
-    {
-      key: 'pending-fees',
-      label: '연회비 대기',
-      value: stats.pendingMembershipFees,
-      status: stats.pendingMembershipFees > 0 ? 'attention' : 'stable',
     },
   ];
 
@@ -85,7 +74,7 @@ function buildAdminConfig(
     {
       key: 'annual-report-policy',
       label: '신상신고 정책',
-      status: stats.pendingAnnualReports > 0 ? 'partial' : 'configured',
+      status: 'configured',
       link: `${basePath}/annual-report`,
     },
     {
@@ -97,23 +86,8 @@ function buildAdminConfig(
   ];
 
   // Block C: Governance Alerts
+  // WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 기반 알림 제거
   const governanceAlerts: GovernanceAlert[] = [];
-  if (stats.pendingAnnualReports > 0) {
-    governanceAlerts.push({
-      id: 'ga-annual-report',
-      message: `신상신고 대기 ${stats.pendingAnnualReports}건이 있습니다. 검토가 필요합니다.`,
-      level: stats.pendingAnnualReports > 5 ? 'warning' : 'info',
-      link: `${basePath}/annual-report`,
-    });
-  }
-  if (stats.pendingMembershipFees > 0) {
-    governanceAlerts.push({
-      id: 'ga-membership-fee',
-      message: `연회비 미납 ${stats.pendingMembershipFees}건이 있습니다.`,
-      level: stats.pendingMembershipFees > 10 ? 'warning' : 'info',
-      link: `${basePath}/membership-fee`,
-    });
-  }
   if (stats.totalMembers === 0) {
     governanceAlerts.push({
       id: 'ga-no-members',

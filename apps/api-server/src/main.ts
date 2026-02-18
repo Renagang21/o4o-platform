@@ -86,6 +86,9 @@ import { createPhysicalStoreRoutes } from './routes/platform/physical-store.rout
 // Platform Slug Check (WO-CORE-STORE-REQUESTED-SLUG-V1)
 import { createSlugRoutes } from './routes/platform/slug.routes.js';
 
+// Platform Store Policy (WO-CORE-STORE-POLICY-SYSTEM-V1)
+import { createStorePolicyRoutes } from './routes/platform/store-policy.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -751,6 +754,10 @@ const startServer = async () => {
     // 8.10. Register Platform Slug Check routes (WO-CORE-STORE-REQUESTED-SLUG-V1)
     app.use('/api/v1/platform/slug', createSlugRoutes(AppDataSource));
     logger.info('✅ Platform Slug routes registered at /api/v1/platform/slug');
+
+    // 8.11. Register Platform Store Policy routes (WO-CORE-STORE-POLICY-SYSTEM-V1)
+    app.use('/api/v1/stores', createStorePolicyRoutes(AppDataSource));
+    logger.info('✅ Platform Store Policy routes registered at /api/v1/stores/:slug/policies');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

@@ -18,12 +18,11 @@ type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
 
 // Response interfaces
+// WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 interface DashboardStats {
   totalBranches: number;     // 분회 수 (type = 'branch' or 'group')
   totalMembers: number;      // 전체 활성 회원 수
   pendingApprovals: number;  // 승인 대기 신청서
-  activeGroupbuys: number;   // 공동구매 (Entity 없음 - 0 반환)
-  recentPosts: number;       // 최근 게시물 (Entity 없음 - 0 반환)
 }
 
 interface OrganizationStats {
@@ -104,16 +103,10 @@ export function createAdminDashboardController(
         // Query pending applications
         const pendingApprovals = await appRepo.count({ where: { status: 'submitted' } });
 
-        // No groupbuy or forum entities - return 0
-        const activeGroupbuys = 0;
-        const recentPosts = 0;
-
         const stats: DashboardStats = {
           totalBranches,
           totalMembers,
           pendingApprovals,
-          activeGroupbuys,
-          recentPosts,
         };
 
         res.json({ success: true, data: stats });

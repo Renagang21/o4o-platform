@@ -13,3 +13,6 @@ export { platformCoreManifest, default as manifest } from './manifest.js';
 
 // Store Identity (WO-CORE-STORE-SLUG-SYSTEM-V1)
 // Full exports available via '@o4o/platform-core/store-identity'
+
+// Store Policy (WO-CORE-STORE-POLICY-SYSTEM-V1)
+// Full exports available via '@o4o/platform-core/store-policy'

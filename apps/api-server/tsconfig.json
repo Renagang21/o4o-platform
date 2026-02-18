@@ -36,6 +36,8 @@
       "@o4o/annualfee-yaksa/*": ["../../packages/annualfee-yaksa/dist/*"],
       "@o4o/cosmetics-seller-extension/backend": ["../../packages/cosmetics-seller-extension/dist/backend"],
       "@o4o/cosmetics-seller-extension/manifest": ["../../packages/cosmetics-seller-extension/dist/manifest"],
+      "@o4o/platform-core/store-identity": ["../../packages/platform-core/dist/store-identity"],
+      "@o4o/platform-core/store-policy": ["../../packages/platform-core/dist/store-policy"],
       "@o4o/*": ["../../packages/*/dist"],
       "@o4o/forum-core": ["../../packages/forum-core/dist"],
       "@o4o/forum-core/*": ["../../packages/forum-core/dist/*"],

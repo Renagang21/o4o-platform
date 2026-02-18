@@ -24,13 +24,10 @@ import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
 type AuthMiddleware = RequestHandler;
 
 // Response interfaces
+// WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 interface BranchDashboardStats {
   totalMembers: number;       // 분회 소속 전체 회원
   activeMembers: number;      // 활성 회원
-  pendingAnnualReports: number; // 신상신고서 대기 (Entity 없음 - 0)
-  pendingMembershipFees: number; // 연회비 미납 (Entity 없음 - 0)
-  recentPosts: number;        // 최근 게시물 (Entity 없음 - 0)
-  upcomingEvents: number;     // 예정 행사 (Entity 없음 - 0)
 }
 
 interface RecentActivity {
@@ -120,10 +117,6 @@ export function createBranchAdminDashboardController(
             data: {
               totalMembers: 0,
               activeMembers: 0,
-              pendingAnnualReports: 0,
-              pendingMembershipFees: 0,
-              recentPosts: 0,
-              upcomingEvents: 0,
             } as BranchDashboardStats,
           });
           return;
@@ -138,14 +131,9 @@ export function createBranchAdminDashboardController(
           memberRepo.count({ where: { organization_id: organizationId, status: 'active' } }),
         ]);
 
-        // No annual report, membership fee, post, or event entities yet - return 0
         const stats: BranchDashboardStats = {
           totalMembers,
           activeMembers,
-          pendingAnnualReports: 0,
-          pendingMembershipFees: 0,
-          recentPosts: 0,
-          upcomingEvents: 0,
         };
 
         res.json({ success: true, data: stats });

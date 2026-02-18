@@ -17,6 +17,10 @@
     "./store-identity": {
       "import": "./dist/store-identity/index.js",
       "types": "./dist/store-identity/index.d.ts"
+    },
+    "./store-policy": {
+      "import": "./dist/store-policy/index.js",
+      "types": "./dist/store-policy/index.d.ts"
     }
   },
   "scripts": {

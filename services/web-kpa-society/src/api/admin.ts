@@ -55,12 +55,11 @@ interface UpdateBranchDto {
   metadata?: Branch['metadata'];
 }
 
+// WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 interface DashboardStats {
   totalBranches: number;
   totalMembers: number;
   pendingApprovals: number;
-  activeGroupbuys: number;
-  recentPosts: number;
 }
 
 interface PaginatedResult<T> {

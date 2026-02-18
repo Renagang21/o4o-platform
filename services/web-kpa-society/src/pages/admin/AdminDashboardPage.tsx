@@ -30,8 +30,6 @@ interface DashboardStats {
   totalBranches: number;
   totalMembers: number;
   pendingApprovals: number;
-  activeGroupbuys: number;
-  recentPosts: number;
 }
 
 // ─── Data Transformer ───
@@ -56,11 +54,6 @@ function buildAdminConfig(stats: DashboardStats): AdminDashboardConfig {
       label: '승인 대기',
       value: stats.pendingApprovals,
       status: stats.pendingApprovals > 0 ? 'attention' : 'stable',
-    },
-    {
-      key: 'groupbuys',
-      label: '진행 공동구매',
-      value: stats.activeGroupbuys,
     },
   ];
 

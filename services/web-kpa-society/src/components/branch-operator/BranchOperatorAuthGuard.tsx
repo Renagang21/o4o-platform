@@ -21,8 +21,11 @@ import { apiClient } from '../../api/client';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
 
-/** Roles that can access any branch without ownership check */
-const BRANCH_BYPASS_ROLES = ['kpa:admin', 'kpa:district_admin'];
+/**
+ * Roles that can access any branch without ownership check
+ * WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role (kpa:district_admin) 제거
+ */
+const BRANCH_BYPASS_ROLES = ['kpa:admin'];
 
 interface MembershipResponse {
   success: boolean;
@@ -139,15 +142,13 @@ export function BranchOperatorAuthGuard({ children }: BranchOperatorAuthGuardPro
 /**
  * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
  * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: branchId 검증 분리 — 역할만 확인
+ * WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
  */
 function checkBranchOperatorRole(user: User): boolean {
   const allowedRoles = [
     'kpa-c:operator',
     'kpa-c:branch_admin',
     'kpa:admin',
-    'kpa:district_admin',
-    'kpa:branch_admin',
-    'kpa:branch_operator',
   ];
 
   if (user.roles.some(r => allowedRoles.includes(r))) {

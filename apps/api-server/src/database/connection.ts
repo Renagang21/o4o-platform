@@ -246,6 +246,12 @@ import {
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
+// PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
+// (WO-CORE-STORE-POLICY-SYSTEM-V1, WO-CORE-STORE-PAYMENT-CONFIG-V1)
+// ============================================================================
+import { PlatformStorePolicy, PlatformStorePaymentConfig } from '@o4o/platform-core/store-policy';
+
+// ============================================================================
 // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
 // ============================================================================
 import { PlatformInquiry } from '../entities/PlatformInquiry.js';
@@ -702,6 +708,11 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     PhysicalStore,
     PhysicalStoreLink,
+    // ============================================================================
+    // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
+    // ============================================================================
+    PlatformStorePolicy,
+    PlatformStorePaymentConfig,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

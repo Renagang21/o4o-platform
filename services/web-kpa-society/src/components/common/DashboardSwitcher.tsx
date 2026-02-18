@@ -37,7 +37,8 @@ export function useAccessibleDashboards(): DashboardItem[] {
   }
 
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
-  const adminRoles = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator'];
+  // WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
+  const adminRoles = ['kpa:admin', 'kpa:operator', 'kpa-c:branch_admin', 'kpa-c:operator'];
   const hasAdminRole = user.roles.some((r: string) => adminRoles.includes(r));
   if (hasAdminRole) {
     items.push({ label: '운영자 대시보드', icon: '🖥️', path: '/admin/kpa-dashboard' });
