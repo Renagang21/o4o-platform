@@ -54,7 +54,7 @@ export function PharmacyApprovalGatePage() {
     setState('submitting');
     try {
       await joinRequestApi.create({
-        organizationId: 'pharmacy-1',
+        organizationId: 'a0000000-0a00-4000-a000-000000000001',
         requestType: 'pharmacy_join',
         requestedRole: 'admin',
         payload: {
