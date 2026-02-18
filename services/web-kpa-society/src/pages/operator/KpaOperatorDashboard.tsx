@@ -5,12 +5,16 @@
  *   @o4o/operator-ux-core 기반 5-Block 구조로 전환.
  *   "콘텐츠 흐름형" — Activity Log + Quick Actions 강조.
  *
+ * WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1:
+ *   Admin/Operator 역할별 UI 차등 적용.
+ *   5-Block 구조 유지, Adapter 레벨에서 역할 분기.
+ *
  * Block 구조:
- *  [1] KPI Grid       — 콘텐츠, 포럼, 사이니지, 가입대기
+ *  [1] KPI Grid       — 콘텐츠, 포럼, 사이니지, 가입대기 (+Admin: 회원수, 서비스신청)
  *  [2] AI Summary     — 상태 기반 인사이트 (LLM 미호출)
- *  [3] Action Queue   — 즉시 처리 항목
+ *  [3] Action Queue   — 즉시 처리 항목 (+Admin: 권한요청, 정책점검)
  *  [4] Activity Log   — 최근 콘텐츠/포럼/사이니지 활동 (핵심)
- *  [5] Quick Actions  — Hub 기능 흡수 (핵심)
+ *  [5] Quick Actions  — Hub 기능 흡수 (+Admin: 회원관리, 서비스승인, 정책설정)
  *
  * API 재사용: operatorApi.getSummary() + apiClient (members, groupbuy)
  */
@@ -27,18 +31,21 @@ import {
 } from '@o4o/operator-ux-core';
 import { operatorApi, type OperatorSummary } from '../../api/operator';
 import { apiClient } from '../../api/client';
+import { useAuth } from '../../contexts/AuthContext';
 
 // ─── Extended Data (Hub에서 가져오던 추가 데이터) ───
 
 interface KpaExtendedData {
   summary: OperatorSummary | null;
   pendingMembers: number;
+  totalMembers: number;
+  serviceApplicationCount: number;
 }
 
 // ─── Data Transformer ───
 
-function buildDashboardConfig(data: KpaExtendedData): OperatorDashboardConfig {
-  const { summary, pendingMembers } = data;
+function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): OperatorDashboardConfig {
+  const { summary, pendingMembers, totalMembers, serviceApplicationCount } = data;
 
   if (!summary) {
     return { kpis: [], actionQueue: [], activityLog: [], quickActions: [] };
@@ -74,6 +81,21 @@ function buildDashboardConfig(data: KpaExtendedData): OperatorDashboardConfig {
       value: pendingMembers,
       status: pendingMembers > 0 ? 'warning' : 'neutral',
     },
+    // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 KPI
+    ...(isAdmin ? [
+      {
+        key: 'total-members',
+        label: '전체 회원',
+        value: totalMembers,
+        status: 'neutral' as const,
+      },
+      {
+        key: 'service-apps',
+        label: '서비스 신청',
+        value: serviceApplicationCount,
+        status: serviceApplicationCount > 0 ? 'warning' as const : 'neutral' as const,
+      },
+    ] : []),
   ];
 
   // Block 2: AI Summary (상태 기반 규칙형)
@@ -110,6 +132,15 @@ function buildDashboardConfig(data: KpaExtendedData): OperatorDashboardConfig {
       link: '/operator/organization-requests',
     });
   }
+  // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 인사이트
+  if (isAdmin && serviceApplicationCount > 0) {
+    aiSummary.push({
+      id: 'ai-service-apps',
+      message: `서비스 신청 ${serviceApplicationCount}건이 대기 중입니다.`,
+      level: serviceApplicationCount > 3 ? 'warning' : 'info',
+      link: '/operator/service-enrollments',
+    });
+  }
 
   // Block 3: Action Queue
   const actionQueue: ActionItem[] = [];
@@ -127,6 +158,23 @@ function buildDashboardConfig(data: KpaExtendedData): OperatorDashboardConfig {
       label: '콘텐츠 등록 필요',
       count: 0,
       link: '/operator/content',
+    });
+  }
+  // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Action Queue
+  if (isAdmin) {
+    if (serviceApplicationCount > 0) {
+      actionQueue.push({
+        id: 'aq-service-apps',
+        label: '서비스 신청 검토',
+        count: serviceApplicationCount,
+        link: '/operator/service-enrollments',
+      });
+    }
+    actionQueue.push({
+      id: 'aq-policy-check',
+      label: '서비스 정책 점검',
+      count: 0,
+      link: '/operator/operators',
     });
   }
 
@@ -170,6 +218,11 @@ function buildDashboardConfig(data: KpaExtendedData): OperatorDashboardConfig {
     { id: 'qa-enrollments', label: '서비스 신청', link: '/operator/service-enrollments', icon: '📋' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },
+    // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Quick Actions
+    ...(isAdmin ? [
+      { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
+      { id: 'qa-operators', label: '운영자 관리', link: '/operator/operators', icon: '⚙️' },
+    ] : []),
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog: validLog, quickActions };
@@ -178,6 +231,9 @@ function buildDashboardConfig(data: KpaExtendedData): OperatorDashboardConfig {
 // ─── Component ───
 
 export default function KpaOperatorDashboard() {
+  const { user } = useAuth();
+  const isAdmin = user?.roles?.includes('kpa:admin') ?? false;
+
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -187,13 +243,24 @@ export default function KpaOperatorDashboard() {
     setError(null);
     try {
       // Promise.allSettled: 개별 실패로 전체가 중단되지 않음
-      const results = await Promise.allSettled([
+      const fetches: Promise<any>[] = [
         operatorApi.getSummary(),
         apiClient.get('/members', { status: 'pending', pageSize: 1 }),
-      ]);
+      ];
+      // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin용 추가 데이터 fetch
+      if (isAdmin) {
+        fetches.push(
+          apiClient.get('/members', { pageSize: 1 }),
+          apiClient.get('/organization-join-requests/pending', { limit: 1 }),
+        );
+      }
+
+      const results = await Promise.allSettled(fetches);
 
       const summaryRes = results[0].status === 'fulfilled' ? results[0].value : null;
       const membersRes = results[1].status === 'fulfilled' ? results[1].value : null;
+      const totalMembersRes = isAdmin && results[2]?.status === 'fulfilled' ? results[2].value : null;
+      const serviceAppsRes = isAdmin && results[3]?.status === 'fulfilled' ? results[3].value : null;
 
       // Log individual failures
       results.forEach((r, i) => {
@@ -205,15 +272,17 @@ export default function KpaOperatorDashboard() {
       const extData: KpaExtendedData = {
         summary: summaryRes?.data ?? null,
         pendingMembers: (membersRes as any)?.total ?? (membersRes as any)?.data?.total ?? 0,
+        totalMembers: (totalMembersRes as any)?.total ?? (totalMembersRes as any)?.data?.total ?? 0,
+        serviceApplicationCount: (serviceAppsRes as any)?.data?.pagination?.total ?? 0,
       };
 
-      setConfig(buildDashboardConfig(extData));
+      setConfig(buildDashboardConfig(extData, isAdmin));
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');
     }
     setLoading(false);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     fetchData();
