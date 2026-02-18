@@ -33,3 +33,6 @@ export { PharmacyBlogPage } from './PharmacyBlogPage';
 
 // WO-STORE-TEMPLATE-PROFILE-V1: 스토어 템플릿 선택
 export { PharmacyTemplatePage } from './PharmacyTemplatePage';
+
+// WO-STORE-BLOCK-ENGINE-V1: 스토어 블록 레이아웃 빌더
+export { LayoutBuilderPage } from './LayoutBuilderPage';

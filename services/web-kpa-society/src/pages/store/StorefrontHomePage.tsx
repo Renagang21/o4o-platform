@@ -1,64 +1,29 @@
 /**
- * StorefrontHomePage — Public Store Home (Block-based)
+ * StorefrontHomePage — Public Store Home (Block Engine)
  *
- * WO-STORE-TEMPLATE-PROFILE-V1
+ * WO-STORE-BLOCK-ENGINE-V1
+ * WO-STORE-BLOCK-REGISTRY-V1: Registry 기반 렌더링
+ * WO-STORE-ENGINE-HARDENING-V1: channels 가시성 제어
  *
  * 경로: /store/:slug
  * 공개 페이지 — 인증 불필요
  *
- * Template Profile에 따라 블록 순서/구성이 달라짐:
- * - BASIC: Hero → Featured Products → Blog Preview → Tablet 안내 → Footer
- * - COMMERCE_FOCUS: Hero → Featured Products → Categories → Blog Preview → Footer
- * - CONTENT_FOCUS: Hero → Blog Preview → About → Featured Products → Footer
- * - MINIMAL: Hero → Featured Products → Footer
+ * StoreBlockRegistry에서 블록 컴포넌트를 lookup하여 렌더링.
+ * visibilityGuard로 채널 미활성 블록 자동 숨김.
  */
 
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-
-// ============================================================================
-// Types
-// ============================================================================
-
-type TemplateProfile = 'BASIC' | 'COMMERCE_FOCUS' | 'CONTENT_FOCUS' | 'MINIMAL';
-type BlockType = 'HERO' | 'FEATURED_PRODUCTS' | 'BLOG_PREVIEW' | 'ABOUT' | 'TABLET_NOTICE';
-
-interface StoreData {
-  name: string;
-  slug: string;
-  description?: string;
-  logo?: string;
-  hero_image?: string;
-  templateProfile: TemplateProfile;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  sale_price?: number;
-  images?: Array<{ url: string }>;
-  category: string;
-}
-
-interface BlogPostPreview {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt?: string;
-  publishedAt?: string;
-}
-
-// ============================================================================
-// Template → Block Order Mapping
-// ============================================================================
-
-const TEMPLATE_BLOCKS: Record<TemplateProfile, BlockType[]> = {
-  BASIC: ['HERO', 'FEATURED_PRODUCTS', 'BLOG_PREVIEW', 'TABLET_NOTICE'],
-  COMMERCE_FOCUS: ['HERO', 'FEATURED_PRODUCTS', 'BLOG_PREVIEW'],
-  CONTENT_FOCUS: ['HERO', 'BLOG_PREVIEW', 'ABOUT', 'FEATURED_PRODUCTS'],
-  MINIMAL: ['HERO', 'FEATURED_PRODUCTS'],
-};
+import { useParams } from 'react-router-dom';
+import {
+  StoreBlockRegistry,
+  type StoreBlock,
+  type StoreBlockType,
+  type StoreChannels,
+  type BlockRenderContext,
+  type StoreData,
+  type Product,
+  type BlogPostPreview,
+} from '@o4o/ui';
 
 // ============================================================================
 // API Helpers
@@ -86,180 +51,18 @@ function getTabletPrefix(service: string = 'glycopharm'): string {
   return service === 'kpa' ? '/kpa/tablet' : '/tablet';
 }
 
-// ============================================================================
-// Block Components
-// ============================================================================
-
-function HeroBlock({ store }: { store: StoreData }) {
-  const bgStyle = store.hero_image
-    ? {
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url(${store.hero_image})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }
-    : undefined;
-
-  return (
-    <div
-      style={{
-        borderRadius: '12px',
-        margin: '16px',
-        overflow: 'hidden',
-        ...bgStyle,
-      }}
-    >
-      <div
-        style={{
-          padding: '32px 24px',
-          color: '#fff',
-          ...(store.hero_image ? {} : { background: 'linear-gradient(135deg, #3b82f6, #2563eb)' }),
-        }}
-      >
-        {store.logo && (
-          <img
-            src={store.logo}
-            alt={store.name}
-            style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.5)', marginBottom: '12px', objectFit: 'cover' }}
-          />
-        )}
-        <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>{store.name}</h1>
-        {store.description && (
-          <p style={{ fontSize: '14px', opacity: 0.9, maxWidth: '400px', lineHeight: 1.6 }}>
-            {store.description}
-          </p>
-        )}
-      </div>
-    </div>
-  );
+function getSignagePrefix(service: string = 'glycopharm'): string {
+  return service === 'kpa' ? '/signage' : '/signage';
 }
 
-function FeaturedProductsBlock({ slug, products, storePrefix }: { slug: string; products: Product[]; storePrefix: string }) {
-  const navigate = useNavigate();
-  if (products.length === 0) return null;
-
-  return (
-    <div style={{ padding: '0 16px', marginBottom: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>추천 상품</h2>
-        <Link to={`${storePrefix}/${slug}/products`} style={{ fontSize: '13px', color: '#3b82f6', textDecoration: 'none' }}>
-          전체보기
-        </Link>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-        {products.slice(0, 4).map((p) => (
-          <button
-            key={p.id}
-            onClick={() => navigate(`${storePrefix}/${slug}/products/${p.id}`)}
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              overflow: 'hidden',
-              textAlign: 'left',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            <div style={{ aspectRatio: '1', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {p.images?.[0]?.url ? (
-                <img src={p.images[0].url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <span style={{ fontSize: '32px', color: '#cbd5e1' }}>📦</span>
-              )}
-            </div>
-            <div style={{ padding: '10px' }}>
-              <p style={{ fontSize: '13px', fontWeight: 500, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {p.name}
-              </p>
-              <p style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb', marginTop: '4px' }}>
-                {(p.sale_price || p.price).toLocaleString()}원
-              </p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+/** 블록 배열에서 특정 타입이 enabled인지 확인 */
+function isBlockEnabled(blocks: StoreBlock[], type: StoreBlockType): boolean {
+  return blocks.some((b) => b.type === type && b.enabled);
 }
 
-function BlogPreviewBlock({ slug, posts, storePrefix }: { slug: string; posts: BlogPostPreview[]; storePrefix: string }) {
-  if (posts.length === 0) return null;
-
-  return (
-    <div style={{ padding: '0 16px', marginBottom: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>블로그</h2>
-        <Link to={`${storePrefix}/${slug}/blog`} style={{ fontSize: '13px', color: '#3b82f6', textDecoration: 'none' }}>
-          전체보기
-        </Link>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {posts.slice(0, 3).map((post) => (
-          <Link
-            key={post.id}
-            to={`${storePrefix}/${slug}/blog/${post.slug}`}
-            style={{
-              display: 'block',
-              padding: '12px 16px',
-              backgroundColor: '#fff',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              textDecoration: 'none',
-              color: 'inherit',
-            }}
-          >
-            <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>{post.title}</p>
-            {post.excerpt && (
-              <p style={{ fontSize: '13px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {post.excerpt}
-              </p>
-            )}
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AboutBlock({ store }: { store: StoreData }) {
-  if (!store.description) return null;
-
-  return (
-    <div style={{ padding: '0 16px', marginBottom: '24px' }}>
-      <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>매장 소개</h2>
-      <div style={{ backgroundColor: '#fff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '16px' }}>
-        <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-          {store.description}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function TabletNoticeBlock({ slug, tabletPrefix }: { slug: string; tabletPrefix: string }) {
-  return (
-    <div style={{ padding: '0 16px', marginBottom: '24px' }}>
-      <Link
-        to={`${tabletPrefix}/${slug}`}
-        style={{
-          display: 'block',
-          padding: '16px',
-          backgroundColor: '#eff6ff',
-          borderRadius: '10px',
-          border: '1px solid #bfdbfe',
-          textDecoration: 'none',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '28px' }}>📱</span>
-          <div>
-            <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e40af' }}>매장 태블릿 주문</p>
-            <p style={{ fontSize: '13px', color: '#3b82f6' }}>태블릿에서 바로 주문 요청하기</p>
-          </div>
-        </div>
-      </Link>
-    </div>
-  );
+/** 블록의 config 값 조회 */
+function getBlockConfig(blocks: StoreBlock[], type: StoreBlockType): Record<string, any> {
+  return blocks.find((b) => b.type === type)?.config || {};
 }
 
 // ============================================================================
@@ -271,9 +74,13 @@ export function StorefrontHomePage({ service }: { service?: string }) {
   const apiBase = getApiBase(service);
   const storePrefix = getStorePrefix(service);
   const tabletPfx = getTabletPrefix(service);
+  const signagePfx = getSignagePrefix(service);
   const [store, setStore] = useState<StoreData | null>(null);
+  const [blocks, setBlocks] = useState<StoreBlock[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPostPreview[]>([]);
+  const [storeId, setStoreId] = useState('');
+  const [channels, setChannels] = useState<StoreChannels>({ B2C: true, TABLET: true, SIGNAGE: true });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -282,10 +89,12 @@ export function StorefrontHomePage({ service }: { service?: string }) {
 
     const load = async () => {
       try {
-        // Fetch store info + template profile in parallel
-        const [storeRes, templateRes] = await Promise.all([
+        // Fetch store info + layout in parallel
+        const [storeRes, layoutRes] = await Promise.all([
           fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}`),
-          fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/template`).catch(() => ({ data: { templateProfile: 'BASIC' } })),
+          fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/layout`).catch(() => ({
+            data: { blocks: [{ type: 'HERO', enabled: true }, { type: 'PRODUCT_GRID', enabled: true, config: { limit: 4 } }] },
+          })),
         ]);
 
         const storeData: StoreData = {
@@ -294,16 +103,18 @@ export function StorefrontHomePage({ service }: { service?: string }) {
           description: storeRes.data.description,
           logo: storeRes.data.logo,
           hero_image: storeRes.data.hero_image,
-          templateProfile: templateRes.data.templateProfile || 'BASIC',
         };
         setStore(storeData);
 
-        // Fetch products and blog posts in parallel
-        const blocks = TEMPLATE_BLOCKS[storeData.templateProfile] || TEMPLATE_BLOCKS.BASIC;
+        const layoutBlocks: StoreBlock[] = layoutRes.data.blocks || [];
+        setBlocks(layoutBlocks);
+        setStoreId(layoutRes.data.storeId || '');
+        setChannels(layoutRes.data.channels || { B2C: true, TABLET: true, SIGNAGE: true });
 
+        // Fetch data for enabled blocks
         const promises: Promise<void>[] = [];
 
-        if (blocks.includes('FEATURED_PRODUCTS')) {
+        if (isBlockEnabled(layoutBlocks, 'PRODUCT_GRID')) {
           promises.push(
             fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/products/featured`)
               .then((res) => setProducts(res.data || []))
@@ -311,9 +122,11 @@ export function StorefrontHomePage({ service }: { service?: string }) {
           );
         }
 
-        if (blocks.includes('BLOG_PREVIEW')) {
+        if (isBlockEnabled(layoutBlocks, 'BLOG_LIST')) {
+          const blogConfig = getBlockConfig(layoutBlocks, 'BLOG_LIST');
+          const blogLimit = blogConfig.limit || 3;
           promises.push(
-            fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/blog?limit=3`)
+            fetchJson(`${apiBase}/stores/${encodeURIComponent(slug)}/blog?limit=${blogLimit}`)
               .then((res) => setBlogPosts(res.data || []))
               .catch(() => setBlogPosts([])),
           );
@@ -350,24 +163,29 @@ export function StorefrontHomePage({ service }: { service?: string }) {
     );
   }
 
-  const blocks = TEMPLATE_BLOCKS[store.templateProfile] || TEMPLATE_BLOCKS.BASIC;
+  // Build render context — shared by all blocks
+  const context: BlockRenderContext = {
+    store,
+    slug: slug!,
+    products,
+    blogPosts,
+    storePrefix,
+    tabletPrefix: tabletPfx,
+    signagePrefix: signagePfx,
+    service: service || 'glycopharm',
+    storeId,
+    channels,
+  };
 
-  // Block renderer
-  const renderBlock = (block: BlockType) => {
-    switch (block) {
-      case 'HERO':
-        return <HeroBlock key="hero" store={store} />;
-      case 'FEATURED_PRODUCTS':
-        return <FeaturedProductsBlock key="products" slug={slug!} products={products} storePrefix={storePrefix} />;
-      case 'BLOG_PREVIEW':
-        return <BlogPreviewBlock key="blog" slug={slug!} posts={blogPosts} storePrefix={storePrefix} />;
-      case 'ABOUT':
-        return <AboutBlock key="about" store={store} />;
-      case 'TABLET_NOTICE':
-        return <TabletNoticeBlock key="tablet" slug={slug!} tabletPrefix={tabletPfx} />;
-      default:
-        return null;
-    }
+  // Registry-based block renderer — no switch/case, with visibility guard
+  const renderBlock = (block: StoreBlock) => {
+    if (!block.enabled) return null;
+    const definition = StoreBlockRegistry[block.type];
+    if (!definition) return null;
+    // WO-STORE-ENGINE-HARDENING-V1: policy/channel guard
+    if (definition.visibilityGuard && !definition.visibilityGuard(context)) return null;
+    const BlockComponent = definition.component;
+    return <BlockComponent key={block.type} block={block} context={context} />;
   };
 
   return (
@@ -388,7 +206,7 @@ export function StorefrontHomePage({ service }: { service?: string }) {
         </div>
       </header>
 
-      {/* Content — block-based rendering */}
+      {/* Content — registry-based block rendering */}
       <main style={{ maxWidth: '640px', margin: '0 auto' }}>
         {blocks.map(renderBlock)}
       </main>

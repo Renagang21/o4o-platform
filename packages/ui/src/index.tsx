@@ -626,3 +626,6 @@ export * from './corner-display';
 
 // Content Discovery Components (Phase 1)
 export * from './content-discovery';
+
+// Store Block Engine (WO-STORE-BLOCK-REGISTRY-V1)
+export * from './store-blocks';

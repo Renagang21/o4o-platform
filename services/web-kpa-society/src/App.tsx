@@ -88,7 +88,7 @@ import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchO
 // Platform Home (WO-KPA-HOME-FOUNDATION-V1) - legacy, kept for reference
 // import { HomePage } from './pages/platform';
 import TestCenterPage from './pages/TestCenterPage';
-import { TestCenterStep2Page } from './pages/test-center';
+import { TestMainPage, TestHubPage, TestStorePage } from './pages/test-center';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -103,7 +103,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -310,9 +310,11 @@ function App() {
           {/* Debug Pages (CLAUDE.md Section 14) */}
           <Route path="/__debug__/api" element={<ApiDebugPage />} />
 
-          {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
+          {/* Test Center (WO-KPA-A-TEST-CENTER-PHASE1-MAIN-PAGE-V1) */}
           <Route path="/test" element={<TestCenterPage />} />
-          <Route path="/test/step2" element={<TestCenterStep2Page />} />
+          <Route path="/test/main" element={<TestMainPage />} />
+          <Route path="/test/hub" element={<TestHubPage />} />
+          <Route path="/test/store" element={<TestStorePage />} />
           <Route path="/test-center" element={<Navigate to="/test" replace />} />
 
           {/* =========================================================
@@ -386,6 +388,8 @@ function App() {
           <Route path="/pharmacy/kpa-blog" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyBlogPage service="kpa" /></PharmacyGuard></Layout>} />
           {/* 스토어 템플릿 (WO-STORE-TEMPLATE-PROFILE-V1) */}
           <Route path="/pharmacy/template" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyTemplatePage /></PharmacyGuard></Layout>} />
+          {/* 스토어 블록 레이아웃 빌더 (WO-STORE-BLOCK-ENGINE-V1) */}
+          <Route path="/pharmacy/layout-builder" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><LayoutBuilderPage /></PharmacyGuard></Layout>} />
 
           {/* ========================================
            * 약국 서비스 신청 게이트

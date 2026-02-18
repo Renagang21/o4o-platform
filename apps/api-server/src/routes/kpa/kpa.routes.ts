@@ -80,6 +80,7 @@ import { createStoreContentController } from './controllers/store-content.contro
 import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
 import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
 import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
+import { createLayoutController } from '../glycopharm/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
@@ -212,6 +213,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
   router.use('/stores', kpaTemplateController);
+
+  const kpaLayoutController = createLayoutController(dataSource, coreRequireAuth as any);
+  router.use('/stores', kpaLayoutController);
 
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership

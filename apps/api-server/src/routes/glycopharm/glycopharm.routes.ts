@@ -22,6 +22,7 @@ import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
 import { createTabletController } from './controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
 import { createBlogController } from './controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
+import { createLayoutController } from './controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
@@ -313,6 +314,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const blogController = createBlogController(dataSource, coreRequireAuth as any);
   router.use('/stores', blogController);
+
+  // ============================================================================
+  // Store Layout Block Engine (WO-STORE-BLOCK-ENGINE-V1)
+  // /api/v1/glycopharm/stores/:slug/layout
+  // ============================================================================
+  const layoutController = createLayoutController(dataSource, coreRequireAuth as any);
+  router.use('/stores', layoutController);
 
   // ============================================================================
   // Store Routes (Public StoreFront API, slug 기반)
