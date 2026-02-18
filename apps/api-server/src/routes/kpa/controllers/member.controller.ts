@@ -284,6 +284,57 @@ export function createMemberController(
 
         const saved = await memberRepo.save(member);
 
+        // ============================================================
+        // WO-KPA-A-ROLE-APPROVAL-ALIGNMENT-V1: Sync User entity
+        // Uses raw SQL to avoid importing User entity (ESM rule compliance)
+        // ============================================================
+        try {
+          const kpaRole = member.membership_type === 'student' ? 'kpa:student' : 'kpa:pharmacist';
+
+          if (oldStatus === 'pending' && newStatus === 'active') {
+            // APPROVAL: Activate user + add KPA role
+            await dataSource.query(
+              `UPDATE users
+               SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
+               WHERE id = $1`,
+              [member.user_id, req.user!.id]
+            );
+            await dataSource.query(
+              `UPDATE users SET roles = array_append(roles, $2)
+               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
+              [member.user_id, kpaRole]
+            );
+          } else if (newStatus === 'suspended') {
+            // SUSPENSION: Remove KPA role + suspend user
+            await dataSource.query(
+              `UPDATE users SET roles = array_remove(roles, $2), status = 'suspended'
+               WHERE id = $1`,
+              [member.user_id, kpaRole]
+            );
+          } else if (newStatus === 'withdrawn') {
+            // WITHDRAWAL: Remove KPA role only
+            await dataSource.query(
+              `UPDATE users SET roles = array_remove(roles, $2)
+               WHERE id = $1`,
+              [member.user_id, kpaRole]
+            );
+          } else if (oldStatus === 'suspended' && newStatus === 'active') {
+            // REACTIVATION: Restore user + re-add KPA role
+            await dataSource.query(
+              `UPDATE users SET status = 'active', "isActive" = true
+               WHERE id = $1`,
+              [member.user_id]
+            );
+            await dataSource.query(
+              `UPDATE users SET roles = array_append(roles, $2)
+               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
+              [member.user_id, kpaRole]
+            );
+          }
+        } catch (syncError) {
+          console.error('[WO-KPA-A-ROLE-APPROVAL-ALIGNMENT-V1] User sync failed:', syncError);
+        }
+
         // 서비스 레코드 동기화 (kpa-a)
         const svcRecord = await serviceRepo.findOne({
           where: { member_id: member.id, service_key: 'kpa-a' },
