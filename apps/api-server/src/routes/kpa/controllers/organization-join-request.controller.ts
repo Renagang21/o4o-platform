@@ -367,6 +367,48 @@ export function createOrganizationJoinRequestRoutes(
         `Organization join request approved: ${id} by ${user.id}`
       );
 
+      // =====================================================================
+      // WO-KPA-C-APPROVAL-USER-SYNC-ALIGNMENT-V1: User.roles 동기화
+      // KPA-a 패턴과 동일 — 승인 시 User.roles에 kpa-c role 반영
+      // =====================================================================
+      try {
+        // request_type + requested_role → kpa-c role 매핑
+        let kpaCRole: string | null = null;
+
+        if (request.request_type === 'operator' || request.request_type === 'pharmacy_operator') {
+          kpaCRole = 'kpa-c:operator';
+        } else if (request.requested_role === 'admin') {
+          kpaCRole = 'kpa-c:branch_admin';
+        } else if (request.requested_role === 'manager' || request.requested_role === 'moderator') {
+          kpaCRole = 'kpa-c:operator';
+        }
+        // requested_role === 'member' → 일반 조직 멤버, 별도 kpa-c role 불필요
+
+        if (kpaCRole) {
+          // 멱등성: 이미 있으면 추가하지 않음
+          await dataSource.query(
+            `UPDATE users SET roles = array_append(roles, $2)
+             WHERE id = $1 AND NOT ($2 = ANY(roles))`,
+            [request.user_id, kpaCRole]
+          );
+
+          logger.info(
+            `[WO-KPA-C-APPROVAL-USER-SYNC] User ${request.user_id} role added: ${kpaCRole}`
+          );
+        }
+
+        // User.status ACTIVE 보장 (PENDING 상태에서 승인된 경우)
+        await dataSource.query(
+          `UPDATE users
+           SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
+           WHERE id = $1 AND status != 'active'`,
+          [request.user_id, user.id]
+        );
+      } catch (syncError) {
+        logger.error('[WO-KPA-C-APPROVAL-USER-SYNC] User sync failed:', syncError);
+        // best-effort: 동기화 실패해도 승인 자체는 유지
+      }
+
       // WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1: Send approval notification
       try {
         const userRepo = dataSource.getRepository(User);
