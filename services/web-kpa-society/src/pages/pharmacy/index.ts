@@ -21,3 +21,9 @@ export { PharmacySellPage } from './PharmacySellPage';
 
 // WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1: 매장 복사 자산 목록
 export { default as StoreAssetsPage } from './StoreAssetsPage';
+
+// WO-STORE-TABLET-REQUEST-CHANNEL-V1: 태블릿 주문 요청 관리
+export { TabletRequestsPage } from './TabletRequestsPage';
+
+// WO-STORE-BLOG-CHANNEL-V1: 매장 블로그 관리
+export { PharmacyBlogPage } from './PharmacyBlogPage';

@@ -20,6 +20,8 @@ import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
+import { createTabletController } from './controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
+import { createBlogController } from './controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
 import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
@@ -295,6 +297,22 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/operator', operatorController);
+
+  // ============================================================================
+  // Tablet Request Channel Routes (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
+  // /api/v1/glycopharm/stores/:slug/tablet/*
+  // Must be registered BEFORE storeController for path priority
+  // ============================================================================
+  const tabletController = createTabletController(dataSource, coreRequireAuth as any);
+  router.use('/stores', tabletController);
+
+  // ============================================================================
+  // Store Blog Channel Routes (WO-STORE-BLOG-CHANNEL-V1)
+  // /api/v1/glycopharm/stores/:slug/blog/*
+  // Must be registered BEFORE storeController for path priority
+  // ============================================================================
+  const blogController = createBlogController(dataSource, coreRequireAuth as any);
+  router.use('/stores', blogController);
 
   // ============================================================================
   // Store Routes (Public StoreFront API, slug 기반)

@@ -103,7 +103,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, TabletRequestsPage, PharmacyBlogPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -125,6 +125,13 @@ import { PharmacyGuard } from './components/auth/PharmacyGuard';
 
 // Debug Pages (CLAUDE.md Section 14)
 import { ApiDebugPage } from './pages/debug/ApiDebugPage';
+
+// Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
+import { TabletStorePage } from './pages/tablet/TabletStorePage';
+
+// Store Blog (WO-STORE-BLOG-CHANNEL-V1)
+import { StoreBlogPage } from './pages/store/StoreBlogPage';
+import { StoreBlogPostPage } from './pages/store/StoreBlogPostPage';
 
 // Legacy pages (for backward compatibility)
 import {
@@ -363,6 +370,10 @@ function App() {
           <Route path="/pharmacy/sales/b2c" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacySellPage /></PharmacyGuard></Layout>} />
           {/* 레거시 redirect: /pharmacy/sell → /pharmacy/sales/b2c */}
           <Route path="/pharmacy/sell" element={<Navigate to="/pharmacy/sales/b2c" replace />} />
+          {/* 태블릿 주문 요청 관리 (WO-STORE-TABLET-REQUEST-CHANNEL-V1) */}
+          <Route path="/pharmacy/tablet-requests" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><TabletRequestsPage /></PharmacyGuard></Layout>} />
+          {/* 블로그 관리 (WO-STORE-BLOG-CHANNEL-V1) */}
+          <Route path="/pharmacy/blog" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyBlogPage /></PharmacyGuard></Layout>} />
 
           {/* ========================================
            * 약국 서비스 신청 게이트
@@ -533,6 +544,13 @@ function App() {
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
+
+          {/* Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1) — fullscreen, no auth */}
+          <Route path="/tablet/:slug" element={<TabletStorePage />} />
+
+          {/* Store Blog (WO-STORE-BLOG-CHANNEL-V1) — public, no auth */}
+          <Route path="/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage /></Layout>} />
+          <Route path="/store/:slug/blog/:postSlug" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPostPage /></Layout>} />
 
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />

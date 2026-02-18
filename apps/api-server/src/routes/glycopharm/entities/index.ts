@@ -60,3 +60,16 @@ export {
 // Orders - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // GlycopharmOrder, GlycopharmOrderItem entities removed
 // New orders will use E-commerce Core with OrderType.GLYCOPHARM
+
+// Tablet Service Request (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
+export {
+  TabletServiceRequest,
+  type TabletServiceRequestStatus,
+  type TabletRequestItem,
+} from './tablet-service-request.entity.js';
+
+// Store Blog Post (WO-STORE-BLOG-CHANNEL-V1)
+export {
+  StoreBlogPost,
+  type StoreBlogPostStatus,
+} from './store-blog-post.entity.js';

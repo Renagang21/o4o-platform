@@ -62,11 +62,15 @@ export const assetSnapshotApi = {
 };
 
 // ─────────────────────────────────────────────────────
-// Store Asset Control — WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
-// Extension layer: publish status management
+// Store Asset Control — WO-KPA-A-ASSET-CONTROL-EXTENSION-V1 / V2
+// Extension layer: publish status + channel map + forced injection
 // ─────────────────────────────────────────────────────
 
 export type AssetPublishStatus = 'draft' | 'published' | 'hidden';
+
+export interface ChannelMap {
+  [channelKey: string]: boolean;
+}
 
 export interface StoreAssetItem {
   id: string;
@@ -80,6 +84,13 @@ export interface StoreAssetItem {
   publishStatus: AssetPublishStatus;
   controlId: string | null;
   controlUpdatedAt: string | null;
+  // V2 fields
+  channelMap: ChannelMap;
+  isForced: boolean;
+  forcedByAdminId: string | null;
+  forcedStartAt: string | null;
+  forcedEndAt: string | null;
+  isLocked: boolean;
 }
 
 export interface PaginatedStoreAssets {
@@ -112,4 +123,73 @@ export const storeAssetControlApi = {
       success: boolean;
       data: { snapshotId: string; publishStatus: AssetPublishStatus; updatedAt: string };
     }>(`/store-assets/${snapshotId}/publish`, { status }),
+
+  /**
+   * V2: Update channel map for an asset snapshot
+   */
+  updateChannelMap: (snapshotId: string, channelMap: ChannelMap) =>
+    apiClient.patch<{
+      success: boolean;
+      data: { snapshotId: string; channelMap: ChannelMap; updatedAt: string };
+    }>(`/store-assets/${snapshotId}/channel`, { channelMap }),
+};
+
+// ─────────────────────────────────────────────────────
+// Published Assets — WO-KPA-A-ASSET-RENDER-FILTER-INTEGRATION-V1
+// Public rendering: storefront / signage / promotion
+// ─────────────────────────────────────────────────────
+
+export interface PublishedAssetItem {
+  id: string;
+  organizationId: string;
+  sourceService: string;
+  sourceAssetId: string;
+  assetType: 'cms' | 'signage';
+  title: string;
+  contentJson: Record<string, unknown>;
+  createdAt: string;
+  publishStatus: AssetPublishStatus;
+  channelMap: ChannelMap;
+  isForced: boolean;
+  forcedStartAt: string | null;
+  forcedEndAt: string | null;
+}
+
+export interface PaginatedPublishedAssets {
+  items: PublishedAssetItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export const publishedAssetsApi = {
+  /**
+   * List published assets for a given organization (public)
+   */
+  list: (
+    organizationId: string,
+    params?: { channel?: string; type?: 'cms' | 'signage'; page?: number; limit?: number },
+  ) => {
+    const query: Record<string, string> = {};
+    if (params?.channel) query.channel = params.channel;
+    if (params?.type) query.type = params.type;
+    if (params?.page) query.page = String(params.page);
+    if (params?.limit) query.limit = String(params.limit);
+    return apiClient.get<{ success: boolean; data: PaginatedPublishedAssets }>(
+      `/published-assets/${organizationId}`,
+      Object.keys(query).length > 0 ? query : undefined,
+    );
+  },
+
+  /**
+   * Get single published asset detail (public)
+   */
+  get: (organizationId: string, snapshotId: string, channel?: string) => {
+    const query: Record<string, string> = {};
+    if (channel) query.channel = channel;
+    return apiClient.get<{ success: boolean; data: PublishedAssetItem }>(
+      `/published-assets/${organizationId}/${snapshotId}`,
+      Object.keys(query).length > 0 ? query : undefined,
+    );
+  },
 };

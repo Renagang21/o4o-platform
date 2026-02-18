@@ -153,6 +153,8 @@ import {
   GlycopharmRequestActionLog,
   GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
   // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
+  TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
+  StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -562,6 +564,8 @@ export const AppDataSource = new DataSource({
     GlycopharmEvent,
     GlycopharmRequestActionLog,
     GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
+    TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
+    StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================

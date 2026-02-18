@@ -4,6 +4,7 @@
  * WO-KPA-A-PAGE-ROLE-CLEANUP-V1
  * WO-KPA-A-DASHBOARD-OPERATIONAL-UPGRADE-V1
  * WO-KPA-A-B2B-SECTION-SIMPLIFICATION-V1
+ * WO-KPA-A-PUBLIC-RENDER-INTEGRATION-V2 (노출 상태 실제 published-assets 연동)
  *
  * Dashboard = "현재 상태 파악 → 문제 인지 → 바로 실행"
  *
@@ -30,6 +31,7 @@ import {
   getApplications,
   type ProductApplication,
 } from '../../api/pharmacyProducts';
+import { publishedAssetsApi } from '../../api/assetSnapshot';
 
 // ── Channel status display ──
 
@@ -62,6 +64,7 @@ function PharmacyDashboardContent() {
   const [channels, setChannels] = useState<ChannelOverview[]>([]);
   const [overview, setOverview] = useState<StoreHubOverview | null>(null);
   const [applications, setApplications] = useState<ProductApplication[]>([]);
+  const [publishedCounts, setPublishedCounts] = useState<{ home: number; signage: number; promotion: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,6 +81,21 @@ function PharmacyDashboardContent() {
     });
     return () => { cancelled = true; };
   }, []);
+
+  // Published-assets exposure counts (fire-and-forget, non-blocking)
+  useEffect(() => {
+    if (!currentOrganization?.id) return;
+    let cancelled = false;
+    const orgId = currentOrganization.id;
+    Promise.all([
+      publishedAssetsApi.list(orgId, { channel: 'home', limit: 1 }).then(r => r.data.total).catch(() => 0),
+      publishedAssetsApi.list(orgId, { channel: 'signage', limit: 1 }).then(r => r.data.total).catch(() => 0),
+      publishedAssetsApi.list(orgId, { channel: 'promotion', limit: 1 }).then(r => r.data.total).catch(() => 0),
+    ]).then(([home, signage, promotion]) => {
+      if (!cancelled) setPublishedCounts({ home, signage, promotion });
+    });
+    return () => { cancelled = true; };
+  }, [currentOrganization?.id]);
 
   // ── Derived data ──
 
@@ -228,21 +246,43 @@ function PharmacyDashboardContent() {
         </div>
       </section>
 
-      {/* [5] 노출 상태 요약 */}
+      {/* [5] 노출 상태 요약 — published-assets 실제 데이터 연동 */}
       <section style={S.section}>
         <h2 style={S.sectionTitle}>노출 상태</h2>
         <div style={S.statusCard}>
           <ExposureRow
             label="홈 노출"
-            active={b2cChannel?.status === 'APPROVED'}
-            desc={b2cChannel?.status === 'APPROVED' ? 'B2C 채널 활성' : 'B2C 채널 미승인'}
+            active={(publishedCounts?.home ?? 0) > 0}
+            desc={
+              publishedCounts
+                ? publishedCounts.home > 0
+                  ? `${publishedCounts.home}건 게시됨`
+                  : '게시된 콘텐츠 없음'
+                : '확인 중...'
+            }
           />
           <ExposureRow
             label="사이니지"
-            active={signageActiveCount > 0}
-            desc={signageActiveCount > 0 ? `${signageActiveCount}개 활성` : '미설정'}
+            active={(publishedCounts?.signage ?? 0) > 0}
+            desc={
+              publishedCounts
+                ? publishedCounts.signage > 0
+                  ? `${publishedCounts.signage}건 게시됨`
+                  : '게시된 콘텐츠 없음'
+                : '확인 중...'
+            }
           />
-          <ExposureRow label="프로모션" active={false} desc="미설정" />
+          <ExposureRow
+            label="프로모션"
+            active={(publishedCounts?.promotion ?? 0) > 0}
+            desc={
+              publishedCounts
+                ? publishedCounts.promotion > 0
+                  ? `${publishedCounts.promotion}건 게시됨`
+                  : '게시된 콘텐츠 없음'
+                : '확인 중...'
+            }
+          />
         </div>
       </section>
 

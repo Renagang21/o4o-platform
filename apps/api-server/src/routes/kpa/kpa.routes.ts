@@ -74,6 +74,8 @@ import { createPharmacyStoreConfigController } from './controllers/pharmacy-stor
 import { createPharmacyProductsController } from './controllers/pharmacy-products.controller.js';
 import { createAssetSnapshotController } from './controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from './controllers/store-asset-control.controller.js';
+import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
+import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
@@ -136,6 +138,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Admin Dashboard routes (WO-KPA-SOCIETY-DASHBOARD-P1-A)
   router.use('/admin', createAdminDashboardController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
+  router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
   router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
@@ -225,6 +230,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // PUBLIC / MIXED ROUTES — optionalAuth or mixed auth levels
   // ============================================================================
+
+  // Published Assets routes — public storefront/signage/promotion rendering
+  // WO-KPA-A-ASSET-RENDER-FILTER-INTEGRATION-V1
+  router.use('/published-assets', createPublishedAssetsController(dataSource));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

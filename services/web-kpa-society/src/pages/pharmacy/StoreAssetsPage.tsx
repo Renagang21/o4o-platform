@@ -6,11 +6,13 @@
  * WO-O4O-ASSET-COPY-NETURE-PILOT-V1 (sourceService column)
  * WO-KPA-A-HUB-TO-STORE-CLONE-FLOW-V2: ?tab= URL 파라미터 지원
  * WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1: StoreHubPage KPI 흡수, 단일 자산 진입점
+ * WO-KPA-A-ASSET-CONTROL-EXTENSION-V1: publish 상태 배지 + 토글
+ * WO-KPA-A-ASSET-CONTROL-EXTENSION-V2: forced 배지, locked 표시, 기간 노출
  *
  * 구조:
  * ├─ KPI 요약 (상품/콘텐츠/사이니지 집계)
  * ├─ 탭 (전체/CMS/사이니지)
- * └─ 복사된 자산 목록 (페이지네이션)
+ * └─ 자산 목록 (publish 상태 + forced/locked 표시, 페이지네이션)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -26,8 +28,14 @@ import {
   Package,
   LayoutGrid,
   Tv,
+  Lock,
+  ShieldAlert,
 } from 'lucide-react';
-import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
+import {
+  storeAssetControlApi,
+  type StoreAssetItem,
+  type AssetPublishStatus,
+} from '../../api/assetSnapshot';
 import { fetchStoreHubOverview, type StoreHubOverview } from '../../api/storeHub';
 
 type TabKey = 'all' | 'cms' | 'signage';
@@ -38,9 +46,20 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('ko-KR');
 }
 
+function formatShortDate(dateStr: string | null): string {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
+}
+
 const SERVICE_LABELS: Record<string, string> = {
   kpa: 'KPA',
   neture: 'Neture',
+};
+
+const STATUS_CONFIG: Record<AssetPublishStatus, { label: string; bg: string; text: string }> = {
+  draft: { label: '초안', bg: 'bg-slate-100', text: 'text-slate-600' },
+  published: { label: '게시됨', bg: 'bg-green-50', text: 'text-green-700' },
+  hidden: { label: '숨김', bg: 'bg-orange-50', text: 'text-orange-700' },
 };
 
 function parseTabParam(value: string | null): TabKey {
@@ -51,12 +70,13 @@ function parseTabParam(value: string | null): TabKey {
 export default function StoreAssetsPage() {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabKey>(() => parseTabParam(searchParams.get('tab')));
-  const [items, setItems] = useState<AssetSnapshotItem[]>([]);
+  const [items, setItems] = useState<StoreAssetItem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [overview, setOverview] = useState<StoreHubOverview | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
@@ -65,7 +85,7 @@ export default function StoreAssetsPage() {
     setError(null);
     try {
       const assetType = activeTab === 'all' ? undefined : activeTab;
-      const res = await assetSnapshotApi.list({ type: assetType, page, limit: PAGE_LIMIT });
+      const res = await storeAssetControlApi.list({ type: assetType, page, limit: PAGE_LIMIT });
       setItems(res.data.items || []);
       setTotal(res.data.total || 0);
     } catch (e: any) {
@@ -86,10 +106,35 @@ export default function StoreAssetsPage() {
     return () => { cancelled = true; };
   }, []);
 
-  // 탭 변경 시 1페이지로 리셋
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
     setPage(1);
+  };
+
+  // Publish status toggle: draft → published → hidden → draft
+  // Blocked for forced items
+  const handleToggleStatus = async (item: StoreAssetItem) => {
+    if (item.isForced) return;
+
+    const cycle: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
+    const currentIdx = cycle.indexOf(item.publishStatus);
+    const nextStatus = cycle[(currentIdx + 1) % cycle.length];
+
+    setUpdatingId(item.id);
+    try {
+      const res = await storeAssetControlApi.updatePublishStatus(item.id, nextStatus);
+      setItems(prev =>
+        prev.map(it =>
+          it.id === item.id
+            ? { ...it, publishStatus: res.data.publishStatus }
+            : it,
+        ),
+      );
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   const tabs: { key: TabKey; label: string; icon: typeof FileText }[] = [
@@ -113,7 +158,7 @@ export default function StoreAssetsPage() {
             <Link to="/pharmacy/dashboard" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">매장 자산</h1>
-          <p className="text-sm text-slate-500 mt-1">매장의 상품·콘텐츠·사이니지 자산을 한눈에 확인합니다</p>
+          <p className="text-sm text-slate-500 mt-1">매장의 상품·콘텐츠·사이니지 자산을 한눈에 확인하고 게시 상태를 관리합니다</p>
         </div>
         <button
           onClick={fetchItems}
@@ -187,32 +232,83 @@ export default function StoreAssetsPage() {
                   <th className="px-4 py-3 font-medium">유형</th>
                   <th className="px-4 py-3 font-medium">출처</th>
                   <th className="px-4 py-3 font-medium">제목</th>
+                  <th className="px-4 py-3 font-medium w-24">상태</th>
                   <th className="px-4 py-3 font-medium w-28">복사일</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {items.map(item => (
-                  <tr key={item.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.assetType === 'cms'
-                          ? 'bg-blue-50 text-blue-700'
-                          : 'bg-purple-50 text-purple-700'
-                      }`}>
-                        {item.assetType === 'cms' ? 'CMS' : '사이니지'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                        {SERVICE_LABELS[item.sourceService] || item.sourceService}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
-                  </tr>
-                ))}
+                {items.map(item => {
+                  const statusCfg = STATUS_CONFIG[item.publishStatus] || STATUS_CONFIG.draft;
+                  const isUpdating = updatingId === item.id;
+                  const isForced = item.isForced;
+                  const isLocked = item.isLocked;
+                  return (
+                    <tr key={item.id} className={`hover:bg-slate-50 ${isForced ? 'bg-red-50/30' : ''}`}>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                          item.assetType === 'cms'
+                            ? 'bg-blue-50 text-blue-700'
+                            : 'bg-purple-50 text-purple-700'
+                        }`}>
+                          {item.assetType === 'cms' ? 'CMS' : '사이니지'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                          {SERVICE_LABELS[item.sourceService] || item.sourceService}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-slate-900 truncate max-w-md">
+                          {item.title}
+                        </div>
+                        {/* Forced injection badge */}
+                        {isForced && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
+                              <ShieldAlert className="w-3 h-3" />
+                              강제노출
+                            </span>
+                            {isLocked && (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-400">
+                                <Lock className="w-3 h-3" />
+                              </span>
+                            )}
+                            {(item.forcedStartAt || item.forcedEndAt) && (
+                              <span className="text-[10px] text-slate-400">
+                                {formatShortDate(item.forcedStartAt)} ~ {formatShortDate(item.forcedEndAt)}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {isForced ? (
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 cursor-not-allowed opacity-70"
+                            title="관리자 강제노출 - 변경 불가"
+                          >
+                            <Lock className="w-3 h-3 mr-1" />
+                            {statusCfg.label}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleToggleStatus(item)}
+                            disabled={isUpdating}
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-50 ${statusCfg.bg} ${statusCfg.text}`}
+                            title="클릭하여 상태 변경"
+                          >
+                            {isUpdating ? (
+                              <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                            ) : null}
+                            {statusCfg.label}
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
