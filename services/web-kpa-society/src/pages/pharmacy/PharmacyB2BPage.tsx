@@ -190,7 +190,7 @@ export function PharmacyB2BPage() {
           {mockServiceB2B.map((service) => (
             <Link
               key={service.serviceId}
-              to={`/pharmacy/b2b/service/${service.serviceId}`}
+              to={`/pharmacy/sales/b2b/service/${service.serviceId}`}
               style={styles.serviceCard}
             >
               <div style={styles.serviceIcon}>{service.icon}</div>
@@ -360,7 +360,7 @@ export function PharmacyB2BPage() {
           ))}
         </div>
 
-        <Link to="/pharmacy/b2b/suppliers" style={styles.viewAllLink}>
+        <Link to="/pharmacy/sales/b2b/suppliers" style={styles.viewAllLink}>
           공급자 전체 보기 →
         </Link>
       </section>

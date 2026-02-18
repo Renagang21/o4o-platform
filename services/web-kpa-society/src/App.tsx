@@ -103,7 +103,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyHubPage, PharmacyDashboardPage, StoreHubPage, PharmacySellPage, StoreAssetsPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -338,23 +338,31 @@ function App() {
            * ======================================== */}
           {/* 게이트: 인증/승인 분기 → 승인 완료 시 /pharmacy/dashboard */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyPage /></PharmacyGuard></Layout>} />
-          {/* 약국 HUB: 공동 자원 탐색 (WO-KPA-A-PAGE-ROLE-CLEANUP-V1) */}
-          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubPage /></PharmacyGuard></Layout>} />
+          {/* 레거시: /pharmacy/hub → /pharmacy/dashboard (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
+          <Route path="/pharmacy/hub" element={<Navigate to="/pharmacy/dashboard" replace />} />
           {/* 내 매장관리: 매장 실행 요약 화면 */}
           <Route path="/pharmacy/dashboard" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyDashboardPage /></PharmacyGuard></Layout>} />
-          <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyB2BPage /></PharmacyGuard></Layout>} />
-          <Route path="/pharmacy/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierListPage /></PharmacyGuard></Layout>} />
-          <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierDetailPage /></PharmacyGuard></Layout>} />
-          <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyStorePage /></PharmacyGuard></Layout>} />
-          {/* 자산: 통합 자산 뷰 (기존 store-hub) */}
-          <Route path="/pharmacy/assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreHubPage /></PharmacyGuard></Layout>} />
+          {/* Sales 그룹 (WO-KPA-A-STORE-IA-REALIGN-PHASE2-V1) */}
+          <Route path="/pharmacy/sales/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyB2BPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/sales/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierListPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/sales/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierDetailPage /></PharmacyGuard></Layout>} />
+          {/* 레거시 redirect: /pharmacy/b2b → /pharmacy/sales/b2b */}
+          <Route path="/pharmacy/b2b" element={<Navigate to="/pharmacy/sales/b2b" replace />} />
+          <Route path="/pharmacy/b2b/suppliers" element={<Navigate to="/pharmacy/sales/b2b/suppliers" replace />} />
+          {/* 매장 설정 (WO-KPA-A-STORE-IA-REALIGN-PHASE3-V1) */}
+          <Route path="/pharmacy/settings" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyStorePage /></PharmacyGuard></Layout>} />
+          {/* 레거시 redirect: /pharmacy/store → /pharmacy/settings */}
+          <Route path="/pharmacy/store" element={<Navigate to="/pharmacy/settings" replace />} />
+          {/* 자산: 통합 자산 목록 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
+          <Route path="/pharmacy/assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />
           {/* 하위호환: /pharmacy/store-hub → /pharmacy/assets */}
           <Route path="/pharmacy/store-hub" element={<Navigate to="/pharmacy/assets" replace />} />
-          {/* WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1: 매장 복사 자산 목록 */}
+          {/* 하위호환: /pharmacy/store-assets (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
           <Route path="/pharmacy/store-assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyServicesPage /></PharmacyGuard></Layout>} />
-          {/* WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리 */}
-          <Route path="/pharmacy/sell" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacySellPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/sales/b2c" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacySellPage /></PharmacyGuard></Layout>} />
+          {/* 레거시 redirect: /pharmacy/sell → /pharmacy/sales/b2c */}
+          <Route path="/pharmacy/sell" element={<Navigate to="/pharmacy/sales/b2c" replace />} />
 
           {/* ========================================
            * 약국 서비스 신청 게이트

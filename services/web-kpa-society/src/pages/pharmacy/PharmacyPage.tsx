@@ -11,7 +11,7 @@
  * 3. 직역 미설정 → FunctionGateModal 표시
  * 4. 직역 != pharmacy_owner → "개설자만 이용 가능" + 돌아가기
  * 5. pharmacy_owner + 승인 없음 → PharmacyApprovalGatePage로 리다이렉트
- * 6. pharmacy_owner + 승인 완료 → /pharmacy/hub로 리다이렉트
+ * 6. pharmacy_owner + 승인 완료 → /pharmacy/dashboard로 리다이렉트
  */
 
 import { useEffect, useState } from 'react';

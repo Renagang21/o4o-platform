@@ -26,6 +26,7 @@ import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import type { ListProductsQueryDto } from '../dto/index.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 // ============================================================================
 // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1
@@ -164,6 +165,31 @@ async function queryVisibleProducts(
   };
 }
 
+// WO-STORE-SLUG-REDIRECT-LAYER-V1
+// Old slug → 301 redirect to new slug (SEO/brand asset protection)
+async function checkSlugRedirect(
+  dataSource: DataSource,
+  slug: string,
+  req: Request,
+  res: Response,
+): Promise<boolean> {
+  try {
+    const slugService = new StoreSlugService(dataSource);
+    const redirect = await slugService.findOldSlugRedirect(slug);
+    if (redirect) {
+      const newPath = req.originalUrl.replace(
+        `/${encodeURIComponent(slug)}`,
+        `/${encodeURIComponent(redirect.newSlug)}`,
+      );
+      res.redirect(301, newPath);
+      return true;
+    }
+  } catch {
+    // redirect check failure → fallback to original 404
+  }
+  return false;
+}
+
 export function createStoreController(dataSource: DataSource): Router {
   const router = Router();
   const service = new GlycopharmService(dataSource);
@@ -180,6 +206,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getActivePharmacyBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -206,6 +233,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -265,6 +293,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -310,6 +339,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -346,6 +376,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -387,6 +418,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -480,6 +512,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },

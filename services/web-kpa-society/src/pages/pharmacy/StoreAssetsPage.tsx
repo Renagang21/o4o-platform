@@ -1,15 +1,20 @@
 /**
- * StoreAssetsPage — 매장 복사 자산 목록
+ * StoreAssetsPage — 매장 자산 통합 페이지
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
  * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (pagination)
  * WO-O4O-ASSET-COPY-NETURE-PILOT-V1 (sourceService column)
+ * WO-KPA-A-HUB-TO-STORE-CLONE-FLOW-V2: ?tab= URL 파라미터 지원
+ * WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1: StoreHubPage KPI 흡수, 단일 자산 진입점
  *
- * 커뮤니티 CMS/Signage에서 "매장으로 복사"된 자산 스냅샷 목록 표시
+ * 구조:
+ * ├─ KPI 요약 (상품/콘텐츠/사이니지 집계)
+ * ├─ 탭 (전체/CMS/사이니지)
+ * └─ 복사된 자산 목록 (페이지네이션)
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   FileText,
   Monitor,
@@ -18,8 +23,12 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
+  Package,
+  LayoutGrid,
+  Tv,
 } from 'lucide-react';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
+import { fetchStoreHubOverview, type StoreHubOverview } from '../../api/storeHub';
 
 type TabKey = 'all' | 'cms' | 'signage';
 
@@ -34,13 +43,20 @@ const SERVICE_LABELS: Record<string, string> = {
   neture: 'Neture',
 };
 
+function parseTabParam(value: string | null): TabKey {
+  if (value === 'cms' || value === 'signage') return value;
+  return 'all';
+}
+
 export default function StoreAssetsPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<TabKey>(() => parseTabParam(searchParams.get('tab')));
   const [items, setItems] = useState<AssetSnapshotItem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [overview, setOverview] = useState<StoreHubOverview | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
@@ -61,6 +77,15 @@ export default function StoreAssetsPage() {
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
+  // KPI overview (fire-and-forget, non-blocking)
+  useEffect(() => {
+    let cancelled = false;
+    fetchStoreHubOverview()
+      .then(data => { if (!cancelled) setOverview(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   // 탭 변경 시 1페이지로 리셋
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
@@ -73,16 +98,22 @@ export default function StoreAssetsPage() {
     { key: 'signage', label: '사이니지', icon: Monitor },
   ];
 
+  const productCount = overview
+    ? (overview.products.glycopharm.totalCount + overview.products.cosmetics.listedCount)
+    : null;
+  const contentCount = overview?.contents.totalSlotCount ?? null;
+  const signageCount = overview?.signage.pharmacy.contentCount ?? null;
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-sm text-slate-500 mb-1">
-            <Link to="/pharmacy/assets" className="text-blue-600 hover:underline">&larr; 자산</Link>
+            <Link to="/pharmacy/dashboard" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">매장 자산</h1>
-          <p className="text-sm text-slate-500 mt-1">커뮤니티에서 복사된 CMS/사이니지 자산 목록</p>
+          <p className="text-sm text-slate-500 mt-1">매장의 상품·콘텐츠·사이니지 자산을 한눈에 확인합니다</p>
         </div>
         <button
           onClick={fetchItems}
@@ -92,6 +123,21 @@ export default function StoreAssetsPage() {
           새로고침
         </button>
       </div>
+
+      {/* KPI Summary */}
+      {overview && (
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <KpiCard icon={Package} label="상품" count={productCount} unit="건" />
+          <KpiCard icon={LayoutGrid} label="콘텐츠 슬롯" count={contentCount} unit="개" />
+          <KpiCard
+            icon={Tv}
+            label="사이니지"
+            count={signageCount}
+            unit="건"
+            extra={`활성 ${overview.signage.pharmacy.activeCount}건`}
+          />
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="border-b border-slate-200 mb-6">
@@ -197,6 +243,27 @@ export default function StoreAssetsPage() {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+function KpiCard({ icon: Icon, label, count, unit, extra }: {
+  icon: typeof Package;
+  label: string;
+  count: number | null;
+  unit: string;
+  extra?: string;
+}) {
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-4">
+      <div className="flex items-center gap-2 text-slate-500 text-xs mb-2">
+        <Icon className="w-4 h-4" />
+        {label}
+      </div>
+      <div className="text-xl font-semibold text-slate-900">
+        {count !== null ? `${count}${unit}` : '—'}
+      </div>
+      {extra && <div className="text-xs text-slate-400 mt-1">{extra}</div>}
     </div>
   );
 }

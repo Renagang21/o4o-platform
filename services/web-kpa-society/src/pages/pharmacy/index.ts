@@ -13,12 +13,8 @@ export { PharmacyServicesPage } from './PharmacyServicesPage';
 // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: 약국 서비스 신청 게이트
 export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
 
-// WO-KPA-A-PAGE-ROLE-CLEANUP-V1: Hub/Dashboard 분리
-export { PharmacyHubPage } from './PharmacyHubPage';
+// WO-KPA-A-PAGE-ROLE-CLEANUP-V1: Dashboard
 export { PharmacyDashboardPage } from './PharmacyDashboardPage';
-
-// WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1: 통합 매장 허브
-export { StoreHubPage } from './StoreHubPage';
 
 // WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리
 export { PharmacySellPage } from './PharmacySellPage';

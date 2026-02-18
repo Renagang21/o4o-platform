@@ -199,7 +199,7 @@ function PharmacyDashboardContent() {
           <StatusRow label="진열 상품" value={String(cosmeticsCount)} />
         </div>
         <button
-          onClick={() => navigate('/pharmacy/b2b')}
+          onClick={() => navigate('/pharmacy/sales/b2b')}
           style={S.b2bLink}
         >
           B2B 관리 &rarr;
@@ -250,11 +250,11 @@ function PharmacyDashboardContent() {
       <section>
         <h2 style={S.sectionTitle}>빠른 실행</h2>
         <div style={S.quickGrid}>
-          <QuickBtn icon="🤝" label="B2B 관리" onClick={() => navigate('/pharmacy/b2b')} />
-          <QuickBtn icon="📦" label="주문 관리" onClick={() => navigate('/pharmacy/sell')} />
-          <QuickBtn icon="📡" label="노출 관리" onClick={() => navigate('/pharmacy/store')} />
+          <QuickBtn icon="🤝" label="B2B 관리" onClick={() => navigate('/pharmacy/sales/b2b')} />
+          <QuickBtn icon="📦" label="주문 관리" onClick={() => navigate('/pharmacy/sales/b2c')} />
+          <QuickBtn icon="📡" label="노출 관리" onClick={() => navigate('/pharmacy/settings')} />
           <QuickBtn icon="🗂️" label="자산 보기" onClick={() => navigate('/pharmacy/assets')} />
-          <QuickBtn icon="⚙️" label="설정" onClick={() => navigate('/pharmacy/store')} />
+          <QuickBtn icon="⚙️" label="설정" onClick={() => navigate('/pharmacy/settings')} />
         </div>
       </section>
     </div>

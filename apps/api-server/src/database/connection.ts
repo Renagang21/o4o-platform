@@ -216,6 +216,7 @@ import {
   OrganizationProductListing,
   OrganizationChannel,
   OrganizationProductChannel,
+  KpaStoreAssetControl,
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -618,6 +619,8 @@ export const AppDataSource = new DataSource({
     OrganizationProductListing,
     OrganizationChannel,
     OrganizationProductChannel,
+    // WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
+    KpaStoreAssetControl,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================

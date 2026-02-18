@@ -116,7 +116,7 @@ export function ChannelLayerSection() {
             <ChannelCard
               key={ch.id}
               channel={ch}
-              onClick={() => navigate(`/pharmacy/sell?channel=${ch.channelType}`)}
+              onClick={() => navigate(`/pharmacy/sales/b2c?channel=${ch.channelType}`)}
             />
           ))}
         </div>

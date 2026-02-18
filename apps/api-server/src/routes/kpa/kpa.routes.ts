@@ -73,6 +73,7 @@ import { createStoreHubController } from './controllers/store-hub.controller.js'
 import { createPharmacyStoreConfigController } from './controllers/pharmacy-store-config.controller.js';
 import { createPharmacyProductsController } from './controllers/pharmacy-products.controller.js';
 import { createAssetSnapshotController } from './controllers/asset-snapshot.controller.js';
+import { createStoreAssetControlController } from './controllers/store-asset-control.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
@@ -181,6 +182,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));
+
+  // Store Asset Control routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V1)
+  router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership

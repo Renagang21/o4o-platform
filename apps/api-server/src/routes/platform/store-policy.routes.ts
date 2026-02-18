@@ -126,6 +126,16 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
       const slugRecord = await slugService.findBySlug(slug);
 
       if (!slugRecord || !slugRecord.isActive) {
+        // WO-STORE-SLUG-REDIRECT-LAYER-V1: old slug → 301 redirect
+        const redirect = await slugService.findOldSlugRedirect(slug);
+        if (redirect) {
+          const newPath = req.originalUrl.replace(
+            `/${encodeURIComponent(slug)}`,
+            `/${encodeURIComponent(redirect.newSlug)}`,
+          );
+          res.redirect(301, newPath);
+          return;
+        }
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },

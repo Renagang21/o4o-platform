@@ -21,3 +21,5 @@ export * from './organization-product-listing.entity.js';
 // WO-PHARMACY-HUB-OWNERSHIP-RESTRUCTURE-PHASE1-V1
 export * from './organization-channel.entity.js';
 export * from './organization-product-channel.entity.js';
+// WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
+export * from './kpa-store-asset-control.entity.js';

@@ -109,7 +109,7 @@ export function SupplierListPage() {
       {/* 헤더 */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <Link to="/pharmacy/b2b" style={styles.backLink}>← B2B 구매</Link>
+          <Link to="/pharmacy/sales/b2b" style={styles.backLink}>← B2B 구매</Link>
           <div style={styles.headerMain}>
             <div style={styles.pharmacyInfo}>
               <h1 style={styles.pageTitle}>공급자 목록</h1>
@@ -151,7 +151,7 @@ export function SupplierListPage() {
           {activeSuppliers.map((supplier) => (
             <Link
               key={supplier.id}
-              to={`/pharmacy/b2b/suppliers/${supplier.id}`}
+              to={`/pharmacy/sales/b2b/suppliers/${supplier.id}`}
               style={styles.supplierCard}
             >
               <div style={styles.cardHeader}>
