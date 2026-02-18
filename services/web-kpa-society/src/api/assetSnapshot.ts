@@ -193,3 +193,37 @@ export const publishedAssetsApi = {
     );
   },
 };
+
+// ─────────────────────────────────────────────────────
+// Store Content — WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+// Store-level independent content editing
+// ─────────────────────────────────────────────────────
+
+export interface StoreContentData {
+  snapshotId: string;
+  organizationId: string;
+  title: string;
+  contentJson: Record<string, unknown>;
+  source: 'store' | 'snapshot';
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+
+export const storeContentApi = {
+  /**
+   * Get editable content for a snapshot (store override or snapshot seed)
+   */
+  get: (snapshotId: string) =>
+    apiClient.get<{ success: boolean; data: StoreContentData }>(
+      `/store-contents/${snapshotId}`,
+    ),
+
+  /**
+   * Save (upsert) store content
+   */
+  save: (snapshotId: string, body: { title: string; contentJson: Record<string, unknown> }) =>
+    apiClient.put<{ success: boolean; data: StoreContentData }>(
+      `/store-contents/${snapshotId}`,
+      body,
+    ),
+};

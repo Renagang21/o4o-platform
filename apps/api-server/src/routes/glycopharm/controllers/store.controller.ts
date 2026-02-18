@@ -23,6 +23,7 @@ import { GlycopharmService } from '../services/glycopharm.service.js';
 import { FeaturedProductsService } from '../services/featured-products.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import type { TemplateProfile } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import type { ListProductsQueryDto } from '../dto/index.js';
@@ -603,6 +604,81 @@ export function createStoreController(dataSource: DataSource): Router {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update hero contents' },
+      });
+    }
+  });
+
+  // ============================================================================
+  // GET /stores/:slug/template — Template Profile 조회 (public)
+  // WO-STORE-TEMPLATE-PROFILE-V1
+  // ============================================================================
+  router.get('/:slug/template', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { slug } = req.params;
+      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+
+      if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: {
+          templateProfile: pharmacy.template_profile || 'BASIC',
+          theme: pharmacy.storefront_config?.theme || null,
+        },
+      });
+    } catch (error: any) {
+      console.error('[StoreController] GET /:slug/template error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch template profile' },
+      });
+    }
+  });
+
+  // ============================================================================
+  // PUT /stores/:slug/template — Template Profile 변경 (authenticated, owner only)
+  // WO-STORE-TEMPLATE-PROFILE-V1
+  // ============================================================================
+  const VALID_PROFILES: TemplateProfile[] = ['BASIC', 'COMMERCE_FOCUS', 'CONTENT_FOCUS', 'MINIMAL'];
+
+  router.put('/:slug/template', authenticate, async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { slug } = req.params;
+      const authReq = req as unknown as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
+      const { templateProfile } = req.body;
+
+      if (!templateProfile || !VALID_PROFILES.includes(templateProfile)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: `templateProfile must be one of: ${VALID_PROFILES.join(', ')}` },
+        });
+        return;
+      }
+
+      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+
+      if (!userId || pharmacy.created_by_user_id !== userId) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+        return;
+      }
+
+      await pharmacyRepo.update(pharmacy.id, { template_profile: templateProfile });
+
+      res.json({ success: true, data: { templateProfile } });
+    } catch (error: any) {
+      console.error('[StoreController] PUT /:slug/template error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to update template profile' },
       });
     }
   });

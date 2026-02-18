@@ -22,8 +22,14 @@ export { PharmacySellPage } from './PharmacySellPage';
 // WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1: 매장 복사 자산 목록
 export { default as StoreAssetsPage } from './StoreAssetsPage';
 
+// WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1: 매장 콘텐츠 편집
+export { default as StoreContentEditPage } from './StoreContentEditPage';
+
 // WO-STORE-TABLET-REQUEST-CHANNEL-V1: 태블릿 주문 요청 관리
 export { TabletRequestsPage } from './TabletRequestsPage';
 
 // WO-STORE-BLOG-CHANNEL-V1: 매장 블로그 관리
 export { PharmacyBlogPage } from './PharmacyBlogPage';
+
+// WO-STORE-TEMPLATE-PROFILE-V1: 스토어 템플릿 선택
+export { PharmacyTemplatePage } from './PharmacyTemplatePage';

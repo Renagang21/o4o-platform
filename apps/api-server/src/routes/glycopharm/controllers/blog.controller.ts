@@ -23,7 +23,7 @@ import { StoreBlogPost } from '../entities/store-blog-post.entity.js';
 import type { StoreBlogPostStatus } from '../entities/store-blog-post.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
-const SERVICE_KEY = 'glycopharm';
+const DEFAULT_SERVICE_KEY = 'glycopharm';
 
 /**
  * Generate URL-friendly slug from title.
@@ -40,9 +40,14 @@ function generateSlug(title: string): string {
     .substring(0, 140);
 }
 
+/**
+ * WO-KPA-STORE-CHANNEL-INTEGRATION-V1: serviceKey parameter
+ * Allows reuse for KPA stores with service_key='kpa'
+ */
 export function createBlogController(
   dataSource: DataSource,
   requireAuth: RequestHandler,
+  serviceKey: string = DEFAULT_SERVICE_KEY,
 ): Router {
   const router = Router();
   const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
@@ -218,7 +223,7 @@ export function createBlogController(
 
       const post = blogRepo.create({
         storeId: pharmacy.id,
-        serviceKey: SERVICE_KEY,
+        serviceKey,
         title,
         slug: finalSlug,
         excerpt: excerpt || content.substring(0, 200),

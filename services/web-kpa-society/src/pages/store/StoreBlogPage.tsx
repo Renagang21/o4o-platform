@@ -17,8 +17,10 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-export function StoreBlogPage() {
+/** WO-KPA-STORE-CHANNEL-INTEGRATION-V1: service prop for KPA reuse */
+export function StoreBlogPage({ service }: { service?: string }) {
   const { slug } = useParams<{ slug: string }>();
+  const storePrefix = service === 'kpa' ? '/kpa/store' : '/store';
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export function StoreBlogPage() {
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
-    fetchBlogPosts(slug, { page, limit: 10 })
+    fetchBlogPosts(slug, { page, limit: 10 }, service)
       .then((res) => {
         setPosts(res.data);
         setTotalPages(res.meta.totalPages);
@@ -70,7 +72,7 @@ export function StoreBlogPage() {
           {posts.map((post) => (
             <Link
               key={post.id}
-              to={`/store/${slug}/blog/${post.slug}`}
+              to={`${storePrefix}/${slug}/blog/${post.slug}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
               <article

@@ -33,7 +33,7 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-export function PharmacyBlogPage() {
+export function PharmacyBlogPage({ service }: { service?: string }) {
   const [slug, setSlug] = useState<string | null>(null);
   const [posts, setPosts] = useState<StaffBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,7 @@ export function PharmacyBlogPage() {
       const res = await fetchStaffBlogPosts(slug, {
         status: statusFilter === 'all' ? undefined : statusFilter,
         limit: 50,
-      });
+      }, service);
       setPosts(res.data);
       setError(null);
     } catch (e: any) {
@@ -121,14 +121,14 @@ export function PharmacyBlogPage() {
           content: editorContent,
           excerpt: editorExcerpt || undefined,
           slug: editorSlug !== editingPost.slug ? editorSlug : undefined,
-        });
+        }, service);
       } else {
         await createBlogPost(slug, {
           title: editorTitle,
           content: editorContent,
           excerpt: editorExcerpt || undefined,
           slug: editorSlug || undefined,
-        });
+        }, service);
       }
       setMode('list');
       await loadPosts();
@@ -142,7 +142,7 @@ export function PharmacyBlogPage() {
   const handlePublish = async (postId: string) => {
     if (!slug) return;
     try {
-      await publishBlogPost(slug, postId);
+      await publishBlogPost(slug, postId, service);
       await loadPosts();
     } catch (e: any) {
       setError(e.message);
@@ -152,7 +152,7 @@ export function PharmacyBlogPage() {
   const handleArchive = async (postId: string) => {
     if (!slug) return;
     try {
-      await archiveBlogPost(slug, postId);
+      await archiveBlogPost(slug, postId, service);
       await loadPosts();
     } catch (e: any) {
       setError(e.message);
@@ -162,7 +162,7 @@ export function PharmacyBlogPage() {
   const handleDelete = async (postId: string) => {
     if (!slug || !confirm('이 게시글을 삭제하시겠습니까?')) return;
     try {
-      await deleteBlogPost(slug, postId);
+      await deleteBlogPost(slug, postId, service);
       await loadPosts();
     } catch (e: any) {
       setError(e.message);

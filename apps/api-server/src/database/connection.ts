@@ -219,6 +219,7 @@ import {
   OrganizationChannel,
   OrganizationProductChannel,
   KpaStoreAssetControl,
+  KpaStoreContent, // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -625,6 +626,8 @@ export const AppDataSource = new DataSource({
     OrganizationProductChannel,
     // WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
     KpaStoreAssetControl,
+    // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+    KpaStoreContent,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================

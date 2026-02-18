@@ -17,8 +17,10 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-export function StoreBlogPostPage() {
+/** WO-KPA-STORE-CHANNEL-INTEGRATION-V1: service prop for KPA reuse */
+export function StoreBlogPostPage({ service }: { service?: string }) {
   const { slug, postSlug } = useParams<{ slug: string; postSlug: string }>();
+  const storePrefix = service === 'kpa' ? '/kpa/store' : '/store';
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function StoreBlogPostPage() {
   useEffect(() => {
     if (!slug || !postSlug) return;
     setLoading(true);
-    fetchBlogPost(slug, postSlug)
+    fetchBlogPost(slug, postSlug, service)
       .then((data) => {
         setPost(data);
         setError(null);
@@ -51,7 +53,7 @@ export function StoreBlogPostPage() {
         </h2>
         <p style={{ color: '#64748b', marginBottom: '24px' }}>{error || '존재하지 않는 게시글입니다.'}</p>
         <Link
-          to={`/store/${slug}/blog`}
+          to={`${storePrefix}/${slug}/blog`}
           style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '14px' }}
         >
           블로그 목록으로 돌아가기
@@ -64,7 +66,7 @@ export function StoreBlogPostPage() {
     <div style={{ maxWidth: '720px', margin: '0 auto', padding: '32px 16px' }}>
       {/* Back link */}
       <Link
-        to={`/store/${slug}/blog`}
+        to={`${storePrefix}/${slug}/blog`}
         style={{ display: 'inline-flex', alignItems: 'center', color: '#3b82f6', textDecoration: 'none', fontSize: '14px', marginBottom: '24px' }}
       >
         &larr; 블로그 목록

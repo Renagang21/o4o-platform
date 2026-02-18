@@ -62,6 +62,9 @@ export interface OperatorSummary {
     totalPosts: number;
     recentPosts: ForumPostItem[];
   };
+  store?: {
+    forcedExpirySoon: number;
+  };
 }
 
 interface OperatorSummaryResponse {

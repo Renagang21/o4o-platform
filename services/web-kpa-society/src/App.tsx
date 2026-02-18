@@ -103,7 +103,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, TabletRequestsPage, PharmacyBlogPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage } from './pages/pharmacy';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -132,6 +132,12 @@ import { TabletStorePage } from './pages/tablet/TabletStorePage';
 // Store Blog (WO-STORE-BLOG-CHANNEL-V1)
 import { StoreBlogPage } from './pages/store/StoreBlogPage';
 import { StoreBlogPostPage } from './pages/store/StoreBlogPostPage';
+
+// Store Home (WO-STORE-TEMPLATE-PROFILE-V1)
+import { StorefrontHomePage } from './pages/store/StorefrontHomePage';
+
+// Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
+import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
 // Legacy pages (for backward compatibility)
 import {
@@ -362,6 +368,8 @@ function App() {
           <Route path="/pharmacy/store" element={<Navigate to="/pharmacy/settings" replace />} />
           {/* 자산: 통합 자산 목록 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
           <Route path="/pharmacy/assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />
+          {/* 콘텐츠 편집 (WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1) */}
+          <Route path="/pharmacy/assets/content/:snapshotId/edit" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreContentEditPage /></PharmacyGuard></Layout>} />
           {/* 하위호환: /pharmacy/store-hub → /pharmacy/assets */}
           <Route path="/pharmacy/store-hub" element={<Navigate to="/pharmacy/assets" replace />} />
           {/* 하위호환: /pharmacy/store-assets (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
@@ -374,6 +382,10 @@ function App() {
           <Route path="/pharmacy/tablet-requests" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><TabletRequestsPage /></PharmacyGuard></Layout>} />
           {/* 블로그 관리 (WO-STORE-BLOG-CHANNEL-V1) */}
           <Route path="/pharmacy/blog" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyBlogPage /></PharmacyGuard></Layout>} />
+          {/* KPA 블로그 관리 (WO-KPA-STORE-CHANNEL-INTEGRATION-V1) — service_key='kpa' */}
+          <Route path="/pharmacy/kpa-blog" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyBlogPage service="kpa" /></PharmacyGuard></Layout>} />
+          {/* 스토어 템플릿 (WO-STORE-TEMPLATE-PROFILE-V1) */}
+          <Route path="/pharmacy/template" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyTemplatePage /></PharmacyGuard></Layout>} />
 
           {/* ========================================
            * 약국 서비스 신청 게이트
@@ -548,9 +560,26 @@ function App() {
           {/* Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1) — fullscreen, no auth */}
           <Route path="/tablet/:slug" element={<TabletStorePage />} />
 
+          {/* Store Home (WO-STORE-TEMPLATE-PROFILE-V1) — public, block-based storefront */}
+          <Route path="/store/:slug" element={<StorefrontHomePage />} />
+
           {/* Store Blog (WO-STORE-BLOG-CHANNEL-V1) — public, no auth */}
           <Route path="/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage /></Layout>} />
           <Route path="/store/:slug/blog/:postSlug" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPostPage /></Layout>} />
+
+          {/* ========================================
+           * KPA Store Channels (WO-KPA-STORE-CHANNEL-INTEGRATION-V1)
+           * GlycoPharm 채널을 KPA namespace로 이식
+           * PK 공유 구조로 동일 데이터 접근, API만 /api/v1/kpa 경유
+           * ======================================== */}
+          <Route path="/kpa/tablet/:slug" element={<TabletStorePage service="kpa" />} />
+          <Route path="/kpa/store/:slug" element={<StorefrontHomePage service="kpa" />} />
+          <Route path="/kpa/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage service="kpa" /></Layout>} />
+          <Route path="/kpa/store/:slug/blog/:postSlug" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPostPage service="kpa" /></Layout>} />
+
+          {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
+          <Route path="/content/:snapshotId/print" element={<PrintContentPage />} />
+          <Route path="/content/:snapshotId" element={<PublicContentViewPage />} />
 
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />

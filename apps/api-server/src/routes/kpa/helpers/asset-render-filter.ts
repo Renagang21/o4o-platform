@@ -2,14 +2,17 @@
  * Asset Render Filter — 공개 렌더링용 자산 필터링 헬퍼
  *
  * WO-KPA-A-ASSET-RENDER-FILTER-INTEGRATION-V1
+ * WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1: store content override (COALESCE)
  *
  * kpa_store_asset_controls 기반으로 실제 서비스 화면에 노출할 자산을 필터링.
+ * kpa_store_contents LEFT JOIN으로 매장 편집 콘텐츠 우선 적용.
  *
  * 필터링 정책:
  * 1. publish_status = 'published' (draft/hidden 제외)
  * 2. forced 항목: 기간 유효성 검증 (start/end)
  * 3. channel_map: 지정된 채널키가 true인 항목만
  * 4. control row 없음 → draft로 간주 → 렌더 제외
+ * 5. store content 존재 시 title/content_json 우선 사용
  */
 
 /**
@@ -97,17 +100,20 @@ export function buildPublishedAssetQuery(
       s.source_service AS "sourceService",
       s.source_asset_id AS "sourceAssetId",
       s.asset_type AS "assetType",
-      s.title,
-      s.content_json AS "contentJson",
+      COALESCE(sc.title, s.title) AS "title",
+      COALESCE(sc.content_json, s.content_json) AS "contentJson",
       s.created_at AS "createdAt",
       c.publish_status AS "publishStatus",
       c.channel_map AS "channelMap",
       c.is_forced AS "isForced",
       c.forced_start_at AS "forcedStartAt",
-      c.forced_end_at AS "forcedEndAt"
+      c.forced_end_at AS "forcedEndAt",
+      CASE WHEN sc.id IS NOT NULL THEN true ELSE false END AS "hasStoreContent"
     FROM o4o_asset_snapshots s
     INNER JOIN kpa_store_asset_controls c
       ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
+    LEFT JOIN kpa_store_contents sc
+      ON sc.snapshot_id = s.id AND sc.organization_id = s.organization_id
     WHERE ${whereClause}
     ORDER BY
       c.is_forced DESC,

@@ -76,6 +76,10 @@ import { createAssetSnapshotController } from './controllers/asset-snapshot.cont
 import { createStoreAssetControlController } from './controllers/store-asset-control.controller.js';
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
 import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
+import { createStoreContentController } from './controllers/store-content.controller.js';
+import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
+import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
+import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
@@ -190,6 +194,24 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Store Asset Control routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V1)
   router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
+
+  // Store Content routes (WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1)
+  router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
+
+  // ============================================================================
+  // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1
+  // PK 공유(glycopharm_pharmacies.id === kpa_organizations.id) 기반
+  // Tablet/Blog/Template 채널을 KPA 네임스페이스에서 제공
+  // /api/v1/kpa/stores/:slug/tablet|blog|template
+  // ============================================================================
+  const kpaTabletController = createTabletController(dataSource, coreRequireAuth as any);
+  router.use('/stores', kpaTabletController);
+
+  const kpaBlogController = createBlogController(dataSource, coreRequireAuth as any, 'kpa');
+  router.use('/stores', kpaBlogController);
+
+  const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
+  router.use('/stores', kpaTemplateController);
 
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership

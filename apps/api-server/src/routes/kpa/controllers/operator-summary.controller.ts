@@ -54,6 +54,7 @@ export function createOperatorSummaryController(
       signageMediaCount,
       signagePlaylistCount,
       forumPostCount,
+      forcedExpirySoonCount,
     ] = await Promise.all([
       contentService.listForHome(['notice', 'news', 'hero', 'promo'], 5),
       signageService.listForHome(3, 3),
@@ -75,6 +76,14 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM forum_post
         WHERE status = 'publish' AND organization_id IS NULL
       `),
+      // WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 (7일 이내)
+      dataSource.query(`
+        SELECT COUNT(*) as count FROM kpa_store_asset_controls
+        WHERE is_forced = true
+          AND forced_end_at IS NOT NULL
+          AND forced_end_at > NOW()
+          AND forced_end_at <= NOW() + INTERVAL '7 days'
+      `),
     ]);
 
     res.json({
@@ -93,6 +102,9 @@ export function createOperatorSummaryController(
         forum: {
           totalPosts: parseInt(forumPostCount[0]?.count || '0', 10),
           recentPosts,
+        },
+        store: {
+          forcedExpirySoon: parseInt(forcedExpirySoonCount[0]?.count || '0', 10),
         },
       },
     });
