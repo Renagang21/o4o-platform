@@ -2,40 +2,31 @@
  * QuickActionsSection - 약국 운영자 빠른 실행
  *
  * WO-PHARMACY-OPERATOR-ACTIONS-V1
+ * WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1: pharmacy_join → 독립 API
  *
  * 약국경영 대시보드에서 운영자가 실행 가능한 액션:
- * - 서비스 신청 (JoinRequest pharmacy_join)
- * - 운영자 권한 관리 (JoinRequest pharmacy_operator)
+ * - 서비스 신청 (pharmacyRequestApi — 개인 신원 확장)
  */
 
 import { useState } from 'react';
-import { useOrganization } from '../../../contexts';
-import { joinRequestApi } from '../../../api/joinRequestApi';
+import { pharmacyRequestApi } from '../../../api/pharmacyRequestApi';
 
 type ActionState = 'idle' | 'confirm' | 'submitting' | 'success' | 'error' | 'duplicate';
 
 export function QuickActionsSection() {
-  const { currentOrganization } = useOrganization();
-
   const [serviceApplyState, setServiceApplyState] = useState<ActionState>('idle');
-  const [operatorState, setOperatorState] = useState<ActionState>('idle');
 
-  async function handleJoinRequest(
-    type: 'pharmacy_join' | 'pharmacy_operator',
-    role: string,
-    setState: (s: ActionState) => void,
-  ) {
+  async function handlePharmacyRequest(setState: (s: ActionState) => void) {
     setState('submitting');
     try {
-      await joinRequestApi.create({
-        organizationId: currentOrganization.id,
-        requestType: type,
-        requestedRole: role,
+      await pharmacyRequestApi.create({
+        pharmacyName: '',
+        businessNumber: '',
       });
       setState('success');
     } catch (err: any) {
-      const code = err?.response?.data?.code || err?.code || '';
-      if (code === 'DUPLICATE_REQUEST') {
+      const code = err?.code || '';
+      if (code === 'DUPLICATE_REQUEST' || code === 'ALREADY_MEMBER') {
         setState('duplicate');
       } else {
         setState('error');
@@ -107,9 +98,6 @@ export function QuickActionsSection() {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '14px', fontWeight: 600, color: '#1e40af' }}>
               {label} 요청을 보내시겠습니까?
-            </div>
-            <div style={{ fontSize: '12px', color: '#3b82f6', marginTop: '2px' }}>
-              {currentOrganization.name} 대상
             </div>
           </div>
           <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
@@ -192,28 +180,16 @@ export function QuickActionsSection() {
         gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
         gap: '12px',
       }}>
-        {/* 서비스 신청 — JoinRequest pharmacy_join */}
+        {/* 서비스 신청 — pharmacyRequestApi */}
         {renderActionButton(
           'service-apply',
-          '📝',
+          '\uD83D\uDCDD',
           '서비스 신청',
           '약국 경영 지원 서비스를 신청합니다',
           serviceApplyState,
           () => setServiceApplyState('confirm'),
-          () => handleJoinRequest('pharmacy_join', 'member', setServiceApplyState),
+          () => handlePharmacyRequest(setServiceApplyState),
           () => setServiceApplyState('idle'),
-        )}
-
-        {/* 운영자 권한 관리 — JoinRequest pharmacy_operator */}
-        {renderActionButton(
-          'operator-manage',
-          '👤',
-          '운영자 권한 요청',
-          '약국 운영자 권한을 요청합니다',
-          operatorState,
-          () => setOperatorState('confirm'),
-          () => handleJoinRequest('pharmacy_operator', 'admin', setOperatorState),
-          () => setOperatorState('idle'),
         )}
       </div>
     </section>

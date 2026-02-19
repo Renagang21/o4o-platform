@@ -25,3 +25,5 @@ export * from './organization-product-channel.entity.js';
 export * from './kpa-store-asset-control.entity.js';
 // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
 export * from './kpa-store-content.entity.js';
+// WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+export * from './kpa-pharmacy-request.entity.js';

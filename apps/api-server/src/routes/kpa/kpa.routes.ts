@@ -68,6 +68,7 @@ import { createOperatorSummaryController } from './controllers/operator-summary.
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
+import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
 import { createStewardController } from './controllers/steward.controller.js';
 import { createStoreHubController } from './controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from './controllers/pharmacy-store-config.controller.js';
@@ -173,6 +174,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
   router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Pharmacy Request routes (WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1)
+  // 약국 서비스 신청 — 개인 신원 확장 (OrganizationJoinRequest에서 분리)
+  router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
   router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));

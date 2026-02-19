@@ -12,7 +12,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { joinRequestApi } from '../../api/joinRequestApi';
+import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 type PageState = 'form' | 'submitting' | 'success' | 'duplicate' | 'already_member' | 'error';
@@ -58,17 +58,12 @@ export function PharmacyApprovalGatePage() {
     if (!isFormValid) return;
     setState('submitting');
     try {
-      await joinRequestApi.create({
-        organizationId: 'a0000000-0a00-4000-a000-000000000001',
-        requestType: 'pharmacy_join',
-        requestedRole: 'admin',
-        payload: {
-          businessRegistrationNumber: form.businessRegistrationNumber.trim(),
-          taxInvoiceEmail: form.taxInvoiceEmail.trim(),
-          pharmacyName: form.pharmacyName.trim(),
-          pharmacyPhone: form.pharmacyPhone.trim(),
-          ownerPhone: form.ownerPhone.trim(),
-        },
+      await pharmacyRequestApi.create({
+        pharmacyName: form.pharmacyName.trim(),
+        businessNumber: form.businessRegistrationNumber.trim(),
+        pharmacyPhone: form.pharmacyPhone.trim(),
+        ownerPhone: form.ownerPhone.trim(),
+        taxInvoiceEmail: form.taxInvoiceEmail.trim(),
       });
       setState('success');
     } catch (err: any) {

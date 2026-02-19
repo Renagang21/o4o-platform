@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthModal } from '../../contexts/AuthModalContext';
-import { joinRequestApi } from '../../api/joinRequestApi';
+import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 /** Admin/operator roles that should NOT see pharmacist function selection */
@@ -50,15 +50,13 @@ export function PharmacyPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await joinRequestApi.getMyRequests();
+        const res = await pharmacyRequestApi.getMyRequests();
         if (cancelled) return;
-        const requests = res?.data || [];
-        const pharmacyRequest = requests.find(
-          (r: any) => r.requestType === 'pharmacy_join'
-        );
-        if (pharmacyRequest?.status === 'approved') {
+        const items = res?.data?.items || [];
+        const approved = items.find((r) => r.status === 'approved');
+        if (approved) {
           setApprovalStatus('approved');
-        } else if (pharmacyRequest) {
+        } else if (items.some((r) => r.status === 'pending')) {
           setApprovalStatus('pending');
         } else {
           setApprovalStatus('none');

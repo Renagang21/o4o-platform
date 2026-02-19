@@ -1,22 +1,16 @@
 /**
- * MyRequestsSection - 이 약국의 요청 상태 요약
+ * MyRequestsSection - 내 약국 서비스 신청 상태 요약
  *
  * WO-PHARMACY-JOIN-REQUEST-UX-CONSOLIDATION-V1
- * WO-PHARMACY-CONTEXT-AUTO-REFRESH-V1: 승인 감지 → Context 자동 refresh
+ * WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1: 독립 pharmacy-requests API 사용
  *
- * 현재 pharmacy Context 기준으로 내 JoinRequest를 표시.
- * 승인된 요청 감지 시 OrganizationContext를 자동 갱신.
+ * 개인의 약국 서비스 신청 내역을 표시.
  * 읽기 전용, 최대 5건.
  */
 
-import { useState, useEffect, useRef } from 'react';
-import { useOrganization } from '../../../contexts';
-import { joinRequestApi } from '../../../api/joinRequestApi';
-import type { OrganizationJoinRequest } from '../../../types/joinRequest';
-import {
-  JOIN_REQUEST_STATUS_LABELS,
-  JOIN_REQUEST_TYPE_LABELS,
-} from '../../../types/joinRequest';
+import { useState, useEffect } from 'react';
+import { pharmacyRequestApi } from '../../../api/pharmacyRequestApi';
+import type { PharmacyRequest } from '../../../api/pharmacyRequestApi';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   pending: { bg: '#fef9c3', text: '#854d0e', border: '#fde68a' },
@@ -24,18 +18,18 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
   rejected: { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
 };
 
-const PHARMACY_REQUEST_TYPES = new Set(['pharmacy_join', 'pharmacy_operator']);
+const STATUS_LABELS: Record<string, string> = {
+  pending: '검토 대기',
+  approved: '승인',
+  rejected: '반려',
+};
+
 const MAX_DISPLAY = 5;
 
 export function MyRequestsSection() {
-  const { currentOrganization, refreshAccessibleOrganizations } = useOrganization();
-  const [requests, setRequests] = useState<OrganizationJoinRequest[]>([]);
+  const [requests, setRequests] = useState<PharmacyRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [refreshNotice, setRefreshNotice] = useState(false);
-
-  // Track previously known request IDs + statuses to detect approval
-  const prevStatusMapRef = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
     let cancelled = false;
@@ -44,46 +38,11 @@ export function MyRequestsSection() {
       try {
         setLoading(true);
         setError(false);
-        const response = await joinRequestApi.getMyRequests();
+        const response = await pharmacyRequestApi.getMyRequests();
         if (cancelled) return;
 
-        // Filter: current pharmacy + pharmacy request types only
-        const filtered = response.data
-          .filter(
-            (r) =>
-              r.organization_id === currentOrganization.id &&
-              PHARMACY_REQUEST_TYPES.has(r.request_type),
-          )
-          .slice(0, MAX_DISPLAY);
-
-        // Detect newly approved requests
-        const prevMap = prevStatusMapRef.current;
-        let hasNewApproval = false;
-
-        for (const req of filtered) {
-          const prevStatus = prevMap.get(req.id);
-          if (prevStatus && prevStatus !== 'approved' && req.status === 'approved') {
-            hasNewApproval = true;
-          }
-        }
-
-        // Update prev map
-        const nextMap = new Map<string, string>();
-        for (const req of filtered) {
-          nextMap.set(req.id, req.status);
-        }
-        prevStatusMapRef.current = nextMap;
-
-        setRequests(filtered);
-
-        // Trigger context refresh on approval detection
-        if (hasNewApproval) {
-          refreshAccessibleOrganizations();
-          setRefreshNotice(true);
-          setTimeout(() => {
-            if (!cancelled) setRefreshNotice(false);
-          }, 4000);
-        }
+        const items = (response.data?.items || []).slice(0, MAX_DISPLAY);
+        setRequests(items);
       } catch {
         if (!cancelled) setError(true);
       } finally {
@@ -93,7 +52,7 @@ export function MyRequestsSection() {
 
     load();
     return () => { cancelled = true; };
-  }, [currentOrganization.id, refreshAccessibleOrganizations]);
+  }, []);
 
   return (
     <section>
@@ -103,24 +62,8 @@ export function MyRequestsSection() {
         fontWeight: 600,
         color: '#0f172a',
       }}>
-        이 약국의 요청 상태
+        약국 서비스 신청 내역
       </h2>
-
-      {/* 권한 반영 알림 */}
-      {refreshNotice && (
-        <div style={{
-          padding: '10px 16px',
-          marginBottom: '12px',
-          background: '#eff6ff',
-          border: '1px solid #bfdbfe',
-          borderRadius: '8px',
-          fontSize: '13px',
-          color: '#1e40af',
-          fontWeight: 500,
-        }}>
-          권한이 반영되었습니다.
-        </div>
-      )}
 
       {loading && (
         <div style={emptyStyle}>불러오는 중...</div>
@@ -134,7 +77,7 @@ export function MyRequestsSection() {
 
       {!loading && !error && requests.length === 0 && (
         <div style={emptyStyle}>
-          이 약국에 대한 요청 내역이 없습니다
+          약국 서비스 신청 내역이 없습니다
         </div>
       )}
 
@@ -157,7 +100,7 @@ export function MyRequestsSection() {
               >
                 <div>
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>
-                    {JOIN_REQUEST_TYPE_LABELS[req.request_type]}
+                    {req.pharmacy_name} ({req.business_number})
                   </div>
                   <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
                     {new Date(req.created_at).toLocaleDateString('ko-KR')}
@@ -174,7 +117,7 @@ export function MyRequestsSection() {
                   fontWeight: 600,
                   flexShrink: 0,
                 }}>
-                  {JOIN_REQUEST_STATUS_LABELS[req.status]}
+                  {STATUS_LABELS[req.status] || req.status}
                 </span>
               </div>
             );

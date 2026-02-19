@@ -220,6 +220,7 @@ import {
   OrganizationProductChannel,
   KpaStoreAssetControl,
   KpaStoreContent, // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+  KpaPharmacyRequest, // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -628,6 +629,8 @@ export const AppDataSource = new DataSource({
     KpaStoreAssetControl,
     // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
     KpaStoreContent,
+    // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+    KpaPharmacyRequest,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
