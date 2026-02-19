@@ -66,6 +66,14 @@ router.get(
   asyncHandler(AuthController.me)
 );
 
+// PATCH /api/v1/auth/me/profile - Update pharmacist profile
+// WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1
+router.patch(
+  '/me/profile',
+  requireAuth,
+  asyncHandler(AuthController.updateProfile)
+);
+
 // POST /api/v1/auth/logout - Logout current session
 router.post(
   '/logout',

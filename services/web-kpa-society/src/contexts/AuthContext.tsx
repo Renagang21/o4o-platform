@@ -326,10 +326,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const setPharmacistFunction = async (fn: PharmacistFunction) => {
     if (user) {
-      // TODO: API call to update pharmacistFunction on server
-      // await authClient.api.put('/auth/me/pharmacist-function', { pharmacistFunction: fn });
-      const updatedUser = { ...user, pharmacistFunction: fn };
-      setUser(updatedUser);
+      // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: DB 영속화
+      try {
+        await authClient.api.patch('/auth/me/profile', { pharmacistFunction: fn });
+      } catch (err) {
+        console.error('Failed to save pharmacistFunction:', err);
+      }
+      setUser({ ...user, pharmacistFunction: fn });
     }
   };
 
@@ -340,10 +343,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const setPharmacistRole = async (role: PharmacistRole) => {
     if (user) {
-      // TODO: API call to update pharmacistRole on server
-      // await authClient.api.put('/auth/me/pharmacist-role', { pharmacistRole: role });
-      const updatedUser = { ...user, pharmacistRole: role };
-      setUser(updatedUser);
+      // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: DB 영속화
+      try {
+        await authClient.api.patch('/auth/me/profile', { pharmacistRole: role });
+      } catch (err) {
+        console.error('Failed to save pharmacistRole:', err);
+      }
+      setUser({ ...user, pharmacistRole: role });
     }
   };
 

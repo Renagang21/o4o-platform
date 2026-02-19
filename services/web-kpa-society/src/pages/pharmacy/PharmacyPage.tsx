@@ -1,17 +1,21 @@
 /**
  * PharmacyPage - 약국경영 게이트 페이지
  *
- * WO-KPA-PHARMACY-MANAGEMENT-V1
- * WO-KPA-PHARMACY-GATE-V1: 약국경영 게이트 화면
- * WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: 인증 상태별 분기 로직
+ * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거, 자체 게이트 로직
+ *
+ * 이 페이지가 약국 서비스의 1차 진입점이며, 모든 분기를 자체 처리한다.
+ * (PharmacyGuard는 운영 라우트(dashboard, store 등)에만 적용)
  *
  * 분기 로직:
  * 1. 미로그인 → "로그인 필요" + 로그인 링크
- * 2. 관리자/운영자 → "접근 불가" (직능 선택 불필요)
+ * 2. 관리자/운영자 → "접근 불가"
  * 3. 직역 미설정 → FunctionGateModal 표시
- * 4. 직역 != pharmacy_owner → "개설자만 이용 가능" + 돌아가기
- * 5. pharmacy_owner + 승인 없음 → PharmacyApprovalGatePage로 리다이렉트
- * 6. pharmacy_owner + 승인 완료 → /pharmacy/dashboard로 리다이렉트
+ * 4. 직역 != pharmacy_owner → "개설자만 이용 가능" + 신청 링크
+ * 5. pharmacy_owner + loading → 로딩 표시
+ * 6. pharmacy_owner + 승인 완료 → /pharmacy/dashboard
+ * 7. pharmacy_owner + 대기 중 → 대기 안내
+ * 8. API 에러 → 에러 안내 (401 시 로그인 링크)
+ * 9. pharmacy_owner + 미신청 → /pharmacy/approval
  */
 
 import { useEffect, useState } from 'react';
@@ -248,6 +252,7 @@ export function PharmacyPage() {
 
   // 8. API 에러 → 구체적 안내
   if (approvalStatus === 'error') {
+    const is401 = approvalError?.includes('인증') || approvalError?.includes('로그인');
     return (
       <div style={styles.page}>
         <div style={styles.container}>
@@ -260,13 +265,19 @@ export function PharmacyPage() {
               {approvalError || '승인 상태를 확인할 수 없습니다.'}
             </p>
             <div style={styles.actions}>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                style={styles.joinBtn}
-              >
-                새로고침
-              </button>
+              {is401 ? (
+                <Link to="/login?returnTo=/pharmacy" style={styles.joinBtn}>
+                  다시 로그인
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  style={styles.joinBtn}
+                >
+                  새로고침
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => navigate(-1)}

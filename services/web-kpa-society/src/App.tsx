@@ -349,8 +349,10 @@ function App() {
            * 약국 경영지원 (실 서비스 경로)
            * WO-KPA-A-STORE-ROUTE-REALIGN-V1: Hub/Store/Assets IA 정렬
            * ======================================== */}
-          {/* 게이트: 인증/승인 분기 → 승인 완료 시 /pharmacy/dashboard */}
-          <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyPage /></PharmacyGuard></Layout>} />
+          {/* 게이트: 인증/승인 분기 → 승인 완료 시 /pharmacy/dashboard
+           * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거
+           * PharmacyPage 자체에 완전한 게이트 로직 존재 (미로그인/관리자/직역 미설정/비개설자) */}
+          <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
           {/* 약국 HUB: 공동 자원 탐색 공간 (WO-KPA-A-PHARMACY-HUB-MENU-ALIGNMENT-V1) */}
           <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubPage /></PharmacyGuard></Layout>} />
           {/* 내 매장관리: 매장 실행 요약 화면 */}
@@ -403,7 +405,8 @@ function App() {
            * - Service User 로그인 제거, Platform User 단일 인증
            * - 약국 승인 미완료 시 신청 폼 표시
            * ======================================== */}
-          <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyApprovalGatePage /></PharmacyGuard></Layout>} />
+          {/* WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거 (자체 인증 체크) */}
+          <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyApprovalGatePage /></Layout>} />
 
           {/* ========================================
            * 근무약사 업무 화면 (개인 기준)

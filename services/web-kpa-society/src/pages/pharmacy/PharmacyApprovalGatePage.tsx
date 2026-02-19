@@ -2,16 +2,18 @@
  * PharmacyApprovalGatePage - 약국 서비스 이용 신청 게이트
  *
  * WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
+ * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거, 자체 인증 체크
  *
- * 약국 개설자(pharmacy_owner)가 약국 서비스에 접근할 때,
- * 운영자 승인이 없으면 이 페이지에서 신청하도록 안내한다.
+ * PharmacyPage(case 4/9)에서 리다이렉트되어 진입.
+ * 미인증 시 로그인 페이지로 리다이렉트 (자체 보호).
  *
  * 필수 입력: 사업자등록증 번호, 세금계산서 이메일, 약국 이름, 약국 전화번호, 개설자 핸드폰 번호
  * 신청 후 또는 취소 시 이전 페이지로 돌아간다.
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
@@ -35,6 +37,7 @@ const initialForm: FormData = {
 
 export function PharmacyApprovalGatePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [state, setState] = useState<PageState>('form');
   const [form, setForm] = useState<FormData>(initialForm);
   const [errorDetail, setErrorDetail] = useState<string>('');
@@ -99,6 +102,11 @@ export function PharmacyApprovalGatePage() {
     navigate(-1);
   };
 
+  // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: 자체 인증 체크
+  if (!user) {
+    return <Navigate to="/login?returnTo=/pharmacy/approval" replace />;
+  }
+
   // 신청 완료
   if (state === 'success') {
     return (
@@ -157,10 +165,10 @@ export function PharmacyApprovalGatePage() {
             <h1 style={styles.title}>이미 승인된 계정입니다</h1>
             <p style={styles.desc}>
               약국 서비스 이용이 승인된 상태입니다.<br />
-              다시 로그인하시면 약국 서비스를 이용하실 수 있습니다.
+              약국 서비스로 이동하여 이용하실 수 있습니다.
             </p>
-            <button type="button" onClick={() => navigate('/login')} style={styles.submitBtn}>
-              다시 로그인
+            <button type="button" onClick={() => navigate('/pharmacy')} style={styles.submitBtn}>
+              약국 서비스로 이동
             </button>
             <div style={{ marginTop: spacing.sm }}>
               <button type="button" onClick={handleGoBack} style={styles.backBtn}>
@@ -250,9 +258,16 @@ export function PharmacyApprovalGatePage() {
           </div>
 
           {state === 'error' && (
-            <p style={styles.error}>
-              {errorDetail || '신청에 실패했습니다. 다시 시도해 주세요.'}
-            </p>
+            <div style={{ marginBottom: spacing.md, textAlign: 'center' }}>
+              <p style={styles.error}>
+                {errorDetail || '신청에 실패했습니다. 다시 시도해 주세요.'}
+              </p>
+              {errorDetail?.includes('로그인') && (
+                <Link to="/login?returnTo=/pharmacy/approval" style={{ fontSize: '0.813rem', color: colors.primary }}>
+                  로그인 페이지로 이동
+                </Link>
+              )}
+            </div>
           )}
 
           <div style={styles.actions}>
