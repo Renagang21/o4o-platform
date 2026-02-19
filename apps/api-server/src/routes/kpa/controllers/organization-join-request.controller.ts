@@ -372,29 +372,42 @@ export function createOrganizationJoinRequestRoutes(
       // KPA-a 패턴과 동일 — 승인 시 User.roles에 kpa-c role 반영
       // =====================================================================
       try {
-        // request_type + requested_role → kpa-c role 매핑
-        let kpaCRole: string | null = null;
-
-        if (request.request_type === 'operator' || request.request_type === 'pharmacy_operator') {
-          kpaCRole = 'kpa-c:operator';
-        } else if (request.requested_role === 'admin') {
-          kpaCRole = 'kpa-c:branch_admin';
-        } else if (request.requested_role === 'manager' || request.requested_role === 'moderator') {
-          kpaCRole = 'kpa-c:operator';
-        }
-        // requested_role === 'member' → 일반 조직 멤버, 별도 kpa-c role 불필요
-
-        if (kpaCRole) {
-          // 멱등성: 이미 있으면 추가하지 않음
+        // WO-KPA-PHARMACY-IDENTITY-REALIGN-V1: pharmacy_join은 KPA-a 도메인
+        // → kpa-c role 매핑 대신 pharmacist_role(1차 정체성) 설정
+        if (request.request_type === 'pharmacy_join') {
           await dataSource.query(
-            `UPDATE users SET roles = array_append(roles, $2)
-             WHERE id = $1 AND NOT ($2 = ANY(roles))`,
-            [request.user_id, kpaCRole]
+            `UPDATE users SET pharmacist_role = 'pharmacy_owner'
+             WHERE id = $1`,
+            [request.user_id]
           );
-
           logger.info(
-            `[WO-KPA-C-APPROVAL-USER-SYNC] User ${request.user_id} role added: ${kpaCRole}`
+            `[WO-KPA-PHARMACY-IDENTITY-REALIGN] User ${request.user_id} pharmacist_role set to pharmacy_owner`
           );
+        } else {
+          // request_type + requested_role → kpa-c role 매핑
+          let kpaCRole: string | null = null;
+
+          if (request.request_type === 'operator' || request.request_type === 'pharmacy_operator') {
+            kpaCRole = 'kpa-c:operator';
+          } else if (request.requested_role === 'admin') {
+            kpaCRole = 'kpa-c:branch_admin';
+          } else if (request.requested_role === 'manager' || request.requested_role === 'moderator') {
+            kpaCRole = 'kpa-c:operator';
+          }
+          // requested_role === 'member' → 일반 조직 멤버, 별도 kpa-c role 불필요
+
+          if (kpaCRole) {
+            // 멱등성: 이미 있으면 추가하지 않음
+            await dataSource.query(
+              `UPDATE users SET roles = array_append(roles, $2)
+               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
+              [request.user_id, kpaCRole]
+            );
+
+            logger.info(
+              `[WO-KPA-C-APPROVAL-USER-SYNC] User ${request.user_id} role added: ${kpaCRole}`
+            );
+          }
         }
 
         // User.status ACTIVE 보장 (PENDING 상태에서 승인된 경우)
