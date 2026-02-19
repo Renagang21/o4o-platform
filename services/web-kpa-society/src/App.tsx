@@ -170,10 +170,13 @@ function LoginRedirect() {
   const { openLoginModal, setOnLoginSuccess } = useAuthModal();
 
   useEffect(() => {
-    const returnTo = searchParams.get('returnTo');
-    const from = (location.state as { from?: string })?.from || returnTo || '/';
-    navigate(from, { replace: true });
+    // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+    // 항상 / (공개 페이지)로 이동 — 가드된 경로로 직접 이동하면 Guard→/login→Guard 무한 루프 발생
+    navigate('/', { replace: true });
 
+    // from/returnTo는 로그인 성공 후에만 사용
+    const returnTo = searchParams.get('returnTo') ||
+                     (location.state as { from?: string })?.from;
     if (returnTo) {
       setOnLoginSuccess(() => {
         navigate(returnTo);
