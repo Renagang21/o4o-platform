@@ -544,8 +544,8 @@ export function AnnualReportFormPage() {
                     type="text"
                     style={styles.input}
                     value={formData.pharmacy?.businessNumber || ''}
-                    onChange={(e) => updatePharmacy('businessNumber', e.target.value)}
-                    placeholder="000-00-00000"
+                    onChange={(e) => updatePharmacy('businessNumber', e.target.value.replace(/\D/g, ''))}
+                    placeholder="0000000000"
                   />
                 </div>
                 <div style={styles.formCell}>

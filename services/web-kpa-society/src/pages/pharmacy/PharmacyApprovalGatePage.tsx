@@ -45,8 +45,12 @@ export function PharmacyApprovalGatePage() {
     form.pharmacyPhone.trim() !== '' &&
     form.ownerPhone.trim() !== '';
 
+  /** 숫자 전용 필드: 비숫자 제거 */
+  const DIGITS_ONLY_FIELDS: (keyof FormData)[] = ['businessRegistrationNumber', 'pharmacyPhone', 'ownerPhone'];
+
   const handleChange = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    const value = DIGITS_ONLY_FIELDS.includes(field) ? e.target.value.replace(/\D/g, '') : e.target.value;
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
@@ -144,7 +148,7 @@ export function PharmacyApprovalGatePage() {
               <label style={styles.label}>사업자등록증 번호</label>
               <input
                 type="text"
-                placeholder="000-00-00000"
+                placeholder="0000000000"
                 value={form.businessRegistrationNumber}
                 onChange={handleChange('businessRegistrationNumber')}
                 style={styles.input}
@@ -180,7 +184,7 @@ export function PharmacyApprovalGatePage() {
               <label style={styles.label}>약국 전화번호</label>
               <input
                 type="tel"
-                placeholder="02-0000-0000"
+                placeholder="0200000000"
                 value={form.pharmacyPhone}
                 onChange={handleChange('pharmacyPhone')}
                 style={styles.input}
@@ -192,7 +196,7 @@ export function PharmacyApprovalGatePage() {
               <label style={styles.label}>개설자 핸드폰 번호</label>
               <input
                 type="tel"
-                placeholder="010-0000-0000"
+                placeholder="01000000000"
                 value={form.ownerPhone}
                 onChange={handleChange('ownerPhone')}
                 style={styles.input}

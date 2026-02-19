@@ -57,7 +57,7 @@ export function OfficersPage() {
       position: ROLE_LABELS[fd.get('role') as string] || fd.get('role') as string,
       role: fd.get('role') as string,
       pharmacy_name: fd.get('pharmacy_name') as string || undefined,
-      phone: fd.get('phone') as string || undefined,
+      phone: (fd.get('phone') as string)?.replace(/\D/g, '') || undefined,
       email: fd.get('email') as string || undefined,
       term_start: fd.get('term_start') as string || undefined,
       term_end: fd.get('term_end') as string || undefined,
@@ -266,7 +266,7 @@ export function OfficersPage() {
                     name="phone"
                     style={pageStyles.input}
                     defaultValue={editingOfficer?.phone || ''}
-                    placeholder="010-0000-0000"
+                    placeholder="01000000000"
                   />
                 </div>
                 <div style={pageStyles.formGroup}>

@@ -79,8 +79,8 @@ const menuItems: MenuItem[] = [
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '콘텐츠', href: '/news' },
-  { label: '내 매장관리', href: '/pharmacy/dashboard' },
   { label: '약국 HUB', href: '/pharmacy/hub' },
+  { label: '내 매장관리', href: '/pharmacy/dashboard' },
   { label: '운영 대시보드', href: '/operator' },
   { label: '테스트 센터', href: '/test' },
 ];
