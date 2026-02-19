@@ -129,7 +129,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
       id: 'ai-pending-members',
       message: `회원 승인 대기 ${pendingMembers}건이 있습니다. 신속한 처리를 권장합니다.`,
       level: pendingMembers > 5 ? 'warning' : 'info',
-      link: '/operator/organization-requests',
+      link: '/operator/members',
     });
   }
   // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 인사이트
@@ -149,7 +149,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
       id: 'aq-members',
       label: '가입 요청 검토',
       count: pendingMembers,
-      link: '/operator/organization-requests',
+      link: '/operator/members',
     });
   }
   if (contentCount === 0) {
@@ -214,7 +214,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
     { id: 'qa-docs', label: '자료실', link: '/operator/docs', icon: '📁' },
-    { id: 'qa-requests', label: '가입 요청', link: '/operator/organization-requests', icon: '👥' },
+    { id: 'qa-requests', label: '조직 요청', link: '/operator/organization-requests', icon: '👥' },
     { id: 'qa-enrollments', label: '서비스 신청', link: '/operator/service-enrollments', icon: '📋' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },

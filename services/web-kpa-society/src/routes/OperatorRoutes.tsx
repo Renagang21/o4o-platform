@@ -4,7 +4,7 @@
  * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
  * - 콘텐츠 CRUD (news, docs, forum) AdminRoutes에서 이동
  * - 요청 관리 (organization-requests, service-enrollments) AdminRoutes에서 이동
- * - members 제거 (Admin 구조 관리 영역)
+ * - members: WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1에서 복원 (KPI → 목록 연결)
  *
  * WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1:
  * - /operator 루트 → 5-Block 대시보드 렌더 (Hub 기능 흡수)
@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage } from '../pages/operator';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
@@ -62,6 +62,9 @@ export function OperatorRoutes() {
 
         {/* 게시판 */}
         <Route path="forum" element={<ForumPage />} />
+
+        {/* WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1: 회원 관리 (KpaMember 기반) */}
+        <Route path="members" element={<MemberManagementPage />} />
 
         {/* 조직 가입/역할 요청 관리 */}
         <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
