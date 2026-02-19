@@ -33,7 +33,7 @@ export function createPharmacyRequestRoutes(
   router.post('/', async (req: Request, res: Response) => {
     try {
       const user = (req as any).user;
-      if (!user?.userId) {
+      if (!user?.id) {
         return res.status(401).json({ success: false, error: '인증이 필요합니다.', code: 'AUTH_REQUIRED' });
       }
 
@@ -50,7 +50,7 @@ export function createPharmacyRequestRoutes(
       // Check if user already has pharmacy_owner role
       const [existingUser] = await dataSource.query(
         `SELECT pharmacist_role FROM users WHERE id = $1`,
-        [user.userId]
+        [user.id]
       );
       if (existingUser?.pharmacist_role === 'pharmacy_owner') {
         return res.status(409).json({
@@ -63,7 +63,7 @@ export function createPharmacyRequestRoutes(
       // Check for existing pending request
       const repo = getRepo();
       const existing = await repo.findOne({
-        where: { user_id: user.userId, status: 'pending' as const },
+        where: { user_id: user.id, status: 'pending' as const },
       });
       if (existing) {
         return res.status(409).json({
@@ -74,7 +74,7 @@ export function createPharmacyRequestRoutes(
       }
 
       const request = repo.create({
-        user_id: user.userId,
+        user_id: user.id,
         pharmacy_name: pharmacyName.trim(),
         business_number: businessNumber.replace(/\D/g, ''),
         pharmacy_phone: pharmacyPhone?.replace(/\D/g, '') || null,
@@ -99,7 +99,7 @@ export function createPharmacyRequestRoutes(
       const user = (req as any).user;
       const repo = getRepo();
       const items = await repo.find({
-        where: { user_id: user.userId },
+        where: { user_id: user.id },
         order: { created_at: 'DESC' },
       });
       return res.json({ success: true, data: { items } });
@@ -169,7 +169,7 @@ export function createPharmacyRequestRoutes(
 
       // Update request status
       request.status = 'approved';
-      request.approved_by = user.userId;
+      request.approved_by = user.id;
       request.approved_at = new Date();
       request.review_note = req.body.reviewNote || null;
       await repo.save(request);
@@ -202,7 +202,7 @@ export function createPharmacyRequestRoutes(
       }
 
       request.status = 'rejected';
-      request.approved_by = user.userId;
+      request.approved_by = user.id;
       request.approved_at = new Date();
       request.review_note = req.body.reviewNote || null;
       await repo.save(request);

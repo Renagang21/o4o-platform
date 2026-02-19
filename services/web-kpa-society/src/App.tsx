@@ -457,8 +457,8 @@ function App() {
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/demo/admin/*" element={<AdminRoutes />} />
 
-          {/* Operator Routes — /demo/operator → /hub 리다이렉트 */}
-          <Route path="/demo/operator/*" element={<Navigate to="/hub" replace />} />
+          {/* Operator Routes — /demo/operator → /operator 리다이렉트 */}
+          <Route path="/demo/operator/*" element={<Navigate to="/operator" replace />} />
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />

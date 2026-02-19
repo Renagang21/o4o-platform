@@ -7,7 +7,7 @@
  *
  * 정책:
  * - 미인증 → /login
- * - admin/operator → /hub (관리자 전용 인터페이스)
+ * - admin/operator → /operator (관리자 전용 인터페이스)
  * - pharmacy_owner 아닌 약사 → /dashboard
  * - pharmacy_owner → 통과
  */
@@ -36,9 +36,9 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  // admin/operator는 Hub로 리다이렉트
+  // admin/operator는 Operator 대시보드로 리다이렉트
   if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
-    return <Navigate to="/hub" replace />;
+    return <Navigate to="/operator" replace />;
   }
 
   // pharmacy_owner만 접근 허용
