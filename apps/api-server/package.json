@@ -31,6 +31,7 @@
     "db:seed:users": "npx tsx scripts/seed-users.ts",
     "db:seed:users:prod": "cross-env NODE_ENV=production npx tsx scripts/seed-users.ts",
     "db:seed:seller-dashboard": "npx tsx src/scripts/seed-seller-dashboard.ts",
+    "seed:kpa:signage": "npx tsx src/scripts/dev/init-kpa-signage.ts",
     "db:setup": "pnpm run migration:run && pnpm run db:seed",
     "db:start": "sudo systemctl start postgresql",
     "db:stop": "sudo systemctl stop postgresql",
