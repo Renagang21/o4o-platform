@@ -65,15 +65,25 @@ export class MigratePharmacyJoinToIndependentTable20260219000006 implements Migr
 
     // Step 2: pharmacy_join으로 인한 OrganizationMember 오염 정리
     // 대한약사회 UUID로 생성된 pharmacy_join 관련 멤버십 삭제
-    const deleted = await queryRunner.query(`
-      DELETE FROM organization_members
-      WHERE organization_id = 'a0000000-0a00-4000-a000-000000000001'
-        AND user_id IN (
-          SELECT user_id FROM kpa_organization_join_requests
-          WHERE request_type = 'pharmacy_join'
-        )
+    const orgMembersExists = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'organization_members'
+      )
     `);
-    console.log(`[Migration] Cleaned up OrganizationMember contamination: ${deleted[1] || 0} rows`);
+    if (orgMembersExists[0]?.exists) {
+      const deleted = await queryRunner.query(`
+        DELETE FROM organization_members
+        WHERE organization_id = 'a0000000-0a00-4000-a000-000000000001'
+          AND user_id IN (
+            SELECT user_id FROM kpa_organization_join_requests
+            WHERE request_type = 'pharmacy_join'
+          )
+      `);
+      console.log(`[Migration] Cleaned up OrganizationMember contamination: ${deleted[1] || 0} rows`);
+    } else {
+      console.log('[Migration] organization_members table does not exist, skipping cleanup');
+    }
 
     // Step 3: 원본 pharmacy_join 레코드 삭제
     const removedJoinRequests = await queryRunner.query(`
