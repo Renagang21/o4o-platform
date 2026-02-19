@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
@@ -166,14 +166,22 @@ const SERVICE_NAME = 'KPA-Society';
 function LoginRedirect() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { openLoginModal } = useAuthModal();
+  const [searchParams] = useSearchParams();
+  const { openLoginModal, setOnLoginSuccess } = useAuthModal();
 
   useEffect(() => {
-    // state.from이 있으면 원래 페이지로 복귀, 없으면 홈
-    const from = (location.state as { from?: string })?.from || '/';
+    const returnTo = searchParams.get('returnTo');
+    const from = (location.state as { from?: string })?.from || returnTo || '/';
     navigate(from, { replace: true });
+
+    if (returnTo) {
+      setOnLoginSuccess(() => {
+        navigate(returnTo);
+      });
+    }
+
     openLoginModal();
-  }, [navigate, openLoginModal, location.state]);
+  }, [navigate, openLoginModal, location.state, searchParams, setOnLoginSuccess]);
 
   return null;
 }

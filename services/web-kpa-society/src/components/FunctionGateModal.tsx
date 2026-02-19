@@ -38,7 +38,7 @@ const options: FunctionOption[] = [
 ];
 
 export default function FunctionGateModal() {
-  const { user, setPharmacistFunction, setPharmacistRole } = useAuth();
+  const { user, setPharmacistProfile } = useAuth();
   const { activeModal, closeModal } = useAuthModal();
 
   const isOpen = activeModal === 'functionGate';
@@ -79,8 +79,8 @@ export default function FunctionGateModal() {
   const handleConfirm = () => {
     const selected = options.find(o => o.key === selectedKey);
     if (selected) {
-      setPharmacistFunction(selected.pharmacistFunction);
-      setPharmacistRole(selected.pharmacistRole);
+      // WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 1회 API + 1회 리렌더로 통합
+      setPharmacistProfile(selected.pharmacistFunction, selected.pharmacistRole);
       closeModal();
     }
   };

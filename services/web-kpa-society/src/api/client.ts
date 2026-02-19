@@ -55,10 +55,11 @@ class ApiClient {
     // Retry on 404 for GET requests (Cloud Run cold start: routes not yet registered)
     const maxRetries = fetchOptions.method === 'GET' ? 2 : 0;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      // WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1:
+      // credentials 제거 — authClient(localStorage 전략)와 동일하게 Bearer 토큰만 사용
       const response = await fetch(url, {
         ...fetchOptions,
         headers,
-        credentials: 'include',
       });
 
       if (response.status === 404 && attempt < maxRetries) {

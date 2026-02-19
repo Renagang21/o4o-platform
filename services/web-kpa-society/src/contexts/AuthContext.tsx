@@ -189,6 +189,8 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   setPharmacistFunction: (fn: PharmacistFunction) => void;
   setPharmacistRole: (role: PharmacistRole) => void;
+  /** WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 직능+직역 한 번에 설정 (1회 API, 1회 리렌더) */
+  setPharmacistProfile: (fn: PharmacistFunction, role: PharmacistRole) => void;
   // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -353,6 +355,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  /**
+   * WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 직능+직역 통합 설정
+   * FunctionGateModal에서 1회 API + 1회 setUser로 불필요한 중간 리렌더 제거
+   */
+  const setPharmacistProfile = async (fn: PharmacistFunction, role: PharmacistRole) => {
+    if (user) {
+      try {
+        await authClient.api.patch('/auth/me/profile', {
+          pharmacistFunction: fn,
+          pharmacistRole: role,
+        });
+      } catch (err) {
+        console.error('Failed to save pharmacist profile:', err);
+      }
+      setUser({ ...user, pharmacistFunction: fn, pharmacistRole: role });
+    }
+  };
+
   // ============================================================================
   // Phase 2-b: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   // ============================================================================
@@ -419,6 +439,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         checkAuth,
         setPharmacistFunction,
         setPharmacistRole,
+        setPharmacistProfile,
         // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
         serviceUser,
         isServiceUserAuthenticated: !!serviceUser,
