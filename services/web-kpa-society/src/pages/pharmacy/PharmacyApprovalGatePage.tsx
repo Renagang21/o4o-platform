@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { joinRequestApi } from '../../api/joinRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-type PageState = 'form' | 'submitting' | 'success' | 'duplicate' | 'error';
+type PageState = 'form' | 'submitting' | 'success' | 'duplicate' | 'already_member' | 'error';
 
 interface FormData {
   businessRegistrationNumber: string;
@@ -37,6 +37,7 @@ export function PharmacyApprovalGatePage() {
   const navigate = useNavigate();
   const [state, setState] = useState<PageState>('form');
   const [form, setForm] = useState<FormData>(initialForm);
+  const [errorDetail, setErrorDetail] = useState<string>('');
 
   const isFormValid =
     form.businessRegistrationNumber.trim() !== '' &&
@@ -71,9 +72,19 @@ export function PharmacyApprovalGatePage() {
       });
       setState('success');
     } catch (err: any) {
-      if (err?.response?.status === 409 || err?.status === 409) {
-        setState('duplicate');
+      const status = err?.status || err?.response?.status;
+      const code = err?.code || '';
+      if (status === 409) {
+        if (code === 'ALREADY_MEMBER') {
+          setState('already_member');
+        } else {
+          setState('duplicate');
+        }
+      } else if (status === 401) {
+        setErrorDetail('인증이 만료되었습니다. 다시 로그인해 주세요.');
+        setState('error');
       } else {
+        setErrorDetail(err?.message || `오류 ${status || ''}`.trim());
         setState('error');
       }
     }
@@ -123,6 +134,34 @@ export function PharmacyApprovalGatePage() {
             <button type="button" onClick={handleGoBack} style={styles.backBtn}>
               돌아가기
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 이미 멤버 (승인 완료 상태에서 재신청)
+  if (state === 'already_member') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>✅</span>
+            </div>
+            <h1 style={styles.title}>이미 승인된 계정입니다</h1>
+            <p style={styles.desc}>
+              약국 서비스 이용이 승인된 상태입니다.<br />
+              다시 로그인하시면 약국 서비스를 이용하실 수 있습니다.
+            </p>
+            <button type="button" onClick={() => navigate('/login')} style={styles.submitBtn}>
+              다시 로그인
+            </button>
+            <div style={{ marginTop: spacing.sm }}>
+              <button type="button" onClick={handleGoBack} style={styles.backBtn}>
+                돌아가기
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -206,7 +245,9 @@ export function PharmacyApprovalGatePage() {
           </div>
 
           {state === 'error' && (
-            <p style={styles.error}>신청에 실패했습니다. 다시 시도해 주세요.</p>
+            <p style={styles.error}>
+              {errorDetail || '신청에 실패했습니다. 다시 시도해 주세요.'}
+            </p>
           )}
 
           <div style={styles.actions}>
