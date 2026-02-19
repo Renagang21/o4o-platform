@@ -69,6 +69,7 @@ export function PharmacyApprovalGatePage() {
     } catch (err: any) {
       const status = err?.status || err?.response?.status;
       const code = err?.code || '';
+      console.error('[PharmacyApprovalGate] Submit failed:', { status, code, message: err?.message });
       if (status === 409) {
         if (code === 'ALREADY_MEMBER') {
           setState('already_member');
@@ -76,10 +77,19 @@ export function PharmacyApprovalGatePage() {
           setState('duplicate');
         }
       } else if (status === 401) {
-        setErrorDetail('인증이 만료되었습니다. 다시 로그인해 주세요.');
+        if (code === 'AUTH_REQUIRED') {
+          setErrorDetail('인증이 필요합니다. 다시 로그인해 주세요.');
+        } else if (code === 'INVALID_TOKEN' || code === 'TOKEN_EXPIRED') {
+          setErrorDetail('인증이 만료되었습니다. 다시 로그인해 주세요.');
+        } else {
+          setErrorDetail('인증 오류가 발생했습니다. 새로고침 후 다시 시도해 주세요.');
+        }
+        setState('error');
+      } else if (status === 403) {
+        setErrorDetail('이 기능에 대한 접근 권한이 없습니다.');
         setState('error');
       } else {
-        setErrorDetail(err?.message || `오류 ${status || ''}`.trim());
+        setErrorDetail(err?.message || `오류가 발생했습니다. (${status || '알 수 없음'})`);
         setState('error');
       }
     }

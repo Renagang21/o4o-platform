@@ -28,7 +28,8 @@ export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { openFunctionGateModal } = useAuthModal();
-  const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none'>('loading');
+  const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none' | 'error'>('loading');
+  const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
   const isPharmacyOwner = !!user && !isAdminOrOperator && user.pharmacistRole === 'pharmacy_owner';
@@ -61,8 +62,18 @@ export function PharmacyPage() {
         } else {
           setApprovalStatus('none');
         }
-      } catch {
-        if (!cancelled) setApprovalStatus('none');
+      } catch (err: any) {
+        if (!cancelled) {
+          const status = err?.status || err?.response?.status;
+          console.error('[PharmacyPage] getMyRequests failed:', status, err?.message);
+          if (status === 401) {
+            setApprovalError('인증 정보를 확인할 수 없습니다. 새로고침하거나 다시 로그인해 주세요.');
+            setApprovalStatus('error');
+          } else {
+            setApprovalError(err?.message || '승인 상태를 확인할 수 없습니다.');
+            setApprovalStatus('error');
+          }
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -206,7 +217,71 @@ export function PharmacyPage() {
     return <Navigate to="/pharmacy/dashboard" replace />;
   }
 
-  // 7. 미승인/미신청 → 신청 게이트로 이동
+  // 7. 대기 중 → 대기 안내 화면
+  if (approvalStatus === 'pending') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>⏳</span>
+            </div>
+            <h1 style={styles.title}>승인 대기 중입니다</h1>
+            <p style={styles.desc}>
+              약국 서비스 이용 신청이 접수되었습니다.<br />
+              운영자 승인 후 이용하실 수 있습니다.
+            </p>
+            <div style={styles.actions}>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={styles.backBtn}
+              >
+                돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 8. API 에러 → 구체적 안내
+  if (approvalStatus === 'error') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>⚠️</span>
+            </div>
+            <h1 style={styles.title}>상태 확인에 실패했습니다</h1>
+            <p style={styles.desc}>
+              {approvalError || '승인 상태를 확인할 수 없습니다.'}
+            </p>
+            <div style={styles.actions}>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                style={styles.joinBtn}
+              >
+                새로고침
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={styles.backBtn}
+              >
+                돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 9. 미신청 → 신청 게이트로 이동
   return <Navigate to="/pharmacy/approval" replace />;
 }
 
