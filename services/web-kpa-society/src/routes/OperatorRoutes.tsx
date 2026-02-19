@@ -3,7 +3,7 @@
  *
  * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
  * - 콘텐츠 CRUD (news, docs, forum) AdminRoutes에서 이동
- * - 요청 관리 (organization-requests, service-enrollments) AdminRoutes에서 이동
+ * - 요청 관리 (organization-requests) AdminRoutes에서 이동
  * - members: WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1에서 복원 (KPI → 목록 연결)
  *
  * WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1:
@@ -20,7 +20,6 @@ import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, Operato
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
-import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
@@ -70,9 +69,6 @@ export function OperatorRoutes() {
         {/* 조직 가입/역할 요청 관리 */}
         <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
 
-        {/* 서비스 신청 관리 */}
-        <Route path="service-enrollments" element={<ServiceEnrollmentManagementPage />} />
-
         {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
         <Route path="operators" element={
           <RoleGuard allowedRoles={[ROLES.KPA_ADMIN]}>
@@ -80,8 +76,8 @@ export function OperatorRoutes() {
           </RoleGuard>
         } />
 
-        {/* 404 → /hub */}
-        <Route path="*" element={<Navigate to="/hub" replace />} />
+        {/* 404 → operator index */}
+        <Route path="*" element={<Navigate to="/operator" replace />} />
       </Routes>
     </RoleGuard>
   );

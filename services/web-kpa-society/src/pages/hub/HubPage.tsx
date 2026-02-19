@@ -45,7 +45,6 @@ import {
   Megaphone,
   FolderOpen,
   UserPlus,
-  ClipboardList,
 } from 'lucide-react';
 
 // ─── Icon helper ───
@@ -102,19 +101,11 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
       },
       {
         id: 'organization-requests',
-        title: '가입 요청 관리',
-        description: '조직 가입/역할 요청 심사',
+        title: '가입/서비스 신청',
+        description: '조직 가입 및 서비스 신청 관리',
         href: '/operator/organization-requests',
         icon: <LucideIcon Icon={UserPlus} color="#059669" />,
         iconBg: '#ECFDF5',
-      },
-      {
-        id: 'service-enrollments',
-        title: '서비스 신청 관리',
-        description: '서비스 신청 승인/관리',
-        href: '/operator/service-enrollments',
-        icon: <LucideIcon Icon={ClipboardList} color="#D97706" />,
-        iconBg: '#FFFBEB',
       },
       {
         id: 'lms',
