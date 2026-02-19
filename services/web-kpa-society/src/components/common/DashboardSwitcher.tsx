@@ -32,7 +32,8 @@ export function useAccessibleDashboards(): DashboardItem[] {
 
   // 약국 context가 있는 사용자: 약국경영
   // admin/operator는 Hub가 메인이므로 제외
-  const isAdminOrOperator = user.roles.some((r: string) => ['kpa:admin', 'kpa:operator'].includes(r));
+  const operatorRoles = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:operator', 'platform:super_admin', 'super_operator'];
+  const isAdminOrOperator = user.roles.some((r: string) => operatorRoles.includes(r));
   const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
   if (hasPharmacyContext && !isAdminOrOperator) {
     items.push({ label: '약국경영', icon: '💊', path: '/pharmacy' });

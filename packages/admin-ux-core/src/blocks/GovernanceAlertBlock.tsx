@@ -6,6 +6,7 @@
  * 비어 있으면 초록 상태 (구조 이상 없음).
  */
 
+import { Link } from 'react-router-dom';
 import type { GovernanceAlert } from '../types';
 
 const levelStyles: Record<string, { bg: string; border: string; text: string }> = {
@@ -37,9 +38,9 @@ export function GovernanceAlertBlock({ items }: { items: GovernanceAlert[] }) {
         {items.map((item) => (
           <li key={item.id} className={`text-sm ${levelStyles[item.level].text}`}>
             {item.link ? (
-              <a href={item.link} className="underline underline-offset-2">
+              <Link to={item.link} className="underline underline-offset-2">
                 {item.message}
-              </a>
+              </Link>
             ) : (
               item.message
             )}

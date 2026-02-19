@@ -5,6 +5,7 @@
  * 비어 있으면 초록 상태 (모두 처리 완료).
  */
 
+import { Link } from 'react-router-dom';
 import type { ActionItem } from '../types';
 
 export function ActionQueueBlock({ items }: { items: ActionItem[] }) {
@@ -25,15 +26,15 @@ export function ActionQueueBlock({ items }: { items: ActionItem[] }) {
       <ul className="space-y-2">
         {items.map((item) => (
           <li key={item.id}>
-            <a
-              href={item.link}
+            <Link
+              to={item.link}
               className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors"
             >
               <span className="text-sm text-slate-700">{item.label}</span>
               <span className="text-sm font-semibold text-amber-600">
                 {item.count}건
               </span>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

@@ -132,9 +132,10 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   };
 }
 
-function CommentItem({ comment, currentUserId, onUpdate, onDelete, compact }: {
+function CommentItem({ comment, currentUserId, isAdmin, onUpdate, onDelete, compact }: {
   comment: DisplayComment;
   currentUserId?: string;
+  isAdmin?: boolean;
   onUpdate: (id: string, content: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   compact?: boolean;
@@ -143,7 +144,7 @@ function CommentItem({ comment, currentUserId, onUpdate, onDelete, compact }: {
   const [editContent, setEditContent] = useState(comment.content);
   const [isSaving, setIsSaving] = useState(false);
 
-  const isOwner = currentUserId && comment.authorId === currentUserId;
+  const isOwner = (currentUserId && comment.authorId === currentUserId) || isAdmin;
 
   const handleSave = async () => {
     if (!editContent.trim() || isSaving) return;
@@ -220,6 +221,7 @@ export function ForumPostPage() {
   const actionMenuRef = useRef<HTMLDivElement>(null);
 
   const currentUserId = user?.id;
+  const isAdmin = user?.roles?.includes('admin') ?? false;
 
   // Close action menu on outside click
   useEffect(() => {
@@ -416,7 +418,7 @@ export function ForumPostPage() {
             </span>
           </div>
           {/* Mobile: ⋮ action menu */}
-          {isMobile && currentUserId && post.authorId === currentUserId && (
+          {isMobile && (isAdmin || (currentUserId && post.authorId === currentUserId)) && (
             <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
               <button
                 style={styles.moreMenuButton}
@@ -451,7 +453,7 @@ export function ForumPostPage() {
           <span>{formatDate(post.publishedAt || post.createdAt)}</span>
         </div>
         {/* Desktop: inline actions */}
-        {!isMobile && currentUserId && post.authorId === currentUserId && (
+        {!isMobile && (isAdmin || (currentUserId && post.authorId === currentUserId)) && (
           <div style={styles.postActions}>
             <button style={styles.actionBtn} onClick={() => navigate(`/forum/write?edit=${post.id}`)}>수정</button>
             <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
@@ -566,7 +568,7 @@ export function ForumPostPage() {
         <div style={styles.commentsList}>
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} currentUserId={currentUserId} onUpdate={handleUpdateComment} onDelete={handleDeleteComment} compact={isMobile} />
+              <CommentItem key={comment.id} comment={comment} currentUserId={currentUserId} isAdmin={isAdmin} onUpdate={handleUpdateComment} onDelete={handleDeleteComment} compact={isMobile} />
             ))
           ) : (
             <div style={styles.noComments}>

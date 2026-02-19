@@ -5,6 +5,7 @@
  * configured / not_configured / partial 3단계 표시.
  */
 
+import { Link } from 'react-router-dom';
 import type { PolicyItem } from '../types';
 
 const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
@@ -26,9 +27,9 @@ export function PolicyOverviewBlock({ items }: { items: PolicyItem[] }) {
             <li key={item.key} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-2">
                 {item.link ? (
-                  <a href={item.link} className="text-sm text-slate-700 underline underline-offset-2">
+                  <Link to={item.link} className="text-sm text-slate-700 underline underline-offset-2">
                     {item.label}
-                  </a>
+                  </Link>
                 ) : (
                   <span className="text-sm text-slate-700">{item.label}</span>
                 )}

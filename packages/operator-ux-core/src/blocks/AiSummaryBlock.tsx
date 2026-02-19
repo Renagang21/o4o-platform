@@ -5,6 +5,7 @@
  * AI가 없어도 동작한다. 비어 있으면 "특이사항 없음" 표시.
  */
 
+import { Link } from 'react-router-dom';
 import type { AiSummaryItem } from '../types';
 
 const levelStyles: Record<string, { bg: string; border: string; text: string }> = {
@@ -37,9 +38,9 @@ export function AiSummaryBlock({ items }: { items: AiSummaryItem[] }) {
         {items.slice(0, 3).map((item) => (
           <li key={item.id} className={`text-sm ${levelStyles[item.level].text}`}>
             {item.link ? (
-              <a href={item.link} className="underline underline-offset-2">
+              <Link to={item.link} className="underline underline-offset-2">
                 {item.message}
-              </a>
+              </Link>
             ) : (
               item.message
             )}

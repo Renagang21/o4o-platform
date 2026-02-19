@@ -105,7 +105,8 @@ export function ForumDetailPage() {
     );
   }
 
-  const isAuthor = user?.id === post.authorId;
+  const isAdmin = user?.roles?.some((r: string) => ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'].includes(r)) ?? false;
+  const isAuthor = user?.id === post.authorId || isAdmin;
 
   return (
     <div style={styles.container}>
