@@ -71,7 +71,9 @@ export function PharmacyPage() {
           const status = err?.status || err?.response?.status;
           console.error('[PharmacyPage] getMyRequests failed:', status, err?.message);
           if (status === 401) {
-            setApprovalError('인증 정보를 확인할 수 없습니다. 새로고침하거나 다시 로그인해 주세요.');
+            // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+            // 401 시 interceptor가 토큰 정리 → 새로고침하면 user=null → 미로그인 화면 표시
+            setApprovalError('인증이 만료되었습니다. 페이지를 새로고침해 주세요.');
             setApprovalStatus('error');
           } else {
             setApprovalError(err?.message || '승인 상태를 확인할 수 없습니다.');
@@ -250,9 +252,9 @@ export function PharmacyPage() {
     );
   }
 
-  // 8. API 에러 → 구체적 안내
+  // 8. API 에러 → 새로고침 안내
+  // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1: 401 별도 분기 제거, AuthContext에 위임
   if (approvalStatus === 'error') {
-    const is401 = approvalError?.includes('인증') || approvalError?.includes('로그인');
     return (
       <div style={styles.page}>
         <div style={styles.container}>
@@ -265,19 +267,13 @@ export function PharmacyPage() {
               {approvalError || '승인 상태를 확인할 수 없습니다.'}
             </p>
             <div style={styles.actions}>
-              {is401 ? (
-                <Link to="/login?returnTo=/pharmacy" style={styles.joinBtn}>
-                  다시 로그인
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => window.location.reload()}
-                  style={styles.joinBtn}
-                >
-                  새로고침
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                style={styles.joinBtn}
+              >
+                새로고침
+              </button>
               <button
                 type="button"
                 onClick={() => navigate(-1)}

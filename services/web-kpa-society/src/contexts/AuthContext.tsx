@@ -257,6 +257,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
 
   const checkAuth = useCallback(async () => {
+    // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+    // 토큰 없으면 /auth/me 호출 자체를 생략 → 불필요한 401 방지
+    const token = getAccessToken();
+    if (!token) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await authClient.api.get('/auth/me');
       const data = response.data as { success: boolean; data: ApiUser };

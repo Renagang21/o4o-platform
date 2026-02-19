@@ -12,7 +12,7 @@
  */
 
 import { useState } from 'react';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
@@ -80,13 +80,10 @@ export function PharmacyApprovalGatePage() {
           setState('duplicate');
         }
       } else if (status === 401) {
-        if (code === 'AUTH_REQUIRED') {
-          setErrorDetail('인증이 필요합니다. 다시 로그인해 주세요.');
-        } else if (code === 'INVALID_TOKEN' || code === 'TOKEN_EXPIRED') {
-          setErrorDetail('인증이 만료되었습니다. 다시 로그인해 주세요.');
-        } else {
-          setErrorDetail('인증 오류가 발생했습니다. 새로고침 후 다시 시도해 주세요.');
-        }
+        // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+        // 401은 interceptor가 토큰 정리 → AuthContext에서 user=null → 상단 Navigate 처리
+        // 여기까지 오면 interceptor 이후에도 남은 케이스(드문 경우)
+        setErrorDetail('인증이 만료되었습니다. 페이지를 새로고침해 주세요.');
         setState('error');
       } else if (status === 403) {
         setErrorDetail('이 기능에 대한 접근 권한이 없습니다.');
@@ -262,11 +259,6 @@ export function PharmacyApprovalGatePage() {
               <p style={styles.error}>
                 {errorDetail || '신청에 실패했습니다. 다시 시도해 주세요.'}
               </p>
-              {errorDetail?.includes('로그인') && (
-                <Link to="/login?returnTo=/pharmacy/approval" style={{ fontSize: '0.813rem', color: colors.primary }}>
-                  로그인 페이지로 이동
-                </Link>
-              )}
             </div>
           )}
 
