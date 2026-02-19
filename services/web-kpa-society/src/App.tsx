@@ -125,6 +125,7 @@ import { PharmacyGuard } from './components/auth/PharmacyGuard';
 
 // Debug Pages (CLAUDE.md Section 14)
 import { ApiDebugPage } from './pages/debug/ApiDebugPage';
+import { PharmacyGateDebugPage } from './pages/debug/PharmacyGateDebugPage';
 
 // Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
 import { TabletStorePage } from './pages/tablet/TabletStorePage';
@@ -318,6 +319,7 @@ function App() {
 
           {/* Debug Pages (CLAUDE.md Section 14) */}
           <Route path="/__debug__/api" element={<ApiDebugPage />} />
+          <Route path="/__debug__/pharmacy-gate" element={<PharmacyGateDebugPage />} />
 
           {/* Test Center (WO-KPA-A-TEST-CENTER-PHASE1-MAIN-PAGE-V1) */}
           <Route path="/test" element={<TestCenterPage />} />
