@@ -140,7 +140,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
       id: 'ai-service-apps',
       message: `서비스 신청 ${serviceApplicationCount}건이 대기 중입니다.`,
       level: serviceApplicationCount > 3 ? 'warning' : 'info',
-      link: '/operator/service-enrollments',
+      link: '/operator/organization-requests',
     });
   }
 
@@ -185,7 +185,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
         id: 'aq-service-apps',
         label: '서비스 신청 검토',
         count: serviceApplicationCount,
-        link: '/operator/service-enrollments',
+        link: '/operator/organization-requests',
       });
     }
     actionQueue.push({
@@ -232,8 +232,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
     { id: 'qa-docs', label: '자료실', link: '/operator/docs', icon: '📁' },
-    { id: 'qa-requests', label: '조직 요청', link: '/operator/organization-requests', icon: '👥' },
-    { id: 'qa-enrollments', label: '서비스 신청', link: '/operator/service-enrollments', icon: '📋' },
+    { id: 'qa-requests', label: '가입/서비스 신청', link: '/operator/organization-requests', icon: '👥' },
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },
