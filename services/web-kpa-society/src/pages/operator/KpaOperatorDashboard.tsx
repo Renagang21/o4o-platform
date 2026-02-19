@@ -52,35 +52,36 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     return { kpis: [], actionQueue: [], activityLog: [], quickActions: [] };
   }
 
-  const contentCount = summary.content?.totalPublished ?? 0;
-  const forumCount = summary.forum?.totalPosts ?? 0;
-  const signageCount = (summary.signage?.totalMedia ?? 0) + (summary.signage?.totalPlaylists ?? 0);
+  // WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required 중심 KPI
+  const contentDraftCount = summary.content?.pendingDraft ?? 0;
+  const forumPendingCount = summary.forum?.pendingRequests ?? 0;
+  const signagePendingCount = (summary.signage?.pendingMedia ?? 0) + (summary.signage?.pendingPlaylists ?? 0);
 
-  // Block 1: KPI Grid
+  // Block 1: KPI Grid — Action Required Only
   const kpis: KpiItem[] = [
     {
-      key: 'content',
-      label: '콘텐츠 발행',
-      value: contentCount,
-      status: contentCount === 0 ? 'warning' : 'neutral',
+      key: 'pending',
+      label: '회원 승인 대기',
+      value: pendingMembers,
+      status: pendingMembers > 0 ? 'warning' : 'neutral',
     },
     {
       key: 'forum',
-      label: '포럼 게시글',
-      value: forumCount,
-      status: forumCount === 0 ? 'warning' : 'neutral',
+      label: '포럼 요청 대기',
+      value: forumPendingCount,
+      status: forumPendingCount > 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'content',
+      label: '콘텐츠 발행 대기',
+      value: contentDraftCount,
+      status: contentDraftCount > 0 ? 'warning' : 'neutral',
     },
     {
       key: 'signage',
-      label: '사이니지',
-      value: signageCount,
-      status: signageCount === 0 ? 'warning' : 'neutral',
-    },
-    {
-      key: 'pending',
-      label: '승인 대기',
-      value: pendingMembers,
-      status: pendingMembers > 0 ? 'warning' : 'neutral',
+      label: '사이니지 검수 대기',
+      value: signagePendingCount,
+      status: signagePendingCount > 0 ? 'warning' : 'neutral',
     },
     // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 KPI
     ...(isAdmin ? [
@@ -99,38 +100,38 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     ] : []),
   ];
 
-  // Block 2: AI Summary (상태 기반 규칙형)
+  // Block 2: AI Summary (상태 기반 규칙형) — Action Required 중심
   const aiSummary: AiSummaryItem[] = [];
-  if (contentCount === 0) {
-    aiSummary.push({
-      id: 'ai-no-content',
-      message: '발행된 콘텐츠가 없습니다. 공지사항 또는 뉴스를 등록하세요.',
-      level: 'warning',
-      link: '/operator/content',
-    });
-  }
-  if (forumCount === 0) {
-    aiSummary.push({
-      id: 'ai-no-forum',
-      message: '포럼 게시글이 없습니다. 커뮤니티 활동을 시작하세요.',
-      level: 'warning',
-      link: '/operator/forum-management',
-    });
-  }
-  if (signageCount === 0) {
-    aiSummary.push({
-      id: 'ai-no-signage',
-      message: '사이니지 콘텐츠가 비어 있습니다.',
-      level: 'info',
-      link: '/operator/signage/content',
-    });
-  }
   if (pendingMembers > 0) {
     aiSummary.push({
       id: 'ai-pending-members',
       message: `회원 승인 대기 ${pendingMembers}건이 있습니다. 신속한 처리를 권장합니다.`,
       level: pendingMembers > 5 ? 'warning' : 'info',
       link: '/operator/members',
+    });
+  }
+  if (forumPendingCount > 0) {
+    aiSummary.push({
+      id: 'ai-forum-requests',
+      message: `포럼 카테고리 요청 ${forumPendingCount}건이 대기 중입니다.`,
+      level: 'warning',
+      link: '/operator/forum-management',
+    });
+  }
+  if (contentDraftCount > 0) {
+    aiSummary.push({
+      id: 'ai-content-draft',
+      message: `콘텐츠 ${contentDraftCount}건이 발행 대기(draft) 상태입니다.`,
+      level: 'info',
+      link: '/operator/content',
+    });
+  }
+  if (signagePendingCount > 0) {
+    aiSummary.push({
+      id: 'ai-signage-pending',
+      message: `사이니지 ${signagePendingCount}건이 검수 대기 상태입니다.`,
+      level: 'info',
+      link: '/operator/signage/content',
     });
   }
   // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 인사이트
@@ -143,22 +144,38 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     });
   }
 
-  // Block 3: Action Queue
+  // Block 3: Action Queue — Action Required Only
   const actionQueue: ActionItem[] = [];
   if (pendingMembers > 0) {
     actionQueue.push({
       id: 'aq-members',
-      label: '가입 요청 검토',
+      label: '회원 승인 검토',
       count: pendingMembers,
       link: '/operator/members',
     });
   }
-  if (contentCount === 0) {
+  if (forumPendingCount > 0) {
+    actionQueue.push({
+      id: 'aq-forum',
+      label: '포럼 요청 검토',
+      count: forumPendingCount,
+      link: '/operator/forum-management',
+    });
+  }
+  if (contentDraftCount > 0) {
     actionQueue.push({
       id: 'aq-content',
-      label: '콘텐츠 등록 필요',
-      count: 0,
+      label: '콘텐츠 발행 대기',
+      count: contentDraftCount,
       link: '/operator/content',
+    });
+  }
+  if (signagePendingCount > 0) {
+    actionQueue.push({
+      id: 'aq-signage',
+      label: '사이니지 검수 대기',
+      count: signagePendingCount,
+      link: '/operator/signage/content',
     });
   }
   // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Action Queue
@@ -217,11 +234,11 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     { id: 'qa-docs', label: '자료실', link: '/operator/docs', icon: '📁' },
     { id: 'qa-requests', label: '조직 요청', link: '/operator/organization-requests', icon: '👥' },
     { id: 'qa-enrollments', label: '서비스 신청', link: '/operator/service-enrollments', icon: '📋' },
+    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },
     // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Quick Actions
     ...(isAdmin ? [
-      { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
       { id: 'qa-operators', label: '운영자 관리', link: '/operator/operators', icon: '⚙️' },
     ] : []),
   ];

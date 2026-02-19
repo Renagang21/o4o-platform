@@ -206,6 +206,7 @@ export function createMemberController(
         const { organization_id, status, role, page = '1', limit = '20' } = req.query;
 
         const qb = memberRepo.createQueryBuilder('m')
+          .leftJoinAndSelect('m.user', 'u')
           .leftJoinAndSelect('m.organization', 'org');
 
         if (organization_id) {

@@ -50,16 +50,20 @@ interface ForumPostItem {
 export interface OperatorSummary {
   content: {
     totalPublished: number;
+    pendingDraft: number;
     recentItems: ContentItem[];
   };
   signage: {
     totalMedia: number;
     totalPlaylists: number;
+    pendingMedia: number;
+    pendingPlaylists: number;
     recentMedia: MediaItem[];
     recentPlaylists: PlaylistItem[];
   };
   forum: {
     totalPosts: number;
+    pendingRequests: number;
     recentPosts: ForumPostItem[];
   };
   store?: {

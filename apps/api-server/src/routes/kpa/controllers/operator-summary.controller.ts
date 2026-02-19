@@ -42,24 +42,32 @@ export function createOperatorSummaryController(
 
   /**
    * GET /operator/summary
-   * 운영자 대시보드 통합 요약: Content + Signage + Forum
+   * WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required 중심 KPI
+   * 운영자 대시보드 통합 요약: 승인/요청 대기 + 최근 활동
    */
   router.get('/summary', asyncHandler(async (req: Request, res: Response) => {
-    // Parallel fetch: counts + recent items using existing QueryServices
+    // Parallel fetch: totals + pending counts + recent items
     const [
       recentContent,
       signageHome,
       recentPosts,
-      contentCount,
-      signageMediaCount,
-      signagePlaylistCount,
-      forumPostCount,
+      // Totals (Hub, BranchOperator용)
+      contentTotalCount,
+      signageMediaTotalCount,
+      signagePlaylistTotalCount,
+      forumPostTotalCount,
+      // WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required counts
+      contentDraftCount,
+      signagePendingMediaCount,
+      signagePendingPlaylistCount,
+      forumPendingRequestCount,
+      // WO-HUB-RISK-LOOP-COMPLETION-V1
       forcedExpirySoonCount,
     ] = await Promise.all([
       contentService.listForHome(['notice', 'news', 'hero', 'promo'], 5),
       signageService.listForHome(3, 3),
       forumService.listRecentPosts(5),
-      // COUNT queries — inline, not modifying frozen QueryServices
+      // Total COUNT queries (Hub/BranchOperator 통계용)
       dataSource.query(`
         SELECT COUNT(*) as count FROM cms_contents
         WHERE "serviceKey" IN ('kpa', 'kpa-society') AND status = 'published'
@@ -76,6 +84,23 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM forum_post
         WHERE status = 'publish' AND organization_id IS NULL
       `),
+      // WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required COUNT queries
+      dataSource.query(`
+        SELECT COUNT(*) as count FROM cms_contents
+        WHERE "serviceKey" IN ('kpa', 'kpa-society') AND status = 'draft'
+      `),
+      dataSource.query(`
+        SELECT COUNT(*) as count FROM signage_media
+        WHERE "serviceKey" = 'kpa-society' AND status IN ('processing', 'inactive')
+      `),
+      dataSource.query(`
+        SELECT COUNT(*) as count FROM signage_playlists
+        WHERE "serviceKey" = 'kpa-society' AND status = 'draft'
+      `),
+      dataSource.query(`
+        SELECT COUNT(*) as count FROM forum_category_requests
+        WHERE status = 'pending' AND service_code = 'kpa-society'
+      `),
       // WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 (7일 이내)
       dataSource.query(`
         SELECT COUNT(*) as count FROM kpa_store_asset_controls
@@ -90,17 +115,21 @@ export function createOperatorSummaryController(
       success: true,
       data: {
         content: {
-          totalPublished: parseInt(contentCount[0]?.count || '0', 10),
+          totalPublished: parseInt(contentTotalCount[0]?.count || '0', 10),
+          pendingDraft: parseInt(contentDraftCount[0]?.count || '0', 10),
           recentItems: recentContent,
         },
         signage: {
-          totalMedia: parseInt(signageMediaCount[0]?.count || '0', 10),
-          totalPlaylists: parseInt(signagePlaylistCount[0]?.count || '0', 10),
+          totalMedia: parseInt(signageMediaTotalCount[0]?.count || '0', 10),
+          totalPlaylists: parseInt(signagePlaylistTotalCount[0]?.count || '0', 10),
+          pendingMedia: parseInt(signagePendingMediaCount[0]?.count || '0', 10),
+          pendingPlaylists: parseInt(signagePendingPlaylistCount[0]?.count || '0', 10),
           recentMedia: signageHome.media,
           recentPlaylists: signageHome.playlists,
         },
         forum: {
-          totalPosts: parseInt(forumPostCount[0]?.count || '0', 10),
+          totalPosts: parseInt(forumPostTotalCount[0]?.count || '0', 10),
+          pendingRequests: parseInt(forumPendingRequestCount[0]?.count || '0', 10),
           recentPosts,
         },
         store: {
