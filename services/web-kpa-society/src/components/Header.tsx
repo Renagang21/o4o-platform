@@ -81,6 +81,7 @@ const menuItems: MenuItem[] = [
   { label: '강의', href: '/lms' },
   { label: '콘텐츠', href: '/news' },
   { label: '내 매장관리', href: '/pharmacy/dashboard' },
+  { label: '약국 HUB', href: '/pharmacy/hub' },
   { label: '운영 대시보드', href: '/operator' },
   { label: '테스트 센터', href: '/test' },
 ];
@@ -103,6 +104,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/operator') return isOperatorOrAdmin;
     if (item.href === '/pharmacy/dashboard') return isPharmacyOwner;
+    if (item.href === '/pharmacy/hub') return isPharmacyOwner;
     return true;
   });
 

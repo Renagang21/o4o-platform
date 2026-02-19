@@ -101,7 +101,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreOverviewPage, StoreChannelsPage, CyberTemplateGalleryPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreOverviewPage, StoreChannelsPage, CyberTemplateGalleryPage } from './pages/pharmacy';
 
 // WO-STORE-ADMIN-CONSOLIDATION-V1: Store Management Layout (sidebar)
 import { StoreManagementLayout } from './components/pharmacy/StoreManagementLayout';
@@ -351,8 +351,8 @@ function App() {
            * ======================================== */}
           {/* 게이트: 인증/승인 분기 → 승인 완료 시 /pharmacy/dashboard */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyPage /></PharmacyGuard></Layout>} />
-          {/* 레거시: /pharmacy/hub → /pharmacy/dashboard (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
-          <Route path="/pharmacy/hub" element={<Navigate to="/pharmacy/dashboard" replace />} />
+          {/* 약국 HUB: 공동 자원 탐색 공간 (WO-KPA-A-PHARMACY-HUB-MENU-ALIGNMENT-V1) */}
+          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubPage /></PharmacyGuard></Layout>} />
           {/* 내 매장관리: 매장 실행 요약 화면 */}
           <Route path="/pharmacy/dashboard" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyDashboardPage /></PharmacyGuard></Layout>} />
           {/* Sales 그룹 (WO-KPA-A-STORE-IA-REALIGN-PHASE2-V1) */}

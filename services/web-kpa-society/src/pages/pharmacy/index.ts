@@ -16,6 +16,9 @@ export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
 // WO-KPA-A-PAGE-ROLE-CLEANUP-V1: Dashboard
 export { PharmacyDashboardPage } from './PharmacyDashboardPage';
 
+// WO-KPA-A-PHARMACY-HUB-MENU-ALIGNMENT-V1: 약국 HUB (공동 자원 탐색)
+export { PharmacyHubPage } from './PharmacyHubPage';
+
 // WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리
 export { PharmacySellPage } from './PharmacySellPage';
 
