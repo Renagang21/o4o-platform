@@ -18,6 +18,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
+import { ROLES } from '../../lib/role-constants';
 import { operatorApi, type OperatorSummary } from '../../api/operator';
 import { colors, shadows, borderRadius, spacing } from '../../styles/theme';
 import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
@@ -146,7 +147,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
     id: 'admin',
     title: '관리자 전용',
     badge: 'Admin',
-    roles: ['kpa:admin'],
+    roles: [ROLES.KPA_ADMIN],
     cards: [
       {
         id: 'organizations',
@@ -328,7 +329,7 @@ export default function HubPage() {
   const [error, setError] = useState<string | null>(null);
 
   const userRoles = user?.roles ?? [];
-  const isAdmin = userRoles.includes('kpa:admin');
+  const isAdmin = userRoles.includes(ROLES.KPA_ADMIN);
   const signals = useMemo(() => buildKpaSignals(hubData), [hubData]);
 
   const fetchData = useCallback(async () => {

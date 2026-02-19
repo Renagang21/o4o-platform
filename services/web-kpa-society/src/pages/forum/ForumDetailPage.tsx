@@ -10,6 +10,7 @@ import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
+import { PLATFORM_ROLES, ROLES, hasAnyRole } from '../../lib/role-constants';
 
 export function ForumDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -105,7 +106,7 @@ export function ForumDetailPage() {
     );
   }
 
-  const isAdmin = user?.roles?.some((r: string) => ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'].includes(r)) ?? false;
+  const isAdmin = hasAnyRole(user?.roles ?? [], [...PLATFORM_ROLES, ROLES.PLATFORM_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]);
   const isAuthor = user?.id === post.authorId || isAdmin;
 
   return (

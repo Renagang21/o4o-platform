@@ -23,10 +23,11 @@ import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinReq
 import { ServiceEnrollmentManagementPage } from '../pages/admin/ServiceEnrollmentManagementPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
+import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 
 export function OperatorRoutes() {
   return (
-    <RoleGuard allowedRoles={['kpa:admin', 'kpa:operator']}>
+    <RoleGuard allowedRoles={[...PLATFORM_ROLES]}>
       <Routes>
         {/* /operator → 5-Block 대시보드 (WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1) */}
         <Route index element={<KpaOperatorDashboard />} />
@@ -74,7 +75,7 @@ export function OperatorRoutes() {
 
         {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
         <Route path="operators" element={
-          <RoleGuard allowedRoles={['kpa:admin']}>
+          <RoleGuard allowedRoles={[ROLES.KPA_ADMIN]}>
             <OperatorManagementPage />
           </RoleGuard>
         } />

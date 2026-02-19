@@ -5,6 +5,7 @@
 
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
+import { INTRANET_ROLES, hasAnyRole } from '../../lib/role-constants';
 
 interface IntranetAuthGuardProps {
   children: React.ReactNode;
@@ -37,16 +38,8 @@ export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
     );
   }
 
-  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require KPA organization role
-  // WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
-  const allowedRoles = [
-    'kpa:admin',
-    'kpa:operator',
-    'kpa-c:branch_admin',
-    'kpa-c:operator',
-  ];
-  const userRoles = user.roles;
-  const hasRole = userRoles.some((r: string) => allowedRoles.includes(r));
+  // WO-KPA-ROLE-SIMPLIFICATION-PHASE1-V1: 상수 사용
+  const hasRole = hasAnyRole(user.roles, INTRANET_ROLES);
 
   if (!hasRole) {
     return (

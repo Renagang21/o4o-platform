@@ -32,6 +32,7 @@ import {
 import { operatorApi, type OperatorSummary } from '../../api/operator';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
+import { ROLES } from '../../lib/role-constants';
 
 // ─── Extended Data (Hub에서 가져오던 추가 데이터) ───
 
@@ -232,7 +233,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
 
 export default function KpaOperatorDashboard() {
   const { user } = useAuth();
-  const isAdmin = user?.roles?.includes('kpa:admin') ?? false;
+  const isAdmin = user?.roles?.includes(ROLES.KPA_ADMIN) ?? false;
 
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
   const [loading, setLoading] = useState(true);

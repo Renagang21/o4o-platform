@@ -8,22 +8,13 @@
  * - 기타 → /dashboard
  * - roles 없음 → /login
  */
+import { PLATFORM_ROLES, BRANCH_ROLES, hasAnyRole } from './role-constants';
+
 export function getDefaultRouteByRole(userRoles?: string[]): string {
   if (!userRoles || userRoles.length === 0) return '/login';
 
-  if (
-    userRoles.includes('kpa:admin') ||
-    userRoles.includes('kpa:operator')
-  ) {
-    return '/hub';
-  }
-
-  if (
-    userRoles.includes('kpa-c:branch_admin') ||
-    userRoles.includes('kpa-c:operator')
-  ) {
-    return '/branch-services';
-  }
+  if (hasAnyRole(userRoles, PLATFORM_ROLES)) return '/hub';
+  if (hasAnyRole(userRoles, BRANCH_ROLES)) return '/branch-services';
 
   return '/dashboard';
 }

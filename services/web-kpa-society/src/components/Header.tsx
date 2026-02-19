@@ -21,6 +21,7 @@ import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
+import { PLATFORM_ROLES, SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
 
 /**
  * Super Operator 감지 헬퍼
@@ -29,9 +30,7 @@ import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSw
 function isSuperOperator(user: UserType | null): boolean {
   if (!user) return false;
   if ((user as any).isSuperOperator) return true;
-  const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
-  if (user.roles.some(r => operatorRoles.includes(r))) return true;
-  return false;
+  return hasAnyRole(user.roles, SUPER_OPERATOR_ROLES);
 }
 
 /**
@@ -98,7 +97,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   const accessibleDashboards = useAccessibleDashboards();
 
   // 운영 대시보드: kpa:admin 또는 kpa:operator만 노출
-  const isOperatorOrAdmin = user?.roles?.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
+  const isOperatorOrAdmin = user ? hasAnyRole(user.roles, PLATFORM_ROLES) : false;
   // 내 매장관리: pharmacy_owner만 노출 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
   const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
   const displayMenuItems = menuItems.filter(item => {

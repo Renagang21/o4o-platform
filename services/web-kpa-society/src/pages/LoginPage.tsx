@@ -13,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getDefaultRouteByRole } from '../lib/auth-utils';
+import { PLATFORM_ROLES, hasAnyRole } from '../lib/role-constants';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -37,9 +38,8 @@ export function LoginPage() {
       // WO-KPA-FUNCTION-GATE-V1: 직능 선택 로직
       // 직능/직역 미선택 시 게이트로 이동, 그 외에는 홈으로 이동
       // WO-KPA-A-DEFAULT-ROUTE-FIX-V2: KPA-a scope roles only
-      const adminRoles = ['kpa:admin', 'kpa:operator'];
-      const isAdmin = (loggedInUser.role && adminRoles.includes(loggedInUser.role)) ||
-                      (loggedInUser.roles && loggedInUser.roles.some((r: string) => adminRoles.includes(r)));
+      const isAdmin = (loggedInUser.role && (PLATFORM_ROLES as readonly string[]).includes(loggedInUser.role)) ||
+                      (loggedInUser.roles && hasAnyRole(loggedInUser.roles, PLATFORM_ROLES));
       // Phase 3: 약대생은 직능/직역 선택 불필요
       const isStudent = loggedInUser.role === 'student' || loggedInUser.membershipType === 'student';
 

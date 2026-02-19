@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
+import { ROLES, hasAnyRole } from '../../lib/role-constants';
 import {
   FeedbackPost,
   FeedbackComment,
@@ -82,7 +83,7 @@ export function FeedbackDetailPage() {
   const canWrite = canWriteFeedback(user?.roles);
   const canManage = canManageFeedback(user?.roles);
   const userRoles = user?.roles ?? [];
-  const isOperator = userRoles.includes('kpa:admin') || userRoles.includes('kpa:operator') || userRoles.includes('kpa:district_admin');
+  const isOperator = hasAnyRole(userRoles, [ROLES.KPA_ADMIN, ROLES.KPA_OPERATOR, ROLES.KPA_DISTRICT_ADMIN]);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;

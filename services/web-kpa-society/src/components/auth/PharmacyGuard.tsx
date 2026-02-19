@@ -14,6 +14,7 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 
 interface PharmacyGuardProps {
   children: React.ReactNode;
@@ -36,7 +37,7 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   }
 
   // admin/operator는 Hub로 리다이렉트
-  if (user.roles.includes('kpa:admin') || user.roles.includes('kpa:operator')) {
+  if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
     return <Navigate to="/hub" replace />;
   }
 
