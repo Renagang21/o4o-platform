@@ -40,3 +40,6 @@ export { LayoutBuilderPage } from './LayoutBuilderPage';
 // WO-STORE-ADMIN-CONSOLIDATION-V1: 매장 관리 통합
 export { StoreOverviewPage } from './StoreOverviewPage';
 export { StoreChannelsPage } from './StoreChannelsPage';
+
+// 사이버 공간 템플릿 갤러리
+export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

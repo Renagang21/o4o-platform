@@ -101,7 +101,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreOverviewPage, StoreChannelsPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreOverviewPage, StoreChannelsPage, CyberTemplateGalleryPage } from './pages/pharmacy';
 
 // WO-STORE-ADMIN-CONSOLIDATION-V1: Store Management Layout (sidebar)
 import { StoreManagementLayout } from './components/pharmacy/StoreManagementLayout';
@@ -376,6 +376,7 @@ function App() {
           <Route path="/pharmacy/store/blog" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><PharmacyBlogPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/store/tablet" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><TabletRequestsPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
           <Route path="/pharmacy/store/channels" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><StoreChannelsPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/cyber-templates" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><CyberTemplateGalleryPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
 
           {/* 자산: 통합 자산 목록 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
           <Route path="/pharmacy/assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />

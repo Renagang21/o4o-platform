@@ -24,6 +24,7 @@ const MENU_ITEMS: MenuItem[] = [
   { path: '/blog', label: '블로그', icon: '📝' },
   { path: '/tablet', label: '태블릿', icon: '📱' },
   { path: '/channels', label: '채널', icon: '📡' },
+  { path: '/cyber-templates', label: '사이버 공간', icon: '🌐' },
 ];
 
 const BASE_PATH = '/pharmacy/store';
