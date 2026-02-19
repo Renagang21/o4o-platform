@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage } from '../pages/operator';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
@@ -68,6 +68,9 @@ export function OperatorRoutes() {
 
         {/* 조직 가입/역할 요청 관리 */}
         <Route path="organization-requests" element={<OrganizationJoinRequestsPage />} />
+
+        {/* 약국 서비스 신청 관리 (WO-KPA-A-PHARMACY-REQUEST-OPERATOR-UI-V1) */}
+        <Route path="pharmacy-requests" element={<PharmacyRequestManagementPage />} />
 
         {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
         <Route path="operators" element={

@@ -41,12 +41,13 @@ interface KpaExtendedData {
   pendingMembers: number;
   totalMembers: number;
   serviceApplicationCount: number;
+  pharmacyRequestCount: number;
 }
 
 // ─── Data Transformer ───
 
 function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): OperatorDashboardConfig {
-  const { summary, pendingMembers, totalMembers, serviceApplicationCount } = data;
+  const { summary, pendingMembers, totalMembers, serviceApplicationCount, pharmacyRequestCount } = data;
 
   if (!summary) {
     return { kpis: [], actionQueue: [], activityLog: [], quickActions: [] };
@@ -82,6 +83,12 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
       label: '사이니지 검수 대기',
       value: signagePendingCount,
       status: signagePendingCount > 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'pharmacy-requests',
+      label: '약국 서비스 신청',
+      value: pharmacyRequestCount,
+      status: pharmacyRequestCount > 0 ? 'warning' : 'neutral',
     },
     // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 KPI
     ...(isAdmin ? [
@@ -134,6 +141,14 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
       link: '/operator/signage/content',
     });
   }
+  if (pharmacyRequestCount > 0) {
+    aiSummary.push({
+      id: 'ai-pharmacy-requests',
+      message: `약국 서비스 신청 ${pharmacyRequestCount}건이 대기 중입니다. 승인 처리가 필요합니다.`,
+      level: pharmacyRequestCount > 3 ? 'warning' : 'info',
+      link: '/operator/pharmacy-requests',
+    });
+  }
   // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 인사이트
   if (isAdmin && serviceApplicationCount > 0) {
     aiSummary.push({
@@ -176,6 +191,14 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
       label: '사이니지 검수 대기',
       count: signagePendingCount,
       link: '/operator/signage/content',
+    });
+  }
+  if (pharmacyRequestCount > 0) {
+    actionQueue.push({
+      id: 'aq-pharmacy-requests',
+      label: '약국 서비스 신청 검토',
+      count: pharmacyRequestCount,
+      link: '/operator/pharmacy-requests',
     });
   }
   // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Action Queue
@@ -232,7 +255,8 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
     { id: 'qa-docs', label: '자료실', link: '/operator/docs', icon: '📁' },
-    { id: 'qa-requests', label: '가입/서비스 신청', link: '/operator/organization-requests', icon: '👥' },
+    { id: 'qa-requests', label: '조직 가입 요청', link: '/operator/organization-requests', icon: '👥' },
+    { id: 'qa-pharmacy-requests', label: '약국 서비스 신청', link: '/operator/pharmacy-requests', icon: '💊' },
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },
@@ -263,6 +287,7 @@ export default function KpaOperatorDashboard() {
       const fetches: Promise<any>[] = [
         operatorApi.getSummary(),
         apiClient.get('/members', { status: 'pending', pageSize: 1 }),
+        apiClient.get('/pharmacy-requests/pending', { limit: 1 }),
       ];
       // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin용 추가 데이터 fetch
       if (isAdmin) {
@@ -276,8 +301,9 @@ export default function KpaOperatorDashboard() {
 
       const summaryRes = results[0].status === 'fulfilled' ? results[0].value : null;
       const membersRes = results[1].status === 'fulfilled' ? results[1].value : null;
-      const totalMembersRes = isAdmin && results[2]?.status === 'fulfilled' ? results[2].value : null;
-      const serviceAppsRes = isAdmin && results[3]?.status === 'fulfilled' ? results[3].value : null;
+      const pharmacyReqRes = results[2].status === 'fulfilled' ? results[2].value : null;
+      const totalMembersRes = isAdmin && results[3]?.status === 'fulfilled' ? results[3].value : null;
+      const serviceAppsRes = isAdmin && results[4]?.status === 'fulfilled' ? results[4].value : null;
 
       // Log individual failures
       results.forEach((r, i) => {
@@ -291,6 +317,7 @@ export default function KpaOperatorDashboard() {
         pendingMembers: (membersRes as any)?.total ?? (membersRes as any)?.data?.total ?? 0,
         totalMembers: (totalMembersRes as any)?.total ?? (totalMembersRes as any)?.data?.total ?? 0,
         serviceApplicationCount: (serviceAppsRes as any)?.data?.pagination?.total ?? 0,
+        pharmacyRequestCount: (pharmacyReqRes as any)?.data?.pagination?.total ?? 0,
       };
 
       setConfig(buildDashboardConfig(extData, isAdmin));
