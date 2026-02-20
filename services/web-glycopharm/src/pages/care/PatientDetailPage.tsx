@@ -17,7 +17,6 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, NavLink, Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import {
   ArrowLeft,
-  User,
   AlertTriangle,
   AlertCircle,
   CheckCircle,
