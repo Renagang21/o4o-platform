@@ -55,8 +55,13 @@ export function ForumDetailPage() {
       const res = await forumApi.likePost(post.id);
       setPost({ ...post, likeCount: res.data.likeCount });
       setIsLiked((res.data as any).isLiked ?? !isLiked);
-    } catch (err) {
-      alert('좋아요 처리에 실패했습니다.');
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('token') || msg.includes('expired') || msg.includes('401')) {
+        alert('로그인 세션이 만료되었습니다. 페이지를 새로고침해 주세요.');
+      } else {
+        alert('좋아요 처리에 실패했습니다.');
+      }
     } finally {
       setIsLiking(false);
     }
