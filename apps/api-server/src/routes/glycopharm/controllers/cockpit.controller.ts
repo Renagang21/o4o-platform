@@ -12,7 +12,8 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmCustomerRequest } from '../entities/customer-request.entity.js';
 import { StoreSummaryEngine, StoreInsightsEngine, DEFAULT_INSIGHT_RULES } from '@o4o/store-core';
@@ -109,7 +110,7 @@ export function createCockpitController(
         }
 
         // Find pharmacy owned by user (created_by_user_id)
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
@@ -128,20 +129,8 @@ export function createCockpitController(
         const legalInfoIssues: string[] = [];
 
         if (pharmacy) {
-          // Map pharmacy status
-          switch (pharmacy.status) {
-            case 'active':
-              storeStatus = 'active';
-              break;
-            case 'inactive':
-              storeStatus = 'preparing';
-              break;
-            case 'suspended':
-              storeStatus = 'suspended';
-              break;
-            default:
-              storeStatus = 'preparing';
-          }
+          // Map isActive boolean to status
+          storeStatus = pharmacy.isActive ? 'active' : 'preparing';
 
           // Check legal info completeness based on business_number
           if (pharmacy.business_number) {
@@ -200,7 +189,7 @@ export function createCockpitController(
         }
 
         // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
@@ -283,7 +272,7 @@ export function createCockpitController(
         }
 
         // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
@@ -306,9 +295,11 @@ export function createCockpitController(
           },
         };
 
-        if (pharmacy && pharmacy.status === 'active') {
-          // Check enabled services from pharmacy's enabled_services field
-          const enabledServices = pharmacy.enabled_services || [];
+        if (pharmacy && pharmacy.isActive) {
+          // Check enabled services from extension table
+          const extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
+          const extension = await extRepo.findOne({ where: { organization_id: pharmacy.id } });
+          const enabledServices = extension?.enabled_services || [];
 
           // Check if signage is enabled (digital_signage service type)
           response.signage.enabled = enabledServices.includes('digital_signage');
@@ -386,7 +377,7 @@ export function createCockpitController(
           return;
         }
 
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
@@ -428,7 +419,7 @@ export function createCockpitController(
           return;
         }
 
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
@@ -482,18 +473,20 @@ export function createCockpitController(
         }
 
         // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
 
-        // Count active services
-        const enabledServices = pharmacy?.enabled_services || [];
+        // Count active services from extension
+        const extRepo2 = dataSource.getRepository(GlycopharmPharmacyExtension);
+        const storeExtension = pharmacy ? await extRepo2.findOne({ where: { organization_id: pharmacy.id } }) : null;
+        const enabledServices = storeExtension?.enabled_services || [];
         const activeServices = enabledServices.length;
 
         // Count active channels (web is always 1 if active)
         let activeChannels = 0;
-        if (pharmacy?.status === 'active') {
+        if (pharmacy?.isActive) {
           activeChannels = 1; // web always on
         }
 
@@ -627,7 +620,7 @@ export function createCockpitController(
         }
 
         // Verify pharmacy exists
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });
@@ -691,7 +684,7 @@ export function createCockpitController(
         }
 
         // Find pharmacy
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });

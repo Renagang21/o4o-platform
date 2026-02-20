@@ -29,7 +29,8 @@ import { Router, Request, Response } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
 import rateLimit from 'express-rate-limit';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
-import { GlycopharmPharmacy } from '../glycopharm/entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../kpa/entities/organization-store.entity.js';
+import { GlycopharmPharmacyExtension } from '../glycopharm/entities/glycopharm-pharmacy-extension.entity.js';
 import { StoreBlogPost } from '../glycopharm/entities/store-blog-post.entity.js';
 import type { StoreBlogPostStatus } from '../glycopharm/entities/store-blog-post.entity.js';
 import { GlycopharmProduct } from '../glycopharm/entities/glycopharm-product.entity.js';
@@ -44,7 +45,7 @@ import type { StoreBlock, TemplateProfile } from '../glycopharm/entities/glycoph
 interface ResolvedStore {
   storeId: string;
   serviceKey: string;
-  pharmacy: GlycopharmPharmacy;
+  pharmacy: OrganizationStore;
 }
 
 async function resolvePublicStore(
@@ -73,9 +74,9 @@ async function resolvePublicStore(
     return null;
   }
 
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
-  const pharmacy = await pharmacyRepo.findOne({
-    where: { id: record.storeId, status: 'active' as any },
+  const orgRepo = dataSource.getRepository(OrganizationStore);
+  const pharmacy = await orgRepo.findOne({
+    where: { id: record.storeId, isActive: true },
   });
 
   if (!pharmacy) {
@@ -405,18 +406,22 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
         where: { pharmacy_id: pharmacy.id, status: 'active' },
       });
 
+      // Load extension for glycopharm-specific fields (logo, hero_image)
+      const extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
+      const extension = await extRepo.findOne({ where: { organization_id: pharmacy.id } });
+
       res.json({
         success: true,
         data: {
           id: pharmacy.id,
           name: pharmacy.name,
-          slug: pharmacy.slug,
+          slug: req.params.slug,
           description: pharmacy.description,
           address: pharmacy.address,
           phone: pharmacy.phone,
-          logo: pharmacy.logo,
-          hero_image: pharmacy.hero_image,
-          status: pharmacy.status,
+          logo: extension?.logo || null,
+          hero_image: extension?.hero_image || null,
+          status: pharmacy.isActive ? 'active' : 'inactive',
           productCount,
         },
       });
@@ -588,7 +593,7 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
       const hasCustomBlocks = pharmacy.storefront_blocks && pharmacy.storefront_blocks.length > 0;
       const blocks = hasCustomBlocks
         ? pharmacy.storefront_blocks!
-        : generateDefaultBlocks(pharmacy.template_profile);
+        : generateDefaultBlocks((pharmacy.template_profile || 'BASIC') as TemplateProfile);
       const channels = await deriveChannels(dataSource, pharmacy.id);
 
       res.json({

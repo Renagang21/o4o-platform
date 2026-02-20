@@ -10,7 +10,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaOrganization } from '../entities/kpa-organization.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import { KpaBranchNews } from '../entities/kpa-branch-news.entity.js';
@@ -723,7 +723,7 @@ export function createBranchAdminDashboardController(
         }
 
         // Also return organization basic info
-        const orgRepo = dataSource.getRepository(KpaOrganization);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
         const org = await orgRepo.findOne({ where: { id: organizationId } });
 
         res.json({ success: true, data: { settings, organization: org } });

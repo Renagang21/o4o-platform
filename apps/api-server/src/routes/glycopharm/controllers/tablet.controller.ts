@@ -19,7 +19,8 @@ import { DataSource, In } from 'typeorm';
 import rateLimit from 'express-rate-limit';
 import { GlycopharmService } from '../services/glycopharm.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { TabletServiceRequest } from '../entities/tablet-service-request.entity.js';
 import type { TabletServiceRequestStatus, TabletRequestItem } from '../entities/tablet-service-request.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
@@ -163,9 +164,16 @@ export function createTabletController(
 ): Router {
   const router = Router();
   const service = new GlycopharmService(dataSource);
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
+  const slugService = new StoreSlugService(dataSource);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
   const requestRepo = dataSource.getRepository(TabletServiceRequest);
+
+  async function findOrgBySlug(slug: string): Promise<OrganizationStore | null> {
+    const record = await slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    return orgRepo.findOne({ where: { id: record.storeId } });
+  }
 
   // ============================================================================
   // GET /stores/:slug/tablet/products — TABLET 채널 상품 (public)
@@ -351,7 +359,7 @@ export function createTabletController(
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
 
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
       if (!pharmacy) {
         res.status(404).json({
           success: false,
@@ -408,7 +416,7 @@ export function createTabletController(
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
 
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
       if (!pharmacy) {
         res.status(404).json({
           success: false,

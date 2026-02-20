@@ -75,9 +75,10 @@ export class PhysicalStoreService {
          WHERE business_number IS NOT NULL AND business_number != ''`,
       ),
       this.dataSource.query(
-        `SELECT id, business_number, name
-         FROM glycopharm_pharmacies
-         WHERE business_number IS NOT NULL AND business_number != ''`,
+        `SELECT o.id, o.business_number, o.name
+         FROM organizations o
+         JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
+         WHERE o.business_number IS NOT NULL AND o.business_number != ''`,
       ),
     ]);
 
@@ -250,7 +251,7 @@ export class PhysicalStoreService {
            WHEN psl.service_type = 'cosmetics'
              THEN (SELECT name FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
            WHEN psl.service_type = 'glycopharm'
-             THEN (SELECT name FROM glycopharm_pharmacies WHERE id = psl.service_store_id)
+             THEN (SELECT name FROM organizations WHERE id = psl.service_store_id)
            ELSE 'Unknown'
          END as "storeName",
          COALESCE(

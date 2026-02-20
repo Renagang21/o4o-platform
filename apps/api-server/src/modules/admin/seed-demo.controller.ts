@@ -141,7 +141,7 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
   }
 
   // ------------------------------------------------------------------
-  // 2. Pharmacies (glycopharm_pharmacies) — PK shared with org
+  // 2. Pharmacies (organizations + enrollment) — unified model
   // ------------------------------------------------------------------
   const pharmacies = [
     { id: DEMO_IDS.pharmCare, name: '[DEMO] Care 약국', code: 'DEMO-CARE-001', bizNum: '000-00-00001', userId: DEMO_IDS.userCare },
@@ -151,11 +151,20 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
 
   for (const ph of pharmacies) {
     await insertIfNotExists(
-      'glycopharm_pharmacies', ph.id,
-      `INSERT INTO glycopharm_pharmacies (id, name, code, business_number, status, created_by_user_id, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, 'active', $5, NOW(), NOW())`,
+      'organizations', ph.id,
+      `INSERT INTO organizations (id, name, code, type, "isActive", level, path, business_number, created_by_user_id, "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, 'pharmacy', true, 0, $3, $4, $5, NOW(), NOW())`,
       [ph.id, ph.name, ph.code, ph.bizNum, ph.userId],
       `pharmacy:${ph.name}`,
+    );
+    // Enrollment for glycopharm service
+    await insertIfNotExists(
+      'organization_service_enrollments', ph.id,
+      `INSERT INTO organization_service_enrollments (organization_id, service_code, status, enrolled_at)
+       VALUES ($1, 'glycopharm', 'active', NOW())
+       ON CONFLICT (organization_id, service_code) DO NOTHING`,
+      [ph.id],
+      `enrollment:${ph.name}`,
     );
   }
 
@@ -344,14 +353,15 @@ async function cleanupDemoData(ds: DataSource): Promise<{ deleted: string[] }> {
     { table: 'care_coaching_sessions', pattern: DEMO_IDS.coachingPrefix },
     { table: 'care_kpi_snapshots', pattern: DEMO_IDS.snapshotPrefix },
     { table: 'glucoseview_customers', pattern: DEMO_IDS.patientPrefix },
-    { table: 'glycopharm_pharmacies', pattern: 'd0000000-de01-4000' },
-    { table: 'kpa_organizations', pattern: 'd0000000-de01-4000' },
+    { table: 'organization_service_enrollments', pattern: 'd0000000-de01-4000', column: 'organization_id' },
+    { table: 'organizations', pattern: 'd0000000-de01-4000' },
   ];
 
-  for (const { table, pattern } of tables) {
+  for (const { table, pattern, column } of tables as Array<{ table: string; pattern: string; column?: string }>) {
     try {
+      const col = column || 'id';
       const result = await ds.query(
-        `DELETE FROM ${table} WHERE id::text LIKE $1`,
+        `DELETE FROM ${table} WHERE ${col}::text LIKE $1`,
         [`${pattern}%`],
       );
       const count = result?.[1] ?? 0;

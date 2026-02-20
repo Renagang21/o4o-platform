@@ -143,7 +143,7 @@ import {
 // GLYCOPHARM ENTITIES (Phase B-1)
 // ============================================================================
 import {
-  GlycopharmPharmacy,
+  // GlycopharmPharmacy - REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
   GlycopharmProduct,
   GlycopharmProductLog,
   GlycopharmApplication,
@@ -155,6 +155,7 @@ import {
   // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
   TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
   StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
+  GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -221,6 +222,8 @@ import {
   KpaStoreAssetControl,
   KpaStoreContent, // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
   KpaPharmacyRequest, // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+  OrganizationStore, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
+  OrganizationServiceEnrollment, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -555,9 +558,9 @@ export const AppDataSource = new DataSource({
     YaksaPostLog,
     // ============================================================================
     // GLYCOPHARM ENTITIES (Phase B-1)
+    // Note: GlycopharmPharmacy REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
     // Note: GlycopharmOrder, GlycopharmOrderItem REMOVED (Phase 4-A Legacy Deprecation)
     // ============================================================================
-    GlycopharmPharmacy,
     GlycopharmProduct,
     GlycopharmProductLog,
     GlycopharmApplication,
@@ -568,6 +571,7 @@ export const AppDataSource = new DataSource({
     GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
     TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
     StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
+    GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================
@@ -631,6 +635,9 @@ export const AppDataSource = new DataSource({
     KpaStoreContent,
     // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
     KpaPharmacyRequest,
+    // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
+    OrganizationStore,
+    OrganizationServiceEnrollment,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================

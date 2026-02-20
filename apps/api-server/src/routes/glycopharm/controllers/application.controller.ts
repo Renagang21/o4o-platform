@@ -11,7 +11,8 @@ import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { StoreSlugService, normalizeSlug } from '@o4o/platform-core/store-identity';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
 import { emailService } from '../../../services/email.service.js';
@@ -378,7 +379,7 @@ export function createApplicationController(
           return;
         }
 
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
 
         // Find pharmacy created by this user
         const pharmacy = await pharmacyRepo.findOne({
@@ -416,6 +417,10 @@ export function createApplicationController(
           return;
         }
 
+        // Load extension for glycopharm-specific fields
+        const extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
+        const extension = await extRepo.findOne({ where: { organization_id: pharmacy.id } });
+
         res.json({
           success: true,
           pharmacy: {
@@ -424,12 +429,12 @@ export function createApplicationController(
             code: pharmacy.code,
             address: pharmacy.address,
             phone: pharmacy.phone,
-            email: pharmacy.email,
-            ownerName: pharmacy.owner_name,
+            email: null, // GAP: email not yet migrated to extension
+            ownerName: extension?.owner_name || null,
             businessNumber: pharmacy.business_number,
-            status: pharmacy.status,
-            enabledServices: pharmacy.enabled_services || [],
-            createdAt: pharmacy.created_at,
+            status: pharmacy.isActive ? 'active' : 'inactive',
+            enabledServices: extension?.enabled_services || [],
+            createdAt: pharmacy.createdAt,
           },
         });
       } catch (error) {

@@ -3,12 +3,17 @@
  *
  * Phase B-1: Glycopharm API Implementation
  * Data access layer for pharmacies and products
+ *
+ * WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C:
+ * Converted from GlycopharmPharmacy → OrganizationStore + enrollment scoping
  */
 
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmProductLog } from '../entities/glycopharm-product-log.entity.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import {
   ListPharmaciesQueryDto,
   ListProductsQueryDto,
@@ -16,36 +21,47 @@ import {
 } from '../dto/index.js';
 
 export class GlycopharmRepository {
-  private pharmacyRepo: Repository<GlycopharmPharmacy>;
+  private orgRepo: Repository<OrganizationStore>;
+  private extRepo: Repository<GlycopharmPharmacyExtension>;
   private productRepo: Repository<GlycopharmProduct>;
   private productLogRepo: Repository<GlycopharmProductLog>;
+  private slugService: StoreSlugService;
 
-  constructor(dataSource: DataSource) {
-    this.pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  constructor(private dataSource: DataSource) {
+    this.orgRepo = dataSource.getRepository(OrganizationStore);
+    this.extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
     this.productRepo = dataSource.getRepository(GlycopharmProduct);
     this.productLogRepo = dataSource.getRepository(GlycopharmProductLog);
+    this.slugService = new StoreSlugService(dataSource);
   }
 
   // ============================================================================
-  // Pharmacy Methods
+  // Pharmacy Methods (OrganizationStore + glycopharm enrollment)
   // ============================================================================
 
   async findAllPharmacies(query: ListPharmaciesQueryDto): Promise<{
-    data: GlycopharmPharmacy[];
+    data: OrganizationStore[];
     meta: PaginationMeta;
   }> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
 
-    const qb = this.pharmacyRepo.createQueryBuilder('pharmacy');
+    const qb = this.orgRepo
+      .createQueryBuilder('org')
+      .innerJoin(
+        'organization_service_enrollments', 'ose',
+        'ose.organization_id = org.id AND ose.service_code = :sc',
+        { sc: 'glycopharm' },
+      );
 
-    if (query.status) {
-      qb.andWhere('pharmacy.status = :status', { status: query.status });
+    if (query.status === 'active') {
+      qb.andWhere('org."isActive" = true');
+    } else if (query.status) {
+      qb.andWhere('org."isActive" = false');
     }
 
-    qb.orderBy('pharmacy.sort_order', 'ASC')
-      .addOrderBy('pharmacy.created_at', 'DESC');
+    qb.orderBy('org.name', 'ASC');
 
     const [data, total] = await qb.skip(skip).take(limit).getManyAndCount();
 
@@ -60,28 +76,33 @@ export class GlycopharmRepository {
     };
   }
 
-  async findPharmacyById(id: string): Promise<GlycopharmPharmacy | null> {
-    return this.pharmacyRepo.findOne({
-      where: { id },
-      relations: ['products'],
-    });
+  async findPharmacyById(id: string): Promise<OrganizationStore | null> {
+    return this.orgRepo.findOne({ where: { id } });
   }
 
-  async findPharmacyByCode(code: string): Promise<GlycopharmPharmacy | null> {
-    return this.pharmacyRepo.findOne({ where: { code } });
+  async findPharmacyByCode(code: string): Promise<OrganizationStore | null> {
+    return this.orgRepo.findOne({ where: { code } });
   }
 
-  async findPharmacyBySlug(slug: string): Promise<GlycopharmPharmacy | null> {
-    return this.pharmacyRepo.findOne({ where: { slug } });
+  async findPharmacyBySlug(slug: string): Promise<OrganizationStore | null> {
+    const record = await this.slugService.findBySlug(slug);
+    if (!record) return null;
+    return this.orgRepo.findOne({ where: { id: record.storeId } });
   }
 
-  async findActivePharmacyBySlug(slug: string): Promise<GlycopharmPharmacy | null> {
-    return this.pharmacyRepo.findOne({ where: { slug, status: 'active' } });
+  async findActivePharmacyBySlug(slug: string): Promise<OrganizationStore | null> {
+    const record = await this.slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    return this.orgRepo.findOne({ where: { id: record.storeId, isActive: true } });
   }
 
-  async createPharmacy(data: Partial<GlycopharmPharmacy>): Promise<GlycopharmPharmacy> {
-    const pharmacy = this.pharmacyRepo.create(data);
-    return this.pharmacyRepo.save(pharmacy);
+  async findExtension(organizationId: string): Promise<GlycopharmPharmacyExtension | null> {
+    return this.extRepo.findOne({ where: { organization_id: organizationId } });
+  }
+
+  async createPharmacy(data: Partial<OrganizationStore>): Promise<OrganizationStore> {
+    const org = this.orgRepo.create(data);
+    return this.orgRepo.save(org);
   }
 
   /**
@@ -90,15 +111,15 @@ export class GlycopharmRepository {
    */
   async createPharmacyWithManager(
     manager: EntityManager,
-    data: Partial<GlycopharmPharmacy>
-  ): Promise<GlycopharmPharmacy> {
-    const repo = manager.getRepository(GlycopharmPharmacy);
-    const pharmacy = repo.create(data);
-    return repo.save(pharmacy);
+    data: Partial<OrganizationStore>
+  ): Promise<OrganizationStore> {
+    const repo = manager.getRepository(OrganizationStore);
+    const org = repo.create(data);
+    return repo.save(org);
   }
 
-  async updatePharmacy(id: string, data: Partial<GlycopharmPharmacy>): Promise<GlycopharmPharmacy | null> {
-    await this.pharmacyRepo.update(id, data);
+  async updatePharmacy(id: string, data: Partial<OrganizationStore>): Promise<OrganizationStore | null> {
+    await this.orgRepo.update(id, data);
     return this.findPharmacyById(id);
   }
 

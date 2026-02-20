@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaMember, KpaOrganization, KpaMemberService, KpaAuditLog } from '../entities/index.js';
+import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -30,7 +30,7 @@ export function createMemberController(
 ): Router {
   const router = Router();
   const memberRepo = dataSource.getRepository(KpaMember);
-  const orgRepo = dataSource.getRepository(KpaOrganization);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
   const serviceRepo = dataSource.getRepository(KpaMemberService);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 

@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { KpaOrganization } from './kpa-organization.entity.js';
+import type { OrganizationStore } from './organization-store.entity.js';
 import type { User } from '../../../modules/auth/entities/User.js';
 
 export type KpaMemberRole = 'member' | 'operator' | 'admin';
@@ -103,7 +103,7 @@ export class KpaMember {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne('KpaOrganization')
+  @ManyToOne('OrganizationStore')
   @JoinColumn({ name: 'organization_id' })
-  organization: KpaOrganization;
+  organization: OrganizationStore;
 }

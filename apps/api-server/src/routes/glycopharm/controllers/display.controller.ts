@@ -11,12 +11,12 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import {
-  GlycopharmPharmacy,
   DisplayPlaylist,
   DisplayMedia,
   DisplayPlaylistItem,
   DisplaySchedule,
 } from '../entities/index.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -46,7 +46,7 @@ async function resolvePharmacyContext(
     return { pharmacyId: null, isAdmin: true };
   }
 
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const pharmacy = await pharmacyRepo.findOne({ where: { created_by_user_id: userId } });
   if (!pharmacy) throw new Error('NO_PHARMACY');
 

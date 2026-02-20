@@ -6,15 +6,16 @@
  * GET  /stores/:slug/template — Template Profile 조회 (public)
  * PUT  /stores/:slug/template — Template Profile 변경 (staff, owner only)
  *
- * PK 공유 구조(glycopharm_pharmacies.id === kpa_organizations.id)를 활용하여
- * 동일 엔티티에서 template_profile 읽기/쓰기.
+ * organizations 테이블의 template_profile 읽기/쓰기.
+ * slug → StoreSlugService 기반 해석.
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import type { TemplateProfile } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 const VALID_PROFILES: TemplateProfile[] = ['BASIC', 'COMMERCE_FOCUS', 'CONTENT_FOCUS', 'MINIMAL'];
 
@@ -23,13 +24,22 @@ export function createKpaStoreTemplateController(
   requireAuth: RequestHandler,
 ): Router {
   const router = Router();
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
+  const slugService = new StoreSlugService(dataSource);
+
+  async function findOrgBySlug(slug: string, activeOnly = false): Promise<OrganizationStore | null> {
+    const record = await slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    const where: any = { id: record.storeId };
+    if (activeOnly) where.isActive = true;
+    return orgRepo.findOne({ where });
+  }
 
   // GET /:slug/template — public
   router.get('/:slug/template', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      const pharmacy = await findOrgBySlug(slug, true);
 
       if (!pharmacy) {
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
@@ -67,7 +77,7 @@ export function createKpaStoreTemplateController(
         return;
       }
 
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      const pharmacy = await findOrgBySlug(slug, true);
       if (!pharmacy) {
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
@@ -78,7 +88,7 @@ export function createKpaStoreTemplateController(
         return;
       }
 
-      await pharmacyRepo.update(pharmacy.id, { template_profile: templateProfile });
+      await orgRepo.update(pharmacy.id, { template_profile: templateProfile });
 
       res.json({ success: true, data: { templateProfile } });
     } catch (error: any) {

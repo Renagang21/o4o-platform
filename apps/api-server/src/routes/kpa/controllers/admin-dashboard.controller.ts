@@ -10,7 +10,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaOrganization } from '../entities/kpa-organization.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 
@@ -86,14 +86,14 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         // Get repositories
-        const orgRepo = dataSource.getRepository(KpaOrganization);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
         const memberRepo = dataSource.getRepository(KpaMember);
         const appRepo = dataSource.getRepository(KpaApplication);
 
         // Query organization stats
         const [branchCount, groupCount] = await Promise.all([
-          orgRepo.count({ where: { type: 'branch', is_active: true } }),
-          orgRepo.count({ where: { type: 'group', is_active: true } }),
+          orgRepo.count({ where: { type: 'branch', isActive: true } }),
+          orgRepo.count({ where: { type: 'group', isActive: true } }),
         ]);
         const totalBranches = branchCount + groupCount;
 
@@ -127,15 +127,15 @@ export function createAdminDashboardController(
     '/dashboard/organizations',
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const orgRepo = dataSource.getRepository(KpaOrganization);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
 
         const [total, association, branch, group, active, inactive] = await Promise.all([
           orgRepo.count(),
           orgRepo.count({ where: { type: 'association' } }),
           orgRepo.count({ where: { type: 'branch' } }),
           orgRepo.count({ where: { type: 'group' } }),
-          orgRepo.count({ where: { is_active: true } }),
-          orgRepo.count({ where: { is_active: false } }),
+          orgRepo.count({ where: { isActive: true } }),
+          orgRepo.count({ where: { isActive: false } }),
         ]);
 
         const stats: OrganizationStats = {

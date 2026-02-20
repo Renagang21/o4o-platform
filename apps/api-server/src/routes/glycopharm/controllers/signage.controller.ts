@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { DisplayPlaylist, DisplayMedia, DisplayPlaylistItem } from '../entities/index.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -41,7 +41,7 @@ export function createSignageController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const playlistRepo = dataSource.getRepository(DisplayPlaylist);
   const mediaRepo = dataSource.getRepository(DisplayMedia);
   const playlistItemRepo = dataSource.getRepository(DisplayPlaylistItem);

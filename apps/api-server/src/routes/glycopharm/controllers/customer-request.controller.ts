@@ -19,7 +19,7 @@ import {
   type CustomerRequestSourceType,
   type CustomerRequestStatus,
 } from '../entities/customer-request.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import {
   RequestActionService,
   VALID_REJECT_REASONS,
@@ -59,7 +59,7 @@ export function createCustomerRequestController(
 ): Router {
   const router = Router();
   const requestRepo = dataSource.getRepository(GlycopharmCustomerRequest);
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const requestActionService = new RequestActionService(dataSource);
 
   /**

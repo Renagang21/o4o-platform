@@ -22,7 +22,7 @@ import { DataSource } from 'typeorm';
 import { GlycopharmService } from '../services/glycopharm.service.js';
 import { FeaturedProductsService } from '../services/featured-products.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import type { TemplateProfile } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../types/auth.js';
@@ -196,7 +196,17 @@ export function createStoreController(dataSource: DataSource): Router {
   const service = new GlycopharmService(dataSource);
   const featuredService = new FeaturedProductsService(dataSource);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
+  const slugService = new StoreSlugService(dataSource);
+
+  /** Resolve slug → OrganizationStore (active only when activeOnly=true) */
+  async function findOrgBySlug(slug: string, activeOnly = false): Promise<OrganizationStore | null> {
+    const record = await slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    const where: any = { id: record.storeId };
+    if (activeOnly) where.isActive = true;
+    return orgRepo.findOne({ where });
+  }
 
   // ============================================================================
   // GET /stores/:slug — 매장 정보 (public)
@@ -416,7 +426,7 @@ export function createStoreController(dataSource: DataSource): Router {
   router.get('/:slug/storefront-config', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
         if (await checkSlugRedirect(dataSource, slug, req, res)) return;
@@ -445,7 +455,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const { slug } = req.params;
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
         res.status(404).json({
@@ -492,7 +502,7 @@ export function createStoreController(dataSource: DataSource): Router {
         ...(template !== undefined && { template }),
       };
 
-      await pharmacyRepo.update(pharmacy.id, { storefront_config: updatedConfig });
+      await orgRepo.update(pharmacy.id, { storefront_config: updatedConfig });
 
       res.json({ success: true, data: updatedConfig });
     } catch (error: any) {
@@ -510,7 +520,7 @@ export function createStoreController(dataSource: DataSource): Router {
   router.get('/:slug/hero', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
         if (await checkSlugRedirect(dataSource, slug, req, res)) return;
@@ -540,7 +550,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const { slug } = req.params;
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
         res.status(404).json({
@@ -596,7 +606,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const currentConfig = pharmacy.storefront_config || {};
       const updatedConfig = { ...currentConfig, heroContents };
 
-      await pharmacyRepo.update(pharmacy.id, { storefront_config: updatedConfig });
+      await orgRepo.update(pharmacy.id, { storefront_config: updatedConfig });
 
       res.json({ success: true, data: heroContents });
     } catch (error: any) {
@@ -615,7 +625,7 @@ export function createStoreController(dataSource: DataSource): Router {
   router.get('/:slug/template', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      const pharmacy = await findOrgBySlug(slug, true);
 
       if (!pharmacy) {
         if (await checkSlugRedirect(dataSource, slug, req, res)) return;
@@ -660,7 +670,7 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      const pharmacy = await findOrgBySlug(slug, true);
       if (!pharmacy) {
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
@@ -671,7 +681,7 @@ export function createStoreController(dataSource: DataSource): Router {
         return;
       }
 
-      await pharmacyRepo.update(pharmacy.id, { template_profile: templateProfile });
+      await orgRepo.update(pharmacy.id, { template_profile: templateProfile });
 
       res.json({ success: true, data: { templateProfile } });
     } catch (error: any) {

@@ -16,7 +16,7 @@ import {
   type GlycopharmEventSourceType,
   type GlycopharmEventPurpose,
 } from '../entities/glycopharm-event.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { EventPromotionService } from '../services/event-promotion.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
@@ -60,7 +60,7 @@ export function createEventController(
 ): Router {
   const router = Router();
   const promotionService = new EventPromotionService(dataSource);
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const eventRepo = dataSource.getRepository(GlycopharmEvent);
 
   /**

@@ -91,7 +91,7 @@ export function createAdminForceAssetController(
               o.name AS "organizationName"
             FROM kpa_store_asset_controls c
             LEFT JOIN o4o_asset_snapshots s ON s.id = c.snapshot_id
-            LEFT JOIN kpa_organizations o ON o.id = c.organization_id
+            LEFT JOIN organizations o ON o.id = c.organization_id
             WHERE c.is_forced = true AND c.organization_id = $3
             ORDER BY c.created_at DESC
             LIMIT $1 OFFSET $2
@@ -116,7 +116,7 @@ export function createAdminForceAssetController(
               o.name AS "organizationName"
             FROM kpa_store_asset_controls c
             LEFT JOIN o4o_asset_snapshots s ON s.id = c.snapshot_id
-            LEFT JOIN kpa_organizations o ON o.id = c.organization_id
+            LEFT JOIN organizations o ON o.id = c.organization_id
             WHERE c.is_forced = true
             ORDER BY c.created_at DESC
             LIMIT $1 OFFSET $2
@@ -197,7 +197,7 @@ export function createAdminForceAssetController(
 
         // Verify organization exists
         const orgCheck = await dataSource.query(
-          `SELECT id FROM kpa_organizations WHERE id = $1`,
+          `SELECT id FROM organizations WHERE id = $1`,
           [organizationId],
         );
         if (!orgCheck.length) {

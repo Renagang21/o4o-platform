@@ -150,8 +150,9 @@ async function getGlycopharmSummary(ds: DataSource): Promise<Record<string, any>
     const [pharmacyStats] = await ds.query(`
       SELECT
         COUNT(*) as "totalPharmacies",
-        COUNT(*) FILTER (WHERE status = 'active') as "activePharmacies"
-      FROM glycopharm_pharmacies
+        COUNT(*) FILTER (WHERE o."isActive" = true) as "activePharmacies"
+      FROM organizations o
+      JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
     `);
 
     // Care KPI (most recent snapshot per pharmacy)

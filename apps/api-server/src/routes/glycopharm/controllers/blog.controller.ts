@@ -19,10 +19,11 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { StoreBlogPost } from '../entities/store-blog-post.entity.js';
 import type { StoreBlogPostStatus } from '../entities/store-blog-post.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 const DEFAULT_SERVICE_KEY = 'glycopharm';
 
@@ -51,16 +52,19 @@ export function createBlogController(
   serviceKey: string = DEFAULT_SERVICE_KEY,
 ): Router {
   const router = Router();
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
   const blogRepo = dataSource.getRepository(StoreBlogPost);
+  const slugService = new StoreSlugService(dataSource);
 
-  // Helper: resolve pharmacy by slug
-  async function resolvePharmacy(slug: string) {
-    return pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+  // Helper: resolve organization by slug (active stores only)
+  async function resolvePharmacy(slug: string): Promise<OrganizationStore | null> {
+    const record = await slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    return orgRepo.findOne({ where: { id: record.storeId, isActive: true } });
   }
 
   // Helper: verify store ownership
-  function verifyOwner(pharmacy: GlycopharmPharmacy, userId: string): boolean {
+  function verifyOwner(pharmacy: OrganizationStore, userId: string): boolean {
     return pharmacy.created_by_user_id === userId;
   }
 

@@ -13,9 +13,10 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import type { StoreBlockType, StoreBlock, TemplateProfile } from '../entities/glycopharm-pharmacy.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 // ── Valid Block Types ───────────────────────────────────────────────────────
 
@@ -153,13 +154,22 @@ export function createLayoutController(
   requireAuth: RequestHandler,
 ): Router {
   const router = Router();
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
+  const slugService = new StoreSlugService(dataSource);
+
+  async function findOrgBySlug(slug: string, activeOnly = false): Promise<OrganizationStore | null> {
+    const record = await slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    const where: any = { id: record.storeId };
+    if (activeOnly) where.isActive = true;
+    return orgRepo.findOne({ where });
+  }
 
   // GET /:slug/layout — public
   router.get('/:slug/layout', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      const pharmacy = await findOrgBySlug(slug, true);
 
       if (!pharmacy) {
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
@@ -169,7 +179,7 @@ export function createLayoutController(
       const hasCustomBlocks = pharmacy.storefront_blocks && pharmacy.storefront_blocks.length > 0;
       const blocks = hasCustomBlocks
         ? pharmacy.storefront_blocks!
-        : generateDefaultBlocks(pharmacy.template_profile);
+        : generateDefaultBlocks((pharmacy.template_profile || 'BASIC') as TemplateProfile);
 
       const channels = await deriveChannels(dataSource, pharmacy.id);
 
@@ -209,7 +219,7 @@ export function createLayoutController(
         return;
       }
 
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug, status: 'active' as any } });
+      const pharmacy = await findOrgBySlug(slug, true);
       if (!pharmacy) {
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
@@ -232,7 +242,7 @@ export function createLayoutController(
         };
       });
 
-      await pharmacyRepo.update(pharmacy.id, { storefront_blocks: sanitized });
+      await orgRepo.update(pharmacy.id, { storefront_blocks: sanitized as any[] });
 
       res.json({ success: true, data: { blocks: sanitized } });
     } catch (error: any) {

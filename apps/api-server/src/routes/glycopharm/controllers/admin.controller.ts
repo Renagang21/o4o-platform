@@ -11,7 +11,8 @@ import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
@@ -247,7 +248,8 @@ export function createAdminController(
         }
 
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
+        const extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
 
         const application = await applicationRepo.findOne({
           where: { id },
@@ -282,59 +284,75 @@ export function createAdminController(
 
         await applicationRepo.save(application);
 
-        // If approved, create pharmacy
-        let pharmacy: GlycopharmPharmacy | null = null;
+        // If approved, create pharmacy (organization + extension + enrollment)
+        let createdOrg: OrganizationStore | null = null;
         if (status === 'approved') {
           // Check if pharmacy already exists for this user
-          const existingPharmacy = await pharmacyRepo.findOne({
+          const existingOrg = await orgRepo.findOne({
             where: { created_by_user_id: application.userId },
           });
 
-          if (!existingPharmacy) {
+          if (!existingOrg) {
             // WO-CORE-STORE-SLUG-TRANSACTION-HARDENING-V1: Atomic pharmacy + slug creation
             const queryRunner = dataSource.createQueryRunner();
             await queryRunner.connect();
             await queryRunner.startTransaction();
 
             try {
-              // Create new pharmacy with enabled services from application
-              pharmacy = new GlycopharmPharmacy();
-              pharmacy.name = application.organizationName;
-              pharmacy.code = generatePharmacyCode();
-              pharmacy.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
+              const pharmacyCode = generatePharmacyCode();
 
               // Use StoreSlugService with EntityManager for transaction support
               const slugService = new StoreSlugService(queryRunner.manager);
 
-              // WO-CORE-STORE-REQUESTED-SLUG-V1: Use requestedSlug if available
+              // WO-CORE-STORE-REQUESTED-SLUG-V1: Compute slug value
+              let slugValue: string;
               if (application.requestedSlug) {
                 const availability = await slugService.checkAvailability(application.requestedSlug);
                 if (!availability.available) {
                   throw new Error(`Requested slug '${application.requestedSlug}' is no longer available: ${availability.reason}`);
                 }
-                pharmacy.slug = application.requestedSlug;
+                slugValue = application.requestedSlug;
               } else {
-                pharmacy.slug = await slugService.generateUniqueSlug(application.organizationName);
+                slugValue = await slugService.generateUniqueSlug(application.organizationName);
               }
 
-              pharmacy.status = 'active';
-              pharmacy.created_by_user_id = application.userId;
-              pharmacy.enabled_services = application.serviceTypes;
+              // Create organization
+              const org = new OrganizationStore();
+              org.name = application.organizationName;
+              org.code = pharmacyCode;
+              org.type = 'pharmacy';
+              org.isActive = true;
+              org.level = 0;
+              org.path = pharmacyCode;
+              org.business_number = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
+              org.created_by_user_id = application.userId;
 
-              // Save pharmacy within transaction
-              pharmacy = await queryRunner.manager.save(GlycopharmPharmacy, pharmacy);
+              createdOrg = await queryRunner.manager.save(OrganizationStore, org);
+
+              // Create glycopharm extension
+              const ext = new GlycopharmPharmacyExtension();
+              ext.organization_id = createdOrg.id;
+              ext.enabled_services = application.serviceTypes;
+              await queryRunner.manager.save(GlycopharmPharmacyExtension, ext);
+
+              // Create service enrollment
+              await queryRunner.manager.query(
+                `INSERT INTO organization_service_enrollments (organization_id, service_code, status, enrolled_at)
+                 VALUES ($1, 'glycopharm', 'active', NOW())`,
+                [createdOrg.id],
+              );
 
               // Register slug in platform-wide registry (same transaction)
               await slugService.reserveSlug({
-                storeId: pharmacy.id,
+                storeId: createdOrg.id,
                 serviceKey: 'glycopharm',
-                slug: pharmacy.slug,
+                slug: slugValue,
               });
 
               await queryRunner.commitTransaction();
 
               logger.info(
-                `[Glycopharm Admin] Pharmacy created: ${pharmacy.id} for user ${application.userId}`
+                `[Glycopharm Admin] Pharmacy created: ${createdOrg.id} for user ${application.userId}`
               );
             } catch (txError) {
               await queryRunner.rollbackTransaction();
@@ -344,27 +362,36 @@ export function createAdminController(
             }
           } else {
             // Pharmacy already exists - merge new services with existing
-            pharmacy = existingPharmacy;
-            const currentServices = pharmacy.enabled_services || [];
+            createdOrg = existingOrg;
+            const existingExt = await extRepo.findOne({ where: { organization_id: existingOrg.id } });
+            const currentServices = existingExt?.enabled_services || [];
             const newServices = application.serviceTypes.filter(
-              (s) => !currentServices.includes(s)
+              (s: string) => !currentServices.includes(s as any)
             );
 
             if (newServices.length > 0) {
-              pharmacy.enabled_services = [...currentServices, ...newServices];
-              await pharmacyRepo.save(pharmacy);
+              if (existingExt) {
+                existingExt.enabled_services = [...currentServices, ...newServices] as any;
+                await extRepo.save(existingExt);
+              } else {
+                const newExt = extRepo.create({
+                  organization_id: existingOrg.id,
+                  enabled_services: newServices as any,
+                });
+                await extRepo.save(newExt);
+              }
               logger.info(
-                `[Glycopharm Admin] Pharmacy ${existingPharmacy.id} updated with new services: ${newServices.join(', ')}`
+                `[Glycopharm Admin] Pharmacy ${existingOrg.id} updated with new services: ${newServices.join(', ')}`
               );
             } else {
               logger.info(
-                `[Glycopharm Admin] Pharmacy already exists: ${existingPharmacy.id} for user ${application.userId}`
+                `[Glycopharm Admin] Pharmacy already exists: ${existingOrg.id} for user ${application.userId}`
               );
             }
           }
 
           // Auto-assign glycopharm:store_owner role (WO-STOREFRONT-STABILIZATION Phase 2)
-          if (pharmacy) {
+          if (createdOrg) {
             const userRepo = dataSource.getRepository(User);
             const applicantUser = await userRepo.findOne({ where: { id: application.userId } });
             if (applicantUser && !applicantUser.roles.includes('glycopharm:store_owner')) {
@@ -391,12 +418,12 @@ export function createAdminController(
             decidedBy: application.decidedBy,
             rejectionReason: application.rejectionReason,
           },
-          pharmacy: pharmacy
+          pharmacy: createdOrg
             ? {
-                id: pharmacy.id,
-                name: pharmacy.name,
-                code: pharmacy.code,
-                status: pharmacy.status,
+                id: createdOrg.id,
+                name: createdOrg.name,
+                code: createdOrg.code,
+                status: createdOrg.isActive ? 'active' : 'inactive',
               }
             : null,
         });
@@ -443,7 +470,8 @@ export function createAdminController(
 
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
         const userRepo = dataSource.getRepository(User);
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
+        const extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
 
         const application = await applicationRepo.findOne({
           where: { id },
@@ -462,10 +490,13 @@ export function createAdminController(
           where: { id: application.userId },
         });
 
-        // Get pharmacy if exists
-        const pharmacy = await pharmacyRepo.findOne({
+        // Get pharmacy (organization) if exists
+        const pharmacy = await orgRepo.findOne({
           where: { created_by_user_id: application.userId },
         });
+        const extension = pharmacy
+          ? await extRepo.findOne({ where: { organization_id: pharmacy.id } })
+          : null;
 
         res.json({
           success: true,
@@ -496,11 +527,11 @@ export function createAdminController(
                 code: pharmacy.code,
                 address: pharmacy.address,
                 phone: pharmacy.phone,
-                email: pharmacy.email,
-                ownerName: pharmacy.owner_name,
+                email: null, // GAP: email not yet migrated
+                ownerName: extension?.owner_name || null,
                 businessNumber: pharmacy.business_number,
-                status: pharmacy.status,
-                createdAt: pharmacy.created_at,
+                status: pharmacy.isActive ? 'active' : 'inactive',
+                createdAt: pharmacy.createdAt,
               }
             : null,
         });

@@ -16,7 +16,7 @@ import type { ForumQueryService } from '../../../modules/forum/index.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
-import { KpaOrganization } from '../entities/kpa-organization.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import { KpaOrganizationJoinRequest } from '../entities/kpa-organization-join-request.entity.js';
@@ -157,7 +157,7 @@ export function createOperatorSummaryController(
    * Operator scope에서 직접 조회.
    */
   router.get('/district-summary', asyncHandler(async (req: Request, res: Response) => {
-    const orgRepo = dataSource.getRepository(KpaOrganization);
+    const orgRepo = dataSource.getRepository(OrganizationStore);
     const memberRepo = dataSource.getRepository(KpaMember);
     const appRepo = dataSource.getRepository(KpaApplication);
     const joinReqRepo = dataSource.getRepository(KpaOrganizationJoinRequest);
@@ -172,8 +172,8 @@ export function createOperatorSummaryController(
       pendingApprovals,
       pendingJoinResult,
     ] = await Promise.all([
-      orgRepo.count({ where: { type: 'branch', is_active: true } }),
-      orgRepo.count({ where: { type: 'group', is_active: true } }),
+      orgRepo.count({ where: { type: 'branch', isActive: true } }),
+      orgRepo.count({ where: { type: 'group', isActive: true } }),
       memberRepo.count({ where: { status: 'active' } }),
       appRepo.count({ where: { status: 'submitted' } }),
       joinReqRepo

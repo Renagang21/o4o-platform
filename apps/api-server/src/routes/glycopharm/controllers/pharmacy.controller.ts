@@ -13,7 +13,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
@@ -58,7 +58,7 @@ export function createPharmacyController(
         }
 
         // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
         const pharmacy = await pharmacyRepo.findOne({
           where: { created_by_user_id: userId },
         });

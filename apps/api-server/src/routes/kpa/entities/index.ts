@@ -27,3 +27,6 @@ export * from './kpa-store-asset-control.entity.js';
 export * from './kpa-store-content.entity.js';
 // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
 export * from './kpa-pharmacy-request.entity.js';
+// WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase B-1a
+export { OrganizationStore } from './organization-store.entity.js';
+export { OrganizationServiceEnrollment } from './organization-service-enrollment.entity.js';

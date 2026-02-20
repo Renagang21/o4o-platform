@@ -85,7 +85,7 @@ import { createLayoutController } from '../glycopharm/controllers/layout.control
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
-import { KpaOrganization } from './entities/kpa-organization.entity.js';
+import { OrganizationStore } from './entities/organization-store.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
@@ -206,7 +206,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1
-  // PK 공유(glycopharm_pharmacies.id === kpa_organizations.id) 기반
+  // organizations 테이블 단일 참조 (Phase C 전환 완료)
   // Tablet/Blog/Template 채널을 KPA 네임스페이스에서 제공
   // /api/v1/kpa/stores/:slug/tablet|blog|template
   // ============================================================================
@@ -241,7 +241,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       return;
     }
 
-    const orgRepo = dataSource.getRepository(KpaOrganization);
+    const orgRepo = dataSource.getRepository(OrganizationStore);
     const org = await orgRepo.findOne({ where: { id: member.organization_id } });
 
     res.json({
@@ -251,7 +251,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         organizationId: member.organization_id,
         organizationType: org?.type || null,
         organizationName: org?.name || null,
-        parentId: org?.parent_id || null,
+        parentId: org?.parentId || null,
         role: member.role,
         status: member.status,
       },

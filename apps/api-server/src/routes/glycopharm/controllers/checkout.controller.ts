@@ -21,7 +21,7 @@ import { DataSource, In, Brackets } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import {
   EcommerceOrder,
   EcommerceOrderItem,
@@ -224,7 +224,7 @@ export function createCheckoutController(
 ): Router {
   const router = Router();
 
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
 
   /**
@@ -273,7 +273,7 @@ export function createCheckoutController(
         // 1. 약국 검증 (트랜잭션 외부 — 읽기 전용)
         // ================================================================
         const pharmacy = await pharmacyRepo.findOne({
-          where: { id: dto.pharmacyId, status: 'active' },
+          where: { id: dto.pharmacyId, isActive: true },
         });
 
         if (!pharmacy) {

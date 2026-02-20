@@ -5,8 +5,9 @@
  * Data Transfer Objects for API requests/responses
  */
 
-import { GlycopharmPharmacyStatus } from '../entities/glycopharm-pharmacy.entity.js';
 import { GlycopharmProductStatus, GlycopharmProductCategory } from '../entities/glycopharm-product.entity.js';
+
+export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
 
 // ============================================================================
 // Error Response

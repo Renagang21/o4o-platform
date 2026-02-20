@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaOrganization, KpaOrganizationType } from '../entities/index.js';
+import { OrganizationStore } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -29,7 +29,7 @@ export function createOrganizationController(
   requireScope: ScopeMiddleware
 ): Router {
   const router = Router();
-  const orgRepo = dataSource.getRepository(KpaOrganization);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
 
   /**
    * GET /kpa/organizations
@@ -46,13 +46,13 @@ export function createOrganizationController(
       }
 
       if (parent_id) {
-        qb.andWhere('org.parent_id = :parent_id', { parent_id });
+        qb.andWhere('org.parentId = :parent_id', { parent_id });
       } else if (parent_id === 'null') {
-        qb.andWhere('org.parent_id IS NULL');
+        qb.andWhere('org.parentId IS NULL');
       }
 
       if (active_only === 'true') {
-        qb.andWhere('org.is_active = true');
+        qb.andWhere('org.isActive = true');
       }
 
       qb.orderBy('org.type', 'ASC').addOrderBy('org.name', 'ASC');
@@ -116,18 +116,28 @@ export function createOrganizationController(
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
         // 상위 조직 검증
+        let parentOrg: OrganizationStore | null = null;
         if (req.body.parent_id) {
-          const parent = await orgRepo.findOne({ where: { id: req.body.parent_id } });
-          if (!parent) {
+          parentOrg = await orgRepo.findOne({ where: { id: req.body.parent_id } });
+          if (!parentOrg) {
             res.status(400).json({ error: { code: 'INVALID_PARENT', message: 'Parent organization not found' } });
             return;
           }
         }
 
+        // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1: organizations 테이블 필수 필드 생성
+        const nameSlug = req.body.name.replace(/[^a-zA-Z0-9가-힣]/g, '').toLowerCase();
+        const code = `kpa-${nameSlug}-${Date.now()}`.substring(0, 100);
+        const path = parentOrg ? `${parentOrg.path}.${nameSlug}` : nameSlug;
+        const level = parentOrg ? parentOrg.level + 1 : 0;
+
         const org = orgRepo.create({
           name: req.body.name,
-          type: req.body.type as KpaOrganizationType,
-          parent_id: req.body.parent_id || null,
+          code,
+          type: req.body.type,
+          parentId: req.body.parent_id || null,
+          path,
+          level,
           description: req.body.description || null,
           address: req.body.address || null,
           phone: req.body.phone ? req.body.phone.replace(/\D/g, '') : null,
@@ -171,7 +181,7 @@ export function createOrganizationController(
         if (req.body.description !== undefined) org.description = req.body.description;
         if (req.body.address !== undefined) org.address = req.body.address;
         if (req.body.phone !== undefined) org.phone = req.body.phone ? req.body.phone.replace(/\D/g, '') : req.body.phone;
-        if (req.body.is_active !== undefined) org.is_active = req.body.is_active;
+        if (req.body.is_active !== undefined) org.isActive = req.body.is_active;
 
         const saved = await orgRepo.save(org);
         res.json({ data: saved });

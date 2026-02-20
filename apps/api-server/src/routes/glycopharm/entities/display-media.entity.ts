@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 
 export type MediaSourceType = 'youtube' | 'vimeo';
 
@@ -24,9 +24,9 @@ export class DisplayMedia {
   @Column({ type: 'uuid', nullable: true })
   pharmacy_id?: string;
 
-  @ManyToOne('GlycopharmPharmacy', { nullable: true })
+  @ManyToOne('OrganizationStore', { nullable: true })
   @JoinColumn({ name: 'pharmacy_id' })
-  pharmacy?: GlycopharmPharmacy;
+  pharmacy?: OrganizationStore;
 
   @Column({ type: 'varchar', length: 200 })
   name!: string;

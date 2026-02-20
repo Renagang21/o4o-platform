@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaApplication, KpaOrganization, KpaApplicationType, KpaAuditLog } from '../entities/index.js';
+import { KpaApplication, OrganizationStore, KpaApplicationType, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import { emailService } from '../../../services/email.service.js';
@@ -34,7 +34,7 @@ export function createApplicationController(
 ): Router {
   const router = Router();
   const appRepo = dataSource.getRepository(KpaApplication);
-  const orgRepo = dataSource.getRepository(KpaOrganization);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   /**
