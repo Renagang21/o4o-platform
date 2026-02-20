@@ -123,10 +123,6 @@ import { getDefaultRouteByRole } from './lib/auth-utils';
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
 
-// Debug Pages (CLAUDE.md Section 14)
-import { ApiDebugPage } from './pages/debug/ApiDebugPage';
-import { PharmacyGateDebugPage } from './pages/debug/PharmacyGateDebugPage';
-
 // Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
 import { TabletStorePage } from './pages/tablet/TabletStorePage';
 
@@ -316,10 +312,6 @@ function App() {
           <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
-
-          {/* Debug Pages (CLAUDE.md Section 14) */}
-          <Route path="/__debug__/api" element={<ApiDebugPage />} />
-          <Route path="/__debug__/pharmacy-gate" element={<PharmacyGateDebugPage />} />
 
           {/* Test Center (WO-KPA-A-TEST-CENTER-PHASE1-MAIN-PAGE-V1) */}
           <Route path="/test" element={<TestCenterPage />} />
